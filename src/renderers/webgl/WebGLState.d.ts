@@ -1,6 +1,7 @@
 import { CullFace, Blending, BlendingEquation, BlendingSrcFactor, BlendingDstFactor, DepthModes } from '../../constants';
 import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLExtensions } from './WebGLExtensions';
+import { WebGLUniformsGroups } from './WebGLUniformsGroups';
 import { Material } from '../../materials/Material';
 import { Vector4 } from '../../math/Vector4';
 
@@ -73,47 +74,49 @@ export class WebGLState {
   bindTexture(webglType: number, webglTexture: any): void;
   // Same interface as https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/compressedTexImage2D
   compressedTexImage2D(
-    target: number, 
-    level: number, 
-    internalformat: number, 
-    width: number, 
-    height: number, 
-    border: number, 
+    target: number,
+    level: number,
+    internalformat: number,
+    width: number,
+    height: number,
+    border: number,
     data: ArrayBufferView
   ): void;
   // Same interface as https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
   texImage2D(
-    target: number, 
-    level: number, 
-    internalformat: number, 
-    width: number, 
-    height: number, 
-    border: number, 
-    format: number, 
-    type: number, 
+    target: number,
+    level: number,
+    internalformat: number,
+    width: number,
+    height: number,
+    border: number,
+    format: number,
+    type: number,
     pixels: ArrayBufferView | null
   ): void;
   texImage2D(
-    target: number, 
-    level: number, 
-    internalformat: number, 
-    format: number, 
-    type: number, 
+    target: number,
+    level: number,
+    internalformat: number,
+    format: number,
+    type: number,
     source: any
   ): void;
   texImage3D(
-    target: number, 
-    level: number, 
-    internalformat: number, 
-    width: number, 
-    height: number, 
-    depth: number, 
-    border: number, 
-    format: number, 
-    type: number, 
+    target: number,
+    level: number,
+    internalformat: number,
+    width: number,
+    height: number,
+    depth: number,
+    border: number,
+    format: number,
+    type: number,
     pixels: any
   ): void;
   scissor(scissor: Vector4): void;
   viewport(viewport: Vector4): void;
   reset(): void;
+  updateUBOMapping(uniformsGroup: UniformsGroup, program: any): void;
+  uniformBlockBinding(uniformsGroup: UniformsGroup, program: any): void;
 }

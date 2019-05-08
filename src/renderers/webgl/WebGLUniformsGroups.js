@@ -2,24 +2,21 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function WebGLUniformsGroups( gl, info, capabilities ) {
+function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	var buffers = {};
 	var updateList = {};
 
 	var allocatedBindingPoints = [];
-	var maxBindingPoints = ( capabilities.isWebGL2 ) ? gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ) : null; // binding points are global whereas block indices are per shader program
+	var maxBindingPoints = ( capabilities.isWebGL2 ) ? gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ) : 0; // binding points are global whereas block indices are per shader program
 
 	function bind( uniformsGroup, program ) {
 
-		// bind shader specific block index to global block point
-
-		var blockIndex = gl.getUniformBlockIndex( program, uniformsGroup.name );
-		gl.uniformBlockBinding( program, blockIndex, uniformsGroup.__bindingPointIndex );
+		state.uniformBlockBinding( uniformsGroup, program );
 
 	}
 
-	function update( uniformsGroup ) {
+	function update( uniformsGroup, program ) {
 
 		var buffer = buffers[ uniformsGroup.id ];
 
@@ -33,6 +30,10 @@ function WebGLUniformsGroups( gl, info, capabilities ) {
 			uniformsGroup.addEventListener( 'dispose', onUniformsGroupsDispose );
 
 		}
+
+		// ensure to update the binding points/block indices mapping for this program
+
+		state.updateUBOMapping( uniformsGroup, program );
 
 		// update UBO once per frame
 

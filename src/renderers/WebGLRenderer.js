@@ -287,7 +287,7 @@ function WebGLRenderer( parameters ) {
 		programCache = new WebGLPrograms( _this, extensions, capabilities, textures );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
-		uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities );
+		uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );
 
 		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
@@ -1993,7 +1993,7 @@ function WebGLRenderer( parameters ) {
 
 					var group = groups[ i ];
 
-					uniformsGroups.update( group );
+					uniformsGroups.update( group, webglProgram );
 					uniformsGroups.bind( group, webglProgram );
 
 				} else {
