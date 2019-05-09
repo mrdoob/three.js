@@ -223,11 +223,6 @@ THREE.LDrawLoader = ( function () {
 		// If not (the default), only one object which contains all the merged primitives will be created.
 		this.separateObjects = false;
 
-		// Current merged object and primitives
-		this.currentGroupObject = null;
-		this.currentTriangles = null;
-		this.currentLineSegments = null;
-
 	}
 
 	// Special surface finish tag types.
@@ -337,22 +332,45 @@ THREE.LDrawLoader = ( function () {
 
 				function finalizeObject() {
 
-					if ( ! scope.separateObjects && ! parentParseScope.isFromParse ) {
+					// TODO: Handle smoothing
+					if ( scope.separateObjects && parseScope.type === 'Part' || ! parentParseScope.isFromParse ) {
 
-						// We are finalizing the root object and merging primitives is activated, so create the entire Mesh and LineSegments objects now
-						if ( scope.currentLineSegments.length > 0 ) {
+						const objGroup = parseScope.groupObject;
+						if ( parseScope.lineSegments.length > 0 ) {
 
-							objGroup.add( createObject( scope.currentLineSegments, 2 ) );
+							objGroup.add( createObject( parseScope.lineSegments, 2 ) );
+
+						}
+
+						if ( parseScope.optionalSegments.length > 0 ) {
+
+							objGroup.add( createObject( parseScope.optionalSegments, 2 ) );
 
 						}
 
-						if ( scope.currentTriangles.length > 0 ) {
+						if ( parseScope.triangles.length > 0 ) {
 
-							objGroup.add( createObject( scope.currentTriangles, 3 ) );
+							objGroup.add( createObject( parseScope.triangles, 3 ) );
 
 						}
+
+						if ( parentParseScope.groupObject ) {
+
+							parentParseScope.groupObject.add( objGroup );
+
+						}
+
+					} else {
+
+						// TODO: we need to multiple matrices here
+						// TODO: First, instead of tracking matrices anywhere else we
+						// should just multiple everything here.
+						parentParseScope.lineSegments.push( ...parseScope.lineSegments );
+						parentParseScope.optionalSegments.push( ...parseScope.optionalSegments );
+						parentParseScope.triangles.push( ...parseScope.triangles );
 
 					}
+
 
 					scope.removeScopeLevel();
 
@@ -536,8 +554,6 @@ THREE.LDrawLoader = ( function () {
 
 			this.materials = materials;
 
-			this.currentGroupObject = null;
-
 			return this;
 
 		},
@@ -589,7 +605,11 @@ THREE.LDrawLoader = ( function () {
 				currentMatrix: new THREE.Matrix4(),
 
 				// If false, it is a root material scope previous to parse
-				isFromParse: true
+				isFromParse: true,
+
+				triangles: null,
+				lineSegments: null,
+				optionalSegments: null,
 			};
 
 			this.parseScopesStack.push( newParseScope );
@@ -932,26 +952,7 @@ THREE.LDrawLoader = ( function () {
 			// Parse result variables
 			var triangles;
 			var lineSegments;
-
-			if ( this.separateObjects ) {
-
-				triangles = [];
-				lineSegments = [];
-
-			} else {
-
-				if ( this.currentGroupObject === null ) {
-
-					this.currentGroupObject = new THREE.Group();
-					this.currentTriangles = [];
-					this.currentLineSegments = [];
-
-				}
-
-				triangles = this.currentTriangles;
-				lineSegments = this.currentLineSegments;
-
-			}
+			var optionalSegments;
 
 			var subobjects = [];
 
@@ -972,6 +973,12 @@ THREE.LDrawLoader = ( function () {
 			var parsingEmbeddedFiles = false;
 			var currentEmbeddedFileName = null;
 			var currentEmbeddedText = null;
+
+			var bfcCertified = false;
+			var bfcCCW = true;
+			var bfcInverted = false;
+			var bfcCull = true;
+			var type = '';
 
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
@@ -1016,11 +1023,6 @@ THREE.LDrawLoader = ( function () {
 				return v;
 
 			}
-
-			var bfcCertified = false;
-			var bfcCCW = true;
-			var bfcInverted = false;
-			var bfcCull = true;
 
 			// Parse all line commands
 			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -1075,6 +1077,26 @@ THREE.LDrawLoader = ( function () {
 						if ( meta ) {
 
 							switch ( meta ) {
+
+								case '!LDRAW_ORG':
+
+									type = lp.getToken();
+
+									if ( ! parsingEmbeddedFiles ) {
+
+										currentParseScope.triangles = [];
+										currentParseScope.lineSegments = [];
+										currentParseScope.optionalSegments = [];
+										currentParseScope.groupObject = new THREE.Group();
+
+										triangles = currentParseScope.triangles;
+										lineSegments = currentParseScope.lineSegments;
+										optionalSegments = currentParseScope.optionalSegments;
+										currentParseScope.type = type;
+
+									}
+
+									break;
 
 								case '!COLOUR':
 
@@ -1261,11 +1283,13 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					// Line type 2: Line segment
+					case '5':
 					case '2':
 
 						var material = parseColourCode( lp, true );
+						var arr = lineType === '2' ? lineSegments : optionalSegments;
 
-						lineSegments.push( {
+						arr.push( {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
@@ -1403,40 +1427,12 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			//
-
-			var groupObject = null;
-
-			if ( this.separateObjects ) {
-
-				groupObject = new THREE.Group();
-
-				if ( lineSegments.length > 0 ) {
-
-					groupObject.add( createObject( lineSegments, 2 ) );
-
-
-				}
-
-				if ( triangles.length > 0 ) {
-
-					groupObject.add( createObject( triangles, 3 ) );
-
-				}
-
-			} else {
-
-				groupObject = this.currentGroupObject;
-
-			}
-
+			const groupObject = currentParseScope.groupObject;
 			groupObject.userData.category = category;
 			groupObject.userData.keywords = keywords;
 			groupObject.userData.subobjects = subobjects;
 
-			//console.timeEnd( 'LDrawLoader' );
-
-			return groupObject;
+			return currentParseScope.groupObject;
 
 		}
 
