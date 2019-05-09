@@ -63,8 +63,6 @@
 				camera.position.y = 150;
 				camera.position.z = 500;
 
-				controls = new THREE.TrackballControls( camera );
-
 				scene = new THREE.Scene();
 
 				var light = new THREE.PointLight( 0xffffff );
@@ -75,7 +73,7 @@
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true }) );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
 				scene.add( sphere );
 
 				// Plane
@@ -97,6 +95,8 @@
 				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
 
 				document.body.appendChild( effect.domElement );
+
+				controls = new THREE.TrackballControls( camera, effect.domElement );
 
 				//
 

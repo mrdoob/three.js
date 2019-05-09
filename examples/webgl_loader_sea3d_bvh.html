@@ -51,7 +51,7 @@
 
 		<script src="js/loaders/BVHLoader.js"></script>
 		<script src="js/utils/SkeletonUtils.js"></script>
-		
+
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -98,7 +98,7 @@
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				new THREE.OrbitControls( camera );
+				new THREE.OrbitControls( camera, renderer.domElement );
 
 				// get meshes
 				player = loader.getMesh( "Player" );

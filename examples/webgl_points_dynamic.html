@@ -135,8 +135,8 @@
 
 				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
 				composer = new THREE.EffectComposer( renderer );
 
@@ -156,17 +156,16 @@
 
 			function onWindowResize() {
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				camera.lookAt( scene.position );
 
-				composer.reset();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
 			}
 

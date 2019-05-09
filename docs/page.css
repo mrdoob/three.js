@@ -1,16 +1,25 @@
 @font-face {
-	font-family: 'inconsolata';
-	src: url('files/inconsolata.woff') format('woff');
+	font-family: 'RobotoMono';
+	src: local('RobotoMono'), url('../files/RobotoMono-Regular.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'SF-Pro-Text';
+	src: local('SF-Pro-Text'), url('../files/SF-Pro-Text-Regular.otf');
 	font-weight: normal;
 	font-style: normal;
 }
 
 body {
-	margin: 30px 20px;
+	margin: 78px auto;
+	padding: 0px 24px;
+	max-width: 780px;
 	color: #555;
-	font-family: 'inconsolata';
-	font-size: 15px;
-	line-height: 18px;
+	font-family: 'SF-Pro-Text', sans-serif;
+	font-size: 16px;
+	line-height: 23px;
 	tab-size: 4;
 	overflow: auto;
 }
@@ -22,19 +31,18 @@ a {
 }
 
 h1 {
-	color: #333;
-	font-size: 25px;
+	color: #049EF4;
+	font-size: 32px;
 	font-weight: normal;
-
-	margin-top: 10px;
+	line-height: 42px;
 }
 
 h2 {
 	color: #4B0;
-	font-size: 18px;
-	font-weight: normal;
 
-	margin-top: 40px;
+	font-size: 22px;
+	font-weight: normal;
+	line-height: 31px;
 }
 
 h3 {
@@ -67,9 +75,6 @@ pre, code {
 
 code {
 	display: block;
-	width: -webkit-calc( 100% - 40px );
-	width: -moz-calc( 100% - 40px );
-	width: calc( 100% - 40px );
 	padding: 20px;
 	white-space: pre-wrap;
 	background-color: #f9f9f9;
@@ -104,18 +109,25 @@ strong {
 
 #button {
 	position: fixed;
-	top: 20px;
-	right: 20px;
+	bottom: 16px;
+	right: 16px;
+
 	padding: 8px;
-	color: #fff;
-	background-color: #555;
-	opacity: 0.5;
+	border-radius: 50%;
+	margin-bottom: 0px; /* TODO div sets it to 20px */
+
+	background-color: #dddddd;
+	opacity: 0.4;
 }
 
-#button:hover {
-	cursor: pointer;
-	opacity: 1;
-}
+	#button:hover {
+		cursor: pointer;
+		opacity: 1;
+	}
+
+	#button img {
+		display: block;
+	}
 
 a.permalink {
 	float: right;
@@ -140,4 +152,25 @@ sup, sub {
 
 sub {
 	top: 0.4em;
+}
+
+/* mobile */
+
+@media all and ( max-width: 640px ) {
+
+	body {
+		margin: 14px auto;
+		padding: 0px 14px;
+		font-size: 14px;
+		line-height: 22px;
+	}
+
+	h1 {
+		font-size: 26px;
+	}
+
+	h2 {
+		font-size: 18px;
+		line-height: 25px;
+	}
 }

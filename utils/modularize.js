@@ -23,6 +23,7 @@ var files = [
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
+	{ path: 'loaders/STLLoader.js', ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
@@ -143,4 +144,4 @@ function convert( path, ignoreList ) {
 
 	fs.writeFileSync( dstFolder + path, output, 'utf-8' );
 
-};
+}

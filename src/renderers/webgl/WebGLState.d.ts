@@ -1,39 +1,43 @@
-import { CullFace } from '../../constants';
+import { CullFace, Blending, BlendingEquation, BlendingSrcFactor, BlendingDstFactor, DepthModes } from '../../constants';
+import { WebGLCapabilities } from './WebGLCapabilities';
+import { WebGLExtensions } from './WebGLExtensions';
+import { Material } from '../../materials/Material';
+import { Vector4 } from '../../math/Vector4';
 
 export class WebGLColorBuffer {
-  constructor(gl: any, state: any);
+  constructor();
 
-  setMask(colorMask: number): void;
+  setMask(colorMask: boolean): void;
   setLocked(lock: boolean): void;
-  setClear(r: number, g: number, b: number, a: number): void;
+  setClear(r: number, g: number, b: number, a: number, premultipliedAlpha: boolean): void;
   reset(): void;
 }
 
 export class WebGLDepthBuffer {
-  constructor(gl: any, state: any);
+  constructor();
 
   setTest(depthTest: boolean): void;
-  setMask(depthMask: number): void;
-  setFunc(depthFunc: number): void;
+  setMask(depthMask: boolean): void;
+  setFunc(depthFunc: DepthModes): void;
   setLocked(lock: boolean): void;
-  setClear(depth: any): void;
+  setClear(depth: number): void;
   reset(): void;
 }
 
 export class WebGLStencilBuffer {
-  constructor(gl: any, state: any);
+  constructor();
 
   setTest(stencilTest: boolean): void;
   setMask(stencilMask: number): void;
-  setFunc(stencilFunc: number, stencilRef: any, stencilMask: number): void;
-  setOp(stencilFail: any, stencilZFail: any, stencilZPass: any): void;
+  setFunc(stencilFunc: number, stencilRef: number, stencilMask: number): void;
+  setOp(stencilFail: number, stencilZFail: number, stencilZPass: number): void;
   setLocked(lock: boolean): void;
-  setClear(stencil: any): void;
+  setClear(stencil: number): void;
   reset(): void;
 }
 
 export class WebGLState {
-  constructor(gl: any, extensions: any, paramThreeToGL: Function);
+  constructor(gl: WebGLRenderingContext, extensions: WebGLExtensions, utils: any, capabilities: WebGLCapabilities);
 
   buffers: {
     color: WebGLColorBuffer;
@@ -41,56 +45,75 @@ export class WebGLState {
     stencil: WebGLStencilBuffer;
   };
 
-  init(): void;
   initAttributes(): void;
-  enableAttribute(attribute: string): void;
-  enableAttributeAndDivisor(
-    attribute: string,
-    meshPerAttribute: any,
-    extension: any
-  ): void;
+  enableAttribute(attribute: number): void;
+  enableAttributeAndDivisor(attribute: number, meshPerAttribute: number): void;
   disableUnusedAttributes(): void;
-  enable(id: string): void;
-  disable(id: string): void;
-  getCompressedTextureFormats(): any[];
+  enable(id: number): void;
+  disable(id: number): void;
+  getCompressedTextureFormats(): number[];
+  useProgram(program: any): boolean;
   setBlending(
-    blending: number,
-    blendEquation?: number,
-    blendSrc?: number,
-    blendDst?: number,
-    blendEquationAlpha?: number,
-    blendSrcAlpha?: number,
-    blendDstAlpha?: number,
+    blending: Blending,
+    blendEquation?: BlendingEquation,
+    blendSrc?: BlendingSrcFactor,
+    blendDst?: BlendingDstFactor,
+    blendEquationAlpha?: BlendingEquation,
+    blendSrcAlpha?: BlendingSrcFactor,
+    blendDstAlpha?: BlendingDstFactor,
     premultiplyAlpha?: boolean
   ): void;
-  setColorWrite(colorWrite: number): void;
-  setDepthTest(depthTest: number): void;
-  setDepthWrite(depthWrite: number): void;
-  setDepthFunc(depthFunc: Function): void;
-  setStencilTest(stencilTest: boolean): void;
-  setStencilWrite(stencilWrite: any): void;
-  setStencilFunc(
-    stencilFunc: Function,
-    stencilRef: any,
-    stencilMask: number
-  ): void;
-  setStencilOp(stencilFail: any, stencilZFail: any, stencilZPass: any): void;
-  setFlipSided(flipSided: number): void;
+  setMaterial(material: Material, frontFaceCW: boolean): void;
+  setFlipSided(flipSided: boolean): void;
   setCullFace(cullFace: CullFace): void;
   setLineWidth(width: number): void;
-  setPolygonOffset(polygonoffset: number, factor: number, units: number): void;
+  setPolygonOffset(polygonoffset: boolean, factor: number, units: number): void;
   setScissorTest(scissorTest: boolean): void;
-  getScissorTest(): boolean;
-  activeTexture(webglSlot: any): void;
-  bindTexture(webglType: any, webglTexture: any): void;
+  activeTexture(webglSlot: number): void;
+  bindTexture(webglType: number, webglTexture: any): void;
   // Same interface as https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/compressedTexImage2D
-  compressedTexImage2D(): void;
+  compressedTexImage2D(
+    target: number, 
+    level: number, 
+    internalformat: number, 
+    width: number, 
+    height: number, 
+    border: number, 
+    data: ArrayBufferView
+  ): void;
   // Same interface as https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
-  texImage2D(): void;
-  clearColor(r: number, g: number, b: number, a: number): void;
-  clearDepth(depth: number): void;
-  clearStencil(stencil: any): void;
-  scissor(scissor: any): void;
-  viewport(viewport: any): void;
+  texImage2D(
+    target: number, 
+    level: number, 
+    internalformat: number, 
+    width: number, 
+    height: number, 
+    border: number, 
+    format: number, 
+    type: number, 
+    pixels: ArrayBufferView | null
+  ): void;
+  texImage2D(
+    target: number, 
+    level: number, 
+    internalformat: number, 
+    format: number, 
+    type: number, 
+    source: any
+  ): void;
+  texImage3D(
+    target: number, 
+    level: number, 
+    internalformat: number, 
+    width: number, 
+    height: number, 
+    depth: number, 
+    border: number, 
+    format: number, 
+    type: number, 
+    pixels: any
+  ): void;
+  scissor(scissor: Vector4): void;
+  viewport(viewport: Vector4): void;
   reset(): void;
 }

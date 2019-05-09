@@ -85,6 +85,15 @@ export interface WebGLRendererParameters {
   logarithmicDepthBuffer?: boolean;
 }
 
+export interface WebGLDebug {
+
+  /**
+   * Enables error checking and reporting when shader programs are being compiled.
+   */
+  checkShaderErrors: boolean;
+
+}
+
 /**
  * The WebGL renderer displays your beautifully crafted scenes using WebGL, if your device supports it.
  * This renderer has way better performance than CanvasRenderer.
@@ -127,6 +136,11 @@ export class WebGLRenderer implements Renderer {
    * If autoClear is true, defines whether the renderer should clear the stencil buffer. Default is true.
    */
   autoClearStencil: boolean;
+
+  /**
+   * Debug configurations.
+   */
+  debug: WebGLDebug;
 
   /**
    * Defines whether the renderer should sort objects. Default is true.
@@ -315,6 +329,14 @@ export class WebGLRenderer implements Renderer {
    * @deprecated Use {@link WebGLRenderer#setAnimationLoop .setAnimationLoop()} instead.
    */
   animate(callback: Function): void;
+
+  /**
+   * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
+   */
+  compile(
+    scene: Scene,
+    camera: Camera
+  ): void;
 
   /**
    * Render a scene using a camera.

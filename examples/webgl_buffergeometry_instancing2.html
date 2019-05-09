@@ -116,8 +116,6 @@
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 			camera.position.z = 4;
 
-			controls = new THREE.TrackballControls( camera );
-
 			scene = new THREE.Scene();
 
 			//
@@ -203,6 +201,8 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
+
+			controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 

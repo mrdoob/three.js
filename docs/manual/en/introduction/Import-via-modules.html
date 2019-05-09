@@ -62,11 +62,72 @@
 		...
 		</code>
 
-		<h2>Caveats</h2>
-
+		<h2>Importable Examples</h2>
 		<p>
-			Currently it's not possible to import the files within the "examples/js" directory in this way.
-			This is due to some of the files relying on global namespace pollution of THREE. For more information see <a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>.
+			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
+			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
+			for their project. However, most of these files are not modules which makes their usage in certain cases inconvenient. In order to address this issue,
+			we are working to provide all the examples as modules in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory.
+			If you install three.js via npm, you can import them like so:
+		</p>
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		</code>
+		<p>
+			The following examples files are already available as modules:
+			<ul>
+				<li>controls
+					<ul>
+						<li>MapControls</li>
+						<li>OrbitControls</li>
+						<li>TrackballControls</li>
+					</ul>
+				</li>
+				<li>exporters
+					<ul>
+						<li>ColladaExporter</li>
+						<li>GLTFExporter</li>
+						<li>MMDExporter</li>
+						<li>OBJExporter</li>
+						<li>PLYExporter</li>
+						<li>STLExporter</li>
+						<li>TypedGeometryExporter</li>
+					</ul>
+				</li>
+				<li>loaders
+					<ul>
+						<li>GLTFLoader</li>
+						<li>MTLLoader</li>
+						<li>OBJLoader</li>
+						<li>STLLoader</li>
+					</ul>
+				</li>
+				<li>pmrem
+					<ul>
+						<li>PMREMCubeUVPacker</li>
+						<li>PMREMGenerator</li>
+					</ul>
+				</li>
+				<li>utils
+					<ul>
+						<li>BufferGeometryUtils</li>
+						<li>GeometryUtils</li>
+						<li>MathUtils</li>
+						<li>SceneUtils</li>
+						<li>ShadowMapViewer</li>
+						<li>SkeletonUtils</li>
+						<li>TypedArrayUtils</li>
+						<li>UVsDebug</li>
+					</ul>
+				</li>
+			</ul>
+		</p>
+		<p>
+			Note: When using code from the examples directory, it's important that all files match the version of
+			your three.js main file. For example it's no good approach to use *GLTFLoader* and *OrbitControls* from R96 together
+			with three.js R103. You can easily keep your files in sync by using the modules from the JSM directory. If the file
+			is not available as a module, you can still use third-party npm packages or convert the file to a module by yourself.
+			In both cases, ensure the code is compatible with your three.js main file.
 		</p>
 	</body>
 </html>

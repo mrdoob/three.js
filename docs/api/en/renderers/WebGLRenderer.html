@@ -92,6 +92,15 @@
 			Default is *true*.
 		</p>
 
+		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<p>
+			If [page:.checkShaderErrors checkShaderErrors] is true, defines whether material shader programs are checked
+			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
+			It is strongly recommended to keep these checks enabled during development.
+			If the shader does not compile and link - it will not work and associated material will not render.
+			Default is *true*.
+		</p>
+
 		<h3>[property:Object capabilities]</h3>
 		<p>
 		An object containing details about the capabilities of the current [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext].<br />
@@ -416,7 +425,7 @@
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
+		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>

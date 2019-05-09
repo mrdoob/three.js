@@ -45,8 +45,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 100;
 
-				controls = new THREE.TrackballControls( camera );
-
 				// scene
 
 				scene = new THREE.Scene();
@@ -100,6 +98,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				//
 

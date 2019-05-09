@@ -583,8 +583,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl, renderer.debug.checkShaderErrors );
+	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl, renderer.debug.checkShaderErrors );
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );
@@ -604,56 +604,61 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	var programLog = gl.getProgramInfoLog( program ).trim();
-	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+	// check for link errors
+	if ( renderer.debug.checkShaderErrors ) {
 
-	var runnable = true;
-	var haveDiagnostics = true;
+		var programLog = gl.getProgramInfoLog( program ).trim();
+		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
-	// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
-	// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
+		var runnable = true;
+		var haveDiagnostics = true;
 
-	if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
-		runnable = false;
+		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-		console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
+			runnable = false;
 
-	} else if ( programLog !== '' ) {
+			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
 
-		console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
+		} else if ( programLog !== '' ) {
 
-	} else if ( vertexLog === '' || fragmentLog === '' ) {
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
 
-		haveDiagnostics = false;
+		} else if ( vertexLog === '' || fragmentLog === '' ) {
 
-	}
+			haveDiagnostics = false;
 
-	if ( haveDiagnostics ) {
+		}
 
-		this.diagnostics = {
+		if ( haveDiagnostics ) {
 
-			runnable: runnable,
-			material: material,
+			this.diagnostics = {
 
-			programLog: programLog,
+				runnable: runnable,
+				material: material,
 
-			vertexShader: {
+				programLog: programLog,
 
-				log: vertexLog,
-				prefix: prefixVertex
+				vertexShader: {
 
-			},
+					log: vertexLog,
+					prefix: prefixVertex
 
-			fragmentShader: {
+				},
 
-				log: fragmentLog,
-				prefix: prefixFragment
+				fragmentShader: {
 
-			}
+					log: fragmentLog,
+					prefix: prefixFragment
 
-		};
+				}
+
+			};
+
+		}
 
 	}
 

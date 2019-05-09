@@ -129,6 +129,20 @@ var diffuseMaps = ( function () {
 
 } )();
 
+var roughnessMaps = ( function () {
+
+	var bricks = textureLoader.load( '../../examples/textures/brick_roughness.jpg' );
+	bricks.wrapT = THREE.RepeatWrapping;
+	bricks.wrapS = THREE.RepeatWrapping;
+	bricks.repeat.set( 9, 1 );
+
+	return {
+		none: null,
+		bricks: bricks
+	};
+
+} )();
+
 var matcaps = ( function () {
 
 	return {
@@ -152,10 +166,30 @@ var alphaMaps = ( function () {
 
 } )();
 
+var gradientMaps = ( function () {
+
+	var threeTone = textureLoader.load( '../../examples/textures/gradientMaps/threeTone.jpg' );
+	threeTone.minFilter = THREE.NearestFilter;
+	threeTone.magFilter = THREE.NearestFilter;
+
+	var fiveTone = textureLoader.load( '../../examples/textures/gradientMaps/fiveTone.jpg' );
+	fiveTone.minFilter = THREE.NearestFilter;
+	fiveTone.magFilter = THREE.NearestFilter;
+
+	return {
+		none: null,
+		threeTone: threeTone,
+		fiveTone: fiveTone
+	};
+
+} )();
+
 var envMapKeys = getObjectsKeys( envMaps );
 var diffuseMapKeys = getObjectsKeys( diffuseMaps );
+var roughnessMapKeys = getObjectsKeys( roughnessMaps );
 var matcapKeys = getObjectsKeys( matcaps );
 var alphaMapKeys = getObjectsKeys( alphaMaps );
+var gradientMapKeys = getObjectsKeys( gradientMaps );
 
 function generateVertexColors( geometry ) {
 
@@ -437,6 +471,25 @@ function guiMeshPhongMaterial( gui, mesh, material, geometry ) {
 
 }
 
+function guiMeshToonMaterial( gui, mesh, material ) {
+
+	var data = {
+		color: material.color.getHex(),
+		map: diffuseMapKeys[ 0 ],
+		gradientMap: gradientMapKeys[ 1 ],
+		alphaMap: alphaMapKeys[ 0 ]
+	};
+
+	var folder = gui.addFolder( 'THREE.MeshToonMaterial' );
+
+	folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
+
+	folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
+	folder.add( data, 'gradientMap', gradientMapKeys ).onChange( updateTexture( material, 'gradientMap', gradientMaps ) );
+	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
+
+}
+
 function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 
 	var data = {
@@ -444,6 +497,7 @@ function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 		emissive: material.emissive.getHex(),
 		envMaps: envMapKeys[ 0 ],
 		map: diffuseMapKeys[ 0 ],
+		roughnessMap: roughnessMapKeys[ 0 ],
 		alphaMap: alphaMapKeys[ 0 ]
 	};
 
@@ -461,9 +515,10 @@ function guiMeshStandardMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
+	folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
-	// TODO roughnessMap and metalnessMap
+	// TODO metalnessMap
 
 }
 
@@ -474,6 +529,7 @@ function guiMeshPhysicalMaterial( gui, mesh, material, geometry ) {
 		emissive: material.emissive.getHex(),
 		envMaps: envMapKeys[ 0 ],
 		map: diffuseMapKeys[ 0 ],
+		roughnessMap: roughnessMapKeys[ 0 ],
 		alphaMap: alphaMapKeys[ 0 ]
 	};
 
@@ -494,9 +550,10 @@ function guiMeshPhysicalMaterial( gui, mesh, material, geometry ) {
 	folder.add( material, 'fog' );
 	folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 	folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
+	folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 	folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
 
-	// TODO roughnessMap and metalnessMap
+	// TODO metalnessMap
 
 }
 
@@ -542,6 +599,21 @@ function chooseFromHash( gui, mesh, geometry ) {
 			material = new THREE.MeshPhongMaterial( { color: 0x2194CE } );
 			guiMaterial( gui, mesh, material, geometry );
 			guiMeshPhongMaterial( gui, mesh, material, geometry );
+
+			return material;
+
+			break;
+
+		case 'MeshToonMaterial' :
+
+			material = new THREE.MeshToonMaterial( { color: 0x2194CE, gradientMap: gradientMaps.threeTone } );
+			guiMaterial( gui, mesh, material, geometry );
+			guiMeshToonMaterial( gui, mesh, material, geometry );
+
+			// only use a single point light
+
+			lights[ 0 ].visible = false;
+			lights[ 2 ].visible = false;
 
 			return material;
 

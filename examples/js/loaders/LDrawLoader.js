@@ -271,7 +271,7 @@ THREE.LDrawLoader = ( function () {
 
 			}, onProgress, onError );
 
-			function processObject( text, onProcessed ) {
+			function processObject( text, onProcessed, subobject ) {
 
 				var parseScope = scope.newParseScopeLevel();
 				parseScope.url = url;
@@ -280,12 +280,19 @@ THREE.LDrawLoader = ( function () {
 
 				// Add to cache
 				var currentFileName = parentParseScope.currentFileName;
+				if ( currentFileName !== null ) {
+
+					currentFileName = parentParseScope.currentFileName.toLowerCase();
+
+				}
+
 				if ( scope.subobjectCache[ currentFileName ] === undefined ) {
 
 					scope.subobjectCache[ currentFileName ] = text;
 
-
 				}
+
+				parseScope.inverted = subobject !== undefined ? subobject.inverted : false;
 
 				// Parse the object (returns a THREE.Group)
 				var objGroup = scope.parse( text );
@@ -295,36 +302,38 @@ THREE.LDrawLoader = ( function () {
 				parseScope.numSubobjects = parseScope.subobjects.length;
 				parseScope.subobjectIndex = 0;
 
-				if ( parseScope.numSubobjects > 0 ) {
+				var finishedCount = 0;
+				onSubobjectFinish();
 
-					// Load the first subobject
-					var subobjectGroup = loadSubobject( parseScope.subobjects[ 0 ], true );
+				return objGroup;
 
-					// Optimization for loading pack: If subobjects are obtained from cache, keep loading them iteratively rather than recursively
-					if ( subobjectGroup ) {
+				function onSubobjectFinish() {
 
-						while ( subobjectGroup && parseScope.subobjectIndex < parseScope.numSubobjects - 1 ) {
+					finishedCount ++;
 
-							subobjectGroup = loadSubobject( parseScope.subobjects[ ++ parseScope.subobjectIndex ], true );
+					if ( finishedCount === parseScope.subobjects.length + 1 ) {
 
-						}
+						finalizeObject();
 
-						if ( subobjectGroup ) {
+					} else {
 
-							finalizeObject();
+						// Once the previous subobject has finished we can start processing the next one in the list.
+						// The subobject processing shares scope in processing so it's important that they be loaded serially
+						// to avoid race conditions.
+						// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
+						// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
+						// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
+						var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+						Promise.resolve().then( function () {
 
-						}
+							loadSubobject( subobject );
+
+						} );
+						parseScope.subobjectIndex ++;
 
 					}
 
-				} else {
-
-					// No subobjects, finish object
-					finalizeObject();
-
 				}
-
-				return objGroup;
 
 				function finalizeObject() {
 
@@ -355,7 +364,7 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				function loadSubobject( subobject, sync ) {
+				function loadSubobject( subobject ) {
 
 					parseScope.mainColourCode = subobject.material.userData.code;
 					parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
@@ -369,16 +378,15 @@ THREE.LDrawLoader = ( function () {
 					}
 
 					// If subobject was cached previously, use the cached one
-					var cached = scope.subobjectCache[ subobject.originalFileName ];
+					var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
 					if ( cached ) {
 
-						var subobjectGroup = processObject( cached, sync ? undefined : onSubobjectLoaded );
-						if ( sync ) {
+						processObject( cached, function ( subobjectGroup ) {
 
-							addSubobject( subobject, subobjectGroup );
-							return subobjectGroup;
+							onSubobjectLoaded( subobjectGroup, subobject );
+							onSubobjectFinish();
 
-						}
+						}, subobject );
 
 						return;
 
@@ -438,22 +446,6 @@ THREE.LDrawLoader = ( function () {
 							// All location possibilities have been tried, give up loading this object
 							console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
 
-							// Try to read the next subobject
-							parseScope.subobjectIndex ++;
-
-							if ( parseScope.subobjectIndex >= parseScope.numSubobjects ) {
-
-								// All subojects have been loaded. Finish parent object
-								scope.removeScopeLevel();
-								onProcessed( objGroup );
-
-							} else {
-
-								// Load next subobject
-								loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-							}
-
 							return;
 
 					}
@@ -462,13 +454,28 @@ THREE.LDrawLoader = ( function () {
 					subobject.url = subobjectURL;
 
 					// Load the subobject
-					scope.load( subobjectURL, onSubobjectLoaded, undefined, onSubobjectError );
+					// Use another file loader here so we can keep track of the subobject information
+					// and use it when processing the next model.
+					var fileLoader = new THREE.FileLoader( scope.manager );
+					fileLoader.setPath( scope.path );
+					fileLoader.load( subobjectURL, function ( text ) {
+
+						processObject( text, function ( subobjectGroup ) {
+
+							onSubobjectLoaded( subobjectGroup, subobject );
+							onSubobjectFinish();
+
+						}, subobject );
+
+					}, undefined, function ( err ) {
+
+						onSubobjectError( err, subobject );
+
+					}, subobject );
 
 				}
 
-				function onSubobjectLoaded( subobjectGroup ) {
-
-					var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+				function onSubobjectLoaded( subobjectGroup, subobject ) {
 
 					if ( subobjectGroup === null ) {
 
@@ -480,20 +487,6 @@ THREE.LDrawLoader = ( function () {
 
 					// Add the subobject just loaded
 					addSubobject( subobject, subobjectGroup );
-
-					// Proceed to load the next subobject, or finish the parent object
-
-					parseScope.subobjectIndex ++;
-
-					if ( parseScope.subobjectIndex < parseScope.numSubobjects ) {
-
-						loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-					} else {
-
-						finalizeObject();
-
-					}
 
 				}
 
@@ -512,10 +505,10 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				function onSubobjectError( err ) {
+				function onSubobjectError( err, subobject ) {
 
 					// Retry download from a different default possible location
-					loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
+					loadSubobject( subobject );
 
 				}
 
@@ -587,6 +580,7 @@ THREE.LDrawLoader = ( function () {
 				subobjects: null,
 				numSubobjects: 0,
 				subobjectIndex: 0,
+				inverted: false,
 
 				// Current subobject
 				currentFileName: null,
@@ -897,9 +891,6 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			// BFC (Back Face Culling) LDraw language meta extension is not implemented, so set all materials double-sided:
-			material.side = THREE.DoubleSide;
-
 			material.transparent = isTransparent;
 			material.opacity = alpha;
 
@@ -1035,6 +1026,11 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
+			var bfcCertified = false;
+			var bfcCCW = true;
+			var bfcInverted = false;
+			var bfcCull = true;
+
 			// Parse all line commands
 			for ( lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
@@ -1047,7 +1043,7 @@ THREE.LDrawLoader = ( function () {
 					if ( line.startsWith( '0 FILE ' ) ) {
 
 						// Save previous embedded file in the cache
-						this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
+						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 						// New embedded text file
 						currentEmbeddedFileName = line.substring( 7 );
@@ -1137,6 +1133,58 @@ THREE.LDrawLoader = ( function () {
 										currentEmbeddedFileName = lp.getRemainingString();
 										currentEmbeddedText = '';
 
+										bfcCertified = false;
+										bfcCCW = true;
+
+									}
+
+									break;
+
+								case 'BFC':
+
+									// Changes to the backface culling state
+									while ( ! lp.isAtTheEnd() ) {
+
+										var token = lp.getToken();
+
+										switch ( token ) {
+
+											case 'CERTIFY':
+											case 'NOCERTIFY':
+
+												bfcCertified = token === 'CERTIFY';
+												bfcCCW = true;
+
+												break;
+
+											case 'CW':
+											case 'CCW':
+
+												bfcCCW = token === 'CCW';
+
+												break;
+
+											case 'INVERTNEXT':
+
+												bfcInverted = true;
+
+												break;
+
+											case 'CLIP':
+											case 'NOCLIP':
+
+											  bfcCull = token === 'CLIP';
+
+												break;
+
+											default:
+
+												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
+
+												break;
+
+										}
+
 									}
 
 									break;
@@ -1198,6 +1246,14 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
+						// If the scale of the object is negated then the triangle winding order
+						// needs to be flipped.
+						if ( scope.separateObjects === false && matrix.determinant() < 0 ) {
+
+							bfcInverted = ! bfcInverted;
+
+						}
+
 						subobjects.push( {
 							material: material,
 							matrix: matrix,
@@ -1205,8 +1261,11 @@ THREE.LDrawLoader = ( function () {
 							originalFileName: fileName,
 							locationState: LDrawLoader.FILE_LOCATION_AS_IS,
 							url: null,
-							triedLowerCase: false
+							triedLowerCase: false,
+							inverted: bfcInverted !== currentParseScope.inverted
 						} );
+
+						bfcInverted = false;
 
 						break;
 
@@ -1229,13 +1288,44 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
+						var inverted = currentParseScope.inverted;
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
+						var v0, v1, v2;
+
+						if ( ccw === true ) {
+
+							v0 = parseVector( lp );
+							v1 = parseVector( lp );
+							v2 = parseVector( lp );
+
+						} else {
+
+							v2 = parseVector( lp );
+							v1 = parseVector( lp );
+							v0 = parseVector( lp );
+
+						}
+
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
-							v0: parseVector( lp ),
-							v1: parseVector( lp ),
-							v2: parseVector( lp )
+							v0: v0,
+							v1: v1,
+							v2: v2
 						} );
+
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1
+							} );
+
+						}
 
 						break;
 
@@ -1244,10 +1334,26 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
-						var v0 = parseVector( lp );
-						var v1 = parseVector( lp );
-						var v2 = parseVector( lp );
-						var v3 = parseVector( lp );
+						var inverted = currentParseScope.inverted;
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
+						var v0, v1, v2, v3;
+
+						if ( ccw === true ) {
+
+							v0 = parseVector( lp );
+							v1 = parseVector( lp );
+							v2 = parseVector( lp );
+							v3 = parseVector( lp );
+
+						} else {
+
+							v3 = parseVector( lp );
+							v2 = parseVector( lp );
+							v1 = parseVector( lp );
+							v0 = parseVector( lp );
+
+						}
 
 						triangles.push( {
 							material: material,
@@ -1264,6 +1370,26 @@ THREE.LDrawLoader = ( function () {
 							v1: v2,
 							v2: v3
 						} );
+
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1
+							} );
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v3,
+								v2: v2
+							} );
+
+						}
 
 						break;
 
@@ -1282,7 +1408,7 @@ THREE.LDrawLoader = ( function () {
 
 			if ( parsingEmbeddedFiles ) {
 
-				this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
+				this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 			}
 

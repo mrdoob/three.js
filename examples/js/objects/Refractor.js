@@ -210,19 +210,9 @@ THREE.Refractor = function ( geometry, options ) {
 
 			// restore viewport
 
-			var bounds = camera.bounds;
+			if ( camera.isArrayCamera ) {
 
-			if ( bounds !== undefined ) {
-
-				renderer.getSize( size );
-				var pixelRatio = renderer.getPixelRatio();
-
-				viewport.x = bounds.x * size.width * pixelRatio;
-				viewport.y = bounds.y * size.height * pixelRatio;
-				viewport.z = bounds.z * size.width * pixelRatio;
-				viewport.w = bounds.w * size.height * pixelRatio;
-
-				renderer.state.viewport( viewport );
+				renderer.state.viewport( camera.viewport );
 
 			}
 

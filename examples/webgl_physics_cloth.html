@@ -87,6 +87,7 @@
 			function initGraphics() {
 
 				container = document.getElementById( 'container' );
+				container.innerHTML = '';
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
@@ -95,14 +96,15 @@
 
 				camera.position.set( - 12, 7, 4 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 2, 0 );
-				controls.update();
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
 
 				textureLoader = new THREE.TextureLoader();
 
@@ -126,11 +128,6 @@
 
 				light.shadow.bias = - 0.003;
 				scene.add( light );
-
-
-				container.innerHTML = "";
-
-				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';

@@ -59,17 +59,33 @@ PositionNode.prototype.generate = function ( builder, output ) {
 
 		case PositionNode.LOCAL:
 
-			builder.requires.position = true;
+			if ( builder.isShader( 'vertex' ) ) {
 
-			result = builder.isShader( 'vertex' ) ? 'transformed' : 'vPosition';
+				result = 'transformed';
+
+			} else {
+
+				builder.requires.position = true;
+
+				result = 'vPosition';
+
+			}
 
 			break;
 
 		case PositionNode.WORLD:
 
-			builder.requires.worldPosition = true;
+			if ( builder.isShader( 'vertex' ) ) {
 
-			result = 'vWPosition';
+				return '( modelMatrix * vec4( transformed, 1.0 ) ).xyz';
+
+			} else {
+
+				builder.requires.worldPosition = true;
+
+				result = 'vWPosition';
+
+			}
 
 			break;
 

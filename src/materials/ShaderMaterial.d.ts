@@ -17,7 +17,7 @@ export interface ShaderMaterialParameters extends MaterialParameters {
   uniforms?: any;
   vertexShader?: string;
   fragmentShader?: string;
-  lineWidth?: number;
+  linewidth?: number;
   wireframe?: boolean;
   wireframeLinewidth?: number;
   lights?: boolean;

@@ -13,6 +13,7 @@ export interface ExtrudeGeometryOptions {
   bevelEnabled?: boolean;
   bevelThickness?: number;
   bevelSize?: number;
+  bevelOffset?: number;
   bevelSegments?: number;
   extrudePath?: CurvePath<Vector3>;
   UVGenerator?: UVGenerator;
