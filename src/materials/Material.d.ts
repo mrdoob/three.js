@@ -44,6 +44,7 @@ export interface MaterialParameters {
   dithering?: boolean;
   flatShading?: boolean;
   side?: Side;
+	shadowSide?: Side;
   transparent?: boolean;
   vertexColors?: Colors;
   vertexTangents?: boolean;
