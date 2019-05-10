@@ -344,6 +344,12 @@ THREE.LDrawLoader = ( function () {
 					if ( scope.separateObjects && parseScope.type === 'Part' || ! parentParseScope.isFromParse ) {
 
 						const objGroup = parseScope.groupObject;
+						if ( parseScope.triangles.length > 0 ) {
+
+							objGroup.add( createObject( parseScope.triangles, 3 ) );
+
+						}
+
 						if ( parseScope.lineSegments.length > 0 ) {
 
 							objGroup.add( createObject( parseScope.lineSegments, 2 ) );
@@ -356,11 +362,6 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						if ( parseScope.triangles.length > 0 ) {
-
-							objGroup.add( createObject( parseScope.triangles, 3 ) );
-
-						}
 
 						if ( parentParseScope.groupObject ) {
 
@@ -400,9 +401,31 @@ THREE.LDrawLoader = ( function () {
 						// TODO: we need to multiple matrices here
 						// TODO: First, instead of tracking matrices anywhere else we
 						// should just multiple everything here.
-						parentParseScope.lineSegments.push( ...parseScope.lineSegments );
-						parentParseScope.optionalSegments.push( ...parseScope.optionalSegments );
-						parentParseScope.triangles.push( ...parseScope.triangles );
+						var parentLineSegments = parentParseScope.lineSegments;
+						var parentOptionalSegments = parentParseScope.optionalSegments;
+						var parentTriangles = parentParseScope.triangles;
+
+						var lineSegments = parseScope.lineSegments;
+						var optionalSegments = parseScope.optionalSegments;
+						var triangles = parseScope.triangles;
+
+						for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+							parentLineSegments.push( lineSegments[ i ] );
+
+						}
+
+						for ( var i = 0, l = optionalSegments.length; i < l; i ++ ) {
+
+							parentOptionalSegments.push( optionalSegments[ i ] );
+
+						}
+
+						for ( var i = 0, l = triangles.length; i < l; i ++ ) {
+
+							parentTriangles.push( triangles[ i ] );
+
+						}
 
 					}
 
@@ -539,11 +562,13 @@ THREE.LDrawLoader = ( function () {
 
 				function addSubobject( subobject, subobjectGroup ) {
 
+					// TODO: Move this logic into finalize object if possible?
 					if ( scope.separateObjects ) {
 
 						subobjectGroup.name = subobject.fileName;
 						objGroup.add( subobjectGroup );
 						subobjectGroup.matrix.copy( subobject.matrix );
+						subobjectGroup.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
 						subobjectGroup.matrixAutoUpdate = false;
 
 					}
@@ -1118,11 +1143,11 @@ THREE.LDrawLoader = ( function () {
 										currentParseScope.lineSegments = [];
 										currentParseScope.optionalSegments = [];
 										currentParseScope.groupObject = new THREE.Group();
+										currentParseScope.type = type;
 
 										triangles = currentParseScope.triangles;
 										lineSegments = currentParseScope.lineSegments;
 										optionalSegments = currentParseScope.optionalSegments;
-										currentParseScope.type = type;
 
 									}
 
@@ -1291,7 +1316,7 @@ THREE.LDrawLoader = ( function () {
 
 						// If the scale of the object is negated then the triangle winding order
 						// needs to be flipped.
-						if ( scope.separateObjects === false && matrix.determinant() < 0 ) {
+						if ( matrix.determinant() < 0 ) {
 
 							bfcInverted = ! bfcInverted;
 
@@ -1462,7 +1487,7 @@ THREE.LDrawLoader = ( function () {
 			groupObject.userData.keywords = keywords;
 			groupObject.userData.subobjects = subobjects;
 
-			return currentParseScope.groupObject;
+			return groupObject;
 
 		}
 
