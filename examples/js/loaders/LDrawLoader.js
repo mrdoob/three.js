@@ -7,6 +7,12 @@
 
 THREE.LDrawLoader = ( function () {
 
+	function isPrimitiveType( type ) {
+
+		return /primitive/i.test( type ) || type === 'Subpart';
+
+	}
+
 	function LineParser( line, lineNumber ) {
 
 		this.line = line;
@@ -334,7 +340,7 @@ THREE.LDrawLoader = ( function () {
 
 
 					// TODO: Handle smoothing
-					if ( scope.separateObjects && parseScope.type === 'Part' || ! parentParseScope.isFromParse ) {
+					if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || ! parentParseScope.isFromParse ) {
 
 						const objGroup = parseScope.groupObject;
 						if ( parseScope.triangles.length > 0 ) {
@@ -352,6 +358,17 @@ THREE.LDrawLoader = ( function () {
 						if ( parseScope.optionalSegments.length > 0 ) {
 
 							objGroup.add( createObject( parseScope.optionalSegments, 2 ) );
+
+						}
+
+						if ( parentParseScope.groupObject ) {
+
+							objGroup.name = parseScope.fileName;
+							objGroup.matrix.copy( parseScope.matrix );
+							objGroup.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
+							objGroup.matrixAutoUpdate = false;
+
+							parentParseScope.groupObject.add( objGroup );
 
 						}
 
@@ -412,18 +429,6 @@ THREE.LDrawLoader = ( function () {
 							parentTriangles.push( triangles[ i ] );
 
 						}
-
-					}
-
-					if ( parentParseScope.groupObject && parseScope.groupObject.children.length ) {
-
-						const objGroup = parseScope.groupObject;
-						objGroup.name = parseScope.fileName;
-						objGroup.matrix.copy( parseScope.matrix );
-						objGroup.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
-						objGroup.matrixAutoUpdate = false;
-
-						parentParseScope.groupObject.add( objGroup );
 
 					}
 
@@ -1118,8 +1123,13 @@ THREE.LDrawLoader = ( function () {
 										currentParseScope.triangles = [];
 										currentParseScope.lineSegments = [];
 										currentParseScope.optionalSegments = [];
-										currentParseScope.groupObject = new THREE.Group();
 										currentParseScope.type = type;
+
+										if ( parentParseScope.isFromParse === false || scope.separateObjects && isPrimitiveType( type ) === false ) {
+
+											currentParseScope.groupObject = new THREE.Group();
+
+										}
 
 										triangles = currentParseScope.triangles;
 										lineSegments = currentParseScope.lineSegments;
@@ -1454,16 +1464,11 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			const groupObject = currentParseScope.groupObject;
-			groupObject.userData.category = category;
-			groupObject.userData.keywords = keywords;
-			groupObject.userData.subobjects = subobjects;
-
+			currentParseScope.category = category;
+			currentParseScope.keywords = keywords;
 			currentParseScope.subobjects = subobjects;
 			currentParseScope.numSubobjects = subobjects.length;
 			currentParseScope.subobjectIndex = 0;
-
-			return groupObject;
 
 		}
 
