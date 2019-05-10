@@ -273,6 +273,14 @@ THREE.LDrawLoader = ( function () {
 
 				var parentParseScope = scope.getParentParseScope();
 
+				// Set current matrix
+				if ( subobject ) {
+
+					parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
+					parseScope.matrix = subobject.matrix.clone();
+
+				}
+
 				// Add to cache
 				var currentFileName = parentParseScope.currentFileName;
 				if ( currentFileName !== null ) {
@@ -362,6 +370,33 @@ THREE.LDrawLoader = ( function () {
 
 					} else {
 
+						if ( scope.separateObjects ) {
+
+							parseScope.lineSegments.forEach( ls => {
+
+								ls.v0.applyMatrix4( parseScope.matrix );
+								ls.v1.applyMatrix4( parseScope.matrix );
+
+							} );
+
+							parseScope.optionalSegments.forEach( ls => {
+
+								ls.v0.applyMatrix4( parseScope.matrix );
+								ls.v1.applyMatrix4( parseScope.matrix );
+
+							} );
+
+							parseScope.triangles.forEach( ls => {
+
+								ls.v0 = ls.v0.clone().applyMatrix4( parseScope.matrix );
+								ls.v1 = ls.v1.clone().applyMatrix4( parseScope.matrix );
+								ls.v2 = ls.v2.clone().applyMatrix4( parseScope.matrix );
+
+							} );
+
+						}
+
+
 						// TODO: we need to multiple matrices here
 						// TODO: First, instead of tracking matrices anywhere else we
 						// should just multiple everything here.
@@ -388,12 +423,6 @@ THREE.LDrawLoader = ( function () {
 					parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
 					parseScope.currentFileName = subobject.originalFileName;
 
-					if ( ! scope.separateObjects ) {
-
-						// Set current matrix
-						parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
-
-					}
 
 					// If subobject was cached previously, use the cached one
 					var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
@@ -603,6 +632,7 @@ THREE.LDrawLoader = ( function () {
 				mainColourCode: topParseScope ? topParseScope.mainColourCode : '16',
 				mainEdgeColourCode: topParseScope ? topParseScope.mainEdgeColourCode : '24',
 				currentMatrix: new THREE.Matrix4(),
+				matrix: new THREE.Matrix4(),
 
 				// If false, it is a root material scope previous to parse
 				isFromParse: true,
@@ -1016,7 +1046,7 @@ THREE.LDrawLoader = ( function () {
 
 				if ( ! scope.separateObjects ) {
 
-					v.applyMatrix4( parentParseScope.currentMatrix );
+					v.applyMatrix4( currentParseScope.currentMatrix );
 
 				}
 
