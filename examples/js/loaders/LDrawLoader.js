@@ -277,7 +277,8 @@ THREE.LDrawLoader = ( function () {
 				if ( subobject ) {
 
 					parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
-					parseScope.matrix = subobject.matrix.clone();
+					parseScope.matrix.copy( subobject.matrix );
+					parseScope.inverted = subobject.inverted;
 
 				}
 
@@ -295,20 +296,11 @@ THREE.LDrawLoader = ( function () {
 
 				}
 
-				parseScope.inverted = subobject !== undefined ? subobject.inverted : false;
 
 				// Parse the object (returns a THREE.Group)
-				var objGroup = scope.parse( text );
-
-				// Load subobjects
-				parseScope.subobjects = objGroup.userData.subobjects;
-				parseScope.numSubobjects = parseScope.subobjects.length;
-				parseScope.subobjectIndex = 0;
-
+				scope.parse( text );
 				var finishedCount = 0;
 				onSubobjectFinish();
-
-				return objGroup;
 
 				function onSubobjectFinish() {
 
@@ -340,6 +332,7 @@ THREE.LDrawLoader = ( function () {
 
 				function finalizeObject() {
 
+
 					// TODO: Handle smoothing
 					if ( scope.separateObjects && parseScope.type === 'Part' || ! parentParseScope.isFromParse ) {
 
@@ -359,13 +352,6 @@ THREE.LDrawLoader = ( function () {
 						if ( parseScope.optionalSegments.length > 0 ) {
 
 							objGroup.add( createObject( parseScope.optionalSegments, 2 ) );
-
-						}
-
-
-						if ( parentParseScope.groupObject ) {
-
-							parentParseScope.groupObject.add( objGroup );
 
 						}
 
@@ -429,12 +415,23 @@ THREE.LDrawLoader = ( function () {
 
 					}
 
+					if ( parentParseScope.groupObject && parseScope.groupObject.children.length ) {
+
+						const objGroup = parseScope.groupObject;
+						objGroup.name = parseScope.fileName;
+						objGroup.matrix.copy( parseScope.matrix );
+						objGroup.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
+						objGroup.matrixAutoUpdate = false;
+
+						parentParseScope.groupObject.add( objGroup );
+
+					}
 
 					scope.removeScopeLevel();
 
 					if ( onProcessed ) {
 
-						onProcessed( objGroup );
+						onProcessed( parseScope.groupObject );
 
 					}
 
@@ -555,24 +552,6 @@ THREE.LDrawLoader = ( function () {
 
 					}
 
-					// Add the subobject just loaded
-					addSubobject( subobject, subobjectGroup );
-
-				}
-
-				function addSubobject( subobject, subobjectGroup ) {
-
-					// TODO: Move this logic into finalize object if possible?
-					if ( scope.separateObjects ) {
-
-						subobjectGroup.name = subobject.fileName;
-						objGroup.add( subobjectGroup );
-						subobjectGroup.matrix.copy( subobject.matrix );
-						subobjectGroup.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
-						subobjectGroup.matrixAutoUpdate = false;
-
-					}
-
 					scope.fileMap[ subobject.originalFileName ] = subobject.url;
 
 				}
@@ -638,9 +617,6 @@ THREE.LDrawLoader = ( function () {
 			}
 
 			var topParseScope = this.getCurrentParseScope();
-
-			var parentParseScope = this.getParentParseScope();
-
 			var newParseScope = {
 
 				lib: matLib,
@@ -1338,8 +1314,9 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					// Line type 2: Line segment
-					case '5':
+					// Line type 5: Optional Line segment
 					case '2':
+					case '5':
 
 						var material = parseColourCode( lp, true );
 						var arr = lineType === '2' ? lineSegments : optionalSegments;
@@ -1463,11 +1440,6 @@ THREE.LDrawLoader = ( function () {
 
 						break;
 
-					// Line type 5: Optional line
-					case '5':
-						// Line type 5 is not implemented
-						break;
-
 					default:
 						throw 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.';
 						break;
@@ -1486,6 +1458,10 @@ THREE.LDrawLoader = ( function () {
 			groupObject.userData.category = category;
 			groupObject.userData.keywords = keywords;
 			groupObject.userData.subobjects = subobjects;
+
+			currentParseScope.subobjects = subobjects;
+			currentParseScope.numSubobjects = subobjects.length;
+			currentParseScope.subobjectIndex = 0;
 
 			return groupObject;
 
