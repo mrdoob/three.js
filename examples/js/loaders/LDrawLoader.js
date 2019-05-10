@@ -1132,6 +1132,20 @@ THREE.LDrawLoader = ( function () {
 
 										}
 
+										// If the scale of the object is negated then the triangle winding order
+										// needs to be flipped.
+										var matrix = currentParseScope.matrix;
+										if (
+											matrix.determinant() < 0 && (
+												scope.separateObjects && isPrimitiveType( type ) ||
+												! scope.separateObjects
+											) ) {
+
+											currentParseScope.inverted = ! currentParseScope.inverted;
+
+										}
+
+
 										triangles = currentParseScope.triangles;
 										lineSegments = currentParseScope.lineSegments;
 										optionalSegments = currentParseScope.optionalSegments;
@@ -1298,14 +1312,6 @@ THREE.LDrawLoader = ( function () {
 								fileName = 'p/' + fileName;
 
 							}
-
-						}
-
-						// If the scale of the object is negated then the triangle winding order
-						// needs to be flipped.
-						if ( matrix.determinant() < 0 ) {
-
-							bfcInverted = ! bfcInverted;
 
 						}
 
