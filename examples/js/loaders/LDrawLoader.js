@@ -338,9 +338,9 @@ THREE.LDrawLoader = ( function () {
 
 				function finalizeObject() {
 
-
 					// TODO: Handle smoothing
-					if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || ! parentParseScope.isFromParse ) {
+					var isRoot = ! parentParseScope.isFromParse;
+					if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
 
 						const objGroup = parseScope.groupObject;
 						if ( parseScope.triangles.length > 0 ) {
@@ -1125,7 +1125,8 @@ THREE.LDrawLoader = ( function () {
 										currentParseScope.optionalSegments = [];
 										currentParseScope.type = type;
 
-										if ( parentParseScope.isFromParse === false || scope.separateObjects && isPrimitiveType( type ) === false ) {
+										var isRoot = ! parentParseScope.isFromParse;
+										if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
 											currentParseScope.groupObject = new THREE.Group();
 
