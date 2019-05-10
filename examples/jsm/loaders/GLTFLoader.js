@@ -3088,7 +3088,7 @@ var GLTFLoader = ( function () {
 
 			if ( nodeDef.name !== undefined ) {
 
-				node.originalName =  nodeDef.name ;
+				node.userData.name = nodeDef.name;
 				node.name = PropertyBinding.sanitizeNodeName( nodeDef.name );
 
 			}
