@@ -1299,7 +1299,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( typeof gltfDef.extras === 'object' ) {
 
-				object.userData = Object.assign(object.userData, gltfDef.extras);
+				Object.assign( object.userData, gltfDef.extras );
 
 			} else {
 
