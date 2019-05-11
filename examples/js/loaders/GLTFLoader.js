@@ -845,6 +845,12 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
+				if ( source.color != undefined ) {
+
+					target.color = source.color.clone();
+
+				}
+
 				return target;
 
 			},
