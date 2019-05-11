@@ -845,9 +845,21 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				if ( source.color != undefined ) {
+				if ( source.color ) {
 
 					target.color = source.color.clone();
+
+				}
+
+				if ( source.specular ) {
+
+					target.specular = source.specular.clone();
+
+				}
+
+				if ( source.emissive ) {
+
+					target.emissive = source.emissive.clone();
 
 				}
 
