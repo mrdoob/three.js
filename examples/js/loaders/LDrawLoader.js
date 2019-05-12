@@ -399,6 +399,9 @@ THREE.LDrawLoader = ( function () {
 		// If not (the default), only one object which contains all the merged primitives will be created.
 		this.separateObjects = false;
 
+		// If this flag is set to true the vertex normals will be smoothed.
+		this.smoothNormals = true;
+
 	}
 
 	// Special surface finish tag types.
@@ -508,7 +511,7 @@ THREE.LDrawLoader = ( function () {
 
 				function finalizeObject() {
 
-					if ( parseScope.type === 'Part' ) {
+					if ( scope.smoothNormals && parseScope.type === 'Part' ) {
 
 						smoothNormals( parseScope.triangles, parseScope.lineSegments );
 
@@ -531,9 +534,9 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						if ( parseScope.optionalSegments.length > 0 ) {
+						if ( parseScope.conditionalSegments.length > 0 ) {
 
-							objGroup.add( createObject( parseScope.optionalSegments, 2 ) );
+							objGroup.add( createObject( parseScope.conditionalSegments, 2 ) );
 
 						}
 
@@ -552,11 +555,11 @@ THREE.LDrawLoader = ( function () {
 
 						var separateObjects = scope.separateObjects;
 						var parentLineSegments = parentParseScope.lineSegments;
-						var parentOptionalSegments = parentParseScope.optionalSegments;
+						var parentConditionalSegments = parentParseScope.conditionalSegments;
 						var parentTriangles = parentParseScope.triangles;
 
 						var lineSegments = parseScope.lineSegments;
-						var optionalSegments = parseScope.optionalSegments;
+						var conditionalSegments = parseScope.conditionalSegments;
 						var triangles = parseScope.triangles;
 
 						for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
@@ -572,16 +575,16 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						for ( var i = 0, l = optionalSegments.length; i < l; i ++ ) {
+						for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
-							var os = optionalSegments[ i ];
+							var os = conditionalSegments[ i ];
 							if ( separateObjects ) {
 
 								os.v0.applyMatrix4( parseScope.matrix );
 								os.v1.applyMatrix4( parseScope.matrix );
 
 							}
-							parentOptionalSegments.push( os );
+							parentConditionalSegments.push( os );
 
 						}
 
@@ -818,7 +821,7 @@ THREE.LDrawLoader = ( function () {
 
 				triangles: null,
 				lineSegments: null,
-				optionalSegments: null,
+				conditionalSegments: null,
 			};
 
 			this.parseScopesStack.push( newParseScope );
@@ -1161,7 +1164,7 @@ THREE.LDrawLoader = ( function () {
 			// Parse result variables
 			var triangles;
 			var lineSegments;
-			var optionalSegments;
+			var conditionalSegments;
 
 			var subobjects = [];
 
@@ -1295,7 +1298,7 @@ THREE.LDrawLoader = ( function () {
 
 										currentParseScope.triangles = [];
 										currentParseScope.lineSegments = [];
-										currentParseScope.optionalSegments = [];
+										currentParseScope.conditionalSegments = [];
 										currentParseScope.type = type;
 
 										var isRoot = ! parentParseScope.isFromParse;
@@ -1320,7 +1323,7 @@ THREE.LDrawLoader = ( function () {
 
 										triangles = currentParseScope.triangles;
 										lineSegments = currentParseScope.lineSegments;
-										optionalSegments = currentParseScope.optionalSegments;
+										conditionalSegments = currentParseScope.conditionalSegments;
 
 									}
 
@@ -1503,12 +1506,12 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					// Line type 2: Line segment
-					// Line type 5: Optional Line segment
+					// Line type 5: Conditional Line segment
 					case '2':
 					case '5':
 
 						var material = parseColourCode( lp, true );
-						var arr = lineType === '2' ? lineSegments : optionalSegments;
+						var arr = lineType === '2' ? lineSegments : conditionalSegments;
 
 						arr.push( {
 							material: material.userData.edgeMaterial,
