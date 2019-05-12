@@ -205,10 +205,11 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function parseBasematerialsNode( basematerialsNode ) {
+		function parseBasematerialsNode( /* basematerialsNode */ ) {
+
 		}
 
-		function parseMeshNode( meshNode, extensions ) {
+		function parseMeshNode( meshNode ) {
 
 			var meshData = {};
 
@@ -299,6 +300,59 @@ THREE.ThreeMFLoader.prototype = {
 		}
 
 		function parseComponentsNode( componentsNode ) {
+
+			var components = [];
+
+			var componentNodes = componentsNode.querySelectorAll( 'component' );
+
+			for ( var i = 0; i < componentNodes.length; i ++ ) {
+
+				var componentNode = componentNodes[ i ];
+				var componentData = parseComponentNode( componentNode );
+				components.push( componentData );
+
+			}
+
+			return components;
+
+		}
+
+		function parseComponentNode( componentNode ) {
+
+			var componentData = {};
+
+			componentData[ 'objectId' ] = componentNode.getAttribute( 'objectid' ); // required
+
+			var transform = componentNode.getAttribute( 'transform' );
+
+			if ( transform ) {
+
+				componentData[ 'transform' ] = parseTransform( transform );
+
+			}
+
+			return componentData;
+
+		}
+
+		function parseTransform( transform ) {
+
+			var t = [];
+			transform.split( ' ' ).forEach( function ( s ) {
+
+				t.push( parseFloat( s ) );
+
+			} );
+
+			var matrix = new THREE.Matrix4();
+			matrix.set(
+				t[ 0 ], t[ 3 ], t[ 6 ], t[ 9 ],
+				t[ 1 ], t[ 4 ], t[ 7 ], t[ 10 ],
+				t[ 2 ], t[ 5 ], t[ 8 ], t[ 11 ],
+				 0.0, 0.0, 0.0, 1.0
+			);
+
+			return matrix;
 
 		}
 
@@ -411,25 +465,13 @@ THREE.ThreeMFLoader.prototype = {
 
 				var itemNode = itemNodes[ i ];
 				var buildItem = {
-					objectid: itemNode.getAttribute( 'objectid' )
+					objectId: itemNode.getAttribute( 'objectid' )
 				};
 				var transform = itemNode.getAttribute( 'transform' );
 
 				if ( transform ) {
 
-					var t = [];
-					transform.split( ' ' ).forEach( function ( s ) {
-
-						t.push( parseFloat( s ) );
-
-					} );
-					var mat4 = new THREE.Matrix4();
-					buildItem[ 'transform' ] = mat4.set(
-						t[ 0 ], t[ 3 ], t[ 6 ], t[ 9 ],
-						t[ 1 ], t[ 4 ], t[ 7 ], t[ 10 ],
-						t[ 2 ], t[ 5 ], t[ 8 ], t[ 11 ],
-						 0.0, 0.0, 0.0, 1.0
-					);
+					buildItem[ 'transform' ] = parseTransform( transform );
 
 				}
 
@@ -472,7 +514,7 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function buildMesh( meshData, data3mf ) {
+		function buildMesh( meshData ) {
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
@@ -505,7 +547,7 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function applyExtensions( extensions, meshData, modelXml, data3mf ) {
+		function applyExtensions( extensions, meshData, modelXml ) {
 
 			if ( ! extensions ) {
 
@@ -543,10 +585,10 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function buildMeshes( data3mf ) {
+		function buildObjects( data3mf ) {
 
 			var modelsData = data3mf.model;
-			var meshes = {};
+			var objects = {};
 			var modelsKeys = Object.keys( modelsData );
 
 			for ( var i = 0; i < modelsKeys.length; i ++ ) {
@@ -563,18 +605,34 @@ THREE.ThreeMFLoader.prototype = {
 					var objectId = objectIds[ j ];
 					var objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
 					var meshData = objectData[ 'mesh' ];
-					applyExtensions( extensions, meshData, modelXml, data3mf );
-					meshes[ objectId ] = buildMesh( meshData, data3mf );
+
+					if ( meshData ) {
+
+						applyExtensions( extensions, meshData, modelXml );
+
+						objects[ objectId ] = {
+							isMesh: true,
+							mesh: buildMesh( meshData )
+						};
+
+					} else {
+
+						objects[ objectId ] = {
+							isComposite: true,
+							components:	objectData[ 'components' ]
+						};
+
+					}
 
 				}
 
 			}
 
-			return meshes;
+			return objects;
 
 		}
 
-		function build( meshes, refs, data3mf ) {
+		function build( objects, refs, data3mf ) {
 
 			var group = new THREE.Group();
 			var buildData = data3mf.model[ refs[ 'target' ].substring( 1 ) ][ 'build' ];
@@ -582,15 +640,59 @@ THREE.ThreeMFLoader.prototype = {
 			for ( var i = 0; i < buildData.length; i ++ ) {
 
 				var buildItem = buildData[ i ];
-				var mesh = meshes[ buildItem[ 'objectid' ] ];
+				var object = objects[ buildItem[ 'objectId' ] ];
 
-				if ( buildItem[ 'transform' ] ) {
+				if ( object.isComposite ) {
 
-					mesh.geometry.applyMatrix( buildItem[ 'transform' ] );
+					var composite = new THREE.Group();
+					var components = object.components;
+
+					// add meshes to composite object
+
+					for ( var j = 0; j < components.length; j ++ ) {
+
+						var component = components[ j ];
+						var mesh = objects[ component.objectId ].mesh.clone();
+
+						var transform = component.transform;
+
+						if ( transform ) {
+
+							mesh.applyMatrix( transform );
+
+						}
+
+						composite.add( mesh );
+
+					}
+
+					// transform composite if necessary
+
+					var transform = buildItem[ 'transform' ];
+
+					if ( transform ) {
+
+						composite.applyMatrix( transform );
+
+					}
+
+					group.add( composite );
+
+
+				} else {
+
+					var mesh = object.mesh;
+					var transform = buildItem[ 'transform' ];
+
+					if ( transform ) {
+
+						mesh.applyMatrix( transform );
+
+					}
+
+					group.add( mesh );
 
 				}
-
-				group.add( mesh );
 
 			}
 
@@ -599,9 +701,9 @@ THREE.ThreeMFLoader.prototype = {
 		}
 
 		var data3mf = loadDocument( data );
-		var meshes = buildMeshes( data3mf );
+		var objects = buildObjects( data3mf );
 
-		return build( meshes, data3mf[ 'rels' ], data3mf );
+		return build( objects, data3mf[ 'rels' ], data3mf );
 
 	},
 
