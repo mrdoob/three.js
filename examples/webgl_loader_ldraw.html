@@ -111,7 +111,8 @@
 					envMapActivated: false,
 					separateObjects: false,
 					displayLines: true,
-					optionalLines: false
+					optionalLines: false,
+					smoothNormals: true
 				};
 
 				gui = new dat.GUI();
@@ -136,15 +137,21 @@
 
 				} );
 
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
 				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
 
-					model.children[ 1 ].visible = value;
+					updateLineSegments();
 
 				} );
 
 				gui.add( guiData, 'optionalLines' ).name( 'Optional Lines' ).onChange( function ( value ) {
 
-					model.children[ 2 ].visible = value;
+					updateLineSegments();
 
 				} );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -166,6 +173,28 @@
 
 			}
 
+			function updateLineSegments() {
+
+				model.traverse( c => {
+
+					if ( c.isLineSegments ) {
+
+						if ( c.isConditionalLine ) {
+
+							c.visible = guiData.optionalLines;
+
+						} else {
+
+							c.visible = guiData.displayLines;
+
+						}
+
+					}
+
+				} );
+
+			}
+
 			function reloadObject( resetCamera ) {
 
 				if ( model ) {
@@ -181,6 +210,7 @@
 
 				var lDrawLoader = new THREE.LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
+				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
@@ -231,8 +261,7 @@
 
 						}
 
-						model.children[ 1 ].visible = guiData.displayLines;
-						model.children[ 2 ].visible = guiData.optionalLines;
+						updateLineSegments();
 
 						// Adjust camera and light
 

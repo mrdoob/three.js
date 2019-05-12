@@ -536,7 +536,9 @@ THREE.LDrawLoader = ( function () {
 
 						if ( parseScope.conditionalSegments.length > 0 ) {
 
-							objGroup.add( createObject( parseScope.conditionalSegments, 2 ) );
+							var lines = createObject( parseScope.conditionalSegments, 2 );
+							lines.isConditionalLine = true;
+							objGroup.add( lines );
 
 						}
 
