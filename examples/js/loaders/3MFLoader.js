@@ -668,9 +668,11 @@ THREE.ThreeMFLoader.prototype = {
 
 					// transform composite if necessary
 
-					if ( buildItem[ 'transform' ] ) {
+					var transform = buildItem[ 'transform' ];
 
-						composite.applyMatrix( buildItem[ 'transform' ] );
+					if ( transform ) {
+
+						composite.applyMatrix( transform );
 
 					}
 
