@@ -72,7 +72,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			for ( file in zip.files ) {
 
-				if ( file.match( /\.rels$/ ) ) {
+				if ( file.match( /\_rels\/.rels$/ ) ) {
 
 					relsName = file;
 
@@ -585,6 +585,76 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
+		function getBuild( data, objects, modelData, builder ) {
+
+			if ( data.build !== undefined ) return data.build;
+
+			data.build = builder( data, objects, modelData );
+
+			return data.build;
+
+		}
+
+		function buildComposite( compositeData, objects, modelData ) {
+
+			var composite = new THREE.Group();
+
+			for ( var j = 0; j < compositeData.length; j ++ ) {
+
+				var component = compositeData[ j ];
+				var build = objects[ component.objectId ];
+
+				if ( build === undefined ) {
+
+					buildObject( component.objectId, objects, modelData );
+					build = objects[ component.objectId ];
+
+				}
+
+				var object3D = build.clone();
+
+				// apply component transfrom
+
+				var transform = component.transform;
+
+				if ( transform ) {
+
+					object3D.applyMatrix( transform );
+
+				}
+
+				composite.add( object3D );
+
+			}
+
+			return composite;
+
+		}
+
+		function buildObject( objectId, objects, modelData ) {
+
+			var objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
+			var meshData = objectData[ 'mesh' ];
+
+			if ( meshData ) {
+
+				var extensions = modelData[ 'extensions' ];
+				var modelXml = modelData[ 'xml' ];
+
+				applyExtensions( extensions, meshData, modelXml );
+
+				objects[ objectData.id ] = getBuild( meshData, objects, modelData, buildMesh );
+
+			} else {
+
+				var compositeData = objectData[ 'components' ];
+
+				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, buildComposite );
+
+			}
+
+		}
+
 		function buildObjects( data3mf ) {
 
 			var modelsData = data3mf.model;
@@ -595,34 +665,14 @@ THREE.ThreeMFLoader.prototype = {
 
 				var modelsKey = modelsKeys[ i ];
 				var modelData = modelsData[ modelsKey ];
-				var modelXml = modelData[ 'xml' ];
-				var extensions = modelData[ 'extensions' ];
 
 				var objectIds = Object.keys( modelData[ 'resources' ][ 'object' ] );
 
 				for ( var j = 0; j < objectIds.length; j ++ ) {
 
 					var objectId = objectIds[ j ];
-					var objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
-					var meshData = objectData[ 'mesh' ];
 
-					if ( meshData ) {
-
-						applyExtensions( extensions, meshData, modelXml );
-
-						objects[ objectId ] = {
-							isMesh: true,
-							mesh: buildMesh( meshData )
-						};
-
-					} else {
-
-						objects[ objectId ] = {
-							isComposite: true,
-							components:	objectData[ 'components' ]
-						};
-
-					}
+					buildObject( objectId, objects, modelData );
 
 				}
 
@@ -640,59 +690,19 @@ THREE.ThreeMFLoader.prototype = {
 			for ( var i = 0; i < buildData.length; i ++ ) {
 
 				var buildItem = buildData[ i ];
-				var object = objects[ buildItem[ 'objectId' ] ];
+				var object3D = objects[ buildItem[ 'objectId' ] ];
 
-				if ( object.isComposite ) {
+				// apply transform
 
-					var composite = new THREE.Group();
-					var components = object.components;
+				var transform = buildItem[ 'transform' ];
 
-					// add meshes to composite object
+				if ( transform ) {
 
-					for ( var j = 0; j < components.length; j ++ ) {
-
-						var component = components[ j ];
-						var mesh = objects[ component.objectId ].mesh.clone();
-
-						var transform = component.transform;
-
-						if ( transform ) {
-
-							mesh.applyMatrix( transform );
-
-						}
-
-						composite.add( mesh );
-
-					}
-
-					// transform composite if necessary
-
-					var transform = buildItem[ 'transform' ];
-
-					if ( transform ) {
-
-						composite.applyMatrix( transform );
-
-					}
-
-					group.add( composite );
-
-
-				} else {
-
-					var mesh = object.mesh;
-					var transform = buildItem[ 'transform' ];
-
-					if ( transform ) {
-
-						mesh.applyMatrix( transform );
-
-					}
-
-					group.add( mesh );
+					object3D.applyMatrix( transform );
 
 				}
+
+				group.add( object3D );
 
 			}
 
