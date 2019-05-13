@@ -13,9 +13,12 @@ THREE.LDrawLoader = ( function () {
 
 		function hashVertex( v ) {
 
-			var x = ~ ~ ( v.x * 1e6 );
-			var y = ~ ~ ( v.y * 1e6 );
-			var z = ~ ~ ( v.z * 1e6 );
+			// NOTE: 1e2 is pretty coarse but was chosen because it allows edges
+			// to be smoothed as expected (see minifig arms). The errors between edges
+			// could be due to matrix multiplication.
+			var x = ~ ~ ( v.x * 1e2 );
+			var y = ~ ~ ( v.y * 1e2 );
+			var z = ~ ~ ( v.z * 1e2 );
 			return `${ x },${ y },${ z }`;
 
 		}
@@ -116,6 +119,15 @@ THREE.LDrawLoader = ( function () {
 					var reverseHash = hashEdge( v1, v0 );
 					var otherTri = fullHalfEdgeList[ reverseHash ];
 					if ( otherTri ) {
+
+						// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
+						// hard edge. There are some cases where the line segments do not line up exactly
+						// with or span multiple triangle edges (see Lunar Vehicle wheels).
+						if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
+
+							continue;
+
+						}
 
 						// if this triangle has already been traversed then it won't be in
 						// the halfEdgeList. If it has not then add it to the queue and delete
