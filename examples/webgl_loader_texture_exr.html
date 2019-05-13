@@ -107,7 +107,7 @@
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'exposure', 0, 4 ).onChange( render );
+				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();
 
 				//
