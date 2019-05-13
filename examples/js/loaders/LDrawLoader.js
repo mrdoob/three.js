@@ -7,6 +7,83 @@
 
 THREE.LDrawLoader = ( function () {
 
+	var optionalLineVertShader = /* glsl */`
+	attribute vec3 optionalControl0;
+	attribute vec3 optionalControl1;
+	attribute vec3 point0;
+	attribute vec3 point1;
+
+	varying vec4 controlOut0;
+	varying vec4 controlOut1;
+	varying vec4 pointOut0;
+	varying vec4 pointOut1;
+	#include <common>
+	#include <color_pars_vertex>
+	#include <fog_pars_vertex>
+	#include <logdepthbuf_pars_vertex>
+	#include <clipping_planes_pars_vertex>
+	void main() {
+		#include <color_vertex>
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+
+		controlOut0 = projectionMatrix * modelViewMatrix * vec4( optionalControl0, 1.0 );
+		controlOut1 = projectionMatrix * modelViewMatrix * vec4( optionalControl1, 1.0 );
+		pointOut0 = projectionMatrix * modelViewMatrix * vec4( point0, 1.0 );
+		pointOut1 = projectionMatrix * modelViewMatrix * vec4( point1, 1.0 );
+
+		#include <logdepthbuf_vertex>
+		#include <clipping_planes_vertex>
+		#include <fog_vertex>
+	}
+	`;
+
+	var optionalLineFragShader = /* glsl */`
+	uniform vec3 diffuse;
+	uniform float opacity;
+	varying vec4 controlOut0;
+	varying vec4 controlOut1;
+	varying vec4 pointOut0;
+	varying vec4 pointOut1;
+
+	#include <common>
+	#include <color_pars_fragment>
+	#include <fog_pars_fragment>
+	#include <logdepthbuf_pars_fragment>
+	#include <clipping_planes_pars_fragment>
+	void main() {
+
+		vec2 c0 = controlOut0.xy / controlOut0.w;
+		vec2 c1 = controlOut1.xy / controlOut1.w;
+		vec2 p0 = pointOut0.xy / pointOut0.w;
+		vec2 p1 = pointOut1.xy / pointOut1.w;
+		vec2 dir = p1 - p0;
+		vec2 norm = vec2( -dir.y, dir.x );
+
+		vec2 c0dir = c0 - p1;
+		vec2 c1dir = c1 - p1;
+
+		float d0 = dot( normalize( norm ), normalize( c0dir ) );
+		float d1 = dot( normalize( norm ), normalize( c1dir ) );
+
+		if ( sign( d0 ) != sign( d1 ) ) discard;
+
+		#include <clipping_planes_fragment>
+		vec3 outgoingLight = vec3( 0.0 );
+		vec4 diffuseColor = vec4( diffuse, opacity );
+		#include <logdepthbuf_fragment>
+		#include <color_fragment>
+		outgoingLight = diffuseColor.rgb; // simple shader
+		gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+		#include <premultiplied_alpha_fragment>
+		#include <tonemapping_fragment>
+		#include <encodings_fragment>
+		#include <fog_fragment>
+	}
+	`;
+
+
+
 	var tempVec0 = new THREE.Vector3();
 	var tempVec1 = new THREE.Vector3();
 	function smoothNormals( triangles, lineSegments ) {
@@ -548,9 +625,76 @@ THREE.LDrawLoader = ( function () {
 
 						if ( parseScope.conditionalSegments.length > 0 ) {
 
-							var lines = createObject( parseScope.conditionalSegments, 2 );
+							var conditionalSegments = parseScope.conditionalSegments;
+							var lines = createObject( conditionalSegments, 2 );
 							lines.isConditionalLine = true;
 							lines.visible = false;
+
+							var controlArray0 = new Float32Array( conditionalSegments.length * 3 * 2 );
+							var controlArray1 = new Float32Array( conditionalSegments.length * 3 * 2 );
+							var pointArray0 = new Float32Array( conditionalSegments.length * 3 * 2 );
+							var pointArray1 = new Float32Array( conditionalSegments.length * 3 * 2 );
+							for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+								var os = conditionalSegments[ i ];
+								var c0 = os.c0;
+								var c1 = os.c1;
+								var v0 = os.v0;
+								var v1 = os.v1;
+								var index = i * 3 * 2;
+								controlArray0[ index + 0 ] = c0.x;
+								controlArray0[ index + 1 ] = c0.y;
+								controlArray0[ index + 2 ] = c0.z;
+								controlArray0[ index + 3 ] = c0.x;
+								controlArray0[ index + 4 ] = c0.y;
+								controlArray0[ index + 5 ] = c0.z;
+
+								controlArray1[ index + 0 ] = c1.x;
+								controlArray1[ index + 1 ] = c1.y;
+								controlArray1[ index + 2 ] = c1.z;
+								controlArray1[ index + 3 ] = c1.x;
+								controlArray1[ index + 4 ] = c1.y;
+								controlArray1[ index + 5 ] = c1.z;
+
+								pointArray0[ index + 0 ] = v0.x;
+								pointArray0[ index + 1 ] = v0.y;
+								pointArray0[ index + 2 ] = v0.z;
+								pointArray0[ index + 3 ] = v0.x;
+								pointArray0[ index + 4 ] = v0.y;
+								pointArray0[ index + 5 ] = v0.z;
+
+								pointArray1[ index + 0 ] = v1.x;
+								pointArray1[ index + 1 ] = v1.y;
+								pointArray1[ index + 2 ] = v1.z;
+								pointArray1[ index + 3 ] = v1.x;
+								pointArray1[ index + 4 ] = v1.y;
+								pointArray1[ index + 5 ] = v1.z;
+
+							}
+
+							lines.geometry.addAttribute( 'optionalControl0', new THREE.BufferAttribute( controlArray0, 3, false ) );
+							lines.geometry.addAttribute( 'optionalControl1', new THREE.BufferAttribute( controlArray1, 3, false ) );
+							lines.geometry.addAttribute( 'point0', new THREE.BufferAttribute( pointArray0, 3, false ) );
+							lines.geometry.addAttribute( 'point1', new THREE.BufferAttribute( pointArray1, 3, false ) );
+
+							lines.material = lines.material.map( mat => {
+
+								return new THREE.ShaderMaterial( {
+									vertexShader: optionalLineVertShader,
+									fragmentShader: optionalLineFragShader,
+									uniforms: {
+										diffuse: {
+											value: mat.color
+										},
+										opacity: {
+											value: mat.opacity
+										}
+									}
+								} );
+
+							} );
+
+
 							objGroup.add( lines );
 
 						}
@@ -597,6 +741,8 @@ THREE.LDrawLoader = ( function () {
 
 								os.v0.applyMatrix4( parseScope.matrix );
 								os.v1.applyMatrix4( parseScope.matrix );
+								os.c0.applyMatrix4( parseScope.matrix );
+								os.c1.applyMatrix4( parseScope.matrix );
 
 							}
 							parentConditionalSegments.push( os );
@@ -1530,12 +1676,21 @@ THREE.LDrawLoader = ( function () {
 						var material = parseColourCode( lp, true );
 						var arr = lineType === '2' ? lineSegments : conditionalSegments;
 
-						arr.push( {
+						var segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
 							v1: parseVector( lp )
-						} );
+						};
+
+						if ( lineType === '5' ) {
+
+							segment.c0 = parseVector( lp );
+							segment.c1 = parseVector( lp );
+
+						}
+
+						arr.push( segment );
 
 						break;
 
