@@ -205,7 +205,35 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function parseBasematerialsNode( /* basematerialsNode */ ) {
+		function parseBasematerialsNode( basematerialsNode ) {
+
+			var basematerialsData = {
+				id: basematerialsNode.getAttribute( 'id' ), // required
+				basematerials: []
+			};
+
+			var basematerialNodes = basematerialsNode.querySelectorAll( 'base' );
+
+			for ( var i = 0; i < basematerialNodes.length; i ++ ) {
+
+				var basematerialNode = basematerialNodes[ i ];
+				var basematerialData = parseBasematerialNode( basematerialNode );
+				basematerialsData.basematerials.push( basematerialData );
+
+			}
+
+			return basematerialsData;
+
+		}
+
+		function parseBasematerialNode( basematerialNode ) {
+
+			var basematerialData = {};
+
+			basematerialData[ 'name' ] = basematerialNode.getAttribute( 'name' ); // required
+			basematerialData[ 'displaycolor' ] = basematerialNode.getAttribute( 'displaycolor' ); // required
+
+			return basematerialData;
 
 		}
 
@@ -437,7 +465,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			if ( basematerialsNode ) {
 
-				resourcesData[ 'basematerial' ] = parseBasematerialsNode( basematerialsNode );
+				resourcesData[ 'basematerials' ] = parseBasematerialsNode( basematerialsNode );
 
 			}
 
@@ -514,36 +542,168 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function buildMesh( meshData ) {
+		function buildMesh( meshData, objects, modelData, objectData ) {
+
+			// geometry
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
 			geometry.addAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
-			if ( meshData[ 'colors' ] ) {
+			// groups
 
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( meshData[ 'colors' ], 3 ) );
+			var basematerialsData = modelData[ 'resources' ][ 'basematerials' ];
+			var triangleProperties = meshData[ 'triangleProperties' ];
+
+			var start = 0;
+			var count = 0;
+			var currentMaterialIndex = - 1;
+
+			for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
+
+				var triangleProperty = triangleProperties[ i ];
+				var pid = triangleProperty.pid;
+
+				// only proceed if the triangle refers to a basematerials definition
+
+				if ( basematerialsData && ( basematerialsData.id === pid ) ) {
+
+					if ( currentMaterialIndex === - 1 ) currentMaterialIndex = triangleProperty.p1;
+
+					if ( currentMaterialIndex === triangleProperty.p1 ) {
+
+						count += 3; // primitves per triangle
+
+					} else {
+
+						geometry.addGroup( start, count, currentMaterialIndex );
+
+						start += count;
+						count = 3;
+						currentMaterialIndex = triangleProperty.p1;
+
+					}
+
+				}
 
 			}
+
+			if ( geometry.groups.length > 0 ) mergeGroups( geometry );
 
 			geometry.computeBoundingSphere();
 
-			var materialOpts = {
-				flatShading: true
-			};
+			// material
 
-			if ( meshData[ 'colors' ] && 0 < meshData[ 'colors' ].length ) {
+			var material;
 
-				materialOpts[ 'vertexColors' ] = THREE.VertexColors;
+			if ( basematerialsData && ( basematerialsData.id === objectData.pid ) ) {
+
+				var materialIndex = objectData.pindex;
+				var basematerialData = basematerialsData.basematerials[ materialIndex ];
+
+				material = getBuild( basematerialData, objects, modelData, objectData, buildBasematerial );
+
+			} else if ( geometry.groups.length > 0 ) {
+
+				var groups = geometry.groups;
+				material = [];
+
+				for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+					var group = groups[ i ];
+					var basematerialData = basematerialsData.basematerials[ group.materialIndex ];
+
+					material.push( getBuild( basematerialData, objects, modelData, objectData, buildBasematerial ) );
+
+				}
 
 			} else {
 
-				materialOpts[ 'color' ] = 0xaaaaff;
+				// default material
+
+				material = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
 
 			}
 
-			var material = new THREE.MeshPhongMaterial( materialOpts );
 			return new THREE.Mesh( geometry, material );
+
+		}
+
+		function mergeGroups( geometry ) {
+
+			// sort by material index
+
+			var groups = geometry.groups.sort( function ( a, b ) {
+
+				if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
+
+				return a.start - b.start;
+
+			} );
+
+			// reorganize index buffer
+
+			var index = geometry.index;
+
+			var itemSize = index.itemSize;
+			var srcArray = index.array;
+
+			var targetOffset = 0;
+
+			var targetArray = new srcArray.constructor( srcArray.length );
+
+			for ( var i = 0; i < groups.length; i ++ ) {
+
+				var group = groups[ i ];
+
+				var groupLength = group.count * itemSize;
+				var groupStart = group.start * itemSize;
+
+				var sub = srcArray.subarray( groupStart, groupStart + groupLength );
+
+				targetArray.set( sub, targetOffset );
+
+				targetOffset += groupLength;
+
+			}
+
+			srcArray.set( targetArray );
+
+			// update groups
+
+			var start = 0;
+
+			for ( i = 0; i < groups.length; i ++ ) {
+
+				group = groups[ i ];
+
+				group.start = start;
+				start += group.count;
+
+			}
+
+			// merge groups
+
+			var lastGroup = groups[ 0 ];
+
+			geometry.groups = [ lastGroup ];
+
+			for ( i = 1; i < groups.length; i ++ ) {
+
+				group = groups[ i ];
+
+				if ( lastGroup.materialIndex === group.materialIndex ) {
+
+					lastGroup.count += group.count;
+
+				} else {
+
+					lastGroup = group;
+					geometry.groups.push( lastGroup );
+
+				}
+
+			}
 
 		}
 
@@ -585,13 +745,39 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function getBuild( data, objects, modelData, builder ) {
+		function getBuild( data, objects, modelData, objectData, builder ) {
 
 			if ( data.build !== undefined ) return data.build;
 
-			data.build = builder( data, objects, modelData );
+			data.build = builder( data, objects, modelData, objectData );
 
 			return data.build;
+
+		}
+
+		function buildBasematerial( materialData ) {
+
+			var material = new THREE.MeshPhongMaterial( { flatShading: true } );
+
+			material.name = materialData.name;
+
+			// displaycolor MUST be specified with a value of a 6 or 8 digit hexadecimal number, e.g. "#RRGGBB" or "#RRGGBBAA"
+
+			var displaycolor = materialData.displaycolor;
+
+			var color = displaycolor.substring( 0, 7 );
+			material.color.setStyle( color );
+			material.color.convertSRGBToLinear(); // displaycolor is in sRGB
+
+			// process alpha if set
+
+			if ( displaycolor.length === 9 ) {
+
+				material.opacity = parseInt( displaycolor.charAt( 7 ) + displaycolor.charAt( 8 ), 16 ) / 255;
+
+			}
+
+			return material;
 
 		}
 
@@ -634,22 +820,23 @@ THREE.ThreeMFLoader.prototype = {
 		function buildObject( objectId, objects, modelData ) {
 
 			var objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
-			var meshData = objectData[ 'mesh' ];
 
-			if ( meshData ) {
+			if ( objectData[ 'mesh' ] ) {
+
+				var meshData = objectData[ 'mesh' ];
 
 				var extensions = modelData[ 'extensions' ];
 				var modelXml = modelData[ 'xml' ];
 
 				applyExtensions( extensions, meshData, modelXml );
 
-				objects[ objectData.id ] = getBuild( meshData, objects, modelData, buildMesh );
+				objects[ objectData.id ] = getBuild( meshData, objects, modelData, objectData, buildMesh );
 
 			} else {
 
 				var compositeData = objectData[ 'components' ];
 
-				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, buildComposite );
+				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, objectData, buildComposite );
 
 			}
 
