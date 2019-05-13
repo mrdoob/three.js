@@ -1740,8 +1740,10 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				if (object.matrixAutoUpdate) {
-						object.updateMatrix();
+				if ( object.matrixAutoUpdate ) {
+
+					object.updateMatrix();
+
 				}
 
 				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
