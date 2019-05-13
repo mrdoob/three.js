@@ -202,6 +202,14 @@
 
 		}
 
+		filterInput.onblur = function ( event ) {
+
+			if(filterInput.value === '') {
+				panel.classList.remove('searchFocused');
+			}
+
+		}
+
 		exitSearchButton.onclick = function( event ) {
 
 			filterInput.value = '';
