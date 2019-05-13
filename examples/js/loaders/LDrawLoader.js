@@ -550,6 +550,7 @@ THREE.LDrawLoader = ( function () {
 
 							var lines = createObject( parseScope.conditionalSegments, 2 );
 							lines.isConditionalLine = true;
+							lines.visible = false;
 							objGroup.add( lines );
 
 						}
@@ -557,9 +558,9 @@ THREE.LDrawLoader = ( function () {
 						if ( parentParseScope.groupObject ) {
 
 							objGroup.name = parseScope.fileName;
-							objGroup.matrix.copy( parseScope.matrix );
 							objGroup.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
-							objGroup.matrixAutoUpdate = false;
+							objGroup.userData.category = parseScope.category;
+							objGroup.userData.keywords = parseScope.keywords;
 
 							parentParseScope.groupObject.add( objGroup );
 
@@ -822,6 +823,8 @@ THREE.LDrawLoader = ( function () {
 				numSubobjects: 0,
 				subobjectIndex: 0,
 				inverted: false,
+				category: null,
+				keywords: null,
 
 				// Current subobject
 				currentFileName: null,
