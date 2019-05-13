@@ -558,9 +558,9 @@ THREE.LDrawLoader = ( function () {
 						if ( parentParseScope.groupObject ) {
 
 							objGroup.name = parseScope.fileName;
-							objGroup.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
 							objGroup.userData.category = parseScope.category;
 							objGroup.userData.keywords = parseScope.keywords;
+							parseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
 
 							parentParseScope.groupObject.add( objGroup );
 
