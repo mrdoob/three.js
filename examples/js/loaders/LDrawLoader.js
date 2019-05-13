@@ -8,10 +8,9 @@
 THREE.LDrawLoader = ( function () {
 
 	var optionalLineVertShader = /* glsl */`
-	attribute vec3 optionalControl0;
-	attribute vec3 optionalControl1;
-	attribute vec3 point0;
-	attribute vec3 point1;
+	attribute vec3 control0;
+	attribute vec3 control1;
+	attribute vec3 direction;
 
 	varying vec4 controlOut0;
 	varying vec4 controlOut1;
@@ -27,10 +26,10 @@ THREE.LDrawLoader = ( function () {
 		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 		gl_Position = projectionMatrix * mvPosition;
 
-		controlOut0 = projectionMatrix * modelViewMatrix * vec4( optionalControl0, 1.0 );
-		controlOut1 = projectionMatrix * modelViewMatrix * vec4( optionalControl1, 1.0 );
-		pointOut0 = projectionMatrix * modelViewMatrix * vec4( point0, 1.0 );
-		pointOut1 = projectionMatrix * modelViewMatrix * vec4( point1, 1.0 );
+		controlOut0 = projectionMatrix * modelViewMatrix * vec4( control0, 1.0 );
+		controlOut1 = projectionMatrix * modelViewMatrix * vec4( control1, 1.0 );
+		pointOut0 = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		pointOut1 = projectionMatrix * modelViewMatrix * vec4( position + direction, 1.0 );
 
 		#include <logdepthbuf_vertex>
 		#include <clipping_planes_vertex>
@@ -632,8 +631,7 @@ THREE.LDrawLoader = ( function () {
 
 							var controlArray0 = new Float32Array( conditionalSegments.length * 3 * 2 );
 							var controlArray1 = new Float32Array( conditionalSegments.length * 3 * 2 );
-							var pointArray0 = new Float32Array( conditionalSegments.length * 3 * 2 );
-							var pointArray1 = new Float32Array( conditionalSegments.length * 3 * 2 );
+							var directionArray = new Float32Array( conditionalSegments.length * 3 * 2 );
 							for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 								var os = conditionalSegments[ i ];
@@ -656,26 +654,18 @@ THREE.LDrawLoader = ( function () {
 								controlArray1[ index + 4 ] = c1.y;
 								controlArray1[ index + 5 ] = c1.z;
 
-								pointArray0[ index + 0 ] = v0.x;
-								pointArray0[ index + 1 ] = v0.y;
-								pointArray0[ index + 2 ] = v0.z;
-								pointArray0[ index + 3 ] = v0.x;
-								pointArray0[ index + 4 ] = v0.y;
-								pointArray0[ index + 5 ] = v0.z;
-
-								pointArray1[ index + 0 ] = v1.x;
-								pointArray1[ index + 1 ] = v1.y;
-								pointArray1[ index + 2 ] = v1.z;
-								pointArray1[ index + 3 ] = v1.x;
-								pointArray1[ index + 4 ] = v1.y;
-								pointArray1[ index + 5 ] = v1.z;
+								directionArray[ index + 0 ] = v1.x - v0.x;
+								directionArray[ index + 1 ] = v1.y - v0.y;
+								directionArray[ index + 2 ] = v1.z - v0.z;
+								directionArray[ index + 3 ] = v1.x - v0.x;
+								directionArray[ index + 4 ] = v1.y - v0.y;
+								directionArray[ index + 5 ] = v1.z - v0.z;
 
 							}
 
-							lines.geometry.addAttribute( 'optionalControl0', new THREE.BufferAttribute( controlArray0, 3, false ) );
-							lines.geometry.addAttribute( 'optionalControl1', new THREE.BufferAttribute( controlArray1, 3, false ) );
-							lines.geometry.addAttribute( 'point0', new THREE.BufferAttribute( pointArray0, 3, false ) );
-							lines.geometry.addAttribute( 'point1', new THREE.BufferAttribute( pointArray1, 3, false ) );
+							lines.geometry.addAttribute( 'control0', new THREE.BufferAttribute( controlArray0, 3, false ) );
+							lines.geometry.addAttribute( 'control1', new THREE.BufferAttribute( controlArray1, 3, false ) );
+							lines.geometry.addAttribute( 'direction', new THREE.BufferAttribute( directionArray, 3, false ) );
 
 							lines.material = lines.material.map( mat => {
 
