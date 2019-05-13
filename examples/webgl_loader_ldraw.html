@@ -111,7 +111,7 @@
 					envMapActivated: false,
 					separateObjects: false,
 					displayLines: true,
-					optionalLines: false,
+					conditionalLines: false,
 					smoothNormals: true
 				};
 
@@ -149,7 +149,7 @@
 
 				} );
 
-				gui.add( guiData, 'optionalLines' ).name( 'Optional Lines' ).onChange( function ( value ) {
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
 
 					updateLineSegments();
 
@@ -181,7 +181,7 @@
 
 						if ( c.isConditionalLine ) {
 
-							c.visible = guiData.optionalLines;
+							c.visible = guiData.conditionalLines;
 
 						} else {
 
