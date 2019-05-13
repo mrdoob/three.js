@@ -9,23 +9,27 @@
 		<style>
 			#panel #content .link {
 				display: block;
-				text-decoration: none;
-				cursor: pointer;
 			}
-
-			#viewSrcButton {
+			#button {
 				position: fixed;
-				bottom: 20px;
-				right: 20px;
+				bottom: 16px;
+				right: 16px;
+
 				padding: 8px;
-				color: #fff;
-				background-color: #555;
-				opacity: 0.7;
+				border-radius: 50%;
+				margin-bottom: 0px; /* TODO div sets it to 20px */
+
+				background-color: #E5E5E5;
+				opacity: .9;
 			}
 
-			#viewSrcButton:hover {
+			#button:hover {
 				cursor: pointer;
 				opacity: 1;
+			}
+
+			#button img {
+				display: block;
 			}
 		</style>
 	</head>
@@ -60,6 +64,8 @@
 		</div>
 
 		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+
+		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
 		<script src="files.js"></script>
 
@@ -106,12 +112,8 @@
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var viewSrcButton = document.createElement( 'a' );
-		viewSrcButton.id = 'viewSrcButton';
-		viewSrcButton.target = '_blank';
-		viewSrcButton.textContent = 'View source';
+		var viewSrcButton = document.getElementById( 'button' );
 		viewSrcButton.style.display = 'none';
-		document.body.appendChild( viewSrcButton );
 
 		var links = {};
 		var selected = null;

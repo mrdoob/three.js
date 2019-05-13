@@ -166,7 +166,7 @@ strong {
 
 	padding: 8px;
 	border-radius: 50%;
-	margin-bottom: 0px; /* TODO div sets it to 20px */
+	margin-bottom: 0px;
 
 	background-color: #E5E5E5;
 	opacity: .9;
