@@ -27,6 +27,7 @@
 
 			<div id="contentWrapper">
 				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+				<div id="exitSearchButton"></div>
 
 				<select id="language">
 					<option value="en">en</option>
@@ -91,6 +92,7 @@
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
 			var expandButton = document.getElementById( 'expandButton' );
+			var exitSearchButton = document.getElementById( 'exitSearchButton' );
 			var panelScrim = document.getElementById( 'panelScrim' );
 			var filterInput = document.getElementById( 'filter' );
 			var iframe = document.querySelector( 'iframe' );
@@ -120,6 +122,19 @@
 
 
 			// Functionality for search/filter input field
+ 			filterInput.onfocus = function ( event ) {
+
+				panel.classList.add('searchFocused');
+
+			}
+
+			exitSearchButton.onclick = function( event ) {
+
+				filterInput.value = '';
+				updateFilter();
+				panel.classList.remove('searchFocused');
+
+			}
 
 			filterInput.oninput = function ( event ) {
 

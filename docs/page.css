@@ -161,8 +161,8 @@ strong {
 
 #button {
 	position: fixed;
-	bottom: 16px;
-	right: 16px;
+	bottom: 12px;
+	right: 12px;
 
 	padding: 8px;
 	border-radius: 50%;
@@ -179,6 +179,7 @@ strong {
 
 	#button img {
 		display: block;
+		width: 20px;
 	}
 
 a.permalink {

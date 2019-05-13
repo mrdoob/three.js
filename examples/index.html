@@ -12,8 +12,8 @@
 			}
 			#button {
 				position: fixed;
-				bottom: 16px;
-				right: 16px;
+				bottom: 12px;
+				right: 12px;
 
 				padding: 8px;
 				border-radius: 50%;
@@ -30,6 +30,7 @@
 
 			#button img {
 				display: block;
+				width: 20px;
 			}
 		</style>
 	</head>
@@ -52,6 +53,7 @@
 
 			<div id="contentWrapper">
 				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+				<div id="exitSearchButton"></div>
 
 				<select id="language">
 					<option value="en">en</option>
@@ -84,6 +86,7 @@
 		var viewer = document.getElementById( 'viewer' );
 
 		var filterInput = document.getElementById( 'filter' );
+		var exitSearchButton = document.getElementById( 'exitSearchButton' );
 
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
@@ -193,6 +196,19 @@
 		}
 
 		// filter
+		filterInput.onfocus = function ( event ) {
+
+			panel.classList.add('searchFocused');
+
+		}
+
+		exitSearchButton.onclick = function( event ) {
+
+			filterInput.value = '';
+			updateFilter();
+			panel.classList.remove('searchFocused');
+
+		}
 
 		filterInput.addEventListener( 'input', function( e ) {
 
