@@ -1268,6 +1268,7 @@ THREE.LDrawLoader = ( function () {
 			}
 
 			material.transparent = isTransparent;
+			material.premultipliedAlpha = true;
 			material.opacity = alpha;
 
 			material.userData.canHaveEnvMap = canHaveEnvMap;
