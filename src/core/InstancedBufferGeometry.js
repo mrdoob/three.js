@@ -36,7 +36,7 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 	},
 
 	toJSON: function(){
-		var data = InstancedBufferGeometry.prototype.toJSON.call( this );
+		var data = BufferGeometry.prototype.toJSON.call( this );
 
 		data.maxInstancedCount = this.maxInstancedCount;
 
