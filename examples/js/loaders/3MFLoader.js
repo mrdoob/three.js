@@ -1,5 +1,17 @@
 /**
  * @author technohippy / https://github.com/technohippy
+ * @author Mugen87 / https://github.com/Mugen87
+ *
+ * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
+ *
+ * The following features from the core specification are supported:
+ *
+ * - 3D Models
+ * - Object Resources (Meshes and Components)
+ * - Material Resources (Base Materials)
+ *
+ * 3MF Materials and Properties Extension (e.g. textures) are not yet supported.
+ *
  */
 
 THREE.ThreeMFLoader = function ( manager ) {
@@ -63,7 +75,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( e instanceof ReferenceError ) {
 
-					console.error( 'THREE.ThreeMFLoader: jszip missing and file is compressed.' );
+					console.error( 'THREE.3MFLoader: jszip missing and file is compressed.' );
 					return null;
 
 				}
@@ -110,7 +122,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
-					console.error( 'THREE.ThreeMFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
+					console.error( 'THREE.3MFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
 
 				}
 
@@ -596,6 +608,8 @@ THREE.ThreeMFLoader.prototype = {
 
 			var material;
 
+			// add material if an object-level definition is present
+
 			if ( basematerialsData && ( basematerialsData.id === objectData.pid ) ) {
 
 				var materialIndex = objectData.pindex;
@@ -603,7 +617,11 @@ THREE.ThreeMFLoader.prototype = {
 
 				material = getBuild( basematerialData, objects, modelData, objectData, buildBasematerial );
 
-			} else if ( geometry.groups.length > 0 ) {
+			}
+
+			// add/overwrite material if definitions on triangles are present
+
+			if ( geometry.groups.length > 0 ) {
 
 				var groups = geometry.groups;
 				material = [];
@@ -617,13 +635,11 @@ THREE.ThreeMFLoader.prototype = {
 
 				}
 
-			} else {
-
-				// default material
-
-				material = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
-
 			}
+
+			// default material
+
+			if ( material === undefined ) material = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
 
 			return new THREE.Mesh( geometry, material );
 
