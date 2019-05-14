@@ -122,7 +122,7 @@
 
 
 			// Functionality for search/filter input field
- 			filterInput.onfocus = function ( event ) {
+			filterInput.onfocus = function ( event ) {
 
 				panel.classList.add('searchFocused');
 
@@ -175,9 +175,12 @@
 					panel.classList.remove( 'open' );
 
 
-					content.querySelectorAll('a').forEach((item) => {
-						item.classList.remove('selected');
-					});
+					content.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+						item.classList.remove( 'selected' );
+
+					} );
+
 					link.classList.add('selected');
 
 				} );
