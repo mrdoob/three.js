@@ -194,7 +194,7 @@ h1 a {
 	}
 	#panel #content {
 		flex: 1;
-		overflow: scroll;
+		overflow-y: scroll;
 		padding: 0 var(--panel-padding) 24px var(--panel-padding);
 	}
 
