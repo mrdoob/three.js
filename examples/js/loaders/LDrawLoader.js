@@ -1271,6 +1271,9 @@ THREE.LDrawLoader = ( function () {
 			material.premultipliedAlpha = true;
 			material.opacity = alpha;
 
+			material.polygonOffset = true;
+			material.polygonOffsetFactor = 1;
+
 			material.userData.canHaveEnvMap = canHaveEnvMap;
 
 			if ( luminance !== 0 ) {
