@@ -75,14 +75,13 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.TextureLoader().load( 'textures/cube/pisaRGBM16/nz.png', function ( texture ) {
+				new THREE.TextureLoader().load( 'textures/memorial.png', function ( texture ) {
 
 					texture.encoding = THREE.RGBM16Encoding;
 
-					// these setting are set correctly by default
-					//texture.minFilter = THREE.LinearMipMapLinearFilter;
-					//texture.magFilter = THREE.LinearFilter;
-					//texture.flipY = true;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.flipY = true;
 
 					var material = new THREE.MeshBasicMaterial( { map: texture } );
 
