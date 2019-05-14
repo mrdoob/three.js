@@ -842,7 +842,7 @@ THREE.GLTFLoader = ( function () {
 				for ( var i = 0, il = params.length; i < il; i ++ ) {
 
 					var value = source[ params[ i ] ];
-					target[ params[ i ] ] = value.isColor ? value.clone() : value;
+					target[ params[ i ] ] = ( value && value.isColor ) ? value.clone() : value;
 
 				}
 
