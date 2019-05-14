@@ -8,6 +8,7 @@ var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
+	{ path: 'controls/DeviceOrientationControls.js', ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
