@@ -459,13 +459,20 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
-							if ( data.length === 8 ) {
+							if ( data.length === 7 ) { // v x y z r g b
 
 								state.colors.push(
 									parseFloat( data[ 4 ] ),
 									parseFloat( data[ 5 ] ),
 									parseFloat( data[ 6 ] )
+								);
 
+							} else if ( data.length === 8 ) { // v x y z w r g b
+
+								state.colors.push(
+									parseFloat( data[ 5 ] ),
+									parseFloat( data[ 6 ] ),
+									parseFloat( data[ 7 ] )
 								);
 
 							}
