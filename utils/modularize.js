@@ -24,10 +24,14 @@ var files = [
 	{ path: 'exporters/STLExporter.js', ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
 
+	{ path: 'loaders/BVHLoader.js', ignoreList: [] },
+	{ path: 'loaders/PCDLoader.js', ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
-	{ path: 'loaders/STLLoader.js', ignoreList: [] },
+	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
+	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
+	{ path: 'loaders/TGALoader.js', ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
