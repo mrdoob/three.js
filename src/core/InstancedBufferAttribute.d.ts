@@ -37,9 +37,8 @@ export namespace GeometryUtils {
  */
 export class InstancedBufferAttribute extends BufferAttribute {
   constructor(
-    array: ArrayLike<number>,
+    data: ArrayLike<number>,
     itemSize: number,
-    normalized?: boolean,
     meshPerAttribute?: number
   );
 

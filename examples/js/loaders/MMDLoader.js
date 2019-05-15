@@ -1359,9 +1359,6 @@ THREE.MMDLoader = ( function () {
 
 					t.image = scope._getRotatedImage( t.image );
 
-					t.magFilter = THREE.NearestFilter;
-					t.minFilter = THREE.NearestFilter;
-
 				}
 
 				t.flipY = false;

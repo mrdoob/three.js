@@ -4,7 +4,7 @@ export function error(message?: any, ...optionalParams: any[]): void;
 export function log(message?: any, ...optionalParams: any[]): void;
 
 // typed array parameters
-export type TypedArray =
+type TypedArray =
   | Int8Array
   | Uint8Array
   | Uint8ClampedArray

@@ -100,8 +100,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		if ( lights.length === 0 ) return;
 
-		var currentRenderTarget = _renderer.getRenderTarget();
-
 		var _state = _renderer.state;
 
 		// Set GL state for depth map.
@@ -257,8 +255,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		}
 
 		scope.needsUpdate = false;
-
-		_renderer.setRenderTarget( currentRenderTarget );
 
 	};
 

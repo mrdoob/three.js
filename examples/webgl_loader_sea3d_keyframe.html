@@ -92,7 +92,7 @@
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				new THREE.OrbitControls( camera, renderer.domElement );
+				new THREE.OrbitControls( camera );
 
 				// events
 
@@ -184,6 +184,7 @@
 				composer.addPass( vignettePass );
 
 				composer.addPass( copyPass );
+				copyPass.renderToScreen = true;
 
 				// events
 

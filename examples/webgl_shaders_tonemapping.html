@@ -368,6 +368,7 @@
 				hdrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
 				bloomPass = new THREE.BloomPass();
 				var gammaCorrectionPass = new THREE.ShaderPass( THREE.GammaCorrectionShader );
+				gammaCorrectionPass.renderToScreen = true;
 
 				dynamicHdrEffectComposer.addPass( skyboxPass );
 				dynamicHdrEffectComposer.addPass( scenePass );
@@ -389,6 +390,7 @@
 				ldrEffectComposer.addPass( gammaCorrectionPass );
 
 				// var gammaPass = new THREE.ShaderPass( GammaShader );
+				// gammaPass.renderToScreen = true;
 				// ldrEffectComposer.addPass( gammaPass );
 
 				var gui = new dat.GUI();

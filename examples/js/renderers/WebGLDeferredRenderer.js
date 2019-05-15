@@ -40,8 +40,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var _this = this;
 
-	var _context;
-	var _state;
+	var _gl;
 
 	var _width, _height;
 
@@ -115,7 +114,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	this.renderer = undefined;
 	this.domElement = undefined;
 
-	this.forwardRendering = false; // for debug
+	this.forwardRendering = false;  // for debug
 
 	// private methods
 
@@ -124,11 +123,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer();
 		_this.domElement = _this.renderer.domElement;
 
-		_context = _this.renderer.context;
-		_state = _this.renderer.state;
+		_gl = _this.renderer.context;
 
-		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize( new THREE.Vector2() ).width;
-		_height = parameters.height !== undefined ? parameters.height : _this.renderer.getSize( new THREE.Vector2() ).height;
+		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize().width;
+		_height = parameters.height !== undefined ? parameters.height : _this.renderer.getSize().height;
 
 		var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 
@@ -182,7 +180,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compNormalDepth = new THREE.EffectComposer( _this.renderer, rt );
-		_compNormalDepth.renderToScreen = false;
 		_compNormalDepth.addPass( _passNormalDepth );
 
 	}
@@ -203,7 +200,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compColor = new THREE.EffectComposer( _this.renderer, rt );
-		_compColor.renderToScreen = false;
 		_compColor.addPass( _passColor );
 
 	}
@@ -228,7 +224,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compLight = new THREE.EffectComposer( _this.renderer, rt );
-		_compLight.renderToScreen = false;
 		_compLight.addPass( _passLightFullscreen );
 		_compLight.addPass( _passLight );
 
@@ -250,7 +245,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rt.texture.generateMipamps = false;
 
 		_compReconstruction = new THREE.EffectComposer( _this.renderer, rt );
-		_compReconstruction.renderToScreen = false;
 		_compReconstruction.addPass( _passReconstruction );
 
 	}
@@ -1072,15 +1066,24 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( _lightPrePass ) {
 
+			_passForward.renderToScreen = false;
 			_passForward.enabled = false;
+
+			_passCopy.renderToScreen = false;
 			_passCopy.enabled = false;
 
 			if ( _antialias ) {
 
+				_passFinal.renderToScreen = false;
+
+				_passFXAA.renderToScreen = true;
 				_passFXAA.enabled = true;
 
 			} else {
 
+				_passFinal.renderToScreen = true;
+
+				_passFXAA.renderToScreen = false;
 				_passFXAA.enabled = false;
 
 			}
@@ -1091,14 +1094,28 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 				if ( _antialias ) {
 
+					_passFinal.renderToScreen = false;
+
+					_passForward.renderToScreen = false;
 					_passForward.enabled = true;
+
+					_passCopy.renderToScreen = false;
 					_passCopy.enabled = false;
+
+					_passFXAA.renderToScreen = true;
 					_passFXAA.enabled = true;
 
 				} else {
 
+					_passFinal.renderToScreen = false;
+
+					_passForward.renderToScreen = false;
 					_passForward.enabled = true;
+
+					_passCopy.renderToScreen = true;
 					_passCopy.enabled = true;
+
+					_passFXAA.renderToScreen = false;
 					_passFXAA.enabled = false;
 
 				}
@@ -1107,14 +1124,28 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 				if ( _antialias ) {
 
+					_passFinal.renderToScreen = false;
+
+					_passForward.renderToScreen = false;
 					_passForward.enabled = false;
+
+					_passCopy.renderToScreen = false;
 					_passCopy.enabled = false;
+
+					_passFXAA.renderToScreen = true;
 					_passFXAA.enabled = true;
 
 				} else {
 
+					_passFinal.renderToScreen = true;
+
+					_passForward.renderToScreen = false;
 					_passForward.enabled = false;
+
+					_passCopy.renderToScreen = false;
 					_passCopy.enabled = false;
+
+					_passFXAA.renderToScreen = false;
 					_passFXAA.enabled = false;
 
 				}
@@ -1145,7 +1176,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			if ( cache[ key ].used === false ) {
 
-				cache[ key ].count ++;
+				cache[ key ].count++;
 
 				if ( cache[ key ].keepAlive === false && cache[ key ].count > _removeThresholdCount ) {
 
@@ -1224,9 +1255,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer.autoClearDepth = true;
 		_this.renderer.autoClearStencil = true;
 
-		_state.buffers.stencil.setTest( true );
-		_state.buffers.stencil.setFunc( _context.ALWAYS, 1, 0xffffffff );
-		_state.buffers.stencil.setOp( _context.REPLACE, _context.REPLACE, _context.REPLACE );
+		_gl.enable( _gl.STENCIL_TEST );
+		_gl.stencilFunc( _gl.ALWAYS, 1, 0xffffffff );
+		_gl.stencilOp( _gl.REPLACE, _gl.REPLACE, _gl.REPLACE );
 
 		_compNormalDepth.render();
 
@@ -1255,8 +1286,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer.autoClearDepth = false;
 		_this.renderer.autoClearStencil = false;
 
-		_state.buffers.stencil.setFunc( _context.EQUAL, 1, 0xffffffff );
-		_state.buffers.stencil.setOp( _context.KEEP, _context.KEEP, _context.KEEP );
+		_gl.stencilFunc( _gl.EQUAL, 1, 0xffffffff );
+		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
 
 		_compColor.render();
 
@@ -1287,7 +1318,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compLight.render();
 
-		_state.buffers.stencil.setTest( false );
+		_gl.disable( _gl.STENCIL_TEST );
 
 	}
 
@@ -1312,8 +1343,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer.autoClearDepth = false;
 		_this.renderer.autoClearStencil = false;
 
-		_state.buffers.stencil.setFunc( _context.EQUAL, 1, 0xffffffff );
-		_state.buffers.stencil.setOp( _context.KEEP, _context.KEEP, _context.KEEP );
+		_gl.stencilFunc( _gl.EQUAL, 1, 0xffffffff );
+		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
 
 		_compLight.render();
 
@@ -1340,7 +1371,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		_compReconstruction.render();
 
-		_state.buffers.stencil.setTest( false );
+		_gl.disable( _gl.STENCIL_TEST );
 
 		scene.traverse( restoreOriginalMaterial );
 

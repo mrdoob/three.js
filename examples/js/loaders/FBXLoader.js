@@ -499,7 +499,7 @@ THREE.FBXLoader = ( function () {
 					break;
 				default:
 					console.warn( 'THREE.FBXLoader: unknown material type "%s". Defaulting to MeshPhongMaterial.', type );
-					material = new THREE.MeshPhongMaterial();
+					material = new THREE.MeshPhongMaterial( { color: 0x3300ff } );
 					break;
 
 			}
@@ -532,13 +532,11 @@ THREE.FBXLoader = ( function () {
 				parameters.color = new THREE.Color().fromArray( materialNode.DiffuseColor.value );
 
 			}
-
 			if ( materialNode.DisplacementFactor ) {
 
 				parameters.displacementScale = materialNode.DisplacementFactor.value;
 
 			}
-
 			if ( materialNode.Emissive ) {
 
 				parameters.emissive = new THREE.Color().fromArray( materialNode.Emissive.value );
@@ -549,37 +547,31 @@ THREE.FBXLoader = ( function () {
 				parameters.emissive = new THREE.Color().fromArray( materialNode.EmissiveColor.value );
 
 			}
-
 			if ( materialNode.EmissiveFactor ) {
 
 				parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor.value );
 
 			}
-
 			if ( materialNode.Opacity ) {
 
 				parameters.opacity = parseFloat( materialNode.Opacity.value );
 
 			}
-
 			if ( parameters.opacity < 1.0 ) {
 
 				parameters.transparent = true;
 
 			}
-
 			if ( materialNode.ReflectionFactor ) {
 
 				parameters.reflectivity = materialNode.ReflectionFactor.value;
 
 			}
-
 			if ( materialNode.Shininess ) {
 
 				parameters.shininess = materialNode.Shininess.value;
 
 			}
-
 			if ( materialNode.Specular ) {
 
 				parameters.specular = new THREE.Color().fromArray( materialNode.Specular.value );
@@ -602,12 +594,7 @@ THREE.FBXLoader = ( function () {
 						parameters.bumpMap = self.getTexture( textureMap, child.ID );
 						break;
 
-					case 'Maya|TEX_ao_map':
-						parameters.aoMap = self.getTexture( textureMap, child.ID );
-						break;
-
 					case 'DiffuseColor':
-					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
 						break;
 
@@ -615,12 +602,12 @@ THREE.FBXLoader = ( function () {
 						parameters.displacementMap = self.getTexture( textureMap, child.ID );
 						break;
 
+
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
 						break;
 
 					case 'NormalMap':
-					case 'Maya|TEX_normal_map':
 						parameters.normalMap = self.getTexture( textureMap, child.ID );
 						break;
 
@@ -2349,17 +2336,15 @@ THREE.FBXLoader = ( function () {
 
 			var rawClips = this.parseClips();
 
-			if ( rawClips !== undefined ) {
+			if ( rawClips === undefined ) return;
 
-				for ( var key in rawClips ) {
+			for ( var key in rawClips ) {
 
-					var rawClip = rawClips[ key ];
+				var rawClip = rawClips[ key ];
 
-					var clip = this.addClip( rawClip );
+				var clip = this.addClip( rawClip );
 
-					animationClips.push( clip );
-
-				}
+				animationClips.push( clip );
 
 			}
 
@@ -2525,7 +2510,7 @@ THREE.FBXLoader = ( function () {
 
 										sceneGraph.traverse( function ( child ) {
 
-											if ( child.ID === rawModel.id ) {
+											if ( child.ID = rawModel.id ) {
 
 												node.transform = child.matrix;
 

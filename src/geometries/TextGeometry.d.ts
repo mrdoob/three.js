@@ -10,7 +10,6 @@ export interface TextGeometryParameters {
   bevelEnabled?: boolean;
   bevelThickness?: number;
   bevelSize?: number;
-  bevelOffset?: number;
   bevelSegments?: number;
 }
 
@@ -25,7 +24,6 @@ export class TextBufferGeometry extends ExtrudeBufferGeometry {
     bevelEnabled: boolean;
     bevelThickness: number;
     bevelSize: number;
-    bevelOffset: number;
     bevelSegments: number;
   };
 }
@@ -41,7 +39,6 @@ export class TextGeometry extends ExtrudeGeometry {
     bevelEnabled: boolean;
     bevelThickness: number;
     bevelSize: number;
-    bevelOffset: number;
     bevelSegments: number;
   };
 }

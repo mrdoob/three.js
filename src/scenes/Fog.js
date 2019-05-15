@@ -1,9 +1,9 @@
+import { Color } from '../math/Color.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
-
-import { Color } from '../math/Color.js';
 
 function Fog( color, near, far ) {
 
@@ -16,27 +16,23 @@ function Fog( color, near, far ) {
 
 }
 
-Object.assign( Fog.prototype, {
+Fog.prototype.isFog = true;
 
-	isFog: true,
+Fog.prototype.clone = function () {
 
-	clone: function () {
+	return new Fog( this.color, this.near, this.far );
 
-		return new Fog( this.color, this.near, this.far );
+};
 
-	},
+Fog.prototype.toJSON = function ( /* meta */ ) {
 
-	toJSON: function ( /* meta */ ) {
+	return {
+		type: 'Fog',
+		color: this.color.getHex(),
+		near: this.near,
+		far: this.far
+	};
 
-		return {
-			type: 'Fog',
-			color: this.color.getHex(),
-			near: this.near,
-			far: this.far
-		};
-
-	}
-
-} );
+};
 
 export { Fog };

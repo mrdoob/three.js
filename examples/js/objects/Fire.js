@@ -431,7 +431,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	};
 
-	this.onBeforeRender = function ( renderer ) {
+	this.onBeforeRender = function ( renderer, scene, camera ) {
 
 		var delta = this.clock.getDelta();
 		if ( delta > 0.1 ) {

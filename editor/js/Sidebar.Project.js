@@ -119,22 +119,45 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
+	rendererPropertiesRow.add( new UI.Break() );
+
+	// Renderer / Gamma input
+
+	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), strings.getKey( 'sidebar/project/gammainput' ) ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaInput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaInput );
+
+	// Renderer / Gamma output
+
+	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), strings.getKey( 'sidebar/project/gammaoutput' ) ).onChange( function () {
+
+		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPropertiesRow.add( rendererGammaOutput );
+
 	container.add( rendererPropertiesRow );
 
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows ) {
+	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
-
+		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
+		renderer.gammaInput = gammaIn;
+		renderer.gammaOutput = gammaOut;
 		if ( shadows && renderer.shadowMap ) {
 
 			renderer.shadowMap.enabled = true;
@@ -146,7 +169,7 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/gammaInput' ), config.getKey( 'project/renderer/gammaOutput' ) );
 
 	return container;
 

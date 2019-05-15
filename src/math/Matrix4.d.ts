@@ -25,9 +25,9 @@ export class Matrix4 implements Matrix {
   constructor();
 
   /**
-   * Array with matrix values.
+   * Float32Array with matrix values.
    */
-  elements: number[];
+  elements: Float32Array;
 
   /**
    * Sets all fields of this matrix.

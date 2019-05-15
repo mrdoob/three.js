@@ -6,6 +6,7 @@
  */
 
 import { _Math } from './Math.js';
+import { Vector3 } from './Vector3.js';
 
 function Quaternion( x, y, z, w ) {
 
@@ -349,48 +350,51 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	setFromUnitVectors: function ( vFrom, vTo ) {
+	setFromUnitVectors: function () {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
+		var v1 = new Vector3();
+		var r;
+
 		var EPS = 0.000001;
 
-		var r = vFrom.dot( vTo ) + 1;
+		return function setFromUnitVectors( vFrom, vTo ) {
 
-		if ( r < EPS ) {
+			if ( v1 === undefined ) v1 = new Vector3();
 
-			r = 0;
+			r = vFrom.dot( vTo ) + 1;
 
-			if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
+			if ( r < EPS ) {
 
-				this._x = - vFrom.y;
-				this._y = vFrom.x;
-				this._z = 0;
-				this._w = r;
+				r = 0;
+
+				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
+
+					v1.set( - vFrom.y, vFrom.x, 0 );
+
+				} else {
+
+					v1.set( 0, - vFrom.z, vFrom.y );
+
+				}
 
 			} else {
 
-				this._x = 0;
-				this._y = - vFrom.z;
-				this._z = vFrom.y;
-				this._w = r;
+				v1.crossVectors( vFrom, vTo );
 
 			}
 
-		} else {
-
-			// crossVectors( vFrom, vTo ); // inlined to avoid cyclic dependency on Vector3
-
-			this._x = vFrom.y * vTo.z - vFrom.z * vTo.y;
-			this._y = vFrom.z * vTo.x - vFrom.x * vTo.z;
-			this._z = vFrom.x * vTo.y - vFrom.y * vTo.x;
+			this._x = v1.x;
+			this._y = v1.y;
+			this._z = v1.z;
 			this._w = r;
 
-		}
+			return this.normalize();
 
-		return this.normalize();
+		};
 
-	},
+	}(),
 
 	angleTo: function ( q ) {
 

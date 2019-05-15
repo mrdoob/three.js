@@ -101,7 +101,12 @@ THREE.OutlinePass = function ( resolution, scene, camera, selectedObjects ) {
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
+	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
+	this.scene.add( this.quad );
 
 	this.tempPulseColor1 = new THREE.Color();
 	this.tempPulseColor2 = new THREE.Color();
@@ -297,11 +302,11 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			this.renderScene.background = currentBackground;
 
 			// 2. Downsample to Half resolution
-			this.fsQuad.material = this.materialCopy;
+			this.quad.material = this.materialCopy;
 			this.copyUniforms[ "tDiffuse" ].value = this.renderTargetMaskBuffer.texture;
 			renderer.setRenderTarget( this.renderTargetMaskDownSampleBuffer );
 			renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 			this.tempPulseColor1.copy( this.visibleEdgeColor );
 			this.tempPulseColor2.copy( this.hiddenEdgeColor );
@@ -315,44 +320,44 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			}
 
 			// 3. Apply Edge Detection Pass
-			this.fsQuad.material = this.edgeDetectionMaterial;
+			this.quad.material = this.edgeDetectionMaterial;
 			this.edgeDetectionMaterial.uniforms[ "maskTexture" ].value = this.renderTargetMaskDownSampleBuffer.texture;
 			this.edgeDetectionMaterial.uniforms[ "texSize" ].value = new THREE.Vector2( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
 			this.edgeDetectionMaterial.uniforms[ "visibleEdgeColor" ].value = this.tempPulseColor1;
 			this.edgeDetectionMaterial.uniforms[ "hiddenEdgeColor" ].value = this.tempPulseColor2;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
 			renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 			// 4. Apply Blur on Half res
-			this.fsQuad.material = this.separableBlurMaterial1;
+			this.quad.material = this.separableBlurMaterial1;
 			this.separableBlurMaterial1.uniforms[ "colorTexture" ].value = this.renderTargetEdgeBuffer1.texture;
 			this.separableBlurMaterial1.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionX;
 			this.separableBlurMaterial1.uniforms[ "kernelRadius" ].value = this.edgeThickness;
 			renderer.setRenderTarget( this.renderTargetBlurBuffer1 );
 			renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 			this.separableBlurMaterial1.uniforms[ "colorTexture" ].value = this.renderTargetBlurBuffer1.texture;
 			this.separableBlurMaterial1.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
 			renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 			// Apply Blur on quarter res
-			this.fsQuad.material = this.separableBlurMaterial2;
+			this.quad.material = this.separableBlurMaterial2;
 			this.separableBlurMaterial2.uniforms[ "colorTexture" ].value = this.renderTargetEdgeBuffer1.texture;
 			this.separableBlurMaterial2.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionX;
 			renderer.setRenderTarget( this.renderTargetBlurBuffer2 );
 			renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 			this.separableBlurMaterial2.uniforms[ "colorTexture" ].value = this.renderTargetBlurBuffer2.texture;
 			this.separableBlurMaterial2.uniforms[ "direction" ].value = THREE.OutlinePass.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer2 );
 			renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 			// Blend it additively over the input texture
-			this.fsQuad.material = this.overlayMaterial;
+			this.quad.material = this.overlayMaterial;
 			this.overlayMaterial.uniforms[ "maskTexture" ].value = this.renderTargetMaskBuffer.texture;
 			this.overlayMaterial.uniforms[ "edgeTexture1" ].value = this.renderTargetEdgeBuffer1.texture;
 			this.overlayMaterial.uniforms[ "edgeTexture2" ].value = this.renderTargetEdgeBuffer2.texture;
@@ -365,7 +370,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 			if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
 			renderer.setRenderTarget( readBuffer );
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
 			renderer.autoClear = oldAutoClear;
@@ -374,10 +379,10 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		if ( this.renderToScreen ) {
 
-			this.fsQuad.material = this.materialCopy;
+			this.quad.material = this.materialCopy;
 			this.copyUniforms[ "tDiffuse" ].value = readBuffer.texture;
 			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 		}
 

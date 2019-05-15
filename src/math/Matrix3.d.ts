@@ -7,9 +7,9 @@ import { Vector3 } from './Vector3';
  */
 export interface Matrix {
   /**
-   * Array with matrix values.
+   * Float32Array with matrix values.
    */
-  elements: number[];
+  elements: Float32Array;
 
   /**
    * identity():T;
@@ -54,9 +54,9 @@ export class Matrix3 implements Matrix {
   constructor();
 
   /**
-   * Array with matrix values.
+   * Float32Array with matrix values.
    */
-  elements: number[];
+  elements: Float32Array;
 
   set(
     n11: number,

@@ -226,9 +226,8 @@
 				this.debug = false;
 				this.dimension = 200;
 				this.quantity = 1;
-				this.callbacks = {
-					onAssetAvailable: null
-				};
+				this.callbackMeshBuilder = null;
+				this.callbackProgress = null;
 				this.serializedMaterials = null;
 				this.logging = {
 					enabled: true,
@@ -239,14 +238,6 @@
 			MeshSpray.Parser.prototype = {
 
 				constructor: MeshSpray.Parser,
-
-				setCallbackOnAssetAvailable: function ( onAssetAvailable ) {
-					if ( onAssetAvailable !== null && onAssetAvailable !== undefined ) {
-
-						this.callbacks.onAssetAvailable = onAssetAvailable;
-
-					}
-				},
 
 				setLogging: function ( enabled, debug ) {
 					this.logging.enabled = enabled === true;
@@ -339,10 +330,10 @@
 							serializedMaterials: newSerializedMaterials
 						}
 					};
-					this.callbacks.onAssetAvailable( payload );
+					this.callbackMeshBuilder( payload );
 
 					this.globalObjectCount++;
-					this.callbacks.onAssetAvailable(
+					this.callbackMeshBuilder(
 						{
 							cmd: 'meshData',
 							progress: {

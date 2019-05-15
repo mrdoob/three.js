@@ -158,10 +158,10 @@ CameraHelper.prototype.update = function () {
 
 		var w = 1, h = 1;
 
-		// we need just camera projection matrix inverse
+		// we need just camera projection matrix
 		// world matrix must be identity
 
-		camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
+		camera.projectionMatrix.copy( this.camera.projectionMatrix );
 
 		// center / target
 

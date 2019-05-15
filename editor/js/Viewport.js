@@ -10,7 +10,6 @@ var Viewport = function ( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
-	container.add( new Viewport.Camera( editor ) );
 	container.add( new Viewport.Info( editor ) );
 
 	//
@@ -199,7 +198,7 @@ var Viewport = function ( editor ) {
 
 	function onMouseDown( event ) {
 
-		// event.preventDefault();
+		event.preventDefault();
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
@@ -313,7 +312,6 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.gammaOutput = true;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -395,7 +393,7 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( object.isPerspectiveCamera ) {
+		if ( object instanceof THREE.PerspectiveCamera ) {
 
 			object.updateProjectionMatrix();
 
@@ -413,7 +411,6 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		controls.enabled = true; // see #14180
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
@@ -480,41 +477,18 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( scene.fog ) {
+		if ( scene.fog instanceof THREE.Fog ) {
 
-			if ( scene.fog.isFog ) {
+			scene.fog.color.setHex( fogColor );
+			scene.fog.near = fogNear;
+			scene.fog.far = fogFar;
 
-				scene.fog.color.setHex( fogColor );
-				scene.fog.near = fogNear;
-				scene.fog.far = fogFar;
+		} else if ( scene.fog instanceof THREE.FogExp2 ) {
 
-			} else if ( scene.fog.isFogExp2 ) {
-
-				scene.fog.color.setHex( fogColor );
-				scene.fog.density = fogDensity;
-
-			}
+			scene.fog.color.setHex( fogColor );
+			scene.fog.density = fogDensity;
 
 		}
-
-		render();
-
-	} );
-
-	signals.viewportCameraChanged.add( function ( viewportCamera ) {
-
-		if ( viewportCamera.isPerspectiveCamera ) {
-
-			viewportCamera.aspect = editor.camera.aspect;
-			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
-
-		} else if ( ! viewportCamera.isOrthographicCamera ) {
-
-			throw "Invalid camera set as viewport";
-
-		}
-
-		camera = viewportCamera;
 
 		render();
 
@@ -545,44 +519,18 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	// animations
-
-	var prevTime = performance.now();
-
-	function animate( time ) {
-
-		requestAnimationFrame( animate );
-
-		var mixer = editor.mixer;
-
-		if ( mixer.stats.actions.inUse > 0 ) {
-
-			mixer.update( ( time - prevTime ) / 1000 );
-			render();
-
-		}
-
-		prevTime = time;
-
-	}
-
-	requestAnimationFrame( animate );
-
 	//
 
 	function render() {
 
+		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
+
 		renderer.render( scene, camera );
 
 		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			if ( camera === editor.camera ) {
-
-				sceneHelpers.updateMatrixWorld();
-				renderer.render( sceneHelpers, camera );
-
-			}
+			renderer.render( sceneHelpers, camera );
 
 		}
 

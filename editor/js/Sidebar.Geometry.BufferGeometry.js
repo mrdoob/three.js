@@ -17,7 +17,7 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 		var geometry = object.geometry;
 
-		if ( geometry && geometry.isBufferGeometry ) {
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			container.clear();
 			container.setDisplay( 'block' );

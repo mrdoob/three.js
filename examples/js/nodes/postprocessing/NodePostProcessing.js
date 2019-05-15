@@ -16,7 +16,7 @@ function NodePostProcessing( renderer, renderTarget ) {
 			stencilBuffer: false
 		};
 
-		var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+		var size = renderer.getDrawingBufferSize();
 		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 
 	}

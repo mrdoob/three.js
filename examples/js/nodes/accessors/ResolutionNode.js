@@ -8,8 +8,6 @@ function ResolutionNode() {
 
 	Vector2Node.call( this );
 
-	this.size = new THREE.Vector2();
-
 }
 
 ResolutionNode.prototype = Object.create( Vector2Node.prototype );
@@ -20,12 +18,11 @@ ResolutionNode.prototype.updateFrame = function ( frame ) {
 
 	if ( frame.renderer ) {
 
-		frame.renderer.getSize( this.size );
+		var size = frame.renderer.getSize(),
+			pixelRatio = frame.renderer.getPixelRatio();
 
-		var pixelRatio = frame.renderer.getPixelRatio();
-
-		this.x = this.size.width * pixelRatio;
-		this.y = this.size.height * pixelRatio;
+		this.x = size.width * pixelRatio;
+		this.y = size.height * pixelRatio;
 
 	} else {
 

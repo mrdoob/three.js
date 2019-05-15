@@ -31,11 +31,9 @@ THREE.SMAAPass = function ( width, height ) {
 
 	var areaTextureImage = new Image();
 	areaTextureImage.src = this.getAreaTexture();
-	areaTextureImage.onload = function () {
-
+	areaTextureImage.onload = function() {
 		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
 		scope.areaTexture.needsUpdate = true;
-
 	};
 
 	this.areaTexture = new THREE.Texture();
@@ -109,7 +107,12 @@ THREE.SMAAPass = function ( width, height ) {
 
 	this.needsSwap = false;
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene  = new THREE.Scene();
+
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quad.frustumCulled = false; // Avoid getting clipped
+	this.scene.add( this.quad );
 
 };
 
@@ -123,36 +126,36 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		this.uniformsEdges[ "tDiffuse" ].value = readBuffer.texture;
 
-		this.fsQuad.material = this.materialEdges;
+		this.quad.material = this.materialEdges;
 
 		renderer.setRenderTarget( this.edgesRT );
 		if ( this.clear ) renderer.clear();
-		this.fsQuad.render( renderer );
+		renderer.render( this.scene, this.camera );
 
 		// pass 2
 
-		this.fsQuad.material = this.materialWeights;
+		this.quad.material = this.materialWeights;
 
 		renderer.setRenderTarget( this.weightsRT );
 		if ( this.clear ) renderer.clear();
-		this.fsQuad.render( renderer );
+		renderer.render( this.scene, this.camera );
 
 		// pass 3
 
 		this.uniformsBlend[ "tColor" ].value = readBuffer.texture;
 
-		this.fsQuad.material = this.materialBlend;
+		this.quad.material = this.materialBlend;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 		}
 

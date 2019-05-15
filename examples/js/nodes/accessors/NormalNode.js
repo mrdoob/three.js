@@ -43,8 +43,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.LOCAL:
 
-			// to use vObjectNormal as vertex normal
-			//builder.requires.normal = true;
+			builder.requires.normal = true;
 
 			result = 'normal';
 
@@ -52,17 +51,9 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.WORLD:
 
-			if ( builder.isShader( 'vertex' ) ) {
+			builder.requires.worldNormal = true;
 
-				return '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz';
-
-			} else {
-
-				builder.requires.worldNormal = true;
-
-				result = 'vWNormal';
-
-			}
+			result = builder.isShader( 'vertex' ) ? '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz' : 'vWNormal';
 
 			break;
 

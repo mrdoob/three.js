@@ -39,10 +39,23 @@ THREE.AfterimagePass = function ( damp ) {
 
 	} );
 
-	this.compFsQuad = new THREE.Pass.FullScreenQuad( this.shaderMaterial );
+	this.sceneComp = new THREE.Scene();
+	this.scene = new THREE.Scene();
 
-	var material = new THREE.MeshBasicMaterial();
-	this.copyFsQuad = new THREE.Pass.FullScreenQuad( material );
+	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.camera.position.z = 1;
+
+	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+
+	this.quadComp = new THREE.Mesh( geometry, this.shaderMaterial );
+	this.sceneComp.add( this.quadComp );
+
+	var material = new THREE.MeshBasicMaterial( { 
+		map: this.textureComp.texture
+	} );
+
+	var quadScreen = new THREE.Mesh( geometry, material );
+	this.scene.add( quadScreen );
 
 };
 
@@ -55,15 +68,18 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 		this.uniforms[ "tOld" ].value = this.textureOld.texture;
 		this.uniforms[ "tNew" ].value = readBuffer.texture;
 
-		renderer.setRenderTarget( this.textureComp );
-		this.compFsQuad.render( renderer );
+		this.quadComp.material = this.shaderMaterial;
 
-		this.copyFsQuad.material.map = this.textureComp.texture;
+		renderer.setRenderTarget( this.textureComp );
+		renderer.render( this.sceneComp, this.camera );
+
+		renderer.setRenderTarget( this.textureOld );
+		renderer.render( this.scene, this.camera );
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			this.copyFsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 		} else {
 
@@ -71,22 +87,9 @@ THREE.AfterimagePass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			if ( this.clear ) renderer.clear();
 
-			this.copyFsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 		}
-
-		// Swap buffers.
-		var temp = this.textureOld;
-		this.textureOld = this.textureComp;
-		this.textureComp = temp;
-		// Now textureOld contains the latest image, ready for the next frame.
-
-	},
-
-	setSize: function ( width, height ) {
-
-		this.textureComp.setSize( width, height );
-		this.textureOld.setSize( width, height );
 
 	}
 

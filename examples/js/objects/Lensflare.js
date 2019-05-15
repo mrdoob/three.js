@@ -162,7 +162,7 @@ THREE.Lensflare = function () {
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
 
-		renderer.getCurrentViewport( viewport );
+		viewport.copy( renderer.getCurrentViewport() );
 
 		var invAspect = viewport.w / viewport.z;
 		var halfViewportWidth = viewport.z / 2.0;

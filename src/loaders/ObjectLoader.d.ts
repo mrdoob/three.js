@@ -13,7 +13,7 @@ export class ObjectLoader {
 
   load(
     url: string,
-    onLoad?: <ObjectType extends Object3D>(object: ObjectType) => void,
+    onLoad?: (object: Object3D) => void,
     onProgress?: (event: ProgressEvent) => void,
     onError?: (event: Error | ErrorEvent) => void
   ): void;

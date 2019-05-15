@@ -33,7 +33,6 @@ THREE.Reflector = function ( geometry, options ) {
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
 	var q = new THREE.Vector4();
-	var size = new THREE.Vector2();
 
 	var textureMatrix = new THREE.Matrix4();
 	var virtualCamera = new THREE.PerspectiveCamera();
@@ -172,9 +171,19 @@ THREE.Reflector = function ( geometry, options ) {
 
 		// Restore viewport
 
-		if ( camera.isArrayCamera ) {
+		var bounds = camera.bounds;
 
-			renderer.state.viewport( camera.viewport );
+		if ( bounds !== undefined ) {
+
+			var size = renderer.getSize();
+			var pixelRatio = renderer.getPixelRatio();
+
+			viewport.x = bounds.x * size.width * pixelRatio;
+			viewport.y = bounds.y * size.height * pixelRatio;
+			viewport.z = bounds.z * size.width * pixelRatio;
+			viewport.w = bounds.w * size.height * pixelRatio;
+
+			renderer.state.viewport( viewport );
 
 		}
 

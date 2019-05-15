@@ -93,7 +93,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		renderer.setRenderTarget( _renderTargetR );
 		renderer.clear();
-		renderer.render( scene, _stereo.cameraR );
+		renderer.render( scene, _stereo.cameraR, _renderTargetR, true );
 
 		renderer.setRenderTarget( null );
 		renderer.render( _scene, _camera );

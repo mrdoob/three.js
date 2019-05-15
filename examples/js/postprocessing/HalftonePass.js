@@ -30,34 +30,39 @@ THREE.HalftonePass = function ( width, height, params ) {
 
 		if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
 
-			this.uniforms[ key ].value = params[ key ];
+			this.uniforms[key].value = params[key];
 
 		}
 
 	}
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
+ 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+ 	this.scene = new THREE.Scene();
+ 	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+ 	this.quad.frustumCulled = false;
+ 	this.scene.add( this.quad );
 
-};
+ };
 
-THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+ THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
 	constructor: THREE.HalftonePass,
 
 	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
  		this.material.uniforms[ "tDiffuse" ].value = readBuffer.texture;
+ 		this.quad.material = this.material;
 
  		if ( this.renderToScreen ) {
 
  			renderer.setRenderTarget( null );
- 			this.fsQuad.render( renderer );
+ 			renderer.render( this.scene, this.camera );
 
 		} else {
 
  			renderer.setRenderTarget( writeBuffer );
  			if ( this.clear ) renderer.clear();
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene, this.camera );
 
 		}
 

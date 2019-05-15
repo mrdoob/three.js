@@ -64,8 +64,7 @@ THREE.GLTFExporter = ( function () {
 		truncateDrawRange: true,
 		animations: [],
 		forceIndices: false,
-		forcePowerOfTwoTextures: false,
-		includeCustomExtensions: false
+		forcePowerOfTwoTextures: false
 	};
 
 	/**
@@ -115,38 +114,6 @@ THREE.GLTFExporter = ( function () {
 		}
 
 		return arrayBuffer;
-	}
-
-	var uids = new Map();
-	var uid = 0;
-
-	/**
-	 * Assign and return a temporal unique id for an object
-	 * especially which doesn't have .uuid
-	 * @param  {Object} object
-	 * @return {Integer}
-	 */
-	function getUID( object ) {
-
-		if ( ! uids.has( object ) ) uids.set( object, uid ++ );
-
-		return uids.get( object );
-
-	}
-
-	/**
-	 * Compare two arrays
-	 * @param  {Array} array1 Array 1 to compare
-	 * @param  {Array} array2 Array 2 to compare
-	 * @return {Boolean}        Returns true if both arrays are equal
-	 */
-	function equalArray( array1, array2 ) {
-
-		return ( array1.length === array2.length ) && array1.every( function ( element, index ) {
-
-			return element === array2[ index ];
-
-		} );
 
 	}
 
@@ -237,6 +204,25 @@ THREE.GLTFExporter = ( function () {
 			};
 
 			var cachedCanvas;
+
+			/**
+			 * Compare two arrays
+			 */
+			/**
+			 * Compare two arrays
+			 * @param  {Array} array1 Array 1 to compare
+			 * @param  {Array} array2 Array 2 to compare
+			 * @return {Boolean}        Returns true if both arrays are equal
+			 */
+			function equalArray( array1, array2 ) {
+
+				return ( array1.length === array2.length ) && array1.every( function ( element, index ) {
+
+					return element === array2[ index ];
+
+				} );
+
+			}
 
 			/**
 			 * Get the min and max vectors from the given attribute
@@ -373,49 +359,20 @@ THREE.GLTFExporter = ( function () {
 			 * Serializes a userData.
 			 *
 			 * @param {THREE.Object3D|THREE.Material} object
-			 * @param {Object} gltfProperty
+			 * @returns {Object}
 			 */
-			function serializeUserData( object, gltfProperty ) {
-
-				if ( Object.keys( object.userData ).length === 0 ) {
-
-					return;
-
-				}
+			function serializeUserData( object ) {
 
 				try {
 
-					var json = JSON.parse( JSON.stringify( object.userData ) );
-
-					if ( options.includeCustomExtensions && json.gltfExtensions ) {
-
-						if ( gltfProperty.extensions === undefined ) {
-
-							gltfProperty.extensions = {};
-
-						}
-
-						for ( var extensionName in json.gltfExtensions ) {
-
-							gltfProperty.extensions[ extensionName ] = json.gltfExtensions[ extensionName ];
-							extensionsUsed[ extensionName ] = true;
-
-						}
-
-						delete json.gltfExtensions;
-
-					}
-
-					if ( Object.keys( json ).length > 0 ) {
-
-						gltfProperty.extras = json;
-
-					}
+					return JSON.parse( JSON.stringify( object.userData ) );
 
 				} catch ( error ) {
 
 					console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
 						'won\'t be serialized because of JSON.stringify error - ' + error.message );
+
+					return {};
 
 				}
 
@@ -1093,7 +1050,11 @@ THREE.GLTFExporter = ( function () {
 
 				}
 
-				serializeUserData( material, gltfMaterial );
+				if ( Object.keys( material.userData ).length > 0 ) {
+
+					gltfMaterial.extras = serializeUserData( material );
+
+				}
 
 				outputJSON.materials.push( gltfMaterial );
 
@@ -1136,6 +1097,10 @@ THREE.GLTFExporter = ( function () {
 					mode = WEBGL_CONSTANTS.LINE_STRIP;
 
 				} else if ( mesh.isPoints ) {
+
+					var geometryTemp = new THREE.BufferGeometry();
+					geometryTemp.fromGeometry( geometry );
+					geometry = geometryTemp;
 
 					mode = WEBGL_CONSTANTS.POINTS;
 
@@ -1200,25 +1165,12 @@ THREE.GLTFExporter = ( function () {
 				var modifiedAttribute = null;
 				for ( var attributeName in geometry.attributes ) {
 
-					// Ignore morph target attributes, which are exported later.
-					if ( attributeName.substr( 0, 5 ) === 'morph' ) continue;
-
 					var attribute = geometry.attributes[ attributeName ];
 					attributeName = nameConversion[ attributeName ] || attributeName.toUpperCase();
 
-					// Prefix all geometry attributes except the ones specifically
-					// listed in the spec; non-spec attributes are considered custom.
-					var validVertexAttributes =
-							/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
-					if ( ! validVertexAttributes.test( attributeName ) ) {
+					if ( cachedData.attributes.has( attribute ) ) {
 
-						attributeName = '_' + attributeName;
-
-					}
-
-					if ( cachedData.attributes.has( getUID( attribute ) ) ) {
-
-						attributes[ attributeName ] = cachedData.attributes.get( getUID( attribute ) );
+						attributes[ attributeName ] = cachedData.attributes.get( attribute );
 						continue;
 
 					}
@@ -1235,11 +1187,15 @@ THREE.GLTFExporter = ( function () {
 
 					}
 
-					var accessor = processAccessor( modifiedAttribute || attribute, geometry );
-					if ( accessor !== null ) {
+					if ( attributeName.substr( 0, 5 ) !== 'MORPH' ) {
 
-						attributes[ attributeName ] = accessor;
-						cachedData.attributes.set( getUID( attribute ), accessor );
+						var accessor = processAccessor( modifiedAttribute || attribute, geometry );
+						if ( accessor !== null ) {
+
+							attributes[ attributeName ] = accessor;
+							cachedData.attributes.set( attribute, accessor );
+
+						}
 
 					}
 
@@ -1305,9 +1261,9 @@ THREE.GLTFExporter = ( function () {
 
 							var baseAttribute = geometry.attributes[ attributeName ];
 
-							if ( cachedData.attributes.has( getUID( attribute ) ) ) {
+							if ( cachedData.attributes.has( attribute ) ) {
 
-								target[ gltfAttributeName ] = cachedData.attributes.get( getUID( attribute ) );
+								target[ gltfAttributeName ] = cachedData.attributes.get( attribute );
 								continue;
 
 							}
@@ -1327,7 +1283,7 @@ THREE.GLTFExporter = ( function () {
 							}
 
 							target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-							cachedData.attributes.set( getUID( baseAttribute ), target[ gltfAttributeName ] );
+							cachedData.attributes.set( baseAttribute, target[ gltfAttributeName ] );
 
 						}
 
@@ -1348,6 +1304,8 @@ THREE.GLTFExporter = ( function () {
 					}
 
 				}
+
+				var extras = ( Object.keys( geometry.userData ).length > 0 ) ? serializeUserData( geometry ) : undefined;
 
 				var forceIndices = options.forceIndices;
 				var isMultiMaterial = Array.isArray( mesh.material );
@@ -1390,32 +1348,22 @@ THREE.GLTFExporter = ( function () {
 						attributes: attributes,
 					};
 
-					serializeUserData( geometry, primitive );
+					if ( extras ) primitive.extras = extras;
 
 					if ( targets.length > 0 ) primitive.targets = targets;
 
 					if ( geometry.index !== null ) {
 
-						var cacheKey = getUID( geometry.index );
+						if ( cachedData.attributes.has( geometry.index ) ) {
 
-						if ( groups[ i ].start !== undefined || groups[ i ].count !== undefined ) {
-
-							cacheKey += ':' + groups[ i ].start + ':' + groups[ i ].count;
-
-						}
-
-						if ( cachedData.attributes.has( cacheKey ) ) {
-
-							primitive.indices = cachedData.attributes.get( cacheKey );
+							primitive.indices = cachedData.attributes.get( geometry.index );
 
 						} else {
 
 							primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-							cachedData.attributes.set( cacheKey, primitive.indices );
+							cachedData.attributes.set( geometry.index, primitive.indices );
 
 						}
-
-						if ( primitive.indices === null ) delete primitive.indices;
 
 					}
 
@@ -1453,7 +1401,6 @@ THREE.GLTFExporter = ( function () {
 				return index;
 
 			}
-
 
 			/**
 			 * Process camera
@@ -1765,12 +1712,7 @@ THREE.GLTFExporter = ( function () {
 
 				} else {
 
-					if ( object.matrixAutoUpdate ) {
-
-						object.updateMatrix();
-
-					}
-
+					object.updateMatrix();
 					if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
 
 						gltfNode.matrix = object.matrix.elements;
@@ -1786,7 +1728,11 @@ THREE.GLTFExporter = ( function () {
 
 				}
 
-				serializeUserData( object, gltfNode );
+				if ( object.userData && Object.keys( object.userData ).length > 0 ) {
+
+					gltfNode.extras = serializeUserData( object );
+
+				}
 
 				if ( object.isMesh || object.isLine || object.isPoints ) {
 
@@ -1817,7 +1763,7 @@ THREE.GLTFExporter = ( function () {
 
 				} else if ( object.isLight ) {
 
-					console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.', object );
+					console.warn( 'THREE.GLTFExporter: Only directional, point, and spot lights are supported.' );
 					return null;
 
 				}
@@ -1893,6 +1839,12 @@ THREE.GLTFExporter = ( function () {
 
 				}
 
+				if ( scene.userData && Object.keys( scene.userData ).length > 0 ) {
+
+					gltfScene.extras = serializeUserData( scene );
+
+				}
+
 				outputJSON.scenes.push( gltfScene );
 
 				var nodes = [];
@@ -1920,8 +1872,6 @@ THREE.GLTFExporter = ( function () {
 					gltfScene.nodes = nodes;
 
 				}
-
-				serializeUserData( scene, gltfScene );
 
 			}
 
@@ -2266,102 +2216,104 @@ THREE.GLTFExporter = ( function () {
 			var tracks = [];
 			var mergedTracks = {};
 			var sourceTracks = clip.tracks;
-	
+
 			for ( var i = 0; i < sourceTracks.length; ++ i ) {
-	
+
 				var sourceTrack = sourceTracks[ i ];
 				var sourceTrackBinding = THREE.PropertyBinding.parseTrackName( sourceTrack.name );
 				var sourceTrackNode = THREE.PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
-	
+
 				if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' || sourceTrackBinding.propertyIndex === undefined ) {
-	
+
 					// Tracks that don't affect morph targets, or that affect all morph targets together, can be left as-is.
 					tracks.push( sourceTrack );
 					continue;
-	
+
 				}
-	
+
 				if ( sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete
 					&& sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
-	
+
 					if ( sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
-	
+
 						// This should never happen, because glTF morph target animations
 						// affect all targets already.
 						throw new Error( 'THREE.GLTFExporter: Cannot merge tracks with glTF CUBICSPLINE interpolation.' );
-	
+
 					}
-	
+
 					console.warn( 'THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.' );
-	
+
 					sourceTrack = sourceTrack.clone();
-					sourceTrack.setInterpolation( THREE.InterpolateLinear );
-	
+					sourceTrack.setInterpolation( InterpolateLinear );
+
 				}
-	
+
 				var targetCount = sourceTrackNode.morphTargetInfluences.length;
 				var targetIndex = sourceTrackNode.morphTargetDictionary[ sourceTrackBinding.propertyIndex ];
-	
+
 				if ( targetIndex === undefined ) {
-	
+
 					throw new Error( 'THREE.GLTFExporter: Morph target name not found: ' + sourceTrackBinding.propertyIndex );
-	
+
 				}
-	
+
 				var mergedTrack;
-	
+
 				// If this is the first time we've seen this object, create a new
 				// track to store merged keyframe data for each morph target.
 				if ( mergedTracks[ sourceTrackNode.uuid ] === undefined ) {
-	
+
 					mergedTrack = sourceTrack.clone();
-	
+
 					var values = new mergedTrack.ValueBufferType( targetCount * mergedTrack.times.length );
-	
+
 					for ( var j = 0; j < mergedTrack.times.length; j ++ ) {
-	
+
 						values[ j * targetCount + targetIndex ] = mergedTrack.values[ j ];
-	
+
 					}
-	
+
 					mergedTrack.name = '.morphTargetInfluences';
 					mergedTrack.values = values;
-	
+
 					mergedTracks[ sourceTrackNode.uuid ] = mergedTrack;
 					tracks.push( mergedTrack );
-	
+
 					continue;
-	
+
 				}
-	
+
+				var mergedKeyframeIndex = 0;
+				var sourceKeyframeIndex = 0;
 				var sourceInterpolant = sourceTrack.createInterpolant( new sourceTrack.ValueBufferType( 1 ) );
-	
+
 				mergedTrack = mergedTracks[ sourceTrackNode.uuid ];
-	
+
 				// For every existing keyframe of the merged track, write a (possibly
 				// interpolated) value from the source track.
 				for ( var j = 0; j < mergedTrack.times.length; j ++ ) {
-	
+
 					mergedTrack.values[ j * targetCount + targetIndex ] = sourceInterpolant.evaluate( mergedTrack.times[ j ] );
-	
+
 				}
-	
+
 				// For every existing keyframe of the source track, write a (possibly
 				// new) keyframe to the merged track. Values from the previous loop may
 				// be written again, but keyframes are de-duplicated.
 				for ( var j = 0; j < sourceTrack.times.length; j ++ ) {
-	
+
 					var keyframeIndex = this.insertKeyframe( mergedTrack, sourceTrack.times[ j ] );
 					mergedTrack.values[ keyframeIndex * targetCount + targetIndex ] = sourceTrack.values[ j ];
-	
+
 				}
-	
+
 			}
-	
+
 			clip.tracks = tracks;
-	
+
 			return clip;
-	
+
 		}
 
 	};

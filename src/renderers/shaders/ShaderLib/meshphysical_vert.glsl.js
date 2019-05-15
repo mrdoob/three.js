@@ -7,13 +7,6 @@ varying vec3 vViewPosition;
 
 	varying vec3 vNormal;
 
-	#ifdef USE_TANGENT
-
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
-
-	#endif
-
 #endif
 
 #include <common>
@@ -43,13 +36,6 @@ void main() {
 #ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
 
 	vNormal = normalize( transformedNormal );
-
-	#ifdef USE_TANGENT
-
-		vTangent = normalize( transformedTangent );
-		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
-
-	#endif
 
 #endif
 

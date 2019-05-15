@@ -3,6 +3,8 @@
 		"type": "App"
 	},
 	"project": {
+		"gammaInput": true,
+		"gammaOutput": true,
 		"shadows": true,
 		"vr": false
 	},

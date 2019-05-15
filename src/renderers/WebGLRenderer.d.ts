@@ -7,7 +7,6 @@ import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { WebGLProperties } from './webgl/WebGLProperties';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLState } from './webgl/WebGLState';
-import { Vector2 } from './../math/Vector2';
 import { Vector4 } from './../math/Vector4';
 import { Color } from './../math/Color';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
@@ -70,28 +69,21 @@ export interface WebGLRendererParameters {
   preserveDrawingBuffer?: boolean;
 
   /**
-   *  Can be "high-performance", "low-power" or "default"
+   * default is 0x000000.
    */
-  powerPreference?: string;
+  clearColor?: number;
 
   /**
-   * default is true.
+   * default is 0.
    */
-  depth?: boolean;
+  clearAlpha?: number;
+
+  devicePixelRatio?: number;
 
   /**
    * default is false.
    */
   logarithmicDepthBuffer?: boolean;
-}
-
-export interface WebGLDebug {
-
-  /**
-   * Enables error checking and reporting when shader programs are being compiled.
-   */
-  checkShaderErrors: boolean;
-
 }
 
 /**
@@ -136,11 +128,6 @@ export class WebGLRenderer implements Renderer {
    * If autoClear is true, defines whether the renderer should clear the stencil buffer. Default is true.
    */
   autoClearStencil: boolean;
-
-  /**
-   * Debug configurations.
-   */
-  debug: WebGLDebug;
 
   /**
    * Defines whether the renderer should sort objects. Default is true.
@@ -192,6 +179,7 @@ export class WebGLRenderer implements Renderer {
   properties: WebGLProperties;
   renderLists: WebGLRenderLists;
   state: WebGLState;
+  allocTextureUnit: any;
 
   vr: WebVRManager;
 
@@ -215,43 +203,26 @@ export class WebGLRenderer implements Renderer {
   getPixelRatio(): number;
   setPixelRatio(value: number): void;
 
-  getDrawingBufferSize(target: Vector2): Vector2;
+  getDrawingBufferSize(): { width: number; height: number };
   setDrawingBufferSize(width: number, height: number, pixelRatio: number): void;
 
-  getSize(target: Vector2): Vector2;
+  getSize(): { width: number; height: number };
 
   /**
    * Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).
    */
   setSize(width: number, height: number, updateStyle?: boolean): void;
 
-  getCurrentViewport(target: Vector4): Vector4;
-
-  /**
-   * Copies the viewport into target.
-   */
-  getViewport(target: Vector4): Vector4;
-
+  getCurrentViewport(): Vector4;
   /**
    * Sets the viewport to render from (x, y) to (x + width, y + height).
-   * (x, y) is the lower-left corner of the region.
    */
-  setViewport(x: Vector4 | number, y?: number, width?: number, height?: number): void;
-
-  /**
-   * Copies the scissor area into target.
-   */
-  getScissor(target: Vector4): Vector4;
+  setViewport(x?: number, y?: number, width?: number, height?: number): void;
 
   /**
    * Sets the scissor area from (x, y) to (x + width, y + height).
    */
-  setScissor(x: Vector4 | number, y?: number, width?: number, height?: number): void;
-
-  /**
-   * Returns true if scissor test is enabled; returns false otherwise.
-   */
-  getScissorTest(): boolean;
+  setScissor(x: number, y: number, width: number, height: number): void;
 
   /**
    * Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.
@@ -331,48 +302,29 @@ export class WebGLRenderer implements Renderer {
   animate(callback: Function): void;
 
   /**
-   * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
-   */
-  compile(
-    scene: Scene,
-    camera: Camera
-  ): void;
-
-  /**
    * Render a scene using a camera.
-   * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
-   * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
-   *
-   * By default render buffers are cleared before rendering but you can prevent this by setting the property
-   * {@link WebGLRenderer#autoClear autoClear} to false. If you want to prevent only certain buffers being cleared
-   * you can set either the {@link WebGLRenderer#autoClearColor autoClearColor},
-   * {@link WebGLRenderer#autoClearStencil autoClearStencil} or {@link WebGLRenderer#autoClearDepth autoClearDepth}
-   * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
+   * The render is done to the renderTarget (if specified) or to the canvas as usual.
+   * If forceClear is true, the canvas will be cleared before rendering, even if the renderer's autoClear property is false.
    */
   render(
     scene: Scene,
-    camera: Camera
+    camera: Camera,
+    renderTarget?: RenderTarget,
+    forceClear?: boolean
   ): void;
 
   /**
-   * Returns the current render target. If no render target is set, null is returned.
+   * @deprecated
    */
-  getRenderTarget(): RenderTarget | null;
-
+  setTexture(texture: Texture, slot: number): void;
+  setTexture2D(texture: Texture, slot: number): void;
+  setTextureCube(texture: Texture, slot: number): void;
+  getRenderTarget(): RenderTarget;
   /**
    * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
    */
-  getCurrentRenderTarget(): RenderTarget | null;
-
-  /**
-   * Sets the active render target.
-   *
-   * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
-	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
-	 * @param activeMipMapLevel Specifies the active mipmap level.
-   */
-  setRenderTarget(renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipMapLevel?: number): void;
-
+  getCurrentRenderTarget(): RenderTarget;
+  setRenderTarget(renderTarget?: RenderTarget): void;
   readRenderTargetPixels(
     renderTarget: RenderTarget,
     x: number,

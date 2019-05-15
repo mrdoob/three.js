@@ -4,46 +4,16 @@
 
 var fs = require( 'fs' );
 
-var srcFolder = __dirname + '/../examples/js/';
-var dstFolder = __dirname + '/../examples/jsm/';
+var srcFolder = '../examples/js/';
+var dstFolder = '../examples/jsm/';
 
 var files = [
-	{ path: 'controls/DragControls.js', ignoreList: [] },
-	{ path: 'controls/DeviceOrientationControls.js', ignoreList: [] },
-	{ path: 'controls/EditorControls.js', ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
-	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	// { path: 'controls/TransformControls.js', ignoreList: [] },
-
-	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
-	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
-	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
-	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
-	{ path: 'exporters/STLExporter.js', ignoreList: [] },
-	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
-
-	{ path: 'loaders/BVHLoader.js', ignoreList: [ 'Bones' ] },
-	{ path: 'loaders/PCDLoader.js', ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
-	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
-	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
-	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
-	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
-	{ path: 'loaders/TGALoader.js', ignoreList: [] },
-
-	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
-	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
-
-	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/MathUtils.js', ignoreList: [] },
-	{ path: 'utils/SceneUtils.js', ignoreList: [] },
-	{ path: 'utils/ShadowMapViewer.js', ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
-	{ path: 'utils/SkeletonUtils.js', ignoreList: [] },
-	{ path: 'utils/TypedArrayUtils.js', ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', ignoreList: [ 'SphereBufferGeometry' ] },
+	// { file: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'DRACOLoader', 'BufferGeometryUtils' ] },
+	{ path: 'loaders/OBJLoader.js', ignoreList: [] }
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
@@ -62,14 +32,6 @@ function convert( path, ignoreList ) {
 	var className = '';
 	var dependencies = {};
 
-	// imports
-
-	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
-
-		return `${match}\n\n_IMPORTS_`;
-
-	} );
-
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
@@ -78,22 +40,13 @@ function convert( path, ignoreList ) {
 
 		console.log( className );
 
-		return `var ${p1} = `;
+		return `_IMPORTS_\n\nvar ${p1} = `;
 
 	} );
 
-	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
+	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)\./g, function ( match, p1 ) {
 
-		if ( p1 === '\'' ) return match; // Inside a string
-		if ( p2 === className ) return `${p2}${p3}`;
-
-		if ( p1 === 'Math' ) {
-
-			dependencies[ '_Math' ] = true;
-
-			return '_Math.';
-
-		}
+		if ( p1 === className ) return `${p1}.`;
 
 		return match;
 
@@ -113,43 +66,29 @@ function convert( path, ignoreList ) {
 
 	// constants
 
-	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)/g, function ( match, p1, p2 ) {
+	contents = contents.replace( /THREE\.([a-zA-Z0-9]+)/g, function ( match, p1 ) {
 
-		if ( ignoreList.includes( p2 ) ) return match;
-		if ( p1 === '\'' ) return match; // Inside a string
-		if ( p2 === className ) return p2;
+		if ( ignoreList.includes( p1 ) ) return match;
+		if ( p1 === className ) return match;
 
-		if ( p2 === 'Math' || p2 === '_Math' ) {
+		dependencies[ p1 ] = true;
 
-			dependencies[ '_Math' ] = true;
+		// console.log( match, p1 );
 
-			return '_Math';
-
-		}
-
-		dependencies[ p2 ] = true;
-
-		// console.log( match, p2 );
-
-		return `${p2}`;
+		return `${p1}`;
 
 	} );
 
 	//
 
-	var keys = Object.keys( dependencies )
-		.filter( value => value !== className )
-		.map( value => value === '_Math' ? 'Math as _Math' : value )
-		.map( value => '\n\t' + value )
-		.sort()
-		.toString();
+	var keys = Object.keys( dependencies ).sort().map( value => '\n\t' + value ).toString();
 	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${className} };\n`;
+	var exports = `export { ${className} }`;
 
-	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
+	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
 	// console.log( output );
 
 	fs.writeFileSync( dstFolder + path, output, 'utf-8' );
 
-}
+};

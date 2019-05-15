@@ -40,7 +40,11 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 		depthWrite: false
 	} );
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( this.copyMaterial );
+	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.scene2	= new THREE.Scene();
+	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.copyMaterial );
+	this.quad2.frustumCulled = false; // Avoid getting clipped
+	this.scene2.add( this.quad2 );
 
 };
 
@@ -96,7 +100,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 			if ( this.camera.setViewOffset ) {
 
 				this.camera.setViewOffset( width, height,
-					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
 					width, height );
 
 			}
@@ -129,7 +133,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			}
 
-			this.fsQuad.render( renderer );
+			renderer.render( this.scene2, this.camera2 );
 
 		}
 

@@ -68,7 +68,7 @@
 			var solver;
 			var physicsWorld;
 			var dynamicObjects = [];
-			var transformAux1;
+			var transformAux1 = new Ammo.btTransform();
 
 			var heightData = null;
 			var ammoHeightData = null;
@@ -78,14 +78,8 @@
 			var timeNextSpawn = time + objectTimePeriod;
 			var maxNumObjects = 30;
 
-			Ammo().then( function( AmmoLib ) {
-
-				Ammo = AmmoLib;
-
-				init();
-				animate();
-
-			} );
+			init();
+			animate();
 
 			function init() {
 
@@ -100,18 +94,21 @@
 			function initGraphics() {
 
 				container = document.getElementById( 'container' );
-				container.innerHTML = '';
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+
+				container.innerHTML = "";
+
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
@@ -123,7 +120,7 @@
 				camera.position.z = terrainDepthExtents / 2;
 				camera.lookAt( 0, 0, 0 );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new THREE.OrbitControls( camera );
 
 				var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
@@ -212,8 +209,6 @@
 				var groundMotionState = new Ammo.btDefaultMotionState( groundTransform );
 				var groundBody = new Ammo.btRigidBody( new Ammo.btRigidBodyConstructionInfo( groundMass, groundMotionState, groundShape, groundLocalInertia ) );
 				physicsWorld.addRigidBody( groundBody );
-
-				transformAux1 = new Ammo.btTransform();
 
 			}
 

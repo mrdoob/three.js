@@ -1,4 +1,5 @@
 import { _Math } from './Math.js';
+import { Matrix4 } from './Matrix4.js';
 import { Quaternion } from './Quaternion.js';
 
 /**
@@ -317,11 +318,17 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	unproject: function ( camera ) {
+	unproject: function () {
 
-		return this.applyMatrix4( camera.projectionMatrixInverse ).applyMatrix4( camera.matrixWorld );
+		var matrix = new Matrix4();
 
-	},
+		return function unproject( camera ) {
+
+			return this.applyMatrix4( matrix.getInverse( camera.projectionMatrix ) ).applyMatrix4( camera.matrixWorld );
+
+		};
+
+	}(),
 
 	transformDirection: function ( m ) {
 
@@ -387,15 +394,21 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	clampScalar: function ( minVal, maxVal ) {
+	clampScalar: function () {
 
-		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
-		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
-		this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
+		var min = new Vector3();
+		var max = new Vector3();
 
-		return this;
+		return function clampScalar( minVal, maxVal ) {
 
-	},
+			min.set( minVal, minVal, minVal );
+			max.set( maxVal, maxVal, maxVal );
+
+			return this.clamp( min, max );
+
+		};
+
+	}(),
 
 	clampLength: function ( min, max ) {
 

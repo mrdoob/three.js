@@ -20,7 +20,6 @@ var Script = function ( editor ) {
 	header.add( title );
 
 	var buttonSVG = ( function () {
-
 		var svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 		svg.setAttribute( 'width', 32 );
 		svg.setAttribute( 'height', 32 );
@@ -29,7 +28,6 @@ var Script = function ( editor ) {
 		path.setAttribute( 'stroke', '#fff' );
 		svg.appendChild( path );
 		return svg;
-
 	} )();
 
 	var close = new UI.Element( buttonSVG );
@@ -82,7 +80,7 @@ var Script = function ( editor ) {
 
 			if ( ! validate( value ) ) return;
 
-			if ( typeof ( currentScript ) === 'object' ) {
+			if ( typeof( currentScript ) === 'object' ) {
 
 				if ( value !== currentScript.source ) {
 
@@ -90,7 +88,6 @@ var Script = function ( editor ) {
 
 				}
 				return;
-
 			}
 
 			if ( currentScript !== 'programInfo' ) return;
@@ -121,7 +118,7 @@ var Script = function ( editor ) {
 
 		}, 300 );
 
-	} );
+	});
 
 	// prevent backspace from deleting objects
 	var wrapper = codemirror.getWrapperElement();
@@ -180,7 +177,7 @@ var Script = function ( editor ) {
 					for ( var i = 0; i < errors.length; i ++ ) {
 
 						var error = errors[ i ];
-						error.message = error.message.replace( /Line [0-9]+: /, '' );
+						error.message = error.message.replace(/Line [0-9]+: /, '');
 
 					}
 
@@ -192,7 +189,7 @@ var Script = function ( editor ) {
 
 					jsonlint.parseError = function ( message, info ) {
 
-						message = message.split( '\n' )[ 3 ];
+						message = message.split('\n')[3];
 
 						errors.push( {
 
@@ -220,11 +217,11 @@ var Script = function ( editor ) {
 					try {
 
 						var shaderType = currentScript === 'vertexShader' ?
-							glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
+								glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
 
 						glslprep.parseGlsl( string, shaderType );
 
-					} catch ( error ) {
+					} catch( error ) {
 
 						if ( error instanceof glslprep.SyntaxError ) {
 
@@ -257,7 +254,7 @@ var Script = function ( editor ) {
 
 					for ( var i = 0, n = programs.length; i !== n; ++ i ) {
 
-						var diagnostics = programs[ i ].diagnostics;
+						var diagnostics = programs[i].diagnostics;
 
 						if ( diagnostics === undefined ||
 								diagnostics.material !== currentObject.material ) continue;
@@ -265,7 +262,7 @@ var Script = function ( editor ) {
 						if ( ! diagnostics.runnable ) valid = false;
 
 						var shaderInfo = diagnostics[ currentScript ];
-						var lineOffset = shaderInfo.prefix.split( /\r\n|\r|\n/ ).length;
+						var lineOffset = shaderInfo.prefix.split(/\r\n|\r|\n/).length;
 
 						while ( true ) {
 
@@ -308,7 +305,7 @@ var Script = function ( editor ) {
 
 			return valid !== undefined ? valid : errors.length === 0;
 
-		} );
+		});
 
 	};
 
@@ -320,23 +317,23 @@ var Script = function ( editor ) {
 	} );
 
 	codemirror.setOption( 'extraKeys', {
-		'Ctrl-Space': function ( cm ) { server.complete( cm ); },
-		'Ctrl-I': function ( cm ) { server.showType( cm ); },
-		'Ctrl-O': function ( cm ) { server.showDocs( cm ); },
-		'Alt-.': function ( cm ) { server.jumpToDef( cm ); },
-		'Alt-,': function ( cm ) { server.jumpBack( cm ); },
-		'Ctrl-Q': function ( cm ) { server.rename( cm ); },
-		'Ctrl-.': function ( cm ) { server.selectName( cm ); }
+		'Ctrl-Space': function(cm) { server.complete(cm); },
+		'Ctrl-I': function(cm) { server.showType(cm); },
+		'Ctrl-O': function(cm) { server.showDocs(cm); },
+		'Alt-.': function(cm) { server.jumpToDef(cm); },
+		'Alt-,': function(cm) { server.jumpBack(cm); },
+		'Ctrl-Q': function(cm) { server.rename(cm); },
+		'Ctrl-.': function(cm) { server.selectName(cm); }
 	} );
 
-	codemirror.on( 'cursorActivity', function ( cm ) {
+	codemirror.on( 'cursorActivity', function( cm ) {
 
 		if ( currentMode !== 'javascript' ) return;
 		server.updateArgHints( cm );
 
 	} );
 
-	codemirror.on( 'keypress', function ( cm, kb ) {
+	codemirror.on( 'keypress', function( cm, kb ) {
 
 		if ( currentMode !== 'javascript' ) return;
 		var typed = String.fromCharCode( kb.which || kb.keyCode );
@@ -361,7 +358,7 @@ var Script = function ( editor ) {
 
 		var mode, name, source;
 
-		if ( typeof ( script ) === 'object' ) {
+		if ( typeof( script ) === 'object' ) {
 
 			mode = 'javascript';
 			name = script.name;

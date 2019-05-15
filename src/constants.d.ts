@@ -233,8 +233,3 @@ export const RGBDEncoding: TextureEncoding;
 export enum DepthPackingStrategies {}
 export const BasicDepthPacking: DepthPackingStrategies;
 export const RGBADepthPacking: DepthPackingStrategies;
-
-// Normal Map types
-export enum NormalMapTypes {}
-export const TangentSpaceNormalMap: NormalMapTypes;
-export const ObjectSpaceNormalMap: NormalMapTypes;

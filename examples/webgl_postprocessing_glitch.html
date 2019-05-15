@@ -103,6 +103,7 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				glitchPass = new THREE.GlitchPass();
+				glitchPass.renderToScreen = true;
 				composer.addPass( glitchPass );
 
 

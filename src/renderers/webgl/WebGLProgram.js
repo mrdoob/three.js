@@ -206,7 +206,7 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities, textures ) {
+function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
 
 	var gl = renderer.context;
 
@@ -359,8 +359,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
-
-			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
@@ -391,12 +389,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
 			'attribute vec2 uv;',
-
-			'#ifdef USE_TANGENT',
-
-			'	attribute vec4 tangent;',
-
-			'#endif',
 
 			'#ifdef USE_COLOR',
 
@@ -474,8 +466,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
-
-			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
@@ -583,8 +573,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl, renderer.debug.checkShaderErrors );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl, renderer.debug.checkShaderErrors );
+	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );
@@ -604,61 +594,56 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	// check for link errors
-	if ( renderer.debug.checkShaderErrors ) {
+	var programLog = gl.getProgramInfoLog( program ).trim();
+	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
-		var programLog = gl.getProgramInfoLog( program ).trim();
-		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+	var runnable = true;
+	var haveDiagnostics = true;
 
-		var runnable = true;
-		var haveDiagnostics = true;
+	// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
+	// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
-		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
-		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
+	if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+		runnable = false;
 
-			runnable = false;
+		console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
 
-			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
+	} else if ( programLog !== '' ) {
 
-		} else if ( programLog !== '' ) {
+		console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
 
-			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
+	} else if ( vertexLog === '' || fragmentLog === '' ) {
 
-		} else if ( vertexLog === '' || fragmentLog === '' ) {
+		haveDiagnostics = false;
 
-			haveDiagnostics = false;
+	}
 
-		}
+	if ( haveDiagnostics ) {
 
-		if ( haveDiagnostics ) {
+		this.diagnostics = {
 
-			this.diagnostics = {
+			runnable: runnable,
+			material: material,
 
-				runnable: runnable,
-				material: material,
+			programLog: programLog,
 
-				programLog: programLog,
+			vertexShader: {
 
-				vertexShader: {
+				log: vertexLog,
+				prefix: prefixVertex
 
-					log: vertexLog,
-					prefix: prefixVertex
+			},
 
-				},
+			fragmentShader: {
 
-				fragmentShader: {
+				log: fragmentLog,
+				prefix: prefixFragment
 
-					log: fragmentLog,
-					prefix: prefixFragment
+			}
 
-				}
-
-			};
-
-		}
+		};
 
 	}
 
@@ -675,7 +660,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 		if ( cachedUniforms === undefined ) {
 
-			cachedUniforms = new WebGLUniforms( gl, program, textures );
+			cachedUniforms = new WebGLUniforms( gl, program, renderer );
 
 		}
 

@@ -59,7 +59,7 @@ Sidebar.Scene = function ( editor ) {
 
 		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
 
-		if ( object.isMesh ) {
+		if ( object instanceof THREE.Mesh ) {
 
 			var geometry = object.geometry;
 			var material = object.material;
@@ -231,13 +231,13 @@ Sidebar.Scene = function ( editor ) {
 
 			fogColor.setHexValue( scene.fog.color.getHex() );
 
-			if ( scene.fog.isFog ) {
+			if ( scene.fog instanceof THREE.Fog ) {
 
 				fogType.setValue( "Fog" );
 				fogNear.setValue( scene.fog.near );
 				fogFar.setValue( scene.fog.far );
 
-			} else if ( scene.fog.isFogExp2 ) {
+			} else if ( scene.fog instanceof THREE.FogExp2 ) {
 
 				fogType.setValue( "FogExp2" );
 				fogDensity.setValue( scene.fog.density );

@@ -455,7 +455,7 @@
 
 							// apply material
 
-							mtl.side = defaultSide;
+							mtl.side = THREE.DoubleSide;
 							mtl.needsUpdate = true;
 
 							mesh.material = mtl;
@@ -765,8 +765,6 @@
 						// MATERIAL
 
 						mtl = new THREE.PhongNodeMaterial();
-
-						defaultSide = THREE.FrontSide;
 
 						var intensity = 1.3;
 						var power = new THREE.FloatNode( 3 );
@@ -1540,8 +1538,6 @@
 
 						mtl = new THREE.PhongNodeMaterial();
 
-						defaultSide = THREE.FrontSide;
-
 						var time = new THREE.TimerNode();
 						var uv = new THREE.UVNode();
 
@@ -1580,6 +1576,8 @@
 
 						mtl.environment = new THREE.ColorNode( 0xFFFFFF );
 						mtl.alpha = clouds;
+
+						defaultSide = THREE.FrontSide;
 
 						// GUI
 

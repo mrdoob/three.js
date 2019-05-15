@@ -114,9 +114,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	applyMatrix: function ( matrix ) {
 
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
-
-		this.matrix.premultiply( matrix );
+		this.matrix.multiplyMatrices( matrix, this.matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
 

@@ -160,7 +160,10 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 		blending: THREE.NoBlending
 	} );
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
+	this.quadCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	this.quadScene = new THREE.Scene();
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
+	this.quadScene.add( this.quad );
 
 };
 
@@ -316,7 +319,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		var originalClearAlpha = renderer.getClearAlpha();
 		var originalAutoClear = renderer.autoClear;
 
-		renderer.setRenderTarget( renderTarget );
+		renderer.setRenderTarget( renderTarget);
 
 		// setup pass state
 		renderer.autoClear = false;
@@ -328,8 +331,8 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 
 		}
 
-		this.fsQuad.material = passMaterial;
-		this.fsQuad.render( renderer );
+		this.quad.material = passMaterial;
+		renderer.render( this.quadScene, this.quadCamera );
 
 		// restore original state
 		renderer.autoClear = originalAutoClear;

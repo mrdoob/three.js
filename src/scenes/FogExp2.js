@@ -1,9 +1,9 @@
+import { Color } from '../math/Color.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
-
-import { Color } from '../math/Color.js';
 
 function FogExp2( color, density ) {
 
@@ -14,26 +14,22 @@ function FogExp2( color, density ) {
 
 }
 
-Object.assign( FogExp2.prototype, {
+FogExp2.prototype.isFogExp2 = true;
 
-	isFogExp2: true,
+FogExp2.prototype.clone = function () {
 
-	clone: function () {
+	return new FogExp2( this.color, this.density );
 
-		return new FogExp2( this.color, this.density );
+};
 
-	},
+FogExp2.prototype.toJSON = function ( /* meta */ ) {
 
-	toJSON: function ( /* meta */ ) {
+	return {
+		type: 'FogExp2',
+		color: this.color.getHex(),
+		density: this.density
+	};
 
-		return {
-			type: 'FogExp2',
-			color: this.color.getHex(),
-			density: this.density
-		};
-
-	}
-
-} );
+};
 
 export { FogExp2 };

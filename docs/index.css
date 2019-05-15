@@ -1,0 +1,213 @@
+@font-face {
+	font-family: 'inconsolata';
+	src: url('files/inconsolata.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	height: 100%;
+}
+
+body {
+	background-color: #ffffff;
+	margin: 0px;
+	height: 100%;
+	color: #555;
+	font-family: 'inconsolata';
+	font-size: 15px;
+	line-height: 18px;
+	overflow: hidden;
+}
+
+h1 {
+	margin-top: 30px;
+	margin-bottom: 40px;
+	font-size: 25px;
+	font-weight: normal;
+}
+
+h2 {
+	color: #454545;
+	font-size: 18px;
+	font-weight: normal;
+
+	margin-top: 20px;
+}
+
+h3 {
+	color: #666;
+	font-size: 16px;
+	font-weight: normal;
+
+	margin-top: 20px;
+}
+
+a {
+	color: #2194CE;
+	text-decoration: none;
+}
+
+#panel {
+	position: fixed;
+	left: 0px;
+	width: 260px;
+	height: 100%;
+	overflow: auto;
+	padding: 0px 20px 0px 20px;
+	background: #fafafa;
+}
+
+#panel ul {
+	list-style-type: none;
+	padding: 0px;
+}
+
+iframe {
+	position: absolute;
+	border: 0px;
+	left: 260px;
+	width: calc(100% - 260px);
+	height: 100%;
+	overflow: auto;
+}
+
+.filterBlock {
+	position: relative;
+}
+
+.filterBlock p {
+	margin: 0;
+}
+
+#filterInput {
+	width: 100%;
+	padding: 5px;
+	font-family: inherit;
+	font-size: 15px;
+	outline: none;
+	border: 1px solid #dedede;
+}
+
+#filterInput:focus{
+	border: 1px solid #2194CE;
+}
+
+#clearFilterButton {
+	position: absolute;
+	right: 6px;
+	top: 50%;
+	margin-top: -8px;
+	width: 16px;
+	height: 16px;
+	font-size: 14px;
+	color: grey;
+	text-align: center;
+	line-height: 0;
+	padding-top: 7px;
+	opacity: .5;
+}
+
+#clearFilterButton:hover {
+	opacity: 1;
+}
+
+.hidden {
+	display: none;
+}
+
+#panel li b {
+	font-weight: bold;
+}
+
+/* mobile */
+
+#expandButton {
+	display: none;
+	position: absolute;
+	right: 20px;
+	top: 12px;
+	width: 32px;
+	height: 32px;
+}
+
+#expandButton span {
+	height: 2px;
+	background-color: #2194CE;
+	width: 16px;
+	position: absolute;
+	left: 8px;
+	top: 10px;
+}
+
+#expandButton span:nth-child(1) {
+	top: 16px;
+}
+
+#expandButton span:nth-child(2) {
+	top: 22px;
+}
+
+@media all and ( max-width: 640px ) {
+
+	h1 {
+		margin-top: 20px;
+		margin-bottom: 20px;
+	}
+
+	#panel {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 100%;
+		right: 0;
+		z-index: 100;
+		overflow: hidden;
+		border-bottom: 1px solid #dedede;
+	}
+
+	#content {
+		position: absolute;
+		left: 0;
+		top: 120px;
+		right: 0;
+		bottom: 0;
+		font-size: 17px;
+		line-height: 22px;
+		padding-left: 20px;
+		overflow: auto;
+	}
+
+	#navigation {
+		position: absolute;
+		left: 0;
+		top: 90px;
+		right: 0;
+		bottom: 0;
+		font-size: 17px;
+		line-height: 22px;
+		overflow: auto;
+	}
+
+	iframe {
+		position: absolute;
+		left: 0;
+		top: 56px;
+		width: 100%;
+		height: calc(100% - 56px);
+	}
+
+	#expandButton {
+		display: block;
+	}
+
+	#panel.collapsed {
+		height: 56px;
+	}
+
+}

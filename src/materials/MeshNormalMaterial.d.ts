@@ -1,41 +1,19 @@
 import { MaterialParameters, Material } from './Material';
-import { Texture } from './../textures/Texture';
-import { Vector2 } from './../math/Vector2';
-import { NormalMapTypes } from '../constants';
 
 export interface MeshNormalMaterialParameters extends MaterialParameters {
-
-	bumpMap?: Texture;
-	bumpScale?: number;
-	normalMap?: Texture;
-	normalMapType?: NormalMapTypes;
-	normalScale?: Vector2;
-	displacementMap?: Texture;
-	displacementScale?: number;
-	displacementBias?: number;
-	wireframe?: boolean;
-	wireframeLinewidth?: number;
-	skinning?: boolean;
-	morphTargets?: boolean;
-	morphNormals?: boolean;
+  /** Render geometry as wireframe. Default is false (i.e. render as smooth shaded). */
+  wireframe?: boolean;
+  /** Controls wireframe thickness. Default is 1. */
+  wireframeLinewidth?: number;
+  morphTargets?: boolean;
 }
 
 export class MeshNormalMaterial extends Material {
-	constructor(parameters?: MeshNormalMaterialParameters);
+  constructor(parameters?: MeshNormalMaterialParameters);
 
-	bumpMap: Texture | null;
-	bumpScale: number;
-	normalMap: Texture | null;
-	normalMapType: NormalMapTypes;
-	normalScale: Vector2;
-	displacementMap: Texture | null;
-	displacementScale: number;
-	displacementBias: number;
-	wireframe: boolean;
-	wireframeLinewidth: number;
-	skinning: boolean;
-	morphTargets: boolean;
-	morphNormals: boolean;
+  wireframe: boolean;
+  wireframeLinewidth: number;
+  morphTargets: boolean;
 
-	setValues(parameters: MeshNormalMaterialParameters): void;
+  setValues(parameters: MeshNormalMaterialParameters): void;
 }

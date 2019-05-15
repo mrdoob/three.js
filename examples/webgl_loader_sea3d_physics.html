@@ -73,74 +73,68 @@
 
 			var loader;
 
-			Ammo().then( function( AmmoLib ) {
+			// Initialize Three.JS
 
-				// Initialize Three.JS
+			init();
 
-				init();
+			// Initialize Physics Engine
 
-				// Initialize Physics Engine
+			SEA3D.AMMO.init();
 
-				Ammo = AmmoLib;
-				SEA3D.AMMO.init();
+			//
+			// SEA3D Loader
+			//
 
-				//
-				// SEA3D Loader
-				//
+			loader = new THREE.SEA3D( {
 
-				loader = new THREE.SEA3D( {
+				container: scene // Container to add models
 
-					container: scene // Container to add models
+			} );
+
+			loader.onComplete = function () {
+
+				new THREE.OrbitControls( camera );
+
+				// events
+
+				window.addEventListener( 'contextmenu', function ( e ) {
+
+					e.preventDefault();
+
+					cloneAsset();
 
 				} );
 
-				loader.onComplete = function () {
+				// prevent material compilation in render loop
 
-					new THREE.OrbitControls( camera, renderer.domElement );
+				renderer.compile( scene, camera );
 
-					// events
+				animate();
 
-					window.addEventListener( 'contextmenu', function ( e ) {
+			};
 
-						e.preventDefault();
+			loader.load( './models/sea3d/car.tjs.sea' );
 
-						cloneAsset();
+			var cloneAsset = function () {
 
-					} );
+				var offset = 0;
 
-					// prevent material compilation in render loop
+				return function () {
 
-					renderer.compile( scene, camera );
+					var domain = this.loader.clone( { lights: false, runScripts: false, autoPlay: false, enabledPhysics: false } );
 
-					animate();
+					offset -= 180;
+
+					domain.container.position.x += offset;
+					domain.applyContainerTransform();
+					domain.enabledPhysics( true );
+					domain.runScripts();
+
+					this.scene.add( domain.container );
 
 				};
 
-				loader.load( './models/sea3d/car.tjs.sea' );
-
-				var cloneAsset = function () {
-
-					var offset = 0;
-
-					return function () {
-
-						var domain = this.loader.clone( { lights: false, runScripts: false, autoPlay: false, enabledPhysics: false } );
-
-						offset -= 180;
-
-						domain.container.position.x += offset;
-						domain.applyContainerTransform();
-						domain.enabledPhysics( true );
-						domain.runScripts();
-
-						this.scene.add( domain.container );
-
-					};
-
-				}();
-
-
-			} );
+			}();
 
 			//
 
@@ -183,6 +177,7 @@
 				composer.addPass( vignettePass );
 
 				composer.addPass( copyPass );
+				copyPass.renderToScreen = true;
 
 				// events
 

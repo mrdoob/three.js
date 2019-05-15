@@ -15,19 +15,9 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 			stencilBuffer: false
 		};
 
-		var size = renderer.getSize( new THREE.Vector2() );
-		this._pixelRatio = renderer.getPixelRatio();
-		this._width = size.width;
-		this._height = size.height;
-
-		renderTarget = new THREE.WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, parameters );
+		var size = renderer.getDrawingBufferSize();
+		renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, parameters );
 		renderTarget.texture.name = 'EffectComposer.rt1';
-
-	} else {
-
-		this._pixelRatio = 1;
-		this._width = renderTarget.width;
-		this._height = renderTarget.height;
 
 	}
 
@@ -37,8 +27,6 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
-
-	this.renderToScreen = true;
 
 	this.passes = [];
 
@@ -76,7 +64,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		this.passes.push( pass );
 
-		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
+		var size = this.renderer.getDrawingBufferSize();
 		pass.setSize( size.width, size.height );
 
 	},
@@ -84,22 +72,6 @@ Object.assign( THREE.EffectComposer.prototype, {
 	insertPass: function ( pass, index ) {
 
 		this.passes.splice( index, 0, pass );
-
-	},
-
-	isLastEnabledPass: function ( passIndex ) {
-
-		for ( var i = passIndex + 1; i < this.passes.length; i ++ ) {
-
-			if ( this.passes[ i ].enabled ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
 
 	},
 
@@ -127,7 +99,6 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			if ( pass.enabled === false ) continue;
 
-			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
 			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
 
 			if ( pass.needsSwap ) {
@@ -172,13 +143,10 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		if ( renderTarget === undefined ) {
 
-			var size = this.renderer.getSize( new THREE.Vector2() );
-			this._pixelRatio = this.renderer.getPixelRatio();
-			this._width = size.width;
-			this._height = size.height;
+			var size = this.renderer.getDrawingBufferSize();
 
 			renderTarget = this.renderTarget1.clone();
-			renderTarget.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+			renderTarget.setSize( size.width, size.height );
 
 		}
 
@@ -194,28 +162,14 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 	setSize: function ( width, height ) {
 
-		this._width = width;
-		this._height = height;
-
-		var effectiveWidth = this._width * this._pixelRatio;
-		var effectiveHeight = this._height * this._pixelRatio;
-
-		this.renderTarget1.setSize( effectiveWidth, effectiveHeight );
-		this.renderTarget2.setSize( effectiveWidth, effectiveHeight );
+		this.renderTarget1.setSize( width, height );
+		this.renderTarget2.setSize( width, height );
 
 		for ( var i = 0; i < this.passes.length; i ++ ) {
 
-			this.passes[ i ].setSize( effectiveWidth, effectiveHeight );
+			this.passes[ i ].setSize( width, height );
 
 		}
-
-	},
-
-	setPixelRatio: function ( pixelRatio ) {
-
-		this._pixelRatio = pixelRatio;
-
-		this.setSize( this._width, this._height );
 
 	}
 
@@ -233,7 +187,7 @@ THREE.Pass = function () {
 	// if set to true, the pass clears its buffer before rendering
 	this.clear = false;
 
-	// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
+	// if set to true, the result of the pass is rendered to screen
 	this.renderToScreen = false;
 
 };
@@ -249,45 +203,3 @@ Object.assign( THREE.Pass.prototype, {
 	}
 
 } );
-
-// Helper for passes that need to fill the viewport with a single quad.
-THREE.Pass.FullScreenQuad = ( function () {
-
-	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-
-	var FullScreenQuad = function ( material ) {
-
-		this._mesh = new THREE.Mesh( geometry, material );
-
-	};
-
-	Object.defineProperty( FullScreenQuad.prototype, 'material', {
-
-		get: function () {
-
-			return this._mesh.material;
-
-		},
-
-		set: function ( value ) {
-
-			this._mesh.material = value;
-
-		}
-
-	} );
-
-	Object.assign( FullScreenQuad.prototype, {
-
-		render: function ( renderer ) {
-
-			renderer.render( this._mesh, camera );
-
-		}
-
-	} );
-
-	return FullScreenQuad;
-
-} )();

@@ -135,8 +135,9 @@ THREE.PMREMGenerator = ( function () {
 
 		renderToCubeMapTargetFace: function ( renderer, renderTarget, faceIndex ) {
 
+			renderTarget.activeCubeFace = faceIndex;
 			shader.uniforms[ 'faceIndex' ].value = faceIndex;
-			renderer.setRenderTarget( renderTarget, faceIndex );
+			renderer.setRenderTarget( renderTarget );
 			renderer.clear();
 			renderer.render( scene, camera );
 
