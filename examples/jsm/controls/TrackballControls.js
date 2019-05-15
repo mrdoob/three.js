@@ -499,7 +499,7 @@ var TrackballControls = function ( object, domElement ) {
 	function touchstart( event ) {
 
 		if ( _this.enabled === false ) return;
-		
+
 		event.preventDefault();
 
 		switch ( event.touches.length ) {
