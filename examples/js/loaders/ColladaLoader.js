@@ -3824,6 +3824,14 @@ THREE.ColladaLoader.prototype = {
 
 		var collada = getElementsByTagName( xml, 'COLLADA' )[ 0 ];
 
+		var parserError = xml.getElementsByTagName( 'parsererror' )[ 0 ];
+		if ( parserError !== undefined ) {
+
+			console.error( 'ColladaLoader: Failed to parse collada file.', parserError );
+			return null;
+
+		}
+
 		// metadata
 
 		var version = collada.getAttribute( 'version' );
