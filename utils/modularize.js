@@ -15,6 +15,7 @@ var files = [
 	{ path: 'controls/FlyControls.js', ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
+	{ path: 'controls/OrthographicTrackballControls.js', ignoreList: [] },
 	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
