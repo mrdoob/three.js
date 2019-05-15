@@ -7,5 +7,5 @@ export class PlaneHelper extends LineSegments {
   plane: Plane;
   size: number;
 
-  updateMatrixWorld(force: boolean): void;
+  updateMatrixWorld(force?: boolean): void;
 }

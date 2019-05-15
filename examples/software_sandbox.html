@@ -57,8 +57,6 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 600;
 
-				controls = new THREE.TrackballControls( camera );
-
 				scene = new THREE.Scene();
 
 				// Torus
@@ -157,8 +155,9 @@
 
 				renderer = new THREE.SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

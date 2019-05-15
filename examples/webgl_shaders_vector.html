@@ -89,10 +89,6 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 50, 100, 500 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 50, 100, 0 );
-				controls.update();
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
@@ -291,6 +287,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 50, 100, 0 );
+				controls.update();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );

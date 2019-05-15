@@ -98,14 +98,14 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera );
-
-				//
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				//
 

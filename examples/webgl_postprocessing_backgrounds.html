@@ -215,7 +215,6 @@
 				composer.addPass( renderPass );
 
 				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
 				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
@@ -240,11 +239,7 @@
 				cameraO.updateProjectionMatrix();*/
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 

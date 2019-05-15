@@ -23,12 +23,7 @@ THREE.GlitchPass = function ( dt_size ) {
 		fragmentShader: shader.fragmentShader
 	} );
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 	this.goWild = false;
 	this.curF = 0;
@@ -73,30 +68,29 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 		}
 
 		this.curF ++;
-		this.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		}
 
 	},
 
-	generateTrigger: function() {
+	generateTrigger: function () {
 
 		this.randX = THREE.Math.randInt( 120, 240 );
 
 	},
 
-	generateHeightmap: function( dt_size ) {
+	generateHeightmap: function ( dt_size ) {
 
 		var data_arr = new Float32Array( dt_size * dt_size * 3 );
 		var length = dt_size * dt_size;

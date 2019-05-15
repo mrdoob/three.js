@@ -83,12 +83,6 @@
 
 				scene = new THREE.Scene();
 
-				// CONTROLS
-
-				var controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = 0.9 * Math.PI / 2;
-				controls.enableZoom = false;
-
 				// LIGHTS
 
 				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
@@ -102,10 +96,10 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: { type: "c", value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
-					offset: { type: "f", value: 400 },
-					exponent: { type: "f", value: 0.6 }
+					topColor: { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					offset: { value: 400 },
+					exponent: { value: 0.6 }
 				};
 				uniforms.topColor.value.copy( light.color );
 
@@ -129,6 +123,12 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				// CONTROLS
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = 0.9 * Math.PI / 2;
+				controls.enableZoom = false;
 
 				// STATS
 

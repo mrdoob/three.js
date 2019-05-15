@@ -369,7 +369,7 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize();
+						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 						var screen = new THREE.ScreenNode();
 
@@ -451,7 +451,7 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize();
+						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );

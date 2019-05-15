@@ -62,11 +62,17 @@
 			var rigidBodies = [];
 			var softBodies = [];
 			var margin = 0.05;
-			var transformAux1 = new Ammo.btTransform();
-			var softBodyHelpers = new Ammo.btSoftBodyHelpers();
+			var transformAux1;
+			var softBodyHelpers;
 
-			init();
-			animate();
+			Ammo().then( function( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 			function init() {
 
@@ -83,6 +89,7 @@
 			function initGraphics() {
 
 				container = document.getElementById( 'container' );
+				container.innerHTML = '';
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
@@ -91,14 +98,15 @@
 
 				camera.position.set( - 7, 5, 8 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 2, 0 );
-				controls.update();
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
 
 				textureLoader = new THREE.TextureLoader();
 
@@ -122,10 +130,6 @@
 
 				scene.add( light );
 
-				container.innerHTML = '';
-
-				container.appendChild( renderer.domElement );
-
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -148,6 +152,9 @@
 				physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
 				physicsWorld.setGravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
 				physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
+
+				transformAux1 = new Ammo.btTransform();
+				softBodyHelpers = new Ammo.btSoftBodyHelpers();
 
 			}
 

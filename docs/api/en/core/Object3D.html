@@ -46,7 +46,7 @@
 
 		<h3>[property:Material customDistanceMaterial]</h3>
 		<p>
-		Same as customDepthMaterial, but used with [page:PointLight]. Default is *undefined*.
+		Same as [page:.customDepthMaterial customDepthMaterial], but used with [page:PointLight]. Default is *undefined*.
 		</p>
 
 		<h3>[property:Boolean frustumCulled]</h3>
@@ -229,6 +229,8 @@
 		recursive -- if true, descendants of the object are also copied. Default is true.<br /><br />
 
 		Copy the given object into this object.
+
+		Note: event listeners and user-defined callbacks ([page:.onAfterRender] and [page:.onBeforeRender]) are not copied.
 		</p>
 
 		<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>

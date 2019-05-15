@@ -31,9 +31,11 @@ THREE.SMAAPass = function ( width, height ) {
 
 	var areaTextureImage = new Image();
 	areaTextureImage.src = this.getAreaTexture();
-	areaTextureImage.onload = function() {
+	areaTextureImage.onload = function () {
+
 		// assigning data to HTMLImageElement.src is asynchronous (see #15162)
 		scope.areaTexture.needsUpdate = true;
+
 	};
 
 	this.areaTexture = new THREE.Texture();
@@ -107,12 +109,7 @@ THREE.SMAAPass = function ( width, height ) {
 
 	this.needsSwap = false;
 
-	this.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
 
 };
 
@@ -126,36 +123,36 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		this.uniformsEdges[ "tDiffuse" ].value = readBuffer.texture;
 
-		this.quad.material = this.materialEdges;
+		this.fsQuad.material = this.materialEdges;
 
 		renderer.setRenderTarget( this.edgesRT );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.scene, this.camera );
+		this.fsQuad.render( renderer );
 
 		// pass 2
 
-		this.quad.material = this.materialWeights;
+		this.fsQuad.material = this.materialWeights;
 
 		renderer.setRenderTarget( this.weightsRT );
 		if ( this.clear ) renderer.clear();
-		renderer.render( this.scene, this.camera );
+		this.fsQuad.render( renderer );
 
 		// pass 3
 
 		this.uniformsBlend[ "tColor" ].value = readBuffer.texture;
 
-		this.quad.material = this.materialBlend;
+		this.fsQuad.material = this.materialBlend;
 
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			if ( this.clear ) renderer.clear();
-			renderer.render( this.scene, this.camera );
+			this.fsQuad.render( renderer );
 
 		}
 

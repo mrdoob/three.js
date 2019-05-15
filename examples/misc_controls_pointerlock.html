@@ -328,9 +328,8 @@
 						canJump = true;
 
 					}
-
 					controls.getObject().translateX( velocity.x * delta );
-					controls.getObject().translateY( velocity.y * delta );
+					controls.getObject().position.y += ( velocity.y * delta ); // new behavior
 					controls.getObject().translateZ( velocity.z * delta );
 
 					if ( controls.getObject().position.y < 10 ) {

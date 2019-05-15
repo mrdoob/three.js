@@ -193,7 +193,7 @@ THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 		scene.overrideMaterial = this.materialDepth;
 		renderer.setRenderTarget( this.postprocessing.rtTextureDepth );
 		renderer.clear();
-		renderer.render( scene, camera, this.postprocessing.rtTextureDepth );
+		renderer.render( scene, camera );
 
 		// Render bokeh composite
 

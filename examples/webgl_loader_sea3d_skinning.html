@@ -95,7 +95,7 @@
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				var controls = new THREE.OrbitControls( camera );
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				// get meshes
 				player = loader.getMesh( "Player" );
@@ -198,7 +198,6 @@
 				composer.addPass( vignettePass );
 
 				composer.addPass( copyPass );
-				copyPass.renderToScreen = true;
 
 				// events
 

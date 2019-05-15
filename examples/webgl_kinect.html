@@ -37,6 +37,11 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/WebGL.js"></script>
 
+		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
+			<source src="textures/kinect.webm">
+			<source src="textures/kinect.mp4">
+		</video>
+
 		<script id="vs" type="x-shader/x-vertex">
 
 			uniform sampler2D map;
@@ -101,8 +106,6 @@
 			var mouse, center;
 			var stats;
 
-			var video, texture;
-
 			if ( WEBGL.isWebGLAvailable() ) {
 
 				init();
@@ -134,10 +137,10 @@
 				center = new THREE.Vector3();
 				center.z = - 1000;
 
-				video = document.createElement( 'video' );
+				var video = document.getElementById( 'video' );
 				video.addEventListener( 'loadedmetadata', function () {
 
-					texture = new THREE.VideoTexture( video );
+					var texture = new THREE.VideoTexture( video );
 					texture.minFilter = THREE.NearestFilter;
 
 					var width = 640, height = 480;
@@ -190,11 +193,7 @@
 
 
 				}, false );
-				video.crossOrigin = 'anonymous';
-				video.loop = true;
-				video.muted = true;
-				video.src = 'textures/kinect.webm';
-				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
+
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();

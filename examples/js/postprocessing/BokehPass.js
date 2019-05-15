@@ -66,12 +66,7 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.uniforms = bokehUniforms;
 	this.needsSwap = false;
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2  = new THREE.Scene();
-
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad2.frustumCulled = false; // Avoid getting clipped
-	this.scene2.add( this.quad2 );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.materialBokeh );
 
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
@@ -83,8 +78,6 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 	constructor: THREE.BokehPass,
 
 	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
-
-		this.quad2.material = this.materialBokeh;
 
 		// Render depth into texture
 
@@ -110,13 +103,13 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 		if ( this.renderToScreen ) {
 
 			renderer.setRenderTarget( null );
-			renderer.render( this.scene2, this.camera2 );
+			this.fsQuad.render( renderer );
 
 		} else {
 
 			renderer.setRenderTarget( writeBuffer );
 			renderer.clear();
-			renderer.render( this.scene2, this.camera2 );
+			this.fsQuad.render( renderer );
 
 		}
 
