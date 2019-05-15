@@ -132,6 +132,7 @@ var files = {
 		"webgl_loader_texture_hdr",
 		"webgl_loader_texture_ktx",
 		"webgl_loader_texture_pvrtc",
+		"webgl_loader_texture_rgbm",
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
 		"webgl_loader_vrm",
