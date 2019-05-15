@@ -39,11 +39,18 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
   const scene = new THREE.Scene();
-  const loader = new THREE.CubeTextureLoader();
-  function loadCubemap(url) {
-    return loader.load([url, url, url, url, url, url]);
+  {
+    const loader = new THREE.CubeTextureLoader();
+    const texture = loader.load([
+      'resources/images/grid-1024.png',
+      'resources/images/grid-1024.png',
+      'resources/images/grid-1024.png',
+      'resources/images/grid-1024.png',
+      'resources/images/grid-1024.png',
+      'resources/images/grid-1024.png',
+    ]);
+    scene.background = texture;
   }
-  scene.background = loadCubemap('resources/images/grid-1024.png'); /* threejsfundamentals: url */
 
   {
     const color = 0xFFFFFF;
@@ -64,7 +71,10 @@ function main() {
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
-  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+  const boxGeometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+
+  const sphereRadius = 0.5;
+  const sphereGeometry = new THREE.SphereBufferGeometry(sphereRadius);
 
   function makeInstance(geometry, color, x) {
     const material = new THREE.MeshPhongMaterial({color});
@@ -79,21 +89,28 @@ function main() {
     return cube;
   }
 
-  const cubeToTextureMap = new Map();
-  cubeToTextureMap.set(
-      makeInstance(geometry, 0x44aa88,  0),
-      loadCubemap('resources/images/grid-cyan-1024.png')); /* threejsfundamentals: url */
-  cubeToTextureMap.set(
-      makeInstance(geometry, 0x8844aa, -2),
-      loadCubemap('resources/images/grid-purple-1024.png')); /* threejsfundamentals: url */
-  cubeToTextureMap.set(
-      makeInstance(geometry, 0xaa8844,  2),
-      loadCubemap('resources/images/grid-gold-1024.png')); /* threejsfundamentals: url */
+  const meshToMeshMap = new Map();
+  [
+    { x:  0, boxColor: 0x44aa88, sphereColor: 0xFF4444, },
+    { x:  2, boxColor: 0x8844aa, sphereColor: 0x44FF44, },
+    { x: -2, boxColor: 0xaa8844, sphereColor: 0x4444FF, },
+  ].forEach((info) => {
+    const {x, boxColor, sphereColor} = info;
+    const sphere = makeInstance(sphereGeometry, sphereColor, x);
+    const box = makeInstance(boxGeometry, boxColor, x);
+    // hide the sphere
+    sphere.visible = false;
+    // map the sphere to the box
+    meshToMeshMap.set(box, sphere);
+    // map the box to the sphere
+    meshToMeshMap.set(sphere, box);
+  });
 
   class PickHelper {
     constructor(camera) {
       this.raycaster = new THREE.Raycaster();
       this.pickedObject = null;
+      this.pickedObjectSavedColor = 0;
 
       const cursorColors = new Uint8Array([
         64, 64, 64, 64,       // dark gray
@@ -117,9 +134,7 @@ function main() {
         blendDst: THREE.OneMinusSrcColorFactor,
       });
       const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
-      // add the cursor as a child of the camera
       camera.add(cursor);
-      // and move it in front of the camera
       cursor.position.z = -1;
       const scale = 0.05;
       cursor.scale.set(scale, scale, scale);
@@ -134,7 +149,10 @@ function main() {
       this.lastTime = time;
 
       const lastPickedObject = this.pickedObject;
-      this.pickedObject = undefined;
+      // restore the color if there is a picked object
+      if (this.pickedObject) {
+        this.pickedObject = undefined;
+      }
 
       // cast a ray through the frustum
       this.raycaster.setFromCamera(normalizedPosition, camera);
@@ -145,7 +163,7 @@ function main() {
         this.pickedObject = intersectedObjects[0].object;
       }
 
-      // show the cursor only if it's hitting something
+      // show or hide cursor
       this.cursor.visible = this.pickedObject ? true : false;
 
       let selected = false;
@@ -200,18 +218,20 @@ function main() {
     }
 
     let ndx = 0;
-    cubeToTextureMap.forEach((texture, cube) => {
+    for (const mesh of meshToMeshMap.keys()) {
       const speed = 1 + ndx * .1;
       const rot = time * speed;
-      cube.rotation.x = rot;
-      cube.rotation.y = rot;
+      mesh.rotation.x = rot;
+      mesh.rotation.y = rot;
       ++ndx;
-    });
+    }
 
     // 0, 0 is the center of the view in normalized coordinates.
     const selectedObject = pickHelper.pick({x: 0, y: 0}, scene, camera, time);
     if (selectedObject) {
-      scene.background = cubeToTextureMap.get(selectedObject);
+      selectedObject.visible = false;
+      const partnerObject = meshToMeshMap.get(selectedObject);
+      partnerObject.visible = true;
     }
 
     renderer.render(scene, camera);
