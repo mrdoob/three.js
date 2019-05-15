@@ -8,8 +8,8 @@ export class OrthographicTrackballControls extends EventDispatcher {
 
   enabled: boolean;
   screen: {left: number; top: number; width: number; height: number};
-	radius: number;
-	rotateSpeed: number;
+  radius: number;
+  rotateSpeed: number;
   zoomSpeed: number;
   noRotate: boolean;
   noZoom: boolean;
