@@ -86,7 +86,7 @@ function main() {
   function render(time) {
     time *= 0.001;
 
-    if (resizeRendererToDisplaySize(renderer)) {
+    if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();

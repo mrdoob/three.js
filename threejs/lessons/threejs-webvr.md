@@ -1,16 +1,68 @@
 Title: Three.js WebVR
 Description: How to use Virtual Reality in Three.js.
 
-Making WebVR apps in three.js is pretty simple.
-You basically just have to tell three.js you want to use WebVR.
-If you think about it a few things about WebVR should be clear.
-Which way the camera is pointing is supplied by the VR system itself
-since the user turns their head to choose a direction to look.
-Similarly the field of view and aspect will be supplied by the VR system since
-each system has a different field of view and display aspect.
+Making WebVR apps in three.js is pretty simple. You basically just have to tell
+three.js you want to use WebVR. If you think about it a few things about WebVR
+should be clear. Which way the camera is pointing is supplied by the VR system
+itself since the user turns their head to choose a direction to look. Similarly
+the field of view and aspect will be supplied by the VR system since each system
+has a different field of view and display aspect.
 
-Let's take an example from the article on [making a responsive webpage](threejs-responsive.html)
-and make it support VR.
+Let's take an example from the article on [making a responsive
+webpage](threejs-responsive.html) and make it support VR.
+
+Before we get started you're going to need a VR capable device like an Android
+smartphone, Google Daydream, Oculus Go, Oculus Rift, Vive, Samsung Gear VR, an
+iPhone with a [WebVR browser](https://itunes.apple.com/us/app/webvr-browser/id1286543066?mt=8).
+
+Next, if you are running locally you need to run a simple web server like is
+covered in [the article on setting up](threejs-setup.html). 
+
+You then need to look up the *local* IP address of your computer. On Mac you can
+Option-Click the WiFi controls (assuming you're on Wifi). 
+
+<div class="threejs_center"><img src="resources/images/ipaddress-macos.png" style="width: 428px;"></div>
+
+On Windows you can
+[click the Wifi icon in the taskbar and then click "Properties" for a particular
+network connection](https://support.microsoft.com/en-us/help/4026518/windows-10-find-your-ip-address).
+
+If you see more than one IP address, local IP addresses most commonly start with
+`10.` or `192.` or `172.`. If you see an address that starts with `127.` that
+address is for your computer only. It's the address the computer can use to talk
+to itself so ignore anything that starts with `127.`.
+
+On your VR device, first make sure it's connected to the same WiFi as your
+computer. Then, open your browser and type in `http://<ipaddress:port>`. Which
+port depends on what server you're running. If you're using
+[Servez](https://greggman.github.io/servez) or the http-server from node.js then
+the port will likely be 8080.
+
+On my computer as I write this article its IP address is `192.168.100.78` and my
+web server is using port 8080 so on my VR device I'd enter
+`http://192.168.100.78:8080` to get the main page of my webserver to appear. If
+you've downloaded these articles and are serving them you should see the front
+page of this website appear. If you're making a new page then you might need to
+add the path to your page for example when entering the URL on your VR device
+something like `http://192.168.100.78:8080/path/to/page.html`
+
+Note that anytime you switch networks your local ip address will change.
+Even on the same network when you re-connect to it your local ip address
+might change so you will need to look it up again and type a different
+address into your VR device.
+
+Also note that this will likely work on your home network or your work network but
+may likely **not work** at a cafe. The WiFi at many cafe's, especially at large
+chains like Starbucks or McDonalds are configured so that machines on the local
+network can not talk to each other.
+
+If you're really going to do WebVR development another thing you should learn about is
+[remote debugging](https://developers.google.com/web/tools/chrome-devtools/remote-debugging/)
+so that you can see console warnings, errors, and of course actually 
+[debug your code](threejs-debugging-javascript.html).
+
+If you just want to see the code work below you can just run the code from
+this site.
 
 The first thing we need to do is include the VR support after
 including three.js
@@ -31,6 +83,14 @@ function main() {
 +  document.body.appendChild(WEBVR.createButton(renderer));
 ```
 
+We need to not try to resize when in VR mode as the VR device
+will decide the size
+
+```js
+-if (resizeRendererToDisplaySize(renderer)) {
++if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
+```
+
 The last major thing we need to do is let three.js run our
 render loop. Until now we have used a `requestAnimationFrame`
 loop but to support VR we need to let three.js handle our
@@ -41,7 +101,7 @@ and passing a function to call for the loop.
 function render(time) {
   time *= 0.001;
 
-  if (resizeRendererToDisplaySize(renderer)) {
+  if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
     const canvas = renderer.domElement;
     camera.aspect = canvas.clientWidth / canvas.clientHeight;
     camera.updateProjectionMatrix();
