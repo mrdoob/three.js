@@ -5,5 +5,5 @@ export class WebGLAttributes {
 
 	remove(attribute: any): void;
 
-	update(attribute: any, bufferType: Array): void;
+	update(attribute: any, bufferType: Array<any>): void;
 }
