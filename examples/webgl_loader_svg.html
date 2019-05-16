@@ -87,7 +87,7 @@
 					drawStrokes: true,
 					fillShapesWireframe: false,
 					strokesWireframe: false
-				}
+				};
 
 				loadSVG( guiData.currentURL );
 
@@ -166,7 +166,7 @@
 						var path = paths[ i ];
 
 						var fillColor = path.userData.style.fill;
-						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none') {
+						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
 							var material = new THREE.MeshBasicMaterial( {
 								color: new THREE.Color().setStyle( fillColor ),
@@ -207,7 +207,7 @@
 
 							for ( var j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
 
-								subPath = path.subPaths[ j ];
+								var subPath = path.subPaths[ j ];
 
 								var geometry = THREE.SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
 
