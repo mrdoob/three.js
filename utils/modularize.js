@@ -64,7 +64,7 @@ function convert( path, ignoreList ) {
 
 	var contents = fs.readFileSync( srcFolder + path, 'utf8' );
 
-	var className = '';
+	var classNames = [];
 	var dependencies = {};
 
 	// imports
@@ -79,9 +79,9 @@ function convert( path, ignoreList ) {
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
 
-		className = p1;
+		classNames.push( p1 );
 
-		console.log( className );
+		console.log( p1 );
 
 		return `var ${p1} = `;
 
@@ -90,7 +90,7 @@ function convert( path, ignoreList ) {
 	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
 
 		if ( p1 === '\'' ) return match; // Inside a string
-		if ( p2 === className ) return `${p2}${p3}`;
+		if ( classNames.includes( p2 ) ) return `${p2}${p3}`;
 
 		if ( p1 === 'Math' ) {
 
@@ -122,7 +122,7 @@ function convert( path, ignoreList ) {
 
 		if ( ignoreList.includes( p2 ) ) return match;
 		if ( p1 === '\'' ) return match; // Inside a string
-		if ( p2 === className ) return p2;
+		if ( classNames.includes( p2 ) ) return p2;
 
 		if ( p2 === 'Math' || p2 === '_Math' ) {
 
@@ -143,13 +143,13 @@ function convert( path, ignoreList ) {
 	//
 
 	var keys = Object.keys( dependencies )
-		.filter( value => value !== className )
+		.filter( value => ! classNames.includes( value ) )
 		.map( value => value === '_Math' ? 'Math as _Math' : value )
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();
 	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${className} };\n`;
+	var exports = `export { ${classNames.join( ", " )} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
 
