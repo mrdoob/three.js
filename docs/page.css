@@ -76,7 +76,7 @@ h2 {
 h3 {
 	color: var(--color-blue);
 	font-size: 1.32rem;
-	line-height: 1.48rem;
+	line-height: 2rem;
 	font-weight: normal;
 	margin-top: 1.8rem;
 	margin-bottom: 1rem;
@@ -130,10 +130,6 @@ table {
 
 .desc {
 	padding-left: 0px;
-}
-
-br {
-	display: none;
 }
 
 table th,
