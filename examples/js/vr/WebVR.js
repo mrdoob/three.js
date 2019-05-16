@@ -131,7 +131,7 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator ) {
+		if ( 'xr' in navigator && 'requestDevice' in navigator.xr ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
