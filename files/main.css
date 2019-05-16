@@ -140,9 +140,16 @@ h1 a {
 	}
 
 	#panel #expandButton {
-		margin-right: 14px;
-		margin-left: 2px;
+		width: 3rem;
+		height: 3rem;
+		margin-right: 4px;
+		margin-left: 4px;
 		display: none;
+		cursor: pointer;
+		background-size: var(--icon-size);
+		background-position: 50% 50%;
+		background-repeat: no-repeat;
+		background-image: url(../files/ic_menu_black_24dp.svg);
 	}
 
 	#panel #sections {
@@ -257,10 +264,14 @@ h1 a {
 
 		#panel #content h2 {
 			margin-top: 2rem;
+			border-top: var(--border-style);
+	    padding-top: .8rem;
 		}
 
 		#panel #content h2:first-child {
 			margin-top: 1rem !important;
+			border-top: none;
+			padding-top: 0;
 		}
 
 		#panel #content a {
@@ -285,6 +296,8 @@ h1 a {
 			margin-bottom: 2px;
 			padding-bottom: 0px;
 			margin-top: 1.2rem;
+			border-top: none;
+			padding-top: .4rem;
 		}
 
 .spacer {
