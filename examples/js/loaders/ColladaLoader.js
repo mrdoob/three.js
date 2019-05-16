@@ -3816,13 +3816,16 @@ THREE.ColladaLoader.prototype = {
 
 		// convert the parser error element into text with each child elements text
 		// separated by new lines.
+
 		function parserErrorToText( parserError ) {
 
 			var result = '';
 			var stack = [ parserError ];
+
 			while ( stack.length ) {
 
 				var node = stack.shift();
+
 				if ( node.nodeType === Node.TEXT_NODE ) {
 
 					result += node.textContent;
@@ -3854,8 +3857,10 @@ THREE.ColladaLoader.prototype = {
 		if ( parserError !== undefined ) {
 
 			// Chrome will return parser error with a div in it
+
 			var errorElement = getElementsByTagName( parserError, 'div' )[ 0 ];
 			var errorText;
+
 			if ( errorElement ) {
 
 				errorText = errorElement.textContent;
@@ -3866,7 +3871,7 @@ THREE.ColladaLoader.prototype = {
 
 			}
 
-			console.error( 'ColladaLoader: Failed to parse collada file.\n', errorText );
+			console.error( 'THREE.ColladaLoader: Failed to parse collada file.\n', errorText );
 
 			return null;
 
