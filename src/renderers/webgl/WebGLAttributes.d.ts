@@ -1,5 +1,5 @@
 export class WebGLAttributes {
-	constructor(gl: CanvasRenderingContext2D | WebGLRenderingContext);
+	constructor(gl: WebGLRenderingContext | WebGL2RenderingContext);
 
 	get(attribute: any): any;
 
