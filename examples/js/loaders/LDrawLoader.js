@@ -7,7 +7,7 @@
 
 THREE.LDrawLoader = ( function () {
 
-	var optionalLineVertShader = /* glsl */`
+	var conditionalLineVertShader = /* glsl */`
 	attribute vec3 control0;
 	attribute vec3 control1;
 	attribute vec3 direction;
@@ -55,7 +55,7 @@ THREE.LDrawLoader = ( function () {
 	}
 	`;
 
-	var optionalLineFragShader = /* glsl */`
+	var conditionalLineFragShader = /* glsl */`
 	uniform vec3 diffuse;
 	uniform float opacity;
 	varying float discardFlag;
@@ -671,8 +671,8 @@ THREE.LDrawLoader = ( function () {
 							lines.material = lines.material.map( mat => {
 
 								return new THREE.ShaderMaterial( {
-									vertexShader: optionalLineVertShader,
-									fragmentShader: optionalLineFragShader,
+									vertexShader: conditionalLineVertShader,
+									fragmentShader: conditionalLineFragShader,
 									uniforms: {
 										diffuse: {
 											value: mat.color
