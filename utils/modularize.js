@@ -35,6 +35,7 @@ var files = [
 	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
 	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
 	{ path: 'loaders/TGALoader.js', ignoreList: [] },
+	{ path: 'loaders/VRMLLoader.js', ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
