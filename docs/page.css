@@ -99,7 +99,7 @@ p {
 
 ul, ol {
 	box-sizing: border-box;
-	padding-left: var(--page-padding);
+	padding-left: 24px;
 }
 ul li,
 ol li {
