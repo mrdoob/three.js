@@ -14,7 +14,7 @@
 	--panel-padding: 1.143rem;
 	--page-padding: 1.5rem;
 	--max-width: 760px;
-	--icon-size: 1.428rem;
+	--icon-size: 24px;
 
 	--thumbnail-width: 200px;
 }
@@ -219,7 +219,7 @@ h1 a {
 		background-repeat: no-repeat;
 		background-position: right center;
 		background-color: white;
-		padding: 4px 1.6rem;
+		padding: 4px 1.8rem;
 		-webkit-appearance: none;
 		-moz-appearance: none;
 		appearance: none;
@@ -390,6 +390,7 @@ iframe {
 		--line-height: 38px;
 		--header-height: 72px;
 		--max-width: 1280px;
+		--icon-size: 34px;
 	}
 }
 
@@ -422,6 +423,10 @@ iframe {
 /* mobile */
 
 @media all and ( max-width: 640px ) {
+
+	:root {
+		--header-height: 56px;
+	}
 
 	#projects {
 		grid-template-columns: repeat(2, 1fr);
