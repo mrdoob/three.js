@@ -383,18 +383,18 @@ iframe {
 
 
 @media all and ( min-width: 1500px ) {
-	:root {
-		--panel-width: 360px;
-		--font-size: 18px;
-		--line-height: 30px;
-		--header-height: 60px;
-	}
 	#projects {
 		grid-template-columns: repeat(7, 1fr);
 	}
 }
 
 @media all and ( min-width: 1700px ) {
+	:root {
+		--panel-width: 360px;
+		--font-size: 18px;
+		--line-height: 30px;
+		--header-height: 60px;
+	}
 	#projects {
 		grid-template-columns: repeat(8, 1fr);
 	}
@@ -408,7 +408,7 @@ iframe {
 
 }
 
-@media all and ( min-width: 2400px ) {
+/* @media all and ( min-width: 2400px ) {
 	:root {
 		--panel-width: 480px;
 		--font-size: 24px;
@@ -417,7 +417,7 @@ iframe {
 		--max-width: 1280px;
 		--icon-size: 34px;
 	}
-}
+} */
 
 
 @media all and ( max-width: 1300px ) {

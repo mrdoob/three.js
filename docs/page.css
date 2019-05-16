@@ -215,18 +215,18 @@ a.param:hover {
 }
 
 
-@media all and ( min-width: 1500px ) {
+@media all and ( min-width: 1700px ) {
 	:root {
 		--panel-width: 360px;
 		--font-size: 18px;
 		--line-height: 30px;
 		--header-height: 60px;
-		--max-width: 960px;
+		--max-width: 1160px;
 	}
 }
 
 
-@media all and ( min-width: 2400px ) {
+/* @media all and ( min-width: 2400px ) {
 	:root {
 		--panel-width: 480px;
 		--font-size: 24px;
@@ -234,7 +234,7 @@ a.param:hover {
 		--header-height: 72px;
 		--max-width: 1280px;
 	}
-}
+} */
 
 /* mobile */
 
