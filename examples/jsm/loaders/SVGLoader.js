@@ -4,21 +4,34 @@
  * @author yomboprime / https://yombo.org
  */
 
-THREE.SVGLoader = function ( manager ) {
+import {
+	BufferGeometry,
+	Color,
+	DefaultLoadingManager,
+	FileLoader,
+	Float32BufferAttribute,
+	Matrix3,
+	Path,
+	ShapePath,
+	Vector2,
+	Vector3
+} from "../../../build/three.module.js";
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var SVGLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 };
 
-THREE.SVGLoader.prototype = {
+SVGLoader.prototype = {
 
-	constructor: THREE.SVGLoader,
+	constructor: SVGLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( scope.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
@@ -138,12 +151,12 @@ THREE.SVGLoader.prototype = {
 
 		function parsePathNode( node ) {
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 
-			var point = new THREE.Vector2();
-			var control = new THREE.Vector2();
+			var point = new Vector2();
+			var control = new Vector2();
 
-			var firstPoint = new THREE.Vector2();
+			var firstPoint = new Vector2();
 			var isFirstPoint = true;
 			var doSetFirstPoint = false;
 
@@ -642,7 +655,7 @@ THREE.SVGLoader.prototype = {
 			var w = parseFloat( node.getAttribute( 'width' ) );
 			var h = parseFloat( node.getAttribute( 'height' ) );
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 			path.moveTo( x + 2 * rx, y );
 			path.lineTo( x + w - 2 * rx, y );
 			if ( rx !== 0 || ry !== 0 ) path.bezierCurveTo( x + w, y, x + w, y, x + w, y + 2 * ry );
@@ -691,7 +704,7 @@ THREE.SVGLoader.prototype = {
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 
 			var index = 0;
 
@@ -726,7 +739,7 @@ THREE.SVGLoader.prototype = {
 
 			var regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 
 			var index = 0;
 
@@ -744,10 +757,10 @@ THREE.SVGLoader.prototype = {
 			var y = parseFloat( node.getAttribute( 'cy' ) );
 			var r = parseFloat( node.getAttribute( 'r' ) );
 
-			var subpath = new THREE.Path();
+			var subpath = new Path();
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 			path.subPaths.push( subpath );
 
 			return path;
@@ -761,10 +774,10 @@ THREE.SVGLoader.prototype = {
 			var rx = parseFloat( node.getAttribute( 'rx' ) );
 			var ry = parseFloat( node.getAttribute( 'ry' ) );
 
-			var subpath = new THREE.Path();
+			var subpath = new Path();
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 			path.subPaths.push( subpath );
 
 			return path;
@@ -778,7 +791,7 @@ THREE.SVGLoader.prototype = {
 			var x2 = parseFloat( node.getAttribute( 'x2' ) );
 			var y2 = parseFloat( node.getAttribute( 'y2' ) );
 
-			var path = new THREE.ShapePath();
+			var path = new ShapePath();
 			path.moveTo( x1, y1 );
 			path.lineTo( x2, y2 );
 			path.currentPath.autoClose = false;
@@ -900,7 +913,7 @@ THREE.SVGLoader.prototype = {
 
 		function parseNodeTransform( node ) {
 
-			var transform = new THREE.Matrix3();
+			var transform = new Matrix3();
 			var currentTransform = tempTransform0;
 			var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
@@ -1138,14 +1151,14 @@ THREE.SVGLoader.prototype = {
 
 		var transformStack = [];
 
-		var tempTransform0 = new THREE.Matrix3();
-		var tempTransform1 = new THREE.Matrix3();
-		var tempTransform2 = new THREE.Matrix3();
-		var tempTransform3 = new THREE.Matrix3();
-		var tempV2 = new THREE.Vector2();
-		var tempV3 = new THREE.Vector3();
+		var tempTransform0 = new Matrix3();
+		var tempTransform1 = new Matrix3();
+		var tempTransform2 = new Matrix3();
+		var tempTransform3 = new Matrix3();
+		var tempV2 = new Vector2();
+		var tempV3 = new Vector3();
 
-		var currentTransform = new THREE.Matrix3();
+		var currentTransform = new Matrix3();
 
 		console.time( 'THREE.SVGLoader: DOMParser' );
 
@@ -1178,10 +1191,10 @@ THREE.SVGLoader.prototype = {
 
 };
 
-THREE.SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap, miterLimit ) {
+SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap, miterLimit ) {
 
 	// Param width: Stroke width
-	// Param color: As returned by THREE.Color.getStyle()
+	// Param color: As returned by Color.getStyle()
 	// Param opacity: 0 (transparent) to 1 (opaque)
 	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
 	// Param lineCap: One of "round", "square" or "butt"
@@ -1205,7 +1218,7 @@ THREE.SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lin
 
 };
 
-THREE.SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance ) {
+SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance ) {
 
 	// Generates a stroke with some witdh around the given path.
 	// The path can be open or closed (last point equals to first point)
@@ -1219,40 +1232,40 @@ THREE.SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDist
 	var normals = [];
 	var uvs = [];
 
-	if ( THREE.SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
+	if ( SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
 
 		return null;
 
 	}
 
-	var geometry = new THREE.BufferGeometry();
-	geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-	geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+	var geometry = new BufferGeometry();
+	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	return geometry;
 
 };
 
-THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
+SVGLoader.pointsToStrokeWithBuffers = function () {
 
-	var tempV2_1 = new THREE.Vector2();
-	var tempV2_2 = new THREE.Vector2();
-	var tempV2_3 = new THREE.Vector2();
-	var tempV2_4 = new THREE.Vector2();
-	var tempV2_5 = new THREE.Vector2();
-	var tempV2_6 = new THREE.Vector2();
-	var tempV2_7 = new THREE.Vector2();
-	var lastPointL = new THREE.Vector2();
-	var lastPointR = new THREE.Vector2();
-	var point0L = new THREE.Vector2();
-	var point0R = new THREE.Vector2();
-	var currentPointL = new THREE.Vector2();
-	var currentPointR = new THREE.Vector2();
-	var nextPointL = new THREE.Vector2();
-	var nextPointR = new THREE.Vector2();
-	var innerPoint = new THREE.Vector2();
-	var outerPoint = new THREE.Vector2();
+	var tempV2_1 = new Vector2();
+	var tempV2_2 = new Vector2();
+	var tempV2_3 = new Vector2();
+	var tempV2_4 = new Vector2();
+	var tempV2_5 = new Vector2();
+	var tempV2_6 = new Vector2();
+	var tempV2_7 = new Vector2();
+	var lastPointL = new Vector2();
+	var lastPointR = new Vector2();
+	var point0L = new Vector2();
+	var point0R = new Vector2();
+	var currentPointL = new Vector2();
+	var currentPointR = new Vector2();
+	var nextPointL = new Vector2();
+	var nextPointR = new Vector2();
+	var innerPoint = new Vector2();
+	var outerPoint = new Vector2();
 
 	return function ( points, style, arcDivisions, minDistance, vertices, normals, uvs, vertexOffset ) {
 
@@ -1979,3 +1992,5 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 	};
 
 }();
+
+export { SVGLoader };
