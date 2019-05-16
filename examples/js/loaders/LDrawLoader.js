@@ -144,6 +144,13 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
+		// NOTE: Some of the normals wind up being skewed in an unexpected way because
+		// quads provide more "influence" to some vertex normals than a triangle due to
+		// the fact that a quad is made up of two triangles and all triangles are weighted
+		// equally. To fix this quads could be tracked separately so their vertex normals
+		// are weighted appropriately or we could try only adding a normal direction
+		// once per normal.
+
 		// Iterate until we've tried to connect all triangles to share normals
 		while ( true ) {
 
@@ -228,11 +235,22 @@ THREE.LDrawLoader = ( function () {
 							var otherHash = hashEdge( otherV0, otherV1 );
 							if ( otherHash === reverseHash ) {
 
-								otherTri[ `n${ otherIndex }` ] = tri[ `n${ next }` ];
-								otherTri[ `n${ otherNext }` ] = tri[ `n${ index }` ];
+								if ( otherTri[ `n${ otherIndex }` ] === null ) {
 
-								tri[ `n${ next }` ].add( otherTri.faceNormal );
-								tri[ `n${ index }` ].add( otherTri.faceNormal );
+									var norm = tri[ `n${ next }` ];
+									otherTri[ `n${ otherIndex }` ] = norm;
+									norm.add( otherTri.faceNormal );
+
+								}
+
+								if ( otherTri[ `n${ otherNext }` ] === null ) {
+
+									var norm = tri[ `n${ index }` ];
+									otherTri[ `n${ otherNext }` ] = norm;
+									norm.add( otherTri.faceNormal );
+
+								}
+
 								break;
 
 							}
@@ -1245,7 +1263,7 @@ THREE.LDrawLoader = ( function () {
 
 				case LDrawLoader.FINISH_TYPE_RUBBER:
 
-					// Rubber is best simulated with Lambert
+					// Rubber finish
 					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
 					canHaveEnvMap = false;
 					break;

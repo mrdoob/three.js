@@ -14,6 +14,8 @@ THREE.MTLLoader.prototype = {
 
 	constructor: THREE.MTLLoader,
 
+	crossOrigin: 'anonymous',
+
 	/**
 	 * Loads and parses a MTL asset from a URL.
 	 *
