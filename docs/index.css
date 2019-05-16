@@ -133,6 +133,7 @@ iframe {
 	top: 12px;
 	width: 32px;
 	height: 32px;
+	background-image: url(files/ic_menu_black_24dp.svg);
 }
 
 #expandButton span {

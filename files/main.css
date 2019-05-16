@@ -1,7 +1,7 @@
 :root {
 	--color-blue: #049EF4;
 	--text-color: #444;
-	--secondary-text-color: #9E9E9E;
+	--secondary-text-color: #9e9e9e;
 
 	--font-size: 14px;
 	--line-height: 24px;
@@ -25,9 +25,17 @@
 	font-style: normal;
 	font-weight: 400;
 }
+@font-face {
+  font-family: 'Roboto Mono';
+  src: local('Roboto Mono Medium'), local('RobotoMono-Medium'), url('../files/RobotoMono-Medium.woff2') format('woff2');
+	font-style: normal;
+  font-weight: 500;
+}
 
 * {
 	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
@@ -52,9 +60,9 @@ a {
 }
 
 h1 {
-	font-weight: normal;
 	font-size: 1.28rem;
 	line-height: 1.6rem;
+	font-weight: 500;
 }
 
 h2 {
@@ -62,13 +70,13 @@ h2 {
 	margin: 1rem 0;
 	font-size: 1rem;
 	line-height: 1.52rem;
-	font-weight: normal;
+	font-weight: 500;
 	color: var(--color-blue);
 }
 
 h3 {
 	margin: 0.25rem 0;
-	font-weight: normal;
+	font-weight: 500;
 	font-size: 1rem;
 	line-height: 1.52rem;
 	color: var(--secondary-text-color);
@@ -159,6 +167,7 @@ h1 a {
 		position: relative;
 		height: 100%;
 		align-items: center;
+		font-weight: 500;
 	}
 
 	#panel #sections * {
@@ -207,6 +216,7 @@ h1 a {
 		width: 100%;
 		padding: 0 2.2rem;
 		font-size: 1rem;
+		font-weight: 500;
 		color: var(--text-color);
 		outline: none;
 		border: 0px;
@@ -221,6 +231,7 @@ h1 a {
 		font-family: 'Roboto Mono', monospace;
 		font-size: 1rem;
 		line-height: 1rem;
+		font-weight: 500;
 		color: #444;
 		border: 0px;
 		background-image: url(ic_arrow_drop_down_black_24dp.svg);
