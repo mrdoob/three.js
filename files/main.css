@@ -93,16 +93,12 @@ h1 a {
 }
 #header #version {
 	border: 1px solid var(--color-blue);
-  color: var(--color-blue);
-  border-radius: .25rem;
-  margin-left: .64rem;
-  font-size: .86rem;
-  line-height: 1rem;
-  font-weight: bold;
-  padding: 2px 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	color: var(--color-blue);
+	border-radius: 0.25rem;
+	line-height: 1.2rem;
+	padding: 0px 2px;
+	margin-left: 6px;
+	font-size: .9rem;
 }
 
 #panel {
@@ -176,6 +172,10 @@ h1 a {
 	}
 	#panel #sections a {
 		color: var(--secondary-text-color);
+	}
+
+	body.home #panel #sections {
+		display: none;
 	}
 
 #panel #inputWrapper {
@@ -287,10 +287,6 @@ h1 a {
 			margin-top: 1.2rem;
 		}
 
-		body.home #panel #sections {
-			display: none;
-		}
-
 .spacer {
 	color: var(--secondary-text-color);
 	margin-left: 2px;
@@ -358,6 +354,8 @@ iframe {
 #projects a:hover img {
 	transform: scale(1.08);
 }
+
+
 
 @media all and ( min-width: 1500px ) {
 	:root {
@@ -486,6 +484,7 @@ iframe {
 		transition: .25s transform;
 		overflow-x: hidden;
 		margin-right: -380px;
+		line-height: 2rem;
 	}
 	#panel.open #contentWrapper {
 		transform: translate3d(-380px, 0 ,0);
