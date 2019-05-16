@@ -1,6 +1,13 @@
+:root {
+	--color-blue: #049EF4;
+	--text-color: #444;
+	--border-style: 1px solid #EEE;
+	--header-height: 56px;
+}
+
 @font-face {
-	font-family: 'RobotoMono';
-	src: local('RobotoMono'), url('../files/RobotoMono-Regular.woff2') format('woff2');
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono'), url('../files/RobotoMono-Regular.woff2') format('woff2');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -13,54 +20,86 @@
 }
 
 body {
-	margin: 78px auto;
-	padding: 0px 24px;
-	max-width: 780px;
-	color: #555;
+	padding: 20px 24px 40px 24px;
+	margin: 0;
+	color: var(--text-color);
 	font-family: 'SF-Pro-Text', sans-serif;
 	font-size: 16px;
-	line-height: 23px;
+	line-height: 24px;
 	tab-size: 4;
 	overflow: auto;
 }
 
 a {
-	color: #1184CE;
+	color: var(--color-blue);
 	cursor: pointer;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 h1 {
-	color: #049EF4;
-	font-size: 32px;
+	color: var(--color-blue);
+	font-size: 2.4em;
 	font-weight: normal;
-	line-height: 42px;
+	line-height: 1.36em;
+	margin-top: 16px;
+	margin-bottom: -16px;
+	text-indent: -2px;
 }
 
 h2 {
-	color: #4B0;
-
-	font-size: 22px;
+	color: var(--color-blue);
+	font-size: 1.8em;
+	line-height: 1.32em;
 	font-weight: normal;
-	line-height: 31px;
+	margin-top: 40px;
+	margin-bottom: 12px;
+	text-indent: -1px;
 }
 
 h3 {
-	color: #000;
-	font-size: 16px;
+	font-size: 1.32em;
+	line-height: 1.48em;
 	font-weight: normal;
-
-	margin-top: 40px;
+	text-indent: -1px;
+	margin-top: 24px;
+	margin-bottom: 12px;
 }
 
-p, ul, ol {
-	margin-top: 0;
+p {
+	margin-top: 24px;
+	margin-bottom: 24px;
+}
+ul, ol {
+	box-sizing: border-box;
+	padding-left: 20px;
+}
+ul li,
+ol li {
+	padding-left: 4px;
+	margin-bottom: 4px;
+}
+
+li ul,
+li ol {
+	margin-top: 4px;
+}
+
+body {
+	max-width: 760px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table,
+pre,
+code {
+	margin-left: -24px;
+	margin-right: -24px;
+	margin-top: 20px;
 	margin-bottom: 20px;
-	max-width: 780px;
 }
 
 div {
-	/* padding-left: 30px; */
 	margin-bottom: 20px;
 }
 
@@ -68,17 +107,30 @@ div {
 	padding-left: 0px;
 }
 
-pre, code {
-	margin-top: 20px;
-	margin-bottom: 20px;
+br {
+	display: none;
+}
+
+table {
+	border-spacing: 24px 4px;
+}
+table,
+table tr,
+table td {
+	text-align: left;
+}
+
+table th {
+	text-decoration: none;
+	padding: 2px 0;
 }
 
 code {
 	display: block;
-	padding: 20px;
+	padding: 20px 24px;
 	white-space: pre-wrap;
-	background-color: #f9f9f9;
 	overflow: auto;
+	box-sizing: border-box;
 }
 
 iframe {
@@ -109,15 +161,15 @@ strong {
 
 #button {
 	position: fixed;
-	bottom: 16px;
-	right: 16px;
+	bottom: 12px;
+	right: 12px;
 
 	padding: 8px;
 	border-radius: 50%;
-	margin-bottom: 0px; /* TODO div sets it to 20px */
+	margin-bottom: 0px;
 
-	background-color: #dddddd;
-	opacity: 0.4;
+	background-color: #E5E5E5;
+	opacity: .9;
 }
 
 	#button:hover {
@@ -127,6 +179,7 @@ strong {
 
 	#button img {
 		display: block;
+		width: 20px;
 	}
 
 a.permalink {
@@ -157,19 +210,17 @@ sub {
 /* mobile */
 
 @media all and ( max-width: 640px ) {
-
 	body {
-		margin: 14px auto;
-		padding: 0px 14px;
-		font-size: 14px;
-		line-height: 22px;
+		padding: 16px 20px;
 	}
 
 	h1 {
+		margin-top: 0;
 		font-size: 26px;
 	}
 
 	h2 {
+		margin-top: 20px;
 		font-size: 18px;
 		line-height: 25px;
 	}

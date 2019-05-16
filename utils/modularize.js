@@ -8,8 +8,12 @@ var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
+	{ path: 'controls/DragControls.js', ignoreList: [] },
+	{ path: 'controls/DeviceOrientationControls.js', ignoreList: [] },
+	{ path: 'controls/EditorControls.js', ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', ignoreList: [] },
 	{ path: 'controls/MapControls.js', ignoreList: [] },
+	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
 	// { path: 'controls/TransformControls.js', ignoreList: [] },
 
@@ -20,10 +24,14 @@ var files = [
 	{ path: 'exporters/STLExporter.js', ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
 
+	{ path: 'loaders/BVHLoader.js', ignoreList: [ 'Bones' ] },
+	{ path: 'loaders/PCDLoader.js', ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
-	{ path: 'loaders/STLLoader.js', ignoreList: [] },
+	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
+	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
+	{ path: 'loaders/TGALoader.js', ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
