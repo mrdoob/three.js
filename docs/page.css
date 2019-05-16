@@ -180,7 +180,7 @@ strong {
 	bottom: 1rem;
 	right: 1rem;
 
-	padding: 0.5rem;
+	padding: 0.75rem;
 	border-radius: 2rem;
 	margin-bottom: 0px;
 
@@ -196,7 +196,7 @@ strong {
 	}
 	#button img {
 		display: block;
-		width: var(--icon-size)
+		width: calc(1.125 * var(--icon-size));
 	}
 
 a.permalink {

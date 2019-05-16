@@ -325,7 +325,7 @@ iframe {
 	position: fixed;
 	bottom: 1rem;
 	right: 1rem;
-	padding: 0.5rem;
+	padding: 0.75rem;
 	border-radius: 2rem;
 	margin-bottom: 0px;
 	background-color: #FFF;
@@ -341,13 +341,14 @@ iframe {
 
 	#button img {
 		display: block;
-		width: var(--icon-size)
+		width:  calc(1.125 * var(--icon-size));
 	}
 
 	#button.text {
-		padding-right: 1rem;
-		padding-left: 1rem;
+		padding-right: 1.2rem;
+    padding-left: 1.2rem;
 		color: var(--color-blue);
+		opacity: 1;
 	}
 
 
