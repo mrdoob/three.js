@@ -24,26 +24,30 @@ THREE.LDrawLoader = ( function () {
 		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 		gl_Position = projectionMatrix * mvPosition;
 
+		// Transform the line segment ends and control points into camera clip space
 		vec4 c0 = projectionMatrix * modelViewMatrix * vec4( control0, 1.0 );
 		vec4 c1 = projectionMatrix * modelViewMatrix * vec4( control1, 1.0 );
 		vec4 p0 = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		vec4 p1 = projectionMatrix * modelViewMatrix * vec4( position + direction, 1.0 );
 
-		c0.xy = c0.xy / c0.w;
-		c1.xy = c1.xy / c1.w;
-		p0.xy = p0.xy / p0.w;
-		p1.xy = p1.xy / p1.w;
+		c0.xy /= c0.w;
+		c1.xy /= c1.w;
+		p0.xy /= p0.w;
+		p1.xy /= p1.w;
 
+		// Get the direction of the segment and an orthogonal vector
 		vec2 dir = p1.xy - p0.xy;
 		vec2 norm = vec2( -dir.y, dir.x );
 
+		// Get control point directions from the line
 		vec2 c0dir = c0.xy - p1.xy;
 		vec2 c1dir = c1.xy - p1.xy;
 
+		// If the vectors to the controls points are pointed in different directions away
+		// from the line segment then the line should not be drawn.
 		float d0 = dot( normalize( norm ), normalize( c0dir ) );
 		float d1 = dot( normalize( norm ), normalize( c1dir ) );
-
-		if ( sign( d0 ) != sign( d1 ) ) discardFlag = 1.0;
+		discardFlag = float( sign( d0 ) != sign( d1 ) );
 
 		#include <logdepthbuf_vertex>
 		#include <clipping_planes_vertex>
