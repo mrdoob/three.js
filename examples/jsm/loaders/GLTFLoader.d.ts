@@ -23,5 +23,5 @@ export class GLTFLoader {
   setResourcePath(path: string) : GLTFLoader;
   setCrossOrigin(value: string): void;
   setDRACOLoader(dracoLoader: object): void;
-  parse(data: ArrayBuffer, path: string, onLoad: (gltf: GLTF) => void, onError?: (event: ErrorEvent) => void) : void;
+  parse(data: ArrayBuffer | string, path: string, onLoad: (gltf: GLTF) => void, onError?: (event: ErrorEvent) => void) : void;
 }
