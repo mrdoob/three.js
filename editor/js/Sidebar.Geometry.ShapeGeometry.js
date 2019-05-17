@@ -16,7 +16,7 @@ Sidebar.Geometry.ShapeGeometry = function ( editor, object ) {
 	// curveSegments
 
 	var curveSegmentsRow = new UI.Row();
-	var curveSegments = new UI.Number( parameters.curveSegments || 12 ).onChange( changeShape );
+	var curveSegments = new UI.Integer( parameters.curveSegments || 12 ).onChange( changeShape ).setRange( 1, Infinity );
 
 	curveSegmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/shape_geometry/curveSegments' ) ).setWidth( '90px' ) );
 	curveSegmentsRow.add( curveSegments );
