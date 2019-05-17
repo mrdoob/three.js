@@ -653,6 +653,55 @@ THREE.GLTFExporter.prototype = {
 
 		}
 
+		function transformImage ( image, mimeType, flipY, onError, onDone ) {
+
+			var shouldResize = options.forcePowerOfTwoTextures && ! isPowerOfTwo( image );
+
+
+			if ( !shouldResize && !flipY ) {
+
+				fetch( image.src )
+					.then( function ( response ) {
+
+						return response.blob();
+
+					} )
+					.then( onDone )
+					.catch( onError );
+
+				return;
+
+			}
+
+			var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
+
+			canvas.width = image.width;
+			canvas.height = image.height;
+
+			if ( shouldResize ) {
+
+				console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
+
+				canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
+				canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
+
+			}
+
+			var ctx = canvas.getContext( '2d' );
+
+			if ( flipY === true ) {
+
+				ctx.translate( 0, canvas.height );
+				ctx.scale( 1, - 1 );
+
+			}
+
+			ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+			canvas.toBlob( onDone, mimeType );
+
+		}
+
 		/**
 		 * Process image
 		 * @param  {Image} image to process
@@ -687,36 +736,11 @@ THREE.GLTFExporter.prototype = {
 			var gltfImage = { mimeType: mimeType };
 			var index = outputJSON.images.length;
 
-			var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
-
-			canvas.width = image.width;
-			canvas.height = image.height;
-
-			if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( image ) ) {
-
-				console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
-
-				canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
-				canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
-
-			}
-
-			var ctx = canvas.getContext( '2d' );
-
-			if ( flipY === true ) {
-
-				ctx.translate( 0, canvas.height );
-				ctx.scale( 1, - 1 );
-
-			}
-
-			ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
-
 			if ( options.mode === "glb" ) {
 
 				pending.push( new Promise( function ( resolve, reject ) {
 
-					canvas.toBlob( function ( blob ) {
+					transformImage( image, mimeType, flipY, reject, function ( blob ) {
 
 						processBufferViewImage( blob ).then( function ( bufferViewIndex ) {
 
@@ -726,7 +750,7 @@ THREE.GLTFExporter.prototype = {
 
 						} ).catch( reject );
 
-					}, mimeType );
+					} );
 
 				} ) );
 
@@ -738,13 +762,13 @@ THREE.GLTFExporter.prototype = {
 
 				pending.push( new Promise( function ( resolve, reject ) {
 
-					canvas.toBlob( function ( blob ) {
+					transformImage( image, mimeType, flipY, reject, function ( blob ) {
 
 						outputImages[ index ] = blob;
 
 						resolve();
 
-					}, mimeType );
+					} );
 
 				} ) );
 
