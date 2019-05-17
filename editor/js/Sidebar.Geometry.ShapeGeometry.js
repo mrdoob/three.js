@@ -32,7 +32,7 @@ Sidebar.Geometry.ShapeGeometry = function ( editor, object ) {
 	function changeShape() {
 
 		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
-			geometry.parameters.shapes,
+			parameters.shapes,
 			curveSegments.getValue()
 		) ) );
 
@@ -41,7 +41,9 @@ Sidebar.Geometry.ShapeGeometry = function ( editor, object ) {
 	function toExtrude() {
 
 		editor.execute( new SetGeometryCommand( object, new THREE.ExtrudeBufferGeometry(
-			geometry.parameters.shapes, {}
+			parameters.shapes, {
+				curveSegments: curveSegments.getValue()
+			}
 		) ) );
 
 	}
