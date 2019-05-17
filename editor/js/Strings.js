@@ -164,6 +164,9 @@ var Strings = function ( config ) {
 			'sidebar/geometry/ring_geometry/thetastart': 'Theta start',
 			'sidebar/geometry/ring_geometry/thetalength': 'Theta length',
 
+			'sidebar/geometry/shape_geometry/curveSegments': 'Curve Segments',
+			'sidebar/geometry/shape_geometry/extrude': 'Extrude',
+
 			'sidebar/geometry/sphere_geometry/radius': 'Radius',
 			'sidebar/geometry/sphere_geometry/widthsegments': 'Width segments',
 			'sidebar/geometry/sphere_geometry/heightsegments': 'Height segments',
