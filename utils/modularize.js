@@ -3,56 +3,42 @@
  */
 
 var fs = require( 'fs' );
+var { join, dirname } = require( 'path' );
 
 var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
-var files = [
-	{ path: 'controls/DragControls.js', ignoreList: [] },
-	{ path: 'controls/DeviceOrientationControls.js', ignoreList: [] },
-	{ path: 'controls/EditorControls.js', ignoreList: [] },
-	{ path: 'controls/FirstPersonControls.js', ignoreList: [] },
-	{ path: 'controls/FlyControls.js', ignoreList: [] },
-	{ path: 'controls/OrbitControls.js', ignoreList: [] },
-	{ path: 'controls/MapControls.js', ignoreList: [] },
-	{ path: 'controls/OrthographicTrackballControls.js', ignoreList: [] },
-	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
-	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	{ path: 'controls/TransformControls.js', ignoreList: [] },
+const files = [];
+const ignoreLists = {
+	'exporters/GLTFExporter.js': [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ],
+	'loaders/GLTFLoader.js': [ 'NoSide', 'Matrix2', 'DDSLoader' ],
+	'utils/ShadowMapViewer.js': [ 'DirectionalLight', 'SpotLight' ],
+	'utils/UVsDebug.js': [ 'SphereBufferGeometry' ]
+};
 
-	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
-	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
-	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
-	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
-	{ path: 'exporters/STLExporter.js', ignoreList: [] },
-	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
+function walkDir( dir ) {
 
-	{ path: 'loaders/BVHLoader.js', ignoreList: [ 'Bones' ] },
-	{ path: 'loaders/PCDLoader.js', ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
-	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
-	{ path: 'loaders/MTLLoader.js', ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
-	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
-	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
-	{ path: 'loaders/SVGLoader.js', ignoreList: [] },
-	{ path: 'loaders/TGALoader.js', ignoreList: [] },
-	{ path: 'loaders/VRMLLoader.js', ignoreList: [] },
+	fs.readdirSync( dir ).forEach( f => {
 
-	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
-	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
+		let dirPath = join( dir, f );
+		let isDirectory = fs.statSync( dirPath ).isDirectory();
+		if ( isDirectory ) {
 
-	{ path: 'renderers/CSS2DRenderer.js', ignoreList: [] },
-	{ path: 'renderers/CSS3DRenderer.js', ignoreList: [] },
+			walkDir( dirPath );
+			return;
 
-	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/MathUtils.js', ignoreList: [] },
-	{ path: 'utils/SceneUtils.js', ignoreList: [] },
-	{ path: 'utils/ShadowMapViewer.js', ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
-	{ path: 'utils/SkeletonUtils.js', ignoreList: [] },
-	{ path: 'utils/TypedArrayUtils.js', ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', ignoreList: [ 'SphereBufferGeometry' ] },
-];
+		}
+		const path = join( dir, f ).substr( __dirname.length + 7 );
+		files.push( {
+			path,
+			ignoreList: ignoreLists[ path ] || []
+		} );
+
+	} );
+
+}
+
+walkDir( srcFolder );
 
 for ( var i = 0; i < files.length; i ++ ) {
 
@@ -84,16 +70,20 @@ function convert( path, ignoreList ) {
 
 		classNames.push( p1 );
 
-		console.log( p1 );
-
 		return `var ${p1} = `;
 
 	} );
 
+	if ( ! classNames.length ) {
+
+		console.log( `Skipping ${path}: no exports found` );
+
+	}
+
 	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
 
 		if ( p1 === '\'' ) return match; // Inside a string
-		if ( classNames.includes( p2 ) ) return `${p2}${p3}`;
+		if ( classNames.indexOf( p2 ) >= 0 ) return `${p2}${p3}`;
 
 		if ( p1 === 'Math' ) {
 
@@ -125,7 +115,7 @@ function convert( path, ignoreList ) {
 
 		if ( ignoreList.includes( p2 ) ) return match;
 		if ( p1 === '\'' ) return match; // Inside a string
-		if ( classNames.includes( p2 ) ) return p2;
+		if ( classNames.indexOf( p2 ) >= 0 ) return p2;
 
 		if ( p2 === 'Math' || p2 === '_Math' ) {
 
@@ -145,19 +135,42 @@ function convert( path, ignoreList ) {
 
 	//
 
-	var keys = Object.keys( dependencies )
-		.filter( value => ! classNames.includes( value ) )
-		.map( value => value === '_Math' ? 'Math as _Math' : value )
-		.map( value => '\n\t' + value )
-		.sort()
-		.toString();
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${classNames.join( ", " )} };\n`;
+	const threeDependencies = [];
+	const exampleDependencies = [];
+	Object.keys( dependencies ).forEach( value => {
 
-	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
+		if ( classNames.indexOf( value ) >= 0 ) {
+
+			return;
+
+		}
+		const file = files.find( file => file.path.endsWith( `/${value}.js` ) );
+		if ( file ) {
+
+			exampleDependencies.push( file.path );
+			return;
+
+		}
+		threeDependencies.push( value === '_Math' ? 'Math as _Math' : value );
+
+	} );
+	var imports = `${threeDependencies.length
+		? `import {\n\t${threeDependencies.sort().join( ',\n\t' )}\n} from "../../../build/three.module.js";`
+		: ''
+	}${exampleDependencies.map( moduleDepency => `\nimport { ${moduleDepency.match( /([^/]*).js$/ )[ 1 ]} } from "../${moduleDepency}";` ).join( "" )}`;
+	var exports = `export { ${classNames.join( ', ' )} };\n`;
+
+	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
 	// console.log( output );
 
-	fs.writeFileSync( dstFolder + path, output, 'utf-8' );
+	var outputFilePath = dstFolder + path;
+	var outputFileDir = dirname( outputFilePath );
+	if ( ! fs.existsSync( outputFileDir ) ) {
+
+		fs.mkdirSync( outputFileDir );
+
+	}
+	fs.writeFileSync( outputFilePath, output, 'utf-8' );
 
 }
