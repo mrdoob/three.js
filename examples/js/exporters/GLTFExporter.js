@@ -76,56 +76,6 @@ THREE.GLTFExporter.prototype = {
 	constructor: THREE.GLTFExporter,
 
 	/**
-	 * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
-	 * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
-	 *
-	 * @param {Integer} bufferSize The size the original buffer.
-	 * @returns {Integer} new buffer size with required padding.
-	 *
-	 */
-	_getPaddedBufferSize( bufferSize ) {
-
-		return Math.ceil( bufferSize / 4 ) * 4;
-
-	},
-
-	/**
-	 * Returns a buffer aligned to 4-byte boundary.
-	 *
-	 * @param {ArrayBuffer} arrayBuffer Buffer to pad
-	 * @param {Integer} paddingByte (Optional)
-	 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
-	 */
-	_getPaddedArrayBuffer( arrayBuffer, paddingByte ) {
-
-		paddingByte = paddingByte || 0;
-
-		var paddedLength = this._getPaddedBufferSize( arrayBuffer.byteLength );
-
-		if ( paddedLength !== arrayBuffer.byteLength ) {
-
-			var array = new Uint8Array( paddedLength );
-			array.set( new Uint8Array( arrayBuffer ) );
-
-			if ( paddingByte !== 0 ) {
-
-				for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
-
-					array[ i ] = paddingByte;
-
-				}
-
-			}
-
-			return array.buffer;
-
-		}
-
-		return arrayBuffer;
-
-	},
-
-	/**
 	 * Parse scenes and generate an object containing the glTF JSON, buffers, and images.
 	 * @param  {THREE.Scene or [THREE.Scenes]} input   THREE.Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
@@ -133,8 +83,6 @@ THREE.GLTFExporter.prototype = {
 	 * @param  {Object} options options
 	 */
 	parseChunks: function ( input, onDone, onError, options ) {
-
-		var self = this;
 
 		options = Object.assign( {}, DEFAULT_OPTIONS, options );
 
@@ -489,7 +437,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var byteLength = self._getPaddedBufferSize( count * attribute.itemSize * componentSize );
+			var byteLength = THREE.GLTFExporter.Utils.getPaddedBufferSize( count * attribute.itemSize * componentSize );
 			var dataView = new DataView( new ArrayBuffer( byteLength ) );
 			var offset = 0;
 
@@ -577,7 +525,7 @@ THREE.GLTFExporter.prototype = {
 				reader.readAsArrayBuffer( blob );
 				reader.onloadend = function () {
 
-					var buffer = self._getPaddedArrayBuffer( reader.result );
+					var buffer = THREE.GLTFExporter.Utils.getPaddedArrayBuffer( reader.result );
 
 					var bufferView = {
 						buffer: processBuffer( buffer ),
@@ -2026,8 +1974,6 @@ THREE.GLTFExporter.prototype = {
 	 */
 	createGLBBlob: function ( chunks, onDone, onError ) {
 
-		var self = this;
-
 		if ( chunks.buffers.length > 1 ) {
 
 			onError( new Error( "GLTFExporter: exportGLB expects 0 or 1 buffers." ) );
@@ -2054,7 +2000,7 @@ THREE.GLTFExporter.prototype = {
 				reader.readAsArrayBuffer( blob );
 				reader.onloadend = function () {
 
-					var binaryChunk = self._getPaddedArrayBuffer( reader.result );
+					var binaryChunk = THREE.GLTFExporter.Utils.getPaddedArrayBuffer( reader.result );
 					resolve( binaryChunk );
 
 				};
@@ -2105,7 +2051,7 @@ THREE.GLTFExporter.prototype = {
 		blobParts.push( header );
 
 		// JSON chunk.
-		var jsonChunk = self._getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( chunks.json ) ), 0x20 );
+		var jsonChunk = THREE.GLTFExporter.Utils.getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( chunks.json ) ), 0x20 );
 		var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
 		jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
 		jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
@@ -2184,6 +2130,56 @@ THREE.GLTFExporter.prototype = {
 };
 
 THREE.GLTFExporter.Utils = {
+
+	/**
+	 * Get the required size + padding for a buffer, rounded to the next 4-byte boundary.
+	 * https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#data-alignment
+	 *
+	 * @param {Integer} bufferSize The size the original buffer.
+	 * @returns {Integer} new buffer size with required padding.
+	 *
+	 */
+	getPaddedBufferSize( bufferSize ) {
+
+		return Math.ceil( bufferSize / 4 ) * 4;
+
+	},
+
+	/**
+	 * Returns a buffer aligned to 4-byte boundary.
+	 *
+	 * @param {ArrayBuffer} arrayBuffer Buffer to pad
+	 * @param {Integer} paddingByte (Optional)
+	 * @returns {ArrayBuffer} The same buffer if it's already aligned to 4-byte boundary or a new buffer
+	 */
+	getPaddedArrayBuffer( arrayBuffer, paddingByte ) {
+
+		paddingByte = paddingByte || 0;
+
+		var paddedLength = THREE.GLTFExporter.Utils.getPaddedBufferSize( arrayBuffer.byteLength );
+
+		if ( paddedLength !== arrayBuffer.byteLength ) {
+
+			var array = new Uint8Array( paddedLength );
+			array.set( new Uint8Array( arrayBuffer ) );
+
+			if ( paddingByte !== 0 ) {
+
+				for ( var i = arrayBuffer.byteLength; i < paddedLength; i ++ ) {
+
+					array[ i ] = paddingByte;
+
+				}
+
+			}
+
+			return array.buffer;
+
+		}
+
+		return arrayBuffer;
+
+	},
 
 	insertKeyframe: function ( track, time ) {
 
