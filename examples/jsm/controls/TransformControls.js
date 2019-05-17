@@ -2,18 +2,43 @@
  * @author arodic / https://github.com/arodic
  */
 
-THREE.TransformControls = function ( camera, domElement ) {
+import {
+	BoxBufferGeometry,
+	BufferGeometry,
+	Color,
+	CylinderBufferGeometry,
+	DoubleSide,
+	Euler,
+	Float32BufferAttribute,
+	Line,
+	LineBasicMaterial,
+	Matrix4,
+	Mesh,
+	MeshBasicMaterial,
+	Object3D,
+	OctahedronBufferGeometry,
+	OrthographicCamera,
+	PerspectiveCamera,
+	PlaneBufferGeometry,
+	Quaternion,
+	Raycaster,
+	SphereBufferGeometry,
+	TorusBufferGeometry,
+	Vector3
+} from "../../../build/three.module.js";
 
-	THREE.Object3D.call( this );
+var TransformControls = function ( camera, domElement ) {
+
+	Object3D.call( this );
 
 	domElement = ( domElement !== undefined ) ? domElement : document;
 
 	this.visible = false;
 
-	var _gizmo = new THREE.TransformControlsGizmo();
+	var _gizmo = new TransformControlsGizmo();
 	this.add( _gizmo );
 
-	var _plane = new THREE.TransformControlsPlane();
+	var _plane = new TransformControlsPlane();
 	this.add( _plane );
 
 	var scope = this;
@@ -43,48 +68,48 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	// Reusable utility variables
 
-	var ray = new THREE.Raycaster();
+	var ray = new Raycaster();
 
-	var _tempVector = new THREE.Vector3();
-	var _tempVector2 = new THREE.Vector3();
-	var _tempQuaternion = new THREE.Quaternion();
+	var _tempVector = new Vector3();
+	var _tempVector2 = new Vector3();
+	var _tempQuaternion = new Quaternion();
 	var _unit = {
-		X: new THREE.Vector3( 1, 0, 0 ),
-		Y: new THREE.Vector3( 0, 1, 0 ),
-		Z: new THREE.Vector3( 0, 0, 1 )
+		X: new Vector3( 1, 0, 0 ),
+		Y: new Vector3( 0, 1, 0 ),
+		Z: new Vector3( 0, 0, 1 )
 	};
 
-	var pointStart = new THREE.Vector3();
-	var pointEnd = new THREE.Vector3();
-	var offset = new THREE.Vector3();
-	var rotationAxis = new THREE.Vector3();
-	var startNorm = new THREE.Vector3();
-	var endNorm = new THREE.Vector3();
+	var pointStart = new Vector3();
+	var pointEnd = new Vector3();
+	var offset = new Vector3();
+	var rotationAxis = new Vector3();
+	var startNorm = new Vector3();
+	var endNorm = new Vector3();
 	var rotationAngle = 0;
 
-	var cameraPosition = new THREE.Vector3();
-	var cameraQuaternion = new THREE.Quaternion();
-	var cameraScale = new THREE.Vector3();
+	var cameraPosition = new Vector3();
+	var cameraQuaternion = new Quaternion();
+	var cameraScale = new Vector3();
 
-	var parentPosition = new THREE.Vector3();
-	var parentQuaternion = new THREE.Quaternion();
-	var parentQuaternionInv = new THREE.Quaternion();
-	var parentScale = new THREE.Vector3();
+	var parentPosition = new Vector3();
+	var parentQuaternion = new Quaternion();
+	var parentQuaternionInv = new Quaternion();
+	var parentScale = new Vector3();
 
-	var worldPositionStart = new THREE.Vector3();
-	var worldQuaternionStart = new THREE.Quaternion();
-	var worldScaleStart = new THREE.Vector3();
+	var worldPositionStart = new Vector3();
+	var worldQuaternionStart = new Quaternion();
+	var worldScaleStart = new Vector3();
 
-	var worldPosition = new THREE.Vector3();
-	var worldQuaternion = new THREE.Quaternion();
-	var worldQuaternionInv = new THREE.Quaternion();
-	var worldScale = new THREE.Vector3();
+	var worldPosition = new Vector3();
+	var worldQuaternion = new Quaternion();
+	var worldQuaternionInv = new Quaternion();
+	var worldScale = new Vector3();
 
-	var eye = new THREE.Vector3();
+	var eye = new Vector3();
 
-	var positionStart = new THREE.Vector3();
-	var quaternionStart = new THREE.Quaternion();
-	var scaleStart = new THREE.Vector3();
+	var positionStart = new Vector3();
+	var quaternionStart = new Quaternion();
+	var scaleStart = new Vector3();
 
 	// TODO: remove properties unused in plane and gizmo
 
@@ -205,17 +230,17 @@ THREE.TransformControls = function ( camera, domElement ) {
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
 
-		if ( this.camera instanceof THREE.PerspectiveCamera ) {
+		if ( this.camera instanceof PerspectiveCamera ) {
 
 			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
 
-		} else if ( this.camera instanceof THREE.OrthographicCamera ) {
+		} else if ( this.camera instanceof OrthographicCamera ) {
 
 			eye.copy( cameraPosition ).normalize();
 
 		}
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this );
+		Object3D.prototype.updateMatrixWorld.call( this );
 
 	};
 
@@ -639,34 +664,34 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 };
 
-THREE.TransformControls.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+TransformControls.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: THREE.TransformControls,
+	constructor: TransformControls,
 
 	isTransformControls: true
 
 } );
 
 
-THREE.TransformControlsGizmo = function () {
+var TransformControlsGizmo = function () {
 
 	'use strict';
 
-	THREE.Object3D.call( this );
+	Object3D.call( this );
 
 	this.type = 'TransformControlsGizmo';
 
 	// shared materials
 
-	var gizmoMaterial = new THREE.MeshBasicMaterial( {
+	var gizmoMaterial = new MeshBasicMaterial( {
 		depthTest: false,
 		depthWrite: false,
 		transparent: true,
-		side: THREE.DoubleSide,
+		side: DoubleSide,
 		fog: false
 	} );
 
-	var gizmoLineMaterial = new THREE.LineBasicMaterial( {
+	var gizmoLineMaterial = new LineBasicMaterial( {
 		depthTest: false,
 		depthWrite: false,
 		transparent: true,
@@ -732,16 +757,16 @@ THREE.TransformControlsGizmo = function () {
 
 	// reusable geometry
 
-	var arrowGeometry = new THREE.CylinderBufferGeometry( 0, 0.05, 0.2, 12, 1, false );
+	var arrowGeometry = new CylinderBufferGeometry( 0, 0.05, 0.2, 12, 1, false );
 
-	var scaleHandleGeometry = new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 );
+	var scaleHandleGeometry = new BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
-	var lineGeometry = new THREE.BufferGeometry( );
-	lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
+	var lineGeometry = new BufferGeometry( );
+	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
 
-		var geometry = new THREE.BufferGeometry( );
+		var geometry = new BufferGeometry( );
 		var vertices = [];
 
 		for ( var i = 0; i <= 64 * arc; ++ i ) {
@@ -750,7 +775,7 @@ THREE.TransformControlsGizmo = function () {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 		return geometry;
 
@@ -760,9 +785,9 @@ THREE.TransformControlsGizmo = function () {
 
 	var TranslateHelperGeometry = function () {
 
-		var geometry = new THREE.BufferGeometry();
+		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
 		return geometry;
 
@@ -772,212 +797,212 @@ THREE.TransformControlsGizmo = function () {
 
 	var gizmoTranslate = {
 		X: [
-			[ new THREE.Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, - Math.PI / 2 ], null, 'fwd' ],
-			[ new THREE.Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, Math.PI / 2 ], null, 'bwd' ],
-			[ new THREE.Line( lineGeometry, matLineRed ) ]
+			[ new Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, - Math.PI / 2 ], null, 'fwd' ],
+			[ new Mesh( arrowGeometry, matRed ), [ 1, 0, 0 ], [ 0, 0, Math.PI / 2 ], null, 'bwd' ],
+			[ new Line( lineGeometry, matLineRed ) ]
 		],
 		Y: [
-			[ new THREE.Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], null, null, 'fwd' ],
-			[ new THREE.Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], [ Math.PI, 0, 0 ], null, 'bwd' ],
-			[ new THREE.Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ]]
+			[ new Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], null, null, 'fwd' ],
+			[ new Mesh( arrowGeometry, matGreen ), [ 0, 1, 0 ], [ Math.PI, 0, 0 ], null, 'bwd' ],
+			[ new Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ]]
 		],
 		Z: [
-			[ new THREE.Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ Math.PI / 2, 0, 0 ], null, 'fwd' ],
-			[ new THREE.Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ - Math.PI / 2, 0, 0 ], null, 'bwd' ],
-			[ new THREE.Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
+			[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ Math.PI / 2, 0, 0 ], null, 'fwd' ],
+			[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 1 ], [ - Math.PI / 2, 0, 0 ], null, 'bwd' ],
+			[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
 		],
 		XYZ: [
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransperent ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
+			[ new Mesh( new OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransperent ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
 		],
 		XY: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matYellowTransparent ), [ 0.15, 0.15, 0 ]],
-			[ new THREE.Line( lineGeometry, matLineYellow ), [ 0.18, 0.3, 0 ], null, [ 0.125, 1, 1 ]],
-			[ new THREE.Line( lineGeometry, matLineYellow ), [ 0.3, 0.18, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
+			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matYellowTransparent ), [ 0.15, 0.15, 0 ]],
+			[ new Line( lineGeometry, matLineYellow ), [ 0.18, 0.3, 0 ], null, [ 0.125, 1, 1 ]],
+			[ new Line( lineGeometry, matLineYellow ), [ 0.3, 0.18, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
 		],
 		YZ: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matCyanTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
-			[ new THREE.Line( lineGeometry, matLineCyan ), [ 0, 0.18, 0.3 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
-			[ new THREE.Line( lineGeometry, matLineCyan ), [ 0, 0.3, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matCyanTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
+			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.18, 0.3 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
+			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.3, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XZ: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matMagentaTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
-			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.18, 0, 0.3 ], null, [ 0.125, 1, 1 ]],
-			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.3, 0, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matMagentaTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
+			[ new Line( lineGeometry, matLineMagenta ), [ 0.18, 0, 0.3 ], null, [ 0.125, 1, 1 ]],
+			[ new Line( lineGeometry, matLineMagenta ), [ 0.3, 0, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		]
 	};
 
 	var pickerTranslate = {
 		X: [
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
 		],
 		Y: [
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0.6, 0 ]]
+			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0.6, 0 ]]
 		],
 		Z: [
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ]]
+			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), matInvisible ), [ 0, 0, 0.6 ], [ Math.PI / 2, 0, 0 ]]
 		],
 		XYZ: [
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.2, 0 ), matInvisible ) ]
+			[ new Mesh( new OctahedronBufferGeometry( 0.2, 0 ), matInvisible ) ]
 		],
 		XY: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0.2, 0 ]]
+			[ new Mesh( new PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0.2, 0 ]]
 		],
 		YZ: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ]]
+			[ new Mesh( new PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0, 0.2, 0.2 ], [ 0, Math.PI / 2, 0 ]]
 		],
 		XZ: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ]]
+			[ new Mesh( new PlaneBufferGeometry( 0.4, 0.4 ), matInvisible ), [ 0.2, 0, 0.2 ], [ - Math.PI / 2, 0, 0 ]]
 		]
 	};
 
 	var helperTranslate = {
 		START: [
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
+			[ new Mesh( new OctahedronBufferGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
 		],
 		END: [
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
+			[ new Mesh( new OctahedronBufferGeometry( 0.01, 2 ), matHelper ), null, null, null, 'helper' ]
 		],
 		DELTA: [
-			[ new THREE.Line( TranslateHelperGeometry(), matHelper ), null, null, null, 'helper' ]
+			[ new Line( TranslateHelperGeometry(), matHelper ), null, null, null, 'helper' ]
 		],
 		X: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
 		],
 		Y: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
 		],
 		Z: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
 		]
 	};
 
 	var gizmoRotate = {
 		X: [
-			[ new THREE.Line( CircleGeometry( 1, 0.5 ), matLineRed ) ],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ]],
+			[ new Line( CircleGeometry( 1, 0.5 ), matLineRed ) ],
+			[ new Mesh( new OctahedronBufferGeometry( 0.04, 0 ), matRed ), [ 0, 0, 0.99 ], null, [ 1, 3, 1 ]],
 		],
 		Y: [
-			[ new THREE.Line( CircleGeometry( 1, 0.5 ), matLineGreen ), null, [ 0, 0, - Math.PI / 2 ]],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ]],
+			[ new Line( CircleGeometry( 1, 0.5 ), matLineGreen ), null, [ 0, 0, - Math.PI / 2 ]],
+			[ new Mesh( new OctahedronBufferGeometry( 0.04, 0 ), matGreen ), [ 0, 0, 0.99 ], null, [ 3, 1, 1 ]],
 		],
 		Z: [
-			[ new THREE.Line( CircleGeometry( 1, 0.5 ), matLineBlue ), null, [ 0, Math.PI / 2, 0 ]],
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ]],
+			[ new Line( CircleGeometry( 1, 0.5 ), matLineBlue ), null, [ 0, Math.PI / 2, 0 ]],
+			[ new Mesh( new OctahedronBufferGeometry( 0.04, 0 ), matBlue ), [ 0.99, 0, 0 ], null, [ 1, 3, 1 ]],
 		],
 		E: [
-			[ new THREE.Line( CircleGeometry( 1.25, 1 ), matLineYellowTransparent ), null, [ 0, Math.PI / 2, 0 ]],
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 1.17, 0, 0 ], [ 0, 0, - Math.PI / 2 ], [ 1, 1, 0.001 ]],
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ - 1.17, 0, 0 ], [ 0, 0, Math.PI / 2 ], [ 1, 1, 0.001 ]],
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, - 1.17, 0 ], [ Math.PI, 0, 0 ], [ 1, 1, 0.001 ]],
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, 1.17, 0 ], [ 0, 0, 0 ], [ 1, 1, 0.001 ]],
+			[ new Line( CircleGeometry( 1.25, 1 ), matLineYellowTransparent ), null, [ 0, Math.PI / 2, 0 ]],
+			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 1.17, 0, 0 ], [ 0, 0, - Math.PI / 2 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ - 1.17, 0, 0 ], [ 0, 0, Math.PI / 2 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, - 1.17, 0 ], [ Math.PI, 0, 0 ], [ 1, 1, 0.001 ]],
+			[ new Mesh( new CylinderBufferGeometry( 0.03, 0, 0.15, 4, 1, false ), matLineYellowTransparent ), [ 0, 1.17, 0 ], [ 0, 0, 0 ], [ 1, 1, 0.001 ]],
 		],
 		XYZE: [
-			[ new THREE.Line( CircleGeometry( 1, 1 ), matLineGray ), null, [ 0, Math.PI / 2, 0 ]]
+			[ new Line( CircleGeometry( 1, 1 ), matLineGray ), null, [ 0, Math.PI / 2, 0 ]]
 		]
 	};
 
 	var helperRotate = {
 		AXIS: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
 		]
 	};
 
 	var pickerRotate = {
 		X: [
-			[ new THREE.Mesh( new THREE.TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ]],
+			[ new Mesh( new TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, - Math.PI / 2, - Math.PI / 2 ]],
 		],
 		Y: [
-			[ new THREE.Mesh( new THREE.TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
+			[ new Mesh( new TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
 		],
 		Z: [
-			[ new THREE.Mesh( new THREE.TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+			[ new Mesh( new TorusBufferGeometry( 1, 0.1, 4, 24 ), matInvisible ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
 		],
 		E: [
-			[ new THREE.Mesh( new THREE.TorusBufferGeometry( 1.25, 0.1, 2, 24 ), matInvisible ) ]
+			[ new Mesh( new TorusBufferGeometry( 1.25, 0.1, 2, 24 ), matInvisible ) ]
 		],
 		XYZE: [
-			[ new THREE.Mesh( new THREE.SphereBufferGeometry( 0.7, 10, 8 ), matInvisible ) ]
+			[ new Mesh( new SphereBufferGeometry( 0.7, 10, 8 ), matInvisible ) ]
 		]
 	};
 
 	var gizmoScale = {
 		X: [
-			[ new THREE.Mesh( scaleHandleGeometry, matRed ), [ 0.8, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
-			[ new THREE.Line( lineGeometry, matLineRed ), null, null, [ 0.8, 1, 1 ]]
+			[ new Mesh( scaleHandleGeometry, matRed ), [ 0.8, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+			[ new Line( lineGeometry, matLineRed ), null, null, [ 0.8, 1, 1 ]]
 		],
 		Y: [
-			[ new THREE.Mesh( scaleHandleGeometry, matGreen ), [ 0, 0.8, 0 ]],
-			[ new THREE.Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ], [ 0.8, 1, 1 ]]
+			[ new Mesh( scaleHandleGeometry, matGreen ), [ 0, 0.8, 0 ]],
+			[ new Line( lineGeometry, matLineGreen ), null, [ 0, 0, Math.PI / 2 ], [ 0.8, 1, 1 ]]
 		],
 		Z: [
-			[ new THREE.Mesh( scaleHandleGeometry, matBlue ), [ 0, 0, 0.8 ], [ Math.PI / 2, 0, 0 ]],
-			[ new THREE.Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ], [ 0.8, 1, 1 ]]
+			[ new Mesh( scaleHandleGeometry, matBlue ), [ 0, 0, 0.8 ], [ Math.PI / 2, 0, 0 ]],
+			[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ], [ 0.8, 1, 1 ]]
 		],
 		XY: [
-			[ new THREE.Mesh( scaleHandleGeometry, matYellowTransparent ), [ 0.85, 0.85, 0 ], null, [ 2, 2, 0.2 ]],
-			[ new THREE.Line( lineGeometry, matLineYellow ), [ 0.855, 0.98, 0 ], null, [ 0.125, 1, 1 ]],
-			[ new THREE.Line( lineGeometry, matLineYellow ), [ 0.98, 0.855, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
+			[ new Mesh( scaleHandleGeometry, matYellowTransparent ), [ 0.85, 0.85, 0 ], null, [ 2, 2, 0.2 ]],
+			[ new Line( lineGeometry, matLineYellow ), [ 0.855, 0.98, 0 ], null, [ 0.125, 1, 1 ]],
+			[ new Line( lineGeometry, matLineYellow ), [ 0.98, 0.855, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
 		],
 		YZ: [
-			[ new THREE.Mesh( scaleHandleGeometry, matCyanTransparent ), [ 0, 0.85, 0.85 ], null, [ 0.2, 2, 2 ]],
-			[ new THREE.Line( lineGeometry, matLineCyan ), [ 0, 0.855, 0.98 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
-			[ new THREE.Line( lineGeometry, matLineCyan ), [ 0, 0.98, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			[ new Mesh( scaleHandleGeometry, matCyanTransparent ), [ 0, 0.85, 0.85 ], null, [ 0.2, 2, 2 ]],
+			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.855, 0.98 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
+			[ new Line( lineGeometry, matLineCyan ), [ 0, 0.98, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XZ: [
-			[ new THREE.Mesh( scaleHandleGeometry, matMagentaTransparent ), [ 0.85, 0, 0.85 ], null, [ 2, 0.2, 2 ]],
-			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.855, 0, 0.98 ], null, [ 0.125, 1, 1 ]],
-			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
+			[ new Mesh( scaleHandleGeometry, matMagentaTransparent ), [ 0.85, 0, 0.85 ], null, [ 2, 0.2, 2 ]],
+			[ new Line( lineGeometry, matLineMagenta ), [ 0.855, 0, 0.98 ], null, [ 0.125, 1, 1 ]],
+			[ new Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XYZX: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
 		]
 	};
 
 	var pickerScale = {
 		X: [
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
 		],
 		Y: [
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0.5, 0 ]]
+			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0.5, 0 ]]
 		],
 		Z: [
-			[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]]
+			[ new Mesh( new CylinderBufferGeometry( 0.2, 0, 0.8, 4, 1, false ), matInvisible ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]]
 		],
 		XY: [
-			[ new THREE.Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0.85, 0 ], null, [ 3, 3, 0.2 ]],
+			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0.85, 0 ], null, [ 3, 3, 0.2 ]],
 		],
 		YZ: [
-			[ new THREE.Mesh( scaleHandleGeometry, matInvisible ), [ 0, 0.85, 0.85 ], null, [ 0.2, 3, 3 ]],
+			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0, 0.85, 0.85 ], null, [ 0.2, 3, 3 ]],
 		],
 		XZ: [
-			[ new THREE.Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0, 0.85 ], null, [ 3, 0.2, 3 ]],
+			[ new Mesh( scaleHandleGeometry, matInvisible ), [ 0.85, 0, 0.85 ], null, [ 3, 0.2, 3 ]],
 		],
 		XYZX: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.2, 0.2, 0.2 ), matInvisible ), [ 0, 0, 1.1 ]],
 		]
 	};
 
 	var helperScale = {
 		X: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ - 1e3, 0, 0 ], null, [ 1e6, 1, 1 ], 'helper' ]
 		],
 		Y: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ 0, - 1e3, 0 ], [ 0, 0, Math.PI / 2 ], [ 1e6, 1, 1 ], 'helper' ]
 		],
 		Z: [
-			[ new THREE.Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
+			[ new Line( lineGeometry, matHelper.clone() ), [ 0, 0, - 1e3 ], [ 0, - Math.PI / 2, 0 ], [ 1e6, 1, 1 ], 'helper' ]
 		]
 	};
 
@@ -985,7 +1010,7 @@ THREE.TransformControlsGizmo = function () {
 
 	var setupGizmo = function ( gizmoMap ) {
 
-		var gizmo = new THREE.Object3D();
+		var gizmo = new Object3D();
 
 		for ( var name in gizmoMap ) {
 
@@ -1040,18 +1065,18 @@ THREE.TransformControlsGizmo = function () {
 
 	// Reusable utility variables
 
-	var tempVector = new THREE.Vector3( 0, 0, 0 );
-	var tempEuler = new THREE.Euler();
-	var alignVector = new THREE.Vector3( 0, 1, 0 );
-	var zeroVector = new THREE.Vector3( 0, 0, 0 );
-	var lookAtMatrix = new THREE.Matrix4();
-	var tempQuaternion = new THREE.Quaternion();
-	var tempQuaternion2 = new THREE.Quaternion();
-	var identityQuaternion = new THREE.Quaternion();
+	var tempVector = new Vector3( 0, 0, 0 );
+	var tempEuler = new Euler();
+	var alignVector = new Vector3( 0, 1, 0 );
+	var zeroVector = new Vector3( 0, 0, 0 );
+	var lookAtMatrix = new Matrix4();
+	var tempQuaternion = new Quaternion();
+	var tempQuaternion2 = new Quaternion();
+	var identityQuaternion = new Quaternion();
 
-	var unitX = new THREE.Vector3( 1, 0, 0 );
-	var unitY = new THREE.Vector3( 0, 1, 0 );
-	var unitZ = new THREE.Vector3( 0, 0, 1 );
+	var unitX = new Vector3( 1, 0, 0 );
+	var unitY = new Vector3( 0, 1, 0 );
+	var unitZ = new Vector3( 0, 0, 1 );
 
 	// Gizmo creation
 
@@ -1425,14 +1450,14 @@ THREE.TransformControlsGizmo = function () {
 			if ( ! this.enabled ) {
 
 				handle.material.opacity *= 0.5;
-				handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+				handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
 
 			} else if ( this.axis ) {
 
 				if ( handle.name === this.axis ) {
 
 					handle.material.opacity = 1.0;
-					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
 
 				} else if ( this.axis.split( '' ).some( function ( a ) {
 
@@ -1441,12 +1466,12 @@ THREE.TransformControlsGizmo = function () {
 				} ) ) {
 
 					handle.material.opacity = 1.0;
-					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
 
 				} else {
 
 					handle.material.opacity *= 0.25;
-					handle.material.color.lerp( new THREE.Color( 1, 1, 1 ), 0.5 );
+					handle.material.color.lerp( new Color( 1, 1, 1 ), 0.5 );
 
 				}
 
@@ -1454,41 +1479,41 @@ THREE.TransformControlsGizmo = function () {
 
 		}
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this );
+		Object3D.prototype.updateMatrixWorld.call( this );
 
 	};
 
 };
 
-THREE.TransformControlsGizmo.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+TransformControlsGizmo.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-	constructor: THREE.TransformControlsGizmo,
+	constructor: TransformControlsGizmo,
 
 	isTransformControlsGizmo: true
 
 } );
 
 
-THREE.TransformControlsPlane = function () {
+var TransformControlsPlane = function () {
 
 	'use strict';
 
-	THREE.Mesh.call( this,
-		new THREE.PlaneBufferGeometry( 100000, 100000, 2, 2 ),
-		new THREE.MeshBasicMaterial( { visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1 } )
+	Mesh.call( this,
+		new PlaneBufferGeometry( 100000, 100000, 2, 2 ),
+		new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1 } )
 	);
 
 	this.type = 'TransformControlsPlane';
 
-	var unitX = new THREE.Vector3( 1, 0, 0 );
-	var unitY = new THREE.Vector3( 0, 1, 0 );
-	var unitZ = new THREE.Vector3( 0, 0, 1 );
+	var unitX = new Vector3( 1, 0, 0 );
+	var unitY = new Vector3( 0, 1, 0 );
+	var unitZ = new Vector3( 0, 0, 1 );
 
-	var tempVector = new THREE.Vector3();
-	var dirVector = new THREE.Vector3();
-	var alignVector = new THREE.Vector3();
-	var tempMatrix = new THREE.Matrix4();
-	var identityQuaternion = new THREE.Quaternion();
+	var tempVector = new Vector3();
+	var dirVector = new Vector3();
+	var alignVector = new Vector3();
+	var tempMatrix = new Matrix4();
+	var identityQuaternion = new Quaternion();
 
 	this.updateMatrixWorld = function () {
 
@@ -1561,16 +1586,18 @@ THREE.TransformControlsPlane = function () {
 
 		}
 
-		THREE.Object3D.prototype.updateMatrixWorld.call( this );
+		Object3D.prototype.updateMatrixWorld.call( this );
 
 	};
 
 };
 
-THREE.TransformControlsPlane.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
+TransformControlsPlane.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
-	constructor: THREE.TransformControlsPlane,
+	constructor: TransformControlsPlane,
 
 	isTransformControlsPlane: true
 
 } );
+
+export { TransformControls, TransformControlsGizmo, TransformControlsPlane };
