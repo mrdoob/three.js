@@ -13,8 +13,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Helper object to show the world-axis-aligned bounding box around an object.
-
+			Helper object to graphically show the world-axis-aligned bounding box around an object. The actual bounding box is handled with [page:Box3], this is just a visual helper for debugging.
+			It can be automatically resized with the [page:BoxHelper.update] method when the object it's created from is transformed.
 			Note that the object must have a [page:Geometry] or [page:BufferGeometry] for this to work,
 			so it won't work with [page:Sprite Sprites].
 		</p>
@@ -28,10 +28,10 @@
 
 
 		<code>
-		var sphere = new THREE.SphereGeometry();
-		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
-		var box = new THREE.BoxHelper( object, 0xffff00 );
-		scene.add( box );
+			var sphere = new THREE.SphereGeometry();
+			var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+			var box = new THREE.BoxHelper( object, 0xffff00 );
+			scene.add( box );
 		</code>
 
 
