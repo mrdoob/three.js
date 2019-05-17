@@ -382,7 +382,7 @@ function main() {
 
 Whether that's good or bad I don't know. I have a feeling the differences
 between what's needed for VR and what's needed for non-VR are often
-very different so for all the most simple things maybe 2 separate pages
+very different so for all but the most simple things maybe 2 separate pages
 are better? You'll have to decide.
 
 Note for various reasons this will not work in the live editor

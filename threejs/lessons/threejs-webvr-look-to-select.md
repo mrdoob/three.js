@@ -453,11 +453,12 @@ that object and un-hide its partner.
 ```js
 // 0, 0 is the center of the view in normalized coordinates.
 -pickHelper.pick({x: 0, y: 0}, scene, camera, time);
-if (selectedObject) {
-  selectedObject.visible = false;
-  const partnerObject = meshToMeshMap.get(selectedObject);
-  partnerObject.visible = true;
-}
++const selectedObject = pickHelper.pick({x: 0, y: 0}, scene, camera, time);
++if (selectedObject) {
++  selectedObject.visible = false;
++  const partnerObject = meshToMeshMap.get(selectedObject);
++  partnerObject.visible = true;
++}
 ```
 
 And with that we should have a pretty decent *look to select* implementation.
