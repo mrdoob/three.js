@@ -135,6 +135,15 @@ var Strings = function ( config ) {
 			'sidebar/geometry/cylinder_geometry/heightsegments': 'Height segments',
 			'sidebar/geometry/cylinder_geometry/openended': 'Open ended',
 
+			'sidebar/geometry/extrude_geometry/curveSegments': 'Curve Segments',
+			'sidebar/geometry/extrude_geometry/steps': 'Steps',
+			'sidebar/geometry/extrude_geometry/depth': 'Depth',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': 'Bevel?',
+			'sidebar/geometry/extrude_geometry/bevelThickness': 'Thickness',
+			'sidebar/geometry/extrude_geometry/bevelSize': 'Size',
+			'sidebar/geometry/extrude_geometry/bevelOffset': 'Offset',
+			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
+
 			'sidebar/geometry/geometry/vertices': 'Vertices',
 			'sidebar/geometry/geometry/faces': 'Faces',
 
