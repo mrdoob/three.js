@@ -633,7 +633,6 @@
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 
 				readWaterLevelShader.uniforms[ "texture" ].value = currentRenderTarget.texture;
-				var gl = renderer.context;
 
 				for ( var i = 0; i < NUM_SPHERES; i ++ ) {
 
@@ -646,11 +645,9 @@
 						var v = 1 - ( 0.5 * sphere.position.z / BOUNDS_HALF + 0.5 );
 						readWaterLevelShader.uniforms[ "point1" ].value.set( u, v );
 						gpuCompute.doRenderTarget( readWaterLevelShader, readWaterLevelRenderTarget );
-						var previousRenderTarget = renderer.getRenderTarget();
-						renderer.setRenderTarget( readWaterLevelRenderTarget );
-						gl.readPixels( 0, 0, 4, 1, gl.RGBA, gl.UNSIGNED_BYTE, readWaterLevelImage );
+
+						renderer.readRenderTargetPixels( readWaterLevelRenderTarget, 0, 0, 4, 1, readWaterLevelImage );
 						var pixels = new Float32Array( readWaterLevelImage.buffer );
-						renderer.setRenderTarget( previousRenderTarget );
 
 						// Get orientation
 						waterNormal.set( pixels[ 1 ], 0, - pixels[ 2 ] );
