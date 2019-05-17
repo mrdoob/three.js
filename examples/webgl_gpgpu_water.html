@@ -633,7 +633,6 @@
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 
 				readWaterLevelShader.uniforms[ "texture" ].value = currentRenderTarget.texture;
-				var gl = renderer.context;
 
 				for ( var i = 0; i < NUM_SPHERES; i ++ ) {
 
