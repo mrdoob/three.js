@@ -18,7 +18,7 @@ var files = [
 	{ path: 'controls/OrthographicTrackballControls.js', ignoreList: [] },
 	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	// { path: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'controls/TransformControls.js', ignoreList: [] },
 
 	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
@@ -31,7 +31,7 @@ var files = [
 	{ path: 'loaders/PCDLoader.js', ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
 	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
-	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
+	{ path: 'loaders/MTLLoader.js', ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
 	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
 	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
 	{ path: 'loaders/SVGLoader.js', ignoreList: [] },
@@ -40,6 +40,9 @@ var files = [
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
+
+	{ path: 'renderers/CSS2DRenderer.js', ignoreList: [] },
+	{ path: 'renderers/CSS3DRenderer.js', ignoreList: [] },
 
 	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
