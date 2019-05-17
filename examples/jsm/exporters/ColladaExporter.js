@@ -19,7 +19,8 @@ import {
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
-	MeshLambertMaterial
+	MeshLambertMaterial,
+	js
 } from "../../../build/three.module.js";
 
 var ColladaExporter = function () {};
@@ -388,7 +389,7 @@ ColladaExporter.prototype = {
 				var reflectivity = m.reflectivity || 0;
 
 				// Do not export and alpha map for the reasons mentioned in issue (#13792)
-				// in THREE.js alpha maps are black and white, but collada expects the alpha
+				// in js alpha maps are black and white, but collada expects the alpha
 				// channel to specify the transparency
 				var transparencyNode = '';
 				if ( m.transparent === true ) {
@@ -536,6 +537,7 @@ ColladaExporter.prototype = {
 				// the materials.
 				var mat = o.material || new MeshBasicMaterial();
 				var materials = Array.isArray( mat ) ? mat : [ mat ];
+
 				if ( geometry.groups.length > materials.length ) {
 
 					matidsArray = new Array( geometry.groups.length );
@@ -596,7 +598,7 @@ ColladaExporter.prototype = {
 			'<asset>' +
 			(
 				'<contributor>' +
-				'<authoring_tool>THREE.js Collada Exporter</authoring_tool>' +
+				'<authoring_tool>js Collada Exporter</authoring_tool>' +
 				( options.author !== null ? `<author>${ options.author }</author>` : '' ) +
 				'</contributor>' +
 				`<created>${ ( new Date() ).toISOString() }</created>` +

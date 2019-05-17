@@ -18,15 +18,15 @@
  * Usage:
  *  var loader = new STLLoader();
  *  loader.load( './models/stl/slotted_disk.stl', function ( geometry ) {
- *    scene.add( new THREE.Mesh( geometry ) );
+ *    scene.add( new Mesh( geometry ) );
  *  });
  *
  * For binary STLs geometry might contain colors for vertices. To use it:
  *  // use the same code to load STL as above
  *  if (geometry.hasColors) {
- *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+ *    material = new MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: VertexColors });
  *  } else { .... }
- *  var mesh = new THREE.Mesh( geometry, material );
+ *  var mesh = new Mesh( geometry, material );
  */
 
 import {
@@ -36,7 +36,10 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	LoaderUtils,
-	Vector3
+	Mesh,
+	MeshPhongMaterial,
+	Vector3,
+	VertexColors
 } from "../../../build/three.module.js";
 
 

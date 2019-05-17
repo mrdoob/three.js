@@ -5,13 +5,17 @@
  */
 
 import {
+	BackSide,
+	ClampToEdgeWrapping,
 	Color,
 	DefaultLoadingManager,
+	DoubleSide,
 	FileLoader,
 	FrontSide,
 	Loader,
 	LoaderUtils,
 	MeshPhongMaterial,
+	MirroredRepeatWrapping,
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
@@ -194,9 +198,9 @@ MTLLoader.prototype = {
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
  *                  side: Which side to apply the material
- *                        FrontSide (default), THREE.BackSide, THREE.DoubleSide
+ *                        FrontSide (default), BackSide, DoubleSide
  *                  wrap: What type of wrapping to apply for textures
- *                        RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
+ *                        RepeatWrapping (default), ClampToEdgeWrapping, MirroredRepeatWrapping
  *                  normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
  *                                Default: false, assumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's

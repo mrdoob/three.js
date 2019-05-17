@@ -10,7 +10,7 @@
  *	var loader = new PLYLoader();
  *	loader.load('./models/ply/ascii/dolphins.ply', function (geometry) {
  *
- *		scene.add( new THREE.Mesh( geometry ) );
+ *		scene.add( new Mesh( geometry ) );
  *
  *	} );
  *
@@ -31,7 +31,8 @@ import {
 	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
-	LoaderUtils
+	LoaderUtils,
+	Mesh
 } from "../../../build/three.module.js";
 
 

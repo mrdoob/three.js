@@ -11,6 +11,7 @@
 import {
 	AnimationClip,
 	Bone,
+	Bones,
 	DefaultLoadingManager,
 	FileLoader,
 	Quaternion,
@@ -303,7 +304,7 @@ BVHLoader.prototype = {
 			recursively converts the internal bvh node structure to a Bone hierarchy
 
 			source: the bvh root node
-			list: pass an empty array, collects a flat list of all converted THREE.Bones
+			list: pass an empty array, collects a flat list of all converted Bones
 
 			returns the root Bone
 		*/
