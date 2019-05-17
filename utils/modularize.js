@@ -51,7 +51,7 @@ var files = [
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/MathUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', module: 'shaders/UnpackDepthRGBAShader' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
+	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
@@ -163,7 +163,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	for ( var dependency of exampleDependencies ) {
 
-		imports += `\nimport { ${dependency.name} } from "../${dependency.module}.js";`;
+		imports += `\nimport { ${dependency.name} } from "../${dependency.path}";`;
 
 	}
 
