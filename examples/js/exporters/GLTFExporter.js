@@ -784,8 +784,9 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
+				var fileName = getFileNameFromUri( image.src );
 				var extension = mimeType === "image/png" ? ".png" : ".jpg";
-				gltfImage.uri = getFileNameFromUri( image.src ) + extension;
+				gltfImage.uri = fileName + index + extension;
 
 				pending.push( new Promise( function ( resolve, reject ) {
 
