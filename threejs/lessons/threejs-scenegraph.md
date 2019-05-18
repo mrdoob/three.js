@@ -113,7 +113,7 @@ Since we added the `sunMesh` to the `objects` array it will rotate.
 
 {{{example url="../threejs-scenegraph-sun.html" }}}
 
-Now let's add an the earth.
+Now let's add in the earth.
 
 ```js
 const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
