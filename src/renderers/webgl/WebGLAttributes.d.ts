@@ -1,9 +1,9 @@
 export class WebGLAttributes {
-	constructor(gl: CanvasRenderingContext2D | WebGLRenderingContext);
+	constructor(gl: WebGLRenderingContext | WebGL2RenderingContext);
 
 	get(attribute: any): any;
 
 	remove(attribute: any): void;
 
-	update(attribute: any, bufferType: Array): void;
+	update(attribute: any, bufferType: Array<any>): void;
 }
