@@ -4,6 +4,7 @@
  * @author Tony Parisi / http://www.tonyparisi.com/
  * @author Takahiro / https://github.com/takahirox
  * @author Don McCurdy / https://www.donmccurdy.com
+ * @author Timoshenko Konstantin / https://github.com/eXponenta
  */
 
 THREE.GLTFLoader = ( function () {
@@ -40,6 +41,9 @@ THREE.GLTFLoader = ( function () {
 				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
 
 			}
+			
+			//save red to progress handler
+			scope.onProgressHandler = onProgress;
 
 			// Tells the LoadingManager to track an extra item, which resolves after
 			// the model is fully loaded. This means the count of items loaded will
@@ -215,6 +219,7 @@ THREE.GLTFLoader = ( function () {
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
 				manager: this.manager
+				onProgressHandler: this.onProgressHandler
 
 			} );
 
@@ -1843,7 +1848,7 @@ THREE.GLTFLoader = ( function () {
 
 		return new Promise( function ( resolve, reject ) {
 
-			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, options.onProgressHandler, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
@@ -2066,7 +2071,7 @@ THREE.GLTFLoader = ( function () {
 
 			return new Promise( function ( resolve, reject ) {
 
-				loader.load( resolveURL( sourceURI, options.path ), resolve, undefined, reject );
+				loader.load( resolveURL( sourceURI, options.path ), resolve, options.onProgressHandler, reject );
 
 			} );
 
