@@ -6,7 +6,7 @@ import {
 
 
 export interface BVH {
-  clip: AnimationClip,
+  clip: AnimationClip;
   skeleton: Skeleton;
 }
 
