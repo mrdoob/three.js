@@ -218,7 +218,7 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
 				onProgressHandler: this.onProgressHandler
 
 			} );
