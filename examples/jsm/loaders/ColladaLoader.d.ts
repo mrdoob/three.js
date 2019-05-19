@@ -22,7 +22,7 @@ export class Collada {
   load(url: string, onLoad: (collada: Collada) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
 	setPath(path: string) : this;
   setResourcePath(path: string) : this;
-  setCrossOrigin(value: string): void;
+  setCrossOrigin(value: string): this;
 
   parse(text: string, path: string) : Collada;
 }
