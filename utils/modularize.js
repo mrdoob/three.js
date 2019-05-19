@@ -21,6 +21,10 @@ var files = [
 	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'curves/NURBSCurve.js', dependencies: [ { name: 'NURBSUtils', path: 'curves/NURBSUtils.js' } ], ignoreList: [] },
+	{ path: 'curves/NURBSSurface.js', dependencies: [ { name: 'NURBSUtils', path: 'curves/NURBSUtils.js' } ], ignoreList: [] },
+	{ path: 'curves/NURBSUtils.js', dependencies: [], ignoreList: [] },
+
 	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
@@ -30,10 +34,11 @@ var files = [
 
 	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
 	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
-	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
-	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', dependencies: [], ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
+	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PLYLoader.js', dependencies: [], ignoreList: [ 'Mesh' ] },
 	{ path: 'loaders/STLLoader.js', dependencies: [], ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
 	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
