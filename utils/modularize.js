@@ -3,72 +3,75 @@
  */
 
 var fs = require( 'fs' );
+THREE = require( '../build/three.js' );
 
 var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
-	{ path: 'controls/DragControls.js', ignoreList: [] },
-	{ path: 'controls/DeviceOrientationControls.js', ignoreList: [] },
-	{ path: 'controls/EditorControls.js', ignoreList: [] },
-	{ path: 'controls/FirstPersonControls.js', ignoreList: [] },
-	{ path: 'controls/FlyControls.js', ignoreList: [] },
-	{ path: 'controls/OrbitControls.js', ignoreList: [] },
-	{ path: 'controls/MapControls.js', ignoreList: [] },
-	{ path: 'controls/OrthographicTrackballControls.js', ignoreList: [] },
-	{ path: 'controls/PointerLockControls.js', ignoreList: [] },
-	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	{ path: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/DeviceOrientationControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/EditorControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/FirstPersonControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/FlyControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/OrbitControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/MapControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/OrthographicTrackballControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/PointerLockControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
-	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
-	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
-	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
-	{ path: 'exporters/STLExporter.js', ignoreList: [] },
-	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
+	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
+	{ path: 'exporters/MMDExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/PLYExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'loaders/BVHLoader.js', ignoreList: [ 'Bones' ] },
-	{ path: 'loaders/PCDLoader.js', ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
-	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
-	{ path: 'loaders/MTLLoader.js', ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
-	{ path: 'loaders/PLYLoader.js', ignoreList: [ 'Mesh' ] },
-	{ path: 'loaders/STLLoader.js', ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
-	{ path: 'loaders/SVGLoader.js', ignoreList: [] },
-	{ path: 'loaders/TGALoader.js', ignoreList: [] },
-	{ path: 'loaders/VRMLLoader.js', ignoreList: [] },
+	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
+	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
+	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/MTLLoader.js', dependencies: [], ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
+	{ path: 'loaders/PLYLoader.js', dependencies: [], ignoreList: [ 'Mesh' ] },
+	{ path: 'loaders/STLLoader.js', dependencies: [], ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
+	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
-	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
+	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
+	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'renderers/CSS2DRenderer.js', ignoreList: [] },
-	{ path: 'renderers/CSS3DRenderer.js', ignoreList: [] },
+	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/MathUtils.js', ignoreList: [] },
-	{ path: 'utils/SceneUtils.js', ignoreList: [] },
-	{ path: 'utils/ShadowMapViewer.js', ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
-	{ path: 'utils/SkeletonUtils.js', ignoreList: [] },
-	{ path: 'utils/TypedArrayUtils.js', ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', ignoreList: [ 'SphereBufferGeometry' ] },
+	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/MathUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
+	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
 
 	var file = files[ i ];
-	convert( file.path, file.ignoreList );
+	convert( file.path, file.dependencies, file.ignoreList );
 
 }
 
 //
 
-function convert( path, ignoreList ) {
+function convert( path, exampleDependencies, ignoreList ) {
 
 	var contents = fs.readFileSync( srcFolder + path, 'utf8' );
 
 	var classNames = [];
-	var dependencies = {};
+	var coreDependencies = {};
 
 	// imports
 
@@ -97,7 +100,7 @@ function convert( path, ignoreList ) {
 
 		if ( p1 === 'Math' ) {
 
-			dependencies[ '_Math' ] = true;
+			coreDependencies[ '_Math' ] = true;
 
 			return '_Math.';
 
@@ -113,7 +116,7 @@ function convert( path, ignoreList ) {
 
 		if ( ignoreList.includes( p1 ) ) return match;
 
-		dependencies[ p1 ] = true;
+		if ( p1 in THREE ) coreDependencies[ p1 ] = true;
 
 		return `new ${p1}(`;
 
@@ -129,13 +132,13 @@ function convert( path, ignoreList ) {
 
 		if ( p2 === 'Math' || p2 === '_Math' ) {
 
-			dependencies[ '_Math' ] = true;
+			coreDependencies[ '_Math' ] = true;
 
 			return '_Math';
 
 		}
 
-		dependencies[ p2 ] = true;
+		if ( p2 in THREE ) coreDependencies[ p2 ] = true;
 
 		// console.log( match, p2 );
 
@@ -145,13 +148,27 @@ function convert( path, ignoreList ) {
 
 	//
 
-	var keys = Object.keys( dependencies )
+	var keys = Object.keys( coreDependencies )
 		.filter( value => ! classNames.includes( value ) )
 		.map( value => value === '_Math' ? 'Math as _Math' : value )
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();
+
+	// core imports
+
 	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
+
+	// example imports
+
+	for ( var dependency of exampleDependencies ) {
+
+		imports += `\nimport { ${dependency.name} } from "../${dependency.path}";`;
+
+	}
+
+	// exports
+
 	var exports = `export { ${classNames.join( ", " )} };\n`;
 
 	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
