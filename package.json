@@ -28,8 +28,12 @@
     "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
-      "html"
-    ]
+      "html",
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": 1
+    }
   },
   "scripts": {
     "build": "rollup -c",
@@ -61,6 +65,7 @@
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^5.0.3",
     "@typescript-eslint/parser": "^1.9.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
     "typescript": "^3.4.5",
     "google-closure-compiler": "20190415.0.0",
     "http-server": "^0.11.1",
