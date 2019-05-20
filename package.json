@@ -25,6 +25,7 @@
     "test": "test"
   },
   "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
       "html"
@@ -38,7 +39,7 @@
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
-    "lint": "eslint src",
+    "lint": "eslint src --ext js --ext ts",
     "test": "npm run build-test && qunit test/unit/three.source.unit.js",
     "travis": "npm run lint && npm test"
   },
@@ -59,6 +60,8 @@
     "eslint": "^5.16.0",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^5.0.3",
+    "@typescript-eslint/parser": "^1.9.0",
+    "typescript": "^3.4.5",
     "google-closure-compiler": "20190415.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.9.2",
