@@ -42,6 +42,7 @@ var files = [
 	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PDBLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PlayCanvasLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PLYLoader.js', dependencies: [], ignoreList: [ 'Mesh' ] },
 	{ path: 'loaders/STLLoader.js', dependencies: [], ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
 	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
