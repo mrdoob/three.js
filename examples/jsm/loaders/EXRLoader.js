@@ -8,6 +8,14 @@
  * implementation, so I have preserved their copyright notices.
  */
 
+import {
+	DataTextureLoader,
+	DefaultLoadingManager,
+	FloatType,
+	RGBAFormat,
+	RGBFormat
+} from "../../../build/three.module.js";
+
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
 // All rights reserved.
@@ -73,15 +81,15 @@
 
 // // End of OpenEXR license -------------------------------------------------
 
-THREE.EXRLoader = function ( manager ) {
+var EXRLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 };
 
-THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
+EXRLoader.prototype = Object.create( DataTextureLoader.prototype );
 
-THREE.EXRLoader.prototype._parser = function ( buffer ) {
+EXRLoader.prototype._parser = function ( buffer ) {
 
 	const USHORT_RANGE = ( 1 << 16 );
 	const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
@@ -1186,8 +1194,10 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		width: width,
 		height: height,
 		data: byteArray,
-		format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
-		type: THREE.FloatType
+		format: EXRHeader.channels.length == 4 ? RGBAFormat : RGBFormat,
+		type: FloatType
 	};
 
 };
+
+export { EXRLoader };
