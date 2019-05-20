@@ -34,10 +34,14 @@
 
 		<script src="js/vr/WebVR.js"></script>
 
+		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
+			<source src="textures/MaryOculus.webm">
+			<source src="textures/MaryOculus.mp4">
+		</video>
+
 		<script>
 
 			var camera, scene, renderer;
-			var video, texture;
 
 			init();
 			animate();
@@ -56,15 +60,10 @@
 
 				// video
 
-				video = document.createElement( 'video' );
-				video.crossOrigin = 'anonymous';
-				video.loop = true;
-				video.muted = true;
-				video.src = 'textures/MaryOculus.webm';
-				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
+				var video = document.getElementById( 'video' );
 				video.play();
 
-				texture = new THREE.Texture( video );
+				var texture = new THREE.Texture( video );
 				texture.generateMipmaps = false;
 				texture.minFilter = THREE.NearestFilter;
 				texture.maxFilter = THREE.NearestFilter;

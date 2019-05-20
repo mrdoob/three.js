@@ -50,7 +50,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, parent_node;
+			var parent_node;
 
 			init();
 			animate();
@@ -201,12 +201,12 @@
 				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.LineSegments( geometry, material );
-				mesh.position.x -= 1200;
-				mesh.position.y -= 1200;
+				var lineSegments = new THREE.LineSegments( geometry, material );
+				lineSegments.position.x -= 1200;
+				lineSegments.position.y -= 1200;
 
 				parent_node = new THREE.Object3D();
-				parent_node.add( mesh );
+				parent_node.add( lineSegments );
 
 				scene.add( parent_node );
 

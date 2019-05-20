@@ -29,5 +29,5 @@ export class Camera extends Object3D {
 
   getWorldDirection(target: Vector3): Vector3;
 
-  updateMatrixWorld(force: boolean): void;
+  updateMatrixWorld(force?: boolean): void;
 }

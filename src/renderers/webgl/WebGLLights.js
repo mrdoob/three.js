@@ -121,6 +121,7 @@ function WebGLLights() {
 		},
 
 		ambient: [ 0, 0, 0 ],
+		probe: [],
 		directional: [],
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
@@ -135,6 +136,8 @@ function WebGLLights() {
 
 	};
 
+	for ( var i = 0; i < 9; i ++ ) state.probe.push( new Vector3() );
+
 	var vector3 = new Vector3();
 	var matrix4 = new Matrix4();
 	var matrix42 = new Matrix4();
@@ -142,6 +145,8 @@ function WebGLLights() {
 	function setup( lights, shadows, camera ) {
 
 		var r = 0, g = 0, b = 0;
+
+		for ( var i = 0; i < 9; i ++ ) state.probe[ i ].set( 0, 0, 0 );
 
 		var directionalLength = 0;
 		var pointLength = 0;
@@ -166,6 +171,14 @@ function WebGLLights() {
 				r += color.r * intensity;
 				g += color.g * intensity;
 				b += color.b * intensity;
+
+			} else if ( light.isLightProbe ) {
+
+				for ( var j = 0; j < 9; j ++ ) {
+
+					state.probe[ j ].addScaledVector( light.sh.coefficients[ j ], intensity );
+
+				}
 
 			} else if ( light.isDirectionalLight ) {
 
