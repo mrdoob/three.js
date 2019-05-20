@@ -1,15 +1,15 @@
 import {
-	BufferGeometry,
+  BufferGeometry,
   LoadingManager
 } from '../../../src/Three';
 
 export interface PDB {
   geometryAtoms: BufferGeometry;
   geometryBonds: BufferGeometry;
-	json: {
-		atoms: any[][],
-		bonds: number[][]
-	}
+  json: {
+    atoms: any[][],
+    bonds: number[][]
+  }
 }
 
 
