@@ -32,6 +32,7 @@ var files = [
 	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'loaders/BabylonLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
 	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/DDSLoader.js', dependencies: [], ignoreList: [] },
