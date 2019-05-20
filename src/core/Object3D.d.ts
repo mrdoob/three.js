@@ -131,6 +131,19 @@ export class Object3D extends EventDispatcher {
   userData: { [key: string]: any };
 
   /**
+   * Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
+   * When shadow-casting with a DirectionalLight or SpotLight, if you are (a) modifying vertex positions in
+   * the vertex shader, (b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a
+   * transparent texture with alphaTest, you must specify a customDepthMaterial for proper shadows.
+   */
+  customDepthMaterial: Material;
+
+  /**
+   * Same as customDepthMaterial, but used with PointLight.
+   */
+  customDistanceMaterial: Material;
+
+  /**
    * Used to check whether this or derived classes are Object3Ds. Default is true.
    * You should not change this, as it is used internally for optimisation.
    */
