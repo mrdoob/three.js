@@ -2,21 +2,30 @@
  * @author Nikos M. / https://github.com/foo123/
  */
 
+import {
+	DataTextureLoader,
+	DefaultLoadingManager,
+	FloatType,
+	RGBEFormat,
+	RGBFormat,
+	UnsignedByteType
+} from "../../../build/three.module.js";
+
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-THREE.RGBELoader = function ( manager ) {
+var RGBELoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-	this.type = THREE.UnsignedByteType;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	this.type = UnsignedByteType;
 
 };
 
-// extend THREE.DataTextureLoader
-THREE.RGBELoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
+// extend DataTextureLoader
+RGBELoader.prototype = Object.create( DataTextureLoader.prototype );
 
 // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
-THREE.RGBELoader.prototype._parser = function ( buffer ) {
+RGBELoader.prototype._parser = function ( buffer ) {
 
 	var
 		/* return codes for rgbe routines */
@@ -32,14 +41,14 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 
 			switch ( rgbe_error_code ) {
 
-				case rgbe_read_error: console.error( "THREE.RGBELoader Read Error: " + ( msg || '' ) );
+				case rgbe_read_error: console.error( "RGBELoader Read Error: " + ( msg || '' ) );
 					break;
-				case rgbe_write_error: console.error( "THREE.RGBELoader Write Error: " + ( msg || '' ) );
+				case rgbe_write_error: console.error( "RGBELoader Write Error: " + ( msg || '' ) );
 					break;
-				case rgbe_format_error: console.error( "THREE.RGBELoader Bad File Format: " + ( msg || '' ) );
+				case rgbe_format_error: console.error( "RGBELoader Bad File Format: " + ( msg || '' ) );
 					break;
 				default:
-				case rgbe_memory_error: console.error( "THREE.RGBELoader: Error: " + ( msg || '' ) );
+				case rgbe_memory_error: console.error( "RGBELoader: Error: " + ( msg || '' ) );
 
 			}
 			return RGBE_RETURN_FAILURE;
@@ -328,13 +337,13 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 		;
 		if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
 
-			if ( this.type === THREE.UnsignedByteType ) {
+			if ( this.type === UnsignedByteType ) {
 
 				var data = image_rgba_data;
-				var format = THREE.RGBEFormat; // handled as THREE.RGBAFormat in shaders
-				var type = THREE.UnsignedByteType;
+				var format = RGBEFormat; // handled as THREE.RGBAFormat in shaders
+				var type = UnsignedByteType;
 
-			} else if ( this.type === THREE.FloatType ) {
+			} else if ( this.type === FloatType ) {
 
 				var RGBEByteToRGBFloat = function ( sourceArray, sourceOffset, destArray, destOffset ) {
 
@@ -357,8 +366,8 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 				}
 
 				var data = floatArray;
-				var format = THREE.RGBFormat;
-				var type = THREE.FloatType;
+				var format = RGBFormat;
+				var type = FloatType;
 
 
 			} else {
@@ -385,9 +394,11 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 
 };
 
-THREE.RGBELoader.prototype.setType = function ( value ) {
+RGBELoader.prototype.setType = function ( value ) {
 
 	this.type = value;
 	return this;
 
 };
+
+export { RGBELoader };
