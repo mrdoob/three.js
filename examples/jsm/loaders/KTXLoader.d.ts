@@ -5,7 +5,7 @@ import {
   CompressedPixelFormat
 } from '../../../src/Three';
 
-export interface DDS {
+export interface KTX {
   mipmaps: object[];
   width: number;
   height: number;
@@ -14,9 +14,9 @@ export interface DDS {
   isCubemap: boolean;
 }
 
-export class DDSLoader extends CompressedTextureLoader {
+export class KTXLoader extends CompressedTextureLoader {
   constructor(manager?: LoadingManager);
 
-  parse(buffer: ArrayBuffer, loadMipmaps: boolean) : DDS;
-  _parser(buffer: ArrayBuffer, loadMipmaps: boolean) : DDS;
+  parse(buffer: ArrayBuffer, loadMipmaps: boolean) : KTX;
+  _parser(buffer: ArrayBuffer, loadMipmaps: boolean) : KTX;
 }
