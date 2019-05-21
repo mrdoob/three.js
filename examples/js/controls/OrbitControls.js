@@ -133,6 +133,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
+		var lookAt = new THREE.Vector3();
+
 		return function update() {
 
 			var position = scope.object.position;
@@ -178,7 +180,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			position.copy( scope.target ).add( offset );
 
-			scope.object.lookAt( scope.target );
+			lookAt.copy(scope.target);
+
+			if(scope.object.parent) {
+
+				scope.object.parent.localToWorld( lookAt );
+
+			}
+
+			scope.object.lookAt( lookAt );
 
 			if ( scope.enableDamping === true ) {
 
