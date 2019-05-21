@@ -91,8 +91,9 @@
 
 				// load jeep model
 
-				var loader1 = new THREE.AssimpJSONLoader();
-				loader1.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
+				var loader = new THREE.AssimpJSONLoader();
+
+				loader.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
 
 					object.scale.multiplyScalar( 0.2 );
 					scene.add( object );
@@ -101,8 +102,7 @@
 
 				// load interior model
 
-				var loader2 = new THREE.AssimpJSONLoader();
-				loader2.load( 'models/assimp/interior/interior.assimp.json', function ( object ) {
+				loader.load( 'models/assimp/interior/interior.assimp.json', function ( object ) {
 
 					scene.add( object );
 
