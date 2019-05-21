@@ -12,6 +12,7 @@ export default /* glsl */`
 
 	#ifdef ENVMAP_TYPE_CUBE
 		uniform samplerCube envMap;
+		uniform mat3 envMapRotation;
 	#else
 		uniform sampler2D envMap;
 	#endif

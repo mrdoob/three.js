@@ -105,6 +105,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
 			boxMesh.material.uniforms.tCube.value = texture;
 			boxMesh.material.uniforms.tFlip.value = ( background.isWebGLRenderTargetCube ) ? 1 : - 1;
+			boxMesh.material.uniforms.cubeRotation.value = background.rotation;
 
 			if ( currentBackground !== background ||
 			     currentBackgroundVersion !== texture.version ) {

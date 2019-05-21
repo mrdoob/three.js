@@ -213,7 +213,8 @@ var ShaderLib = {
 		uniforms: {
 			tCube: { value: null },
 			tFlip: { value: - 1 },
-			opacity: { value: 1.0 }
+			opacity: { value: 1.0 },
+			cubeRotation: { value: new Matrix3() }
 		},
 
 		vertexShader: ShaderChunk.cube_vert,

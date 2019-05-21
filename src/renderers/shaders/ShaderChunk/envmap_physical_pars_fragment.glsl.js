@@ -72,7 +72,7 @@ export default /* glsl */`
 
 		#ifdef ENVMAP_TYPE_CUBE
 
-			vec3 queryReflectVec = vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
+			vec3 queryReflectVec = envMapRotation * vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
 
 			#ifdef TEXTURE_LOD_EXT
 

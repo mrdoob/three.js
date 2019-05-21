@@ -2004,6 +2004,7 @@ function WebGLRenderer( parameters ) {
 		if ( material.envMap ) {
 
 			uniforms.envMap.value = material.envMap;
+			uniforms.envMapRotation.value = material.envMap.rotation;
 
 			// don't flip CubeTexture envMaps, flip everything else:
 			//  WebGLRenderTargetCube will be flipped for backwards compatibility
