@@ -2,15 +2,37 @@
  * @author Virtulous / https://virtulo.us/
  */
 
-THREE.AssimpLoader = function ( manager ) {
+import {
+	Bone,
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	DefaultLoadingManager,
+	FileLoader,
+	LoaderUtils,
+	Matrix4,
+	Mesh,
+	MeshLambertMaterial,
+	MeshPhongMaterial,
+	Object3D,
+	Quaternion,
+	Skeleton,
+	SkinnedMesh,
+	TextureLoader,
+	Vector2,
+	Vector3,
+	Vector4
+} from "../../../build/three.module.js";
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var AssimpLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 };
 
-THREE.AssimpLoader.prototype = {
+AssimpLoader.prototype = {
 
-	constructor: THREE.AssimpLoader,
+	constructor: AssimpLoader,
 
 	crossOrigin: 'anonymous',
 
@@ -18,9 +40,9 @@ THREE.AssimpLoader.prototype = {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -55,7 +77,7 @@ THREE.AssimpLoader.prototype = {
 
 	parse: function ( buffer, path ) {
 
-		var textureLoader = new THREE.TextureLoader( this.manager );
+		var textureLoader = new TextureLoader( this.manager );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		var Virtulous = {};
@@ -64,9 +86,9 @@ THREE.AssimpLoader.prototype = {
 
 			this.time = time;
 			this.matrix = matrix.clone();
-			this.position = new THREE.Vector3();
-			this.quaternion = new THREE.Quaternion();
-			this.scale = new THREE.Vector3( 1, 1, 1 );
+			this.position = new Vector3();
+			this.quaternion = new Quaternion();
+			this.scale = new Vector3( 1, 1, 1 );
 			this.matrix.decompose( this.position, this.quaternion, this.scale );
 			this.clone = function () {
 
@@ -100,10 +122,10 @@ THREE.AssimpLoader.prototype = {
 
 		};
 
-		Virtulous.KeyFrame.tempAniPos = new THREE.Vector3();
-		Virtulous.KeyFrame.tempAniQuat = new THREE.Quaternion();
-		Virtulous.KeyFrame.tempAniScale = new THREE.Vector3( 1, 1, 1 );
-		Virtulous.KeyFrame.tempAniMatrix = new THREE.Matrix4();
+		Virtulous.KeyFrame.tempAniPos = new Vector3();
+		Virtulous.KeyFrame.tempAniQuat = new Quaternion();
+		Virtulous.KeyFrame.tempAniScale = new Vector3( 1, 1, 1 );
+		Virtulous.KeyFrame.tempAniMatrix = new Matrix4();
 		Virtulous.KeyFrameTrack = function () {
 
 			this.keys = [];
@@ -523,7 +545,7 @@ THREE.AssimpLoader.prototype = {
 		}
 		function cloneTreeToBones( root, scene ) {
 
-			var rootBone = new THREE.Bone();
+			var rootBone = new Bone();
 			rootBone.matrix.copy( root.matrix );
 			rootBone.matrixWorld.copy( root.matrixWorld );
 			rootBone.position.copy( root.position );
@@ -680,9 +702,9 @@ THREE.AssimpLoader.prototype = {
 					}
 
 				}
-				var skeleton = new THREE.Skeleton( allBones, offsetMatrix );
+				var skeleton = new Skeleton( allBones, offsetMatrix );
 
-				this.threeNode.bind( skeleton, new THREE.Matrix4() );
+				this.threeNode.bind( skeleton, new Matrix4() );
 				this.threeNode.material.skinning = true;
 
 			};
@@ -690,26 +712,26 @@ THREE.AssimpLoader.prototype = {
 			this.toTHREE = function ( scene ) {
 
 				if ( this.threeNode ) return this.threeNode;
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 				var mat;
 				if ( scene.mMaterials[ this.mMaterialIndex ] )
 					mat = scene.mMaterials[ this.mMaterialIndex ].toTHREE( scene );
 				else
-					mat = new THREE.MeshLambertMaterial();
-				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
+					mat = new MeshLambertMaterial();
+				geometry.setIndex( new BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
+				geometry.addAttribute( 'position', new BufferAttribute( this.mVertexBuffer, 3 ) );
 				if ( this.mNormalBuffer && this.mNormalBuffer.length > 0 )
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
+					geometry.addAttribute( 'normal', new BufferAttribute( this.mNormalBuffer, 3 ) );
 				if ( this.mColorBuffer && this.mColorBuffer.length > 0 )
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
+					geometry.addAttribute( 'color', new BufferAttribute( this.mColorBuffer, 4 ) );
 				if ( this.mTexCoordsBuffers[ 0 ] && this.mTexCoordsBuffers[ 0 ].length > 0 )
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
+					geometry.addAttribute( 'uv', new BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
 				if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ].length > 0 )
-					geometry.addAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
+					geometry.addAttribute( 'uv1', new BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
 				if ( this.mTangentBuffer && this.mTangentBuffer.length > 0 )
-					geometry.addAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
+					geometry.addAttribute( 'tangents', new BufferAttribute( this.mTangentBuffer, 3 ) );
 				if ( this.mBitangentBuffer && this.mBitangentBuffer.length > 0 )
-					geometry.addAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
+					geometry.addAttribute( 'bitangents', new BufferAttribute( this.mBitangentBuffer, 3 ) );
 				if ( this.mBones.length > 0 ) {
 
 					var weights = [];
@@ -762,19 +784,19 @@ THREE.AssimpLoader.prototype = {
 
 					}
 
-					geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
-					geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
+					geometry.addAttribute( 'skinWeight', new BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
+					geometry.addAttribute( 'skinIndex', new BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
 
 				}
 
 				var mesh;
 
 				if ( this.mBones.length == 0 )
-					mesh = new THREE.Mesh( geometry, mat );
+					mesh = new Mesh( geometry, mat );
 
 				if ( this.mBones.length > 0 ) {
 
-					mesh = new THREE.SkinnedMesh( geometry, mat );
+					mesh = new SkinnedMesh( geometry, mat );
 					mesh.normalizeSkinWeights();
 
 				}
@@ -802,7 +824,7 @@ THREE.AssimpLoader.prototype = {
 
 			this.toTHREE = function () {
 
-				return new THREE.Vector3( this.x, this.y, this.z );
+				return new Vector3( this.x, this.y, this.z );
 
 			};
 
@@ -814,7 +836,7 @@ THREE.AssimpLoader.prototype = {
 			this.y = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Vector2( this.x, this.y );
+				return new Vector2( this.x, this.y );
 
 			};
 
@@ -828,7 +850,7 @@ THREE.AssimpLoader.prototype = {
 			this.z = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Vector4( this.w, this.x, this.y, this.z );
+				return new Vector4( this.w, this.x, this.y, this.z );
 
 			};
 
@@ -842,7 +864,7 @@ THREE.AssimpLoader.prototype = {
 			this.a = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Color( this.r, this.g, this.b, this.a );
+				return new Color( this.r, this.g, this.b, this.a );
 
 			};
 
@@ -856,7 +878,7 @@ THREE.AssimpLoader.prototype = {
 			this.a = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Color( this.r, this.g, this.b, 1 );
+				return new Color( this.r, this.g, this.b, 1 );
 
 			};
 
@@ -870,7 +892,7 @@ THREE.AssimpLoader.prototype = {
 			this.w = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Quaternion( this.x, this.y, this.z, this.w );
+				return new Quaternion( this.x, this.y, this.z, this.w );
 
 			};
 
@@ -925,7 +947,7 @@ THREE.AssimpLoader.prototype = {
 			this.toTHREE = function ( scene ) {
 
 				if ( this.threeNode ) return this.threeNode;
-				var o = new THREE.Object3D();
+				var o = new Object3D();
 				o.name = this.mName;
 				o.matrix = this.mTransformation.toTHREE();
 
@@ -974,7 +996,7 @@ THREE.AssimpLoader.prototype = {
 				var g = reader.getFloat32( 4, true );
 				var b = reader.getFloat32( 8, true );
 				//var a = reader.getFloat32(12, true);
-				return new THREE.Color( r, g, b );
+				return new Color( r, g, b );
 
 			};
 
@@ -1068,7 +1090,7 @@ THREE.AssimpLoader.prototype = {
 			this.toTHREE = function ( scene ) {
 
 				var name = this.mProperties[ 0 ].dataAsString();
-				var mat = new THREE.MeshPhongMaterial();
+				var mat = new MeshPhongMaterial();
 
 				for ( var i = 0; i < this.mProperties.length; i ++ ) {
 
@@ -1111,7 +1133,7 @@ THREE.AssimpLoader.prototype = {
 
 		function veclerp( v1, v2, l ) {
 
-			var v = new THREE.Vector3();
+			var v = new Vector3();
 			var lm1 = 1 - l;
 			v.x = v1.x * l + v2.x * lm1;
 			v.y = v1.y * l + v2.y * lm1;
@@ -1246,7 +1268,7 @@ THREE.AssimpLoader.prototype = {
 
 				for ( var i = 0; i < length; i += .05 ) {
 
-					var matrix = new THREE.Matrix4();
+					var matrix = new Matrix4();
 					var time = i;
 					var pos = sampleTrack( this.mPositionKeys, time, length, veclerp );
 					var scale = sampleTrack( this.mScalingKeys, time, length, veclerp );
@@ -1428,7 +1450,7 @@ THREE.AssimpLoader.prototype = {
 			];
 			this.toTHREE = function () {
 
-				var m = new THREE.Matrix4();
+				var m = new Matrix4();
 
 				for ( var i = 0; i < 4; ++ i ) {
 
@@ -2376,3 +2398,5 @@ THREE.AssimpLoader.prototype = {
 	}
 
 };
+
+export { AssimpLoader };
