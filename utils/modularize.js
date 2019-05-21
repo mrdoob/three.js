@@ -34,6 +34,7 @@ var files = [
 	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BabylonLoader.js', dependencies: [], ignoreList: [] },
