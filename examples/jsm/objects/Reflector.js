@@ -212,17 +212,14 @@ Reflector.ReflectorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 
