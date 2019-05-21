@@ -11,7 +11,7 @@ export interface DDS {
   height: number;
   format: PixelFormat | CompressedPixelFormat;
   mipmapCount: number;
-	isCubemap: boolean;
+  isCubemap: boolean;
 }
 
 export class DDSLoader extends CompressedTextureLoader {
