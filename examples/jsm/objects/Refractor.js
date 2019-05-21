@@ -3,9 +3,26 @@
  *
  */
 
-THREE.Refractor = function ( geometry, options ) {
+import {
+	Color,
+	LinearFilter,
+	Math as _Math,
+	Matrix4,
+	Mesh,
+	PerspectiveCamera,
+	Plane,
+	Quaternion,
+	RGBFormat,
+	ShaderMaterial,
+	UniformsUtils,
+	Vector3,
+	Vector4,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
 
-	THREE.Mesh.call( this, geometry );
+var Refractor = function ( geometry, options ) {
+
+	Mesh.call( this, geometry );
 
 	this.type = 'Refractor';
 
@@ -13,35 +30,35 @@ THREE.Refractor = function ( geometry, options ) {
 
 	options = options || {};
 
-	var color = ( options.color !== undefined ) ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
+	var color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
 	var textureWidth = options.textureWidth || 512;
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
-	var shader = options.shader || THREE.Refractor.RefractorShader;
+	var shader = options.shader || Refractor.RefractorShader;
 
 	//
 
-	var virtualCamera = new THREE.PerspectiveCamera();
+	var virtualCamera = new PerspectiveCamera();
 	virtualCamera.matrixAutoUpdate = false;
 	virtualCamera.userData.refractor = true;
 
 	//
 
-	var refractorPlane = new THREE.Plane();
-	var textureMatrix = new THREE.Matrix4();
+	var refractorPlane = new Plane();
+	var textureMatrix = new Matrix4();
 
 	// render target
 
 	var parameters = {
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat,
+		minFilter: LinearFilter,
+		magFilter: LinearFilter,
+		format: RGBFormat,
 		stencilBuffer: false
 	};
 
-	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) || ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! _Math.isPowerOfTwo( textureWidth ) || ! _Math.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -49,8 +66,8 @@ THREE.Refractor = function ( geometry, options ) {
 
 	// material
 
-	this.material = new THREE.ShaderMaterial( {
-		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+	this.material = new ShaderMaterial( {
+		uniforms: UniformsUtils.clone( shader.uniforms ),
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
 		transparent: true // ensures, refractors are drawn from farthest to closest
@@ -64,12 +81,12 @@ THREE.Refractor = function ( geometry, options ) {
 
 	var visible = ( function () {
 
-		var refractorWorldPosition = new THREE.Vector3();
-		var cameraWorldPosition = new THREE.Vector3();
-		var rotationMatrix = new THREE.Matrix4();
+		var refractorWorldPosition = new Vector3();
+		var cameraWorldPosition = new Vector3();
+		var rotationMatrix = new Matrix4();
 
-		var view = new THREE.Vector3();
-		var normal = new THREE.Vector3();
+		var view = new Vector3();
+		var normal = new Vector3();
 
 		return function visible( camera ) {
 
@@ -91,10 +108,10 @@ THREE.Refractor = function ( geometry, options ) {
 
 	var updateRefractorPlane = ( function () {
 
-		var normal = new THREE.Vector3();
-		var position = new THREE.Vector3();
-		var quaternion = new THREE.Quaternion();
-		var scale = new THREE.Vector3();
+		var normal = new Vector3();
+		var position = new Vector3();
+		var quaternion = new Quaternion();
+		var scale = new Vector3();
 
 		return function updateRefractorPlane() {
 
@@ -113,9 +130,9 @@ THREE.Refractor = function ( geometry, options ) {
 
 	var updateVirtualCamera = ( function () {
 
-		var clipPlane = new THREE.Plane();
-		var clipVector = new THREE.Vector4();
-		var q = new THREE.Vector4();
+		var clipPlane = new Plane();
+		var clipVector = new Vector4();
+		var q = new Vector4();
 
 		return function updateVirtualCamera( camera ) {
 
@@ -247,10 +264,10 @@ THREE.Refractor = function ( geometry, options ) {
 
 };
 
-THREE.Refractor.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Refractor.prototype.constructor = THREE.Refractor;
+Refractor.prototype = Object.create( Mesh.prototype );
+Refractor.prototype.constructor = Refractor;
 
-THREE.Refractor.RefractorShader = {
+Refractor.RefractorShader = {
 
 	uniforms: {
 
@@ -313,3 +330,5 @@ THREE.Refractor.RefractorShader = {
 
 	].join( '\n' )
 };
+
+export { Refractor };

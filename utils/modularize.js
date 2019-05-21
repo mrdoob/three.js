@@ -61,12 +61,14 @@ var files = [
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Refractor.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'shaders/BokehShader2.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/WaterRefractionShader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },

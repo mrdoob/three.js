@@ -3,7 +3,9 @@
  *
  */
 
-THREE.WaterRefractionShader = {
+
+
+var WaterRefractionShader = {
 
 	uniforms: {
 
@@ -94,3 +96,5 @@ THREE.WaterRefractionShader = {
 
 	].join( '\n' )
 };
+
+export { WaterRefractionShader };
