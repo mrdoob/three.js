@@ -7,19 +7,23 @@
  * ported from https://github.com/BabylonJS/Babylon.js/blob/master/src/Tools/babylon.khronosTextureContainer.ts
  */
 
+import {
+	CompressedTextureLoader
+} from "../../../build/three.module.js";
 
-THREE.KTXLoader = function ( manager ) {
 
-	THREE.CompressedTextureLoader.call( this, manager );
+var KTXLoader = function ( manager ) {
 
-	this._parser = THREE.KTXLoader.parse;
+	CompressedTextureLoader.call( this, manager );
+
+	this._parser = KTXLoader.parse;
 
 };
 
-THREE.KTXLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.KTXLoader.prototype.constructor = THREE.KTXLoader;
+KTXLoader.prototype = Object.create( CompressedTextureLoader.prototype );
+KTXLoader.prototype.constructor = KTXLoader;
 
-THREE.KTXLoader.parse = function ( buffer, loadMipmaps ) {
+KTXLoader.parse = function ( buffer, loadMipmaps ) {
 
 	var ktx = new KhronosTextureContainer( buffer, 1 );
 
@@ -123,7 +127,7 @@ var KhronosTextureContainer = ( function () {
 
 	}
 
-	// return mipmaps for THREE.js
+	// return mipmaps for js
 	KhronosTextureContainer.prototype.mipmaps = function ( loadMipmaps ) {
 
 		var mipmaps = [];
@@ -168,3 +172,5 @@ var KhronosTextureContainer = ( function () {
 	return KhronosTextureContainer;
 
 }() );
+
+export { KTXLoader };
