@@ -310,6 +310,7 @@ var files = {
 		"webgl_lightningstrike",
 		"webgl_lightshafts",
 		"webgl_materials_modified",
+		"webgl_paint_texture",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",

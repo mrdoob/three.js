@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - mesh - paint</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+
+				background-color: #363636;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#container {
+				cursor: none;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				cursor: auto;
+			}
+
+			a, a:visited {
+			  color: #2983ff;
+			}
+
+			li.function span {
+				width: 100% !important;
+				font-weight: bold;
+			}
+
+			li.function .c {
+				width: 0 !important;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - paint texture - by <a href="https://github.com/sciecode">ScieCode</a><br/>
+			Left-click to paint | Right-click to rotate<br/>
+
+		</div>
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/TexturePainter.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+
+			var renderer, camera, scene, mesh;
+			var container, controls, stats, painter;
+
+			color = new THREE.Color( '#cccb26' );
+
+			meshes = [ 'Sphere', 'Plane', 'Torus' ];
+
+			options = {
+				'Mesh': 'Sphere',
+				'Normal Falloff': 45,
+				'Clip Bleed': 0.015,
+				'Color': "#"+color.getHexString(),
+				'Opacity': 0.5,
+				'Brush Size': 5,
+				'Download Texture': downloadTexture
+			};
+
+
+			init();
+			render();
+
+			function init() {
+
+
+
+				// renderer
+				renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( width, height );
+
+				renderer.physicallyCorrectLights = true;
+				renderer.gammaFactor = 1.18;
+				renderer.gammaOutput = true;
+
+				container = document.getElementById( "container" );
+				container.appendChild( renderer.domElement );
+
+
+				// scene
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+				camera.position.set(-54, 3, 95);
+				camera.lookAt( scene.position );
+
+				// model
+				var planeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.MirroredRepeatWrapping, THREE.MirroredRepeatWrapping );
+				planeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+				material = new THREE.MeshStandardMaterial( { map: planeTexture } );
+				geometry = new THREE.SphereBufferGeometry( 20, 20, 128, 128 );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// lights
+				var ambientLight = new THREE.AmbientLight( 0xaaaaaa, 3.5 );
+				scene.add( ambientLight );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 0, 200, 100 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff, 0.7 );
+				light.position.set( -100, 200, -100 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				light.position.set( 100, -200, 100 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( -100, -100, 100 );
+				scene.add( light );
+
+				// controls
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.mouseButtons.LEFT = THREE.MOUSE.RIGHT;
+				controls.update();
+
+				// painter
+				painter = new THREE.TexturePainter( renderer, camera, mesh );
+
+				// GUI
+				gui = new dat.GUI();
+				gui.add(options, 'Mesh' ).options( meshes ).onChange( changeMesh );
+				gui.add(options, 'Normal Falloff', 0, 90 ).onChange( updatePainter );
+				gui.add(options, 'Clip Bleed', 0.0, 0.3 ).onChange( updatePainter );
+				gui.add(options, 'Opacity', 0.1, 1).onChange( updatePainter );
+				gui.add(options, 'Brush Size', 1, 10).onChange( updatePainter );
+				gui.addColor(options, 'Color').onChange( updatePainter );
+				gui.add(options, 'Download Texture');
+
+				// stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			};
+
+			function updatePainter( ) {
+
+				function handleColorChange( value ) {
+					value = value.replace( '#', '0x' );
+					color.setHex( value );
+					return color;
+				}
+
+				painter.falloff = options['Normal Falloff'] / 90 * ( Math.PI/2 );
+				painter.bleed = options['Clip Bleed'];
+				painter.color = handleColorChange( options['Color'] );
+				painter.opacity = options['Opacity'];
+				painter.setBrushSize( options['Brush Size'] );
+
+			};
+
+			function changeMesh() {
+
+				var geometry;
+
+				switch( options['Mesh'] ) {
+					case 'Sphere':
+						geometry = new THREE.SphereGeometry( 20, 20, 128, 128 );
+						break;
+					case 'Plane':
+						geometry = new THREE.PlaneGeometry( 50, 50, 10, 10 );
+						break;
+					case 'Torus':
+						geometry = new THREE.TorusGeometry( 20, 7, 64, 128 );
+						break;
+				}
+
+				scene.remove( mesh );
+				mesh.geometry.dispose();
+
+				camera.position.set( 0, 0, 105 );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				painter.setMesh(mesh);
+
+			};
+
+			function downloadTexture() {
+				let url = mesh.material.map.image.toDataURL('image/png');
+				let link = document.createElement('a');
+
+				link.href = url;
+				link.download = "texture.png";
+				link.click();
+				link = null;
+
+				URL.revokeObjectURL(url);
+			};
+
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				camera.aspect = aspect;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				painter.resize();
+
+			};
+
+			function render() {
+
+				requestAnimationFrame( render );
+
+				controls.update();
+
+				renderer.autoClear = true;
+				renderer.render( scene, camera );
+
+				painter.update(); // after scene is rendered.
+
+				stats.update();
+
+			};
+
+		</script>
+	</body>
+</html>
