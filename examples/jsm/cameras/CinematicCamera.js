@@ -5,9 +5,24 @@
  * @author kaypiKun
  */
 
-THREE.CinematicCamera = function ( fov, aspect, near, far ) {
+import {
+	LinearFilter,
+	Mesh,
+	OrthographicCamera,
+	PerspectiveCamera,
+	PlaneBufferGeometry,
+	RGBFormat,
+	Scene,
+	ShaderMaterial,
+	UniformsUtils,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
+import { BokehShader } from "../shaders/BokehShader2.js";
+import { BokehDepthShader } from "../shaders/BokehShader2.js";
 
-	THREE.PerspectiveCamera.call( this, fov, aspect, near, far );
+var CinematicCamera = function ( fov, aspect, near, far ) {
+
+	PerspectiveCamera.call( this, fov, aspect, near, far );
 
 	this.type = 'CinematicCamera';
 
@@ -17,9 +32,9 @@ THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 		samples: 4
 	};
 
-	var depthShader = THREE.BokehDepthShader;
+	var depthShader = BokehDepthShader;
 
-	this.materialDepth = new THREE.ShaderMaterial( {
+	this.materialDepth = new ShaderMaterial( {
 		uniforms: depthShader.uniforms,
 		vertexShader: depthShader.vertexShader,
 		fragmentShader: depthShader.fragmentShader
@@ -35,12 +50,12 @@ THREE.CinematicCamera = function ( fov, aspect, near, far ) {
 
 };
 
-THREE.CinematicCamera.prototype = Object.create( THREE.PerspectiveCamera.prototype );
-THREE.CinematicCamera.prototype.constructor = THREE.CinematicCamera;
+CinematicCamera.prototype = Object.create( PerspectiveCamera.prototype );
+CinematicCamera.prototype.constructor = CinematicCamera;
 
 
 // providing fnumber and coc(Circle of Confusion) as extra arguments
-THREE.CinematicCamera.prototype.setLens = function ( focalLength, filmGauge, fNumber, coc ) {
+CinematicCamera.prototype.setLens = function ( focalLength, filmGauge, fNumber, coc ) {
 
 	// In case of cinematicCamera, having a default lens set is important
 	if ( focalLength === undefined ) focalLength = 35;
@@ -63,7 +78,7 @@ THREE.CinematicCamera.prototype.setLens = function ( focalLength, filmGauge, fNu
 
 };
 
-THREE.CinematicCamera.prototype.linearize = function ( depth ) {
+CinematicCamera.prototype.linearize = function ( depth ) {
 
 	var zfar = this.far;
 	var znear = this.near;
@@ -71,21 +86,21 @@ THREE.CinematicCamera.prototype.linearize = function ( depth ) {
 
 };
 
-THREE.CinematicCamera.prototype.smoothstep = function ( near, far, depth ) {
+CinematicCamera.prototype.smoothstep = function ( near, far, depth ) {
 
 	var x = this.saturate( ( depth - near ) / ( far - near ) );
 	return x * x * ( 3 - 2 * x );
 
 };
 
-THREE.CinematicCamera.prototype.saturate = function ( x ) {
+CinematicCamera.prototype.saturate = function ( x ) {
 
 	return Math.max( 0, Math.min( 1, x ) );
 
 };
 
 // function for focusing at a distance from the camera
-THREE.CinematicCamera.prototype.focusAt = function ( focusDistance ) {
+CinematicCamera.prototype.focusAt = function ( focusDistance ) {
 
 	if ( focusDistance === undefined ) focusDistance = 20;
 
@@ -114,23 +129,23 @@ THREE.CinematicCamera.prototype.focusAt = function ( focusDistance ) {
 
 };
 
-THREE.CinematicCamera.prototype.initPostProcessing = function () {
+CinematicCamera.prototype.initPostProcessing = function () {
 
 	if ( this.postprocessing.enabled ) {
 
-		this.postprocessing.scene = new THREE.Scene();
+		this.postprocessing.scene = new Scene();
 
-		this.postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,	window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
+		this.postprocessing.camera = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,	window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 
 		this.postprocessing.scene.add( this.postprocessing.camera );
 
-		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-		this.postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-		this.postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+		var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat };
+		this.postprocessing.rtTextureDepth = new WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+		this.postprocessing.rtTextureColor = new WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
-		var bokeh_shader = THREE.BokehShader;
+		var bokeh_shader = BokehShader;
 
-		this.postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
+		this.postprocessing.bokeh_uniforms = UniformsUtils.clone( bokeh_shader.uniforms );
 
 		this.postprocessing.bokeh_uniforms[ "tColor" ].value = this.postprocessing.rtTextureColor.texture;
 		this.postprocessing.bokeh_uniforms[ "tDepth" ].value = this.postprocessing.rtTextureDepth.texture;
@@ -154,7 +169,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 		this.postprocessing.bokeh_uniforms[ "textureHeight" ].value = window.innerHeight;
 
-		this.postprocessing.materialBokeh = new THREE.ShaderMaterial( {
+		this.postprocessing.materialBokeh = new ShaderMaterial( {
 			uniforms: this.postprocessing.bokeh_uniforms,
 			vertexShader: bokeh_shader.vertexShader,
 			fragmentShader: bokeh_shader.fragmentShader,
@@ -165,7 +180,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 			}
 		} );
 
-		this.postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
+		this.postprocessing.quad = new Mesh( new PlaneBufferGeometry( window.innerWidth, window.innerHeight ), this.postprocessing.materialBokeh );
 		this.postprocessing.quad.position.z = - 500;
 		this.postprocessing.scene.add( this.postprocessing.quad );
 
@@ -173,7 +188,7 @@ THREE.CinematicCamera.prototype.initPostProcessing = function () {
 
 };
 
-THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
+CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 
 	if ( this.postprocessing.enabled ) {
 
@@ -205,3 +220,5 @@ THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 	}
 
 };
+
+export { CinematicCamera };

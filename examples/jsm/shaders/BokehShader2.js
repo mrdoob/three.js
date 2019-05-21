@@ -8,9 +8,13 @@
  * Requires #define RINGS and SAMPLES integers
  */
 
+import {
+	Vector2
+} from "../../../build/three.module.js";
 
 
-THREE.BokehShader = {
+
+var BokehShader = {
 
 	uniforms: {
 
@@ -44,7 +48,7 @@ THREE.BokehShader = {
 		"pentagon": { value: 0 },
 
 		"shaderFocus": { value: 1 },
-		"focusCoords": { value: new THREE.Vector2() }
+		"focusCoords": { value: new Vector2() }
 
 
 	},
@@ -355,7 +359,7 @@ THREE.BokehShader = {
 
 };
 
-THREE.BokehDepthShader = {
+var BokehDepthShader = {
 
 	uniforms: {
 
@@ -396,3 +400,5 @@ THREE.BokehDepthShader = {
 	].join( "\n" )
 
 };
+
+export { BokehShader, BokehDepthShader };
