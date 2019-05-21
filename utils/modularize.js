@@ -67,6 +67,7 @@ var files = [
 	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/SoftwareRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
+	{ path: 'renderers/RaytracingRenderer.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
