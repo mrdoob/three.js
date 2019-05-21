@@ -60,6 +60,8 @@ var files = [
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
+
 	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
