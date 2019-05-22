@@ -67,9 +67,10 @@ var files = [
 	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'shaders/BokehShader2.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/WaterRefractionShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'postprocessing/EffectComposer.js', dependencies: [ { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'MaskPass', path: 'postprocessing/MaskPass.js' }, { name: 'ClearMaskPass', path: 'postprocessing/MaskPass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/MaskPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/RenderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/ShaderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
@@ -77,6 +78,13 @@ var files = [
 	{ path: 'renderers/SoftwareRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 	{ path: 'renderers/RaytracingRenderer.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'shaders/BokehShader2.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/CopyShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/DotScreenShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/WaterRefractionShader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
@@ -186,9 +194,11 @@ function convert( path, exampleDependencies, ignoreList ) {
 		.sort()
 		.toString();
 
+	var imports = '';
+
 	// core imports
 
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
+	if ( keys ) imports += `import {${keys}\n} from "../../../build/three.module.js";`;
 
 	// example imports
 
@@ -202,7 +212,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var exports = `export { ${classNames.join( ", " )} };\n`;
 
-	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
+	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
 	// console.log( output );
 
