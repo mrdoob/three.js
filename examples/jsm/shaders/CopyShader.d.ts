@@ -8,5 +8,5 @@ export interface CopyShader {
     opacity: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }

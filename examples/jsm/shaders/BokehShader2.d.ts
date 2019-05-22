@@ -29,7 +29,7 @@ export interface BokehShader {
     focusCoords: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }
 
 export interface BokehDepthShader {
@@ -38,5 +38,5 @@ export interface BokehDepthShader {
     mFar: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }

@@ -11,5 +11,5 @@ export interface WaterRefractionShader {
     textureMatrix: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }
