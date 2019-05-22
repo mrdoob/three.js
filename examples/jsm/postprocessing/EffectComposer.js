@@ -2,25 +2,39 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.EffectComposer = function ( renderer, renderTarget ) {
+import {
+	LinearFilter,
+	Mesh,
+	OrthographicCamera,
+	PlaneBufferGeometry,
+	RGBAFormat,
+	Vector2,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
+import { CopyShader } from "../shaders/CopyShader.js";
+import { ShaderPass } from "../postprocessing/ShaderPass.js";
+import { MaskPass } from "../postprocessing/MaskPass.js";
+import { ClearMaskPass } from "../postprocessing/MaskPass.js";
+
+var EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
 
 	if ( renderTarget === undefined ) {
 
 		var parameters = {
-			minFilter: THREE.LinearFilter,
-			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
+			minFilter: LinearFilter,
+			magFilter: LinearFilter,
+			format: RGBAFormat,
 			stencilBuffer: false
 		};
 
-		var size = renderer.getSize( new THREE.Vector2() );
+		var size = renderer.getSize( new Vector2() );
 		this._pixelRatio = renderer.getPixelRatio();
 		this._width = size.width;
 		this._height = size.height;
 
-		renderTarget = new THREE.WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, parameters );
+		renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, parameters );
 		renderTarget.texture.name = 'EffectComposer.rt1';
 
 	} else {
@@ -44,25 +58,25 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	// dependencies
 
-	if ( THREE.CopyShader === undefined ) {
+	if ( CopyShader === undefined ) {
 
-		console.error( 'THREE.EffectComposer relies on THREE.CopyShader' );
-
-	}
-
-	if ( THREE.ShaderPass === undefined ) {
-
-		console.error( 'THREE.EffectComposer relies on THREE.ShaderPass' );
+		console.error( 'THREE.EffectComposer relies on CopyShader' );
 
 	}
 
-	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
+	if ( ShaderPass === undefined ) {
+
+		console.error( 'THREE.EffectComposer relies on ShaderPass' );
+
+	}
+
+	this.copyPass = new ShaderPass( CopyShader );
 
 	this._previousFrameTime = Date.now();
 
 };
 
-Object.assign( THREE.EffectComposer.prototype, {
+Object.assign( EffectComposer.prototype, {
 
 	swapBuffers: function () {
 
@@ -76,7 +90,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		this.passes.push( pass );
 
-		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
+		var size = this.renderer.getDrawingBufferSize( new Vector2() );
 		pass.setSize( size.width, size.height );
 
 	},
@@ -148,13 +162,13 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 			}
 
-			if ( THREE.MaskPass !== undefined ) {
+			if ( MaskPass !== undefined ) {
 
-				if ( pass instanceof THREE.MaskPass ) {
+				if ( pass instanceof MaskPass ) {
 
 					maskActive = true;
 
-				} else if ( pass instanceof THREE.ClearMaskPass ) {
+				} else if ( pass instanceof ClearMaskPass ) {
 
 					maskActive = false;
 
@@ -172,7 +186,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 		if ( renderTarget === undefined ) {
 
-			var size = this.renderer.getSize( new THREE.Vector2() );
+			var size = this.renderer.getSize( new Vector2() );
 			this._pixelRatio = this.renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
@@ -222,7 +236,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 } );
 
 
-THREE.Pass = function () {
+var Pass = function () {
 
 	// if set to true, the pass is processed by the composer
 	this.enabled = true;
@@ -238,7 +252,7 @@ THREE.Pass = function () {
 
 };
 
-Object.assign( THREE.Pass.prototype, {
+Object.assign( Pass.prototype, {
 
 	setSize: function ( /* width, height */ ) {},
 
@@ -251,14 +265,14 @@ Object.assign( THREE.Pass.prototype, {
 } );
 
 // Helper for passes that need to fill the viewport with a single quad.
-THREE.Pass.FullScreenQuad = ( function () {
+Pass.FullScreenQuad = ( function () {
 
-	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+	var camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+	var geometry = new PlaneBufferGeometry( 2, 2 );
 
 	var FullScreenQuad = function ( material ) {
 
-		this._mesh = new THREE.Mesh( geometry, material );
+		this._mesh = new Mesh( geometry, material );
 
 	};
 
@@ -291,3 +305,5 @@ THREE.Pass.FullScreenQuad = ( function () {
 	return FullScreenQuad;
 
 } )();
+
+export { EffectComposer, Pass };
