@@ -67,9 +67,11 @@ var files = [
 	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'postprocessing/ClearPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/EffectComposer.js', dependencies: [ { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'MaskPass', path: 'postprocessing/MaskPass.js' }, { name: 'ClearMaskPass', path: 'postprocessing/MaskPass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/MaskPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/RenderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/TexturePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/ShaderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
