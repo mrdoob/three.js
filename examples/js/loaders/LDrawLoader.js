@@ -384,7 +384,7 @@ THREE.LDrawLoader = ( function () {
 
 	}
 
-	function createObject( elements, elementSize ) {
+	function createObject( elements, elementSize, isConditionalSegments ) {
 
 		// Creates a THREE.LineSegments (elementSize = 2) or a THREE.Mesh (elementSize = 3 )
 		// With per face / segment material, implemented with mesh groups and materials array
@@ -466,6 +466,50 @@ THREE.LDrawLoader = ( function () {
 		} else if ( elementSize === 3 ) {
 
 			object3d = new THREE.Mesh( bufferGeometry, materials );
+
+		}
+
+		if ( isConditionalSegments ) {
+
+			object3d.isConditionalLine = true;
+
+			var controlArray0 = new Float32Array( elements.length * 3 * 2 );
+			var controlArray1 = new Float32Array( elements.length * 3 * 2 );
+			var directionArray = new Float32Array( elements.length * 3 * 2 );
+			for ( var i = 0, l = elements.length; i < l; i ++ ) {
+
+				var os = elements[ i ];
+				var c0 = os.c0;
+				var c1 = os.c1;
+				var v0 = os.v0;
+				var v1 = os.v1;
+				var index = i * 3 * 2;
+				controlArray0[ index + 0 ] = c0.x;
+				controlArray0[ index + 1 ] = c0.y;
+				controlArray0[ index + 2 ] = c0.z;
+				controlArray0[ index + 3 ] = c0.x;
+				controlArray0[ index + 4 ] = c0.y;
+				controlArray0[ index + 5 ] = c0.z;
+
+				controlArray1[ index + 0 ] = c1.x;
+				controlArray1[ index + 1 ] = c1.y;
+				controlArray1[ index + 2 ] = c1.z;
+				controlArray1[ index + 3 ] = c1.x;
+				controlArray1[ index + 4 ] = c1.y;
+				controlArray1[ index + 5 ] = c1.z;
+
+				directionArray[ index + 0 ] = v1.x - v0.x;
+				directionArray[ index + 1 ] = v1.y - v0.y;
+				directionArray[ index + 2 ] = v1.z - v0.z;
+				directionArray[ index + 3 ] = v1.x - v0.x;
+				directionArray[ index + 4 ] = v1.y - v0.y;
+				directionArray[ index + 5 ] = v1.z - v0.z;
+
+			}
+
+			bufferGeometry.addAttribute( 'control0', new THREE.BufferAttribute( controlArray0, 3, false ) );
+			bufferGeometry.addAttribute( 'control1', new THREE.BufferAttribute( controlArray1, 3, false ) );
+			bufferGeometry.addAttribute( 'direction', new THREE.BufferAttribute( directionArray, 3, false ) );
 
 		}
 
@@ -644,67 +688,7 @@ THREE.LDrawLoader = ( function () {
 
 						if ( parseScope.conditionalSegments.length > 0 ) {
 
-							var conditionalSegments = parseScope.conditionalSegments;
-							var lines = createObject( conditionalSegments, 2 );
-							lines.isConditionalLine = true;
-
-							var controlArray0 = new Float32Array( conditionalSegments.length * 3 * 2 );
-							var controlArray1 = new Float32Array( conditionalSegments.length * 3 * 2 );
-							var directionArray = new Float32Array( conditionalSegments.length * 3 * 2 );
-							for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
-
-								var os = conditionalSegments[ i ];
-								var c0 = os.c0;
-								var c1 = os.c1;
-								var v0 = os.v0;
-								var v1 = os.v1;
-								var index = i * 3 * 2;
-								controlArray0[ index + 0 ] = c0.x;
-								controlArray0[ index + 1 ] = c0.y;
-								controlArray0[ index + 2 ] = c0.z;
-								controlArray0[ index + 3 ] = c0.x;
-								controlArray0[ index + 4 ] = c0.y;
-								controlArray0[ index + 5 ] = c0.z;
-
-								controlArray1[ index + 0 ] = c1.x;
-								controlArray1[ index + 1 ] = c1.y;
-								controlArray1[ index + 2 ] = c1.z;
-								controlArray1[ index + 3 ] = c1.x;
-								controlArray1[ index + 4 ] = c1.y;
-								controlArray1[ index + 5 ] = c1.z;
-
-								directionArray[ index + 0 ] = v1.x - v0.x;
-								directionArray[ index + 1 ] = v1.y - v0.y;
-								directionArray[ index + 2 ] = v1.z - v0.z;
-								directionArray[ index + 3 ] = v1.x - v0.x;
-								directionArray[ index + 4 ] = v1.y - v0.y;
-								directionArray[ index + 5 ] = v1.z - v0.z;
-
-							}
-
-							lines.geometry.addAttribute( 'control0', new THREE.BufferAttribute( controlArray0, 3, false ) );
-							lines.geometry.addAttribute( 'control1', new THREE.BufferAttribute( controlArray1, 3, false ) );
-							lines.geometry.addAttribute( 'direction', new THREE.BufferAttribute( directionArray, 3, false ) );
-
-							lines.material = lines.material.map( mat => {
-
-								return new THREE.ShaderMaterial( {
-									vertexShader: conditionalLineVertShader,
-									fragmentShader: conditionalLineFragShader,
-									uniforms: {
-										diffuse: {
-											value: mat.color
-										},
-										opacity: {
-											value: mat.opacity
-										}
-									}
-								} );
-
-							} );
-
-
-							objGroup.add( lines );
+							objGroup.add( createObject( parseScope.conditionalSegments, 2, true ) );
 
 						}
 
@@ -1309,6 +1293,21 @@ THREE.LDrawLoader = ( function () {
 				edgeMaterial.name = name + " - Edge";
 				edgeMaterial.userData.canHaveEnvMap = false;
 
+				// This is the material used for conditional edges
+				edgeMaterial.userData.conditionalEdgeMaterial = new THREE.ShaderMaterial( {
+					vertexShader: conditionalLineVertShader,
+					fragmentShader: conditionalLineFragShader,
+					uniforms: {
+						diffuse: {
+							value: new THREE.Color( edgeColour )
+						},
+						opacity: {
+							value: alpha
+						}
+					}
+				} );
+				edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
+
 			}
 
 			material.userData.code = code;
@@ -1682,12 +1681,9 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					// Line type 2: Line segment
-					// Line type 5: Conditional Line segment
 					case '2':
-					case '5':
 
 						var material = parseColourCode( lp, true );
-						var arr = lineType === '2' ? lineSegments : conditionalSegments;
 
 						var segment = {
 							material: material.userData.edgeMaterial,
@@ -1696,14 +1692,25 @@ THREE.LDrawLoader = ( function () {
 							v1: parseVector( lp )
 						};
 
-						if ( lineType === '5' ) {
+						lineSegments.push( segment );
 
-							segment.c0 = parseVector( lp );
-							segment.c1 = parseVector( lp );
+						break;
 
-						}
+					// Line type 5: Conditional Line segment
+					case '5':
 
-						arr.push( segment );
+						var material = parseColourCode( lp, true );
+
+						var segment = {
+							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
+							colourCode: material.userData.code,
+							v0: parseVector( lp ),
+							v1: parseVector( lp ),
+							c0: parseVector( lp ),
+							c1: parseVector( lp )
+						};
+
+						conditionalSegments.push( segment );
 
 						break;
 
