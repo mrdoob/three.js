@@ -9,5 +9,5 @@ export interface RGBShiftShader {
     angle: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }

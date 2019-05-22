@@ -11,5 +11,5 @@ export interface DotScreenShader {
     scale: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }

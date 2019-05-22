@@ -8,5 +8,5 @@ export interface UnpackDepthRGBAShader {
     opacity: Uniform;
   };
   vertexShader: string;
-  fragmentShader:string;
+  fragmentShader: string;
 }
