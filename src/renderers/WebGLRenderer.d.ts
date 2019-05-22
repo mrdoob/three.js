@@ -379,7 +379,8 @@ export class WebGLRenderer implements Renderer {
     y: number,
     width: number,
     height: number,
-    buffer: any
+    buffer: any,
+    activeCubeFaceIndex?: number
   ): void;
 
   /**
