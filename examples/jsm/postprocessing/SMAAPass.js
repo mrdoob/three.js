@@ -2,27 +2,42 @@
  * @author mpk / http://polko.me/
  */
 
-THREE.SMAAPass = function ( width, height ) {
+import {
+	LinearFilter,
+	NearestFilter,
+	RGBAFormat,
+	RGBFormat,
+	ShaderMaterial,
+	Texture,
+	UniformsUtils,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
+import { Pass } from "../postprocessing/Pass.js";
+import { SMAAEdgesShader } from "../shaders/SMAAShader.js";
+import { SMAAWeightsShader } from "../shaders/SMAAShader.js";
+import { SMAABlendShader } from "../shaders/SMAAShader.js";
 
-	THREE.Pass.call( this );
+var SMAAPass = function ( width, height ) {
+
+	Pass.call( this );
 
 	// render targets
 
-	this.edgesRT = new THREE.WebGLRenderTarget( width, height, {
+	this.edgesRT = new WebGLRenderTarget( width, height, {
 		depthBuffer: false,
 		stencilBuffer: false,
 		generateMipmaps: false,
-		minFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat
+		minFilter: LinearFilter,
+		format: RGBFormat
 	} );
 	this.edgesRT.texture.name = "SMAAPass.edges";
 
-	this.weightsRT = new THREE.WebGLRenderTarget( width, height, {
+	this.weightsRT = new WebGLRenderTarget( width, height, {
 		depthBuffer: false,
 		stencilBuffer: false,
 		generateMipmaps: false,
-		minFilter: THREE.LinearFilter,
-		format: THREE.RGBAFormat
+		minFilter: LinearFilter,
+		format: RGBAFormat
 	} );
 	this.weightsRT.texture.name = "SMAAPass.weights";
 
@@ -38,11 +53,11 @@ THREE.SMAAPass = function ( width, height ) {
 
 	};
 
-	this.areaTexture = new THREE.Texture();
+	this.areaTexture = new Texture();
 	this.areaTexture.name = "SMAAPass.area";
 	this.areaTexture.image = areaTextureImage;
-	this.areaTexture.format = THREE.RGBFormat;
-	this.areaTexture.minFilter = THREE.LinearFilter;
+	this.areaTexture.format = RGBFormat;
+	this.areaTexture.minFilter = LinearFilter;
 	this.areaTexture.generateMipmaps = false;
 	this.areaTexture.flipY = false;
 
@@ -55,71 +70,71 @@ THREE.SMAAPass = function ( width, height ) {
 
 	};
 
-	this.searchTexture = new THREE.Texture();
+	this.searchTexture = new Texture();
 	this.searchTexture.name = "SMAAPass.search";
 	this.searchTexture.image = searchTextureImage;
-	this.searchTexture.magFilter = THREE.NearestFilter;
-	this.searchTexture.minFilter = THREE.NearestFilter;
+	this.searchTexture.magFilter = NearestFilter;
+	this.searchTexture.minFilter = NearestFilter;
 	this.searchTexture.generateMipmaps = false;
 	this.searchTexture.flipY = false;
 
 	// materials - pass 1
 
-	if ( THREE.SMAAEdgesShader === undefined ) {
+	if ( SMAAEdgesShader === undefined ) {
 
-		console.error( "THREE.SMAAPass relies on THREE.SMAAShader" );
+		console.error( "SMAAPass relies on SMAAShader" );
 
 	}
 
-	this.uniformsEdges = THREE.UniformsUtils.clone( THREE.SMAAEdgesShader.uniforms );
+	this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
 	this.uniformsEdges[ "resolution" ].value.set( 1 / width, 1 / height );
 
-	this.materialEdges = new THREE.ShaderMaterial( {
-		defines: Object.assign( {}, THREE.SMAAEdgesShader.defines ),
+	this.materialEdges = new ShaderMaterial( {
+		defines: Object.assign( {}, SMAAEdgesShader.defines ),
 		uniforms: this.uniformsEdges,
-		vertexShader: THREE.SMAAEdgesShader.vertexShader,
-		fragmentShader: THREE.SMAAEdgesShader.fragmentShader
+		vertexShader: SMAAEdgesShader.vertexShader,
+		fragmentShader: SMAAEdgesShader.fragmentShader
 	} );
 
 	// materials - pass 2
 
-	this.uniformsWeights = THREE.UniformsUtils.clone( THREE.SMAAWeightsShader.uniforms );
+	this.uniformsWeights = UniformsUtils.clone( SMAAWeightsShader.uniforms );
 
 	this.uniformsWeights[ "resolution" ].value.set( 1 / width, 1 / height );
 	this.uniformsWeights[ "tDiffuse" ].value = this.edgesRT.texture;
 	this.uniformsWeights[ "tArea" ].value = this.areaTexture;
 	this.uniformsWeights[ "tSearch" ].value = this.searchTexture;
 
-	this.materialWeights = new THREE.ShaderMaterial( {
-		defines: Object.assign( {}, THREE.SMAAWeightsShader.defines ),
+	this.materialWeights = new ShaderMaterial( {
+		defines: Object.assign( {}, SMAAWeightsShader.defines ),
 		uniforms: this.uniformsWeights,
-		vertexShader: THREE.SMAAWeightsShader.vertexShader,
-		fragmentShader: THREE.SMAAWeightsShader.fragmentShader
+		vertexShader: SMAAWeightsShader.vertexShader,
+		fragmentShader: SMAAWeightsShader.fragmentShader
 	} );
 
 	// materials - pass 3
 
-	this.uniformsBlend = THREE.UniformsUtils.clone( THREE.SMAABlendShader.uniforms );
+	this.uniformsBlend = UniformsUtils.clone( SMAABlendShader.uniforms );
 
 	this.uniformsBlend[ "resolution" ].value.set( 1 / width, 1 / height );
 	this.uniformsBlend[ "tDiffuse" ].value = this.weightsRT.texture;
 
-	this.materialBlend = new THREE.ShaderMaterial( {
+	this.materialBlend = new ShaderMaterial( {
 		uniforms: this.uniformsBlend,
-		vertexShader: THREE.SMAABlendShader.vertexShader,
-		fragmentShader: THREE.SMAABlendShader.fragmentShader
+		vertexShader: SMAABlendShader.vertexShader,
+		fragmentShader: SMAABlendShader.fragmentShader
 	} );
 
 	this.needsSwap = false;
 
-	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
+	this.fsQuad = new Pass.FullScreenQuad( null );
 
 };
 
-THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
+SMAAPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
-	constructor: THREE.SMAAPass,
+	constructor: SMAAPass,
 
 	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
@@ -186,3 +201,5 @@ THREE.SMAAPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	}
 
 } );
+
+export { SMAAPass };

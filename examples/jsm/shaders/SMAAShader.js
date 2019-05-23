@@ -6,7 +6,11 @@
  * https://github.com/iryoku/smaa/releases/tag/v2.8
  */
 
-THREE.SMAAEdgesShader = {
+import {
+	Vector2
+} from "../../../build/three.module.js";
+
+var SMAAEdgesShader = {
 
 	defines: {
 
@@ -17,7 +21,7 @@ THREE.SMAAEdgesShader = {
 	uniforms: {
 
 		"tDiffuse": { value: null },
-		"resolution": { value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"resolution": { value: new Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -115,7 +119,7 @@ THREE.SMAAEdgesShader = {
 
 };
 
-THREE.SMAAWeightsShader = {
+var SMAAWeightsShader = {
 
 	defines: {
 
@@ -131,7 +135,7 @@ THREE.SMAAWeightsShader = {
 		"tDiffuse": { value: null },
 		"tArea": { value: null },
 		"tSearch": { value: null },
-		"resolution": { value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"resolution": { value: new Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -371,13 +375,13 @@ THREE.SMAAWeightsShader = {
 
 };
 
-THREE.SMAABlendShader = {
+var SMAABlendShader = {
 
 	uniforms: {
 
 		"tDiffuse": { value: null },
 		"tColor": { value: null },
-		"resolution": { value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
+		"resolution": { value: new Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 
@@ -464,3 +468,5 @@ THREE.SMAABlendShader = {
 	].join( "\n" )
 
 };
+
+export { SMAAEdgesShader, SMAAWeightsShader, SMAABlendShader };
