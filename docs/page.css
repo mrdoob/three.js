@@ -92,7 +92,7 @@ body {
 
 table,
 pre,
-code {
+code:not(.inline) {
 	margin-left: -24px;
 	margin-right: -24px;
 	margin-top: 20px;
@@ -131,6 +131,13 @@ code {
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;
+}
+
+code.inline {
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+	padding: 2px 5px;
 }
 
 iframe {
