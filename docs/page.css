@@ -152,12 +152,19 @@ table td:first-child {
 	padding-left: 0;
 }
 
-code {
+code:not(.inline) {
 	display: block;
 	padding: 1.25rem var(--page-padding);
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;
+}
+
+code.inline {
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+	padding: 2px 5px;
 }
 
 iframe {
