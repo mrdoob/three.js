@@ -9,6 +9,20 @@ import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, Equirecta
 
 var programIdCount = 0;
 
+function addLineNumbers( string ) {
+
+	var lines = string.split( '\n' );
+
+	for ( var i = 0; i < lines.length; i ++ ) {
+
+		lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
+
+	}
+
+	return lines.join( '\n' );
+
+}
+
 function getEncodingComponents( encoding ) {
 
 	switch ( encoding ) {
@@ -31,6 +45,22 @@ function getEncodingComponents( encoding ) {
 			throw new Error( 'unsupported encoding: ' + encoding );
 
 	}
+
+}
+
+function getShaderErrors( gl, shader ) {
+
+	var status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
+	var source = gl.getShaderSource( shader );
+	var log = gl.getShaderInfoLog( shader ).trim();
+	var type = gl.getShaderParameter( shader, gl.SHADER_TYPE ) === gl.VERTEX_SHADER ? 'vertex' : 'fragment';
+
+	if ( status && log === '' ) return '';
+
+	// --enable-privileged-webgl-extension
+	// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
+
+	return 'THREE.WebGLShader: gl.getShaderInfoLog() ' + type + ' ' + log + addLineNumbers( source );
 
 }
 
@@ -610,18 +640,17 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 		var programLog = gl.getProgramInfoLog( program ).trim();
 		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
 		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+		var vertexErrors = getShaderErrors( gl, glVertexShader );
+		var fragmentErrors = getShaderErrors( gl, glFragmentShader );
 
 		var runnable = true;
 		var haveDiagnostics = true;
-
-		// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
-		// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
 
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
 			runnable = false;
 
-			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
+			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
 
 		} else if ( programLog !== '' ) {
 
