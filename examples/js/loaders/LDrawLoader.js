@@ -7,6 +7,84 @@
 
 THREE.LDrawLoader = ( function () {
 
+	var conditionalLineVertShader = /* glsl */`
+	attribute vec3 control0;
+	attribute vec3 control1;
+	attribute vec3 direction;
+	varying float discardFlag;
+
+	#include <common>
+	#include <color_pars_vertex>
+	#include <fog_pars_vertex>
+	#include <logdepthbuf_pars_vertex>
+	#include <clipping_planes_pars_vertex>
+	void main() {
+		#include <color_vertex>
+
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+
+		// Transform the line segment ends and control points into camera clip space
+		vec4 c0 = projectionMatrix * modelViewMatrix * vec4( control0, 1.0 );
+		vec4 c1 = projectionMatrix * modelViewMatrix * vec4( control1, 1.0 );
+		vec4 p0 = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		vec4 p1 = projectionMatrix * modelViewMatrix * vec4( position + direction, 1.0 );
+
+		c0.xy /= c0.w;
+		c1.xy /= c1.w;
+		p0.xy /= p0.w;
+		p1.xy /= p1.w;
+
+		// Get the direction of the segment and an orthogonal vector
+		vec2 dir = p1.xy - p0.xy;
+		vec2 norm = vec2( -dir.y, dir.x );
+
+		// Get control point directions from the line
+		vec2 c0dir = c0.xy - p1.xy;
+		vec2 c1dir = c1.xy - p1.xy;
+
+		// If the vectors to the controls points are pointed in different directions away
+		// from the line segment then the line should not be drawn.
+		float d0 = dot( normalize( norm ), normalize( c0dir ) );
+		float d1 = dot( normalize( norm ), normalize( c1dir ) );
+		discardFlag = float( sign( d0 ) != sign( d1 ) );
+
+		#include <logdepthbuf_vertex>
+		#include <clipping_planes_vertex>
+		#include <fog_vertex>
+	}
+	`;
+
+	var conditionalLineFragShader = /* glsl */`
+	uniform vec3 diffuse;
+	uniform float opacity;
+	varying float discardFlag;
+
+	#include <common>
+	#include <color_pars_fragment>
+	#include <fog_pars_fragment>
+	#include <logdepthbuf_pars_fragment>
+	#include <clipping_planes_pars_fragment>
+	void main() {
+
+		if ( discardFlag > 0.5 ) discard;
+
+		#include <clipping_planes_fragment>
+		vec3 outgoingLight = vec3( 0.0 );
+		vec4 diffuseColor = vec4( diffuse, opacity );
+		#include <logdepthbuf_fragment>
+		#include <color_fragment>
+		outgoingLight = diffuseColor.rgb; // simple shader
+		gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+		#include <premultiplied_alpha_fragment>
+		#include <tonemapping_fragment>
+		#include <encodings_fragment>
+		#include <fog_fragment>
+	}
+	`;
+
+
+
 	var tempVec0 = new THREE.Vector3();
 	var tempVec1 = new THREE.Vector3();
 	function smoothNormals( triangles, lineSegments ) {
@@ -306,7 +384,7 @@ THREE.LDrawLoader = ( function () {
 
 	}
 
-	function createObject( elements, elementSize ) {
+	function createObject( elements, elementSize, isConditionalSegments ) {
 
 		// Creates a THREE.LineSegments (elementSize = 2) or a THREE.Mesh (elementSize = 3 )
 		// With per face / segment material, implemented with mesh groups and materials array
@@ -388,6 +466,50 @@ THREE.LDrawLoader = ( function () {
 		} else if ( elementSize === 3 ) {
 
 			object3d = new THREE.Mesh( bufferGeometry, materials );
+
+		}
+
+		if ( isConditionalSegments ) {
+
+			object3d.isConditionalLine = true;
+
+			var controlArray0 = new Float32Array( elements.length * 3 * 2 );
+			var controlArray1 = new Float32Array( elements.length * 3 * 2 );
+			var directionArray = new Float32Array( elements.length * 3 * 2 );
+			for ( var i = 0, l = elements.length; i < l; i ++ ) {
+
+				var os = elements[ i ];
+				var c0 = os.c0;
+				var c1 = os.c1;
+				var v0 = os.v0;
+				var v1 = os.v1;
+				var index = i * 3 * 2;
+				controlArray0[ index + 0 ] = c0.x;
+				controlArray0[ index + 1 ] = c0.y;
+				controlArray0[ index + 2 ] = c0.z;
+				controlArray0[ index + 3 ] = c0.x;
+				controlArray0[ index + 4 ] = c0.y;
+				controlArray0[ index + 5 ] = c0.z;
+
+				controlArray1[ index + 0 ] = c1.x;
+				controlArray1[ index + 1 ] = c1.y;
+				controlArray1[ index + 2 ] = c1.z;
+				controlArray1[ index + 3 ] = c1.x;
+				controlArray1[ index + 4 ] = c1.y;
+				controlArray1[ index + 5 ] = c1.z;
+
+				directionArray[ index + 0 ] = v1.x - v0.x;
+				directionArray[ index + 1 ] = v1.y - v0.y;
+				directionArray[ index + 2 ] = v1.z - v0.z;
+				directionArray[ index + 3 ] = v1.x - v0.x;
+				directionArray[ index + 4 ] = v1.y - v0.y;
+				directionArray[ index + 5 ] = v1.z - v0.z;
+
+			}
+
+			bufferGeometry.addAttribute( 'control0', new THREE.BufferAttribute( controlArray0, 3, false ) );
+			bufferGeometry.addAttribute( 'control1', new THREE.BufferAttribute( controlArray1, 3, false ) );
+			bufferGeometry.addAttribute( 'direction', new THREE.BufferAttribute( directionArray, 3, false ) );
 
 		}
 
@@ -566,10 +688,7 @@ THREE.LDrawLoader = ( function () {
 
 						if ( parseScope.conditionalSegments.length > 0 ) {
 
-							var lines = createObject( parseScope.conditionalSegments, 2 );
-							lines.isConditionalLine = true;
-							lines.visible = false;
-							objGroup.add( lines );
+							objGroup.add( createObject( parseScope.conditionalSegments, 2, true ) );
 
 						}
 
@@ -615,6 +734,8 @@ THREE.LDrawLoader = ( function () {
 
 								os.v0.applyMatrix4( parseScope.matrix );
 								os.v1.applyMatrix4( parseScope.matrix );
+								os.c0.applyMatrix4( parseScope.matrix );
+								os.c1.applyMatrix4( parseScope.matrix );
 
 							}
 							parentConditionalSegments.push( os );
@@ -1150,7 +1271,11 @@ THREE.LDrawLoader = ( function () {
 			}
 
 			material.transparent = isTransparent;
+			material.premultipliedAlpha = true;
 			material.opacity = alpha;
+
+			material.polygonOffset = true;
+			material.polygonOffsetFactor = 1;
 
 			material.userData.canHaveEnvMap = canHaveEnvMap;
 
@@ -1167,6 +1292,21 @@ THREE.LDrawLoader = ( function () {
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + " - Edge";
 				edgeMaterial.userData.canHaveEnvMap = false;
+
+				// This is the material used for conditional edges
+				edgeMaterial.userData.conditionalEdgeMaterial = new THREE.ShaderMaterial( {
+					vertexShader: conditionalLineVertShader,
+					fragmentShader: conditionalLineFragShader,
+					uniforms: {
+						diffuse: {
+							value: new THREE.Color( edgeColour )
+						},
+						opacity: {
+							value: alpha
+						}
+					}
+				} );
+				edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
 
 			}
 
@@ -1541,19 +1681,36 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 					// Line type 2: Line segment
-					// Line type 5: Conditional Line segment
 					case '2':
-					case '5':
 
 						var material = parseColourCode( lp, true );
-						var arr = lineType === '2' ? lineSegments : conditionalSegments;
 
-						arr.push( {
+						var segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
 							v1: parseVector( lp )
-						} );
+						};
+
+						lineSegments.push( segment );
+
+						break;
+
+					// Line type 5: Conditional Line segment
+					case '5':
+
+						var material = parseColourCode( lp, true );
+
+						var segment = {
+							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
+							colourCode: material.userData.code,
+							v0: parseVector( lp ),
+							v1: parseVector( lp ),
+							c0: parseVector( lp ),
+							c1: parseVector( lp )
+						};
+
+						conditionalSegments.push( segment );
 
 						break;
 

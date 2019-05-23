@@ -77,27 +77,48 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.RGBELoader().load( 'textures/memorial.hdr', function ( texture, textureData ) {
+				var type = THREE.UnsignedByteType;
+				//var type = THREE.FloatType;
 
-					//console.log( textureData );
-					//console.log( texture );
+				new THREE.RGBELoader()
+					.setType( type )
+					.load( 'textures/memorial.hdr', function ( texture, textureData ) {
 
-					texture.encoding = THREE.RGBEEncoding;
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.flipY = true;
+						switch ( type ) {
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+							case THREE.UnsignedByteType:
 
-					var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+								texture.encoding = THREE.RGBEEncoding;
+								texture.minFilter = THREE.NearestFilter;
+								texture.magFilter = THREE.NearestFilter;
+								break;
 
-					var mesh = new THREE.Mesh( quad, material );
+							case THREE.FloatType:
 
-					scene.add( mesh );
+								texture.encoding = THREE.LinearEncoding;
+								texture.minFilter = THREE.LinearFilter;
+								texture.magFilter = THREE.LinearFilter;
+								break;
 
-					render();
+						}
 
-				} );
+						texture.generateMipmaps = false;
+						texture.flipY = true;
+
+						//console.log( textureData );
+						//console.log( texture );
+
+						var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+						var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+
+						var mesh = new THREE.Mesh( quad, material );
+
+						scene.add( mesh );
+
+						render();
+
+					} );
 
 				//
 

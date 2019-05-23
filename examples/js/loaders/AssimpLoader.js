@@ -773,8 +773,10 @@ THREE.AssimpLoader.prototype = {
 					mesh = new THREE.Mesh( geometry, mat );
 
 				if ( this.mBones.length > 0 ) {
+
 					mesh = new THREE.SkinnedMesh( geometry, mat );
 					mesh.normalizeSkinWeights();
+
 				}
 
 				this.threeNode = mesh;
@@ -1853,7 +1855,7 @@ THREE.AssimpLoader.prototype = {
 
 				} else {
 
-				// else write as usual
+					// else write as usual
 
 					mesh.mTextureCoords[ n ] = [];
 					//note that assbin always writes 3d texcoords
