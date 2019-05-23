@@ -240,8 +240,6 @@
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
 
-				effectFilm.renderToScreen = true;
-
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
@@ -254,12 +252,11 @@
 				SCREEN_HEIGHT = window.innerHeight;
 				SCREEN_WIDTH = window.innerWidth;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				composer.reset();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 

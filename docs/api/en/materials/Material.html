@@ -296,6 +296,13 @@
 		Other options are [page:Materials THREE.VertexColors] and [page:Materials THREE.FaceColors].
 		</p>
 
+		<h3>[property:Boolean vertexTangents]</h3>
+		<p>
+		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		</p>
+
 		<h3>[property:Boolean visible]</h3>
 		<p>
 		Defines whether this material is visible. Default is *true*.
@@ -323,7 +330,7 @@
 		These needs to be disposed by [page:Texture Texture].
 		</p>
 
-		<h3>[method:null onBeforeCompile]( [param:Object shader], [param:WebGLRenderer renderer] )</h3>
+		<h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 		<p>
 		An optional callback that is executed immediately before the shader program is compiled.
 		This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
@@ -335,10 +342,10 @@
 		Sets the properties based on the *values*.
 		</p>
 
-		<h3>[method:null toJSON]( [param:object meta] )</h3>
+		<h3>[method:Object toJSON]( [param:object meta] )</h3>
 		<p>
 		meta -- object containing metadata such as textures or images for the material.<br />
-		Convert the material to three.js JSON format.
+		Convert the material to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
 		</p>
 
 		<h2>Source</h2>

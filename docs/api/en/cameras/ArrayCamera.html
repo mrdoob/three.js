@@ -8,13 +8,13 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:PerspectiveCamera] &rarr;
+		[page:Object3D] &rarr; [page:Camera] &rarr; [page:PerspectiveCamera] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
 			[name] can be used in order to efficiently render a scene with a predefined set of cameras. This is an important performance aspect for rendering VR scenes.<br />
-			An instance of [name] always has an array of sub cameras. It's mandatory to define for each sub camera the *bounds* property which determines the part of the viewport that is rendered with this camera.
+			An instance of [name] always has an array of sub cameras. It's mandatory to define for each sub camera the *viewport* property which determines the part of the viewport that is rendered with this camera.
 		</p>
 
 		<h2>Example</h2>

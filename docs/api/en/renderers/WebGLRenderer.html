@@ -55,7 +55,10 @@
 
 		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
-		See the [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for more information.<br />
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
 		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
@@ -89,6 +92,15 @@
 		<h3>[property:Boolean autoClearStencil]</h3>
 		<p>
 			If [page:.autoClear autoClear] is true, defines whether the renderer should clear the stencil buffer.
+			Default is *true*.
+		</p>
+
+		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<p>
+			If [page:.checkShaderErrors checkShaderErrors] is true, defines whether material shader programs are checked
+			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
+			It is strongly recommended to keep these checks enabled during development.
+			If the shader does not compile and link - it will not work and associated material will not render.
 			Default is *true*.
 		</p>
 
@@ -279,13 +291,6 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Integer allocTextureUnit]</h3>
-		<p>
-		Attempt to allocate a texture unit for use by a shader. Will warn if trying to allocate
-		more texture units than the GPU supports. This is mainly used internally.
-		See [page:WebGLRenderer.capabilities capabilities.maxTextures].
-		</p>
-
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
 		Tells the renderer to clear its color, depth or stencil drawing buffer(s).
@@ -346,39 +351,68 @@
 		<p>Returns an object that describes the attributes set on the WebGL context when it was created.</p>
 
 		<h3>[method:RenderTarget getRenderTarget]()</h3>
-		<p>Returns the current RenderTarget, if any.</p>
+		<p>Returns the current [page:RenderTarget RenderTarget] if there are; returns *null* otherwise.</p>
 
-		<h3>[method:RenderTarget getCurrentViewport]()</h3>
-		<p>Returns the current viewport.</p>
+		<h3>[method:Vector4 getCurrentViewport]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — the result will be copied into this Vector4.<br /><br />
 
-		<h3>[method:Object getDrawingBufferSize]()</h3>
-		<p>Returns an object containing the width and height of the renderer's drawing buffer, in pixels.</p>
+		Returns the current viewport.
+		</p>
+
+		<h3>[method:Vector2 getDrawingBufferSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the width and height of the renderer's drawing buffer, in pixels.
+		</p>
 
 		<h3>[method:number getPixelRatio]()</h3>
 		<p>Returns current device pixel ratio used.</p>
 
-		<h3>[method:Object getSize]()</h3>
-		<p>Returns an object containing the width and height of the renderer's output canvas, in pixels.</p>
+		<h3>[method:Vector4 getScissor]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — the result will be copied into this Vector4.<br /><br />
+
+		Returns the scissor region.
+		</p>
+
+		<h3>[method:Boolean getScissorTest]()</h3>
+		<p>Returns *true* if scissor test is enabled; returns *false* otherwise.</p>
+
+		<h3>[method:Vector2 getSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the width and height of the renderer's output canvas, in pixels.
+		</p>
+
+		<h3>[method:Vector4 getViewport]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — the result will be copied into this Vector4.<br /><br />
+
+		Returns the viewport.
+		</p>
 
 		<h3>[method:null resetGLState]( )</h3>
 		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
 
-		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], buffer )</h3>
-		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().<br />
-		See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
-		</p>
+		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
+		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
+		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
+		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.</p>
+		<p>For reading out a [page:WebGLRenderTargetCube WebGLRenderTargetCube] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera], [param:WebGLRenderTarget renderTarget], [param:Boolean forceClear] )</h3>
+
+		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
 		<p>
 			Render a [page:Scene scene] using a [page:Camera camera].<br />
 
-			The render is done to the [page:WebGLRenderTarget renderTarget] (if specified) or to the canvas as usual.<br />
+			The render is done to a previously specified [page:WebGLRenderTarget renderTarget] set by calling [page:WebGLRenderer.setRenderTarget .setRenderTarget] or to the canvas as usual.<br />
 
-			If [page:Boolean forceClear] is *true*, the depth, stencil and color buffers will be cleared
-			before rendering even if the renderer's [page:WebGLRenderer.autoClear autoClear] property is false.<br />
-
-			Even with forceClear set to true you can prevent certain buffers being cleared by setting
-			either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or [page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false.
+			By default render buffers are cleared before rendering but you can prevent this by setting the property [page:WebGLRenderer.autoClear autoClear] to false.
+			If you want to prevent only certain buffers being cleared you can set either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or
+			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one ore more buffers call [page:WebGLRenderer.clear .clear].
 		</p>
 
 		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
@@ -394,7 +428,7 @@
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
+		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>
@@ -405,15 +439,23 @@
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
 
-		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget] )</h3>
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipMapLevel] )</h3>
 		<p>
-		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated (optional).<br /><br />
-		This method sets the active rendertarget. If the parameter is omitted the canvas is set as the active rendertarget.
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
+		activeMipMapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		This method sets the active rendertarget.
 		</p>
 
-		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
+		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:null setScissor]( [param:Vector4 vector] )</h3>
+
 		<p>
-		Sets the scissor area from (x, y) to (x + width, y + height)
+		The x, y, width, and height parameters of the scissor region.<br />
+		Optionally, a 4-component vector specifying the parameters of the region.<br /><br />
+
+		Sets the scissor region from (x, y) to (x + width, y + height).<br />
+		(x, y) is the lower-left corner of the scissor region.
 		</p>
 
 		<h3>[method:null setScissorTest]( [param:Boolean boolean] )</h3>
@@ -429,28 +471,16 @@
 			Setting [page:Boolean updateStyle] to false prevents any style changes to the output canvas.
 		</p>
 
-		<h3>[method:null setTexture2D]( [param:Texture texture], [param:number slot] )</h3>
+		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:null setViewport]( [param:Vector4 vector] )</h3>
+
 		<p>
-		texture -- The [page:Texture texture] that needs to be set.<br />
-		slot -- The number indicating which slot should be used by the texture.<br /><br />
+		The x, y, width, and height parameters of the viewport.<br />
+		Optionally, a 4-component vector specifying the parameters of a viewport.<br /><br />
 
-		This method sets the correct texture to the correct slot for the WebGL shader.
-		The slot number can be found as a value of the uniform of the sampler.<br /><br />
-
-		Note: This method replaces the older [method:null setTexture] method.
+		Sets the viewport to render from (x, y) to (x + width, y + height).<br />
+		(x, y) is the lower-left corner of the region.
 		</p>
-
-		<h3>[method:null setTextureCube]( [param:CubeTexture cubeTexture], [param:Number slot] )</h3>
-		<p>
-		texture -- The [page:CubeTexture cubeTexture] that needs to be set.<br />
-		slot -- The number indicating which slot should be used by the texture.<br /><br />
-
-		This method sets the correct texture to the correct slot for the WebGL shader.
-		The slot number can be found as a value of the uniform of the sampler.
-		</p>
-
-		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
-		<p>Sets the viewport to render from (x, y) to (x + width, y + height).</p>
 
 		<h2>Source</h2>
 

@@ -162,5 +162,4 @@ var AnimationUtils = {
 
 };
 
-
 export { AnimationUtils };

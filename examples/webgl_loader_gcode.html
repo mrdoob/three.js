@@ -50,8 +50,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
 				camera.position.set( 0, 0, 50 );
 
-				var controls = new THREE.OrbitControls( camera );
-
 				scene = new THREE.Scene();
 
 				var loader = new THREE.GCodeLoader();
@@ -66,6 +64,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', resize, false );
 

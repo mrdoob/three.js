@@ -117,6 +117,9 @@
 
 						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();
 
@@ -149,6 +152,7 @@
 					.load( rgbmUrls, function () {
 
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+						rgbmCubeMap.format = THREE.RGBAFormat;
 
 						var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
 						pmremGenerator.update( renderer );
@@ -157,6 +161,9 @@
 						pmremCubeUVPacker.update( renderer );
 
 						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						rgbmCubeMap.magFilter = THREE.LinearFilter;
+						rgbmCubeMap.needsUpdate = true;
 
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();
@@ -183,9 +190,9 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'metalness', 0, 1 );
-				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
 				gui.add( params, 'debug', false );
 				gui.open();
 

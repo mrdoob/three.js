@@ -81,11 +81,6 @@
 				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 185, 40, 170 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = Math.PI / 2;
-				controls.minDistance = 150;
-				controls.maxDistance = 500;
-
 				// SCENE
 
 				var r = "textures/cube/pisa/";
@@ -119,14 +114,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-
-				container.appendChild( renderer.domElement );
-
-				//
-
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.minDistance = 150;
+				controls.maxDistance = 500;
 
 				// STATS
 

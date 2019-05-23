@@ -36,7 +36,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/geometries/hilbert3D.js"></script>
+		<script src="js/geometries/Hilbert.js"></script>
 
 		<script src="js/WebGL.js"></script>
 
@@ -100,7 +100,7 @@
 				var positions = [];
 				var colors = [];
 
-				var points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var points = THREE.Hilbert.generate3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var spline = new THREE.CatmullRomCurve3( points );
 				var divisions = Math.round( 12 * points.length );
@@ -205,9 +205,9 @@
 
 				renderer.setScissorTest( true );
 
-				renderer.setScissor( 20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight );
+				renderer.setScissor( 20, 20, insetWidth, insetHeight );
 
-				renderer.setViewport( 20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight );
+				renderer.setViewport( 20, 20, insetWidth, insetHeight );
 
 				camera2.position.copy( camera.position );
 				camera2.quaternion.copy( camera.quaternion );

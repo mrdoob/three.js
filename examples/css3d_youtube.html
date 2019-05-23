@@ -76,7 +76,7 @@
 				group.add( new Element( '9ubytEsCaS0', - 240, 0, 0, - Math.PI / 2 ) );
 				scene.add( group );
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 4;
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -73,6 +73,7 @@ import { Skeleton } from './objects/Skeleton.js';
 import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
+import { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { ImageUtils } from './extras/ImageUtils.js';
@@ -1370,42 +1371,36 @@ Object.assign( WebGLRenderer.prototype, {
 		this.clear( color, depth, stencil );
 
 	},
-
 	animate: function ( callback ) {
 
 		console.warn( 'THREE.WebGLRenderer: .animate() is now .setAnimationLoop().' );
 		this.setAnimationLoop( callback );
 
 	},
-
 	getCurrentRenderTarget: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getCurrentRenderTarget() is now .getRenderTarget().' );
 		return this.getRenderTarget();
 
 	},
-
 	getMaxAnisotropy: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getMaxAnisotropy() is now .capabilities.getMaxAnisotropy().' );
 		return this.capabilities.getMaxAnisotropy();
 
 	},
-
 	getPrecision: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .getPrecision() is now .capabilities.precision.' );
 		return this.capabilities.precision;
 
 	},
-
 	resetGLState: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .resetGLState() is now .state.reset().' );
 		return this.state.reset();
 
 	},
-
 	supportsFloatTextures: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .supportsFloatTextures() is now .extensions.get( \'OES_texture_float\' ).' );
@@ -1483,6 +1478,26 @@ Object.assign( WebGLRenderer.prototype, {
 	setFaceCulling: function () {
 
 		console.warn( 'THREE.WebGLRenderer: .setFaceCulling() has been removed.' );
+
+	},
+	allocTextureUnit: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .allocTextureUnit() has been removed.' );
+
+	},
+	setTexture: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setTexture() has been removed.' );
+
+	},
+	setTexture2D: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setTexture2D() has been removed.' );
+
+	},
+	setTextureCube: function () {
+
+		console.warn( 'THREE.WebGLRenderer: .setTextureCube() has been removed.' );
 
 	}
 
@@ -1569,6 +1584,27 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.WebGLRenderer: .shadowMap.renderSingleSided has been removed. Set Material.shadowSide instead.' );
+
+		}
+	}
+
+} );
+
+//
+
+Object.defineProperties( WebGLRenderTargetCube.prototype, {
+
+	activeCubeFace: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
+
+		}
+	},
+	activeMipMapLevel: {
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
 
 		}
 	}
@@ -1849,34 +1885,6 @@ ImageUtils.loadCompressedTextureCube = function () {
 	console.error( 'THREE.ImageUtils.loadCompressedTextureCube has been removed. Use THREE.DDSLoader instead.' );
 
 };
-
-//
-
-export function Projector() {
-
-	console.error( 'THREE.Projector has been moved to /examples/js/renderers/Projector.js.' );
-
-	this.projectVector = function ( vector, camera ) {
-
-		console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
-		vector.project( camera );
-
-	};
-
-	this.unprojectVector = function ( vector, camera ) {
-
-		console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
-		vector.unproject( camera );
-
-	};
-
-	this.pickingRay = function () {
-
-		console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
-
-	};
-
-}
 
 //
 

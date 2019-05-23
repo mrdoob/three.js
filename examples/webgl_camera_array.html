@@ -20,15 +20,17 @@
 
 			var camera, scene, renderer;
 			var mesh;
+			var AMOUNT = 6;
 
 			init();
 			animate();
 
 			function init() {
 
-				var AMOUNT = 6;
-				var SIZE = 1 / AMOUNT;
 				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
+
+				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
 
 				var cameras = [];
 
@@ -37,7 +39,7 @@
 					for ( var x = 0; x < AMOUNT; x ++ ) {
 
 						var subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
-						subcamera.bounds = new THREE.Vector4( x / AMOUNT, y / AMOUNT, SIZE, SIZE );
+						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
 						subcamera.position.z = 1.5;
@@ -93,8 +95,30 @@
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
+				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
+				var HEIGHT = ( window.innerHeight / AMOUNT ) * window.devicePixelRatio;
+
+				camera.aspect = ASPECT_RATIO;
 				camera.updateProjectionMatrix();
+
+				for ( var y = 0; y < AMOUNT; y ++ ) {
+
+					for ( var x = 0; x < AMOUNT; x ++ ) {
+
+						var subcamera = camera.cameras[ AMOUNT * y + x ];
+
+						subcamera.viewport.set(
+							Math.floor( x * WIDTH ),
+							Math.floor( y * HEIGHT ),
+							Math.ceil( WIDTH ),
+							Math.ceil( HEIGHT ) );
+
+						subcamera.aspect = ASPECT_RATIO;
+						subcamera.updateProjectionMatrix();
+
+					}
+				}
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

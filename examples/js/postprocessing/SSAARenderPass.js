@@ -40,11 +40,7 @@ THREE.SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 		depthWrite: false
 	} );
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2	= new THREE.Scene();
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), this.copyMaterial );
-	this.quad2.frustumCulled = false; // Avoid getting clipped
-	this.scene2.add( this.quad2 );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.copyMaterial );
 
 };
 
@@ -100,7 +96,7 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 			if ( this.camera.setViewOffset ) {
 
 				this.camera.setViewOffset( width, height,
-					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
+					jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
 					width, height );
 
 			}
@@ -120,15 +116,20 @@ THREE.SSAARenderPass.prototype = Object.assign( Object.create( THREE.Pass.protot
 
 			this.copyUniforms[ "opacity" ].value = sampleWeight;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
-			renderer.render( this.scene, this.camera, this.sampleRenderTarget, true );
+			renderer.setRenderTarget( this.sampleRenderTarget );
+			renderer.clear();
+			renderer.render( this.scene, this.camera );
+
+			renderer.setRenderTarget( this.renderToScreen ? null : writeBuffer );
 
 			if ( i === 0 ) {
 
 				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.clear();
 
 			}
 
-			renderer.render( this.scene2, this.camera2, this.renderToScreen ? null : writeBuffer, ( i === 0 ) );
+			this.fsQuad.render( renderer );
 
 		}
 

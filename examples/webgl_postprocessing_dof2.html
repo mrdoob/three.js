@@ -332,6 +332,15 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				postprocessing.rtTextureDepth.setSize( window.innerWidth, window.innerHeight );
+				postprocessing.rtTextureColor.setSize( window.innerWidth, window.innerHeight );
+
+				postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
+				postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -507,16 +516,21 @@
 
 					// render scene into texture
 
-					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
+					renderer.setRenderTarget( postprocessing.rtTextureColor );
+					renderer.clear();
+					renderer.render( scene, camera );
 
 					// render depth into texture
 
 					scene.overrideMaterial = materialDepth;
-					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					renderer.setRenderTarget( postprocessing.rtTextureDepth );
+					renderer.clear();
+					renderer.render( scene, camera );
 					scene.overrideMaterial = null;
 
 					// render bokeh composite
 
+					renderer.setRenderTarget( null );
 					renderer.render( postprocessing.scene, postprocessing.camera );
 
 
@@ -524,6 +538,7 @@
 
 					scene.overrideMaterial = null;
 
+					renderer.setRenderTarget( null );
 					renderer.clear();
 					renderer.render( scene, camera );
 
