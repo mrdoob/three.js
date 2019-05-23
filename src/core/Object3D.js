@@ -433,6 +433,38 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	attach: function () {
+
+		// adds object as a child of this, while maintaining the object's world transform
+
+		var m = new Matrix4();
+
+		return function attach( object ) {
+
+			this.updateWorldMatrix( true, false );
+
+			m.getInverse( this.matrixWorld );
+
+			if ( object.parent !== null ) {
+
+				object.parent.updateWorldMatrix( true, false );
+
+				m.multiply( object.parent.matrixWorld );
+
+			}
+
+			object.applyMatrix( m );
+
+			object.updateWorldMatrix( false, false );
+
+			this.add( object );
+
+			return this;
+
+		};
+
+	}(),
+
 	getObjectById: function ( id ) {
 
 		return this.getObjectByProperty( 'id', id );
