@@ -272,15 +272,15 @@
 					color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
 
 					var material = new THREE.MeshBasicMaterial( { color: color } );
-					var box = new THREE.Mesh( geometry, material );
-					box.position.x = Math.random() * 10 - 5;
-					box.position.y = Math.random() * 10 - 5;
-					box.position.z = Math.random() * 10 - 5;
-					box.position.normalize().multiplyScalar( Math.random() * 4.0 + 2.0 );
-					box.scale.setScalar( Math.random() * Math.random() + 0.5 );
-					scene.add( box );
+					var sphere = new THREE.Mesh( geometry, material );
+					sphere.position.x = Math.random() * 10 - 5;
+					sphere.position.y = Math.random() * 10 - 5;
+					sphere.position.z = Math.random() * 10 - 5;
+					sphere.position.normalize().multiplyScalar( Math.random() * 4.0 + 2.0 );
+					sphere.scale.setScalar( Math.random() * Math.random() + 0.5 );
+					scene.add( sphere );
 
-					if ( Math.random() < 0.25 ) box.layers.enable( BLOOM_SCENE );
+					if ( Math.random() < 0.25 ) sphere.layers.enable( BLOOM_SCENE );
 
 				}
 
