@@ -475,7 +475,7 @@ Sidebar.Material = function ( editor ) {
 	// sizeAttenuation
 
 	var materialSizeAttenuationRow = new UI.Row();
-	var materialSizeAttenuation = new UI.Checkbox( false ).onChange( update );
+	var materialSizeAttenuation = new UI.Checkbox( true ).onChange( update );
 
 	materialSizeAttenuationRow.add( new UI.Text( strings.getKey( 'sidebar/material/sizeAttenuation' ) ).setWidth( '90px' ) );
 	materialSizeAttenuationRow.add( materialSizeAttenuation );
@@ -1012,7 +1012,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.sizeAttenuation !== undefined && material.sizeAttenuation != materialSizeAttenuation.getValue() ) {
+			if ( material.sizeAttenuation !== undefined && material.sizeAttenuation !== materialSizeAttenuation.getValue() ) {
 
 				editor.execute( new SetMaterialValueCommand( currentObject, 'sizeAttenuation', materialSizeAttenuation.getValue(), currentMaterialSlot ) );
 
