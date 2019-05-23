@@ -1012,7 +1012,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.sizeAttenuation !== undefined &&  material.sizeAttenuation != materialSizeAttenuation.getValue() ) {
+			if ( material.sizeAttenuation !== undefined && material.sizeAttenuation != materialSizeAttenuation.getValue() ) {
 
 				editor.execute( new SetMaterialValueCommand( currentObject, 'sizeAttenuation', materialSizeAttenuation.getValue(), currentMaterialSlot ) );
 

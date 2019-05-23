@@ -28,26 +28,30 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 			var container2 = new UI.Span().setDisplay( 'inline-block' ).setWidth( '160px' );
 			container.add( container2 );
 
-			if(object.isPoints === true){
+			if ( object.isPoints === true ) {
+
 				container2.add( new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/points' ) ).setWidth( '80px' ) );
 
 				var positions = [];
 				var v = new THREE.Vector3();
 				var attr = geometry.attributes.position;
-				for(var i = 0; i < attr.count; ++i)
-				{
-					v.fromBufferAttribute(attr, i);
-					positions.push(v.clone());
+				for ( var i = 0; i < attr.count; ++ i ) {
+
+					v.fromBufferAttribute( attr, i );
+					positions.push( v.clone() );
+
 				}
 
-				var points = new UI.Points3().setValue(positions).onChange(function(){
+				var points = new UI.Points3().setValue( positions ).onChange( function () {
 
-					editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ]().setFromPoints(points.getValue())));
-				});
+					editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ]().setFromPoints( points.getValue() ) ) );
 
-				container2.add(points);
+				} );
+
+				container2.add( points );
 
 				container2.add( new UI.Break() );
+
 			}
 
 			var index = geometry.index;
