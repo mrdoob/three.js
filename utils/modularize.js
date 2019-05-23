@@ -86,6 +86,7 @@ var files = [
 	{ path: 'postprocessing/ShaderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/SMAAPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'SMAAEdgesShader', path: 'shaders/SMAAShader.js' }, { name: 'SMAAWeightsShader', path: 'shaders/SMAAShader.js' }, { name: 'SMAABlendShader', path: 'shaders/SMAAShader.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/SSAARenderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/TAARenderPass.js', dependencies: [ { name: 'SSAARenderPass', path: 'postprocessing/SSAARenderPass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/TexturePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/UnrealBloomPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'LuminosityHighPassShader', path: 'shaders/LuminosityHighPassShader.js' } ], ignoreList: [] },
 
