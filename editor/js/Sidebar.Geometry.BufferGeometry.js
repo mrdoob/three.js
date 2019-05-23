@@ -22,15 +22,9 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 			container.clear();
 			container.setDisplay( 'block' );
 
-			var text = new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
-			container.add( text );
-
-			var container2 = new UI.Span().setDisplay( 'inline-block' ).setWidth( '160px' );
-			container.add( container2 );
-
 			if ( object.isPoints === true ) {
 
-				container2.add( new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/points' ) ).setWidth( '80px' ) );
+				container.add( new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/points' ) ).setWidth( '80px' ) );
 
 				var positions = [];
 				var v = new THREE.Vector3();
@@ -48,11 +42,17 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 				} );
 
-				container2.add( points );
+				container.add( points );
 
-				container2.add( new UI.Break() );
+				container.add( new UI.Break() );
 
 			}
+
+			var text = new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
+			container.add( text );
+
+			var container2 = new UI.Span().setDisplay( 'inline-block' ).setWidth( '160px' );
+			container.add( container2 );
 
 			var index = geometry.index;
 
