@@ -49,6 +49,7 @@ var Strings = function ( config ) {
 			'menubar/add/torusknot': 'TorusKnot',
 			'menubar/add/lathe': 'Lathe',
 			'menubar/add/sprite': 'Sprite',
+			'menubar/add/points': 'Points',
 			'menubar/add/pointlight': 'PointLight',
 			'menubar/add/spotlight': 'SpotLight',
 			'menubar/add/directionallight': 'DirectionalLight',
@@ -122,6 +123,7 @@ var Strings = function ( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributes',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/points': 'Points',
 
 			'sidebar/geometry/circle_geometry/radius': 'Radius',
 			'sidebar/geometry/circle_geometry/segments': 'Segments',
@@ -257,6 +259,8 @@ var Strings = function ( config ) {
 			'sidebar/material/blending/subtractive': 'Subtractive',
 			'sidebar/material/blending/multiply': 'Multiply',
 			'sidebar/material/blending/custom': 'Custom',
+			'sidebar/material/size': 'Size',
+			'sidebar/material/sizeAttenuation': 'Size Attenuation',
 			'sidebar/material/opacity': 'Opacity',
 			'sidebar/material/transparent': 'Transparent',
 			'sidebar/material/alphatest': 'Alpha Test',

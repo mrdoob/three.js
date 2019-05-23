@@ -310,6 +310,23 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 	*/
+	
+	//
+	options.add( new UI.HorizontalRule() );
+
+	// Points
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/points' ) );
+	option.onClick( function () {
+
+		var points = new THREE.Points(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3()]), new THREE.PointsMaterial());
+		points.name = 'Points';
+
+		editor.execute( new AddObjectCommand( points ) );
+
+	} );
+	options.add( option );
 
 	//
 
