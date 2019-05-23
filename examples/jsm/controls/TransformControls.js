@@ -144,6 +144,7 @@ var TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "mousedown", onPointerDown );
 		domElement.removeEventListener( "touchstart", onPointerDown );
 		domElement.removeEventListener( "mousemove", onPointerHover );
+		document.removeEventListener( "mousemove", onPointerMove );
 		domElement.removeEventListener( "touchmove", onPointerHover );
 		domElement.removeEventListener( "touchmove", onPointerMove );
 		document.removeEventListener( "mouseup", onPointerUp );

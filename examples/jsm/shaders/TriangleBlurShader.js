@@ -10,12 +10,16 @@
  * perpendicular triangle filters.
  */
 
-THREE.TriangleBlurShader = {
+import {
+	Vector2
+} from "../../../build/three.module.js";
+
+var TriangleBlurShader = {
 
 	uniforms: {
 
 		"texture": { value: null },
-		"delta": { value: new THREE.Vector2( 1, 1 ) }
+		"delta": { value: new Vector2( 1, 1 ) }
 
 	},
 
@@ -70,3 +74,5 @@ THREE.TriangleBlurShader = {
 	].join( "\n" )
 
 };
+
+export { TriangleBlurShader };
