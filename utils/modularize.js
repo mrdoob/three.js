@@ -74,6 +74,7 @@ var files = [
 	{ path: 'postprocessing/EffectComposer.js', dependencies: [ { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'MaskPass', path: 'postprocessing/MaskPass.js' }, { name: 'ClearMaskPass', path: 'postprocessing/MaskPass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/FilmPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'FilmShader', path: 'shaders/FilmShader.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/GlitchPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'DigitalGlitch', path: 'shaders/DigitalGlitch.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/HalftonePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'HalftoneShader', path: 'shaders/HalftoneShader.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/MaskPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/RenderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/SavePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
