@@ -5,4 +5,4 @@
 
 ## Build
 
-- Execute `npm run build` (`npm run build-closure` or `npm run build-uglify` for minifying)
+- Execute `npm run build` (`npm run build-closure` to compile using the [Google Closure Compiler](https://developers.google.com/closure/compiler/))
