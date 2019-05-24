@@ -30,6 +30,7 @@ var files = [
 
 	{ path: 'effects/AnaglyphEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/AsciiEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/OutlineEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/ParallaxBarrierEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/PeppersGhostEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/StereoEffect.js', dependencies: [], ignoreList: [] },
