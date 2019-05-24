@@ -2,7 +2,11 @@
  * @author daron1337 / http://daron1337.github.io/
  */
 
-THREE.Lut = function ( colormap, numberofcolors ) {
+import {
+	Color
+} from "../../../build/three.module.js";
+
+var Lut = function ( colormap, numberofcolors ) {
 
 	this.lut = [];
 	this.setColorMap( colormap, numberofcolors );
@@ -10,15 +14,15 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 };
 
-THREE.Lut.prototype = {
+Lut.prototype = {
 
-	constructor: THREE.Lut,
+	constructor: Lut,
 
 	lut: [], map: [], n: 256, minV: 0, maxV: 1,
 
 	set: function ( value ) {
 
-		if ( value instanceof THREE.Lut ) {
+		if ( value instanceof Lut ) {
 
 			this.copy( value );
 
@@ -46,7 +50,7 @@ THREE.Lut.prototype = {
 
 	setColorMap: function ( colormap, numberofcolors ) {
 
-		this.map = THREE.ColorMapKeywords[ colormap ] || THREE.ColorMapKeywords.rainbow;
+		this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
 		this.n = numberofcolors || 32;
 
 		var step = 1.0 / this.n;
@@ -61,8 +65,8 @@ THREE.Lut.prototype = {
 					var min = this.map[ j ][ 0 ];
 					var max = this.map[ j + 1 ][ 0 ];
 
-					var minColor = new THREE.Color( this.map[ j ][ 1 ] );
-					var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
+					var minColor = new Color( this.map[ j ][ 1 ] );
+					var maxColor = new Color( this.map[ j + 1 ][ 1 ] );
 
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
@@ -113,7 +117,7 @@ THREE.Lut.prototype = {
 
 	addColorMap: function ( colormapName, arrayOfColors ) {
 
-		THREE.ColorMapKeywords[ colormapName ] = arrayOfColors;
+		ColorMapKeywords[ colormapName ] = arrayOfColors;
 
 	},
 
@@ -150,8 +154,8 @@ THREE.Lut.prototype = {
 					var min = this.map[ j - 1 ][ 0 ];
 					var max = this.map[ j ][ 0 ];
 
-					var minColor = new THREE.Color( this.map[ j - 1 ][ 1 ] );
-					var maxColor = new THREE.Color( this.map[ j ][ 1 ] );
+					var minColor = new Color( this.map[ j - 1 ][ 1 ] );
+					var maxColor = new Color( this.map[ j ][ 1 ] );
 
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
@@ -175,7 +179,7 @@ THREE.Lut.prototype = {
 	}
 };
 
-THREE.ColorMapKeywords = {
+var ColorMapKeywords = {
 
 	"rainbow": [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
 	"cooltowarm": [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],
@@ -183,3 +187,5 @@ THREE.ColorMapKeywords = {
 	"grayscale": [[ 0.0, 0x000000 ], [ 0.2, 0x404040 ], [ 0.5, 0x7F7F80 ], [ 0.8, 0xBFBFBF ], [ 1.0, 0xFFFFFF ]]
 
 };
+
+export { Lut, ColorMapKeywords };

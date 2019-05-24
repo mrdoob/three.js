@@ -68,6 +68,9 @@ var files = [
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
