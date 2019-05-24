@@ -38,17 +38,13 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple views using multiview extension - by <a href="https://twitter.com/fernandojsg">fernandojsg</a><br/>
-			<span id="options"></span>
-		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script>
 
-			var container, clock, stats;
+			var container, clock, stats, ms;
 			var camera, scene, renderer, panel, balls;
 			var radius = 0.08;
 			var AMOUNT = 2;
@@ -66,18 +62,10 @@
 
 			function init() {
 
-				const urlParams = new URLSearchParams(window.location.search);
-
 				container = document.getElementById('container');
 
-				var options = document.getElementById('options');
-				options.innerHTML =`Number of balls:
-						${addNumLink(200)}
-						${addNumLink(500)}
-						${addNumLink(1000)}
-						${addNumLink(2500)}
-						${addNumLink(5000)}`;
-
+				const urlParams = new URLSearchParams(window.location.search);
+				const multiview = urlParams.has('enableMultiview');
 
 				var ASPECT_RATIO = window.innerWidth / window.innerHeight;
 				var WIDTH = ( window.innerWidth / AMOUNT ) * window.devicePixelRatio;
@@ -191,14 +179,40 @@
 
         var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2', { antialias: false } );
-				renderer = new THREE.WebGLRenderer( { context: context, canvas: canvas, antialias: true, multiview: true } );
+				renderer = new THREE.WebGLRenderer( { context: context, canvas: canvas, antialias: true, multiview: multiview } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				container.appendChild( renderer.domElement );
 
+				console.log(renderer.multiview);
 				//
+
+				function colorize( value ) {
+					return value ? '<b style="color:#3f3">true</b>' : '<b style="color:#f33">false</b>';
+				}
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				container.appendChild(info);
+
+				info.innerHTML = `<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple views using multiview extension - by <a href="https://twitter.com/fernandojsg">fernandojsg</a><br/>`;
+				info.innerHTML += 'enabled: ' + colorize( renderer.multiview.isEnabled() ) + ` <a href="?num=${ numObjects }&${ multiview ? '' : 'enableMultiview' }">toggle</a>`
+					+ `<br/>available: ${ colorize( renderer.multiview.isAvailable() ) }<br/>Number of balls:
+						${addNumLink(200)}
+						${addNumLink(500)}
+						${addNumLink(1000)}
+						${addNumLink(2500)}
+						${addNumLink(5000)}
+					<br/><br/>`;
+
+				ms = document.createElement('div');
+				ms.innerHTML = '';
+				info.appendChild(ms);
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -293,7 +307,11 @@
 				//
 
 				var t = performance.now();
+
 				renderer.render( scene, camera );
+
+				var trender = performance.now() - t;
+				ms.innerHTML = `renderer.render time: ${ trender.toFixed( 2 ) }ms`;
 
 				panel.update(performance.now() - t, 460);
 
