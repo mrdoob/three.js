@@ -36,7 +36,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/geometries/Hilbert.js"></script>
+		<script src="js/utils/GeometryUtils.js"></script>
 
 		<script src="js/WebGL.js"></script>
 
@@ -100,7 +100,7 @@
 				var positions = [];
 				var colors = [];
 
-				var points = THREE.Hilbert.generate3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var points = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var spline = new THREE.CatmullRomCurve3( points );
 				var divisions = Math.round( 12 * points.length );
