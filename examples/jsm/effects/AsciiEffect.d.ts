@@ -17,7 +17,6 @@ export class AsciiEffect {
   constructor(renderer: WebGLRenderer, charSet?: string, options?: AsciiEffectOptions);
   domElement: HTMLElement;
 
-  dispose(): void;
   render(scene: Scene, camera: Camera): void;
   setSize(width: number, height: number): void;
 }
