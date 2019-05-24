@@ -26,7 +26,7 @@ function HemisphereLightHelper( light, size, color ) {
 	this.color = color;
 
 	var geometry = new OctahedronBufferGeometry( size );
-	geometry.rotateY( Math.PI * 0.5 );
+	geometry.rotateZ( Math.PI * 0.5 );
 
 	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
@@ -85,8 +85,6 @@ HemisphereLightHelper.prototype.update = function () {
 			colors.needsUpdate = true;
 
 		}
-
-		mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	};
 

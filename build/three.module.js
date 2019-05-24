@@ -18337,6 +18337,7 @@ function WebGLLights() {
 	var vector3 = new Vector3();
 	var matrix4 = new Matrix4();
 	var matrix42 = new Matrix4();
+	var quaternion = new Quaternion();
 
 	function setup( lights, shadows, camera ) {
 
@@ -18508,7 +18509,7 @@ function WebGLLights() {
 
 				var uniforms = cache.get( light );
 
-				uniforms.direction.set(0, 1, 0).applyQuaternion(light.getWorldQuaternion());
+				uniforms.direction.set(0, 1, 0).applyQuaternion(light.getWorldQuaternion(quaternion));
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.direction.normalize();
 
@@ -45572,7 +45573,7 @@ function HemisphereLightHelper( light, size, color ) {
 	this.color = color;
 
 	var geometry = new OctahedronBufferGeometry( size );
-	geometry.rotateY( Math.PI * 0.5 );
+	geometry.rotateZ( Math.PI * 0.5 );
 
 	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
 	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
@@ -45599,8 +45600,6 @@ HemisphereLightHelper.prototype.dispose = function () {
 };
 
 HemisphereLightHelper.prototype.update = function () {
-
-	var vector = new Vector3();
 
 	var color1 = new Color();
 	var color2 = new Color();
@@ -45631,8 +45630,6 @@ HemisphereLightHelper.prototype.update = function () {
 			colors.needsUpdate = true;
 
 		}
-
-		mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	};
 

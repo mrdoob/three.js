@@ -6,6 +6,7 @@ import { Color } from '../../math/Color.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { Quaternion } from '../../math/Quaternion.js';
 
 function UniformsCache() {
 
@@ -141,6 +142,7 @@ function WebGLLights() {
 	var vector3 = new Vector3();
 	var matrix4 = new Matrix4();
 	var matrix42 = new Matrix4();
+	var quaternion = new Quaternion();
 
 	function setup( lights, shadows, camera ) {
 
@@ -312,7 +314,7 @@ function WebGLLights() {
 
 				var uniforms = cache.get( light );
 
-				uniforms.direction.set(0, 1, 0).applyQuaternion(light.getWorldQuaternion());
+				uniforms.direction.set(0, 1, 0).applyQuaternion(light.getWorldQuaternion(quaternion));
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.direction.normalize();
 
