@@ -236,7 +236,7 @@ use promises.
 
 It's too big a topic to go into here but you can [read up
 on promises here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises)
-and [async/await here]().
+and [async/await here](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await).
 
 ### Use Template Literals
 
