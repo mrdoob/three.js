@@ -7,7 +7,7 @@
  *
  * 1. Traditional
  *
- * var effect = new THREE.OutlineEffect( renderer );
+ * var effect = new OutlineEffect( renderer );
  *
  * function render() {
  *
@@ -17,7 +17,7 @@
  *
  * 2. VR compatible
  *
- * var effect = new THREE.OutlineEffect( renderer );
+ * var effect = new OutlineEffect( renderer );
  * var renderingOutline = false;
  *
  * scene.onAfterRender = function () {
@@ -39,7 +39,7 @@
  * }
  *
  * // How to set default outline parameters
- * new THREE.OutlineEffect( renderer, {
+ * new OutlineEffect( renderer, {
  * 	defaultThickness: 0.01,
  * 	defaultColor: [ 0, 0, 0 ],
  * 	defaultAlpha: 0.8,
@@ -59,14 +59,21 @@
  *  - support shader material without objectNormal in its vertexShader
  */
 
-THREE.OutlineEffect = function ( renderer, parameters ) {
+import {
+	BackSide,
+	Color,
+	ShaderLib,
+	ShaderMaterial
+} from "../../../build/three.module.js";
+
+var OutlineEffect = function ( renderer, parameters ) {
 
 	parameters = parameters || {};
 
 	this.enabled = true;
 
 	var defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
-	var defaultColor = new THREE.Color().fromArray( parameters.defaultColor !== undefined ? parameters.defaultColor : [ 0, 0, 0 ] );
+	var defaultColor = new Color().fromArray( parameters.defaultColor !== undefined ? parameters.defaultColor : [ 0, 0, 0 ] );
 	var defaultAlpha = parameters.defaultAlpha !== undefined ? parameters.defaultAlpha : 1.0;
 	var defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false;
 
@@ -165,7 +172,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	function createInvisibleMaterial() {
 
-		return new THREE.ShaderMaterial( { name: 'invisible', visible: false } );
+		return new ShaderMaterial( { name: 'invisible', visible: false } );
 
 	}
 
@@ -176,7 +183,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		if ( shaderID !== undefined ) {
 
-			var shader = THREE.ShaderLib[ shaderID ];
+			var shader = ShaderLib[ shaderID ];
 			originalUniforms = shader.uniforms;
 			originalVertexShader = shader.vertexShader;
 
@@ -224,12 +231,12 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		if ( ! /vec3\s+transformed\s*=/.test( originalVertexShader ) &&
 		     ! /#include\s+<begin_vertex>/.test( originalVertexShader ) ) defines.DECLARE_TRANSFORMED = true;
 
-		return new THREE.ShaderMaterial( {
+		return new ShaderMaterial( {
 			defines: defines,
 			uniforms: uniforms,
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
-			side: THREE.BackSide,
+			side: BackSide,
 			//wireframe: true,
 			skinning: false,
 			morphTargets: false,
@@ -506,9 +513,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	 * See #9918
 	 *
 	 * The following property copies and wrapper methods enable
-	 * THREE.OutlineEffect to be called from other *Effect, like
+	 * OutlineEffect to be called from other *Effect, like
 	 *
-	 * effect = new THREE.StereoEffect( new THREE.OutlineEffect( renderer ) );
+	 * effect = new StereoEffect( new OutlineEffect( renderer ) );
 	 *
 	 * function render () {
 	 *
@@ -575,3 +582,5 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	};
 
 };
+
+export { OutlineEffect };
