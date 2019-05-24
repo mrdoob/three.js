@@ -66,6 +66,11 @@ var files = [
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Refractor.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/ReflectorRTT.js', dependencies: [ { name: 'Reflector', path: 'objects/Reflector.js' } ], ignoreList: [] },
+	{ path: 'objects/ShadowMesh.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Sky.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Water.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Water2.js', dependencies: [ { name: 'Reflector', path: 'objects/Reflector.js' }, { name: 'Refractor', path: 'objects/Refractor.js' } ], ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
