@@ -29,6 +29,7 @@ var files = [
 	{ path: 'curves/NURBSUtils.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'effects/AnaglyphEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/AsciiEffect.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', dependencies: [], ignoreList: [] },
