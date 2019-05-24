@@ -66,6 +66,7 @@ var files = [
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Refractor.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Sky.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
