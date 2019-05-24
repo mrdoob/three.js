@@ -18508,7 +18508,7 @@ function WebGLLights() {
 
 				var uniforms = cache.get( light );
 
-				uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+				uniforms.direction.set(0, 1, 0).applyQuaternion(light.getWorldQuaternion());
 				uniforms.direction.transformDirection( viewMatrix );
 				uniforms.direction.normalize();
 
