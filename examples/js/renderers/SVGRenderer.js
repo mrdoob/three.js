@@ -57,6 +57,8 @@ THREE.SVGRenderer = function () {
 	this.sortObjects = true;
 	this.sortElements = true;
 
+	this.overdraw = 0.5;
+
 	this.info = {
 
 		render: {
