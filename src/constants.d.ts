@@ -238,3 +238,25 @@ export const RGBADepthPacking: DepthPackingStrategies;
 export enum NormalMapTypes {}
 export const TangentSpaceNormalMap: NormalMapTypes;
 export const ObjectSpaceNormalMap: NormalMapTypes;
+
+// Stencil Op types
+export enum StencilOp {}
+export const ZeroStencilOp: StencilOp;
+export const KeepStencilOp: StencilOp;
+export const ReplaceStencilOp: StencilOp;
+export const IncrementStencilOp: StencilOp;
+export const DecrementStencilOp: StencilOp;
+export const IncrementWrapStencilOp: StencilOp;
+export const DecrementWrapStencilOp: StencilOp;
+export const InvertStencilOp: StencilOp;
+
+// Stencil Func types
+export enum StencilFunc {}
+export const NeverStencilFunc: number;
+export const LessStencilFunc: number;
+export const EqualStencilFunc: number;
+export const LessEqualStencilFunc: number;
+export const GreaterStencilFunc: number;
+export const NotEqualStencilFunc: number;
+export const GreaterEqualStencilFunc: number;
+export const AlwaysStencilFunc: number;

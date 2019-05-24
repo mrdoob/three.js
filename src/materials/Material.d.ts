@@ -10,6 +10,8 @@ import {
   DepthModes,
   Side,
   Colors,
+  StencilFunc,
+  StencilOp
 } from '../constants';
 
 // Materials //////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +51,13 @@ export interface MaterialParameters {
   vertexColors?: Colors;
   vertexTangents?: boolean;
   visible?: boolean;
+  stencilWrite?: boolean;
+  stencilFunc?: StencilFunc;
+  stencilRef?: number;
+  stencilMask?: number;
+  stencilFail?: StencilOp;
+  stencilZFail?: StencilOp;
+  stencilZPass?: StencilOp;
 }
 
 /**
@@ -142,6 +151,41 @@ export class Material extends EventDispatcher {
    * Unique number of this material instance.
    */
   id: number;
+
+  /**
+   * Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+   */
+  stencilWrite: boolean;
+
+  /**
+   * The stencil comparison function to use. Default is {@link AlwaysStencilFunc}. See stencil operation constants for all possible values.
+   */
+  stencilFunc: StencilFunc;
+
+  /**
+   * The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+   */
+  stencilRef: number;
+
+  /**
+   * The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+   */
+  stencilMask: number;
+
+  /**
+   * Which stencil operation to perform when the comparison function returns false. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+   */
+  stencilFail: StencilOp;
+
+  /**
+   * Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+   */
+  stencilZFail: StencilOp;
+
+  /**
+   * Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+   */
+  stencilZPass: StencilOp;
 
   /**
    * Used to check whether this or derived classes are materials. Default is true.
