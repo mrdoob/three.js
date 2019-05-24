@@ -714,6 +714,8 @@ function WebGLRenderer( parameters ) {
 
 		var program = setProgram( camera, fog, material, object );
 
+		if ( ! program.ready ) return;
+
 		var updateBuffers = false;
 
 		if ( _currentGeometryProgram.geometry !== geometry.id ||
@@ -1417,6 +1419,8 @@ function WebGLRenderer( parameters ) {
 
 			var program = setProgram( camera, scene.fog, material, object );
 
+			if ( ! program.ready ) return;
+
 			_currentGeometryProgram.geometry = null;
 			_currentGeometryProgram.program = null;
 			_currentGeometryProgram.wireframe = false;
@@ -1462,13 +1466,14 @@ function WebGLRenderer( parameters ) {
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
 
-		} else if ( lightsHash.stateID !== lightsStateHash.stateID ||
+		} else if ( program.ready && (
+			lightsHash.stateID !== lightsStateHash.stateID ||
 			lightsHash.directionalLength !== lightsStateHash.directionalLength ||
 			lightsHash.pointLength !== lightsStateHash.pointLength ||
 			lightsHash.spotLength !== lightsStateHash.spotLength ||
 			lightsHash.rectAreaLength !== lightsStateHash.rectAreaLength ||
 			lightsHash.hemiLength !== lightsStateHash.hemiLength ||
-			lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) {
+			lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) ) {
 
 			lightsHash.stateID = lightsStateHash.stateID;
 			lightsHash.directionalLength = lightsStateHash.directionalLength;
@@ -1480,7 +1485,7 @@ function WebGLRenderer( parameters ) {
 
 			programChange = false;
 
-		} else if ( parameters.shaderID !== undefined ) {
+		} else if ( program.ready && parameters.shaderID !== undefined ) {
 
 			// same glsl and uniform list
 			return;
@@ -1525,6 +1530,13 @@ function WebGLRenderer( parameters ) {
 
 			materialProperties.program = program;
 			material.program = program;
+
+		}
+
+		if (! program.ready && ! program.isLinked( _this, material ) ) {
+
+			materialProperties.lightsHash = {};
+			return;
 
 		}
 
@@ -1691,8 +1703,11 @@ function WebGLRenderer( parameters ) {
 		var refreshMaterial = false;
 		var refreshLights = false;
 
-		var program = materialProperties.program,
-			p_uniforms = program.getUniforms(),
+		var program = materialProperties.program;
+
+		if ( ! program.ready ) return false;
+
+		var	p_uniforms = program.getUniforms(),
 			m_uniforms = materialProperties.shader.uniforms;
 
 		if ( state.useProgram( program.program ) ) {
