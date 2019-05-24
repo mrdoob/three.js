@@ -82,16 +82,16 @@ funciton *closes* over the variable `foo`. Here's [more info](https://developer.
 ## Understand how `this` works
 
 `this` is not magic. It's effectively a variable that is automatically passed to functions just like
-an argument is passed to function. The simple explaintion is when you call a function directly
+an argument is passed to function. The simple explanation is when you call a function directly
 like
 
     somefunction(a, b, c);
 
-This will be `null` where as when you call a function via the dot operator `.` like this
+`this` will be `null` (when in strict mode) where as when you call a function via the dot operator `.` like this
 
     someobject.somefunction(a, b, c);
 
-This will be set to `someobject`.
+`this` will be set to `someobject`.
 
 The parts where people get confused is with callbacks.
 
@@ -107,7 +107,7 @@ tell JavaScript that by binding it to the function.
      const callback = someobject.somefunction.bind(someobject);
      loader.load(callback);
 
-[*this* article might help](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this).
+[*this* article might help explain `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this).
 
 ## ES5/ES6/ES7 stuff
 
