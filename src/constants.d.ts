@@ -252,11 +252,11 @@ export const InvertStencilOp: StencilOp;
 
 // Stencil Func types
 export enum StencilFunc {}
-export const NeverStencilFunc: number;
-export const LessStencilFunc: number;
-export const EqualStencilFunc: number;
-export const LessEqualStencilFunc: number;
-export const GreaterStencilFunc: number;
-export const NotEqualStencilFunc: number;
-export const GreaterEqualStencilFunc: number;
-export const AlwaysStencilFunc: number;
+export const NeverStencilFunc: StencilFunc;
+export const LessStencilFunc: StencilFunc;
+export const EqualStencilFunc: StencilFunc;
+export const LessEqualStencilFunc: StencilFunc;
+export const GreaterStencilFunc: StencilFunc;
+export const NotEqualStencilFunc: StencilFunc;
+export const GreaterEqualStencilFunc: StencilFunc;
+export const AlwaysStencilFunc: StencilFunc;
