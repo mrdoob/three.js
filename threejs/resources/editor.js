@@ -1,9 +1,17 @@
-(function() {  // eslint-disable-line
-'use strict';  // eslint-disable-line
+(function() {  // eslint-disable-line strict
+'use strict';  // eslint-disable-line strict
 
-/* global monaco, require */
+/* global monaco, require, lessonEditorSettings */
 
-const lessonHelperScriptRE = /<script src="[^"]+threejs-lessons-helper\.js"><\/script>/;
+const {
+  fixSourceLinks,
+  fixJSForCodeSite,
+  extraHTMLParsing,
+  runOnResize,
+  lessonSettings,
+} = lessonEditorSettings;
+
+const lessonHelperScriptRE = /<script src="[^"]+lessons-helper\.js"><\/script>/;
 
 function getQuery(s) {
   s = s === undefined ? window.location.search : s;
@@ -24,80 +32,20 @@ function getSearch(url) {
   return s < 0 ? {} : getQuery(url.substring(s));
 }
 
-const getFQUrl = (function() {
-  const a = document.createElement('a');
-  return function getFQUrl(url) {
-    a.href = url;
-    return a.href;
-  };
-}());
+function getFQUrl(path, baseUrl) {
+  const url = new URL(path, baseUrl || window.location.href);
+  return url.href;
+}
 
-function getHTML(url, callback) {
-  const req = new XMLHttpRequest();
-  req.open('GET', url, true);
-  req.addEventListener('load', function() {
-    const success = req.status === 200 || req.status === 0;
-    callback(success ? null : 'could not load: ' + url, req.responseText);
-  });
-  req.addEventListener('timeout', function() {
-    callback('timeout get: ' + url);
-  });
-  req.addEventListener('error', function() {
-    callback('error getting: ' + url);
-  });
-  req.send('');
+async function getHTML(url) {
+  const req = await fetch(url);
+  return await req.text();
 }
 
 function getPrefix(url) {
-  const u = new URL(window.location.origin + url);
+  const u = new URL(url, window.location.href);
   const prefix = u.origin + dirname(u.pathname);
   return prefix;
-}
-
-function fixSourceLinks(url, source) {
-  const srcRE = /(src=)"(.*?)"/g;
-  const linkRE = /(href=)"(.*?)"/g;
-  const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
-  const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
-  const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
-  const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
-  const threejsfundamentalsUrlRE = /(.*?)('|")(.*?)('|")(.*?)(\/\*\s+threejsfundamentals:\s+url\s+\*\/)/ig;
-  const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
-  const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
-  const prefix = getPrefix(url);
-
-  function addPrefix(url) {
-    return url.indexOf('://') < 0 && url[0] !== '?' ? (prefix + url) : url;
-  }
-  function makeLinkFQed(match, p1, url) {
-    return p1 + '"' + addPrefix(url) + '"';
-  }
-  function makeLinkFDedQuotes(match, fn, q1, url, q2) {
-    return fn + q1 + addPrefix(url) + q2;
-  }
-  function makeTaggedFDedQuotes(match, start, q1, url, q2, suffix) {
-    return start + q1 + addPrefix(url) + q2 + suffix;
-  }
-  function makeArrayLinksFDed(match, prefix, arrayStr, suffix) {
-    const lines = arrayStr.split(',').map((line) => {
-      const m = arrayLineRE.exec(line);
-      return m
-          ? `${m[1]}${addPrefix(m[2])}${m[3]}`
-          : line;
-    });
-    return `${prefix}${lines.join(',')}${suffix}`;
-  }
-
-  source = source.replace(srcRE, makeLinkFQed);
-  source = source.replace(linkRE, makeLinkFQed);
-  source = source.replace(imageSrcRE, makeLinkFQed);
-  source = source.replace(urlPropRE, makeLinkFDedQuotes);
-  source = source.replace(loadFileRE, makeLinkFDedQuotes);
-  source = source.replace(loaderLoadRE, makeLinkFDedQuotes);
-  source = source.replace(loaderArrayLoadRE, makeArrayLinksFDed);
-  source = source.replace(threejsfundamentalsUrlRE, makeTaggedFDedQuotes);
-
-  return source;
 }
 
 function fixCSSLinks(url, source) {
@@ -115,19 +63,59 @@ function fixCSSLinks(url, source) {
   return source;
 }
 
+/**
+ * @typedef {Object} Globals
+ * @property {SourceInfo} rootScriptInfo
+ * @property {Object<string, SourceInfo} scriptInfos
+ */
+
+/** @type {Globals} */
 const g = {
   html: '',
 };
 
+/**
+ * This is what's in the sources array
+ * @typedef {Object} SourceInfo
+ * @property {string} source The source text (html, css, js)
+ * @property {string} name The filename or "main page"
+ * @property {ScriptInfo} scriptInfo The associated ScriptInfo
+ * @property {string} fqURL ??
+ * @property {Editor} editor in instance of Monaco editor
+ *
+ */
+
+/**
+ * @typedef {Object} EditorInfo
+ * @property {HTMLElement} div The div holding the monaco editor
+ * @property {Editor} editor an instance of a monaco editor
+ */
+
+/**
+ * What's under each language
+ * @typedef {Object} HTMLPart
+ * @property {string} language Name of language
+ * @property {SourceInfo} sources array of SourceInfos. Usually 1 for HTML, 1 for CSS, N for JS
+ * @property {HTMLElement} pane the pane for these editors
+ * @property {HTMLElement} code the div holding the files
+ * @property {HTMLElement} files the div holding the divs holding the monaco editors
+ * @property {HTMLElement} button the element to click to show this pane
+ * @property {EditorInfo} editors
+ */
+
+/** @type {Object<string, HTMLPart>} */
 const htmlParts = {
   js: {
     language: 'javascript',
+    sources: [],
   },
   css: {
     language: 'css',
+    sources: [],
   },
   html: {
     language: 'html',
+    sources: [],
   },
 };
 
@@ -138,7 +126,6 @@ function forEachHTMLPart(fn) {
   });
 }
 
-
 function getHTMLPart(re, obj, tag) {
   let part = '';
   obj.html = obj.html.replace(re, function(p0, p1) {
@@ -148,7 +135,86 @@ function getHTMLPart(re, obj, tag) {
   return part.replace(/\s*/, '');
 }
 
-function parseHTML(url, html) {
+// doesn't handle multi-line comments or comments with { or } in them
+function formatCSS(css) {
+  let indent = '';
+  return css.split('\n').map((line) => {
+    let currIndent = indent;
+    if (line.includes('{')) {
+      indent = indent + '  ';
+    } else if (line.includes('}')) {
+      indent = indent.substring(0, indent.length - 2);
+      currIndent = indent;
+    }
+    return `${currIndent}${line.trim()}`;
+  }).join('\n');
+}
+
+async function getScript(url, scriptInfos) {
+  // check it's an example script, not some other lib
+  if (!scriptInfos[url].source) {
+    const source = await getHTML(url);
+    const fixedSource = fixSourceLinks(url, source);
+    const {text} = await getWorkerScripts(fixedSource, url, scriptInfos);
+    scriptInfos[url].source = text;
+  }
+}
+
+/**
+ * @typedef {Object} ScriptInfo
+ * @property {string} fqURL The original fully qualified URL
+ * @property {ScriptInfo[]} deps Array of other ScriptInfos this is script dependant on
+ * @property {boolean} isWorker True if this script came from `new Worker('someurl')` vs `import` or `importScripts`
+ * @property {string} blobUrl The blobUrl for this script if one has been made
+ * @property {number} blobGenerationId Used to not visit things twice while recursing.
+ * @property {string} source The source as extracted. Updated from editor by getSourcesFromEditor
+ * @property {string} munged The source after urls have been replaced with blob urls etc... (the text send to new Blob)
+ */
+
+async function getWorkerScripts(text, baseUrl, scriptInfos = {}) {
+  const parentScriptInfo = scriptInfos[baseUrl];
+  const workerRE = /(new\s+Worker\s*\(\s*)('|")(.*?)('|")/g;
+  const importScriptsRE = /(importScripts\s*\(\s*)('|")(.*?)('|")/g;
+
+  const newScripts = [];
+  const slashRE = /\/threejs\/[^/]+$/;
+
+  function replaceWithUUID(match, prefix, quote, url) {
+    const fqURL = getFQUrl(url, baseUrl);
+    if (!slashRE.test(fqURL)) {
+      return match.toString();
+    }
+
+    if (!scriptInfos[url]) {
+      scriptInfos[fqURL] = {
+        fqURL,
+        deps: [],
+        isWorker: prefix.indexOf('Worker') >= 0,
+      };
+      newScripts.push(fqURL);
+    }
+    parentScriptInfo.deps.push(scriptInfos[fqURL]);
+
+    return `${prefix}${quote}${fqURL}${quote}`;
+  }
+
+  text = text.replace(workerRE, replaceWithUUID);
+  text = text.replace(importScriptsRE, replaceWithUUID);
+
+  await Promise.all(newScripts.map((url) => {
+    return getScript(url, scriptInfos);
+  }));
+
+  return {text, scriptInfos};
+}
+
+// hack: scriptInfo is undefined for html and css
+// should try to include html and css in scriptInfos
+function addSource(type, name, source, scriptInfo) {
+  htmlParts[type].sources.push({source, name, scriptInfo});
+}
+
+async function parseHTML(url, html) {
   html = fixSourceLinks(url, html);
 
   html = html.replace(/<div class="description">[^]*?<\/div>/, '');
@@ -164,32 +230,49 @@ function parseHTML(url, html) {
   const hrefRE = /href="([^"]+)"/;
 
   const obj = { html: html };
-  htmlParts.css.source = fixCSSLinks(url, getHTMLPart(styleRE, obj, '<style>\n${css}</style>'));
-  htmlParts.html.source = getHTMLPart(bodyRE, obj, '<body>${html}</body>');
-  htmlParts.js.source = getHTMLPart(inlineScriptRE, obj, '<script>${js}</script>');
+  addSource('css', 'css', formatCSS(fixCSSLinks(url, getHTMLPart(styleRE, obj, '<style>\n${css}</style>'))));
+  addSource('html', 'html', getHTMLPart(bodyRE, obj, '<body>${html}</body>'));
+  const rootScript = getHTMLPart(inlineScriptRE, obj, '<script>${js}</script>');
   html = obj.html;
+
+  const fqURL = getFQUrl(url);
+  /** @type Object<string, SourceInfo> */
+  const scriptInfos = {};
+  g.rootScriptInfo = {
+    fqURL,
+    deps: [],
+    source: rootScript,
+  };
+  scriptInfos[fqURL] = g.rootScriptInfo;
+
+  const {text} = await getWorkerScripts(rootScript, fqURL, scriptInfos);
+  g.rootScriptInfo.source = text;
+  g.scriptInfos = scriptInfos;
+  for (const [fqURL, scriptInfo] of Object.entries(scriptInfos)) {
+    addSource('js', basename(fqURL), scriptInfo.source, scriptInfo);
+  }
 
   const tm = titleRE.exec(html);
   if (tm) {
     g.title = tm[1];
   }
 
-  let scripts = '';
+  const scripts = [];
   html = html.replace(externalScriptRE, function(p0, p1, p2) {
     p1 = p1 || '';
-    scripts += '\n' + p1 + '<script src="' + p2 + '"></script>';
+    scripts.push(`${p1}<script src="${p2}"></script>`);
     return '';
   });
 
-  let dataScripts = '';
+  const dataScripts = [];
   html = html.replace(dataScriptRE, function(p0, p1, p2, p3) {
     p1 = p1 || '';
-    dataScripts += '\n' + p1 + '<script ' + p2 + '>' + p3 + '</script>';
+    dataScripts.push(`${p1}<script ${p2}>${p3}</script>`);
     return '';
   });
 
-  htmlParts.html.source += dataScripts;
-  htmlParts.html.source += scripts + '\n';
+  htmlParts.html.sources[0].source += dataScripts.join('\n');
+  htmlParts.html.sources[0].source += scripts.join('\n');
 
   // add style section if there is non
   if (html.indexOf('${css}') < 0) {
@@ -200,6 +283,8 @@ function parseHTML(url, html) {
   // We need a way to pass parameters to a blob. Normally they'd be passed as
   // query params but that only works in Firefox >:(
   html = html.replace('</head>', '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>');
+
+  html = extraHTMLParsing(html, htmlParts);
 
   let links = '';
   html = html.replace(cssLinkRE, function(p0, p1) {
@@ -214,7 +299,7 @@ function parseHTML(url, html) {
     }
   });
 
-  htmlParts.css.source = links + htmlParts.css.source;
+  htmlParts.css.sources[0].source = links + htmlParts.css.sources[0].source;
 
   g.html = html;
 }
@@ -224,62 +309,116 @@ function cantGetHTML(e) {  // eslint-disable-line
   console.log("TODO: don't run editor if can't get HTML");  // eslint-disable-line
 }
 
-function main() {
+async function main() {
   const query = getQuery();
   g.url = getFQUrl(query.url);
   g.query = getSearch(g.url);
-  getHTML(query.url, function(err, html) {
-    if (err) {
-      console.log(err);  // eslint-disable-line
-      return;
-    }
-    parseHTML(query.url, html);
-    setupEditor(query.url);
-    if (query.startPane) {
-      const button = document.querySelector('.button-' + query.startPane);
-      toggleSourcePane(button);
-    }
-  });
+  let html;
+  try {
+    html = await getHTML(query.url);
+  } catch (err) {
+    console.log(err);  // eslint-disable-line
+    return;
+  }
+  await parseHTML(query.url, html);
+  setupEditor(query.url);
+  if (query.startPane) {
+    const button = document.querySelector('.button-' + query.startPane);
+    toggleSourcePane(button);
+  }
 }
 
+function getJavaScriptBlob(source) {
+  const blob = new Blob([source], {type: 'application/javascript'});
+  return URL.createObjectURL(blob);
+}
 
-let blobUrl;
-function getSourceBlob(htmlParts, options) {
-  options = options || {};
-  if (blobUrl) {
-    URL.revokeObjectURL(blobUrl);
+let blobGeneration = 0;
+function makeBlobURLsForSources(scriptInfo) {
+  ++blobGeneration;
+
+  function makeBlobURLForSourcesImpl(scriptInfo) {
+    if (scriptInfo.blobGenerationId !== blobGeneration) {
+      scriptInfo.blobGenerationId = blobGeneration;
+      if (scriptInfo.blobUrl) {
+        URL.revokeObjectURL(scriptInfo.blobUrl);
+      }
+      scriptInfo.deps.forEach(makeBlobURLForSourcesImpl);
+      let text = scriptInfo.source;
+      scriptInfo.deps.forEach((depScriptInfo) => {
+        text = text.split(depScriptInfo.fqURL).join(depScriptInfo.blobUrl);
+      });
+      scriptInfo.numLinesBeforeScript = 0;
+      if (scriptInfo.isWorker) {
+        const extra = `self.lessonSettings = ${JSON.stringify(lessonSettings)};
+importScripts('${dirname(scriptInfo.fqURL)}/resources/lessons-worker-helper.js')`;
+        scriptInfo.numLinesBeforeScript = extra.split('\n').length;
+        text = `${extra}\n${text}`;
+      }
+      scriptInfo.blobUrl = getJavaScriptBlob(text);
+      scriptInfo.munged = text;
+    }
   }
+  makeBlobURLForSourcesImpl(scriptInfo);
+}
+
+function getSourceBlob(htmlParts) {
+  g.rootScriptInfo.source = htmlParts.js;
+  makeBlobURLsForSources(g.rootScriptInfo);
+
   const prefix = dirname(g.url);
   let source = g.html;
   source = source.replace('${hackedParams}', JSON.stringify(g.query));
   source = source.replace('${html}', htmlParts.html);
   source = source.replace('${css}', htmlParts.css);
-  source = source.replace('${js}', htmlParts.js);
-  source = source.replace('<head>', '<head>\n<script match="false">threejsLessonSettings = ' + JSON.stringify(options) + ';</script>');
+  source = source.replace('${js}', g.rootScriptInfo.munged); //htmlParts.js);
+  source = source.replace('<head>', `<head>
+  <link rel="stylesheet" href="${prefix}/resources/lesson-helper.css" type="text/css">
+  <script match="false">self.lessonSettings = ${JSON.stringify(lessonSettings)}</script>`);
 
-  source = source.replace('</head>', '<script src="' + prefix + '/resources/threejs-lessons-helper.js"></script>\n</head>');
+  source = source.replace('</head>', `<script src="${prefix}/resources/lessons-helper.js"></script>
+  </head>`);
   const scriptNdx = source.indexOf('<script>');
-  g.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
+  g.rootScriptInfo.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
 
   const blob = new Blob([source], {type: 'text/html'});
-  blobUrl = URL.createObjectURL(blob);
+  // This seems hacky. We are combining html/css/js into one html blob but we already made
+  // a blob for the JS so let's replace that blob. That means it will get auto-released when script blobs
+  // are regenerated. It also means error reporting will work
+  const blobUrl = URL.createObjectURL(blob);
+  URL.revokeObjectURL(g.rootScriptInfo.blobUrl);
+  g.rootScriptInfo.blobUrl = blobUrl;
   return blobUrl;
 }
 
-function getSourceBlobFromEditor(options) {
+function getSourcesFromEditor() {
+  for (const partTypeInfo of Object.values(htmlParts)) {
+    for (const source of partTypeInfo.sources) {
+      source.source = source.editor.getValue();
+      // hack: shouldn't store this twice. Also see other comment,
+      // should consolidate so scriptInfo is used for css and html
+      if (source.scriptInfo) {
+        source.scriptInfo.source = source.source;
+      }
+    }
+  }
+}
+function getSourceBlobFromEditor() {
+  getSourcesFromEditor();
+
   return getSourceBlob({
-    html: htmlParts.html.editor.getValue(),
-    css: htmlParts.css.editor.getValue(),
-    js: htmlParts.js.editor.getValue(),
-  }, options);
+    html: htmlParts.html.sources[0].source,
+    css: htmlParts.css.sources[0].source,
+    js: htmlParts.js.sources[0].source,
+  });
 }
 
-function getSourceBlobFromOrig(options) {
+function getSourceBlobFromOrig() {
   return getSourceBlob({
-    html: htmlParts.html.source,
-    css: htmlParts.css.source,
-    js: htmlParts.js.source,
-  }, options);
+    html: htmlParts.html.sources[0].source,
+    css: htmlParts.css.sources[0].source,
+    js: htmlParts.js.sources[0].source,
+  });
 }
 
 function dirname(path) {
@@ -287,30 +426,99 @@ function dirname(path) {
   return path.substring(0, ndx + 1);
 }
 
+function basename(path) {
+  const ndx = path.lastIndexOf('/');
+  return path.substring(ndx + 1);
+}
+
 function resize() {
   forEachHTMLPart(function(info) {
-    info.editor.layout();
+    info.editors.forEach((editorInfo) => {
+      editorInfo.editor.layout();
+    });
   });
 }
 
-function addCORSSupport(js) {
-  // not yet needed for three.js
-  return js;
+function makeScriptsForWorkers(scriptInfo) {
+  ++blobGeneration;
+
+  function makeScriptsForWorkersImpl(scriptInfo) {
+    const scripts = [];
+    if (scriptInfo.blobGenerationId !== blobGeneration) {
+      scriptInfo.blobGenerationId = blobGeneration;
+      scripts.push(...scriptInfo.deps.map(makeScriptsForWorkersImpl).flat());
+      let text = scriptInfo.source;
+      scriptInfo.deps.forEach((depScriptInfo) => {
+        text = text.split(depScriptInfo.fqURL).join(`worker-${basename(depScriptInfo.fqURL)}`);
+      });
+
+      scripts.push({
+        name: `worker-${basename(scriptInfo.fqURL)}`,
+        text,
+      });
+    }
+    return scripts;
+  }
+
+  const scripts = makeScriptsForWorkersImpl(scriptInfo);
+  const mainScript = scripts.pop().text;
+  if (!scripts.length) {
+    return {
+      js: mainScript,
+      html: '',
+    };
+  }
+
+  const workerName = scripts[scripts.length - 1].name;
+  const html = scripts.map((nameText) => {
+    const {name, text} = nameText;
+    return `<script id="${name}" type="x-worker">\n${text}\n</script>`;
+  }).join('\n');
+  const init = `
+
+
+
+// ------
+// Creates Blobs for the Worker Scripts so things can be self contained for snippets/JSFiddle/Codepen
+//
+function getWorkerBlob() {
+  const idsToUrls = [];
+  const scriptElements = [...document.querySelectorAll('script[type=x-worker]')];
+  for (const scriptElement of scriptElements) {
+    let text = scriptElement.text;
+    for (const {id, url} of idsToUrls) {
+      text = text.split(id).join(url);
+    }
+    const blob = new Blob([text], {type: 'application/javascript'});
+    const url = URL.createObjectURL(blob);
+    const id = scriptElement.id;
+    idsToUrls.push({id, url});
+  }
+  return idsToUrls.pop().url;
+}
+`;
+  return {
+    js: mainScript.split(`'${workerName}'`).join('getWorkerBlob()') + init,
+    html,
+  };
 }
 
 function openInCodepen() {
   const comment = `// ${g.title}
 // from ${g.url}
 
+
   `;
+  getSourcesFromEditor();
+  const scripts = makeScriptsForWorkers(g.rootScriptInfo);
   const pen = {
     title                 : g.title,
     description           : 'from: ' + g.url,
-    tags                  : ['three.js', 'threejsfundamentals.org'],
+    tags                  : lessonEditorSettings.tags,
     editors               : '101',
-    html                  : htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, ''),
-    css                   : htmlParts.css.editor.getValue(),
-    js                    : comment + addCORSSupport(htmlParts.js.editor.getValue()),
+    html                  : scripts.html + htmlParts.html.sources[0].source.replace(lessonHelperScriptRE, ''),
+    css                   : htmlParts.css.sources[0].source,
+    js                    : comment + fixJSForCodeSite(scripts.js),
   };
 
   const elem = document.createElement('div');
@@ -331,15 +539,9 @@ function openInJSFiddle() {
 // from ${g.url}
 
   `;
-  // const pen = {
-  //   title                 : g.title,
-  //   description           : "from: " + g.url,
-  //   tags                  : ["three.js", "threejsfundamentals.org"],
-  //   editors               : "101",
-  //   html                  : htmlParts.html.editor.getValue(),
-  //   css                   : htmlParts.css.editor.getValue(),
-  //   js                    : comment + htmlParts.js.editor.getValue(),
-  // };
+
+  getSourcesFromEditor();
+  const scripts = makeScriptsForWorkers(g.rootScriptInfo);
 
   const elem = document.createElement('div');
   elem.innerHTML = `
@@ -352,24 +554,60 @@ function openInJSFiddle() {
       <input type="submit" />
     </form>
   `;
-  elem.querySelector('input[name=html]').value = htmlParts.html.editor.getValue().replace(lessonHelperScriptRE, '');
-  elem.querySelector('input[name=css]').value = htmlParts.css.editor.getValue();
-  elem.querySelector('input[name=js]').value = comment + addCORSSupport(htmlParts.js.editor.getValue());
+  elem.querySelector('input[name=html]').value = scripts.html + htmlParts.html.sources[0].source.replace(lessonHelperScriptRE, '');
+  elem.querySelector('input[name=css]').value = htmlParts.css.sources[0].source;
+  elem.querySelector('input[name=js]').value = comment + fixJSForCodeSite(scripts.js);
   elem.querySelector('input[name=title]').value = g.title;
   window.frameElement.ownerDocument.body.appendChild(elem);
   elem.querySelector('form').submit();
   window.frameElement.ownerDocument.body.removeChild(elem);
 }
 
+function selectFile(info, ndx, fileDivs) {
+  if (info.editors.length <= 1) {
+    return;
+  }
+  info.editors.forEach((editorInfo, i) => {
+    const selected = i === ndx;
+    editorInfo.div.style.display = selected ? '' : 'none';
+    editorInfo.editor.layout();
+    addRemoveClass(fileDivs.children[i], 'fileSelected', selected);
+  });
+}
+
+function showEditorSubPane(type, ndx) {
+  const info = htmlParts[type];
+  selectFile(info, ndx, info.files);
+}
+
 function setupEditor() {
 
   forEachHTMLPart(function(info, ndx, name) {
-    info.parent = document.querySelector('.panes>.' + name);
-    info.editor = runEditor(info.parent, info.source, info.language);
+    info.pane = document.querySelector('.panes>.' + name);
+    info.code = info.pane.querySelector('.code');
+    info.files = info.pane.querySelector('.files');
+    info.editors = info.sources.map((sourceInfo, ndx) => {
+      if (info.sources.length > 1) {
+        const div = document.createElement('div');
+        div.textContent = basename(sourceInfo.name);
+        info.files.appendChild(div);
+        div.addEventListener('click', () => {
+          selectFile(info, ndx, info.files);
+        });
+      }
+      const div = document.createElement('div');
+      info.code.appendChild(div);
+      const editor = runEditor(div, sourceInfo.source, info.language);
+      sourceInfo.editor = editor;
+      return {
+        div,
+        editor,
+      };
+    });
     info.button = document.querySelector('.button-' + name);
     info.button.addEventListener('click', function() {
       toggleSourcePane(info.button);
-      run();
+      runIfNeeded();
     });
   });
 
@@ -389,7 +627,7 @@ function setupEditor() {
   g.resultButton = document.querySelector('.button-result');
   g.resultButton.addEventListener('click', function() {
      toggleResultPane();
-     run();
+     runIfNeeded();
   });
   g.result.style.display = 'none';
   toggleResultPane();
@@ -400,20 +638,27 @@ function setupEditor() {
 
   window.addEventListener('resize', resize);
 
+  showEditorSubPane('js', 0);
   showOtherIfAllPanesOff();
   document.querySelector('.other .loading').style.display = 'none';
 
   resize();
-  run({glDebug: false});
+  run();
 }
 
 function toggleFullscreen() {
   try {
     toggleIFrameFullscreen(window);
     resize();
-    run();
+    runIfNeeded();
   } catch (e) {
     console.error(e);  // eslint-disable-line
+  }
+}
+
+function runIfNeeded() {
+  if (runOnResize) {
+    run();
   }
 }
 
@@ -478,11 +723,11 @@ function toggleSourcePane(pressedButton) {
     const pressed = pressedButton === info.button;
     if (pressed && !info.showing) {
       addClass(info.button, 'show');
-      info.parent.style.display = 'block';
+      info.pane.style.display = 'flex';
       info.showing = true;
     } else {
       removeClass(info.button, 'show');
-      info.parent.style.display = 'none';
+      info.pane.style.display = 'none';
       info.showing = false;
     }
   });
@@ -509,19 +754,35 @@ function showOtherIfAllPanesOff() {
   g.other.style.display = paneOn ? 'none' : 'block';
 }
 
-function getActualLineNumberAndMoveTo(lineNo, colNo) {
-  const actualLineNo = lineNo - g.numLinesBeforeScript;
-  if (!g.setPosition) {
-    // Only set the first position
-    g.setPosition = true;
-    htmlParts.js.editor.setPosition({
-      lineNumber: actualLineNo,
-      column: colNo,
-    });
-    htmlParts.js.editor.revealLineInCenterIfOutsideViewport(actualLineNo);
-    htmlParts.js.editor.focus();
+// seems like we should probably store a map
+function getEditorNdxByBlobUrl(type, url) {
+  return htmlParts[type].sources.findIndex(source => source.scriptInfo.blobUrl === url);
+}
+
+function getActualLineNumberAndMoveTo(url, lineNo, colNo) {
+  let origUrl = url;
+  let actualLineNo = lineNo;
+  const scriptInfo = Object.values(g.scriptInfos).find(scriptInfo => scriptInfo.blobUrl === url);
+  if (scriptInfo) {
+    actualLineNo = lineNo - scriptInfo.numLinesBeforeScript;
+    origUrl = basename(scriptInfo.fqURL);
+    if (!g.setPosition) {
+      // Only set the first position
+      g.setPosition = true;
+      const editorNdx = getEditorNdxByBlobUrl('js', url);
+      if (editorNdx >= 0) {
+        showEditorSubPane('js', editorNdx);
+        const editor = htmlParts.js.editors[editorNdx].editor;
+        editor.setPosition({
+          lineNumber: actualLineNo,
+          column: colNo,
+        });
+        editor.revealLineInCenterIfOutsideViewport(actualLineNo);
+        editor.focus();
+      }
+    }
   }
-  return actualLineNo;
+  return {origUrl, actualLineNo};
 }
 
 window.getActualLineNumberAndMoveTo = getActualLineNumberAndMoveTo;
@@ -539,17 +800,27 @@ function runEditor(parent, source, language) {
   });
 }
 
-function runAsBlob() {
+async function runAsBlob() {
   const query = getQuery();
   g.url = getFQUrl(query.url);
   g.query = getSearch(g.url);
-  getHTML(query.url, function(err, html) {
-    if (err) {
-      console.log(err);  // eslint-disable-line
-      return;
-    }
-    parseHTML(query.url, html);
-    window.location.href = getSourceBlobFromOrig();
+  let html;
+  try {
+    html = await getHTML(query.url);
+  } catch (err) {
+    console.log(err);  // eslint-disable-line
+    return;
+  }
+  await parseHTML(query.url, html);
+  window.location.href = getSourceBlobFromOrig();
+}
+
+function applySubstitutions() {
+  [...document.querySelectorAll('[data-subst]')].forEach((elem) => {
+    elem.dataset.subst.split('&').forEach((pair) => {
+      const [attr, key] = pair.split('|');
+      elem[attr] = lessonEditorSettings[key];
+    });
   });
 }
 
@@ -562,6 +833,7 @@ function start() {
     // var url = query.url;
     // window.location.href = url;
   } else {
+    applySubstitutions();
     require.config({ paths: { 'vs': '/monaco-editor/min/vs' }});
     require(['vs/editor/editor.main'], main);
   }

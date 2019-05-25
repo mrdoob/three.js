@@ -39,11 +39,12 @@
     });
   } else {
     // Browser globals
-    root.threejsLessonsHelper = factory.call(root);
+    root.lessonsHelper = factory.call(root);
   }
 }(this, function() {
   'use strict';  // eslint-disable-line
 
+  const lessonSettings = window.lessonSettings || {};
   const topWindow = this;
 
   /**
@@ -204,28 +205,186 @@
     window.console.error = wrapFunc(window.console, 'error', 'red', '❌');
   }
 
+  function reportJSError(url, lineNo, colNo, msg) {
+    try {
+      const {origUrl, actualLineNo} = window.parent.getActualLineNumberAndMoveTo(url, lineNo, colNo);
+      url = origUrl;
+      lineNo = actualLineNo;
+    } catch (ex) {
+      origConsole.error(ex);
+    }
+    console.error(url, "line:", lineNo, ":", msg);  // eslint-disable-line
+  }
+
+  /**
+   * @typedef {Object} StackInfo
+   * @property {string} url Url of line
+   * @property {number} lineNo line number of error
+   * @property {number} colNo column number of error
+   * @property {string} [funcName] name of function
+   */
+
+  /**
+   * @parameter {string} stack A stack string as in `(new Error()).stack`
+   * @returns {StackInfo}
+   */
+  const parseStack = function() {
+    const browser = getBrowser();
+    let lineNdx;
+    let matcher;
+    if ((/chrome|opera/i).test(browser.name)) {
+      lineNdx = 3;
+      matcher = function(line) {
+        const m = /at ([^(]+)*\(*(.*?):(\d+):(\d+)/.exec(line);
+        if (m) {
+          let userFnName = m[1];
+          let url = m[2];
+          const lineNo = parseInt(m[3]);
+          const colNo = parseInt(m[4]);
+          if (url === '') {
+            url = userFnName;
+            userFnName = '';
+          }
+          return {
+            url: url,
+            lineNo: lineNo,
+            colNo: colNo,
+            funcName: userFnName,
+          };
+        }
+        return undefined;
+      };
+    } else if ((/firefox|safari/i).test(browser.name)) {
+      lineNdx = 2;
+      matcher = function(line) {
+        const m = /@(.*?):(\d+):(\d+)/.exec(line);
+        if (m) {
+          const url = m[1];
+          const lineNo = parseInt(m[2]);
+          const colNo = parseInt(m[3]);
+          return {
+            url: url,
+            lineNo: lineNo,
+            colNo: colNo,
+          };
+        }
+        return undefined;
+      };
+    }
+
+    return function stackParser(stack) {
+      if (matcher) {
+        try {
+          const lines = stack.split('\n');
+          // window.fooLines = lines;
+          // lines.forEach(function(line, ndx) {
+          //   origConsole.log("#", ndx, line);
+          // });
+          return matcher(lines[lineNdx]);
+        } catch (e) {
+          // do nothing
+        }
+      }
+      return undefined;
+    };
+  }();
+
+  function setupWorkerSupport() {
+    function log(data) {
+      const {logType, msg} = data;
+      console[logType]('[Worker]', msg);  /* eslint-disable-line no-console */
+    }
+
+    function lostContext(/* data */) {
+      addContextLostHTML();
+    }
+
+    function jsError(data) {
+      const {url, lineNo, colNo, msg} = data;
+      reportJSError(url, lineNo, colNo, msg);
+    }
+
+    function jsErrorWithStack(data) {
+      const {url, stack, msg} = data;
+      const errorInfo = parseStack(stack);
+      if (errorInfo) {
+        reportJSError(errorInfo.url || url, errorInfo.lineNo, errorInfo.colNo, msg);
+      } else {
+        console.error(errorMsg)  // eslint-disable-line
+      }
+    }
+
+    const handlers = {
+      log,
+      lostContext,
+      jsError,
+      jsErrorWithStack,
+    };
+    const OrigWorker = self.Worker;
+    class WrappedWorker extends OrigWorker {
+      constructor(url) {
+        super(url);
+        let listener;
+        this.onmessage = function(e) {
+          if (!e || !e.data || !e.data.type === '___editor___') {
+            if (listener) {
+              listener(e);
+            }
+            return;
+          }
+
+          e.stopImmediatePropagation();
+          const data = e.data.data;
+          const fn = handlers[data.type];
+          if (!fn) {
+            origConsole.error('unknown editor msg:', data.type);
+          } else {
+            fn(data);
+          }
+          return;
+        };
+        Object.defineProperty(this, 'onmessage', {
+          get() {
+            return listener;
+          },
+          set(fn) {
+            listener = fn;
+          },
+        });
+      }
+    }
+    self.Worker = WrappedWorker;
+  }
+
+  function addContextLostHTML() {
+    const div = document.createElement('div');
+    div.className = 'contextlost';
+    div.innerHTML = '<div>Context Lost: Click To Reload</div>';
+    div.addEventListener('click', function() {
+        window.location.reload();
+    });
+    document.body.appendChild(div);
+  }
+
   /**
    * Gets a WebGL context.
    * makes its backing store the size it is displayed.
    * @param {HTMLCanvasElement} canvas a canvas element.
+   * @param {module:webgl-utils.GetWebGLContextOptions} [opt_options] options
    * @memberOf module:webgl-utils
    */
-  let setupLesson = function(canvas) {
+  let setupLesson = function(canvas, opt_options) {
     // only once
     setupLesson = function() {};
+
+    const options = opt_options || {};
 
     if (canvas) {
       canvas.addEventListener('webglcontextlost', function(e) {
           // the default is to do nothing. Preventing the default
           // means allowing context to be restored
           e.preventDefault();
-          const div = document.createElement('div');
-          div.className = 'contextlost';
-          div.innerHTML = '<div>Context Lost: Click To Reload</div>';
-          div.addEventListener('click', function() {
-              window.location.reload();
-          });
-          document.body.appendChild(div);
+          addContextLostHTML();
       });
       canvas.addEventListener('webglcontextrestored', function() {
           // just reload the page. Easiest.
@@ -633,8 +792,9 @@
    */
   function glEnumToString(value) {
     const name = glEnums[value];
-    return (name !== undefined) ? ('gl.' + name) :
-        ('/*UNKNOWN WebGL ENUM*/ 0x' + value.toString(16) + '');
+    return (name !== undefined)
+        ? `gl.${name}`
+        : `/*UNKNOWN WebGL ENUM*/ 0x${value.toString(16)}`;
   }
 
   /**
@@ -727,8 +887,7 @@
     options.sharedState = sharedState;
 
     const errorFunc = options.errorFunc || function(err, functionName, args) {
-      console.error("WebGL error " + glEnumToString(err) + " in " + functionName +  // eslint-disable-line
-          '(' + glFunctionArgsToString(functionName, args) + ')');
+      console.error(`WebGL error ${glEnumToString(err)} in ${functionName}(${glFunctionArgsToString(functionName, args)})`);  /* eslint-disable-line no-console */
     };
 
     // Holds booleans for each GL error so after we get the error ourselves
@@ -785,7 +944,7 @@
           ext = wrapped.apply(ctx, arguments);
           if (ext) {
             const origExt = ext;
-            ext = makeDebugContext(ext, options);
+            ext = makeDebugContext(ext, Object.assign({}, options, {errCtx: ctx}));
             sharedState.wrappers[extensionName] = { wrapper: ext, orig: origExt };
             addEnumsForContext(origExt, extensionName);
           }
@@ -839,17 +998,9 @@
     window.addEventListener('error', function(e) {
       const msg = e.message || e.error;
       const url = e.filename;
-      let lineNo = e.lineno || 1;
+      const lineNo = e.lineno || 1;
       const colNo = e.colno || 1;
-      const isUserScript = (url === window.location.href);
-      if (isUserScript) {
-        try {
-          lineNo = window.parent.getActualLineNumberAndMoveTo(lineNo, colNo);
-        } catch (ex) {
-          origConsole.error(ex);
-        }
-      }
-      console.error("line:", lineNo, ":", msg);  // eslint-disable-line
+      reportJSError(url, lineNo, colNo, msg);
       origConsole.error(e.error);
     });
   }
@@ -927,79 +1078,13 @@
                 }
                 return str;
               });
-
-              const browser = getBrowser();
-              let lineNdx;
-              let matcher;
-              if ((/chrome|opera/i).test(browser.name)) {
-                lineNdx = 3;
-                matcher = function(line) {
-                  const m = /at ([^(]+)*\(*(.*?):(\d+):(\d+)/.exec(line);
-                  if (m) {
-                    let userFnName = m[1];
-                    let url = m[2];
-                    const lineNo = parseInt(m[3]);
-                    const colNo = parseInt(m[4]);
-                    if (url === '') {
-                      url = userFnName;
-                      userFnName = '';
-                    }
-                    return {
-                      url: url,
-                      lineNo: lineNo,
-                      colNo: colNo,
-                      funcName: userFnName,
-                    };
-                  }
-                  return undefined;
-                };
-              } else if ((/firefox|safari/i).test(browser.name)) {
-                lineNdx = 2;
-                matcher = function(line) {
-                  const m = /@(.*?):(\d+):(\d+)/.exec(line);
-                  if (m) {
-                    const url = m[1];
-                    const lineNo = parseInt(m[2]);
-                    const colNo = parseInt(m[3]);
-                    return {
-                      url: url,
-                      lineNo: lineNo,
-                      colNo: colNo,
-                    };
-                  }
-                  return undefined;
-                };
+              const errorMsg = `WebGL error ${glEnumToString(err)} in ${funcName}(${enumedArgs.join(', ')})`;
+              const errorInfo = parseStack((new Error()).stack);
+              if (errorInfo) {
+                reportJSError(errorInfo.url, errorInfo.lineNo, errorInfo.colNo, errorMsg);
+              } else {
+                console.error(errorMsg)  // eslint-disable-line
               }
-
-              let lineInfo = '';
-              if (matcher) {
-                try {
-                  const error = new Error();
-                  const lines = error.stack.split('\n');
-                  // window.fooLines = lines;
-                  // lines.forEach(function(line, ndx) {
-                  //   origConsole.log("#", ndx, line);
-                  // });
-                  const info = matcher(lines[lineNdx]);
-                  if (info) {
-                    let lineNo = info.lineNo;
-                    const colNo = info.colNo;
-                    const url = info.url;
-                    const isUserScript = (url === window.location.href);
-                    if (isUserScript) {
-                      lineNo = window.parent.getActualLineNumberAndMoveTo(lineNo, colNo);
-                    }
-                    lineInfo = ' line:' + lineNo + ':' + colNo;
-                  }
-                } catch (e) {
-                  origConsole.error(e);
-                }
-              }
-
-              console.error(  // eslint-disable-line
-                  'WebGL error' + lineInfo, glEnumToString(err), 'in',
-                  funcName, '(', enumedArgs.join(', '), ')');
-
             },
           });
         }
@@ -1011,9 +1096,10 @@
   installWebGLLessonSetup();
 
   if (isInEditor()) {
+    setupWorkerSupport();
     setupConsole();
     captureJSErrors();
-    if (window.threejsLessonSettings === undefined || window.threejsLessonSettings.glDebug !== false) {
+    if (lessonSettings.glDebug !== false) {
       installWebGLDebugContextCreator();
     }
   }

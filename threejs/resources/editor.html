@@ -44,14 +44,38 @@ iframe {
 .panes>div {
     display: none;
     flex: 1 1 50%;
-    position: relative;
-    overflow: hidden;
+    flex-direction: column;
+    min-width: 0;
     /*
     this calc is to get things to work in safari.
-    but firefox and chrome will let chidren of
-    the panes go 100% size but not safarai
+    but firefox and chrome will let children of
+    the panes go 100% size but not safari
     */
     height: calc(100vh - 2.5em - 5px - 1px);
+}
+.panes .code {
+    flex: 1 1 auto;
+    position: relative;
+    height: 100%;
+}
+.panes .code > div {
+    height: 100%;
+}
+.panes .files {
+    position: relative;
+}
+.panes .fileSelected {
+    color: white;
+    background: #666;
+}
+.panes .files > div {
+    border: 1px solid black;
+    font-family: monospace;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    white-space: nowrap;
+    cursor: pointer;
 }
 .panes>div.other {
     display: block
@@ -103,6 +127,7 @@ iframe {
     border-bottom: 5px solid black;
     margin: 0.25em;
     width: 5em;
+    cursor: pointer;
 }
 .panebuttons>button:focus {
     outline: none;
@@ -166,24 +191,24 @@ iframe {
             <button class="button-fullscreen">&nbsp;</button>
         </div>
         <div class="panelogo">
-          <div><a href="/">threejsfundamentals&nbsp;</a><a href="/"><img src="/threejs/lessons/resources/threejsfundamentals-icon-256.png" width="32" height="32"/></a></div>
+          <div><a href="/"><span data-subst="textContent|name"></span>&nbsp;</a><a href="/"><img data-subst="src|icon" width="32" height="32"/></a></div>
         </div>
     </div>
     <div class="panes">
-        <div class="js"></div>
-        <div class="html"></div>
-        <div class="css"></div>
+        <div class="js"><div class="files"></div><div class="code"></div></div>
+        <div class="html"><div class="files"></div><div class="code"></div></div>
+        <div class="css"><div class="files"></div><div class="code"></div></div>
         <div class="result"><iframe></iframe></div>
         <div class="other">
           <div>
-            <div><a href="/">threejsfundamentals&nbsp;</a><a href="/"><img src="/threejs/lessons/resources/threejsfundamentals-icon-256.png" width="64" height="64"/></a></div>
-            <div class="loading">
-            </div>
+            <div><a href="/"><span data-subst="textContent|name"></span>&nbsp;</a><a href="/"><img data-subst="src|icon" width="64" height="64"/></a></div>
+            <div class="loading"></div>
           </div>
         </div>
     </div>
 </div>
 </body>
 <script src="/monaco-editor/min/vs/loader.js"></script>
+<script src="editor-settings.js"></script>
 <script src="editor.js"></script>
 
