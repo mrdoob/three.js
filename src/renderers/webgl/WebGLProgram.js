@@ -607,7 +607,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	}
 
-	var parallelShaderExt = extensions.get( 'KHR_parallel_shader_compile' );
+	var parallelShaderExt = capabilities.parallelShaderCompile;
 
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
@@ -615,8 +615,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl, renderer.debug.checkShaderErrors );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl, renderer.debug.checkShaderErrors );
+	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );
@@ -643,14 +643,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	this.ready = true;
-
-//	var status = gl.getProgramParameter( program, parallelShaderExt.COMPLETION_STATUS_KHR );
-
 	if ( parallelShaderExt === null ) {
 
 		// check for link errors
 		this.checkLink( renderer, material );
+		this.ready = true;
 
 	} else {
 
