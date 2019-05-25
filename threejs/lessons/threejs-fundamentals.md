@@ -310,7 +310,7 @@ and here's that.
 {{{example url="../threejs-fundamentals-3-cubes.html" }}}
 
 If you compare it to the top down diagram above you can see
-it matches our expectections. With cubes at X = -2 and X = +2
+it matches our expectations. With cubes at X = -2 and X = +2
 they are partially outside our frustum. They are also
 somewhat exaggeratedly warped since the field of view
 across the canvas is so extreme.
