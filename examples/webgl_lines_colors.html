@@ -42,7 +42,7 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/geometries/hilbert3D.js"></script>
+		<script src="js/utils/GeometryUtils.js"></script>
 
 		<script src="js/WebGL.js"></script>
 
@@ -78,7 +78,7 @@
 
 				//
 
-				var hilbertPoints = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var geometry1 = new THREE.BufferGeometry();
 				var geometry2 = new THREE.BufferGeometry();

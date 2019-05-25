@@ -10,29 +10,32 @@
 		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
-
-		<div id="panel" class="collapsed">
+		<div id="panel" class="">
 
 			<div id="header">
-
 				<h1><a href="http://threejs.org">three.js</a></h1>
 
-				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
-
 				<div id="sections">
-					<span class="selected">docs</span> <a href="../examples/">examples</a>
+					<span class="selected">docs</span>
+					<a href="../examples/">examples</a>
 				</div>
 
-				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false">
+				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
+			</div>
+
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+				<div id="exitSearchButton"></div>
 
 				<select id="language">
 					<option value="en">en</option>
 					<option value="zh">zh</option>
 				</select>
 
+				<div id="content"></div>
 			</div>
-
-			<div id="content"></div>
 
 		</div>
 
@@ -89,6 +92,8 @@
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
 			var expandButton = document.getElementById( 'expandButton' );
+			var exitSearchButton = document.getElementById( 'exitSearchButton' );
+			var panelScrim = document.getElementById( 'panelScrim' );
 			var filterInput = document.getElementById( 'filter' );
 			var iframe = document.querySelector( 'iframe' );
 
@@ -104,12 +109,40 @@
 			expandButton.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.classList.toggle( 'collapsed' );
+				panel.classList.toggle( 'open' );
+
+			};
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
 
 			};
 
 
 			// Functionality for search/filter input field
+			filterInput.onfocus = function ( event ) {
+
+				panel.classList.add('searchFocused');
+
+			}
+
+			filterInput.onblur = function ( event ) {
+
+				if(filterInput.value === '') {
+					panel.classList.remove('searchFocused');
+				}
+
+			}
+
+			exitSearchButton.onclick = function( event ) {
+
+				filterInput.value = '';
+				updateFilter();
+				panel.classList.remove('searchFocused');
+
+			}
 
 			filterInput.oninput = function ( event ) {
 
@@ -139,7 +172,16 @@
 					if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
 					window.location.hash = pageURL;
-					panel.classList.add( 'collapsed' );
+					panel.classList.remove( 'open' );
+
+
+					content.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+						item.classList.remove( 'selected' );
+
+					} );
+
+					link.classList.add('selected');
 
 				} );
 

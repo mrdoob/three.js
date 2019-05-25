@@ -184,43 +184,36 @@ THREE.Refractor = function ( geometry, options ) {
 
 	//
 
-	var render = ( function () {
+	function render( renderer, scene, camera ) {
 
-		var viewport = new THREE.Vector4();
-		var size = new THREE.Vector2();
+		scope.visible = false;
 
-		return function render( renderer, scene, camera ) {
+		var currentRenderTarget = renderer.getRenderTarget();
+		var currentVrEnabled = renderer.vr.enabled;
+		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-			scope.visible = false;
+		renderer.vr.enabled = false; // avoid camera modification
+		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
-			var currentRenderTarget = renderer.getRenderTarget();
-			var currentVrEnabled = renderer.vr.enabled;
-			var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+		renderer.setRenderTarget( renderTarget );
+		renderer.clear();
+		renderer.render( scene, virtualCamera );
 
-			renderer.vr.enabled = false; // avoid camera modification
-			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
+		renderer.vr.enabled = currentVrEnabled;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+		renderer.setRenderTarget( currentRenderTarget );
 
-			renderer.setRenderTarget( renderTarget );
-			renderer.clear();
-			renderer.render( scene, virtualCamera );
+		// restore viewport
 
-			renderer.vr.enabled = currentVrEnabled;
-			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-			renderer.setRenderTarget( currentRenderTarget );
+		if ( camera.isArrayCamera ) {
 
-			// restore viewport
+			renderer.state.viewport( camera.viewport );
 
-			if ( camera.isArrayCamera ) {
+		}
 
-				renderer.state.viewport( camera.viewport );
+		scope.visible = true;
 
-			}
-
-			scope.visible = true;
-
-		};
-
-	} )();
+	}
 
 	//
 
@@ -262,17 +255,14 @@ THREE.Refractor.RefractorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 

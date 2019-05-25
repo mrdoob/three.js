@@ -56,7 +56,7 @@ export class MeshStandardMaterial extends Material {
   bumpScale: number;
   normalMap: Texture | null;
   normalMapType: NormalMapTypes;
-  normalScale: number;
+  normalScale: Vector2;
   displacementMap: Texture | null;
   displacementScale: number;
   displacementBias: number;

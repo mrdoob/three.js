@@ -27,7 +27,7 @@
 
 		<h2>Importing the module</h2>
 
-		<p>Assuming that you're bundling your files with a tool such as [link:https://webpack.github.io/ Webpack] or [link:https://github.com/substack/node-browserify Browserify], which allow you to "require('modules') in the browser by bundling up all of your dependencies."</p>
+		<p>Assuming that you're bundling your files with a tool such as [link:https://webpack.github.io/ Webpack] or [link:https://github.com/substack/node-browserify Browserify], which allow you to "require('modules')" in the browser by bundling up all of your dependencies.</p>
 
 		<p>
 			You should now be able to import the module into your source files and continue to use it as per normal.
@@ -76,11 +76,41 @@
 		<p>
 			The following examples files are already available as modules:
 			<ul>
+				<li>cameras
+					<ul>
+						<li>CinematicCamera</li>
+					</ul>
+				</li>
 				<li>controls
 					<ul>
+						<li>DeviceOrientationControls</li>
+						<li>DragControls</li>
+						<li>EditorControls</li>
+						<li>FirstPersonControls</li>
+						<li>FlyControls</li>
 						<li>MapControls</li>
 						<li>OrbitControls</li>
+						<li>OrthographicTrackballControls</li>
+						<li>PointerLockControls</li>
 						<li>TrackballControls</li>
+						<li>TransformControls</li>
+					</ul>
+				</li>
+				<li>curves
+					<ul>
+						<li>NURBSCurve</li>
+						<li>NURBSSurface</li>
+						<li>NURBSUtils</li>
+					</ul>
+				</li>
+				<li>effects
+					<ul>
+						<li>AnaglyphEffect</li>
+						<li>AsciiEffect</li>
+						<li>OutlineEffect</li>
+						<li>ParallaxBarrierEffect</li>
+						<li>PeppersGhostEffect</li>
+						<li>StereoEffect</li>
 					</ul>
 				</li>
 				<li>exporters
@@ -96,16 +126,144 @@
 				</li>
 				<li>loaders
 					<ul>
+						<li>3MFLoader</li>
+						<li>AMFLoader</li>
+						<li>AssimpJSONLoader</li>
+						<li>AssimpLoader</li>
+						<li>BabylonLoader</li>
+						<li>BVHLoader</li>
+						<li>ColladaLoader</li>
+						<li>DDSLoader</li>
+						<li>EXRLoader</li>
+						<li>FBXLoader</li>
+						<li>GCodeLoader</li>
 						<li>GLTFLoader</li>
+						<li>KMZLoader</li>
+						<li>KTXLoader</li>
 						<li>MTLLoader</li>
 						<li>OBJLoader</li>
+						<li>PCDLoader</li>
+						<li>PDBLoader</li>
+						<li>PlayCanvasLoader</li>
+						<li>PLYLoader</li>
+						<li>RGBELoader</li>
 						<li>STLLoader</li>
+						<li>SVGLoader</li>
+						<li>TGALoader</li>
+						<li>VRMLLoader</li>
+					</ul>
+				</li>
+				<li>math
+					<ul>
+						<li>ColorConverter</li>
+						<li>ImprovedNoise</li>
+						<li>Lut</li>
+						<li>SimplexNoise</li>
+					</ul>
+				</li>
+				<li>objects
+					<ul>
+						<li>Lensflare</li>
+						<li>Reflector</li>
+						<li>Refractor</li>
+						<li>ReflectorRTT</li>
+						<li>ShadowMesh</li>
+						<li>Sky</li>
+						<li>Water</li>
+						<li>Water2</li>
 					</ul>
 				</li>
 				<li>pmrem
 					<ul>
 						<li>PMREMCubeUVPacker</li>
 						<li>PMREMGenerator</li>
+					</ul>
+				</li>
+				<li>postprocessing
+					<ul>
+						<li>AdaptiveToneMappingPass</li>
+						<li>AfterimagePass</li>
+						<li>BloomPass</li>
+						<li>BokehPass</li>
+						<li>ClearPass</li>
+						<li>CubeTexturePass</li>
+						<li>DotScreenPass</li>
+						<li>EffectComposer</li>
+						<li>FilmPass</li>
+						<li>GlitchPass</li>
+						<li>HalftonePass</li>
+						<li>MaskPass</li>
+						<li>OutlinePass</li>
+						<li>RenderPass</li>
+						<li>SAOPass</li>
+						<li>SavePass</li>
+						<li>ShaderPass</li>
+						<li>SMAAPass</li>
+						<li>SSAARenderPass</li>
+						<li>SSAOPass</li>
+						<li>TAARenderPass</li>
+						<li>TexturePass</li>
+						<li>UnrealBloomPass</li>
+					</ul>
+				</li>
+				<li>renderers
+					<ul>
+						<li>CSS2DRenderer</li>
+						<li>CSS3DRenderer</li>
+						<li>Projector</li>
+						<li>SoftwareRenderer</li>
+						<li>SVGRenderer</li>
+						<li>RaytracingRenderer</li>
+					</ul>
+				</li>
+				<li>shaders
+					<ul>
+						<li>AfterimageShader</li>
+						<li>BasicShader</li>
+						<li>BleachBypassShader</li>
+						<li>BlendShader</li>
+						<li>BokehShader</li>
+						<li>BokehShader2</li>
+						<li>BrightnessContrastShader</li>
+						<li>ColorCorrectionShader</li>
+						<li>ColorifyShader</li>
+						<li>ConvolutionShader</li>
+						<li>CopyShader</li>
+						<li>DepthLimitedBlurShader</li>
+						<li>DigitalGlitch</li>
+						<li>DOFMipMapShader</li>
+						<li>DotScreenShader</li>
+						<li>FilmShader</li>
+						<li>FocusShader</li>
+						<li>FreiChenShader</li>
+						<li>FresnelShader</li>
+						<li>FXAAShader</li>
+						<li>GammaCorrectionShader</li>
+						<li>HalftoneShader</li>
+						<li>HorizontalBlurShader</li>
+						<li>HorizontalTiltShiftShader</li>
+						<li>HueSaturationShader</li>
+						<li>KaleidoShader</li>
+						<li>LuminosityHighPassShader</li>
+						<li>LuminosityShader</li>
+						<li>MirrorShader</li>
+						<li>NormalMapShader</li>
+						<li>ParallaxShader</li>
+						<li>PixelShader</li>
+						<li>RGBShiftShader</li>
+						<li>SAOShader</li>
+						<li>SepiaShader</li>
+						<li>SMAAShader</li>
+						<li>SobelOperatorShader</li>
+						<li>SSAOShader</li>
+						<li>TechnicolorShader</li>
+						<li>ToneMapShader</li>
+						<li>TriangleBlurShader</li>
+						<li>UnpackDepthRGBAShader</li>
+						<li>VerticalBlurShader</li>
+						<li>VerticalTiltShiftShader</li>
+						<li>VignetteShader</li>
+						<li>WaterRefractionShader</li>
 					</ul>
 				</li>
 				<li>utils
@@ -124,7 +282,7 @@
 		</p>
 		<p>
 			Note: When using code from the examples directory, it's important that all files match the version of
-			your three.js main file. For example it's no good approach to use *GLTFLoader* and *OrbitControls* from R96 together
+			your three.js main file. For example, it's not acceptable to use *GLTFLoader* and *OrbitControls* from R96 together
 			with three.js R103. You can easily keep your files in sync by using the modules from the JSM directory. If the file
 			is not available as a module, you can still use third-party npm packages or convert the file to a module by yourself.
 			In both cases, ensure the code is compatible with your three.js main file.
