@@ -16,7 +16,7 @@ export class EffectComposer {
   readBuffer: WebGLRenderTarget;
   passes: Pass[];
   copyPass: ShaderPass;
-	clock: Clock;
+  clock: Clock;
 
   swapBuffers(): void;
   addPass(pass: Pass): void;
