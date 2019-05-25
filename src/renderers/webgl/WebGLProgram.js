@@ -607,6 +607,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	}
 
+	var parallelShaderExt = capabilities.parallelShaderCompile;
+
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
 
@@ -632,69 +634,26 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	}
 
+	this.program = program;
+	this.vertexShader = glVertexShader;
+	this.fragmentShader = glFragmentShader;
+	this.parallelShaderExt = parallelShaderExt;
+	this.prefixVertex = prefixVertex;
+	this.prefixFragment = prefixFragment;
+
 	gl.linkProgram( program );
 
-	// check for link errors
-	if ( renderer.debug.checkShaderErrors ) {
+	if ( parallelShaderExt === null ) {
 
-		var programLog = gl.getProgramInfoLog( program ).trim();
-		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
-		var vertexErrors = getShaderErrors( gl, glVertexShader );
-		var fragmentErrors = getShaderErrors( gl, glFragmentShader );
+		// check for link errors
+		this.checkLink( renderer, material );
+		this.ready = true;
 
-		var runnable = true;
-		var haveDiagnostics = true;
+	} else {
 
-		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
-
-			runnable = false;
-
-			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
-
-		} else if ( programLog !== '' ) {
-
-			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
-
-		} else if ( vertexLog === '' || fragmentLog === '' ) {
-
-			haveDiagnostics = false;
-
-		}
-
-		if ( haveDiagnostics ) {
-
-			this.diagnostics = {
-
-				runnable: runnable,
-				material: material,
-
-				programLog: programLog,
-
-				vertexShader: {
-
-					log: vertexLog,
-					prefix: prefixVertex
-
-				},
-
-				fragmentShader: {
-
-					log: fragmentLog,
-					prefix: prefixFragment
-
-				}
-
-			};
-
-		}
+		this.ready = false;
 
 	}
-
-	// clean up
-
-	gl.deleteShader( glVertexShader );
-	gl.deleteShader( glFragmentShader );
 
 	// set up caching for uniform locations
 
@@ -768,12 +727,102 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	this.id = programIdCount ++;
 	this.code = code;
 	this.usedTimes = 1;
-	this.program = program;
-	this.vertexShader = glVertexShader;
-	this.fragmentShader = glFragmentShader;
 
 	return this;
 
 }
+
+Object.assign( WebGLProgram.prototype, {
+
+	isLinked: function ( renderer, material ) {
+
+		var gl = renderer.context;
+
+		if ( gl.getProgramParameter( this.program, this.parallelShaderExt.COMPLETION_STATUS_KHR ) == true ) {
+
+			this.checkLink( renderer, material );
+			this.ready = true;
+
+		} else {
+
+			console.log( 'not ready' );
+
+		}
+
+		return this.ready;
+
+	},
+
+	checkLink: function ( renderer, material ) {
+
+		// check for link errors
+
+		var gl = renderer.context;
+		var program = this.program;
+		var glVertexShader = this.vertexShader;
+		var glFragmentShader = this.fragmentShader;
+
+		if ( renderer.debug.checkShaderErrors ) {
+
+			var programLog = gl.getProgramInfoLog( program ).trim();
+			var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+			var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+			var vertexErrors = getShaderErrors( gl, glVertexShader );
+			var fragmentErrors = getShaderErrors( gl, glFragmentShader );
+
+			var runnable = true;
+			var haveDiagnostics = true;
+
+			if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+
+				runnable = false;
+
+				console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
+
+			} else if ( programLog !== '' ) {
+
+				console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
+
+			} else if ( vertexLog === '' || fragmentLog === '' ) {
+
+				haveDiagnostics = false;
+
+			}
+
+			if ( haveDiagnostics ) {
+
+				this.diagnostics = {
+
+					runnable: runnable,
+					material: material,
+
+					programLog: programLog,
+
+					vertexShader: {
+
+						log: vertexLog,
+						prefix: this.prefixVertex
+
+					},
+
+					fragmentShader: {
+
+						log: fragmentLog,
+						prefix: this.prefixFragment
+
+					}
+
+				};
+
+			}
+
+		}
+
+		gl.deleteShader( glVertexShader );
+		gl.deleteShader( glFragmentShader );
+
+	}
+
+} );
 
 export { WebGLProgram };
