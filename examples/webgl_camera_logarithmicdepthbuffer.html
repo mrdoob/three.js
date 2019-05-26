@@ -319,19 +319,20 @@
 				window.addEventListener( "mousemove", onBorderMouseMove );
 				window.addEventListener( "mouseup", onBorderMouseUp );
 				ev.stopPropagation();
-				ev.preventDefault();
 
 			}
 
 			function onBorderMouseMove( ev ) {
 
 				screensplit = Math.max( 0, Math.min( 1, ev.clientX / window.innerWidth ) );
+				ev.preventDefault();
 				ev.stopPropagation();
 
 			}
 
 			function onBorderMouseUp() {
 
+				screensplit = 0.5;
 				window.removeEventListener( "mousemove", onBorderMouseMove );
 				window.removeEventListener( "mouseup", onBorderMouseUp );
 

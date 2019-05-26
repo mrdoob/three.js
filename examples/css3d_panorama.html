@@ -129,14 +129,14 @@
 
 			function onDocumentMouseDown( event ) {
 
-				event.preventDefault();
-
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
 			}
 
 			function onDocumentMouseMove( event ) {
+
+				event.preventDefault();
 
 				var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 				var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
