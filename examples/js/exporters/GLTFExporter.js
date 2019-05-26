@@ -2169,7 +2169,7 @@ THREE.GLTFExporter.Utils = {
 			if ( sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete
 				&& sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
 
-				if ( sourceTrack.createInterpolant !== undefined && sourceTrack.createInterpolant.type == "GLTFCubicSplineInterpolant" ) {
+				if ( sourceTrack.createInterpolant !== undefined && sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline === true ) {
 
 					// This should never happen, because glTF morph target animations
 					// affect all targets already.
