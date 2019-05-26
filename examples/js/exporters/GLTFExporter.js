@@ -1555,7 +1555,7 @@ THREE.GLTFExporter.prototype = {
 				// Detecting glTF cubic spline interpolant by checking the method's type parameter.
 				// GLTFCubicSplineInterpolant is a custom interpolant and track doesn't return
 				// valid value from .getInterpolation().
-				if ( track.createInterpolant !== undefined && track.createInterpolant.type == "GLTFCubicSplineInterpolant" ) {
+				if ( track.createInterpolant !== undefined && track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline === true ) {
 
 					interpolation = 'CUBICSPLINE';
 

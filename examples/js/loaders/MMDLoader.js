@@ -2022,6 +2022,7 @@ THREE.MMDLoader = ( function () {
 
 	};
 
+	CubicBezierInterpolation.FactoryMethod.isInterpolantFactoryMethodCubicBezierSpline = true;
 	CubicBezierInterpolation.FactoryMethod.type = 'CubicBezierInterpolation';
 
 	THREE.CubicBezierInterpolation = CubicBezierInterpolation;
