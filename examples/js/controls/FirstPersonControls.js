@@ -81,13 +81,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onMouseDown = function ( event ) {
 
-		if ( this.domElement !== document ) {
-
-			this.domElement.focus();
-
-		}
-
-		event.preventDefault();
 		event.stopPropagation();
 
 		if ( this.activeLook ) {
@@ -142,8 +135,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 	this.onKeyDown = function ( event ) {
-
-		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 

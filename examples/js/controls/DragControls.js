@@ -119,8 +119,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	function onDocumentMouseDown( event ) {
 
-		event.preventDefault();
-
 		_raycaster.setFromCamera( _mouse, _camera );
 
 		var intersects = _raycaster.intersectObjects( _objects );

@@ -771,8 +771,6 @@ THREE.MapControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
-
 		switch ( event.button ) {
 
 			case scope.mouseButtons.LEFT:

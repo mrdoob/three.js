@@ -37,8 +37,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		}
 
-		//event.preventDefault();
-
 		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
@@ -101,13 +99,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.mousedown = function ( event ) {
 
-		if ( this.domElement !== document ) {
-
-			this.domElement.focus();
-
-		}
-
-		event.preventDefault();
 		event.stopPropagation();
 
 		if ( this.dragToLook ) {
