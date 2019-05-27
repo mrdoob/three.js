@@ -3,6 +3,7 @@
  *
  * parameters = {
  *  color: <hex>,
+ *  opacity: <float>,
  *  linewidth: <float>,
  *  dashed: <boolean>,
  *  dashScale: <float>,
@@ -267,6 +268,24 @@ THREE.LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.diffuse.value = value;
+
+			}
+
+		},
+
+		opacity: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.opacity.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.opacity.value = value;
 
 			}
 
