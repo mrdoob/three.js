@@ -44,6 +44,7 @@ var files = [
 
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
