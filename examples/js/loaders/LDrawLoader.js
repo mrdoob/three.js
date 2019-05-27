@@ -1288,7 +1288,11 @@ THREE.LDrawLoader = ( function () {
 			if ( ! edgeMaterial ) {
 
 				// This is the material used for edges
-				edgeMaterial = new THREE.LineBasicMaterial( { color: edgeColour } );
+				edgeMaterial = new THREE.LineBasicMaterial( {
+					color: edgeColour,
+					transparent: isTransparent,
+					opacity: alpha
+				} );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + " - Edge";
 				edgeMaterial.userData.canHaveEnvMap = false;
