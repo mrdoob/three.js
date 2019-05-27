@@ -74,6 +74,7 @@
 
 				loader.load( 'textures/compressed/kodim20.basis', function ( texture ) {
 
+					texture.encoding = THREE.sRGBEncoding;
 					material.map = texture;
 					material.needsUpdate = true;
 
