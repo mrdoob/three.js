@@ -42,6 +42,11 @@ var files = [
 	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
+
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },

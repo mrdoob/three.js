@@ -49,7 +49,15 @@
  *
  */
 
-THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Matrix4,
+	Vector3,
+	Vector4
+} from "../../../build/three.module.js";
+
+var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
 
 	// 32 * 4 * 4 Bezier spline patches
 	var teapotPatches = [
@@ -386,7 +394,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 		1.5, - 0.84, 0.075
 	];
 
-	THREE.BufferGeometry.call( this );
+	BufferGeometry.call( this );
 
 	size = size || 50;
 
@@ -435,7 +443,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	var uvs = new Float32Array( numVertices * 2 );
 
 	// Bezier form
-	var ms = new THREE.Matrix4();
+	var ms = new Matrix4();
 	ms.set(
 		- 1.0, 3.0, - 3.0, 1.0,
 		3.0, - 6.0, 3.0, 0.0,
@@ -458,7 +466,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	var sdir = [];
 	var tdir = [];
 
-	var norm = new THREE.Vector3();
+	var norm = new Vector3();
 
 	var tcoord;
 
@@ -469,19 +477,19 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	var dsval = 0;
 	var dtval = 0;
 
-	var normOut = new THREE.Vector3();
+	var normOut = new Vector3();
 	var v1, v2, v3, v4;
 
-	var gmx = new THREE.Matrix4();
-	var tmtx = new THREE.Matrix4();
+	var gmx = new Matrix4();
+	var tmtx = new Matrix4();
 
-	var vsp = new THREE.Vector4();
-	var vtp = new THREE.Vector4();
-	var vdsp = new THREE.Vector4();
-	var vdtp = new THREE.Vector4();
+	var vsp = new Vector4();
+	var vtp = new Vector4();
+	var vdsp = new Vector4();
+	var vdtp = new Vector4();
 
-	var vsdir = new THREE.Vector3();
-	var vtdir = new THREE.Vector3();
+	var vsdir = new Vector3();
+	var vtdir = new Vector3();
 
 	var mst = ms.clone();
 	mst.transpose();
@@ -506,7 +514,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 
 	for ( i = 0; i < 3; i ++ ) {
 
-		mgm[ i ] = new THREE.Matrix4();
+		mgm[ i ] = new Matrix4();
 
 	}
 
@@ -701,15 +709,17 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 
 	}
 
-	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setIndex( new BufferAttribute( indices, 1 ) );
+	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
 	this.computeBoundingSphere();
 
 };
 
 
-THREE.TeapotBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-THREE.TeapotBufferGeometry.prototype.constructor = THREE.TeapotBufferGeometry;
+TeapotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
+TeapotBufferGeometry.prototype.constructor = TeapotBufferGeometry;
+
+export { TeapotBufferGeometry };
