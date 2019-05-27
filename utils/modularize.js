@@ -43,6 +43,7 @@ var files = [
 	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
 
