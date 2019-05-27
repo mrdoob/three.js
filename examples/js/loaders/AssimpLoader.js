@@ -834,20 +834,6 @@ THREE.AssimpLoader.prototype = {
 
 		}
 
-		function aiColor4D() {
-
-			this.r = 0;
-			this.g = 0;
-			this.b = 0;
-			this.a = 0;
-			this.toTHREE = function () {
-
-				return new THREE.Color( this.r, this.g, this.b, this.a );
-
-			};
-
-		}
-
 		function aiColor3D() {
 
 			this.r = 0;
@@ -856,7 +842,7 @@ THREE.AssimpLoader.prototype = {
 			this.a = 0;
 			this.toTHREE = function () {
 
-				return new THREE.Color( this.r, this.g, this.b, 1 );
+				return new THREE.Color( this.r, this.g, this.b );
 
 			};
 
@@ -1536,17 +1522,6 @@ THREE.AssimpLoader.prototype = {
 
 		}
 
-		function Read_aiColor4D( stream ) {
-
-			var c = new aiColor4D();
-			c.r = readFloat( stream );
-			c.g = readFloat( stream );
-			c.b = readFloat( stream );
-			c.a = readFloat( stream );
-			return c;
-
-		}
-
 		function Read_aiQuaternion( stream ) {
 
 			var v = new aiQuaternion();
@@ -1639,12 +1614,6 @@ THREE.AssimpLoader.prototype = {
 		function ReadArray_aiVertexWeight( stream, data, size ) {
 
 			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiVertexWeight( stream );
-
-		}
-
-		function ReadArray_aiColor4D( stream, data, size ) {
-
-			for ( var i = 0; i < size; i ++ ) data[ i ] = Read_aiColor4D( stream );
 
 		}
 
