@@ -878,7 +878,7 @@ AssimpLoader.prototype = {
 			this.a = 0;
 			this.toTHREE = function () {
 
-				return new Color( this.r, this.g, this.b, 1 );
+				return new Color( this.r, this.g, this.b );
 
 			};
 
