@@ -56,37 +56,37 @@ THREE.SVGLoader.prototype = {
 
 				case 'path':
 					style = parseStyle( node, style );
-					if ( node.hasAttribute( 'd' ) ) path = parsePathNode( node, style );
+					if ( node.hasAttribute( 'd' ) ) path = parsePathNode( node );
 					break;
 
 				case 'rect':
 					style = parseStyle( node, style );
-					path = parseRectNode( node, style );
+					path = parseRectNode( node );
 					break;
 
 				case 'polygon':
 					style = parseStyle( node, style );
-					path = parsePolygonNode( node, style );
+					path = parsePolygonNode( node );
 					break;
 
 				case 'polyline':
 					style = parseStyle( node, style );
-					path = parsePolylineNode( node, style );
+					path = parsePolylineNode( node );
 					break;
 
 				case 'circle':
 					style = parseStyle( node, style );
-					path = parseCircleNode( node, style );
+					path = parseCircleNode( node );
 					break;
 
 				case 'ellipse':
 					style = parseStyle( node, style );
-					path = parseEllipseNode( node, style );
+					path = parseEllipseNode( node );
 					break;
 
 				case 'line':
 					style = parseStyle( node, style );
-					path = parseLineNode( node, style );
+					path = parseLineNode( node );
 					break;
 
 				default:
