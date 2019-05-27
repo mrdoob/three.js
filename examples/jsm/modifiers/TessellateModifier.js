@@ -5,13 +5,17 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.TessellateModifier = function ( maxEdgeLength ) {
+import {
+	Face3
+} from "../../../build/three.module.js";
+
+var TessellateModifier = function ( maxEdgeLength ) {
 
 	this.maxEdgeLength = maxEdgeLength;
 
 };
 
-THREE.TessellateModifier.prototype.modify = function ( geometry ) {
+TessellateModifier.prototype.modify = function ( geometry ) {
 
 	var edge;
 
@@ -29,7 +33,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 		var face = geometry.faces[ i ];
 
-		if ( face instanceof THREE.Face3 ) {
+		if ( face instanceof Face3 ) {
 
 			var a = face.a;
 			var b = face.b;
@@ -234,3 +238,5 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 	geometry.faceVertexUvs = faceVertexUvs;
 
 };
+
+export { TessellateModifier };

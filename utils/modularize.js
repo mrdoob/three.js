@@ -78,6 +78,11 @@ var files = [
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
+
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Refractor.js', dependencies: [], ignoreList: [] },
