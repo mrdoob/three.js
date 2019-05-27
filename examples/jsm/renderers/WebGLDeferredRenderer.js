@@ -641,7 +641,7 @@ var WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-		updateDeferredColorUniforms( renderer, scene, camera, geometry, material, group );
+		updateDeferredColorUniforms( renderer, scene, camera, geometry, material );
 
 		material.uniforms.samplerLight.value = _compLight.renderTarget2.texture;
 
