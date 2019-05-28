@@ -14040,6 +14040,23 @@ Object.assign( Triangle, {
 
 		};
 
+	}(),
+
+	isFrontFacing: function () {
+
+		var v0 = new Vector3();
+		var v1 = new Vector3();
+
+		return function isFrontFacing( a, b, c, direction ) {
+
+			v0.subVectors( c, b );
+			v1.subVectors( a, b );
+
+			// strictly front facing
+			return ( v0.cross( v1 ).dot( direction ) < 0 ) ? true : false;
+
+		};
+
 	}()
 
 } );
@@ -14145,6 +14162,12 @@ Object.assign( Triangle.prototype, {
 	getUV: function ( point, uv1, uv2, uv3, result ) {
 
 		return Triangle.getUV( point, this.a, this.b, this.c, uv1, uv2, uv3, result );
+
+	},
+
+	isFrontFacing: function ( direction ) {
+
+		return Triangle.isFrontFacing( this.a, this.b, this.c, direction );
 
 	},
 
@@ -22378,10 +22401,7 @@ function WebXRManager( renderer ) {
 	var device = null;
 	var session = null;
 
-	var framebufferScaleFactor = 1.0;
-
 	var frameOfReference = null;
-	var frameOfReferenceType = 'stage';
 
 	var pose = null;
 
@@ -22439,7 +22459,6 @@ function WebXRManager( renderer ) {
 	this.setDevice = function ( value ) {
 
 		if ( value !== undefined ) device = value;
-		if ( value instanceof XRDevice ) gl.setCompatibleXRDevice( value );
 
 	};
 
@@ -22460,15 +22479,20 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {
+	function onRequestFrameOfReference( value ) {
 
-		framebufferScaleFactor = value;
+		frameOfReference = value;
+
+		animation.setContext( session );
+		animation.start();
+
+	}
+
+	this.setFramebufferScaleFactor = function ( value ) {
 
 	};
 
 	this.setFrameOfReferenceType = function ( value ) {
-
-		frameOfReferenceType = value;
 
 	};
 
@@ -22483,17 +22507,9 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: framebufferScaleFactor } );
-			session.requestFrameOfReference( frameOfReferenceType ).then( function ( value ) {
+			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
-				frameOfReference = value;
-
-				renderer.setFramebuffer( session.baseLayer.framebuffer );
-
-				animation.setContext( session );
-				animation.start();
-
-			} );
+			session.requestReferenceSpace( { type: 'stationary', subtype: 'eye-level' } ).then( onRequestFrameOfReference );
 
 			//
 
@@ -22578,18 +22594,20 @@ function WebXRManager( renderer ) {
 
 	function onAnimationFrame( time, frame ) {
 
-		pose = frame.getDevicePose( frameOfReference );
+		pose = frame.getViewerPose( frameOfReference );
 
 		if ( pose !== null ) {
 
-			var layer = session.baseLayer;
-			var views = frame.views;
+			var layer = session.renderState.baseLayer;
+			var views = pose.views;
+
+			renderer.setFramebuffer( session.renderState.baseLayer.framebuffer );
 
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
 				var viewport = layer.getViewport( view );
-				var viewMatrix = pose.getViewMatrix( view );
+				var viewMatrix = view.transform.inverse().matrix;
 
 				var camera = cameraVR.cameras[ i ];
 				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
@@ -22616,21 +22634,12 @@ function WebXRManager( renderer ) {
 
 			if ( inputSource ) {
 
-				var inputPose = frame.getInputPose( inputSource, frameOfReference );
+				var inputPose = frame.getPose( inputSource.targetRaySpace, frameOfReference );
 
 				if ( inputPose !== null ) {
 
-					if ( 'targetRay' in inputPose ) {
-
-						controller.matrix.elements = inputPose.targetRay.transformMatrix;
-
-					} else if ( 'pointerMatrix' in inputPose ) {
-
-						// DEPRECATED
-
-						controller.matrix.elements = inputPose.pointerMatrix;
-
-					}
+					var targetRay = new XRRay( inputPose.transform );
+					controller.matrix.elements = targetRay.matrix;
 
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
@@ -22830,7 +22839,8 @@ function WebGLRenderer( parameters ) {
 			premultipliedAlpha: _premultipliedAlpha,
 			preserveDrawingBuffer: _preserveDrawingBuffer,
 			powerPreference: _powerPreference,
-			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat
+			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat,
+			xrCompatible: true
 		};
 
 		// event listeners must be registered before WebGL context is created, see #12753
@@ -25040,8 +25050,9 @@ function WebGLRenderer( parameters ) {
 	}
 
 	//
-
 	this.setFramebuffer = function ( value ) {
+
+		if ( _framebuffer !== value ) _gl.bindFramebuffer( 36160, value );
 
 		_framebuffer = value;
 
@@ -25231,6 +25242,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	/*
+	if ( typeof __THREE_DEVTOOLS__ !== undefined ) {
+		__THREE_DEVTOOLS__.dispatchEvent( { type: 'renderer', value: this } );
+	}
+	*/
+
 }
 
 /**
@@ -25323,6 +25340,12 @@ function Scene() {
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
+
+	/*
+	if ( typeof __THREE_DEVTOOLS__ !== undefined ) {
+		__THREE_DEVTOOLS__.dispatchEvent( { type: 'scene', value: this } );
+	}
+	*/
 
 }
 
