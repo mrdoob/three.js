@@ -5,14 +5,14 @@
  *
  */
 
-( function () {
+THREE.ConvexHull = ( function () {
 
 	var Visible = 0;
 	var Deleted = 1;
 
 	var v1 = new THREE.Vector3();
 
-	function QuickHull() {
+	function ConvexHull() {
 
 		this.tolerance = - 1;
 
@@ -36,19 +36,19 @@
 
 	}
 
-	Object.assign( QuickHull.prototype, {
+	Object.assign( ConvexHull.prototype, {
 
 		setFromPoints: function ( points ) {
 
 			if ( Array.isArray( points ) !== true ) {
 
-				console.error( 'THREE.QuickHull: Points parameter is not an array.' );
+				console.error( 'THREE.ConvexHull: Points parameter is not an array.' );
 
 			}
 
 			if ( points.length < 4 ) {
 
-				console.error( 'THREE.QuickHull: The algorithm needs at least four points.' );
+				console.error( 'THREE.ConvexHull: The algorithm needs at least four points.' );
 
 			}
 
@@ -1311,9 +1311,6 @@
 
 	} );
 
-	// export
-
-	THREE.QuickHull = QuickHull;
-
+	return ConvexHull;
 
 } )();
