@@ -469,6 +469,9 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
+		// Draw lines before transparent meshes
+		object3d.renderOrder = elementSize;
+
 		if ( isConditionalSegments ) {
 
 			object3d.isConditionalLine = true;
@@ -1273,7 +1276,6 @@ THREE.LDrawLoader = ( function () {
 			material.transparent = isTransparent;
 			material.premultipliedAlpha = true;
 			material.opacity = alpha;
-			material.depthWrite = ! isTransparent;
 
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
@@ -1292,8 +1294,7 @@ THREE.LDrawLoader = ( function () {
 				edgeMaterial = new THREE.LineBasicMaterial( {
 					color: edgeColour,
 					transparent: isTransparent,
-					opacity: alpha,
-					depthWrite: ! isTransparent
+					opacity: alpha
 				} );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + " - Edge";
@@ -1311,8 +1312,7 @@ THREE.LDrawLoader = ( function () {
 							value: alpha
 						}
 					},
-					transparent: isTransparent,
-					depthWrite: ! isTransparent
+					transparent: isTransparent
 				} );
 				edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
 
