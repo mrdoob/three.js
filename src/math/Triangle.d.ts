@@ -30,7 +30,10 @@ export class Triangle {
 	getPlane( target: Vector3 ): Plane;
 	getBarycoord( point: Vector3, target: Vector3 ): Vector3;
 	containsPoint( point: Vector3 ): boolean;
+<<<<<<< HEAD
 	isFrontFacing( direction: Vector3 ): boolean;
+=======
+>>>>>>> 408ae04915114cdd59b3c02823f0fecca6d9dad9
 	closestPointToPoint( point: Vector3, target: Vector3 ): Vector3;
 	equals( triangle: Triangle ): boolean;
 
@@ -53,11 +56,14 @@ export class Triangle {
 		b: Vector3,
 		c: Vector3
 	): boolean;
+<<<<<<< HEAD
 	static isFrontFacing(
 		a: Vector3,
 		b: Vector3,
 		c: Vector3,
 		direction: Vector3
 	): boolean;
+=======
+>>>>>>> 408ae04915114cdd59b3c02823f0fecca6d9dad9
 
 }
