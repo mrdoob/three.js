@@ -1463,10 +1463,10 @@ function WebGLRenderer( parameters ) {
 			releaseMaterialProgramReference( material );
 
 		} else if ( lightsHash.stateID !== lightsStateHash.stateID ||
-			lightsHash.value !== lightsStateHash.value ) {
+			lightsHash.version !== lightsStateHash.version ) {
 
 			lightsHash.stateID = lightsStateHash.stateID;
-			lightsHash.value = lightsStateHash.value;
+			lightsHash.version = lightsStateHash.version;
 
 			programChange = false;
 
@@ -1574,7 +1574,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		lightsHash.stateID = lightsStateHash.stateID;
-		lightsHash.value = lightsStateHash.value;
+		lightsHash.version = lightsStateHash.version;
 
 		if ( material.lights ) {
 
@@ -1646,7 +1646,7 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( material.lights && ( lightsHash.stateID !== lightsStateHash.stateID ||
-				lightsHash.value !== lightsStateHash.value ) ) {
+				lightsHash.version !== lightsStateHash.version ) ) {
 
 				material.needsUpdate = true;
 

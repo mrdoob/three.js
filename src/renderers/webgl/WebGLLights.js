@@ -118,7 +118,7 @@ function WebGLLights() {
 			rectAreaLength: - 1,
 			hemiLength: - 1,
 			shadowsLength: - 1,
-			value: 0
+			version: 0
 		},
 
 		ambient: [ 0, 0, 0 ],
@@ -355,7 +355,7 @@ function WebGLLights() {
 			hash.hemiLength = hemiLength;
 			hash.shadowsLength = shadows.length;
 
-			hash.value ++;
+			hash.version ++;
 
 		}
 
