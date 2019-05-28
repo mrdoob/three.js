@@ -125,6 +125,23 @@ Object.assign( Triangle, {
 
 		};
 
+	}(),
+
+	isFrontFacing: function () {
+
+		var v0 = new Vector3();
+		var v1 = new Vector3();
+
+		return function isFrontFacing( a, b, c, direction ) {
+
+			v0.subVectors( c, b );
+			v1.subVectors( a, b );
+
+			// strictly front facing
+			return ( v0.cross( v1 ).dot( direction ) < 0 ) ? true : false;
+
+		};
+
 	}()
 
 } );
@@ -230,6 +247,12 @@ Object.assign( Triangle.prototype, {
 	getUV: function ( point, uv1, uv2, uv3, result ) {
 
 		return Triangle.getUV( point, this.a, this.b, this.c, uv1, uv2, uv3, result );
+
+	},
+
+	isFrontFacing: function ( direction ) {
+
+		return Triangle.isFrontFacing( this.a, this.b, this.c, direction );
 
 	},
 
