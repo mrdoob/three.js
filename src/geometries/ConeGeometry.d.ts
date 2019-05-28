@@ -1,8 +1,7 @@
 import { CylinderGeometry } from './CylinderGeometry';
 import { CylinderBufferGeometry } from './CylinderGeometry';
-import { BufferGeometry } from '../core/BufferGeometry';
 
-export class ConeBufferGeometry extends BufferGeometry {
+export class ConeBufferGeometry extends CylinderBufferGeometry {
 
 	constructor(
     radius?: number,

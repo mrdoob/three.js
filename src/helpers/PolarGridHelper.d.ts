@@ -1,11 +1,7 @@
 import { LineSegments } from '../objects/LineSegments';
-import { VertexColors } from '../constants.js';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
 import { Color } from '../math/Color';
 
-export class PolarGridHelper {
+export class PolarGridHelper extends LineSegments {
 
 	constructor(
     radius: number,

@@ -1,5 +1,3 @@
-import { TextGeometryParameters } from './TextGeometry';
-import { Font } from './../extras/core/Font';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 

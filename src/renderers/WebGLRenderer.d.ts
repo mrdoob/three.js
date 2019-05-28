@@ -14,7 +14,6 @@ import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
 import { Fog } from './../scenes/Fog';
-import { Texture } from './../textures/Texture';
 import { ToneMapping, ShadowMapType, CullFace } from '../constants';
 import { WebVRManager } from '../renderers/webvr/WebVRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';

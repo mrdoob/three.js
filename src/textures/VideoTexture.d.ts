@@ -5,7 +5,6 @@ import {
 	TextureFilter,
 	PixelFormat,
 	TextureDataType,
-	TextureEncoding,
 } from '../constants';
 
 export class VideoTexture extends Texture {

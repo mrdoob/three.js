@@ -1,6 +1,5 @@
 import { Font } from './../extras/core/Font';
 import { ExtrudeGeometry, ExtrudeBufferGeometry } from './ExtrudeGeometry';
-import { BufferGeometry } from './../core/BufferGeometry';
 
 export interface TextGeometryParameters {
   font?: Font;
