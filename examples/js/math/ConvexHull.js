@@ -48,7 +48,7 @@ THREE.ConvexHull = ( function () {
 
 			if ( points.length < 4 ) {
 
-				console.error( 'THREE.QuickHull: The algorithm needs at least four points.' );
+				console.error( 'THREE.ConvexHull: The algorithm needs at least four points.' );
 
 			}
 
