@@ -8,50 +8,53 @@ import { Object3D } from './../core/Object3D';
  * Abstract base class for lights.
  */
 export class Light extends Object3D {
-  constructor(hex?: number | string, intensity?: number);
 
-  color: Color;
-  intensity: number;
-  receiveShadow: boolean;
-  shadow: LightShadow;
-  /**
+	constructor( hex?: number | string, intensity?: number );
+
+	color: Color;
+	intensity: number;
+	isLight: true;
+	receiveShadow: boolean;
+	shadow: LightShadow;
+	/**
    * @deprecated Use shadow.camera.fov instead.
    */
-  shadowCameraFov: any;
-  /**
+	shadowCameraFov: any;
+	/**
    * @deprecated Use shadow.camera.left instead.
    */
-  shadowCameraLeft: any;
-  /**
+	shadowCameraLeft: any;
+	/**
    * @deprecated Use shadow.camera.right instead.
    */
-  shadowCameraRight: any;
-  /**
+	shadowCameraRight: any;
+	/**
    * @deprecated Use shadow.camera.top instead.
    */
-  shadowCameraTop: any;
-  /**
+	shadowCameraTop: any;
+	/**
    * @deprecated Use shadow.camera.bottom instead.
    */
-  shadowCameraBottom: any;
-  /**
+	shadowCameraBottom: any;
+	/**
    * @deprecated Use shadow.camera.near instead.
    */
-  shadowCameraNear: any;
-  /**
+	shadowCameraNear: any;
+	/**
    * @deprecated Use shadow.camera.far instead.
    */
-  shadowCameraFar: any;
-  /**
+	shadowCameraFar: any;
+	/**
    * @deprecated Use shadow.bias instead.
    */
-  shadowBias: any;
-  /**
+	shadowBias: any;
+	/**
    * @deprecated Use shadow.mapSize.width instead.
    */
-  shadowMapWidth: any;
-  /**
+	shadowMapWidth: any;
+	/**
    * @deprecated Use shadow.mapSize.height instead.
    */
-  shadowMapHeight: any;
+	shadowMapHeight: any;
+
 }

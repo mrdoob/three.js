@@ -253,7 +253,9 @@ var list = {
 				"Material": "api/en/materials/Material",
 				"MeshBasicMaterial": "api/en/materials/MeshBasicMaterial",
 				"MeshDepthMaterial": "api/en/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/en/materials/MeshDistanceMaterial",
 				"MeshLambertMaterial": "api/en/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/en/materials/MeshMatcapMaterial",
 				"MeshNormalMaterial": "api/en/materials/MeshNormalMaterial",
 				"MeshPhongMaterial": "api/en/materials/MeshPhongMaterial",
 				"MeshPhysicalMaterial": "api/en/materials/MeshPhysicalMaterial",
@@ -391,12 +393,12 @@ var list = {
 				"LookupTable": "examples/Lut",
 			},
 
-			"QuickHull": {
-				"Face": "examples/quickhull/Face",
-				"HalfEdge": "examples/quickhull/HalfEdge",
-				"QuickHull": "examples/quickhull/QuickHull",
-				"VertexNode": "examples/quickhull/VertexNode",
-				"VertexList": "examples/quickhull/VertexList"
+			"ConvexHull": {
+				"Face": "examples/math/convexhull/Face",
+				"HalfEdge": "examples/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/math/convexhull/ConvexHull",
+				"VertexNode": "examples/math/convexhull/VertexNode",
+				"VertexList": "examples/math/convexhull/VertexList"
 			},
 
 			"Renderers": {
@@ -683,7 +685,9 @@ var list = {
 				"Material": "api/zh/materials/Material",
 				"MeshBasicMaterial": "api/zh/materials/MeshBasicMaterial",
 				"MeshDepthMaterial": "api/zh/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/zh/materials/MeshDistanceMaterial",
 				"MeshLambertMaterial": "api/zh/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/zh/materials/MeshMatcapMaterial",
 				"MeshNormalMaterial": "api/zh/materials/MeshNormalMaterial",
 				"MeshPhongMaterial": "api/zh/materials/MeshPhongMaterial",
 				"MeshPhysicalMaterial": "api/zh/materials/MeshPhysicalMaterial",

@@ -33,7 +33,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/geometries/hilbert3D.js"></script>
+		<script src="js/utils/GeometryUtils.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
@@ -56,8 +56,6 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 600;
-
-				controls = new THREE.TrackballControls( camera );
 
 				scene = new THREE.Scene();
 
@@ -121,7 +119,7 @@
 				scene.add( texSprite );
 
 				// Line
-				var hilbertPoints = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var lineGeometry = new THREE.BufferGeometry();
 				var subdivisions = 6;
@@ -157,8 +155,9 @@
 
 				renderer = new THREE.SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

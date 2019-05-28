@@ -38,7 +38,7 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/SSAOPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/SimplexNoise.js"></script>
+		<script src="js/math/SimplexNoise.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -63,8 +63,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var effectComposer;
-			var ssaoPass;
+			var composer;
 			var group;
 
 			init();
@@ -125,11 +124,11 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
-				ssaoPass.kernelRadius = 16;
+				composer = new THREE.EffectComposer( renderer );
 
-				effectComposer = new THREE.EffectComposer( renderer );
-				effectComposer.addPass( ssaoPass );
+				var ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
+				ssaoPass.kernelRadius = 16;
+				composer.addPass( ssaoPass );
 
 				// Init gui
 				var gui = new dat.GUI();
@@ -152,8 +151,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				onWindowResize();
-
 			}
 
 			function onWindowResize() {
@@ -163,9 +160,9 @@
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
-				renderer.setSize( width, height );
 
-				ssaoPass.setSize( width, height );
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
 
 			}
 
@@ -185,7 +182,7 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				effectComposer.render();
+				composer.render();
 
 			}
 

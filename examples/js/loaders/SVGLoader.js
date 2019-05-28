@@ -56,37 +56,37 @@ THREE.SVGLoader.prototype = {
 
 				case 'path':
 					style = parseStyle( node, style );
-					if ( node.hasAttribute( 'd' ) ) path = parsePathNode( node, style );
+					if ( node.hasAttribute( 'd' ) ) path = parsePathNode( node );
 					break;
 
 				case 'rect':
 					style = parseStyle( node, style );
-					path = parseRectNode( node, style );
+					path = parseRectNode( node );
 					break;
 
 				case 'polygon':
 					style = parseStyle( node, style );
-					path = parsePolygonNode( node, style );
+					path = parsePolygonNode( node );
 					break;
 
 				case 'polyline':
 					style = parseStyle( node, style );
-					path = parsePolylineNode( node, style );
+					path = parsePolylineNode( node );
 					break;
 
 				case 'circle':
 					style = parseStyle( node, style );
-					path = parseCircleNode( node, style );
+					path = parseCircleNode( node );
 					break;
 
 				case 'ellipse':
 					style = parseStyle( node, style );
-					path = parseEllipseNode( node, style );
+					path = parseEllipseNode( node );
 					break;
 
 				case 'line':
 					style = parseStyle( node, style );
-					path = parseLineNode( node, style );
+					path = parseLineNode( node );
 					break;
 
 				default:
@@ -120,13 +120,23 @@ THREE.SVGLoader.prototype = {
 
 			if ( transform ) {
 
-				currentTransform.copy( transformStack.pop() );
+				transformStack.pop();
+
+				if ( transformStack.length > 0 ) {
+
+					currentTransform.copy( transformStack[ transformStack.length - 1 ] );
+
+				} else {
+
+					currentTransform.identity();
+
+				}
 
 			}
 
 		}
 
-		function parsePathNode( node, style ) {
+		function parsePathNode( node ) {
 
 			var path = new THREE.ShapePath();
 
@@ -151,8 +161,10 @@ THREE.SVGLoader.prototype = {
 				var data = command.substr( 1 ).trim();
 
 				if ( isFirstPoint === true ) {
+
 					doSetFirstPoint = true;
 					isFirstPoint = false;
+
 				}
 
 				switch ( type ) {
@@ -160,56 +172,78 @@ THREE.SVGLoader.prototype = {
 					case 'M':
 						var numbers = parseFloats( data );
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+
 							point.x = numbers[ j + 0 ];
 							point.y = numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
+
 							if ( j === 0 ) {
+
 								path.moveTo( point.x, point.y );
+
 							} else {
+
 								path.lineTo( point.x, point.y );
+
 							}
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'H':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+
 							point.x = numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'V':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+
 							point.y = numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'L':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+
 							point.x = numbers[ j + 0 ];
 							point.y = numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'C':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 6 ) {
+
 							path.bezierCurveTo(
 								numbers[ j + 0 ],
 								numbers[ j + 1 ],
@@ -222,13 +256,17 @@ THREE.SVGLoader.prototype = {
 							control.y = numbers[ j + 3 ];
 							point.x = numbers[ j + 4 ];
 							point.y = numbers[ j + 5 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'S':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+
 							path.bezierCurveTo(
 								getReflection( point.x, control.x ),
 								getReflection( point.y, control.y ),
@@ -241,13 +279,17 @@ THREE.SVGLoader.prototype = {
 							control.y = numbers[ j + 1 ];
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'Q':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+
 							path.quadraticCurveTo(
 								numbers[ j + 0 ],
 								numbers[ j + 1 ],
@@ -258,13 +300,17 @@ THREE.SVGLoader.prototype = {
 							control.y = numbers[ j + 1 ];
 							point.x = numbers[ j + 2 ];
 							point.y = numbers[ j + 3 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'T':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+
 							var rx = getReflection( point.x, control.x );
 							var ry = getReflection( point.y, control.y );
 							path.quadraticCurveTo(
@@ -277,13 +323,17 @@ THREE.SVGLoader.prototype = {
 							control.y = ry;
 							point.x = numbers[ j + 0 ];
 							point.y = numbers[ j + 1 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'A':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+
 							var start = point.clone();
 							point.x = numbers[ j + 5 ];
 							point.y = numbers[ j + 6 ];
@@ -292,65 +342,88 @@ THREE.SVGLoader.prototype = {
 							parseArcCommand(
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
-					//
-
 					case 'm':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+
 							point.x += numbers[ j + 0 ];
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
+
 							if ( j === 0 ) {
+
 								path.moveTo( point.x, point.y );
+
 							} else {
+
 								path.lineTo( point.x, point.y );
+
 							}
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'h':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+
 							point.x += numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'v':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j ++ ) {
+
 							point.y += numbers[ j ];
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'l':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+
 							point.x += numbers[ j + 0 ];
 							point.y += numbers[ j + 1 ];
 							control.x = point.x;
 							control.y = point.y;
 							path.lineTo( point.x, point.y );
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'c':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 6 ) {
+
 							path.bezierCurveTo(
 								point.x + numbers[ j + 0 ],
 								point.y + numbers[ j + 1 ],
@@ -363,13 +436,17 @@ THREE.SVGLoader.prototype = {
 							control.y = point.y + numbers[ j + 3 ];
 							point.x += numbers[ j + 4 ];
 							point.y += numbers[ j + 5 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 's':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+
 							path.bezierCurveTo(
 								getReflection( point.x, control.x ),
 								getReflection( point.y, control.y ),
@@ -382,13 +459,17 @@ THREE.SVGLoader.prototype = {
 							control.y = point.y + numbers[ j + 1 ];
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'q':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 4 ) {
+
 							path.quadraticCurveTo(
 								point.x + numbers[ j + 0 ],
 								point.y + numbers[ j + 1 ],
@@ -399,13 +480,17 @@ THREE.SVGLoader.prototype = {
 							control.y = point.y + numbers[ j + 1 ];
 							point.x += numbers[ j + 2 ];
 							point.y += numbers[ j + 3 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 't':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 2 ) {
+
 							var rx = getReflection( point.x, control.x );
 							var ry = getReflection( point.y, control.y );
 							path.quadraticCurveTo(
@@ -418,13 +503,17 @@ THREE.SVGLoader.prototype = {
 							control.y = ry;
 							point.x = point.x + numbers[ j + 0 ];
 							point.y = point.y + numbers[ j + 1 ];
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
 
 					case 'a':
 						var numbers = parseFloats( data );
+
 						for ( var j = 0, jl = numbers.length; j < jl; j += 7 ) {
+
 							var start = point.clone();
 							point.x += numbers[ j + 5 ];
 							point.y += numbers[ j + 6 ];
@@ -433,20 +522,23 @@ THREE.SVGLoader.prototype = {
 							parseArcCommand(
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
+
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
+
 						}
 						break;
-
-					//
 
 					case 'Z':
 					case 'z':
 						path.currentPath.autoClose = true;
+
 						if ( path.currentPath.curves.length > 0 ) {
+
 							// Reset point to beginning of Path
 							point.copy( firstPoint );
 							path.currentPath.currentPoint.copy( point );
 							isFirstPoint = true;
+
 						}
 						break;
 
@@ -530,8 +622,8 @@ THREE.SVGLoader.prototype = {
 		function svgAngle( ux, uy, vx, vy ) {
 
 			var dot = ux * vx + uy * vy;
-			var len = Math.sqrt( ux * ux + uy * uy ) *  Math.sqrt( vx * vx + vy * vy );
-			var ang = Math.acos( Math.max( -1, Math.min( 1, dot / len ) ) ); // floating point precision, slightly over values appear
+			var len = Math.sqrt( ux * ux + uy * uy ) * Math.sqrt( vx * vx + vy * vy );
+			var ang = Math.acos( Math.max( - 1, Math.min( 1, dot / len ) ) ); // floating point precision, slightly over values appear
 			if ( ( ux * vy - uy * vx ) < 0 ) ang = - ang;
 			return ang;
 
@@ -541,7 +633,7 @@ THREE.SVGLoader.prototype = {
 		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
 		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
 		*/
-		function parseRectNode( node, style ) {
+		function parseRectNode( node ) {
 
 			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
 			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
@@ -576,7 +668,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parsePolygonNode( node, style ) {
+		function parsePolygonNode( node ) {
 
 			function iterator( match, a, b ) {
 
@@ -584,9 +676,13 @@ THREE.SVGLoader.prototype = {
 				var y = parseFloat( b );
 
 				if ( index === 0 ) {
+
 					path.moveTo( x, y );
+
 				} else {
+
 					path.lineTo( x, y );
+
 				}
 
 				index ++;
@@ -599,7 +695,7 @@ THREE.SVGLoader.prototype = {
 
 			var index = 0;
 
-			node.getAttribute( 'points' ).replace(regex, iterator);
+			node.getAttribute( 'points' ).replace( regex, iterator );
 
 			path.currentPath.autoClose = true;
 
@@ -607,7 +703,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parsePolylineNode( node, style ) {
+		function parsePolylineNode( node ) {
 
 			function iterator( match, a, b ) {
 
@@ -615,9 +711,13 @@ THREE.SVGLoader.prototype = {
 				var y = parseFloat( b );
 
 				if ( index === 0 ) {
+
 					path.moveTo( x, y );
+
 				} else {
+
 					path.lineTo( x, y );
+
 				}
 
 				index ++;
@@ -630,7 +730,7 @@ THREE.SVGLoader.prototype = {
 
 			var index = 0;
 
-			node.getAttribute( 'points' ).replace(regex, iterator);
+			node.getAttribute( 'points' ).replace( regex, iterator );
 
 			path.currentPath.autoClose = false;
 
@@ -638,7 +738,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parseCircleNode( node, style ) {
+		function parseCircleNode( node ) {
 
 			var x = parseFloat( node.getAttribute( 'cx' ) );
 			var y = parseFloat( node.getAttribute( 'cy' ) );
@@ -654,7 +754,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parseEllipseNode( node, style ) {
+		function parseEllipseNode( node ) {
 
 			var x = parseFloat( node.getAttribute( 'cx' ) );
 			var y = parseFloat( node.getAttribute( 'cy' ) );
@@ -671,7 +771,7 @@ THREE.SVGLoader.prototype = {
 
 		}
 
-		function parseLineNode( node, style ) {
+		function parseLineNode( node ) {
 
 			var x1 = parseFloat( node.getAttribute( 'x1' ) );
 			var y1 = parseFloat( node.getAttribute( 'y1' ) );
@@ -695,7 +795,11 @@ THREE.SVGLoader.prototype = {
 
 			function addStyle( svgName, jsName, adjustFunction ) {
 
-				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) { return v; };
+				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
+
+					return v;
+
+				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
 				if ( node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
@@ -770,7 +874,9 @@ THREE.SVGLoader.prototype = {
 		function getNodeTransform( node ) {
 
 			if ( ! node.hasAttribute( 'transform' ) ) {
+
 				return null;
+
 			}
 
 			var transform = parseNodeTransform( node );
@@ -778,7 +884,9 @@ THREE.SVGLoader.prototype = {
 			if ( transform ) {
 
 				if ( transformStack.length > 0 ) {
+
 					transform.premultiply( transformStack[ transformStack.length - 1 ] );
+
 				}
 
 				currentTransform.copy( transform );
@@ -794,13 +902,16 @@ THREE.SVGLoader.prototype = {
 
 			var transform = new THREE.Matrix3();
 			var currentTransform = tempTransform0;
-			var transformsTexts = node.getAttribute( 'transform' ).split( ' ' );
+			var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
 			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
-				var transformText = transformsTexts[ tIndex ];
-				var openParPos = transformText.indexOf( "(" );
-				var closeParPos = transformText.indexOf( ")" );
+				var transformText = transformsTexts[ tIndex ].trim();
+
+				if ( transformText === '' ) continue;
+
+				var openParPos = transformText.indexOf( '(' );
+				var closeParPos = transformText.length;
 
 				if ( openParPos > 0 && openParPos < closeParPos ) {
 
@@ -851,7 +962,7 @@ THREE.SVGLoader.prototype = {
 								}
 
 								// Rotate around center (cx, cy)
-								tempTransform1.identity().translate( -cx, -cy );
+								tempTransform1.identity().translate( - cx, - cy );
 								tempTransform2.identity().rotate( angle );
 								tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
 								tempTransform1.identity().translate( cx, cy );
@@ -869,7 +980,9 @@ THREE.SVGLoader.prototype = {
 								var scaleY = scaleX;
 
 								if ( array.length >= 2 ) {
+
 									scaleY = array[ 1 ];
+
 								}
 
 								currentTransform.scale( scaleX, scaleY );
@@ -919,6 +1032,7 @@ THREE.SVGLoader.prototype = {
 							}
 
 							break;
+
 					}
 
 				}
@@ -945,12 +1059,12 @@ THREE.SVGLoader.prototype = {
 
 			var subPaths = path.subPaths;
 
-			for ( var i = 0, n = subPaths.length; i < n; i++ ) {
+			for ( var i = 0, n = subPaths.length; i < n; i ++ ) {
 
 				var subPath = subPaths[ i ];
 				var curves = subPath.curves;
 
-				for ( var j = 0; j < curves.length; j++ ) {
+				for ( var j = 0; j < curves.length; j ++ ) {
 
 					var curve = curves[ j ];
 
@@ -975,7 +1089,9 @@ THREE.SVGLoader.prototype = {
 					} else if ( curve.isEllipseCurve ) {
 
 						if ( isRotated ) {
+
 							console.warn( "SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented." );
+
 						}
 
 						tempV2.set( curve.aX, curve.aY );
@@ -995,17 +1111,23 @@ THREE.SVGLoader.prototype = {
 		}
 
 		function isTransformRotated( m ) {
+
 			return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
+
 		}
 
 		function getTransformScaleX( m ) {
+
 			var te = m.elements;
-			return Math.sqrt( te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] )
+			return Math.sqrt( te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] );
+
 		}
 
 		function getTransformScaleY( m ) {
+
 			var te = m.elements;
-			return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] )
+			return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] );
+
 		}
 
 		//
@@ -1024,8 +1146,6 @@ THREE.SVGLoader.prototype = {
 		var tempV3 = new THREE.Vector3();
 
 		var currentTransform = new THREE.Matrix3();
-
-		var scope = this;
 
 		console.time( 'THREE.SVGLoader: DOMParser' );
 
@@ -1058,7 +1178,7 @@ THREE.SVGLoader.prototype = {
 
 };
 
-THREE.SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap,  miterLimit ) {
+THREE.SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap, miterLimit ) {
 
 	// Param width: Stroke width
 	// Param color: As returned by THREE.Color.getStyle()
@@ -1123,7 +1243,6 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 	var tempV2_5 = new THREE.Vector2();
 	var tempV2_6 = new THREE.Vector2();
 	var tempV2_7 = new THREE.Vector2();
-	var tempV3_1 = new THREE.Vector3();
 	var lastPointL = new THREE.Vector2();
 	var lastPointR = new THREE.Vector2();
 	var point0L = new THREE.Vector2();
@@ -1134,9 +1253,6 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 	var nextPointR = new THREE.Vector2();
 	var innerPoint = new THREE.Vector2();
 	var outerPoint = new THREE.Vector2();
-	var tempTransform0 = new THREE.Matrix3();
-	var tempTransform1 = new THREE.Matrix3();
-	var tempTransform2 = new THREE.Matrix3();
 
 	return function ( points, style, arcDivisions, minDistance, vertices, normals, uvs, vertexOffset ) {
 
@@ -1147,7 +1263,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 		// if 'vertices' parameter is undefined no triangles will be generated, but the returned vertices count will still be valid (useful to preallocate the buffers)
 		// 'normals' and 'uvs' buffers are optional
 
-		arcLengthDivisions = arcDivisions !== undefined ? arcDivisions : 12;
+		arcDivisions = arcDivisions !== undefined ? arcDivisions : 12;
 		minDistance = minDistance !== undefined ? minDistance : 0.001;
 		vertexOffset = vertexOffset !== undefined ? vertexOffset : 0;
 
@@ -1197,11 +1313,9 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 					// Skip duplicated initial point
 					nextPoint = points[ 1 ];
 
-				}
-				else nextPoint = undefined;
+				} else nextPoint = undefined;
 
-			}
-			else {
+			} else {
 
 				nextPoint = points[ iPoint + 1 ];
 
@@ -1237,8 +1351,8 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 				}
 				if ( iPoint === 1 ) initialJoinIsOnLeftSide = joinIsOnLeftSide;
 
-				tempV2_3.subVectors( nextPoint, currentPoint )
-				var maxInnerDistance = tempV2_3.normalize();
+				tempV2_3.subVectors( nextPoint, currentPoint );
+				tempV2_3.normalize();
 				var dot = Math.abs( normal1.dot( tempV2_3 ) );
 
 				// If path is straight, don't create join
@@ -1274,16 +1388,14 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 							nextPointR.copy( innerPoint );
 							currentPointR.copy( innerPoint );
 
-						}
-						else {
+						} else {
 
 							nextPointL.copy( innerPoint );
 							currentPointL.copy( innerPoint );
 
 						}
 
-					}
-					else {
+					} else {
 
 						// The segment triangles are generated here if there was overlapping
 
@@ -1311,8 +1423,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 								makeCircularSector( currentPoint, currentPointL, nextPointL, u1, 0 );
 
-							}
-							else {
+							} else {
 
 								makeCircularSector( currentPoint, nextPointR, currentPointR, u1, 1 );
 
@@ -1335,8 +1446,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 									makeSegmentWithBevelJoin( joinIsOnLeftSide, innerSideModified, u1 );
 									break;
 
-								}
-								else {
+								} else {
 
 									// Segment triangles
 
@@ -1361,8 +1471,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 										addVertex( tempV2_7, u1, 0 );
 										addVertex( nextPointL, u1, 0 );
 
-									}
-									else {
+									} else {
 
 										tempV2_6.subVectors( outerPoint, currentPointR ).multiplyScalar( miterFraction ).add( currentPointR );
 										tempV2_7.subVectors( outerPoint, nextPointR ).multiplyScalar( miterFraction ).add( nextPointR );
@@ -1383,8 +1492,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 								}
 
-							}
-							else {
+							} else {
 
 								// Miter join segment triangles
 
@@ -1402,8 +1510,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 										addVertex( outerPoint, u1, 0 );
 										addVertex( innerPoint, u1, 1 );
 
-									}
-									else {
+									} else {
 
 										addVertex( lastPointR, u0, 1 );
 										addVertex( lastPointL, u0, 0 );
@@ -1420,16 +1527,14 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 										nextPointL.copy( outerPoint );
 
-									}
-									else {
+									} else {
 
 										nextPointR.copy( outerPoint );
 
 									}
 
 
-								}
-								else {
+								} else {
 
 									// Add extra miter join triangles
 
@@ -1443,8 +1548,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 										addVertex( outerPoint, u1, 0 );
 										addVertex( nextPointL, u1, 0 );
 
-									}
-									else {
+									} else {
 
 										addVertex( currentPointR, u1, 1 );
 										addVertex( outerPoint, u1, 1 );
@@ -1466,8 +1570,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 					}
 
-				}
-				else {
+				} else {
 
 					// The segment triangles are generated here when two consecutive points are collinear
 
@@ -1475,8 +1578,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 				}
 
-			}
-			else {
+			} else {
 
 				// The segment triangles are generated here if it is the ending segment
 
@@ -1507,16 +1609,18 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 			// Ending line endcap
 			addCapGeometry( currentPoint, currentPointL, currentPointR, joinIsOnLeftSide, false, u1 );
 
-		}
-		else if ( innerSideModified && vertices ) {
+		} else if ( innerSideModified && vertices ) {
 
 			// Modify path first segment vertices to adjust to the segments inner and outer intersections
 
 			var lastOuter = outerPoint;
 			var lastInner = innerPoint;
-			if ( initialJoinIsOnLeftSide !== joinIsOnLeftSide) {
+
+			if ( initialJoinIsOnLeftSide !== joinIsOnLeftSide ) {
+
 				lastOuter = innerPoint;
 				lastInner = outerPoint;
+
 			}
 
 			if ( joinIsOnLeftSide ) {
@@ -1527,10 +1631,10 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 				if ( isMiter ) {
 
 					lastOuter.toArray( vertices, 1 * 3 );
+
 				}
 
-			}
-			else {
+			} else {
 
 				lastInner.toArray( vertices, 1 * 3 );
 				lastInner.toArray( vertices, 3 * 3 );
@@ -1538,6 +1642,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 				if ( isMiter ) {
 
 					lastOuter.toArray( vertices, 0 * 3 );
+
 				}
 
 			}
@@ -1602,11 +1707,11 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 			var dot = tempV2_1.dot( tempV2_2 );
 			if ( Math.abs( dot ) < 1 ) angle = Math.abs( Math.acos( dot ) );
 
-			angle /= arcLengthDivisions;
+			angle /= arcDivisions;
 
 			tempV2_3.copy( p1 );
 
-			for ( var i = 0, il = arcLengthDivisions - 1; i < il; i++ ) {
+			for ( var i = 0, il = arcDivisions - 1; i < il; i ++ ) {
 
 				tempV2_4.copy( tempV2_3 ).rotateAround( center, angle );
 
@@ -1615,6 +1720,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 				addVertex( center, u, 0.5 );
 
 				tempV2_3.copy( tempV2_4 );
+
 			}
 
 			addVertex( tempV2_4, u, v );
@@ -1659,8 +1765,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 					addVertex( nextPointL, u, 0 );
 					addVertex( innerPoint, u, 0.5 );
 
-				}
-				else {
+				} else {
 
 					// Path segments triangles
 
@@ -1680,8 +1785,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 				}
 
-			}
-			else {
+			} else {
 
 				// Bevel join triangle. The segment triangles are done in the main loop
 
@@ -1691,8 +1795,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 					addVertex( nextPointL, u, 0 );
 					addVertex( currentPoint, u, 0.5 );
 
-				}
-				else {
+				} else {
 
 					addVertex( currentPointR, u, 1 );
 					addVertex( nextPointR, u, 0 );
@@ -1726,8 +1829,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 					addVertex( nextPointL, u0, 0 );
 					addVertex( innerPoint, u1, 1 );
 
-				}
-				else {
+				} else {
 
 					addVertex( lastPointR, u0, 1 );
 					addVertex( lastPointL, u0, 0 );
@@ -1764,8 +1866,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 						makeCircularSector( center, p2, p1, u, 0.5 );
 
-					}
-					else {
+					} else {
 
 						makeCircularSector( center, p1, p2, u, 0.5 );
 
@@ -1790,8 +1891,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 							tempV2_4.toArray( vertices, 0 * 3 );
 							tempV2_4.toArray( vertices, 3 * 3 );
 
-						}
-						else {
+						} else {
 
 							tempV2_3.toArray( vertices, 1 * 3 );
 							tempV2_3.toArray( vertices, 3 * 3 );
@@ -1799,8 +1899,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 						}
 
-					}
-					else {
+					} else {
 
 						tempV2_1.subVectors( p2, center );
 						tempV2_2.set( tempV2_1.y, - tempV2_1.x );
@@ -1817,8 +1916,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 							tempV2_4.toArray( vertices, vl - 2 * 3 );
 							tempV2_4.toArray( vertices, vl - 4 * 3 );
 
-						}
-						else {
+						} else {
 
 							tempV2_3.toArray( vertices, vl - 2 * 3 );
 							tempV2_4.toArray( vertices, vl - 1 * 3 );
@@ -1869,6 +1967,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 					newPoints.push( points[ i ] );
 
 				}
+
 			}
 
 			newPoints.push( points[ points.length - 1 ] );
@@ -1876,6 +1975,7 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 			return newPoints;
 
 		}
+
 	};
 
 }();

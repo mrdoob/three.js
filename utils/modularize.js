@@ -1,57 +1,204 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
 var fs = require( 'fs' );
+THREE = require( '../build/three.js' );
 
 var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
-	{ path: 'controls/OrbitControls.js', ignoreList: [] },
-	{ path: 'controls/MapControls.js', ignoreList: [] },
-	{ path: 'controls/TrackballControls.js', ignoreList: [] },
-	// { path: 'controls/TransformControls.js', ignoreList: [] },
+	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
 
-	{ path: 'exporters/GLTFExporter.js', ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
-	{ path: 'exporters/MMDExporter.js', ignoreList: [] },
-	{ path: 'exporters/OBJExporter.js', ignoreList: [] },
-	{ path: 'exporters/PLYExporter.js', ignoreList: [] },
-	{ path: 'exporters/STLExporter.js', ignoreList: [] },
-	{ path: 'exporters/TypedGeometryExporter.js', ignoreList: [] },
+	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/DeviceOrientationControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/EditorControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/FirstPersonControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/FlyControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/OrbitControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/MapControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/OrthographicTrackballControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/PointerLockControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'loaders/GLTFLoader.js', ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
-	{ path: 'loaders/OBJLoader.js', ignoreList: [] },
-	{ path: 'loaders/MTLLoader.js', ignoreList: [] },
+	{ path: 'curves/NURBSCurve.js', dependencies: [ { name: 'NURBSUtils', path: 'curves/NURBSUtils.js' } ], ignoreList: [] },
+	{ path: 'curves/NURBSSurface.js', dependencies: [ { name: 'NURBSUtils', path: 'curves/NURBSUtils.js' } ], ignoreList: [] },
+	{ path: 'curves/NURBSUtils.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'pmrem/PMREMCubeUVPacker.js', ignoreList: [] },
-	{ path: 'pmrem/PMREMGenerator.js', ignoreList: [] },
+	{ path: 'effects/AnaglyphEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/AsciiEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/OutlineEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/ParallaxBarrierEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/PeppersGhostEffect.js', dependencies: [], ignoreList: [] },
+	{ path: 'effects/StereoEffect.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'utils/BufferGeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/GeometryUtils.js', ignoreList: [] },
-	{ path: 'utils/MathUtils.js', ignoreList: [] },
-	{ path: 'utils/SceneUtils.js', ignoreList: [] },
-	{ path: 'utils/ShadowMapViewer.js', ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
-	{ path: 'utils/SkeletonUtils.js', ignoreList: [] },
-	{ path: 'utils/TypedArrayUtils.js', ignoreList: [] },
-	{ path: 'utils/UVsDebug.js', ignoreList: [ 'SphereBufferGeometry' ] },
+	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
+	{ path: 'exporters/MMDExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/PLYExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/BabylonLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
+	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
+	{ path: 'loaders/DDSLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
+	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
+	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' } ], ignoreList: [] },
+	{ path: 'loaders/KTXLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/MTLLoader.js', dependencies: [], ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
+	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PDBLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PlayCanvasLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PLYLoader.js', dependencies: [], ignoreList: [ 'Mesh' ] },
+	{ path: 'loaders/RGBELoader.js', dependencies: [], ignoreList: [ 'RGBAFormat' ] },
+	{ path: 'loaders/STLLoader.js', dependencies: [], ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
+	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
+	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Refractor.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/ReflectorRTT.js', dependencies: [ { name: 'Reflector', path: 'objects/Reflector.js' } ], ignoreList: [] },
+	{ path: 'objects/ShadowMesh.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Sky.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Water.js', dependencies: [], ignoreList: [] },
+	{ path: 'objects/Water2.js', dependencies: [ { name: 'Reflector', path: 'objects/Reflector.js' }, { name: 'Refractor', path: 'objects/Refractor.js' } ], ignoreList: [] },
+
+	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
+	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'postprocessing/AdaptiveToneMappingPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'LuminosityShader', path: 'shaders/LuminosityShader.js' }, { name: 'ToneMapShader', path: 'shaders/ToneMapShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/AfterimagePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'AfterimageShader', path: 'shaders/AfterimageShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/BloomPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'ConvolutionShader', path: 'shaders/ConvolutionShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/BokehPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'BokehShader', path: 'shaders/BokehShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/ClearPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/CubeTexturePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/DotScreenPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'DotScreenShader', path: 'shaders/DotScreenShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/EffectComposer.js', dependencies: [ { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'MaskPass', path: 'postprocessing/MaskPass.js' }, { name: 'ClearMaskPass', path: 'postprocessing/MaskPass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/FilmPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'FilmShader', path: 'shaders/FilmShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/GlitchPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'DigitalGlitch', path: 'shaders/DigitalGlitch.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/HalftonePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'HalftoneShader', path: 'shaders/HalftoneShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/MaskPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/OutlinePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/RenderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/SAOPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'SAOShader', path: 'shaders/SAOShader.js' }, { name: 'DepthLimitedBlurShader', path: 'shaders/DepthLimitedBlurShader.js' }, { name: 'BlurShaderUtils', path: 'shaders/DepthLimitedBlurShader.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/SavePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/ShaderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/SMAAPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'SMAAEdgesShader', path: 'shaders/SMAAShader.js' }, { name: 'SMAAWeightsShader', path: 'shaders/SMAAShader.js' }, { name: 'SMAABlendShader', path: 'shaders/SMAAShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/SSAARenderPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/SSAOPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'SimplexNoise', path: 'math/SimplexNoise.js' }, { name: 'SSAOShader', path: 'shaders/SSAOShader.js' }, { name: 'SSAOBlurShader', path: 'shaders/SSAOShader.js' }, { name: 'SSAODepthShader', path: 'shaders/SSAOShader.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/TAARenderPass.js', dependencies: [ { name: 'SSAARenderPass', path: 'postprocessing/SSAARenderPass.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/TexturePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+	{ path: 'postprocessing/UnrealBloomPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'LuminosityHighPassShader', path: 'shaders/LuminosityHighPassShader.js' } ], ignoreList: [] },
+
+	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/RaytracingRenderer.js', dependencies: [], ignoreList: [] },
+	{ path: 'renderers/SoftwareRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
+	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
+	{ path: 'renderers/WebGLDeferredRenderer.js', dependencies: [ { name: 'EffectComposer', path: 'postprocessing/EffectComposer.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'RenderPass', path: 'postprocessing/RenderPass.js' }, { name: 'FXAAShader', path: 'shaders/FXAAShader.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
+
+	{ path: 'shaders/AfterimageShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BasicShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BleachBypassShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BlendShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BokehShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BokehShader2.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BrightnessContrastShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/ColorCorrectionShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/ColorifyShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/ConvolutionShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/CopyShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/DepthLimitedBlurShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/DigitalGlitch.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/DOFMipMapShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/DotScreenShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/FilmShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/FocusShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/FreiChenShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/FresnelShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/FXAAShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/GammaCorrectionShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/HalftoneShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/HorizontalBlurShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/HorizontalTiltShiftShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/HueSaturationShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/KaleidoShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/LuminosityHighPassShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/LuminosityShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/MirrorShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/NormalMapShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/ParallaxShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/PixelShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SAOShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SepiaShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SMAAShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SobelOperatorShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SSAOShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/TechnicolorShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/ToneMapShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/TriangleBlurShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/VerticalBlurShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/VerticalTiltShiftShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/VignetteShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/WaterRefractionShader.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/MathUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
+	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
 
 	var file = files[ i ];
-	convert( file.path, file.ignoreList );
+	convert( file.path, file.dependencies, file.ignoreList );
 
 }
 
 //
 
-function convert( path, ignoreList ) {
+function convert( path, exampleDependencies, ignoreList ) {
 
 	var contents = fs.readFileSync( srcFolder + path, 'utf8' );
 
-	var className = '';
-	var dependencies = {};
+	var classNames = [];
+	var coreDependencies = {};
 
 	// imports
 
@@ -65,9 +212,9 @@ function convert( path, ignoreList ) {
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
 
-		className = p1;
+		classNames.push( p1 );
 
-		console.log( className );
+		console.log( p1 );
 
 		return `var ${p1} = `;
 
@@ -76,11 +223,11 @@ function convert( path, ignoreList ) {
 	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)(\.{0,1})/g, function ( match, p1, p2, p3 ) {
 
 		if ( p1 === '\'' ) return match; // Inside a string
-		if ( p2 === className ) return `${p2}${p3}`;
+		if ( classNames.includes( p2 ) ) return `${p2}${p3}`;
 
 		if ( p1 === 'Math' ) {
 
-			dependencies[ '_Math' ] = true;
+			coreDependencies[ '_Math' ] = true;
 
 			return '_Math.';
 
@@ -96,7 +243,7 @@ function convert( path, ignoreList ) {
 
 		if ( ignoreList.includes( p1 ) ) return match;
 
-		dependencies[ p1 ] = true;
+		if ( p1 in THREE ) coreDependencies[ p1 ] = true;
 
 		return `new ${p1}(`;
 
@@ -104,21 +251,21 @@ function convert( path, ignoreList ) {
 
 	// constants
 
-	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9]+)/g, function ( match, p1, p2 ) {
+	contents = contents.replace( /(\'?)THREE\.([a-zA-Z0-9_]+)/g, function ( match, p1, p2 ) {
 
 		if ( ignoreList.includes( p2 ) ) return match;
 		if ( p1 === '\'' ) return match; // Inside a string
-		if ( p2 === className ) return p2;
+		if ( classNames.includes( p2 ) ) return p2;
 
 		if ( p2 === 'Math' || p2 === '_Math' ) {
 
-			dependencies[ '_Math' ] = true;
+			coreDependencies[ '_Math' ] = true;
 
 			return '_Math';
 
 		}
 
-		dependencies[ p2 ] = true;
+		if ( p2 in THREE ) coreDependencies[ p2 ] = true;
 
 		// console.log( match, p2 );
 
@@ -128,19 +275,35 @@ function convert( path, ignoreList ) {
 
 	//
 
-	var keys = Object.keys( dependencies )
-		.filter( value => value !== className )
+	var keys = Object.keys( coreDependencies )
+		.filter( value => ! classNames.includes( value ) )
 		.map( value => value === '_Math' ? 'Math as _Math' : value )
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();
-	var imports = `import {${keys}\n} from "../../../build/three.module.js";`;
-	var exports = `export { ${className} };\n`;
 
-	var output = contents.replace( '_IMPORTS_', keys ? imports : '' ) + '\n' + exports;
+	var imports = '';
+
+	// core imports
+
+	if ( keys ) imports += `import {${keys}\n} from "../../../build/three.module.js";`;
+
+	// example imports
+
+	for ( var dependency of exampleDependencies ) {
+
+		imports += `\nimport { ${dependency.name} } from "../${dependency.path}";`;
+
+	}
+
+	// exports
+
+	var exports = `export { ${classNames.join( ", " )} };\n`;
+
+	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
 
 	// console.log( output );
 
 	fs.writeFileSync( dstFolder + path, output, 'utf-8' );
 
-};
+}

@@ -32,7 +32,7 @@ var scene = new THREE.Scene();
 
 var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-var controls = new THREE.OrbitControls( camera );
+var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 //controls.update() must be called after any manual changes to the camera's transform
 camera.position.set( 0, 20, 100 );
@@ -54,7 +54,7 @@ function animate() {
 
 		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
 		<p>
-			[page:Camera object]: (required) The camera to be controlled.<br><br>
+			[page:Camera object]: (required) The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.<br><br>
 
 			[page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the whole document,
 			however if you only want the controls to work over a specific element (e.g. the canvas) you can specify that here.

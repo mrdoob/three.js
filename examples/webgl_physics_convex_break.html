@@ -38,7 +38,7 @@
 	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/ConvexObjectBreaker.js"></script>
-	<script src="js/QuickHull.js"></script>
+	<script src="js/math/ConvexHull.js"></script>
 	<script src="js/geometries/ConvexGeometry.js"></script>
 
 		<script>
@@ -123,22 +123,24 @@
 		function initGraphics() {
 
 			container = document.getElementById( 'container' );
+			container.innerHTML = '';
 
 			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xbfd1e5 );
 
-			camera.position.set( -14, 8, 16 );
-
-			controls = new THREE.OrbitControls( camera );
-			controls.target.set( 0, 2, 0 );
-			controls.update();
+			camera.position.set( - 14, 8, 16 );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
+			container.appendChild( renderer.domElement );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 2, 0 );
+			controls.update();
 
 			textureLoader = new THREE.TextureLoader();
 
@@ -146,13 +148,13 @@
 			scene.add( ambientLight );
 
 			var light = new THREE.DirectionalLight( 0xffffff, 1 );
-			light.position.set( -10, 18, 5 );
+			light.position.set( - 10, 18, 5 );
 			light.castShadow = true;
 			var d = 14;
-			light.shadow.camera.left = -d;
+			light.shadow.camera.left = - d;
 			light.shadow.camera.right = d;
 			light.shadow.camera.top = d;
-			light.shadow.camera.bottom = -d;
+			light.shadow.camera.bottom = - d;
 
 			light.shadow.camera.near = 2;
 			light.shadow.camera.far = 50;
@@ -161,11 +163,6 @@
 			light.shadow.mapSize.y = 1024;
 
 			scene.add( light );
-
-
-			container.innerHTML = "";
-
-			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
 			stats.domElement.style.position = 'absolute';
@@ -471,8 +468,8 @@
 			for ( var i = 0, il = dispatcher.getNumManifolds(); i < il; i ++ ) {
 
 				var contactManifold = dispatcher.getManifoldByIndexInternal( i );
-				var rb0 = contactManifold.getBody0();
-				var rb1 = contactManifold.getBody1();
+				var rb0 = Ammo.castObject( contactManifold.getBody0(), Ammo.btRigidBody );
+				var rb1 = Ammo.castObject( contactManifold.getBody1(), Ammo.btRigidBody );
 
 				var threeObject0 = Ammo.castObject( rb0.getUserPointer(), Ammo.btVector3 ).threeObject;
 				var threeObject1 = Ammo.castObject( rb1.getUserPointer(), Ammo.btVector3 ).threeObject;
@@ -528,7 +525,13 @@
 					var numObjects = debris.length;
 					for ( var j = 0; j < numObjects; j++ ) {
 
-						createDebrisFromBreakableObject( debris[ j ] );
+						var vel = rb0.getLinearVelocity();
+						var angVel = rb0.getAngularVelocity();
+						var fragment = debris[ j ];
+						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
+						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+
+						createDebrisFromBreakableObject( fragment );
 
 					}
 
@@ -544,7 +547,13 @@
 					var numObjects = debris.length;
 					for ( var j = 0; j < numObjects; j++ ) {
 
-						createDebrisFromBreakableObject( debris[ j ] );
+						var vel = rb1.getLinearVelocity();
+						var angVel = rb1.getAngularVelocity();
+						var fragment = debris[ j ];
+						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
+						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+
+						createDebrisFromBreakableObject( fragment );
 
 					}
 

@@ -44,7 +44,7 @@ THREE.HalftonePass.prototype = Object.assign( Object.create( THREE.Pass.prototyp
 
 	constructor: THREE.HalftonePass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
  		this.material.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 

@@ -256,14 +256,6 @@
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( - 1200, 800, 1200 );
 
-				controls = new THREE.OrbitControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.keys = [ 65, 83, 68 ];
-
 				// SCENE (FINAL)
 
 				scene = new THREE.Scene();
@@ -407,6 +399,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
+
+				// CONTROLS
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.keys = [ 65, 83, 68 ];
 
 				// STATS
 

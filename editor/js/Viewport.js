@@ -413,6 +413,7 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
+		controls.enabled = true; // see #14180
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
@@ -502,10 +503,18 @@ var Viewport = function ( editor ) {
 
 	signals.viewportCameraChanged.add( function ( viewportCamera ) {
 
-		camera = viewportCamera;
+		if ( viewportCamera.isPerspectiveCamera ) {
 
-		camera.aspect = editor.camera.aspect;
-		camera.projectionMatrix.copy( editor.camera.projectionMatrix );
+			viewportCamera.aspect = editor.camera.aspect;
+			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
+
+		} else if ( ! viewportCamera.isOrthographicCamera ) {
+
+			throw "Invalid camera set as viewport";
+
+		}
+
+		camera = viewportCamera;
 
 		render();
 

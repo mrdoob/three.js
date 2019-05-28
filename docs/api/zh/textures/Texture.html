@@ -188,11 +188,15 @@
 		<p>
 			默认为false，这是PNG图像的规范。
 			如果RGB值已被Alpha预乘，请将其设为true。
+			Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+			You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:boolean flipY]</h3>
 		<p>
 		默认为true。翻转图像的Y轴以匹配WebGL纹理坐标空间。
+		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:number unpackAlignment]</h3>

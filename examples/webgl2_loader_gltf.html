@@ -115,7 +115,10 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2' );
+
+				renderer = new WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;

@@ -74,21 +74,6 @@
 				camera.position.z = - 2;
 				camera.up.set( 0, 0, 1 );
 
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 2.0;
-				controls.zoomSpeed = 0.3;
-				controls.panSpeed = 0.2;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
-				controls.minDistance = 0.3;
-				controls.maxDistance = 0.3 * 100;
-
 				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -109,6 +94,21 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 2.0;
+				controls.zoomSpeed = 0.3;
+				controls.panSpeed = 0.2;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.minDistance = 0.3;
+				controls.maxDistance = 0.3 * 100;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

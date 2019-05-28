@@ -1,17 +1,27 @@
 import { DepthPackingStrategies } from '../constants';
 import { MaterialParameters, Material } from './Material';
+import { Texture } from './../textures/Texture';
 
 export interface MeshDepthMaterialParameters extends MaterialParameters {
-  wireframe?: boolean;
-  wireframeLinewidth?: number;
+	depthPacking?: DepthPackingStrategies;
+	displacementMap?: Texture;
+	displacementScale?: number;
+	displacementBias?: number;
+	wireframe?: boolean;
+	wireframeLinewidth?: number;
 }
 
 export class MeshDepthMaterial extends Material {
-  constructor(parameters?: MeshDepthMaterialParameters);
 
-  wireframe: boolean;
-  wireframeLinewidth: number;
-  depthPacking: DepthPackingStrategies;
+	constructor( parameters?: MeshDepthMaterialParameters );
 
-  setValues(parameters: MeshDepthMaterialParameters): void;
+	depthPacking: DepthPackingStrategies;
+	displacementMap: Texture | null;
+	displacementScale: number;
+	displacementBias: number;
+	wireframe: boolean;
+	wireframeLinewidth: number;
+
+	setValues( parameters: MeshDepthMaterialParameters ): void;
+
 }

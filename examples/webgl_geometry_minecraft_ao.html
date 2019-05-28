@@ -45,7 +45,7 @@
 
 		<script src="js/controls/FirstPersonControls.js"></script>
 
-		<script src="js/ImprovedNoise.js"></script>
+		<script src="js/math/ImprovedNoise.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -320,7 +320,7 @@
 
 			function generateHeight( width, height ) {
 
-				var data = [], perlin = new ImprovedNoise(),
+				var data = [], perlin = new THREE.ImprovedNoise(),
 					size = width * height, quality = 2, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {

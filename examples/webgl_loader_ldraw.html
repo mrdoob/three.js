@@ -97,7 +97,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -108,7 +108,11 @@
 
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
-					envMapActivated: false
+					envMapActivated: false,
+					separateObjects: false,
+					displayLines: true,
+					conditionalLines: true,
+					smoothNormals: true
 				};
 
 				gui = new dat.GUI();
@@ -127,6 +131,29 @@
 
 				} );
 
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
+
+					updateLineSegments();
+
+				} );
+
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
+
+					updateLineSegments();
+
+				} );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
@@ -146,6 +173,28 @@
 
 			}
 
+			function updateLineSegments() {
+
+				model.traverse( c => {
+
+					if ( c.isLineSegments ) {
+
+						if ( c.isConditionalLine ) {
+
+							c.visible = guiData.conditionalLines;
+
+						} else {
+
+							c.visible = guiData.displayLines;
+
+						}
+
+					}
+
+				} );
+
+			}
+
 			function reloadObject( resetCamera ) {
 
 				if ( model ) {
@@ -160,6 +209,8 @@
 				showProgressBar();
 
 				var lDrawLoader = new THREE.LDrawLoader();
+				lDrawLoader.separateObjects = guiData.separateObjects;
+				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
@@ -209,6 +260,8 @@
 							}
 
 						}
+
+						updateLineSegments();
 
 						// Adjust camera and light
 
@@ -297,7 +350,7 @@
 		<!-- LDraw.org CC BY 2.0 Parts Library attribution -->
 		<div style="display: block; position: absolute; bottom: 8px; left: 8px; width: 160px; padding: 10px; background-color: #F3F7F8;">
 			<center>
-				<a href="http://www.ldraw.org"><img style="width: 145px" src="files/ldraw_org_logo/Stamp145.png"></a>
+				<a href="http://www.ldraw.org"><img style="width: 145px" src="models/ldraw/ldraw_org_logo/Stamp145.png"></a>
 				<br />
 				<a href="http://www.ldraw.org/">This software uses the LDraw Parts Library</a>
 			</center>

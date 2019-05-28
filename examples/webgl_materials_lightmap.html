@@ -83,12 +83,6 @@
 
 				scene = new THREE.Scene();
 
-				// CONTROLS
-
-				var controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = 0.9 * Math.PI / 2;
-				controls.enableZoom = false;
-
 				// LIGHTS
 
 				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
@@ -129,6 +123,12 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				// CONTROLS
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = 0.9 * Math.PI / 2;
+				controls.enableZoom = false;
 
 				// STATS
 
