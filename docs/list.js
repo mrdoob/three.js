@@ -393,12 +393,12 @@ var list = {
 				"LookupTable": "examples/Lut",
 			},
 
-			"QuickHull": {
-				"Face": "examples/quickhull/Face",
-				"HalfEdge": "examples/quickhull/HalfEdge",
-				"QuickHull": "examples/quickhull/QuickHull",
-				"VertexNode": "examples/quickhull/VertexNode",
-				"VertexList": "examples/quickhull/VertexList"
+			"ConvexHull": {
+				"Face": "examples/math/convexhull/Face",
+				"HalfEdge": "examples/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/math/convexhull/ConvexHull",
+				"VertexNode": "examples/math/convexhull/VertexNode",
+				"VertexList": "examples/math/convexhull/VertexList"
 			},
 
 			"Renderers": {
