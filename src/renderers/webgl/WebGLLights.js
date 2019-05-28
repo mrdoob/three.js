@@ -355,7 +355,7 @@ function WebGLLights() {
 			hash.hemiLength = hemiLength;
 			hash.shadowsLength = shadows.length;
 
-			hash.value++;
+			hash.value ++;
 
 		}
 
