@@ -1,0 +1,73 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - OffscreenCanvas w/Fallback</title>
+    <style>
+    body {
+        margin: 0;
+    }
+    #c {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script src="resources/threejs/r103/three.min.js"></script>
+<script src="shared-cubes.js"></script>
+<script>
+'use strict';
+
+/* global state, init */
+
+function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-cubes.js');
+  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+
+function startMainPage(canvas) {
+  init({canvas});
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');  /* eslint-disable-line no-console */
+}
+
+function main() {  /* eslint consistent-return: 0 */
+  const canvas = document.querySelector('#c');
+  if (canvas.transferControlToOffscreen) {
+    startWorker(canvas);
+  } else {
+    startMainPage(canvas);
+  }
+}
+
+main();
+</script>
+</html>
+

@@ -370,14 +370,11 @@
    * Gets a WebGL context.
    * makes its backing store the size it is displayed.
    * @param {HTMLCanvasElement} canvas a canvas element.
-   * @param {module:webgl-utils.GetWebGLContextOptions} [opt_options] options
    * @memberOf module:webgl-utils
    */
-  let setupLesson = function(canvas, opt_options) {
+  let setupLesson = function(canvas) {
     // only once
     setupLesson = function() {};
-
-    const options = opt_options || {};
 
     if (canvas) {
       canvas.addEventListener('webglcontextlost', function(e) {
