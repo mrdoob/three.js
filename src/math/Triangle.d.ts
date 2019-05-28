@@ -53,11 +53,10 @@ export class Triangle {
     b: Vector3,
     c: Vector3
   ): boolean;
-	static isFrontFacing(
+  static isFrontFacing(
     a: Vector3,
     b: Vector3,
-    c: Vector3,
-		direction: Vector3
+    c: Vector3
   ): boolean;
 
 }
