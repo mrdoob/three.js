@@ -4,7 +4,7 @@ import { LightShadow } from './LightShadow';
 
 export class SpotLightShadow extends LightShadow {
 
-  camera: PerspectiveCamera;
-  update( light: Light ): void;
+	camera: PerspectiveCamera;
+	update( light: Light ): void;
 
 }

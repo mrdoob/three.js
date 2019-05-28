@@ -3,6 +3,6 @@ import { LightShadow } from './LightShadow';
 
 export class DirectionalLightShadow extends LightShadow {
 
-  camera: OrthographicCamera;
+	camera: OrthographicCamera;
 
 }

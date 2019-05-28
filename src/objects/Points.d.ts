@@ -17,23 +17,23 @@ export class Points extends Object3D {
    * @param material An instance of Material (optional).
    */
 	constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[]
-  );
+		geometry?: Geometry | BufferGeometry,
+		material?: Material | Material[]
+	);
 
-  type: 'Points';
-  isPoints: true;
+	type: 'Points';
+	isPoints: true;
 
-  /**
+	/**
    * An instance of Geometry or BufferGeometry, where each vertex designates the position of a particle in the system.
    */
-  geometry: Geometry | BufferGeometry;
+	geometry: Geometry | BufferGeometry;
 
-  /**
+	/**
    * An instance of Material, defining the object's appearance. Default is a PointsMaterial with randomised colour.
    */
-  material: Material | Material[];
+	material: Material | Material[];
 
-  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
 
 }

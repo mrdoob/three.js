@@ -9,24 +9,24 @@ export class TextureLoader {
 
 	constructor( manager?: LoadingManager );
 
-  manager: LoadingManager;
-  crossOrigin: string;
-  withCredentials: string;
-  path: string;
+	manager: LoadingManager;
+	crossOrigin: string;
+	withCredentials: string;
+	path: string;
 
-  /**
+	/**
    * Begin loading from url
    *
    * @param url
    */
-  load(
-    url: string,
-    onLoad?: ( texture: Texture ) => void,
-    onProgress?: ( event: ProgressEvent ) => void,
-    onError?: ( event: ErrorEvent ) => void
-  ): Texture;
-  setCrossOrigin( crossOrigin: string ): TextureLoader;
-  setWithCredentials( value: string ): TextureLoader;
-  setPath( path: string ): TextureLoader;
+	load(
+		url: string,
+		onLoad?: ( texture: Texture ) => void,
+		onProgress?: ( event: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
+	): Texture;
+	setCrossOrigin( crossOrigin: string ): TextureLoader;
+	setWithCredentials( value: string ): TextureLoader;
+	setPath( path: string ): TextureLoader;
 
 }

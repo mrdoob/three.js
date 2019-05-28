@@ -7,15 +7,15 @@ export class LightShadow {
 
 	constructor( camera: Camera );
 
-  camera: Camera;
-  bias: number;
-  radius: number;
-  mapSize: Vector2;
-  map: RenderTarget;
-  matrix: Matrix4;
+	camera: Camera;
+	bias: number;
+	radius: number;
+	mapSize: Vector2;
+	map: RenderTarget;
+	matrix: Matrix4;
 
-  copy( source: LightShadow ): this;
-  clone( recursive?: boolean ): this;
-  toJSON(): any;
+	copy( source: LightShadow ): this;
+	clone( recursive?: boolean ): this;
+	toJSON(): any;
 
 }

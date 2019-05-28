@@ -6,11 +6,11 @@ import { BufferGeometry } from '../core/BufferGeometry';
 export class LineLoop extends Line {
 
 	constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[]
-  );
+		geometry?: Geometry | BufferGeometry,
+		material?: Material | Material[]
+	);
 
-  type: 'LineLoop';
-  isLineLoop: true;
+	type: 'LineLoop';
+	isLineLoop: true;
 
 }

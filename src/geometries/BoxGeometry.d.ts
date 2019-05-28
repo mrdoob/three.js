@@ -5,22 +5,22 @@ import { BufferGeometry } from '../core/BufferGeometry';
 export class BoxBufferGeometry extends BufferGeometry {
 
 	constructor(
-    width?: number,
-    height?: number,
-    depth?: number,
-    widthSegments?: number,
-    heightSegments?: number,
-    depthSegments?: number
-  );
+		width?: number,
+		height?: number,
+		depth?: number,
+		widthSegments?: number,
+		heightSegments?: number,
+		depthSegments?: number
+	);
 
-  parameters: {
-    width: number;
-    height: number;
-    depth: number;
-    widthSegments: number;
-    heightSegments: number;
-    depthSegments: number;
-  };
+	parameters: {
+		width: number;
+		height: number;
+		depth: number;
+		widthSegments: number;
+		heightSegments: number;
+		depthSegments: number;
+	};
 
 }
 
@@ -38,21 +38,21 @@ export class BoxGeometry extends Geometry {
    * @param depthSegments — Number of segmented faces along the depth of the sides.
    */
 	constructor(
-    width?: number,
-    height?: number,
-    depth?: number,
-    widthSegments?: number,
-    heightSegments?: number,
-    depthSegments?: number
-  );
+		width?: number,
+		height?: number,
+		depth?: number,
+		widthSegments?: number,
+		heightSegments?: number,
+		depthSegments?: number
+	);
 
-  parameters: {
-    width: number;
-    height: number;
-    depth: number;
-    widthSegments: number;
-    heightSegments: number;
-    depthSegments: number;
-  };
+	parameters: {
+		width: number;
+		height: number;
+		depth: number;
+		widthSegments: number;
+		heightSegments: number;
+		depthSegments: number;
+	};
 
 }

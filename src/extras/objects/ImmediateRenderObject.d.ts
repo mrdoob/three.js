@@ -14,7 +14,7 @@ export class ImmediateRenderObject extends Object3D {
 
 	constructor( material: Material );
 
-  material: Material;
-  render( renderCallback: Function ): void;
+	material: Material;
+	render( renderCallback: Function ): void;
 
 }

@@ -5,20 +5,20 @@ export class Uniform {
    * @deprecated
    */
 	constructor( type: string, value: any );
-  /**
+	/**
    * @deprecated
    */
-  type: string;
-  value: any;
-  /**
+	type: string;
+	value: any;
+	/**
    * @deprecated Use {@link Object3D#onBeforeRender object.onBeforeRender()} instead.
    */
-  dynamic: boolean;
-  onUpdateCallback: Function;
+	dynamic: boolean;
+	onUpdateCallback: Function;
 
-  /**
+	/**
    * @deprecated Use {@link Object3D#onBeforeRender object.onBeforeRender()} instead.
    */
-  onUpdate( callback: Function ): Uniform;
+	onUpdate( callback: Function ): Uniform;
 
 }

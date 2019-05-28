@@ -1,14 +1,14 @@
 export class WebGLTextures {
 
 	constructor(
-    gl: any,
-    extensions: any,
-    state: any,
-    properties: any,
-    capabilities: any,
-    paramThreeToGL: Function,
-    info: any
-  );
+		gl: any,
+		extensions: any,
+		state: any,
+		properties: any,
+		capabilities: any,
+		paramThreeToGL: Function,
+		info: any
+	);
 
 	setTexture2D( texture: any, slot: number ): void;
 	setTextureCube( texture: any, slot: number ): void;

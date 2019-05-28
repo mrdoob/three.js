@@ -8,72 +8,72 @@ import { Vector } from './../../math/Vector2';
  */
 export class Curve<T extends Vector> {
 
-  /**
+	/**
    * This value determines the amount of divisions when calculating the cumulative segment lengths of a curve via .getLengths.
    * To ensure precision when using methods like .getSpacedPoints, it is recommended to increase .arcLengthDivisions if the curve is very large.
    * Default is 200.
    */
-  arcLengthDivisions: number;
+	arcLengthDivisions: number;
 
-  /**
+	/**
    * Returns a vector for point t of the curve where t is between 0 and 1
    * getPoint(t: number): T;
    */
-  getPoint( t: number, optionalTarget?: T ): T;
+	getPoint( t: number, optionalTarget?: T ): T;
 
-  /**
+	/**
    * Returns a vector for point at relative position in curve according to arc length
    * getPointAt(u: number): T;
    */
-  getPointAt( u: number, optionalTarget?: T ): T;
+	getPointAt( u: number, optionalTarget?: T ): T;
 
-  /**
+	/**
    * Get sequence of points using getPoint( t )
    * getPoints(divisions?: number): T[];
    */
-  getPoints( divisions?: number ): T[];
+	getPoints( divisions?: number ): T[];
 
-  /**
+	/**
    * Get sequence of equi-spaced points using getPointAt( u )
    * getSpacedPoints(divisions?: number): T[];
    */
-  getSpacedPoints( divisions?: number ): T[];
+	getSpacedPoints( divisions?: number ): T[];
 
-  /**
+	/**
    * Get total curve arc length
    */
-  getLength(): number;
+	getLength(): number;
 
-  /**
+	/**
    * Get list of cumulative segment lengths
    */
-  getLengths( divisions?: number ): number[];
+	getLengths( divisions?: number ): number[];
 
-  /**
+	/**
    * Update the cumlative segment distance cache
    */
-  updateArcLengths(): void;
+	updateArcLengths(): void;
 
-  /**
+	/**
    * Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance
    */
-  getUtoTmapping( u: number, distance: number ): number;
+	getUtoTmapping( u: number, distance: number ): number;
 
-  /**
+	/**
    * Returns a unit vector tangent at t. If the subclassed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation
    * getTangent(t: number): T;
    */
-  getTangent( t: number ): T;
+	getTangent( t: number ): T;
 
-  /**
+	/**
    * Returns tangent at equidistance point u on the curve
    * getTangentAt(u: number): T;
    */
-  getTangentAt( u: number ): T;
+	getTangentAt( u: number ): T;
 
-  /**
+	/**
    * @deprecated since r84.
    */
-  static create( constructorFunc: Function, getPointFunc: Function ): Function;
+	static create( constructorFunc: Function, getPointFunc: Function ): Function;
 
 }

@@ -11,11 +11,11 @@ export class MultiMaterial extends Material {
 
 	constructor( materials?: Material[] );
 
-  isMultiMaterial: true;
+	isMultiMaterial: true;
 
-  materials: Material[];
+	materials: Material[];
 
-  toJSON( meta: any ): any;
+	toJSON( meta: any ): any;
 
 }
 
@@ -24,21 +24,21 @@ export class MultiMaterial extends Material {
  */
 
 export interface PointsMaterialParameters extends MaterialParameters {
-  color?: Color | string | number;
-  map?: Texture;
-  size?: number;
-  sizeAttenuation?: boolean;
+	color?: Color | string | number;
+	map?: Texture;
+	size?: number;
+	sizeAttenuation?: boolean;
 }
 
 export class PointsMaterial extends Material {
 
 	constructor( parameters?: PointsMaterialParameters );
 
-  color: Color;
-  map: Texture | null;
-  size: number;
-  sizeAttenuation: boolean;
+	color: Color;
+	map: Texture | null;
+	size: number;
+	sizeAttenuation: boolean;
 
-  setValues( parameters: PointsMaterialParameters ): void;
+	setValues( parameters: PointsMaterialParameters ): void;
 
 }

@@ -7,12 +7,12 @@ export class SpotLightHelper extends Object3D {
 
 	constructor( light: Light, color?: Color | string | number );
 
-  light: Light;
-  matrix: Matrix4;
-  matrixAutoUpdate: boolean;
-  color: Color | string | number | undefined;
+	light: Light;
+	matrix: Matrix4;
+	matrixAutoUpdate: boolean;
+	color: Color | string | number | undefined;
 
-  dispose(): void;
-  update(): void;
+	dispose(): void;
+	update(): void;
 
 }

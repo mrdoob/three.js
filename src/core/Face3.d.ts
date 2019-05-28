@@ -2,9 +2,9 @@ import { Vector3 } from './../math/Vector3';
 import { Color } from './../math/Color';
 
 export interface Event {
-  type: string;
-  target?: any;
-  [attachment: string]: any;
+	type: string;
+	target?: any;
+	[attachment: string]: any;
 }
 
 /**
@@ -28,79 +28,79 @@ export class Face3 {
    * @param materialIndex Material index.
    */
 	constructor(
-    a: number,
-    b: number,
-    c: number,
-    normal?: Vector3,
-    color?: Color,
-    materialIndex?: number
-  );
+		a: number,
+		b: number,
+		c: number,
+		normal?: Vector3,
+		color?: Color,
+		materialIndex?: number
+	);
 	constructor(
-    a: number,
-    b: number,
-    c: number,
-    normal?: Vector3,
-    vertexColors?: Color[],
-    materialIndex?: number
-  );
+		a: number,
+		b: number,
+		c: number,
+		normal?: Vector3,
+		vertexColors?: Color[],
+		materialIndex?: number
+	);
 	constructor(
-    a: number,
-    b: number,
-    c: number,
-    vertexNormals?: Vector3[],
-    color?: Color,
-    materialIndex?: number
-  );
+		a: number,
+		b: number,
+		c: number,
+		vertexNormals?: Vector3[],
+		color?: Color,
+		materialIndex?: number
+	);
 	constructor(
-    a: number,
-    b: number,
-    c: number,
-    vertexNormals?: Vector3[],
-    vertexColors?: Color[],
-    materialIndex?: number
-  );
+		a: number,
+		b: number,
+		c: number,
+		vertexNormals?: Vector3[],
+		vertexColors?: Color[],
+		materialIndex?: number
+	);
 
-  /**
+	/**
    * Vertex A index.
    */
-  a: number;
+	a: number;
 
-  /**
+	/**
    * Vertex B index.
    */
-  b: number;
+	b: number;
 
-  /**
+	/**
    * Vertex C index.
    */
-  c: number;
+	c: number;
 
-  /**
+	/**
    * Face normal.
    */
-  normal: Vector3;
+	normal: Vector3;
 
-  /**
+	/**
    * Array of 4 vertex normals.
    */
-  vertexNormals: Vector3[];
+	vertexNormals: Vector3[];
 
-  /**
+	/**
    * Face color.
    */
-  color: Color;
+	color: Color;
 
-  /**
+	/**
    * Array of 4 vertex normals.
    */
-  vertexColors: Color[];
+	vertexColors: Color[];
 
-  /**
+	/**
    * Material index (points to {@link Geometry.materials}).
    */
-  materialIndex: number;
+	materialIndex: number;
 
-  clone(): this;
-  copy( source: Face3 ): this;
+	clone(): this;
+	copy( source: Face3 ): this;
 
 }

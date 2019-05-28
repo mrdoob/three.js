@@ -9,33 +9,33 @@ import { WebGLUniforms } from './WebGLUniforms';
 export class WebGLProgram {
 
 	constructor(
-    renderer: WebGLRenderer,
-    extensions: WebGLExtensions,
-    code: string,
-    material: ShaderMaterial,
-    shader: WebGLShader,
-    parameters: WebGLRendererParameters,
-    capabilities: WebGLCapabilities,
-    textures: WebGLTextures
-  );
+		renderer: WebGLRenderer,
+		extensions: WebGLExtensions,
+		code: string,
+		material: ShaderMaterial,
+		shader: WebGLShader,
+		parameters: WebGLRendererParameters,
+		capabilities: WebGLCapabilities,
+		textures: WebGLTextures
+	);
 
-  id: number;
-  code: string;
-  usedTimes: number;
-  program: any;
-  vertexShader: WebGLShader;
-  fragmentShader: WebGLShader;
-  /**
+	id: number;
+	code: string;
+	usedTimes: number;
+	program: any;
+	vertexShader: WebGLShader;
+	fragmentShader: WebGLShader;
+	/**
    * @deprecated Use {@link WebGLProgram#getUniforms getUniforms()} instead.
    */
-  uniforms: any;
-  /**
+	uniforms: any;
+	/**
    * @deprecated Use {@link WebGLProgram#getAttributes getAttributes()} instead.
    */
-  attributes: any;
+	attributes: any;
 
-  getUniforms(): WebGLUniforms;
-  getAttributes(): any;
-  destroy(): void;
+	getUniforms(): WebGLUniforms;
+	getAttributes(): any;
+	destroy(): void;
 
 }

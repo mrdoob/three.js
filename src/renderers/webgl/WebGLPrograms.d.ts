@@ -9,21 +9,21 @@ export class WebGLPrograms {
 
 	constructor( renderer: WebGLRenderer, extensions: WebGLExtensions, capabilities: WebGLCapabilities, textures: WebGLTextures );
 
-  programs: WebGLProgram[];
+	programs: WebGLProgram[];
 
-  getParameters(
-    material: ShaderMaterial,
-    lights: any,
-    fog: any,
-    nClipPlanes: number,
-    object: any
-  ): any;
-  getProgramCode( material: ShaderMaterial, parameters: any ): string;
-  acquireProgram(
-    material: ShaderMaterial,
-    parameters: any,
-    code: string
-  ): WebGLProgram;
-  releaseProgram( program: WebGLProgram ): void;
+	getParameters(
+		material: ShaderMaterial,
+		lights: any,
+		fog: any,
+		nClipPlanes: number,
+		object: any
+	): any;
+	getProgramCode( material: ShaderMaterial, parameters: any ): string;
+	acquireProgram(
+		material: ShaderMaterial,
+		parameters: any,
+		code: string
+	): WebGLProgram;
+	releaseProgram( program: WebGLProgram ): void;
 
 }

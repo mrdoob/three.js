@@ -6,10 +6,10 @@ export class SkeletonHelper extends LineSegments {
 
 	constructor( bone: Object3D );
 
-  bones: Bone[];
-  root: Object3D;
+	bones: Bone[];
+	root: Object3D;
 
-  getBoneList( object: Object3D ): Bone[];
-  update(): void;
+	getBoneList( object: Object3D ): Bone[];
+	update(): void;
 
 }

@@ -11,9 +11,9 @@ export class DodecahedronGeometry extends Geometry {
 
 	constructor( radius?: number, detail?: number );
 
-  parameters: {
-    radius: number;
-    detail: number;
-  };
+	parameters: {
+		radius: number;
+		detail: number;
+	};
 
 }

@@ -5,31 +5,31 @@ import { BufferGeometry } from './../core/BufferGeometry';
 export class ParametricBufferGeometry extends BufferGeometry {
 
 	constructor(
-    func: ( u: number, v: number, dest: Vector3 ) => void,
-    slices: number,
-    stacks: number
-  );
+		func: ( u: number, v: number, dest: Vector3 ) => void,
+		slices: number,
+		stacks: number
+	);
 
-  parameters: {
-    func: ( u: number, v: number, dest: Vector3 ) => void;
-    slices: number;
-    stacks: number;
-  };
+	parameters: {
+		func: ( u: number, v: number, dest: Vector3 ) => void;
+		slices: number;
+		stacks: number;
+	};
 
 }
 
 export class ParametricGeometry extends Geometry {
 
 	constructor(
-    func: ( u: number, v: number, dest: Vector3 ) => void,
-    slices: number,
-    stacks: number
-  );
+		func: ( u: number, v: number, dest: Vector3 ) => void,
+		slices: number,
+		stacks: number
+	);
 
-  parameters: {
-    func: ( u: number, v: number, dest: Vector3 ) => void;
-    slices: number;
-    stacks: number;
-  };
+	parameters: {
+		func: ( u: number, v: number, dest: Vector3 ) => void;
+		slices: number;
+		stacks: number;
+	};
 
 }

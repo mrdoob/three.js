@@ -5,6 +5,6 @@ export class SplineCurve extends Curve<Vector2> {
 
 	constructor( points?: Vector2[] );
 
-  points: Vector2[];
+	points: Vector2[];
 
 }

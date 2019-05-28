@@ -7,9 +7,9 @@ export class InstancedBufferGeometry extends BufferGeometry {
 
 	constructor();
 
-  groups: { start: number; count: number; instances: number }[];
-  maxInstancedCount: number;
+	groups: { start: number; count: number; instances: number }[];
+	maxInstancedCount: number;
 
-  addGroup( start: number, count: number, instances: number ): void;
+	addGroup( start: number, count: number, instances: number ): void;
 
 }

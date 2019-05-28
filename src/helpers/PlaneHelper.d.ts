@@ -5,9 +5,9 @@ export class PlaneHelper extends LineSegments {
 
 	constructor( plane: Plane, size?: number, hex?: number );
 
-  plane: Plane;
-  size: number;
+	plane: Plane;
+	size: number;
 
-  updateMatrixWorld( force?: boolean ): void;
+	updateMatrixWorld( force?: boolean ): void;
 
 }

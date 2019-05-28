@@ -4,24 +4,24 @@ import { BufferGeometry } from './../core/BufferGeometry';
 export class SphereBufferGeometry extends BufferGeometry {
 
 	constructor(
-    radius?: number,
-    widthSegments?: number,
-    heightSegments?: number,
-    phiStart?: number,
-    phiLength?: number,
-    thetaStart?: number,
-    thetaLength?: number
-  );
+		radius?: number,
+		widthSegments?: number,
+		heightSegments?: number,
+		phiStart?: number,
+		phiLength?: number,
+		thetaStart?: number,
+		thetaLength?: number
+	);
 
-  parameters: {
-    radius: number;
-    widthSegments: number;
-    heightSegments: number;
-    phiStart: number;
-    phiLength: number;
-    thetaStart: number;
-    thetaLength: number;
-  };
+	parameters: {
+		radius: number;
+		widthSegments: number;
+		heightSegments: number;
+		phiStart: number;
+		phiLength: number;
+		thetaStart: number;
+		thetaLength: number;
+	};
 
 }
 
@@ -42,23 +42,23 @@ export class SphereGeometry extends Geometry {
    * @param thetaLength — specify vertical sweep angle size. Default is Math.PI.
    */
 	constructor(
-    radius?: number,
-    widthSegments?: number,
-    heightSegments?: number,
-    phiStart?: number,
-    phiLength?: number,
-    thetaStart?: number,
-    thetaLength?: number
-  );
+		radius?: number,
+		widthSegments?: number,
+		heightSegments?: number,
+		phiStart?: number,
+		phiLength?: number,
+		thetaStart?: number,
+		thetaLength?: number
+	);
 
-  parameters: {
-    radius: number;
-    widthSegments: number;
-    heightSegments: number;
-    phiStart: number;
-    phiLength: number;
-    thetaStart: number;
-    thetaLength: number;
-  };
+	parameters: {
+		radius: number;
+		widthSegments: number;
+		heightSegments: number;
+		phiStart: number;
+		phiLength: number;
+		thetaStart: number;
+		thetaLength: number;
+	};
 
 }

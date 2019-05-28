@@ -7,23 +7,23 @@ export class Sphere {
 
 	constructor( center?: Vector3, radius?: number );
 
-  center: Vector3;
-  radius: number;
+	center: Vector3;
+	radius: number;
 
-  set( center: Vector3, radius: number ): Sphere;
-  setFromPoints( points: Vector3[], optionalCenter?: Vector3 ): Sphere;
-  clone(): this;
-  copy( sphere: Sphere ): this;
-  empty(): boolean;
-  containsPoint( point: Vector3 ): boolean;
-  distanceToPoint( point: Vector3 ): number;
-  intersectsSphere( sphere: Sphere ): boolean;
-  intersectsBox( box: Box3 ): boolean;
-  intersectsPlane( plane: Plane ): boolean;
-  clampPoint( point: Vector3, target: Vector3 ): Vector3;
-  getBoundingBox( target: Box3 ): Box3;
-  applyMatrix4( matrix: Matrix4 ): Sphere;
-  translate( offset: Vector3 ): Sphere;
-  equals( sphere: Sphere ): boolean;
+	set( center: Vector3, radius: number ): Sphere;
+	setFromPoints( points: Vector3[], optionalCenter?: Vector3 ): Sphere;
+	clone(): this;
+	copy( sphere: Sphere ): this;
+	empty(): boolean;
+	containsPoint( point: Vector3 ): boolean;
+	distanceToPoint( point: Vector3 ): number;
+	intersectsSphere( sphere: Sphere ): boolean;
+	intersectsBox( box: Box3 ): boolean;
+	intersectsPlane( plane: Plane ): boolean;
+	clampPoint( point: Vector3, target: Vector3 ): Vector3;
+	getBoundingBox( target: Box3 ): Box3;
+	applyMatrix4( matrix: Matrix4 ): Sphere;
+	translate( offset: Vector3 ): Sphere;
+	equals( sphere: Sphere ): boolean;
 
 }

@@ -5,14 +5,14 @@ export class FontLoader {
 
 	constructor( manager?: LoadingManager );
 
-  manager: LoadingManager;
+	manager: LoadingManager;
 
-  load(
-    url: string,
-    onLoad?: ( responseFont: Font ) => void,
-    onProgress?: ( event: ProgressEvent ) => void,
-    onError?: ( event: ErrorEvent ) => void
-  ): void;
-  parse( json: any ): Font;
+	load(
+		url: string,
+		onLoad?: ( responseFont: Font ) => void,
+		onProgress?: ( event: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
+	): void;
+	parse( json: any ): Font;
 
 }

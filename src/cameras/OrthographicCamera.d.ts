@@ -20,72 +20,72 @@ export class OrthographicCamera extends Camera {
    * @param far Camera frustum far plane.
    */
 	constructor(
-    left: number,
-    right: number,
-    top: number,
-    bottom: number,
-    near?: number,
-    far?: number
-  );
+		left: number,
+		right: number,
+		top: number,
+		bottom: number,
+		near?: number,
+		far?: number
+	);
 
-  type: 'OrthographicCamera';
+	type: 'OrthographicCamera';
 
-  isOrthographicCamera: true;
+	isOrthographicCamera: true;
 
-  zoom: number;
-  view: null | {
-    enabled: boolean;
-    fullWidth: number;
-    fullHeight: number;
-    offsetX: number;
-    offsetY: number;
-    width: number;
-    height: number;
-  };
+	zoom: number;
+	view: null | {
+		enabled: boolean;
+		fullWidth: number;
+		fullHeight: number;
+		offsetX: number;
+		offsetY: number;
+		width: number;
+		height: number;
+	};
 
-  /**
+	/**
    * Camera frustum left plane.
    */
-  left: number;
+	left: number;
 
-  /**
+	/**
    * Camera frustum right plane.
    */
-  right: number;
+	right: number;
 
-  /**
+	/**
    * Camera frustum top plane.
    */
-  top: number;
+	top: number;
 
-  /**
+	/**
    * Camera frustum bottom plane.
    */
-  bottom: number;
+	bottom: number;
 
-  /**
+	/**
    * Camera frustum near plane.
    */
-  near: number;
+	near: number;
 
-  /**
+	/**
    * Camera frustum far plane.
    */
-  far: number;
+	far: number;
 
-  /**
+	/**
    * Updates the camera projection matrix. Must be called after change of parameters.
    */
-  updateProjectionMatrix(): void;
-  setViewOffset(
-    fullWidth: number,
-    fullHeight: number,
-    offsetX: number,
-    offsetY: number,
-    width: number,
-    height: number
-  ): void;
-  clearViewOffset(): void;
-  toJSON( meta?: any ): any;
+	updateProjectionMatrix(): void;
+	setViewOffset(
+		fullWidth: number,
+		fullHeight: number,
+		offsetX: number,
+		offsetY: number,
+		width: number,
+		height: number
+	): void;
+	clearViewOffset(): void;
+	toJSON( meta?: any ): any;
 
 }

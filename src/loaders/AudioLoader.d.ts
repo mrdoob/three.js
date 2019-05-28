@@ -5,10 +5,10 @@ export class AudioLoader {
 	constructor( manager?: LoadingManager );
 
 	load(
-    url: string,
-    onLoad: Function,
-    onPrgress: Function,
-    onError: Function
-  ): void;
+		url: string,
+		onLoad: Function,
+		onPrgress: Function,
+		onError: Function
+	): void;
 
 }

@@ -7,6 +7,6 @@ export class Box3Helper extends LineSegments {
 
 	constructor( object?: Object3D, color?: Color );
 
-  box: Box3;
+	box: Box3;
 
 }

@@ -6,17 +6,17 @@ export class MaterialLoader {
 
 	constructor( manager?: LoadingManager );
 
-  manager: LoadingManager;
-  textures: { [key: string]: Texture };
+	manager: LoadingManager;
+	textures: { [key: string]: Texture };
 
-  load(
-    url: string,
-    onLoad: ( material: Material ) => void,
-    onProgress?: ( event: ProgressEvent ) => void,
-    onError?: ( event: Error | ErrorEvent ) => void
-  ): void;
-  setTextures( textures: { [key: string]: Texture } ): void;
-  getTexture( name: string ): Texture;
-  parse( json: any ): Material;
+	load(
+		url: string,
+		onLoad: ( material: Material ) => void,
+		onProgress?: ( event: ProgressEvent ) => void,
+		onError?: ( event: Error | ErrorEvent ) => void
+	): void;
+	setTextures( textures: { [key: string]: Texture } ): void;
+	getTexture( name: string ): Texture;
+	parse( json: any ): Material;
 
 }

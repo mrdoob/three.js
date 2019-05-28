@@ -18,18 +18,18 @@ import { EventDispatcher } from './EventDispatcher';
  */
 
 export interface MorphTarget {
-  name: string;
-  vertices: Vector3[];
+	name: string;
+	vertices: Vector3[];
 }
 
 export interface MorphColor {
-  name: string;
-  colors: Color[];
+	name: string;
+	colors: Color[];
 }
 
 export interface MorphNormals {
-  name: string;
-  normals: Vector3[];
+	name: string;
+	normals: Vector3[];
 }
 
 export let GeometryIdCount: number;
@@ -51,217 +51,217 @@ export class Geometry extends EventDispatcher {
 
 	constructor();
 
-  /**
+	/**
    * Unique number of this geometry instance
    */
-  id: number;
+	id: number;
 
-  uuid: string;
+	uuid: string;
 
-  /**
+	/**
    * Name for this geometry. Default is an empty string.
    */
-  name: string;
+	name: string;
 
-  type: string;
+	type: string;
 
-  /**
+	/**
    * The array of vertices hold every position of points of the model.
    * To signal an update in this array, Geometry.verticesNeedUpdate needs to be set to true.
    */
-  vertices: Vector3[];
+	vertices: Vector3[];
 
-  /**
+	/**
    * Array of vertex colors, matching number and order of vertices.
    * Used in ParticleSystem, Line and Ribbon.
    * Meshes use per-face-use-of-vertex colors embedded directly in faces.
    * To signal an update in this array, Geometry.colorsNeedUpdate needs to be set to true.
    */
-  colors: Color[];
+	colors: Color[];
 
-  /**
+	/**
    * Array of triangles or/and quads.
    * The array of faces describe how each vertex in the model is connected with each other.
    * To signal an update in this array, Geometry.elementsNeedUpdate needs to be set to true.
    */
-  faces: Face3[];
+	faces: Face3[];
 
-  /**
+	/**
    * Array of face UV layers.
    * Each UV layer is an array of UV matching order and number of vertices in faces.
    * To signal an update in this array, Geometry.uvsNeedUpdate needs to be set to true.
    */
-  faceVertexUvs: Vector2[][][];
+	faceVertexUvs: Vector2[][][];
 
-  /**
+	/**
    * Array of morph targets. Each morph target is a Javascript object:
    *
    *     { name: "targetName", vertices: [ new THREE.Vector3(), ... ] }
    *
    * Morph vertices match number and order of primary vertices.
    */
-  morphTargets: MorphTarget[];
+	morphTargets: MorphTarget[];
 
-  /**
+	/**
    * Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
    *
    *     morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }
    */
-  morphNormals: MorphNormals[];
+	morphNormals: MorphNormals[];
 
-  /**
+	/**
    * Array of skinning weights, matching number and order of vertices.
    */
-  skinWeights: Vector4[];
+	skinWeights: Vector4[];
 
-  /**
+	/**
    * Array of skinning indices, matching number and order of vertices.
    */
-  skinIndices: Vector4[];
+	skinIndices: Vector4[];
 
-  /**
+	/**
    *
    */
-  lineDistances: number[];
+	lineDistances: number[];
 
-  /**
+	/**
    * Bounding box.
    */
-  boundingBox: Box3;
+	boundingBox: Box3;
 
-  /**
+	/**
    * Bounding sphere.
    */
-  boundingSphere: Sphere;
+	boundingSphere: Sphere;
 
-  /**
+	/**
    * Set to true if the vertices array has been updated.
    */
-  verticesNeedUpdate: boolean;
+	verticesNeedUpdate: boolean;
 
-  /**
+	/**
    * Set to true if the faces array has been updated.
    */
-  elementsNeedUpdate: boolean;
+	elementsNeedUpdate: boolean;
 
-  /**
+	/**
    * Set to true if the uvs array has been updated.
    */
-  uvsNeedUpdate: boolean;
+	uvsNeedUpdate: boolean;
 
-  /**
+	/**
    * Set to true if the normals array has been updated.
    */
-  normalsNeedUpdate: boolean;
+	normalsNeedUpdate: boolean;
 
-  /**
+	/**
    * Set to true if the colors array has been updated.
    */
-  colorsNeedUpdate: boolean;
+	colorsNeedUpdate: boolean;
 
-  /**
+	/**
    * Set to true if the linedistances array has been updated.
    */
-  lineDistancesNeedUpdate: boolean;
+	lineDistancesNeedUpdate: boolean;
 
-  /**
+	/**
    *
    */
-  groupsNeedUpdate: boolean;
+	groupsNeedUpdate: boolean;
 
-  /**
+	/**
    * Bakes matrix transform directly into vertex coordinates.
    */
-  applyMatrix( matrix: Matrix4 ): Geometry;
+	applyMatrix( matrix: Matrix4 ): Geometry;
 
-  rotateX( angle: number ): Geometry;
-  rotateY( angle: number ): Geometry;
-  rotateZ( angle: number ): Geometry;
+	rotateX( angle: number ): Geometry;
+	rotateY( angle: number ): Geometry;
+	rotateZ( angle: number ): Geometry;
 
-  translate( x: number, y: number, z: number ): Geometry;
-  scale( x: number, y: number, z: number ): Geometry;
-  lookAt( vector: Vector3 ): void;
+	translate( x: number, y: number, z: number ): Geometry;
+	scale( x: number, y: number, z: number ): Geometry;
+	lookAt( vector: Vector3 ): void;
 
-  fromBufferGeometry( geometry: BufferGeometry ): Geometry;
+	fromBufferGeometry( geometry: BufferGeometry ): Geometry;
 
-  center(): Geometry;
+	center(): Geometry;
 
-  normalize(): Geometry;
+	normalize(): Geometry;
 
-  /**
+	/**
    * Computes face normals.
    */
-  computeFaceNormals(): void;
+	computeFaceNormals(): void;
 
-  /**
+	/**
    * Computes vertex normals by averaging face normals.
    * Face normals must be existing / computed beforehand.
    */
-  computeVertexNormals( areaWeighted?: boolean ): void;
+	computeVertexNormals( areaWeighted?: boolean ): void;
 
-  /**
+	/**
    * Compute vertex normals, but duplicating face normals.
    */
-  computeFlatVertexNormals(): void;
+	computeFlatVertexNormals(): void;
 
-  /**
+	/**
    * Computes morph normals.
    */
-  computeMorphNormals(): void;
+	computeMorphNormals(): void;
 
-  /**
+	/**
    * Computes bounding box of the geometry, updating {@link Geometry.boundingBox} attribute.
    */
-  computeBoundingBox(): void;
+	computeBoundingBox(): void;
 
-  /**
+	/**
    * Computes bounding sphere of the geometry, updating Geometry.boundingSphere attribute.
    * Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are null.
    */
-  computeBoundingSphere(): void;
+	computeBoundingSphere(): void;
 
-  merge(
-    geometry: Geometry,
-    matrix?: Matrix,
-    materialIndexOffset?: number
-  ): void;
+	merge(
+		geometry: Geometry,
+		matrix?: Matrix,
+		materialIndexOffset?: number
+	): void;
 
-  mergeMesh( mesh: Mesh ): void;
+	mergeMesh( mesh: Mesh ): void;
 
-  /**
+	/**
    * Checks for duplicate vertices using hashmap.
    * Duplicated vertices are removed and faces' vertices are updated.
    */
-  mergeVertices(): number;
+	mergeVertices(): number;
 
-  setFromPoints( points: Array<Vector2> | Array<Vector3> ): this;
+	setFromPoints( points: Array<Vector2> | Array<Vector3> ): this;
 
-  sortFacesByMaterialIndex(): void;
+	sortFacesByMaterialIndex(): void;
 
-  toJSON(): any;
+	toJSON(): any;
 
-  /**
+	/**
    * Creates a new clone of the Geometry.
    */
-  clone(): this;
+	clone(): this;
 
-  copy( source: Geometry ): this;
+	copy( source: Geometry ): this;
 
-  /**
+	/**
    * Removes The object from memory.
    * Don't forget to call this method when you remove an geometry because it can cuase meomory leaks.
    */
-  dispose(): void;
+	dispose(): void;
 
-  // These properties do not exist in a normal Geometry class, but if you use the instance that was passed by JSONLoader, it will be added.
-  bones: Bone[];
-  animation: AnimationClip;
-  animations: AnimationClip[];
+	// These properties do not exist in a normal Geometry class, but if you use the instance that was passed by JSONLoader, it will be added.
+	bones: Bone[];
+	animation: AnimationClip;
+	animations: AnimationClip[];
 
-  // EventDispatcher mixins
-  addEventListener( type: string, listener: ( event: Event ) => void ): void;
-  hasEventListener( type: string, listener: ( event: Event ) => void ): boolean;
-  removeEventListener( type: string, listener: ( event: Event ) => void ): void;
-  dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
+	// EventDispatcher mixins
+	addEventListener( type: string, listener: ( event: Event ) => void ): void;
+	hasEventListener( type: string, listener: ( event: Event ) => void ): boolean;
+	removeEventListener( type: string, listener: ( event: Event ) => void ): void;
+	dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
 
 }

@@ -9,14 +9,14 @@ export class Sprite extends Object3D {
 
 	constructor( material?: SpriteMaterial );
 
-  type: 'Sprite';
-  isSprite: true;
+	type: 'Sprite';
+	isSprite: true;
 
-  geometry: BufferGeometry;
-  material: SpriteMaterial;
-  center: Vector2;
+	geometry: BufferGeometry;
+	material: SpriteMaterial;
+	center: Vector2;
 
-  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
-  copy( source: this ): this;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	copy( source: this ): this;
 
 }

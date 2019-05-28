@@ -7,7 +7,7 @@ export class RectAreaLightHelper {
 
 	constructor( light: RectAreaLight, color?: Color | string | number );
 
-  light: RectAreaLight;
-  color: Color | string | number | undefined;
+	light: RectAreaLight;
+	color: Color | string | number | undefined;
 
 }

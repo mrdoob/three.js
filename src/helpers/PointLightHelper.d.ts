@@ -6,17 +6,17 @@ import { Object3D } from './../core/Object3D';
 export class PointLightHelper extends Object3D {
 
 	constructor(
-    light: PointLight,
-    sphereSize?: number,
-    color?: Color | string | number
-  );
+		light: PointLight,
+		sphereSize?: number,
+		color?: Color | string | number
+	);
 
-  light: PointLight;
-  color: Color | string | number | undefined;
-  matrix: Matrix4;
-  matrixAutoUpdate: boolean;
+	light: PointLight;
+	color: Color | string | number | undefined;
+	matrix: Matrix4;
+	matrixAutoUpdate: boolean;
 
-  dispose(): void;
-  update(): void;
+	dispose(): void;
+	update(): void;
 
 }

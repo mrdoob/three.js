@@ -14,22 +14,22 @@ export class Camera extends Object3D {
    */
 	constructor();
 
-  /**
+	/**
    * This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.
    */
-  matrixWorldInverse: Matrix4;
+	matrixWorldInverse: Matrix4;
 
-  /**
+	/**
    * This is the matrix which contains the projection.
    */
-  projectionMatrix: Matrix4;
+	projectionMatrix: Matrix4;
 
-  isCamera: true;
+	isCamera: true;
 
-  copy( source: Camera, recursive?: boolean ): this;
+	copy( source: Camera, recursive?: boolean ): this;
 
-  getWorldDirection( target: Vector3 ): Vector3;
+	getWorldDirection( target: Vector3 ): Vector3;
 
-  updateMatrixWorld( force?: boolean ): void;
+	updateMatrixWorld( force?: boolean ): void;
 
 }

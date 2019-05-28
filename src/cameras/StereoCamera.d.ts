@@ -5,13 +5,13 @@ export class StereoCamera extends Camera {
 
 	constructor();
 
-  type: 'StereoCamera';
+	type: 'StereoCamera';
 
-  aspect: number;
-  eyeSep: number;
-  cameraL: PerspectiveCamera;
-  cameraR: PerspectiveCamera;
+	aspect: number;
+	eyeSep: number;
+	cameraL: PerspectiveCamera;
+	cameraR: PerspectiveCamera;
 
-  update( camera: PerspectiveCamera ): void;
+	update( camera: PerspectiveCamera ): void;
 
 }

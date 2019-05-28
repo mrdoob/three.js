@@ -5,10 +5,10 @@ export class QuadraticBezierCurve3 extends Curve<Vector3> {
 
 	constructor( v0: Vector3, v1: Vector3, v2: Vector3 );
 
-  v0: Vector3;
-  v1: Vector3;
-  v2: Vector3;
+	v0: Vector3;
+	v1: Vector3;
+	v2: Vector3;
 
-  getPoint( t: number ): Vector3;
+	getPoint( t: number ): Vector3;
 
 }

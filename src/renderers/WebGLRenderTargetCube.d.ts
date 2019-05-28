@@ -6,9 +6,9 @@ import {
 export class WebGLRenderTargetCube extends WebGLRenderTarget {
 
 	constructor(
-    width: number,
-    height: number,
-    options?: WebGLRenderTargetOptions
-  );
+		width: number,
+		height: number,
+		options?: WebGLRenderTargetOptions
+	);
 
 }

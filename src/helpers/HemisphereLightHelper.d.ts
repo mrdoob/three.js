@@ -7,19 +7,19 @@ import { Object3D } from './../core/Object3D';
 export class HemisphereLightHelper extends Object3D {
 
 	constructor(
-    light: HemisphereLight,
-    size: number,
-    color?: Color | number | string
-  );
+		light: HemisphereLight,
+		size: number,
+		color?: Color | number | string
+	);
 
-  light: HemisphereLight;
-  matrix: Matrix4;
-  matrixAutoUpdate: boolean;
-  material: MeshBasicMaterial;
+	light: HemisphereLight;
+	matrix: Matrix4;
+	matrixAutoUpdate: boolean;
+	material: MeshBasicMaterial;
 
-  color: Color | string | number | undefined;
+	color: Color | string | number | undefined;
 
-  dispose(): void;
-  update(): void;
+	dispose(): void;
+	update(): void;
 
 }

@@ -8,18 +8,18 @@ import { Intersection } from '../core/Raycaster';
 export class Line extends Object3D {
 
 	constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[],
-    mode?: number
-  );
+		geometry?: Geometry | BufferGeometry,
+		material?: Material | Material[],
+		mode?: number
+	);
 
-  geometry: Geometry | BufferGeometry;
-  material: Material | Material[];
+	geometry: Geometry | BufferGeometry;
+	material: Material | Material[];
 
-  type: 'Line' | 'LineLoop' | 'LineSegments';
-  isLine: true;
+	type: 'Line' | 'LineLoop' | 'LineSegments';
+	isLine: true;
 
-  computeLineDistances(): this;
-  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	computeLineDistances(): this;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
 
 }

@@ -7,19 +7,19 @@ export class LOD extends Object3D {
 
 	constructor();
 
-  type: 'LOD';
+	type: 'LOD';
 
-  levels: { distance: number; object: Object3D }[];
+	levels: { distance: number; object: Object3D }[];
 
-  addLevel( object: Object3D, distance?: number ): this;
-  getObjectForDistance( distance: number ): Object3D;
-  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
-  update( camera: Camera ): void;
-  toJSON( meta: any ): any;
+	addLevel( object: Object3D, distance?: number ): this;
+	getObjectForDistance( distance: number ): Object3D;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	update( camera: Camera ): void;
+	toJSON( meta: any ): any;
 
-  /**
+	/**
    * @deprecated Use {@link LOD#levels .levels} instead.
    */
-  objects: any[];
+	objects: any[];
 
 }

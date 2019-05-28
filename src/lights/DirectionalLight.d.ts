@@ -18,17 +18,17 @@ export class DirectionalLight extends Light {
 
 	constructor( color?: Color | string | number, intensity?: number );
 
-  /**
+	/**
    * Target used for shadow camera orientation.
    */
-  target: Object3D;
+	target: Object3D;
 
-  /**
+	/**
    * Light's intensity.
    * Default — 1.0.
    */
-  intensity: number;
+	intensity: number;
 
-  shadow: DirectionalLightShadow;
+	shadow: DirectionalLightShadow;
 
 }

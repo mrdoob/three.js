@@ -5,9 +5,9 @@ export class CameraHelper extends LineSegments {
 
 	constructor( camera: Camera );
 
-  camera: Camera;
-  pointMap: { [id: string]: number[] };
+	camera: Camera;
+	pointMap: { [id: string]: number[] };
 
-  update(): void;
+	update(): void;
 
 }

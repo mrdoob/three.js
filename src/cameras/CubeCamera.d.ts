@@ -7,15 +7,15 @@ export class CubeCamera extends Object3D {
 
 	constructor( near?: number, far?: number, cubeResolution?: number );
 
-  type: 'CubeCamera';
+	type: 'CubeCamera';
 
-  renderTarget: WebGLRenderTargetCube;
+	renderTarget: WebGLRenderTargetCube;
 
-  /**
+	/**
    * @deprecated Use {@link CubeCamera#update .update()} instead
    */
-  //updateCubeMap(renderer: Renderer, scene: Scene): void;
+	//updateCubeMap(renderer: Renderer, scene: Scene): void;
 
-  update( renderer: WebGLRenderer, scene: Scene ): void;
+	update( renderer: WebGLRenderer, scene: Scene ): void;
 
 }
