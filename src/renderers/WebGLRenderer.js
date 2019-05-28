@@ -2602,6 +2602,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	/*
+	if ( typeof __THREE_DEVTOOLS__ !== undefined ) {
+		__THREE_DEVTOOLS__.dispatchEvent( { type: 'renderer', value: this } );
+	}
+	*/
+
 }
 
 export { WebGLRenderer };
