@@ -3,7 +3,7 @@
  *
  * Timeliner GUI library (required to use this class):
  *
- * 		./libs/timeliner_gui.min.js
+ * 		../libs/timeliner_gui.min.js
  *
  * Source code:
  *
@@ -35,7 +35,7 @@ THREE.TimelinerController.prototype = {
 
 	constructor: THREE.TimelinerController,
 
-	init: function( timeliner ) {
+	init: function () {
 
 		var tracks = [],
 			trackInfo = this._trackInfo;
@@ -44,9 +44,8 @@ THREE.TimelinerController.prototype = {
 
 			var spec = trackInfo[ i ];
 
-			tracks.push( this._addTrack(
-					spec.type, spec.propertyPath,
-					spec.initialValue, spec.interpolation ) );
+			tracks.push( this._addTrack( spec.type, spec.propertyPath, spec.initialValue, spec.interpolation ) );
+
 		}
 
 		this._clip = new THREE.AnimationClip( 'editclip', 0, tracks );
@@ -54,7 +53,7 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	setDisplayTime: function( time ) {
+	setDisplayTime: function ( time ) {
 
 		this._action.time = time;
 		this._mixer.update( 0 );
@@ -63,25 +62,25 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	setDuration: function( duration ) {
+	setDuration: function ( duration ) {
 
 		this._clip.duration = duration;
 
 	},
 
-	getChannelNames: function() {
+	getChannelNames: function () {
 
 		return this._channelNames;
 
 	},
 
-	getChannelKeyTimes: function( channelName ) {
+	getChannelKeyTimes: function ( channelName ) {
 
 		return this._tracks[ channelName ].times;
 
 	},
 
-	setKeyframe: function( channelName, time ) {
+	setKeyframe: function ( channelName, time ) {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
@@ -106,8 +105,7 @@ THREE.TimelinerController.prototype = {
 
 			}
 
-			for ( var i = nValues - 1,
-					e = offset + stride - 1; i !== e; -- i ) {
+			for ( var i = nValues - 1, e = offset + stride - 1; i !== e; -- i ) {
 
 				values[ i ] = values[ i - stride ];
 
@@ -120,7 +118,7 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	delKeyframe: function( channelName, time ) {
+	delKeyframe: function ( channelName, time ) {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
@@ -159,7 +157,7 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	moveKeyframe: function( channelName, time, delta, moveRemaining ) {
+	moveKeyframe: function ( channelName, time, delta, moveRemaining ) {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
@@ -179,7 +177,7 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	serialize: function() {
+	serialize: function () {
 
 		var result = {
 				duration: this._clip.duration,
@@ -209,7 +207,7 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	deserialize: function( structs ) {
+	deserialize: function ( structs ) {
 
 		var names = this._channelNames,
 			tracks = this._tracks,
@@ -234,33 +232,29 @@ THREE.TimelinerController.prototype = {
 
 	},
 
-	_sort: function( track ) {
+	_sort: function ( track ) {
 
-		var times = track.times,
-			order = THREE.AnimationUtils.getKeyframeOrder( times );
+		var times = track.times, order = THREE.AnimationUtils.getKeyframeOrder( times );
 
-		this._setArray( times,
-				THREE.AnimationUtils.sortedArray( times, 1, order ) );
+		this._setArray( times, THREE.AnimationUtils.sortedArray( times, 1, order ) );
 
 		var values = track.values,
 			stride = track.getValueSize();
 
-		this._setArray( values,
-				THREE.AnimationUtils.sortedArray( values, stride, order ) );
+		this._setArray( values, THREE.AnimationUtils.sortedArray( values, stride, order ) );
 
 	},
 
-	_setArray: function( dst, src ) {
+	_setArray: function ( dst, src ) {
 
 		dst.length = 0;
 		dst.push.apply( dst, src );
 
 	},
 
-	_addTrack: function( type, prop, initialValue, interpolation ) {
+	_addTrack: function ( type, prop, initialValue, interpolation ) {
 
-		var track = new type(
-				prop, [ 0 ], initialValue, interpolation );
+		var track = new type( prop, [ 0 ], initialValue, interpolation );
 
 		// data must be in JS arrays so it can be resized
 		track.times = Array.prototype.slice.call( track.times );
