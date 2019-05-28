@@ -2414,7 +2414,7 @@ function WebGLRenderer( parameters ) {
 	//
 	this.setFramebuffer = function ( value ) {
 
-		if (_framebuffer !== value ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
+		if ( _framebuffer !== value ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
 
 		_framebuffer = value;
 

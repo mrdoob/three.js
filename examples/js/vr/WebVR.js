@@ -91,11 +91,7 @@ var WEBVR = {
 
 			};
 
-			if ( device ) {
-
-				renderer.vr.setDevice( device );
-
-			}
+			if ( device ) renderer.vr.setDevice( device );
 
 		}
 
@@ -142,9 +138,7 @@ var WEBVR = {
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSessionMode( 'immersive-vr' ).then( function () {
-				showEnterXR( );
-			});
+			navigator.xr.supportsSessionMode( 'immersive-vr' ).then( showEnterXR );
 
 			return button;
 
