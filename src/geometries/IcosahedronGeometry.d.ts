@@ -1,5 +1,3 @@
-import { Shape } from './../extras/core/Shape';
-import { UVGenerator } from './ExtrudeGeometry';
 import {
 	PolyhedronGeometry,
 	PolyhedronBufferGeometry,

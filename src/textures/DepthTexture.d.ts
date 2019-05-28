@@ -3,9 +3,7 @@ import {
 	Mapping,
 	Wrapping,
 	TextureFilter,
-	PixelFormat,
 	TextureDataType,
-	TextureEncoding,
 } from '../constants';
 
 export class DepthTexture extends Texture {

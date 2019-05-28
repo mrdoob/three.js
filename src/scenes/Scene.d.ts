@@ -1,5 +1,3 @@
-import { WebGLRenderer } from './../renderers/WebGLRenderer';
-import { Camera } from './../cameras/Camera';
 import { IFog } from './Fog';
 import { Material } from './../materials/Material';
 import { Object3D } from './../core/Object3D';

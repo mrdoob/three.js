@@ -1,4 +1,3 @@
-import { Shape } from './../extras/core/Shape';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 

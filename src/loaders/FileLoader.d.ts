@@ -1,5 +1,4 @@
 import { LoadingManager } from './LoadingManager';
-import { Loader } from './Loader';
 
 /**
  * Interface for all loaders

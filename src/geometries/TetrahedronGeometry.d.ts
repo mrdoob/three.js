@@ -1,6 +1,4 @@
-import { PolyhedronGeometry } from './PolyhedronGeometry';
-import { BufferGeometry } from './../core/BufferGeometry';
-import { PolyhedronBufferGeometry } from './PolyhedronGeometry';
+import { PolyhedronGeometry, PolyhedronBufferGeometry } from './PolyhedronGeometry';
 
 export class TetrahedronBufferGeometry extends PolyhedronBufferGeometry {
 

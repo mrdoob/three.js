@@ -3,11 +3,10 @@ import { Box3 } from './../math/Box3';
 import { Color } from './../math/Color';
 import { LineSegments } from './../objects/LineSegments';
 
-export class Box3Helper {
+export class Box3Helper extends LineSegments {
 
 	constructor( object?: Object3D, color?: Color );
 
-  type: string;
   box: Box3;
 
 }
