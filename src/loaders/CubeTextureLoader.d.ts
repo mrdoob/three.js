@@ -2,7 +2,8 @@ import { LoadingManager } from './LoadingManager';
 import { CubeTexture } from './../textures/CubeTexture';
 
 export class CubeTextureLoader {
-  constructor(manager?: LoadingManager);
+
+	constructor( manager?: LoadingManager );
 
   manager: LoadingManager;
   crossOrigin: string;
@@ -10,10 +11,11 @@ export class CubeTextureLoader {
 
   load(
     urls: Array<string>,
-    onLoad?: (texture: CubeTexture) => void,
-    onProgress?: (event: ProgressEvent) => void,
-    onError?: (event: ErrorEvent) => void
+    onLoad?: ( texture: CubeTexture ) => void,
+    onProgress?: ( event: ProgressEvent ) => void,
+    onError?: ( event: ErrorEvent ) => void
   ): CubeTexture;
-  setCrossOrigin(crossOrigin: string): this;
-  setPath(path: string): this;
+  setCrossOrigin( crossOrigin: string ): this;
+  setPath( path: string ): this;
+
 }

@@ -1,16 +1,17 @@
 import { Texture } from './Texture';
 import {
-  Mapping,
-  Wrapping,
-  TextureFilter,
-  PixelFormat,
-  TextureDataType,
-  TextureEncoding,
+	Mapping,
+	Wrapping,
+	TextureFilter,
+	PixelFormat,
+	TextureDataType,
+	TextureEncoding,
 } from '../constants';
 import { TypedArray } from '../polyfills';
 
 export class DataTexture extends Texture {
-  constructor(
+
+	constructor(
     data: ArrayBuffer | TypedArray,
     width: number,
     height: number,
@@ -26,4 +27,5 @@ export class DataTexture extends Texture {
   );
 
   image: ImageData;
+
 }

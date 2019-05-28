@@ -3,7 +3,8 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export class PolyhedronBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     vertices: number[],
     indices: number[],
     radius?: number,
@@ -16,10 +17,12 @@ export class PolyhedronBufferGeometry extends BufferGeometry {
     radius: number;
     detail: number;
   };
+
 }
 
 export class PolyhedronGeometry extends Geometry {
-  constructor(
+
+	constructor(
     vertices: number[],
     indices: number[],
     radius?: number,
@@ -33,4 +36,5 @@ export class PolyhedronGeometry extends Geometry {
     detail: number;
   };
   boundingSphere: Sphere;
+
 }

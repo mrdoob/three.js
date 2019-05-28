@@ -8,7 +8,8 @@ import { Object3D } from './../core/Object3D';
  * Abstract base class for lights.
  */
 export class Light extends Object3D {
-  constructor(hex?: number | string, intensity?: number);
+
+	constructor( hex?: number | string, intensity?: number );
 
   color: Color;
   intensity: number;
@@ -55,4 +56,5 @@ export class Light extends Object3D {
    * @deprecated Use shadow.mapSize.height instead.
    */
   shadowMapHeight: any;
+
 }

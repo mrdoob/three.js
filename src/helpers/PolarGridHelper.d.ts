@@ -6,7 +6,8 @@ import { BufferGeometry } from '../core/BufferGeometry';
 import { Color } from '../math/Color';
 
 export class PolarGridHelper {
-  constructor(
+
+	constructor(
     radius: number,
     radials: number,
     circles: number,
@@ -14,4 +15,5 @@ export class PolarGridHelper {
     color1: Color | string | number | undefined,
     color2: Color | string | number | undefined
   );
+
 }

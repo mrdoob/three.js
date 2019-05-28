@@ -15,7 +15,8 @@ export interface TextGeometryParameters {
 }
 
 export class TextBufferGeometry extends ExtrudeBufferGeometry {
-  constructor(text: string, parameters?: TextGeometryParameters);
+
+	constructor( text: string, parameters?: TextGeometryParameters );
 
   parameters: {
     font: Font;
@@ -28,10 +29,12 @@ export class TextBufferGeometry extends ExtrudeBufferGeometry {
     bevelOffset: number;
     bevelSegments: number;
   };
+
 }
 
 export class TextGeometry extends ExtrudeGeometry {
-  constructor(text: string, parameters?: TextGeometryParameters);
+
+	constructor( text: string, parameters?: TextGeometryParameters );
 
   parameters: {
     font: Font;
@@ -44,4 +47,5 @@ export class TextGeometry extends ExtrudeGeometry {
     bevelOffset: number;
     bevelSegments: number;
   };
+
 }

@@ -33,7 +33,8 @@ export namespace CurveUtils {
 }
 
 export class CatmullRomCurve3 extends Curve<Vector3> {
-  constructor(
+
+	constructor(
     points?: Vector3[],
     closed?: boolean,
     curveType?: string,
@@ -42,5 +43,6 @@ export class CatmullRomCurve3 extends Curve<Vector3> {
 
   points: Vector3[];
 
-  getPoint(t: number): Vector3;
+  getPoint( t: number ): Vector3;
+
 }

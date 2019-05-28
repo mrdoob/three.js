@@ -13,8 +13,9 @@ export interface HSL {
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/math/Color.js">src/math/Color.js</a>
  */
 export class Color {
-  constructor(color?: Color | string | number);
-  constructor(r: number, g: number, b: number);
+
+	constructor( color?: Color | string | number );
+	constructor( r: number, g: number, b: number );
 
   /**
    * Red channel value between 0 and 1. Default is 1.
@@ -31,11 +32,11 @@ export class Color {
    */
   b: number;
 
-  set(color: Color): Color;
-  set(color: number): Color;
-  set(color: string): Color;
-  setScalar(scalar: number): Color;
-  setHex(hex: number): Color;
+  set( color: Color ): Color;
+  set( color: number ): Color;
+  set( color: string ): Color;
+  setScalar( scalar: number ): Color;
+  setHex( hex: number ): Color;
 
   /**
    * Sets this color from RGB values.
@@ -43,7 +44,7 @@ export class Color {
    * @param g Green channel value between 0 and 1.
    * @param b Blue channel value between 0 and 1.
    */
-  setRGB(r: number, g: number, b: number): Color;
+  setRGB( r: number, g: number, b: number ): Color;
 
   /**
    * Sets this color from HSL values.
@@ -53,13 +54,13 @@ export class Color {
    * @param s Saturation value channel between 0 and 1.
    * @param l Value channel value between 0 and 1.
    */
-  setHSL(h: number, s: number, l: number): Color;
+  setHSL( h: number, s: number, l: number ): Color;
 
   /**
    * Sets this color from a CSS context style string.
    * @param contextStyle Color in CSS context style format.
    */
-  setStyle(style: string): Color;
+  setStyle( style: string ): Color;
 
   /**
    * Clones this color.
@@ -70,19 +71,19 @@ export class Color {
    * Copies given color.
    * @param color Color to copy.
    */
-  copy(color: Color): this;
+  copy( color: Color ): this;
 
   /**
    * Copies given color making conversion from gamma to linear space.
    * @param color Color to copy.
    */
-  copyGammaToLinear(color: Color, gammaFactor?: number): Color;
+  copyGammaToLinear( color: Color, gammaFactor?: number ): Color;
 
   /**
    * Copies given color making conversion from linear to gamma space.
    * @param color Color to copy.
    */
-  copyLinearToGamma(color: Color, gammaFactor?: number): Color;
+  copyLinearToGamma( color: Color, gammaFactor?: number ): Color;
 
   /**
    * Converts this color from gamma to linear space.
@@ -104,7 +105,7 @@ export class Color {
    */
   getHexString(): string;
 
-  getHSL(target: HSL): HSL;
+  getHSL( target: HSL ): HSL;
 
   /**
    * Returns the value of this color in CSS context style.
@@ -112,18 +113,19 @@ export class Color {
    */
   getStyle(): string;
 
-  offsetHSL(h: number, s: number, l: number): this;
+  offsetHSL( h: number, s: number, l: number ): this;
 
-  add(color: Color): this;
-  addColors(color1: Color, color2: Color): this;
-  addScalar(s: number): this;
-  sub(color: Color): this;
-  multiply(color: Color): this;
-  multiplyScalar(s: number): this;
-  lerp(color: Color, alpha: number): this;
-  lerpHSL(color: Color, alpha: number): this;
-  equals(color: Color): boolean;
-  fromArray(rgb: number[], offset?: number): this;
-  toArray(array?: number[], offset?: number): number[];
-  toArray(xyz: ArrayLike<number>, offset?: number): ArrayLike<number>;
+  add( color: Color ): this;
+  addColors( color1: Color, color2: Color ): this;
+  addScalar( s: number ): this;
+  sub( color: Color ): this;
+  multiply( color: Color ): this;
+  multiplyScalar( s: number ): this;
+  lerp( color: Color, alpha: number ): this;
+  lerpHSL( color: Color, alpha: number ): this;
+  equals( color: Color ): boolean;
+  fromArray( rgb: number[], offset?: number ): this;
+  toArray( array?: number[], offset?: number ): number[];
+  toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
 }

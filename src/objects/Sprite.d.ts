@@ -6,7 +6,8 @@ import { SpriteMaterial } from '../materials/Materials';
 import { BufferGeometry } from '../core/BufferGeometry';
 
 export class Sprite extends Object3D {
-  constructor(material?: SpriteMaterial);
+
+	constructor( material?: SpriteMaterial );
 
   type: 'Sprite';
   isSprite: true;
@@ -15,6 +16,7 @@ export class Sprite extends Object3D {
   material: SpriteMaterial;
   center: Vector2;
 
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
-  copy(source: this): this;
+  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+  copy( source: this ): this;
+
 }

@@ -7,7 +7,8 @@ import { Light } from './Light';
  * A point light that can cast shadow in one direction.
  */
 export class SpotLight extends Light {
-  constructor(
+
+	constructor(
     color?: Color | string | number,
     intensity?: number,
     distance?: number,
@@ -50,4 +51,5 @@ export class SpotLight extends Light {
   shadow: SpotLightShadow;
   power: number;
   penumbra: number;
+
 }

@@ -4,7 +4,8 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export class TorusBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     radius?: number,
     tube?: number,
     radialSegments?: number,
@@ -19,10 +20,12 @@ export class TorusBufferGeometry extends BufferGeometry {
     tubularSegments: number;
     arc: number;
   };
+
 }
 
 export class TorusGeometry extends Geometry {
-  constructor(
+
+	constructor(
     radius?: number,
     tube?: number,
     radialSegments?: number,
@@ -37,4 +40,5 @@ export class TorusGeometry extends Geometry {
     tubularSegments: number;
     arc: number;
   };
+
 }

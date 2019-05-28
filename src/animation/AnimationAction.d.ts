@@ -4,6 +4,7 @@ import { AnimationActionLoopStyles } from '../constants';
 // Animation ////////////////////////////////////////////////////////////////////////////////////////
 
 export class AnimationAction {
+
   loop: AnimationActionLoopStyles;
   time: number;
   timeScale: number;
@@ -20,15 +21,15 @@ export class AnimationAction {
   reset(): AnimationAction;
   isRunning(): boolean;
   isScheduled(): boolean;
-  startAt(time: number): AnimationAction;
+  startAt( time: number ): AnimationAction;
   setLoop(
     mode: AnimationActionLoopStyles,
     repetitions: number
   ): AnimationAction;
-  setEffectiveWeight(weight: number): AnimationAction;
+  setEffectiveWeight( weight: number ): AnimationAction;
   getEffectiveWeight(): number;
-  fadeIn(duration: number): AnimationAction;
-  fadeOut(duration: number): AnimationAction;
+  fadeIn( duration: number ): AnimationAction;
+  fadeOut( duration: number ): AnimationAction;
   crossFadeFrom(
     fadeOutAction: AnimationAction,
     duration: number,
@@ -40,11 +41,11 @@ export class AnimationAction {
     warp: boolean
   ): AnimationAction;
   stopFading(): AnimationAction;
-  setEffectiveTimeScale(timeScale: number): AnimationAction;
+  setEffectiveTimeScale( timeScale: number ): AnimationAction;
   getEffectiveTimeScale(): number;
-  setDuration(duration: number): AnimationAction;
-  syncWith(action: AnimationAction): AnimationAction;
-  halt(duration: number): AnimationAction;
+  setDuration( duration: number ): AnimationAction;
+  syncWith( action: AnimationAction ): AnimationAction;
+  halt( duration: number ): AnimationAction;
   warp(
     statTimeScale: number,
     endTimeScale: number,
@@ -54,4 +55,5 @@ export class AnimationAction {
   getMixer(): AnimationMixer;
   getClip(): AnimationClip;
   getRoot(): any;
+
 }

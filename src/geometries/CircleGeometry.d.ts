@@ -5,7 +5,8 @@ import { BufferGeometry } from '../core/BufferGeometry';
  * @deprecated Use {@link BoxGeometry} instead.
  */
 export class CircleBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     radius?: number,
     segments?: number,
     thetaStart?: number,
@@ -18,10 +19,12 @@ export class CircleBufferGeometry extends BufferGeometry {
     thetaStart: number;
     thetaLength: number;
   };
+
 }
 
 export class CircleGeometry extends Geometry {
-  constructor(
+
+	constructor(
     radius?: number,
     segments?: number,
     thetaStart?: number,
@@ -34,4 +37,5 @@ export class CircleGeometry extends Geometry {
     thetaStart: number;
     thetaLength: number;
   };
+
 }

@@ -3,7 +3,8 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export class LatheBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     points: Vector2[],
     segments?: number,
     phiStart?: number,
@@ -16,10 +17,12 @@ export class LatheBufferGeometry extends BufferGeometry {
     phiStart: number;
     phiLength: number;
   };
+
 }
 
 export class LatheGeometry extends Geometry {
-  constructor(
+
+	constructor(
     points: Vector2[],
     segments?: number,
     phiStart?: number,
@@ -32,4 +35,5 @@ export class LatheGeometry extends Geometry {
     phiStart: number;
     phiLength: number;
   };
+
 }

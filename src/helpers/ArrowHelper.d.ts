@@ -7,7 +7,8 @@ import { Object3D } from './../core/Object3D';
 // Extras / Helpers /////////////////////////////////////////////////////////////////////
 
 export class ArrowHelper extends Object3D {
-  constructor(
+
+	constructor(
     dir: Vector3,
     origin?: Vector3,
     length?: number,
@@ -19,7 +20,8 @@ export class ArrowHelper extends Object3D {
   line: Line;
   cone: Mesh;
 
-  setDirection(dir: Vector3): void;
-  setLength(length: number, headLength?: number, headWidth?: number): void;
-  setColor(color: Color): void;
+  setDirection( dir: Vector3 ): void;
+  setLength( length: number, headLength?: number, headWidth?: number ): void;
+  setColor( color: Color ): void;
+
 }

@@ -8,13 +8,14 @@ export interface SplineControlPoint {
 }
 
 export class Triangle {
-  constructor(a?: Vector3, b?: Vector3, c?: Vector3);
+
+	constructor( a?: Vector3, b?: Vector3, c?: Vector3 );
 
   a: Vector3;
   b: Vector3;
   c: Vector3;
 
-  set(a: Vector3, b: Vector3, c: Vector3): Triangle;
+  set( a: Vector3, b: Vector3, c: Vector3 ): Triangle;
   setFromPointsAndIndices(
     points: Vector3[],
     i0: number,
@@ -22,15 +23,15 @@ export class Triangle {
     i2: number
   ): Triangle;
   clone(): this;
-  copy(triangle: Triangle): this;
+  copy( triangle: Triangle ): this;
   getArea(): number;
-  getMidpoint(target: Vector3): Vector3;
-  getNormal(target: Vector3): Vector3;
-  getPlane(target: Vector3): Plane;
-  getBarycoord(point: Vector3, target: Vector3): Vector3;
-  containsPoint(point: Vector3): boolean;
-  closestPointToPoint(point: Vector3, target: Vector3): Vector3;
-  equals(triangle: Triangle): boolean;
+  getMidpoint( target: Vector3 ): Vector3;
+  getNormal( target: Vector3 ): Vector3;
+  getPlane( target: Vector3 ): Plane;
+  getBarycoord( point: Vector3, target: Vector3 ): Vector3;
+  containsPoint( point: Vector3 ): boolean;
+  closestPointToPoint( point: Vector3, target: Vector3 ): Vector3;
+  equals( triangle: Triangle ): boolean;
 
   static getNormal(
     a: Vector3,
@@ -51,4 +52,5 @@ export class Triangle {
     b: Vector3,
     c: Vector3
   ): boolean;
+
 }

@@ -7,7 +7,8 @@ import { Intersection } from '../core/Raycaster';
 import { TrianglesDrawModes } from '../constants';
 
 export class Mesh extends Object3D {
-  constructor(
+
+	constructor(
     geometry?: Geometry | BufferGeometry,
     material?: Material | Material[]
   );
@@ -20,8 +21,9 @@ export class Mesh extends Object3D {
   isMesh: true;
   type: string;
 
-  setDrawMode(drawMode: TrianglesDrawModes): void;
+  setDrawMode( drawMode: TrianglesDrawModes ): void;
   updateMorphTargets(): void;
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
-  copy(source: this, recursive?: boolean): this;
+  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+  copy( source: this, recursive?: boolean ): this;
+
 }

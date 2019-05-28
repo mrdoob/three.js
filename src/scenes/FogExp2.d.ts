@@ -4,7 +4,8 @@ import { IFog } from './Fog';
  * This class contains the parameters that define linear fog, i.e., that grows exponentially denser with the distance.
  */
 export class FogExp2 implements IFog {
-  constructor(hex: number | string, density?: number);
+
+	constructor( hex: number | string, density?: number );
 
   name: string;
   color: Color;
@@ -17,4 +18,5 @@ export class FogExp2 implements IFog {
 
   clone(): this;
   toJSON(): any;
+
 }

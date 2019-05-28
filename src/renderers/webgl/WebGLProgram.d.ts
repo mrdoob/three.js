@@ -7,7 +7,8 @@ import { WebGLTextures } from './WebGLTextures';
 import { WebGLUniforms } from './WebGLUniforms';
 
 export class WebGLProgram {
-  constructor(
+
+	constructor(
     renderer: WebGLRenderer,
     extensions: WebGLExtensions,
     code: string,
@@ -36,4 +37,5 @@ export class WebGLProgram {
   getUniforms(): WebGLUniforms;
   getAttributes(): any;
   destroy(): void;
+
 }

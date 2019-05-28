@@ -18,7 +18,8 @@ export interface Event {
  * @source https://github.com/mrdoob/three.js/blob/master/src/core/Face3.js
  */
 export class Face3 {
-  /**
+
+	/**
    * @param a Vertex A index.
    * @param b Vertex B index.
    * @param c Vertex C index.
@@ -26,7 +27,7 @@ export class Face3 {
    * @param color Face color or array of vertex colors.
    * @param materialIndex Material index.
    */
-  constructor(
+	constructor(
     a: number,
     b: number,
     c: number,
@@ -34,7 +35,7 @@ export class Face3 {
     color?: Color,
     materialIndex?: number
   );
-  constructor(
+	constructor(
     a: number,
     b: number,
     c: number,
@@ -42,7 +43,7 @@ export class Face3 {
     vertexColors?: Color[],
     materialIndex?: number
   );
-  constructor(
+	constructor(
     a: number,
     b: number,
     c: number,
@@ -50,7 +51,7 @@ export class Face3 {
     color?: Color,
     materialIndex?: number
   );
-  constructor(
+	constructor(
     a: number,
     b: number,
     c: number,
@@ -100,5 +101,6 @@ export class Face3 {
   materialIndex: number;
 
   clone(): this;
-  copy(source: Face3): this;
+  copy( source: Face3 ): this;
+
 }

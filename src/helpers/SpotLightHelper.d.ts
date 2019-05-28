@@ -4,7 +4,8 @@ import { Matrix4 } from './../math/Matrix4';
 import { Object3D } from './../core/Object3D';
 
 export class SpotLightHelper extends Object3D {
-  constructor(light: Light, color?: Color | string | number);
+
+	constructor( light: Light, color?: Color | string | number );
 
   light: Light;
   matrix: Matrix4;
@@ -13,4 +14,5 @@ export class SpotLightHelper extends Object3D {
 
   dispose(): void;
   update(): void;
+
 }

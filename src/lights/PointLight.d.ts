@@ -4,7 +4,9 @@ import { PerspectiveCamera } from './../cameras/PerspectiveCamera';
 import { LightShadow } from './LightShadow';
 
 export class PointLightShadow extends LightShadow {
+
   camera: PerspectiveCamera;
+
 }
 
 /**
@@ -16,7 +18,8 @@ export class PointLightShadow extends LightShadow {
  * scene.add( light );
  */
 export class PointLight extends Light {
-  constructor(
+
+	constructor(
     color?: Color | string | number,
     intensity?: number,
     distance?: number,
@@ -38,4 +41,5 @@ export class PointLight extends Light {
   decay: number;
   shadow: PointLightShadow;
   power: number;
+
 }

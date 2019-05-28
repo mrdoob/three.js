@@ -1,12 +1,14 @@
 import {
-  WebGLRenderTarget,
-  WebGLRenderTargetOptions,
+	WebGLRenderTarget,
+	WebGLRenderTargetOptions,
 } from './WebGLRenderTarget';
 
 export class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
-  constructor(
+
+	constructor(
     width: number,
     height: number,
     options?: WebGLRenderTargetOptions
   );
+
 }

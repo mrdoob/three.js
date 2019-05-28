@@ -4,8 +4,10 @@ import { Color } from './../math/Color';
 import { LineSegments } from './../objects/LineSegments';
 
 export class Box3Helper {
-  constructor(object?: Object3D, color?: Color);
+
+	constructor( object?: Object3D, color?: Color );
 
   type: string;
   box: Box3;
+
 }

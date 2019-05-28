@@ -6,7 +6,8 @@ import { WebGLTextures } from './WebGLTextures';
 import { ShaderMaterial } from './../../materials/ShaderMaterial';
 
 export class WebGLPrograms {
-  constructor(renderer: WebGLRenderer, extensions: WebGLExtensions, capabilities: WebGLCapabilities, textures: WebGLTextures);
+
+	constructor( renderer: WebGLRenderer, extensions: WebGLExtensions, capabilities: WebGLCapabilities, textures: WebGLTextures );
 
   programs: WebGLProgram[];
 
@@ -17,11 +18,12 @@ export class WebGLPrograms {
     nClipPlanes: number,
     object: any
   ): any;
-  getProgramCode(material: ShaderMaterial, parameters: any): string;
+  getProgramCode( material: ShaderMaterial, parameters: any ): string;
   acquireProgram(
     material: ShaderMaterial,
     parameters: any,
     code: string
   ): WebGLProgram;
-  releaseProgram(program: WebGLProgram): void;
+  releaseProgram( program: WebGLProgram ): void;
+
 }

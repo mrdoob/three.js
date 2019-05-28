@@ -4,7 +4,8 @@ import { Matrix4 } from './../math/Matrix4';
 import { RenderTarget } from '../renderers/webgl/WebGLRenderLists';
 
 export class LightShadow {
-  constructor(camera: Camera);
+
+	constructor( camera: Camera );
 
   camera: Camera;
   bias: number;
@@ -13,7 +14,8 @@ export class LightShadow {
   map: RenderTarget;
   matrix: Matrix4;
 
-  copy(source: LightShadow): this;
-  clone(recursive?: boolean): this;
+  copy( source: LightShadow ): this;
+  clone( recursive?: boolean ): this;
   toJSON(): any;
+
 }

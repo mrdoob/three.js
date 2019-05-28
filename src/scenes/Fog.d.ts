@@ -11,7 +11,8 @@ export interface IFog {
  * This class contains the parameters that define linear fog, i.e., that grows linearly denser with the distance.
  */
 export class Fog implements IFog {
-  constructor(hex: number, near?: number, far?: number);
+
+	constructor( hex: number, near?: number, far?: number );
 
   name: string;
 
@@ -33,4 +34,5 @@ export class Fog implements IFog {
 
   clone(): this;
   toJSON(): any;
+
 }

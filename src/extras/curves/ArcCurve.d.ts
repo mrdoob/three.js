@@ -1,6 +1,7 @@
 import { EllipseCurve } from './EllipseCurve';
 export class ArcCurve extends EllipseCurve {
-  constructor(
+
+	constructor(
     aX: number,
     aY: number,
     aRadius: number,
@@ -8,4 +9,5 @@ export class ArcCurve extends EllipseCurve {
     aEndAngle: number,
     aClockwise: boolean
   );
+
 }

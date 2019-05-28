@@ -4,7 +4,8 @@ import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import { Object3D } from './../core/Object3D';
 
 export class CubeCamera extends Object3D {
-  constructor(near?: number, far?: number, cubeResolution?: number);
+
+	constructor( near?: number, far?: number, cubeResolution?: number );
 
   type: 'CubeCamera';
 
@@ -15,5 +16,6 @@ export class CubeCamera extends Object3D {
    */
   //updateCubeMap(renderer: Renderer, scene: Scene): void;
 
-  update(renderer: WebGLRenderer, scene: Scene): void;
+  update( renderer: WebGLRenderer, scene: Scene ): void;
+
 }

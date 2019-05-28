@@ -1,15 +1,16 @@
 import { Texture } from './Texture';
 import {
-  Mapping,
-  Wrapping,
-  TextureFilter,
-  PixelFormat,
-  TextureDataType,
-  TextureEncoding,
+	Mapping,
+	Wrapping,
+	TextureFilter,
+	PixelFormat,
+	TextureDataType,
+	TextureEncoding,
 } from '../constants';
 
 export class CompressedTexture extends Texture {
-  constructor(
+
+	constructor(
     mipmaps: ImageData[],
     width: number,
     height: number,
@@ -25,4 +26,5 @@ export class CompressedTexture extends Texture {
   );
 
   image: { width: number; height: number };
+
 }

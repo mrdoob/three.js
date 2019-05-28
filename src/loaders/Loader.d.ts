@@ -17,7 +17,8 @@ import { LoaderHandler } from './FileLoader';
  *          message — error message
  */
 export class Loader {
-  constructor();
+
+	constructor();
 
   /**
    * Will be called when load starts.
@@ -46,8 +47,8 @@ export class Loader {
   /**
    * @deprecated Use THREE.LoaderUtils.extractUrlBase() instead.
    */
-  extractUrlBase(url: string): string;
-  initMaterials(materials: Material[], texturePath: string): Material[];
+  extractUrlBase( url: string ): string;
+  initMaterials( materials: Material[], texturePath: string ): Material[];
   createMaterial(
     m: Material,
     texturePath: string,
@@ -55,4 +56,5 @@ export class Loader {
   ): boolean;
 
   static Handlers: LoaderHandler;
+
 }

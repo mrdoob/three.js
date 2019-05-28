@@ -9,12 +9,14 @@ export interface LineBasicMaterialParameters extends MaterialParameters {
 }
 
 export class LineBasicMaterial extends Material {
-  constructor(parameters?: LineBasicMaterialParameters);
+
+	constructor( parameters?: LineBasicMaterialParameters );
 
   color: Color;
   linewidth: number;
   linecap: string;
   linejoin: string;
 
-  setValues(parameters: LineBasicMaterialParameters): void;
+  setValues( parameters: LineBasicMaterialParameters ): void;
+
 }

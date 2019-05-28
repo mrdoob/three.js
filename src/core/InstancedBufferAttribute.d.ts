@@ -8,7 +8,7 @@ export namespace BufferGeometryUtils {
   export function mergeBufferGeometries(
     geometries: BufferGeometry[]
   ): BufferGeometry;
-  export function computeTangents(geometry: BufferGeometry): null;
+  export function computeTangents( geometry: BufferGeometry ): null;
   export function mergeBufferAttributes(
     attributes: BufferAttribute[]
   ): BufferAttribute;
@@ -29,14 +29,15 @@ export namespace GeometryUtils {
   /**
    * @deprecated Use {@link Geometry#center geometry.center()} instead.
    */
-  export function center(geometry: any): any;
+  export function center( geometry: any ): any;
 }
 
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InstancedBufferAttribute.js">src/core/InstancedBufferAttribute.js</a>
  */
 export class InstancedBufferAttribute extends BufferAttribute {
-  constructor(
+
+	constructor(
     array: ArrayLike<number>,
     itemSize: number,
     normalized?: boolean,
@@ -44,4 +45,5 @@ export class InstancedBufferAttribute extends BufferAttribute {
   );
 
   meshPerAttribute: number;
+
 }

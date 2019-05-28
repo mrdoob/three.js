@@ -2,7 +2,8 @@ import { Curve } from './../core/Curve';
 import { Vector2 } from '../../math/Vector2';
 
 export class EllipseCurve extends Curve<Vector2> {
-  constructor(
+
+	constructor(
     aX: number,
     aY: number,
     xRadius: number,
@@ -21,4 +22,5 @@ export class EllipseCurve extends Curve<Vector2> {
   aEndAngle: number;
   aClockwise: boolean;
   aRotation: number;
+
 }

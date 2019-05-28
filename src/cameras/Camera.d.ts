@@ -8,10 +8,11 @@ import { Object3D } from './../core/Object3D';
  * Abstract base class for cameras. This class should always be inherited when you build a new camera.
  */
 export class Camera extends Object3D {
-  /**
+
+	/**
    * This constructor sets following properties to the correct type: matrixWorldInverse, projectionMatrix and projectionMatrixInverse.
    */
-  constructor();
+	constructor();
 
   /**
    * This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.
@@ -25,9 +26,10 @@ export class Camera extends Object3D {
 
   isCamera: true;
 
-  copy(source: Camera, recursive?: boolean): this;
+  copy( source: Camera, recursive?: boolean ): this;
 
-  getWorldDirection(target: Vector3): Vector3;
+  getWorldDirection( target: Vector3 ): Vector3;
 
-  updateMatrixWorld(force?: boolean): void;
+  updateMatrixWorld( force?: boolean ): void;
+
 }

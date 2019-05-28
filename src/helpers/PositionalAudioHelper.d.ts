@@ -2,7 +2,8 @@ import { PositionalAudio } from './../audio/PositionalAudio';
 import { Line } from './../objects/Line';
 
 export class PositionalAudioHelper extends Line {
-  constructor(audio: PositionalAudio, range?: number, divisionsInnerAngle?: number, divisionsOuterAngle?: number);
+
+	constructor( audio: PositionalAudio, range?: number, divisionsInnerAngle?: number, divisionsOuterAngle?: number );
 
   audio: PositionalAudio;
   range: number;
@@ -11,4 +12,5 @@ export class PositionalAudioHelper extends Line {
 
   dispose(): void;
   update(): void;
+
 }

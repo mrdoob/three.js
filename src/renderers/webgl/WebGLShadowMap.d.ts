@@ -4,7 +4,8 @@ import { WebGLRenderer } from '../WebGLRenderer';
 import { ShadowMapType } from '../../constants';
 
 export class WebGLShadowMap {
-  constructor(
+
+	constructor(
     _renderer: WebGLRenderer,
     _lights: any[],
     _objects: any[],
@@ -16,10 +17,11 @@ export class WebGLShadowMap {
   needsUpdate: boolean;
   type: ShadowMapType;
 
-  render(scene: Scene, camera: Camera): void;
+  render( scene: Scene, camera: Camera ): void;
 
   /**
    * @deprecated Use {@link WebGLShadowMap#renderReverseSided .shadowMap.renderReverseSided} instead.
    */
   cullFace: any;
+
 }

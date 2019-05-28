@@ -20,18 +20,19 @@ export interface PathAction {
  * a 2d path representation, comprising of points, lines, and cubes, similar to the html5 2d canvas api. It extends CurvePath.
  */
 export class Path extends CurvePath<Vector2> {
-  constructor(points?: Vector2[]);
+
+	constructor( points?: Vector2[] );
 
   currentPoint: Vector2;
 
   /**
    * @deprecated Use {@link Path#setFromPoints .setFromPoints()} instead.
    */
-  fromPoints(vectors: Vector2[]): void;
-  setFromPoints(vectors: Vector2[]): void;
-  moveTo(x: number, y: number): void;
-  lineTo(x: number, y: number): void;
-  quadraticCurveTo(aCPx: number, aCPy: number, aX: number, aY: number): void;
+  fromPoints( vectors: Vector2[] ): void;
+  setFromPoints( vectors: Vector2[] ): void;
+  moveTo( x: number, y: number ): void;
+  lineTo( x: number, y: number ): void;
+  quadraticCurveTo( aCPx: number, aCPy: number, aX: number, aY: number ): void;
   bezierCurveTo(
     aCP1x: number,
     aCP1y: number,
@@ -40,7 +41,7 @@ export class Path extends CurvePath<Vector2> {
     aX: number,
     aY: number
   ): void;
-  splineThru(pts: Vector2[]): void;
+  splineThru( pts: Vector2[] ): void;
   arc(
     aX: number,
     aY: number,
@@ -77,4 +78,5 @@ export class Path extends CurvePath<Vector2> {
     aClockwise: boolean,
     aRotation: number
   ): void;
+
 }

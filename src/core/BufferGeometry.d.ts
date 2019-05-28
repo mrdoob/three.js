@@ -18,10 +18,11 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js">src/core/BufferGeometry.js</a>
  */
 export class BufferGeometry extends EventDispatcher {
-  /**
+
+	/**
    * This creates a new BufferGeometry. It also sets several properties to an default value.
    */
-  constructor();
+	constructor();
 
   static MaxIndex: number;
 
@@ -44,42 +45,42 @@ export class BufferGeometry extends EventDispatcher {
   userData: {[key: string]: any};
 
   getIndex(): BufferAttribute;
-  setIndex(index: BufferAttribute | number[]): void;
+  setIndex( index: BufferAttribute | number[] ): void;
 
   addAttribute(
     name: string,
     attribute: BufferAttribute | InterleavedBufferAttribute
   ): BufferGeometry;
 
-  getAttribute(name: string): BufferAttribute | InterleavedBufferAttribute;
-  removeAttribute(name: string): BufferGeometry;
+  getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
+  removeAttribute( name: string ): BufferGeometry;
 
-  addGroup(start: number, count: number, materialIndex?: number): void;
+  addGroup( start: number, count: number, materialIndex?: number ): void;
   clearGroups(): void;
 
-  setDrawRange(start: number, count: number): void;
+  setDrawRange( start: number, count: number ): void;
 
   /**
    * Bakes matrix transform directly into vertex coordinates.
    */
-  applyMatrix(matrix: Matrix4): BufferGeometry;
+  applyMatrix( matrix: Matrix4 ): BufferGeometry;
 
-  rotateX(angle: number): BufferGeometry;
-  rotateY(angle: number): BufferGeometry;
-  rotateZ(angle: number): BufferGeometry;
-  translate(x: number, y: number, z: number): BufferGeometry;
-  scale(x: number, y: number, z: number): BufferGeometry;
-  lookAt(v: Vector3): void;
+  rotateX( angle: number ): BufferGeometry;
+  rotateY( angle: number ): BufferGeometry;
+  rotateZ( angle: number ): BufferGeometry;
+  translate( x: number, y: number, z: number ): BufferGeometry;
+  scale( x: number, y: number, z: number ): BufferGeometry;
+  lookAt( v: Vector3 ): void;
 
   center(): BufferGeometry;
 
-  setFromObject(object: Object3D): BufferGeometry;
-  setFromPoints(points: Vector3[] | Vector2[]): BufferGeometry;
-  updateFromObject(object: Object3D): void;
+  setFromObject( object: Object3D ): BufferGeometry;
+  setFromPoints( points: Vector3[] | Vector2[] ): BufferGeometry;
+  updateFromObject( object: Object3D ): void;
 
-  fromGeometry(geometry: Geometry, settings?: any): BufferGeometry;
+  fromGeometry( geometry: Geometry, settings?: any ): BufferGeometry;
 
-  fromDirectGeometry(geometry: DirectGeometry): BufferGeometry;
+  fromDirectGeometry( geometry: DirectGeometry ): BufferGeometry;
 
   /**
    * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.
@@ -98,14 +99,14 @@ export class BufferGeometry extends EventDispatcher {
    */
   computeVertexNormals(): void;
 
-  merge(geometry: BufferGeometry, offset: number): BufferGeometry;
+  merge( geometry: BufferGeometry, offset: number ): BufferGeometry;
   normalizeNormals(): void;
 
   toNonIndexed(): BufferGeometry;
 
   toJSON(): any;
   clone(): this;
-  copy(source: BufferGeometry): this;
+  copy( source: BufferGeometry ): this;
 
   /**
    * Disposes the object from memory.
@@ -126,17 +127,18 @@ export class BufferGeometry extends EventDispatcher {
   /**
    * @deprecated Use {@link BufferGeometry#setIndex .setIndex()} instead.
    */
-  addIndex(index: any): void;
+  addIndex( index: any ): void;
 
   /**
    * @deprecated Use {@link BufferGeometry#addGroup .addGroup()} instead.
    */
-  addDrawCall(start: any, count: any, indexOffset?: any): void;
+  addDrawCall( start: any, count: any, indexOffset?: any ): void;
 
   /**
    * @deprecated Use {@link BufferGeometry#clearGroups .clearGroups()} instead.
    */
   clearDrawCalls(): void;
 
-  addAttribute(name: any, array: any, itemSize: any): any;
+  addAttribute( name: any, array: any, itemSize: any ): any;
+
 }

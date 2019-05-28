@@ -1,14 +1,15 @@
 import { Texture } from './Texture';
 import {
-  Mapping,
-  Wrapping,
-  TextureFilter,
-  PixelFormat,
-  TextureDataType,
+	Mapping,
+	Wrapping,
+	TextureFilter,
+	PixelFormat,
+	TextureDataType,
 } from '../constants';
 
 export class CanvasTexture extends Texture {
-  constructor(
+
+	constructor(
     canvas: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
     mapping?: Mapping,
     wrapS?: Wrapping,
@@ -19,4 +20,5 @@ export class CanvasTexture extends Texture {
     type?: TextureDataType,
     anisotropy?: number
   );
+
 }

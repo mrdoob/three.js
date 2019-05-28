@@ -4,7 +4,8 @@ export interface WebGLCapabilitiesParameters {
 }
 
 export class WebGLCapabilities {
-  constructor(
+
+	constructor(
     gl: WebGLRenderingContext,
     extensions: any,
     parameters: WebGLCapabilitiesParameters
@@ -25,5 +26,6 @@ export class WebGLCapabilities {
   floatVertexTextures: any;
 
   getMaxAnisotropy(): number;
-  getMaxPrecision(precision: string): string;
+  getMaxPrecision( precision: string ): string;
+
 }

@@ -2,7 +2,8 @@ import { Color } from './../math/Color';
 import { Light } from './Light';
 
 export class HemisphereLight extends Light {
-  constructor(
+
+	constructor(
     skyColor?: Color | string | number,
     groundColor?: Color | string | number,
     intensity?: number
@@ -11,4 +12,5 @@ export class HemisphereLight extends Light {
   skyColor: Color;
   groundColor: Color;
   intensity: number;
+
 }

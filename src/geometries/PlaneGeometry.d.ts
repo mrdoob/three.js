@@ -2,7 +2,8 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export class PlaneBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     width?: number,
     height?: number,
     widthSegments?: number,
@@ -15,10 +16,12 @@ export class PlaneBufferGeometry extends BufferGeometry {
     widthSegments: number;
     heightSegments: number;
   };
+
 }
 
 export class PlaneGeometry extends Geometry {
-  constructor(
+
+	constructor(
     width?: number,
     height?: number,
     widthSegments?: number,
@@ -31,4 +34,5 @@ export class PlaneGeometry extends Geometry {
     widthSegments: number;
     heightSegments: number;
   };
+
 }

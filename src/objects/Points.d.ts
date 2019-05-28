@@ -11,11 +11,12 @@ import { Intersection } from '../core/Raycaster';
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/objects/ParticleSystem.js">src/objects/ParticleSystem.js</a>
  */
 export class Points extends Object3D {
-  /**
+
+	/**
    * @param geometry An instance of Geometry or BufferGeometry.
    * @param material An instance of Material (optional).
    */
-  constructor(
+	constructor(
     geometry?: Geometry | BufferGeometry,
     material?: Material | Material[]
   );
@@ -33,5 +34,6 @@ export class Points extends Object3D {
    */
   material: Material | Material[];
 
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
+  raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+
 }

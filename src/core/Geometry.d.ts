@@ -48,7 +48,8 @@ export let GeometryIdCount: number;
  * @see https://github.com/mrdoob/three.js/blob/master/src/core/Geometry.js
  */
 export class Geometry extends EventDispatcher {
-  constructor();
+
+	constructor();
 
   /**
    * Unique number of this geometry instance
@@ -171,17 +172,17 @@ export class Geometry extends EventDispatcher {
   /**
    * Bakes matrix transform directly into vertex coordinates.
    */
-  applyMatrix(matrix: Matrix4): Geometry;
+  applyMatrix( matrix: Matrix4 ): Geometry;
 
-  rotateX(angle: number): Geometry;
-  rotateY(angle: number): Geometry;
-  rotateZ(angle: number): Geometry;
+  rotateX( angle: number ): Geometry;
+  rotateY( angle: number ): Geometry;
+  rotateZ( angle: number ): Geometry;
 
-  translate(x: number, y: number, z: number): Geometry;
-  scale(x: number, y: number, z: number): Geometry;
-  lookAt(vector: Vector3): void;
+  translate( x: number, y: number, z: number ): Geometry;
+  scale( x: number, y: number, z: number ): Geometry;
+  lookAt( vector: Vector3 ): void;
 
-  fromBufferGeometry(geometry: BufferGeometry): Geometry;
+  fromBufferGeometry( geometry: BufferGeometry ): Geometry;
 
   center(): Geometry;
 
@@ -196,7 +197,7 @@ export class Geometry extends EventDispatcher {
    * Computes vertex normals by averaging face normals.
    * Face normals must be existing / computed beforehand.
    */
-  computeVertexNormals(areaWeighted?: boolean): void;
+  computeVertexNormals( areaWeighted?: boolean ): void;
 
   /**
    * Compute vertex normals, but duplicating face normals.
@@ -225,7 +226,7 @@ export class Geometry extends EventDispatcher {
     materialIndexOffset?: number
   ): void;
 
-  mergeMesh(mesh: Mesh): void;
+  mergeMesh( mesh: Mesh ): void;
 
   /**
    * Checks for duplicate vertices using hashmap.
@@ -233,7 +234,7 @@ export class Geometry extends EventDispatcher {
    */
   mergeVertices(): number;
 
-  setFromPoints(points: Array<Vector2> | Array<Vector3>): this;
+  setFromPoints( points: Array<Vector2> | Array<Vector3> ): this;
 
   sortFacesByMaterialIndex(): void;
 
@@ -244,7 +245,7 @@ export class Geometry extends EventDispatcher {
    */
   clone(): this;
 
-  copy(source: Geometry): this;
+  copy( source: Geometry ): this;
 
   /**
    * Removes The object from memory.
@@ -258,8 +259,9 @@ export class Geometry extends EventDispatcher {
   animations: AnimationClip[];
 
   // EventDispatcher mixins
-  addEventListener(type: string, listener: (event: Event) => void): void;
-  hasEventListener(type: string, listener: (event: Event) => void): boolean;
-  removeEventListener(type: string, listener: (event: Event) => void): void;
-  dispatchEvent(event: { type: string; [attachment: string]: any }): void;
+  addEventListener( type: string, listener: ( event: Event ) => void ): void;
+  hasEventListener( type: string, listener: ( event: Event ) => void ): boolean;
+  removeEventListener( type: string, listener: ( event: Event ) => void ): void;
+  dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
+
 }

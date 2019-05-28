@@ -10,7 +10,8 @@ import { DataTexture } from './../textures/DataTexture';
  */
 
 export class Skeleton {
-  constructor(bones: Bone[], boneInverses?: Matrix4[]);
+
+	constructor( bones: Bone[], boneInverses?: Matrix4[] );
 
   /**
    * @deprecated This property has been removed completely.
@@ -24,8 +25,9 @@ export class Skeleton {
   boneTexture: DataTexture;
   boneInverses: Matrix4[];
 
-  calculateInverses(bone: Bone): void;
+  calculateInverses( bone: Bone ): void;
   pose(): void;
   update(): void;
   clone(): this;
+
 }

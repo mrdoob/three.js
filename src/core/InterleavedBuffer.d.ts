@@ -4,7 +4,8 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js">src/core/InterleavedBuffer.js</a>
  */
 export class InterleavedBuffer {
-  constructor(array: ArrayLike<number>, stride: number);
+
+	constructor( array: ArrayLike<number>, stride: number );
 
   array: ArrayLike<number>;
   stride: number;
@@ -15,14 +16,15 @@ export class InterleavedBuffer {
   count: number;
   needsUpdate: boolean;
 
-  setArray(array?: ArrayBufferView): void;
-  setDynamic(dynamic: boolean): InterleavedBuffer;
+  setArray( array?: ArrayBufferView ): void;
+  setDynamic( dynamic: boolean ): InterleavedBuffer;
   clone(): this;
-  copy(source: InterleavedBuffer): this;
+  copy( source: InterleavedBuffer ): this;
   copyAt(
     index1: number,
     attribute: InterleavedBufferAttribute,
     index2: number
   ): InterleavedBuffer;
-  set(value: ArrayLike<number>, index: number): InterleavedBuffer;
+  set( value: ArrayLike<number>, index: number ): InterleavedBuffer;
+
 }

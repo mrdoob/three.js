@@ -9,13 +9,15 @@ export interface SpriteMaterialParameters extends MaterialParameters {
 }
 
 export class SpriteMaterial extends Material {
-  constructor(parameters?: SpriteMaterialParameters);
+
+	constructor( parameters?: SpriteMaterialParameters );
 
   color: Color;
   map: Texture | null;
   rotation: number;
   isSpriteMaterial: true;
 
-  setValues(parameters: SpriteMaterialParameters): void;
-  copy(source: SpriteMaterial): this;
+  setValues( parameters: SpriteMaterialParameters ): void;
+  copy( source: SpriteMaterial ): this;
+
 }

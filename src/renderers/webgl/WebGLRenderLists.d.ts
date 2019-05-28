@@ -21,6 +21,7 @@ export interface RenderItem {
 }
 
 export class WebGLRenderList {
+
   opaque: Array<RenderItem>;
   transparent: Array<RenderItem>;
   init(): void;
@@ -41,9 +42,12 @@ export class WebGLRenderList {
     group: Group | null
   ): void;
   sort(): void;
+
 }
 
 export class WebGLRenderLists {
-  dispose(): void;
-  get(scene: Scene, camera: Camera): WebGLRenderList;
+
+	dispose(): void;
+	get( scene: Scene, camera: Camera ): WebGLRenderList;
+
 }

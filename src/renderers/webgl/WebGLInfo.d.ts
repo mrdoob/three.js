@@ -4,6 +4,7 @@ import { WebGLProgram } from './WebGLProgram';
  * An object with a series of statistical information about the graphics board memory and the rendering process.
  */
 export class WebGLInfo {
+
   autoReset: boolean;
   memory: {
     geometries: number;
@@ -18,4 +19,5 @@ export class WebGLInfo {
     triangles: number;
   };
   reset(): void;
+
 }

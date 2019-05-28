@@ -38,7 +38,8 @@ export interface MeshStandardMaterialParameters extends MaterialParameters {
 }
 
 export class MeshStandardMaterial extends Material {
-  constructor(parameters?: MeshStandardMaterialParameters);
+
+	constructor( parameters?: MeshStandardMaterialParameters );
 
   defines: any;
   color: Color;
@@ -72,5 +73,6 @@ export class MeshStandardMaterial extends Material {
   morphTargets: boolean;
   morphNormals: boolean;
 
-  setValues(parameters: MeshStandardMaterialParameters): void;
+  setValues( parameters: MeshStandardMaterialParameters ): void;
+
 }

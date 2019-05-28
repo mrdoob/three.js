@@ -1,6 +1,6 @@
 import {
-  MeshStandardMaterialParameters,
-  MeshStandardMaterial,
+	MeshStandardMaterialParameters,
+	MeshStandardMaterial,
 } from './MeshStandardMaterial';
 
 export interface MeshPhysicalMaterialParameters
@@ -11,10 +11,12 @@ export interface MeshPhysicalMaterialParameters
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
-  constructor(parameters: MeshPhysicalMaterialParameters);
+
+	constructor( parameters: MeshPhysicalMaterialParameters );
 
   defines: any;
   reflectivity: number;
   clearCoat: number;
   clearCoatRoughness: number;
+
 }

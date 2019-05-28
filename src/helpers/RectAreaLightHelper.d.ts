@@ -4,8 +4,10 @@ import { Color } from './../math/Color';
 //import { Object3D } from './../core/Object3D';
 
 export class RectAreaLightHelper {
-  constructor(light: RectAreaLight, color?: Color | string | number);
+
+	constructor( light: RectAreaLight, color?: Color | string | number );
 
   light: RectAreaLight;
   color: Color | string | number | undefined;
+
 }

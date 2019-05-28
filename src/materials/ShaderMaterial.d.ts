@@ -28,7 +28,8 @@ export interface ShaderMaterialParameters extends MaterialParameters {
 }
 
 export class ShaderMaterial extends Material {
-  constructor(parameters?: ShaderMaterialParameters);
+
+	constructor( parameters?: ShaderMaterialParameters );
 
   defines: any;
   uniforms: { [uniform: string]: IUniform };
@@ -55,6 +56,7 @@ export class ShaderMaterial extends Material {
   defaultAttributeValues: any;
   index0AttributeName: string | undefined;
 
-  setValues(parameters: ShaderMaterialParameters): void;
-  toJSON(meta: any): any;
+  setValues( parameters: ShaderMaterialParameters ): void;
+  toJSON( meta: any ): any;
+
 }

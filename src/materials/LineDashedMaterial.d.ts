@@ -11,12 +11,14 @@ export interface LineDashedMaterialParameters extends MaterialParameters {
 }
 
 export class LineDashedMaterial extends LineBasicMaterial {
-  constructor(parameters?: LineDashedMaterialParameters);
+
+	constructor( parameters?: LineDashedMaterialParameters );
 
   scale: number;
   dashSize: number;
   gapSize: number;
   isLineDashedMaterial: boolean;
 
-  setValues(parameters: LineDashedMaterialParameters): void;
+  setValues( parameters: LineDashedMaterialParameters ): void;
+
 }

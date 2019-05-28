@@ -1,19 +1,20 @@
 import { Vector2, Vector } from './../math/Vector2';
 import { EventDispatcher } from './../core/EventDispatcher';
 import {
-  Mapping,
-  Wrapping,
-  TextureFilter,
-  PixelFormat,
-  TextureDataType,
-  TextureEncoding,
+	Mapping,
+	Wrapping,
+	TextureFilter,
+	PixelFormat,
+	TextureDataType,
+	TextureEncoding,
 } from '../constants';
 
 // Textures /////////////////////////////////////////////////////////////////////
 export let TextureIdCount: number;
 
 export class Texture extends EventDispatcher {
-  constructor(
+
+	constructor(
     image?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement,
     mapping?: Mapping,
     wrapS?: Wrapping,
@@ -56,8 +57,9 @@ export class Texture extends EventDispatcher {
   static DEFAULT_MAPPING: any;
 
   clone(): this;
-  copy(source: Texture): this;
-  toJSON(meta: any): any;
+  copy( source: Texture ): this;
+  toJSON( meta: any ): any;
   dispose(): void;
-  transformUv(uv: Vector): void;
+  transformUv( uv: Vector ): void;
+
 }

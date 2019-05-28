@@ -38,19 +38,23 @@ export interface UVGenerator {
 }
 
 export class ExtrudeBufferGeometry extends BufferGeometry {
-  constructor(shapes: Shape | Shape[], options?: ExtrudeGeometryOptions);
+
+	constructor( shapes: Shape | Shape[], options?: ExtrudeGeometryOptions );
 
   static WorldUVGenerator: UVGenerator;
 
-  addShapeList(shapes: Shape[], options?: any): void;
-  addShape(shape: Shape, options?: any): void;
+  addShapeList( shapes: Shape[], options?: any ): void;
+  addShape( shape: Shape, options?: any ): void;
+
 }
 
 export class ExtrudeGeometry extends Geometry {
-  constructor(shapes: Shape | Shape[], options?: ExtrudeGeometryOptions);
+
+	constructor( shapes: Shape | Shape[], options?: ExtrudeGeometryOptions );
 
   static WorldUVGenerator: UVGenerator;
 
-  addShapeList(shapes: Shape[], options?: any): void;
-  addShape(shape: Shape, options?: any): void;
+  addShapeList( shapes: Shape[], options?: any ): void;
+  addShape( shape: Shape, options?: any ): void;
+
 }

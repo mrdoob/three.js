@@ -1,15 +1,15 @@
 import { Plane } from './../math/Plane';
-import { Shader } from './../renderers/shaders/ShaderLib'
+import { Shader } from './../renderers/shaders/ShaderLib';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import {
-  BlendingDstFactor,
-  BlendingEquation,
-  Blending,
-  BlendingSrcFactor,
-  DepthModes,
-  Side,
-  Colors,
+	BlendingDstFactor,
+	BlendingEquation,
+	Blending,
+	BlendingSrcFactor,
+	DepthModes,
+	Side,
+	Colors,
 } from '../constants';
 
 // Materials //////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,8 @@ export interface MaterialParameters {
  * Materials describe the appearance of objects. They are defined in a (mostly) renderer-independent way, so you don't have to rewrite materials if you decide to use a different renderer.
  */
 export class Material extends EventDispatcher {
-  constructor();
+
+	constructor();
 
   /**
    * Sets the alpha value to be used when running an alpha test. Default is 0.
@@ -262,7 +263,7 @@ export class Material extends EventDispatcher {
    * Copy the parameters from the passed material into this material.
    * @param material
    */
-  copy(material: Material): this;
+  copy( material: Material ): this;
 
   /**
    * This disposes the material. Textures of a material don't get disposed. These needs to be disposed by {@link Texture}.
@@ -270,7 +271,7 @@ export class Material extends EventDispatcher {
   dispose(): void;
 
   /**
-   * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials. 
+   * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
    * @param shader Source code of the shader
    * @param renderer WebGLRenderer Context that is initializing the material
    */
@@ -280,16 +281,17 @@ export class Material extends EventDispatcher {
    * Sets the properties based on the values.
    * @param values A container with parameters.
    */
-  setValues(values: MaterialParameters): void;
+  setValues( values: MaterialParameters ): void;
 
   /**
    * Convert the material to three.js JSON format.
    * @param meta Object containing metadata such as textures or images for the material.
    */
-  toJSON(meta?: any): any;
+  toJSON( meta?: any ): any;
 
   /**
    * Call .dispatchEvent ( { type: 'update' }) on the material.
    */
   update(): void;
+
 }

@@ -29,7 +29,8 @@ export interface MeshLambertMaterialParameters extends MaterialParameters {
 }
 
 export class MeshLambertMaterial extends Material {
-  constructor(parameters?: MeshLambertMaterialParameters);
+
+	constructor( parameters?: MeshLambertMaterialParameters );
 
   color: Color;
   emissive: Color;
@@ -54,5 +55,6 @@ export class MeshLambertMaterial extends Material {
   morphTargets: boolean;
   morphNormals: boolean;
 
-  setValues(parameters: MeshLambertMaterialParameters): void;
+  setValues( parameters: MeshLambertMaterialParameters ): void;
+
 }

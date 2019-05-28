@@ -2,7 +2,8 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export class TorusKnotBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     radius?: number,
     tube?: number,
     tubularSegments?: number,
@@ -20,10 +21,12 @@ export class TorusKnotBufferGeometry extends BufferGeometry {
     q: number;
     heightScale: number;
   };
+
 }
 
 export class TorusKnotGeometry extends Geometry {
-  constructor(
+
+	constructor(
     radius?: number,
     tube?: number,
     tubularSegments?: number,
@@ -41,4 +44,5 @@ export class TorusKnotGeometry extends Geometry {
     q: number;
     heightScale: number;
   };
+
 }

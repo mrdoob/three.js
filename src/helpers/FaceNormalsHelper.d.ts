@@ -9,7 +9,8 @@ import { LineSegments } from './../objects/LineSegments';
 // }
 
 export class FaceNormalsHelper extends LineSegments {
-  constructor(
+
+	constructor(
     object: Object3D,
     size?: number,
     hex?: number,
@@ -19,5 +20,6 @@ export class FaceNormalsHelper extends LineSegments {
   object: Object3D;
   size: number;
 
-  update(object?: Object3D): void;
+  update( object?: Object3D ): void;
+
 }

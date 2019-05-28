@@ -10,7 +10,8 @@ import { Camera } from './Camera';
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/OrthographicCamera.js">src/cameras/OrthographicCamera.js</a>
  */
 export class OrthographicCamera extends Camera {
-  /**
+
+	/**
    * @param left Camera frustum left plane.
    * @param right Camera frustum right plane.
    * @param top Camera frustum top plane.
@@ -18,7 +19,7 @@ export class OrthographicCamera extends Camera {
    * @param near Camera frustum near plane.
    * @param far Camera frustum far plane.
    */
-  constructor(
+	constructor(
     left: number,
     right: number,
     top: number,
@@ -85,5 +86,6 @@ export class OrthographicCamera extends Camera {
     height: number
   ): void;
   clearViewOffset(): void;
-  toJSON(meta?: any): any;
+  toJSON( meta?: any ): any;
+
 }

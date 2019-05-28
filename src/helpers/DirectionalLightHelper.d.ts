@@ -5,7 +5,8 @@ import { Matrix4 } from './../math/Matrix4';
 import { Object3D } from './../core/Object3D';
 
 export class DirectionalLightHelper extends Object3D {
-  constructor(
+
+	constructor(
     light: DirectionalLight,
     size?: number,
     color?: Color | string | number
@@ -20,4 +21,5 @@ export class DirectionalLightHelper extends Object3D {
 
   dispose(): void;
   update(): void;
+
 }

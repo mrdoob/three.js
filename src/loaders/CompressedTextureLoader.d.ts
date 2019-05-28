@@ -6,16 +6,18 @@ import { CompressedTexture } from './../textures/CompressedTexture';
  */
 
 export class CompressedTextureLoader {
-  constructor(manager?: LoadingManager);
+
+	constructor( manager?: LoadingManager );
 
   manager: LoadingManager;
   path: string;
 
   load(
     url: string,
-    onLoad: (texture: CompressedTexture) => void,
-    onProgress?: (event: ProgressEvent) => void,
-    onError?: (event: ErrorEvent) => void
+    onLoad: ( texture: CompressedTexture ) => void,
+    onProgress?: ( event: ProgressEvent ) => void,
+    onError?: ( event: ErrorEvent ) => void
   ): void;
-  setPath(path: string): CompressedTextureLoader;
+  setPath( path: string ): CompressedTextureLoader;
+
 }

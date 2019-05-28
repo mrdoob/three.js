@@ -11,7 +11,8 @@ import { Texture } from '../textures/Texture';
  * Scenes allow you to set up what and where is to be rendered by three.js. This is where you place objects, lights and cameras.
  */
 export class Scene extends Object3D {
-  constructor();
+
+	constructor();
 
   type: 'Scene';
 
@@ -27,7 +28,8 @@ export class Scene extends Object3D {
   autoUpdate: boolean;
   background: null | Color | Texture;
 
-  copy(source: this, recursive?: boolean): this;
-  toJSON(meta?: any): any;
+  copy( source: this, recursive?: boolean ): this;
+  toJSON( meta?: any ): any;
   dispose(): void;
+
 }

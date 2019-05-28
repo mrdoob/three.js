@@ -4,7 +4,8 @@ import { CubicInterpolant } from './../math/interpolants/CubicInterpolant';
 import { InterpolationModes } from '../constants';
 
 export class KeyframeTrack {
-  constructor(
+
+	constructor(
     name: string,
     times: any[],
     values: any[],
@@ -21,21 +22,22 @@ export class KeyframeTrack {
 
   DefaultInterpolation: InterpolationModes;
 
-  InterpolantFactoryMethodDiscrete(result: any): DiscreteInterpolant;
-  InterpolantFactoryMethodLinear(result: any): LinearInterpolant;
-  InterpolantFactoryMethodSmooth(result: any): CubicInterpolant;
+  InterpolantFactoryMethodDiscrete( result: any ): DiscreteInterpolant;
+  InterpolantFactoryMethodLinear( result: any ): LinearInterpolant;
+  InterpolantFactoryMethodSmooth( result: any ): CubicInterpolant;
 
-  setInterpolation(interpolation: InterpolationModes): void;
+  setInterpolation( interpolation: InterpolationModes ): void;
   getInterpolation(): InterpolationModes;
 
   getValuesize(): number;
 
-  shift(timeOffset: number): KeyframeTrack;
-  scale(timeScale: number): KeyframeTrack;
-  trim(startTime: number, endTime: number): KeyframeTrack;
+  shift( timeOffset: number ): KeyframeTrack;
+  scale( timeScale: number ): KeyframeTrack;
+  trim( startTime: number, endTime: number ): KeyframeTrack;
   validate(): boolean;
   optimize(): KeyframeTrack;
 
-  static parse(json: any): KeyframeTrack;
-  static toJSON(track: KeyframeTrack): any;
+  static parse( json: any ): KeyframeTrack;
+  static toJSON( track: KeyframeTrack ): any;
+
 }

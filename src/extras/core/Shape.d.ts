@@ -7,20 +7,21 @@ import { ShapeGeometry } from './../../geometries/ShapeGeometry';
  * Defines a 2d shape plane using paths.
  */
 export class Shape extends Path {
-  constructor(points?: Vector2[]);
+
+	constructor( points?: Vector2[] );
 
   holes: Path[];
 
   /**
    * @deprecated Use {@link ExtrudeGeometry ExtrudeGeometry()} instead.
    */
-  extrude(options?: any): ExtrudeGeometry;
+  extrude( options?: any ): ExtrudeGeometry;
 
   /**
    * @deprecated Use {@link ShapeGeometry ShapeGeometry()} instead.
    */
-  makeGeometry(options?: any): ShapeGeometry;
-  getPointsHoles(divisions: number): Vector2[][];
+  makeGeometry( options?: any ): ShapeGeometry;
+  getPointsHoles( divisions: number ): Vector2[][];
 
   /**
    * @deprecated Use {@link Shape#extractPoints .extractPoints()} instead.
@@ -31,5 +32,6 @@ export class Shape extends Path {
     shape: Vector2[];
     holes: Vector2[][];
   };
-  extractPoints(divisions: number): Vector2[];
+  extractPoints( divisions: number ): Vector2[];
+
 }

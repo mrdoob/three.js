@@ -11,8 +11,10 @@ import { Material } from './../../materials/Material';
 // Extras / Objects /////////////////////////////////////////////////////////////////////
 
 export class ImmediateRenderObject extends Object3D {
-  constructor(material: Material);
+
+	constructor( material: Material );
 
   material: Material;
-  render(renderCallback: Function): void;
+  render( renderCallback: Function ): void;
+
 }

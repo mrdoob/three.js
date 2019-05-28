@@ -16,7 +16,9 @@ import { LineSegments } from './../objects/LineSegments';
 // }
 
 export class BoxHelper extends LineSegments {
-  constructor(object?: Object3D, color?: Color);
 
-  update(object?: Object3D): void;
+	constructor( object?: Object3D, color?: Color );
+
+	update( object?: Object3D ): void;
+
 }

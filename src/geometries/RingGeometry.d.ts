@@ -2,7 +2,8 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export class RingBufferGeometry extends BufferGeometry {
-  constructor(
+
+	constructor(
     innerRadius?: number,
     outerRadius?: number,
     thetaSegments?: number,
@@ -19,10 +20,12 @@ export class RingBufferGeometry extends BufferGeometry {
     thetaStart: number;
     thetaLength: number;
   };
+
 }
 
 export class RingGeometry extends Geometry {
-  constructor(
+
+	constructor(
     innerRadius?: number,
     outerRadius?: number,
     thetaSegments?: number,
@@ -39,4 +42,5 @@ export class RingGeometry extends Geometry {
     thetaStart: number;
     thetaLength: number;
   };
+
 }

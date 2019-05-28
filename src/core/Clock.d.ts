@@ -4,10 +4,11 @@
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js">src/core/Clock.js</a>
  */
 export class Clock {
-  /**
+
+	/**
    * @param autoStart Automatically start the clock.
    */
-  constructor(autoStart?: boolean);
+	constructor( autoStart?: boolean );
 
   /**
    * If set, starts the clock automatically when the first update is called.
@@ -56,4 +57,5 @@ export class Clock {
    * Get the seconds passed since the last call to this method.
    */
   getDelta(): number;
+
 }

@@ -1,9 +1,10 @@
 export class Uniform {
-  constructor(value: any);
-  /**
+
+	constructor( value: any );
+	/**
    * @deprecated
    */
-  constructor(type: string, value: any);
+	constructor( type: string, value: any );
   /**
    * @deprecated
    */
@@ -18,5 +19,6 @@ export class Uniform {
   /**
    * @deprecated Use {@link Object3D#onBeforeRender object.onBeforeRender()} instead.
    */
-  onUpdate(callback: Function): Uniform;
+  onUpdate( callback: Function ): Uniform;
+
 }

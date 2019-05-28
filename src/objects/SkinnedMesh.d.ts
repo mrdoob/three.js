@@ -6,7 +6,8 @@ import { Mesh } from './Mesh';
 import { BufferGeometry } from '../core/BufferGeometry';
 
 export class SkinnedMesh extends Mesh {
-  constructor(
+
+	constructor(
     geometry?: Geometry | BufferGeometry,
     material?: Material | Material[],
     useVertexTexture?: boolean
@@ -17,8 +18,9 @@ export class SkinnedMesh extends Mesh {
   bindMatrixInverse: Matrix4;
   skeleton: Skeleton;
 
-  bind(skeleton: Skeleton, bindMatrix?: Matrix4): void;
+  bind( skeleton: Skeleton, bindMatrix?: Matrix4 ): void;
   pose(): void;
   normalizeSkinWeights(): void;
-  updateMatrixWorld(force?: boolean): void;
+  updateMatrixWorld( force?: boolean ): void;
+
 }

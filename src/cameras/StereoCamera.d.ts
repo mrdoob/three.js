@@ -2,7 +2,8 @@ import { PerspectiveCamera } from './PerspectiveCamera';
 import { Camera } from './Camera';
 
 export class StereoCamera extends Camera {
-  constructor();
+
+	constructor();
 
   type: 'StereoCamera';
 
@@ -11,5 +12,6 @@ export class StereoCamera extends Camera {
   cameraL: PerspectiveCamera;
   cameraR: PerspectiveCamera;
 
-  update(camera: PerspectiveCamera): void;
+  update( camera: PerspectiveCamera ): void;
+
 }

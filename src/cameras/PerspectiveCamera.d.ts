@@ -10,13 +10,14 @@ import { Camera } from './Camera';
  * @source https://github.com/mrdoob/three.js/blob/master/src/cameras/PerspectiveCamera.js
  */
 export class PerspectiveCamera extends Camera {
-  /**
+
+	/**
    * @param fov Camera frustum vertical field of view. Default value is 50.
    * @param aspect Camera frustum aspect ratio. Default value is 1.
    * @param near Camera frustum near plane. Default value is 0.1.
    * @param far Camera frustum far plane. Default value is 2000.
    */
-  constructor(fov?: number, aspect?: number, near?: number, far?: number);
+	constructor( fov?: number, aspect?: number, near?: number, far?: number );
 
   type: 'PerspectiveCamera';
 
@@ -57,7 +58,7 @@ export class PerspectiveCamera extends Camera {
   filmGauge: number;
   filmOffset: number;
 
-  setFocalLength(focalLength: number): void;
+  setFocalLength( focalLength: number ): void;
   getFocalLength(): number;
   getEffectiveFOV(): number;
   getFilmWidth(): number;
@@ -114,10 +115,11 @@ export class PerspectiveCamera extends Camera {
    * Updates the camera projection matrix. Must be called after change of parameters.
    */
   updateProjectionMatrix(): void;
-  toJSON(meta?: any): any;
+  toJSON( meta?: any ): any;
 
   /**
    * @deprecated Use {@link PerspectiveCamera#setFocalLength .setFocalLength()} and {@link PerspectiveCamera#filmGauge .filmGauge} instead.
    */
-  setLens(focalLength: number, frameHeight?: number): void;
+  setLens( focalLength: number, frameHeight?: number ): void;
+
 }

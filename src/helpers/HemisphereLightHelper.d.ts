@@ -5,7 +5,8 @@ import { MeshBasicMaterial } from './../materials/MeshBasicMaterial';
 import { Object3D } from './../core/Object3D';
 
 export class HemisphereLightHelper extends Object3D {
-  constructor(
+
+	constructor(
     light: HemisphereLight,
     size: number,
     color?: Color | number | string
@@ -20,4 +21,5 @@ export class HemisphereLightHelper extends Object3D {
 
   dispose(): void;
   update(): void;
+
 }

@@ -17,7 +17,8 @@ export interface WebGLRenderTargetOptions {
 }
 
 export class WebGLRenderTarget extends EventDispatcher {
-  constructor(
+
+	constructor(
     width: number,
     height: number,
     options?: WebGLRenderTargetOptions
@@ -74,8 +75,9 @@ export class WebGLRenderTarget extends EventDispatcher {
    */
   generateMipmaps: any;
 
-  setSize(width: number, height: number): void;
+  setSize( width: number, height: number ): void;
   clone(): this;
-  copy(source: WebGLRenderTarget): this;
+  copy( source: WebGLRenderTarget ): this;
   dispose(): void;
+
 }

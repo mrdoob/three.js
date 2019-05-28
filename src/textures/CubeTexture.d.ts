@@ -1,15 +1,16 @@
 import { Texture } from './Texture';
 import {
-  Mapping,
-  Wrapping,
-  TextureFilter,
-  PixelFormat,
-  TextureDataType,
-  TextureEncoding,
+	Mapping,
+	Wrapping,
+	TextureFilter,
+	PixelFormat,
+	TextureDataType,
+	TextureEncoding,
 } from '../constants';
 
 export class CubeTexture extends Texture {
-  constructor(
+
+	constructor(
     images?: any[], // HTMLImageElement or HTMLCanvasElement
     mapping?: Mapping,
     wrapS?: Wrapping,
@@ -23,4 +24,5 @@ export class CubeTexture extends Texture {
   );
 
   images: any; // returns and sets the value of Texture.image in the codde ?
+
 }

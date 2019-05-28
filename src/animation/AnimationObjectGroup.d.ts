@@ -1,5 +1,6 @@
 export class AnimationObjectGroup {
-  constructor(...args: any[]);
+
+	constructor( ...args: any[] );
 
   uuid: string;
   stats: {
@@ -10,7 +11,8 @@ export class AnimationObjectGroup {
     };
   };
 
-  add(...args: any[]): void;
-  remove(...args: any[]): void;
-  uncache(...args: any[]): void;
+  add( ...args: any[] ): void;
+  remove( ...args: any[] ): void;
+  uncache( ...args: any[] ): void;
+
 }

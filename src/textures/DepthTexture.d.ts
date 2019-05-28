@@ -1,15 +1,16 @@
 import { Texture } from './Texture';
 import {
-  Mapping,
-  Wrapping,
-  TextureFilter,
-  PixelFormat,
-  TextureDataType,
-  TextureEncoding,
+	Mapping,
+	Wrapping,
+	TextureFilter,
+	PixelFormat,
+	TextureDataType,
+	TextureEncoding,
 } from '../constants';
 
 export class DepthTexture extends Texture {
-  constructor(
+
+	constructor(
     width: number,
     heighht: number,
     type?: TextureDataType,
@@ -22,4 +23,5 @@ export class DepthTexture extends Texture {
   );
 
   image: { width: number; height: number };
+
 }

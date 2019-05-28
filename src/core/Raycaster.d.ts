@@ -25,14 +25,15 @@ export interface RaycasterParameters {
 }
 
 export class Raycaster {
-  /**
+
+	/**
    * This creates a new raycaster object.
    * @param origin The origin vector where the ray casts from.
    * @param direction The direction vector that gives direction to the ray. Should be normalized.
    * @param near All results returned are further away than near. Near can't be negative. Default value is 0.
    * @param far All results returned are closer then far. Far can't be lower then near . Default value is Infinity.
    */
-  constructor(
+	constructor(
     origin?: Vector3,
     direction?: Vector3,
     near?: number,
@@ -66,14 +67,14 @@ export class Raycaster {
    * @param origin The origin vector where the ray casts from.
    * @param direction The normalized direction vector that gives direction to the ray.
    */
-  set(origin: Vector3, direction: Vector3): void;
+  set( origin: Vector3, direction: Vector3 ): void;
 
   /**
    * Updates the ray with a new origin and direction.
    * @param coords 2D coordinates of the mouse, in normalized device coordinates (NDC)---X and Y components should be between -1 and 1.
    * @param camera camera from which the ray should originate
    */
-  setFromCamera(coords: { x: number; y: number }, camera: Camera): void;
+  setFromCamera( coords: { x: number; y: number }, camera: Camera ): void;
 
   /**
    * Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first.
@@ -98,4 +99,5 @@ export class Raycaster {
     recursive?: boolean,
     optionalTarget?: Intersection[]
   ): Intersection[];
+
 }

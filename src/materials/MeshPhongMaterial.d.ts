@@ -42,7 +42,8 @@ export interface MeshPhongMaterialParameters extends MaterialParameters {
 }
 
 export class MeshPhongMaterial extends Material {
-  constructor(parameters?: MeshPhongMaterialParameters);
+
+	constructor( parameters?: MeshPhongMaterialParameters );
 
   color: Color;
   specular: Color;
@@ -81,5 +82,6 @@ export class MeshPhongMaterial extends Material {
    */
   metal: boolean;
 
-  setValues(parameters: MeshPhongMaterialParameters): void;
+  setValues( parameters: MeshPhongMaterialParameters ): void;
+
 }

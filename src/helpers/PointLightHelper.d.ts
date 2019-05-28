@@ -4,7 +4,8 @@ import { Matrix4 } from './../math/Matrix4';
 import { Object3D } from './../core/Object3D';
 
 export class PointLightHelper extends Object3D {
-  constructor(
+
+	constructor(
     light: PointLight,
     sphereSize?: number,
     color?: Color | string | number
@@ -17,4 +18,5 @@ export class PointLightHelper extends Object3D {
 
   dispose(): void;
   update(): void;
+
 }
