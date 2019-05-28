@@ -125,30 +125,12 @@
 
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
-				// controllers
-
-				function onSelectStart() {
-
-					this.userData.isSelecting = true;
-
-				}
-
-				function onSelectEnd() {
-
-					this.userData.isSelecting = false;
-
-				}
-
 				controller1 = renderer.vr.getController( 0 );
-				controller1.addEventListener( 'selectstart', onSelectStart );
-				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller1 );
 
 				controller2 = renderer.vr.getController( 1 );
-				controller2.addEventListener( 'selectstart', onSelectStart );
-				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller2 );
@@ -386,6 +368,28 @@
 			function handleController( controller ) {
 
 				var pivot = controller.getObjectByName( 'pivot' );
+
+				var gamepad;
+
+				controller.userData.isSelecting = false;
+
+				if ( controller.userData.inputSource ) {
+
+					gamepad = controller.userData.inputSource.gamepad;
+
+					for (var i = 0; i < gamepad.buttons.length; ++i) {
+
+	          if (gamepad.buttons[i].pressed) {
+
+	          	controller.userData.isSelecting = true;
+
+	          	break;
+
+	          }
+
+	        }
+
+				}
 
 				if ( pivot ) {
 

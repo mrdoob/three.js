@@ -85,8 +85,16 @@ function WebXRManager( renderer ) {
 
 	function onSessionEvent( event ) {
 
-		var controller = controllers[ inputSources.indexOf( event.inputSource ) ];
-		if ( controller ) controller.dispatchEvent( { type: event.type } );
+		for ( var i = 0; i < inputSources.length; ++ i ) {
+
+			if ( inputSources === event.inputSource ) {
+
+				controller.dispatchEvent( { type: event.type } );
+				return;
+
+			}
+
+		}
 
 	}
 
@@ -132,15 +140,15 @@ function WebXRManager( renderer ) {
 
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
-			session.requestReferenceSpace( { type: 'stationary', subtype: 'eye-level' } ).then( onRequestFrameOfReference );
+			session.requestReferenceSpace( 'local-floor' ).then( onRequestFrameOfReference );
 
 			//
 
-			inputSources = session.getInputSources();
+			inputSources = session.inputSources;
 
 			session.addEventListener( 'inputsourceschange', function () {
 
-				inputSources = session.getInputSources();
+				inputSources = session.inputSources;
 				console.log( inputSources );
 
 				for ( var i = 0; i < controllers.length; i ++ ) {
@@ -229,8 +237,8 @@ function WebXRManager( renderer ) {
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
-				var viewport = layer.getViewport( view );
-				var viewMatrix = view.transform.inverse().matrix;
+				var viewport = session.renderState.baseLayer.getViewport( view );
+				var viewMatrix = view.transform.inverse.matrix;
 
 				var camera = cameraVR.cameras[ i ];
 				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
@@ -261,8 +269,7 @@ function WebXRManager( renderer ) {
 
 				if ( inputPose !== null ) {
 
-					var targetRay = new XRRay( inputPose.transform );
-					controller.matrix.elements = targetRay.matrix;
+					controller.matrix.elements = inputPose.transform.matrix;
 
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
