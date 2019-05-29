@@ -17,6 +17,8 @@ export class Color {
 	constructor( color?: Color | string | number );
 	constructor( r: number, g: number, b: number );
 
+	isColor: boolean;
+
 	/**
    * Red channel value between 0 and 1. Default is 1.
    */
@@ -94,6 +96,28 @@ export class Color {
    * Converts this color from linear to gamma space.
    */
 	convertLinearToGamma(): Color;
+
+	/**
+   * Copies given color making conversion from sRGB to linear space.
+   * @param color Color to copy.
+   */
+	copySRGBToLinear(): Color;
+
+	/**
+	 * Copies given color making conversion from linear to sRGB space.
+	 * @param color Color to copy.
+	 */
+	copyLinearToSRGB(): Color;
+
+	/**
+	 * Converts this color from sRGB to linear space.
+	 */
+	convertSRGBToLinear(): Color;
+
+	/**
+	 * Converts this color from linear to sRGB space.
+	 */
+	convertLinearToSRGB(): Color;
 
 	/**
    * Returns the hexadecimal value of this color.
