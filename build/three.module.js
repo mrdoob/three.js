@@ -22605,15 +22605,15 @@ function WebXRManager( renderer ) {
 
 		if ( pose !== null ) {
 
-			var layer = session.renderState.baseLayer;
 			var views = pose.views;
+			var baseLayer = session.renderState.baseLayer;
 
-			renderer.setFramebuffer( session.renderState.baseLayer.framebuffer );
+			renderer.setFramebuffer( baseLayer.framebuffer );
 
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
-				var viewport = layer.getViewport( view );
+				var viewport = baseLayer.getViewport( view );
 				var viewMatrix = view.transform.inverse.matrix;
 
 				var camera = cameraVR.cameras[ i ];
