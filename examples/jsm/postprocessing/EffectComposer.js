@@ -3,13 +3,13 @@
  */
 
 import {
+	Clock,
 	LinearFilter,
 	Mesh,
 	OrthographicCamera,
 	PlaneBufferGeometry,
 	RGBAFormat,
 	Vector2,
-	Clock,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
 import { CopyShader } from "../shaders/CopyShader.js";
