@@ -640,8 +640,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 		var programLog = gl.getProgramInfoLog( program ).trim();
 		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
 		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
-		var vertexErrors = getShaderErrors( gl, glVertexShader );
-		var fragmentErrors = getShaderErrors( gl, glFragmentShader );
 
 		var runnable = true;
 		var haveDiagnostics = true;
@@ -649,6 +647,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
 			runnable = false;
+
+			var vertexErrors = getShaderErrors( gl, glVertexShader );
+			var fragmentErrors = getShaderErrors( gl, glFragmentShader );
 
 			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
 
