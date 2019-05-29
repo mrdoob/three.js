@@ -81,7 +81,7 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( { mode: 'immersive-vr' } ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-vr' ).then( onSessionStarted );
 
 				} else {
 
@@ -90,8 +90,6 @@ var WEBVR = {
 				}
 
 			};
-
-			if ( device ) renderer.vr.setDevice( device );
 
 		}
 
@@ -131,14 +129,14 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'requestDevice' in navigator.xr ) {
+		if ( 'xr' in navigator && 'supportsSession' in navigator.xr ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSessionMode( 'immersive-vr' ).then( showEnterXR );
+			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR );
 
 			return button;
 
