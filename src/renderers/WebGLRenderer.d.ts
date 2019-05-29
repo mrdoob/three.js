@@ -355,6 +355,16 @@ export class WebGLRenderer implements Renderer {
 	): void;
 
 	/**
+	 * Returns the current active cube face.
+	 */
+	getActiveCubeFace(): number;
+
+	/**
+	 * Returns the current active mipmap level.
+	 */
+	getActiveMipMapLevel(): number;
+
+	/**
    * Returns the current render target. If no render target is set, null is returned.
    */
 	getRenderTarget(): RenderTarget | null;
