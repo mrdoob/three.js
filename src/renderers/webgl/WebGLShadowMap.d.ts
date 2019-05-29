@@ -13,6 +13,9 @@ export class WebGLShadowMap {
 	);
 
 	enabled: boolean;
+	directionalLightEnabled: boolean;
+	pointLightEnabled: boolean;
+	spotLightEnabled: boolean;
 	autoUpdate: boolean;
 	needsUpdate: boolean;
 	type: ShadowMapType;

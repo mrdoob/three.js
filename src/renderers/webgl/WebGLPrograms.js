@@ -36,7 +36,8 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
-		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
+		"shadowMapEnabled", "directionalLightShadowMapEnabled", "pointLightShadowMapEnabled", "spotLightShadowMapEnabled",
+		"shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering"
 	];
 
@@ -196,6 +197,9 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 			dithering: material.dithering,
 
 			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && shadows.length > 0,
+			directionalLightShadowMapEnabled: renderer.shadowMap.directionalLightEnabled,
+			pointLightShadowMapEnabled: renderer.shadowMap.pointLightEnabled,
+			spotLightShadowMapEnabled: renderer.shadowMap.spotLightEnabled,
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: renderer.toneMapping,

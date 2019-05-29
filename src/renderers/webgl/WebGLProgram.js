@@ -405,6 +405,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
+			parameters.directionalLightShadowMapEnabled ? '#define USE_SHADOWMAP_DIR_LIGHT' : '',
+			parameters.pointLightShadowMapEnabled ? '#define USE_SHADOWMAP_POINT_LIGHT' : '',
+			parameters.spotLightShadowMapEnabled ? '#define USE_SHADOWMAP_SPOT_LIGHT' : '',
 
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
@@ -517,6 +520,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
+			parameters.directionalLightShadowMapEnabled ? '#define USE_SHADOWMAP_DIR_LIGHT' : '',
+			parameters.pointLightShadowMapEnabled ? '#define USE_SHADOWMAP_POINT_LIGHT' : '',
+			parameters.spotLightShadowMapEnabled ? '#define USE_SHADOWMAP_SPOT_LIGHT' : '',
 
 			parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
 

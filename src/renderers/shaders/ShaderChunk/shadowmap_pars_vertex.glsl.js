@@ -1,21 +1,21 @@
 export default /* glsl */`
 #ifdef USE_SHADOWMAP
 
-	#if NUM_DIR_LIGHTS > 0
+	#if NUM_DIR_LIGHTS > 0 && defined(USE_SHADOWMAP_DIR_LIGHT)
 
 		uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 
 	#endif
 
-	#if NUM_SPOT_LIGHTS > 0
+	#if NUM_SPOT_LIGHTS > 0 && defined(USE_SHADOWMAP_SPOT_LIGHT)
 
 		uniform mat4 spotShadowMatrix[ NUM_SPOT_LIGHTS ];
 		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
 
 	#endif
 
-	#if NUM_POINT_LIGHTS > 0
+	#if NUM_POINT_LIGHTS > 0 && defined(USE_SHADOWMAP_POINT_LIGHT)
 
 		uniform mat4 pointShadowMatrix[ NUM_POINT_LIGHTS ];
 		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];

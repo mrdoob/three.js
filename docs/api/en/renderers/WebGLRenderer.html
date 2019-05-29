@@ -248,6 +248,15 @@
 		<h3>[property:Boolean shadowMap.enabled]</h3>
 		<p>If set, use shadow maps in the scene. Default is *false*.</p>
 
+		<h3>[property:Boolean shadowMap.pointLightEnabled]</h3>
+		<p>If set and shadow maps are enabled in general, use shadow maps for point lights. Setting this to *false* makes it possible to have a lot of point lights in the scene while still using shadow maps for other types of lights. Default is *true*.</p>
+
+		<h3>[property:Boolean shadowMap.spotLightEnabled]</h3>
+		<p>If set and shadow maps are enabled in general, use shadow maps for spot lights. Setting this to *false* makes it possible to have a lot of spot lights in the scene while still using shadow maps for other types of lights. Default is *true*.</p>
+
+		<h3>[property:Boolean shadowMap.directionalLightEnabled]</h3>
+		<p>If set and shadow maps are enabled in general, use shadow maps for directional lights. Setting this to *false* makes it possible to have a lot of directional lights in the scene while still using shadow maps for other types of lights. Default is *true*.</p>
+
 		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
 		<p>Enables automatic updates to the shadows in the scene. Default is *true*.</p>
 		<p>If you do not require dynamic lighting / shadows, you may set this to *false* when the renderer is instantiated.</p>

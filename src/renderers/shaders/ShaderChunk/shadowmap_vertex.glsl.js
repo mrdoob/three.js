@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_SHADOWMAP
 
-	#if NUM_DIR_LIGHTS > 0
+	#if NUM_DIR_LIGHTS > 0 && defined(USE_SHADOWMAP_DIR_LIGHT)
 
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
@@ -12,7 +12,7 @@ export default /* glsl */`
 
 	#endif
 
-	#if NUM_SPOT_LIGHTS > 0
+	#if NUM_SPOT_LIGHTS > 0 && defined(USE_SHADOWMAP_SPOT_LIGHT)
 
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
@@ -23,7 +23,7 @@ export default /* glsl */`
 
 	#endif
 
-	#if NUM_POINT_LIGHTS > 0
+	#if NUM_POINT_LIGHTS > 0 && defined(USE_SHADOWMAP_POINT_LIGHT)
 
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {

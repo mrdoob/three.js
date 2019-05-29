@@ -88,6 +88,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	this.enabled = false;
 
+	this.directionalLightEnabled = true;
+	this.pointLightEnabled = true;
+	this.spotLightEnabled = true;
+
 	this.autoUpdate = true;
 	this.needsUpdate = false;
 
