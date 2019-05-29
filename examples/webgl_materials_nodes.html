@@ -2198,11 +2198,14 @@
 
 						var speed = new THREE.FloatNode( .5 );
 
-						mtl.color = new THREE.ExpressionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
-						mtl.color.keywords[ "speed" ] = speed;
+						var myspeed = new THREE.ExpressionNode( "speed * time", "float" );
+						myspeed.keywords[ "speed" ] = speed;
 
-						mtl.position = new THREE.ExpressionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
-						mtl.position.keywords[ "speed" ] = speed;
+						mtl.color = new THREE.ExpressionNode( "myCustomUv + (sin(myspeed)*.5) + (position * .05)", "vec3" );
+						mtl.color.keywords[ "myspeed" ] = myspeed;
+
+						mtl.position = new THREE.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
+						mtl.position.keywords[ "myspeed" ] = myspeed;
 
 						// add global keyword ( variable or const )
 						THREE.NodeLib.addKeyword( 'myCustomUv', function () {
