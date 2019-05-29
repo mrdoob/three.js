@@ -610,6 +610,7 @@ THREE.LDrawLoader = ( function () {
 					parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 					parseScope.matrix.copy( subobject.matrix );
 					parseScope.inverted = subobject.inverted;
+					parseScope.constructionStep = subobject.constructionStep;
 
 				}
 
@@ -978,6 +979,9 @@ THREE.LDrawLoader = ( function () {
 				triangles: null,
 				lineSegments: null,
 				conditionalSegments: null,
+
+				constructionStep: 0
+
 			};
 
 			this.parseScopesStack.push( newParseScope );
@@ -1336,6 +1340,8 @@ THREE.LDrawLoader = ( function () {
 			// Retrieve data from the parent parse scope
 			var parentParseScope = this.getParentParseScope();
 
+			var isRoot = ! parentParseScope.isFromParse;
+
 			// Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
 			var mainColourCode = parentParseScope.mainColourCode;
 			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
@@ -1374,6 +1380,10 @@ THREE.LDrawLoader = ( function () {
 			var bfcInverted = false;
 			var bfcCull = true;
 			var type = '';
+
+			var currentConstructionStep = 0;
+			var geometrySinceStartFlag = false;
+			var geometrySinceLastStepFlag = false;
 
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
@@ -1484,10 +1494,10 @@ THREE.LDrawLoader = ( function () {
 										currentParseScope.conditionalSegments = [];
 										currentParseScope.type = type;
 
-										var isRoot = ! parentParseScope.isFromParse;
 										if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
 											currentParseScope.groupObject = new THREE.Group();
+											currentParseScope.groupObject.userData.constructionStep = currentParseScope.constructionStep;
 
 										}
 
@@ -1616,6 +1626,18 @@ THREE.LDrawLoader = ( function () {
 
 									break;
 
+								case 'STEP':
+
+									if ( isRoot && geometrySinceStartFlag ) {
+
+										currentParseScope.groupObject.userData.numConstructionSteps = ++ currentConstructionStep;
+
+										geometrySinceLastStepFlag = false;
+
+									}
+
+									break;
+
 								default:
 									// Other meta directives are not implemented
 									break;
@@ -1681,10 +1703,14 @@ THREE.LDrawLoader = ( function () {
 							locationState: LDrawLoader.FILE_LOCATION_AS_IS,
 							url: null,
 							triedLowerCase: false,
-							inverted: bfcInverted !== currentParseScope.inverted
+							inverted: bfcInverted !== currentParseScope.inverted,
+							constructionStep: currentConstructionStep
 						} );
 
 						bfcInverted = false;
+
+						geometrySinceStartFlag = true;
+						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1701,6 +1727,9 @@ THREE.LDrawLoader = ( function () {
 						};
 
 						lineSegments.push( segment );
+
+						geometrySinceStartFlag = true;
+						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1719,6 +1748,9 @@ THREE.LDrawLoader = ( function () {
 						};
 
 						conditionalSegments.push( segment );
+
+						geometrySinceStartFlag = true;
+						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1779,6 +1811,9 @@ THREE.LDrawLoader = ( function () {
 							} );
 
 						}
+
+						geometrySinceStartFlag = true;
+						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1866,6 +1901,9 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
+						geometrySinceStartFlag = true;
+						geometrySinceLastStepFlag = true;
+
 						break;
 
 					default:
@@ -1873,6 +1911,12 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 				}
+
+			}
+
+			if ( isRoot && geometrySinceLastStepFlag ) {
+
+ 				currentParseScope.groupObject.userData.numConstructionSteps = ++ currentConstructionStep;
 
 			}
 
