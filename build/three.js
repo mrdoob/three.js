@@ -22019,7 +22019,7 @@
 
 		var framebufferScaleFactor = 1.0;
 
-		var frameOfReferenceType = 'stage';
+		var referenceSpaceType = 'local-floor';
 
 		if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
@@ -22224,9 +22224,9 @@
 
 		};
 
-		this.setFrameOfReferenceType = function ( value ) {
+		this.setReferenceSpaceType = function ( value ) {
 
-			frameOfReferenceType = value;
+			referenceSpaceType = value;
 
 		};
 
@@ -22238,7 +22238,7 @@
 
 		this.getCamera = function ( camera ) {
 
-			var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
+			var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
 
 			if ( isPresenting() === false ) {
 
@@ -22256,7 +22256,7 @@
 
 			//
 
-			if ( frameOfReferenceType === 'stage' ) {
+			if ( referenceSpaceType === 'local-floor' ) {
 
 				var stageParameters = device.stageParameters;
 
@@ -22313,7 +22313,7 @@
 
 			standingMatrixInverse.getInverse( standingMatrix );
 
-			if ( frameOfReferenceType === 'stage' ) {
+			if ( referenceSpaceType === 'local-floor' ) {
 
 				cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
 				cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
@@ -22393,6 +22393,14 @@
 				window.removeEventListener( 'vrdisplaypresentchange', onVRDisplayPresentChange );
 
 			}
+
+		};
+
+		// DEPRECATED
+
+		this.setFrameOfReferenceType = function () {
+
+			console.warn( 'THREE.WebVRManager: setFrameOfReferenceType() has been deprecated.' );
 
 		};
 
@@ -22690,6 +22698,12 @@
 		this.setDevice = function () {
 
 			console.warn( 'THREE.WebXRManager: setDevice() has been deprecated.' );
+
+		};
+
+		this.setFrameOfReferenceType = function () {
+
+			console.warn( 'THREE.WebXRManager: setFrameOfReferenceType() has been deprecated.' );
 
 		};
 
