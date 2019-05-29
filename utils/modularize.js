@@ -43,6 +43,7 @@ var files = [
 	{ path: 'exporters/TypedGeometryExporter.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'geometries/ConvexGeometry.js', dependencies: [ { name: 'ConvexHull', path: 'math/ConvexHull.js' } ], ignoreList: [] },
 	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
@@ -74,6 +75,7 @@ var files = [
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
