@@ -9,9 +9,9 @@ var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
-		if ( options && options.frameOfReferenceType ) {
+		if ( options && options.referenceSpaceType ) {
 
-			renderer.vr.setFrameOfReferenceType( options.frameOfReferenceType );
+			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
 
 		}
 

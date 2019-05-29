@@ -305,6 +305,12 @@ function WebXRManager( renderer ) {
 
 	};
 
+	this.setFrameOfReferenceType = function () {
+
+		console.warn( 'THREE.WebXRManager: setFrameOfReferenceType() has been deprecated.' );
+
+	};
+
 	this.submitFrame = function () {};
 
 }
