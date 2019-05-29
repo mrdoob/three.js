@@ -47,7 +47,7 @@ var WEBVR = {
 				session.addEventListener( 'end', onSessionEnded );
 
 				renderer.vr.setSession( session );
-				button.textContent = 'EXIT VR';
+				button.textContent = 'EXIT XR';
 
 				currentSession = session;
 
@@ -58,7 +58,7 @@ var WEBVR = {
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
 				renderer.vr.setSession( null );
-				button.textContent = 'ENTER VR';
+				button.textContent = 'ENTER XR';
 
 				currentSession = null;
 
@@ -72,7 +72,7 @@ var WEBVR = {
 			button.style.left = 'calc(50% - 50px)';
 			button.style.width = '100px';
 
-			button.textContent = 'ENTER VR';
+			button.textContent = 'ENTER XR';
 
 			button.onmouseenter = function () { button.style.opacity = '1.0'; };
 			button.onmouseleave = function () { button.style.opacity = '0.5'; };
