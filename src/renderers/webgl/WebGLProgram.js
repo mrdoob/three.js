@@ -48,19 +48,19 @@ function getEncodingComponents( encoding ) {
 
 }
 
-function getShaderErrors( gl, shader ) {
+function getShaderErrors( gl, shader, type ) {
 
 	var status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
-	var source = gl.getShaderSource( shader );
 	var log = gl.getShaderInfoLog( shader ).trim();
-	var type = gl.getShaderParameter( shader, gl.SHADER_TYPE ) === gl.VERTEX_SHADER ? 'vertex' : 'fragment';
 
 	if ( status && log === '' ) return '';
 
 	// --enable-privileged-webgl-extension
 	// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
-	return 'THREE.WebGLShader: gl.getShaderInfoLog() ' + type + ' ' + log + addLineNumbers( source );
+	var source = gl.getShaderSource( shader );
+
+	return 'THREE.WebGLShader: gl.getShaderInfoLog() ' + type + '\n' + log + addLineNumbers( source );
 
 }
 
@@ -648,8 +648,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			runnable = false;
 
-			var vertexErrors = getShaderErrors( gl, glVertexShader );
-			var fragmentErrors = getShaderErrors( gl, glFragmentShader );
+			var vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
+			var fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
 			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
 
