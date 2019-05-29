@@ -201,7 +201,8 @@ function WebGLRenderer( parameters ) {
 			premultipliedAlpha: _premultipliedAlpha,
 			preserveDrawingBuffer: _preserveDrawingBuffer,
 			powerPreference: _powerPreference,
-			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat
+			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat,
+			xrCompatible: true
 		};
 
 		// event listeners must be registered before WebGL context is created, see #12753
@@ -310,7 +311,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'requestDevice' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -2411,8 +2412,9 @@ function WebGLRenderer( parameters ) {
 	}
 
 	//
-
 	this.setFramebuffer = function ( value ) {
+
+		if ( _framebuffer !== value ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
 
 		_framebuffer = value;
 
@@ -2601,6 +2603,12 @@ function WebGLRenderer( parameters ) {
 		}
 
 	};
+
+	/*
+	if ( typeof __THREE_DEVTOOLS__ !== undefined ) {
+		__THREE_DEVTOOLS__.dispatchEvent( { type: 'renderer', value: this } );
+	}
+	*/
 
 }
 

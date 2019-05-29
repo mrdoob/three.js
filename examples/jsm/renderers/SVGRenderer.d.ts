@@ -16,6 +16,7 @@ export class SVGRenderer {
   autoClear: boolean;
   sortObjects: boolean;
   sortElements: boolean;
+  overdraw: number;
   info: {render: {vertices: number, faces: number}};
 
   setQuality(quality: string): void;

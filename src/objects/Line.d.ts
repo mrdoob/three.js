@@ -6,18 +6,20 @@ import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
 
 export class Line extends Object3D {
-  constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[],
-    mode?: number
-  );
 
-  geometry: Geometry | BufferGeometry;
-  material: Material | Material[];
+	constructor(
+		geometry?: Geometry | BufferGeometry,
+		material?: Material | Material[],
+		mode?: number
+	);
 
-  type: 'Line' | 'LineLoop' | 'LineSegments';
-  isLine: true;
+	geometry: Geometry | BufferGeometry;
+	material: Material | Material[];
 
-  computeLineDistances(): this;
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
+	type: 'Line' | 'LineLoop' | 'LineSegments';
+	isLine: true;
+
+	computeLineDistances(): this;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+
 }

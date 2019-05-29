@@ -4,78 +4,80 @@ import { EventDispatcher } from './../core/EventDispatcher';
 import { Wrapping, TextureFilter, TextureDataType } from '../constants';
 
 export interface WebGLRenderTargetOptions {
-  wrapS?: Wrapping;
-  wrapT?: Wrapping;
-  magFilter?: TextureFilter;
-  minFilter?: TextureFilter;
-  format?: number; // RGBAFormat;
-  type?: TextureDataType; // UnsignedByteType;
-  anisotropy?: number; // 1;
-  depthBuffer?: boolean; // true;
-  stencilBuffer?: boolean; // true;
-  generateMipmaps?: boolean; // true;
+	wrapS?: Wrapping;
+	wrapT?: Wrapping;
+	magFilter?: TextureFilter;
+	minFilter?: TextureFilter;
+	format?: number; // RGBAFormat;
+	type?: TextureDataType; // UnsignedByteType;
+	anisotropy?: number; // 1;
+	depthBuffer?: boolean; // true;
+	stencilBuffer?: boolean; // true;
+	generateMipmaps?: boolean; // true;
 }
 
 export class WebGLRenderTarget extends EventDispatcher {
-  constructor(
-    width: number,
-    height: number,
-    options?: WebGLRenderTargetOptions
-  );
 
-  uuid: string;
-  width: number;
-  height: number;
-  scissor: Vector4;
-  scissorTest: boolean;
-  viewport: Vector4;
-  texture: Texture;
-  depthBuffer: boolean;
-  stencilBuffer: boolean;
-  depthTexture: Texture;
-  /**
+	constructor(
+		width: number,
+		height: number,
+		options?: WebGLRenderTargetOptions
+	);
+
+	uuid: string;
+	width: number;
+	height: number;
+	scissor: Vector4;
+	scissorTest: boolean;
+	viewport: Vector4;
+	texture: Texture;
+	depthBuffer: boolean;
+	stencilBuffer: boolean;
+	depthTexture: Texture;
+	/**
    * @deprecated Use {@link Texture#wrapS texture.wrapS} instead.
    */
-  wrapS: any;
-  /**
+	wrapS: any;
+	/**
    * @deprecated Use {@link Texture#wrapT texture.wrapT} instead.
    */
-  wrapT: any;
-  /**
+	wrapT: any;
+	/**
    * @deprecated Use {@link Texture#magFilter texture.magFilter} instead.
    */
-  magFilter: any;
-  /**
+	magFilter: any;
+	/**
    * @deprecated Use {@link Texture#minFilter texture.minFilter} instead.
    */
-  minFilter: any;
-  /**
+	minFilter: any;
+	/**
    * @deprecated Use {@link Texture#anisotropy texture.anisotropy} instead.
    */
-  anisotropy: any;
-  /**
+	anisotropy: any;
+	/**
    * @deprecated Use {@link Texture#offset texture.offset} instead.
    */
-  offset: any;
-  /**
+	offset: any;
+	/**
    * @deprecated Use {@link Texture#repeat texture.repeat} instead.
    */
-  repeat: any;
-  /**
+	repeat: any;
+	/**
    * @deprecated Use {@link Texture#format texture.format} instead.
    */
-  format: any;
-  /**
+	format: any;
+	/**
    * @deprecated Use {@link Texture#type texture.type} instead.
    */
-  type: any;
-  /**
+	type: any;
+	/**
    * @deprecated Use {@link Texture#generateMipmaps texture.generateMipmaps} instead.
    */
-  generateMipmaps: any;
+	generateMipmaps: any;
 
-  setSize(width: number, height: number): void;
-  clone(): this;
-  copy(source: WebGLRenderTarget): this;
-  dispose(): void;
+	setSize( width: number, height: number ): void;
+	clone(): this;
+	copy( source: WebGLRenderTarget ): this;
+	dispose(): void;
+
 }

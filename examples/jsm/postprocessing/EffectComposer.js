@@ -9,6 +9,7 @@ import {
 	PlaneBufferGeometry,
 	RGBAFormat,
 	Vector2,
+	Clock,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
 import { CopyShader } from "../shaders/CopyShader.js";
@@ -72,7 +73,7 @@ var EffectComposer = function ( renderer, renderTarget ) {
 
 	this.copyPass = new ShaderPass( CopyShader );
 
-	this._previousFrameTime = Date.now();
+	this.clock = new Clock();
 
 };
 
@@ -123,11 +124,9 @@ Object.assign( EffectComposer.prototype, {
 
 		if ( deltaTime === undefined ) {
 
-			deltaTime = ( Date.now() - this._previousFrameTime ) * 0.001;
+			deltaTime = this.clock.getDelta();
 
 		}
-
-		this._previousFrameTime = Date.now();
 
 		var currentRenderTarget = this.renderer.getRenderTarget();
 

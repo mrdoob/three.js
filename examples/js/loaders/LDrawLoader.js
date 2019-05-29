@@ -1273,6 +1273,7 @@ THREE.LDrawLoader = ( function () {
 			material.transparent = isTransparent;
 			material.premultipliedAlpha = true;
 			material.opacity = alpha;
+			material.depthWrite = ! isTransparent;
 
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
@@ -1288,7 +1289,12 @@ THREE.LDrawLoader = ( function () {
 			if ( ! edgeMaterial ) {
 
 				// This is the material used for edges
-				edgeMaterial = new THREE.LineBasicMaterial( { color: edgeColour } );
+				edgeMaterial = new THREE.LineBasicMaterial( {
+					color: edgeColour,
+					transparent: isTransparent,
+					opacity: alpha,
+					depthWrite: ! isTransparent
+				} );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + " - Edge";
 				edgeMaterial.userData.canHaveEnvMap = false;
@@ -1304,7 +1310,9 @@ THREE.LDrawLoader = ( function () {
 						opacity: {
 							value: alpha
 						}
-					}
+					},
+					transparent: isTransparent,
+					depthWrite: ! isTransparent
 				} );
 				edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
 

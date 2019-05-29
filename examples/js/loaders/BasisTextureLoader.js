@@ -143,9 +143,7 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 				texture.minFilter = THREE.LinearMipMapLinearFilter;
 				texture.magFilter = THREE.LinearFilter;
-				texture.encoding = THREE.sRGBEncoding;
 				texture.generateMipmaps = false;
-				texture.flipY = false;
 				texture.needsUpdate = true;
 
 				return texture;

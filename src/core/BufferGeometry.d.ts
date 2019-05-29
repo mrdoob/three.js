@@ -18,125 +18,127 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js">src/core/BufferGeometry.js</a>
  */
 export class BufferGeometry extends EventDispatcher {
-  /**
+
+	/**
    * This creates a new BufferGeometry. It also sets several properties to an default value.
    */
-  constructor();
+	constructor();
 
-  static MaxIndex: number;
+	static MaxIndex: number;
 
-  /**
+	/**
    * Unique number of this buffergeometry instance
    */
-  id: number;
-  uuid: string;
-  name: string;
-  type: string;
-  index: BufferAttribute;
-  attributes: {
-    [name: string]: BufferAttribute | InterleavedBufferAttribute;
-  };
-  morphAttributes: any;
-  groups: { start: number; count: number; materialIndex?: number }[];
-  boundingBox: Box3;
-  boundingSphere: Sphere;
-  drawRange: { start: number; count: number };
-  userData: {[key: string]: any};
+	id: number;
+	uuid: string;
+	name: string;
+	type: string;
+	index: BufferAttribute;
+	attributes: {
+		[name: string]: BufferAttribute | InterleavedBufferAttribute;
+	};
+	morphAttributes: any;
+	groups: { start: number; count: number; materialIndex?: number }[];
+	boundingBox: Box3;
+	boundingSphere: Sphere;
+	drawRange: { start: number; count: number };
+	userData: {[key: string]: any};
 
-  getIndex(): BufferAttribute;
-  setIndex(index: BufferAttribute | number[]): void;
+	getIndex(): BufferAttribute;
+	setIndex( index: BufferAttribute | number[] ): void;
 
-  addAttribute(
-    name: string,
-    attribute: BufferAttribute | InterleavedBufferAttribute
-  ): BufferGeometry;
+	addAttribute(
+		name: string,
+		attribute: BufferAttribute | InterleavedBufferAttribute
+	): BufferGeometry;
 
-  getAttribute(name: string): BufferAttribute | InterleavedBufferAttribute;
-  removeAttribute(name: string): BufferGeometry;
+	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
+	removeAttribute( name: string ): BufferGeometry;
 
-  addGroup(start: number, count: number, materialIndex?: number): void;
-  clearGroups(): void;
+	addGroup( start: number, count: number, materialIndex?: number ): void;
+	clearGroups(): void;
 
-  setDrawRange(start: number, count: number): void;
+	setDrawRange( start: number, count: number ): void;
 
-  /**
+	/**
    * Bakes matrix transform directly into vertex coordinates.
    */
-  applyMatrix(matrix: Matrix4): BufferGeometry;
+	applyMatrix( matrix: Matrix4 ): BufferGeometry;
 
-  rotateX(angle: number): BufferGeometry;
-  rotateY(angle: number): BufferGeometry;
-  rotateZ(angle: number): BufferGeometry;
-  translate(x: number, y: number, z: number): BufferGeometry;
-  scale(x: number, y: number, z: number): BufferGeometry;
-  lookAt(v: Vector3): void;
+	rotateX( angle: number ): BufferGeometry;
+	rotateY( angle: number ): BufferGeometry;
+	rotateZ( angle: number ): BufferGeometry;
+	translate( x: number, y: number, z: number ): BufferGeometry;
+	scale( x: number, y: number, z: number ): BufferGeometry;
+	lookAt( v: Vector3 ): void;
 
-  center(): BufferGeometry;
+	center(): BufferGeometry;
 
-  setFromObject(object: Object3D): BufferGeometry;
-  setFromPoints(points: Vector3[] | Vector2[]): BufferGeometry;
-  updateFromObject(object: Object3D): void;
+	setFromObject( object: Object3D ): BufferGeometry;
+	setFromPoints( points: Vector3[] | Vector2[] ): BufferGeometry;
+	updateFromObject( object: Object3D ): void;
 
-  fromGeometry(geometry: Geometry, settings?: any): BufferGeometry;
+	fromGeometry( geometry: Geometry, settings?: any ): BufferGeometry;
 
-  fromDirectGeometry(geometry: DirectGeometry): BufferGeometry;
+	fromDirectGeometry( geometry: DirectGeometry ): BufferGeometry;
 
-  /**
+	/**
    * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.
    * Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are null.
    */
-  computeBoundingBox(): void;
+	computeBoundingBox(): void;
 
-  /**
+	/**
    * Computes bounding sphere of the geometry, updating Geometry.boundingSphere attribute.
    * Bounding spheres aren't' computed by default. They need to be explicitly computed, otherwise they are null.
    */
-  computeBoundingSphere(): void;
+	computeBoundingSphere(): void;
 
-  /**
+	/**
    * Computes vertex normals by averaging face normals.
    */
-  computeVertexNormals(): void;
+	computeVertexNormals(): void;
 
-  merge(geometry: BufferGeometry, offset: number): BufferGeometry;
-  normalizeNormals(): void;
+	merge( geometry: BufferGeometry, offset: number ): BufferGeometry;
+	normalizeNormals(): void;
 
-  toNonIndexed(): BufferGeometry;
+	toNonIndexed(): BufferGeometry;
 
-  toJSON(): any;
-  clone(): this;
-  copy(source: BufferGeometry): this;
+	toJSON(): any;
+	clone(): this;
+	copy( source: BufferGeometry ): this;
 
-  /**
+	/**
    * Disposes the object from memory.
    * You need to call this when you want the bufferGeometry removed while the application is running.
    */
-  dispose(): void;
+	dispose(): void;
 
-  /**
+	/**
    * @deprecated Use {@link BufferGeometry#groups .groups} instead.
    */
-  drawcalls: any;
+	drawcalls: any;
 
-  /**
+	/**
    * @deprecated Use {@link BufferGeometry#groups .groups} instead.
    */
-  offsets: any;
+	offsets: any;
 
-  /**
+	/**
    * @deprecated Use {@link BufferGeometry#setIndex .setIndex()} instead.
    */
-  addIndex(index: any): void;
+	addIndex( index: any ): void;
 
-  /**
+	/**
    * @deprecated Use {@link BufferGeometry#addGroup .addGroup()} instead.
    */
-  addDrawCall(start: any, count: any, indexOffset?: any): void;
+	addDrawCall( start: any, count: any, indexOffset?: any ): void;
 
-  /**
+	/**
    * @deprecated Use {@link BufferGeometry#clearGroups .clearGroups()} instead.
    */
-  clearDrawCalls(): void;
+	clearDrawCalls(): void;
 
-  addAttribute(name: any, array: any, itemSize: any): any;
+	addAttribute( name: any, array: any, itemSize: any ): any;
+
 }
