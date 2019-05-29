@@ -301,10 +301,9 @@
 						}
 						else {
 
-							var dummyControl = gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( function ( value ) {
+							gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( function ( value ) {
 
 								guiData.noConstructionSteps = "No steps.";
-								//dummyControl.setValue( guiData.noConstructionSteps );
 
 							} );
 
