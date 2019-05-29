@@ -37,7 +37,7 @@ export class Frustum {
 	copy( frustum: Frustum ): this;
 	setFromMatrix( m: Matrix4 ): Frustum;
 	intersectsObject( object: Object3D ): boolean;
-	intersectsObject( sprite: Sprite ): boolean;
+	intersectsSprite( sprite: Sprite ): boolean;
 	intersectsSphere( sphere: Sphere ): boolean;
 	intersectsBox( box: Box3 ): boolean;
 	containsPoint( point: Vector3 ): boolean;

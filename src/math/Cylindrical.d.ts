@@ -12,5 +12,6 @@ export class Cylindrical {
 	copy( other: Cylindrical ): this;
 	set( radius: number, theta: number, y: number ): this;
 	setFromVector3( vec3: Vector3 ): this;
+	setFromCartesianCoords( x: number, y: number, z: number ): this;
 
 }

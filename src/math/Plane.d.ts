@@ -27,6 +27,7 @@ export class Plane {
 	intersectLine( line: Line3, target: Vector3 ): Vector3;
 	intersectsLine( line: Line3 ): boolean;
 	intersectsBox( box: Box3 ): boolean;
+	intersectsSphere( sphere: Sphere ): boolean;
 	coplanarPoint( target: Vector3 ): Vector3;
 	applyMatrix4( matrix: Matrix4, optionalNormalMatrix?: Matrix3 ): Plane;
 	translate( offset: Vector3 ): Plane;

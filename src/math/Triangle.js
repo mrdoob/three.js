@@ -238,15 +238,15 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	containsPoint: function ( point ) {
+	getUV: function ( point, uv1, uv2, uv3, target ) {
 
-		return Triangle.containsPoint( point, this.a, this.b, this.c );
+		return Triangle.getUV( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
 
 	},
 
-	getUV: function ( point, uv1, uv2, uv3, result ) {
+	containsPoint: function ( point ) {
 
-		return Triangle.getUV( point, this.a, this.b, this.c, uv1, uv2, uv3, result );
+		return Triangle.containsPoint( point, this.a, this.b, this.c );
 
 	},
 
