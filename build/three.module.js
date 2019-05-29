@@ -22398,10 +22398,10 @@ function WebXRManager( renderer ) {
 
 	var gl = renderer.context;
 
-	var device = null;
 	var session = null;
 
-	var frameOfReference = null;
+	var referenceSpace = null;
+	var referenceSpaceType = 'local-floor';
 
 	var pose = null;
 
@@ -22410,7 +22410,7 @@ function WebXRManager( renderer ) {
 
 	function isPresenting() {
 
-		return session !== null && frameOfReference !== null;
+		return session !== null && referenceSpace !== null;
 
 	}
 
@@ -22450,24 +22450,19 @@ function WebXRManager( renderer ) {
 
 	};
 
-	this.getDevice = function () {
-
-		return device;
-
-	};
-
-	this.setDevice = function ( value ) {
-
-		if ( value !== undefined ) device = value;
-
-	};
-
 	//
 
 	function onSessionEvent( event ) {
 
-		var controller = controllers[ inputSources.indexOf( event.inputSource ) ];
-		if ( controller ) controller.dispatchEvent( { type: event.type } );
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			if ( inputSources[ i ] === event.inputSource ) {
+
+				controllers[ i ].dispatchEvent( { type: event.type } );
+
+			}
+
+		}
 
 	}
 
@@ -22479,9 +22474,9 @@ function WebXRManager( renderer ) {
 
 	}
 
-	function onRequestFrameOfReference( value ) {
+	function onRequestReferenceSpace( value ) {
 
-		frameOfReference = value;
+		referenceSpace = value;
 
 		animation.setContext( session );
 		animation.start();
@@ -22492,7 +22487,9 @@ function WebXRManager( renderer ) {
 
 	};
 
-	this.setFrameOfReferenceType = function ( value ) {
+	this.setReferenceSpaceType = function ( value ) {
+
+		referenceSpaceType = value;
 
 	};
 
@@ -22509,15 +22506,15 @@ function WebXRManager( renderer ) {
 
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
-			session.requestReferenceSpace( { type: 'stationary', subtype: 'eye-level' } ).then( onRequestFrameOfReference );
+			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
 			//
 
-			inputSources = session.getInputSources();
+			inputSources = session.inputSources;
 
 			session.addEventListener( 'inputsourceschange', function () {
 
-				inputSources = session.getInputSources();
+				inputSources = session.inputSources;
 				console.log( inputSources );
 
 				for ( var i = 0; i < controllers.length; i ++ ) {
@@ -22594,7 +22591,7 @@ function WebXRManager( renderer ) {
 
 	function onAnimationFrame( time, frame ) {
 
-		pose = frame.getViewerPose( frameOfReference );
+		pose = frame.getViewerPose( referenceSpace );
 
 		if ( pose !== null ) {
 
@@ -22607,7 +22604,7 @@ function WebXRManager( renderer ) {
 
 				var view = views[ i ];
 				var viewport = layer.getViewport( view );
-				var viewMatrix = view.transform.inverse().matrix;
+				var viewMatrix = view.transform.inverse.matrix;
 
 				var camera = cameraVR.cameras[ i ];
 				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
@@ -22634,13 +22631,11 @@ function WebXRManager( renderer ) {
 
 			if ( inputSource ) {
 
-				var inputPose = frame.getPose( inputSource.targetRaySpace, frameOfReference );
+				var inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
 
 				if ( inputPose !== null ) {
 
-					var targetRay = new XRRay( inputPose.transform );
-					controller.matrix.elements = targetRay.matrix;
-
+					controller.matrix.fromArray( inputPose.transform.matrix );
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
 
@@ -22675,6 +22670,18 @@ function WebXRManager( renderer ) {
 
 		console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
 		return new Matrix4();
+
+	};
+
+	this.getDevice = function () {
+
+		console.warn( 'THREE.WebXRManager: getDevice() has been deprecated.' );
+
+	};
+
+	this.setDevice = function () {
+
+		console.warn( 'THREE.WebXRManager: setDevice() has been deprecated.' );
 
 	};
 
@@ -22949,7 +22956,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'requestDevice' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
