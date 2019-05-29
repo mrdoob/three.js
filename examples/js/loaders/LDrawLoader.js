@@ -980,7 +980,7 @@ THREE.LDrawLoader = ( function () {
 				lineSegments: null,
 				conditionalSegments: null,
 
-				constructionStep: 0
+				constructionStep: false
 
 			};
 
@@ -1381,9 +1381,7 @@ THREE.LDrawLoader = ( function () {
 			var bfcCull = true;
 			var type = '';
 
-			var currentConstructionStep = 0;
-			var geometrySinceStartFlag = false;
-			var geometrySinceLastStepFlag = false;
+			var currentConstructionStep = false;
 
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
@@ -1628,13 +1626,7 @@ THREE.LDrawLoader = ( function () {
 
 								case 'STEP':
 
-									if ( isRoot && geometrySinceStartFlag ) {
-
-										currentParseScope.groupObject.userData.numConstructionSteps = ++ currentConstructionStep;
-
-										geometrySinceLastStepFlag = false;
-
-									}
+									currentConstructionStep = true;
 
 									break;
 
@@ -1708,9 +1700,7 @@ THREE.LDrawLoader = ( function () {
 						} );
 
 						bfcInverted = false;
-
-						geometrySinceStartFlag = true;
-						geometrySinceLastStepFlag = true;
+						currentConstructionStep = false;
 
 						break;
 
@@ -1727,9 +1717,6 @@ THREE.LDrawLoader = ( function () {
 						};
 
 						lineSegments.push( segment );
-
-						geometrySinceStartFlag = true;
-						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1748,9 +1735,6 @@ THREE.LDrawLoader = ( function () {
 						};
 
 						conditionalSegments.push( segment );
-
-						geometrySinceStartFlag = true;
-						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1811,9 +1795,6 @@ THREE.LDrawLoader = ( function () {
 							} );
 
 						}
-
-						geometrySinceStartFlag = true;
-						geometrySinceLastStepFlag = true;
 
 						break;
 
@@ -1901,9 +1882,6 @@ THREE.LDrawLoader = ( function () {
 
 						}
 
-						geometrySinceStartFlag = true;
-						geometrySinceLastStepFlag = true;
-
 						break;
 
 					default:
@@ -1911,12 +1889,6 @@ THREE.LDrawLoader = ( function () {
 						break;
 
 				}
-
-			}
-
-			if ( isRoot && geometrySinceLastStepFlag ) {
-
- 				currentParseScope.groupObject.userData.numConstructionSteps = ++ currentConstructionStep;
 
 			}
 
