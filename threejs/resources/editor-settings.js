@@ -13,10 +13,27 @@ function getPrefix(url) {
   return prefix;
 }
 
+/**
+ * Fix any local URLs into fully qualified urls.
+ *
+ * Examples:
+ *    resources/image.jpg ->  https://domain.org/webgl/resouces/image.jpg
+ *    /3rdparty/lib.js    ->  https://domain.org/3rdparty/lib.js
+ *
+ * The reason is (a) we're running the code as via blobUrl and nothing is relative to a blob.
+ * (b) we can upload to jsfiddle/codepen and so need to link back to the files.
+ *
+ * This is all kind of hacky in that it's just a bunch of regular expressions looking
+ * for matches.
+ *
+ * @param {string} url The URL of the file source.
+ * @param {string} source An HTML file or JavaScript file
+ * @returns {string} the source after having urls fixed.
+ */
 function fixSourceLinks(url, source) {
-  const srcRE = /(src=)"(.*?)"/g;
-  const linkRE = /(href=)"(.*?)"/g;
-  const imageSrcRE = /((?:image|img)\.src = )"(.*?)"/g;
+  const srcRE = /(src=)(")(.*?)(")/g;
+  const linkRE = /(href=)(")(.*?)(")/g;
+  const imageSrcRE = /((?:image|img)\.src = )(")(.*?)(")/g;
   const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
   const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
@@ -29,9 +46,6 @@ function fixSourceLinks(url, source) {
 
   function addPrefix(url) {
     return url.indexOf('://') < 0 && url[0] !== '?' ? (prefix + url) : url;
-  }
-  function makeLinkFQed(match, p1, url) {
-    return p1 + '"' + addPrefix(url) + '"';
   }
   function makeLinkFDedQuotes(match, fn, q1, url, q2) {
     return fn + q1 + addPrefix(url) + q2;
@@ -49,9 +63,9 @@ function fixSourceLinks(url, source) {
     return `${prefix}${lines.join(',')}${suffix}`;
   }
 
-  source = source.replace(srcRE, makeLinkFQed);
-  source = source.replace(linkRE, makeLinkFQed);
-  source = source.replace(imageSrcRE, makeLinkFQed);
+  source = source.replace(srcRE, makeTaggedFDedQuotes);
+  source = source.replace(linkRE, makeTaggedFDedQuotes);
+  source = source.replace(imageSrcRE, makeTaggedFDedQuotes);
   source = source.replace(urlPropRE, makeLinkFDedQuotes);
   source = source.replace(loadFileRE, makeLinkFDedQuotes);
   source = source.replace(loaderLoadRE, makeLinkFDedQuotes);
@@ -63,10 +77,22 @@ function fixSourceLinks(url, source) {
   return source;
 }
 
+/**
+ * Called after parsing to give a change to update htmlParts
+ * @param {string} html The main page html turned into a template with the <style>, <script> and <body> parts extracted
+ * @param {Object<string, HTMLPart>} htmlParts All the extracted parts
+ * @return {string} The modified html template
+ */
 function extraHTMLParsing(html /* , htmlParts */) {
   return html;
 }
 
+/**
+ * Change JavaScript before uploading code to JSFiddle/Codepen
+ *
+ * @param {string} js JavaScript source
+ * @returns {string} The JavaScript source with any fixes applied.
+ */
 function fixJSForCodeSite(js) {
   // not yet needed for three.js
   return js;
