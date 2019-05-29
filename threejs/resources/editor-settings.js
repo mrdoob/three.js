@@ -31,9 +31,9 @@ function getPrefix(url) {
  * @returns {string} the source after having urls fixed.
  */
 function fixSourceLinks(url, source) {
-  const srcRE = /(src=)(")(.*?)(")/g;
-  const linkRE = /(href=)(")(.*?)(")/g;
-  const imageSrcRE = /((?:image|img)\.src = )(")(.*?)(")/g;
+  const srcRE = /(src=)(")(.*?)(")()/g;
+  const linkRE = /(href=)(")(.*?)(")()/g;
+  const imageSrcRE = /((?:image|img)\.src = )(")(.*?)(")()/g;
   const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
   const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;

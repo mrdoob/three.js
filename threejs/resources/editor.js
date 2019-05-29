@@ -12,6 +12,7 @@ const {
 } = lessonEditorSettings;
 
 const lessonHelperScriptRE = /<script src="[^"]+lessons-helper\.js"><\/script>/;
+const webglDebugHelperScriptRE = /<script src="[^"]+webgl-debug-helper\.js"><\/script>/;
 
 function getQuery(s) {
   s = s === undefined ? window.location.search : s;
@@ -351,6 +352,7 @@ function makeBlobURLsForSources(scriptInfo) {
       scriptInfo.numLinesBeforeScript = 0;
       if (scriptInfo.isWorker) {
         const extra = `self.lessonSettings = ${JSON.stringify(lessonSettings)};
+importScripts('${dirname(scriptInfo.fqURL)}/resources/webgl-debug-helper.js');
 importScripts('${dirname(scriptInfo.fqURL)}/resources/lessons-worker-helper.js')`;
         scriptInfo.numLinesBeforeScript = extra.split('\n').length;
         text = `${extra}\n${text}`;
@@ -376,7 +378,8 @@ function getSourceBlob(htmlParts) {
   <link rel="stylesheet" href="${prefix}/resources/lesson-helper.css" type="text/css">
   <script match="false">self.lessonSettings = ${JSON.stringify(lessonSettings)}</script>`);
 
-  source = source.replace('</head>', `<script src="${prefix}/resources/lessons-helper.js"></script>
+  source = source.replace('</head>', `<script src="${prefix}/resources/webgl-debug-helper.js"></script>
+<script src="${prefix}/resources/lessons-helper.js"></script>
   </head>`);
   const scriptNdx = source.indexOf('<script>');
   g.rootScriptInfo.numLinesBeforeScript = (source.substring(0, scriptNdx).match(/\n/g) || []).length;
@@ -423,7 +426,7 @@ function getSourceBlobFromOrig() {
 
 function dirname(path) {
   const ndx = path.lastIndexOf('/');
-  return path.substring(0, ndx + 1);
+  return path.substring(0, ndx);
 }
 
 function basename(path) {
@@ -503,6 +506,12 @@ function getWorkerBlob() {
   };
 }
 
+function fixHTMLForCodeSite(html) {
+  html = html.replace(lessonHelperScriptRE, '');
+  html = html.replace(webglDebugHelperScriptRE, '');
+  return html;
+}
+
 function openInCodepen() {
   const comment = `// ${g.title}
 // from ${g.url}
@@ -516,7 +525,7 @@ function openInCodepen() {
     description           : 'from: ' + g.url,
     tags                  : lessonEditorSettings.tags,
     editors               : '101',
-    html                  : scripts.html + htmlParts.html.sources[0].source.replace(lessonHelperScriptRE, ''),
+    html                  : scripts.html + fixHTMLForCodeSite(htmlParts.html.sources[0].source),
     css                   : htmlParts.css.sources[0].source,
     js                    : comment + fixJSForCodeSite(scripts.js),
   };
@@ -554,7 +563,7 @@ function openInJSFiddle() {
       <input type="submit" />
     </form>
   `;
-  elem.querySelector('input[name=html]').value = scripts.html + htmlParts.html.sources[0].source.replace(lessonHelperScriptRE, '');
+  elem.querySelector('input[name=html]').value = scripts.html + fixHTMLForCodeSite(htmlParts.html.sources[0].source);
   elem.querySelector('input[name=css]').value = htmlParts.css.sources[0].source;
   elem.querySelector('input[name=js]').value = comment + fixJSForCodeSite(scripts.js);
   elem.querySelector('input[name=title]').value = g.title;
