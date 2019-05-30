@@ -4,17 +4,7 @@
 		<title>three.js webgl - materials - lightmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a { color:skyblue }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -83,12 +73,6 @@
 
 				scene = new THREE.Scene();
 
-				// CONTROLS
-
-				var controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = 0.9 * Math.PI / 2;
-				controls.enableZoom = false;
-
 				// LIGHTS
 
 				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
@@ -129,6 +113,12 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				// CONTROLS
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = 0.9 * Math.PI / 2;
+				controls.enableZoom = false;
 
 				// STATS
 

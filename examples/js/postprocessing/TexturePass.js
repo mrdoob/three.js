@@ -36,7 +36,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 	constructor: THREE.TexturePass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
@@ -52,6 +52,7 @@ THREE.TexturePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 		this.fsQuad.render( renderer );
 
 		renderer.autoClear = oldAutoClear;
+
 	}
 
 } );

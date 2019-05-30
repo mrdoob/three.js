@@ -5,17 +5,13 @@
  */
 
 import {
-	BackSide,
-	ClampToEdgeWrapping,
 	Color,
 	DefaultLoadingManager,
-	DoubleSide,
 	FileLoader,
 	FrontSide,
 	Loader,
 	LoaderUtils,
 	MeshPhongMaterial,
-	MirroredRepeatWrapping,
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
@@ -30,6 +26,8 @@ var MTLLoader = function ( manager ) {
 MTLLoader.prototype = {
 
 	constructor: MTLLoader,
+
+	crossOrigin: 'anonymous',
 
 	/**
 	 * Loads and parses a MTL asset from a URL.
@@ -166,7 +164,7 @@ MTLLoader.prototype = {
 
 			} else {
 
-				if ( key === 'ka' || key === 'kd' || key === 'ks' || key ==='ke' ) {
+				if ( key === 'ka' || key === 'kd' || key === 'ks' || key === 'ke' ) {
 
 					var ss = value.split( delimiter_pattern, 3 );
 					info[ key ] = [ parseFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
@@ -196,9 +194,9 @@ MTLLoader.prototype = {
  * @param baseUrl - Url relative to which textures are loaded
  * @param options - Set of options on how to construct the materials
  *                  side: Which side to apply the material
- *                        FrontSide (default), BackSide, DoubleSide
+ *                        FrontSide (default), THREE.BackSide, THREE.DoubleSide
  *                  wrap: What type of wrapping to apply for textures
- *                        RepeatWrapping (default), ClampToEdgeWrapping, MirroredRepeatWrapping
+ *                        RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
  *                  normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
  *                                Default: false, assumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's

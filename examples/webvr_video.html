@@ -4,27 +4,11 @@
 		<title>three.js webvr - 360 stereo video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				color: #fff;
-				text-align: center;
-			}
-			a {
-				color: #ff0
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="container"></div>
+
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - 360 stereo video<br />
 			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
@@ -34,10 +18,14 @@
 
 		<script src="js/vr/WebVR.js"></script>
 
+		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
+			<source src="textures/MaryOculus.webm">
+			<source src="textures/MaryOculus.mp4">
+		</video>
+
 		<script>
 
 			var camera, scene, renderer;
-			var video, texture;
 
 			init();
 			animate();
@@ -56,18 +44,13 @@
 
 				// video
 
-				video = document.createElement( 'video' );
-				video.crossOrigin = 'anonymous';
-				video.loop = true;
-				video.muted = true;
-				video.src = 'textures/MaryOculus.webm';
-				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
+				var video = document.getElementById( 'video' );
 				video.play();
 
-				texture = new THREE.Texture( video );
+				var texture = new THREE.Texture( video );
 				texture.generateMipmaps = false;
 				texture.minFilter = THREE.NearestFilter;
-				texture.maxFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
 
 				setInterval( function () {
@@ -133,7 +116,7 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );
+				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 				//
 

@@ -5,7 +5,7 @@
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
+THREE.RGBELoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.type = THREE.UnsignedByteType;
@@ -316,8 +316,7 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 		}
 	;
 
-	var byteArray = new Uint8Array( buffer ),
-		byteLength = byteArray.byteLength;
+	var byteArray = new Uint8Array( buffer );
 	byteArray.pos = 0;
 	var rgbe_header_info = RGBE_ReadHeader( byteArray );
 
@@ -392,5 +391,3 @@ THREE.RGBELoader.prototype.setType = function ( value ) {
 	return this;
 
 };
-
-

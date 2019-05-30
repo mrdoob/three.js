@@ -7,7 +7,7 @@
 
 THREE.LuminosityHighPassShader = {
 
-  shaderID: "luminosityHighPass",
+	shaderID: "luminosityHighPass",
 
 	uniforms: {
 
@@ -15,7 +15,7 @@ THREE.LuminosityHighPassShader = {
 		"luminosityThreshold": { value: 1.0 },
 		"smoothWidth": { value: 1.0 },
 		"defaultColor": { value: new THREE.Color( 0x000000 ) },
-		"defaultOpacity":  { value: 0.0 }
+		"defaultOpacity": { value: 0.0 }
 
 	},
 

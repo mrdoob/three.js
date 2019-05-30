@@ -4,33 +4,12 @@
 		<title>three.js webgl - Light Shafts</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #ffffff;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Light Shafts -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Light Shafts<br/>
 			Model by <a href="https://skfb.ly/6ICER" target="_blank" rel="noopener">Splodeman</a><br />
 		</div>
 
@@ -113,12 +92,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 3.2, 3, 3.7 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0.5, 1.5, 0 );
-				controls.minDistance = 2;
-				controls.maxDistance = 20;
-				controls.update();
 
 				clock = new THREE.Clock();
 
@@ -219,6 +192,12 @@
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0.5, 1.5, 0 );
+				controls.minDistance = 2;
+				controls.maxDistance = 20;
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

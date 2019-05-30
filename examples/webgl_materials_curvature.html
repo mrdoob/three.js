@@ -4,34 +4,15 @@
 		<title>three.js webgl - shader - curvature [ninja]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a { color: #ffffff; }
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - curvature estimation of a geometry by <a href="http://codercat.club" target="_blank" rel="noopener">CoderCat</a></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - curvature estimation of a geometry<br/>
+			by <a href="http://codercat.club" target="_blank" rel="noopener">CoderCat</a>
+		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/WebGL.js"></script>
@@ -151,13 +132,12 @@
 				camera.position.y = 2;
 				camera.position.z = 24;
 
-				var controls = new THREE.OrbitControls( camera );
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
-
 				document.body.appendChild( renderer.domElement );
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				var loader = new THREE.OBJLoader();
 				//load the obj

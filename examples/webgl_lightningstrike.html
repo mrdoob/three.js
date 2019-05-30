@@ -4,33 +4,7 @@
 		<title>three.js webgl - lightning strike</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #0080ff;
-			}
-			
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -45,7 +19,7 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/geometries/LightningStrike.js"></script>
 		<script src="js/objects/LightningStorm.js"></script>
-		<script src="js/SimplexNoise.js"></script>
+		<script src="js/math/SimplexNoise.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -77,7 +51,7 @@
 			var textureLoader;
 
 			var clock = new THREE.Clock();
-			
+
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2();
 
@@ -124,7 +98,7 @@
 				scene.userData.camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
+
 				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -150,7 +124,7 @@
 					createScene();
 
 				} );
-				
+
 				scene.userData.timeRate = 1;
 				sceneFolder.add( scene.userData, 'timeRate', scene.userData.canGoBackwardsInTime ? -1 : 0, 1 ).name( 'Time rate' );
 
@@ -192,7 +166,7 @@
 				rayFolder.add( scene.userData.rayParams, 'subrayDutyCycle', 0, 1 ).name( 'Subray duty cycle' );
 
 				if ( scene.userData.recreateRay ) {
-				
+
 					// Parameters which need to recreate the ray after modification
 
 					var raySlowFolder = gui.addFolder( "Ray parameters (slow)" );
@@ -259,7 +233,7 @@
 				composer.addPass( outlinePass );
 
 				scene.userData.outlineEnabled = true;
-				
+
 				return outlinePass;
 
 			}
@@ -274,7 +248,7 @@
 				scene.userData.canGoBackwardsInTime = true;
 
 				scene.userData.camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 200, 100000 );
-				
+
 				// Lights
 
 				scene.userData.lightningColor = new THREE.Color( 0xB0FFFF );
@@ -519,7 +493,7 @@
 					onSubrayCreation: function ( segment, parentSubray, childSubray, lightningStrike ) {
 
 						lightningStrike.subrayConePosition( segment, parentSubray, childSubray, 0.6, 0.9, 0.7 );
-					
+
 						// Sphere projection
 
 						vec1.subVectors( childSubray.pos1, lightningStrike.rayParameters.sourceOffset );
@@ -537,7 +511,7 @@
 				var lightningStrike;
 				var lightningStrikeMesh;
 				var outlineMeshArray = [];
-				
+
 				scene.userData.recreateRay = function () {
 
 					if ( lightningStrikeMesh ) {
@@ -639,9 +613,9 @@
 				return scene;
 
 			}
-			
+
 			//
-			
+
 			function createStormScene() {
 
 				var scene = new THREE.Scene();
@@ -709,7 +683,7 @@
 						lightningStrike.subrayConePosition( segment, parentSubray, childSubray, 0.6, 0.6, 0.5 );
 
 						// Plane projection
-						
+
 						rayLength = lightningStrike.rayParameters.sourceOffset.y;
 						vec1.subVectors( childSubray.pos1, lightningStrike.rayParameters.sourceOffset );
 						var proj = rayDirection.dot( vec1 );
@@ -750,7 +724,7 @@
 				starGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( starVertices, 3 ) );
 				var starMesh = new THREE.Mesh( starGeometry, new THREE.MeshBasicMaterial( { color: 0x020900 } ) );
 				starMesh.scale.multiplyScalar( 6 );
-				
+
 				//
 
 				var storm = new THREE.LightningStorm( {

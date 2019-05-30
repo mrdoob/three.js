@@ -3,22 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Three.js Material Browser</title>
+		<link rel="shortcut icon" href="../../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../../files/main.css">
 		<style>
-			@font-face {
-				font-family: 'inconsolata';
-				src: url('../files/inconsolata.woff') format('woff');
-				font-weight: normal;
-				font-style: normal;
-			}
-
-			body {
-				margin:0;
-				font-family: 'inconsolata';
-				font-size: 15px;
-				line-height: 18px;
-				overflow: hidden;
-			}
-
 			canvas { width: 100%; height: 100% }
 
 			#newWindow {
@@ -43,14 +30,16 @@
 			document.getElementById( 'newWindow' ).href += window.location.hash;
 
 			var gui = new dat.GUI();
+
 			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x444444 );
+
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 10, 50 );
 			camera.position.z = 30;
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setClearColor( 0x000000, 1 );
 			document.body.appendChild( renderer.domElement );
 
 			var ambientLight = new THREE.AmbientLight( 0x000000 );

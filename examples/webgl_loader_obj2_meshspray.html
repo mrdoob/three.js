@@ -4,32 +4,8 @@
 		<title>three.js webgl - Mesh Spray</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0 0 0 0;
-				padding: 0 0 0 0;
-				border: none;
-				cursor: default;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
 			#glFullscreen {
 				width: 100%;
 				height: 100vh;
@@ -226,8 +202,9 @@
 				this.debug = false;
 				this.dimension = 200;
 				this.quantity = 1;
-				this.callbackMeshBuilder = null;
-				this.callbackProgress = null;
+				this.callbacks = {
+					onAssetAvailable: null
+				};
 				this.serializedMaterials = null;
 				this.logging = {
 					enabled: true,
@@ -238,6 +215,14 @@
 			MeshSpray.Parser.prototype = {
 
 				constructor: MeshSpray.Parser,
+
+				setCallbackOnAssetAvailable: function ( onAssetAvailable ) {
+					if ( onAssetAvailable !== null && onAssetAvailable !== undefined ) {
+
+						this.callbacks.onAssetAvailable = onAssetAvailable;
+
+					}
+				},
 
 				setLogging: function ( enabled, debug ) {
 					this.logging.enabled = enabled === true;
@@ -330,10 +315,10 @@
 							serializedMaterials: newSerializedMaterials
 						}
 					};
-					this.callbackMeshBuilder( payload );
+					this.callbacks.onAssetAvailable( payload );
 
 					this.globalObjectCount++;
-					this.callbackMeshBuilder(
+					this.callbacks.onAssetAvailable(
 						{
 							cmd: 'meshData',
 							progress: {

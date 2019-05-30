@@ -4,33 +4,8 @@
 		<title>three.js webgl - cameras - logarithmic depth buffer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index: 100;
-				color: #ddd;
-				text-shadow: 0 0 1px rgba(0,0,0,1);
-			}
-
-			a {
-				color: #0080ff;
-			}
-
-			b { color: lightgreen }
-
 			.renderer_label {
 				position: absolute;
 				bottom: 1em;
@@ -40,24 +15,27 @@
 				display: block;
 				text-align: center;
 			}
+
 			#container {
-				white-space: nowrap;
+				display: flex;
 			}
+
 			#container_normal {
 				width: 50%;
 				display: inline-block;
 				position: relative;
-				overflow: hidden;
 			}
+
 			#container_logzbuf {
 				width: 50%;
 				display: inline-block;
 				position: relative;
-				overflow: hidden;
 			}
+
 			#renderer_border {
 				position: absolute;
 				top: 0;
+				left: 25%;
 				bottom: 0;
 				width: 2px;
 				z-index: 10;
@@ -71,15 +49,14 @@
 	<body>
 
 		<div id="container">
-			<div id="container_normal"><h2 class="renderer_label">normal z-buffer</h2></div><div id="container_logzbuf"><h2 class="renderer_label">logarithmic z-buffer</h2></div>
+			<div id="container_normal"><h2 class="renderer_label">normal z-buffer</h2></div>
+			<div id="container_logzbuf"><h2 class="renderer_label">logarithmic z-buffer</h2></div>
 			<div id="renderer_border"></div>
 		</div>
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
-			Zoom through scene with objects ranging in size from 1µm to 100,000,000 light years using the mousewheel<br/>
-			Linear z-buffer handles close-up objects well, but fails spectacularly at distant objects<br/>
-			Logarithmic handles all but the smallest objects with ease
+			mousewheel to dolly out
 		</div>
 
 		<script src="../build/three.js"></script>
