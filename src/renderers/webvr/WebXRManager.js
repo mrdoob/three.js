@@ -99,7 +99,9 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {};
+	this.setFramebufferScaleFactor = function ( value ) {
+
+	};
 
 	this.setReferenceSpaceType = function ( value ) {
 
@@ -111,7 +113,7 @@ function WebXRManager( renderer ) {
 
 		return session;
 
-	}
+	};
 
 	this.setSession = function ( value ) {
 
