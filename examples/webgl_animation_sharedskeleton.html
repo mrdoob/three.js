@@ -44,7 +44,7 @@
 		</div>
 
 		<div id="explanation">
-			Multiple instances of SkinnedMesh all controlled by a single Skeleton. Use the controls to compare performance with a multi skeleton approach.
+			Multiple instances of SkinnedMesh all controlled by a single Skeleton. Use the controls to compare performance with a multi skeleton approach. You may need to increase the rows before the performance gains are noticeable.
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -66,7 +66,7 @@
 
 			}
 
-			const numCols = 15;
+			const numCols = 9;
 			const rowSize = 150;
 			const rowOffset = ( numCols - 1 ) * ( rowSize / 2 );
 
@@ -75,9 +75,14 @@
 			let danceGroup, danceAnimation;
 			let sharedDanceAction;
 
-			let loadedObject, sharedMainModel, sharedJointsModel;
+			let loadedObject, sharedModel;
 
 			const clock = new THREE.Clock();
+
+			// Simple material to use instead of the model default
+			const normalMat = new THREE.MeshNormalMaterial({ 
+				skinning: true
+			});
 
 			// Shared objects for the shared skeleton technique
 			let sharedMixer;
@@ -91,7 +96,7 @@
 
 			const GuiOptions = function () {
 
-				this.numRows = 20;
+				this.numRows = 1;
 				this.isSkeletonShared = true;
 
 			};
@@ -118,21 +123,16 @@
 							const group = new THREE.Group();
 							const meshGroup = new THREE.Group();
 
-							const mainMesh = sharedMainModel.clone();
-							const jointsMesh = sharedJointsModel.clone();
+							const mainMesh = sharedModel.clone();
 
-							// The model we are working with is actually two skinnedMeshes
-							// so we're binding the skeleton twice
-							mainMesh.bind( sharedSkeleton, meshGroup.matrixWorld );
-							jointsMesh.bind( sharedSkeleton, meshGroup.matrixWorld );
+							// It's important to pass in the matrixWorld for each mesh here as the skeleton is shared
+							mainMesh.bind( sharedSkeleton, meshGroup.matrixWorld );  
 
 							// Because we're sharing a skeleton that isn't sharing world space
-							// wit the mesh, we need to set bindMode to detached
+							// with the mesh, we need to set bindMode to detached
 							mainMesh.bindMode = 'detached';
-							jointsMesh.bindMode = 'detached';
 
 							meshGroup.add( mainMesh );
-							meshGroup.add( jointsMesh );
 
 							meshGroup.position.x = x * rowSize - rowOffset;
 							meshGroup.position.z = - z * rowSize;
@@ -176,23 +176,29 @@
 
 				loadedObject = object;
 				danceAnimation = loadedObject.animations[ 0 ];
+				const jointsModel = loadedObject.getObjectByName('Alpha_Joints');
+				const mainModel = loadedObject.getObjectByName('Alpha_Surface')
 
-				// Only cloning this so it doesnt clash with the other non-shared skeleton mode
+				// Setting the material for the main model to something less GPU intensive
+				// and also removing the "joints" part of the model as this just complicates the demo
+				mainModel.material = normalMat
+				loadedObject.remove(jointsModel)
+
+				// Cloning the model so it doesn't clash with the other non-shared skeleton mode
 				const sharedObject = THREE.SkeletonUtils.clone( loadedObject );
 
 				// Setting objects that are all used by the shared skeleton models
-				sharedMainModel = sharedObject.getObjectByName( 'Alpha_Surface' );
-				sharedJointsModel = sharedObject.getObjectByName( 'Alpha_Joints' );
+				sharedModel = sharedObject.getObjectByName( 'Alpha_Surface' );
 				const sharedParentBone = sharedObject.getObjectByName( 'mixamorigHips' );
-
 				sharedMixer = new THREE.AnimationMixer( sharedObject );
-				sharedSkeleton = sharedMainModel.skeleton;
+				sharedSkeleton = sharedModel.skeleton;
 				sharedDanceAction = sharedMixer.clipAction( danceAnimation );
 				sharedDanceAction.play();
 
 				// The bones need to be in the scene for the animation to work
 				scene.add( sharedParentBone );
 
+				// Once model is loded we can set the gui up
 				guiSetup();
 
 				// Initiate first set of dancers
@@ -213,36 +219,17 @@
 				controls.update();
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 500, 3500 );
 
-				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 0, 200, 0 );
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 200, 100 );
-				scene.add( light );
-
-				// ground
-				const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
-
-				const grid = new THREE.GridHelper( 10000, 50, 0x000000, 0x000000 );
-				grid.material.opacity = 0.2;
-				grid.material.transparent = true;
+				const grid = new THREE.GridHelper( 10000, 50, 0xffffff, 0xffffff );
 				scene.add( grid );
 
 				// model could be in any format (e.g. glTF)
 				const loader = new THREE.FBXLoader();
 				loader.load( 'models/fbx/Samba Dancing.fbx', onModelLoad );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -251,9 +238,9 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				};
+			};
 
-				const onWindowResize = () => {
+			const onWindowResize = () => {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -283,7 +270,7 @@
 
 			const guiSetup = () => {
 
-				const numRowsControl = gui.add( guiOptions, 'numRows' ).min( 1 ).max( 50 );
+				const numRowsControl = gui.add( guiOptions, 'numRows' ).min( 1 ).max( 50 ).step( 1 );
 
 				numRowsControl.onChange( numRows => {
 
