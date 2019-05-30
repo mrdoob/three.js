@@ -4,35 +4,22 @@
 		<title>three.js WebGL 2 - Multisampled Renderbuffers</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
 			body {
-				background: #ffffff;
-				padding: 0;
-				margin: 0;
-				font-family: Monospace;
-				font-size: 13px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #222;
 			}
 
-			#info {
-				top: 0px;
-				width: 100%;
-				color: #000000;
-				margin: 6px 0px;
-				text-align: center;
-			}
-
-			#info a {
-				color: #000000;
+			a {
+				color: #08f;
 			}
 
 			#container {
+				position: absolute;
+				top: 80px;
 				width: 100%;
-				height: calc(100% - 80px);
+				bottom: 0px;
 			}
 		</style>
 	</head>
@@ -74,7 +61,7 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( window.innerWidth * 0.5 ) / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -120,7 +107,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -156,12 +143,12 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( window.innerWidth * 0.5 ) / window.innerHeight;
+				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer1.setSize( window.innerWidth, window.innerHeight );
-				composer2.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.offsetWidth, container.offsetHeight  );
+				composer1.setSize( container.offsetWidth, container.offsetHeight  );
+				composer2.setSize( container.offsetWidth, container.offsetHeight  );
 
 			}
 
@@ -169,15 +156,15 @@
 
 				requestAnimationFrame( animate );
 
-				var halfWidth = window.innerWidth / 2;
+				var halfWidth = container.offsetWidth / 2;
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, window.innerHeight );
+				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
 
 				composer1.render();
 
-				renderer.setViewport( halfWidth, 0, halfWidth, window.innerHeight );
+				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
 
 				composer2.render();
 

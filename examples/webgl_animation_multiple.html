@@ -4,20 +4,13 @@
 		<title>Multiple animated objects</title>
 		<meta charset="utf-8">
 		<meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
-		<style>
-			body {
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="container"></div>
 
-		<div id="info"
-		style="position: absolute; left: 0; top: 0; width: 100%; background-color: white; border: 1px solid black; margin: 10px; padding: 10px;">
-			This demo shows how to load several instances of the same 3D model (same .GLTF file) into the
-			scene, position them at different locations and launch different animations for them.
-			To do it, some tricky cloning of SkinnedMesh, Skeleton and Bone objects is necessary (done by SkeletonUtils.clone().
+		<div id="info">
+			This demo shows how clone a skinned 3d model using <strong>SkeletonUtils.clone()</strong><br/>
 			Soldier model from <a href="https://www.mixamo.com" target="_blank" rel="noopener">https://www.mixamo.com</a>.
 		</div>
 
