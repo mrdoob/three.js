@@ -47,7 +47,7 @@
 
 			var camera, scene, renderer, controls, gui, guiData;
 
-			var modelFileList, model, numberOfConstructionSteps, textureCube;
+			var modelFileList, model, textureCube;
 
 			var envMapActivated = false;
 
@@ -134,33 +134,6 @@
 				// load materials and then the model
 
 				reloadObject( true );
-
-			}
-
-			function processConstructionSteps( model ) {
-
-				// Returns total construction steps number
-
-				var stepNumber = 0;
-
-				model.traverse( c => {
-
-					if ( c.isGroup ) {
-
-						if ( c.userData.constructionStep ) {
-
-							stepNumber ++;
-
-						}
-
-						// Overwrite userData.constructionStep boolean flag with step number
-						c.userData.constructionStep = stepNumber;
-
-					}
-
-				} );
-
-				return stepNumber + 1;
 
 			}
 
@@ -258,9 +231,7 @@
 
 						}
 
-						numberOfConstructionSteps = processConstructionSteps( model );
-
-						guiData.constructionStep = numberOfConstructionSteps - 1;
+						guiData.constructionStep = model.userData.numConstructionSteps - 1;
 
 						updateObjectsVisibility();
 
@@ -319,9 +290,9 @@
 
 				if ( guiData.separateObjects ) {
 
-						if ( numberOfConstructionSteps > 1  ) {
+						if ( model.userData.numConstructionSteps > 1  ) {
 
-							gui.add( guiData, 'constructionStep', 0, numberOfConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( function ( value ) {
+							gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( function ( value ) {
 
 								updateObjectsVisibility();
 

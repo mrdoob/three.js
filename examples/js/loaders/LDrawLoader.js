@@ -593,7 +593,13 @@ THREE.LDrawLoader = ( function () {
 			fileLoader.setPath( this.path );
 			fileLoader.load( url, function ( text ) {
 
-				processObject( text, onLoad );
+				processObject( text, function onMainObjectProcessed( model ) {
+
+					scope.computeConstructionSteps( model );
+
+					onLoad( model );
+
+				} );
 
 			}, onProgress, onError );
 
@@ -610,7 +616,7 @@ THREE.LDrawLoader = ( function () {
 					parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 					parseScope.matrix.copy( subobject.matrix );
 					parseScope.inverted = subobject.inverted;
-					parseScope.constructionStep = subobject.constructionStep;
+					parseScope.startingConstructionStep = subobject.startingConstructionStep;
 
 				}
 
@@ -980,7 +986,8 @@ THREE.LDrawLoader = ( function () {
 				lineSegments: null,
 				conditionalSegments: null,
 
-				constructionStep: false
+				// If true, this object is the start of a construction step
+				startingConstructionStep: false
 
 			};
 
@@ -1331,6 +1338,33 @@ THREE.LDrawLoader = ( function () {
 
 		},
 
+		computeConstructionSteps: function ( model ) {
+
+			// Sets userdata.constructionStep number for Group objects and userData.numConstructionSteps number for the root Group object.
+
+			var stepNumber = 0;
+
+			model.traverse( c => {
+
+				if ( c.isGroup ) {
+
+					if ( c.userData.startingConstructionStep ) {
+
+						stepNumber ++;
+
+					}
+
+					c.userData.constructionStep = stepNumber;
+
+				}
+
+			} );
+
+			model.userData.numConstructionSteps = stepNumber + 1;
+
+		},
+
+
 		//
 
 		parse: function ( text ) {
@@ -1381,7 +1415,7 @@ THREE.LDrawLoader = ( function () {
 			var bfcCull = true;
 			var type = '';
 
-			var currentConstructionStep = false;
+			var startingConstructionStep = false;
 
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
@@ -1495,7 +1529,7 @@ THREE.LDrawLoader = ( function () {
 										if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
 											currentParseScope.groupObject = new THREE.Group();
-											currentParseScope.groupObject.userData.constructionStep = currentParseScope.constructionStep;
+											currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
 
 										}
 
@@ -1626,7 +1660,7 @@ THREE.LDrawLoader = ( function () {
 
 								case 'STEP':
 
-									currentConstructionStep = true;
+									startingConstructionStep = true;
 
 									break;
 
@@ -1696,11 +1730,11 @@ THREE.LDrawLoader = ( function () {
 							url: null,
 							triedLowerCase: false,
 							inverted: bfcInverted !== currentParseScope.inverted,
-							constructionStep: currentConstructionStep
+							startingConstructionStep: startingConstructionStep
 						} );
 
 						bfcInverted = false;
-						currentConstructionStep = false;
+						startingConstructionStep = false;
 
 						break;
 
