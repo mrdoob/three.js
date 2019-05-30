@@ -1,6 +1,6 @@
-import { Material } from './Material';
-import { MultiplyOperation } from '../constants';
-import { Color } from '../math/Color';
+import { Material } from './Material.js';
+import { MultiplyOperation } from '../constants.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -26,7 +26,7 @@ import { Color } from '../math/Color';
  *
  *  alphaMap: new THREE.Texture( <Image> ),
  *
- *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
+ *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,

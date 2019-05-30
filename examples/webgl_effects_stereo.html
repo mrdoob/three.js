@@ -28,33 +28,32 @@
 				color: #ffffff;
 			}
 
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - effects - stereo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - stereo. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/effects/StereoEffect.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var container;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var camera, scene, renderer, effect;
+			}
 
-			var mesh, lightMesh, geometry;
+			var container, camera, scene, renderer, effect;
+
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -118,8 +117,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

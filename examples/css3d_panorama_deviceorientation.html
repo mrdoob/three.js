@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>three.js css3d - panorama - deviceorientation</title>
+		<title>three.js css3d - panorama - device orientation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -34,12 +34,12 @@
 		<script src="js/controls/DeviceOrientationControls.js"></script>
 		<script src="js/renderers/CSS3DRenderer.js"></script>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - panorama - decideorientation. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - panorama - device orientation. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
 
 		<script>
 
 			var camera, scene, renderer;
-			var geometry, material, mesh;
+			var controls;
 
 			init();
 			animate();
@@ -55,32 +55,32 @@
 				var sides = [
 					{
 						url: 'textures/cube/Bridge2/posx.jpg',
-						position: [ -512, 0, 0 ],
+						position: [ - 512, 0, 0 ],
 						rotation: [ 0, Math.PI / 2, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negx.jpg',
 						position: [ 512, 0, 0 ],
-						rotation: [ 0, -Math.PI / 2, 0 ]
+						rotation: [ 0, - Math.PI / 2, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/posy.jpg',
-						position: [ 0,  512, 0 ],
+						position: [ 0, 512, 0 ],
 						rotation: [ Math.PI / 2, 0, Math.PI ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negy.jpg',
-						position: [ 0, -512, 0 ],
+						position: [ 0, - 512, 0 ],
 						rotation: [ - Math.PI / 2, 0, Math.PI ]
 					},
 					{
 						url: 'textures/cube/Bridge2/posz.jpg',
-						position: [ 0, 0,  512 ],
+						position: [ 0, 0, 512 ],
 						rotation: [ 0, Math.PI, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negz.jpg',
-						position: [ 0, 0, -512 ],
+						position: [ 0, 0, - 512 ],
 						rotation: [ 0, 0, 0 ]
 					}
 				];

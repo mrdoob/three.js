@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>多细节层次（[name]，Levels of Detail）</h1>
+
+		<p class="desc">
+			多细节层次 —— 在显示网格时，根据摄像机距离物体的距离，来使用更多或者更少的几何体来对其进行显示。<br /><br />
+			每一个级别都和一个几何体相关联，且在渲染时，可以根据给定的距离，来在这些级别对应的几何体之间进行切换。
+			通常情况下，你会创建多个几何体，比如说三个，一个距离很远（低细节），一个距离适中（中等细节），还有一个距离非常近（高质量）。
+		</p>
+
+		<h2>示例</h2>
+		
+		<p>
+			[example:webgl_lod webgl / lod ]
+		</p>
+
+		<code>
+var lod = new THREE.LOD();
+
+//Create spheres with 3 levels of detail and create new LOD levels for them
+for( var i = 0; i < 3; i++ ) {
+
+	var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+
+	var mesh = new THREE.Mesh( geometry, material );
+
+	lod.addLevel( mesh, i * 75 );
+
+}
+
+scene.add( lod );
+		</code>
+
+		<p>
+			请注意，要使得LOD在各不同细节层次之间进行切换，你将需要在你的渲染循环中调用[page:.update update]( camera )。
+			详情请查看这个示例中的源代码：
+		[example:webgl_lod WebGL / LOD]
+		</div>
+
+		<h2>Constructor</h2>
+		<h3>[name]( )</h3>
+		<p>
+			创建一个新的 [name].
+		</p>
+
+
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Object3D]来查看公共属性。</p>
+
+		<h3>[property:array levels]</h3>
+		<p>
+			一个包含有[page:object level] objects（各层次物体）的数组。<br /><br />
+
+			每一个层级都是一个对象，具有以下两个属性：
+			[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
+			[page:Float distance] —— 将显示这一细节层次的距离。
+		</p>
+
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
+
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance] )</h3>
+		<p>
+		[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
+		[page:Float distance] —— 将显示这一细节层次的距离。<br /><br />
+
+		添加在一定距离和更大范围内显示的网格。通常来说，距离越远，网格中的细节就越少。
+		</p>
+
+		<h3>[method:LOD clone]()</h3>
+		<p>
+			返回一个LOD对象及其所关联的在特定距离中的物体。
+		</p>
+
+
+		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
+		<p>
+			获得第一个比[page:Float distance]大的[page:Object3D]（网格）的引用。
+		</p>
+
+		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+			在一条投射出去的[page:Ray]（射线）和这个LOD之间获得交互。
+			[page:Raycaster.intersectObject]将会调用这个方法。
+		</p>
+
+
+
+		<h3>[method:Object toJSON]( meta )</h3>
+		<p>
+			使用这个方法，为LOD对象中的每个细节层次创建一个JSON结构。
+		</p>
+
+		<h3>[method:null update]( [param:Camera camera] )</h3>
+		<p>
+			基于每个[page:levels level]中的[page:Object3D object]和[page:Camera camera]（摄像机）之间的距离，来设置其可见性。
+			为了使得多细节层次能够被自动地更新，这个方法需要在渲染循环中被调用。
+		</p>
+
+		<h2>源代码</h2>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

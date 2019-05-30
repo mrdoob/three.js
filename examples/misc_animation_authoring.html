@@ -33,7 +33,7 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
 		<script src="js/libs/timeliner_gui.min.js"></script>
-		<script src="js/TimelinerController.js"></script>
+		<script src="js/animation/TimelinerController.js"></script>
 
 		<script>
 
@@ -44,20 +44,19 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.set( 1000, 500, 1000 );
-				camera.lookAt( new THREE.Vector3( 0, 200, 0 ) );
+				camera.lookAt( 0, 200, 0 );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 500, 10 ) );
+				scene.add( new THREE.GridHelper( 1000, 10 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
@@ -66,9 +65,9 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
 				texture.mapping = THREE.UVMapping;
-				texture.anisotropy = renderer.getMaxAnisotropy();
+				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				control = new THREE.TransformControls( camera, renderer.domElement );
@@ -120,7 +119,7 @@
 
 					}
 
-				});
+				} );
 
 				window.addEventListener( 'keyup', function ( event ) {
 
@@ -133,7 +132,7 @@
 
 					}
 
-				});
+				} );
 
 				var trackInfo = [
 
@@ -154,8 +153,7 @@
 
 				];
 
-				new Timeliner(
-						new THREE.TimelinerController( scene, trackInfo, render ) );
+				new Timeliner( new THREE.TimelinerController( scene, trackInfo, render ) );
 
 			}
 
@@ -171,8 +169,6 @@
 			}
 
 			function render() {
-
-				control.update();
 
 				renderer.render( scene, camera );
 

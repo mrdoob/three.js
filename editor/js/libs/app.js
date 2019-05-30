@@ -6,39 +6,31 @@ var APP = {
 
 	Player: function () {
 
-		var scope = this;
-
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
 
-		var controls, effect, cameraVR, isVR;
-
 		var events = {};
 
-		this.dom = document.createElement( 'div' );
+		var dom = document.createElement( 'div' );
+
+		this.dom = dom;
 
 		this.width = 500;
 		this.height = 500;
 
 		this.load = function ( json ) {
 
-			isVR = json.project.vr;
-
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.gammaOutput = true;
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
-			if ( json.project.gammaInput ) renderer.gammaInput = true;
-			if ( json.project.gammaOutput ) renderer.gammaOutput = true;
+			var project = json.project;
 
-			if ( json.project.shadows ) {
+			if ( project.shadows ) renderer.shadowMap.enabled = true;
+			if ( project.vr ) renderer.vr.enabled = true;
 
-				renderer.shadowMap.enabled = true;
-				// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-			}
-
-			this.dom.appendChild( renderer.domElement );
+			dom.appendChild( renderer.domElement );
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -118,26 +110,9 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-			if ( isVR === true ) {
+			if ( renderer.vr.enabled ) {
 
-				cameraVR = new THREE.PerspectiveCamera();
-				cameraVR.projectionMatrix = camera.projectionMatrix;
-				camera.add( cameraVR );
-
-				controls = new THREE.VRControls( cameraVR );
-				effect = new THREE.VREffect( renderer );
-
-				if ( WEBVR.isAvailable() === true ) {
-
-					this.dom.appendChild( WEBVR.getButton( effect ) );
-
-				}
-
-				if ( WEBVR.isLatestAvailable() === false ) {
-
-					this.dom.appendChild( WEBVR.getMessage() );
-
-				}
+				dom.appendChild( WEBVR.createButton( renderer ) );
 
 			}
 
@@ -179,11 +154,11 @@ var APP = {
 
 		}
 
-		var prevTime, request;
+		var time, prevTime;
 
-		function animate( time ) {
+		function animate() {
 
-			request = requestAnimationFrame( animate );
+			time = performance.now();
 
 			try {
 
@@ -195,24 +170,15 @@ var APP = {
 
 			}
 
-			if ( isVR === true ) {
-
-				camera.updateMatrixWorld();
-
-				controls.update();
-				effect.render( scene, cameraVR );
-
-			} else {
-
-				renderer.render( scene, camera );
-
-			}
+			renderer.render( scene, camera );
 
 			prevTime = time;
 
 		}
 
 		this.play = function () {
+
+			prevTime = performance.now();
 
 			document.addEventListener( 'keydown', onDocumentKeyDown );
 			document.addEventListener( 'keyup', onDocumentKeyUp );
@@ -225,8 +191,7 @@ var APP = {
 
 			dispatch( events.start, arguments );
 
-			request = requestAnimationFrame( animate );
-			prevTime = performance.now();
+			renderer.setAnimationLoop( animate );
 
 		};
 
@@ -243,15 +208,15 @@ var APP = {
 
 			dispatch( events.stop, arguments );
 
-			cancelAnimationFrame( request );
+			renderer.setAnimationLoop( null );
 
 		};
 
 		this.dispose = function () {
 
-			while ( this.dom.children.length ) {
+			while ( dom.children.length ) {
 
-				this.dom.removeChild( this.dom.firstChild );
+				dom.removeChild( dom.firstChild );
 
 			}
 

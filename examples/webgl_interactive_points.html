@@ -29,11 +29,11 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -79,11 +79,15 @@
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var renderer, scene, camera, stats;
 
-			var particles, uniforms;
+			var particles;
 
 			var PARTICLE_SIZE = 20;
 
@@ -95,7 +99,7 @@
 
 			function init() {
 
-				container = document.getElementById( 'container' );
+				var container = document.getElementById( 'container' );
 
 				scene = new THREE.Scene();
 
@@ -104,8 +108,7 @@
 
 				//
 
-				var geometry1 = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
-				var vertices = geometry1.vertices;
+				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
 
 				var positions = new Float32Array( vertices.length * 3 );
 				var colors = new Float32Array( vertices.length * 3 );
@@ -119,7 +122,7 @@
 					vertex = vertices[ i ];
 					vertex.toArray( positions, i * 3 );
 
-					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 )
+					color.setHSL( 0.01 + 0.1 * ( i / l ), 1.0, 0.5 );
 					color.toArray( colors, i * 3 );
 
 					sizes[ i ] = PARTICLE_SIZE * 0.5;
@@ -136,13 +139,13 @@
 				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color:   { value: new THREE.Color( 0xffffff ) },
+						color: { value: new THREE.Color( 0xffffff ) },
 						texture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-					alphaTest: 0.9,
+					alphaTest: 0.9
 
 				} );
 

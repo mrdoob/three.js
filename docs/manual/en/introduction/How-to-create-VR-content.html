@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="list.js"></script>
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>[name]</h1>
+	<br />
+
+	<p>
+		This guide provides a brief overview of the basic components of a web-based VR application
+		made with three.js.
+	</p>
+
+	<h2>Workflow</h2>
+
+	<p>
+		First, you have to include [link:https://github.com/mrdoob/three.js/blob/master/examples/js/vr/WebVR.js WebVR.js]
+		into your project.
+	</p>
+
+	<code>
+&lt;script src="/path/to/WebVR.js"&gt;&lt;/script&gt;
+	</code>
+
+	<p>
+		*WEBVR.createButton()* does two important things: It creates a button which indicates
+		VR compatibility. Besides, it initiates a VR session if the user activates the button. The only thing you have
+		to do is to add the following line of code to your app.
+	</p>
+
+	<code>
+document.body.appendChild( WEBVR.createButton( renderer ) );
+	</code>
+
+	<p>
+		Next, you have to tell your instance of *WebGLRenderer* to enable VR rendering.
+	</p>
+
+	<code>
+renderer.vr.enabled = true;
+	</code>
+
+	<p>
+		Finally, you have to adjust your animation loop since we can't use our well known
+		*window.requestAnimationFrame()* function. For VR projects we use [page:WebGLRenderer.setAnimationLoop setAnimationLoop]. 
+		The minimal code looks like this:
+	</p>
+
+	<code>
+renderer.setAnimationLoop( function () {
+
+	renderer.render( scene, camera );
+
+} );
+	</code>
+
+	<h2>Next Steps</h2>
+
+	<p>
+		Have a look at one of the official WebVR examples to see this workflow in action.<br /><br />
+
+		[example:webvr_ballshooter WebVR / ballshoter]<br />
+		[example:webvr_cubes WebVR / cubes]<br />
+		[example:webvr_dragging WebVR / dragging]<br />
+		[example:webvr_lorenzattractor WebVR / lorenzattractor]<br />
+		[example:webvr_panorama WebVR / panorama]<br />
+		[example:webvr_paint WebVR / paint]<br />
+		[example:webvr_rollercoaster WebVR / rollercoaster]<br />
+		[example:webvr_sandbox WebVR / sandbox]<br />
+		[example:webvr_sculpt WebVR / sculpt]<br />
+		[example:webvr_vive_paint WebVR / vive / paint]<br />
+		[example:webvr_vive_sculpt WebVR / vive / sculpt]<br />
+	</p>
+
+</body>
+
+</html>

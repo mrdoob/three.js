@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - sea3d / bvh</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: white }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank" rel="noopener">Trivision</a>
+			<br/>
+			<br/>Runtime convertion of BVH Animation to SEA3D Skeleton Animation
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
+
+		<script src="js/loaders/sea3d/SEA3D.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
+		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+
+		<script src="js/loaders/BVHLoader.js"></script>
+		<script src="js/utils/SkeletonUtils.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
+
+			var container, stats;
+
+			var camera, scene, renderer, composer, player, hat;
+
+			var loader;
+
+			var bvhSkeletonHelper, bvhMixer;
+
+			// Initialize Three.JS
+
+			init();
+
+			//
+			// SEA3D Loader
+			//
+
+			loader = new THREE.SEA3D( {
+
+				autoPlay: true, // Auto play animations
+				container: scene, // Container to add models
+				multiplier: .6 // Light multiplier
+
+			} );
+
+			loader.onComplete = function ( ) {
+
+				// Get the first camera from SEA3D Studio
+				// use loader.get... to get others objects
+
+				var cam = loader.cameras[ 0 ];
+				camera.position.copy( cam.position );
+				camera.rotation.copy( cam.rotation );
+
+				new THREE.OrbitControls( camera, renderer.domElement );
+
+				// get meshes
+				player = loader.getMesh( "Player" );
+				hat = loader.getMesh( "Hat" );
+
+				hat.visible = false;
+
+				loadBVH();
+
+				animate();
+
+			};
+
+			loader.load( './models/sea3d/skin.tjs.sea' );
+
+			//
+
+			function bvhToSEA3D( result ) {
+
+				var options = {
+					useFirstFramePosition: true,
+					preserveHipPosition: false,
+					hip: "hip",
+					// left is SEA3D bone names and right BVH bone names
+					names: {
+						"Base HumanPelvis": "hip",
+						"Base HumanSpine3": "abdomen",
+						"Base HumanRibcage": "chest",
+						"Base HumanHead": "head",
+
+						"Base HumanRUpperarm": "rShldr",
+						"Base HumanRForearm1": "rForeArm",
+						"Base HumanRPalm": "rHand",
+
+						"Base HumanLUpperarm": "lShldr",
+						"Base HumanLForearm1": "lForeArm",
+						"Base HumanLPalm": "lHand",
+
+						"Base HumanRThigh": "rThigh",
+						"Base HumanRCalf1": "rShin",
+						"Base HumanRFoot": "rFoot",
+
+						"Base HumanLThigh": "lThigh",
+						"Base HumanLCalf1": "lShin",
+						"Base HumanLFoot": "lFoot"
+					},
+
+				};
+
+				// Automatic offset: get offsets when it is in T-Pose
+				options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
+
+				/*
+				// Manual offsets: compensates the difference in skeletons ( T-Pose )
+				options.offsets = {
+					"lShldr": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( - 45 ),
+							THREE.Math.degToRad( - 80 )
+						)
+					),
+					"rShldr": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 45 ),
+							THREE.Math.degToRad( 80 )
+						)
+					),
+					"lFoot": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 15 ),
+							0
+						)
+					),
+					"rFoot": new THREE.Matrix4().makeRotationFromEuler(
+						new THREE.Euler(
+							0,
+							THREE.Math.degToRad( 15 ),
+							0
+						)
+					)
+				};
+				*/
+
+				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, options );
+
+				clip.name = "dance";
+
+				clip = THREE.SEA3D.AnimationClip.fromClip( clip );
+
+				player.addAnimation( new THREE.SEA3D.Animation( clip ) );
+
+				player.play( "dance" );
+
+
+			}
+
+			function loadBVH() {
+
+				var loader = new THREE.BVHLoader();
+				loader.load( "models/bvh/pirouette.bvh", function ( result ) {
+
+					bvhSkeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+					bvhSkeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+
+					var boneContainer = new THREE.Group();
+					boneContainer.add( result.skeleton.bones[ 0 ] );
+					boneContainer.position.y = - 100;
+
+					scene.add( bvhSkeletonHelper );
+					scene.add( boneContainer );
+
+					// play animation
+					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
+					bvhMixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
+
+					bvhToSEA3D( result );
+
+				} );
+
+			}
+
+			function init() {
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.set( 1000, - 300, 1000 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				// post-processing
+
+				composer = new THREE.EffectComposer( renderer );
+
+				var renderPass = new THREE.RenderPass( scene, camera );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				composer.addPass( renderPass );
+
+				var vh = 1.4, vl = 1.2;
+
+				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
+				composer.addPass( colorCorrectionPass );
+
+				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				vignettePass.uniforms[ "darkness" ].value = 1.0;
+				composer.addPass( vignettePass );
+
+				composer.addPass( copyPass );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				composer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			var clock = new THREE.Clock();
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				requestAnimationFrame( animate );
+
+				// Update SEA3D Animations
+				THREE.SEA3D.AnimationHandler.update( delta );
+
+				if ( bvhMixer ) bvhMixer.update( delta );
+
+				render( delta );
+
+				stats.update();
+
+			}
+
+			function render( dlt ) {
+
+				//renderer.render( scene, camera );
+				composer.render( dlt );
+
+			}
+
+		</script>
+
+	</body>
+</html>

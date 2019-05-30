@@ -10,6 +10,7 @@ var Viewport = function ( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
+	container.add( new Viewport.Camera( editor ) );
 	container.add( new Viewport.Info( editor ) );
 
 	//
@@ -22,22 +23,22 @@ var Viewport = function ( editor ) {
 
 	var objects = [];
 
-	//
-
-	var vrEffect, vrControls;
-
-	if ( WEBVR.isAvailable() === true ) {
-
-		var vrCamera = new THREE.PerspectiveCamera();
-		vrCamera.projectionMatrix = camera.projectionMatrix;
-		camera.add( vrCamera );
-
-	}
-
 	// helpers
 
-	var grid = new THREE.GridHelper( 30, 60 );
+	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
 	sceneHelpers.add( grid );
+
+	var array = grid.geometry.attributes.color.array;
+
+	for ( var i = 0; i < array.length; i += 60 ) {
+
+		for ( var j = 0; j < 12; j ++ ) {
+
+			array[ i + j ] = 0.26;
+
+		}
+
+	}
 
 	//
 
@@ -60,7 +61,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			selectionBox.update( object );
+			selectionBox.setFromObject( object );
 
 			if ( editor.helpers[ object.id ] !== undefined ) {
 
@@ -198,7 +199,7 @@ var Viewport = function ( editor ) {
 
 	function onMouseDown( event ) {
 
-		event.preventDefault();
+		// event.preventDefault();
 
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
@@ -269,7 +270,6 @@ var Viewport = function ( editor ) {
 	var controls = new THREE.EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
-		transformControls.update();
 		signals.cameraChanged.dispatch( camera );
 
 	} );
@@ -279,33 +279,6 @@ var Viewport = function ( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
-		render();
-
-	} );
-
-	signals.enterVR.add( function () {
-
-		vrEffect.isPresenting ? vrEffect.exitPresent() : vrEffect.requestPresent();
-
-	} );
-
-	signals.themeChanged.add( function ( value ) {
-
-		switch ( value ) {
-
-			case 'css/light.css':
-				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 60, 0x444444, 0x888888 );
-				sceneHelpers.add( grid );
-				break;
-			case 'css/dark.css':
-				sceneHelpers.remove( grid );
-				grid = new THREE.GridHelper( 30, 60, 0xbbbbbb, 0x888888 );
-				sceneHelpers.add( grid );
-				break;
-
-		}
-
 		render();
 
 	} );
@@ -340,23 +313,11 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
+		renderer.gammaOutput = true;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
-
-		if ( WEBVR.isAvailable() === true ) {
-
-			vrControls = new THREE.VRControls( vrCamera );
-			vrEffect = new THREE.VREffect( renderer );
-
-			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
-
-				effect.isPresenting ? signals.enteredVR.dispatch() : signals.exitedVR.dispatch();
-
-			}, false );
-
-		}
 
 		render();
 
@@ -367,8 +328,6 @@ var Viewport = function ( editor ) {
 		render();
 
 	} );
-
-	var saveTimeout;
 
 	signals.cameraChanged.add( function () {
 
@@ -381,13 +340,13 @@ var Viewport = function ( editor ) {
 		selectionBox.visible = false;
 		transformControls.detach();
 
-		if ( object !== null ) {
+		if ( object !== null && object !== scene && object !== camera ) {
 
 			box.setFromObject( object );
 
 			if ( box.isEmpty() === false ) {
 
-				selectionBox.update( box );
+				selectionBox.setFromObject( object );
 				selectionBox.visible = true;
 
 			}
@@ -410,7 +369,7 @@ var Viewport = function ( editor ) {
 
 		if ( object !== undefined ) {
 
-			selectionBox.update( object );
+			selectionBox.setFromObject( object );
 
 		}
 
@@ -432,12 +391,11 @@ var Viewport = function ( editor ) {
 
 		if ( editor.selected === object ) {
 
-			selectionBox.update( object );
-			transformControls.update();
+			selectionBox.setFromObject( object );
 
 		}
 
-		if ( object instanceof THREE.PerspectiveCamera ) {
+		if ( object.isPerspectiveCamera ) {
 
 			object.updateProjectionMatrix();
 
@@ -454,6 +412,13 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.objectRemoved.add( function ( object ) {
+
+		controls.enabled = true; // see #14180
+		if ( object === transformControls.object ) {
+
+			transformControls.detach();
+
+		}
 
 		object.traverse( function ( child ) {
 
@@ -515,18 +480,41 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( scene.fog instanceof THREE.Fog ) {
+		if ( scene.fog ) {
 
-			scene.fog.color.setHex( fogColor );
-			scene.fog.near = fogNear;
-			scene.fog.far = fogFar;
+			if ( scene.fog.isFog ) {
 
-		} else if ( scene.fog instanceof THREE.FogExp2 ) {
+				scene.fog.color.setHex( fogColor );
+				scene.fog.near = fogNear;
+				scene.fog.far = fogFar;
 
-			scene.fog.color.setHex( fogColor );
-			scene.fog.density = fogDensity;
+			} else if ( scene.fog.isFogExp2 ) {
+
+				scene.fog.color.setHex( fogColor );
+				scene.fog.density = fogDensity;
+
+			}
 
 		}
+
+		render();
+
+	} );
+
+	signals.viewportCameraChanged.add( function ( viewportCamera ) {
+
+		if ( viewportCamera.isPerspectiveCamera ) {
+
+			viewportCamera.aspect = editor.camera.aspect;
+			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
+
+		} else if ( ! viewportCamera.isOrthographicCamera ) {
+
+			throw "Invalid camera set as viewport";
+
+		}
+
+		camera = viewportCamera;
 
 		render();
 
@@ -557,73 +545,48 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	//
+	// animations
 
-	function animate() {
+	var prevTime = performance.now();
+
+	function animate( time ) {
 
 		requestAnimationFrame( animate );
 
-		/*
+		var mixer = editor.mixer;
 
-		// animations
+		if ( mixer.stats.actions.inUse > 0 ) {
 
-		if ( THREE.AnimationHandler.animations.length > 0 ) {
-
-			THREE.AnimationHandler.update( 0.016 );
-
-			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
-
-				var helper = sceneHelpers.children[ i ];
-
-				if ( helper instanceof THREE.SkeletonHelper ) {
-
-					helper.update();
-
-				}
-
-			}
-
-		}
-		*/
-
-		if ( vrEffect && vrEffect.isPresenting ) {
-
+			mixer.update( ( time - prevTime ) / 1000 );
 			render();
 
 		}
 
+		prevTime = time;
+
 	}
+
+	requestAnimationFrame( animate );
+
+	//
 
 	function render() {
 
-		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
+		renderer.render( scene, camera );
 
-		if ( vrEffect && vrEffect.isPresenting ) {
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
 
-			vrControls.update();
+			if ( camera === editor.camera ) {
 
-			camera.updateMatrixWorld();
-
-			vrEffect.render( scene, vrCamera );
-			vrEffect.render( sceneHelpers, vrCamera );
-
-		} else {
-
-			renderer.render( scene, camera );
-
-			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
-
+				sceneHelpers.updateMatrixWorld();
 				renderer.render( sceneHelpers, camera );
 
 			}
 
 		}
 
-
 	}
-
-	requestAnimationFrame( animate );
 
 	return container;
 

@@ -34,8 +34,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span> by <a href="https://Clara.io">Ben Houston</a>.<br />
-			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank">AMD GPU MeshMapper</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span> by <a href="https://Clara.io">Ben Houston</a>.<br />
+			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 
 			<div id="vt">displacement mapping requires vertex textures</div>
 		</div>
@@ -43,32 +43,40 @@
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
+		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
-
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
 
-			var stats, loader;
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			var camera, scene, renderer, controls;
+			}
+
+			var stats;
+
+			var camera, scene, renderer;
 
 			var params = {
 				material: 'normal',
-				camera: 'perspective'
+				camera: 'perspective',
+				side: 'double'
+			};
+
+			var sides = {
+				'front': THREE.FrontSide,
+				'back': THREE.BackSide,
+				'double': THREE.DoubleSide
 			};
 
 			var cameraOrtho, cameraPerspective;
 			var controlsOrtho, controlsPerspective;
 
 			var mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
-
-			var pointLight, ambientLight;
 
 			var height = 500; // of camera frustum
 
@@ -85,6 +93,7 @@
 				var gui = new dat.GUI();
 				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 
 			}
 
@@ -145,12 +154,9 @@
 				// textures
 
 				var textureLoader = new THREE.TextureLoader();
-
-				var normalMap = textureLoader.load( "textures/normal/ninja/normal.jpg" );
-
-				var aoMap = textureLoader.load( "textures/normal/ninja/ao.jpg" );
-
-				var displacementMap = textureLoader.load( "textures/normal/ninja/displacement.jpg" );
+				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
+				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
+				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
 
 				// material
 
@@ -168,6 +174,8 @@
 
 					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 1, - 1 ),
+
+					//flatShading: true,
 
 					side: THREE.DoubleSide
 				} );
@@ -192,15 +200,27 @@
 					side: THREE.DoubleSide
 				} );
 
-				materialNormal = new THREE.MeshNormalMaterial();
+				materialNormal = new THREE.MeshNormalMaterial( {
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					normalMap: normalMap,
+					normalScale: new THREE.Vector2( 1, - 1 ),
+
+					//flatShading: true,
+
+					side: THREE.DoubleSide
+				} );
 
 				//
 
-				loader = new THREE.BinaryLoader();
+				var loader = new THREE.OBJLoader();
+				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
-				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) {
-
-					geometry.faceVertexUvs[ 1 ] = geometry.faceVertexUvs[ 0 ]; // 2nd set of UVs required for aoMap
+					var geometry = group.children[ 0 ].geometry;
+					geometry.attributes.uv2 = geometry.attributes.uv;
+					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, materialNormal );
 					mesh.scale.multiplyScalar( 25 );
@@ -245,9 +265,6 @@
 
 				requestAnimationFrame( animate );
 
-				controlsOrtho.update();
-				controlsPerspective.update();
-
 				stats.begin();
 				render();
 				stats.end();
@@ -266,6 +283,20 @@
 						case 'depthBasic': material = materialDepthBasic; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'normal': material = materialNormal; break;
+
+					}
+
+					if ( sides[ params.side ] !== material.side ) {
+
+						switch ( params.side ) {
+
+							case 'front': material.side = THREE.FrontSide; break;
+							case 'back': material.side = THREE.BackSide; break;
+							case 'double': material.side = THREE.DoubleSide; break;
+
+						}
+
+						material.needsUpdate = true;
 
 					}
 

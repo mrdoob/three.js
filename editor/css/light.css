@@ -1,43 +1,55 @@
-﻿.Outliner {
-	color: #444;
-	background: #fff;
-	padding: 0;
-	width: 100%;
-	height: 140px;
-	font-size: 12px;
-	cursor: default;
-	overflow: auto;
+button {
+	color: #555;
+	background-color: #ddd;
+	border: 0px;
+	padding: 5px 8px;
+	text-transform: uppercase;
+	cursor: pointer;
 	outline: none;
 }
 
-	.Outliner .option {
-		padding: 4px;
-		color: #666;
-		white-space: nowrap;
+	button:hover {
+		background-color: #fff;
 	}
 
-	.Outliner .option:hover {
-		background-color: rgba(0,0,0,0.02);
+	button.selected {
+		background-color: #fff;
 	}
 
-	.Outliner .option.active {
-		background-color: rgba(0,0,0,0.04);
-	}
+input, textarea {
+	border: 1px solid transparent;
+	color: #444;
+}
 
 input.Number {
-	color: #0080f0!important;
+	color: #08f!important;
 	font-size: 12px;
 	border: 0px;
 	padding: 2px;
 	cursor: col-resize;
 }
 
+select {
+	color: #666;
+	background-color: #ddd;
+	border: 0px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}
+
+	select:hover {
+		background-color: #fff;
+	}
+
+/* UI */
+
 #viewport {
 	position: absolute;
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 }
 
 	#viewport #info {
@@ -50,7 +62,7 @@ input.Number {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 	opacity: 0.9;
 }
 
@@ -59,7 +71,7 @@ input.Number {
 	top: 32px;
 	left: 0;
 	right: 300px;
-	bottom: 32px;
+	bottom: 0;
 }
 
 #menubar {
@@ -91,14 +103,17 @@ input.Number {
 			color: #888;
 			margin: 0;
 			padding: 8px;
+			line-height: 16px;
 		}
 
 		#menubar .menu .options {
-			position: absolute;
+			position: fixed;
 			display: none;
 			padding: 5px 0;
 			background: #eee;
 			width: 150px;
+			max-height: calc(100% - 80px);
+			overflow: auto;
 		}
 
 		#menubar .menu:hover .options {
@@ -147,13 +162,6 @@ input.Number {
 		vertical-align: middle;
 	}
 
-	#sidebar input,
-	#sidebar textarea,
-	#sidebar select {
-		border: 1px solid transparent;
-		color: #444;
-	}
-
 	#sidebar .Panel {
 		color: #888;
 		padding: 10px;
@@ -187,9 +195,9 @@ input.Number {
 
 #toolbar {
 	position: absolute;
-	left: 0;
-	right: 300px;
-	bottom: 0;
+	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
+	width: 280px;
+	bottom: 16px;
 	height: 32px;
 	background: #eee;
 	color: #333;
@@ -206,4 +214,80 @@ input.Number {
 
 	#toolbar button {
 		margin-right: 6px;
+		line-height: 14px;
+		height: 24px;
 	}
+
+.Outliner {
+	color: #444;
+	background-color: #fff;
+	padding: 0;
+	width: 100%;
+	height: 140px;
+	font-size: 12px;
+	cursor: default;
+	overflow: auto;
+	outline: none !important;
+}
+
+	.Outliner .option {
+		padding: 4px;
+		color: #666;
+		white-space: nowrap;
+	}
+
+	.Outliner .option:hover {
+		background-color: rgba(0,0,0,0.02);
+	}
+
+	.Outliner .option.active {
+		background-color: rgba(0,0,0,0.04);
+	}
+
+/* */
+
+@media all and ( max-width: 600px ) {
+
+	#menubar .menu .options {
+		max-height: calc(100% - 372px);
+	}
+
+	#menubar .menu.right {
+		display: none;
+	}
+
+	#viewport {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#script {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#player {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#sidebar {
+		left: 0;
+		width: 100%;
+		top: calc(100% - 320px);
+		bottom: 0;
+	}
+
+	#toolbar {
+		left: calc(50% - 140px);
+		width: 280px;
+		top: 68px;
+	}
+
+}

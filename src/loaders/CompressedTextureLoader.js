@@ -1,7 +1,7 @@
-import { LinearFilter } from '../constants';
-import { XHRLoader } from './XHRLoader';
-import { CompressedTexture } from '../textures/CompressedTexture';
-import { DefaultLoadingManager } from './LoadingManager';
+import { LinearFilter } from '../constants.js';
+import { FileLoader } from './FileLoader.js';
+import { CompressedTexture } from '../textures/CompressedTexture.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -29,7 +29,7 @@ Object.assign( CompressedTextureLoader.prototype, {
 		var texture = new CompressedTexture();
 		texture.image = images;
 
-		var loader = new XHRLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -88,7 +88,7 @@ Object.assign( CompressedTextureLoader.prototype, {
 
 					for ( var f = 0; f < faces; f ++ ) {
 
-						images[ f ] = { mipmaps : [] };
+						images[ f ] = { mipmaps: [] };
 
 						for ( var i = 0; i < texDatas.mipmapCount; i ++ ) {
 

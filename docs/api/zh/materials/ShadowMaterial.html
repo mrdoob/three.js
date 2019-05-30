@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:ShaderMaterial] &rarr;
+
+		<h1>阴影材质([name])</h1>
+
+		<p class="desc">
+			此材质可以接收阴影，但在其他方面完全透明。
+		</p>
+
+		<h3>例子(Example)</h3>
+		[example:webgl_geometry_spline_editor geometry / spline / editor]
+
+		<code>
+var planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
+planeGeometry.rotateX( - Math.PI / 2 );
+
+var planeMaterial = new THREE.ShadowMaterial();
+planeMaterial.opacity = 0.2;
+
+var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.position.y = -200;
+plane.receiveShadow = true;
+scene.add( plane );
+		</code>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material] 和 [page:ShaderMaterial]继承的任何属性)。<br /><br />
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+		<p>常用属性请参见基类[page:Material]和[page:ShaderMaterial]。</p>
+
+		<h3>[property:Boolean isShadowMaterial]</h3>
+		<p> 用于检查此类或派生类是否为阴影材质。默认值为 *true*。<br /><br />
+			因为其通常用在内部优化，所以不应该更改该属性值。
+		</p>
+
+		<h3>[property:Boolean lights]</h3>
+		<p> 材质是否受到光照的影响。默认值为 *true*。</p>
+
+		<h3>[property:Boolean transparent]</h3>
+		<p>定义此材质是否透明。默认值为 *true*。</p>
+
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Material]和[page:ShaderMaterial]。</p>
+
+		<h2>源码(Source)</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

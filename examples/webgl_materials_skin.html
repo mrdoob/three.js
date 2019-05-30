@@ -27,7 +27,7 @@
 				z-index:1000;
 			}
 
-			#oldie {
+			#webglmessage {
 				background:rgb(200,100,0) !important;
 				color:#fff;
 			}
@@ -37,8 +37,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl skin rendering demo.
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank">Lee Perry-Smith</a> head.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl skin rendering demo.
+			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -56,13 +56,17 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-
-		<script src="js/Detector.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var statsEnabled = true;
 
@@ -74,7 +78,7 @@
 
 			var composer, composerUV1, composerUV2, composerUV3, composerBeckmann;
 
-			var directionalLight, pointLight, ambientLight;
+			var directionalLight;
 
 			var mouseX = 0, mouseY = 0;
 			var targetX = 0, targetY = 0;
@@ -96,6 +100,7 @@
 				camera.position.z = 900;
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				// LIGHTS
 
@@ -104,14 +109,12 @@
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
-				directionalLight.position.set( -1, 0.5, -1 );
+				directionalLight.position.set( - 1, 0.5, - 1 );
 				scene.add( directionalLight );
 
 				// MATERIALS
 
-				var diffuse = 0xbbbbbb, specular = 0x070707, shininess = 50;
-
-				specular = 0x555555;
+				var diffuse = 0xbbbbbb, specular = 0x555555;
 
 				var shader = THREE.ShaderSkin[ "skin" ];
 
@@ -119,10 +122,10 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
-				uniformsUV[ "tNormal" ].value = textureLoader.load( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = -1.5;
+				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniformsUV[ "uNormalScale" ].value = - 1.5;
 
-				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -142,7 +145,7 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
-				material = new THREE.ShaderMaterial( parameters );
+				var material = new THREE.ShaderMaterial( parameters );
 				material.extensions.derivatives = true;
 
 				var materialUV = new THREE.ShaderMaterial( parametersUV );
@@ -150,13 +153,16 @@
 
 				// LOADER
 
-				loader = new THREE.JSONLoader();
-				loader.load(  "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader = new THREE.GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+
+					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
+
+				} );
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColor( 0x050505 );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
@@ -180,8 +186,6 @@
 
 				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0x575757 ) );
 
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
-
 				var effectBloom1 = new THREE.BloomPass( 1, 15, 2, 512 );
 				var effectBloom2 = new THREE.BloomPass( 1, 25, 3, 512 );
 				var effectBloom3 = new THREE.BloomPass( 1, 25, 4, 512 );
@@ -190,11 +194,10 @@
 				effectBloom2.clear = true;
 				effectBloom3.clear = true;
 
-				effectCopy.renderToScreen = true;
-
 				//
 
 				var pars = {
+					generateMipmaps: true,
 					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter,
 					format: THREE.RGBFormat,
@@ -206,10 +209,11 @@
 
 				//
 
-				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
-				composerScene.addPass( renderModelUV );
+				composer = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composer.addPass( renderModelUV );
+				composer.renderToScreen = false;
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
+				var renderScene = new THREE.TexturePass( composer.renderTarget2.texture );
 
 				//
 
@@ -217,16 +221,19 @@
 
 				composerUV1.addPass( renderScene );
 				composerUV1.addPass( effectBloom1 );
+				composerUV1.renderToScreen = false;
 
 				composerUV2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV2.addPass( renderScene );
 				composerUV2.addPass( effectBloom2 );
+				composerUV2.renderToScreen = false;
 
 				composerUV3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV3.addPass( renderScene );
 				composerUV3.addPass( effectBloom3 );
+				composerUV3.renderToScreen = false;
 
 				//
 
@@ -236,7 +243,7 @@
 
 				//
 
-				uniforms[ "tBlur1" ].value = composerScene.renderTarget2.texture;
+				uniforms[ "tBlur1" ].value = composer.renderTarget2.texture;
 				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2.texture;
 				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2.texture;
 				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2.texture;
@@ -310,7 +317,7 @@
 
 				}
 
-				composerScene.render();
+				composer.render();
 
 				composerUV1.render();
 				composerUV2.render();

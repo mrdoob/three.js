@@ -24,33 +24,32 @@
 				z-index:1000;
 			}
 
-			a {
-				color: #ffffff;
-			}
+			a { color: #ffffff; }
 
-			#oldie a { color:#da0 }
+			#webglmessage a { color:#da0 }
 		</style>
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube reflection demo. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube reflection demo. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a></div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var container;
 
 			var camera, scene, renderer;
 
-			var mesh, lightMesh, geometry;
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -110,8 +109,8 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2,
-				windowHalfY = window.innerHeight / 2,
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

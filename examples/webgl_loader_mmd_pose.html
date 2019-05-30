@@ -18,7 +18,6 @@
 				top: 10px;
 				width: 100%;
 				text-align: center;
-				z-index: 100;
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
@@ -27,45 +26,45 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - MMDLoader test<br />
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank">Model Data</a>
-		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank">Pose Data</a>
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/libs/charsetencoder.min.js"></script>
+		<script src="js/libs/mmdparser.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
+
 		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/MMDLoader.js"></script>
+		<script src="js/effects/OutlineEffect.js"></script>
 		<script src="js/animation/CCDIKSolver.js"></script>
 		<script src="js/animation/MMDPhysics.js"></script>
+		<script src="js/animation/MMDAnimationHelper.js"></script>
 
-		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<script>
 
-			var container, stats;
+			var container;
 
-			var camera, scene, renderer;
-			var helper;
+			var camera, scene, renderer, effect;
+			var mesh, helper;
 
 			var vpds = [];
 
-			var ready = false;
+			Ammo().then( function( AmmoLib ) {
 
-			var mouseX = 0, mouseY = 0;
+				Ammo = AmmoLib;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+				init();
+				animate();
 
-			var clock = new THREE.Clock();
-
-			init();
-			animate();
+			} );
 
 			function init() {
 
@@ -78,74 +77,74 @@
 				// scene
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( new THREE.Color( 0xffffff ) );
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.OutlineEffect( renderer );
 
 				// model
 
-				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
+				function onProgress( xhr ) {
 
-				var onError = function ( xhr ) {
-				};
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				}
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vpdFiles = [
-					'models/mmd/vpd/01.vpd',
-					'models/mmd/vpd/02.vpd',
-					'models/mmd/vpd/03.vpd',
-					'models/mmd/vpd/04.vpd',
-					'models/mmd/vpd/05.vpd',
-					'models/mmd/vpd/06.vpd',
-					'models/mmd/vpd/07.vpd',
-					'models/mmd/vpd/08.vpd',
-					//'models/mmd/vpd/09.vpd',
-					//'models/mmd/vpd/10.vpd',
-					'models/mmd/vpd/11.vpd'
+					'models/mmd/vpds/01.vpd',
+					'models/mmd/vpds/02.vpd',
+					'models/mmd/vpds/03.vpd',
+					'models/mmd/vpds/04.vpd',
+					'models/mmd/vpds/05.vpd',
+					'models/mmd/vpds/06.vpd',
+					'models/mmd/vpds/07.vpd',
+					'models/mmd/vpds/08.vpd',
+					//'models/mmd/vpds/09.vpd',
+					//'models/mmd/vpds/10.vpd',
+					'models/mmd/vpds/11.vpd'
 				];
 
-				helper = new THREE.MMDHelper( renderer );
+				helper = new THREE.MMDAnimationHelper();
 
 				var loader = new THREE.MMDLoader();
-				loader.setDefaultTexturePath( './models/mmd/default/' );
 
-				loader.loadModel( modelFile, function ( object ) {
+				loader.load( modelFile, function ( object ) {
 
 					mesh = object;
-
-					mesh.position.y = -10;
-
-					helper.add( mesh );
+					mesh.position.y = - 10;
 
 					scene.add( mesh );
 
 					var vpdIndex = 0;
-					function loadVpd () {
+
+					function loadVpd() {
 
 						var vpdFile = vpdFiles[ vpdIndex ];
 
-						loader.loadVpd( vpdFile, function ( vpd ) {
+						loader.loadVPD( vpdFile, false, function ( vpd ) {
 
 							vpds.push( vpd );
 
-							vpdIndex++;
+							vpdIndex ++;
 
 							if ( vpdIndex < vpdFiles.length ) {
 
@@ -153,25 +152,23 @@
 
 							} else {
 
-								initGui( mesh, vpds );
-								ready = true;
+								initGui();
 
 							}
 
-						}, onProgress, onError );
+						}, onProgress, null );
 
-					};
+					}
+
 					loadVpd();
 
-				}, onProgress, onError );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				}, onProgress, null );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				function initGui () {
+				function initGui() {
 
 					var gui = new dat.GUI();
 
@@ -183,13 +180,13 @@
 					var poses = gui.addFolder( 'Poses' );
 					var morphs = gui.addFolder( 'Morphs' );
 
-					function getBaseName ( s ) {
+					function getBaseName( s ) {
 
 						return s.slice( s.lastIndexOf( '/' ) + 1 );
 
-					};
+					}
 
-					function initControls () {
+					function initControls() {
 
 						for ( var key in dictionary ) {
 
@@ -197,17 +194,17 @@
 
 						}
 
-						controls.pose = -1;
+						controls.pose = - 1;
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
 
 						}
 
-					};
+					}
 
-					function initKeys () {
+					function initKeys() {
 
 						for ( var key in dictionary ) {
 
@@ -215,13 +212,13 @@
 
 						}
 
-					};
+					}
 
-					function initPoses () {
+					function initPoses() {
 
-						var files = { default: -1 };
+						var files = { default: - 1 };
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							files[ getBaseName( vpdFiles[ i ] ) ] = i;
 
@@ -229,9 +226,9 @@
 
 						poses.add( controls, 'pose', files ).onChange( onChangePose );
 
-					};
+					}
 
-					function initMorphs () {
+					function initMorphs() {
 
 						for ( var key in dictionary ) {
 
@@ -239,11 +236,11 @@
 
 						}
 
-					};
+					}
 
-					function onChangeMorph () {
+					function onChangeMorph() {
 
-						for ( var i = 0; i < keys.length; i++ ) {
+						for ( var i = 0; i < keys.length; i ++ ) {
 
 							var key = keys[ i ];
 							var value = controls[ key ];
@@ -251,23 +248,23 @@
 
 						}
 
-					};
+					}
 
-					function onChangePose () {
+					function onChangePose() {
 
 						var index = parseInt( controls.pose );
 
-						if ( index === -1 ) {
+						if ( index === - 1 ) {
 
 							mesh.pose();
 
 						} else {
 
-							helper.poseAsVpd( mesh, vpds[ index ] );
+							helper.pose( mesh, vpds[ index ] );
 
 						}
 
-					};
+					}
 
 					initControls();
 					initKeys();
@@ -282,25 +279,14 @@
 
 				}
 
-
 			}
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -314,22 +300,8 @@
 			}
 
 			function render() {
-/*
-				camera.position.x += ( - mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				camera.lookAt( scene.position );
-*/
-				if ( ready ) {
-
-					helper.render( scene, camera );
-
-				} else {
-
-					renderer.clear();
-					renderer.render( scene, camera );
-
-				}
+				effect.render( scene, camera );
 
 			}
 

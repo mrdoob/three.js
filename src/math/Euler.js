@@ -1,7 +1,7 @@
-import { Quaternion } from './Quaternion';
-import { Vector3 } from './Vector3';
-import { Matrix4 } from './Matrix4';
-import { _Math } from './Math';
+import { Quaternion } from './Quaternion.js';
+import { Vector3 } from './Vector3.js';
+import { Matrix4 } from './Matrix4.js';
+import { _Math } from './Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -22,63 +22,81 @@ Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 Euler.DefaultOrder = 'XYZ';
 
-Euler.prototype = {
+Object.defineProperties( Euler.prototype, {
 
-	constructor: Euler,
+	x: {
+
+		get: function () {
+
+			return this._x;
+
+		},
+
+		set: function ( value ) {
+
+			this._x = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	y: {
+
+		get: function () {
+
+			return this._y;
+
+		},
+
+		set: function ( value ) {
+
+			this._y = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	z: {
+
+		get: function () {
+
+			return this._z;
+
+		},
+
+		set: function ( value ) {
+
+			this._z = value;
+			this.onChangeCallback();
+
+		}
+
+	},
+
+	order: {
+
+		get: function () {
+
+			return this._order;
+
+		},
+
+		set: function ( value ) {
+
+			this._order = value;
+			this.onChangeCallback();
+
+		}
+
+	}
+
+} );
+
+Object.assign( Euler.prototype, {
 
 	isEuler: true,
-
-	get x () {
-
-		return this._x;
-
-	},
-
-	set x ( value ) {
-
-		this._x = value;
-		this.onChangeCallback();
-
-	},
-
-	get y () {
-
-		return this._y;
-
-	},
-
-	set y ( value ) {
-
-		this._y = value;
-		this.onChangeCallback();
-
-	},
-
-	get z () {
-
-		return this._z;
-
-	},
-
-	set z ( value ) {
-
-		this._z = value;
-		this.onChangeCallback();
-
-	},
-
-	get order () {
-
-		return this._order;
-
-	},
-
-	set order ( value ) {
-
-		this._order = value;
-		this.onChangeCallback();
-
-	},
 
 	set: function ( x, y, z, order ) {
 
@@ -237,11 +255,9 @@ Euler.prototype = {
 
 	setFromQuaternion: function () {
 
-		var matrix;
+		var matrix = new Matrix4();
 
 		return function setFromQuaternion( q, order, update ) {
-
-			if ( matrix === undefined ) matrix = new Matrix4();
 
 			matrix.makeRotationFromQuaternion( q );
 
@@ -330,7 +346,7 @@ Euler.prototype = {
 
 	onChangeCallback: function () {}
 
-};
+} );
 
 
 export { Euler };

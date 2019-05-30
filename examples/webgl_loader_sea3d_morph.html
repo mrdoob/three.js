@@ -28,8 +28,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - asset by <a href="https://github.com/sunag/sea3d" style="color:#FFFFF" target="_blank">sea3d</a>
-			<div id="description">Flag is Vertex Animation / Teapot is Morpher</div>
+			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>
+			<br/>
+			<br/><div id="description">Flag is Vertex Animation / Teapot is Morpher</div>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -48,16 +49,22 @@
 		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
 		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls, teapot;
+			var camera, scene, renderer, composer, teapot;
 
 			var loader;
 
@@ -71,25 +78,26 @@
 
 			loader = new THREE.SEA3D( {
 
-				autoPlay : true, // Auto play animations
-				container : scene // Container to add models
+				autoPlay: true, // Auto play animations
+				scripts: false, // Disable embed scripts
+				container: scene // Container to add models
 
 			} );
 
-			loader.onComplete = function( e ) {
+			loader.onComplete = function () {
 
 				// Get the first camera from SEA3D Studio
 				// use loader.get... to get others objects
 
-				var cam = loader.cameras[0];
+				var cam = loader.cameras[ 0 ];
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				controls = new THREE.OrbitControls( camera );
+				new THREE.OrbitControls( camera, renderer.domElement );
 
 				// get mesh
 
-				teapot = loader.getMesh("Teapot01");
+				teapot = loader.getMesh( "Teapot01" );
 
 				// events
 
@@ -106,6 +114,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -116,7 +125,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x333333, 1 );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -142,7 +150,6 @@
 				composer.addPass( vignettePass );
 
 				composer.addPass( copyPass );
-				copyPass.renderToScreen = true;
 
 				// events
 
@@ -157,8 +164,8 @@
 
 				// change morph weight: 0 at 1
 				// names from modifier Morph of 3ds Max
-				teapot.setWeight("OldTeapot", mouseX / window.innerWidth);
-				teapot.setWeight("Sphere", mouseY / window.innerHeight);
+				teapot.setWeight( "OldTeapot", mouseX / window.innerWidth );
+				teapot.setWeight( "Sphere", mouseY / window.innerHeight );
 
 			}
 

@@ -1,12 +1,9 @@
-import { _Math } from '../math/Math';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
-
-	this.uuid = _Math.generateUUID();
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
@@ -16,31 +13,33 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 }
 
+Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
-InterleavedBufferAttribute.prototype = {
+	count: {
 
-	constructor: InterleavedBufferAttribute,
+		get: function () {
+
+			return this.data.count;
+
+		}
+
+	},
+
+	array: {
+
+		get: function () {
+
+			return this.data.array;
+
+		}
+
+	}
+
+} );
+
+Object.assign( InterleavedBufferAttribute.prototype, {
 
 	isInterleavedBufferAttribute: true,
-
-	get length() {
-
-		console.warn( 'THREE.BufferAttribute: .length has been deprecated. Please use .count.' );
-		return this.array.length;
-
-	},
-
-	get count() {
-
-		return this.data.count;
-
-	},
-
-	get array() {
-
-		return this.data.array;
-
-	},
 
 	setX: function ( index, x ) {
 
@@ -134,7 +133,7 @@ InterleavedBufferAttribute.prototype = {
 
 	}
 
-};
+} );
 
 
 export { InterleavedBufferAttribute };

@@ -4,12 +4,14 @@
 
 Menubar.Edit = function ( editor ) {
 
+	var strings = editor.strings;
+
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
-	title.setTextContent( 'Edit' );
+	title.setTextContent( strings.getKey( 'menubar/edit' ) );
 	container.add( title );
 
 	var options = new UI.Panel();
@@ -20,7 +22,7 @@ Menubar.Edit = function ( editor ) {
 
 	var undo = new UI.Row();
 	undo.setClass( 'option' );
-	undo.setTextContent( 'Undo (Ctrl+Z)' );
+	undo.setTextContent( strings.getKey( 'menubar/edit/undo' ) );
 	undo.onClick( function () {
 
 		editor.undo();
@@ -32,7 +34,7 @@ Menubar.Edit = function ( editor ) {
 
 	var redo = new UI.Row();
 	redo.setClass( 'option' );
-	redo.setTextContent( 'Redo (Ctrl+Shift+Z)' );
+	redo.setTextContent( strings.getKey( 'menubar/edit/redo' ) );
 	redo.onClick( function () {
 
 		editor.redo();
@@ -44,7 +46,7 @@ Menubar.Edit = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Clear History' );
+	option.setTextContent( strings.getKey( 'menubar/edit/clear_history' ) );
 	option.onClick( function () {
 
 		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
@@ -86,7 +88,7 @@ Menubar.Edit = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Clone' );
+	option.setTextContent( strings.getKey( 'menubar/edit/clone' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
@@ -104,12 +106,10 @@ Menubar.Edit = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Delete (Del)' );
+	option.setTextContent( strings.getKey( 'menubar/edit/delete' ) );
 	option.onClick( function () {
 
 		var object = editor.selected;
-
-		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		var parent = object.parent;
 		if ( parent === undefined ) return; // avoid deleting the camera or scene
@@ -123,7 +123,7 @@ Menubar.Edit = function ( editor ) {
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
-	option.setTextContent( 'Minify Shaders' );
+	option.setTextContent( strings.getKey( 'menubar/edit/minify_shaders' ) );
 	option.onClick( function() {
 
 		var root = editor.selected || editor.scene;
@@ -151,7 +151,7 @@ Menubar.Edit = function ( editor ) {
 
 			var material = object.material;
 
-			if ( material instanceof THREE.ShaderMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				try {
 
@@ -199,6 +199,68 @@ Menubar.Edit = function ( editor ) {
 	} );
 	options.add( option );
 
+	options.add( new UI.HorizontalRule() );
+
+	// Set textures to sRGB. See #15903
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
+	option.onClick( function () {
+
+		editor.scene.traverse( fixColorMap );
+
+	} );
+	options.add( option );
+
+	var colorMaps = [ 'map', 'envMap', 'emissiveMap' ];
+
+	function fixColorMap( obj ) {
+
+		var material = obj.material;
+
+		if ( material !== undefined ) {
+
+			if ( Array.isArray( material ) === true ) {
+
+				for ( var i = 0; i < material.length; i ++ ) {
+
+					fixMaterial( material[ i ] );
+
+				}
+
+			} else {
+
+				fixMaterial( material );
+
+			}
+
+			editor.signals.sceneGraphChanged.dispatch();
+
+		}
+
+	}
+
+	function fixMaterial( material ) {
+
+		var needsUpdate = material.needsUpdate;
+
+		for ( var i = 0; i < colorMaps.length; i ++ ) {
+
+			var map = material[ colorMaps[ i ] ];
+
+			if ( map ) {
+
+				map.encoding = THREE.sRGBEncoding;
+				needsUpdate = true;
+
+			}
+
+		}
+
+		material.needsUpdate = needsUpdate;
+
+	}
 
 	return container;
 

@@ -1,5 +1,5 @@
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -22,10 +22,11 @@ function LOD() {
 
 }
 
-
 LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: LOD,
+
+	isLOD: true,
 
 	copy: function ( source ) {
 
@@ -66,6 +67,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		levels.splice( l, 0, { distance: distance, object: object } );
 
 		this.add( object );
+
+		return this;
 
 	},
 

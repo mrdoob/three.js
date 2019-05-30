@@ -37,7 +37,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - texture manual mipmapping example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - texture manual mipmapping example
 			- painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
 		</div>
 
@@ -63,12 +63,16 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -95,10 +99,12 @@
 				camera.position.z = 1500;
 
 				scene1 = new THREE.Scene();
+				scene1.background = new THREE.Color( 0x000000 );
 				scene1.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				scene2 = new THREE.Scene();
-				scene2.fog = scene1.fog;
+				scene2.background = new THREE.Color( 0x000000 );
+				scene2.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				// GROUND
 
@@ -125,10 +131,10 @@
 				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
 				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );
 				textureCanvas1.mipmaps[ 3 ] = mipmap( 16, '#400' );
-				textureCanvas1.mipmaps[ 4 ] = mipmap( 8,  '#040' );
-				textureCanvas1.mipmaps[ 5 ] = mipmap( 4,  '#004' );
-				textureCanvas1.mipmaps[ 6 ] = mipmap( 2,  '#044' );
-				textureCanvas1.mipmaps[ 7 ] = mipmap( 1,  '#404' );
+				textureCanvas1.mipmaps[ 4 ] = mipmap( 8, '#040' );
+				textureCanvas1.mipmaps[ 5 ] = mipmap( 4, '#004' );
+				textureCanvas1.mipmaps[ 6 ] = mipmap( 2, '#044' );
+				textureCanvas1.mipmaps[ 7 ] = mipmap( 1, '#404' );
 				textureCanvas1.repeat.set( 1000, 1000 );
 				textureCanvas1.wrapS = THREE.RepeatWrapping;
 				textureCanvas1.wrapT = THREE.RepeatWrapping;
@@ -137,17 +143,17 @@
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestMipMapNearestFilter;
 
-				materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
-				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
+				var materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
+				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var meshCanvas1 = new THREE.Mesh( geometry, materialCanvas1 );
-				meshCanvas1.rotation.x = -Math.PI / 2;
-				meshCanvas1.scale.set(1000, 1000, 1000);
+				meshCanvas1.rotation.x = - Math.PI / 2;
+				meshCanvas1.scale.set( 1000, 1000, 1000 );
 
 				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
-				meshCanvas2.rotation.x = -Math.PI / 2;
+				meshCanvas2.rotation.x = - Math.PI / 2;
 				meshCanvas2.scale.set( 1000, 1000, 1000 );
 
 
@@ -177,21 +183,21 @@
 
 						zscene.add( zmesh );
 
-						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } ) );
+						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+						meshFrame.position.z = - 10.0;
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
-
 						zscene.add( meshFrame );
 
 						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
-						meshShadow.position.y = -1.1 * image.height / 2;
-						meshShadow.position.z = -1.1 * image.height / 2;
-						meshShadow.rotation.x = -Math.PI / 2;
+						meshShadow.position.y = - 1.1 * image.height / 2;
+						meshShadow.position.z = - 1.1 * image.height / 2;
+						meshShadow.rotation.x = - Math.PI / 2;
 						meshShadow.scale.x = 1.1 * image.width / 100;
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshShadow );
 
-						var floorHeight = -1.117 * image.height / 2;
+						var floorHeight = - 1.117 * image.height / 2;
 						meshCanvas1.position.y = meshCanvas2.position.y = floorHeight;
 
 					}
@@ -209,7 +215,6 @@
 				texturePainting1.mapping = THREE.UVMapping;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene1.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
@@ -246,7 +251,7 @@
 			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( -( mouseY - 200 ) - camera.position.y ) * .05;
+				camera.position.y += ( - ( mouseY - 200 ) - camera.position.y ) * .05;
 
 				camera.lookAt( scene1.position );
 

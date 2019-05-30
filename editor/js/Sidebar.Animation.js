@@ -5,110 +5,80 @@
 Sidebar.Animation = function ( editor ) {
 
 	var signals = editor.signals;
+	var mixer = editor.mixer;
 
-	var options = {};
-	var possibleAnimations = {};
-
-	var container = new UI.CollapsiblePanel();
-	container.setCollapsed( editor.config.getKey( 'ui/sidebar/animation/collapsed' ) );
-	container.onCollapsedChange( function ( boolean ) {
-
-		editor.config.setKey( 'ui/sidebar/animation/collapsed', boolean );
-
-	} );
-	container.setDisplay( 'none' );
-
-	container.addStatic( new UI.Text( 'Animation' ).setTextTransform( 'uppercase' ) );
-	container.add( new UI.Break() );
-
-	var animationsRow = new UI.Row();
-	container.add( animationsRow );
-
-	/*
-
-	var animations = {};
-
-	signals.objectAdded.add( function ( object ) {
-
-		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.SkinnedMesh ) {
-
-				var material = child.material;
-
-				if ( material instanceof THREE.MultiMaterial ) {
-
-					for ( var i = 0; i < material.materials.length; i ++ ) {
-
-						material.materials[ i ].skinning = true;
-
-					}
-
-				} else {
-
-					child.material.skinning = true;
-
-				}
-
-				animations[ child.id ] = new THREE.Animation( child, child.geometry.animation );
-
-			} else if ( child instanceof THREE.MorphAnimMesh ) {
-
-				var animation = new THREE.MorphAnimation( child );
-				animation.duration = 30;
-
-				// temporal hack for THREE.AnimationHandler
-				animation._play = animation.play;
-				animation.play = function () {
-					this._play();
-					THREE.AnimationHandler.play( this );
-				};
-				animation.resetBlendWeights = function () {};
-				animation.stop = function () {
-					this.pause();
-					THREE.AnimationHandler.stop( this );
-				};
-
-				animations[ child.id ] = animation;
-
-			}
-
-		} );
-
-	} );
+	var actions = {};
 
 	signals.objectSelected.add( function ( object ) {
 
-		container.setDisplay( 'none' );
+		var animations = editor.animations[ object !== null ? object.uuid : '' ];
 
-		if ( object instanceof THREE.SkinnedMesh || object instanceof THREE.MorphAnimMesh ) {
+		if ( animations !== undefined ) {
 
-			animationsRow.clear();
+			container.setDisplay( '' );
 
-			var animation = animations[ object.id ];
+			var options = {};
+			var firstAnimation;
 
-			var playButton = new UI.Button( 'Play' ).onClick( function () {
+			for ( var animation of animations ) {
 
-				animation.play();
+				if ( firstAnimation === undefined ) firstAnimation = animation.name;
 
-			} );
-			animationsRow.add( playButton );
+				actions[ animation.name ] = mixer.clipAction( animation, object );
+				options[ animation.name ] = animation.name;
 
-			var pauseButton = new UI.Button( 'Stop' ).onClick( function () {
+			}
 
-				animation.stop();
+			animationsSelect.setOptions( options );
+			animationsSelect.setValue( firstAnimation );
 
-			} );
-			animationsRow.add( pauseButton );
+		} else {
 
-			container.setDisplay( 'block' );
+			container.setDisplay( 'none' );
 
 		}
 
 	} );
 
-	*/
+	signals.objectRemoved.add( function ( object ) {
+
+		var animations = editor.animations[ object !== null ? object.uuid : '' ];
+
+		if ( animations !== undefined ) {
+
+			mixer.uncacheRoot( object );
+
+		}
+
+	} );
+
+	function playAction() {
+
+		actions[ animationsSelect.getValue() ].play();
+
+	}
+
+	function stopAction() {
+
+		actions[ animationsSelect.getValue() ].stop();
+
+	}
+
+	var container = new UI.Panel();
+	container.setDisplay( 'none' );
+
+	container.add( new UI.Text( 'Animations' ).setTextTransform( 'uppercase' ) );
+	container.add( new UI.Break() );
+	container.add( new UI.Break() );
+
+	var div = new UI.Div();
+	container.add( div );
+
+	var animationsSelect = new UI.Select().setFontSize( '12px' );
+	div.add( animationsSelect );
+	div.add( new UI.Button( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
+	div.add( new UI.Button( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
 
 	return container;
 
-}
+};

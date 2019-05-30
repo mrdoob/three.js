@@ -2,15 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Vector3 } from '../math/Vector3';
-import { Audio } from './Audio';
-import { Object3D } from '../core/Object3D';
+import { Vector3 } from '../math/Vector3.js';
+import { Quaternion } from '../math/Quaternion.js';
+import { Audio } from './Audio.js';
+import { Object3D } from '../core/Object3D.js';
 
 function PositionalAudio( listener ) {
 
 	Audio.call( this, listener );
 
 	this.panner = this.context.createPanner();
+	this.panner.panningModel = 'HRTF';
 	this.panner.connect( this.gain );
 
 }
@@ -35,6 +37,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.refDistance = value;
 
+		return this;
+
 	},
 
 	getRolloffFactor: function () {
@@ -46,6 +50,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	setRolloffFactor: function ( value ) {
 
 		this.panner.rolloffFactor = value;
+
+		return this;
 
 	},
 
@@ -59,6 +65,8 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.distanceModel = value;
 
+		return this;
+
 	},
 
 	getMaxDistance: function () {
@@ -71,19 +79,59 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		this.panner.maxDistance = value;
 
+		return this;
+
+	},
+
+	setDirectionalCone: function ( coneInnerAngle, coneOuterAngle, coneOuterGain ) {
+
+		this.panner.coneInnerAngle = coneInnerAngle;
+		this.panner.coneOuterAngle = coneOuterAngle;
+		this.panner.coneOuterGain = coneOuterGain;
+
+		return this;
+
 	},
 
 	updateMatrixWorld: ( function () {
 
 		var position = new Vector3();
+		var quaternion = new Quaternion();
+		var scale = new Vector3();
+
+		var orientation = new Vector3();
 
 		return function updateMatrixWorld( force ) {
 
 			Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			position.setFromMatrixPosition( this.matrixWorld );
+			if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
-			this.panner.setPosition( position.x, position.y, position.z );
+			this.matrixWorld.decompose( position, quaternion, scale );
+
+			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+
+			var panner = this.panner;
+
+			if ( panner.positionX ) {
+
+				// code path for Chrome and Firefox (see #14393)
+
+				var endTime = this.context.currentTime + this.listener.timeDelta;
+
+				panner.positionX.linearRampToValueAtTime( position.x, endTime );
+				panner.positionY.linearRampToValueAtTime( position.y, endTime );
+				panner.positionZ.linearRampToValueAtTime( position.z, endTime );
+				panner.orientationX.linearRampToValueAtTime( orientation.x, endTime );
+				panner.orientationY.linearRampToValueAtTime( orientation.y, endTime );
+				panner.orientationZ.linearRampToValueAtTime( orientation.z, endTime );
+
+			} else {
+
+				panner.setPosition( position.x, position.y, position.z );
+				panner.setOrientation( orientation.x, orientation.y, orientation.z );
+
+			}
 
 		};
 

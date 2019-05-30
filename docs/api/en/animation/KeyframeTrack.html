@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A KeyframeTrack is a timed sequence of [link:https://en.wikipedia.org/wiki/Key_frame keyframes],
+			which are composed of lists of times and related values, and which are used to animate a
+			specific property of an object.
+		</p>
+
+		<p>
+			For an overview of the different elements of the three.js animation system see the
+			"Animation System" article in the "Next Steps" section of the manual.
+		</p>
+
+		<p>
+			In contrast to the animation hierarchy of the
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] a
+			*KeyframeTrack* doesn't store its single keyframes as objects in a "keys" array (holding the
+			times and the values for each frame together in one place).
+		</p>
+
+		<p>
+			Instead of this there are always two arrays in a *KeyframeTrack*: the [page:.times times] array
+			stores the time values for all keyframes of this track in sequential order, and the
+			[page:.values values] array contains the corresponding changing values of the animated property.
+		</p>
+
+		<p>
+			A single value, belonging to a certain point of time, can not only be a simple number, but (for
+			example) a vector (if a position is animated) or a quaternion (if a rotation is animated). For
+			this reason the values array (which is a flat array, too) might be three or four times as long as the
+			times array.
+		</p>
+
+		<p>
+			Corresponding to the different possible types of animated values there are several subclasses of
+			*KeyframeTrack*, inheriting the most properties and methods:
+		</p>
+
+		<ul>
+			<li>[page:BooleanKeyframeTrack]</li>
+			<li>[page:ColorKeyframeTrack]</li>
+			<li>[page:NumberKeyframeTrack]</li>
+			<li>[page:QuaternionKeyframeTrack]</li>
+			<li>[page:StringKeyframeTrack]</li>
+			<li>[page:VectorKeyframeTrack]</li>
+		</ul>
+
+		<p>
+			Some examples of how to manually create [page:AnimationClip AnimationClips] with different sorts
+			of KeyframeTracks can be found in the [link:https://threejs.org/examples/js/animation/AnimationClipCreator.js AnimationClipCreator]
+			file.
+		</p>
+
+		<p>
+			Since explicit values are only specified for the discrete points of time stored in the times array,
+			all values in between have to be interpolated.
+		</p>
+
+		<p>
+			The track's name is important for the connection of this track with a specific property of the
+			animated node (done by [page:PropertyBinding]).
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
+		<p>
+			[page:String name] - the identifier for the *KeyframeTrack*.<br />
+			[page:Array times] - an array of keyframe times, converted internally to a
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
+			[page:Array values] - an array with the values related to the times array, converted internally to a
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
+			[page:Constant interpolation] - the type of interpolation to use. See
+			[page:Animation Animation Constants] for possible values. Default is [page:Animation InterpolateLinear].
+		</p>
+
+
+		<h2>Properties</h2>
+
+
+		<h3>[property:String name]</h3>
+		<p>
+			The track's name can refer to [page:Geometry.morphTargets morph targets] or
+			[page:SkinnedMesh bones] or possibly other values within an animated object. See
+			[page:PropertyBinding.parseTrackName] for the forms of strings that can be parsed for property
+			binding:
+		</p>
+
+		<p>
+			The name can specify the node either using its name or its uuid (although it needs to be in the
+			subtree of the scene graph node passed into the mixer). Or, if the track name starts with a dot,
+			the track applies to the root node that was passed into the mixer.
+		</p>
+
+		<p>
+			Usually after the node a property will be specified directly. But you can also specify a
+			subproperty, such as .rotation[x], if you just want to drive the X component of the rotation
+			via a float track.
+		</p>
+
+		<p>
+			You can also specify bones or multimaterials by using an object name, for example:
+			.bones[R_hand].scale; the red channel of the diffuse color of the fourth material in a
+			materials array - as a further example - can be accessed with .materials[3].diffuse[r].
+		</p>
+
+		<p>
+			PropertyBinding will also resolve morph target names, for example: .morphTargetInfluences[run].
+		</p>
+
+		<p>
+			Note: The track's name does not necessarily have to be unique. Multiple tracks can drive the same
+			property. The result should be based on a weighted blend between the multiple tracks according to
+			the weights of their respective actions.
+		</p>
+
+		<h3>[property:Float32Array times]</h3>
+		<p>
+			A [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			converted from the times array which is passed in the constructor.
+		</p>
+
+		<h3>[property:Float32Array values]</h3>
+		<p>
+			A [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			converted from the values array which is passed in the constructor.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			The default interpolation type: [page:Animation InterpolateLinear].
+		</p>
+
+		<h3>[property:Constant TimeBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			the type of the buffer internally used for the times.
+		</p>
+
+		<h3>[property:Constant ValueBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			the type of the buffer internally used for the values.
+		</p>
+
+
+		<h2>Methods</h2>
+
+
+		<h3>[method:KeyframeTrack clone]()</h3>
+		<p>
+			Returns a copy of this track.
+		</p>
+
+		<h3>[method:null createInterpolant]()</h3>
+		<p>
+			Creates a [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
+			or [page:DiscreteInterpolant DiscreteInterpolant], depending on the value of the interpolation
+			parameter passed in the constructor.
+		</p>
+
+		<h3>[method:null getInterpolation]()</h3>
+		<p>
+			Returns the interpolation type.
+		</p>
+
+		<h3>[method:Number getValueSize]()</h3>
+		<p>
+			Returns the size of each value (that is the length of the [page:.values values] array divided
+			by the length of the [page:.times times] array).
+		</p>
+
+		<h3>[method:DiscreteInterpolant InterpolantFactoryMethodDiscrete]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			Creates a new [page:DiscreteInterpolant DiscreteInterpolant] from the
+			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
+			passed which will receive the results. Otherwise a new array with the appropriate size will be
+			created automatically.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			Creates a new [page:LinearInterpolant LinearInterpolant] from the
+			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
+			passed which will receive the results. Otherwise a new array with the appropriate size will be
+			created automatically.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			Create a new [page:CubicInterpolant CubicInterpolant] from the
+			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
+			passed which will receive the results. Otherwise a new array with the appropriate size will be
+			created automatically.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			Removes equivalent sequential keys, which are common in morph target sequences.
+		</p>
+
+		<h3>[method:this scale]()</h3>
+		<p>
+			Scales all keyframe times by a factor.<br /><br />
+
+			Note: This is useful, for example, for conversions to a certain rate of frames per seconds (as it
+			is done internally by
+			[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
+		</p>
+
+		<h3>[method:this setInterpolation]( [param:Constant interpolationType] )</h3>
+		<p>
+			Sets the interpolation type. See [page:Animation Animation Constants] for choices.
+		</p>
+
+		<h3>[method:this shift]( [param:Number timeOffsetInSeconds] )</h3>
+		<p>
+			Moves all keyframes either forward or backward in time.
+		</p>
+
+
+		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
+		<p>
+			Removes keyframes before *startTime* and after *endTime*,
+			without changing any values within the range [*startTime*, *endTime*].
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			Performs minimal validation on the tracks. Returns true if valid.
+		</p>
+
+		<p>
+			This method logs errors to the console, if a track is empty, if the [page:.valueSize value size] is not valid, if an item
+			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the *times* array are out of order.
+		</p>
+
+		<h2>Static Methods</h2>
+
+		<h3>[method:KeyframeTrack parse]( [param:JSON json] )</h3>
+		<p>
+		Parses a JSON object and returns a new keyframe track of the correct type.
+		</p>
+
+		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
+		<p>
+		Converts the track to JSON.
+		</p>
+
+
+		<h2>Source</h2>
+
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

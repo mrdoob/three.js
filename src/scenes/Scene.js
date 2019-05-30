@@ -1,10 +1,10 @@
-import { Object3D } from '../core/Object3D';
+import { Object3D } from '../core/Object3D.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-function Scene () {
+function Scene() {
 
 	Object3D.call( this );
 
@@ -16,36 +16,54 @@ function Scene () {
 
 	this.autoUpdate = true; // checked by the renderer
 
+	/*
+	if ( typeof __THREE_DEVTOOLS__ !== undefined ) {
+		__THREE_DEVTOOLS__.dispatchEvent( { type: 'scene', value: this } );
+	}
+	*/
+
 }
 
-Scene.prototype = Object.create( Object3D.prototype );
+Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
-Scene.prototype.constructor = Scene;
+	constructor: Scene,
 
-Scene.prototype.copy = function ( source, recursive ) {
+	isScene: true,
 
-	Object3D.prototype.copy.call( this, source, recursive );
+	copy: function ( source, recursive ) {
 
-	if ( source.background !== null ) this.background = source.background.clone();
-	if ( source.fog !== null ) this.fog = source.fog.clone();
-	if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
+		Object3D.prototype.copy.call( this, source, recursive );
 
-	this.autoUpdate = source.autoUpdate;
-	this.matrixAutoUpdate = source.matrixAutoUpdate;
+		if ( source.background !== null ) this.background = source.background.clone();
+		if ( source.fog !== null ) this.fog = source.fog.clone();
+		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-	return this;
+		this.autoUpdate = source.autoUpdate;
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
-};
+		return this;
 
-Scene.prototype.toJSON = function ( meta ) {
+	},
 
-	var data = Object3D.prototype.toJSON.call( this, meta );
+	toJSON: function ( meta ) {
 
-	if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
-	if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+		var data = Object3D.prototype.toJSON.call( this, meta );
 
-	return data;
+		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
-};
+		return data;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+} );
+
+
 
 export { Scene };

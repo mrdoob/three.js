@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - glTF 2.0 - extensions</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #222222;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #808080;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+
+			#container {
+				position: absolute;
+				top: 0px;
+				width:100%;
+				height:100%;
+				z-index: -1;
+			}
+
+			#info a, .button {
+				color: #f00;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader<br />
+			<div id="description"></div>
+		</div>
+
+		<div id="container"></div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/loaders/DRACOLoader.js"></script>
+		<script src="js/loaders/DDSLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
+
+		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
+		<script src="js/loaders/RGBELoader.js"></script>
+
+		<script src="js/pmrem/PMREMGenerator.js"></script>
+		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+
+		<script>
+			var orbitControls;
+			var container, camera, scene, renderer, loader;
+			var gltf, background, envMap, mixer, gui, extensionControls;
+
+			var clock = new THREE.Clock();
+
+			var scenes = {
+				Boombox: {
+					name: 'BoomBox (PBR)',
+					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
+					author: 'Microsoft',
+					authorURL: 'https://www.microsoft.com/',
+					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
+					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
+					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
+					addEnvMap: true
+				},
+				'Bot Skinned': {
+					name: 'Bot Skinned',
+					url: './models/gltf/BotSkinned/%s/Bot_Skinned.gltf',
+					author: 'MozillaVR',
+					authorURL: 'https://vr.mozilla.org/',
+					cameraPos: new THREE.Vector3( 0.5, 2, 2 ),
+					center: new THREE.Vector3( 0, 1.2, 0 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF-MaterialsUnlit' ]
+				},
+				MetalRoughSpheres: {
+					name: 'MetalRoughSpheres (PBR)',
+					url: './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
+					author: '@emackey',
+					authorURL: 'https://twitter.com/emackey',
+					cameraPos: new THREE.Vector3( 2, 1, 15 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
+					extensions: [ 'glTF', 'glTF-Embedded' ],
+					addEnvMap: true
+				},
+				Duck: {
+					name: 'Duck',
+					url: './models/gltf/Duck/%s/Duck.gltf',
+					author: 'Sony',
+					authorURL: 'https://www.playstation.com/en-us/corporate/about/',
+					cameraPos: new THREE.Vector3( 0, 3, 5 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco' ]
+				},
+				Monster: {
+					name: 'Monster',
+					url: './models/gltf/Monster/%s/Monster.gltf',
+					author: '3drt.com',
+					authorURL: 'http://www.3drt.com/downloads.htm',
+					cameraPos: new THREE.Vector3( 3, 1, 7 ),
+					objectScale: new THREE.Vector3( 0.04, 0.04, 0.04 ),
+					objectPosition: new THREE.Vector3( 0.2, 0.1, 0 ),
+					objectRotation: new THREE.Euler( 0, - 3 * Math.PI / 4, 0 ),
+					animationTime: 3,
+					addLights: true,
+					shadows: true,
+					addGround: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco', 'glTF-lights' ]
+				},
+				'Cesium Man': {
+					name: 'Cesium Man',
+					url: './models/gltf/CesiumMan/%s/CesiumMan.gltf',
+					author: 'Cesium',
+					authorURL: 'https://cesiumjs.org/',
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco' ]
+				},
+				'Cesium Milk Truck': {
+					name: 'Cesium Milk Truck',
+					url: './models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf',
+					author: 'Cesium',
+					authorURL: 'https://cesiumjs.org/',
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
+					addLights: true,
+					addGround: true,
+					shadows: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco' ]
+				},
+				'Outlined Box': {
+					name: 'Outlined Box',
+					url: './models/gltf/OutlinedBox/OutlinedBox.gltf',
+					author: '@twittmann',
+					authorURL: 'https://github.com/twittmann',
+					cameraPos: new THREE.Vector3( 0, 5, 15 ),
+					objectScale: new THREE.Vector3( 0.01, 0.01, 0.01 ),
+					objectRotation: new THREE.Euler( 0, 90, 0 ),
+					addLights: true,
+					shadows: true,
+					extensions: [ 'glTF' ]
+				},
+			};
+
+			var state = {
+				scene: Object.keys( scenes )[ 0 ],
+				extension: scenes[ Object.keys( scenes )[ 0 ] ].extensions[ 0 ],
+				playAnimation: true
+			};
+
+			function onload() {
+
+				container = document.getElementById( 'container' );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaOutput = true;
+				renderer.physicallyCorrectLights = true;
+				container.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// Load background and generate envMap
+
+				var loader = new THREE.RGBELoader().setPath( 'textures/equirectangular/' );
+				loader.load( 'venice_sunset_2k.hdr', function ( texture ) {
+
+					texture.encoding = THREE.RGBEEncoding;
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
+					texture.flipY = true;
+
+					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
+					cubeGenerator.update( renderer );
+
+					background = cubeGenerator.renderTarget;
+
+					var pmremGenerator = new THREE.PMREMGenerator( cubeGenerator.renderTarget.texture );
+					pmremGenerator.update( renderer );
+
+					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+
+					envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+
+					//
+
+					buildGUI();
+					initScene( scenes[ state.scene ] );
+					animate();
+
+				} );
+
+			}
+
+			function initScene( sceneInfo ) {
+
+				var descriptionEl = document.getElementById( 'description' );
+
+				if ( sceneInfo.author && sceneInfo.authorURL ) {
+
+					descriptionEl.innerHTML = sceneInfo.name + ' by <a href="' + sceneInfo.authorURL + '" target="_blank" rel="noopener">' + sceneInfo.author + '</a>';
+
+				}
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				scene.add( camera );
+
+				var spot1;
+
+				if ( sceneInfo.addLights ) {
+
+					var ambient = new THREE.AmbientLight( 0x222222 );
+					scene.add( ambient );
+
+					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
+					directionalLight.position.set( 0, 0, 1 ).normalize();
+					scene.add( directionalLight );
+
+					spot1 = new THREE.SpotLight( 0xffffff, 1 );
+					spot1.position.set( 5, 10, 5 );
+					spot1.angle = 0.50;
+					spot1.penumbra = 0.75;
+					spot1.intensity = 100;
+					spot1.decay = 2;
+
+					if ( sceneInfo.shadows ) {
+
+						spot1.castShadow = true;
+						spot1.shadow.bias = 0.0001;
+						spot1.shadow.mapSize.width = 2048;
+						spot1.shadow.mapSize.height = 2048;
+
+					}
+
+					scene.add( spot1 );
+
+				}
+
+				if ( sceneInfo.shadows ) {
+
+					renderer.shadowMap.enabled = true;
+					renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+				}
+
+				// TODO: Reuse existing OrbitControls, GLTFLoaders, and so on
+
+				orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				if ( sceneInfo.addGround ) {
+
+					var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
+					var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 512, 512 ), groundMaterial );
+					ground.receiveShadow = !! sceneInfo.shadows;
+
+					if ( sceneInfo.groundPos ) {
+
+						ground.position.copy( sceneInfo.groundPos );
+
+					} else {
+
+						ground.position.z = - 70;
+
+					}
+
+					ground.rotation.x = - Math.PI / 2;
+
+					scene.add( ground );
+
+				}
+
+				loader = new THREE.GLTFLoader();
+
+				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				loader.setDRACOLoader( new THREE.DRACOLoader() );
+
+				var url = sceneInfo.url.replace( /%s/g, state.extension );
+
+				if ( state.extension === 'glTF-Binary' ) {
+
+					url = url.replace( '.gltf', '.glb' );
+
+				}
+
+				var loadStartTime = performance.now();
+
+				loader.load( url, function ( data ) {
+
+					gltf = data;
+
+					var object = gltf.scene;
+
+					console.info( 'Load time: ' + ( performance.now() - loadStartTime ).toFixed( 2 ) + ' ms.' );
+
+					if ( sceneInfo.cameraPos ) {
+
+						camera.position.copy( sceneInfo.cameraPos );
+
+					}
+
+					if ( sceneInfo.center ) {
+
+						orbitControls.target.copy( sceneInfo.center );
+
+					}
+
+					if ( sceneInfo.objectPosition ) {
+
+						object.position.copy( sceneInfo.objectPosition );
+
+						if ( spot1 ) {
+
+							spot1.target.position.copy( sceneInfo.objectPosition );
+
+						}
+
+					}
+
+					if ( sceneInfo.objectRotation ) {
+
+						object.rotation.copy( sceneInfo.objectRotation );
+
+					}
+
+					if ( sceneInfo.objectScale ) {
+
+						object.scale.copy( sceneInfo.objectScale );
+
+					}
+
+					if ( sceneInfo.addEnvMap ) {
+
+						object.traverse( function ( node ) {
+
+							if ( node.material && ( node.material.isMeshStandardMaterial ||
+								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
+
+								node.material.envMap = envMap;
+								node.material.envMapIntensity = 1.5; // boombox seems too dark otherwise
+
+							}
+
+						} );
+
+						scene.background = background;
+
+					}
+
+					object.traverse( function ( node ) {
+
+						if ( node.isMesh || node.isLight ) node.castShadow = true;
+
+					} );
+
+					var animations = gltf.animations;
+
+					if ( animations && animations.length ) {
+
+						mixer = new THREE.AnimationMixer( object );
+
+						for ( var i = 0; i < animations.length; i ++ ) {
+
+							var animation = animations[ i ];
+
+							// There's .3333 seconds junk at the tail of the Monster animation that
+							// keeps it from looping cleanly. Clip it at 3 seconds
+							if ( sceneInfo.animationTime ) {
+
+								animation.duration = sceneInfo.animationTime;
+
+							}
+
+							var action = mixer.clipAction( animation );
+
+							if ( state.playAnimation ) action.play();
+
+						}
+
+					}
+
+					scene.add( object );
+					onWindowResize();
+
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( mixer ) mixer.update( clock.getDelta() );
+
+				orbitControls.update();
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			function buildGUI() {
+
+				gui = new dat.GUI( { width: 330 } );
+				gui.domElement.parentElement.style.zIndex = 101;
+
+				var sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );
+				sceneCtrl.onChange( reload );
+
+				var animCtrl = gui.add( state, 'playAnimation' );
+				animCtrl.onChange( toggleAnimations );
+
+				updateGUI();
+
+			}
+
+			function updateGUI() {
+
+				if ( extensionControls ) extensionControls.remove();
+
+				var sceneInfo = scenes[ state.scene ];
+
+				if ( sceneInfo.extensions.indexOf( state.extension ) === - 1 ) {
+
+					state.extension = sceneInfo.extensions[ 0 ];
+
+				}
+
+				extensionControls = gui.add( state, 'extension', sceneInfo.extensions );
+				extensionControls.onChange( reload );
+
+			}
+
+			function toggleAnimations() {
+
+				for ( var i = 0; i < gltf.animations.length; i ++ ) {
+
+					var clip = gltf.animations[ i ];
+					var action = mixer.existingAction( clip );
+
+					state.playAnimation ? action.play() : action.stop();
+
+				}
+
+			}
+
+			function reload() {
+
+				if ( loader && mixer ) mixer.stopAllAction();
+
+				updateGUI();
+				initScene( scenes[ state.scene ] );
+
+			}
+
+			onload();
+		</script>
+
+	</body>
+</html>

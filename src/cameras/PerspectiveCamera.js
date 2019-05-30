@@ -1,6 +1,6 @@
-import { Camera } from './Camera';
-import { Object3D } from '../core/Object3D';
-import { _Math } from '../math/Math';
+import { Camera } from './Camera.js';
+import { Object3D } from '../core/Object3D.js';
+import { _Math } from '../math/Math.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -38,9 +38,9 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	isPerspectiveCamera: true,
 
-	copy: function ( source ) {
+	copy: function ( source, recursive ) {
 
-		Camera.prototype.copy.call( this, source );
+		Camera.prototype.copy.call( this, source, recursive );
 
 		this.fov = source.fov;
 		this.zoom = source.zoom;
@@ -91,7 +91,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	getEffectiveFOV: function () {
 
 		return _Math.RAD2DEG * 2 * Math.atan(
-				Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+			Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 	},
 
@@ -130,17 +130,17 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	 *   var fullHeight = h * 2;
 	 *
 	 *   --A--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
 	 *   --B--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
 	 *   --C--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
 	 *   --D--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
 	 *   --E--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
 	 *   --F--
-	 *   camera.setOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+	 *   camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 	 *
 	 *   Note there is no reason monitors have to be the same size or in a grid.
 	 */
@@ -148,22 +148,40 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 		this.aspect = fullWidth / fullHeight;
 
-		this.view = {
-			fullWidth: fullWidth,
-			fullHeight: fullHeight,
-			offsetX: x,
-			offsetY: y,
-			width: width,
-			height: height
-		};
+		if ( this.view === null ) {
+
+			this.view = {
+				enabled: true,
+				fullWidth: 1,
+				fullHeight: 1,
+				offsetX: 0,
+				offsetY: 0,
+				width: 1,
+				height: 1
+			};
+
+		}
+
+		this.view.enabled = true;
+		this.view.fullWidth = fullWidth;
+		this.view.fullHeight = fullHeight;
+		this.view.offsetX = x;
+		this.view.offsetY = y;
+		this.view.width = width;
+		this.view.height = height;
 
 		this.updateProjectionMatrix();
 
 	},
 
-	clearViewOffset: function() {
+	clearViewOffset: function () {
 
-		this.view = null;
+		if ( this.view !== null ) {
+
+			this.view.enabled = false;
+
+		}
+
 		this.updateProjectionMatrix();
 
 	},
@@ -171,14 +189,13 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	updateProjectionMatrix: function () {
 
 		var near = this.near,
-			top = near * Math.tan(
-					_Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+			top = near * Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 			height = 2 * top,
 			width = this.aspect * height,
 			left = - 0.5 * width,
 			view = this.view;
 
-		if ( view !== null ) {
+		if ( this.view !== null && this.view.enabled ) {
 
 			var fullWidth = view.fullWidth,
 				fullHeight = view.fullHeight;
@@ -193,8 +210,9 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		var skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makeFrustum(
-				left, left + width, top - height, top, near, this.far );
+		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+
+		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
 
 	},
 

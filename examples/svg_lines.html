@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js svg - lines</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				position: absolute;
+				top: 10px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				z-index:100;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> svg - lines
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/renderers/Projector.js"></script>
+		<script src="js/renderers/SVGRenderer.js"></script>
+
+		<script>
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 10;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0, 0, 0 );
+
+				renderer = new THREE.SVGRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				var vertices = [];
+				var divisions = 50;
+
+				for ( var i = 0; i <= divisions; i ++ ) {
+
+					var v = ( i / divisions ) * ( Math.PI * 2 );
+
+					var x = Math.sin( v );
+					var z = Math.cos( v );
+
+					vertices.push( x, 0, z );
+
+				}
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+				//
+
+				for ( var i = 1; i <= 3; i ++ ) {
+
+					var material = new THREE.LineBasicMaterial( {
+						color: Math.random() * 0xffffff,
+						linewidth: 10
+					} );
+					var line = new THREE.Line( geometry, material );
+					line.scale.setScalar( i / 3 );
+					scene.add( line );
+
+				}
+
+				var material = new THREE.LineDashedMaterial( {
+					color: 'blue',
+					linewidth: 1,
+					dashSize: 10,
+					gapSize: 10
+				} );
+				var line = new THREE.Line( geometry, material );
+				line.scale.setScalar( 2 );
+				scene.add( line );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				var count = 0;
+				var time = performance.now() / 1000;
+
+				scene.traverse( function ( child ) {
+
+					child.rotation.x = count + ( time / 3 );
+					child.rotation.z = count + ( time / 4 );
+
+					count ++;
+
+				} );
+
+				renderer.render( scene, camera );
+				requestAnimationFrame( animate );
+
+			}
+
+		</script>
+	</body>
+</html>

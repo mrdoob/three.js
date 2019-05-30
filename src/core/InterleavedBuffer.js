@@ -1,4 +1,3 @@
-import { _Math } from '../math/Math';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -6,10 +5,9 @@ import { _Math } from '../math/Math';
 
 function InterleavedBuffer( array, stride ) {
 
-	this.uuid = _Math.generateUUID();
-
 	this.array = array;
 	this.stride = stride;
+	this.count = array !== undefined ? array.length / stride : 0;
 
 	this.dynamic = false;
 	this.updateRange = { offset: 0, count: - 1 };
@@ -18,27 +16,34 @@ function InterleavedBuffer( array, stride ) {
 
 }
 
-InterleavedBuffer.prototype = {
+Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 
-	constructor: InterleavedBuffer,
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
 
 	isInterleavedBuffer: true,
 
-	get length () {
+	onUploadCallback: function () {},
 
-		return this.array.length;
+	setArray: function ( array ) {
 
-	},
+		if ( Array.isArray( array ) ) {
 
-	get count () {
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
 
-		return this.array.length / this.stride;
+		}
 
-	},
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
 
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
+		return this;
 
 	},
 
@@ -53,6 +58,7 @@ InterleavedBuffer.prototype = {
 	copy: function ( source ) {
 
 		this.array = new source.array.constructor( source.array );
+		this.count = source.count;
 		this.stride = source.stride;
 		this.dynamic = source.dynamic;
 
@@ -89,9 +95,17 @@ InterleavedBuffer.prototype = {
 
 		return new this.constructor().copy( this );
 
+	},
+
+	onUpload: function ( callback ) {
+
+		this.onUploadCallback = callback;
+
+		return this;
+
 	}
 
-};
+} );
 
 
 export { InterleavedBuffer };

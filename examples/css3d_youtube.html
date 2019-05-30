@@ -11,7 +11,6 @@
 			}
 			#blocker {
 				position: absolute;
-				/* background-color: rgba(255, 0, 0, 0.5); */
 				top: 0px;
 				left: 0px;
 				width: 100%;
@@ -30,6 +29,7 @@
 		<script>
 
 			var camera, scene, renderer;
+			var controls;
 
 			var Element = function ( id, x, y, z, ry ) {
 
@@ -42,7 +42,7 @@
 				iframe.style.width = '480px';
 				iframe.style.height = '360px';
 				iframe.style.border = '0px';
-				iframe.src = [ 'http://www.youtube.com/embed/', id, '?rel=0' ].join( '' );
+				iframe.src = [ 'https://www.youtube.com/embed/', id, '?rel=0' ].join( '' );
 				div.appendChild( iframe );
 
 				var object = new THREE.CSS3DObject( div );
@@ -67,18 +67,16 @@
 
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.domElement.style.position = 'absolute';
-				renderer.domElement.style.top = 0;
 				container.appendChild( renderer.domElement );
 
 				var group = new THREE.Group();
-				group.add( new Element( 'njCDZWTI-xg', 0, 0, 240, 0 ) );
-				group.add( new Element( 'HDh4uK9PvJU', 240, 0, 0, Math.PI / 2 ) );
-				group.add( new Element( 'OX9I1KyNa8M', 0, 0, - 240, Math.PI ) );
-				group.add( new Element( 'nhORZ6Ep_jE', - 240, 0, 0, - Math.PI / 2 ) );
+				group.add( new Element( 'SJOz3qjfQXU', 0, 0, 240, 0 ) );
+				group.add( new Element( 'Y2-xZ-1HE-Q', 240, 0, 0, Math.PI / 2 ) );
+				group.add( new Element( 'IrydklNpcFI', 0, 0, - 240, Math.PI ) );
+				group.add( new Element( '9ubytEsCaS0', - 240, 0, 0, - Math.PI / 2 ) );
 				scene.add( group );
 
-				controls = new THREE.TrackballControls( camera );
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 4;
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -88,8 +86,16 @@
 				var blocker = document.getElementById( 'blocker' );
 				blocker.style.display = 'none';
 
-				document.addEventListener( 'mousedown', function () { blocker.style.display = ''; } );
-				document.addEventListener( 'mouseup', function () { blocker.style.display = 'none'; } );
+				document.addEventListener( 'mousedown', function () {
+
+					blocker.style.display = '';
+
+				} );
+				document.addEventListener( 'mouseup', function () {
+
+					blocker.style.display = 'none';
+
+				} );
 
 			}
 

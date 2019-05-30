@@ -2,8 +2,8 @@
  * @author tschw
  */
 
-import { Matrix3 } from '../../math/Matrix3';
-import { Plane } from '../../math/Plane';
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Plane } from '../../math/Plane.js';
 
 function WebGLClipping() {
 
@@ -21,8 +21,9 @@ function WebGLClipping() {
 
 	this.uniform = uniform;
 	this.numPlanes = 0;
+	this.numIntersection = 0;
 
-	this.init = function( planes, enableLocalClipping, camera ) {
+	this.init = function ( planes, enableLocalClipping, camera ) {
 
 		var enabled =
 			planes.length !== 0 ||
@@ -41,28 +42,28 @@ function WebGLClipping() {
 
 	};
 
-	this.beginShadows = function() {
+	this.beginShadows = function () {
 
 		renderingShadows = true;
 		projectPlanes( null );
 
 	};
 
-	this.endShadows = function() {
+	this.endShadows = function () {
 
 		renderingShadows = false;
 		resetGlobalState();
 
 	};
 
-	this.setState = function( planes, clipShadows, camera, cache, fromCache ) {
+	this.setState = function ( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
 
-		if ( ! localClippingEnabled ||
-				planes === null || planes.length === 0 ||
-				renderingShadows && ! clipShadows ) {
+		if ( ! localClippingEnabled || planes === null || planes.length === 0 || renderingShadows && ! clipShadows ) {
+
 			// there's no local clipping
 
 			if ( renderingShadows ) {
+
 				// there's no global clipping
 
 				projectPlanes( null );
@@ -70,6 +71,7 @@ function WebGLClipping() {
 			} else {
 
 				resetGlobalState();
+
 			}
 
 		} else {
@@ -90,6 +92,7 @@ function WebGLClipping() {
 			}
 
 			cache.clippingState = dstArray;
+			this.numIntersection = clipIntersection ? this.numPlanes : 0;
 			this.numPlanes += nGlobal;
 
 		}
@@ -107,6 +110,7 @@ function WebGLClipping() {
 		}
 
 		scope.numPlanes = numGlobalPlanes;
+		scope.numIntersection = 0;
 
 	}
 
@@ -132,11 +136,9 @@ function WebGLClipping() {
 
 				}
 
-				for ( var i = 0, i4 = dstOffset;
-									i !== nPlanes; ++ i, i4 += 4 ) {
+				for ( var i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
 
-					plane.copy( planes[ i ] ).
-							applyMatrix4( viewMatrix, viewNormalMatrix );
+					plane.copy( planes[ i ] ).applyMatrix4( viewMatrix, viewNormalMatrix );
 
 					plane.normal.toArray( dstArray, i4 );
 					dstArray[ i4 + 3 ] = plane.constant;
@@ -151,10 +153,12 @@ function WebGLClipping() {
 		}
 
 		scope.numPlanes = nPlanes;
+
 		return dstArray;
 
 	}
 
 }
+
 
 export { WebGLClipping };

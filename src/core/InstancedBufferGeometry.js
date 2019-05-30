@@ -1,4 +1,4 @@
-import { BufferGeometry } from './BufferGeometry';
+import { BufferGeometry } from './BufferGeometry.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -13,54 +13,40 @@ function InstancedBufferGeometry() {
 
 }
 
-InstancedBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-InstancedBufferGeometry.prototype.constructor = InstancedBufferGeometry;
+InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry.prototype ), {
 
-InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
+	constructor: InstancedBufferGeometry,
 
-InstancedBufferGeometry.prototype.addGroup = function ( start, count, instances ) {
+	isInstancedBufferGeometry: true,
 
-	this.groups.push( {
+	copy: function ( source ) {
 
-		start: start,
-		count: count,
-		instances: instances
+		BufferGeometry.prototype.copy.call( this, source );
 
-	} );
+		this.maxInstancedCount = source.maxInstancedCount;
 
-};
+		return this;
 
-InstancedBufferGeometry.prototype.copy = function ( source ) {
+	},
 
-	var index = source.index;
+	clone: function () {
 
-	if ( index !== null ) {
+		return new this.constructor().copy( this );
 
-		this.setIndex( index.clone() );
+	},
 
-	}
+	toJSON: function () {
 
-	var attributes = source.attributes;
+		var data = BufferGeometry.prototype.toJSON.call( this );
 
-	for ( var name in attributes ) {
+		data.maxInstancedCount = this.maxInstancedCount;
 
-		var attribute = attributes[ name ];
-		this.addAttribute( name, attribute.clone() );
+		data.isInstancedBufferGeometry = true;
+
+		return data;
 
 	}
 
-	var groups = source.groups;
-
-	for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-		var group = groups[ i ];
-		this.addGroup( group.start, group.count, group.instances );
-
-	}
-
-	return this;
-
-};
-
+} );
 
 export { InstancedBufferGeometry };

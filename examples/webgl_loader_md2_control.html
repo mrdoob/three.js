@@ -31,7 +31,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - MD2 Loader -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
 			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a><br />
 			use arrows to control characters, mouse for camera
 		</div>
@@ -40,21 +40,27 @@
 
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src='js/loaders/MD2Loader.js'></script>
-		<script src='js/MD2CharacterComplex.js'></script>
-		<script src='js/Gyroscope.js'></script>
+		<script src="js/loaders/MD2Loader.js"></script>
+		<script src="js/MorphBlendMesh.js"></script>
+		<script src="js/MD2CharacterComplex.js"></script>
+		<script src="js/Gyroscope.js"></script>
 
-		<script src='js/Detector.js'></script>
-		<script src='js/libs/stats.min.js'></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container, camera, scene, renderer;
+			var container, stats;
+			var camera, scene, renderer;
 
 			var characters = [];
 			var nCharacters = 0;
@@ -88,6 +94,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
 
 				scene.add( camera );
@@ -107,10 +114,10 @@
 				light.shadow.camera.near = 100;
 				light.shadow.camera.far = 1200;
 
-				light.shadow.camera.left = -1000;
+				light.shadow.camera.left = - 1000;
 				light.shadow.camera.right = 1000;
 				light.shadow.camera.top = 350;
-				light.shadow.camera.bottom = -350;
+				light.shadow.camera.bottom = - 350;
 
 				scene.add( light );
 				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
@@ -135,7 +142,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -163,6 +169,7 @@
 
 				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
+				cameraControls.update();
 
 				// CHARACTER
 
@@ -174,7 +181,7 @@
 					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
 							 "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
 							 "sharokh.png" ],
-					weapons:  [ [ "weapon.md2", "weapon.jpg" ] ],
+					weapons: [[ "weapon.md2", "weapon.jpg" ]],
 					animations: {
 						move: "run",
 						idle: "stand",
@@ -225,7 +232,7 @@
 							cloneCharacter.setWeapon( 0 );
 							cloneCharacter.setSkin( i );
 
-							cloneCharacter.root.position.x = ( i - nSkins/2 ) * 150;
+							cloneCharacter.root.position.x = ( i - nSkins / 2 ) * 150;
 							cloneCharacter.root.position.z = j * 250;
 
 							scene.add( cloneCharacter.root );
@@ -250,23 +257,23 @@
 
 			// EVENT HANDLERS
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				event.stopPropagation();
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: /*up*/
 					case 87: /*W*/ 	controls.moveForward = true; break;
@@ -275,10 +282,10 @@
 					case 83: /*S*/ 	 controls.moveBackward = true; break;
 
 					case 37: /*left*/
-					case 65: /*A*/   controls.moveLeft = true; break;
+					case 65: /*A*/ controls.moveLeft = true; break;
 
 					case 39: /*right*/
-					case 68: /*D*/    controls.moveRight = true; break;
+					case 68: /*D*/ controls.moveRight = true; break;
 
 					//case 67: /*C*/     controls.crouch = true; break;
 					//case 32: /*space*/ controls.jump = true; break;
@@ -288,11 +295,11 @@
 
 			}
 
-			function onKeyUp ( event ) {
+			function onKeyUp( event ) {
 
 				event.stopPropagation();
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: /*up*/
 					case 87: /*W*/ controls.moveForward = false; break;
@@ -304,7 +311,7 @@
 					case 65: /*A*/ 	 controls.moveLeft = false; break;
 
 					case 39: /*right*/
-					case 68: /*D*/ 	  controls.moveRight = false; break;
+					case 68: /*D*/ controls.moveRight = false; break;
 
 					//case 67: /*C*/     controls.crouch = false; break;
 					//case 32: /*space*/ controls.jump = false; break;
@@ -328,8 +335,6 @@
 			function render() {
 
 				var delta = clock.getDelta();
-
-				cameraControls.update( delta );
 
 				for ( var i = 0; i < nCharacters; i ++ ) {
 

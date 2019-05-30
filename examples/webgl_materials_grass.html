@@ -20,11 +20,15 @@
 	<body>
 		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			var camera, scene, renderer;
 
@@ -37,6 +41,7 @@
 				camera.position.set( 0, 75, 100 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x003300 );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
@@ -64,7 +69,6 @@
 				scene.children.reverse();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x003300 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

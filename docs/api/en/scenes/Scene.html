@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+		<h1>[name]</h1>
+
+		<p class="desc">Scenes allow you to set up what and where is to be rendered by three.js. This is where you place objects, lights and cameras.</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		Create a new scene object.
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Fog fog]</h3>
+
+		<p>A [page:Fog fog] instance defining the type of fog that affects everything rendered in the scene. Default is null.</p>
+
+		<h3>[property:Material overrideMaterial]</h3>
+
+		<p>If not null, it will force everything in the scene to be rendered with that material. Default is null.</p>
+
+		<h3>[property:boolean autoUpdate]</h3>
+		<p>
+		Default is true. If set, then the renderer checks every frame if the scene and its objects needs matrix updates.
+		When it isn't, then you have to maintain all matrices in the scene yourself.
+		</p>
+
+		<h3>[property:Object background]</h3>
+		<p>
+		If not null, sets the background used when rendering the scene, and is always rendered first. Can be set to a [page:Color] which sets the clear color, a [page:Texture] covering the canvas, or a cubemap as a [page:CubeTexture] or [page:WebGLRenderTargetCube]. Default is null.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Object toJSON]</h3>
+		<p>
+		meta -- object containing metadata such as textures or images for the scene.<br />
+		Convert the scene to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+		Clears scene related data internally cached by [page:WebGLRenderer].
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,8 +1,8 @@
-import { Texture } from './Texture';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
+
+import { Texture } from './Texture.js';
 
 function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 

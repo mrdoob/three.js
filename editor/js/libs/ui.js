@@ -115,8 +115,8 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
+	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
@@ -215,131 +215,6 @@ UI.Panel = function () {
 
 UI.Panel.prototype = Object.create( UI.Element.prototype );
 UI.Panel.prototype.constructor = UI.Panel;
-
-
-// Collapsible Panel
-
-UI.CollapsiblePanel = function () {
-
-	UI.Panel.call( this );
-
-	this.setClass( 'Panel Collapsible' );
-
-	var scope = this;
-
-	this.static = new UI.Panel();
-	this.static.setClass( 'Static' );
-	this.static.onClick( function () {
-
-		scope.toggle();
-
-	} );
-	this.dom.appendChild( this.static.dom );
-
-	this.contents = new UI.Panel();
-	this.contents.setClass( 'Content' );
-	this.dom.appendChild( this.contents.dom );
-
-	var button = new UI.Panel();
-	button.setClass( 'Button' );
-	this.static.add( button );
-
-	this.isCollapsed = false;
-
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype = Object.create( UI.Panel.prototype );
-UI.CollapsiblePanel.prototype.constructor = UI.CollapsiblePanel;
-
-UI.CollapsiblePanel.prototype.addStatic = function () {
-
-	this.static.add.apply( this.static, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.removeStatic = function () {
-
-	this.static.remove.apply( this.static, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.clearStatic = function () {
-
-	this.static.clear();
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.add = function () {
-
-	this.contents.add.apply( this.contents, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.remove = function () {
-
-	this.contents.remove.apply( this.contents, arguments );
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.clear = function () {
-
-	this.contents.clear();
-	return this;
-
-};
-
-UI.CollapsiblePanel.prototype.toggle = function() {
-
-	this.setCollapsed( ! this.isCollapsed );
-
-};
-
-UI.CollapsiblePanel.prototype.collapse = function() {
-
-	this.setCollapsed( true );
-
-};
-
-UI.CollapsiblePanel.prototype.expand = function() {
-
-	this.setCollapsed( false );
-
-};
-
-UI.CollapsiblePanel.prototype.setCollapsed = function( boolean ) {
-
-	if ( boolean ) {
-
-		this.dom.classList.add( 'collapsed' );
-
-	} else {
-
-		this.dom.classList.remove( 'collapsed' );
-
-	}
-
-	this.isCollapsed = boolean;
-
-	if ( this.onCollapsedChangeCallback !== undefined ) {
-
-		this.onCollapsedChangeCallback( boolean );
-
-	}
-
-};
-
-UI.CollapsiblePanel.prototype.onCollapsedChange = function ( callback ) {
-
-	this.onCollapsedChangeCallback = callback;
-
-};
 
 // Text
 
@@ -750,6 +625,56 @@ UI.Number = function ( number ) {
 
 	}
 
+	function onTouchStart( event ) {
+
+		if ( event.touches.length === 1 ) {
+
+			distance = 0;
+
+			onMouseDownValue = scope.value;
+
+			prevPointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+			document.addEventListener( 'touchmove', onTouchMove, false );
+			document.addEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+	}
+
+	function onTouchMove( event ) {
+
+		var currentValue = scope.value;
+
+		pointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
+
+		var value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+		value = Math.min( scope.max, Math.max( scope.min, value ) );
+
+		if ( currentValue !== value ) {
+
+			scope.setValue( value );
+			dom.dispatchEvent( changeEvent );
+
+		}
+
+		prevPointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+	}
+
+	function onTouchEnd( event ) {
+
+		if ( event.touches.length === 0 ) {
+
+			document.removeEventListener( 'touchmove', onTouchMove, false );
+			document.removeEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+	}
+
 	function onChange( event ) {
 
 		scope.setValue( dom.value );
@@ -773,6 +698,7 @@ UI.Number = function ( number ) {
 	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'touchstart', onTouchStart, false );
 	dom.addEventListener( 'change', onChange, false );
 	dom.addEventListener( 'focus', onFocus, false );
 	dom.addEventListener( 'blur', onBlur, false );
@@ -800,7 +726,9 @@ UI.Number.prototype.setValue = function ( value ) {
 		if ( value > this.max ) value = this.max;
 
 		this.value = value;
-		this.dom.value = value.toFixed( this.precision ) + ' ' + this.unit;
+		this.dom.value = value.toFixed( this.precision );
+
+		if ( this.unit !== '' ) this.dom.value += ' ' + this.unit;
 
 	}
 
@@ -985,9 +913,9 @@ UI.Integer.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setStep = function ( step ) {
+UI.Integer.prototype.setStep = function ( step ) {
 
-	this.step = step;
+	this.step = parseInt( step );
 
 	return this;
 
@@ -1063,64 +991,6 @@ UI.Button.prototype.constructor = UI.Button;
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
-
-	return this;
-
-};
-
-
-// Modal
-
-UI.Modal = function ( value ) {
-
-	var scope = this;
-
-	var dom = document.createElement( 'div' );
-
-	dom.style.position = 'absolute';
-	dom.style.width = '100%';
-	dom.style.height = '100%';
-	dom.style.backgroundColor = 'rgba(0,0,0,0.5)';
-	dom.style.display = 'none';
-	dom.style.alignItems = 'center';
-	dom.style.justifyContent = 'center';
-	dom.addEventListener( 'click', function ( event ) {
-
-		scope.hide();
-
-	} );
-
-	this.dom = dom;
-
-	this.container = new UI.Panel();
-	this.container.dom.style.width = '200px';
-	this.container.dom.style.padding = '20px';
-	this.container.dom.style.backgroundColor = '#ffffff';
-	this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
-
-	this.add( this.container );
-
-	return this;
-
-};
-
-UI.Modal.prototype = Object.create( UI.Element.prototype );
-UI.Modal.prototype.constructor = UI.Modal;
-
-UI.Modal.prototype.show = function ( content ) {
-
-	this.container.clear();
-	this.container.add( content );
-
-	this.dom.style.display = 'flex';
-
-	return this;
-
-};
-
-UI.Modal.prototype.hide = function () {
-
-	this.dom.style.display = 'none';
 
 	return this;
 

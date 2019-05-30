@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			在3D空间中表示一个盒子或立方体。这个的主要目的是表示对象的最小边界框[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes]。
+		</p>
+
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<p>
+		[page:Vector3 min] - (参数可选) [page:Vector3] 表示包围盒的下边界。
+		默认值是（ + Infinity, + Infinity, + Infinity ）。<br>
+
+		[page:Vector3 max] - (参数可选) [page:Vector3] 表示包围盒的上边界。
+		默认值是（ - Infinity, - Infinity, - Infinity ）。<br /><br />
+
+		创建一个以max和min为边界的包围盒。
+		</p>
+
+		<h2>属性（Properties）</h2>
+
+		<h3>[property:Boolean isBox3]</h3>
+		<p>
+			用于检测当前对象或者派生类对象是否是Box3。默认为 *true*。<br /><br />
+
+			不应该修改这个值，因为内部使用该属性做了优化的任务。
+		</p>
+
+		<h3>[property:Vector3 min]</h3>
+		<p>
+			[page:Vector3] 表示包围盒的下边界。<br />
+			默认值是（ - Infinity, - Infinity, - Infinity ）。
+		</p>
+
+		<h3>[property:Vector3 max]</h3>
+		<p>
+			[page:Vector3] 包围盒的(x, y, z)上边界。<br />
+			默认值是 ( - Infinity, - Infinity, - Infinity ).
+		</p>
+
+
+
+		<h2>方法（Methods）</h2>
+
+		<h3>[method:Box3 applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+		[page:Matrix4 matrix] - 要应用的 [page:Matrix4] <br /><br />
+
+		使用传入的矩阵变换Box3（包围盒8个顶点都会乘以这个变换矩阵）。
+		</p>
+
+		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - 需要做clamp 的坐标 [page:Vector3]。 <br>
+		[page:Vector3 target] — 结果将会被拷贝到这个对象中<br /><br />
+
+		是这个点[page:Vector3 point] [link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps](处于范围内) 处于包围盒边界范围内。<br />
+		</p>
+
+		<h3>[method:Box3 clone]()</h3>
+		<p>返回一个与该包围盒子有相同下边界[page:.min min] 和上边界 [page:.max max]的新包围盒。</p>
+
+		<h3>[method:Boolean containsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - 需要检测是否在当前包围盒内的 [page:Box3 Box3]。<br /><br />
+		传入的 [page:Box3 box] 整体都被包含在该对象中则返回true。如果他们两个包围盒是一样的也返回true。
+		</p>
+
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - 需要检测是否在当前包围盒内的 [page:Vector3]。<br /><br />
+
+		当传入的值 [page:Vector3 point] 在包围盒内部或者边界都会返回true。
+		</p>
+
+		<h3>[method:Box3 copy]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box]  - 需要复制的包围盒 [page:Box3] 。<br /><br />
+
+		将传入的值 [page:Box3 box] 中的 [page:.min min] 和 [page:.max max] 拷贝到当前对象。
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - 用来测试距离的点 [page:Vector3]。<br /><br />
+
+		返回这个box的任何边缘到指定点的距离。如果这个点位于这个盒子里，距离将是0。
+		</p>
+
+
+		<h3>[method:Boolean equals]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - 将box与当前对象做比较。<br /><br />
+
+		返回true如果传入的值与当前的对象 [page:Box3 box] 有相同的上下边界。
+		</p>
+
+		<h3>[method:Box3 expandByObject]( [param:Object3D object] )</h3>
+		<p>
+		[page:Object3D object] - 包裹在包围盒中的3d对象 [page:Object3D]。<br /><br />
+
+		扩展此包围盒的边界，使得对象及其子对象在包围盒内，包括对象和子对象的世界坐标的变换。
+
+		</p>
+
+		<h3>[method:Box3 expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - 需要在包围盒中的点 [page:Vector3]。<br /><br />
+
+		扩展这个包围盒的边界使得该点（[page:Vector3 point]）在包围盒内。
+		</p>
+
+		<h3>[method:Box3 expandByScalar]( [param:float scalar] )</h3>
+		<p>
+		[page:float scalar] - 扩展包围盒的比例。<br /><br />
+
+		按 [page:float scalar] 的值展开盒子的每个维度。如果是负数，盒子的尺寸会缩小。
+		</p>
+
+		<h3>[method:Box3 expandByVector]( [param:Vector3 vector] )</h3>
+		<p>
+		[page:Vector3 vector] - 扩展包围盒的数值 [page:Vector3] 。<br /><br />
+
+		按 [page:Vector3 vector] 每个纬度的值展开这个箱子。
+		这个盒子的宽度将由 [page:Vector3 vector] 的x分量在两个方向上展开。
+		这个盒子的高度将由 [page:Vector3 vector] 两个方向上的y分量展开。
+		这个盒子的深度将由 [page:Vector3 vector] z分量在两个方向上展开。
+
+		</p>
+
+		<h3>[method:Sphere getBoundingSphere]( [param:Sphere target] )</h3>
+		<p>
+		[page:Sphere target] — 如果指定了target ，结果将会被拷贝到target。<br /><br />
+
+		获取一个包围球 [page:Sphere]。
+		</p>
+
+		<h3>[method:Vector3 getCenter]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — 如果指定了target ，结果将会被拷贝到target。<br /><br />
+
+		返回包围盒的中心点 [page:Vector3]。
+		</p>
+
+		<h3>[method:Vector3 getParameter]( [param:Vector3 point], [param:Vector3 target] ) </h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3].<br/>
+		[page:Vector3 target] — 如果指定了target ，结果将会被拷贝到target。<br /><br />
+
+		返回一个点为这个盒子的宽度和高度的比例。
+		</p>
+
+		<h3>[method:Vector3 getSize]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — 如果指定了target ，结果将会被拷贝到target。<br /><br />
+
+		返回包围盒的宽度，高度，和深度。
+		</p>
+
+		<h3>[method:Box3 intersect]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - 与包围盒的交集<br /><br />
+
+		返回此包围盒和 [page:Box3 box] 的交集，将此框的上界设置为两个框的max的较小部分，
+		将此包围盒的下界设置为两个包围盒的min的较大部分。
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - 用来检测是否相交的包围盒<br /><br />
+
+		确定当前包围盒是否与传入包围盒[page:Box3 box] 相交。
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - 用来检测是否相交的 [page:Plane]。<br /><br />
+
+		确定当前包围盒是否与平面 [page:Plane plane] 相交。
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - 用来检测是否相交的球体 [page:Sphere]。<br /><br />
+
+		确定当前包围盒是否与球体 [page:Sphere sphere] 相交。
+		</p>
+
+		<h3>[method:Boolean intersectsTriangle]( [param:Triangle triangle] )</h3>
+		<p>
+		[page:Triangle triangle] - 用来检测是否相交的三角形 [page:Triangle]。<br /><br />
+
+		确定当前包围盒是否与三角形 [page:Triangle triangle] 相交。
+		</p>
+
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		如果这个盒子包含0个顶点，则返回true。<br>
+		注意，下界和上界相等的方框仍然包含一个点，即两个边界共享的那个点。
+		</p>
+
+		<h3>[method:Box3 makeEmpty]()</h3>
+		<p>清空包围盒。</p>
+
+		<h3>[method:Box3 set]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<p>
+		[page:Vector3 min] - [page:Vector3] 表示下边界每个纬度（x,y,z）的值。<br />
+		[page:Vector3 max] - [page:Vector3] 表示上边界每个纬度（x,y,z）的值。<br /><br />
+
+		设置包围盒上下边界每个纬度（x,y,z)的值。
+		</p>
+
+		<h3>[method:Box3 setFromArray]( [param:Array array] ) [param:Box3 this]</h3>
+		<p>
+		array -- 数组当中的所有的点都将被包围盒包裹。<br /><br />
+
+		设置包围盒的上下边界使得数组 *array* 中的所有点的点都被包含在内。
+		</p>
+
+		<h3>[method:Box3 setFromBufferAttribute]( [param:BufferAttribute attribute] ) [param:Box3 this]</h3>
+		<p>
+		[page:BufferAttribute attribute] - 位置的缓冲数据，包含在返回的包围盒内。<br /><br />
+
+		设置此包围盒的上边界和下边界，以包含 [page:BufferAttribute attribute] 中的所有位置数据。
+		</p>
+
+		<h3>[method:Box3 setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] ) [param:Box3 this]</h3>
+		<p>
+		[page:Vector3 center], - 包围盒所要设置的中心位置。 <br>
+		[page:Vector3 size] - 包围盒所要设置的x、y和z尺寸（宽/高/长）。<br /><br />
+
+		将当前包围盒的中心点设置为 [page:Vector3 center] ，并将此包围盒的宽度，高度和深度设置为大小指定 [page:Vector3 size] 的值。
+		</p>
+
+		<h3>[method:Box3 setFromObject]( [param:Object3D object] )</h3>
+		<p>
+		[page:Object3D object] - 用来计算包围盒的3D对象 [page:Object3D]。<br /><br />
+
+		计算和世界轴对齐的一个对象 [page:Object3D] （含其子对象）的包围盒，计算对象和子对象的世界坐标变换。
+
+		</p>
+
+		<h3>[method:Box3 setFromPoints]( [param:Array points] )</h3>
+		<p>
+		[page:Array points] - 计算出的包围盒将包含数组中所有的点 [page:Vector3 Vector3s]<br /><br />
+
+		设置此包围盒的上边界和下边界，以包含数组 [page:Array points] 中的所有点。
+		</p>
+
+		<h3>[method:Box3 translate]( [param:Vector3 offset] )</h3>
+		<p>
+		[page:Vector3 offset] - 偏移方向和距离。<br /><br />
+
+		给包围盒的上下边界添加偏移量 [page:Vector3 offset]，这样可以有效的在3D空间中移动包围盒。
+		偏移量为 [page:Vector3 offset] 大小。
+		</p>
+
+		<h3>[method:Box3 union]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - 要结合在一起的包围盒。<br /><br />
+
+		在 [page:Box3 box] 参数的上边界和已有box对象的上边界之间取较大者，而对两者的下边界取较小者，这样获得一个新的较大的联合盒子。
+		</p>
+
+		<h2>源码（Source）</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

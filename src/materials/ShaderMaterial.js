@@ -1,6 +1,3 @@
-import { Material } from './Material';
-import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -22,6 +19,12 @@ import { UniformsUtils } from '../renderers/shaders/UniformsUtils';
  * }
  */
 
+import { Material } from './Material.js';
+import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
+
+import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
+import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
+
 function ShaderMaterial( parameters ) {
 
 	Material.call( this );
@@ -31,8 +34,8 @@ function ShaderMaterial( parameters ) {
 	this.defines = {};
 	this.uniforms = {};
 
-	this.vertexShader = 'void main() {\n\tgl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n}';
-	this.fragmentShader = 'void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}';
+	this.vertexShader = default_vertex;
+	this.fragmentShader = default_fragment;
 
 	this.linewidth = 1;
 
@@ -63,6 +66,7 @@ function ShaderMaterial( parameters ) {
 	};
 
 	this.index0AttributeName = undefined;
+	this.uniformsNeedUpdate = false;
 
 	if ( parameters !== undefined ) {
 
@@ -90,9 +94,9 @@ ShaderMaterial.prototype.copy = function ( source ) {
 	this.fragmentShader = source.fragmentShader;
 	this.vertexShader = source.vertexShader;
 
-	this.uniforms = UniformsUtils.clone( source.uniforms );
+	this.uniforms = cloneUniforms( source.uniforms );
 
-	this.defines = source.defines;
+	this.defines = Object.assign( {}, source.defines );
 
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
@@ -115,9 +119,88 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 
 	var data = Material.prototype.toJSON.call( this, meta );
 
-	data.uniforms = this.uniforms;
+	data.uniforms = {};
+
+	for ( var name in this.uniforms ) {
+
+		var uniform = this.uniforms[ name ];
+		var value = uniform.value;
+
+		if ( value && value.isTexture ) {
+
+			data.uniforms[ name ] = {
+				type: 't',
+				value: value.toJSON( meta ).uuid
+			};
+
+		} else if ( value && value.isColor ) {
+
+			data.uniforms[ name ] = {
+				type: 'c',
+				value: value.getHex()
+			};
+
+		} else if ( value && value.isVector2 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v2',
+				value: value.toArray()
+			};
+
+		} else if ( value && value.isVector3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v3',
+				value: value.toArray()
+			};
+
+		} else if ( value && value.isVector4 ) {
+
+			data.uniforms[ name ] = {
+				type: 'v4',
+				value: value.toArray()
+			};
+
+		} else if ( value && value.isMatrix3 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm3',
+				value: value.toArray()
+			};
+
+		} else if ( value && value.isMatrix4 ) {
+
+			data.uniforms[ name ] = {
+				type: 'm4',
+				value: value.toArray()
+			};
+
+		} else {
+
+			data.uniforms[ name ] = {
+				value: value
+			};
+
+			// note: the array variants v2v, v3v, v4v, m4v and tv are not supported so far
+
+		}
+
+	}
+
+	if ( Object.keys( this.defines ).length > 0 ) data.defines = this.defines;
+
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
+
+	var extensions = {};
+
+	for ( var key in this.extensions ) {
+
+		if ( this.extensions[ key ] === true ) extensions[ key ] = true;
+
+	}
+
+	if ( Object.keys( extensions ).length > 0 ) data.extensions = extensions;
 
 	return data;
 

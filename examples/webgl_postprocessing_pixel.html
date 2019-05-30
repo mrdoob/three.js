@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - pixel shader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				/*text-align:center;*/
+				font-weight: lighter;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display: block;
+			}
+
+			#info a {
+				color: #f88;
+				font-weight: bold;
+				text-decoration: underline;
+				cursor: pointer;
+			}
+
+			.dg.ac {
+				z-index: 1 !important;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/PixelShader.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src='js/libs/dat.gui.min.js'></script>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader by <a href="http://wongbryan.github.io">wongbryan</a>
+		</div>
+
+		<script>
+
+			var camera, scene, renderer, gui, composer, controls;
+			var pixelPass, params;
+
+			var group;
+
+			init();
+			animate();
+
+			function updateGUI() {
+
+				pixelPass.uniforms[ "pixelSize" ].value = params.pixelSize;
+
+			}
+
+			function resize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+
+			}
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 30 );
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 2.0;
+				controls.panSpeed = 0.8;
+				controls.zoomSpeed = 1.5;
+
+				scene = new THREE.Scene();
+
+				var hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
+				scene.add( hemisphereLight );
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
+				dirLight.position.set( 150, 75, 150 );
+				scene.add( dirLight );
+
+				var dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
+				dirLight2.position.set( - 150, 75, - 150 );
+				scene.add( dirLight2 );
+
+				var dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
+				dirLight3.position.set( 0, 125, 0 );
+				scene.add( dirLight3 );
+
+				var geometries = [
+					new THREE.SphereBufferGeometry( 1, 64, 64 ),
+					new THREE.BoxBufferGeometry( 1, 1, 1 ),
+					new THREE.ConeBufferGeometry( 1, 1, 32 ),
+					new THREE.TetrahedronBufferGeometry( 1 ),
+					new THREE.TorusKnotBufferGeometry( 1, .4 )
+				];
+
+				group = new THREE.Group();
+
+				for ( var i = 0; i < 25; i ++ ) {
+
+					var geom = geometries[ Math.floor( Math.random() * geometries.length ) ];
+					var color = new THREE.Color();
+					color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
+					var mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
+					var mesh = new THREE.Mesh( geom, mat );
+					var s = 4 + Math.random() * 10;
+					mesh.scale.set( s, s, s );
+
+					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
+					mesh.position.multiplyScalar( Math.random() * 200 );
+					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+					group.add( mesh );
+
+				}
+
+				scene.add( group );
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+				pixelPass = new THREE.ShaderPass( THREE.PixelShader );
+				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
+				composer.addPass( pixelPass );
+
+				window.addEventListener( 'resize', resize );
+
+				params = {
+					pixelSize: 16,
+					postprocessing: true
+				};
+				gui = new dat.GUI();
+				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
+				gui.add( params, 'postprocessing' );
+
+			}
+
+			function update() {
+
+				controls.update();
+				updateGUI();
+
+				group.rotation.y += .0015;
+				group.rotation.z += .001;
+
+			}
+
+			function animate() {
+
+				update();
+
+				if ( params.postprocessing ) {
+
+					composer.render();
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
+
+				window.requestAnimationFrame( animate );
+
+			}
+
+		</script>
+	</body>
+</html>

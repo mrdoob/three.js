@@ -4,40 +4,49 @@
 
 function WebGLProperties() {
 
-	var properties = {};
+	var properties = new WeakMap();
 
-	return {
+	function get( object ) {
 
-		get: function ( object ) {
+		var map = properties.get( object );
 
-			var uuid = object.uuid;
-			var map = properties[ uuid ];
+		if ( map === undefined ) {
 
-			if ( map === undefined ) {
-
-				map = {};
-				properties[ uuid ] = map;
-
-			}
-
-			return map;
-
-		},
-
-		delete: function ( object ) {
-
-			delete properties[ object.uuid ];
-
-		},
-
-		clear: function () {
-
-			properties = {};
+			map = {};
+			properties.set( object, map );
 
 		}
 
+		return map;
+
+	}
+
+	function remove( object ) {
+
+		properties.delete( object );
+
+	}
+
+	function update( object, key, value ) {
+
+		properties.get( object )[ key ] = value;
+
+	}
+
+	function dispose() {
+
+		properties = new WeakMap();
+
+	}
+
+	return {
+		get: get,
+		remove: remove,
+		update: update,
+		dispose: dispose
 	};
 
 }
+
 
 export { WebGLProperties };

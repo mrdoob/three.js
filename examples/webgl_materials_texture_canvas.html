@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - canvas texture</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #050505;
+				color: #fff;
+				overflow: hidden;
+			}
+
+			a { color: #e00 }
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				z-index: 1000;
+			}
+
+			#drawing-canvas {
+				position: absolute;
+				background-color: #000000;
+				top: 0px;
+				right: 0px;
+				z-index: 3000;
+				cursor: crosshair;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - canvas as a texture
+			<div>click and draw in the white box</div>
+		</div>
+		<canvas id="drawing-canvas" height="128" width="128"></canvas>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/WebGL.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var camera, scene, renderer, mesh, material;
+			var drawStartPos = new THREE.Vector2();
+
+			init();
+			setupCanvasDrawing();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				material = new THREE.MeshBasicMaterial();
+
+				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			// Sets up the drawing canvas and adds it as the material map
+
+			function setupCanvasDrawing() {
+
+				// get canvas and context
+
+				var drawingCanvas = document.getElementById( 'drawing-canvas' );
+				var drawingContext = drawingCanvas.getContext( '2d' );
+
+				// draw white background
+
+				drawingContext.fillStyle = '#FFFFFF';
+				drawingContext.fillRect( 0, 0, 128, 128 );
+
+				// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+
+				material.map = new THREE.CanvasTexture( drawingCanvas );
+
+				// set the variable to keep track of when to draw
+
+				var paint = false;
+
+				// add canvas event listeners
+				drawingCanvas.addEventListener( 'mousedown', function ( e ) {
+
+					paint = true;
+					drawStartPos.set( e.offsetX, e.offsetY );
+
+				} );
+
+				drawingCanvas.addEventListener( 'mousemove', function ( e ) {
+
+					if ( paint ) draw( drawingContext, e.offsetX, e.offsetY );
+
+				} );
+
+				drawingCanvas.addEventListener( 'mouseup', function () {
+
+					paint = false;
+
+				} );
+
+				drawingCanvas.addEventListener( 'mouseleave', function () {
+
+					paint = false;
+
+				} );
+
+			}
+
+			function draw( drawContext, x, y ) {
+
+				drawContext.moveTo( drawStartPos.x, drawStartPos.y );
+				drawContext.strokeStyle = '#000000';
+				drawContext.lineTo( x, y );
+				drawContext.stroke();
+				// reset drawing start position to current position.
+				drawStartPos.set( x, y );
+				// need to flag the map as needing updating.
+				material.map.needsUpdate = true;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mesh.rotation.x += 0.01;
+				mesh.rotation.y += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

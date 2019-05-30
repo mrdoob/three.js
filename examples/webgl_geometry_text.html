@@ -26,7 +26,7 @@
 	<body>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq
 		<br/>type to enter new text, drag to spin the text
 		<br/><span class="button" id="color">change color</span>,
 			<span class="button" id="font">change font</span>,
@@ -39,20 +39,24 @@
 		<script src="../build/three.js"></script>
 		<script src="js/utils/GeometryUtils.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
 
 			THREE.Cache.enabled = true;
 
-			var container, stats, permalink, hex, color;
+			var container, stats, permalink, hex;
 
 			var camera, cameraTarget, scene, renderer;
 
-			var group, textMesh1, textMesh2, textGeo, material;
+			var group, textMesh1, textMesh2, textGeo, materials;
 
 			var firstLetter = true;
 
@@ -66,7 +70,6 @@
 
 				bevelThickness = 2,
 				bevelSize = 1.5,
-				bevelSegments = 3,
 				bevelEnabled = true,
 
 				font = undefined,
@@ -96,8 +99,8 @@
 			var reverseFontMap = [];
 			var reverseWeightMap = [];
 
-			for ( var i in fontMap ) reverseFontMap[ fontMap[i] ] = i;
-			for ( var i in weightMap ) reverseWeightMap[ weightMap[i] ] = i;
+			for ( var i in fontMap ) reverseFontMap[ fontMap[ i ] ] = i;
+			for ( var i in weightMap ) reverseWeightMap[ weightMap[ i ] ] = i;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -106,7 +109,6 @@
 			var mouseXOnMouseDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			var fontIndex = 1;
 
@@ -138,6 +140,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				// LIGHTS
@@ -156,11 +159,11 @@
 
 				if ( hash.length !== 0 ) {
 
-					var colorhash  = hash.substring( 0, 6 );
-					var fonthash   = hash.substring( 6, 7 );
+					var colorhash = hash.substring( 0, 6 );
+					var fonthash = hash.substring( 6, 7 );
 					var weighthash = hash.substring( 7, 8 );
-					var bevelhash  = hash.substring( 8, 9 );
-					var texthash   = hash.substring( 10 );
+					var bevelhash = hash.substring( 8, 9 );
+					var texthash = hash.substring( 10 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
@@ -181,10 +184,10 @@
 
 				}
 
-				material = new THREE.MultiMaterial( [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
-					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
-				] );
+				materials = [
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+				];
 
 				group = new THREE.Group();
 				group.position.y = 100;
@@ -204,7 +207,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -222,7 +224,7 @@
 				document.addEventListener( 'keypress', onDocumentKeyPress, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 
-				document.getElementById( "color" ).addEventListener( 'click', function() {
+				document.getElementById( "color" ).addEventListener( 'click', function () {
 
 					pointLight.color.setHSL( Math.random(), 1, 0.5 );
 					hex = decimalToHex( pointLight.color.getHex() );
@@ -231,7 +233,7 @@
 
 				}, false );
 
-				document.getElementById( "font" ).addEventListener( 'click', function() {
+				document.getElementById( "font" ).addEventListener( 'click', function () {
 
 					fontIndex ++;
 
@@ -242,7 +244,7 @@
 				}, false );
 
 
-				document.getElementById( "weight" ).addEventListener( 'click', function() {
+				document.getElementById( "weight" ).addEventListener( 'click', function () {
 
 					if ( fontWeight === "bold" ) {
 
@@ -258,9 +260,9 @@
 
 				}, false );
 
-				document.getElementById( "bevel" ).addEventListener( 'click', function() {
+				document.getElementById( "bevel" ).addEventListener( 'click', function () {
 
-					bevelEnabled = !bevelEnabled;
+					bevelEnabled = ! bevelEnabled;
 
 					refreshText();
 
@@ -275,7 +277,6 @@
 			function onWindowResize() {
 
 				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -373,12 +374,9 @@
 
 					bevelThickness: bevelThickness,
 					bevelSize: bevelSize,
-					bevelEnabled: bevelEnabled,
+					bevelEnabled: bevelEnabled
 
-					material: 0,
-					extrudeMaterial: 1
-
-				});
+				} );
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
@@ -425,9 +423,11 @@
 
 				}
 
-				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+				var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				textMesh1 = new THREE.Mesh( textGeo, material );
+				textGeo = new THREE.BufferGeometry().fromGeometry( textGeo );
+
+				textMesh1 = new THREE.Mesh( textGeo, materials );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -440,10 +440,10 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new THREE.Mesh( textGeo, material );
+					textMesh2 = new THREE.Mesh( textGeo, materials );
 
 					textMesh2.position.x = centerOffset;
-					textMesh2.position.y = -hover;
+					textMesh2.position.y = - hover;
 					textMesh2.position.z = height;
 
 					textMesh2.rotation.x = Math.PI;
@@ -462,7 +462,7 @@
 				group.remove( textMesh1 );
 				if ( mirror ) group.remove( textMesh2 );
 
-				if ( !text ) return;
+				if ( ! text ) return;
 
 				createText();
 
@@ -489,7 +489,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -497,7 +497,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

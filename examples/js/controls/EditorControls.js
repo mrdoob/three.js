@@ -13,11 +13,16 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	this.enabled = true;
 	this.center = new THREE.Vector3();
+	this.panSpeed = 0.002;
+	this.zoomSpeed = 0.1;
+	this.rotationSpeed = 0.005;
 
 	// internals
 
 	var scope = this;
 	var vector = new THREE.Vector3();
+	var delta = new THREE.Vector3();
+	var box = new THREE.Box3();
 
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
@@ -27,27 +32,37 @@ THREE.EditorControls = function ( object, domElement ) {
 	var pointer = new THREE.Vector2();
 	var pointerOld = new THREE.Vector2();
 	var spherical = new THREE.Spherical();
+	var sphere = new THREE.Sphere();
 
 	// events
 
 	var changeEvent = { type: 'change' };
 
-	this.focus = function ( target, frame ) {
+	this.focus = function ( target ) {
 
-		var scale = new THREE.Vector3();
-		target.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
+		var distance;
 
-		if ( frame && target.geometry ) {
+		box.setFromObject( target );
 
-			scale = ( scale.x + scale.y + scale.z ) / 3;
-			center.add( target.geometry.boundingSphere.center.clone().multiplyScalar( scale ) );
-			var radius = target.geometry.boundingSphere.radius * ( scale );
-			var pos = object.position.clone().sub( center ).normalize().multiplyScalar( radius * 2 );
-			object.position.copy( center ).add( pos );
+		if ( box.isEmpty() === false ) {
+
+			box.getCenter( center );
+			distance = box.getBoundingSphere( sphere ).radius;
+
+		} else {
+
+			// Focusing on an Group, AmbientLight, etc
+
+			center.setFromMatrixPosition( target.matrixWorld );
+			distance = 0.1;
 
 		}
 
-		object.lookAt( center );
+		delta.set( 0, 0, 1 );
+		delta.applyQuaternion( object.quaternion );
+		delta.multiplyScalar( distance * 4 );
+
+		object.position.copy( center ).add( delta );
 
 		scope.dispatchEvent( changeEvent );
 
@@ -57,7 +72,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * 0.001 );
+		delta.multiplyScalar( distance * scope.panSpeed );
 		delta.applyMatrix3( normalMatrix.getNormalMatrix( object.matrix ) );
 
 		object.position.add( delta );
@@ -71,7 +86,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		var distance = object.position.distanceTo( center );
 
-		delta.multiplyScalar( distance * 0.001 );
+		delta.multiplyScalar( distance * scope.zoomSpeed );
 
 		if ( delta.length() > distance ) return;
 
@@ -89,8 +104,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		spherical.setFromVector3( vector );
 
-		spherical.theta += delta.x;
-		spherical.phi += delta.y;
+		spherical.theta += delta.x * scope.rotationSpeed;
+		spherical.phi += delta.y * scope.rotationSpeed;
 
 		spherical.makeSafe();
 
@@ -144,15 +159,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( state === STATE.ROTATE ) {
 
-			scope.rotate( new THREE.Vector3( - movementX * 0.005, - movementY * 0.005, 0 ) );
+			scope.rotate( delta.set( - movementX, - movementY, 0 ) );
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
+			scope.zoom( delta.set( 0, 0, movementY ) );
 
 		} else if ( state === STATE.PAN ) {
 
-			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
+			scope.pan( delta.set( - movementX, movementY, 0 ) );
 
 		}
 
@@ -175,9 +190,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		// if ( scope.enabled === false ) return;
-
-		scope.zoom( new THREE.Vector3( 0, 0, event.deltaY ) );
+		// Normalize deltaY due to https://bugzilla.mozilla.org/show_bug.cgi?id=1392460
+		scope.zoom( delta.set( 0, 0, event.deltaY > 0 ? 1 : - 1 ) );
 
 	}
 
@@ -187,7 +201,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		domElement.removeEventListener( 'mousedown', onMouseDown, false );
@@ -209,8 +223,6 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	// touch
 
-	var touch = new THREE.Vector3();
-
 	var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 	var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
@@ -223,13 +235,13 @@ THREE.EditorControls = function ( object, domElement ) {
 		switch ( event.touches.length ) {
 
 			case 1:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
 				break;
 
 			case 2:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
 				prevDistance = touches[ 0 ].distanceTo( touches[ 1 ] );
 				break;
 
@@ -265,16 +277,16 @@ THREE.EditorControls = function ( object, domElement ) {
 		switch ( event.touches.length ) {
 
 			case 1:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 0.005 ) );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 1 ) );
 				break;
 
 			case 2:
-				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
-				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
-				distance = touches[ 0 ].distanceTo( touches[ 1 ] );
-				scope.zoom( new THREE.Vector3( 0, 0, prevDistance - distance ) );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+				var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
+				scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 				prevDistance = distance;
 
 
@@ -283,7 +295,7 @@ THREE.EditorControls = function ( object, domElement ) {
 				offset0.x = - offset0.x;
 				offset1.x = - offset1.x;
 
-				scope.pan( offset0.add( offset1 ).multiplyScalar( 0.5 ) );
+				scope.pan( offset0.add( offset1 ) );
 
 				break;
 

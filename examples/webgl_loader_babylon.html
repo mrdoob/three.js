@@ -27,7 +27,7 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - BabylonLoader test
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - BabylonLoader test
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -45,8 +45,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 100;
 
-				controls = new THREE.TrackballControls( camera );
-
 				// scene
 
 				scene = new THREE.Scene();
@@ -60,18 +58,15 @@
 
 				};
 
-				var texture = new THREE.Texture();
-
-				var material = new THREE.MeshBasicMaterial( { color: 'red' } );
-
 				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
 
-				var onError = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
 				};
 
 				// model
@@ -95,7 +90,7 @@
 
 					animate();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				//
 
@@ -103,6 +98,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 				//
 
