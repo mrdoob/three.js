@@ -1524,7 +1524,6 @@ function WebGLRenderer( parameters ) {
 
 		if ( ! program.ready && ! program.isLinked( _this, material ) ) {
 
-			materialProperties.lightsHash = {};
 			return;
 
 		}
