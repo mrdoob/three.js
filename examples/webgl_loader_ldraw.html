@@ -17,7 +17,8 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader<br/>
+		Activate Separate option to enable model construction animation
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -99,48 +100,11 @@
 					separateObjects: false,
 					displayLines: true,
 					conditionalLines: true,
-					smoothNormals: true
+					smoothNormals: true,
+					constructionStep: 0,
+					noConstructionSteps: "No steps."
 				};
 
-				gui = new dat.GUI();
-
-				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
-
-					reloadObject( true );
-
-				} );
-
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
-
-					envMapActivated = value;
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
-
-					updateLineSegments();
-
-				} );
-
-				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
-
-					updateLineSegments();
-
-				} );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
@@ -160,7 +124,7 @@
 
 			}
 
-			function updateLineSegments() {
+			function updateObjectsVisibility() {
 
 				model.traverse( c => {
 
@@ -177,6 +141,13 @@
 						}
 
 					}
+					else if ( c.isGroup ) {
+
+						// Hide objects with construction step > gui setting
+						c.visible = c.userData.constructionStep <= guiData.constructionStep;
+
+					}
+
 
 				} );
 
@@ -248,7 +219,9 @@
 
 						}
 
-						updateLineSegments();
+						guiData.constructionStep = model.userData.numConstructionSteps - 1;
+
+						updateObjectsVisibility();
 
 						// Adjust camera and light
 
@@ -264,6 +237,8 @@
 
 						}
 
+						createGUI();
+
 						hideProgressBar();
 
 					}, onProgress, onError );
@@ -278,6 +253,80 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
+
+			function createGUI() {
+
+				if ( gui ) {
+
+					gui.destroy();
+
+				}
+
+				gui = new dat.GUI();
+
+				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+
+					reloadObject( true );
+
+				} );
+
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				if ( guiData.separateObjects ) {
+
+					if ( model.userData.numConstructionSteps > 1  ) {
+
+						gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( function ( value ) {
+
+							updateObjectsVisibility();
+
+						} );
+
+					}
+					else {
+
+						gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( function ( value ) {
+
+							guiData.noConstructionSteps = "No steps.";
+
+						} );
+
+					}
+
+				}
+
+				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
+
+					envMapActivated = value;
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
+
+					updateObjectsVisibility();
+
+				} );
+
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
+
+					updateObjectsVisibility();
+
+				} );
+
+			}
+
 
 			//
 
