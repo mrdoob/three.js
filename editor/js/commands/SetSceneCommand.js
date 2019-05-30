@@ -21,8 +21,9 @@ var SetSceneCommand = function ( scene ) {
 
 		this.cmdArray.push( new SetUuidCommand( this.editor.scene, scene.uuid ) );
 		this.cmdArray.push( new SetValueCommand( this.editor.scene, 'name', scene.name ) );
+		this.cmdArray.push( new SetValueCommand( this.editor.scene, 'background', scene.background ) );
 		this.cmdArray.push( new SetValueCommand( this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
-
+		
 		while ( scene.children.length > 0 ) {
 
 			var child = scene.children.pop();
