@@ -1308,10 +1308,10 @@ function WebGLRenderer( parameters ) {
 
 					// update skeleton only once in a frame
 
-					if ( object.skeleton.version !== info.render.frame ) {
+					if ( object.skeleton.frame !== info.render.frame ) {
 
 						object.skeleton.update();
-						object.skeleton.version = info.render.frame;
+						object.skeleton.frame = info.render.frame;
 
 					}
 
