@@ -1468,7 +1468,7 @@ function WebGLRenderer( parameters ) {
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
 
-		} else if ( materialProperties.lightsStateVersion !== lightsStateVersion ) {
+		} else if ( program.ready && materialProperties.lightsStateVersion !== lightsStateVersion ) {
 
 			materialProperties.lightsStateVersion = lightsStateVersion;
 
@@ -1524,9 +1524,12 @@ function WebGLRenderer( parameters ) {
 
 		if ( ! program.ready && ! program.isLinked( _this, material ) ) {
 
+			materialProperties.retry = true;
 			return;
 
 		}
+
+		materialProperties.retry = false;
 
 		var programAttributes = program.getAttributes();
 
@@ -1660,7 +1663,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.needsUpdate ) {
+		if ( material.needsUpdate || materialProperties.retry ) {
 
 			initMaterial( material, fog, object );
 			material.needsUpdate = false;
