@@ -599,11 +599,11 @@ THREE.LDrawLoader = ( function () {
 
 		},
 
-		parse: function ( text, onParsed ) {
+		parse: function ( text, path, onLoad ) {
 
 			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
-			this.processObject( text, onProcessed, null, "" );
+			this.processObject( text, onLoad, null, path );
 
 		},
 
