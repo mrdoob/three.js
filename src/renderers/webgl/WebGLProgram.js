@@ -643,15 +643,15 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	if ( parallelShaderExt === null ) {
+	if ( parallelShaderExt !== null && material.parallelCompile ) {
+
+		this.ready = false;
+
+	} else {
 
 		// check for link errors
 		this.checkLink( renderer, material );
 		this.ready = true;
-
-	} else {
-
-		this.ready = false;
 
 	}
 
