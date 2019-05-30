@@ -23,16 +23,16 @@
 	font-weight: 400;
 }
 @font-face {
-  font-family: 'Inter';
-  font-style:  normal;
-  font-weight: 400;
-  src: local('Inter-Regular'), url("../files/Inter-Regular.woff2?v=3.6") format("woff2");
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Inter-Regular'), url("../files/Inter-Regular.woff2?v=3.6") format("woff2");
 }
 @font-face {
-  font-family: 'Inter';
-  font-style:  normal;
-  font-weight: 600;
-  src: local('Inter-SemiBold'), url("../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 600;
+	src: local('Inter-SemiBold'), url("../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
 }
 
 html {
@@ -247,8 +247,8 @@ a.param:hover {
 	}
 
 	h2 {
-    font-size: 1.6rem;
-    line-height: 2.2rem;
+		font-size: 1.6rem;
+		line-height: 2.2rem;
 		margin-top: 1.6rem;
 	}
 }
