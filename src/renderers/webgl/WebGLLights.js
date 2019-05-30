@@ -100,7 +100,7 @@ function UniformsCache() {
 
 }
 
-var count = 0;
+var nextVersion = 0;
 
 function WebGLLights() {
 
@@ -108,17 +108,15 @@ function WebGLLights() {
 
 	var state = {
 
-		id: count ++,
+		version: 0,
 
 		hash: {
-			stateID: - 1,
 			directionalLength: - 1,
 			pointLength: - 1,
 			spotLength: - 1,
 			rectAreaLength: - 1,
 			hemiLength: - 1,
 			shadowsLength: - 1,
-			version: 0
 		},
 
 		ambient: [ 0, 0, 0 ],
@@ -347,7 +345,6 @@ function WebGLLights() {
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
-			hash.stateID = state.id;
 			hash.directionalLength = directionalLength;
 			hash.pointLength = pointLength;
 			hash.spotLength = spotLength;
@@ -355,7 +352,7 @@ function WebGLLights() {
 			hash.hemiLength = hemiLength;
 			hash.shadowsLength = shadows.length;
 
-			hash.version ++;
+			state.version = nextVersion++;
 
 		}
 
