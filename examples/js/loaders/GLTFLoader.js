@@ -12,6 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this.revokeObjectURLs = true;
 
 	}
 
@@ -214,7 +215,8 @@ THREE.GLTFLoader = ( function () {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
-				manager: this.manager
+				manager: this.manager,
+				revokeObjectURLs: this.revokeObjectURLs
 
 			} );
 
@@ -1595,7 +1597,9 @@ THREE.GLTFLoader = ( function () {
 
 		this.json = json || {};
 		this.extensions = extensions || {};
-		this.options = options || {};
+		this.options = options || {
+			revokeObjectURLs: true
+		};
 
 		// loader object cache
 		this.cache = new GLTFRegistry();
@@ -2074,7 +2078,7 @@ THREE.GLTFLoader = ( function () {
 
 			// Clean up resources and configure Texture.
 
-			if ( isObjectURL === true ) {
+			if ( isObjectURL === true && options.revokeObjectURLs ) {
 
 				URL.revokeObjectURL( sourceURI );
 

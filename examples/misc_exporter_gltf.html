@@ -29,11 +29,17 @@
 			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
 			<button id="export_scene_object">Export Scene1 and Sphere</button>
-			<br/><br/>
-			<label><input id="option_trs" name="trs" type="checkbox"/>TRS</label>
+			<br/>
+			<label>
+				Mode:
+				<select id="option_mode" value="glb">
+					<option value="glb">glb (binary)</option>
+					<option value="gltf">gltf</option>
+				</select>
+			</label>
+			<label><input id="option_trs" name="trs" type="checkbox" checked="checked"/>TRS</label>
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label>
-			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
 			<label><input id="option_forceindices" name="visible" type="checkbox">Force indices</label>
 			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 		</div>
@@ -46,33 +52,70 @@
 
 		<script>
 
+			function getOptions () {
+
+				return {
+					mode: document.getElementById('option_mode').value,
+					trs: document.getElementById('option_trs').checked,
+					onlyVisible: document.getElementById('option_visible').checked,
+					truncateDrawRange: document.getElementById('option_drawrange').checked,
+					forceIndices: document.getElementById('option_forceindices').checked,
+					forcePowerOfTwoTextures: document.getElementById('option_forcepot').checked
+				};
+
+			}
+
 			function exportGLTF( input ) {
 
 				var gltfExporter = new THREE.GLTFExporter();
 
-				var options = {
-					trs: document.getElementById( 'option_trs' ).checked,
-					onlyVisible: document.getElementById( 'option_visible' ).checked,
-					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
-					binary: document.getElementById( 'option_binary' ).checked,
-					forceIndices: document.getElementById( 'option_forceindices' ).checked,
-					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked
-				};
-				gltfExporter.parse( input, function ( result ) {
+				var options = getOptions();
 
-					if ( result instanceof ArrayBuffer ) {
+				console.log( options );
 
-						saveArrayBuffer( result, 'scene.glb' );
+				function onComplete ( result ) {
+
+					if ( options.mode === 'glb' ) {
+
+						saveBlob( result, 'scene.glb' );
 
 					} else {
 
-						var output = JSON.stringify( result, null, 2 );
+						var json = result.json;
+						var buffers = result.buffers;
+						var images = result.images;
+
+						var output = JSON.stringify( json, null, 2 );
 						console.log( output );
 						saveString( output, 'scene.gltf' );
 
+						for ( var i = 0; i < buffers.length; i++ ) {
+
+							var buffer = buffers[ i ];
+							var bufferUri = json.buffers[ i ].uri;
+							saveBlob( buffer, bufferUri );
+
+						}
+
+						for ( var j = 0; j < images.length; j++ ) {
+
+							var image = images[ j ];
+							var imageUri = json.images[ j ].uri;
+							saveBlob( image, imageUri );
+
+						}
+
 					}
 
-				}, options );
+				}
+
+				function onError ( error ) {
+
+					console.error( error );
+
+				}
+				
+				gltfExporter.parse( input, onComplete, onError, options );
 
 			}
 
@@ -117,9 +160,11 @@
 			link.style.display = 'none';
 			document.body.appendChild( link ); // Firefox workaround, see #6594
 
-			function save( blob, filename ) {
+			function saveBlob( blob, filename ) {
 
-				link.href = URL.createObjectURL( blob );
+				var url = URL.createObjectURL( blob );
+				
+				link.href = url;
 				link.download = filename;
 				link.click();
 
@@ -129,14 +174,7 @@
 
 			function saveString( text, filename ) {
 
-				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
-
-			}
-
-
-			function saveArrayBuffer( buffer, filename ) {
-
-				save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+				saveBlob( new Blob( [ text ], { type: 'text/plain' } ), filename );
 
 			}
 
