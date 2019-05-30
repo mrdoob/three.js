@@ -4,8 +4,8 @@
 
 	--font-size: 14px;
 	--line-height: 24px;
-	--font-size-sanserif: 1.128rem;
-	--line-height-sanserif: 1.74rem;
+	--font-size-sanserif: 1.14285714286rem;
+	--line-height-sanserif: 1.71428571rem;
 
 	--border-style: 1px solid #E8E8E8;
 	--header-height: 48px;
@@ -60,17 +60,15 @@ a {
 }
 
 h1 {
-	color: var(--color-blue);
 	font-size: 2.8rem;
 	line-height: 3.4rem;
 	font-weight: normal;
 	margin-top: 1rem;
-	margin-bottom: -0.4rem;
+	margin-bottom: -0.2rem;
 	margin-left: -2px;
 }
 
 h2 {
-	color: var(--color-blue);
 	font-size: 2rem;
 	line-height: 2.6rem;
 	font-weight: normal;
@@ -79,12 +77,11 @@ h2 {
 }
 
 h3 {
-	color: var(--color-blue);
-	font-size: 1.32rem;
-	line-height: 2rem;
+	font-size: 1.42857143rem;
+	line-height: 2.14285714rem;
 	font-weight: normal;
 	margin-top: 1.8rem;
-	margin-bottom: 1rem;
+	margin-bottom: -0.4rem;
 }
 
 p,
@@ -117,7 +114,6 @@ li ol {
 	margin-top: 0.25rem;
 }
 
-pre,
 code {
 	margin: 1.2rem calc(-1 * var(--page-padding));
 }
@@ -125,6 +121,15 @@ code {
 ol code,
 ul code {
 	margin: 1.2rem 0;
+}
+
+code.inline {
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+	padding: 0px 5px;
+	background: #F5F5F5;
+	margin: 0;
 }
 
 table {
@@ -158,13 +163,6 @@ code:not(.inline) {
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;
-}
-
-code.inline {
-	display: inline-block;
-	vertical-align: middle;
-	border-radius: 4px;
-	padding: 2px 5px;
 }
 
 iframe {
