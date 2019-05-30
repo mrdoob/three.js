@@ -48,6 +48,14 @@ var files = [
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'lines/Line2.js', dependencies: [ { name: 'LineSegments2', path: 'lines/LineSegments2.js' }, { name: 'LineGeometry', path: 'lines/LineGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
+	{ path: 'lines/LineGeometry.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
+	{ path: 'lines/LineMaterial.js', dependencies: [], ignoreList: [] },
+	{ path: 'lines/LineSegments2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
+	{ path: 'lines/LineSegmentsGeometry.js', dependencies: [], ignoreList: [] },
+	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
+	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
+
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },
