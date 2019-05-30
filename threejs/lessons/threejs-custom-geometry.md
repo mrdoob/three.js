@@ -490,4 +490,4 @@ and we deleted the code related to spinning the cubes.
 I hope that was a useful instruction to making your own
 geometry using `Geometry`.
 
-In another article we'll go over `BufferGeometry`.
+In [another article](threejs-custom-buffergeometry.html) we'll go over `BufferGeometry`.
