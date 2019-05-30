@@ -216,27 +216,27 @@ function WebXRManager( renderer ) {
 
 		if ( pose !== null ) {
 
-			var layer;
 			var views = pose.views;
+			var baseLayer;
 
 			if ( 'renderState' in session ) {
 
-				layer = session.renderState.baseLayer;
+				baseLayer = session.renderState.baseLayer;
 
 			} else {
 
 				// DEPRECATED
 
-				layer = session.baseLayer;
+				baseLayer = session.baseLayer;
 
 			}
 
-			renderer.setFramebuffer( layer.framebuffer );
+			renderer.setFramebuffer( baseLayer.framebuffer );
 
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
-				var viewport = layer.getViewport( view );
+				var viewport = baseLayer.getViewport( view );
 
 				var viewMatrix;
 
@@ -355,6 +355,12 @@ function WebXRManager( renderer ) {
 	this.setDevice = function () {
 
 		console.warn( 'THREE.WebXRManager: setDevice() has been deprecated.' );
+
+	};
+
+	this.setFrameOfReferenceType = function () {
+
+		console.warn( 'THREE.WebXRManager: setFrameOfReferenceType() has been deprecated.' );
 
 	};
 

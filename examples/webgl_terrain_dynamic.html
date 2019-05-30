@@ -4,26 +4,14 @@
 		<title>three.js webgl - dynamic procedural terrain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style type="text/css">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
 			body {
-				background: #000;
-				color: #999;
-				padding: 0;
-				margin: 0;
-				overflow: hidden;
-				font-family: georgia;
-				font-size:1em;
-				text-align: center;
+				color: #333;
 			}
-
-			#info { position: absolute; top: 10px; width: 100%; }
-
-			a { color: #fb0; }
-
-			#footer { position: absolute; bottom: 10px; width: 100%; }
-			.h { color: #fb0 }
-			.c { display: inline; margin-left: 1em }
-
+			a {
+				color: #080;
+			}
 		</style>
 	</head>
 
@@ -35,16 +23,9 @@
 			<a href="https://github.com/ashima/webgl-noise" target="_blank" rel="noopener">3d simplex noise</a><br/>
 			textures by <a href="http://opengameart.org/content/dark-grass">qubodup</a> and
 			<a href="http://opengameart.org/content/backgrounds-topdown-games">davis123</a>
-		</div>
-
-		<div id="footer">
-			<div class="c">
-			day / night: <span class="h">n</span>
-			</div>
-
-			<div class="c">
-			animate terrain: <span class="h">m</span>
-			</div>
+			<br/>
+			day / night: <strong>n</strong>&nbsp;&nbsp;
+			animate terrain: <strong>m</strong>
 		</div>
 
 		<script src="../build/three.js"></script>
