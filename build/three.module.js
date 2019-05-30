@@ -22493,17 +22493,13 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {};
+	this.setFramebufferScaleFactor = function ( value ) {
+
+	};
 
 	this.setReferenceSpaceType = function ( value ) {
 
 		referenceSpaceType = value;
-
-	};
-
-	this.getSession = function () {
-
-		return session;
 
 	};
 
@@ -22518,25 +22514,18 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			if ( 'updateRenderState' in session ) {
+			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
-				session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
-				session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
+			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
-			} else {
+			//
 
-				// DEPRECATED
-
-				session.baseLayer = new XRWebGLLayer( session, gl, { framebufferScaleFactor: 1.0 } );
-				session.requestReferenceSpace( { type: 'stationary', subtype: 'floor-level' } ).then( onRequestReferenceSpace );
-
-			}
-
-			inputSources = session.inputSources || session.getInputSources();
+			inputSources = session.inputSources;
 
 			session.addEventListener( 'inputsourceschange', function () {
 
-				inputSources = session.inputSources || session.getInputSources();
+				inputSources = session.inputSources;
+				console.log( inputSources );
 
 				for ( var i = 0; i < controllers.length; i ++ ) {
 
@@ -22617,19 +22606,7 @@ function WebXRManager( renderer ) {
 		if ( pose !== null ) {
 
 			var views = pose.views;
-			var baseLayer;
-
-			if ( 'renderState' in session ) {
-
-				baseLayer = session.renderState.baseLayer;
-
-			} else {
-
-				// DEPRECATED
-
-				baseLayer = session.baseLayer;
-
-			}
+			var baseLayer = session.renderState.baseLayer;
 
 			renderer.setFramebuffer( baseLayer.framebuffer );
 
@@ -22637,20 +22614,7 @@ function WebXRManager( renderer ) {
 
 				var view = views[ i ];
 				var viewport = baseLayer.getViewport( view );
-
-				var viewMatrix;
-
-				if ( 'transform ' in view ) {
-
-					viewMatrix = view.transform.inverse.matrix;
-
-				} else {
-
-					// DEPRECATED
-
-					viewMatrix = view.viewMatrix;
-
-				}
+				var viewMatrix = view.transform.inverse.matrix;
 
 				var camera = cameraVR.cameras[ i ];
 				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
@@ -22677,38 +22641,11 @@ function WebXRManager( renderer ) {
 
 			if ( inputSource ) {
 
-				var inputPose;
-
-				if ( 'getPose' in frame ) {
-
-					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-				} else {
-
-					// DEPRECATED
-
-					inputPose = frame.getInputPose( inputSource, referenceSpace );
-
-				}
+				var inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
 
 				if ( inputPose !== null ) {
 
-					if ( 'transform' in inputPose ) {
-
-						controller.matrix.fromArray( inputPose.transform.matrix );
-
-					} else if ( 'targetRay' in inputPose ) {
-
-						controller.matrix.elements = inputPose.targetRay.transformMatrix;
-
-					} else if ( 'pointerMatrix' in inputPose ) {
-
-						// DEPRECATED
-
-						controller.matrix.elements = inputPose.pointerMatrix;
-
-					}
-
+					controller.matrix.fromArray( inputPose.transform.matrix );
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
 
@@ -23037,7 +22974,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && ( ( 'supportsSessionMode' in navigator.xr ) || ( 'supportsSession' in navigator.xr ) ) ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
