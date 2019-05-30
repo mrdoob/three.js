@@ -14,9 +14,6 @@
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
 		</div>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<script type="module">
 			import {
 				CubeTextureLoader,
@@ -25,16 +22,12 @@
 				WebGLRenderer
 			} from "../build/three.module.js";
 
+			import Stats from './jsm/libs/stats.module.js';
+
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
 
 			var container, stats, controls;
 			var camera, scene, renderer;
