@@ -9,11 +9,16 @@ var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
-		if ( options && options.frameOfReferenceType ) {
+		var isMagicLeapOne = /(Helio)/g.test( navigator.userAgent );
+
+		var sessionType = isMagicLeapOne ? 'immersive-ar' : 'immersive-vr';
+
+		if ( options && options.frameOfReferenceType && renderer.vr.setFrameOfReferenceType ) {
 
 			renderer.vr.setFrameOfReferenceType( options.frameOfReferenceType );
 
 		}
+
 
 		function showEnterVR( device ) {
 
@@ -81,7 +86,17 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-vr' ).then( onSessionStarted );
+					if ( 'supportSession' in navigator.xr ) {
+
+						navigator.xr.requestSession( sessionType ).then( onSessionStarted );
+
+					} else if ( 'supportsSessionMode' in navigator.xr ) {
+
+						// DEPRECATED
+
+						navigator.xr.requestSession( { mode: sessionType } ).then( onSessionStarted );
+
+					}
 
 				} else {
 
@@ -129,14 +144,24 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'supportsSession' in navigator.xr ) {
+		if ( 'xr' in navigator && ( 'supportsSessionMode' in navigator.xr || 'supportSession' in navigator.xr ) ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR );
+			if ( 'supportSession' in navigator.xr ) {
+
+				navigator.xr.supportsSession( sessionType ).then( showEnterXR );
+
+			} else if ( 'supportsSessionMode' in navigator.xr ) {
+
+				// DEPRECATED
+
+				navigator.xr.supportsSessionMode( sessionType ).then( showEnterXR );
+
+			}
 
 			return button;
 

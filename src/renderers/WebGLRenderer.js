@@ -313,7 +313,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && ( ( 'supportsSessionMode' in navigator.xr ) || ( 'supportsSession' in navigator.xr ) ) ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
