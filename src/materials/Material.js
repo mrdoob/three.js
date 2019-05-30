@@ -61,6 +61,7 @@ function Material() {
 	this.premultipliedAlpha = false;
 
 	this.visible = true;
+	this.parallelCompile = false;
 
 	this.userData = {};
 
