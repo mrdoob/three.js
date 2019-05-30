@@ -2,7 +2,7 @@
 	--color-blue: #049EF4;
 	--text-color: #444;
 
-	--font-size: 16px;
+	--font-size: 14px;
 	--line-height: 24px;
 	--font-size-sanserif: 1.128rem;
 	--line-height-sanserif: 1.74rem;
@@ -22,21 +22,26 @@
 	font-style: normal;
 	font-weight: 400;
 }
-
 @font-face {
-	font-family: 'SF-Pro-Text';
-	src: local('SF-Pro-Text'), url('../files/SF-Pro-Text-Regular.otf');
-	font-weight: normal;
-	font-style: normal;
+  font-family: 'Inter';
+  font-style:  normal;
+  font-weight: 400;
+  src: local('Inter-Regular'), url("../files/Inter-Regular.woff2?v=3.6") format("woff2");
+}
+@font-face {
+  font-family: 'Inter';
+  font-style:  normal;
+  font-weight: 600;
+  src: local('Inter-SemiBold'), url("../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
 }
 
 html {
+	font-family: 'Inter', sans-serif;
 	font-size: var(--font-size);
 	line-height: var(--line-height);
 }
 
 body {
-	font-family: 'SF-Pro-Text', sans-serif;
 	color: var(--text-color);
 	tab-size: 4;
 	overflow: auto;
@@ -115,8 +120,6 @@ li ol {
 pre,
 code {
 	margin: 1.2rem calc(-1 * var(--page-padding));
-	font-size: calc(var(--font-size) - 2px);
-	line-height: calc(var(--line-height) - 2px);
 }
 
 ol code,
@@ -151,7 +154,7 @@ table td:first-child {
 
 code {
 	display: block;
-	padding: 1.5rem var(--page-padding);
+	padding: 1.25rem var(--page-padding);
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;
@@ -170,7 +173,7 @@ table code {
 }
 
 strong {
-	font-weight: bold;
+	font-weight: 600;
 }
 
 
