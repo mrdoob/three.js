@@ -2,7 +2,7 @@
 	--color-blue: #049EF4;
 	--text-color: #444;
 
-	--font-size: 14px;
+	--font-size: 16px;
 	--line-height: 24px;
 	--font-size-sanserif: 1.128rem;
 	--line-height-sanserif: 1.74rem;
@@ -11,7 +11,7 @@
 	--header-height: 48px;
 	--panel-width: 300px;
 	--panel-padding: 1.143rem;
-	--page-padding: 1.5rem;
+	--page-padding: 1.75rem;
 	--max-width: 760px;
 	--icon-size: 1.428rem;
 }
@@ -112,10 +112,11 @@ li ol {
 	margin-top: 0.25rem;
 }
 
-
 pre,
 code {
 	margin: 1.2rem calc(-1 * var(--page-padding));
+	font-size: calc(var(--font-size) - 2px);
+	line-height: calc(var(--line-height) - 2px);
 }
 
 ol code,
@@ -150,7 +151,7 @@ table td:first-child {
 
 code {
 	display: block;
-	padding: 1.32rem var(--page-padding);
+	padding: 1.5rem var(--page-padding);
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;
@@ -218,22 +219,11 @@ a.param:hover {
 	:root {
 		--panel-width: 360px;
 		--font-size: 18px;
-		--line-height: 30px;
-		--header-height: 60px;
+		--line-height: 28px;
+		--header-height: 56px;
 		--max-width: 1160px;
 	}
 }
-
-
-/* @media all and ( min-width: 2400px ) {
-	:root {
-		--panel-width: 480px;
-		--font-size: 24px;
-		--line-height: 38px;
-		--header-height: 72px;
-		--max-width: 1280px;
-	}
-} */
 
 /* mobile */
 

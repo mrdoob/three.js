@@ -360,6 +360,7 @@ iframe {
     padding-left: 1.2rem;
 		color: var(--color-blue);
 		opacity: 1;
+		font-weight: 500;
 	}
 
 
@@ -391,9 +392,9 @@ iframe {
 @media all and ( min-width: 1700px ) {
 	:root {
 		--panel-width: 360px;
-		--font-size: 18px;
+		--font-size: 16px;
 		--line-height: 30px;
-		--header-height: 60px;
+		--header-height: 56px;
 	}
 	#projects {
 		grid-template-columns: repeat(8, 1fr);
@@ -407,18 +408,6 @@ iframe {
 	}
 
 }
-
-/* @media all and ( min-width: 2400px ) {
-	:root {
-		--panel-width: 480px;
-		--font-size: 24px;
-		--line-height: 38px;
-		--header-height: 72px;
-		--max-width: 1280px;
-		--icon-size: 34px;
-	}
-} */
-
 
 @media all and ( max-width: 1300px ) {
 	#projects {
