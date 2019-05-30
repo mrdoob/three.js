@@ -352,7 +352,7 @@ function WebGLLights() {
 			hash.hemiLength = hemiLength;
 			hash.shadowsLength = shadows.length;
 
-			state.version = nextVersion++;
+			state.version = nextVersion ++;
 
 		}
 
