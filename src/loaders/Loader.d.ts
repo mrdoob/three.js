@@ -17,42 +17,44 @@ import { LoaderHandler } from './FileLoader';
  *          message — error message
  */
 export class Loader {
-  constructor();
 
-  /**
+	constructor();
+
+	/**
    * Will be called when load starts.
    * The default is a function with empty body.
    */
-  onLoadStart: () => void;
+	onLoadStart: () => void;
 
-  /**
+	/**
    * Will be called while load progresses.
    * The default is a function with empty body.
    */
-  onLoadProgress: () => void;
+	onLoadProgress: () => void;
 
-  /**
+	/**
    * Will be called when load completes.
    * The default is a function with empty body.
    */
-  onLoadComplete: () => void;
+	onLoadComplete: () => void;
 
-  /**
+	/**
    * default — null.
    * If set, assigns the crossOrigin attribute of the image to the value of crossOrigin, prior to starting the load.
    */
-  crossOrigin: string;
+	crossOrigin: string;
 
-  /**
+	/**
    * @deprecated Use THREE.LoaderUtils.extractUrlBase() instead.
    */
-  extractUrlBase(url: string): string;
-  initMaterials(materials: Material[], texturePath: string): Material[];
-  createMaterial(
-    m: Material,
-    texturePath: string,
-    crossOrigin?: string
-  ): boolean;
+	extractUrlBase( url: string ): string;
+	initMaterials( materials: Material[], texturePath: string ): Material[];
+	createMaterial(
+		m: Material,
+		texturePath: string,
+		crossOrigin?: string
+	): boolean;
 
-  static Handlers: LoaderHandler;
+	static Handlers: LoaderHandler;
+
 }

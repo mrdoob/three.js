@@ -24,7 +24,8 @@ export interface MeshMatcapMaterialParameters extends MaterialParameters {
 }
 
 export class MeshMatcapMaterial extends Material {
-	constructor(parameters?: MeshMatcapMaterialParameters);
+
+	constructor( parameters?: MeshMatcapMaterialParameters );
 
 	color: Color;
 	matMap: Texture | null;
@@ -42,5 +43,6 @@ export class MeshMatcapMaterial extends Material {
 	morphTargets: boolean;
 	morphNormals: boolean;
 
-	setValues(parameters: MeshMatcapMaterialParameters): void;
+	setValues( parameters: MeshMatcapMaterialParameters ): void;
+
 }

@@ -381,9 +381,9 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 	this.positionAttribute = null;
 	this.uvsAttribute = null;
 
-	this.simplexX = new SimplexNoise( this.seedGenerator );
-	this.simplexY = new SimplexNoise( this.seedGenerator );
-	this.simplexZ = new SimplexNoise( this.seedGenerator );
+	this.simplexX = new THREE.SimplexNoise( this.seedGenerator );
+	this.simplexY = new THREE.SimplexNoise( this.seedGenerator );
+	this.simplexZ = new THREE.SimplexNoise( this.seedGenerator );
 
 	// Temp vectors
 	this.forwards = new THREE.Vector3();

@@ -1,4 +1,5 @@
 import {
+	Clock,
   WebGLRenderer,
   WebGLRenderTarget,
 } from '../../../src/Three';
@@ -15,6 +16,7 @@ export class EffectComposer {
   readBuffer: WebGLRenderTarget;
   passes: Pass[];
   copyPass: ShaderPass;
+  clock: Clock;
 
   swapBuffers(): void;
   addPass(pass: Pass): void;

@@ -1,5 +1,5 @@
 import {
-  Group
+  Group,
   LoadingManager
 } from '../../../src/Three';
 

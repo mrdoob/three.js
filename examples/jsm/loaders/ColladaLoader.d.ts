@@ -12,7 +12,7 @@ export interface Collada {
   scene: Scene;
 }
 
-export class Collada {
+export class ColladaLoader {
   constructor(manager?: LoadingManager);
   manager: LoadingManager;
   crossOrigin: string;
