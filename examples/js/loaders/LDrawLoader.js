@@ -593,13 +593,7 @@ THREE.LDrawLoader = ( function () {
 			fileLoader.setPath( this.path );
 			fileLoader.load( url, function ( text ) {
 
-				processObject( text, function onMainObjectProcessed( model ) {
-
-					scope.computeConstructionSteps( model );
-
-					onLoad( model );
-
-				} );
+				processObject( text, onLoad );
 
 			}, onProgress, onError );
 
@@ -766,6 +760,13 @@ THREE.LDrawLoader = ( function () {
 							parentTriangles.push( tri );
 
 						}
+
+					}
+
+					// If it is root object, compute construction steps
+					if ( ! parentParseScope.isFromParse ) {
+
+						scope.computeConstructionSteps( parseScope.groupObject );
 
 					}
 
