@@ -1,7 +1,9 @@
-// r104
+// r105
 
 const staticAssets = [
 	'./',
+
+	'../files/favicon.ico',
 
 	'../build/three.js',
 	'../examples/js/libs/system.min.js',
@@ -125,9 +127,14 @@ const staticAssets = [
 	'./js/Sidebar.Geometry.BoxGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
+	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
+	'./js/Sidebar.Geometry.OctahedronGeometry.js',
 	'./js/Sidebar.Geometry.PlaneGeometry.js',
+	'./js/Sidebar.Geometry.RingGeometry.js',
 	'./js/Sidebar.Geometry.SphereGeometry.js',
+	'./js/Sidebar.Geometry.ShapeGeometry.js',
+	'./js/Sidebar.Geometry.TetrahedronGeometry.js',
 	'./js/Sidebar.Geometry.TorusGeometry.js',
 	'./js/Sidebar.Geometry.TorusKnotGeometry.js',
 	'./js/Sidebar.Geometry.TubeGeometry.js',
@@ -141,6 +148,7 @@ const staticAssets = [
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
+	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
 
 	'./js/Command.js',
