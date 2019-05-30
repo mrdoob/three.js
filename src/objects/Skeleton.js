@@ -16,6 +16,8 @@ function Skeleton( bones, boneInverses ) {
 	this.bones = bones.slice( 0 );
 	this.boneMatrices = new Float32Array( this.bones.length * 16 );
 
+	this.version = - 1;
+
 	// use the supplied bone inverses or calculate the inverses
 
 	if ( boneInverses === undefined ) {
