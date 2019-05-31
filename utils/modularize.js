@@ -176,6 +176,7 @@ var files = [
 	{ path: 'shaders/SobelOperatorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SSAOShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TechnicolorShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/TerrainShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToneMapShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TriangleBlurShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
