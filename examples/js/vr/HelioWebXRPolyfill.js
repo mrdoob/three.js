@@ -1,22 +1,22 @@
+if ('xr' in navigator && /(Helio)/g.test(navigator.userAgent)) {
 
-
-if( 'xr' in navigator ) {
-
-	console.log('Helio - (Chrome m73) WebXR Polyfill', navigator.xr);
+	console.log('Helio WebXR Polyfill', navigator.xr);
 
 	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
 
-	navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
+	if ('supportsSession' in navigator.xr === false) navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
 
-	if( 'supportsSessionMode' in navigator.xr ) {
+	if ('requestSession' in navigator.xr) {
 
 		const tempRequestSession = navigator.xr.requestSession.bind(navigator.xr);
 
 		navigator.xr.requestSession = function (sessionType) {
 
 			return new Promise((resolve, reject) => {
-				tempRequestSession({ mode: sessionType })
-					.then(session => {
+				tempRequestSession({
+						mode: sessionType
+					})
+					.then(function (session) {
 
 						// WebXRManager - xrFrame.getPose() Polyfill - line 279
 
@@ -31,11 +31,11 @@ if( 'xr' in navigator ) {
 
 								const tempGetViewerPose = frame.getViewerPose.bind(frame);
 
-								frame.getViewerPose = function ( referenceSpace ) {
+								frame.getViewerPose = function (referenceSpace) {
 
-									const pose = tempGetViewerPose( referenceSpace );
+									const pose = tempGetViewerPose(referenceSpace);
 
-									pose.views.forEach(view => {
+									pose.views.forEach(function (view) {
 
 										view.transform = {
 											inverse: {
@@ -63,11 +63,11 @@ if( 'xr' in navigator ) {
 
 								}
 
-								callback(time, frame);
+								callback(time, frame)
 
 							})
 
-						};
+						}
 
 						// WebXRManager - xrFrame.getPose( inputSource.targetRaySpace, referenceSpace) Polyfill - line 279
 
@@ -83,9 +83,9 @@ if( 'xr' in navigator ) {
 									get: function () {
 										return xrInputSource
 									},
-								});
+								})
 
-							});
+							})
 
 							return res;
 						}
@@ -98,7 +98,9 @@ if( 'xr' in navigator ) {
 
 						// WebXRManager - xrSession.updateRenderState() Polyfill Line 129
 
-						session.updateRenderState = function ({ baseLayer }) {
+						session.updateRenderState = function ({
+							baseLayer
+						}) {
 
 							session.baseLayer = baseLayer;
 
@@ -116,13 +118,19 @@ if( 'xr' in navigator ) {
 
 						session.requestReferenceSpace = function () {
 
-							return temp({ type: 'stationary', subtype: 'floor-level' });
+							return temp({
+								type: 'stationary',
+								subtype: 'floor-level'
+							})
 
 						}
 
 						resolve(session);
 
-					});
+					})
+					.catch(function (error) {
+						return reject(error);
+					})
 			})
 
 		}
@@ -130,5 +138,3 @@ if( 'xr' in navigator ) {
 	}
 
 }
-
-

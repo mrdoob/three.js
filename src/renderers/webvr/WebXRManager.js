@@ -261,7 +261,6 @@ function WebXRManager( renderer ) {
 				if ( inputPose !== null ) {
 
 					controller.matrix.fromArray( inputPose.transform.matrix );
-
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
 					controller.visible = true;
 

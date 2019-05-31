@@ -48,8 +48,6 @@ var WEBVR = {
 
 			function onSessionStarted( session ) {
 
-				console.log(session);
-
 				session.addEventListener( 'end', onSessionEnded );
 
 				renderer.vr.setSession( session );
@@ -135,16 +133,12 @@ var WEBVR = {
 
 		}
 
-		console.log(navigator);
-
 		if ( 'xr' in navigator ) {
 
-			console.log('test');
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
-			console.log(navigator.xr)
 			navigator.xr.supportsSession( sessionType ).then( showEnterXR );
 
 			return button;
