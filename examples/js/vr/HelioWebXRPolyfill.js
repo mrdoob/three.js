@@ -2,7 +2,7 @@
  * @author mvilledieu / http://github.com/mvilledieu
  */
 
-if ('xr' in navigator && /(Helio)/g.test(navigator.userAgent)) {
+if (/(Helio)/g.test(navigator.userAgent) && 'xr' in navigator) {
 
 	console.log('Helio WebXR Polyfill', navigator.xr);
 
