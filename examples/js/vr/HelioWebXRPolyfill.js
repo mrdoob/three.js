@@ -2,147 +2,132 @@
  * @author mvilledieu / http://github.com/mvilledieu
  */
 
-if (/(Helio)/g.test(navigator.userAgent) && 'xr' in navigator) {
+if (/(Helio)/g.test(navigator.userAgent) && "xr" in navigator) {
+  console.log("Helio WebXR Polyfill", navigator.xr);
 
-	console.log('Helio WebXR Polyfill', navigator.xr);
+  // WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
 
-	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
+  if (
+    "supportsSession" in navigator.xr === false &&
+    "supportsSessionMode" in navigator.xr
+  ) {
+    navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
+  }
 
-	if ('supportsSession' in navigator.xr === false && 'supportsSessionMode' in navigator.xr) {
+  if ("requestSession" in navigator.xr) {
+    const tempRequestSession = navigator.xr.requestSession.bind(navigator.xr);
 
-		navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
+    navigator.xr.requestSession = function(sessionType) {
+      return new Promise((resolve, reject) => {
+        tempRequestSession({
+          mode: sessionType
+        })
+          .then(function(session) {
+            // WebXRManager - xrFrame.getPose() Polyfill - line 279
 
-	}
+            const tempRequestAnimationFrame = session.requestAnimationFrame.bind(
+              session
+            );
 
-	if ('requestSession' in navigator.xr) {
+            session.requestAnimationFrame = function(callback) {
+              return tempRequestAnimationFrame(function(time, frame) {
+                // WebXRManager - xrFrame.getViewerPose() Polyfill - line 279
+                // Transforms view.viewMatrix to view.transform.inverse.matrix
 
-		const tempRequestSession = navigator.xr.requestSession.bind(navigator.xr);
+                const tempGetViewerPose = frame.getViewerPose.bind(frame);
 
-		navigator.xr.requestSession = function (sessionType) {
+                frame.getViewerPose = function(referenceSpace) {
+                  const pose = tempGetViewerPose(referenceSpace);
 
-			return new Promise((resolve, reject) => {
-				tempRequestSession({
-						mode: sessionType
-					})
-					.then(function (session) {
+                  pose.views.forEach(function(view) {
+                    view.transform = {
+                      inverse: {
+                        matrix: view.viewMatrix
+                      }
+                    };
+                  });
 
-						// WebXRManager - xrFrame.getPose() Polyfill - line 279
+                  return pose;
+                };
 
-						const tempRequestAnimationFrame = session.requestAnimationFrame.bind(session);
+                // WebXRManager - xrFrame.getPose() Polyfill - line 259
 
-						session.requestAnimationFrame = function (callback) {
+                frame.getPose = function(targetRaySpace, referenceSpace) {
+                  const inputPose = frame.getInputPose(
+                    targetRaySpace,
+                    referenceSpace
+                  );
 
-							return tempRequestAnimationFrame(function (time, frame) {
+                  inputPose.transform = {
+                    matrix: inputPose.targetRay.transformMatrix
+                  };
 
-								// WebXRManager - xrFrame.getViewerPose() Polyfill - line 279
-								// Transforms view.viewMatrix to view.transform.inverse.matrix
+                  return inputPose;
+                };
 
-								const tempGetViewerPose = frame.getViewerPose.bind(frame);
+                callback(time, frame);
+              });
+            };
 
-								frame.getViewerPose = function (referenceSpace) {
+            // WebXRManager - xrFrame.getPose( inputSource.targetRaySpace, referenceSpace) Polyfill - line 279
 
-									const pose = tempGetViewerPose(referenceSpace);
+            const tempGetInputSources = session.getInputSources.bind(session);
 
-									pose.views.forEach(function (view) {
+            session.getInputSources = function() {
+              const res = tempGetInputSources();
 
-										view.transform = {
-											inverse: {
-												matrix: view.viewMatrix
-											}
-										}
+              res.forEach(xrInputSource => {
+                Object.defineProperty(xrInputSource, "targetRaySpace", {
+                  get: function() {
+                    return xrInputSource;
+                  }
+                });
+              });
 
-									})
+              return res;
+            };
 
-									return pose;
+            // WebXRManager - xrSession.getInputSources() Polyfill Line 132 - 136
 
-								}
+            session.inputSources = Object.defineProperty(
+              session,
+              "inputSources",
+              {
+                get: session.getInputSources
+              }
+            );
 
-								// WebXRManager - xrFrame.getPose() Polyfill - line 259
+            // WebXRManager - xrSession.updateRenderState() Polyfill Line 129
 
-								frame.getPose = function (targetRaySpace, referenceSpace) {
+            session.updateRenderState = function({ baseLayer }) {
+              session.baseLayer = baseLayer;
 
-									const inputPose = frame.getInputPose(targetRaySpace, referenceSpace);
+              // WebXRManager - xrSession.renderState.baseLayer Polyfill Line 219
 
-									inputPose.transform = {
-										matrix: inputPose.targetRay.transformMatrix
-									}
+              session.renderState = {
+                baseLayer: baseLayer
+              };
+            };
 
-									return inputPose;
+            // WebXRManager - xrSession.requestReferenceSpace() Polyfill Line 130
 
-								}
+            const tempRequestReferenceSpace = session.requestReferenceSpace.bind(
+              session
+            );
 
-								callback(time, frame)
+            session.requestReferenceSpace = function() {
+              return tempRequestReferenceSpace({
+                type: "stationary",
+                subtype: "floor-level"
+              });
+            };
 
-							})
-
-						}
-
-						// WebXRManager - xrFrame.getPose( inputSource.targetRaySpace, referenceSpace) Polyfill - line 279
-
-						const tempGetInputSources = session.getInputSources.bind(session);
-
-						session.getInputSources = function () {
-
-							const res = tempGetInputSources();
-
-							res.forEach(xrInputSource => {
-
-								Object.defineProperty(xrInputSource, 'targetRaySpace', {
-									get: function () {
-										return xrInputSource
-									},
-								})
-
-							})
-
-							return res;
-						}
-
-						// WebXRManager - xrSession.getInputSources() Polyfill Line 132 - 136
-
-						session.inputSources = Object.defineProperty(session, 'inputSources', {
-							get: session.getInputSources
-						});
-
-						// WebXRManager - xrSession.updateRenderState() Polyfill Line 129
-
-						session.updateRenderState = function ({
-							baseLayer
-						}) {
-
-							session.baseLayer = baseLayer;
-
-							// WebXRManager - xrSession.renderState.baseLayer Polyfill Line 219
-
-							session.renderState = {
-								baseLayer: baseLayer,
-							}
-
-						}
-
-						// WebXRManager - xrSession.requestReferenceSpace() Polyfill Line 130
-
-						const tempRequestReferenceSpace = session.requestReferenceSpace.bind(session);
-
-						session.requestReferenceSpace = function () {
-
-							return tempRequestReferenceSpace({
-								type: 'stationary',
-								subtype: 'floor-level'
-							})
-
-						}
-
-						resolve(session);
-
-					})
-					.catch(function (error) {
-						return reject(error);
-					})
-			})
-
-		}
-
-	}
-
+            resolve(session);
+          })
+          .catch(function(error) {
+            return reject(error);
+          });
+      });
+    };
+  }
 }
