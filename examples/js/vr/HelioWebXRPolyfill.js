@@ -4,7 +4,11 @@ if ('xr' in navigator && /(Helio)/g.test(navigator.userAgent)) {
 
 	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
 
-	if ('supportsSession' in navigator.xr === false) navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
+	if ('supportsSession' in navigator.xr === false && 'supportsSessionMode' in navigator.xr) {
+
+		navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
+
+	}
 
 	if ('requestSession' in navigator.xr) {
 
