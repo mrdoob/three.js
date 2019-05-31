@@ -165,7 +165,7 @@
 
 		}
 
-		if ( window.location.hash !== '' ) {
+		if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
 
 			loadFile( window.location.hash.substring( 1 ) );
 
