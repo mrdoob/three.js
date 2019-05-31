@@ -447,7 +447,7 @@ A few minor changes to make it easier to view.
 * include the `OrbitControls`
 
 ```html
-<script src="resources/threejs/r103/three.js"></script>
+<script src="resources/threejs/r103/three.min.js"></script>
 +<script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
 ```
 

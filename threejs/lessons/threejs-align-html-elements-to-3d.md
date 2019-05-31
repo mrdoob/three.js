@@ -723,7 +723,7 @@ Finally, since I'm not sure what good values are for these settings lets
 add a GUI so we can play with them
 
 ```html
-<script src="resources/threejs/r103/three.js"></script>
+<script src="resources/threejs/r103/three.min.js"></script>
 <script src="resources/threejs/r103/js/utils/BufferGeometryUtils.js"></script>
 <script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
 +<script src="../3rdparty/dat.gui.min.js"></script>

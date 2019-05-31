@@ -377,7 +377,7 @@ because the original webgl globe uses
 We need to include the library
 
 ```html
-<script src="resources/threejs/r103/three.js"></script>
+<script src="resources/threejs/r103/three.min.js"></script>
 <script src="resources/threejs/r103/js/utils/BufferGeometryUtils.js"></script>
 <script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
 +<script src="resources/threejs/r103/js/libs/tween.min.js"></script>
