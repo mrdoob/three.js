@@ -7,7 +7,9 @@ export default /* glsl */`
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
-#define saturate(a) clamp( a, 0.0, 1.0 )
+#ifndef saturate
+    #define saturate(a) clamp( a, 0.0, 1.0 )
+#endif
 #define whiteCompliment(a) ( 1.0 - saturate( a ) )
 
 float pow2( const in float x ) { return x*x; }
