@@ -3,20 +3,14 @@
 	--text-color: #444;
 	--secondary-text-color: #9e9e9e;
 
-	--font-size: 14px;
+	--font-size: 16px;
 	--line-height: 24px;
-	--font-size-sanserif: 1.128rem;
-	--line-height-sanserif: 1.74rem;
 
 	--border-style: 1px solid #E8E8E8;
 	--header-height: 48px;
 	--panel-width: 300px;
-	--panel-padding: 1.143rem;
-	--page-padding: 1.5rem;
-	--max-width: 760px;
+	--panel-padding: 16px;
 	--icon-size: 20px;
-
-	--thumbnail-width: 200px;
 }
 
 @font-face {
@@ -43,8 +37,8 @@ html, body {
 }
 
 html {
-	font-size: var(--font-size);
-	line-height: var(--line-height);
+	font-size: calc(var(--font-size) - 1px);
+	line-height: calc(var(--line-height) + 1px);
 }
 
 body {
@@ -60,25 +54,25 @@ a {
 }
 
 h1 {
-	font-size: 1.28rem;
-	line-height: 1.6rem;
+	font-size: 18px;
+	line-height: 24px;
 	font-weight: 500;
 }
 
 h2 {
 	padding: 0;
-	margin: 1rem 0;
-	font-size: 1rem;
-	line-height: 1.52rem;
+	margin: 16px 0;
+	font-size: calc(var(--font-size) - 1px);
+	line-height: calc(var(--line-height) + 1px);
 	font-weight: 500;
 	color: var(--color-blue);
 }
 
 h3 {
-	margin: 0.25rem 0;
+	margin: 2px 0;
 	font-weight: 500;
-	font-size: 1rem;
-	line-height: 1.52rem;
+	font-size: calc(var(--font-size) - 1px);
+	line-height: calc(var(--line-height) + 1px);
 	color: var(--secondary-text-color);
 }
 
@@ -102,8 +96,8 @@ h1 a {
 #header #version {
 	border: 1px solid var(--color-blue);
 	color: var(--color-blue);
-	border-radius: 0.25rem;
-	line-height: 1.2rem;
+	border-radius: 4px;
+	line-height: 16px;
 	padding: 0px 2px;
 	margin-left: 6px;
 	font-size: .9rem;
@@ -123,15 +117,15 @@ h1 a {
 }
 
 	#panel #exitSearchButton {
-		width: 3rem;
-		height: 3rem;
+		width: 48px;
+		height: 48px;
 		display: none;
 		background-size: var(--icon-size);
 		background-position: 50% 50%;
 		background-repeat: no-repeat;
 		background-image: url(../files/ic_close_black_24dp.svg);
 		cursor: pointer;
-		margin-right: 2px;
+		margin-right: 0px;
 	}
 
 	#panel.searchFocused #exitSearchButton {
@@ -148,8 +142,8 @@ h1 a {
 	}
 
 	#panel #expandButton {
-		width: 3rem;
-		height: 3rem;
+		width: 48px;
+		height: 48px;
 		margin-right: 4px;
 		margin-left: 4px;
 		display: none;
@@ -214,7 +208,7 @@ h1 a {
 	#panel #filter {
 		flex: 1;
 		width: 100%;
-		padding: 0 2.2rem;
+		padding: 0 36px;
 		font-size: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
@@ -239,7 +233,7 @@ h1 a {
 		background-repeat: no-repeat;
 		background-position: right center;
 		background-color: white;
-		padding: 4px 1.72rem;
+		padding: 2px 24px 4px 24px;
 		-webkit-appearance: none;
 		-moz-appearance: none;
 		appearance: none;
@@ -261,26 +255,26 @@ h1 a {
 		flex: 1;
 		overflow-y: scroll;
 		overflow-x: hidden;
-		padding: 0 var(--panel-padding) 1rem var(--panel-padding);
+		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
 
 		#panel #content ul {
 			list-style-type: none;
 			padding: 0px;
-			margin: 0px 0 1.2rem 0;
+			margin: 0px 0 20px 0;
 		}
 		#panel #content ul li {
 			margin: 1px 0;
 		}
 
 		#panel #content h2 {
-			margin-top: 2rem;
+			margin-top: 32px;
 			border-top: var(--border-style);
-	    padding-top: .8rem;
+	    padding-top: 12px;
 		}
 
 		#panel #content h2:first-child {
-			margin-top: 1rem !important;
+			margin-top: 16px !important;
 			border-top: none;
 			padding-top: 0;
 		}
@@ -306,9 +300,9 @@ h1 a {
 		body.home #panel #content h2 {
 			margin-bottom: 2px;
 			padding-bottom: 0px;
-			margin-top: 1.2rem;
+			margin-top: 18px;
 			border-top: none;
-			padding-top: .4rem;
+			padding-top: 6px;
 		}
 
 .spacer {
@@ -334,30 +328,31 @@ iframe {
 
 #button {
 	position: fixed;
-	bottom: 1rem;
-	right: 1rem;
-	padding: 0.75rem;
-	border-radius: 2rem;
+	bottom: 16px;
+	right: 16px;
+
+	padding: 12px;
+	border-radius: 50%;
 	margin-bottom: 0px;
+
 	background-color: #FFF;
 	opacity: .9;
 	z-index: 999;
+
 	box-shadow: 0 0 4px rgba(0,0,0,.15);
 }
-
 	#button:hover {
 		cursor: pointer;
 		opacity: 1;
 	}
-
 	#button img {
 		display: block;
-		width:  calc(1.125 * var(--icon-size));
+		width: var(--icon-size);
 	}
 
 	#button.text {
-		padding-right: 1.2rem;
-    padding-left: 1.2rem;
+		padding-right: 20px;
+    padding-left: 20px;
 		color: var(--color-blue);
 		opacity: 1;
 		font-weight: 500;
@@ -392,9 +387,10 @@ iframe {
 @media all and ( min-width: 1700px ) {
 	:root {
 		--panel-width: 360px;
-		--font-size: 16px;
-		--line-height: 30px;
+		--font-size: 18px;
+		--line-height: 26px;
 		--header-height: 56px;
+		--icon-size: 24px;
 	}
 	#projects {
 		grid-template-columns: repeat(8, 1fr);
