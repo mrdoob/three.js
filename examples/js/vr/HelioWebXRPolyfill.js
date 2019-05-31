@@ -118,11 +118,11 @@ if ('xr' in navigator && /(Helio)/g.test(navigator.userAgent)) {
 
 						// WebXRManager - xrSession.requestReferenceSpace() Polyfill Line 130
 
-						const temp = session.requestReferenceSpace.bind(session);
+						const tempRequestReferenceSpace = session.requestReferenceSpace.bind(session);
 
 						session.requestReferenceSpace = function () {
 
-							return temp({
+							return tempRequestReferenceSpace({
 								type: 'stationary',
 								subtype: 'floor-level'
 							})
