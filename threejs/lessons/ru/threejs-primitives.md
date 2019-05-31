@@ -330,8 +330,8 @@ function addLineGeometry(x, y, geometry) {
 Далее давайте рассмотрим [как работает граф сцены и как его использовать](threejs-scenegraph.html).
 
 <canvas id="c"></canvas>
-<script src="../../resources/threejs/r103/three.min.js"></script>
-<script src="../../resources/threejs/r103/js/controls/TrackballControls.js"></script>
+<script src="../../resources/threejs/r105/three.min.js"></script>
+<script src="../../resources/threejs/r105/js/controls/TrackballControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-primitives.js"></script>
 <style>

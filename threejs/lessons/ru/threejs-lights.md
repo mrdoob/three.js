@@ -28,8 +28,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 включить их в нашу страницу.
 
 ```html
-<script src="../resources/threejs/r103/three.min.js"></script>
-+<script src="../resources/threejs/r103/js/controls/OrbitControls.js"></script>
+<script src="../resources/threejs/r105/three.min.js"></script>
++<script src="../resources/threejs/r105/js/controls/OrbitControls.js"></script>
 ```
 
 Теперь мы можем использовать их. Мы передаем в `OrbitControls` камеру для 
@@ -468,8 +468,8 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 Для использования `RectAreaLight` нам нужно включить некоторые дополнительные возможности three.js
 
 ```html
-<script src="../resources/threejs/r103/three.min.js"></script>
-+<script src="../resources/threejs/r103/js/lights/RectAreaLightUniformsLib.js"></script>
+<script src="../resources/threejs/r105/three.min.js"></script>
++<script src="../resources/threejs/r105/js/lights/RectAreaLightUniformsLib.js"></script>
 ```
 
 Если вы забудете RectAreaLightUniformsLib, индикатор все равно будет работать, 
@@ -564,7 +564,7 @@ gui.add(light, 'power', 0, 2000);
 Далее давайте перейдем к  [работе с камерами](threejs-cameras.html).
 
 <canvas id="c"></canvas>
-<script src="../../resources/threejs/r103/three.min.js"></script>
-<script src="../../resources/threejs/r103/js/controls/OrbitControls.js"></script>
+<script src="../../resources/threejs/r105/three.min.js"></script>
+<script src="../../resources/threejs/r105/js/controls/OrbitControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-lights.js"></script>

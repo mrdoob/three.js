@@ -590,7 +590,7 @@ function render(time) {
 А пока давайте перейдем к [теням](threejs-shadows.html).
 
 <canvas id="c"></canvas>
-<script src="../../resources/threejs/r103/three.min.js"></script>
-<script src="../../resources/threejs/r103/js/controls/TrackballControls.js"></script>
+<script src="../../resources/threejs/r105/three.min.js"></script>
+<script src="../../resources/threejs/r105/js/controls/TrackballControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-cameras.js"></script>

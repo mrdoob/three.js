@@ -260,8 +260,8 @@ What's left is to add some `OrbitControls` so we can move
 the camera.
 
 ```html
-<script src="resources/threejs/r103/three.min.js"></script>
-+<script src="resources/threejs/r103/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r105/three.min.js"></script>
++<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
 ```
 
 ```js
