@@ -9,6 +9,10 @@ var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
+		var isMagicLeapOne = /(Helio)/g.test( navigator.userAgent );
+
+		var sessionType = isMagicLeapOne ? 'immersive-ar' : 'immersive-vr';
+
 		if ( options && options.referenceSpaceType ) {
 
 			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
@@ -43,6 +47,8 @@ var WEBVR = {
 			var currentSession = null;
 
 			function onSessionStarted( session ) {
+
+				console.log(session);
 
 				session.addEventListener( 'end', onSessionEnded );
 
@@ -81,7 +87,7 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-vr' ).then( onSessionStarted );
+					navigator.xr.requestSession( sessionType ).then( onSessionStarted );
 
 				} else {
 
@@ -129,14 +135,17 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'supportsSession' in navigator.xr ) {
+		console.log(navigator);
 
+		if ( 'xr' in navigator ) {
+
+			console.log('test');
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
-
-			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR );
+			console.log(navigator.xr)
+			navigator.xr.supportsSession( sessionType ).then( showEnterXR );
 
 			return button;
 
