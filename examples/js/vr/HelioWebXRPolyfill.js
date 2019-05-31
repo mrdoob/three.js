@@ -13,7 +13,11 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
     "supportsSessionMode" in navigator.xr
 	) {
 
-		navigator.xr.supportsSession = navigator.xr.supportsSessionMode;
+		navigator.xr.supportsSession = function () {
+
+			return navigator.xr.supportsSessionMode( 'immersive-ar' );
+
+		};
 
 	}
 
@@ -26,7 +30,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 			return new Promise( ( resolve, reject ) => {
 
 				tempRequestSession( {
-					mode: sessionType
+					mode: 'immersive-ar'
 				} )
 					.then( function ( session ) {
 
