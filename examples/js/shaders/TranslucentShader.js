@@ -3,23 +3,15 @@
  *
  */
 
+THREE.TranslucentShader = {
 
-THREE.TranslucentShader = function TranslucentShader() {
-
-	/* ------------------------------------------------------------------------------------------
-	//	Subsurface Scattering shader
-	// 		- Base on GDC 2011 – Approximating Translucency for a Fast, Cheap and Convincing Subsurface Scattering Look
-	// 			https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/
-	// ------------------------------------------------------------------------------------------ */
-
-	this.uniforms = THREE.UniformsUtils.merge( [
+	uniforms: THREE.UniformsUtils.merge( [
 
 		THREE.UniformsLib[ "common" ],
 		THREE.UniformsLib[ "lights" ],
-
 		{
-			"color":  { value: new THREE.Color( 0xffffff ) },
-			"diffuse":  { value: new THREE.Color( 0xffffff ) },
+			"color": { value: new THREE.Color( 0xffffff ) },
+			"diffuse": { value: new THREE.Color( 0xffffff ) },
 			"specular": { value: new THREE.Color( 0xffffff ) },
 			"emissive": { value: new THREE.Color( 0x000000 ) },
 			"opacity": { value: 1 },
@@ -34,9 +26,36 @@ THREE.TranslucentShader = function TranslucentShader() {
 			"thicknessScale": { value: 10.0 }
 		}
 
-	] );
+	] ),
 
-	this.fragmentShader = [
+	vertexShader: [
+
+		"varying vec3 vNormal;",
+		"varying vec2 vUv;",
+
+		"varying vec3 vViewPosition;",
+
+		THREE.ShaderChunk[ "common" ],
+
+		"void main() {",
+
+		"	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+
+		"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+		"	vViewPosition = -mvPosition.xyz;",
+
+		"	vNormal = normalize( normalMatrix * normal );",
+
+		"	vUv = uv;",
+
+		"	gl_Position = projectionMatrix * mvPosition;",
+
+		"}",
+
+	].join( "\n" ),
+
+	fragmentShader: [
 		"#define USE_MAP",
 		"#define PHONG",
 		"#define TRANSLUCENT",
@@ -82,13 +101,13 @@ THREE.TranslucentShader = function TranslucentShader() {
 		"	vec4 diffuseColor = vec4( diffuse, opacity );",
 		"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
-			THREE.ShaderChunk[ "map_fragment" ],
-			THREE.ShaderChunk[ "color_fragment" ],
-			THREE.ShaderChunk[ "specularmap_fragment" ],
+		THREE.ShaderChunk[ "map_fragment" ],
+		THREE.ShaderChunk[ "color_fragment" ],
+		THREE.ShaderChunk[ "specularmap_fragment" ],
 
 		"	vec3 totalEmissiveRadiance = emissive;",
 
-			THREE.ShaderChunk["lights_phong_fragment"],
+		THREE.ShaderChunk[ "lights_phong_fragment" ],
 
 		// Doing lights fragment begin.
 		"	GeometricContext geometry;",
@@ -165,42 +184,15 @@ THREE.TranslucentShader = function TranslucentShader() {
 		"		vec3 clearCoatRadiance = vec3( 0.0 );",
 
 		"	#endif",
-			THREE.ShaderChunk["lights_fragment_end"],
+		THREE.ShaderChunk[ "lights_fragment_end" ],
 
 		"	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
 		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
-			THREE.ShaderChunk["encodings_fragment"],
+		THREE.ShaderChunk[ "encodings_fragment" ],
 
 		"}"
 
 	].join( "\n" ),
-
-	this.vertexShader = [
-
-		"varying vec3 vNormal;",
-		"varying vec2 vUv;",
-
-		"varying vec3 vViewPosition;",
-
-		THREE.ShaderChunk[ "common" ],
-
-		"void main() {",
-
-		"	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
-
-		"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
-		"	vViewPosition = -mvPosition.xyz;",
-
-		"	vNormal = normalize( normalMatrix * normal );",
-
-		"	vUv = uv;",
-
-		"	gl_Position = projectionMatrix * mvPosition;",
-
-		"}",
-
-	].join( "\n" )
 
 };

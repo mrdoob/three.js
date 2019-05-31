@@ -20,7 +20,7 @@
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/libs/dat.gui.min.js"></script>
 	<script src="js/loaders/FBXLoader.js"></script>
-	<script src="js/ShaderTranslucent.js"></script>
+	<script src="js/shaders/TranslucentShader.js"></script>
 
 	<script>
 
@@ -97,7 +97,7 @@
 			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-			var shader = new THREE.TranslucentShader();
+			var shader = THREE.TranslucentShader;
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;
