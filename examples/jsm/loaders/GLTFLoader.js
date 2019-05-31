@@ -1737,6 +1737,9 @@ var GLTFLoader = ( function () {
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
 
+		// Track node names, to ensure no duplicates
+		this.nodeNamesUsed = {};
+
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
 		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
@@ -2731,6 +2734,22 @@ var GLTFLoader = ( function () {
 
 	};
 
+	GLTFParser.prototype.assignUniqueName = function ( object, originalName ) {
+
+		var name = originalName;
+
+		for ( var i = 1; this.nodeNamesUsed[ name ]; ++ i ) {
+
+			name = originalName + '_' + i;
+
+		}
+
+		this.nodeNamesUsed[ name ] = true;
+
+		object.name = name;
+
+	};
+
 	/**
 	 * @param {BufferGeometry} geometry
 	 * @param {GLTF.Primitive} primitiveDef
@@ -3154,7 +3173,7 @@ var GLTFLoader = ( function () {
 
 				}
 
-				mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
+				parser.assignUniqueName( mesh, meshDef.name || ( 'mesh_' + meshIndex ) );
 
 				if ( geometries.length > 1 ) mesh.name += '_' + i;
 
@@ -3214,7 +3233,7 @@ var GLTFLoader = ( function () {
 
 		}
 
-		if ( cameraDef.name ) camera.name = cameraDef.name;
+		if ( cameraDef.name ) this.assignUniqueName( camera, cameraDef.name );
 
 		assignExtrasToUserData( camera, cameraDef );
 
@@ -3547,7 +3566,8 @@ var GLTFLoader = ( function () {
 			if ( nodeDef.name ) {
 
 				node.userData.name = nodeDef.name;
-				node.name = PropertyBinding.sanitizeNodeName( nodeDef.name );
+
+				parser.assignUniqueName( node, PropertyBinding.sanitizeNodeName( nodeDef.name ) );
 
 			}
 
@@ -3706,7 +3726,7 @@ var GLTFLoader = ( function () {
 			// Loader returns Group, not Scene.
 			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
 			var scene = new Group();
-			if ( sceneDef.name ) scene.name = sceneDef.name;
+			if ( sceneDef.name ) parser.assignUniqueName( scene, sceneDef.name );
 
 			assignExtrasToUserData( scene, sceneDef );
 
