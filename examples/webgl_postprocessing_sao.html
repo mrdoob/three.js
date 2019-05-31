@@ -41,12 +41,6 @@
 			var composer, renderPass, saoPass;
 			var group;
 
-			var params = {
-
-				clippingPlaneEnabled: false
-
-			};
-
 			init();
 			animate();
 
@@ -60,12 +54,10 @@
 				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( 0xffffff );
+				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
-
-				var globalClipPlane = new THREE.Plane( new THREE.Vector3( 1, 0, -1 ), 0 );
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
 				camera.position.z = 7;
@@ -149,17 +141,6 @@
 				gui.add( saoPass.params, 'saoBlurRadius', 0, 200 );
 				gui.add( saoPass.params, 'saoBlurStdDev', 0.5, 150 );
 				gui.add( saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
-				gui.add( params, 'clippingPlaneEnabled' ).onChange( function() {
-					if ( params.clippingPlaneEnabled ) {
-
-						renderer.clippingPlanes = [ globalClipPlane ];
-
-					} else {
-
-						renderer.clippingPlanes = [];
-
-					}
-				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
