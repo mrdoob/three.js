@@ -2,7 +2,7 @@
 
 if( 'xr' in navigator ) {
 
-	console.log('Helio: Chrome m73 WebXR Polyfill:', navigator.xr);
+	console.log('Helio - (Chrome m73) WebXR Polyfill', navigator.xr);
 
 	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
 
@@ -10,12 +10,12 @@ if( 'xr' in navigator ) {
 
 	if( 'supportsSessionMode' in navigator.xr ) {
 
-		const temp = navigator.xr.requestSession.bind(navigator.xr);
+		const tempRequestSession = navigator.xr.requestSession.bind(navigator.xr);
 
 		navigator.xr.requestSession = function (sessionType) {
 
 			return new Promise((resolve, reject) => {
-				temp({ mode: sessionType })
+				tempRequestSession({ mode: sessionType })
 					.then(session => {
 
 						// WebXRManager - xrFrame.getPose() Polyfill - line 279
@@ -26,11 +26,40 @@ if( 'xr' in navigator ) {
 
 							return tempRequestAnimationFrame(function (time, frame) {
 
+								// WebXRManager - xrFrame.getViewerPose() Polyfill - line 279
+								// Transforms view.viewMatrix to view.transform.inverse.matrix
+
+								const tempGetViewerPose = frame.getViewerPose.bind(frame);
+
+								frame.getViewerPose = function ( referenceSpace ) {
+
+									const pose = tempGetViewerPose( referenceSpace );
+
+									pose.views.forEach(view => {
+
+										view.transform = {
+											inverse: {
+												matrix: view.viewMatrix
+											}
+										}
+
+									})
+
+									return pose;
+
+								}
+
+								// WebXRManager - xrFrame.getPose() Polyfill - line 259
+
 								frame.getPose = function (targetRaySpace, referenceSpace) {
 
-									console.log('targetRay', targetRaySpace)
+									const inputPose = frame.getInputPose(targetRaySpace, referenceSpace);
 
-									return frame.getInputPose(targetRaySpace, referenceSpace);
+									inputPose.transform = {
+										matrix: inputPose.targetRay.transformMatrix
+									}
+
+									return inputPose;
 
 								}
 
