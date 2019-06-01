@@ -453,7 +453,7 @@ var Loader = function ( editor ) {
 					var contents = event.target.result;
 
 					var loader = new THREE.SVGLoader();
-					var paths = loader.parse( contents );
+					var paths = loader.parse( contents ).paths;
 
 					//
 

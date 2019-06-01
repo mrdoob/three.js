@@ -4,32 +4,20 @@
 	  <title>three.js webgl - loaders - BVHLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #eee;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #000000;
+			a {
+				color: #08f;
 			}
 		</style>
-
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - BVH Loader -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - BVH Loader<br/>
 			animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
 		</div>
 		<script src="../build/three.js"></script>
@@ -68,10 +56,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 200, 400 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.minDistance = 300;
-				controls.maxDistance = 700;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
@@ -81,8 +65,11 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				document.body.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 300;
+				controls.maxDistance = 700;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

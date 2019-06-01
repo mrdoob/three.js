@@ -4,33 +4,7 @@
 		<title>three.js webgl - post processing - Outline Pass</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color:#00ff78;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
@@ -298,7 +272,6 @@
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-				effectFXAA.renderToScreen = true;
 				composer.addPass( effectFXAA );
 
 				window.addEventListener( 'resize', onWindowResize, false );

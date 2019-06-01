@@ -79,6 +79,15 @@
 			默认是*true*
 		</p>
 
+		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<p>
+			如果[page:.checkShaderErrors checkShaderErrors]为true，定义是否检查材质着色器程序
+			编译和链接过程中的错误。 禁用此检查生产以获得性能增益可能很有用。
+			强烈建议在开发期间保持启用这些检查。
+			如果着色器没有编译和链接 - 它将无法工作，并且相关材料将不会呈现。
+			默认是*true*
+		</p>
+
 		<h3>[property:Object capabilities]</h3>
 		<p>
             一个包含当前渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])的功能细节的对象。<br />
@@ -254,12 +263,6 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:Integer allocTextureUnit]</h3>
-		<p>
-		尝试分配纹理单元以供着色器使用。如果尝试分配超过GPU支持量的纹理单元，则会报警告。主要供内部使用。
-		请参阅[page:WebGLRenderer.capabilities capabilities.maxTextures]。
-		</p>
-
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
 		告诉渲染器清除颜色、深度或模板缓存.
@@ -410,23 +413,6 @@
 		<p>
 		将输出canvas的大小调整为(width, height)并考虑设备像素比，且将视口从(0, 0)开始调整到适合大小
 		将[page:Boolean updateStyle]设置为false以阻止对canvas的样式做任何改变。
-		</p>
-
-		<h3>[method:null setTexture2D]( [param:Texture texture], [param:number slot] )</h3>
-		<p>
-		texture -- 需被设置的[page:Texture texture]<br />
-		slot -- 纹理应该使用的插槽号<br /><br />
-        该方法为WebGL着色器将正确的纹理设置到正确的插槽中。插槽号可作为取样器的全局变量（uniform）<br /><br />
-
-		说明: 该方法取代了旧的[method:null setTexture]方法
-		</p>
-
-		<h3>[method:null setTextureCube]( [param:CubeTexture cubeTexture], [param:Number slot] )</h3>
-		<p>
-		texture -- 需要被设置的[page:CubeTexture cubeTexture]<br />
-		slot -- 纹理应该使用的插槽号<br /><br />
-
-        该方法为WebGL着色器将正确的纹理设置到正确的插槽中。插槽号可作为取样器的全局变量（uniform）
 		</p>
 
 		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>

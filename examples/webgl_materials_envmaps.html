@@ -4,30 +4,12 @@
 		<title>three.js webgl - materials - environment maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a { color:skyblue; text-decoration:none }
-			#info {
-				position: absolute;
-				width: 100%;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<script src="../build/three.js"></script>
-
 		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/dat.gui.min.js"></script>
 
 		<div id="info">
@@ -54,10 +36,6 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.set( 0, 0, 1000 );
 				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.minDistance = 500;
-				controls.maxDistance = 2500;
 
 				// SCENE
 
@@ -159,6 +137,12 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.gammaOutput = true;
+
+				//
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 500;
+				controls.maxDistance = 2500;
 
 				//
 

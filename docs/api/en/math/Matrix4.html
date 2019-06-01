@@ -90,7 +90,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h2>Properties</h2>
 
-		<h3>[property:Float32Array elements]</h3>
+		<h3>[property:Array elements]</h3>
 		<p>
 		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]
 		 list of matrix values.
@@ -375,6 +375,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
 			Sets the position component for this matrix from vector [page:Vector3 v], without affecting the
 			rest of the matrix - i.e. if the matrix is currently:

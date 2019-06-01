@@ -4,51 +4,19 @@
 		<title>three.js software - lines - splines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				position: absolute;
-				top: 10px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index:100;
-			}
-
-			a {
-				color: orange;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - splines Software demo
-			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - splines Software demo<br/>
+			<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/geometries/hilbert3D.js"></script>
+		<script src="js/utils/GeometryUtils.js"></script>
 
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
 
@@ -59,7 +27,7 @@
 				windowHalfX = window.innerWidth / 2,
 				windowHalfY = window.innerHeight / 2,
 
-				camera, scene, renderer, material, stats;
+				camera, scene, renderer;
 
 			init();
 			animate();
@@ -81,7 +49,7 @@
 
 				//
 
-				var hilbertPoints = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var geometry1 = new THREE.BufferGeometry();
 				var geometry2 = new THREE.BufferGeometry();
@@ -147,8 +115,6 @@
 					scene.add( line );
 
 				}
-
-				stats = new Stats();
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
