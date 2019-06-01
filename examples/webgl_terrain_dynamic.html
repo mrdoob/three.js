@@ -35,7 +35,7 @@
 		<script src="js/utils/BufferGeometryUtils.js"></script>
 
 		<script src="js/shaders/NormalMapShader.js"></script>
-		<script src="js/ShaderTerrain.js"></script>
+		<script src="js/shaders/TerrainShader.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -307,7 +307,7 @@
 
 				// TERRAIN SHADER
 
-				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
+				var terrainShader = THREE.TerrainShader;
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
