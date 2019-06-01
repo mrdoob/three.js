@@ -21,7 +21,6 @@
 	<script src="js/controls/OrbitControls.js"></script>
 
 	<script src="js/MarchingCubes.js"></script>
-	<script src="js/ShaderToon.js"></script>
 
 	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
@@ -159,13 +158,6 @@
 			var refractionCube = cubeTextureLoader.load( urls );
 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
-			// toons
-
-			var toonMaterial1 = createShaderMaterial( "toon1", light, ambientLight );
-			var toonMaterial2 = createShaderMaterial( "toon2", light, ambientLight );
-			var hatchingMaterial = createShaderMaterial( "hatching", light, ambientLight );
-			var dottedMaterial = createShaderMaterial( "dotted", light, ambientLight );
-
 			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
@@ -217,49 +209,14 @@
 					h: 0.6, s: 0.8, l: 0.1
 				},
 
-				"toon1": {
-					m: toonMaterial1,
-					h: 0.2, s: 1, l: 0.75
-				},
-
-				"toon2": {
-					m: toonMaterial2,
-					h: 0.4, s: 1, l: 0.75
-				},
-
-				"hatching": {
-					m: hatchingMaterial,
-					h: 0.2, s: 1, l: 0.9
-				},
-
-				"dotted": {
-					m: dottedMaterial,
-					h: 0.2, s: 1, l: 0.9
+				"toon": {
+					m: new THREE.MeshToonMaterial(),
+					h: 0.2, s: 1, l: 0.7
 				}
 
 			};
 
 			return materials;
-
-		}
-
-		function createShaderMaterial( id, light, ambientLight ) {
-
-			var shader = THREE.ShaderToon[ id ];
-
-			var u = THREE.UniformsUtils.clone( shader.uniforms );
-
-			var vs = shader.vertexShader;
-			var fs = shader.fragmentShader;
-
-			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
-
-			material.uniforms[ "uDirLightPos" ].value = light.position;
-			material.uniforms[ "uDirLightColor" ].value = light.color;
-
-			material.uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
-
-			return material;
 
 		}
 
@@ -385,14 +342,14 @@
 
 			var i, ballx, bally, ballz, subtract, strength;
 			var rainbow = [
-					new THREE.Color(0xff0000),
-					new THREE.Color(0xff7f00),
-					new THREE.Color(0xffff00),
-					new THREE.Color(0x00ff00),
-					new THREE.Color(0x0000ff),
-					new THREE.Color(0x4b0082),
-					new THREE.Color(0x9400d3)
-				];
+				new THREE.Color( 0xff0000 ),
+				new THREE.Color( 0xff7f00 ),
+				new THREE.Color( 0xffff00 ),
+				new THREE.Color( 0x00ff00 ),
+				new THREE.Color( 0x0000ff ),
+				new THREE.Color( 0x4b0082 ),
+				new THREE.Color( 0x9400d3 )
+			];
 			subtract = 12;
 			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
 
@@ -404,7 +361,7 @@
 
 				if ( current_material === 'multiColors' ) {
 
-					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[i % 7] );
+					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[ i % 7 ] );
 
 				} else {
 
