@@ -4,50 +4,21 @@
 		<title>three.js webgl - materials - skin [Lee Perry-Smith]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#aaa;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #eee;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #eee;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			#webglmessage {
-				background:rgb(200,100,0) !important;
-				color:#fff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl skin rendering demo.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl skin rendering demo.<br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/ShaderSkin.js"></script>
-
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/SkinShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -116,7 +87,7 @@
 
 				var diffuse = 0xbbbbbb, specular = 0x555555;
 
-				var shader = THREE.ShaderSkin[ "skin" ];
+				var shader = THREE.SkinShaderAdvanced;
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -237,7 +208,7 @@
 
 				//
 
-				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
+				var effectBeckmann = new THREE.ShaderPass( THREE.SkinShaderBeckmann );
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerBeckmann.addPass( effectBeckmann );
 

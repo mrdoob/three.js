@@ -4,71 +4,49 @@
 		<title>three.js css3d - molecules</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
 			body {
 				background-color: #050505;
 				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%);
-
-				margin: 0;
-				font-family: Arial;
-				overflow: hidden;
 			}
 
-			a {
-				color: #ffffff;
-			}
-
-			#info {
+			#topmenu {
 				position: absolute;
-				top: 0px;
+				top: 50px;
 				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				font-weight: bold;
+				padding: 10px;
+				box-sizing: border-box;
 				text-align: center;
-				z-index: 1;
 			}
 
 			#menu {
 				position: absolute;
 				bottom: 20px;
 				width: 100%;
+				padding: 10px;
+				box-sizing: border-box;
 				text-align: center;
-				padding: 0;
-				margin: 0;
-			}
-
-			#topmenu {
-				position: absolute;
-				top: 10px;
-				right: 10px;
-				width: 100%;
-				text-align: right;
-				padding: 0;
-				margin: 0;
-				z-index: 1;
 			}
 
 			button {
 				color: rgb(255,255,255);
-				background: transparent;
+				background: rgb(255,255,255,0.1);
 				border: 0px;
 				padding: 5px 10px;
+				margin: 2px;
+				font-size: 14px;
 				cursor: pointer;
 			}
-			button:hover {
-				background-color: rgba(0,255,255,0.5);
-			}
-			button:active {
-				color: #000000;
-				background-color: rgba(0,255,255,1);
-			}
+
+				button:hover {
+					background-color: rgba(0,255,255,0.5);
+				}
+
+				button:active {
+					color: #000000;
+					background-color: rgba(0,255,255,1);
+				}
 
 			.bond {
 				width: 5px;
@@ -85,11 +63,9 @@
 		<script src="js/loaders/PDBLoader.js"></script>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - molecules</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - molecules</div>
 		<div id="topmenu">
-			<button id="b_a">Atoms</button>
-			<button id="b_b">Bonds</button>
-			<button id="b_ab">Atoms + Bonds</button>
+			<button id="b_a">Atoms</button><button id="b_b">Bonds</button><button id="b_ab">Atoms + Bonds</button>
 		</div>
 		<div id="menu"></div>
 

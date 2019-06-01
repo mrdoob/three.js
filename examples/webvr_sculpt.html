@@ -4,20 +4,13 @@
 		<title>three.js webvr - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - sculpt
+		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/vr/WebVR.js"></script>
@@ -43,14 +36,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - sculpt';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );

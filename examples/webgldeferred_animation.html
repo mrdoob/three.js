@@ -4,33 +4,7 @@
 		<title>three.js webgl - deferred rendering [morphing + skinning]</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 20px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-			a:hover {
-				color: #0080ff;
-			}
-			#stats { position: absolute; top:10px; left: 5px }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -87,9 +61,6 @@
 				scene = new THREE.Scene();
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '8px';
-				stats.domElement.style.zIndex = 100;
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );

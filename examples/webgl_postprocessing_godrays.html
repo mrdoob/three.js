@@ -4,34 +4,13 @@
 		<title>three.js webgl - postprocessing - godrays</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color:#0078ff; }
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/ShaderGodRays.js"></script>
+		<script src="js/shaders/GodRaysShader.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -225,7 +204,7 @@
 
 				// god-ray shaders
 
-				var godraysMaskShader = THREE.ShaderGodRays[ "godrays_depthMask" ];
+				var godraysMaskShader = THREE.GodRaysDepthMaskShader;
 				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
 				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
 
@@ -235,7 +214,7 @@
 
 				} );
 
-				var godraysGenShader = THREE.ShaderGodRays[ "godrays_generate" ];
+				var godraysGenShader = THREE.GodRaysGenerateShader;
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
 				postprocessing.materialGodraysGenerate = new THREE.ShaderMaterial( {
 
@@ -245,7 +224,7 @@
 
 				} );
 
-				var godraysCombineShader = THREE.ShaderGodRays[ "godrays_combine" ];
+				var godraysCombineShader = THREE.GodRaysCombineShader;
 				postprocessing.godrayCombineUniforms = THREE.UniformsUtils.clone( godraysCombineShader.uniforms );
 				postprocessing.materialGodraysCombine = new THREE.ShaderMaterial( {
 
@@ -255,7 +234,7 @@
 
 				} );
 
-				var godraysFakeSunShader = THREE.ShaderGodRays[ "godrays_fake_sun" ];
+				var godraysFakeSunShader = THREE.GodRaysFakeSunShader;
 				postprocessing.godraysFakeSunUniforms = THREE.UniformsUtils.clone( godraysFakeSunShader.uniforms );
 				postprocessing.materialGodraysFakeSun = new THREE.ShaderMaterial( {
 

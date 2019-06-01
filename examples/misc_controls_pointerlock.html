@@ -4,32 +4,16 @@
 		<title>three.js - pointerlock controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				width: 100%;
-				height: 100%;
-			}
-
-			body {
-				background-color: #ffffff;
-				margin: 0;
-				overflow: hidden;
-				font-family: arial;
-			}
-
 			#blocker {
-
 				position: absolute;
-
 				width: 100%;
 				height: 100%;
-
 				background-color: rgba(0,0,0,0.5);
-
 			}
 
 			#instructions {
-
 				width: 100%;
 				height: 100%;
 
@@ -51,11 +35,12 @@
 
 				color: #ffffff;
 				text-align: center;
+				font-family: Arial;
+				font-size: 14px;
+				line-height: 24px;
 
 				cursor: pointer;
-
 			}
-
 		</style>
 	</head>
 	<body>
@@ -65,9 +50,11 @@
 		<div id="blocker">
 
 			<div id="instructions">
-				<span style="font-size:40px">Click to play</span>
-				<br />
-				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+				<span style="font-size:36px">Click to play</span>
+				<br /><br />
+				Move: WASD<br/>
+				Jump: SPACE<br/>
+				Look: MOUSE
 			</div>
 
 		</div>
