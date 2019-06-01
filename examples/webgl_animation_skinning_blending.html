@@ -4,23 +4,10 @@
 		<title>three.js webgl - animation - skinning</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
 			a {
-				color: #ff0000;
+				color: #f00;
 			}
 			.ac {  /* prevent dat-gui from being selected */
 				-webkit-user-select: none;
@@ -41,8 +28,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Skeletal Animation Blending
-			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)
-			<br/><br/>Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
+			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)<br/>
+			Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
 		<script src="../build/three.js"></script>

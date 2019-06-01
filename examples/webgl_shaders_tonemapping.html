@@ -4,20 +4,14 @@
 		<title>three.js webgl - adaptive tone-mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
+			.label {
+				background-color: black;
+				position: absolute;
+				z-index: 100;
+				padding: 5px
 			}
-			a { color:skyblue; text-decoration:none }
-			canvas { pointer-events:none; z-index:0; position:relative; }
-			.label { background-color: black; position: absolute; z-index: 100; padding: 5px }
-
 		</style>
 	</head>
 
@@ -28,12 +22,18 @@
 				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
 
 			</div>
-			<div class="label" style="position: absolute;left: 12%;bottom: 10%;">Low Dynamic Range</div>
-			<div class="label" style="position: absolute;left: 12%;bottom: 5%;">Static Tone Mapping</div>
-			<div class="label" style="position: absolute;left: 45%;bottom: 10%;">High Dynamic Range</div>
-			<div class="label" style="position: absolute;left: 45%;bottom: 5%;">Static Tone Mapping</div>
-			<div class="label" style="position: absolute;left: 80%;bottom: 10%;">High Dynamic Range</div>
-			<div class="label" style="position: absolute;left: 80%;bottom: 5%;">Adaptive Tone Mapping</div>
+			<div class="label" style="position: absolute;left: 10%;bottom: 10%;">
+				Low Dynamic Range<br/>
+				Static Tone Mapping
+			</div>
+			<div class="label" style="position: absolute;left: 40%;bottom: 10%;">
+				High Dynamic Range<br/>
+				Static Tone Mapping
+			</div>
+			<div class="label" style="position: absolute;left: 73%;bottom: 10%;">
+				High Dynamic Range<br/>
+				Adaptive Tone Mapping
+			</div>
 		</div>
 
 		<script src="../build/three.js"></script>

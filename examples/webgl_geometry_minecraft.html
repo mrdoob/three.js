@@ -4,41 +4,20 @@
 		<title>three.js webgl - geometry - minecraft</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
 				color: #a06851;
 			}
-
-			#webglmessage {
-				background:rgb(100,0,0) !important;
-				color:#fff !important;
-				margin-top:10em !important;
-			}
-			#webglmessage a { color:#fff }
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
 		<script src="../build/three.js"></script>
@@ -46,7 +25,7 @@
 		<script src="js/controls/FirstPersonControls.js"></script>
 
 		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/ImprovedNoise.js"></script>
+		<script src="js/math/ImprovedNoise.js"></script>
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -55,7 +34,6 @@
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
 
 			}
 
@@ -192,9 +170,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -219,7 +194,7 @@
 
 			function generateHeight( width, height ) {
 
-				var data = [], perlin = new ImprovedNoise(),
+				var data = [], perlin = new THREE.ImprovedNoise(),
 					size = width * height, quality = 2, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {

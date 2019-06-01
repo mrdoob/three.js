@@ -4,6 +4,7 @@
  * Inspired from Unreal Engine
  * https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
+
 THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 
 	THREE.Pass.call( this );
@@ -106,7 +107,7 @@ THREE.UnrealBloomPass = function ( resolution, strength, radius, threshold ) {
 	// copy material
 	if ( THREE.CopyShader === undefined ) {
 
-		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
+		console.error( "THREE.UnrealBloomPass relies on THREE.CopyShader" );
 
 	}
 

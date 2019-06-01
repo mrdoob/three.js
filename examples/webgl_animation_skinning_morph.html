@@ -4,45 +4,30 @@
 		<title>three.js webgl - skinning and morphing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #222;
 			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
+
+			a {
+				color: #2fa1d6;
 			}
-			#info p {
+
+			p {
 				max-width: 600px;
 				margin-left: auto;
 				margin-right: auto;
 				padding: 0 2em;
-			}
-			#info a {
-				color: #2fa1d6;
-				font-weight: bold;
-			}
-			.dg.ac {
-				z-index: 999 !important;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - skinning and morphing<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - skinning and morphing<br />
 			<p>
-				The animation system allows clips to be played individually, looped, or crossfaded with
-				other clips. This example shows a character looping in one of several base animation states,
-				then transitioning smoothly to one-time actions. Facial expressions are controlled
-				independently with morph targets.
+				The animation system allows clips to be played individually, looped, or crossfaded with other clips. This example shows a character looping in one of several base animation states, then transitioning smoothly to one-time actions. Facial expressions are controlled independently with morph targets.
 			</p>
 			Model by
 			<a href="https://www.patreon.com/quaternius" target="_blank" rel="noopener">Tomás Laulhé</a>,

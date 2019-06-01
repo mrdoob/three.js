@@ -4,26 +4,13 @@
 		<title>three.js webgl - LDrawLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #888;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			#info a {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -109,7 +96,10 @@
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
 					envMapActivated: false,
-					separateObjects: false
+					separateObjects: false,
+					displayLines: true,
+					conditionalLines: true,
+					smoothNormals: true
 				};
 
 				gui = new dat.GUI();
@@ -134,6 +124,23 @@
 
 				} );
 
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
+
+					updateLineSegments();
+
+				} );
+
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
+
+					updateLineSegments();
+
+				} );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
@@ -153,6 +160,28 @@
 
 			}
 
+			function updateLineSegments() {
+
+				model.traverse( c => {
+
+					if ( c.isLineSegments ) {
+
+						if ( c.isConditionalLine ) {
+
+							c.visible = guiData.conditionalLines;
+
+						} else {
+
+							c.visible = guiData.displayLines;
+
+						}
+
+					}
+
+				} );
+
+			}
+
 			function reloadObject( resetCamera ) {
 
 				if ( model ) {
@@ -168,6 +197,7 @@
 
 				var lDrawLoader = new THREE.LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
+				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
@@ -217,6 +247,8 @@
 							}
 
 						}
+
+						updateLineSegments();
 
 						// Adjust camera and light
 

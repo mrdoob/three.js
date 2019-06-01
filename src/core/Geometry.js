@@ -228,7 +228,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
-		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
+		for ( var i = 0; i < positions.length; i += 3 ) {
 
 			scope.vertices.push( new Vector3().fromArray( positions, i ) );
 

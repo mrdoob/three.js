@@ -44,7 +44,7 @@ export class OrbitControls {
 
 	enableKeys: boolean;
 	keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number; };
-	mouseButtons: { ORBIT: MOUSE; ZOOM: MOUSE; PAN: MOUSE; };
+	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE; };
 
 	rotateLeft(angle?: number): void;
 
