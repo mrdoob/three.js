@@ -80,9 +80,12 @@ var files = [
 	{ path: 'loaders/PDBLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PlayCanvasLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PLYLoader.js', dependencies: [], ignoreList: [ 'Mesh' ] },
+	{ path: 'loaders/PRWMLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/PVRLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/RGBELoader.js', dependencies: [], ignoreList: [ 'RGBAFormat' ] },
 	{ path: 'loaders/STLLoader.js', dependencies: [], ignoreList: [ 'Mesh', 'MeshPhongMaterial', 'VertexColors' ] },
 	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 
