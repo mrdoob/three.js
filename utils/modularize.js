@@ -24,6 +24,7 @@ var files = [
 	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'curves/CurveExtras.js', dependencies: [], ignoreList: [] },
 	{ path: 'curves/NURBSCurve.js', dependencies: [ { name: 'NURBSUtils', path: 'curves/NURBSUtils.js' } ], ignoreList: [] },
 	{ path: 'curves/NURBSSurface.js', dependencies: [ { name: 'NURBSUtils', path: 'curves/NURBSUtils.js' } ], ignoreList: [] },
 	{ path: 'curves/NURBSUtils.js', dependencies: [], ignoreList: [] },
