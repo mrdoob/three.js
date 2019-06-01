@@ -11,7 +11,7 @@ a wide variety of GPU texture compression formats.
 
 This folder contains two files:
 
-* `basis_transcoder.js`<sup>1</sup> — JavaScript wrapper for the WebAssembly transcoder.
+* `basis_transcoder.js` — JavaScript wrapper for the WebAssembly transcoder.
 * `basis_transcoder.wasm` — WebAssembly transcoder.
 
 Both are dependencies of `THREE.BasisTextureLoader`:
@@ -36,9 +36,7 @@ basisLoader.load( 'diffuse.basis', function ( texture ) {
 ```
 
 For further documentation about the Basis compressor and transcoder, refer to
-the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal).
-
-<small><sup>1</sup> The JavaScript wrapper requires one modification from the version provided in the Basis repository – the declaration on the first line is changed from `var Module` to `Module`, to accomodate lazy initialization in a Web Worker ([details](https://github.com/mrdoob/three.js/issues/16524)).
+the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal). The JavaScript wrapper requires one modification from the version provided in the Basis repository – the declaration on the first line is changed from `var Module` to `Module`, to accomodate lazy initialization in a Web Worker ([details](https://github.com/mrdoob/three.js/issues/16524)).
 
 ## License
 
