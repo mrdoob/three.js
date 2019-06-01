@@ -159,6 +159,7 @@ var files = [
 	{ path: 'shaders/FresnelShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/FXAAShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/GammaCorrectionShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/GodRaysShader.js', dependencies: [], ignoreList: [ 'MeshDepthMaterial' ] },
 	{ path: 'shaders/HalftoneShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/HorizontalBlurShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/HorizontalTiltShiftShader.js', dependencies: [], ignoreList: [] },
