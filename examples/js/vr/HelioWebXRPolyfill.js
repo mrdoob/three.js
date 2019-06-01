@@ -28,7 +28,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 		navigator.xr.requestSession = function ( sessionType ) {
 
-			return new Promise( ( resolve, reject ) => {
+			return new Promise( function ( resolve, reject ) {
 
 				tempRequestSession( {
 					mode: 'immersive-ar' // Force using immersive-ar
@@ -99,7 +99,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 							const res = tempGetInputSources();
 
-							res.forEach( xrInputSource => {
+							res.forEach( function (xrInputSource ) {
 
 								Object.defineProperty( xrInputSource, "targetRaySpace", {
 									get: function () {
