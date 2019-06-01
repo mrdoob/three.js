@@ -15,9 +15,8 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/ShaderSkin.js"></script>
-
 		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/SkinShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -104,7 +103,7 @@
 
 				// BECKMANN
 
-				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
+				var effectBeckmann = new THREE.ShaderPass( THREE.SkinShaderBeckmann );
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
@@ -143,7 +142,7 @@
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
 				mapColor.format = THREE.RGBFormat;
 
-				var shader = THREE.ShaderSkin[ "skinSimple" ];
+				var shader = THREE.SkinShaderBasic;
 
 				var fragmentShader = shader.fragmentShader;
 				var vertexShader = shader.vertexShader;

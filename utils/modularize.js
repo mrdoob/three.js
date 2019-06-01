@@ -177,6 +177,7 @@ var files = [
 	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SAOShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SepiaShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SkinShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SMAAShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SobelOperatorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SSAOShader.js', dependencies: [], ignoreList: [] },
