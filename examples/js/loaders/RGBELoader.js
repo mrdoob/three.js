@@ -391,3 +391,37 @@ THREE.RGBELoader.prototype.setType = function ( value ) {
 	return this;
 
 };
+
+THREE.RGBELoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
+
+	function onLoadCallback( texture, texData ) {
+
+		switch ( texture.type ) {
+
+			case THREE.UnsignedByteType:
+
+				texture.encoding = THREE.RGBEEncoding;
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+			case THREE.FloatType:
+
+				texture.encoding = THREE.LinearEncoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+		}
+
+		if ( onLoad ) onLoad( texture, texData );
+
+	}
+
+	return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
+
+};
