@@ -36,7 +36,7 @@ basisLoader.load( 'diffuse.basis', function ( texture ) {
 ```
 
 For further documentation about the Basis compressor and transcoder, refer to
-the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal).
+the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal). The JavaScript wrapper requires one modification from the version provided in the Basis repository – the declaration on the first line is changed from `var Module` to `Module`, to accomodate lazy initialization in a Web Worker ([details](https://github.com/mrdoob/three.js/issues/16524)).
 
 ## License
 
