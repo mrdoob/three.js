@@ -35,7 +35,7 @@ This brings up a point, here's a diagram of a cube with one corner highlighted.
 
 Thinking about it that single corner needs a different normal for each face of the
 cube. It needs different UVs for each face as well. This points out the biggest difference
-between `Geometry` and `BufferGeometry`. Nothing is shared with `BufferGeomtry`.
+between `Geometry` and `BufferGeometry`. Nothing is shared with `BufferGeometry`.
 A single *vertex* is the combination of all of its parts. If a vertex needs any
 part to be different then it must be a different vertex.
 
@@ -43,7 +43,7 @@ The truth is when you use `Geometry` three.js transforms it into this format.
 That is where the extra memory and time comes from when using `Geometry`. Extra
 memory for all the `Vector3`s, `Vector2`s, `Face3`s and array objects and then
 extra time to translate all of that data into parallel arrays in the form of
-`BufferAtrribute`s like above. Somtimes that makes using `Geometry` easier.
+`BufferAttribute`s like above. Somtimes that makes using `Geometry` easier.
 With `BufferGeometry` is up to us to supply the data already turned into this format.
 
 As a simple example let's make a cube using `BufferGeometry`. A cube is interesting
@@ -146,13 +146,13 @@ and add it to the `BufferGeometry`.
 Note that the names are sigificant. You must name your attributes the names
 that match what three.js expects (unless you are creating a custom shader).
 In this case `position`, `normal`, and `uv`. If you want vertex colors then
-name your attribtue `color`.
+name your attribute `color`.
 
 Above we created 3 JavaScript native arrays, `positions`, `normals` and `uvs`.
 We then convert those into
 [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
 of type `Float32Array`. A `BufferAttribute` requires a typedarray not a native
-array. A `BufferAttribute` also requres you tell it how many components there
+array. A `BufferAttribute` also requires you tell it how many components there
 are per vertex. For the positions and normals we have 3 components per vertex,
 x, y, and z. For the UVs we have 2, u and v.
 
@@ -219,7 +219,7 @@ const vertices = [
 ```
 
 So now we have 24 unique vertices. Then we specify 36 indices
-for the 36 vertices we need drawn to make 12 triangles by calling `BufferGeometry.setIndex` with an array of indicies.
+for the 36 vertices we need drawn to make 12 triangles by calling `BufferGeometry.setIndex` with an array of indices.
 
 ```js
 geometry.addAttribute(
@@ -327,7 +327,7 @@ geometry.setIndex([
 
 {{{example url="../threejs-custom-buffergeometry-cube-typedarrays.html"}}}
 
-A good reason to use typedarrays is if you want to dyanmically update any
+A good reason to use typedarrays is if you want to dynamically update any
 part of the vertices. 
 
 I couldn't think of a really good example of dynamically updating the vertices
