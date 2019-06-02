@@ -433,12 +433,18 @@ the contents of the attribute often.
 In our render loop we update the positions based off their normals every frame.
 
 ```js
+const temp = new THREE.Vector3();
+
+...
+
 for (let i = 0; i < positions.length; i += 3) {
   const quad = (i / 12 | 0);
-  const off1 = quad / segmentsAround | 0;
-  const off2 = quad % segmentsAround * Math.PI * 2 / segmentsAround;
+  const ringId = quad / segmentsAround | 0;
+  const ringQuadId = quad % segmentsAround;
+  const ringU = ringQuadId / segmentsAround;
+  const angle = ringU * Math.PI * 2;
   temp.fromArray(normals, i);
-  temp.multiplyScalar(THREE.Math.lerp(1, 1.4, Math.sin(time + off1 + off2) * .5 + .5));
+  temp.multiplyScalar(THREE.Math.lerp(1, 1.4, Math.sin(time + ringId + angle) * .5 + .5));
   temp.toArray(positions, i);
 }
 positionAttribute.needsUpdate = true;
