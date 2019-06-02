@@ -21,6 +21,11 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 [Gitter](https://gitter.im/mrdoob/three.js) &mdash;
 [Slack](https://threejs-slack.herokuapp.com/)
 
+You can open this repository in Gitpod, a free online dev environment.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/mrdoob/three.js)
+
+
 ### Usage ###
 
 Download the [minified library](http://threejs.org/build/three.min.js) and include it in your HTML, or install and import it as a [module](http://threejs.org/docs/#manual/introduction/Import-via-modules),
