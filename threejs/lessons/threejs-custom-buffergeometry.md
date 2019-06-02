@@ -6,7 +6,7 @@ how to use `Geometry`. This article is about `BufferGeometry`.
 `BufferGeometry` is *generally* faster to start and uses
 less memory but can be harder to setup.
 
-In [the article on Geometry] we went over that to use a `Geometry` you supply an
+In [the article on Geometry](threejs-custom-geometry.html) we went over that to use a `Geometry` you supply an
 array of `Vector3` vertices (postions). You then make `Face3` objects specifying
 by index the 3 vertices that make each triangle of the shape you're making. To
 each `Face3` you can specify either a face normal or normals for each individual
