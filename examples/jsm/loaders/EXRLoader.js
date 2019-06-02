@@ -104,7 +104,6 @@ EXRLoader.prototype._parser = function ( buffer ) {
 	const SHORT_ZEROCODE_RUN = 59;
 	const LONG_ZEROCODE_RUN = 63;
 	const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
-	const LONGEST_LONG_RUN = 255 + SHORTEST_LONG_RUN;
 
 	const BYTES_PER_HALF = 2;
 
@@ -403,11 +402,6 @@ EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var NBITS = 16;
-	var A_OFFSET = 1 << ( NBITS - 1 );
-	var M_OFFSET = 1 << ( NBITS - 1 );
-	var MOD_MASK = ( 1 << NBITS ) - 1;
-
 	function UInt16( value ) {
 
 		return ( value & 0xFFFF );
@@ -439,7 +433,7 @@ EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	function wav2Decode( j, buffer, nx, ox, ny, oy, mx ) {
+	function wav2Decode( j, buffer, nx, ox, ny, oy ) {
 
 		var n = ( nx > ny ) ? ny : nx;
 		var p = 1;
@@ -724,7 +718,7 @@ EXRLoader.prototype._parser = function ( buffer ) {
 		}
 
 		var lut = new Uint16Array( USHORT_RANGE );
-		var maxValue = reverseLutFromBitmap( bitmap, lut );
+		reverseLutFromBitmap( bitmap, lut );
 
 		var length = parseUint32( inDataView, inOffset );
 
@@ -735,10 +729,6 @@ EXRLoader.prototype._parser = function ( buffer ) {
 		var outBufferEnd = 0;
 
 		for ( var i = 0; i < num_channels; i ++ ) {
-
-			var exrChannelInfo = exrChannelInfos[ i ];
-
-			var pixelSize = 2; // assumes HALF_FLOAT
 
 			pizChannelData[ i ] = {};
 			pizChannelData[ i ][ 'start' ] = outBufferEnd;
@@ -763,8 +753,7 @@ EXRLoader.prototype._parser = function ( buffer ) {
 					pizChannelData[ i ].nx,
 					pizChannelData[ i ].size,
 					pizChannelData[ i ].ny,
-					pizChannelData[ i ].nx * pizChannelData[ i ].size,
-					maxValue
+					pizChannelData[ i ].nx * pizChannelData[ i ].size
 				);
 
 			}
@@ -1043,9 +1032,9 @@ EXRLoader.prototype._parser = function ( buffer ) {
 
 	var EXRHeader = {};
 
-	var magic = bufferDataView.getUint32( 0, true );
-	var versionByteZero = bufferDataView.getUint8( 4, true );
-	var fullMask = bufferDataView.getUint8( 5, true );
+	bufferDataView.getUint32( 0, true ); // magic
+	bufferDataView.getUint8( 4, true ); // versionByteZero
+	bufferDataView.getUint8( 5, true ); // fullMask
 
 	// start of header
 
@@ -1088,7 +1077,7 @@ EXRLoader.prototype._parser = function ( buffer ) {
 
 	for ( var i = 0; i < numBlocks; i ++ ) {
 
-		var scanlineOffset = parseUlong( bufferDataView, offset );
+		parseUlong( bufferDataView, offset ); // scanlineOffset
 
 	}
 
@@ -1112,7 +1101,7 @@ EXRLoader.prototype._parser = function ( buffer ) {
 		for ( var y = 0; y < height; y ++ ) {
 
 			var y_scanline = parseUint32( bufferDataView, offset );
-			var dataSize = parseUint32( bufferDataView, offset );
+			parseUint32( bufferDataView, offset ); // dataSize
 
 			for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
 
@@ -1143,8 +1132,8 @@ EXRLoader.prototype._parser = function ( buffer ) {
 
 		for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
 
-			var line_no = parseUint32( bufferDataView, offset );
-			var data_len = parseUint32( bufferDataView, offset );
+			parseUint32( bufferDataView, offset ); // line_no
+			parseUint32( bufferDataView, offset ); // data_len
 
 			var tmpBufferSize = width * scanlineBlockSize * ( EXRHeader.channels.length * BYTES_PER_HALF );
 			var tmpBuffer = new Uint16Array( tmpBufferSize );
