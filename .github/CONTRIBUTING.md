@@ -26,3 +26,7 @@
 3. Check the [Contribution Guidelines](https://github.com/mrdoob/three.js/wiki/How-to-contribute-to-three.js).
 4. Make changes to your clone of the repository.
 5. Submit a pull request. Don't include build files in the PR.
+
+#### Issue Triage [![Open Source Helpers](https://www.codetriage.com/mrdoob/three.js/badges/users.svg)](https://www.codetriage.com/mrdoob/three.js)
+
+You can triage issues which may include reproducing bug reports or asking for vital information, such as version numbers or reproduction instructions. If you would like to start triaging issues, one easy way to get started is to [subscribe to three.js on CodeTriage](https://www.codetriage.com/mrdoob/three.js).
