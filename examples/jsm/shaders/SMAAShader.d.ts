@@ -30,3 +30,13 @@ export interface SMAAWeightsShader {
   vertexShader: string;
   fragmentShader: string;
 }
+
+export interface SMAABlendShader {
+  uniforms: {
+    tDiffuse: Uniform;
+    tColor: Uniform;
+    resolution: Uniform;
+  };
+  vertexShader: string;
+  fragmentShader: string;
+}
