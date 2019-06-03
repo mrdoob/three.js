@@ -981,6 +981,9 @@
 
 							mtl.needsUpdate = true;
 
+							var killer = new THREE.PhongNodeMaterial();
+							killer.needsUpdate = false; // this is used mtl.onBeforeCompile
+
 						} );
 
 						break;
