@@ -55,7 +55,7 @@
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
 				new THREE.RGBELoader()
-					.setType( THREE.UnsignedByteType ) // alt: THREE.FloatType
+					.setType( THREE.UnsignedByteType ) // alt: THREE.FloatType, THREE.HalfFloatType
 					.load( 'textures/memorial.hdr', function ( texture, textureData ) {
 
 						//console.log( textureData );

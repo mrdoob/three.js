@@ -53,13 +53,10 @@
 
 				scene = new THREE.Scene();
 
-				var loader = new THREE.RGBELoader().setPath( 'textures/equirectangular/' );
-				loader.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
-
-					texture.encoding = THREE.RGBEEncoding;
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.flipY = true;
+				new THREE.RGBELoader()
+					.setType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
 					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
 					cubeGenerator.update( renderer );
