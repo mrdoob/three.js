@@ -93,7 +93,7 @@ function WebXRManager( renderer ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
-		scope.dispatchEvent( { type: 'endsession' } );
+		scope.dispatchEvent( { type: 'sessionend' } );
 
 	}
 
@@ -104,7 +104,7 @@ function WebXRManager( renderer ) {
 		animation.setContext( session );
 		animation.start();
 
-		scope.dispatchEvent( { type: 'startsession' } );
+		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
