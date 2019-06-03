@@ -20,7 +20,7 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 
 	var
 		/* return codes for rgbe routines */
-		RGBE_RETURN_SUCCESS = 0,
+		//RGBE_RETURN_SUCCESS = 0,
 		RGBE_RETURN_FAILURE = - 1,
 
 		/* default error routine.  change this to change error handling */
@@ -47,12 +47,12 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 		},
 
 		/* offsets to red, green, and blue components in a data (float) pixel */
-		RGBE_DATA_RED = 0,
-		RGBE_DATA_GREEN = 1,
-		RGBE_DATA_BLUE = 2,
+		//RGBE_DATA_RED = 0,
+		//RGBE_DATA_GREEN = 1,
+		//RGBE_DATA_BLUE = 2,
 
 		/* number of floats per pixel, use 4 since stored in rgba image format */
-		RGBE_DATA_SIZE = 4,
+		//RGBE_DATA_SIZE = 4,
 
 		/* flags indicating which fields in an rgbe_header_info are valid */
 		RGBE_VALID_PROGRAMTYPE = 1,
