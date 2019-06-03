@@ -83,7 +83,7 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
-			scope.dispatchEvent( { type: 'startSession' } );
+			scope.dispatchEvent( { type: 'startsession' } );
 
 		} else {
 
@@ -95,7 +95,7 @@ function WebVRManager( renderer ) {
 
 			animation.stop();
 
-			scope.dispatchEvent( { type: 'endSession' } );
+			scope.dispatchEvent( { type: 'endsession' } );
 
 		}
 
