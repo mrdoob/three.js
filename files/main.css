@@ -4,7 +4,7 @@
 	--secondary-text-color: #9e9e9e;
 
 	--font-size: 16px;
-	--line-height: 24px;
+	--line-height: 26px;
 
 	--border-style: 1px solid #E8E8E8;
 	--header-height: 48px;
@@ -38,7 +38,7 @@ html, body {
 
 html {
 	font-size: calc(var(--font-size) - 1px);
-	line-height: calc(var(--line-height) + 1px);
+	line-height: calc(var(--line-height) - 1px);
 }
 
 body {
@@ -63,16 +63,16 @@ h2 {
 	padding: 0;
 	margin: 16px 0;
 	font-size: calc(var(--font-size) - 1px);
-	line-height: calc(var(--line-height) + 1px);
+	line-height: var(--line-height);
 	font-weight: 500;
 	color: var(--color-blue);
 }
 
 h3 {
-	margin: 2px 0;
+	margin: 0;
 	font-weight: 500;
 	font-size: calc(var(--font-size) - 1px);
-	line-height: calc(var(--line-height) + 1px);
+	line-height: var(--line-height);
 	color: var(--secondary-text-color);
 }
 
@@ -388,7 +388,7 @@ iframe {
 	:root {
 		--panel-width: 360px;
 		--font-size: 18px;
-		--line-height: 26px;
+		--line-height: 28px;
 		--header-height: 56px;
 		--icon-size: 24px;
 	}

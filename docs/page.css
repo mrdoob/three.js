@@ -3,7 +3,7 @@
 	--text-color: #444;
 
 	--font-size: 16px;
-	--line-height: 24px;
+	--line-height: 26px;
 
 	--border-style: 1px solid #E8E8E8;
 	--panel-width: 300px;
@@ -61,7 +61,7 @@ h1 {
 	font-weight: normal;
 	margin-left: -2px;
 	margin-top: 16px;
-	margin-bottom: -6px;
+	margin-bottom: -8px;
 }
 
 h2 {
@@ -70,7 +70,7 @@ h2 {
 	font-weight: normal;
 	margin-left: -1px;
 	margin-top: 28px;
-	margin-bottom: -6px;
+	margin-bottom: -8px;
 }
 
 h3 {
@@ -78,7 +78,7 @@ h3 {
 	line-height: 28px;
 	font-weight: normal;
 	margin-top: 24px;
-	margin-bottom: -6px;
+	margin-bottom: -8px;
 }
 
 p,
@@ -86,8 +86,8 @@ div,
 table,
 ol,
 ul {
-	margin-top: 12px;
-	margin-bottom: 12px;
+	margin-top: 16px;
+	margin-bottom: 16px;
 }
 
 p {
@@ -111,7 +111,7 @@ li ol {
 
 code {
 	font-size: calc(var(--font-size) - 1px);
-	line-height: calc(var(--line-height) + 1px);
+	line-height: calc(var(--line-height) - 1px);
 	margin: 16px calc(-1 * var(--page-padding));
 }
 
@@ -224,7 +224,7 @@ a.param:hover {
 	:root {
 		--panel-width: 360px;
 		--font-size: 18px;
-		--line-height: 26px;
+		--line-height: 28px;
 		--max-width: 880px;
 		--page-padding: 28px;
 		--icon-size: 24px;
