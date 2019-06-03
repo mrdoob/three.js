@@ -18,7 +18,7 @@ export namespace ParametricGeometries  {
   }
 
   export class SphereGeometry {
-    constructor(size: number, u: number, v): number;
+    constructor(size: number, u: number, v);
   }
 
   export class PlaneGeometry {
