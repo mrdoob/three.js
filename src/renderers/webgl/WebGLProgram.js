@@ -734,11 +734,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 Object.assign( WebGLProgram.prototype, {
 
-	isLinked: function ( renderer, material ) {
+	isLinked: function ( renderer, material, sync ) {
 
 		var gl = renderer.context;
 
-		if ( gl.getProgramParameter( this.program, this.parallelShaderExt.COMPLETION_STATUS_KHR ) == true ) {
+		if ( gl.getProgramParameter( this.program, this.parallelShaderExt.COMPLETION_STATUS_KHR ) == true || sync ) {
 
 			this.checkLink( renderer, material );
 			this.ready = true;

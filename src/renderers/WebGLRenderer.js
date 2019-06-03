@@ -1044,13 +1044,13 @@ function WebGLRenderer( parameters ) {
 
 					for ( var i = 0; i < object.material.length; i ++ ) {
 
-						initMaterial( object.material[ i ], scene.fog, object );
+						initMaterial( object.material[ i ], scene.fog, object, true );
 
 					}
 
 				} else {
 
-					initMaterial( object.material, scene.fog, object );
+					initMaterial( object.material, scene.fog, object, true );
 
 				}
 
@@ -1441,7 +1441,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function initMaterial( material, fog, object ) {
+	function initMaterial( material, fog, object, sync ) {
 
 		var materialProperties = properties.get( material );
 
@@ -1522,7 +1522,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( ! program.ready && ! program.isLinked( _this, material ) ) {
+		if ( ! program.ready && ! program.isLinked( _this, material, sync ) ) {
 
 			materialProperties.retry = true;
 			return;
@@ -1665,7 +1665,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.needsUpdate || materialProperties.retry ) {
 
-			initMaterial( material, fog, object );
+			initMaterial( material, fog, object, false );
 			material.needsUpdate = false;
 
 		}
