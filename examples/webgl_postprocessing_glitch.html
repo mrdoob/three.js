@@ -4,25 +4,7 @@
 		<title>three.js webgl - postprocessing - digital glitch</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-
-			div {
-				position: absolute;
-				z-index: 10;
-				color: #fff;
-				font-family: monospace;
-				text-align: center;
-				margin: 10px;
-				width: 100%;
-			}
-
-			input { cursor: pointer; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -37,7 +19,7 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/GlitchPass.js"></script>
 
-		<div>
+		<div id="info">
 			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox" onchange="updateOptions()"/><br />
 		</div>
 

@@ -4,35 +4,13 @@
 		<title>three.js webgl - materials - HDR texture loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
-			a { color: red; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR (RGBE) texture loader example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl HDR (RGBE) texture loader example<br/>
+			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -51,7 +29,7 @@
 			}
 
 			var params = {
-				exposure: 1.0
+				exposure: 2.0
 			};
 
 			var renderer, scene, camera;
@@ -76,33 +54,30 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.RGBELoader().load( 'textures/miranda_uncropped.hdr', function ( texture, textureData ) {
+				new THREE.RGBELoader()
+					.setType( THREE.UnsignedByteType ) // alt: THREE.FloatType
+					.load( 'textures/memorial.hdr', function ( texture, textureData ) {
 
-					//console.log( textureData );
-					//console.log( texture );
+						//console.log( textureData );
+						//console.log( texture );
 
-					texture.encoding = THREE.RGBEEncoding;
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.flipY = true;
+						var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+						var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
-					var quad = new THREE.PlaneBufferGeometry( textureData.width / textureData.height, 1 );
+						var mesh = new THREE.Mesh( quad, material );
 
-					var mesh = new THREE.Mesh( quad, material );
+						scene.add( mesh );
 
-					scene.add( mesh );
+						render();
 
-					render();
-
-				} );
+					} );
 
 				//
 
 				var gui = new dat.GUI();
 
-				gui.add( params, 'exposure', 0, 2 ).onChange( render );
+				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();
 
 				//

@@ -4,27 +4,7 @@
 		<title>three.js webgl - custom attributes [lines]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -83,7 +63,7 @@
 
 		var renderer, scene, camera, stats;
 
-		var object, uniforms;
+		var line, uniforms;
 
 		var loader = new THREE.FontLoader();
 		loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
@@ -155,9 +135,9 @@
 
 			}
 
-			object = new THREE.Line( geometry, shaderMaterial );
-			object.rotation.x = 0.2;
-			scene.add( object );
+			line = new THREE.Line( geometry, shaderMaterial );
+			line.rotation.x = 0.2;
+			scene.add( line );
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -197,12 +177,12 @@
 
 			var time = Date.now() * 0.001;
 
-			object.rotation.y = 0.25 * time;
+			line.rotation.y = 0.25 * time;
 
 			uniforms.amplitude.value = Math.sin( 0.5 * time );
 			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
-			var attributes = object.geometry.attributes;
+			var attributes = line.geometry.attributes;
 			var array = attributes.displacement.array;
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {

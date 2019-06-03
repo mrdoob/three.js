@@ -4,28 +4,11 @@
 		<title>three.js webgl - svg loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
-		a {
-			color: #ffffff;
-		}
+			body {
+				background-color: #b0b0b0;
+			}
 		</style>
 	</head>
 
@@ -87,7 +70,7 @@
 					drawStrokes: true,
 					fillShapesWireframe: false,
 					strokesWireframe: false
-				}
+				};
 
 				loadSVG( guiData.currentURL );
 
@@ -166,7 +149,7 @@
 						var path = paths[ i ];
 
 						var fillColor = path.userData.style.fill;
-						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none') {
+						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
 							var material = new THREE.MeshBasicMaterial( {
 								color: new THREE.Color().setStyle( fillColor ),
@@ -207,7 +190,7 @@
 
 							for ( var j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
 
-								subPath = path.subPaths[ j ];
+								var subPath = path.subPaths[ j ];
 
 								var geometry = THREE.SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
 

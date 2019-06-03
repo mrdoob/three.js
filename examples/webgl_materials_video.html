@@ -4,27 +4,8 @@
 		<title>three.js webgl - materials - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color:#0078ff; }
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 5px; width: 100%;
-				z-index:100;
-			}
 
 			#overlay {
 				position: absolute;
@@ -67,13 +48,14 @@
 		<div id="overlay">
 			<div>
 				<button id="startButton">Click to Play</button>
-				<p>Automatic video playback with audio requires a user interaction.</p>
+				<p>Video playback with audio requires user interaction.</p>
 			</div>
 		</div>
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo<br/>
+			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -244,7 +226,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.reset();
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

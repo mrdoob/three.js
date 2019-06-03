@@ -5,7 +5,7 @@
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
+THREE.RGBELoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 	this.type = THREE.UnsignedByteType;
@@ -316,8 +316,7 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 		}
 	;
 
-	var byteArray = new Uint8Array( buffer ),
-		byteLength = byteArray.byteLength;
+	var byteArray = new Uint8Array( buffer );
 	byteArray.pos = 0;
 	var rgbe_header_info = RGBE_ReadHeader( byteArray );
 
@@ -393,4 +392,36 @@ THREE.RGBELoader.prototype.setType = function ( value ) {
 
 };
 
+THREE.RGBELoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
 
+	function onLoadCallback( texture, texData ) {
+
+		switch ( texture.type ) {
+
+			case THREE.UnsignedByteType:
+
+				texture.encoding = THREE.RGBEEncoding;
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+			case THREE.FloatType:
+
+				texture.encoding = THREE.LinearEncoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+		}
+
+		if ( onLoad ) onLoad( texture, texData );
+
+	}
+
+	return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
+
+};

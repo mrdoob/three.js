@@ -15,44 +15,11 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 
 	// points
 
-	var lastPointIdx = 0;
-	var pointsUI = [];
-
 	var pointsRow = new UI.Row();
 	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setWidth( '90px' ) );
 
-	var points = new UI.Span().setDisplay( 'inline-block' );
+	var points = new UI.Points3().setValue( parameters.path.points ).onChange( update );
 	pointsRow.add( points );
-
-	var pointsList = new UI.Div();
-	points.add( pointsList );
-
-	var parameterPoints = parameters.path.points;
-	for ( var i = 0; i < parameterPoints.length; i ++ ) {
-
-		var point = parameterPoints[ i ];
-		pointsList.add( createPointRow( point.x, point.y, point.z ) );
-
-	}
-
-	var addPointButton = new UI.Button( '+' ).onClick( function () {
-
-		if ( pointsUI.length === 0 ) {
-
-			pointsList.add( createPointRow( 0, 0, 0 ) );
-
-		} else {
-
-			var point = pointsUI[ pointsUI.length - 1 ];
-
-			pointsList.add( createPointRow( point.x.getValue(), point.y.getValue(), point.z.getValue() ) );
-
-		}
-
-		update();
-
-	} );
-	points.add( addPointButton );
 
 	container.add( pointsRow );
 
@@ -118,63 +85,15 @@ Sidebar.Geometry.TubeGeometry = function ( editor, object ) {
 
 	function update() {
 
-		var points = [];
-		var count = 0;
-
-		for ( var i = 0; i < pointsUI.length; i ++ ) {
-
-			var pointUI = pointsUI[ i ];
-
-			if ( ! pointUI ) continue;
-
-			points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
-			count ++;
-			pointUI.lbl.setValue( count );
-
-		}
-
 		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
 		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
-			new THREE.CatmullRomCurve3( points, closed.getValue(), curveType.getValue(), tension.getValue() ),
+			new THREE.CatmullRomCurve3( points.getValue(), closed.getValue(), curveType.getValue(), tension.getValue() ),
 			tubularSegments.getValue(),
 			radius.getValue(),
 			radialSegments.getValue(),
 			closed.getValue()
 		) ) );
-
-	}
-
-	function createPointRow( x, y, z ) {
-
-		var pointRow = new UI.Div();
-		var lbl = new UI.Text( lastPointIdx + 1 ).setWidth( '20px' );
-		var txtX = new UI.Number( x ).setWidth( '30px' ).onChange( update );
-		var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( update );
-		var txtZ = new UI.Number( z ).setWidth( '30px' ).onChange( update );
-		var idx = lastPointIdx;
-		var btn = new UI.Button( '-' ).onClick( function () {
-
-			deletePointRow( idx );
-
-		} );
-
-		pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
-		lastPointIdx ++;
-		pointRow.add( lbl, txtX, txtY, txtZ, btn );
-
-		return pointRow;
-
-	}
-
-	function deletePointRow( idx ) {
-
-		if ( ! pointsUI[ idx ] ) return;
-
-		pointsList.remove( pointsUI[ idx ].row );
-		pointsUI[ idx ] = null;
-
-		update();
 
 	}
 

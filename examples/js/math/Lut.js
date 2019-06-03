@@ -10,20 +10,6 @@ THREE.Lut = function ( colormap, numberofcolors ) {
 
 };
 
-var defaultLabelParameters = {
-	fontsize: 24,
-	fontface: 'Arial',
-	title: '',
-	um: '',
-	ticks: 0,
-	decimal: 2,
-	notation: 'standard'
-};
-
-var defaultBackgroundColor = { r: 255, g: 100, b: 100, a: 0.8 };
-var defaultBorderColor = { r: 255, g: 0, b: 0, a: 1.0 };
-var defaultBorderThickness = 4;
-
 THREE.Lut.prototype = {
 
 	constructor: THREE.Lut,
@@ -188,7 +174,6 @@ THREE.Lut.prototype = {
 
 	}
 };
-
 
 THREE.ColorMapKeywords = {
 
