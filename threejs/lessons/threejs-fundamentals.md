@@ -220,10 +220,9 @@ Outside the loop we call `requestAnimationFrame` one time to start the loop.
 
 {{{example url="../threejs-fundamentals-with-animation.html" }}}
 
-It's a little better but it's still hard to see the 3d. What would help is to add some lighting
-so let's add a light. There are many kinds of lights in three.js which
-we'll go over in a future article. For now let's create a directional
-light.
+It's a little better but it's still hard to see the 3d. What would help is to
+add some lighting so let's add a light. There are many kinds of lights in
+three.js which we'll go over in [a future article](threejs-lights.html). For now let's create a directional light.
 
 ```js
 {
