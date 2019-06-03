@@ -6,13 +6,31 @@
  *
  */
 
-THREE.Fire = function ( geometry, options ) {
+import {
+	Clock,
+	Color,
+	DataTexture,
+	LinearFilter,
+	Math as _Math,
+	Mesh,
+	NearestFilter,
+	NoToneMapping,
+	OrthographicCamera,
+	PlaneBufferGeometry,
+	RGBAFormat,
+	Scene,
+	ShaderMaterial,
+	Vector2,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
 
-	THREE.Mesh.call( this, geometry );
+var Fire = function ( geometry, options ) {
+
+	Mesh.call( this, geometry );
 
 	this.type = 'Fire';
 
-	this.clock = new THREE.Clock();
+	this.clock = new Clock();
 
 	options = options || {};
 
@@ -22,9 +40,9 @@ THREE.Fire = function ( geometry, options ) {
 	var oneOverHeight = 1.0 / textureHeight;
 
 	var debug = ( options.debug === undefined ) ? false : options.debug;
-	this.color1 = options.color1 || new THREE.Color( 0xffffff );
-	this.color2 = options.color2 || new THREE.Color( 0xffa000 );
-	this.color3 = options.color3 || new THREE.Color( 0x000000 );
+	this.color1 = options.color1 || new Color( 0xffffff );
+	this.color2 = options.color2 || new Color( 0xffa000 );
+	this.color3 = options.color3 || new Color( 0x000000 );
 	this.colorBias = ( options.colorBias === undefined ) ? 0.8 : options.colorBias;
 	this.diffuse = ( options.diffuse === undefined ) ? 1.33 : options.diffuse;
 	this.viscosity = ( options.viscosity === undefined ) ? 0.25 : options.viscosity;
@@ -33,7 +51,7 @@ THREE.Fire = function ( geometry, options ) {
 	this.burnRate = ( options.burnRate === undefined ) ? 0.3 : options.burnRate;
 	this.drag = ( options.drag === undefined ) ? 0.35 : options.drag;
 	this.airSpeed = ( options.airSpeed === undefined ) ? 6.0 : options.airSpeed;
-	this.windVector = options.windVector || new THREE.Vector2( 0.0, 0.75 );
+	this.windVector = options.windVector || new Vector2( 0.0, 0.75 );
 	this.speed = ( options.speed === undefined ) ? 500.0 : options.speed;
 	this.massConservation = ( options.massConservation === undefined ) ? false : options.massConservation;
 
@@ -126,27 +144,27 @@ THREE.Fire = function ( geometry, options ) {
 	};
 
 	var parameters = {
-		minFilter: THREE.NearestFilter,
-		magFilter: THREE.NearestFilter,
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
 		depthBuffer: false,
 		stencilBuffer: false
 	};
 
 
-	this.field0 = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+	this.field0 = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	this.field0.background = new THREE.Color( 0x000000 );
+	this.field0.background = new Color( 0x000000 );
 
-	this.field1 = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+	this.field1 = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	this.field0.background = new THREE.Color( 0x000000 );
+	this.field0.background = new Color( 0x000000 );
 
-	this.fieldProj = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+	this.fieldProj = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	this.field0.background = new THREE.Color( 0x000000 );
+	this.field0.background = new Color( 0x000000 );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) ||
-		 ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! _Math.isPowerOfTwo( textureWidth ) ||
+		 ! _Math.isPowerOfTwo( textureHeight ) ) {
 
 		this.field0.texture.generateMipmaps = false;
 		this.field1.texture.generateMipmaps = false;
@@ -155,20 +173,20 @@ THREE.Fire = function ( geometry, options ) {
 	}
 
 
-	this.fieldScene = new THREE.Scene();
-	this.fieldScene.background = new THREE.Color( 0x000000 );
+	this.fieldScene = new Scene();
+	this.fieldScene.background = new Color( 0x000000 );
 
-	this.orthoCamera = new THREE.OrthographicCamera( textureWidth / - 2, textureWidth / 2, textureHeight / 2, textureHeight / - 2, 1, 2 );
+	this.orthoCamera = new OrthographicCamera( textureWidth / - 2, textureWidth / 2, textureHeight / 2, textureHeight / - 2, 1, 2 );
 	this.orthoCamera.position.z = 1;
 
-	this.fieldGeometry = new THREE.PlaneBufferGeometry( textureWidth, textureHeight );
+	this.fieldGeometry = new PlaneBufferGeometry( textureWidth, textureHeight );
 
-	this.internalSource = new THREE.DataTexture( this.sourceData, textureWidth, textureHeight, THREE.RGBAFormat );
+	this.internalSource = new DataTexture( this.sourceData, textureWidth, textureHeight, RGBAFormat );
 
 	// Source Shader
 
-	var shader = THREE.Fire.SourceShader;
-	this.sourceMaterial = new THREE.ShaderMaterial( {
+	var shader = Fire.SourceShader;
+	this.sourceMaterial = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -177,13 +195,13 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.clearSources();
 
-	this.sourceMesh = new THREE.Mesh( this.fieldGeometry, this.sourceMaterial );
+	this.sourceMesh = new Mesh( this.fieldGeometry, this.sourceMaterial );
 	this.fieldScene.add( this.sourceMesh );
 
 	// Diffuse Shader
 
-	var shader = THREE.Fire.DiffuseShader;
-	this.diffuseMaterial = new THREE.ShaderMaterial( {
+	var shader = Fire.DiffuseShader;
+	this.diffuseMaterial = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -193,13 +211,13 @@ THREE.Fire = function ( geometry, options ) {
 	this.diffuseMaterial.uniforms[ "oneOverWidth" ].value = oneOverWidth;
 	this.diffuseMaterial.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
-	this.diffuseMesh = new THREE.Mesh( this.fieldGeometry, this.diffuseMaterial );
+	this.diffuseMesh = new Mesh( this.fieldGeometry, this.diffuseMaterial );
 	this.fieldScene.add( this.diffuseMesh );
 
 	// Drift Shader
 
-	shader = THREE.Fire.DriftShader;
-	this.driftMaterial = new THREE.ShaderMaterial( {
+	shader = Fire.DriftShader;
+	this.driftMaterial = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -209,13 +227,13 @@ THREE.Fire = function ( geometry, options ) {
 	this.driftMaterial.uniforms[ "oneOverWidth" ].value = oneOverWidth;
 	this.driftMaterial.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
-	this.driftMesh = new THREE.Mesh( this.fieldGeometry, this.driftMaterial );
+	this.driftMesh = new Mesh( this.fieldGeometry, this.driftMaterial );
 	this.fieldScene.add( this.driftMesh );
 
 	// Projection Shader 1
 
-	shader = THREE.Fire.ProjectionShader1;
-	this.projMaterial1 = new THREE.ShaderMaterial( {
+	shader = Fire.ProjectionShader1;
+	this.projMaterial1 = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -225,13 +243,13 @@ THREE.Fire = function ( geometry, options ) {
 	this.projMaterial1.uniforms[ "oneOverWidth" ].value = oneOverWidth;
 	this.projMaterial1.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
-	this.projMesh1 = new THREE.Mesh( this.fieldGeometry, this.projMaterial1 );
+	this.projMesh1 = new Mesh( this.fieldGeometry, this.projMaterial1 );
 	this.fieldScene.add( this.projMesh1 );
 
 	// Projection Shader 2
 
-	shader = THREE.Fire.ProjectionShader2;
-	this.projMaterial2 = new THREE.ShaderMaterial( {
+	shader = Fire.ProjectionShader2;
+	this.projMaterial2 = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -242,13 +260,13 @@ THREE.Fire = function ( geometry, options ) {
 	this.projMaterial2.uniforms[ "oneOverWidth" ].value = oneOverWidth;
 	this.projMaterial2.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
-	this.projMesh2 = new THREE.Mesh( this.fieldGeometry, this.projMaterial2 );
+	this.projMesh2 = new Mesh( this.fieldGeometry, this.projMaterial2 );
 	this.fieldScene.add( this.projMesh2 );
 
 	// Projection Shader 3
 
-	shader = THREE.Fire.ProjectionShader3;
-	this.projMaterial3 = new THREE.ShaderMaterial( {
+	shader = Fire.ProjectionShader3;
+	this.projMaterial3 = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -259,21 +277,21 @@ THREE.Fire = function ( geometry, options ) {
 	this.projMaterial3.uniforms[ "oneOverWidth" ].value = oneOverWidth;
 	this.projMaterial3.uniforms[ "oneOverHeight" ].value = oneOverHeight;
 
-	this.projMesh3 = new THREE.Mesh( this.fieldGeometry, this.projMaterial3 );
+	this.projMesh3 = new Mesh( this.fieldGeometry, this.projMaterial3 );
 	this.fieldScene.add( this.projMesh3 );
 
 	// Color Shader
 
 	if ( debug ) {
 
-		shader = THREE.Fire.DebugShader;
+		shader = Fire.DebugShader;
 
 	} else {
 
-		shader = THREE.Fire.ColorShader;
+		shader = Fire.ColorShader;
 
 	}
-	this.material = new THREE.ShaderMaterial( {
+	this.material = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
@@ -448,7 +466,7 @@ THREE.Fire = function ( geometry, options ) {
 		renderer.vr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 		renderer.antialias = false;
-		renderer.toneMapping = THREE.NoToneMapping;
+		renderer.toneMapping = NoToneMapping;
 
 		this.sourceMesh.visible = false;
 		this.diffuseMesh.visible = false;
@@ -481,8 +499,8 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.material.map = this.field1.texture;
 		this.material.transparent = true;
-		this.material.minFilter = THREE.LinearFilter,
-		this.material.magFilter = THREE.LinearFilter,
+		this.material.minFilter = LinearFilter,
+		this.material.magFilter = LinearFilter,
 
 		this.restoreRenderState( renderer );
 
@@ -491,10 +509,10 @@ THREE.Fire = function ( geometry, options ) {
 };
 
 
-THREE.Fire.prototype = Object.create( THREE.Mesh.prototype );
-THREE.Fire.prototype.constructor = THREE.Fire;
+Fire.prototype = Object.create( Mesh.prototype );
+Fire.prototype.constructor = Fire;
 
-THREE.Fire.SourceShader = {
+Fire.SourceShader = {
 
 	uniforms: {
 		'sourceMap': {
@@ -551,7 +569,7 @@ THREE.Fire.SourceShader = {
 };
 
 
-THREE.Fire.DiffuseShader = {
+Fire.DiffuseShader = {
 
 	uniforms: {
 		'oneOverWidth': {
@@ -659,7 +677,7 @@ THREE.Fire.DiffuseShader = {
 	].join( "\n" )
 };
 
-THREE.Fire.DriftShader = {
+Fire.DriftShader = {
 
 	uniforms: {
 		'oneOverWidth': {
@@ -669,7 +687,7 @@ THREE.Fire.DriftShader = {
 			value: null
 		},
 		'windVector': {
-			value: new THREE.Vector2( 0.0, 0.0 )
+			value: new Vector2( 0.0, 0.0 )
 		},
 		'airSpeed': {
 			value: null
@@ -739,7 +757,7 @@ THREE.Fire.DriftShader = {
 };
 
 
-THREE.Fire.ProjectionShader1 = {
+Fire.ProjectionShader1 = {
 
 	uniforms: {
 		'oneOverWidth': {
@@ -796,7 +814,7 @@ THREE.Fire.ProjectionShader1 = {
 };
 
 
-THREE.Fire.ProjectionShader2 = {
+Fire.ProjectionShader2 = {
 
 	uniforms: {
 		'oneOverWidth': {
@@ -854,7 +872,7 @@ THREE.Fire.ProjectionShader2 = {
 };
 
 
-THREE.Fire.ProjectionShader3 = {
+Fire.ProjectionShader3 = {
 
 	uniforms: {
 		'oneOverWidth': {
@@ -920,7 +938,7 @@ THREE.Fire.ProjectionShader3 = {
 	].join( "\n" )
 };
 
-THREE.Fire.ColorShader = {
+Fire.ColorShader = {
 
 	uniforms: {
 		'color1': {
@@ -979,7 +997,7 @@ THREE.Fire.ColorShader = {
 };
 
 
-THREE.Fire.DebugShader = {
+Fire.DebugShader = {
 
 	uniforms: {
 		'color1': {
@@ -1037,3 +1055,5 @@ THREE.Fire.DebugShader = {
 
 	].join( "\n" )
 };
+
+export { Fire };
