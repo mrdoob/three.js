@@ -31,25 +31,25 @@ export interface ShaderMaterialParameters extends MaterialParameters {
 
 export class ShaderMaterial extends Material {
 
-		constructor( parameters?: ShaderMaterialParameters );
+	constructor( parameters?: ShaderMaterialParameters );
 
-		defines: any;
-		uniforms: { [uniform: string]: IUniform };
-		uniformsGroups: UniformsGroup[];
-		vertexShader: string;
-		fragmentShader: string;
-		linewidth: number;
-		wireframe: boolean;
-		wireframeLinewidth: number;
-		lights: boolean;
-		clipping: boolean;
-		skinning: boolean;
-		morphTargets: boolean;
-		morphNormals: boolean;
+	defines: any;
+	uniforms: { [uniform: string]: IUniform };
+	uniformsGroups: UniformsGroup[];
+	vertexShader: string;
+	fragmentShader: string;
+	linewidth: number;
+	wireframe: boolean;
+	wireframeLinewidth: number;
+	lights: boolean;
+	clipping: boolean;
+	skinning: boolean;
+	morphTargets: boolean;
+	morphNormals: boolean;
 
-		/**
-		 * @deprecated Use {@link ShaderMaterial#extensions.derivatives extensions.derivatives} instead.
-		 */
+	/**
+	 * @deprecated Use {@link ShaderMaterial#extensions.derivatives extensions.derivatives} instead.
+	 */
 	derivatives: any;
 	extensions: {
 		derivatives: boolean;
