@@ -6,6 +6,10 @@ import {
 	DataTextureLoader,
 	DefaultLoadingManager,
 	FloatType,
+	LinearEncoding,
+	LinearFilter,
+	NearestFilter,
+	RGBEEncoding,
 	RGBEFormat,
 	RGBFormat,
 	UnsignedByteType
@@ -29,7 +33,7 @@ RGBELoader.prototype._parser = function ( buffer ) {
 
 	var
 		/* return codes for rgbe routines */
-		RGBE_RETURN_SUCCESS = 0,
+		//RGBE_RETURN_SUCCESS = 0,
 		RGBE_RETURN_FAILURE = - 1,
 
 		/* default error routine.  change this to change error handling */
@@ -56,12 +60,12 @@ RGBELoader.prototype._parser = function ( buffer ) {
 		},
 
 		/* offsets to red, green, and blue components in a data (float) pixel */
-		RGBE_DATA_RED = 0,
-		RGBE_DATA_GREEN = 1,
-		RGBE_DATA_BLUE = 2,
+		//RGBE_DATA_RED = 0,
+		//RGBE_DATA_GREEN = 1,
+		//RGBE_DATA_BLUE = 2,
 
 		/* number of floats per pixel, use 4 since stored in rgba image format */
-		RGBE_DATA_SIZE = 4,
+		//RGBE_DATA_SIZE = 4,
 
 		/* flags indicating which fields in an rgbe_header_info are valid */
 		RGBE_VALID_PROGRAMTYPE = 1,
@@ -398,6 +402,40 @@ RGBELoader.prototype.setType = function ( value ) {
 
 	this.type = value;
 	return this;
+
+};
+
+RGBELoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
+
+	function onLoadCallback( texture, texData ) {
+
+		switch ( texture.type ) {
+
+			case UnsignedByteType:
+
+				texture.encoding = RGBEEncoding;
+				texture.minFilter = NearestFilter;
+				texture.magFilter = NearestFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+			case FloatType:
+
+				texture.encoding = LinearEncoding;
+				texture.minFilter = LinearFilter;
+				texture.magFilter = LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+		}
+
+		if ( onLoad ) onLoad( texture, texData );
+
+	}
+
+	return DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
 
 };
 
