@@ -2873,8 +2873,29 @@ THREE.GLTFLoader = ( function () {
 
 				if ( outputAccessor.normalized ) {
 
-					var bits = outputAccessor.array.BYTES_PER_ELEMENT * 8;
-					var scale = 1 / ((1 << (bits - 1)) - 1);
+					var scale;
+
+					if ( outputArray.constructor === Int8Array ) {
+
+						scale = 1 / 127;
+
+					} else if ( outputArray.constructor === Uint8Array ) {
+
+						scale = 1 / 255;
+
+					} else if ( outputArray.constructor == Int16Array ) {
+
+						scale = 1 / 32767;
+
+					} else if ( outputArray.constructor === Uint16Array ) {
+
+						scale = 1 / 65535;
+
+					} else {
+
+						throw new Error( 'THREE.GLTFLoader: Unsupported output accessor component type.' );
+
+					}
 
 					var scaled = new Float32Array( outputArray.length );
 
