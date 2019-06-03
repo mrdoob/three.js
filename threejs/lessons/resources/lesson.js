@@ -18,8 +18,22 @@ function getQueryParams() {
 }
 
 $(document).ready(function($){
+  const supportedLangs = {
+    'en': true,
+    'zh': true,
+  };
 
-  const codeKeywordLinks = {
+  function insertLang(codeKeywordLinks) {
+    const lang = document.documentElement.lang.substr(0, 2).toLowerCase();
+    const langPart = `#api/${supportedLangs[lang] ? lang : 'en'}/`;
+    const langAddedLinks = {};
+    for (const [keyword, url] of Object.entries(codeKeywordLinks)) {
+      langAddedLinks[keyword] = url.replace('#api/', langPart);
+    }
+    return langAddedLinks;
+  }
+
+  const codeKeywordLinks = insertLang({
     AnimationAction: 'https://threejs.org/docs/#api/animation/AnimationAction',
     AnimationClip: 'https://threejs.org/docs/#api/animation/AnimationClip',
     AnimationMixer: 'https://threejs.org/docs/#api/animation/AnimationMixer',
@@ -265,7 +279,7 @@ $(document).ready(function($){
     PRWMLoader: 'https://threejs.org/docs/#examples/loaders/PRWMLoader',
     Lensflare: 'https://threejs.org/docs/#examples/objects/Lensflare',
     GLTFExporter: 'https://threejs.org/docs/#examples/exporters/GLTFExporter',
-  };
+  });
 
   function getKeywordLink(keyword) {
     const dotNdx = keyword.indexOf('.');
