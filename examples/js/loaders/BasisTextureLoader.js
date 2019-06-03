@@ -117,9 +117,7 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 				var config = this.workerConfig;
 
-				var { data, width, height } = message;
-
-				var mipmaps = [ { data, width, height } ];
+				var { width, height, mipmaps } = message;
 
 				var texture;
 
@@ -305,9 +303,17 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 			case 'transcode':
 				transcoderPending.then( () => {
 
-					var { data, width, height } = transcode( message.buffer );
+					var { width, height, mipmaps } = transcode( message.buffer );
 
-					self.postMessage( { type: 'transcode', id: message.id, data, width, height }, [ data.buffer ] );
+					var buffers = [];
+
+					for ( var i = 0; i < mipmaps.length; ++i ) {
+
+						buffers.push( mipmaps[i].data.buffer );
+
+					}
+
+					self.postMessage( { type: 'transcode', id: message.id, width, height, mipmaps }, buffers );
 
 				} );
 				break;
@@ -348,7 +354,6 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 		var width = basisFile.getImageWidth( 0, 0 );
 		var height = basisFile.getImageHeight( 0, 0 );
-		var images = basisFile.getNumImages();
 		var levels = basisFile.getNumLevels( 0 );
 
 		function cleanup () {
@@ -358,7 +363,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 		}
 
-		if ( ! width || ! height || ! images || ! levels ) {
+		if ( ! width || ! height || ! levels ) {
 
 			cleanup();
 			throw new Error( 'THREE.BasisTextureLoader:  Invalid .basis file' );
@@ -372,28 +377,37 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 		}
 
-		var dst = new Uint8Array( basisFile.getImageTranscodedSizeInBytes( 0, 0, config.format ) );
+		var mipmaps = [];
 
-		var startTime = performance.now();
+		for ( var mip = 0; mip < levels; mip++ ) {
 
-		var status = basisFile.transcodeImage(
-			dst,
-			0,
-			0,
-			config.format,
-			config.etcSupported ? 0 : ( config.dxtSupported ? 1 : 0 ),
-			0
-		);
+			var mipWidth = basisFile.getImageWidth( 0, mip );
+			var mipHeight = basisFile.getImageHeight( 0, mip );
+			var dst = new Uint8Array( basisFile.getImageTranscodedSizeInBytes( 0, mip, config.format ) );
 
-		cleanup();
+			var status = basisFile.transcodeImage(
+				dst,
+				0,
+				mip,
+				config.format,
+				config.etcSupported ? 0 : ( config.dxtSupported ? 1 : 0 ),
+				0
+			);
 
-		if ( ! status ) {
+			if ( ! status ) {
 
-			throw new Error( 'THREE.BasisTextureLoader: .transcodeImage failed.' );
+				cleanup();
+				throw new Error( 'THREE.BasisTextureLoader: .transcodeImage failed.' );
+
+			}
+
+			mipmaps.push( { data: dst, width: mipWidth, height: mipHeight } );
 
 		}
 
-		return { data: dst, width, height };
+		cleanup();
+
+		return { width, height, mipmaps };
 
 	}
 
