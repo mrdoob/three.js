@@ -743,10 +743,6 @@ Object.assign( WebGLProgram.prototype, {
 			this.checkLink( renderer, material );
 			this.ready = true;
 
-		} else {
-
-			console.log( 'not ready' );
-
 		}
 
 		return this.ready;

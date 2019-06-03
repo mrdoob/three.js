@@ -109,7 +109,6 @@ function MeshStandardMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
-	this.parallelCompile = true;
 
 	this.setValues( parameters );
 
