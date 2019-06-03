@@ -113,6 +113,12 @@ function WebXRManager( renderer ) {
 
 	};
 
+	this.getSession = function () {
+
+		return session;
+
+	};
+
 	this.setSession = function ( value ) {
 
 		session = value;
