@@ -365,6 +365,7 @@ var list = {
 
 			"Loaders": {
 				"BabylonLoader": "examples/loaders/BabylonLoader",
+				"BasisTextureLoader": "examples/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/loaders/DRACOLoader",
 				"GLTFLoader": "examples/loaders/GLTFLoader",
 				"MMDLoader": "examples/loaders/MMDLoader",
