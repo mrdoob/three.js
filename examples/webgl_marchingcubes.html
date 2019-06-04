@@ -21,7 +21,7 @@
 	<script src="js/controls/OrbitControls.js"></script>
 
 	<script src="js/MarchingCubes.js"></script>
-	<script src="js/ShaderToon.js"></script>
+	<script src="js/shaders/ToonShader.js"></script>
 
 	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
@@ -161,10 +161,10 @@
 
 			// toons
 
-			var toonMaterial1 = createShaderMaterial( "toon1", light, ambientLight );
-			var toonMaterial2 = createShaderMaterial( "toon2", light, ambientLight );
-			var hatchingMaterial = createShaderMaterial( "hatching", light, ambientLight );
-			var dottedMaterial = createShaderMaterial( "dotted", light, ambientLight );
+			var toonMaterial1 = createShaderMaterial( THREE.ToonShader1, light, ambientLight );
+			var toonMaterial2 = createShaderMaterial( THREE.ToonShader2, light, ambientLight );
+			var hatchingMaterial = createShaderMaterial( THREE.ToonShaderHatching, light, ambientLight );
+			var dottedMaterial = createShaderMaterial( THREE.ToonShaderDotted, light, ambientLight );
 
 			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = THREE.RepeatWrapping;
@@ -243,9 +243,7 @@
 
 		}
 
-		function createShaderMaterial( id, light, ambientLight ) {
-
-			var shader = THREE.ShaderToon[ id ];
+		function createShaderMaterial( shader, light, ambientLight ) {
 
 			var u = THREE.UniformsUtils.clone( shader.uniforms );
 

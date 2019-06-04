@@ -6,12 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			.models {
-				position: absolute;
-				top: 10px;
-				left: 12px;
-				font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif;
-			}
 			.notes {
 				position:absolute;
 				left: 12px;
@@ -22,7 +16,7 @@
 	</head>
 	<body>
 
-		<div class="models">
+		<div id="info">
 			<strong>Models</strong>:
 			<a class="model" href="models/prwm/faceted-nefertiti.*.prwm">Faceted Nefertiti</a>,
 			<a class="model" href="models/prwm/smooth-suzanne.*.prwm">Smooth Suzanne</a>,
@@ -138,7 +132,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

@@ -3718,6 +3718,10 @@ function WebGLRenderTarget( width, height, options ) {
 
 	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
+	this.texture.image = {};
+	this.texture.image.width = width;
+	this.texture.image.height = height;
+
 	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 	this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
@@ -3739,6 +3743,9 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 
 			this.width = width;
 			this.height = height;
+
+			this.texture.image.width = width;
+			this.texture.image.height = height;
 
 			this.dispose();
 
@@ -20617,7 +20624,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.pixelStorei( 37440, texture.flipY );
 
-				var isCompressed = ( texture && texture.isCompressedTexture );
+				var isCompressed = ( texture.image[ 0 ] && texture.image[ 0 ].isCompressedTexture );
 				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 				var cubeImage = [];
@@ -22074,6 +22081,8 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
+			scope.dispatchEvent( { type: 'sessionstart' } );
+
 		} else {
 
 			if ( scope.enabled ) {
@@ -22083,6 +22092,8 @@ function WebVRManager( renderer ) {
 			}
 
 			animation.stop();
+
+			scope.dispatchEvent( { type: 'sessionend' } );
 
 		}
 
@@ -22408,11 +22419,15 @@ function WebVRManager( renderer ) {
 
 }
 
+Object.assign( WebVRManager.prototype, EventDispatcher.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
 function WebXRManager( renderer ) {
+
+	var scope = this;
 
 	var gl = renderer.context;
 
@@ -22490,6 +22505,8 @@ function WebXRManager( renderer ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
+		scope.dispatchEvent( { type: 'sessionend' } );
+
 	}
 
 	function onRequestReferenceSpace( value ) {
@@ -22498,6 +22515,8 @@ function WebXRManager( renderer ) {
 
 		animation.setContext( session );
 		animation.start();
+
+		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
@@ -22508,6 +22527,12 @@ function WebXRManager( renderer ) {
 	this.setReferenceSpaceType = function ( value ) {
 
 		referenceSpaceType = value;
+
+	};
+
+	this.getSession = function () {
+
+		return session;
 
 	};
 
@@ -22712,6 +22737,8 @@ function WebXRManager( renderer ) {
 	this.submitFrame = function () {};
 
 }
+
+Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
