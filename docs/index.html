@@ -39,7 +39,9 @@
 
 		</div>
 
-		<iframe name="viewer"></iframe>
+		<div id="iframe-wrapper">
+			<iframe name="viewer"></iframe>
+		</div>
 
 		<script src="list.js"></script>
 
@@ -426,9 +428,8 @@
 
 				}
 
-				document.body.replaceChild( iframe, oldIframe );
+				document.getElementById('iframe-wrapper').replaceChild( iframe, oldIframe );
 				document.title = subtitle + 'three.js docs';
-
 
 			}
 
