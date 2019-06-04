@@ -72,10 +72,10 @@ THREE.BasisTextureLoader.prototype = {
 		var context = renderer.context;
 		var config = this.workerConfig;
 
-		config.etcSupported = !! context.getExtension('WEBGL_compressed_texture_etc1');
-		config.dxtSupported = !! context.getExtension('WEBGL_compressed_texture_s3tc');
-		config.pvrtcSupported = !! context.getExtension('WEBGL_compressed_texture_pvrtc')
-			|| !! context.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
+		config.etcSupported = !! context.getExtension( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = !! context.getExtension( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = !! context.getExtension( 'WEBGL_compressed_texture_pvrtc' )
+			|| !! context.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.etcSupported ) {
 
@@ -128,7 +128,7 @@ THREE.BasisTextureLoader.prototype = {
 			.then( ( _worker ) => {
 
 				worker = _worker;
-				taskID = this.workerNextTaskID++;
+				taskID = this.workerNextTaskID ++;
 
 				return new Promise( ( resolve, reject ) => {
 
@@ -138,7 +138,7 @@ THREE.BasisTextureLoader.prototype = {
 
 					worker.postMessage( { type: 'transcode', id: taskID, buffer }, [ buffer ] );
 
-				} )
+				} );
 
 			} )
 			.then( ( message ) => {
@@ -174,7 +174,7 @@ THREE.BasisTextureLoader.prototype = {
 
 				return texture;
 
-			});
+			} );
 
 		texturePending
 			.finally( () => {
@@ -281,13 +281,17 @@ THREE.BasisTextureLoader.prototype = {
 
 					}
 
-				}
+				};
 
 				this.workerPool.push( worker );
 
 			} else {
 
-				this.workerPool.sort( function ( a, b ) { return a._taskLoad > b._taskLoad ? -1 : 1; } );
+				this.workerPool.sort( function ( a, b ) {
+
+					return a._taskLoad > b._taskLoad ? - 1 : 1;
+
+				} );
 
 			}
 
@@ -299,7 +303,7 @@ THREE.BasisTextureLoader.prototype = {
 
 	dispose: function () {
 
-		for ( var i = 0; i < this.workerPool.length; i++ ) {
+		for ( var i = 0; i < this.workerPool.length; i ++ ) {
 
 			this.workerPool[ i ].terminate();
 
@@ -310,7 +314,7 @@ THREE.BasisTextureLoader.prototype = {
 		return this;
 
 	}
-}
+};
 
 /* CONSTANTS */
 
@@ -342,6 +346,7 @@ THREE.BasisTextureLoader.DXT_FORMAT_MAP[ THREE.BasisTextureLoader.BASIS_FORMAT.c
 /* WEB WORKER */
 
 THREE.BasisTextureLoader.BasisWorker = function () {
+
 	var config;
 	var transcoderPending;
 	var _BasisFile;
@@ -366,9 +371,9 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 						var buffers = [];
 
-						for ( var i = 0; i < mipmaps.length; ++i ) {
+						for ( var i = 0; i < mipmaps.length; ++ i ) {
 
-							buffers.push( mipmaps[i].data.buffer );
+							buffers.push( mipmaps[ i ].data.buffer );
 
 						}
 
@@ -389,7 +394,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 	};
 
-	function init ( wasmBinary ) {
+	function init( wasmBinary ) {
 
 		transcoderPending = new Promise( ( resolve ) => {
 
@@ -415,7 +420,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 	}
 
-	function transcode ( buffer ) {
+	function transcode( buffer ) {
 
 		var basisFile = new _BasisFile( new Uint8Array( buffer ) );
 
@@ -423,7 +428,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 		var height = basisFile.getImageHeight( 0, 0 );
 		var levels = basisFile.getNumLevels( 0 );
 
-		function cleanup () {
+		function cleanup() {
 
 			basisFile.close();
 			basisFile.delete();
@@ -446,7 +451,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 		var mipmaps = [];
 
-		for ( var mip = 0; mip < levels; mip++ ) {
+		for ( var mip = 0; mip < levels; mip ++ ) {
 
 			var mipWidth = basisFile.getImageWidth( 0, mip );
 			var mipHeight = basisFile.getImageHeight( 0, mip );
