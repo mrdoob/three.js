@@ -8,6 +8,8 @@ import { ShaderChunk } from '../shaders/ShaderChunk.js';
 import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding } from '../../constants.js';
 
 var programIdCount = 0;
+var maxParallel = 1;
+var currentParallel = 0;
 
 function addLineNumbers( string ) {
 
@@ -609,47 +611,36 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	var parallelShaderExt = capabilities.parallelShaderCompile;
 
-	var vertexGlsl = prefixVertex + vertexShader;
-	var fragmentGlsl = prefixFragment + fragmentShader;
-
-	// console.log( '*VERTEX*', vertexGlsl );
-	// console.log( '*FRAGMENT*', fragmentGlsl );
-
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
-
-	gl.attachShader( program, glVertexShader );
-	gl.attachShader( program, glFragmentShader );
-
-	// Force a particular attribute to index 0.
-
-	if ( material.index0AttributeName !== undefined ) {
-
-		gl.bindAttribLocation( program, 0, material.index0AttributeName );
-
-	} else if ( parameters.morphTargets === true ) {
-
-		// programs with morphTargets displace position out of attribute 0
-		gl.bindAttribLocation( program, 0, 'position' );
-
-	}
-
-	this.program = program;
-	this.vertexShader = glVertexShader;
-	this.fragmentShader = glFragmentShader;
-	this.parallelShaderExt = parallelShaderExt;
 	this.prefixVertex = prefixVertex;
 	this.prefixFragment = prefixFragment;
 
-	gl.linkProgram( program );
+	this.vertexShader = vertexShader;
+	this.fragmentShader = fragmentShader;
+
+	this.program = program;
+	this.parameters = parameters;
+	this.parallelShaderExt = parallelShaderExt;
+	this.pending = false;
 
 	if ( parallelShaderExt !== null && material.parallelCompile ) {
+
+		if ( currentParallel < maxParallel ) {
+
+			this.compileAndLink( renderer, material );
+			currentParallel ++;
+
+		} else {
+
+			this.pending = true;
+
+		}
 
 		this.ready = false;
 
 	} else {
 
 		// check for link errors
+		this.compileAndLink( renderer, material );
 		this.checkLink( renderer, material );
 		this.ready = true;
 
@@ -734,14 +725,64 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 Object.assign( WebGLProgram.prototype, {
 
+	compileAndLink: function ( renderer, material ) {
+
+		var gl = renderer.context;
+
+		var program = this.program;
+		var vertexGlsl = this.prefixVertex + this.vertexShader;
+		var fragmentGlsl = this.prefixFragment + this.fragmentShader;
+
+		this.startFrame = renderer.info.render.frame;
+
+		// console.log( '*VERTEX*', vertexGlsl );
+		// console.log( '*FRAGMENT*', fragmentGlsl );
+
+		var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+		var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+
+		gl.attachShader( program, glVertexShader );
+		gl.attachShader( program, glFragmentShader );
+
+		// Force a particular attribute to index 0.
+
+		if ( material.index0AttributeName !== undefined ) {
+
+			gl.bindAttribLocation( program, 0, material.index0AttributeName );
+
+		} else if ( this.parameters.morphTargets === true ) {
+
+			// programs with morphTargets displace position out of attribute 0
+			gl.bindAttribLocation( program, 0, 'position' );
+
+		}
+
+		gl.linkProgram( program );
+
+		this.vertexShader = glVertexShader;
+		this.fragmentShader = glFragmentShader;
+
+	},
+
 	isLinked: function ( renderer, material, sync ) {
 
 		var gl = renderer.context;
 
-		if ( gl.getProgramParameter( this.program, this.parallelShaderExt.COMPLETION_STATUS_KHR ) == true || sync ) {
+		if ( this.pending && currentParallel < maxParallel ) {
+
+			this.compileAndLink( renderer, material );
+			currentParallel ++;
+			this.pending = false;
+
+		}
+
+		if ( ( ! this.pending && gl.getProgramParameter( this.program, this.parallelShaderExt.COMPLETION_STATUS_KHR ) == true ) || sync ) {
 
 			this.checkLink( renderer, material );
 			this.ready = true;
+			currentParallel --;
+
+			console.log( 'done', this.startFrame, renderer.info.render.frame - this.startFrame );
 
 		}
 
