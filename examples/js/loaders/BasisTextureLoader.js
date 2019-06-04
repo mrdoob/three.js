@@ -16,46 +16,66 @@
  * of web workers, before transferring the transcoded compressed texture back
  * to the main thread.
  */
-// TODO(donmccurdy): Don't use ES6 classes.
-THREE.BasisTextureLoader = class BasisTextureLoader {
+THREE.BasisTextureLoader = function ( manager ) {
 
-	constructor ( manager ) {
+	this.manager = manager || THREE.DefaultLoadingManager;
 
-		// TODO(donmccurdy): Loading manager is unused.
-		this.manager = manager || THREE.DefaultLoadingManager;
+	this.crossOrigin = 'anonymous';
 
-		this.transcoderPath = '';
-		this.transcoderBinary = null;
-		this.transcoderPending = null;
+	this.transcoderPath = '';
+	this.transcoderBinary = null;
+	this.transcoderPending = null;
 
-		this.workerLimit = 4;
-		this.workerPool = [];
-		this.workerNextTaskID = 1;
-		this.workerSourceURL = '';
-		this.workerConfig = {
-			format: null,
-			etcSupported: false,
-			dxtSupported: false,
-			pvrtcSupported: false,
-		};
+	this.workerLimit = 4;
+	this.workerPool = [];
+	this.workerNextTaskID = 1;
+	this.workerSourceURL = '';
+	this.workerConfig = {
+		format: null,
+		etcSupported: false,
+		dxtSupported: false,
+		pvrtcSupported: false,
+	};
 
-	}
+};
 
-	setTranscoderPath ( path ) {
+THREE.BasisTextureLoader.prototype = {
+
+	constructor: THREE.BasisTextureLoader,
+
+	setCrossOrigin: function ( crossOrigin ) {
+
+		this.crossOrigin = crossOrigin;
+
+		return this;
+
+	},
+
+	setTranscoderPath: function ( path ) {
 
 		this.transcoderPath = path;
 
-	}
+		return this;
 
-	detectSupport ( renderer ) {
+	},
+
+	setWorkerLimit: function ( workerLimit ) {
+
+		this.workerLimit = workerLimit;
+
+		return this;
+
+	},
+
+	detectSupport: function ( renderer ) {
 
 		var context = renderer.context;
 		var config = this.workerConfig;
 
-		config.etcSupported = !! context.getExtension('WEBGL_compressed_texture_etc1');
-		config.dxtSupported = !! context.getExtension('WEBGL_compressed_texture_s3tc');
-		config.pvrtcSupported = !! context.getExtension('WEBGL_compressed_texture_pvrtc')
-			|| !! context.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
+		config.etcSupported = !! context.getExtension( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = !! context.getExtension( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = !! context.getExtension( 'WEBGL_compressed_texture_pvrtc' )
+			|| !! context.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.etcSupported ) {
 
@@ -77,36 +97,44 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		return this;
 
-	}
+	},
 
-	load ( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
-		// TODO(donmccurdy): Use THREE.FileLoader.
-		fetch( url )
-			.then( ( res ) => res.arrayBuffer() )
-			.then( ( buffer ) => this._createTexture( buffer ) )
-			.then( onLoad )
-			.catch( onError );
+		var loader = new THREE.FileLoader( this.manager );
 
-	}
+		loader.setResponseType( 'arraybuffer' );
+
+		loader.load( url, ( buffer ) => {
+
+			this._createTexture( buffer )
+				.then( onLoad )
+				.catch( onError );
+
+		}, onProgress, onError );
+
+	},
 
 	/**
 	 * @param  {ArrayBuffer} buffer
 	 * @return {Promise<THREE.CompressedTexture>}
 	 */
-	_createTexture ( buffer ) {
+	_createTexture: function ( buffer ) {
 
-		return this.getWorker()
-			.then( ( worker ) => {
+		var worker;
+		var taskID;
 
-				return new Promise( ( resolve ) => {
+		var texturePending = this._getWorker()
+			.then( ( _worker ) => {
 
-					var taskID = this.workerNextTaskID++;
+				worker = _worker;
+				taskID = this.workerNextTaskID ++;
 
-					worker._callbacks[ taskID ] = resolve;
+				return new Promise( ( resolve, reject ) => {
+
+					worker._callbacks[ taskID ] = { resolve, reject };
 					worker._taskCosts[ taskID ] = buffer.byteLength;
 					worker._taskLoad += worker._taskCosts[ taskID ];
-					worker._taskCount++;
 
 					worker.postMessage( { type: 'transcode', id: taskID, buffer }, [ buffer ] );
 
@@ -146,20 +174,47 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 				return texture;
 
-			});
+			} );
 
-	}
+		texturePending
+			.finally( () => {
 
-	_initTranscoder () {
+				if ( worker && taskID ) {
+
+					worker._taskLoad -= worker._taskCosts[ taskID ];
+					delete worker._callbacks[ taskID ];
+					delete worker._taskCosts[ taskID ];
+
+				}
+
+			} );
+
+		return texturePending;
+
+	},
+
+	_initTranscoder: function () {
 
 		if ( ! this.transcoderBinary ) {
 
-			// TODO(donmccurdy): Use THREE.FileLoader.
-			var jsContent = fetch( this.transcoderPath + 'basis_transcoder.js' )
-				.then( ( response ) => response.text() );
+			// Load transcoder wrapper.
+			var jsLoader = new THREE.FileLoader( this.manager );
+			jsLoader.setPath( this.transcoderPath );
+			var jsContent = new Promise( ( resolve, reject ) => {
 
-			var binaryContent = fetch( this.transcoderPath + 'basis_transcoder.wasm' )
-				.then( ( response ) => response.arrayBuffer() );
+				jsLoader.load( 'basis_transcoder.js', resolve, undefined, reject );
+
+			} );
+
+			// Load transcoder WASM binary.
+			var binaryLoader = new THREE.FileLoader( this.manager );
+			binaryLoader.setPath( this.transcoderPath );
+			binaryLoader.setResponseType( 'arraybuffer' );
+			var binaryContent = new Promise( ( resolve, reject ) => {
+
+				binaryLoader.load( 'basis_transcoder.wasm', resolve, undefined, reject );
+
+			} );
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
@@ -187,9 +242,9 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		return this.transcoderPending;
 
-	}
+	},
 
-	getWorker () {
+	_getWorker: function () {
 
 		return this._initTranscoder().then( () => {
 
@@ -200,7 +255,6 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 				worker._callbacks = {};
 				worker._taskCosts = {};
 				worker._taskLoad = 0;
-				worker._taskCount = 0;
 
 				worker.postMessage( {
 					type: 'init',
@@ -215,24 +269,29 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 					switch ( message.type ) {
 
 						case 'transcode':
-							worker._callbacks[ message.id ]( message );
-							worker._taskLoad -= worker._taskCosts[ message.id ];
-							delete worker._callbacks[ message.id ];
-							delete worker._taskCosts[ message.id ];
+							worker._callbacks[ message.id ].resolve( message );
+							break;
+
+						case 'error':
+							worker._callbacks[ message.id ].reject( message );
 							break;
 
 						default:
-							throw new Error( 'THREE.BasisTextureLoader: Unexpected message, "' + message.type + '"' );
+							console.error( 'THREE.BasisTextureLoader: Unexpected message, "' + message.type + '"' );
 
 					}
 
-				}
+				};
 
 				this.workerPool.push( worker );
 
 			} else {
 
-				this.workerPool.sort( function ( a, b ) { return a._taskLoad > b._taskLoad ? -1 : 1; } );
+				this.workerPool.sort( function ( a, b ) {
+
+					return a._taskLoad > b._taskLoad ? - 1 : 1;
+
+				} );
 
 			}
 
@@ -240,11 +299,11 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		} );
 
-	}
+	},
 
-	dispose () {
+	dispose: function () {
 
-		for ( var i = 0; i < this.workerPool.length; i++ ) {
+		for ( var i = 0; i < this.workerPool.length; i ++ ) {
 
 			this.workerPool[ i ].terminate();
 
@@ -252,8 +311,10 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		this.workerPool.length = 0;
 
+		return this;
+
 	}
-}
+};
 
 /* CONSTANTS */
 
@@ -285,6 +346,7 @@ THREE.BasisTextureLoader.DXT_FORMAT_MAP[ THREE.BasisTextureLoader.BASIS_FORMAT.c
 /* WEB WORKER */
 
 THREE.BasisTextureLoader.BasisWorker = function () {
+
 	var config;
 	var transcoderPending;
 	var _BasisFile;
@@ -303,17 +365,27 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 			case 'transcode':
 				transcoderPending.then( () => {
 
-					var { width, height, mipmaps } = transcode( message.buffer );
+					try {
 
-					var buffers = [];
+						var { width, height, mipmaps } = transcode( message.buffer );
 
-					for ( var i = 0; i < mipmaps.length; ++i ) {
+						var buffers = [];
 
-						buffers.push( mipmaps[i].data.buffer );
+						for ( var i = 0; i < mipmaps.length; ++ i ) {
+
+							buffers.push( mipmaps[ i ].data.buffer );
+
+						}
+
+						self.postMessage( { type: 'transcode', id: message.id, width, height, mipmaps }, buffers );
+
+					} catch ( error ) {
+
+						console.error( error );
+
+						self.postMessage( { type: 'error', id: message.id, error: error.message } );
 
 					}
-
-					self.postMessage( { type: 'transcode', id: message.id, width, height, mipmaps }, buffers );
 
 				} );
 				break;
@@ -322,7 +394,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 	};
 
-	function init ( wasmBinary ) {
+	function init( wasmBinary ) {
 
 		transcoderPending = new Promise( ( resolve ) => {
 
@@ -348,7 +420,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 	}
 
-	function transcode ( buffer ) {
+	function transcode( buffer ) {
 
 		var basisFile = new _BasisFile( new Uint8Array( buffer ) );
 
@@ -356,7 +428,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 		var height = basisFile.getImageHeight( 0, 0 );
 		var levels = basisFile.getNumLevels( 0 );
 
-		function cleanup () {
+		function cleanup() {
 
 			basisFile.close();
 			basisFile.delete();
@@ -379,7 +451,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 		var mipmaps = [];
 
-		for ( var mip = 0; mip < levels; mip++ ) {
+		for ( var mip = 0; mip < levels; mip ++ ) {
 
 			var mipWidth = basisFile.getImageWidth( 0, mip );
 			var mipHeight = basisFile.getImageHeight( 0, mip );

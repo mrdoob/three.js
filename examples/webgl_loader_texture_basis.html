@@ -57,6 +57,10 @@
 					material.map = texture;
 					material.needsUpdate = true;
 
+				}, undefined, function ( error ) {
+
+					console.error( error );
+
 				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
