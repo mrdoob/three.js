@@ -4,25 +4,14 @@
 		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<style>
-			body {
-				margin: 0px;
-				color: #fff;
-				font-family: Monospace;
-				background-color: #444;
-				overflow: hidden;
-			}
-			a {
-				color: #00f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 		<script src="../build/three.js"></script>
 
 		<script src="js/RollerCoaster.js"></script>
-
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
@@ -33,7 +22,7 @@
 			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'eye-level' } ) );
+			document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 			//
 

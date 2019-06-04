@@ -4,28 +4,7 @@
 		<title>three.js webgl - glTF loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #75ddc1;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -74,13 +53,10 @@
 
 				scene = new THREE.Scene();
 
-				var loader = new THREE.RGBELoader().setPath( 'textures/equirectangular/' );
-				loader.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
-
-					texture.encoding = THREE.RGBEEncoding;
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.flipY = true;
+				new THREE.RGBELoader()
+					.setType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
 					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
 					cubeGenerator.update( renderer );

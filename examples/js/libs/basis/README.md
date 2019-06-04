@@ -22,21 +22,21 @@ basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
 basisLoader.detectSupport( renderer );
 basisLoader.load( 'diffuse.basis', function ( texture ) {
 
-  var material = new THREE.MeshStandardMaterial( { map: texture } );
+	var material = new THREE.MeshStandardMaterial( { map: texture } );
 
 }, function () {
 
-  console.log( 'onProgress' );
+	console.log( 'onProgress' );
 
 }, function ( e ) {
 
-  console.error( e );
+	console.error( e );
 
 } );
 ```
 
 For further documentation about the Basis compressor and transcoder, refer to
-the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal).
+the [Basis GitHub repository](https://github.com/BinomialLLC/basis_universal). The JavaScript wrapper requires one modification from the version provided in the Basis repository – the declaration on the first line is changed from `var Module` to `Module`, to accomodate lazy initialization in a Web Worker ([details](https://github.com/mrdoob/three.js/issues/16524)).
 
 ## License
 

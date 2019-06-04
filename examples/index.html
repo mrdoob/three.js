@@ -2,35 +2,13 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js / examples</title>
+		<title>three.js examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<style>
 			#panel #content .link {
 				display: block;
-			}
-			#button {
-				position: fixed;
-				bottom: 12px;
-				right: 12px;
-
-				padding: 8px;
-				border-radius: 50%;
-				margin-bottom: 0px; /* TODO div sets it to 20px */
-
-				background-color: #E5E5E5;
-				opacity: .9;
-			}
-
-			#button:hover {
-				cursor: pointer;
-				opacity: 1;
-			}
-
-			#button img {
-				display: block;
-				width: 20px;
 			}
 		</style>
 	</head>
@@ -42,18 +20,21 @@
 				<h1><a href="http://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<a href="../docs/">docs</a>
+					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
 					<span class="selected">examples</span>
 				</div>
 
-				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
+				<div id="expandButton"></div>
 			</div>
 
 			<div id="panelScrim"></div>
 
 			<div id="contentWrapper">
-				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
-				<div id="exitSearchButton"></div>
+
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="exitSearchButton"></div>
+				</div>
 
 				<div id="content"></div>
 			</div>
@@ -275,7 +256,7 @@
 
 			var name = file.split( '_' );
 			name.shift();
-			return name.join( ' / ' );
+			return name.join( '<span class="spacer">/</span>' );
 
 		}
 

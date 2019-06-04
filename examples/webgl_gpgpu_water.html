@@ -4,29 +4,7 @@
 		<title>three.js webgl - gpgpu - water</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				text-align:center;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color: #ffffff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -42,7 +20,7 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/SimplexNoise.js"></script>
+		<script src="js/math/SimplexNoise.js"></script>
 
 		<script src="js/GPUComputationRenderer.js"></script>
 
@@ -317,7 +295,7 @@
 			var spheres = [];
 			var spheresEnabled = true;
 
-			var simplex = new SimplexNoise();
+			var simplex = new THREE.SimplexNoise();
 
 			document.getElementById( 'waterSize' ).innerText = WIDTH + ' x ' + WIDTH;
 

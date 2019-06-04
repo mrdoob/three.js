@@ -357,13 +357,13 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		var width = 4, height = 4;
 
-		if ( SimplexNoise === undefined ) {
+		if ( THREE.SimplexNoise === undefined ) {
 
 			console.error( 'THREE.SSAOPass: The pass relies on THREE.SimplexNoise.' );
 
 		}
 
-		var simplex = new SimplexNoise();
+		var simplex = new THREE.SimplexNoise();
 
 		var size = width * height;
 		var data = new Float32Array( size * 4 );

@@ -4,19 +4,12 @@
 		<title>three.js - raytracing renderer with web workers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				color: #ffffff;
-				margin: 0px;
-				padding: 0px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/renderers/RaytracingRenderer.js"></script>
-
+		<div id="info"></div>
 		<script>
 
 			var hash = location.hash ? location.hash.substring( 1 ) : '3';
@@ -232,16 +225,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.zIndex = '100';
-				info.style.textAlign = 'center';
-				container.appendChild( info );
+				info = document.getElementById( 'info' );
 
 				updateWorkers();
 
@@ -258,12 +242,7 @@
 					blockSize: 64
 				} );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = "0px";
-				renderer.domElement.style.left = "0px";
-
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 
 				window.addEventListener( 'resize', function () {
@@ -283,9 +262,8 @@
 
 				}
 
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js<a/> - raytracing renderer (using ' + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
+				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raytracing renderer (using ' + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
 				'<br/><button onclick="rearrange()">Rearrange</button><button onclick="render()">Render</button>';
-
 
 			}
 

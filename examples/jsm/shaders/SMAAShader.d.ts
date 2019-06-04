@@ -31,7 +31,7 @@ export interface SMAAWeightsShader {
   fragmentShader: string;
 }
 
-export interface SMAAWeightsShader {
+export interface SMAABlendShader {
   uniforms: {
     tDiffuse: Uniform;
     tColor: Uniform;

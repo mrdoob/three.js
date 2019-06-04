@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -29,7 +30,7 @@ function WebVRManager( renderer ) {
 
 	var framebufferScaleFactor = 1.0;
 
-	var frameOfReferenceType = 'stage';
+	var referenceSpaceType = 'local-floor';
 
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
@@ -69,18 +70,20 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
+			renderWidth = 2 * eyeParameters.renderWidth * framebufferScaleFactor;
 			renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( currentSize );
 
-			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
+			renderer.setDrawingBufferSize( renderWidth, renderHeight, 1 );
 
-			cameraL.viewport.set( 0, 0, renderWidth, renderHeight );
-			cameraR.viewport.set( renderWidth, 0, renderWidth, renderHeight );
+			cameraL.viewport.set( 0, 0, renderWidth / 2, renderHeight );
+			cameraR.viewport.set( renderWidth / 2, 0, renderWidth / 2, renderHeight );
 
 			animation.start();
+
+			scope.dispatchEvent( { type: 'sessionstart' } );
 
 		} else {
 
@@ -91,6 +94,8 @@ function WebVRManager( renderer ) {
 			}
 
 			animation.stop();
+
+			scope.dispatchEvent( { type: 'sessionend' } );
 
 		}
 
@@ -234,9 +239,9 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.setFrameOfReferenceType = function ( value ) {
+	this.setReferenceSpaceType = function ( value ) {
 
-		frameOfReferenceType = value;
+		referenceSpaceType = value;
 
 	};
 
@@ -248,7 +253,7 @@ function WebVRManager( renderer ) {
 
 	this.getCamera = function ( camera ) {
 
-		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
+		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
 
 		if ( isPresenting() === false ) {
 
@@ -266,7 +271,7 @@ function WebVRManager( renderer ) {
 
 		//
 
-		if ( frameOfReferenceType === 'stage' ) {
+		if ( referenceSpaceType === 'local-floor' ) {
 
 			var stageParameters = device.stageParameters;
 
@@ -323,7 +328,7 @@ function WebVRManager( renderer ) {
 
 		standingMatrixInverse.getInverse( standingMatrix );
 
-		if ( frameOfReferenceType === 'stage' ) {
+		if ( referenceSpaceType === 'local-floor' ) {
 
 			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
 			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
@@ -406,6 +411,16 @@ function WebVRManager( renderer ) {
 
 	};
 
+	// DEPRECATED
+
+	this.setFrameOfReferenceType = function () {
+
+		console.warn( 'THREE.WebVRManager: setFrameOfReferenceType() has been deprecated.' );
+
+	};
+
 }
+
+Object.assign( WebVRManager.prototype, EventDispatcher.prototype );
 
 export { WebVRManager };
