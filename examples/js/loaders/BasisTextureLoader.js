@@ -124,7 +124,7 @@ THREE.BasisTextureLoader.prototype = {
 		var worker;
 		var taskID;
 
-		var texturePending = this.getWorker()
+		var texturePending = this._getWorker()
 			.then( ( _worker ) => {
 
 				worker = _worker;
@@ -244,7 +244,7 @@ THREE.BasisTextureLoader.prototype = {
 
 	},
 
-	getWorker: function () {
+	_getWorker: function () {
 
 		return this._initTranscoder().then( () => {
 

@@ -91,6 +91,15 @@
 		Load from url and call the <em>onLoad</em> function with the transcoded [page:CompressedTexture].
 		</p>
 
+		<h3>[method:this detectSupport]( [param:WebGLRenderer renderer] )</h3>
+		<p>
+		[page:WebGLRenderer renderer] — A renderer instance.
+		</p>
+		<p>
+		Detects hardware support for available compressed texture formats, to determine
+		the output format for the transcoder. Must be called before loading a texture.
+		</p>
+
 		<h3>[method:this setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<p>
 		[page:String crossOrigin] — Options are '', 'anonymous', or 'use-credentials'. Default is 'anonymous'.
@@ -99,17 +108,22 @@
 		Sets options for CORS requests.
 		</p>
 
-		<h3>[method:this setTranscoderPath]( [param:String value] )</h3>
+		<h3>[method:this setTranscoderPath]( [param:String path] )</h3>
 		<p>
-		[page:String value] — Path to folder containing the WASM transcoder and JS wrapper.
+		[page:String path] — Path to folder containing the WASM transcoder and JS wrapper.
+		</p>
+		<p>
+		The WASM transcoder and JS wrapper are available from the
+		[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/basis examples/js/libs/basis]
+		directory.
 		</p>
 
 		<h3>[method:this setWorkerLimit]( [param:Number limit] )</h3>
 		<p>
-		[page:Number limit] — Maximum number of workers.
+		[page:Number limit] — Maximum number of workers. Default is '4'.
 		</p>
 		<p>
-		Sets the maximum number of web workers to be allocated by this instance. Default is '4'.
+		Sets the maximum number of web workers to be allocated by this instance.
 		</p>
 
 		<h3>[method:this dispose]()</h3>
