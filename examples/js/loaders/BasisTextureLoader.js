@@ -16,57 +16,58 @@
  * of web workers, before transferring the transcoded compressed texture back
  * to the main thread.
  */
-// TODO(donmccurdy): Don't use ES6 classes.
-THREE.BasisTextureLoader = class BasisTextureLoader {
+THREE.BasisTextureLoader = function ( manager ) {
 
-	constructor ( manager ) {
+	this.manager = manager || THREE.DefaultLoadingManager;
 
-		this.manager = manager || THREE.DefaultLoadingManager;
+	this.crossOrigin = 'anonymous';
 
-		this.crossOrigin = 'anonymous';
+	this.transcoderPath = '';
+	this.transcoderBinary = null;
+	this.transcoderPending = null;
 
-		this.transcoderPath = '';
-		this.transcoderBinary = null;
-		this.transcoderPending = null;
+	this.workerLimit = 4;
+	this.workerPool = [];
+	this.workerNextTaskID = 1;
+	this.workerSourceURL = '';
+	this.workerConfig = {
+		format: null,
+		etcSupported: false,
+		dxtSupported: false,
+		pvrtcSupported: false,
+	};
 
-		this.workerLimit = 4;
-		this.workerPool = [];
-		this.workerNextTaskID = 1;
-		this.workerSourceURL = '';
-		this.workerConfig = {
-			format: null,
-			etcSupported: false,
-			dxtSupported: false,
-			pvrtcSupported: false,
-		};
+};
 
-	}
+THREE.BasisTextureLoader.prototype = {
 
-	setCrossOrigin ( crossOrigin ) {
+	constructor: THREE.BasisTextureLoader,
+
+	setCrossOrigin: function ( crossOrigin ) {
 
 		this.crossOrigin = crossOrigin;
 
 		return this;
 
-	}
+	},
 
-	setTranscoderPath ( path ) {
+	setTranscoderPath: function ( path ) {
 
 		this.transcoderPath = path;
 
 		return this;
 
-	}
+	},
 
-	setWorkerLimit ( workerLimit ) {
+	setWorkerLimit: function ( workerLimit ) {
 
 		this.workerLimit = workerLimit;
 
 		return this;
 
-	}
+	},
 
-	detectSupport ( renderer ) {
+	detectSupport: function ( renderer ) {
 
 		var context = renderer.context;
 		var config = this.workerConfig;
@@ -96,9 +97,9 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		return this;
 
-	}
+	},
 
-	load ( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var loader = new THREE.FileLoader( this.manager );
 
@@ -112,13 +113,13 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		}, onProgress, onError );
 
-	}
+	},
 
 	/**
 	 * @param  {ArrayBuffer} buffer
 	 * @return {Promise<THREE.CompressedTexture>}
 	 */
-	_createTexture ( buffer ) {
+	_createTexture: function ( buffer ) {
 
 		var worker;
 		var taskID;
@@ -190,9 +191,9 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		return texturePending;
 
-	}
+	},
 
-	_initTranscoder () {
+	_initTranscoder: function () {
 
 		if ( ! this.transcoderBinary ) {
 
@@ -241,9 +242,9 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		return this.transcoderPending;
 
-	}
+	},
 
-	getWorker () {
+	getWorker: function () {
 
 		return this._initTranscoder().then( () => {
 
@@ -294,9 +295,9 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 		} );
 
-	}
+	},
 
-	dispose () {
+	dispose: function () {
 
 		for ( var i = 0; i < this.workerPool.length; i++ ) {
 
