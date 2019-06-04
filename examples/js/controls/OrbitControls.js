@@ -234,7 +234,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		window.removeEventListener( 'keydown', onKeyDown, false );
+		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -933,7 +933,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
+
+	// make sure element can receive keys.
+
+	if ( scope.domElement !== document && scope.domElement.tabIndex === -1) {
+
+		scope.domElement.tabIndex = 0;
+
+	}
 
 	// force an update at start
 
