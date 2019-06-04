@@ -17,6 +17,35 @@
  *
  **/
 
+import {
+	AddOperation,
+	BackSide,
+	BufferAttribute,
+	BufferGeometry,
+	ClampToEdgeWrapping,
+	Color,
+	DefaultLoadingManager,
+	DoubleSide,
+	EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping,
+	FileLoader,
+	Float32BufferAttribute,
+	FrontSide,
+	LineBasicMaterial,
+	LineSegments,
+	LoaderUtils,
+	Mesh,
+	MeshPhongMaterial,
+	MeshPhysicalMaterial,
+	MeshStandardMaterial,
+	MirroredRepeatWrapping,
+	Points,
+	PointsMaterial,
+	RepeatWrapping,
+	TextureLoader,
+	Vector2
+} from "../../../build/three.module.js";
+
 function LWO2Parser( IFFParser ) {
 
 	this.IFF = IFFParser;
@@ -1896,7 +1925,7 @@ DataViewReader.prototype = {
 
 		}
 
-		return THREE.LoaderUtils.decodeText( new Uint8Array( a ) );
+		return LoaderUtils.decodeText( new Uint8Array( a ) );
 
 	},
 
@@ -2014,15 +2043,15 @@ function stringOffset( string ) {
 // printBuffer( this.reader.dv.buffer, this.reader.offset, length );
 function printBuffer( buffer, from, to ) {
 
-	console.log( THREE.LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) ) );
+	console.log( LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) ) );
 
 }
 
 var lwoTree;
 
-THREE.LWOLoader = function ( manager, parameters ) {
+var LWOLoader = function ( manager, parameters ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	parameters = parameters || {};
 
@@ -2030,9 +2059,9 @@ THREE.LWOLoader = function ( manager, parameters ) {
 
 };
 
-THREE.LWOLoader.prototype = {
+LWOLoader.prototype = {
 
-	constructor: THREE.LWOLoader,
+	constructor: LWOLoader,
 
 	crossOrigin: 'anonymous',
 
@@ -2045,7 +2074,7 @@ THREE.LWOLoader.prototype = {
 		// give the mesh a default name based on the filename
 		var modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( self.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -2086,7 +2115,7 @@ THREE.LWOLoader.prototype = {
 
 		// console.log( 'lwoTree', lwoTree );
 
-		var textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		var textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		return new LWOTreeParser( textureLoader ).parse( modelName );
 
@@ -2158,9 +2187,9 @@ LWOTreeParser.prototype = {
 
 		this.duplicateUVs( geometry, materials );
 
-		if ( layer.geometry.type === 'points' ) mesh = new THREE.Points( geometry, materials );
-		else if ( layer.geometry.type === 'lines' ) mesh = new THREE.LineSegments( geometry, materials );
-		else mesh = new THREE.Mesh( geometry, materials );
+		if ( layer.geometry.type === 'points' ) mesh = new Points( geometry, materials );
+		else if ( layer.geometry.type === 'lines' ) mesh = new LineSegments( geometry, materials );
+		else mesh = new Mesh( geometry, materials );
 
 		if ( layer.name ) mesh.name = layer.name;
 		else mesh.name = this.defaultLayerName + '_layer_' + layer.number;
@@ -2226,11 +2255,11 @@ LWOTreeParser.prototype = {
 					spec.size = 0.1;
 					spec.map = mat.map;
 					spec.morphTargets = mat.morphTargets;
-					materials[ i ] = new THREE.PointsMaterial( spec );
+					materials[ i ] = new PointsMaterial( spec );
 
 				} else if ( type === 'lines' ) {
 
-					materials[ i ] = new THREE.LineBasicMaterial( spec );
+					materials[ i ] = new LineBasicMaterial( spec );
 
 				}
 
@@ -2277,7 +2306,7 @@ LWOTreeParser.prototype = {
 
 		if ( ! duplicateUVs ) return;
 
-		geometry.addAttribute( 'uv2', new THREE.BufferAttribute( geometry.attributes.uv.array, 2 ) );
+		geometry.addAttribute( 'uv2', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 	},
 
@@ -2353,24 +2382,24 @@ MaterialParser.prototype = {
 
 		var attributes = this.parseAttributes( materialData.attributes, {} );
 		params = Object.assign( params, attributes );
-		return new THREE.MeshPhongMaterial( params );
+		return new MeshPhongMaterial( params );
 
 	},
 
 	// Note: converting from left to right handed coords by switching x -> -x in vertices, and
 	// then switching mat FrontSide -> BackSide
-	// NB: this means that THREE.FrontSide and THREE.BackSide have been switched!
+	// NB: this means that FrontSide and BackSide have been switched!
 	getSide( attributes ) {
 
-		if ( ! attributes.side ) return THREE.BackSide;
+		if ( ! attributes.side ) return BackSide;
 
 		switch ( attributes.side ) {
 
 			case 0:
 			case 1:
-				return THREE.BackSide;
-			case 2: return THREE.FrontSide;
-			case 3: return THREE.DoubleSide;
+				return BackSide;
+			case 2: return FrontSide;
+			case 3: return DoubleSide;
 
 		}
 
@@ -2478,7 +2507,7 @@ MaterialParser.prototype = {
 					break;
 				case 'Normal':
 					maps.normalMap = texture;
-					if ( node.amplitude !== undefined ) maps.normalScale = new THREE.Vector2( node.amplitude, node.amplitude );
+					if ( node.amplitude !== undefined ) maps.normalScale = new Vector2( node.amplitude, node.amplitude );
 					break;
 				case 'Bump':
 					maps.bumpMap = texture;
@@ -2566,9 +2595,9 @@ MaterialParser.prototype = {
 		// don't use color data if color map is present
 		if ( attributes.Color && ! maps.map ) {
 
-			params.color = new THREE.Color().fromArray( attributes.Color.value );
+			params.color = new Color().fromArray( attributes.Color.value );
 
-		} else params.color = new THREE.Color();
+		} else params.color = new Color();
 
 
 		if ( attributes.Transparency && attributes.Transparency.value !== 0 ) {
@@ -2615,11 +2644,11 @@ MaterialParser.prototype = {
 
 			if ( attributes[ 'Luminous Color' ] && ! maps.emissive ) {
 
-				params.emissive = new THREE.Color().fromArray( attributes[ 'Luminous Color' ].value );
+				params.emissive = new Color().fromArray( attributes[ 'Luminous Color' ].value );
 
 			} else {
 
-				params.emissive = new THREE.Color( 0x808080 );
+				params.emissive = new Color( 0x808080 );
 
 			}
 
@@ -2637,7 +2666,7 @@ MaterialParser.prototype = {
 		if ( attributes.Reflection ) {
 
 			params.reflectivity = attributes.Reflection.value;
-			params.combine = THREE.AddOperation;
+			params.combine = AddOperation;
 
 		}
 
@@ -2651,7 +2680,7 @@ MaterialParser.prototype = {
 
 			} else {
 
-				params.emissive = new THREE.Color( 0x808080 );
+				params.emissive = new Color( 0x808080 );
 
 			}
 
@@ -2662,11 +2691,11 @@ MaterialParser.prototype = {
 
 			if ( attributes[ 'Color Highlight' ] ) {
 
-				params.specular = new THREE.Color().setScalar( attributes.Specular.value ).lerp( params.color.clone().multiplyScalar( attributes.Specular.value ), attributes[ 'Color Highlight' ].value );
+				params.specular = new Color().setScalar( attributes.Specular.value ).lerp( params.color.clone().multiplyScalar( attributes.Specular.value ), attributes[ 'Color Highlight' ].value );
 
 			} else {
 
-				params.specular = new THREE.Color().setScalar( attributes.Specular.value );
+				params.specular = new Color().setScalar( attributes.Specular.value );
 
 			}
 
@@ -2684,7 +2713,7 @@ MaterialParser.prototype = {
 
 			if ( attributes.transparent && attributes.opacity < 0.999 ) {
 
-				envMap.mapping = THREE.EquirectangularRefractionMapping;
+				envMap.mapping = EquirectangularRefractionMapping;
 
 				// Reflectivity and refraction mapping don't work well together in Phong materials
 				if ( attributes.reflectivity !== undefined ) {
@@ -2700,7 +2729,7 @@ MaterialParser.prototype = {
 
 				}
 
-			} else envMap.mapping = THREE.EquirectangularReflectionMapping;
+			} else envMap.mapping = EquirectangularReflectionMapping;
 
 			maps.envMap = envMap;
 
@@ -2753,10 +2782,10 @@ MaterialParser.prototype = {
 
 			case 0:
 				console.warn( 'LWOLoader: "Reset" texture wrapping type is not supported in three.js' );
-				return THREE.ClampToEdgeWrapping;
-			case 1: return THREE.RepeatWrapping;
-			case 2: return THREE.MirroredRepeatWrapping;
-			case 3: return THREE.ClampToEdgeWrapping;
+				return ClampToEdgeWrapping;
+			case 1: return RepeatWrapping;
+			case 2: return MirroredRepeatWrapping;
+			case 3: return ClampToEdgeWrapping;
 
 		}
 
@@ -2764,9 +2793,9 @@ MaterialParser.prototype = {
 
 	getMaterialType( nodeData ) {
 
-		if ( nodeData.Clearcoat && nodeData.Clearcoat.value > 0 ) return THREE.MeshPhysicalMaterial;
-		if ( nodeData.Roughness ) return THREE.MeshStandardMaterial;
-		return THREE.MeshPhongMaterial;
+		if ( nodeData.Clearcoat && nodeData.Clearcoat.value > 0 ) return MeshPhysicalMaterial;
+		if ( nodeData.Roughness ) return MeshStandardMaterial;
+		return MeshPhongMaterial;
 
 	}
 
@@ -2780,9 +2809,9 @@ GeometryParser.prototype = {
 
 	parse( geoData, layer ) {
 
-		var geometry = new THREE.BufferGeometry();
+		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( geoData.points, 3 ) );
+		geometry.addAttribute( 'position', new Float32BufferAttribute( geoData.points, 3 ) );
 
 		var indices = this.splitIndices( geoData.vertexIndices, geoData.polygonDimensions );
 		geometry.setIndex( indices );
@@ -2995,7 +3024,7 @@ GeometryParser.prototype = {
 
 		}
 
-		geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( remappedUVs, 2 ) );
+		geometry.addAttribute( 'uv', new Float32BufferAttribute( remappedUVs, 2 ) );
 
 	},
 
@@ -3030,7 +3059,7 @@ GeometryParser.prototype = {
 
 			} );
 
-			geometry.morphAttributes.position[ num ] = new THREE.Float32BufferAttribute( remappedPoints, 3 );
+			geometry.morphAttributes.position[ num ] = new Float32BufferAttribute( remappedPoints, 3 );
 			geometry.morphAttributes.position[ num ].name = name;
 
 			num ++;
@@ -3053,3 +3082,5 @@ function extractParentUrl( url, dir ) {
 	return url.substr( 0, index );
 
 }
+
+export { LWOLoader };
