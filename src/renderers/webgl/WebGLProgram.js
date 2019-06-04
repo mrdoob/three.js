@@ -236,7 +236,7 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities, textures ) {
+function WebGLProgram( renderer, extensions, checksum, material, shader, parameters, capabilities, textures ) {
 
 	var gl = renderer.context;
 
@@ -767,7 +767,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	this.name = shader.name;
 	this.id = programIdCount ++;
-	this.code = code;
+	this.checksum = checksum;
 	this.usedTimes = 1;
 	this.program = program;
 	this.vertexShader = glVertexShader;

@@ -38,6 +38,42 @@ var _Math = {
 
 	} )(),
 
+	crc32: ( function () {
+
+		// https://stackoverflow.com/questions/18638900/javascript-crc32
+
+		var crcTable = [];
+
+		for ( var n = 0; n < 256; n ++ ) {
+
+			var c = n;
+
+			for ( var k = 0; k < 8; k ++ ) {
+
+				c = ( ( c & 1 ) ? ( 0xEDB88320 ^ ( c >>> 1 ) ) : ( c >>> 1 ) );
+
+			}
+
+			crcTable[ n ] = c;
+
+		}
+
+		return function crc32( str ) {
+
+			var crc = 0 ^ ( - 1 );
+
+			for ( var i = 0; i < str.length; i ++ ) {
+
+				crc = ( crc >>> 8 ) ^ crcTable[ ( crc ^ str.charCodeAt( i ) ) & 0xFF ];
+
+			}
+
+			return ( crc ^ ( - 1 ) ) >>> 0;
+
+		};
+
+	} )(),
+
 	clamp: function ( value, min, max ) {
 
 		return Math.max( min, Math.min( max, value ) );

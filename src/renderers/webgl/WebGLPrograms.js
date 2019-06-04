@@ -4,6 +4,7 @@
 
 import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, ObjectSpaceNormalMap } from '../../constants.js';
 import { WebGLProgram } from './WebGLProgram.js';
+import { _Math } from '../../math/Math.js';
 
 function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
@@ -215,7 +216,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 	};
 
-	this.getProgramCode = function ( material, parameters ) {
+	this.getProgramChecksum = function ( material, parameters ) {
 
 		var array = [];
 
@@ -253,11 +254,11 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 		array.push( renderer.gammaFactor );
 
-		return array.join();
+		return _Math.crc32( array.join() );
 
 	};
 
-	this.acquireProgram = function ( material, shader, parameters, code ) {
+	this.acquireProgram = function ( material, shader, parameters, checksum ) {
 
 		var program;
 
@@ -266,7 +267,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 			var programInfo = programs[ p ];
 
-			if ( programInfo.code === code ) {
+			if ( programInfo.checksum === checksum ) {
 
 				program = programInfo;
 				++ program.usedTimes;
@@ -279,7 +280,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities, textures );
+			program = new WebGLProgram( renderer, extensions, checksum, material, shader, parameters, capabilities, textures );
 			programs.push( program );
 
 		}
