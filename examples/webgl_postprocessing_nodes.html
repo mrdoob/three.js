@@ -4,27 +4,7 @@
 		<title>three.js webgl - postprocessing with nodes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -369,7 +349,7 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize();
+						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 						var screen = new THREE.ScreenNode();
 
@@ -451,7 +431,7 @@
 
 						// POST
 
-						var size = renderer.getDrawingBufferSize();
+						var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 
 						var blurScreen = new THREE.BlurNode( new THREE.ScreenNode() );
 						blurScreen.size = new THREE.Vector2( size.width, size.height );

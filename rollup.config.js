@@ -66,6 +66,7 @@ function glconstants() {
 		TEXTURE_MIN_FILTER: 10241,
 		TEXTURE_WRAP_S: 10242,
 		TEXTURE_WRAP_T: 10243,
+		TEXTURE_WRAP_R: 32882,
 		REPEAT: 10497,
 		COLOR_BUFFER_BIT: 16384,
 		FUNC_ADD: 32774,
@@ -116,6 +117,7 @@ function glconstants() {
 		ACTIVE_ATTRIBUTES: 35721,
 		IMPLEMENTATION_COLOR_READ_TYPE: 35738,
 		IMPLEMENTATION_COLOR_READ_FORMAT: 35739,
+		TEXTURE_2D_ARRAY: 35866,
 		DEPTH_COMPONENT32F: 36012,
 		COLOR_ATTACHMENT0: 36064,
 		FRAMEBUFFER_COMPLETE: 36053,
@@ -129,7 +131,10 @@ function glconstants() {
 		MAX_VARYING_VECTORS: 36348,
 		MAX_FRAGMENT_UNIFORM_VECTORS: 36349,
 		UNPACK_FLIP_Y_WEBGL: 37440,
-		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441
+		UNPACK_PREMULTIPLY_ALPHA_WEBGL: 37441,
+		MAX_SAMPLES: 36183,
+		READ_FRAMEBUFFER: 36008,
+		DRAW_FRAMEBUFFER: 36009
 	};
 
 	return {
@@ -147,10 +152,11 @@ function glconstants() {
 			return {
 				code: code,
 				map: { mappings: '' }
-			}
+			};
+
 		}
 
-	}
+	};
 
 }
 
@@ -192,7 +198,6 @@ export default {
 		glconstants(),
 		glsl()
 	],
-	// sourceMap: true,
 	output: [
 		{
 			format: 'umd',

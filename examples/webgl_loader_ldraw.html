@@ -4,26 +4,13 @@
 		<title>three.js webgl - LDrawLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #888;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			#info a {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -42,7 +29,7 @@
 
 		<script>
 
-			var container, stats, progressBar, progressBarDiv;
+			var container, progressBarDiv;
 
 			var camera, scene, renderer, controls, gui, guiData;
 
@@ -92,12 +79,12 @@
 				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.set( -1000, 1200, 1500 );
+				directionalLight.position.set( - 1000, 1200, 1500 );
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -108,7 +95,11 @@
 
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
-					envMapActivated: false
+					envMapActivated: false,
+					separateObjects: false,
+					displayLines: true,
+					conditionalLines: true,
+					smoothNormals: true
 				};
 
 				gui = new dat.GUI();
@@ -119,7 +110,7 @@
 
 				} );
 
-				gui.add( guiData , 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
+				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
 
 					envMapActivated = value;
 
@@ -127,6 +118,29 @@
 
 				} );
 
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
+
+					updateLineSegments();
+
+				} );
+
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
+
+					updateLineSegments();
+
+				} );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
@@ -146,7 +160,29 @@
 
 			}
 
-			function reloadObject ( resetCamera ) {
+			function updateLineSegments() {
+
+				model.traverse( c => {
+
+					if ( c.isLineSegments ) {
+
+						if ( c.isConditionalLine ) {
+
+							c.visible = guiData.conditionalLines;
+
+						} else {
+
+							c.visible = guiData.displayLines;
+
+						}
+
+					}
+
+				} );
+
+			}
+
+			function reloadObject( resetCamera ) {
 
 				if ( model ) {
 
@@ -160,6 +196,8 @@
 				showProgressBar();
 
 				var lDrawLoader = new THREE.LDrawLoader();
+				lDrawLoader.separateObjects = guiData.separateObjects;
+				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
@@ -188,8 +226,8 @@
 								// Envmap texture
 								var r = "textures/cube/Bridge2/";
 								var urls = [ r + "posx.jpg", r + "negx.jpg",
-											r + "posy.jpg", r + "negy.jpg",
-											r + "posz.jpg", r + "negz.jpg" ];
+									r + "posy.jpg", r + "negy.jpg",
+									r + "posz.jpg", r + "negz.jpg" ];
 								textureCube = new THREE.CubeTextureLoader().load( urls );
 								textureCube.format = THREE.RGBFormat;
 								textureCube.mapping = THREE.CubeReflectionMapping;
@@ -202,13 +240,15 @@
 
 								if ( material.userData.canHaveEnvMap ) {
 
-										material.envMap = textureCube;
+									material.envMap = textureCube;
 
 								}
 
-							};
+							}
 
 						}
+
+						updateLineSegments();
 
 						// Adjust camera and light
 
@@ -254,7 +294,7 @@
 
 			}
 
-			function onProgress ( xhr ) {
+			function onProgress( xhr ) {
 
 				if ( xhr.lengthComputable ) {
 
@@ -266,7 +306,7 @@
 
 			}
 
-			function onError ( error ) {
+			function onError() {
 
 				var message = "Error loading model";
 				progressBarDiv.innerText = message;
@@ -274,19 +314,19 @@
 
 			}
 
-			function showProgressBar () {
+			function showProgressBar() {
 
 				document.body.appendChild( progressBarDiv );
 
 			}
 
-			function hideProgressBar () {
+			function hideProgressBar() {
 
 				document.body.removeChild( progressBarDiv );
 
 			}
 
-			function updateProgressBar ( fraction ) {
+			function updateProgressBar( fraction ) {
 
 				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
 
@@ -297,7 +337,7 @@
 		<!-- LDraw.org CC BY 2.0 Parts Library attribution -->
 		<div style="display: block; position: absolute; bottom: 8px; left: 8px; width: 160px; padding: 10px; background-color: #F3F7F8;">
 			<center>
-				<a href="http://www.ldraw.org"><img style="width: 145px" src="files/ldraw_org_logo/Stamp145.png"></a>
+				<a href="http://www.ldraw.org"><img style="width: 145px" src="models/ldraw/ldraw_org_logo/Stamp145.png"></a>
 				<br />
 				<a href="http://www.ldraw.org/">This software uses the LDraw Parts Library</a>
 			</center>

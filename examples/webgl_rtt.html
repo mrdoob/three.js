@@ -4,27 +4,7 @@
 		<title>three.js webgl - render-to-texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a { color: #ffffff; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -252,14 +232,17 @@
 
 				material.uniforms[ "time" ].value += delta;
 
-				renderer.clear();
 
 				// Render first scene into texture
 
-				renderer.render( sceneRTT, cameraRTT, rtTexture, true );
+				renderer.setRenderTarget( rtTexture );
+				renderer.clear();
+				renderer.render( sceneRTT, cameraRTT );
 
 				// Render full screen quad with generated texture
 
+				renderer.setRenderTarget( null );
+				renderer.clear();
 				renderer.render( sceneScreen, cameraRTT );
 
 				// Render second scene to screen

@@ -4,34 +4,13 @@
 		<title>three.js webgl - postprocessing - godrays</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color:#0078ff; }
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<script src="../build/three.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/ShaderGodRays.js"></script>
+		<script src="js/shaders/GodRaysShader.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -129,7 +108,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-				window.addEventListener( 'resize', onResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
@@ -174,10 +153,10 @@
 
 			//
 
-			function onResize() {
+			function onWindowResize() {
 
-				renderTargetWidth = window.innerWidth;
-				renderTargetHeight = window.innerHeight;
+				var renderTargetWidth = window.innerWidth;
+				var renderTargetHeight = window.innerHeight;
 
 				camera.aspect = renderTargetWidth / renderTargetHeight;
 				camera.updateProjectionMatrix();
@@ -225,7 +204,7 @@
 
 				// god-ray shaders
 
-				var godraysMaskShader = THREE.ShaderGodRays[ "godrays_depthMask" ];
+				var godraysMaskShader = THREE.GodRaysDepthMaskShader;
 				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
 				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
 
@@ -235,7 +214,7 @@
 
 				} );
 
-				var godraysGenShader = THREE.ShaderGodRays[ "godrays_generate" ];
+				var godraysGenShader = THREE.GodRaysGenerateShader;
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
 				postprocessing.materialGodraysGenerate = new THREE.ShaderMaterial( {
 
@@ -245,7 +224,7 @@
 
 				} );
 
-				var godraysCombineShader = THREE.ShaderGodRays[ "godrays_combine" ];
+				var godraysCombineShader = THREE.GodRaysCombineShader;
 				postprocessing.godrayCombineUniforms = THREE.UniformsUtils.clone( godraysCombineShader.uniforms );
 				postprocessing.materialGodraysCombine = new THREE.ShaderMaterial( {
 
@@ -255,7 +234,7 @@
 
 				} );
 
-				var godraysFakeSunShader = THREE.ShaderGodRays[ "godrays_fake_sun" ];
+				var godraysFakeSunShader = THREE.GodRaysFakeSunShader;
 				postprocessing.godraysFakeSunUniforms = THREE.UniformsUtils.clone( godraysFakeSunShader.uniforms );
 				postprocessing.materialGodraysFakeSun = new THREE.ShaderMaterial( {
 
@@ -302,7 +281,8 @@
 				postprocessing.godrayGenUniforms[ "fStepSize" ].value = stepSize;
 				postprocessing.godrayGenUniforms[ "tInput" ].value = inputTex;
 
-				renderer.render( postprocessing.scene, postprocessing.camera, renderTarget );
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( postprocessing.scene, postprocessing.camera );
 				postprocessing.scene.overrideMaterial = null;
 
 			}
@@ -360,7 +340,8 @@
 					postprocessing.godraysFakeSunUniforms[ "fAspect" ].value = window.innerWidth / window.innerHeight;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.render( postprocessing.scene, postprocessing.camera );
 
 					renderer.setScissorTest( false );
 
@@ -369,19 +350,23 @@
 					// Colors
 
 					scene.overrideMaterial = null;
-					renderer.render( scene, camera, postprocessing.rtTextureColors );
+					renderer.setRenderTarget( postprocessing.rtTextureColors );
+					renderer.render( scene, camera );
 
 					// Depth
 
 					scene.overrideMaterial = materialDepth;
-					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+					renderer.setRenderTarget( postprocessing.rtTextureDepth );
+					renderer.clear();
+					renderer.render( scene, camera );
 
 					//
 
 					postprocessing.godrayMaskUniforms[ "tInput" ].value = postprocessing.rtTextureDepth.texture;
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysDepthMask;
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureDepthMask );
+					renderer.setRenderTarget( postprocessing.rtTextureDepthMask );
+					renderer.render( postprocessing.scene, postprocessing.camera );
 
 					// -- Render god-rays --
 
@@ -414,11 +399,13 @@
 
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
 
+					renderer.setRenderTarget( null );
 					renderer.render( postprocessing.scene, postprocessing.camera );
 					postprocessing.scene.overrideMaterial = null;
 
 				} else {
 
+					renderer.setRenderTarget( null );
 					renderer.clear();
 					renderer.render( scene, camera );
 

@@ -4,29 +4,15 @@
 		<title>three.js webgl - gpgpu - flocking</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				text-align:center;
-				cursor: pointer;
+				background-color: #fff;
+				color: #444;
 			}
-
 			a {
-				color:#0078ff;
+				color:#08f;
 			}
-
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
 		</style>
 	</head>
 	<body>
@@ -35,7 +21,6 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="birds"></span> webgl gpgpu birds<br/>
 			Select <span id="options"></span> birds<br/>
 			Move mouse to disturb birds.
-
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -83,7 +68,7 @@
 			uniform float time;
 			uniform float testing;
 			uniform float delta; // about 0.016
-			uniform float seperationDistance; // 20
+			uniform float separationDistance; // 20
 			uniform float alignmentDistance; // 40
 			uniform float cohesionDistance; //
 			uniform float freedomFactor;
@@ -107,15 +92,15 @@
 
 			const float SPEED_LIMIT = 9.0;
 
-			float rand(vec2 co){
-				return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+			float rand( vec2 co ){
+				return fract( sin( dot( co.xy, vec2(12.9898,78.233) ) ) * 43758.5453 );
 			}
 
 			void main() {
 
-				zoneRadius = seperationDistance + alignmentDistance + cohesionDistance;
-				separationThresh = seperationDistance / zoneRadius;
-				alignmentThresh = ( seperationDistance + alignmentDistance ) / zoneRadius;
+				zoneRadius = separationDistance + alignmentDistance + cohesionDistance;
+				separationThresh = separationDistance / zoneRadius;
+				alignmentThresh = ( separationDistance + alignmentDistance ) / zoneRadius;
 				zoneRadiusSquared = zoneRadius * zoneRadius;
 
 
@@ -129,7 +114,7 @@
 				vec3 dir; // direction
 				float distSquared;
 
-				float seperationSquared = seperationDistance * seperationDistance;
+				float separationSquared = separationDistance * separationDistance;
 				float cohesionSquared = cohesionDistance * cohesionDistance;
 
 				float f;
@@ -150,7 +135,7 @@
 
 
 				// move birds away from predator
-				if (dist < preyRadius) {
+				if ( dist < preyRadius ) {
 
 					f = ( distSquared / preyRadiusSq - 1.0 ) * delta * 100.;
 					velocity += normalize( dir ) * f;
@@ -170,28 +155,28 @@
 				dir.y *= 2.5;
 				velocity -= normalize( dir ) * delta * 5.;
 
-				for (float y=0.0;y<height;y++) {
-					for (float x=0.0;x<width;x++) {
+				for ( float y = 0.0; y < height; y++ ) {
+					for ( float x = 0.0; x < width; x++ ) {
 
 						vec2 ref = vec2( x + 0.5, y + 0.5 ) / resolution.xy;
 						birdPosition = texture2D( texturePosition, ref ).xyz;
 
 						dir = birdPosition - selfPosition;
-						dist = length(dir);
+						dist = length( dir );
 
-						if (dist < 0.0001) continue;
+						if ( dist < 0.0001 ) continue;
 
 						distSquared = dist * dist;
 
-						if (distSquared > zoneRadiusSquared ) continue;
+						if ( distSquared > zoneRadiusSquared ) continue;
 
 						percent = distSquared / zoneRadiusSquared;
 
 						if ( percent < separationThresh ) { // low
 
 							// Separation - Move apart for comfort
-							f = (separationThresh / percent - 1.0) * delta;
-							velocity -= normalize(dir) * f;
+							f = ( separationThresh / percent - 1.0 ) * delta;
+							velocity -= normalize( dir ) * f;
 
 						} else if ( percent < alignmentThresh ) { // high
 
@@ -202,7 +187,7 @@
 							birdVelocity = texture2D( textureVelocity, ref ).xyz;
 
 							f = ( 0.5 - cos( adjustedPercent * PI_2 ) * 0.5 + 0.5 ) * delta;
-							velocity += normalize(birdVelocity) * f;
+							velocity += normalize( birdVelocity ) * f;
 
 						} else {
 
@@ -212,7 +197,7 @@
 
 							f = ( 0.5 - ( cos( adjustedPercent * PI_2 ) * -0.5 + 0.5 ) ) * delta;
 
-							velocity += normalize(dir) * f;
+							velocity += normalize( dir ) * f;
 
 						}
 
@@ -365,9 +350,9 @@
 
 						vertices.array[ v ++ ] = arguments[ i ];
 
-		}
+					}
 
-	}
+				}
 
 				var wingsSpan = 20;
 
@@ -442,8 +427,7 @@
 				location.reload();
 				return false;
 
-}
-
+			}
 
 			var options = '';
 			for ( i = 1; i < 7; i ++ ) {
@@ -451,7 +435,8 @@
 				var j = Math.pow( 2, i );
 				options += '<a href="#" onclick="return change(' + j + ')">' + ( j * j ) + '</a> ';
 
-}
+			}
+
 			document.getElementById( 'options' ).innerHTML = options;
 
 			var last = performance.now();
@@ -502,7 +487,7 @@
 
 
 				var effectController = {
-					seperation: 20.0,
+					separation: 20.0,
 					alignment: 20.0,
 					cohesion: 20.0,
 					freedom: 0.75
@@ -510,7 +495,7 @@
 
 				var valuesChanger = function () {
 
-					velocityUniforms[ "seperationDistance" ].value = effectController.seperation;
+					velocityUniforms[ "separationDistance" ].value = effectController.separation;
 					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
 					velocityUniforms[ "cohesionDistance" ].value = effectController.cohesion;
 					velocityUniforms[ "freedomFactor" ].value = effectController.freedom;
@@ -520,7 +505,7 @@
 				valuesChanger();
 
 
-				gui.add( effectController, "seperation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
+				gui.add( effectController, "separation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
 				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
 				gui.close();
@@ -552,7 +537,7 @@
 				velocityUniforms[ "time" ] = { value: 1.0 };
 				velocityUniforms[ "delta" ] = { value: 0.0 };
 				velocityUniforms[ "testing" ] = { value: 1.0 };
-				velocityUniforms[ "seperationDistance" ] = { value: 1.0 };
+				velocityUniforms[ "separationDistance" ] = { value: 1.0 };
 				velocityUniforms[ "alignmentDistance" ] = { value: 1.0 };
 				velocityUniforms[ "cohesionDistance" ] = { value: 1.0 };
 				velocityUniforms[ "freedomFactor" ] = { value: 1.0 };
@@ -569,7 +554,7 @@
 
 				    console.error( error );
 
-	}
+				}
 
 			}
 

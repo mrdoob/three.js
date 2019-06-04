@@ -512,7 +512,9 @@ THREE.VRMLLoader.prototype = {
 
 					}
 
-					node[ fieldName ] = property;
+					// VRMLLoader does not support text so it can't process the "string" property yet
+
+					if ( fieldName !== 'string' ) node[ fieldName ] = property;
 
 				}
 
@@ -825,6 +827,16 @@ THREE.VRMLLoader.prototype = {
 
 						parent.geometry = new THREE.SphereBufferGeometry( data.radius );
 
+					} else if ( data.nodeType === 'IndexedLineSet' ) {
+
+						console.warn( 'THREE.VRMLLoader: IndexedLineSet not supported yet.' );
+						parent.parent.remove( parent ); // since the loader is not able to parse the geometry, remove the respective 3D object
+
+					} else if ( data.nodeType === 'Text' ) {
+
+						console.warn( 'THREE.VRMLLoader: Text not supported yet.' );
+						parent.parent.remove( parent );
+
 					} else if ( data.nodeType === 'IndexedFaceSet' ) {
 
 						var geometry = new THREE.BufferGeometry();
@@ -932,7 +944,7 @@ THREE.VRMLLoader.prototype = {
 
 						if ( data.coordIndex ) {
 
-							function triangulateIndexArray( indexArray, ccw ) {
+							function triangulateIndexArray( indexArray, ccw, colorPerVertex ) {
 
 								if ( ccw === undefined ) {
 
@@ -946,21 +958,37 @@ THREE.VRMLLoader.prototype = {
 
 								for ( i = 0, il = indexArray.length; i < il; i ++ ) {
 
-									var indexedFace = indexArray[ i ];
+									if ( colorPerVertex === false ) {
 
-									// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+										var colorIndices = indexArray[ i ];
 
-									skip = 0;
+										for ( j = 0, jl = colorIndices.length; j < jl; j ++ ) {
 
-									while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
+											var index = colorIndices[ j ];
 
-										var i1 = indexedFace[ 0 ];
-										var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
-										var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
+											triangulatedIndexArray.push( index, index, index );
 
-										triangulatedIndexArray.push( i1, i2, i3 );
+										}
 
-										skip ++;
+									} else {
+
+										var indexedFace = indexArray[ i ];
+
+										// VRML support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+
+										skip = 0;
+
+										while ( indexedFace.length >= 3 && skip < ( indexedFace.length - 2 ) ) {
+
+											var i1 = indexedFace[ 0 ];
+											var i2 = indexedFace[ skip + ( ccw ? 1 : 2 ) ];
+											var i3 = indexedFace[ skip + ( ccw ? 2 : 1 ) ];
+
+											triangulatedIndexArray.push( i1, i2, i3 );
+
+											skip ++;
+
+										}
 
 									}
 
@@ -972,7 +1000,7 @@ THREE.VRMLLoader.prototype = {
 
 							var positionIndexes = data.coordIndex ? triangulateIndexArray( data.coordIndex, data.ccw ) : [];
 							var normalIndexes = data.normalIndex ? triangulateIndexArray( data.normalIndex, data.ccw ) : positionIndexes;
-							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw ) : positionIndexes;
+							var colorIndexes = data.colorIndex ? triangulateIndexArray( data.colorIndex, data.ccw, data.colorPerVertex ) : [];
 							var uvIndexes = data.texCoordIndex ? triangulateIndexArray( data.texCoordIndex, data.ccw ) : positionIndexes;
 
 							var newIndexes = [];
@@ -1094,6 +1122,8 @@ THREE.VRMLLoader.prototype = {
 						if ( colors.length > 0 ) {
 
 							geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+							parent.material.vertexColors = THREE.VertexColors;
 
 						}
 
@@ -1226,13 +1256,13 @@ THREE.VRMLLoader.prototype = {
 
 		// some lines do not have breaks
 
-		for ( var i = lines.length - 1; i > - 1; i -- ) {
-
-			var line = lines[ i ];
+		for ( var i = lines.length - 1; i > 0; i -- ) {
 
 			// The # symbol indicates that all subsequent text, until the end of the line is a comment,
 			// and should be ignored. (see http://gun.teipir.gr/VRML-amgem/spec/part1/grammar.html)
-			line = line.replace( /(#.*)/, '' );
+			lines[ i ] = lines[ i ].replace( /(#.*)/, '' );
+
+			var line = lines[ i ];
 
 			// split lines with {..{ or {..[ - some have both
 			if ( /{.*[{\[]/.test( line ) ) {
@@ -1252,6 +1282,8 @@ THREE.VRMLLoader.prototype = {
 
 			}
 
+			line = lines[ i ];
+
 			if ( /}.*}/.test( line ) ) {
 
 				// split lines with }..}
@@ -1261,6 +1293,8 @@ THREE.VRMLLoader.prototype = {
 				lines.splice.apply( lines, parts );
 
 			}
+
+			line = lines[ i ];
 
 			if ( /^\b[^\s]+\b$/.test( line.trim() ) ) {
 

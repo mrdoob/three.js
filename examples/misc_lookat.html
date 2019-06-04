@@ -4,32 +4,20 @@
 		<title>three.js misc - lookAt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #404040;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+				background-color: #fff;
+				color: #444;
 			}
 
 			a {
-
-				color: #0080bb;
+				color: #08b;
 			}
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D::lookAt() demo</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D.lookAt() example</div>
 
 		<script src="../build/three.js"></script>
 
@@ -78,8 +66,6 @@
 					scene.add( mesh );
 
 				}
-
-				scene.matrixAutoUpdate = false;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );

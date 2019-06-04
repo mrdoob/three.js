@@ -3,34 +3,17 @@
 		<title>Convex object breaking example</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #333;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #a06851;
-			}
-
 		</style>
 	</head>
 	<body>
 
 	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Press mouse to throw balls and move the camera.</div>
-	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<div id="container"></div>
 
 	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
@@ -38,7 +21,7 @@
 	<script src="js/WebGL.js"></script>
 	<script src="js/libs/stats.min.js"></script>
 	<script src="js/ConvexObjectBreaker.js"></script>
-	<script src="js/QuickHull.js"></script>
+	<script src="js/math/ConvexHull.js"></script>
 	<script src="js/geometries/ConvexGeometry.js"></script>
 
 		<script>
@@ -48,7 +31,6 @@
 		if ( WEBGL.isWebGLAvailable() === false ) {
 
 			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-			document.getElementById( 'container' ).innerHTML = "";
 
 		}
 
@@ -80,8 +62,8 @@
 
 		var pos = new THREE.Vector3();
 		var quat = new THREE.Quaternion();
-		var transformAux1 = new Ammo.btTransform();
-		var tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 );
+		var transformAux1;
+		var tempBtVec3_1;
 
 		var time = 0;
 
@@ -96,8 +78,14 @@
 
 		// - Main code -
 
-		init();
-		animate();
+		Ammo().then( function( AmmoLib ) {
+
+			Ammo = AmmoLib;
+
+			init();
+			animate();
+
+		} );
 
 
 		// - Functions -
@@ -123,16 +111,17 @@
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xbfd1e5 );
 
-			camera.position.set( -14, 8, 16 );
-
-			controls = new THREE.OrbitControls( camera );
-			controls.target.set( 0, 2, 0 );
-			controls.update();
+			camera.position.set( - 14, 8, 16 );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
+			container.appendChild( renderer.domElement );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 2, 0 );
+			controls.update();
 
 			textureLoader = new THREE.TextureLoader();
 
@@ -140,13 +129,13 @@
 			scene.add( ambientLight );
 
 			var light = new THREE.DirectionalLight( 0xffffff, 1 );
-			light.position.set( -10, 18, 5 );
+			light.position.set( - 10, 18, 5 );
 			light.castShadow = true;
 			var d = 14;
-			light.shadow.camera.left = -d;
+			light.shadow.camera.left = - d;
 			light.shadow.camera.right = d;
 			light.shadow.camera.top = d;
-			light.shadow.camera.bottom = -d;
+			light.shadow.camera.bottom = - d;
 
 			light.shadow.camera.near = 2;
 			light.shadow.camera.far = 50;
@@ -155,11 +144,6 @@
 			light.shadow.mapSize.y = 1024;
 
 			scene.add( light );
-
-
-			container.innerHTML = "";
-
-			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
 			stats.domElement.style.position = 'absolute';
@@ -183,6 +167,8 @@
 			physicsWorld = new Ammo.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
 			physicsWorld.setGravity( new Ammo.btVector3( 0, - gravityConstant, 0 ) );
 
+			transformAux1 = new Ammo.btTransform();
+			tempBtVec3_1 = new Ammo.btVector3( 0, 0, 0 );
 		}
 
 		function createObject( mass, halfExtents, pos, quat, material ) {
@@ -463,8 +449,8 @@
 			for ( var i = 0, il = dispatcher.getNumManifolds(); i < il; i ++ ) {
 
 				var contactManifold = dispatcher.getManifoldByIndexInternal( i );
-				var rb0 = contactManifold.getBody0();
-				var rb1 = contactManifold.getBody1();
+				var rb0 = Ammo.castObject( contactManifold.getBody0(), Ammo.btRigidBody );
+				var rb1 = Ammo.castObject( contactManifold.getBody1(), Ammo.btRigidBody );
 
 				var threeObject0 = Ammo.castObject( rb0.getUserPointer(), Ammo.btVector3 ).threeObject;
 				var threeObject1 = Ammo.castObject( rb1.getUserPointer(), Ammo.btVector3 ).threeObject;
@@ -520,7 +506,13 @@
 					var numObjects = debris.length;
 					for ( var j = 0; j < numObjects; j++ ) {
 
-						createDebrisFromBreakableObject( debris[ j ] );
+						var vel = rb0.getLinearVelocity();
+						var angVel = rb0.getAngularVelocity();
+						var fragment = debris[ j ];
+						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
+						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+
+						createDebrisFromBreakableObject( fragment );
 
 					}
 
@@ -536,7 +528,13 @@
 					var numObjects = debris.length;
 					for ( var j = 0; j < numObjects; j++ ) {
 
-						createDebrisFromBreakableObject( debris[ j ] );
+						var vel = rb1.getLinearVelocity();
+						var angVel = rb1.getAngularVelocity();
+						var fragment = debris[ j ];
+						fragment.userData.velocity.set( vel.x(), vel.y(), vel.z() );
+						fragment.userData.angularVelocity.set( angVel.x(), angVel.y(), angVel.z() );
+
+						createDebrisFromBreakableObject( fragment );
 
 					}
 

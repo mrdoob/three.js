@@ -4,31 +4,7 @@
 		<title>three.js webgl - effects - ascii</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ff0000;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -63,8 +39,6 @@
 				camera.position.y = 150;
 				camera.position.z = 500;
 
-				controls = new THREE.TrackballControls( camera );
-
 				scene = new THREE.Scene();
 
 				var light = new THREE.PointLight( 0xffffff );
@@ -75,7 +49,7 @@
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true }) );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
 				scene.add( sphere );
 
 				// Plane
@@ -97,6 +71,8 @@
 				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
 
 				document.body.appendChild( effect.domElement );
+
+				controls = new THREE.TrackballControls( camera, effect.domElement );
 
 				//
 

@@ -4,66 +4,40 @@
 		<title>three.js webaudio - orientation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family: Monospace;
-			}
-
-			#info {
-				position: absolute;
-				z-index: 2;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
 			#overlay {
 				position: absolute;
-				z-index: 1;
 				top: 0;
 				left: 0;
 				width: 100%;
-				height:100%;
+				height: 100%;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				opacity: 1;
 				background-color: #000000;
-				color: #ffffff;
+				z-index: 1;
 			}
 
-			#overlay > div {
-				text-align: center;
-			}
+				#overlay > div {
+					text-align: center;
+				}
 
-			#overlay > div > button {
-				height: 20px;
-				width: 100px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
+				#overlay > div > button {
+					height: 20px;
+					width: 100px;
+					background: transparent;
+					color: #ffffff;
+					outline: 1px solid #ffffff;
+					border: 0px;
+					cursor: pointer;
+				}
 
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
-
+				#overlay > div > p {
+					color: #777777;
+					font-size: 12px;
+				}
 		</style>
 
 		<script src="../build/three.js"></script>
@@ -82,12 +56,12 @@
 	<div id="overlay">
 		<div>
 			<button id="startButton">Click to Play</button>
-			<p>Automatic audio playback requires a user interaction.</p>
+			<p>Audio playback requires user interaction.</p>
 		</div>
 	</div>
 	<div id="container"></div>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio orientation |
+		<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - orientation<br/>
 		music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener noreferrer">skullbeatz</a>
 	</div>
 
@@ -114,7 +88,7 @@
 		//
 
 		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
-		camera.position.set( 0, 1, 2 );
+		camera.position.set( 3, 2, 3 );
 
 		var reflectionCube = new THREE.CubeTextureLoader()
 			.setPath( 'textures/cube/SwedishRoyalCastle/' )
@@ -127,29 +101,31 @@
 
 		//
 
-		var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-		light.position.set( 0, 200, 0 );
-		scene.add( light );
+		var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+		hemiLight.position.set( 0, 20, 0 );
+		scene.add( hemiLight );
 
-		light = new THREE.DirectionalLight( 0xffffff );
-		light.position.set( 0, 200, 100 );
-		light.castShadow = true;
-		light.shadow.camera.top = 180;
-		light.shadow.camera.bottom = - 100;
-		light.shadow.camera.left = - 120;
-		light.shadow.camera.right = 120;
-		scene.add( light );
+		var dirLight = new THREE.DirectionalLight( 0xffffff );
+		dirLight.position.set( 5, 5, 0 );
+		dirLight.castShadow = true;
+		dirLight.shadow.camera.top = 1;
+		dirLight.shadow.camera.bottom = - 1;
+		dirLight.shadow.camera.left = - 1;
+		dirLight.shadow.camera.right = 1;
+		dirLight.shadow.camera.near = 0.1;
+		dirLight.shadow.camera.far = 20;
+		scene.add( dirLight );
+
+		// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 		//
 
-		var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20, 20 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+		var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 		mesh.rotation.x = - Math.PI / 2;
 		mesh.receiveShadow = true;
 		scene.add( mesh );
 
-		var grid = new THREE.GridHelper( 20, 20, 0x000000, 0x000000 );
-		grid.material.opacity = 0.2;
-		grid.material.transparent = true;
+		var grid = new THREE.GridHelper( 50, 50, 0x888888, 0x888888 );
 		scene.add( grid );
 
 		//
@@ -163,7 +139,10 @@
 		var positionalAudio = new THREE.PositionalAudio( listener );
 		positionalAudio.setMediaElementSource( audioElement );
 		positionalAudio.setRefDistance( 1 );
-		positionalAudio.setDirectionalCone( 210, 230, 0.1 );
+		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+
+		var helper = new THREE.PositionalAudioHelper( positionalAudio, 0.1 );
+		positionalAudio.add( helper );
 
 		//
 
@@ -180,6 +159,7 @@
 
 					object.material.envMap = reflectionCube;
 					object.geometry.rotateY( - Math.PI );
+					object.castShadow = true;
 
 				}
 
@@ -194,7 +174,7 @@
 		// sound is damped behind this wall
 
 		var wallGeometry = new THREE.BoxBufferGeometry( 2, 1, 0.1 );
-		var wallMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+		var wallMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.5 } );
 
 		var wall = new THREE.Mesh( wallGeometry, wallMaterial );
 		wall.position.set( 0, 0.5, - 0.5 );
@@ -206,9 +186,10 @@
 		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		renderer.setPixelRatio( window.devicePixelRatio );
-		container.appendChild( renderer.domElement );
-
 		renderer.gammaOutput = true;
+		renderer.gammaFactor = 2.2;
+		renderer.shadowMap.enabled = true;
+		container.appendChild( renderer.domElement );
 
 		//
 

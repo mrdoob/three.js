@@ -4,32 +4,15 @@
 		<title>threejs webgl - materials - hdr environment mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
-			}
-			a { color: #00f }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
-			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
+		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
@@ -117,6 +100,9 @@
 
 						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();
 
@@ -149,6 +135,7 @@
 					.load( rgbmUrls, function () {
 
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+						rgbmCubeMap.format = THREE.RGBAFormat;
 
 						var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
 						pmremGenerator.update( renderer );
@@ -157,6 +144,9 @@
 						pmremCubeUVPacker.update( renderer );
 
 						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						rgbmCubeMap.magFilter = THREE.LinearFilter;
+						rgbmCubeMap.needsUpdate = true;
 
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();
@@ -183,9 +173,9 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'metalness', 0, 1 );
-				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
 				gui.add( params, 'debug', false );
 				gui.open();
 

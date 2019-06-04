@@ -4,24 +4,7 @@
 		<title>three.js webgl - materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -80,12 +63,7 @@
 
 				};
 
-				var textureCube = new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
-
 				scene = new THREE.Scene();
-				scene.background = textureCube;
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
@@ -154,7 +132,10 @@
 
 					}
 
-					hdrCubeMap.dispose();
+					hdrCubeMap.magFilter = THREE.LinearFilter;
+					hdrCubeMap.needsUpdate = true;
+					scene.background = hdrCubeMap;
+
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -219,7 +200,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera );
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

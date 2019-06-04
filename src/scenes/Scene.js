@@ -16,11 +16,19 @@ function Scene() {
 
 	this.autoUpdate = true; // checked by the renderer
 
+	/*
+	if ( typeof __THREE_DEVTOOLS__ !== undefined ) {
+		__THREE_DEVTOOLS__.dispatchEvent( { type: 'scene', value: this } );
+	}
+	*/
+
 }
 
 Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Scene,
+
+	isScene: true,
 
 	copy: function ( source, recursive ) {
 
@@ -45,6 +53,12 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

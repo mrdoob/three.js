@@ -12,7 +12,7 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.program && b.program && a.program !== b.program ) {
+	} else if ( a.program !== b.program ) {
 
 		return a.program.id - b.program.id;
 
@@ -42,7 +42,7 @@ function reversePainterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} if ( a.z !== b.z ) {
+	} else if ( a.z !== b.z ) {
 
 		return b.z - a.z;
 
@@ -62,6 +62,8 @@ function WebGLRenderList() {
 
 	var opaque = [];
 	var transparent = [];
+
+	var defaultProgram = { id: - 1 };
 
 	function init() {
 
@@ -83,7 +85,7 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
-				program: material.program,
+				program: material.program || defaultProgram,
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
@@ -98,7 +100,7 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
-			renderItem.program = material.program;
+			renderItem.program = material.program || defaultProgram;
 			renderItem.groupOrder = groupOrder;
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
@@ -152,6 +154,16 @@ function WebGLRenderLists() {
 
 	var lists = {};
 
+	function onSceneDispose( event ) {
+
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', onSceneDispose );
+
+		delete lists[ scene.id ];
+
+	}
+
 	function get( scene, camera ) {
 
 		var cameras = lists[ scene.id ];
@@ -161,6 +173,8 @@ function WebGLRenderLists() {
 			list = new WebGLRenderList();
 			lists[ scene.id ] = {};
 			lists[ scene.id ][ camera.id ] = list;
+
+			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 

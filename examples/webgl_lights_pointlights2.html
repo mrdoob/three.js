@@ -4,32 +4,7 @@
 		<title>three.js webgl - lights - point lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -78,22 +53,6 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x040306 );
 				scene.fog = new THREE.Fog( 0x040306, 10, 300 );
-
-				// CONTROLS
-
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = false;
-				controls.dynamicDampingFactor = 0.15;
-
-				controls.keys = [ 65, 83, 68 ];
 
 				// TEXTURES
 
@@ -184,6 +143,22 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				// CONTROLS
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = false;
+				controls.dynamicDampingFactor = 0.15;
+
+				controls.keys = [ 65, 83, 68 ];
 
 				// STATS
 

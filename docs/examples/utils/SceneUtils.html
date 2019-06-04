@@ -26,26 +26,6 @@
 		This is mostly useful for objects that need both a material and a wireframe implementation.
 		</p>
 
-		<h3>[method:null attach]( [param:Object3D child], [param:Object3D scene], [param:Object3D parent] )</h3>
-		<p>
-		child -- The object to add to the parent  <br />
-		scene -- The scene to detach the object from. <br />
-		parent -- The parent to attach the object to.
-		</p>
-		<p>
-		Attaches the object to the parent without the moving the object in the worldspace. Beware that to do this the matrixWorld needs to be updated. This can be done by calling the updateMatrixWorld method on the parent object.
-		</p>
-
-		<h3>[method:null detach]( [param:Object3D child], [param:Object3D parent], [param:Object3D scene] )</h3>
-		<p>
-		child -- The object to remove from the parent  <br />
-		scene -- The scene to attach the object on. <br />
-		parent -- The parent to detach the object from.
-		</p>
-		<p>
-		Detaches the object from the parent and adds it back to the scene without moving in worldspace. Beware that to do this the matrixWorld needs to be updated. This can be done by calling the updateMatrixWorld method on the parent object.
-		</p>
-
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/utils/SceneUtils.js examples/js/utils/SceneUtils.js]

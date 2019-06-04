@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - LWO loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader<br />
+			Loader for Lightwave LWO V3 file format, by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+		<script src="js/loaders/LWOLoader.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			var container, stats, controls;
+			var camera, scene, renderer;
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
+				camera.position.set( 5, 4, 20 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+
+				var ambientLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
+
+				var mainLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				mainLight.position.set( 10, 10, - 10 );
+
+				scene.add( ambientLight, mainLight );
+
+				var grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				var loader = new THREE.LWOLoader();
+				loader.load( 'models/lwo/StandardMaterials.lwo', function ( lwo ) {
+
+					const mesh = lwo.meshes[ 0 ];
+
+					mesh.position.set( 3, 6, 0 );
+
+					scene.add( mesh );
+
+				} );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.physicallyCorrectLights = true;
+				renderer.gammaFactor = 2.2;
+				renderer.gammaOutput = true;
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.y = 4;
+				controls.update();
+
+				renderer.setAnimationLoop( function () {
+
+					stats.begin();
+
+					renderer.render( scene, camera );
+
+					stats.end();
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			init();
+
+		</script>
+
+	</body>
+</html>

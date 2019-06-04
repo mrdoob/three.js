@@ -4,25 +4,16 @@
 		<title>three.js webvr - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - sculpt
+		</div>
+
+		
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
@@ -47,14 +38,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - sculpt';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );

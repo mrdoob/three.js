@@ -4,33 +4,12 @@
 		<title>three.js webgl - FBX loader - Nurbs</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #f00;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader - Nurbs
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader - Nurbs
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -66,10 +45,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 2, 18, 28 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 12, 0 );
-				controls.update();
-
 				scene = new THREE.Scene();
 
 				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
@@ -100,6 +75,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 12, 0 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

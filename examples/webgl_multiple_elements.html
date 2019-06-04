@@ -4,6 +4,7 @@
 		<title>three.js webgl - multiple elements</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			* {
 				box-sizing: border-box;
@@ -11,19 +12,12 @@
 			}
 
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-
 				background-color: #fff;
-				margin: 0;
+				color: #444;
 			}
 
-			#info {
-				position: absolute;
-				top: 0; width: 100%;
-				padding: 5px;
-				text-align:center;
+			a {
+				color: #08f;
 			}
 
 			#content {
@@ -31,10 +25,6 @@
 				top: 0; width: 100%;
 				z-index: 1;
 				padding: 3em 0 0 0;
-			}
-
-			a {
-				color: #0080ff;
 			}
 
 			#c {
@@ -224,10 +214,10 @@
 					var width = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left = rect.left;
-					var top = rect.top;
+					var bottom = renderer.domElement.clientHeight - rect.bottom;
 
-					renderer.setViewport( left, top, width, height );
-					renderer.setScissor( left, top, width, height );
+					renderer.setViewport( left, bottom, width, height );
+					renderer.setScissor( left, bottom, width, height );
 
 					var camera = scene.userData.camera;
 
