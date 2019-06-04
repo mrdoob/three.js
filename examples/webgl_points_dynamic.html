@@ -4,34 +4,15 @@
 		<title>three.js webgl - particles - dynamic - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #046;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic particles + postprocessing
-			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank" rel="noopener">Reallusion</a>
-			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>,
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic particles + postprocessing<br/>
+			models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank" rel="noopener">Reallusion</a>
+			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -135,8 +116,8 @@
 
 				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
 				composer = new THREE.EffectComposer( renderer );
 
@@ -156,17 +137,16 @@
 
 			function onWindowResize() {
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				camera.lookAt( scene.position );
 
-				composer.reset();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
 			}
 

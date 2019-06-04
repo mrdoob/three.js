@@ -519,13 +519,23 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	setPosition: function ( v ) {
+	setPosition: function ( x, y, z ) {
 
 		var te = this.elements;
 
-		te[ 12 ] = v.x;
-		te[ 13 ] = v.y;
-		te[ 14 ] = v.z;
+		if ( x.isVector3 ) {
+
+			te[ 12 ] = x.x;
+			te[ 13 ] = x.y;
+			te[ 14 ] = x.z;
+
+		} else {
+
+			te[ 12 ] = x;
+			te[ 13 ] = y;
+			te[ 14 ] = z;
+
+		}
 
 		return this;
 

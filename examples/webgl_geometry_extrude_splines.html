@@ -4,36 +4,31 @@
 		<title>three.js webgl - geometry - spline extrusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - spline extrusion examples by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - spline extrusion examples<br/>
+			by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a>
+		</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<!-- where curves formulas are defined -->
 
-		<script src="js/CurveExtras.js"></script>
+		<script src="js/curves/CurveExtras.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>

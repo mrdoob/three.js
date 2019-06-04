@@ -53,7 +53,6 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 ( function () {
 
 	// Some constants
-	var WARNINGS = ! true; // Set to true for development
 	var ABC = [ 'a', 'b', 'c' ];
 
 
@@ -215,7 +214,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				if ( connectedFaces != 1 ) {
 
-					if ( WARNINGS ) console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
+					// console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
 
 				}
 
@@ -292,7 +291,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				if ( n == 2 ) {
 
-					if ( WARNINGS ) console.warn( '2 connecting edges', connectingEdges );
+					// console.warn( '2 connecting edges', connectingEdges );
 					sourceVertexWeight = 3 / 4;
 					connectingVertexWeight = 1 / 8;
 
@@ -301,11 +300,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				} else if ( n == 1 ) {
 
-					if ( WARNINGS ) console.warn( 'only 1 connecting edge' );
+					// console.warn( 'only 1 connecting edge' );
 
 				} else if ( n == 0 ) {
 
-					if ( WARNINGS ) console.warn( '0 connecting edges' );
+					// console.warn( '0 connecting edges' );
 
 				}
 

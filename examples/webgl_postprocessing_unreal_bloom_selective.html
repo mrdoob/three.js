@@ -4,40 +4,14 @@
 		<title>three.js webgl - postprocessing - unreal bloom selective</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-			#info p {
-				max-width: 600px;
-				margin-left: auto;
-				margin-right: auto;
-				padding: 0 2em;
-			}
-			a {
-				color: #2983ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a box to toggle bloom<br>By <a href="http://github.com/Temdog007" target="_blank" rel="noopener">Temdog007</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a sphere to toggle bloom<br>By <a href="http://github.com/Temdog007" target="_blank" rel="noopener">Temdog007</a>
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -140,7 +114,6 @@
 
 			var bloomComposer = new THREE.EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
-			bloomComposer.setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
@@ -158,7 +131,6 @@
 			finalPass.needsSwap = true;
 
 			var finalComposer = new THREE.EffectComposer( renderer );
-			finalComposer.setSize( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
@@ -251,8 +223,8 @@
 
 				renderer.setSize( width, height );
 
-				bloomComposer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
-				finalComposer.setSize( width * window.devicePixelRatio, height * window.devicePixelRatio );
+				bloomComposer.setSize( width, height );
+				finalComposer.setSize( width, height );
 
 				render();
 
@@ -274,15 +246,15 @@
 					color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
 
 					var material = new THREE.MeshBasicMaterial( { color: color } );
-					var box = new THREE.Mesh( geometry, material );
-					box.position.x = Math.random() * 10 - 5;
-					box.position.y = Math.random() * 10 - 5;
-					box.position.z = Math.random() * 10 - 5;
-					box.position.normalize().multiplyScalar( Math.random() * 4.0 + 2.0 );
-					box.scale.setScalar( Math.random() * Math.random() + 0.5 );
-					scene.add( box );
+					var sphere = new THREE.Mesh( geometry, material );
+					sphere.position.x = Math.random() * 10 - 5;
+					sphere.position.y = Math.random() * 10 - 5;
+					sphere.position.z = Math.random() * 10 - 5;
+					sphere.position.normalize().multiplyScalar( Math.random() * 4.0 + 2.0 );
+					sphere.scale.setScalar( Math.random() * Math.random() + 0.5 );
+					scene.add( sphere );
 
-					if ( Math.random() < 0.25 ) box.layers.enable( BLOOM_SCENE );
+					if ( Math.random() < 0.25 ) sphere.layers.enable( BLOOM_SCENE );
 
 				}
 

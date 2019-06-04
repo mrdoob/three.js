@@ -4,13 +4,7 @@
 		<title>three.js webgl - postprocessing - masking</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -37,7 +31,7 @@
 
 			}
 
-			var composer, renderer;
+			var camera, composer, renderer;
 			var box, torus;
 
 			init();
@@ -45,7 +39,7 @@
 
 			function init() {
 
-				var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 10;
 
 				var scene1 = new THREE.Scene();
@@ -100,6 +94,21 @@
 				composer.addPass( texturePass2 );
 				composer.addPass( clearMaskPass );
 				composer.addPass( outputPass );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
 
 			}
 

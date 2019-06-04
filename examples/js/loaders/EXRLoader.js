@@ -83,20 +83,19 @@ THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
 THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
-	const USHORT_RANGE = (1 << 16);
-	const BITMAP_SIZE = (USHORT_RANGE >> 3);
+	const USHORT_RANGE = ( 1 << 16 );
+	const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
 
-	const HUF_ENCBITS = 16;  // literal (value) bit length
-	const HUF_DECBITS = 14;  // decoding bit size (>= 8)
+	const HUF_ENCBITS = 16; // literal (value) bit length
+	const HUF_DECBITS = 14; // decoding bit size (>= 8)
 
-	const HUF_ENCSIZE = (1 << HUF_ENCBITS) + 1;  // encoding table size
-	const HUF_DECSIZE = 1 << HUF_DECBITS;        // decoding table size
+	const HUF_ENCSIZE = ( 1 << HUF_ENCBITS ) + 1; // encoding table size
+	const HUF_DECSIZE = 1 << HUF_DECBITS; // decoding table size
 	const HUF_DECMASK = HUF_DECSIZE - 1;
 
 	const SHORT_ZEROCODE_RUN = 59;
 	const LONG_ZEROCODE_RUN = 63;
 	const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
-	const LONGEST_LONG_RUN = 255 + SHORTEST_LONG_RUN;
 
 	const BYTES_PER_HALF = 2;
 
@@ -157,6 +156,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		getBitsReturn.l = ( c >> lc ) & ( ( 1 << nBits ) - 1 );
 		getBitsReturn.c = c;
 		getBitsReturn.lc = lc;
+
 	}
 
 	const hufTableBuffer = new Array( 59 );
@@ -249,9 +249,17 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	function hufLength( code ) { return code & 63; }
+	function hufLength( code ) {
 
-	function hufCode( code ) { return code >> 6; }
+		return code & 63;
+
+	}
+
+	function hufCode( code ) {
+
+		return code >> 6;
+
+	}
 
 	function hufBuildDecTable( hcode, im, iM, hdecod ) {
 
@@ -355,7 +363,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 			lc -= 8;
 
 			var cs = ( c >> lc );
-			var cs = new Uint8Array([cs])[0];
+			var cs = new Uint8Array( [ cs ] )[ 0 ];
 
 			if ( outBufferOffset.value + cs > outBufferEndOffset ) {
 
@@ -365,7 +373,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 			var s = outBuffer[ outBufferOffset.value - 1 ];
 
-			while ( cs-- > 0 ) {
+			while ( cs -- > 0 ) {
 
 				outBuffer[ outBufferOffset.value ++ ] = s;
 
@@ -385,11 +393,6 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		getCodeReturn.lc = lc;
 
 	}
-
-	var NBITS = 16;
-	var A_OFFSET = 1 << ( NBITS - 1 );
-	var M_OFFSET = 1 << ( NBITS - 1 );
-	var MOD_MASK = ( 1 << NBITS ) - 1;
 
 	function UInt16( value ) {
 
@@ -422,7 +425,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	function wav2Decode( j, buffer, nx, ox, ny, oy, mx ) {
+	function wav2Decode( j, buffer, nx, ox, ny, oy ) {
 
 		var n = ( nx > ny ) ? ny : nx;
 		var p = 1;
@@ -707,7 +710,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		}
 
 		var lut = new Uint16Array( USHORT_RANGE );
-		var maxValue = reverseLutFromBitmap( bitmap, lut );
+		reverseLutFromBitmap( bitmap, lut );
 
 		var length = parseUint32( inDataView, inOffset );
 
@@ -718,10 +721,6 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		var outBufferEnd = 0;
 
 		for ( var i = 0; i < num_channels; i ++ ) {
-
-			var exrChannelInfo = exrChannelInfos[ i ];
-
-			var pixelSize = 2; // assumes HALF_FLOAT
 
 			pizChannelData[ i ] = {};
 			pizChannelData[ i ][ 'start' ] = outBufferEnd;
@@ -746,8 +745,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 					pizChannelData[ i ].nx,
 					pizChannelData[ i ].size,
 					pizChannelData[ i ].ny,
-					pizChannelData[ i ].nx * pizChannelData[ i ].size,
-					maxValue
+					pizChannelData[ i ].nx * pizChannelData[ i ].size
 				);
 
 			}
@@ -805,7 +803,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	function parseUint32( dataView, offset ) {
 
-		var Uint32 = dataView.getUint32(offset.value, true);
+		var Uint32 = dataView.getUint32( offset.value, true );
 
 		offset.value = offset.value + INT32_SIZE;
 
@@ -815,7 +813,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	function parseUint8Array( uInt8Array, offset ) {
 
-		var Uint8 = uInt8Array[offset.value];
+		var Uint8 = uInt8Array[ offset.value ];
 
 		offset.value = offset.value + INT8_SIZE;
 
@@ -825,7 +823,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	function parseUint8( dataView, offset ) {
 
-		var Uint8 = dataView.getUint8(offset.value);
+		var Uint8 = dataView.getUint8( offset.value );
 
 		offset.value = offset.value + INT8_SIZE;
 
@@ -835,7 +833,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	function parseFloat32( dataView, offset ) {
 
-		var float = dataView.getFloat32(offset.value, true);
+		var float = dataView.getFloat32( offset.value, true );
 
 		offset.value += FLOAT32_SIZE;
 
@@ -873,7 +871,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	function parseFloat16( buffer, offset ) {
 
-		return decodeFloat16( parseUint16( buffer, offset) );
+		return decodeFloat16( parseUint16( buffer, offset ) );
 
 	}
 
@@ -1021,14 +1019,14 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	}
 
-	var bufferDataView = new DataView(buffer);
-	var uInt8Array = new Uint8Array(buffer);
+	var bufferDataView = new DataView( buffer );
+	var uInt8Array = new Uint8Array( buffer );
 
 	var EXRHeader = {};
 
-	var magic = bufferDataView.getUint32( 0, true );
-	var versionByteZero = bufferDataView.getUint8( 4, true );
-	var fullMask = bufferDataView.getUint8( 5, true );
+	bufferDataView.getUint32( 0, true ); // magic
+	bufferDataView.getUint8( 4, true ); // versionByteZero
+	bufferDataView.getUint8( 5, true ); // fullMask
 
 	// start of header
 
@@ -1071,7 +1069,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 	for ( var i = 0; i < numBlocks; i ++ ) {
 
-		var scanlineOffset = parseUlong( bufferDataView, offset );
+		parseUlong( bufferDataView, offset ); // scanlineOffset
 
 	}
 
@@ -1095,7 +1093,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		for ( var y = 0; y < height; y ++ ) {
 
 			var y_scanline = parseUint32( bufferDataView, offset );
-			var dataSize = parseUint32( bufferDataView, offset );
+			parseUint32( bufferDataView, offset ); // dataSize
 
 			for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
 
@@ -1126,8 +1124,8 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
 
-			var line_no = parseUint32( bufferDataView, offset );
-			var data_len = parseUint32( bufferDataView, offset );
+			parseUint32( bufferDataView, offset ); // line_no
+			parseUint32( bufferDataView, offset ); // data_len
 
 			var tmpBufferSize = width * scanlineBlockSize * ( EXRHeader.channels.length * BYTES_PER_HALF );
 			var tmpBuffer = new Uint16Array( tmpBufferSize );
