@@ -1449,7 +1449,7 @@ function WebGLRenderer( parameters ) {
 		var parameters = programCache.getParameters(
 			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
-		var checksum = programCache.getProgramChecksum( material, parameters );
+		var hash = programCache.getProgramHashCode( material, parameters );
 
 		var program = materialProperties.program;
 		var programChange = true;
@@ -1459,7 +1459,7 @@ function WebGLRenderer( parameters ) {
 			// new material
 			material.addEventListener( 'dispose', onMaterialDispose );
 
-		} else if ( program.checksum !== checksum ) {
+		} else if ( program.hash !== hash ) {
 
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
@@ -1508,10 +1508,10 @@ function WebGLRenderer( parameters ) {
 
 			material.onBeforeCompile( materialProperties.shader, _this );
 
-			// Computing checksum again as onBeforeCompile may have changed the shaders
-			checksum = programCache.getProgramChecksum( material, parameters );
+			// Computing hash again as onBeforeCompile may have changed the shaders
+			hash = programCache.getProgramHashCode( material, parameters );
 
-			program = programCache.acquireProgram( material, materialProperties.shader, parameters, checksum );
+			program = programCache.acquireProgram( material, materialProperties.shader, parameters, hash );
 
 			materialProperties.program = program;
 			material.program = program;

@@ -216,7 +216,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 	};
 
-	this.getProgramChecksum = function ( material, parameters ) {
+	this.getProgramCode = function ( material, parameters ) {
 
 		var array = [];
 
@@ -254,11 +254,17 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 		array.push( renderer.gammaFactor );
 
-		return _Math.crc32( array.join() );
+		return array.join();
 
 	};
 
-	this.acquireProgram = function ( material, shader, parameters, checksum ) {
+	this.getProgramHashCode = function ( material, parameters ) {
+
+		return _Math.crc32( this.getProgramCode( material, parameters ) );
+
+	};
+
+	this.acquireProgram = function ( material, shader, parameters, hash ) {
 
 		var program;
 
@@ -267,7 +273,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 			var programInfo = programs[ p ];
 
-			if ( programInfo.checksum === checksum ) {
+			if ( programInfo.hash === hash ) {
 
 				program = programInfo;
 				++ program.usedTimes;
@@ -280,7 +286,7 @@ function WebGLPrograms( renderer, extensions, capabilities, textures ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, checksum, material, shader, parameters, capabilities, textures );
+			program = new WebGLProgram( renderer, extensions, hash, material, shader, parameters, capabilities, textures );
 			programs.push( program );
 
 		}
