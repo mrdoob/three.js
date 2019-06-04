@@ -21,8 +21,9 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 	constructor ( manager ) {
 
-		// TODO(donmccurdy): Loading manager is unused.
 		this.manager = manager || THREE.DefaultLoadingManager;
+
+		this.crossOrigin = 'anonymous';
 
 		this.transcoderPath = '';
 		this.transcoderBinary = null;
@@ -41,9 +42,27 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 	}
 
+	setCrossOrigin ( crossOrigin ) {
+
+		this.crossOrigin = crossOrigin;
+
+		return this;
+
+	}
+
 	setTranscoderPath ( path ) {
 
 		this.transcoderPath = path;
+
+		return this;
+
+	}
+
+	setWorkerLimit ( workerLimit ) {
+
+		this.workerLimit = workerLimit;
+
+		return this;
 
 	}
 
@@ -81,12 +100,17 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 	load ( url, onLoad, onProgress, onError ) {
 
-		// TODO(donmccurdy): Use THREE.FileLoader.
-		fetch( url )
-			.then( ( res ) => res.arrayBuffer() )
-			.then( ( buffer ) => this._createTexture( buffer ) )
-			.then( onLoad )
-			.catch( onError );
+		var loader = new THREE.FileLoader( this.manager );
+
+		loader.setResponseType( 'arraybuffer' );
+
+		loader.load( url, ( buffer ) => {
+
+			this._createTexture( buffer )
+				.then( onLoad )
+				.catch( onError );
+
+		}, onProgress, onError );
 
 	}
 
@@ -96,21 +120,24 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 	 */
 	_createTexture ( buffer ) {
 
-		return this.getWorker()
-			.then( ( worker ) => {
+		var worker;
+		var taskID;
 
-				return new Promise( ( resolve ) => {
+		var texturePending = this.getWorker()
+			.then( ( _worker ) => {
 
-					var taskID = this.workerNextTaskID++;
+				worker = _worker;
+				taskID = this.workerNextTaskID++;
 
-					worker._callbacks[ taskID ] = resolve;
+				return new Promise( ( resolve, reject ) => {
+
+					worker._callbacks[ taskID ] = { resolve, reject };
 					worker._taskCosts[ taskID ] = buffer.byteLength;
 					worker._taskLoad += worker._taskCosts[ taskID ];
-					worker._taskCount++;
 
 					worker.postMessage( { type: 'transcode', id: taskID, buffer }, [ buffer ] );
 
-				} );
+				} )
 
 			} )
 			.then( ( message ) => {
@@ -148,18 +175,45 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 
 			});
 
+		texturePending
+			.finally( () => {
+
+				if ( worker && taskID ) {
+
+					worker._taskLoad -= worker._taskCosts[ taskID ];
+					delete worker._callbacks[ taskID ];
+					delete worker._taskCosts[ taskID ];
+
+				}
+
+			} );
+
+		return texturePending;
+
 	}
 
 	_initTranscoder () {
 
 		if ( ! this.transcoderBinary ) {
 
-			// TODO(donmccurdy): Use THREE.FileLoader.
-			var jsContent = fetch( this.transcoderPath + 'basis_transcoder.js' )
-				.then( ( response ) => response.text() );
+			// Load transcoder wrapper.
+			var jsLoader = new THREE.FileLoader( this.manager );
+			jsLoader.setPath( this.transcoderPath );
+			var jsContent = new Promise( ( resolve, reject ) => {
 
-			var binaryContent = fetch( this.transcoderPath + 'basis_transcoder.wasm' )
-				.then( ( response ) => response.arrayBuffer() );
+				jsLoader.load( 'basis_transcoder.js', resolve, undefined, reject );
+
+			} );
+
+			// Load transcoder WASM binary.
+			var binaryLoader = new THREE.FileLoader( this.manager );
+			binaryLoader.setPath( this.transcoderPath );
+			binaryLoader.setResponseType( 'arraybuffer' );
+			var binaryContent = new Promise( ( resolve, reject ) => {
+
+				binaryLoader.load( 'basis_transcoder.wasm', resolve, undefined, reject );
+
+			} );
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
@@ -200,7 +254,6 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 				worker._callbacks = {};
 				worker._taskCosts = {};
 				worker._taskLoad = 0;
-				worker._taskCount = 0;
 
 				worker.postMessage( {
 					type: 'init',
@@ -215,14 +268,15 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 					switch ( message.type ) {
 
 						case 'transcode':
-							worker._callbacks[ message.id ]( message );
-							worker._taskLoad -= worker._taskCosts[ message.id ];
-							delete worker._callbacks[ message.id ];
-							delete worker._taskCosts[ message.id ];
+							worker._callbacks[ message.id ].resolve( message );
+							break;
+
+						case 'error':
+							worker._callbacks[ message.id ].reject( message );
 							break;
 
 						default:
-							throw new Error( 'THREE.BasisTextureLoader: Unexpected message, "' + message.type + '"' );
+							console.error( 'THREE.BasisTextureLoader: Unexpected message, "' + message.type + '"' );
 
 					}
 
@@ -251,6 +305,8 @@ THREE.BasisTextureLoader = class BasisTextureLoader {
 		}
 
 		this.workerPool.length = 0;
+
+		return this;
 
 	}
 }
@@ -303,17 +359,27 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 			case 'transcode':
 				transcoderPending.then( () => {
 
-					var { width, height, mipmaps } = transcode( message.buffer );
+					try {
 
-					var buffers = [];
+						var { width, height, mipmaps } = transcode( message.buffer );
 
-					for ( var i = 0; i < mipmaps.length; ++i ) {
+						var buffers = [];
 
-						buffers.push( mipmaps[i].data.buffer );
+						for ( var i = 0; i < mipmaps.length; ++i ) {
+
+							buffers.push( mipmaps[i].data.buffer );
+
+						}
+
+						self.postMessage( { type: 'transcode', id: message.id, width, height, mipmaps }, buffers );
+
+					} catch ( error ) {
+
+						console.error( error );
+
+						self.postMessage( { type: 'error', id: message.id, error: error.message } );
 
 					}
-
-					self.postMessage( { type: 'transcode', id: message.id, width, height, mipmaps }, buffers );
 
 				} );
 				break;
