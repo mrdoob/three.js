@@ -37,7 +37,7 @@
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="js/Car.js"></script>
+		<script src="js/controls/CarControls.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -59,8 +59,8 @@
 			var followCamera = document.getElementById( 'camera-toggle' );
 
 			var clock = new THREE.Clock();
-			var car = new THREE.Car();
-			car.turningRadius = 75;
+			var carControls = new THREE.CarControls();
+			carControls.turningRadius = 75;
 
 			var carParts = {
 				body: [],
@@ -156,7 +156,7 @@
 
 					carModel = gltf.scene.children[ 0 ];
 
-					car.setModel( carModel );
+					carControls.setModel( carModel );
 
 					carModel.traverse( function ( child ) {
 
@@ -289,14 +289,14 @@
 
 				if ( carModel ) {
 
-					car.update( delta / 3 );
+					carControls.update( delta / 3 );
 
 					console.log(   );
 
 					if ( carModel.position.length() > 200 ) {
 
 						carModel.position.set( 0, 0, 0 );
-						car.speed = 0;
+						carControls.speed = 0;
 
 					}
 

@@ -3,7 +3,7 @@ import {
 } from '../../../src/Three';
 
 export class CarControls {
-  constructor( maxSpeed: number, acceleration: number, brakePower: number, turningRadius: number, keys: object );
+  constructor( maxSpeed?: number, acceleration?: number, brakePower?: number, turningRadius?: number, keys?: object );
 
   // API
   enabled: boolean;
