@@ -6,12 +6,17 @@
  * This is not the only approach, therefore it's marked 1.
  */
 
-THREE.VolumeRenderShader1 = {
+import {
+	Vector2,
+	Vector3
+} from "../../../build/three.module.js";
+
+var VolumeRenderShader1 = {
 	uniforms: {
-				"u_size": { value: new THREE.Vector3( 1, 1, 1 ) },
+				"u_size": { value: new Vector3( 1, 1, 1 ) },
 				"u_renderstyle": { value: 0 },
 				"u_renderthreshold": { value: 0.5 },
-				"u_clim": { value: new THREE.Vector2( 1, 1 ) },
+				"u_clim": { value: new Vector2( 1, 1 ) },
 				"u_data": { value: null },
 				"u_cmdata": { value: null }
 		},
@@ -322,3 +327,5 @@ THREE.VolumeRenderShader1 = {
 				'}',
 	].join( '\n' )
 };
+
+export { VolumeRenderShader1 };
