@@ -1,9 +1,8 @@
 import {
   LoadingManager,
   BufferGeometry,
-  TrianglesDrawMode,
-  TriangleStripDrawMode,
-} from '../../../build/three.module.js';
+  TrianglesDrawModes
+} from '../../../src/Three';
 
 export class DRACOLoader {
   constructor(manager?: LoadingManager);
