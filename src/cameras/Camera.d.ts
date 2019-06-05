@@ -23,6 +23,11 @@ export class Camera extends Object3D {
    * This is the matrix which contains the projection.
    */
 	projectionMatrix: Matrix4;
+	
+	/**
+   * This is the inverse of projectionMatrix.
+   */
+	projectionMatrixInverse: Matrix4;
 
 	isCamera: true;
 
