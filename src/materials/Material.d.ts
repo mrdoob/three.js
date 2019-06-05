@@ -3,15 +3,15 @@ import { Shader } from './../renderers/shaders/ShaderLib';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import {
-  BlendingDstFactor,
-  BlendingEquation,
-  Blending,
-  BlendingSrcFactor,
-  DepthModes,
-  Side,
-  Colors,
-  StencilFunc,
-  StencilOp
+	BlendingDstFactor,
+	BlendingEquation,
+	Blending,
+	BlendingSrcFactor,
+	DepthModes,
+	Side,
+	Colors,
+	StencilFunc,
+	StencilOp
 } from '../constants';
 
 // Materials //////////////////////////////////////////////////////////////////////////////////
@@ -47,17 +47,17 @@ export interface MaterialParameters {
 	flatShading?: boolean;
 	side?: Side;
 	shadowSide?: Side;
-  transparent?: boolean;
-  vertexColors?: Colors;
-  vertexTangents?: boolean;
-  visible?: boolean;
-  stencilWrite?: boolean;
-  stencilFunc?: StencilFunc;
-  stencilRef?: number;
-  stencilMask?: number;
-  stencilFail?: StencilOp;
-  stencilZFail?: StencilOp;
-  stencilZPass?: StencilOp;
+	transparent?: boolean;
+	vertexColors?: Colors;
+	vertexTangents?: boolean;
+	visible?: boolean;
+	stencilWrite?: boolean;
+	stencilFunc?: StencilFunc;
+	stencilRef?: number;
+	stencilMask?: number;
+	stencilFail?: StencilOp;
+	stencilZFail?: StencilOp;
+	stencilZPass?: StencilOp;
 }
 
 /**
@@ -153,42 +153,42 @@ export class Material extends EventDispatcher {
    */
 	id: number;
 
-  /**
+	/**
    * Whether rendering this material has any effect on the stencil buffer. Default is *false*.
    */
-  stencilWrite: boolean;
+	stencilWrite: boolean;
 
-  /**
+	/**
    * The stencil comparison function to use. Default is {@link AlwaysStencilFunc}. See stencil operation constants for all possible values.
    */
-  stencilFunc: StencilFunc;
+	stencilFunc: StencilFunc;
 
-  /**
+	/**
    * The value to use when performing stencil comparisons or stencil operations. Default is *0*.
    */
-  stencilRef: number;
+	stencilRef: number;
 
-  /**
+	/**
    * The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
    */
-  stencilMask: number;
+	stencilMask: number;
 
-  /**
+	/**
    * Which stencil operation to perform when the comparison function returns false. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
    */
-  stencilFail: StencilOp;
+	stencilFail: StencilOp;
 
-  /**
+	/**
    * Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
    */
-  stencilZFail: StencilOp;
+	stencilZFail: StencilOp;
 
-  /**
+	/**
    * Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
    */
-  stencilZPass: StencilOp;
+	stencilZPass: StencilOp;
 
-  /**
+	/**
    * Used to check whether this or derived classes are materials. Default is true.
    * You should not change this, as it used internally for optimisation.
    */
