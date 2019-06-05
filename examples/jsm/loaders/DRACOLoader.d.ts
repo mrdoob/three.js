@@ -17,5 +17,5 @@ export class DRACOLoader {
   setVerbosity(level: number): DRACOLoader;
   setDrawMode(drawMode: TrianglesDrawModes): DRACOLoader;
   setSkipDequantization(attributeName: 'position', skip?: boolean): DRACOLoader;
-  isVersionSupported(version: number, callback: (isVersionSupported: boolean) => any);
+  isVersionSupported(version: number, callback: (isVersionSupported: boolean) => any): void;
 }

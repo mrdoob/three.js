@@ -21,7 +21,6 @@ import {
 	Int16BufferAttribute,
 	Int32BufferAttribute,
 	Int8BufferAttribute,
-	LoadingManager,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	Uint16BufferAttribute,
@@ -31,7 +30,7 @@ import {
 "use strict";
 
 /**
- * @param {LoadingManager} manager
+ * @param {THREE.LoadingManager} manager
  */
 var DRACOLoader = function ( manager ) {
 
