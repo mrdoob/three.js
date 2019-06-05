@@ -66,7 +66,7 @@
 		<p>
 			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
 			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
-			for their project. However, most of these files are not modules which makes their usage in certain cases inconvenient. In order to address this issue,
+			for their project. However, not all files are modules which makes their usage in certain cases inconvenient. In order to address this issue,
 			we are working to provide all the examples as modules in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory.
 			If you install three.js via npm, you can import them like so:
 		</p>
@@ -76,6 +76,12 @@
 		<p>
 			The following examples files are already available as modules:
 			<ul>
+				<li>animation
+					<ul>
+						<li>AnimationClipCreator</li>
+						<li>TimelinerController</li>
+					</ul>
+				</li>
 				<li>cameras
 					<ul>
 						<li>CinematicCamera</li>

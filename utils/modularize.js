@@ -10,6 +10,9 @@ var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
+	{ path: 'animation/AnimationClipCreator.js', dependencies: [], ignoreList: [] },
+	{ path: 'animation/TimelinerController.js', dependencies: [], ignoreList: [] },
+
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
 
 	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
