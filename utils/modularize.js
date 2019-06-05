@@ -12,6 +12,7 @@ var dstFolder = __dirname + '/../examples/jsm/';
 var files = [
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
 
+	{ path: 'controls/CarControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/DeviceOrientationControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/EditorControls.js', dependencies: [], ignoreList: [] },
