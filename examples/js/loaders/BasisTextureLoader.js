@@ -167,7 +167,7 @@ THREE.BasisTextureLoader.prototype = {
 
 				}
 
-				texture.minFilter = THREE.LinearMipMapLinearFilter;
+				texture.minFilter = mipmaps.length === 1 ? THREE.LinearFilter : THREE.LinearMipMapLinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
@@ -446,6 +446,12 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 
 			cleanup();
 			throw new Error( 'THREE.BasisTextureLoader: .startTranscoding failed' );
+
+		}
+
+		if ( basisFile.getHasAlpha() ) {
+
+			console.warn( 'THREE.BasisTextureLoader: Alpha not yet implemented.' );
 
 		}
 
