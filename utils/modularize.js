@@ -101,6 +101,8 @@ var files = [
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [] },
+
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/SubdivisionModifier.js', dependencies: [], ignoreList: [] },
