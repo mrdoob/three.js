@@ -58,11 +58,11 @@
 			sprite.scale.set( 2, 5, 1 );
 			group.add( sprite );
 
-			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
+			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f', sizeAttenuation: false } ) );
 			sprite.material.rotation = Math.PI / 3 * 4;
 			sprite.position.set( 8, - 2, 2 );
 			sprite.center.set( 0.5, 0 );
-			sprite.scale.set( 1, - 5, 1 );
+			sprite.scale.set( .1, .5, .1 );
 			group.add( sprite );
 
 			var group2 = new THREE.Object3D();
