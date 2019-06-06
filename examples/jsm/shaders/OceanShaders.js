@@ -22,8 +22,12 @@
 // [7] ocean_main               -> Vertex and Fragment shader used to create the final render
 */
 
-THREE.OceanShaders = {}
-THREE.OceanShaders[ 'ocean_sim_vertex' ] = {
+import {
+	Vector2
+} from "../../../build/three.module.js";
+
+var OceanShaders = {}
+OceanShaders[ 'ocean_sim_vertex' ] = {
 	vertexShader: [
 		'varying vec2 vUV;',
 
@@ -33,7 +37,7 @@ THREE.OceanShaders[ 'ocean_sim_vertex' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.OceanShaders[ 'ocean_subtransform' ] = {
+OceanShaders[ 'ocean_subtransform' ] = {
 	uniforms: {
 		"u_input": { value: null },
 		"u_transformSize": { value: 512.0 },
@@ -83,9 +87,9 @@ THREE.OceanShaders[ 'ocean_subtransform' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.OceanShaders[ 'ocean_initial_spectrum' ] = {
+OceanShaders[ 'ocean_initial_spectrum' ] = {
 	uniforms: {
-		"u_wind": { value: new THREE.Vector2( 10.0, 10.0 ) },
+		"u_wind": { value: new Vector2( 10.0, 10.0 ) },
 		"u_resolution": { value: 512.0 },
 		"u_size": { value: 250.0 }
 	},
@@ -164,7 +168,7 @@ THREE.OceanShaders[ 'ocean_initial_spectrum' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.OceanShaders[ 'ocean_phase' ] = {
+OceanShaders[ 'ocean_phase' ] = {
 	uniforms: {
 		"u_phases": { value: null },
 		"u_deltaTime": { value: null },
@@ -204,7 +208,7 @@ THREE.OceanShaders[ 'ocean_phase' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.OceanShaders[ 'ocean_spectrum' ] = {
+OceanShaders[ 'ocean_spectrum' ] = {
 	uniforms: {
 		"u_size": { value: null },
 		"u_resolution": { value: null },
@@ -268,7 +272,7 @@ THREE.OceanShaders[ 'ocean_spectrum' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.OceanShaders[ 'ocean_normals' ] = {
+OceanShaders[ 'ocean_normals' ] = {
 	uniforms: {
 		"u_displacementMap": { value: null },
 		"u_resolution": { value: null },
@@ -302,7 +306,7 @@ THREE.OceanShaders[ 'ocean_normals' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.OceanShaders[ 'ocean_main' ] = {
+OceanShaders[ 'ocean_main' ] = {
 	uniforms: {
 		"u_displacementMap": { value: null },
 		"u_normalMap": { value: null },
@@ -369,3 +373,5 @@ THREE.OceanShaders[ 'ocean_main' ] = {
 		'}'
 	].join( '\n' )
 };
+
+export { OceanShaders };

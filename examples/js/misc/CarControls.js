@@ -9,7 +9,7 @@
  *
  */
 
-THREE.Car = ( function ( ) {
+THREE.CarControls = ( function ( ) {
 
 	// private variables
 	var steeringWheelSpeed = 1.5;
@@ -51,7 +51,7 @@ THREE.Car = ( function ( ) {
 
 	};
 
-	function Car( maxSpeed, acceleration, brakePower, turningRadius, keys ) {
+	function CarControls( maxSpeed, acceleration, brakePower, turningRadius, keys ) {
 
 		this.enabled = true;
 
@@ -96,9 +96,9 @@ THREE.Car = ( function ( ) {
 
 	}
 
-	Car.prototype = {
+	CarControls.prototype = {
 
-		constructor: Car,
+		constructor: CarControls,
 
 		onKeyDown: function ( event ) {
 
@@ -300,6 +300,6 @@ THREE.Car = ( function ( ) {
 
 	}
 
-	return Car;
+	return CarControls;
 
 } )();

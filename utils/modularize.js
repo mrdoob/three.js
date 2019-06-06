@@ -11,6 +11,7 @@ var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
 	{ path: 'animation/AnimationClipCreator.js', dependencies: [], ignoreList: [] },
+	{ path: 'animation/CCDIKSolver.js', dependencies: [], ignoreList: [ 'SkinnedMesh' ] },
 	{ path: 'animation/TimelinerController.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
@@ -65,12 +66,14 @@ var files = [
 
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/AWDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BabylonLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
 	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/DDSLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/DRACOLoader.js', dependencies: [], ignoreList: [ 'LoadingManager' ] },
 	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
@@ -92,6 +95,7 @@ var files = [
 	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VTKLoader.js', dependencies: [], ignoreList: [] },
 
@@ -101,7 +105,9 @@ var files = [
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [] },
+	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
+	{ path: 'misc/Ocean.js', dependencies: [ { name: 'OceanShaders', path: 'shaders/OceanShaders.js' } ], ignoreList: [] },
 
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
@@ -184,6 +190,7 @@ var files = [
 	{ path: 'shaders/LuminosityShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/MirrorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/NormalMapShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/OceanShaders.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ParallaxShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/PixelShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
