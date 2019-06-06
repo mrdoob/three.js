@@ -29,16 +29,13 @@
  *
 */
 
-
-import { ConvexBufferGeometry } from "../geometries/ConvexGeometry.js";
-
 import {
 	Line3,
-	Matrix4,
 	Mesh,
 	Plane,
 	Vector3
 } from "../../../build/three.module.js";
+import { ConvexBufferGeometry } from "../geometries/ConvexGeometry.js";
 
 var ConvexObjectBreaker = function ( minSizeForBreak, smallDelta ) {
 
@@ -464,7 +461,7 @@ ConvexObjectBreaker.transformFreeVector = function ( v, m ) {
 
 	// input:
 	// vector interpreted as a free vector
-	// Matrix4 orthogonal matrix (matrix without scale)
+	// THREE.Matrix4 orthogonal matrix (matrix without scale)
 
 	var x = v.x, y = v.y, z = v.z;
 	var e = m.elements;
@@ -481,7 +478,7 @@ ConvexObjectBreaker.transformFreeVectorInverse = function ( v, m ) {
 
 	// input:
 	// vector interpreted as a free vector
-	// Matrix4 orthogonal matrix (matrix without scale)
+	// THREE.Matrix4 orthogonal matrix (matrix without scale)
 
 	var x = v.x, y = v.y, z = v.z;
 	var e = m.elements;
@@ -498,7 +495,7 @@ ConvexObjectBreaker.transformTiedVectorInverse = function ( v, m ) {
 
 	// input:
 	// vector interpreted as a tied (ordinary) vector
-	// Matrix4 orthogonal matrix (matrix without scale)
+	// THREE.Matrix4 orthogonal matrix (matrix without scale)
 
 	var x = v.x, y = v.y, z = v.z;
 	var e = m.elements;
@@ -533,5 +530,3 @@ ConvexObjectBreaker.transformPlaneToLocalSpace = function () {
 }();
 
 export { ConvexObjectBreaker };
-
-export {  };
