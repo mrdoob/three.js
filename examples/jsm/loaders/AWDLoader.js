@@ -3,7 +3,21 @@
  * Date: 09/12/2013 17:21
  */
 
-THREE.AWDLoader = ( function () {
+import {
+	Bone,
+	BufferAttribute,
+	BufferGeometry,
+	DefaultLoadingManager,
+	FileLoader,
+	ImageLoader,
+	Matrix4,
+	Mesh,
+	MeshPhongMaterial,
+	Object3D,
+	Texture
+} from "../../../build/three.module.js";
+
+var AWDLoader = ( function () {
 
 	var //UNCOMPRESSED = 0,
 		//DEFLATE = 1,
@@ -78,9 +92,9 @@ THREE.AWDLoader = ( function () {
 
 	var AWDLoader = function ( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-		this.trunk = new THREE.Object3D();
+		this.trunk = new Object3D();
 
 		this.materialFactory = undefined;
 
@@ -115,7 +129,7 @@ THREE.AWDLoader = ( function () {
 			this._url = url;
 			this._baseDir = url.substr( 0, url.lastIndexOf( '/' ) + 1 );
 
-			var loader = new THREE.FileLoader( this.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.load( url, function ( text ) {
@@ -274,7 +288,7 @@ THREE.AWDLoader = ( function () {
 		parseContainer: function () {
 
 			var parent,
-				ctr = new THREE.Object3D(),
+				ctr = new Object3D(),
 				par_id = this.readU32(),
 				mtx = this.parseMatrix4();
 
@@ -333,10 +347,10 @@ THREE.AWDLoader = ( function () {
 			// so we create sub meshes for each groups
 			if ( meshLen > 1 ) {
 
-				mesh = new THREE.Object3D();
+				mesh = new Object3D();
 				for ( i = 0; i < meshLen; i ++ ) {
 
-					var sm = new THREE.Mesh( geometries[ i ] );
+					var sm = new Mesh( geometries[ i ] );
 					meshes.push( sm );
 					mesh.add( sm );
 
@@ -344,7 +358,7 @@ THREE.AWDLoader = ( function () {
 
 			} else {
 
-				mesh = new THREE.Mesh( geometries[ 0 ] );
+				mesh = new Mesh( geometries[ 0 ] );
 				meshes.push( mesh );
 
 			}
@@ -416,7 +430,7 @@ THREE.AWDLoader = ( function () {
 
 			}
 
-			mat = new THREE.MeshPhongMaterial();
+			mat = new MeshPhongMaterial();
 
 			if ( type === 1 ) {
 
@@ -469,9 +483,9 @@ THREE.AWDLoader = ( function () {
 
 		loadTexture: function ( url ) {
 
-			var tex = new THREE.Texture();
+			var tex = new Texture();
 
-			var loader = new THREE.ImageLoader( this.manager );
+			var loader = new ImageLoader( this.manager );
 
 			loader.load( this._baseDir + url, function ( image ) {
 
@@ -501,7 +515,7 @@ THREE.AWDLoader = ( function () {
 				// Ignore joint id
 				this.readU16();
 
-				joint = new THREE.Bone();
+				joint = new Bone();
 				joint.parent = this.readU16() - 1; // 0=null in AWD
 				joint.name = this.readUTF();
 
@@ -551,7 +565,7 @@ THREE.AWDLoader = ( function () {
 
 				} else {
 
-					mtx_data = new THREE.Matrix4();
+					mtx_data = new Matrix4();
 
 				}
 				pose[ joints_parsed ] = mtx_data;
@@ -712,7 +726,7 @@ THREE.AWDLoader = ( function () {
 
 				var sm_len, sm_end, attrib;
 
-				geom = new THREE.BufferGeometry();
+				geom = new BufferGeometry();
 				geom.name = name;
 				geometries.push( geom );
 
@@ -738,7 +752,7 @@ THREE.AWDLoader = ( function () {
 						// VERTICES
 
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
-						attrib = new THREE.BufferAttribute( buffer, 3 );
+						attrib = new BufferAttribute( buffer, 3 );
 
 						geom.addAttribute( 'position', attrib );
 						idx = 0;
@@ -757,7 +771,7 @@ THREE.AWDLoader = ( function () {
 						// INDICES
 
 						buffer = new Uint16Array( str_len / 2 );
-						attrib = new THREE.BufferAttribute( buffer, 1 );
+						attrib = new BufferAttribute( buffer, 1 );
 						geom.setIndex( attrib );
 
 						idx = 0;
@@ -776,7 +790,7 @@ THREE.AWDLoader = ( function () {
 						// UVS
 
 						buffer = new Float32Array( ( str_len / 8 ) * 2 );
-						attrib = new THREE.BufferAttribute( buffer, 2 );
+						attrib = new BufferAttribute( buffer, 2 );
 
 						geom.addAttribute( 'uv', attrib );
 						idx = 0;
@@ -794,7 +808,7 @@ THREE.AWDLoader = ( function () {
 						// NORMALS
 
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
-						attrib = new THREE.BufferAttribute( buffer, 3 );
+						attrib = new BufferAttribute( buffer, 3 );
 						geom.addAttribute( 'normal', attrib );
 						idx = 0;
 
@@ -950,7 +964,7 @@ THREE.AWDLoader = ( function () {
 
 		parseMatrix4: function () {
 
-			var mtx = new THREE.Matrix4();
+			var mtx = new Matrix4();
 			var e = mtx.elements;
 
 			e[ 0 ] = this.readF32();
@@ -1216,3 +1230,5 @@ THREE.AWDLoader = ( function () {
 	return AWDLoader;
 
 } )();
+
+export { AWDLoader };
