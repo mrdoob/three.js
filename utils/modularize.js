@@ -102,6 +102,7 @@ var files = [
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/Ocean.js', dependencies: [ { name: 'OceanShaders', path: 'shaders/OceanShaders.js' } ], ignoreList: [] },
 
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
