@@ -106,6 +106,7 @@ var files = [
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
 	{ path: 'misc/Ocean.js', dependencies: [ { name: 'OceanShaders', path: 'shaders/OceanShaders.js' } ], ignoreList: [] },
 
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
