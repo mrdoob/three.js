@@ -77,7 +77,7 @@ var files = [
 	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader' ] },
+	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'Camera' ] },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/LWOLoader.js', dependencies: [], ignoreList: [] },
