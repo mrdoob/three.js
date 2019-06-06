@@ -37,7 +37,7 @@ function fixSourceLinks(url, source) {
   const loaderLoadRE = /(loader\.load[a-z]*\s*\(\s*)('|")(.*?)('|")/ig;
   const loaderArrayLoadRE = /(loader\.load[a-z]*\(\[)([\s\S]*?)(\])/ig;
   const loadFileRE = /(loadFile\s*\(\s*)('|")(.*?)('|")/ig;
-  const threejsfundamentalsUrlRE = /(.*?)('|")(.*?)('|")(.*?)(\/\*\s+threejsfundamentals:\s+url\s+\*\/)/ig;
+  const threejsfundamentalsUrlRE = /(.*?)('|")([^"']*?)('|")([^'"]*?)(\/\*\s+threejsfundamentals:\s+url\s+\*\/)/ig;
   const arrayLineRE = /^(\s*["|'])([\s\S]*?)(["|']*$)/;
   const urlPropRE = /(url:\s*)('|")(.*?)('|")/g;
   const workerRE = /(new\s+Worker\s*\(\s*)('|")(.*?)('|")/g;
