@@ -66,6 +66,7 @@ var files = [
 
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/AWDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BabylonLoader.js', dependencies: [], ignoreList: [] },
