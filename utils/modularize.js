@@ -12,7 +12,6 @@ var dstFolder = __dirname + '/../examples/jsm/';
 var files = [
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
 
-	{ path: 'controls/CarControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/DeviceOrientationControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/EditorControls.js', dependencies: [], ignoreList: [] },
@@ -97,6 +96,8 @@ var files = [
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
