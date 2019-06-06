@@ -94,6 +94,7 @@ var files = [
 	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VTKLoader.js', dependencies: [], ignoreList: [] },
 

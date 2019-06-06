@@ -7,22 +7,27 @@
  * to create THREE.Font objects.
  */
 
-THREE.TTFLoader = function ( manager ) {
+import {
+	DefaultLoadingManager,
+	FileLoader
+} from "../../../build/three.module.js";
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+var TTFLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 	this.reversed = false;
 
 };
 
-THREE.TTFLoader.prototype = {
+TTFLoader.prototype = {
 
-	constructor: THREE.TTFLoader,
+	constructor: TTFLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
@@ -198,3 +203,5 @@ THREE.TTFLoader.prototype = {
 	}
 
 };
+
+export { TTFLoader };
