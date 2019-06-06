@@ -22,7 +22,7 @@ export class EffectComposer {
   addPass(pass: Pass): void;
   insertPass(pass: Pass, index: number): void;
   isLastEnabledPass(): boolean;
-  render(deltaTime: number): void;
+  render(deltaTime?: number): void;
   reset(renderTarget?: WebGLRenderTarget): void;
   setSize(width: number, height: number): void;
   setPixelRatio(pixelRatio: number): void;

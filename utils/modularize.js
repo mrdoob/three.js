@@ -10,6 +10,9 @@ var srcFolder = __dirname + '/../examples/js/';
 var dstFolder = __dirname + '/../examples/jsm/';
 
 var files = [
+	{ path: 'animation/AnimationClipCreator.js', dependencies: [], ignoreList: [] },
+	{ path: 'animation/TimelinerController.js', dependencies: [], ignoreList: [] },
+
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
 
 	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
@@ -90,6 +93,7 @@ var files = [
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VTKLoader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
@@ -98,6 +102,7 @@ var files = [
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'misc/Ocean.js', dependencies: [ { name: 'OceanShaders', path: 'shaders/OceanShaders.js' } ], ignoreList: [] },
 
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
 	{ path: 'modifiers/SimplifyModifier.js', dependencies: [], ignoreList: [] },
@@ -180,6 +185,7 @@ var files = [
 	{ path: 'shaders/LuminosityShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/MirrorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/NormalMapShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/OceanShaders.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ParallaxShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/PixelShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
@@ -199,6 +205,7 @@ var files = [
 	{ path: 'shaders/VerticalBlurShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/VerticalTiltShiftShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/VignetteShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/VolumeShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/WaterRefractionShader.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
