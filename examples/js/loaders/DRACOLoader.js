@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
 
 /**
  * @param {THREE.LoadingManager} manager
@@ -473,7 +472,7 @@ THREE.DRACOLoader.prototype = {
 			if ( this.drawMode === THREE.TriangleStripDrawMode ) {
 
 				var stripsArray = new dracoDecoder.DracoInt32Array();
-				var numStrips = decoder.GetTriangleStripsFromMesh(
+				decoder.GetTriangleStripsFromMesh(
 					dracoGeometry,
 					stripsArray
 				);
