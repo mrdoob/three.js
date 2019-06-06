@@ -353,7 +353,7 @@
 
 			function initComputeRenderer() {
 
-				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new THREE.GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
