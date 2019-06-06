@@ -93,7 +93,7 @@ var files = [
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/VTKLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VTKLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.min.js' } ], ignoreList: [] },
 
 	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
