@@ -27,7 +27,6 @@ import {
 	Uint32BufferAttribute,
 	Uint8BufferAttribute
 } from "../../../build/three.module.js";
-"use strict";
 
 /**
  * @param {THREE.LoadingManager} manager
@@ -488,7 +487,7 @@ DRACOLoader.prototype = {
 			if ( this.drawMode === TriangleStripDrawMode ) {
 
 				var stripsArray = new dracoDecoder.DracoInt32Array();
-				var numStrips = decoder.GetTriangleStripsFromMesh(
+				decoder.GetTriangleStripsFromMesh(
 					dracoGeometry,
 					stripsArray
 				);
