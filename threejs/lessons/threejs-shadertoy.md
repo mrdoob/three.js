@@ -239,7 +239,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 }
 ```
 
-Passing a texture into a shader is similar to [passing one into a normal material](../threejs-textures.html) but we need to set up the texture on the uniforms.
+Passing a texture into a shader is similar to [passing one into a normal material](threejs-textures.html) but we need to set up the texture on the uniforms.
 
 First we'll add the uniform for the texture to the shader. They're referred to as `sampler2D` in GLSL.
 
@@ -254,7 +254,7 @@ uniform float iTime;
 ...
 ```
 
-Then we can load a texture like we covered [here](../threejs-textures.html) and assign the uniform's value.
+Then we can load a texture like we covered [here](threejs-textures.html) and assign the uniform's value.
 
 ```js
 +const loader = new THREE.TextureLoader();
@@ -330,7 +330,7 @@ and we no longer need to set it at render time
 uniforms.iTime.value = time;
 ```
 
-Otherwise I copied back in the original camera and code that sets up 3 rotating cubes from [the article on responsiveness](../threejs-responsive.html). The result:
+Otherwise I copied back in the original camera and code that sets up 3 rotating cubes from [the article on responsiveness](threejs-responsive.html). The result:
 
 {{{example url="../threejs-shadertoy-as-texture.html" }}}
 

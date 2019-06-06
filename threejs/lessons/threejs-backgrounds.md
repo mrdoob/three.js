@@ -4,7 +4,7 @@ Description: How to add a background in THREE.js
 Most of the articles here use a solid color for a background.
 
 Adding as static background can be as simple as setting some CSS. Taking
-an example from [the article on making THREE.js responsive](../threejs-responsive.html)
+an example from [the article on making THREE.js responsive](threejs-responsive.html)
 we only need to change 2 things.
 
 We need to add some CSS to our canvas to set its background to an image
@@ -105,7 +105,7 @@ it, draw it from the inside. On each side of the cube put a texture (using
 texture coordinates) that looks like some image of the horizon. It's also often
 common to use a sky sphere or a sky dome with a texture drawn on it. You can
 probably figure that one out on your own. Just make a cube or sphere, 
-[apply a texture](../threejs-textures.html), mark it as `THREE.BackSide` so we 
+[apply a texture](threejs-textures.html), mark it as `THREE.BackSide` so we 
 render the inside instead of the outside, and either put it in your scene directly 
 or like above, or, make 2 scenes, a special one to draw the skybox/sphere/dome and the
 normal one to draw everything else. You'd use your normal `PerspectiveCamera` to
