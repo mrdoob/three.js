@@ -40,6 +40,7 @@ var files = [
 	{ path: 'effects/PeppersGhostEffect.js', dependencies: [], ignoreList: [] },
 	{ path: 'effects/StereoEffect.js', dependencies: [], ignoreList: [] },
 
+	{ path: 'exporters/ColladaExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
 	{ path: 'exporters/MMDExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
