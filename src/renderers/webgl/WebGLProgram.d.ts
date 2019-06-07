@@ -3,7 +3,6 @@ import { ShaderMaterial } from './../../materials/ShaderMaterial';
 import { WebGLShader } from './WebGLShader';
 import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLExtensions } from './WebGLExtensions';
-import { WebGLTextures } from './WebGLTextures';
 import { WebGLUniforms } from './WebGLUniforms';
 
 export class WebGLProgram {
@@ -15,8 +14,7 @@ export class WebGLProgram {
 		material: ShaderMaterial,
 		shader: WebGLShader,
 		parameters: WebGLRendererParameters,
-		capabilities: WebGLCapabilities,
-		textures: WebGLTextures
+		capabilities: WebGLCapabilities
 	);
 
 	id: number;
