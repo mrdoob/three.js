@@ -86,7 +86,7 @@ Object.assign( VideoTextureLoader.prototype, {
 
 		video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
 		video.setAttribute( 'playsinline', '' );
-		
+
 		var texture = new VideoTexture();
 
 		texture.image = video;
