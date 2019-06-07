@@ -563,7 +563,6 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 			} catch ( err ) {
 
-				userDefineColor = false;
 				ballColor = new THREE.Color( ballx, bally, ballz );
 
 			}
