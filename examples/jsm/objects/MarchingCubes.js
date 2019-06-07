@@ -571,7 +571,6 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 			} catch ( err ) {
 
-				userDefineColor = false;
 				ballColor = new Color( ballx, bally, ballz );
 
 			}
