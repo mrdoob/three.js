@@ -82,6 +82,7 @@ var files = [
 	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/LWOLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/KTXLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/MD2Loader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', dependencies: [], ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
 	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
@@ -107,6 +108,7 @@ var files = [
 
 	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
+	{ path: 'misc/MD2Character.js', dependencies: [ { name: 'MD2Loader', path: 'loaders/MD2Loader.js' } ], ignoreList: [] },
 	{ path: 'misc/Ocean.js', dependencies: [ { name: 'OceanShaders', path: 'shaders/OceanShaders.js' } ], ignoreList: [] },
 
 	{ path: 'modifiers/ExplodeModifier.js', dependencies: [], ignoreList: [] },
