@@ -75,7 +75,7 @@ var files = [
 	{ path: 'loaders/DDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/DRACOLoader.js', dependencies: [], ignoreList: [ 'LoadingManager' ] },
 	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
+	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.min.js' }, { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'Camera' ] },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },
@@ -98,7 +98,7 @@ var files = [
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/VTKLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VTKLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.min.js' } ], ignoreList: [] },
 
 	{ path: 'math/ColorConverter.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
