@@ -1,5 +1,5 @@
 import {
-  Object3D
+  Object3D,
   Plane,
   Vector3
 } from '../../../src/Three';
