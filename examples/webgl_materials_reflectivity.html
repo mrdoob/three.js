@@ -141,7 +141,10 @@
 	};
 
 				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+
+				new THREE.HDRCubeTextureLoader()
+					.setType( THREE.UnsignedByteType )
+					.load( hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
@@ -187,7 +190,6 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
 				stats = new Stats();

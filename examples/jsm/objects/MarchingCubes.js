@@ -5,9 +5,17 @@
  * Port of http://webglsamples.org/blob/blob.html
  */
 
-THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Color,
+	ImmediateRenderObject,
+	NoColors
+} from "../../../build/three.module.js";
 
-	THREE.ImmediateRenderObject.call( this, material );
+var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
+
+	ImmediateRenderObject.call( this, material );
 
 	var scope = this;
 
@@ -198,7 +206,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		// if cube is entirely in/out of the surface - bail, nothing to draw
 
-		var bits = THREE.edgeTable[ cubeindex ];
+		var bits = edgeTable[ cubeindex ];
 		if ( bits === 0 ) return 0;
 
 		var d = scope.delta,
@@ -350,7 +358,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		// here is where triangles are created
 
-		while ( THREE.triTable[ cubeindex + i ] != - 1 ) {
+		while ( triTable[ cubeindex + i ] != - 1 ) {
 
 			o1 = cubeindex + i;
 			o2 = o1 + 1;
@@ -360,9 +368,9 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 				vlist,
 				nlist,
 				clist,
-				3 * THREE.triTable[ o1 ],
-				3 * THREE.triTable[ o2 ],
-				3 * THREE.triTable[ o3 ],
+				3 * triTable[ o1 ],
+				3 * triTable[ o2 ],
+				3 * triTable[ o3 ],
 				renderCallback
 			);
 
@@ -523,7 +531,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 		}
 
-		if ( this.enableColors && this.material.vertexColors !== THREE.NoColors ) {
+		if ( this.enableColors && this.material.vertexColors !== NoColors ) {
 
 			this.hasColors = true;
 
@@ -545,25 +553,26 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		var sign = Math.sign( strength );
 		strength = Math.abs( strength );
 		var userDefineColor = ! ( colors === undefined || colors === null );
-		var ballColor = new THREE.Color( ballx, bally, ballz );
+		var ballColor = new Color( ballx, bally, ballz );
 		if ( userDefineColor ) {
 
 			try {
 
 				ballColor =
-					colors instanceof THREE.Color
+					colors instanceof Color
 						? colors
 						: Array.isArray( colors )
-							? new THREE.Color(
+							? new Color(
 								Math.min( Math.abs( colors[ 0 ] ), 1 ),
 								Math.min( Math.abs( colors[ 1 ] ), 1 ),
 								Math.min( Math.abs( colors[ 2 ] ), 1 )
 						  )
-							: new THREE.Color( colors );
+							: new Color( colors );
 
 			} catch ( err ) {
 
-				ballColor = new THREE.Color( ballx, bally, ballz );
+				userDefineColor = false;
+				ballColor = new Color( ballx, bally, ballz );
 
 			}
 
@@ -900,7 +909,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 	this.generateGeometry = function () {
 
 		console.warn(
-			"THREE.MarchingCubes: generateGeometry() now returns THREE.BufferGeometry"
+			"MarchingCubes: generateGeometry() now returns BufferGeometry"
 		);
 		return this.generateBufferGeometry();
 
@@ -917,7 +926,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 	this.generateBufferGeometry = function () {
 
-		var geo = new THREE.BufferGeometry();
+		var geo = new BufferGeometry();
 		var posArray = new Float32Array();
 		var normArray = new Float32Array();
 		var colorArray = new Float32Array();
@@ -954,13 +963,13 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 		this.render( geo_callback );
 
 		if ( this.hasPositions )
-			geo.addAttribute( "position", new THREE.BufferAttribute( posArray, 3 ) );
+			geo.addAttribute( "position", new BufferAttribute( posArray, 3 ) );
 		if ( this.hasNormals )
-			geo.addAttribute( "normal", new THREE.BufferAttribute( normArray, 3 ) );
+			geo.addAttribute( "normal", new BufferAttribute( normArray, 3 ) );
 		if ( this.hasColors )
-			geo.addAttribute( "color", new THREE.BufferAttribute( colorArray, 3 ) );
+			geo.addAttribute( "color", new BufferAttribute( colorArray, 3 ) );
 		if ( this.hasUvs )
-			geo.addAttribute( "uv", new THREE.BufferAttribute( uvArray, 2 ) );
+			geo.addAttribute( "uv", new BufferAttribute( uvArray, 2 ) );
 
 		return geo;
 
@@ -970,9 +979,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors )
 
 };
 
-THREE.MarchingCubes.prototype = Object.create( THREE.ImmediateRenderObject.prototype );
-THREE.MarchingCubes.prototype.constructor = THREE.MarchingCubes;
-
+MarchingCubes.prototype = Object.create( ImmediateRenderObject.prototype );
+MarchingCubes.prototype.constructor = MarchingCubes;
 
 /////////////////////////////////////
 // Marching cubes lookup tables
@@ -982,7 +990,7 @@ THREE.MarchingCubes.prototype.constructor = THREE.MarchingCubes;
 // http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/
 // who in turn got them from Cory Gene Bloyd.
 
-THREE.edgeTable = new Int32Array( [
+var edgeTable = new Int32Array( [
 	0x0, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
 	0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
 	0x190, 0x99, 0x393, 0x29a, 0x596, 0x49f, 0x795, 0x69c,
@@ -1016,7 +1024,7 @@ THREE.edgeTable = new Int32Array( [
 	0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c,
 	0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0 ] );
 
-THREE.triTable = new Int32Array( [
+var triTable = new Int32Array( [
 	- 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
 	0, 8, 3, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
 	0, 1, 9, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
@@ -1273,3 +1281,5 @@ THREE.triTable = new Int32Array( [
 	0, 9, 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
 	0, 3, 8, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
 	- 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1 ] );
+
+export { MarchingCubes, edgeTable, triTable };
