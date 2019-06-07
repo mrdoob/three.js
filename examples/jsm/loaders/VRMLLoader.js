@@ -526,7 +526,7 @@ var VRMLLoader = ( function () {
 
 					var node = nodes[ i ];
 
-					buildNodeMap( node, scene );
+					buildNodeMap( node );
 
 				}
 
