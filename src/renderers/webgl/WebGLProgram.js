@@ -738,31 +738,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	};
 
-	// DEPRECATED
-
-	Object.defineProperties( this, {
-
-		uniforms: {
-			get: function () {
-
-				console.warn( 'THREE.WebGLProgram: .uniforms is now .getUniforms().' );
-				return this.getUniforms();
-
-			}
-		},
-
-		attributes: {
-			get: function () {
-
-				console.warn( 'THREE.WebGLProgram: .attributes is now .getAttributes().' );
-				return this.getAttributes();
-
-			}
-		}
-
-	} );
-
-
 	//
 
 	this.name = shader.name;
