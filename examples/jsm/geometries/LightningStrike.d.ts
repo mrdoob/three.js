@@ -3,8 +3,8 @@ import {
 } from '../../../src/Three';
 
 export interface RandomGenerator {
-  random(void): number;
-  getSeed(void): number;
+  random(): number;
+  getSeed(): number;
   setSeed(seed: number): void;
 }
 
@@ -47,38 +47,38 @@ export interface LightningSubray {
 }
 
 export interface RayParameters {
-  sourceOffset: Vector3 | undefined;
-  destOffset: Vector3 | undefined;
+  sourceOffset?: Vector3;
+  destOffset?: Vector3;
 
-  timeScale: number | undefined;
-  roughness: number | undefined;
-  straightness: number | undefined;
+  timeScale?: number;
+  roughness?: number;
+  straightness?: number;
 
-  up0: Vector3 | undefined;
-  up1: Vector3 | undefined;
-  radius0: number | undefined;
-  radius1: number | undefined;
-  radius0Factor : number | undefined;
-  radius1Factor : number | undefined;
-  minRadius : number | undefined;
+  up0?: Vector3;
+  up1?: Vector3;
+  radius0?: number;
+  radius1?: number;
+  radius0Factor? : number;
+  radius1Factor? : number;
+  minRadius? : number;
 
-  isEternal: boolean | undefined;
-  birthTime: number | undefined;
-  deathTime: number | undefined;
-  propagationTimeFactor: number | undefined;
-  vanishingTimeFactor: number | undefined;
-  subrayPeriod: number | undefined;
-  subrayDutyCycle: number | undefined;
+  isEternal?: boolean;
+  birthTime?: number;
+  deathTime?: number;
+  propagationTimeFactor?: number;
+  vanishingTimeFactor?: number;
+  subrayPeriod?: number;
+  subrayDutyCycle?: number;
 
-  maxIterations: number | undefined;
-  isStatic: boolean | undefined;
-  ramification: number | undefined;
-  maxSubrayRecursion: number | undefined;
-  recursionProbability: number | undefined;
-  generateUVs: boolean | undefined;
+  maxIterations?: number;
+  isStatic?: boolean;
+  ramification?: number;
+  maxSubrayRecursion?: number;
+  recursionProbability?: number;
+  generateUVs?: boolean;
 
-  randomGenerator: RandomGenerator | undefined;
-  noiseSeed: number | undefined;
+  randomGenerator?: RandomGenerator;
+  noiseSeed?: number;
 
   onDecideSubrayCreation?: (segment: LightningSegment, lightningStrike: LightningStrike) => void;
   onSubrayCreation?: (segment: LightningSegment, parentSubray: LightningSubray, childSubray: LightningSubray, lightningStrike: LightningStrike) => void;
@@ -101,5 +101,5 @@ export class LightningStrike {
   update(time: number): void;
 
   copy(source: LightningStrike): LightningStrike;
-  clone(void): LightningStrike;
+  clone(): LightningStrike;
 }

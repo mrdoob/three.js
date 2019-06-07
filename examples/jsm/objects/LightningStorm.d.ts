@@ -3,23 +3,25 @@ import {
   Vector3
 } from '../../../src/Three';
 
+import { LightningStrike, RayParameters } from '../geometries/LightningStrike';
+
 export interface StormParams {
-  size: number | undefined;
-  minHeight: number | undefined;
-  maxHeight: number | undefined;
-  maxSlope: number | undefined;
+  size?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  maxSlope?: number;
 
-  maxLightnings: number | undefined;
+  maxLightnings?: number;
 
-  lightningMinPeriod: number | undefined;
-  lightningMaxPeriod: number | undefined;
-  lightningMinDuration: number | undefined;
-  lightningMaxDuration: number | undefined;
+  lightningMinPeriod?: number;
+  lightningMaxPeriod?: number;
+  lightningMinDuration?: number;
+  lightningMaxDuration?: number;
 
-  lightningParameters: RayParameters | undefined;
-  lightningMaterial: Material | undefined;
+  lightningParameters?: RayParameters;
+  lightningMaterial?: Material;
 
-  isEternal: boolean | undefined;
+  isEternal?: boolean;
 
   onRayPosition?: (source: Vector3, dest: Vector3) => void;
   onLightningDown?: (lightning: LightningStrike) => void;
