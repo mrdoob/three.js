@@ -4,7 +4,10 @@ import {
   Texture,
   DataTexture,
   Material,
-  ShaderMaterial
+  ShaderMaterial,
+  Wrapping,
+  TextureFilter
+
 } from '../../../src/Three';
 
 export interface Variable {
@@ -25,14 +28,14 @@ export class GPUComputationRenderer {
   addVariable(variableName: string, computeFragmentShader: string, initialValueTexture: Texture): Variable;
   setVariableDependencies(variable: Variable, dependencies: Variable[] | null): void;
 
-  init(void): string | null;
-  compute(void): void;
+  init(): string | null;
+  compute(): void;
 
   getCurrentRenderTarget(variable: Variable): RenderTarget;
   getAlternateRenderTarget(variable: Variable): RenderTarget;
   addResolutionDefine(materialShader: ShaderMaterial): void;
-  createRenderTarget(sizeXTexture: number, sizeYTexture: number, wrapS: number, wrapT: number, minFilter: number, magFilter: number): RenderTarget;
-  createTexture(void): DataTexture;
+  createRenderTarget(sizeXTexture: number, sizeYTexture: number, wrapS: Wrapping, wrapT: number, minFilter: TextureFilter, magFilter: TextureFilter): RenderTarget;
+  createTexture(): DataTexture;
   renderTexture(input: Texture, output: Texture): void;
   doRenderTarget( material: Material, output: RenderTarget ): void;
 }
