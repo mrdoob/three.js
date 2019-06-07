@@ -10,331 +10,278 @@
 // http://cg.alexandra.dk/tag/spring-mass-system/
 // Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
 
-var DAMPING = 0.03;
-var DRAG = 1 - DAMPING;
-var MASS = 0.1;
-var restDistance = 25;
+THREE.Cloth = ( function() {
 
-var xSegs = 10;
-var ySegs = 10;
+	var pos = new THREE.Vector3();
+	var pos2 = new THREE.Vector3();
+	var acc = new THREE.Vector3();
+	var tmp = new THREE.Vector3();
 
-var clothFunction = plane( restDistance * xSegs, restDistance * ySegs );
+	var timestep = 18 / 1000;
+	var timestepSq = timestep * timestep;
 
-var cloth = new Cloth( xSegs, ySegs );
+	var Cloth = function( width, height, xSegs, ySegs, material ) {
 
-var GRAVITY = 981 * 1.4;
-var gravity = new THREE.Vector3( 0, - GRAVITY, 0 ).multiplyScalar( MASS );
+		this.width = width  || 1;
+		this.height = height  || 1;
+		this.xSegs = xSegs  || 10;
+		this.ySegs = ySegs  || 10;
 
+		this.geometry = createGeometry( width, height, xSegs, ySegs )
 
-var TIMESTEP = 18 / 1000;
-var TIMESTEP_SQ = TIMESTEP * TIMESTEP;
+		material = material || new THREE.MeshBasicMaterial();
 
-var pins = [];
+		THREE.Mesh.call( this, this.geometry, material );
 
+		// physics constants
 
-var wind = true;
-var windStrength = 2;
-var windForce = new THREE.Vector3( 0, 0, 0 );
+		this.damping = 0.03;
+		this.drag = 1 - this.damping;
+		this.mass = 1;
+		this.massInv = 1 / this.mass;
 
-var ballPosition = new THREE.Vector3( 0, - 45, 0 );
-var ballSize = 60; //40
+		this.gravity = - 9.81 * this.mass;
+		this.gravityVector = new THREE.Vector3();
 
-var tmpForce = new THREE.Vector3();
+		this.force = new THREE.Vector3( 0, 0, 0 );
 
-var lastTime;
+		// constraints
+		this.pins = [];
+		this.groundPos = 0;
 
+		this.positions = this.geometry.attributes.position;
+		this.count = this.positions.count;
 
-function plane( width, height ) {
+		this.prevPositions = this.geometry.attributes.position.clone();
+		this.origPositions = this.geometry.attributes.position.clone();
 
-	return function ( u, v, target ) {
-
-		var x = ( u - 0.5 ) * width;
-		var y = ( v + 0.5 ) * height;
-		var z = 0;
-
-		target.set( x, y, z );
-
-	};
-
-}
-
-function Particle( x, y, z, mass ) {
-
-	this.position = new THREE.Vector3();
-	this.previous = new THREE.Vector3();
-	this.original = new THREE.Vector3();
-	this.a = new THREE.Vector3( 0, 0, 0 ); // acceleration
-	this.mass = mass;
-	this.invMass = 1 / mass;
-	this.tmp = new THREE.Vector3();
-	this.tmp2 = new THREE.Vector3();
-
-	// init
-
-	clothFunction( x, y, this.position ); // position
-	clothFunction( x, y, this.previous ); // previous
-	clothFunction( x, y, this.original );
-
-}
-
-// Force -> Acceleration
-
-Particle.prototype.addForce = function ( force ) {
-
-	this.a.add(
-		this.tmp2.copy( force ).multiplyScalar( this.invMass )
-	);
-
-};
+		this.acceleration = new THREE.BufferAttribute( new Float32Array( this.count * 3 ), 3 );
 
 
-// Performs Verlet integration
+		// create constraints
+		this.constraints = [];
 
-Particle.prototype.integrate = function ( timesq ) {
+		for ( var v = 0; v < this.ySegs; v ++ ) {
 
-	var newPos = this.tmp.subVectors( this.position, this.previous );
-	newPos.multiplyScalar( DRAG ).add( this.position );
-	newPos.add( this.a.multiplyScalar( timesq ) );
+			for ( var u = 0; u < this.xSegs; u ++ ) {
 
-	this.tmp = this.previous;
-	this.previous = this.position;
-	this.position = newPos;
+				this.constraints.push(
+					[
+						getIndex( u, v, this.xSegs ),
+						getIndex( u, v + 1, this.xSegs ),
+					],
+					[
+						getIndex( u, v, this.xSegs ),
+						getIndex( u + 1, v, this.xSegs ),
+					]
+				);
 
-	this.a.set( 0, 0, 0 );
-
-};
-
-
-var diff = new THREE.Vector3();
-
-function satisfyConstraints( p1, p2, distance ) {
-
-	diff.subVectors( p2.position, p1.position );
-	var currentDist = diff.length();
-	if ( currentDist === 0 ) return; // prevents division by 0
-	var correction = diff.multiplyScalar( 1 - distance / currentDist );
-	var correctionHalf = correction.multiplyScalar( 0.5 );
-	p1.position.add( correctionHalf );
-	p2.position.sub( correctionHalf );
-
-}
-
-
-function Cloth( w, h ) {
-
-	w = w || 10;
-	h = h || 10;
-	this.w = w;
-	this.h = h;
-
-	var particles = [];
-	var constraints = [];
-
-	var u, v;
-
-	// Create particles
-	for ( v = 0; v <= h; v ++ ) {
-
-		for ( u = 0; u <= w; u ++ ) {
-
-			particles.push(
-				new Particle( u / w, v / h, 0, MASS )
-			);
+			}
 
 		}
 
-	}
+		for ( u = this.xSegs, v = 0; v < this.ySegs; v ++ ) {
 
-	// Structural
-
-	for ( v = 0; v < h; v ++ ) {
-
-		for ( u = 0; u < w; u ++ ) {
-
-			constraints.push( [
-				particles[ index( u, v ) ],
-				particles[ index( u, v + 1 ) ],
-				restDistance
+			this.constraints.push( [
+				getIndex( u, v, this.xSegs ),
+				getIndex( u, v + 1, this.xSegs )
 			] );
 
-			constraints.push( [
-				particles[ index( u, v ) ],
-				particles[ index( u + 1, v ) ],
-				restDistance
+		}
+
+		for ( v = this.ySegs, u = 0; u < this.xSegs; u ++ ) {
+
+			this.constraints.push( [
+				getIndex( u, v, this.xSegs ),
+				getIndex( u + 1, v, this.xSegs )
 			] );
 
 		}
 
 	}
 
-	for ( u = w, v = 0; v < h; v ++ ) {
+	Cloth.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
 
-		constraints.push( [
-			particles[ index( u, v ) ],
-			particles[ index( u, v + 1 ) ],
-			restDistance
+		constructor: Cloth,
 
-		] );
+		updateGeometry: function () {
 
-	}
+			for ( var i = 0, il = this.particles.length; i < il; i ++ ) {
 
-	for ( v = h, u = 0; u < w; u ++ ) {
+				var v = this.particles[ i ].position;
 
-		constraints.push( [
-			particles[ index( u, v ) ],
-			particles[ index( u + 1, v ) ],
-			restDistance
-		] );
-
-	}
-
-
-	// While many systems use shear and bend springs,
-	// the relaxed constraints model seems to be just fine
-	// using structural springs.
-	// Shear
-	// var diagonalDist = Math.sqrt(restDistance * restDistance * 2);
-
-
-	// for (v=0;v<h;v++) {
-	// 	for (u=0;u<w;u++) {
-
-	// 		constraints.push([
-	// 			particles[index(u, v)],
-	// 			particles[index(u+1, v+1)],
-	// 			diagonalDist
-	// 		]);
-
-	// 		constraints.push([
-	// 			particles[index(u+1, v)],
-	// 			particles[index(u, v+1)],
-	// 			diagonalDist
-	// 		]);
-
-	// 	}
-	// }
-
-
-	this.particles = particles;
-	this.constraints = constraints;
-
-	function index( u, v ) {
-
-		return u + v * ( w + 1 );
-
-	}
-
-	this.index = index;
-
-}
-
-function simulate( time ) {
-
-	if ( ! lastTime ) {
-
-		lastTime = time;
-		return;
-
-	}
-
-	var i, il, particles, particle, pt, constraints, constraint;
-
-	// Aerodynamics forces
-
-	if ( wind ) {
-
-		var indx;
-		var normal = new THREE.Vector3();
-		var indices = clothGeometry.index;
-		var normals = clothGeometry.attributes.normal;
-
-		particles = cloth.particles;
-
-		for ( i = 0, il = indices.count; i < il; i += 3 ) {
-
-			for ( j = 0; j < 3; j ++ ) {
-
-				indx = indices.getX( i + j );
-				normal.fromBufferAttribute( normals, indx )
-				tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( windForce ) );
-				particles[ indx ].addForce( tmpForce );
+				this.geometry.attributes.position.setXYZ( i, v.x, v.y, v.z );
 
 			}
 
-		}
+			this.geometry.attributes.position.needsUpdate = true;
 
-	}
+			this.geometry.computeVertexNormals();
 
-	for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
+		},
 
-		particle = particles[ i ];
-		particle.addForce( gravity );
+		addForce( force ) {
 
-		particle.integrate( TIMESTEP_SQ );
+			force.multiplyScalar( 1 / this.mass );
 
-	}
+			for( var i = 0; i < this.count; i++) {
 
-	// Start Constraints
-
-	constraints = cloth.constraints;
-	il = constraints.length;
-
-	for ( i = 0; i < il; i ++ ) {
-
-		constraint = constraints[ i ];
-		satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
-
-	}
-
-	// Ball Constraints
-
-	ballPosition.z = - Math.sin( Date.now() / 600 ) * 90; //+ 40;
-	ballPosition.x = Math.cos( Date.now() / 400 ) * 70;
-
-	if ( sphere.visible ) {
-
-		for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
-
-			particle = particles[ i ];
-			var pos = particle.position;
-			diff.subVectors( pos, ballPosition );
-			if ( diff.length() < ballSize ) {
-
-				// collided
-				diff.normalize().multiplyScalar( ballSize );
-				pos.copy( ballPosition ).add( diff );
+				this.acceleration.setXY(
+					i,
+					this.acceleration.getX( i ) + force.x,
+					this.acceleration.getY( i ) + force.y
+				);
 
 			}
 
+		},
+
+		addGravity: function() {
+
+			this.gravityVector.set( 0, -this.gravity, 0 ).applyQuaternion( this.quaternion );
+
+			this.addForce( this.gravityVector );
+
+		},
+
+		integrate() {
+
+			for( var i = 0; i < this.count; i++) {
+
+				pos.fromBufferAttribute( this.positions, i );
+
+				var x = this.positions.getX( i );
+				var y = this.positions.getY( i );
+
+				acc.fromBufferAttribute( this.acceleration, i ).multiplyScalar( timestepSq );
+
+				tmp.set(
+					x - this.prevPositions.getX( i ),
+					y - this.prevPositions.getY( i ),
+					0,
+				).multiplyScalar( this.drag ).add( pos ).add( acc );
+
+				this.prevPositions.setXY( i, x, y );
+				this.positions.setXY( i, tmp.x, tmp.y );
+				this.acceleration.setXY( i, 0, 0 );
+
+			}
+
+		},
+
+		applyConstraints: function() {
+
+			for ( i = 0, l = this.constraints.length; i < l; i ++ ) {
+
+				constraint = this.constraints[ i ];
+
+				pos.fromBufferAttribute( this.positions, constraint[ 0 ] );
+				pos2.fromBufferAttribute( this.positions, constraint[ 1 ] );
+
+				tmp.subVectors( pos2, pos );
+
+				var distance = this.width / this.xSegs;
+				var currentDist = tmp.length();
+				if ( currentDist === 0 ) return; // prevents division by 0
+				tmp.multiplyScalar( 1 - distance / currentDist ).multiplyScalar( 0.5 );
+
+				pos.add( tmp );
+				pos2.sub( tmp );
+
+				this.positions.setXY( constraint[ 0 ], pos.x, pos.y );
+				this.positions.setXY( constraint[ 1 ], pos2.x, pos2.y );
+
+			}
+
+		},
+
+		applyPinConstraints: function() {
+
+			var pos = new THREE.Vector3();
+
+			for ( i = 0; i < this.pins.length; i ++ ) {
+
+				var index = this.pins[ i ];
+				pos.fromBufferAttribute( this.origPositions, i );
+				this.positions.setXY( index, pos.x, pos.y );
+				this.prevPositions.setXY( index, pos.x, pos.y );
+
+			}
+
+		},
+
+		simulate: function ( time ) {
+
+			// Aerodynamics forces
+
+			// wind force
+			// var indx;
+			// var normal = new THREE.Vector3();
+			// var indices = this.geometry.index;
+			// var indicesCount = this.geometry.index.count;
+			// var normals = this.geometry.attributes.normal;
+
+			// for ( i = 0; i < indicesCount; i += 3 ) {
+
+			// 	for ( j = 0; j < 3; j ++ ) {
+
+			// 		indx = indices.getX( i + j );
+			// 		normal.fromBufferAttribute( normals, indx )
+			// 		tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( this.force ) );
+			// 		this.particles[ indx ].addForce( tmpForce, this.mass );
+
+			// 	}
+
+			// }
+
+			this.addGravity();
+
+
+
+
+			// Floor Constraints
+
+			// for ( i = 0; i < particlesCount; i ++ ) {
+
+			// 	particle = this.particles[ i ];
+			// 	var pos = particle.position;
+			// 	if ( pos.y < this.groundPos  ) {
+
+			// 		pos.y = this.groundPos;
+
+			// 	}
+
+			// }
+
+			this.applyConstraints();
+			this.applyPinConstraints();
+
+			this.integrate();
+
+			this.positions.needsUpdate = true;
+
 		}
 
-	}
+	} );
 
+	function createGeometry( width, height, wSegs, hSegs ) {
 
-	// Floor Constraints
+		var geo = new THREE.PlaneBufferGeometry( width, height, wSegs, hSegs );
+		geo.translate( 0, - width, 0 );
+		geo.rotateX( Math.PI );
 
-	for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
+		geo.attributes.position.setDynamic( true );
 
-		particle = particles[ i ];
-		pos = particle.position;
-		if ( pos.y < - 250 ) {
-
-			pos.y = - 250;
-
-		}
+		return geo;
 
 	}
 
-	// Pin Constraints
+	function getIndex( u, v, xSegs ) {
 
-	for ( i = 0, il = pins.length; i < il; i ++ ) {
-
-		var xy = pins[ i ];
-		var p = particles[ xy ];
-		p.position.copy( p.original );
-		p.previous.copy( p.original );
+		return u + v * ( xSegs + 1 );
 
 	}
 
+	return Cloth;
 
-}
+} )()
