@@ -88,9 +88,11 @@
 				scene.add( planeMesh );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+
 				hdrCubeMap = new THREE.HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.load( THREE.UnsignedByteType, hdrUrls, function () {
+					.setType( THREE.UnsignedByteType )
+					.load( hdrUrls, function () {
 
 						var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 						pmremGenerator.update( renderer );
@@ -113,7 +115,7 @@
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
 
-						ldrCubeMap.encoding = THREE.GammaEncoding;
+						ldrCubeMap.encoding = THREE.sRGBEncoding;
 
 						var pmremGenerator = new THREE.PMREMGenerator( ldrCubeMap );
 						pmremGenerator.update( renderer );
@@ -158,7 +160,6 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = THREE.ReinhardToneMapping;
-				renderer.gammaInput = true; // ???
 				renderer.gammaOutput = true;
 
 				stats = new Stats();
