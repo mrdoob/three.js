@@ -75,7 +75,9 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+				new THREE.HDRCubeTextureLoader()
+					.setType( THREE.UnsignedByteType )
+					.load( hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
@@ -190,7 +192,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.toneMapping = THREE.Uncharted2ToneMapping;
 				renderer.toneMappingExposure = 0.75;

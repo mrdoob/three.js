@@ -7,33 +7,23 @@
  */
 
 import {
-	AddEquation,
-	AlwaysDepth,
 	AnimationClip,
-	BackSide,
 	Bone,
 	BufferAttribute,
 	BufferGeometry,
-	Camera,
 	ClampToEdgeWrapping,
 	Color,
 	DefaultLoadingManager,
 	DirectionalLight,
 	DoubleSide,
-	DstAlphaFactor,
-	DstColorFactor,
-	EqualDepth,
 	FileLoader,
 	FrontSide,
-	GreaterEqualDepth,
 	Group,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	Interpolant,
 	InterpolateDiscrete,
 	InterpolateLinear,
-	LessDepth,
-	LessEqualDepth,
 	Line,
 	LineBasicMaterial,
 	LineLoop,
@@ -45,7 +35,6 @@ import {
 	LoaderUtils,
 	Material,
 	Math as _Math,
-	Matrix3,
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
@@ -54,15 +43,8 @@ import {
 	NearestFilter,
 	NearestMipMapLinearFilter,
 	NearestMipMapNearestFilter,
-	NeverDepth,
-	NotEqualDepth,
 	NumberKeyframeTrack,
 	Object3D,
-	OneFactor,
-	OneMinusDstAlphaFactor,
-	OneMinusDstColorFactor,
-	OneMinusSrcAlphaFactor,
-	OneMinusSrcColorFactor,
 	OrthographicCamera,
 	PerspectiveCamera,
 	PointLight,
@@ -73,28 +55,20 @@ import {
 	RGBAFormat,
 	RGBFormat,
 	RepeatWrapping,
-	ReverseSubtractEquation,
 	Scene,
 	ShaderLib,
 	ShaderMaterial,
 	Skeleton,
 	SkinnedMesh,
 	SpotLight,
-	SrcAlphaFactor,
-	SrcAlphaSaturateFactor,
-	SrcColorFactor,
-	SubtractEquation,
 	Texture,
 	TextureLoader,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	UniformsUtils,
 	Vector2,
-	Vector3,
-	Vector4,
 	VectorKeyframeTrack,
 	VertexColors,
-	ZeroFactor,
 	sRGBEncoding
 } from "../../../build/three.module.js";
 
@@ -160,9 +134,9 @@ var GLTFLoader = ( function () {
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
-			if ( this.options.crossOrigin === 'use-credentials' ) {
+			if ( scope.crossOrigin === 'use-credentials' ) {
 
-				this.fileLoader.setWithCredentials( true );
+				loader.setWithCredentials( true );
 
 			}
 
@@ -275,11 +249,11 @@ var GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.KHR_MATERIALS_UNLIT:
-							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension( json );
+							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
 							break;
 
 						case EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS:
-							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension( json );
+							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
 							break;
 
 						case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
@@ -291,7 +265,7 @@ var GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
-							extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension( json );
+							extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension();
 							break;
 
 						default:
@@ -511,8 +485,6 @@ var GLTFLoader = ( function () {
 	};
 
 	/* BINARY EXTENSION */
-
-	var BINARY_EXTENSION_BUFFER_NAME = 'binary_glTF';
 	var BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
 	var BINARY_EXTENSION_HEADER_LENGTH = 12;
 	var BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4E4F534A, BIN: 0x004E4942 };
@@ -1197,17 +1169,6 @@ var GLTFLoader = ( function () {
 		UNSIGNED_SHORT: 5123
 	};
 
-	var WEBGL_TYPE = {
-		5126: Number,
-		//35674: THREE.Matrix2,
-		35675: Matrix3,
-		35676: Matrix4,
-		35664: Vector2,
-		35665: Vector3,
-		35666: Vector4,
-		35678: Texture
-	};
-
 	var WEBGL_COMPONENT_TYPES = {
 		5120: Int8Array,
 		5121: Uint8Array,
@@ -1230,48 +1191,6 @@ var GLTFLoader = ( function () {
 		33071: ClampToEdgeWrapping,
 		33648: MirroredRepeatWrapping,
 		10497: RepeatWrapping
-	};
-
-	var WEBGL_SIDES = {
-		1028: BackSide, // Culling front
-		1029: FrontSide // Culling back
-		//1032: THREE.NoSide   // Culling front and back, what to do?
-	};
-
-	var WEBGL_DEPTH_FUNCS = {
-		512: NeverDepth,
-		513: LessDepth,
-		514: EqualDepth,
-		515: LessEqualDepth,
-		516: GreaterEqualDepth,
-		517: NotEqualDepth,
-		518: GreaterEqualDepth,
-		519: AlwaysDepth
-	};
-
-	var WEBGL_BLEND_EQUATIONS = {
-		32774: AddEquation,
-		32778: SubtractEquation,
-		32779: ReverseSubtractEquation
-	};
-
-	var WEBGL_BLEND_FUNCS = {
-		0: ZeroFactor,
-		1: OneFactor,
-		768: SrcColorFactor,
-		769: OneMinusSrcColorFactor,
-		770: SrcAlphaFactor,
-		771: OneMinusSrcAlphaFactor,
-		772: DstAlphaFactor,
-		773: OneMinusDstAlphaFactor,
-		774: DstColorFactor,
-		775: OneMinusDstColorFactor,
-		776: SrcAlphaSaturateFactor
-		// The followings are not supported by Three.js yet
-		//32769: CONSTANT_COLOR,
-		//32770: ONE_MINUS_CONSTANT_COLOR,
-		//32771: CONSTANT_ALPHA,
-		//32772: ONE_MINUS_CONSTANT_COLOR
 	};
 
 	var WEBGL_TYPE_SIZES = {
@@ -1307,15 +1226,6 @@ var GLTFLoader = ( function () {
 		                        // keyframe track will be initialized with a default interpolation type, then modified.
 		LINEAR: InterpolateLinear,
 		STEP: InterpolateDiscrete
-	};
-
-	var STATES_ENABLES = {
-		2884: 'CULL_FACE',
-		2929: 'DEPTH_TEST',
-		3042: 'BLEND',
-		3089: 'SCISSOR_TEST',
-		32823: 'POLYGON_OFFSET_FILL',
-		32926: 'SAMPLE_ALPHA_TO_COVERAGE'
 	};
 
 	var ALPHA_MODES = {
@@ -1609,19 +1519,6 @@ var GLTFLoader = ( function () {
 			}
 
 		}
-
-	}
-	function isObjectEqual( a, b ) {
-
-		if ( Object.keys( a ).length !== Object.keys( b ).length ) return false;
-
-		for ( var key in a ) {
-
-			if ( a[ key ] !== b[ key ] ) return false;
-
-		}
-
-		return true;
 
 	}
 
@@ -2673,7 +2570,6 @@ var GLTFLoader = ( function () {
 
 		var parser = this;
 		var json = this.json;
-		var extensions = this.extensions;
 
 		var meshDef = json.meshes[ meshIndex ];
 		var primitives = meshDef.primitives;
@@ -2800,7 +2696,7 @@ var GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#cameras
 	 * @param {number} cameraIndex
-	 * @return {Promise<Camera>}
+	 * @return {Promise<THREE.Camera>}
 	 */
 	GLTFParser.prototype.loadCamera = function ( cameraIndex ) {
 
@@ -2973,12 +2869,52 @@ var GLTFLoader = ( function () {
 
 				}
 
+				var outputArray = outputAccessor.array;
+
+				if ( outputAccessor.normalized ) {
+
+					var scale;
+
+					if ( outputArray.constructor === Int8Array ) {
+
+						scale = 1 / 127;
+
+					} else if ( outputArray.constructor === Uint8Array ) {
+
+						scale = 1 / 255;
+
+					} else if ( outputArray.constructor == Int16Array ) {
+
+						scale = 1 / 32767;
+
+					} else if ( outputArray.constructor === Uint16Array ) {
+
+						scale = 1 / 65535;
+
+					} else {
+
+						throw new Error( 'THREE.GLTFLoader: Unsupported output accessor component type.' );
+
+					}
+
+					var scaled = new Float32Array( outputArray.length );
+
+					for ( var j = 0, jl = outputArray.length; j < jl; j ++ ) {
+
+						scaled[j] = outputArray[j] * scale;
+
+					}
+
+					outputArray = scaled;
+
+				}
+
 				for ( var j = 0, jl = targetNames.length; j < jl; j ++ ) {
 
 					var track = new TypedKeyframeTrack(
 						targetNames[ j ] + '.' + PATH_PROPERTIES[ target.path ],
 						inputAccessor.array,
-						outputAccessor.array,
+						outputArray,
 						interpolation
 					);
 
