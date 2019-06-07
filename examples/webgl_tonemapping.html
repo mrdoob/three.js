@@ -145,13 +145,15 @@
 				// Materials
 				var hdrpath = "textures/cube/pisaHDR/";
 				var hdrformat = '.hdr';
-				var hdrurls = [
+				var hdrUrls = [
 					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
 					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
+				new THREE.HDRCubeTextureLoader()
+					.setType( THREE.UnsignedByteType )
+					.load( hdrUrls, function ( hdrCubeMap ) {
 
 					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
 					pmremGenerator.update( renderer );
