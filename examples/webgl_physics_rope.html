@@ -3,31 +3,16 @@
 		<title>Amjs softbody rope demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-				body {
-					color: #61443e;
-					font-family:Monospace;
-					font-size:13px;
-					text-align:center;
-
-					background-color: #bfd1e5;
-					margin: 0px;
-					overflow: hidden;
-				}
-
-				#info {
-					position: absolute;
-					top: 0px; width: 100%;
-					padding: 5px;
-				}
-
-				a { color: #a06851; }
-
+			body {
+				color: #333;
+			}
 		</style>
 	</head>
 	<body>
 	<div id="info">Ammo.js physics soft body rope demo<br>Press Q or A to move the arm.</div>
-	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<div id="container"></div>
 
 	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
@@ -42,7 +27,6 @@
 		if ( WEBGL.isWebGLAvailable() === false ) {
 
 			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-			document.getElementById( 'container' ).innerHTML = "";
 
 		}
 
@@ -64,12 +48,18 @@
 		var margin = 0.05;
 		var hinge;
 		var rope;
-		var transformAux1 = new Ammo.btTransform();
+		var transformAux1;
 
 		var armMovement = 0;
 
-		init();
-		animate();
+		Ammo().then( function( AmmoLib ) {
+
+			Ammo = AmmoLib;
+
+			init();
+			animate();
+
+		} );
 
 		function init() {
 
@@ -94,14 +84,15 @@
 
 			camera.position.set( - 7, 5, 8 );
 
-			controls = new THREE.OrbitControls( camera );
-			controls.target.set( 0, 2, 0 );
-			controls.update();
-
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
+			container.appendChild( renderer.domElement );
+
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 2, 0 );
+			controls.update();
 
 			textureLoader = new THREE.TextureLoader();
 
@@ -124,10 +115,6 @@
 			light.shadow.mapSize.y = 1024;
 
 			scene.add( light );
-
-			container.innerHTML = "";
-
-			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
 			stats.domElement.style.position = 'absolute';
@@ -152,6 +139,8 @@
 			physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
 			physicsWorld.setGravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
 			physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
+
+			transformAux1 = new Ammo.btTransform();
 
 		}
 

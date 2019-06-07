@@ -1,0 +1,14 @@
+# http://editorconfig.org
+
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{js,ts,html}]
+charset = utf-8
+indent_style = tab
+
+[*.{js,ts}]
+trim_trailing_whitespace = true

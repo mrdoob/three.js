@@ -12,11 +12,31 @@
 
 		<p class="desc">
 			Represents a box or cube in 3D space. The main purpose of this is to represent
-			the [link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes]
-			for objects.
+			the world-axis-aligned bounding boxes for objects. 
 		</p>
 
+		
+		<h2>Example</h2>
 
+		<code>
+		// Creating the object whose bounding box we want to compute
+		var sphereObject = new THREE.Mesh( 
+			new THREE.SphereGeometry(), 
+			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		);
+		// Creating the actual bounding box with Box3
+		sphereObject.geometry.computeBoundingBox();
+		var box = sphereObject.geometry.boundingBox.clone();
+
+		// ...
+		
+		// In the animation loop, to keep the bounding box updated after move/rotate/scale operations
+		sphereObject.updateMatrixWorld( true );
+		box.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+		</code>
+
+
+		
 		<h2>Constructor</h2>
 
 
@@ -242,15 +262,6 @@
 		[page:BufferAttribute attribute] - A buffer attribute of position data that the resulting box will envelop.<br /><br />
 
 		Sets the upper and lower bounds of this box to include all of the data in [page:BufferAttribute attribute].
-		</p>
-
-		<h3>[method:Box3 setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )</h3>
-		<p>
-		[page:Vector3 center] - Desired center position of the box ([page:Vector3]). <br>
-		[page:Vector3 size] - Desired x, y and z dimensions of the box ([page:Vector3]).<br /><br />
-
-		Centers this box on [page:Vector3 center] and sets this box's width and height to the values specified
-		in [page:Vector3 size].
 		</p>
 
 		<h3>[method:Box3 setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] ) [param:Box3 this]</h3>

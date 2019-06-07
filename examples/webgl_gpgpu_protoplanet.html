@@ -4,33 +4,11 @@
 		<title>three.js webgl - gpgpu - protoplanet</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				text-align:center;
-				cursor: pointer;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color: #ffffff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
 			#warning {
 				color: #ff0000;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -47,7 +25,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/GPUComputationRenderer.js"></script>
+		<script src="js/misc/GPUComputationRenderer.js"></script>
 
 
 		<!-- Fragment shader for protoplanet's position -->
@@ -390,8 +368,8 @@
 
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				velocityUniforms.gravityConstant = { value: 0.0 };
-				velocityUniforms.density = { value: 0.0 };
+				velocityUniforms[ "gravityConstant" ] = { value: 0.0 };
+				velocityUniforms[ "density" ] = { value: 0.0 };
 
 				var error = gpuCompute.init();
 
@@ -450,10 +428,10 @@
 				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
-					texturePosition: { value: null },
-					textureVelocity: { value: null },
-					cameraConstant: { value: getCameraConstant( camera ) },
-					density: { value: 0.0 }
+					"texturePosition": { value: null },
+					"textureVelocity": { value: null },
+					"cameraConstant": { value: getCameraConstant( camera ) },
+					"density": { value: 0.0 }
 				};
 
 				// ShaderMaterial
@@ -538,15 +516,15 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				particleUniforms.cameraConstant.value = getCameraConstant( camera );
+				particleUniforms[ "cameraConstant" ].value = getCameraConstant( camera );
 
 			}
 
 			function dynamicValuesChanger() {
 
-				velocityUniforms.gravityConstant.value = effectController.gravityConstant;
-				velocityUniforms.density.value = effectController.density;
-				particleUniforms.density.value = effectController.density;
+				velocityUniforms[ "gravityConstant" ].value = effectController.gravityConstant;
+				velocityUniforms[ "density" ].value = effectController.density;
+				particleUniforms[ "density" ].value = effectController.density;
 
 			}
 
@@ -604,8 +582,8 @@
 
 				gpuCompute.compute();
 
-				particleUniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				particleUniforms.textureVelocity.value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				particleUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				particleUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

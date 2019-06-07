@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #define PHYSICAL
 
 uniform vec3 diffuse;
@@ -17,6 +17,13 @@ varying vec3 vViewPosition;
 #ifndef FLAT_SHADED
 
 	varying vec3 vNormal;
+
+	#ifdef USE_TANGENT
+
+		varying vec3 vTangent;
+		varying vec3 vBitangent;
+
+	#endif
 
 #endif
 

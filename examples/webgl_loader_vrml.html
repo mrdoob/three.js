@@ -4,28 +4,13 @@
 		<title>three.js webgl - loaders - vrml loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -33,7 +18,7 @@
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		vrml format loader test -
+		vrml format loader test
 		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank" rel="noopener">VRML 2.0 Tutorial</a>,-->
 		</div>
 
@@ -54,9 +39,7 @@
 
 			}
 
-			var container, stats;
-
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -65,8 +48,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 6;
-
-				controls = new THREE.OrbitControls( camera );
 
 				scene = new THREE.Scene();
 				scene.add( camera );
@@ -91,13 +72,16 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+				// controls
+
+				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 

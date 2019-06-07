@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_SKINNING
 
 	uniform mat4 bindMatrix;
@@ -6,7 +6,7 @@ export default `
 
 	#ifdef BONE_TEXTURE
 
-		uniform sampler2D boneTexture;
+		uniform highp sampler2D boneTexture;
 		uniform int boneTextureSize;
 
 		mat4 getBoneMatrix( const in float i ) {

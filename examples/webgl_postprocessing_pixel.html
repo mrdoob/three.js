@@ -4,37 +4,7 @@
 		<title>three.js webgl - postprocessing - pixel shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				/*text-align:center;*/
-				font-weight: lighter;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display: block;
-			}
-
-			#info a {
-				color: #f88;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer;
-			}
-
-			.dg.ac {
-				z-index: 1 !important;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -66,7 +36,7 @@
 
 			function updateGUI() {
 
-				pixelPass.uniforms.pixelSize.value = params.pixelSize;
+				pixelPass.uniforms[ "pixelSize" ].value = params.pixelSize;
 
 			}
 
@@ -76,7 +46,7 @@
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				pixelPass.uniforms.resolution.value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+				pixelPass.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
 			}
 
@@ -145,9 +115,8 @@
 				composer.addPass( new THREE.RenderPass( scene, camera ) );
 
 				pixelPass = new THREE.ShaderPass( THREE.PixelShader );
-				pixelPass.uniforms.resolution.value = new THREE.Vector2( window.innerWidth, window.innerHeight );
-				pixelPass.uniforms.resolution.value.multiplyScalar( window.devicePixelRatio );
-				pixelPass.renderToScreen = true;
+				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
 				composer.addPass( pixelPass );
 
 				window.addEventListener( 'resize', resize );

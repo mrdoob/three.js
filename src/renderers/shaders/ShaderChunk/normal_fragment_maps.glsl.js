@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef USE_NORMALMAP
 
 	#ifdef OBJECTSPACE_NORMALMAP
@@ -21,7 +21,18 @@ export default `
 
 	#else // tangent-space normal map
 
-		normal = perturbNormal2Arb( -vViewPosition, normal );
+		#ifdef USE_TANGENT
+
+			mat3 vTBN = mat3( tangent, bitangent, normal );
+			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+			mapN.xy = normalScale * mapN.xy;
+			normal = normalize( vTBN * mapN );
+
+		#else
+
+			normal = perturbNormal2Arb( -vViewPosition, normal );
+
+		#endif
 
 	#endif
 

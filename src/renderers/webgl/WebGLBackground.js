@@ -27,6 +27,18 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		var background = scene.background;
 
+		// Ignore background in AR
+		// TODO: Reconsider this.
+
+		var vr = renderer.vr;
+		var session = vr.getSession && vr.getSession();
+
+		if ( session && session.environmentBlendMode === 'additive' ) {
+
+			background = null;
+
+		}
+
 		if ( background === null ) {
 
 			setClear( clearColor, clearAlpha );
@@ -60,7 +72,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 						vertexShader: ShaderLib.cube.vertexShader,
 						fragmentShader: ShaderLib.cube.fragmentShader,
 						side: BackSide,
-						depthTest: true,
+						depthTest: false,
 						depthWrite: false,
 						fog: false
 					} )
@@ -105,7 +117,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			}
 
 			// push to the pre-sorted opaque render list
-			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, null );
+			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
 
 		} else if ( background && background.isTexture ) {
 
@@ -164,7 +176,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 
 			// push to the pre-sorted opaque render list
-			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, null );
+			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null );
 
 		}
 

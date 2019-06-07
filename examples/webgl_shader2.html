@@ -4,31 +4,7 @@
 		<title>three.js webgl - materials - shaders [custom]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -191,15 +167,15 @@
 				var geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
-					time: { value: 1.0 }
+					"time": { value: 1.0 }
 				};
 
 				uniforms2 = {
-					time: { value: 1.0 },
-					texture: { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+					"time": { value: 1.0 },
+					"texture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
+				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],
@@ -262,8 +238,8 @@
 
 				var delta = clock.getDelta();
 
-				uniforms1.time.value += delta * 5;
-				uniforms2.time.value = clock.elapsedTime;
+				uniforms1[ "time" ].value += delta * 5;
+				uniforms2[ "time" ].value = clock.elapsedTime;
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 

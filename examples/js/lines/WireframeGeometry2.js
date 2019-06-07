@@ -21,7 +21,7 @@ THREE.WireframeGeometry2.prototype = Object.assign( Object.create( THREE.LineSeg
 
 	isWireframeGeometry2: true,
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 

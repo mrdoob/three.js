@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef TOON
 
 	uniform sampler2D gradientMap;

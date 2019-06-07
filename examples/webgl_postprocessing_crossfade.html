@@ -4,31 +4,13 @@
 		<title>three.js webgl - scenes transition</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			.info {
-				position: absolute;
-				background-color: black;
-				opacity: 0.8;
-				color: white;
-				text-align: center;
-				top: 0px;
-				width: 100%;
-			}
-
-			a { color: #00ffff; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<div class="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions - by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions<br/>
+			by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
 		</div>
 
 		<div id="container"></div>
@@ -36,9 +18,6 @@
 		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/crossfade/scenes.js"></script>
-		<script src="js/crossfade/gui.js"></script>
-		<script src="js/crossfade/transition.js"></script>
 		<script src="js/utils/BufferGeometryUtils.js"></script>
 
 		<script>
@@ -46,6 +25,16 @@
 			var container, stats;
 			var renderer;
 			var transition;
+
+			var transitionParams = {
+				"useTexture": true,
+				"transition": 0.5,
+				"transitionSpeed": 2.0,
+				"texture": 5,
+				"loopTexture": true,
+				"animateTransition": true,
+				"textureThreshold": 0.3
+			};
 
 			var clock = new THREE.Clock();
 
@@ -82,9 +71,329 @@
 
 			}
 
+			function initGUI() {
+
+				var gui = new dat.GUI();
+
+				gui.add( transitionParams, "useTexture" ).onChange( function ( value ) {
+
+					transition.useTexture( value );
+
+				} );
+
+				gui.add( transitionParams, 'loopTexture' );
+
+				gui.add( transitionParams, 'texture', { Perlin: 0, Squares: 1, Cells: 2, Distort: 3, Gradient: 4, Radial: 5 } ).onChange( function ( value ) {
+
+					transition.setTexture( value );
+
+				} ).listen();
+
+				gui.add( transitionParams, "textureThreshold", 0, 1, 0.01 ).onChange( function ( value ) {
+
+					transition.setTextureThreshold( value );
+
+				} );
+
+				gui.add( transitionParams, "animateTransition" );
+				gui.add( transitionParams, "transition", 0, 1, 0.01 ).listen();
+				gui.add( transitionParams, "transitionSpeed", 0.5, 5, 0.01 );
+
+			}
+
+
 			function render() {
 
 				transition.render( clock.getDelta() );
+
+			}
+
+			function generateGeometry( objectType, numObjects ) {
+
+				function applyVertexColors( geometry, color ) {
+
+					var position = geometry.attributes.position;
+					var colors = [];
+
+					for ( var i = 0; i < position.count; i ++ ) {
+
+						colors.push( color.r, color.g, color.b );
+
+					}
+
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				}
+
+				var geometries = [];
+
+				var matrix = new THREE.Matrix4();
+				var position = new THREE.Vector3();
+				var rotation = new THREE.Euler();
+				var quaternion = new THREE.Quaternion();
+				var scale = new THREE.Vector3();
+				var color = new THREE.Color();
+
+				for ( var i = 0; i < numObjects; i ++ ) {
+
+					position.x = Math.random() * 10000 - 5000;
+					position.y = Math.random() * 6000 - 3000;
+					position.z = Math.random() * 8000 - 4000;
+
+					rotation.x = Math.random() * 2 * Math.PI;
+					rotation.y = Math.random() * 2 * Math.PI;
+					rotation.z = Math.random() * 2 * Math.PI;
+					quaternion.setFromEuler( rotation, false );
+
+					scale.x = Math.random() * 200 + 100;
+
+					var geometry;
+
+					if ( objectType === 'cube' ) {
+
+						geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+						geometry = geometry.toNonIndexed(); // merging needs consistent buffer geometries
+						scale.y = Math.random() * 200 + 100;
+						scale.z = Math.random() * 200 + 100;
+						color.setRGB( 0, 0, 0.1 + 0.9 * Math.random() );
+
+					} else if ( objectType === 'sphere' ) {
+
+						geometry = new THREE.IcosahedronBufferGeometry( 1, 1 );
+						scale.y = scale.z = scale.x;
+						color.setRGB( 0.1 + 0.9 * Math.random(), 0, 0 );
+
+					}
+
+					// give the geom's vertices a random color, to be displayed
+					applyVertexColors( geometry, color );
+
+					matrix.compose( position, quaternion, scale );
+					geometry.applyMatrix( matrix );
+
+					geometries.push( geometry );
+
+				}
+
+				return THREE.BufferGeometryUtils.mergeBufferGeometries( geometries );
+
+			}
+
+			function Scene( type, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
+
+				this.clearColor = clearColor;
+
+				this.camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 10000 );
+				this.camera.position.z = cameraZ;
+
+				// Setup scene
+				this.scene = new THREE.Scene();
+				this.scene.add( new THREE.AmbientLight( 0x555555 ) );
+
+				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 500, 2000 );
+				this.scene.add( light );
+
+				this.rotationSpeed = rotationSpeed;
+
+				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+				this.mesh = new THREE.Mesh( generateGeometry( type, numObjects ), defaultMaterial );
+				this.scene.add( this.mesh );
+
+				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
+
+				this.render = function ( delta, rtt ) {
+
+					this.mesh.rotation.x += delta * this.rotationSpeed.x;
+					this.mesh.rotation.y += delta * this.rotationSpeed.y;
+					this.mesh.rotation.z += delta * this.rotationSpeed.z;
+
+					renderer.setClearColor( this.clearColor );
+
+					if ( rtt ) {
+
+						renderer.setRenderTarget( this.fbo );
+						renderer.clear();
+						renderer.render( this.scene, this.camera );
+
+					} else {
+
+						renderer.setRenderTarget( null );
+						renderer.render( this.scene, this.camera );
+
+					}
+
+				};
+
+			}
+
+			function Transition( sceneA, sceneB ) {
+
+				this.scene = new THREE.Scene();
+
+				this.cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10, 10 );
+
+				this.textures = [];
+
+				var loader = new THREE.TextureLoader();
+
+				for ( var i = 0; i < 6; i ++ )
+					this.textures[ i ] = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
+
+				this.quadmaterial = new THREE.ShaderMaterial( {
+
+					uniforms: {
+
+						tDiffuse1: {
+							value: null
+						},
+						tDiffuse2: {
+							value: null
+						},
+						mixRatio: {
+							value: 0.0
+						},
+						threshold: {
+							value: 0.1
+						},
+						useTexture: {
+							value: 1
+						},
+						tMixTexture: {
+							value: this.textures[ 0 ]
+						}
+					},
+					vertexShader: [
+
+						"varying vec2 vUv;",
+
+						"void main() {",
+
+						"vUv = vec2( uv.x, uv.y );",
+						"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+						"}"
+
+					].join( "\n" ),
+					fragmentShader: [
+
+						"uniform float mixRatio;",
+
+						"uniform sampler2D tDiffuse1;",
+						"uniform sampler2D tDiffuse2;",
+						"uniform sampler2D tMixTexture;",
+
+						"uniform int useTexture;",
+						"uniform float threshold;",
+
+						"varying vec2 vUv;",
+
+						"void main() {",
+
+						"	vec4 texel1 = texture2D( tDiffuse1, vUv );",
+						"	vec4 texel2 = texture2D( tDiffuse2, vUv );",
+
+						"	if (useTexture==1) {",
+
+						"		vec4 transitionTexel = texture2D( tMixTexture, vUv );",
+						"		float r = mixRatio * (1.0 + threshold * 2.0) - threshold;",
+						"		float mixf=clamp((transitionTexel.r - r)*(1.0/threshold), 0.0, 1.0);",
+
+						"		gl_FragColor = mix( texel1, texel2, mixf );",
+
+						"	} else {",
+
+						"		gl_FragColor = mix( texel2, texel1, mixRatio );",
+
+						"	}",
+
+						"}"
+
+					].join( "\n" )
+
+				} );
+
+				var quadgeometry = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+
+				this.quad = new THREE.Mesh( quadgeometry, this.quadmaterial );
+				this.scene.add( this.quad );
+
+				// Link both scenes and their FBOs
+				this.sceneA = sceneA;
+				this.sceneB = sceneB;
+
+				this.quadmaterial.uniforms.tDiffuse1.value = sceneA.fbo.texture;
+				this.quadmaterial.uniforms.tDiffuse2.value = sceneB.fbo.texture;
+
+				this.needChange = false;
+
+				this.setTextureThreshold = function ( value ) {
+
+					this.quadmaterial.uniforms.threshold.value = value;
+
+				};
+
+				this.useTexture = function ( value ) {
+
+					this.quadmaterial.uniforms.useTexture.value = value ? 1 : 0;
+
+				};
+
+				this.setTexture = function ( i ) {
+
+					this.quadmaterial.uniforms.tMixTexture.value = this.textures[ i ];
+
+				};
+
+				this.render = function ( delta ) {
+
+					// Transition animation
+					if ( transitionParams.animateTransition ) {
+
+						var t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
+						transitionParams.transition = THREE.Math.smoothstep( t, 0.3, 0.7 );
+
+						// Change the current alpha texture after each transition
+						if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {
+
+							if ( this.needChange ) {
+
+								transitionParams.texture = ( transitionParams.texture + 1 ) % this.textures.length;
+								this.quadmaterial.uniforms.tMixTexture.value = this.textures[ transitionParams.texture ];
+								this.needChange = false;
+
+							}
+
+						} else
+							this.needChange = true;
+
+					}
+
+					this.quadmaterial.uniforms.mixRatio.value = transitionParams.transition;
+
+					// Prevent render both scenes when it's not necessary
+					if ( transitionParams.transition == 0 ) {
+
+						this.sceneB.render( delta, false );
+
+					} else if ( transitionParams.transition == 1 ) {
+
+						this.sceneA.render( delta, false );
+
+					} else {
+
+						// When 0<transition<1 render transition between two scenes
+
+						this.sceneA.render( delta, true );
+						this.sceneB.render( delta, true );
+						renderer.setRenderTarget( null );
+						renderer.clear();
+						renderer.render( this.scene, this.cameraOrtho );
+
+					}
+
+				};
 
 			}
 

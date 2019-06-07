@@ -4,34 +4,8 @@
 		<title>three.js webgl - postprocessing - unreal bloom</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-			#info p {
-				max-width: 600px;
-				margin-left: auto;
-				margin-right: auto;
-				padding: 0 2em;
-			}
-			a {
-				color: #2983ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="container"></div>
@@ -104,13 +78,11 @@
 			var renderScene = new THREE.RenderPass( scene, camera );
 
 			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-			bloomPass.renderToScreen = true;
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
 			composer = new THREE.EffectComposer( renderer );
-			composer.setSize( window.innerWidth, window.innerHeight );
 			composer.addPass( renderScene );
 			composer.addPass( bloomPass );
 

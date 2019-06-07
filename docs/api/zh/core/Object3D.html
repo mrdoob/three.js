@@ -36,6 +36,17 @@
 	<h3>[property:Object3D children]</h3>
 	<p>含有对象的子级的数组。请参阅[page:Group]来了解将手动对象进行分组的相关信息。</p>
 
+	<h3>[property:Material customDepthMaterial]</h3>
+	<p>渲染到深度贴图时此材质要使用的自定义深度材质。
+	    当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
+	    （b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
+	    您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
+	</p>
+
+	<h3>[property:Material customDistanceMaterial]</h3>
+	<p>与[page:.customDepthMaterial customDepthMaterial]相同，但与[page:PointLight]一起使用。默认值为*undefined*。
+	</p>
+
 	<h3>[property:Boolean frustumCulled]</h3>
 	<p>
 		当这个属性被设置的时候，它将在渲染物体之前，检查每一帧的物体是否在摄像机的视锥体中。
@@ -262,7 +273,7 @@
 		将局部空间向量转换为世界空间向量。
 	</p>
 
-	<h3>[method:null lookAt]( [param:Vector3 vector] )</br>
+	<h3>[method:null lookAt]( [param:Vector3 vector] )<br />
 		[method:null lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 	<p>
 		vector - 一个表示世界空间中位置的向量。<br /><br />
@@ -334,7 +345,7 @@
 	<h3>[method:null setRotationFromMatrix]( [param:Matrix4 m] )</h3>
 	<p>
 		m -- 通过该矩阵中的旋转分量来旋转四元数。<br />
-			
+
 		调用[page:.quaternion]中的[page:Quaternion.setFromRotationMatrix setFromRotationMatrix]( [page:Matrix4 m])。
 		<br /><br />
 

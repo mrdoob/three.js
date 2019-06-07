@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 BlinnPhongMaterial material;
 material.diffuseColor = diffuseColor.rgb;
 material.specularColor = specular;

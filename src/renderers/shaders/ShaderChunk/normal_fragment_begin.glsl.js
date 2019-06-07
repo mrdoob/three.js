@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 #ifdef FLAT_SHADED
 
 	// Workaround for Adreno/Nexus5 not able able to do dFdx( vViewPosition ) ...
@@ -14,6 +14,20 @@ export default `
 	#ifdef DOUBLE_SIDED
 
 		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+	#endif
+
+	#ifdef USE_TANGENT
+
+		vec3 tangent = normalize( vTangent );
+		vec3 bitangent = normalize( vBitangent );
+
+		#ifdef DOUBLE_SIDED
+
+			tangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+			bitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+		#endif
 
 	#endif
 

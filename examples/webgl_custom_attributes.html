@@ -4,27 +4,7 @@
 		<title>three.js webgl - custom attributes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -109,13 +89,13 @@
 
 			uniforms = {
 
-				amplitude: { value: 1.0 },
-				color: { value: new THREE.Color( 0xff2200 ) },
-				texture: { value: new THREE.TextureLoader().load( "textures/water.jpg" ) }
+				"amplitude": { value: 1.0 },
+				"color": { value: new THREE.Color( 0xff2200 ) },
+				"texture": { value: new THREE.TextureLoader().load( "textures/water.jpg" ) }
 
 			};
 
-			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
+			uniforms[ "texture" ].value.wrapS = uniforms[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
@@ -184,8 +164,8 @@
 
 			sphere.rotation.y = sphere.rotation.z = 0.01 * time;
 
-			uniforms.amplitude.value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
-			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
+			uniforms[ "amplitude" ].value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
+			uniforms[ "color" ].value.offsetHSL( 0.0005, 0, 0 );
 
 			for ( var i = 0; i < displacement.length; i ++ ) {
 

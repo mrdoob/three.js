@@ -4,37 +4,8 @@
 		<title>three.js webgl - Depth Texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #B2E9FF;
-				font-weight: bold;
-				pointer-events: auto;
-			}
-
-			canvas {
-				position: absolute;
-				top: 0;
-				left: 0;
-			}
-
-			#info {
-				pointer-events: none;
-				position: absolute;
-				left: 0;
-				top: 0px; width: 100%;
-				padding: 5px;
-				display: inline-block;
-			}
-
 			#error {
 				margin: auto;
 				margin-top: 40px;
@@ -82,7 +53,7 @@
 	<body>
 		<canvas></canvas>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - WebGL - Depth Texture<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> webgl - depth texture<br/>
 			Stores render target depth in a texture attachment.<br/>
 			Created by <a href="http://twitter.com/mattdesl" target="_blank" rel="noopener">@mattdesl</a>.
 
@@ -93,7 +64,6 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/shaders/SSAOShader.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -229,9 +199,11 @@
 				requestAnimationFrame( animate );
 
 				// render scene into target
-				renderer.render( scene, camera, target );
+				renderer.setRenderTarget( target );
+				renderer.render( scene, camera );
 
 				// render post FX
+				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
 
 				stats.update();

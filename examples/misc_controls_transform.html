@@ -4,30 +4,7 @@
 		<title>three.js webgl - transform controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				color: #fff;
-				font-family:Monospace;
-				text-align: center;
-				font-size: 15px;
-				line-height: 30px;
-				overflow: hidden;
-			}
-			
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 15px;
-				z-index:100;
-				box-sizing: border-box;
-			}
-			
-			a {
-				color: white;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -79,7 +56,7 @@
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshLambertMaterial( { map: texture } );
+				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
 				orbit = new THREE.OrbitControls( camera, renderer.domElement );
 				orbit.update();

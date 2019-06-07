@@ -22,7 +22,8 @@ var elements = NodeUtils.elements,
 		vec3: 'v3',
 		vec4: 'v4',
 		mat4: 'v4',
-		int: 'i'
+		int: 'i',
+		bool: 'b'
 	},
 	convertTypeToFormat = {
 		t: 'sampler2D',
@@ -442,9 +443,7 @@ NodeBuilder.prototype = {
 
 	},
 
-	getVar: function ( uuid, type, ns, shader ) {
-
-		shader = shader || 'varying';
+	getVar: function ( uuid, type, ns, shader = 'varying', prefix = 'V', label = '' ) {
 
 		var vars = this.getVars( shader ),
 			data = vars[ uuid ];
@@ -452,7 +451,7 @@ NodeBuilder.prototype = {
 		if ( ! data ) {
 
 			var index = vars.length,
-				name = ns ? ns : 'nVv' + index;
+				name = ns ? ns : 'node' + prefix + index + ( label ? '_' + label : '' );
 
 			data = { name: name, type: type };
 
@@ -465,9 +464,9 @@ NodeBuilder.prototype = {
 
 	},
 
-	getTempVar: function ( uuid, type, ns ) {
+	getTempVar: function ( uuid, type, ns, label ) {
 
-		return this.getVar( uuid, type, ns, this.shader );
+		return this.getVar( uuid, type, ns, this.shader, 'T', label );
 
 	},
 
@@ -550,14 +549,14 @@ NodeBuilder.prototype = {
 
 	},
 
-	createUniform: function ( shader, type, node, ns, needsUpdate ) {
+	createUniform: function ( shader, type, node, ns, needsUpdate, label ) {
 
 		var uniforms = this.inputs.uniforms,
 			index = uniforms.list.length;
 
 		var uniform = new NodeUniform( {
 			type: type,
-			name: ns ? ns : 'nVu' + index,
+			name: ns ? ns : 'nodeU' + index + ( label ? '_' + label : '' ),
 			node: node,
 			needsUpdate: needsUpdate
 		} );
@@ -573,15 +572,15 @@ NodeBuilder.prototype = {
 
 	},
 
-	createVertexUniform: function ( type, node, ns, needsUpdate ) {
+	createVertexUniform: function ( type, node, ns, needsUpdate, label ) {
 
-		return this.createUniform( 'vertex', type, node, ns, needsUpdate );
+		return this.createUniform( 'vertex', type, node, ns, needsUpdate, label );
 
 	},
 
-	createFragmentUniform: function ( type, node, ns, needsUpdate ) {
+	createFragmentUniform: function ( type, node, ns, needsUpdate, label ) {
 
-		return this.createUniform( 'fragment', type, node, ns, needsUpdate );
+		return this.createUniform( 'fragment', type, node, ns, needsUpdate, label );
 
 	},
 
@@ -821,27 +820,38 @@ NodeBuilder.prototype = {
 			case 'f <- v2' : return code + '.x';
 			case 'f <- v3' : return code + '.x';
 			case 'f <- v4' : return code + '.x';
-			case 'f <- i' : return 'float( ' + code + ' )';
+			case 'f <- i' :
+			case 'f <- b' :	return 'float( ' + code + ' )';
 
 			case 'v2 <- f' : return 'vec2( ' + code + ' )';
 			case 'v2 <- v3': return code + '.xy';
 			case 'v2 <- v4': return code + '.xy';
-			case 'v2 <- i' : return 'vec2( float( ' + code + ' ) )';
+			case 'v2 <- i' :
+			case 'v2 <- b' : return 'vec2( float( ' + code + ' ) )';
 
 			case 'v3 <- f' : return 'vec3( ' + code + ' )';
 			case 'v3 <- v2': return 'vec3( ' + code + ', 0.0 )';
 			case 'v3 <- v4': return code + '.xyz';
-			case 'v3 <- i' : return 'vec2( float( ' + code + ' ) )';
+			case 'v3 <- i' :
+			case 'v3 <- b' : return 'vec2( float( ' + code + ' ) )';
 
 			case 'v4 <- f' : return 'vec4( ' + code + ' )';
 			case 'v4 <- v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
 			case 'v4 <- v3': return 'vec4( ' + code + ', 1.0 )';
-			case 'v4 <- i' : return 'vec4( float( ' + code + ' ) )';
+			case 'v4 <- i' :
+			case 'v4 <- b' : return 'vec4( float( ' + code + ' ) )';
 
-			case 'i <- f' : return 'int( ' + code + ' )';
+			case 'i <- f' :
+			case 'i <- b' : return 'int( ' + code + ' )';
 			case 'i <- v2' : return 'int( ' + code + '.x )';
 			case 'i <- v3' : return 'int( ' + code + '.x )';
 			case 'i <- v4' : return 'int( ' + code + '.x )';
+
+			case 'b <- f' : return '( ' + code + ' != 0.0 )';
+			case 'b <- v2' : return '( ' + code + ' != vec2( 0.0 ) )';
+			case 'b <- v3' : return '( ' + code + ' != vec3( 0.0 ) )';
+			case 'b <- v4' : return '( ' + code + ' != vec4( 0.0 ) )';
+			case 'b <- i' : return '( ' + code + ' != 0 )';
 
 		}
 

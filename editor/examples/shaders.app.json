@@ -3,8 +3,6 @@
 		"type": "App"
 	},
 	"project": {
-		"gammaInput": true,
-		"gammaOutput": true,
 		"shadows": true,
 		"vr": false
 	},
@@ -39,7 +37,7 @@
 		"geometries": [
 			{
 				"uuid": "EA781333-F3AE-470D-9110-A9724FCB42AA",
-				"type": "IcosahedronGeometry",
+				"type": "IcosahedronBufferGeometry",
 				"radius": 1,
 				"detail": 4
 			}],

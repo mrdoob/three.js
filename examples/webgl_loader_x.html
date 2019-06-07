@@ -4,61 +4,17 @@
 	<title>three.js webgl - loaders - X-File loader</title>
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
-	<style>
-		body {
-			color: #ffffff;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-		#info {
-			color: #fff;
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
-		}
-		a {
-			color: #ff0000
-		}
-
-		#info2 {
-			color: #fff;
-			background-color: #000;
-			position: absolute;
-			top: 3em;
-			right : 0px;
-			width: 10em;
-			z-index: 200;
-			display: block;
-		}
-
-		td {
-			padding: 0.5em;
-		}
-
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
 	<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - X-File Loader <br>
-		<a href="https://github.com/adrs2002/threeXfileLoader" target="_new">see more info and samples</a> <br />
-	</div>
-
-	<div id="info2">
-		<table>
-			<tr>
-				<td>mech 1</td>
-				<td><select id="mech1_anime" onchange="mech1_changeAnime(this.value)">
-						<option value="stand">stand</option>
-						<option value="wark">walk</option>
-						<option value="attack">attack</option>
-					  </select>
-					</td>
-			</tr>
-		</table>
+		<a href="https://github.com/adrs2002/threeXfileLoader" target="_new">see more info and samples</a> <br /><br/>
+		<select id="mech1_anime" onchange="mech1_changeAnime(this.value)">
+			<option value="stand">stand</option>
+			<option value="wark">walk</option>
+			<option value="attack">attack</option>
+		</select>
 	</div>
 
 	<div id="canvase3d"></div>

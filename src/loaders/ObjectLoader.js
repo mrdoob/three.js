@@ -341,6 +341,21 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
+					case 'TubeGeometry':
+					case 'TubeBufferGeometry':
+
+						// This only works for built-in curves (e.g. CatmullRomCurve3).
+						// User defined curves or instances of CurvePath will not be deserialized.
+						geometry = new Geometries[ data.type ](
+							new Curves[ data.path.type ]().fromJSON( data.path ),
+							data.tubularSegments,
+							data.radius,
+							data.radialSegments,
+							data.closed
+						);
+
+						break;
+
 					case 'LatheGeometry':
 					case 'LatheBufferGeometry':
 
@@ -415,6 +430,7 @@ Object.assign( ObjectLoader.prototype, {
 						break;
 
 					case 'BufferGeometry':
+					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
 
@@ -497,8 +513,13 @@ Object.assign( ObjectLoader.prototype, {
 
 				} else {
 
-					materials[ data.uuid ] = loader.parse( data );
-					cache[ data.uuid ] = materials[ data.uuid ];
+					if ( cache[ data.uuid ] === undefined ) {
+
+						cache[ data.uuid ] = loader.parse( data );
+
+					}
+
+					materials[ data.uuid ] = cache[ data.uuid ];
 
 				}
 
@@ -844,6 +865,8 @@ Object.assign( ObjectLoader.prototype, {
 					object = new Mesh( geometry, material );
 
 				}
+
+				if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
 
 				break;
 

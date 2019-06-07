@@ -1,4 +1,4 @@
-// Author: Aleksandr Albert
+/* Author: Aleksandr Albert
 // Website: www.routter.co.tt
 
 // Description: A deep water ocean shader set
@@ -20,9 +20,10 @@
 
 // -- Rendering Shader
 // [7] ocean_main               -> Vertex and Fragment shader used to create the final render
+*/
 
-
-THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
+THREE.OceanShaders = {}
+THREE.OceanShaders[ 'ocean_sim_vertex' ] = {
 	vertexShader: [
 		'varying vec2 vUV;',
 
@@ -32,7 +33,7 @@ THREE.ShaderLib[ 'ocean_sim_vertex' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.ShaderLib[ 'ocean_subtransform' ] = {
+THREE.OceanShaders[ 'ocean_subtransform' ] = {
 	uniforms: {
 		"u_input": { value: null },
 		"u_transformSize": { value: 512.0 },
@@ -82,12 +83,17 @@ THREE.ShaderLib[ 'ocean_subtransform' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
+THREE.OceanShaders[ 'ocean_initial_spectrum' ] = {
 	uniforms: {
 		"u_wind": { value: new THREE.Vector2( 10.0, 10.0 ) },
 		"u_resolution": { value: 512.0 },
 		"u_size": { value: 250.0 }
 	},
+	vertexShader: [
+		'void main (void) {',
+			'gl_Position = vec4(position, 1.0);',
+		'}'
+	].join( '\n' ),
 	fragmentShader: [
 		'precision highp float;',
 		'#include <common>',
@@ -158,7 +164,7 @@ THREE.ShaderLib[ 'ocean_initial_spectrum' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.ShaderLib[ 'ocean_phase' ] = {
+THREE.OceanShaders[ 'ocean_phase' ] = {
 	uniforms: {
 		"u_phases": { value: null },
 		"u_deltaTime": { value: null },
@@ -198,7 +204,7 @@ THREE.ShaderLib[ 'ocean_phase' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.ShaderLib[ 'ocean_spectrum' ] = {
+THREE.OceanShaders[ 'ocean_spectrum' ] = {
 	uniforms: {
 		"u_size": { value: null },
 		"u_resolution": { value: null },
@@ -262,7 +268,7 @@ THREE.ShaderLib[ 'ocean_spectrum' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.ShaderLib[ 'ocean_normals' ] = {
+THREE.OceanShaders[ 'ocean_normals' ] = {
 	uniforms: {
 		"u_displacementMap": { value: null },
 		"u_resolution": { value: null },
@@ -296,7 +302,7 @@ THREE.ShaderLib[ 'ocean_normals' ] = {
 		'}'
 	].join( '\n' )
 };
-THREE.ShaderLib[ 'ocean_main' ] = {
+THREE.OceanShaders[ 'ocean_main' ] = {
 	uniforms: {
 		"u_displacementMap": { value: null },
 		"u_normalMap": { value: null },

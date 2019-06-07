@@ -32,8 +32,8 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	Object3D.call( this );
 
-	if ( dir === undefined ) dir = new THREE.Vector3( 0, 0, 1 );
-	if ( origin === undefined ) origin = new THREE.Vector3( 0, 0, 0 );
+	if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
+	if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
 	if ( length === undefined ) length = 1;
 	if ( color === undefined ) color = 0xffff00;
 	if ( headLength === undefined ) headLength = 0.2 * length;

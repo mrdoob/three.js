@@ -4,11 +4,10 @@
 		<title>three.js svg - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
+			svg {
+				display: block;
 			}
 		</style>
 	</head>
@@ -177,6 +176,23 @@
 					scene.add( object );
 
 				}
+
+				// CUSTOM FROM FILE
+
+				var fileLoader = new THREE.FileLoader();
+				fileLoader.load( 'models/svg/hexagon.svg', function ( svg ) {
+
+					var node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
+					var parser = new DOMParser();
+					var doc = parser.parseFromString( svg, 'image/svg+xml' );
+
+					node.appendChild( doc.documentElement );
+
+					var object = new THREE.SVGObject( node );
+					object.position.x = 500;
+					scene.add( object );
+
+				} );
 
 				// LIGHTS
 

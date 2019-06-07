@@ -1,4 +1,4 @@
-export default `
+export default /* glsl */`
 /**
  * This is a template that can be used to light a material, it uses pluggable
  * RenderEquations (RE)for specific lighting scenarios.
@@ -102,6 +102,8 @@ IncidentLight directLight;
 #if defined( RE_IndirectDiffuse )
 
 	vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
+
+	irradiance += getLightProbeIrradiance( lightProbe, geometry );
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 

@@ -4,34 +4,58 @@
 		<title>three.js webgl - materials - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
+
+			#overlay {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
 			}
 
-			a { color:#0078ff; }
+			#overlay > div {
+				text-align: center;
+			}
 
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 5px; width: 100%;
-				z-index:100;
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
 			}
 
 		</style>
 	</head>
 	<body>
 
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Video playback with audio requires user interaction.</p>
+			</div>
+		</div>
+		<div id="container"></div>
+
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo<br/>
+			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
 
 		<script src="../build/three.js"></script>
@@ -47,7 +71,7 @@
 
 		<script src="js/WebGL.js"></script>
 
-		<video id="video" autoplay loop crossOrigin="anonymous" webkit-playsinline style="display:none">
+		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
@@ -82,10 +106,18 @@
 				xgrid = 20,
 				ygrid = 10;
 
-			init();
-			animate();
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
+
+				init();
+				animate();
+
+			}, false );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -105,6 +137,7 @@
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
+				video.play();
 
 				texture = new THREE.VideoTexture( video );
 
@@ -172,8 +205,6 @@
 				var effectBloom = new THREE.BloomPass( 1.3 );
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
-				effectCopy.renderToScreen = true;
-
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
@@ -195,7 +226,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.reset();
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
