@@ -3,26 +3,6 @@ import { Event } from './Face3';
 /**
  * JavaScript events for custom objects
  *
- * # Example
- *		 var Car = function () {
- *
- *				 EventDispatcher.call( this );
- *				 this.start = function () {
- *
- *						 this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
- *
- *				 };
- *
- *		 };
- *
- *		 var car = new Car();
- *		 car.addEventListener( 'start', function ( event ) {
- *
- *				 alert( event.message );
- *
- *		 } );
- *		 car.start();
- *
  * @source src/core/EventDispatcher.js
  */
 export class EventDispatcher {

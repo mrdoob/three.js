@@ -37,14 +37,6 @@ export let GeometryIdCount: number;
 /**
  * Base class for geometries
  *
- * # Example
- *		 var geometry = new THREE.Geometry();
- *		 geometry.vertices.push( new THREE.Vector3( -10, 10, 0 ) );
- *		 geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
- *		 geometry.vertices.push( new THREE.Vector3( 10, -10, 0 ) );
- *		 geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
- *		 geometry.computeBoundingSphere();
- *
  * @see https://github.com/mrdoob/three.js/blob/master/src/core/Geometry.js
  */
 export class Geometry extends EventDispatcher {

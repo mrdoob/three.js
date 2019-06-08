@@ -3,10 +3,6 @@ import { Camera } from './Camera';
 /**
  * Camera with perspective projection.
  *
- * # example
- *		 var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
- *		 scene.add( camera );
- *
  * @source https://github.com/mrdoob/three.js/blob/master/src/cameras/PerspectiveCamera.js
  */
 export class PerspectiveCamera extends Camera {
