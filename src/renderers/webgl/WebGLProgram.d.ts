@@ -26,12 +26,12 @@ export class WebGLProgram {
 	vertexShader: WebGLShader;
 	fragmentShader: WebGLShader;
 	/**
-   * @deprecated Use {@link WebGLProgram#getUniforms getUniforms()} instead.
-   */
+	 * @deprecated Use {@link WebGLProgram#getUniforms getUniforms()} instead.
+	 */
 	uniforms: any;
 	/**
-   * @deprecated Use {@link WebGLProgram#getAttributes getAttributes()} instead.
-   */
+	 * @deprecated Use {@link WebGLProgram#getAttributes getAttributes()} instead.
+	 */
 	attributes: any;
 
 	getUniforms(): WebGLUniforms;

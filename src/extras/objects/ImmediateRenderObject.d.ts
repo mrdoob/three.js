@@ -5,7 +5,7 @@ import { Material } from './../../materials/Material';
  * @deprecated Use {@link WireframeGeometry THREE.WireframeGeometry} instead.
  */
 // export class WireframeHelper extends LineSegments {
-//   constructor(object: Object3D, hex?: number);
+//	 constructor(object: Object3D, hex?: number);
 // }
 
 // Extras / Objects /////////////////////////////////////////////////////////////////////

@@ -27,15 +27,15 @@ export class PointLight extends Light {
 	);
 
 	/*
-   * Light's intensity.
-   * Default - 1.0.
-   */
+	 * Light's intensity.
+	 * Default - 1.0.
+	 */
 	intensity: number;
 
 	/**
-   * If non-zero, light will attenuate linearly from maximum intensity at light position down to zero at distance.
-   * Default — 0.0.
-   */
+	 * If non-zero, light will attenuate linearly from maximum intensity at light position down to zero at distance.
+	 * Default — 0.0.
+	 */
 	distance: number;
 
 	decay: number;

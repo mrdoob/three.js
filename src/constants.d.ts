@@ -54,7 +54,7 @@ export const CustomBlending: Blending;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other
-//  mappings to OpenGL constants defined in Texture.js)
+//	mappings to OpenGL constants defined in Texture.js)
 export enum BlendingEquation {}
 export const AddEquation: BlendingEquation;
 export const SubtractEquation: BlendingEquation;

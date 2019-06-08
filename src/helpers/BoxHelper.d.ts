@@ -6,12 +6,12 @@ import { LineSegments } from './../objects/LineSegments';
  * @deprecated Use {@link BoxHelper THREE.BoxHelper} instead.
  */
 // export class BoundingBoxHelper extends Mesh {
-//   constructor(object?: Object3D, hex?: number);
+//	 constructor(object?: Object3D, hex?: number);
 
-//   object: Object3D;
-//   box: Box3;
+//	 object: Object3D;
+//	 box: Box3;
 
-//   update(): void;
+//	 update(): void;
 // }
 
 export class BoxHelper extends LineSegments {

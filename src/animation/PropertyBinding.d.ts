@@ -31,12 +31,12 @@ export class PropertyBinding {
 export namespace PropertyBinding {
 	export class Composite {
 
-  	constructor( targetGroup: any, path: any, parsedPath?: any );
+		constructor( targetGroup: any, path: any, parsedPath?: any );
 
-  	getValue( array: any, offset: number ): any;
-  	setValue( array: any, offset: number ): void;
-  	bind(): void;
-  	unbind(): void;
+		getValue( array: any, offset: number ): any;
+		setValue( array: any, offset: number ): void;
+		bind(): void;
+		unbind(): void;
 
 	}
 }

@@ -7,40 +7,40 @@ import { Vector3 } from './Vector3';
  */
 export interface Matrix {
 	/**
-   * Array with matrix values.
-   */
+	 * Array with matrix values.
+	 */
 	elements: number[];
 
 	/**
-   * identity():T;
-   */
+	 * identity():T;
+	 */
 	identity(): Matrix;
 
 	/**
-   * copy(m:T):T;
-   */
+	 * copy(m:T):T;
+	 */
 	copy( m: this ): this;
 
 	/**
-   * multiplyScalar(s:number):T;
-   */
+	 * multiplyScalar(s:number):T;
+	 */
 	multiplyScalar( s: number ): Matrix;
 
 	determinant(): number;
 
 	/**
-   * getInverse(matrix:T, throwOnInvertible?:boolean):T;
-   */
+	 * getInverse(matrix:T, throwOnInvertible?:boolean):T;
+	 */
 	getInverse( matrix: Matrix, throwOnInvertible?: boolean ): Matrix;
 
 	/**
-   * transpose():T;
-   */
+	 * transpose():T;
+	 */
 	transpose(): Matrix;
 
 	/**
-   * clone():T;
-   */
+	 * clone():T;
+	 */
 	clone(): this;
 }
 
@@ -50,13 +50,13 @@ export interface Matrix {
 export class Matrix3 implements Matrix {
 
 	/**
-   * Creates an identity matrix.
-   */
+	 * Creates an identity matrix.
+	 */
 	constructor();
 
 	/**
-   * Array with matrix values.
-   */
+	 * Array with matrix values.
+	 */
 	elements: number[];
 
 	set(
@@ -76,8 +76,8 @@ export class Matrix3 implements Matrix {
 	setFromMatrix4( m: Matrix4 ): Matrix3;
 
 	/**
-   * @deprecated Use {@link Matrix3#applyToBufferAttribute matrix3.applyToBufferAttribute( attribute )} instead.
-   */
+	 * @deprecated Use {@link Matrix3#applyToBufferAttribute matrix3.applyToBufferAttribute( attribute )} instead.
+	 */
 	applyToBuffer(
 		buffer: BufferAttribute,
 		offset?: number,
@@ -91,44 +91,44 @@ export class Matrix3 implements Matrix {
 	getInverse( matrix: Matrix3, throwOnDegenerate?: boolean ): Matrix3;
 
 	/**
-   * Transposes this matrix in place.
-   */
+	 * Transposes this matrix in place.
+	 */
 	transpose(): Matrix3;
 	getNormalMatrix( matrix4: Matrix4 ): Matrix3;
 
 	/**
-   * Transposes this matrix into the supplied array r, and returns itself.
-   */
+	 * Transposes this matrix into the supplied array r, and returns itself.
+	 */
 	transposeIntoArray( r: number[] ): number[];
 	fromArray( array: number[], offset?: number ): Matrix3;
 	toArray(): number[];
 
 	/**
-   * Multiplies this matrix by m.
-   */
+	 * Multiplies this matrix by m.
+	 */
 	multiply( m: Matrix3 ): Matrix3;
 
 	premultiply( m: Matrix3 ): Matrix3;
 
 	/**
-   * Sets this matrix to a x b.
-   */
+	 * Sets this matrix to a x b.
+	 */
 	multiplyMatrices( a: Matrix3, b: Matrix3 ): Matrix3;
 
 	/**
-   * @deprecated Use {@link Vector3.applyMatrix3 vector.applyMatrix3( matrix )} instead.
-   */
+	 * @deprecated Use {@link Vector3.applyMatrix3 vector.applyMatrix3( matrix )} instead.
+	 */
 	multiplyVector3( vector: Vector3 ): any;
 
 	/**
-   * @deprecated This method has been removed completely.
-   */
+	 * @deprecated This method has been removed completely.
+	 */
 	multiplyVector3Array( a: any ): any;
 	getInverse( matrix: Matrix4, throwOnDegenerate?: boolean ): Matrix3;
 
 	/**
-   * @deprecated Use {@link Matrix3#toArray .toArray()} instead.
-   */
+	 * @deprecated Use {@link Matrix3#toArray .toArray()} instead.
+	 */
 	flattenToArrayOffset( array: number[], offset: number ): number[];
 
 }

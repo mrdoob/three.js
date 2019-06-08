@@ -30,13 +30,13 @@ export class BoxBufferGeometry extends BufferGeometry {
 export class BoxGeometry extends Geometry {
 
 	/**
-   * @param width — Width of the sides on the X axis.
-   * @param height — Height of the sides on the Y axis.
-   * @param depth — Depth of the sides on the Z axis.
-   * @param widthSegments — Number of segmented faces along the width of the sides.
-   * @param heightSegments — Number of segmented faces along the height of the sides.
-   * @param depthSegments — Number of segmented faces along the depth of the sides.
-   */
+	 * @param width — Width of the sides on the X axis.
+	 * @param height — Height of the sides on the Y axis.
+	 * @param depth — Depth of the sides on the Z axis.
+	 * @param widthSegments — Number of segmented faces along the width of the sides.
+	 * @param heightSegments — Number of segmented faces along the height of the sides.
+	 * @param depthSegments — Number of segmented faces along the depth of the sides.
+	 */
 	constructor(
 		width?: number,
 		height?: number,
