@@ -14,7 +14,7 @@ export class LDrawLoader {
 	setFileMap(fileMap: Record<string, string>): void;
 	setMaterials(materials: Material[]): void;
 
-	parse(text: string, path?: string, onLoad: (data: Group) => void): void;
+	parse(text: string, path: string, onLoad: (data: Group) => void): void;
 
 	addMaterial(material: Material ): void;
 	getMaterial(colourCode: string): Material | null;

@@ -9,7 +9,6 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Cache,
 	Color,
 	DefaultLoadingManager,
 	FileLoader,
@@ -17,12 +16,10 @@ import {
 	Group,
 	LineBasicMaterial,
 	LineSegments,
-	Material,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
 	MeshStandardMaterial,
-	Object3D,
 	ShaderMaterial,
 	Vector3
 } from "../../../build/three.module.js";
@@ -553,10 +550,10 @@ var LDrawLoader = ( function () {
 
 		this.path = '';
 
-		// Array of Material
+		// Array of THREE.Material
 		this.materials = [];
 
-		// Not using Cache here because it returns the previous HTML error response instead of calling onError()
+		// Not using THREE.Cache here because it returns the previous HTML error response instead of calling onError()
 		// This also allows to handle the embedded text files ("0 FILE" lines)
 		this.subobjectCache = {};
 
@@ -623,7 +620,7 @@ var LDrawLoader = ( function () {
 
 		parse: function ( text, path, onLoad ) {
 
-			// Async parse.  This function calls onParse with the parsed Object3D as parameter
+			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
 			this.processObject( text, onLoad, null, path );
 
@@ -796,7 +793,7 @@ var LDrawLoader = ( function () {
 
 		parseColourMetaDirective: function ( lineParser ) {
 
-			// Parses a colour definition and returns a Material or null if error
+			// Parses a colour definition and returns a THREE.Material or null if error
 
 			var code = null;
 
@@ -1103,7 +1100,7 @@ var LDrawLoader = ( function () {
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
 
-				// Parses next colour code and returns a Material
+				// Parses next colour code and returns a THREE.Material
 
 				var colourCode = lineParser.getToken();
 
