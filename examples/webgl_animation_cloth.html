@@ -5,66 +5,38 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				background-color: #cce0ff;
-				color: #000;
-			}
-			a {
-				color: #080;
-			}
-		</style>
 	</head>
 
 	<body>
-		<div id="info">Simple Cloth Simulation<br/>
+		<div id="info"><a href="https://github.com/zz85" target="_blank" rel="noopener">@zz85's</a> Simple Cloth Simulation<br/>
 			Verlet integration with relaxed constraints<br/>
-			<a onclick="toggleWind();">Wind</a> |
-			<a onclick="togglePins();">Pins</a>
+			Example by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
 		<script src="../build/three.js"></script>
 
 		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/Cloth.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/objects/Cloth.js"></script>
 
 		<script>
-
-			var camera, cloth;
-			/* testing cloth simulation */
-
-			var windFactor = 1;
-			var windForce = new THREE.Vector3();
-
-			var pinPositions = [
-				[ 6 ],
-				[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
-				[ 0 ],
-				[], // cut the rope ;)
-				[ 0, 10 ], // classic 2 pins
-			];
-
-			function togglePins() {
-
-				cloth.pins = pinPositions[ ~~ ( Math.random() * pinPositions.length ) ];
-
-			}
-
-			function toggleWind() {
-
-				windFactor = windFactor === 1 ? 0 : 1;
-
-			}
 
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
 			}
+
+			var camera, scene, renderer, controls, cloth;
+
+			var windFactor = 1;
+
+			var textureLoader = new THREE.TextureLoader();
+			var clock = new THREE.Clock();
 
 			init();
 
@@ -73,76 +45,53 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// scene
-
-				var scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xcce0ff );
-				scene.fog = new THREE.Fog( 0xcce0ff, 5, 100 );
-
-				// camera
+				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 100 );
-				camera.position.set( 2, 0.5, 4 );
+				camera.position.set( 5, 1, 0 );
 
-				// lights
+				scene.add( new THREE.HemisphereLight( 0xD09E59, 0x3E3735, 5 ) );
 
-				scene.add( new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 1 ) );
-
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
-  			light.position.set( -1, 1.5, 1 );
+				var light = new THREE.SpotLight( 0xffffff, 50, 0, Math.PI / 5, 0.5 );
+				light.position.set( 2, 3.5, 2 );
+				light.target.position.set( 0, 1, 0 );
+				scene.add( light.target );
 				light.castShadow = true;
 
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
-
-				var d = 2;
-
-				light.shadow.camera.left = - d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = - d;
-				light.shadow.bias = -0.01;
-
-				light.shadow.camera.far = 5;
+				light.shadow.camera.near = 3;
+				light.shadow.camera.far = 8;
 
 				scene.add( light );
 
-				// scene.add( new THREE.CameraHelper(light.shadow.camera) );
+				var envMap = new THREE.CubeTextureLoader()
+					.setPath( './textures/cube/pisa/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function() {
 
-				var loader = new THREE.TextureLoader();
-				var logo = loader.load( 'textures/logo.png' );
-				logo.anisotropy = 16;
-				logo.center.set( 0.5, 0.5 );
-				logo.rotation = -Math.PI / 2;
+						envMap.encoding = THREE.sRGBEncoding;
+						scene.background = envMap;
+						scene.traverse( function( child ) {
 
-				var clothMaterial = new THREE.MeshStandardMaterial( {
-					map: logo,
-					side: THREE.DoubleSide,
-					metalness: 0,
-					roughness: 0.9,
-				} );
+							if ( child.isMesh ) child.material.envMap = envMap;
 
+						} );
 
-				cloth = new THREE.Cloth( 1, 1, 10, 10, clothMaterial );
-				cloth.groundPos = - 0.5;
-				cloth.scale.x = 0.5;
+					} );
+
+				cloth = createCloth( envMap );
+				createFlagStand( envMap );
+				createGround( envMap );
+
 				scene.add( cloth );
 
-				cloth.pins = pinPositions[ 1 ];
-
-				cloth.castShadow = true;
-
-				cloth.rotation.z = Math.PI / 2;
-				cloth.receiveShadow = true;
-
-				var groundMaterial = new THREE.MeshStandardMaterial( { color: 0x222222, metalness: 0 } );
-
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 200 ), groundMaterial );
-				mesh.position.y = - 1;
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
-
+				controls = new THREE.OrbitControls( camera, container );
+				controls.maxPolarAngle = Math.PI * 0.5;
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.y = 1;
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.15;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -151,18 +100,12 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1.2;
+				renderer.toneMappingExposure = 0.05;
 				renderer.physicallyCorrectLights = true;
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 
 				renderer.shadowMap.enabled = true;
-
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 2;
-				controls.maxDistance = 20;
-				controls.update();
 
 				var stats = new Stats();
 				container.appendChild( stats.dom );
@@ -178,7 +121,7 @@
 
 				} );
 
-				addControls();
+				initGUI();
 
 			}
 
@@ -193,34 +136,92 @@
 
 			function update() {
 
-				var time = Date.now();
+				var time = clock.getElapsedTime();
 
-				var windStrength = ( Math.cos( time / 7000 ) * 2 + 4 ) * windFactor;
+				var windStrength = ( Math.cos( time ) * 2 + 4 ) * windFactor;
 
 				cloth.force
-					.set( Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) )
+					.set( Math.sin( time ), Math.cos( time ), -1 )
 					.normalize()
 					.multiplyScalar( windStrength );
 
-				cloth.simulate( time );
+				cloth.simulate();
+
+				controls.update();
 
 			}
 
-			function addControls() {
+			function createGround() {
+
+				var map = textureLoader.load( 'textures/particle2.png' );
+				var groundMaterial = new THREE.MeshStandardMaterial( { color: 0x3E3735, metalness: 0, roughness: 1, map, transparent: true } );
+
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 40, 40 ), groundMaterial );
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+			}
+
+			function createFlagStand() {
+
+				var base = new THREE.Mesh(
+					new THREE.CylinderBufferGeometry( 0.1, 0.4, 0.075,  32, 1 ),
+					new THREE.MeshStandardMaterial( { color: 0x111111, metalness: 0, roughness: 0.9,  } )
+				);
+
+				var pole = new THREE.Mesh(
+					new THREE.CylinderBufferGeometry( 0.015,  0.015, 1.5, 16, 1 ),
+					new THREE.MeshStandardMaterial( { color: 0x333333, metalness: 1, roughness: 1 } )
+				);
+				pole.position.y = 0.75;
+
+				base.receiveShadow = true;
+				base.castShadow = true;
+				pole.receiveShadow = true;
+				pole.castShadow = true;
+
+				scene.add( base, pole );
+
+			}
+
+			function createCloth() {
+
+				var map = textureLoader.load( 'textures/logo.png' );
+				map.anisotropy = 16;
+				map.encoding = THREE.sRGBEncoding;
+				map.center.set( 0.5, 0.5 );
+				map.rotation = -Math.PI / 2;
+
+				var mat = new THREE.MeshStandardMaterial( { map, metalness: 0, side: THREE.DoubleSide, } );
+
+				var cloth = new THREE.Cloth( 1, 1, 10, 10, mat );
+
+				cloth.position.set( 0.5, 1.2, 0 );
+				cloth.scale.x = 0.5;
+				cloth.rotation.z = Math.PI / 2;
+
+				cloth.pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+				cloth.castShadow = true;
+
+				return cloth;
+
+			}
+
+			function initGUI() {
 
 				var gui = new dat.GUI();
 				var settings = {
-					'Wind Strength': 1,
+					'Wind Strength': windFactor,
 				}
 
-				gui.add( settings, 'Wind Strength' ).min( 0.0 ).max( 5.0 ).step( 0.01 ).onChange( function () {
+				gui.add( settings, 'Wind Strength' ).min( 0.0 ).max( 2.0 ).step( 0.1 ).onChange( function () {
 
 					windFactor = settings[ 'Wind Strength' ];
 
 				} );
 
 			}
-
 
 		</script>
 	</body>
