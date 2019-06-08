@@ -26,8 +26,8 @@ export class Path extends CurvePath<Vector2> {
 	currentPoint: Vector2;
 
 	/**
-   * @deprecated Use {@link Path#setFromPoints .setFromPoints()} instead.
-   */
+	 * @deprecated Use {@link Path#setFromPoints .setFromPoints()} instead.
+	 */
 	fromPoints( vectors: Vector2[] ): void;
 	setFromPoints( vectors: Vector2[] ): void;
 	moveTo( x: number, y: number ): void;

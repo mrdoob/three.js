@@ -14,9 +14,9 @@ export class ImageLoader {
 	path: string;
 
 	/**
-   * Begin loading from url
-   * @param url
-   */
+	 * Begin loading from url
+	 * @param url
+	 */
 	load(
 		url: string,
 		onLoad?: ( image: HTMLImageElement ) => void,

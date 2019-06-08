@@ -30,28 +30,28 @@ export class Vector3 implements Vector {
 	isVector3: true;
 
 	/**
-   * Sets value of this vector.
-   */
+	 * Sets value of this vector.
+	 */
 	set( x: number, y: number, z: number ): this;
 
 	/**
-   * Sets all values of this vector.
-   */
+	 * Sets all values of this vector.
+	 */
 	setScalar( scalar: number ): this;
 
 	/**
-   * Sets x value of this vector.
-   */
+	 * Sets x value of this vector.
+	 */
 	setX( x: number ): Vector3;
 
 	/**
-   * Sets y value of this vector.
-   */
+	 * Sets y value of this vector.
+	 */
 	setY( y: number ): Vector3;
 
 	/**
-   * Sets z value of this vector.
-   */
+	 * Sets z value of this vector.
+	 */
 	setZ( z: number ): Vector3;
 
 	setComponent( index: number, value: number ): this;
@@ -59,18 +59,18 @@ export class Vector3 implements Vector {
 	getComponent( index: number ): number;
 
 	/**
-   * Clones this vector.
-   */
+	 * Clones this vector.
+	 */
 	clone(): this;
 
 	/**
-   * Copies value of v to this vector.
-   */
+	 * Copies value of v to this vector.
+	 */
 	copy( v: Vector3 ): this;
 
 	/**
-   * Adds v to this vector.
-   */
+	 * Adds v to this vector.
+	 */
 	add( a: Vector3, b?: Vector3 ): this;
 
 	addScalar( s: number ): this;
@@ -78,27 +78,27 @@ export class Vector3 implements Vector {
 	addScaledVector( v: Vector3, s: number ): this;
 
 	/**
-   * Sets this vector to a + b.
-   */
+	 * Sets this vector to a + b.
+	 */
 	addVectors( a: Vector3, b: Vector3 ): this;
 
 	/**
-   * Subtracts v from this vector.
-   */
+	 * Subtracts v from this vector.
+	 */
 	sub( a: Vector3 ): this;
 
 	subScalar( s: number ): this;
 
 	/**
-   * Sets this vector to a - b.
-   */
+	 * Sets this vector to a - b.
+	 */
 	subVectors( a: Vector3, b: Vector3 ): this;
 
 	multiply( v: Vector3 ): this;
 
 	/**
-   * Multiplies this vector by scalar s.
-   */
+	 * Multiplies this vector by scalar s.
+	 */
 	multiplyScalar( s: number ): this;
 
 	multiplyVectors( a: Vector3, b: Vector3 ): this;
@@ -122,9 +122,9 @@ export class Vector3 implements Vector {
 	divide( v: Vector3 ): this;
 
 	/**
-   * Divides this vector by scalar s.
-   * Set vector to ( 0, 0, 0 ) if s == 0.
-   */
+	 * Divides this vector by scalar s.
+	 * Set vector to ( 0, 0, 0 ) if s == 0.
+	 */
 	divideScalar( s: number ): this;
 
 	min( v: Vector3 ): this;
@@ -146,74 +146,74 @@ export class Vector3 implements Vector {
 	roundToZero(): this;
 
 	/**
-   * Inverts this vector.
-   */
+	 * Inverts this vector.
+	 */
 	negate(): this;
 
 	/**
-   * Computes dot product of this vector and v.
-   */
+	 * Computes dot product of this vector and v.
+	 */
 	dot( v: Vector3 ): number;
 
 	/**
-   * Computes squared length of this vector.
-   */
+	 * Computes squared length of this vector.
+	 */
 	lengthSq(): number;
 
 	/**
-   * Computes length of this vector.
-   */
+	 * Computes length of this vector.
+	 */
 	length(): number;
 
 	/**
-   * Computes Manhattan length of this vector.
-   * http://en.wikipedia.org/wiki/Taxicab_geometry
-   *
-   * @deprecated Use {@link Vector3#manhattanLength .manhattanLength()} instead.
-   */
+	 * Computes Manhattan length of this vector.
+	 * http://en.wikipedia.org/wiki/Taxicab_geometry
+	 *
+	 * @deprecated Use {@link Vector3#manhattanLength .manhattanLength()} instead.
+	 */
 	lengthManhattan(): number;
 
 	/**
-   * Computes the Manhattan length of this vector.
-   *
-   * @return {number}
-   *
-   * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
-   */
+	 * Computes the Manhattan length of this vector.
+	 *
+	 * @return {number}
+	 *
+	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 */
 	manhattanLength(): number;
 
 	/**
-   * Computes the Manhattan length (distance) from this vector to the given vector v
-   *
-   * @param {Vector3} v
-   *
-   * @return {number}
-   *
-   * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
-   */
+	 * Computes the Manhattan length (distance) from this vector to the given vector v
+	 *
+	 * @param {Vector3} v
+	 *
+	 * @return {number}
+	 *
+	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 */
 	manhattanDistanceTo( v: Vector3 ): number;
 
 	/**
-   * Normalizes this vector.
-   */
+	 * Normalizes this vector.
+	 */
 	normalize(): this;
 
 	/**
-   * Normalizes this vector and multiplies it by l.
-   */
+	 * Normalizes this vector and multiplies it by l.
+	 */
 	setLength( l: number ): this;
 	lerp( v: Vector3, alpha: number ): this;
 
 	lerpVectors( v1: Vector3, v2: Vector3, alpha: number ): this;
 
 	/**
-   * Sets this vector to cross product of itself and v.
-   */
+	 * Sets this vector to cross product of itself and v.
+	 */
 	cross( a: Vector3, w?: Vector3 ): this;
 
 	/**
-   * Sets this vector to cross product of a and b.
-   */
+	 * Sets this vector to cross product of a and b.
+	 */
 	crossVectors( a: Vector3, b: Vector3 ): this;
 	projectOnVector( v: Vector3 ): this;
 	projectOnPlane( planeNormal: Vector3 ): this;
@@ -221,18 +221,18 @@ export class Vector3 implements Vector {
 	angleTo( v: Vector3 ): number;
 
 	/**
-   * Computes distance of this vector to v.
-   */
+	 * Computes distance of this vector to v.
+	 */
 	distanceTo( v: Vector3 ): number;
 
 	/**
-   * Computes squared distance of this vector to v.
-   */
+	 * Computes squared distance of this vector to v.
+	 */
 	distanceToSquared( v: Vector3 ): number;
 
 	/**
-   * @deprecated Use {@link Vector3#manhattanDistanceTo .manhattanDistanceTo()} instead.
-   */
+	 * @deprecated Use {@link Vector3#manhattanDistanceTo .manhattanDistanceTo()} instead.
+	 */
 	distanceToManhattan( v: Vector3 ): number;
 
 	setFromSpherical( s: Spherical ): this;
@@ -242,26 +242,26 @@ export class Vector3 implements Vector {
 	setFromMatrixColumn( matrix: Matrix4, index: number ): this;
 
 	/**
-   * Checks for strict equality of this vector and v.
-   */
+	 * Checks for strict equality of this vector and v.
+	 */
 	equals( v: Vector3 ): boolean;
 
 	fromArray( xyz: number[], offset?: number ): Vector3;
 
 	/**
-   * Returns an array [x, y, z], or copies x, y and z into the provided array.
-   * @param array (optional) array to store the vector to. If this is not provided, a new array will be created.
-   * @param offset (optional) optional offset into the array.
-   * @return The created or provided array.
-   */
+	 * Returns an array [x, y, z], or copies x, y and z into the provided array.
+	 * @param array (optional) array to store the vector to. If this is not provided, a new array will be created.
+	 * @param offset (optional) optional offset into the array.
+	 * @return The created or provided array.
+	 */
 	toArray( xyz?: number[], offset?: number ): number[];
 
 	/**
-   * Copies x, y and z into the provided array-like.
-   * @param array array-like to store the vector to.
-   * @param offset (optional) optional offset into the array.
-   * @return The provided array-like.
-   */
+	 * Copies x, y and z into the provided array-like.
+	 * @param array array-like to store the vector to.
+	 * @param offset (optional) optional offset into the array.
+	 * @return The provided array-like.
+	 */
 	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
 
 	fromBufferAttribute(
