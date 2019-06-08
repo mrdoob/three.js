@@ -18,5 +18,4 @@ export class LDrawLoader {
 
 	addMaterial(material: Material ): void;
 	getMaterial(colourCode: string): Material | null;
-
 }
