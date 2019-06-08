@@ -117,15 +117,10 @@ export class Quaternion {
 		dst: number[],
 		dstOffset: number,
 		src0: number[],
-		srcOffset: number,
+		srcOffset0: number,
 		src1: number[],
-		stcOffset1: number,
+		srcOffset1: number,
 		t: number
-	): Quaternion;
-
-	/**
-   * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
-   */
-	multiplyVector3( v: any ): any;
+	): void;
 
 }
