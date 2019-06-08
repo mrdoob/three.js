@@ -24,6 +24,11 @@ export class Camera extends Object3D {
    */
 	projectionMatrix: Matrix4;
 
+	/**
+   * This is the inverse of projectionMatrix.
+   */
+	projectionMatrixInverse: Matrix4;
+
 	isCamera: true;
 
 	copy( source: Camera, recursive?: boolean ): this;
