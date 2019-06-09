@@ -26,9 +26,6 @@ THREE.Cloth = ( function () {
 		var geometry = new THREE.PlaneBufferGeometry( width, height, xSegs, ySegs );
 		geometry.attributes.position.setDynamic( true );
 
-		geometry.addAttribute( 'originalPos', geometry.attributes.position.clone() );
-		geometry.addAttribute( 'prevPos', geometry.attributes.position.clone() );
-
 		positions = geometry.attributes.position;
 		normals = geometry.attributes.normal;
 		verticesCount = positions.count;
