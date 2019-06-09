@@ -78,8 +78,8 @@ export class MeshPhongMaterial extends Material {
 	morphTargets: boolean;
 	morphNormals: boolean;
 	/**
-   * @deprecated Use {@link MeshStandardMaterial THREE.MeshStandardMaterial} instead.
-   */
+	 * @deprecated Use {@link MeshStandardMaterial THREE.MeshStandardMaterial} instead.
+	 */
 	metal: boolean;
 
 	setValues( parameters: MeshPhongMaterialParameters ): void;

@@ -34,8 +34,8 @@ export class Plane {
 	equals( plane: Plane ): boolean;
 
 	/**
-   * @deprecated Use {@link Plane#intersectsLine .intersectsLine()} instead.
-   */
+	 * @deprecated Use {@link Plane#intersectsLine .intersectsLine()} instead.
+	 */
 	isIntersectionLine( l: any ): any;
 
 }

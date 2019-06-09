@@ -3724,6 +3724,10 @@
 
 		this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
+		this.texture.image = {};
+		this.texture.image.width = width;
+		this.texture.image.height = height;
+
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
@@ -3745,6 +3749,9 @@
 
 				this.width = width;
 				this.height = height;
+
+				this.texture.image.width = width;
+				this.texture.image.height = height;
 
 				this.dispose();
 
@@ -20623,7 +20630,7 @@
 
 					_gl.pixelStorei( 37440, texture.flipY );
 
-					var isCompressed = ( texture && texture.isCompressedTexture );
+					var isCompressed = ( texture.image[ 0 ] && texture.image[ 0 ].isCompressedTexture );
 					var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 					var cubeImage = [];
@@ -22080,6 +22087,8 @@
 
 				animation.start();
 
+				scope.dispatchEvent( { type: 'sessionstart' } );
+
 			} else {
 
 				if ( scope.enabled ) {
@@ -22089,6 +22098,8 @@
 				}
 
 				animation.stop();
+
+				scope.dispatchEvent( { type: 'sessionend' } );
 
 			}
 
@@ -22414,11 +22425,15 @@
 
 	}
 
+	Object.assign( WebVRManager.prototype, EventDispatcher.prototype );
+
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
 	function WebXRManager( renderer ) {
+
+		var scope = this;
 
 		var gl = renderer.context;
 
@@ -22496,6 +22511,8 @@
 			renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 			animation.stop();
 
+			scope.dispatchEvent( { type: 'sessionend' } );
+
 		}
 
 		function onRequestReferenceSpace( value ) {
@@ -22504,6 +22521,8 @@
 
 			animation.setContext( session );
 			animation.start();
+
+			scope.dispatchEvent( { type: 'sessionstart' } );
 
 		}
 
@@ -22514,6 +22533,12 @@
 		this.setReferenceSpaceType = function ( value ) {
 
 			referenceSpaceType = value;
+
+		};
+
+		this.getSession = function () {
+
+			return session;
 
 		};
 
@@ -22718,6 +22743,8 @@
 		this.submitFrame = function () {};
 
 	}
+
+	Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
 
 	/**
 	 * @author supereggbert / http://www.paulbrunt.co.uk/

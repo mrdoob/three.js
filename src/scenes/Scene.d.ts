@@ -15,13 +15,13 @@ export class Scene extends Object3D {
 	type: 'Scene';
 
 	/**
-   * A fog instance defining the type of fog that affects everything rendered in the scene. Default is null.
-   */
+	 * A fog instance defining the type of fog that affects everything rendered in the scene. Default is null.
+	 */
 	fog: IFog | null;
 
 	/**
-   * If not null, it will force everything in the scene to be rendered with that material. Default is null.
-   */
+	 * If not null, it will force everything in the scene to be rendered with that material. Default is null.
+	 */
 	overrideMaterial: Material | null;
 	autoUpdate: boolean;
 	background: null | Color | Texture;

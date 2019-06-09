@@ -22,7 +22,7 @@
 		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/math/SimplexNoise.js"></script>
 
-		<script src="js/GPUComputationRenderer.js"></script>
+		<script src="js/misc/GPUComputationRenderer.js"></script>
 
 
 		<!-- This is the 'compute shader' for the water heightmap: -->
@@ -470,7 +470,7 @@
 
 				// Creates the gpu computation class and sets it up
 
-				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new THREE.GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var heightmap0 = gpuCompute.createTexture();
 

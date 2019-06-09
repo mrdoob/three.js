@@ -25,7 +25,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/GPUComputationRenderer.js"></script>
+		<script src="js/misc/GPUComputationRenderer.js"></script>
 
 
 		<!-- Fragment shader for protoplanet's position -->
@@ -353,7 +353,7 @@
 
 			function initComputeRenderer() {
 
-				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new THREE.GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();

@@ -12,8 +12,8 @@ export class CubeCamera extends Object3D {
 	renderTarget: WebGLRenderTargetCube;
 
 	/**
-   * @deprecated Use {@link CubeCamera#update .update()} instead
-   */
+	 * @deprecated Use {@link CubeCamera#update .update()} instead
+	 */
 	//updateCubeMap(renderer: Renderer, scene: Scene): void;
 
 	update( renderer: WebGLRenderer, scene: Scene ): void;
