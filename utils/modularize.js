@@ -87,7 +87,7 @@ var files = [
 	{ path: 'loaders/KTXLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MD2Loader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MTLLoader.js', dependencies: [], ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
-	{ path: 'loaders/NRRDLoader.js', dependencies: [ { name: 'Volume', path: 'misc/Volume.js' } ], ignoreList: [] },
+	{ path: 'loaders/NRRDLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/gunzip.min.js' }, { name: 'Volume', path: 'misc/Volume.js' } ], ignoreList: [] },
 	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PDBLoader.js', dependencies: [], ignoreList: [] },
