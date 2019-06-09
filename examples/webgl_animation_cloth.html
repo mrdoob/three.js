@@ -139,7 +139,7 @@
 
 				var time = clock.getElapsedTime();
 
-				var windStrength = ( Math.cos( time ) * 2 + 4 ) * 3 * windFactor;
+				var windStrength = 24 * windFactor;
 
 				cloth.force
 					.set( Math.sin( time ), Math.cos( time ), - 1 )
