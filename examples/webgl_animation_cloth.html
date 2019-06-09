@@ -52,7 +52,8 @@
 
 				scene.add( new THREE.HemisphereLight( 0xD09E59, 0x3E3735, 5 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 50, 0, Math.PI / 5, 0.5 );
+				var light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.5 );
+				light.power = 200;
 				light.position.set( 2, 3.5, 2 );
 				light.target.position.set( 0, 1, 0 );
 				scene.add( light.target );
@@ -67,11 +68,11 @@
 
 				var envMap = new THREE.CubeTextureLoader()
 					.setPath( './textures/cube/pisa/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function() {
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function () {
 
 						envMap.encoding = THREE.sRGBEncoding;
 						scene.background = envMap;
-						scene.traverse( function( child ) {
+						scene.traverse( function ( child ) {
 
 							if ( child.isMesh ) child.material.envMap = envMap;
 
@@ -141,11 +142,11 @@
 				var windStrength = ( Math.cos( time ) * 2 + 4 ) * windFactor;
 
 				cloth.force
-					.set( Math.sin( time ), Math.cos( time ), -1 )
+					.set( Math.sin( time ), Math.cos( time ), - 1 )
 					.normalize()
 					.multiplyScalar( windStrength );
 
-				cloth.simulate();
+				cloth.update();
 
 				controls.update();
 
@@ -166,12 +167,12 @@
 			function createFlagStand() {
 
 				var base = new THREE.Mesh(
-					new THREE.CylinderBufferGeometry( 0.1, 0.4, 0.075,  32, 1 ),
-					new THREE.MeshStandardMaterial( { color: 0x111111, metalness: 0, roughness: 0.9,  } )
+					new THREE.CylinderBufferGeometry( 0.1, 0.4, 0.075, 32, 1 ),
+					new THREE.MeshStandardMaterial( { color: 0x111111, metalness: 0, roughness: 0.9 } )
 				);
 
 				var pole = new THREE.Mesh(
-					new THREE.CylinderBufferGeometry( 0.015,  0.015, 1.5, 16, 1 ),
+					new THREE.CylinderBufferGeometry( 0.015, 0.015, 1.5, 16, 1 ),
 					new THREE.MeshStandardMaterial( { color: 0x333333, metalness: 1, roughness: 1 } )
 				);
 				pole.position.y = 0.75;
@@ -191,7 +192,7 @@
 				map.anisotropy = 16;
 				map.encoding = THREE.sRGBEncoding;
 				map.center.set( 0.5, 0.5 );
-				map.rotation = -Math.PI / 2;
+				map.rotation = - Math.PI / 2;
 
 				var mat = new THREE.MeshStandardMaterial( { map, metalness: 0, side: THREE.DoubleSide, } );
 
@@ -201,6 +202,7 @@
 				cloth.scale.x = 0.5;
 				cloth.rotation.z = Math.PI / 2;
 
+				// pin all ten vertices along leading edge of cloth
 				cloth.pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 				cloth.castShadow = true;
 
@@ -213,7 +215,7 @@
 				var gui = new dat.GUI();
 				var settings = {
 					'Wind Strength': windFactor,
-				}
+				};
 
 				gui.add( settings, 'Wind Strength' ).min( 0.0 ).max( 2.0 ).step( 0.1 ).onChange( function () {
 

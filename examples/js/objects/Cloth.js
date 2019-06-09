@@ -7,7 +7,6 @@
  * Suggested Readings
  *
  * Advanced Character Physics by Thomas Jakobsen Character
- * http://freespace.virgin.net/hugo.elias/models/m_cloth.htm
  * http://en.wikipedia.org/wiki/Cloth_modeling
  * https://viscomp.alexandra.dk/?p=147
  * Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
@@ -44,7 +43,6 @@ THREE.Cloth = ( function () {
 	}
 
 	var Cloth = function ( width, height, xSegs, ySegs, material ) {
-
 
 		THREE.Mesh.call( this, createGeometry( width, height, xSegs, ySegs ), material );
 
@@ -86,9 +84,7 @@ THREE.Cloth = ( function () {
 
 		applyAerodynamicForce: function () {
 
-			var index;
-
-			for ( var i = 0, l = indices.count; i < l; i ++ ) {
+			for ( var i = 0, l = indices.count, index; i < l; i ++ ) {
 
 				index = indices.getX( i );
 				tmp.fromBufferAttribute( normals, index );
@@ -99,10 +95,10 @@ THREE.Cloth = ( function () {
 
 		},
 
-		// TODO: gravity is not correctly taking into account mesh rotation
+		// TODO: gravity is not taking into account mesh rotation
 		applyGravity: function () {
 
-			gravityVector.set( 0, - this.gravity * this.mass, 0 ).applyEuler( this.rotation );
+			gravityVector.set( this.gravity * this.mass, 0, 0 );
 
 			for ( var i = 0; i < verticesCount; i ++ ) {
 
@@ -134,12 +130,9 @@ THREE.Cloth = ( function () {
 				ay = acceleration.getY( i );
 				az = acceleration.getZ( i );
 
-				nx = ( x - px ) * drag;
-				nx += x + ( ax * timestepSq );
-				ny = ( y - py ) * drag;
-				ny += y + ( ay * timestepSq );
-				nz = ( z - pz ) * drag;
-				nz += z + ( az * timestepSq );
+				nx = ( x - px ) * drag + x + ( ax * timestepSq );
+				ny = ( y - py ) * drag + y + ( ay * timestepSq );
+				nz = ( z - pz ) * drag + z + ( az * timestepSq );
 
 				positions.setXYZ( i, nx, ny, nz );
 				prevPositions.setXYZ( i, x, y, z );
@@ -151,7 +144,7 @@ THREE.Cloth = ( function () {
 
 		applyConstraints: function () {
 
-			var index1, index2;
+			var index1, index2, currentDist;
 
 			for ( var i = 0, l = this.constraints.length; i < l; i ++ ) {
 
@@ -164,7 +157,7 @@ THREE.Cloth = ( function () {
 					positions.getZ( index2 ) - positions.getZ( index1 ),
 				);
 
-				var currentDist = tmp.length();
+				currentDist = tmp.length();
 
 				if ( currentDist === 0 ) return;
 
