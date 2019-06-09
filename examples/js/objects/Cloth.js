@@ -9,7 +9,7 @@
  * Advanced Character Physics by Thomas Jakobsen Character
  * http://freespace.virgin.net/hugo.elias/models/m_cloth.htm
  * http://en.wikipedia.org/wiki/Cloth_modeling
- * http://cg.alexandra.dk/tag/spring-mass-system/
+ * https://viscomp.alexandra.dk/?p=147
  * Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
  *
  */
@@ -20,46 +20,45 @@ THREE.Cloth = ( function () {
 
 	var gravityVector = new THREE.Vector3();
 
-	var timestep = 18 / 1000;
-	var timestepSq = timestep * timestep;
+	var positions, verticesCount, indices, prevPositions, originalPositions, acceleration, normals;
+
+	function createGeometry( width, height, xSegs, ySegs ) {
+
+		var geometry = new THREE.PlaneBufferGeometry( width, height, xSegs, ySegs );
+		geometry.attributes.position.setDynamic( true );
+
+		geometry.addAttribute( 'originalPos', geometry.attributes.position.clone() );
+		geometry.addAttribute( 'prevPos', geometry.attributes.position.clone() );
+
+		positions = geometry.attributes.position;
+		normals = geometry.attributes.normal;
+		indices = geometry.index;
+		verticesCount = positions.count;
+
+		prevPositions = geometry.attributes.position.clone();
+		originalPositions = geometry.attributes.position.clone();
+		acceleration = new THREE.BufferAttribute( new Float32Array( verticesCount * 3 ), 3 );
+
+		return geometry;
+
+	}
 
 	var Cloth = function ( width, height, xSegs, ySegs, material ) {
 
-		this.width = width || 1;
-		this.height = height || 1;
-		this.xSegs = xSegs || 10;
-		this.ySegs = ySegs || 10;
 
-		this.geometry = new THREE.PlaneBufferGeometry( width, height, xSegs, ySegs );
-		this.geometry.attributes.position.setDynamic( true );
+		THREE.Mesh.call( this, createGeometry( width, height, xSegs, ySegs ), material );
 
-		material = material || new THREE.MeshBasicMaterial();
-
-		THREE.Mesh.call( this, this.geometry, material );
-
+		this.distance = width / xSegs;
 		this.damping = 0.03;
 		this.mass = 1;
 
 		this.gravity = - 9.81;
 		this.force = new THREE.Vector3( 0, 0, 0 );
 
-		// pin constraints correspond to to vertex indices
+		// pin constraints correspond to vertex indices
 		this.pins = [];
 
-		// create one particle for each vertex
-		this.particles = [];
-
-		var positions = this.geometry.attributes.position;
-		this.particlesCount = positions.count;
-		for ( var i = 0; i < this.particlesCount; i ++ ) {
-
-			this.particles.push(
-				new Particle( positions.getX( i ), positions.getY( i ) )
-			);
-
-		}
-
-		this.constraints = buildConstraintIndices( this.xSegs, this.ySegs );
+		this.constraints = buildConstraintIndices( xSegs, ySegs );
 
 	};
 
@@ -69,33 +68,32 @@ THREE.Cloth = ( function () {
 
 		updateGeometry: function () {
 
-			for ( var i = 0; i < this.particlesCount; i ++ ) {
-
-				var p = this.particles[ i ].position;
-
-				this.geometry.attributes.position.setXYZ( i, p.x, p.y, p.z );
-
-			}
-
 			this.geometry.attributes.position.needsUpdate = true;
-
 			this.geometry.computeVertexNormals();
+
+		},
+
+		applyForceToVertex: function ( force, index ) {
+
+			acceleration.setXYZ(
+				index,
+				acceleration.getX( index ) + force.x * ( 1 / this.mass ),
+				acceleration.getY( index ) + force.y * ( 1 / this.mass ),
+				acceleration.getZ( index ) + force.z * ( 1 / this.mass ),
+			);
 
 		},
 
 		applyAerodynamicForce: function () {
 
-			var index, m;
-			var indices = this.geometry.index;
-			var normals = this.geometry.attributes.normal;
+			var index;
 
-			for ( var i = 0, l = this.geometry.index.count; i < l; i ++ ) {
+			for ( var i = 0, l = indices.count; i < l; i ++ ) {
 
 				index = indices.getX( i );
 				tmp.fromBufferAttribute( normals, index );
-				m = tmp.dot( this.force );
-				tmp.normalize().multiplyScalar( m );
-				this.particles[ index ].addForce( tmp, this.mass );
+				tmp.normalize().multiplyScalar( tmp.dot( this.force ) );
+				this.applyForceToVertex( tmp, index );
 
 			}
 
@@ -104,12 +102,11 @@ THREE.Cloth = ( function () {
 		// TODO: gravity is not correctly taking into account mesh rotation
 		applyGravity: function () {
 
-
 			gravityVector.set( 0, - this.gravity * this.mass, 0 ).applyEuler( this.rotation );
 
-			for ( var i = 0; i < this.particlesCount; i ++ ) {
+			for ( var i = 0; i < verticesCount; i ++ ) {
 
-				this.particles[ i ].addForce( gravityVector, this.mass );
+				this.applyForceToVertex( gravityVector, i );
 
 			}
 
@@ -119,9 +116,34 @@ THREE.Cloth = ( function () {
 
 			var drag = 1 - this.damping;
 
-			for ( var i = 0; i < this.particlesCount; i ++ ) {
+			// Todo: use clock.delta instead of fixed timestep
+			var timestep = 18 / 1000;
+			var timestepSq = timestep * timestep;
 
-				this.particles[ i ].integrate( drag );
+			var x, y, z, px, py, pz, ax, ay, az, nx, ny, nz;
+
+			for ( var i = 0; i < verticesCount; i ++ ) {
+
+				x = positions.getX( i );
+				y = positions.getY( i );
+				z = positions.getZ( i );
+				px = prevPositions.getX( i );
+				py = prevPositions.getY( i );
+				pz = prevPositions.getZ( i );
+				ax = acceleration.getX( i );
+				ay = acceleration.getY( i );
+				az = acceleration.getZ( i );
+
+				nx = ( x - px ) * drag;
+				nx += x + ( ax * timestepSq );
+				ny = ( y - py ) * drag;
+				ny += y + ( ay * timestepSq );
+				nz = ( z - pz ) * drag;
+				nz += z + ( az * timestepSq );
+
+				positions.setXYZ( i, nx, ny, nz );
+				prevPositions.setXYZ( i, x, y, z );
+				acceleration.setXYZ( i, 0, 0, 0	);
 
 			}
 
@@ -129,12 +151,38 @@ THREE.Cloth = ( function () {
 
 		applyConstraints: function () {
 
-			for ( var i = 0, l = this.constraints.length, constraint, p1, p2; i < l; i ++ ) {
+			var index1, index2;
 
-				constraint = this.constraints[ i ];
-				p1 = this.particles[ constraint[ 0 ] ];
-				p2 = this.particles[ constraint[ 1 ] ];
-				satisfyConstraints( p1, p2, this.width / this.xSegs );
+			for ( var i = 0, l = this.constraints.length; i < l; i ++ ) {
+
+				index1 = this.constraints[ i ][ 0 ];
+				index2 = this.constraints[ i ][ 1 ];
+
+				tmp.set(
+					positions.getX( index2 ) - positions.getX( index1 ),
+					positions.getY( index2 ) - positions.getY( index1 ),
+					positions.getZ( index2 ) - positions.getZ( index1 ),
+				);
+
+				var currentDist = tmp.length();
+
+				if ( currentDist === 0 ) return;
+
+				tmp.multiplyScalar( ( 1 - this.distance / currentDist ) * 0.5 );
+
+				positions.setXYZ(
+					index1,
+					positions.getX( index1 ) + tmp.x,
+					positions.getY( index1 ) + tmp.y,
+					positions.getZ( index1 ) + tmp.z,
+				);
+
+				positions.setXYZ(
+					index2,
+					positions.getX( index2 ) - tmp.x,
+					positions.getY( index2 ) - tmp.y,
+					positions.getZ( index2 ) - tmp.z,
+				);
 
 			}
 
@@ -142,81 +190,34 @@ THREE.Cloth = ( function () {
 
 		applyPinConstraints: function () {
 
-			for ( var i = 0, idx, p; i < this.pins.length; i ++ ) {
+			for ( var i = 0; i < this.pins.length; i ++ ) {
 
-				idx = this.pins[ i ];
+				var x = originalPositions.getX( this.pins[ i ] );
+				var y = originalPositions.getY( this.pins[ i ] );
+				var z = originalPositions.getZ( this.pins[ i ] );
 
-				p = this.particles[ idx ];
-
-				p.position.copy( p.original );
-				p.previous.copy( p.original );
+				positions.setXYZ( this.pins[ i ], x, y, z );
+				prevPositions.setXYZ( this.pins[ i ], x, y, z );
 
 			}
 
 		},
 
-		simulate: function () {
+		update: function () {
 
 			this.applyAerodynamicForce();
 			this.applyGravity();
 
+			this.applyVerletIntegration();
+
 			this.applyConstraints();
 			this.applyPinConstraints();
-
-			this.applyVerletIntegration();
 
 			this.updateGeometry();
 
 		}
 
 	} );
-
-	function Particle( x, y ) {
-
-		this.position = new THREE.Vector3( x, y, 0 );
-		this.previous = this.position.clone();
-		this.original = this.position.clone();
-		this.acceleration = new THREE.Vector3();
-
-	}
-
-	Particle.prototype.addForce = function ( force, mass ) {
-
-		this.acceleration.add(
-			tmp.copy( force ).multiplyScalar( 1 / mass )
-		);
-
-	};
-
-	// Performs Verlet integration
-	Particle.prototype.integrate = function ( drag ) {
-
-		var newPos = tmp.subVectors( this.position, this.previous );
-
-		newPos.multiplyScalar( drag ).add( this.position );
-		newPos.add( this.acceleration.multiplyScalar( timestepSq ) );
-
-		tmp = this.previous;
-		this.previous = this.position;
-
-		this.position = newPos;
-		this.acceleration.set( 0, 0, 0 );
-
-	};
-
-	function satisfyConstraints( p1, p2, distance ) {
-
-		tmp.subVectors( p2.position, p1.position );
-		var currentDist = tmp.length();
-
-		if ( currentDist === 0 ) return;
-
-		tmp.multiplyScalar( ( 1 - distance / currentDist ) * 0.5 );
-
-		p1.position.add( tmp );
-		p2.position.sub( tmp );
-
-	}
 
 	function buildConstraintIndices( xSegs, ySegs ) {
 
