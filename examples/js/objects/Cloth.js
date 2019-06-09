@@ -19,7 +19,7 @@ THREE.Cloth = ( function () {
 
 	var gravityVector = new THREE.Vector3();
 
-	var positions, verticesCount, indices, prevPositions, originalPositions, acceleration, normals;
+	var positions, verticesCount, prevPositions, originalPositions, acceleration, normals;
 
 	function createGeometry( width, height, xSegs, ySegs ) {
 
@@ -31,7 +31,6 @@ THREE.Cloth = ( function () {
 
 		positions = geometry.attributes.position;
 		normals = geometry.attributes.normal;
-		indices = geometry.index;
 		verticesCount = positions.count;
 
 		prevPositions = geometry.attributes.position.clone();
@@ -51,6 +50,7 @@ THREE.Cloth = ( function () {
 		this.mass = 1;
 
 		this.gravity = - 9.81;
+		gravityVector.set( this.gravity * this.mass, 0, 0 );
 		this.force = new THREE.Vector3( 0, 0, 0 );
 
 		// pin constraints correspond to vertex indices
@@ -82,33 +82,15 @@ THREE.Cloth = ( function () {
 
 		},
 
-		applyAerodynamicForce: function () {
+		applyAerodynamicForceToVertex: function ( i ) {
 
-			for ( var i = 0, l = indices.count, index; i < l; i ++ ) {
-
-				index = indices.getX( i );
-				tmp.fromBufferAttribute( normals, index );
-				tmp.normalize().multiplyScalar( tmp.dot( this.force ) );
-				this.applyForceToVertex( tmp, index );
-
-			}
+			tmp.fromBufferAttribute( normals, i );
+			tmp.normalize().multiplyScalar( tmp.dot( this.force ) );
+			this.applyForceToVertex( tmp, i );
 
 		},
 
-		// TODO: gravity is not taking into account mesh rotation
-		applyGravity: function () {
-
-			gravityVector.set( this.gravity * this.mass, 0, 0 );
-
-			for ( var i = 0; i < verticesCount; i ++ ) {
-
-				this.applyForceToVertex( gravityVector, i );
-
-			}
-
-		},
-
-		applyVerletIntegration: function () {
+		performVerletIntegrationOnVertex: function ( i ) {
 
 			var drag = 1 - this.damping;
 
@@ -116,29 +98,23 @@ THREE.Cloth = ( function () {
 			var timestep = 18 / 1000;
 			var timestepSq = timestep * timestep;
 
-			var x, y, z, px, py, pz, ax, ay, az, nx, ny, nz;
+			var x = positions.getX( i );
+			var y = positions.getY( i );
+			var z = positions.getZ( i );
+			var px = prevPositions.getX( i );
+			var py = prevPositions.getY( i );
+			var pz = prevPositions.getZ( i );
+			var ax = acceleration.getX( i );
+			var ay = acceleration.getY( i );
+			var az = acceleration.getZ( i );
 
-			for ( var i = 0; i < verticesCount; i ++ ) {
+			var nx = ( x - px ) * drag + x + ( ax * timestepSq );
+			var ny = ( y - py ) * drag + y + ( ay * timestepSq );
+			var nz = ( z - pz ) * drag + z + ( az * timestepSq );
 
-				x = positions.getX( i );
-				y = positions.getY( i );
-				z = positions.getZ( i );
-				px = prevPositions.getX( i );
-				py = prevPositions.getY( i );
-				pz = prevPositions.getZ( i );
-				ax = acceleration.getX( i );
-				ay = acceleration.getY( i );
-				az = acceleration.getZ( i );
-
-				nx = ( x - px ) * drag + x + ( ax * timestepSq );
-				ny = ( y - py ) * drag + y + ( ay * timestepSq );
-				nz = ( z - pz ) * drag + z + ( az * timestepSq );
-
-				positions.setXYZ( i, nx, ny, nz );
-				prevPositions.setXYZ( i, x, y, z );
-				acceleration.setXYZ( i, 0, 0, 0	);
-
-			}
+			positions.setXYZ( i, nx, ny, nz );
+			prevPositions.setXYZ( i, x, y, z );
+			acceleration.setXYZ( i, 0, 0, 0	);
 
 		},
 
@@ -198,10 +174,15 @@ THREE.Cloth = ( function () {
 
 		update: function () {
 
-			this.applyAerodynamicForce();
-			this.applyGravity();
+			for ( var i = 0; i < verticesCount; i ++ ) {
 
-			this.applyVerletIntegration();
+				// TODO: gravity is not taking into account mesh rotation
+				this.applyForceToVertex( gravityVector, i );
+
+				this.applyAerodynamicForceToVertex( i );
+				this.performVerletIntegrationOnVertex( i );
+
+			}
 
 			this.applyConstraints();
 			this.applyPinConstraints();
