@@ -42,8 +42,8 @@ export class InterleavedBufferAttribute {
 		w: number
 	): InterleavedBufferAttribute;
 	/**
-   * @deprecated Use {@link InterleavedBufferAttribute#count .count} instead.
-   */
+	 * @deprecated Use {@link InterleavedBufferAttribute#count .count} instead.
+	 */
 	length: number;
 
 }

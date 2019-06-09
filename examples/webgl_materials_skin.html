@@ -15,11 +15,10 @@
 
 		<script src="../build/three.js"></script>
 
-		<script src="js/ShaderSkin.js"></script>
-
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/SkinShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -88,7 +87,7 @@
 
 				var diffuse = 0xbbbbbb, specular = 0x555555;
 
-				var shader = THREE.ShaderSkin[ "skin" ];
+				var shader = THREE.SkinShaderAdvanced;
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -209,7 +208,7 @@
 
 				//
 
-				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
+				var effectBeckmann = new THREE.ShaderPass( THREE.SkinShaderBeckmann );
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerBeckmann.addPass( effectBeckmann );
 

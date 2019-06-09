@@ -68,7 +68,7 @@ THREE.TTFLoader.prototype = {
 
 					}
 
-					glyph.path.commands.forEach( function ( command, i ) {
+					glyph.path.commands.forEach( function ( command ) {
 
 						if ( command.type.toLowerCase() === 'c' ) {
 

@@ -8,13 +8,13 @@ import { Texture } from '../textures/Texture';
  */
 export namespace ImageUtils {
 	/**
-   * @deprecated
-   */
+	 * @deprecated
+	 */
 	export let crossOrigin: string;
 
 	/**
-   * @deprecated Use {@link TextureLoader THREE.TextureLoader()} instead.
-   */
+	 * @deprecated Use {@link TextureLoader THREE.TextureLoader()} instead.
+	 */
 	export function loadTexture(
 		url: string,
 		mapping?: Mapping,
@@ -23,8 +23,8 @@ export namespace ImageUtils {
 	): Texture;
 
 	/**
-   * @deprecated Use {@link CubeTextureLoader THREE.CubeTextureLoader()} instead.
-   */
+	 * @deprecated Use {@link CubeTextureLoader THREE.CubeTextureLoader()} instead.
+	 */
 	export function loadTextureCube(
 		array: string[],
 		mapping?: Mapping,

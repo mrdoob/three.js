@@ -585,7 +585,7 @@ var SkeletonUtils = {
 };
 
 
-function parallelTraverse ( a, b, callback ) {
+function parallelTraverse( a, b, callback ) {
 
 	callback( a, b );
 

@@ -44,8 +44,8 @@ export class ShaderMaterial extends Material {
 	morphTargets: boolean;
 	morphNormals: boolean;
 	/**
-   * @deprecated Use {@link ShaderMaterial#extensions.derivatives extensions.derivatives} instead.
-   */
+	 * @deprecated Use {@link ShaderMaterial#extensions.derivatives extensions.derivatives} instead.
+	 */
 	derivatives: any;
 	extensions: {
 		derivatives: boolean;

@@ -10,19 +10,24 @@ import { Object3D } from './../core/Object3D';
 export class Camera extends Object3D {
 
 	/**
-   * This constructor sets following properties to the correct type: matrixWorldInverse, projectionMatrix and projectionMatrixInverse.
-   */
+	 * This constructor sets following properties to the correct type: matrixWorldInverse, projectionMatrix and projectionMatrixInverse.
+	 */
 	constructor();
 
 	/**
-   * This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.
-   */
+	 * This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.
+	 */
 	matrixWorldInverse: Matrix4;
 
 	/**
-   * This is the matrix which contains the projection.
-   */
+	 * This is the matrix which contains the projection.
+	 */
 	projectionMatrix: Matrix4;
+
+	/**
+	 * This is the inverse of projectionMatrix.
+	 */
+	projectionMatrixInverse: Matrix4;
 
 	isCamera: true;
 

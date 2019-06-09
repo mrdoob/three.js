@@ -2470,7 +2470,9 @@ THREE.SEA3D.prototype.readCubeMapURL = function ( sea ) {
 
 		this.file.resume = ! usePMREM;
 
-		texture = new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, faces, function ( texture ) {
+		texture = new THREE.HDRCubeTextureLoader()
+			.setType( THREE.UnsignedByteType )
+			.load( faces, function ( texture ) {
 
 			if ( usePMREM ) {
 

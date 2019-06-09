@@ -20,8 +20,8 @@ export class WebGLShadowMap {
 	render( scene: Scene, camera: Camera ): void;
 
 	/**
-   * @deprecated Use {@link WebGLShadowMap#renderReverseSided .shadowMap.renderReverseSided} instead.
-   */
+	 * @deprecated Use {@link WebGLShadowMap#renderReverseSided .shadowMap.renderReverseSided} instead.
+	 */
 	cullFace: any;
 
 }

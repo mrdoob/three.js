@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author yomboprime / https://github.com/yomboprime/
+ * @author gkjohnson / https://github.com/gkjohnson/
  *
  *
  */
@@ -1051,8 +1052,6 @@ THREE.LDrawLoader = ( function () {
 			var mainColourCode = parentParseScope.mainColourCode;
 			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
 
-			var url = parentParseScope.url;
-
 			var currentParseScope = this.getCurrentParseScope();
 
 			// Parse result variables
@@ -1372,7 +1371,7 @@ THREE.LDrawLoader = ( function () {
 							0, 0, 0, 1
 						);
 
-						var fileName = lp.getRemainingString().trim().replace( "\\", "/" );
+						var fileName = lp.getRemainingString().trim().replace( /\\/g, "/" );
 
 						if ( scope.fileMap[ fileName ] ) {
 

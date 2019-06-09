@@ -154,13 +154,10 @@
 
 				// Load background and generate envMap
 
-				var loader = new THREE.RGBELoader().setPath( 'textures/equirectangular/' );
-				loader.load( 'venice_sunset_2k.hdr', function ( texture ) {
-
-					texture.encoding = THREE.RGBEEncoding;
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.flipY = true;
+				new THREE.RGBELoader()
+					.setType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_2k.hdr', function ( texture ) {
 
 					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
 					cubeGenerator.update( renderer );

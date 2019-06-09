@@ -20,15 +20,15 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 export class BufferGeometry extends EventDispatcher {
 
 	/**
-   * This creates a new BufferGeometry. It also sets several properties to an default value.
-   */
+	 * This creates a new BufferGeometry. It also sets several properties to an default value.
+	 */
 	constructor();
 
 	static MaxIndex: number;
 
 	/**
-   * Unique number of this buffergeometry instance
-   */
+	 * Unique number of this buffergeometry instance
+	 */
 	id: number;
 	uuid: string;
 	name: string;
@@ -61,8 +61,8 @@ export class BufferGeometry extends EventDispatcher {
 	setDrawRange( start: number, count: number ): void;
 
 	/**
-   * Bakes matrix transform directly into vertex coordinates.
-   */
+	 * Bakes matrix transform directly into vertex coordinates.
+	 */
 	applyMatrix( matrix: Matrix4 ): BufferGeometry;
 
 	rotateX( angle: number ): BufferGeometry;
@@ -83,20 +83,20 @@ export class BufferGeometry extends EventDispatcher {
 	fromDirectGeometry( geometry: DirectGeometry ): BufferGeometry;
 
 	/**
-   * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.
-   * Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are null.
-   */
+	 * Computes bounding box of the geometry, updating Geometry.boundingBox attribute.
+	 * Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are null.
+	 */
 	computeBoundingBox(): void;
 
 	/**
-   * Computes bounding sphere of the geometry, updating Geometry.boundingSphere attribute.
-   * Bounding spheres aren't' computed by default. They need to be explicitly computed, otherwise they are null.
-   */
+	 * Computes bounding sphere of the geometry, updating Geometry.boundingSphere attribute.
+	 * Bounding spheres aren't' computed by default. They need to be explicitly computed, otherwise they are null.
+	 */
 	computeBoundingSphere(): void;
 
 	/**
-   * Computes vertex normals by averaging face normals.
-   */
+	 * Computes vertex normals by averaging face normals.
+	 */
 	computeVertexNormals(): void;
 
 	merge( geometry: BufferGeometry, offset: number ): BufferGeometry;
@@ -109,34 +109,34 @@ export class BufferGeometry extends EventDispatcher {
 	copy( source: BufferGeometry ): this;
 
 	/**
-   * Disposes the object from memory.
-   * You need to call this when you want the bufferGeometry removed while the application is running.
-   */
+	 * Disposes the object from memory.
+	 * You need to call this when you want the bufferGeometry removed while the application is running.
+	 */
 	dispose(): void;
 
 	/**
-   * @deprecated Use {@link BufferGeometry#groups .groups} instead.
-   */
+	 * @deprecated Use {@link BufferGeometry#groups .groups} instead.
+	 */
 	drawcalls: any;
 
 	/**
-   * @deprecated Use {@link BufferGeometry#groups .groups} instead.
-   */
+	 * @deprecated Use {@link BufferGeometry#groups .groups} instead.
+	 */
 	offsets: any;
 
 	/**
-   * @deprecated Use {@link BufferGeometry#setIndex .setIndex()} instead.
-   */
+	 * @deprecated Use {@link BufferGeometry#setIndex .setIndex()} instead.
+	 */
 	addIndex( index: any ): void;
 
 	/**
-   * @deprecated Use {@link BufferGeometry#addGroup .addGroup()} instead.
-   */
+	 * @deprecated Use {@link BufferGeometry#addGroup .addGroup()} instead.
+	 */
 	addDrawCall( start: any, count: any, indexOffset?: any ): void;
 
 	/**
-   * @deprecated Use {@link BufferGeometry#clearGroups .clearGroups()} instead.
-   */
+	 * @deprecated Use {@link BufferGeometry#clearGroups .clearGroups()} instead.
+	 */
 	clearDrawCalls(): void;
 
 	addAttribute( name: any, array: any, itemSize: any ): any;
