@@ -1,3 +1,7 @@
+/**
+ * @author Joe Pea / http://github.com/trusktr
+ */
+
 export interface HSL {
 	h: number;
 	s: number;
@@ -90,24 +94,24 @@ export class Color {
 	/**
 	 * Converts this color from gamma to linear space.
 	 */
-	convertGammaToLinear(): Color;
+	convertGammaToLinear( gammaFactor?: number ): Color;
 
 	/**
 	 * Converts this color from linear to gamma space.
 	 */
-	convertLinearToGamma(): Color;
+	convertLinearToGamma( gammaFactor?: number ): Color;
 
 	/**
 	 * Copies given color making conversion from sRGB to linear space.
 	 * @param color Color to copy.
 	 */
-	copySRGBToLinear(): Color;
+	copySRGBToLinear( color: Color ): Color;
 
 	/**
 	 * Copies given color making conversion from linear to sRGB space.
 	 * @param color Color to copy.
 	 */
-	copyLinearToSRGB(): Color;
+	copyLinearToSRGB( color: Color ): Color;
 
 	/**
 	 * Converts this color from sRGB to linear space.
