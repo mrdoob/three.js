@@ -1,3 +1,7 @@
+/**
+ * @author Joe Pea / http://github.com/trusktr
+ */
+
 export interface HSL {
 	h: number;
 	s: number;
