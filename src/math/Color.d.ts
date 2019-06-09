@@ -101,13 +101,13 @@ export class Color {
 	 * Copies given color making conversion from sRGB to linear space.
 	 * @param color Color to copy.
 	 */
-	copySRGBToLinear( color?: Color ): Color;
+	copySRGBToLinear( color: Color ): Color;
 
 	/**
 	 * Copies given color making conversion from linear to sRGB space.
 	 * @param color Color to copy.
 	 */
-	copyLinearToSRGB( color?: Color ): Color;
+	copyLinearToSRGB( color: Color ): Color;
 
 	/**
 	 * Converts this color from sRGB to linear space.
