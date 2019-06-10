@@ -4,6 +4,8 @@ Description: Small issues that might trip you up using three.js
 This article is a collection of small issues you might run into
 using three.js that seemed too small to have their own article.
 
+---
+
 <a id="screenshot"></a>
 
 # Taking A Screenshot of the Canvas
@@ -120,6 +122,8 @@ And now it should work.
 
 For a different solution see the next item.
 
+---
+
 <a id="preservedrawingbuffer"></a>
 
 # Preventing the canvas being cleared
@@ -152,6 +156,8 @@ the user turns their phone and the browser switches from portrait to landscape.
 
 If you really wanted to make a drawing program you'd
 [render to a texture using a render target](threejs-rendertargets.html).
+
+---
 
 <a id="tabindex"></a>
 
@@ -227,6 +233,8 @@ The second canvas you can but it gets highlighted. The 3rd
 canvas has both solutions applied.
 
 {{{example url="../threejs-gotchas-tabindex.html"}}}
+
+---
 
 <a id="transparent-canvas"></a>
  
