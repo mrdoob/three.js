@@ -10,6 +10,7 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 
 	this.mixer = new THREE.AnimationMixer( this );
 	this.activeAction = null;
+
 };
 
 THREE.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
@@ -23,17 +24,17 @@ THREE.MorphAnimMesh.prototype.setDirectionForward = function () {
 
 THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
 
-	this.mixer.timeScale = -1.0;
+	this.mixer.timeScale = - 1.0;
 
 };
 
 THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
-	if( this.activeAction ) {
+	if ( this.activeAction ) {
 
 		this.activeAction.stop();
 		this.activeAction = null;
-		
+
 	}
 
 	var clip = THREE.AnimationClip.findByName( this, label );
