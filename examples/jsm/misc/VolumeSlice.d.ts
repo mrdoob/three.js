@@ -1,9 +1,9 @@
 import {
+  Matrix3,
   Mesh,
 } from '../../../src/Three';
 
 import { volume } from './Volume';
-import { Matrix3 } from '../../../build/three.module';
 
 export class VolumeSlice {
   constructor( volume: Volume, index?: number, axis?: string );

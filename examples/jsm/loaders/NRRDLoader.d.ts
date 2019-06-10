@@ -17,7 +17,7 @@ export class NRRDLoader {
 
   load(url: string, onLoad: (group: Volume) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   parse(data: string) : Volume;
-  parseChars(array: number[], start?: number, end?: number) : Volume;
+  parseChars(array: number[], start?: number, end?: number) : string;
   setPath(value: string) : this;
 
 }
