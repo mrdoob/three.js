@@ -160,7 +160,7 @@ export class Euler {
 	y: number;
 	z: number;
 	order: string;
-	onChangeCallback: Function;
+	_onChangeCallback: Function;
 
 	set( x: number, y: number, z: number, order?: string ): Euler;
 	clone(): this;
@@ -173,7 +173,7 @@ export class Euler {
 	fromArray( xyzo: any[] ): Euler;
 	toArray( array?: number[], offset?: number ): number[];
 	toVector3( optionalResult?: Vector3 ): Vector3;
-	onChange( callback: Function ): this;
+	_onChange( callback: Function ): this;
 
 	static RotationOrders: string[];
 	static DefaultOrder: string;
