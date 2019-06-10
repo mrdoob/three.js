@@ -30,51 +30,51 @@ WebGLRenderTargetCube.prototype.fromEquirectangularTexture = function ( renderer
 			tEquirect: { value: null },
 		},
 
-		vertexShader:
+		vertexShader: [
 
-			`
-			varying vec3 vWorldDirection;
+			"varying vec3 vWorldDirection;",
 
-			vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
+			"vec3 transformDirection( in vec3 dir, in mat4 matrix ) {",
 
-				return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
+			"	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );",
 
-			}
+			"}",
 
-			void main() {
+			"void main() {",
 
-				vWorldDirection = transformDirection( position, modelMatrix );
+			"	vWorldDirection = transformDirection( position, modelMatrix );",
 
-				#include <begin_vertex>
-				#include <project_vertex>
+			"	#include <begin_vertex>",
+			"	#include <project_vertex>",
 
-			}
-			`,
+			"}"
 
-		fragmentShader:
+		].join( '\n' ),
 
-			`
-			uniform sampler2D tEquirect;
+		fragmentShader: [
 
-			varying vec3 vWorldDirection;
+			"uniform sampler2D tEquirect;",
 
-			#define RECIPROCAL_PI 0.31830988618
-			#define RECIPROCAL_PI2 0.15915494
+			"varying vec3 vWorldDirection;",
 
-			void main() {
+			"#define RECIPROCAL_PI 0.31830988618",
+			"#define RECIPROCAL_PI2 0.15915494",
 
-				vec3 direction = normalize( vWorldDirection );
+			"void main() {",
 
-				vec2 sampleUV;
+			"	vec3 direction = normalize( vWorldDirection );",
 
-				sampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
+			"	vec2 sampleUV;",
 
-				sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;
+			"	sampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;",
 
-				gl_FragColor = texture2D( tEquirect, sampleUV );
+			"	sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
 
-			}
-			`
+			"	gl_FragColor = texture2D( tEquirect, sampleUV );",
+
+			"}"
+
+		].join( '\n' ),
 	};
 
 	var material = new THREE.ShaderMaterial( {
