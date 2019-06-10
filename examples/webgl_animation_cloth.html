@@ -80,9 +80,9 @@
 
 					} );
 
-				cloth = createCloth( envMap );
-				createFlagStand( envMap );
-				createGround( envMap );
+				cloth = createCloth();
+				createFlagStand();
+				createGround();
 
 				scene.add( cloth );
 
@@ -142,7 +142,7 @@
 				var windStrength = 24 * windFactor;
 
 				cloth.force
-					.set( Math.sin( time ), Math.cos( time ), - 1 )
+					.set( 1, Math.cos( time ), Math.sin( time ) )
 					.normalize()
 					.multiplyScalar( windStrength );
 
@@ -191,19 +191,17 @@
 				var map = textureLoader.load( 'textures/logo.png' );
 				map.anisotropy = 16;
 				map.encoding = THREE.sRGBEncoding;
-				map.center.set( 0.5, 0.5 );
-				map.rotation = - Math.PI / 2;
 
 				var mat = new THREE.MeshStandardMaterial( { map, metalness: 0, side: THREE.DoubleSide, } );
 
 				var cloth = new THREE.Cloth( 1, 1, 10, 10, mat );
 
-				cloth.position.set( 0.5, 1.2, 0 );
-				cloth.scale.x = 0.5;
-				cloth.rotation.z = Math.PI / 2;
+				cloth.position.set( 0, 1.2, -0.5 );
+				cloth.scale.y = 0.5;
+				cloth.rotation.y = Math.PI / 2
 
-				// pin all ten vertices along leading edge of cloth
-				cloth.pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+				// pin vertices along left edge of cloth
+				cloth.pins = [ 0, 11, 22, 33, 44, 55, 66, 77, 88, 99, 110 ];
 				cloth.castShadow = true;
 
 				return cloth;

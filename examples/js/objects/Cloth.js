@@ -17,8 +17,6 @@ THREE.Cloth = ( function () {
 
 	var tmp = new THREE.Vector3();
 
-	var gravityVector = new THREE.Vector3();
-
 	var positions, verticesCount, prevPositions, originalPositions, acceleration, normals;
 
 	function createGeometry( width, height, xSegs, ySegs ) {
@@ -47,8 +45,10 @@ THREE.Cloth = ( function () {
 		this.mass = 1;
 
 		this.gravity = - 9.81;
-		gravityVector.set( this.gravity * this.mass, 0, 0 );
-		this.force = new THREE.Vector3( 0, 0, 0 );
+
+		this.gravityVector = new THREE.Vector3( 0, this.gravity * this.mass, 0 );
+
+		this.force = new THREE.Vector3();
 
 		// pin constraints correspond to vertex indices
 		this.pins = [];
@@ -173,8 +173,7 @@ THREE.Cloth = ( function () {
 
 			for ( var i = 0; i < verticesCount; i ++ ) {
 
-				// TODO: gravity is not taking into account mesh rotation
-				this.applyForceToVertex( gravityVector, i );
+				this.applyForceToVertex( this.gravityVector, i );
 
 				this.applyAerodynamicForceToVertex( i );
 				this.performVerletIntegrationOnVertex( i );
