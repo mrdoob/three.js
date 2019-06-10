@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function RollerCoasterGeometry( curve, divisions ) {
+THREE.RollerCoasterGeometry = function ( curve, divisions ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -210,11 +210,11 @@ function RollerCoasterGeometry( curve, divisions ) {
 	this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 	this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
-}
+};
 
-RollerCoasterGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.RollerCoasterGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-function RollerCoasterLiftersGeometry( curve, divisions ) {
+THREE.RollerCoasterLiftersGeometry = function ( curve, divisions ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -384,11 +384,11 @@ function RollerCoasterLiftersGeometry( curve, divisions ) {
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 	this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
-}
+};
 
-RollerCoasterLiftersGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.RollerCoasterLiftersGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-function RollerCoasterShadowGeometry( curve, divisions ) {
+THREE.RollerCoasterShadowGeometry = function ( curve, divisions ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -454,11 +454,11 @@ function RollerCoasterShadowGeometry( curve, divisions ) {
 
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-}
+};
 
-RollerCoasterShadowGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.RollerCoasterShadowGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-function SkyGeometry() {
+THREE.SkyGeometry = function () {
 
 	THREE.BufferGeometry.call( this );
 
@@ -485,11 +485,11 @@ function SkyGeometry() {
 
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-}
+};
 
-SkyGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.SkyGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-function TreesGeometry( landscape ) {
+THREE.TreesGeometry = function ( landscape ) {
 
 	THREE.BufferGeometry.call( this );
 
@@ -539,6 +539,6 @@ function TreesGeometry( landscape ) {
 	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 	this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
-}
+};
 
-TreesGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+THREE.TreesGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
