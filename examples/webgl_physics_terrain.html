@@ -4,30 +4,15 @@
 		<title>Ammo.js terrain heightfield demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #333;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a { color: #a06851; }
-
 		</style>
 	</head>
 	<body>
-		<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+		<div id="container"></div>
 		<div id="info">Ammo.js physics terrain heightfield demo</div>
 
 		<script src="../build/three.js"></script>
@@ -41,7 +26,6 @@
 			if ( WEBGL.isWebGLAvailable() === false ) {
 
 				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
 
 			}
 
@@ -100,7 +84,6 @@
 			function initGraphics() {
 
 				container = document.getElementById( 'container' );
-				container.innerHTML = '';
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

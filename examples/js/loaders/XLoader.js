@@ -2,16 +2,7 @@
  * @author adrs2002 / https://github.com/adrs2002
  */
 
-
-( function ( global, factory ) {
-
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-		typeof define === 'function' && define.amd ? define( factory ) :
-			( global.THREE = global.THREE || {}, global.THREE.XLoader = factory() );
-
-}( this, ( function () {
-
-	'use strict';
+THREE.XLoader = ( function () {
 
 	var classCallCheck = function ( instance, Constructor ) {
 
@@ -283,7 +274,7 @@
 				loader.setResponseType( 'arraybuffer' );
 				loader.load( this.url, function ( response ) {
 
-					_this._parse( response, onLoad );
+					_this.parse( response, onLoad );
 
 				}, onProgress, onError );
 
@@ -310,14 +301,6 @@
 
 				this.resourcePath = value;
 				return this;
-
-			}
-		}, {
-			key: 'fromResponsedData',
-			value: function fromResponsedData( _data, _arg, onLoad ) {
-
-				this._setArgOption( _arg );
-				this._parse( _data, onLoad );
 
 			}
 		}, {
@@ -441,8 +424,8 @@
 
 			}
 		}, {
-			key: 'ensureBinary',
-			value: function ensureBinary( buf ) {
+			key: '_ensureBinary',
+			value: function _ensureBinary( buf ) {
 
 				if ( typeof buf === "string" ) {
 
@@ -462,8 +445,8 @@
 
 			}
 		}, {
-			key: 'ensureString',
-			value: function ensureString( buf ) {
+			key: '_ensureString',
+			value: function _ensureString( buf ) {
 
 				if ( typeof buf !== "string" ) {
 
@@ -477,11 +460,11 @@
 
 			}
 		}, {
-			key: '_parse',
+			key: 'parse',
 			value: function _parse( data, onLoad ) {
 
-				var binData = this.ensureBinary( data );
-				this._data = this.ensureString( data );
+				var binData = this._ensureBinary( data );
+				this._data = this._ensureString( data );
 				this.onLoad = onLoad;
 				return this._isBinary( binData ) ? this._parseBinary( binData ) : this._parseASCII();
 
@@ -520,7 +503,7 @@
 				this._hierarchieParse( this.Hierarchies, endRead );
 				this._changeRoot();
 				this._currentObject = this.Hierarchies.children.shift();
-				this.mainloop();
+				this._mainloop();
 
 			}
 		}, {
@@ -605,17 +588,17 @@
 
 			}
 		}, {
-			key: 'mainloop',
-			value: function mainloop() {
+			key: '_mainloop',
+			value: function _mainloop() {
 
 				var _this2 = this;
 
-				this.mainProc();
+				this._mainProc();
 				if ( this._currentObject.parent || this._currentObject.children.length > 0 || ! this._currentObject.worked ) {
 
 					setTimeout( function () {
 
-						_this2.mainloop();
+						_this2._mainloop();
 
 					}, 1 );
 
@@ -634,8 +617,8 @@
 
 			}
 		}, {
-			key: 'mainProc',
-			value: function mainProc() {
+			key: '_mainProc',
+			value: function _mainProc() {
 
 				var breakFlag = false;
 				while ( true ) {
@@ -1573,7 +1556,7 @@
 			}
 		}, {
 			key: 'assignAnimation',
-			value: function assignAnimation( _model, _animation, _isBind ) {
+			value: function assignAnimation( _model, _animation ) {
 
 				var model = _model;
 				var animation = _animation;
@@ -1686,4 +1669,4 @@
 
 	return XLoader;
 
-} ) ) );
+} )();

@@ -4,28 +4,11 @@
 	<title>three.js webgl - interactive instances (gpu)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			font-family: Monospace;
-			background-color: #f0f0f0;
-			margin: 0px;
-			overflow: hidden;
+		#info {
+			background-color: rgba(0,0,0,0.75);
 		}
-
-		.info {
-			position: absolute;
-			background-color: black;
-			opacity: 0.8;
-			color: white;
-			text-align: center;
-			top: 0px;
-			width: 100%;
-		}
-
-		.info a {
-			color: #00ffff;
-		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
@@ -37,7 +20,7 @@
 </head>
 <body>
 
-	<div class="info">
+	<div id="info">
 
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking of geometry instances
 
@@ -45,15 +28,10 @@
 
 		<br/><br/>
 
-		<div>This demo compares different methods of constructing and rendering many instances of a single geometry.</div>
-
-		<br/>
-
 		<div>
 
-			<div style="display:inline-block;">
-				<span>number of<br/>geometry instances</span>
-				<br/>
+			<div>
+				number of instances:
 				<select id="instanceCount">
 					<option>100</option>
 					<option>500</option>
@@ -69,11 +47,8 @@
 				</select>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>method of<br/>construction/rendering</span>
-				<br/>
+			<div>
+				method:
 				<select id="method">
 					<option>instanced</option>
 					<option>merged</option>
@@ -82,27 +57,18 @@
 				</select>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>render continuously<br/>(to get fps reading)</span>
-				<br/>
+			<div>
+				render continuously:
 				<input id="animate" type="checkbox" />
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>use override material<br/>(only effects singleMaterial method)</span>
-				<br/>
+			<div>
+				override material (only affects singleMaterial):
 				<input id="override" type="checkbox" checked/>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>construct anew<br/>(to get additional timings)</span>
-				<br/>
+			<div>
+				construct anew(to get additional timings):
 				<button id="construct" type="button">do it</button>
 			</div>
 

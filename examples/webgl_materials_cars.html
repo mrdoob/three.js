@@ -4,35 +4,24 @@
 		<title>three.js webgl - materials - car</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-			}
-			#info a {
-				color: blue;
-				font-weight: bold;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo :
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
 			<span>Body: <select id="body-mat"></select></span>
-			<span>Rims / Trim: <select id="rim-mat"></select></span>
+			<span>Details: <select id="rim-mat"></select></span>
 			<span>Glass: <select id="glass-mat"></select></span>
 			<br><br>
 			<span>Follow camera: <input type="checkbox" id="camera-toggle"></span>
@@ -48,7 +37,7 @@
 		<script src="js/pmrem/PMREMGenerator.js"></script>
 		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
 
-		<script src="js/Car.js"></script>
+		<script src="js/misc/CarControls.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -70,8 +59,8 @@
 			var followCamera = document.getElementById( 'camera-toggle' );
 
 			var clock = new THREE.Clock();
-			var car = new THREE.Car();
-			car.turningRadius = 75;
+			var carControls = new THREE.CarControls();
+			carControls.turningRadius = 75;
 
 			var carParts = {
 				body: [],
@@ -167,7 +156,7 @@
 
 					carModel = gltf.scene.children[ 0 ];
 
-					car.setModel( carModel );
+					carControls.setModel( carModel );
 
 					carModel.traverse( function ( child ) {
 
@@ -300,14 +289,14 @@
 
 				if ( carModel ) {
 
-					car.update( delta / 3 );
+					carControls.update( delta / 3 );
 
 					console.log(   );
 
 					if ( carModel.position.length() > 200 ) {
 
 						carModel.position.set( 0, 0, 0 );
-						car.speed = 0;
+						carControls.speed = 0;
 
 					}
 

@@ -115,8 +115,7 @@
 
 		<h3>[method:Quaternion inverse]()</h3>
 		<p>
-			Inverts this quaternion - calculate the [page:.conjugate conjugate] and then
-			[page:.normalize normalizes] the result.
+			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The quaternion is assumed to have unit length.
 		</p>
 
 		<h3>[method:Float length]()</h3>
@@ -166,7 +165,7 @@
 					functions are called.
 				</li>
 				<li>
-					[page:.setFromEuler setFromEuler]() function is called with its *update* argument set to true.
+					[page:.setFromEuler setFromEuler]() function is called with its *update* argument not set to false.
 				</li>
 			</ul>
 			By default it is the empty function, however you can change it if needed using [page:.onChange onChange]( [page:Function onChangeCallback] ).

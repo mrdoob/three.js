@@ -4,7 +4,9 @@ import { PerspectiveCamera } from './../cameras/PerspectiveCamera';
 import { LightShadow } from './LightShadow';
 
 export class PointLightShadow extends LightShadow {
-  camera: PerspectiveCamera;
+
+	camera: PerspectiveCamera;
+
 }
 
 /**
@@ -16,26 +18,28 @@ export class PointLightShadow extends LightShadow {
  * scene.add( light );
  */
 export class PointLight extends Light {
-  constructor(
-    color?: Color | string | number,
-    intensity?: number,
-    distance?: number,
-    decay?: number
-  );
 
-  /*
-   * Light's intensity.
-   * Default - 1.0.
-   */
-  intensity: number;
+	constructor(
+		color?: Color | string | number,
+		intensity?: number,
+		distance?: number,
+		decay?: number
+	);
 
-  /**
-   * If non-zero, light will attenuate linearly from maximum intensity at light position down to zero at distance.
-   * Default — 0.0.
-   */
-  distance: number;
+	/*
+	 * Light's intensity.
+	 * Default - 1.0.
+	 */
+	intensity: number;
 
-  decay: number;
-  shadow: PointLightShadow;
-  power: number;
+	/**
+	 * If non-zero, light will attenuate linearly from maximum intensity at light position down to zero at distance.
+	 * Default — 0.0.
+	 */
+	distance: number;
+
+	decay: number;
+	shadow: PointLightShadow;
+	power: number;
+
 }

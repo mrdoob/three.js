@@ -125,7 +125,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 	constructor: THREE.AdaptiveToneMappingPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer, deltaTime/*, maskActive*/ ) {
 
 		if ( this.needsInit ) {
 
@@ -183,7 +183,7 @@ THREE.AdaptiveToneMappingPass.prototype = Object.assign( Object.create( THREE.Pa
 
 	},
 
-	reset: function ( renderer ) {
+	reset: function () {
 
 		// render targets
 		if ( this.luminanceRT ) {

@@ -4,26 +4,7 @@
 		<title>three.js - software renderer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color:#0078ff;
-			}
-			#info {
-				position: absolute;
-				top: 10px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index:100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -33,7 +14,7 @@
 		</div>
 
 		<script src="../build/three.js"></script>
-		<script src="js/geometries/Hilbert.js"></script>
+		<script src="js/utils/GeometryUtils.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
 		<script src="js/renderers/Projector.js"></script>
 		<script src="js/renderers/SoftwareRenderer.js"></script>
@@ -119,7 +100,7 @@
 				scene.add( texSprite );
 
 				// Line
-				var hilbertPoints = THREE.Hilbert.generate3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var lineGeometry = new THREE.BufferGeometry();
 				var subdivisions = 6;

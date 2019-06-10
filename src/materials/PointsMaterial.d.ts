@@ -8,13 +8,15 @@ import { Texture } from './../textures/Texture';
  * @deprecated Use an Array instead.
  */
 export class MultiMaterial extends Material {
-  constructor(materials?: Material[]);
 
-  isMultiMaterial: true;
+	constructor( materials?: Material[] );
 
-  materials: Material[];
+	isMultiMaterial: true;
 
-  toJSON(meta: any): any;
+	materials: Material[];
+
+	toJSON( meta: any ): any;
+
 }
 
 /**
@@ -22,19 +24,21 @@ export class MultiMaterial extends Material {
  */
 
 export interface PointsMaterialParameters extends MaterialParameters {
-  color?: Color | string | number;
-  map?: Texture;
-  size?: number;
-  sizeAttenuation?: boolean;
+	color?: Color | string | number;
+	map?: Texture;
+	size?: number;
+	sizeAttenuation?: boolean;
 }
 
 export class PointsMaterial extends Material {
-  constructor(parameters?: PointsMaterialParameters);
 
-  color: Color;
-  map: Texture | null;
-  size: number;
-  sizeAttenuation: boolean;
+	constructor( parameters?: PointsMaterialParameters );
 
-  setValues(parameters: PointsMaterialParameters): void;
+	color: Color;
+	map: Texture | null;
+	size: number;
+	sizeAttenuation: boolean;
+
+	setValues( parameters: PointsMaterialParameters ): void;
+
 }

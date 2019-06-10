@@ -4,17 +4,18 @@
 		<title>three.js css3d - youtube</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-				overflow: hidden;
+			body {
+				background-color: #ffffff;
 			}
+
 			#blocker {
 				position: absolute;
-				top: 0px;
-				left: 0px;
-				width: 100%;
-				height: 100%;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
 			}
 		</style>
 	</head>
@@ -86,12 +87,12 @@
 				var blocker = document.getElementById( 'blocker' );
 				blocker.style.display = 'none';
 
-				document.addEventListener( 'mousedown', function () {
+				controls.addEventListener( 'start', function () {
 
 					blocker.style.display = '';
 
 				} );
-				document.addEventListener( 'mouseup', function () {
+				controls.addEventListener( 'end', function () {
 
 					blocker.style.display = 'none';
 

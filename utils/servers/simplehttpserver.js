@@ -32,12 +32,34 @@ var port = 8000,
 		"bin": "application/octet-stream"
 	};
 
+// https://github.com/parshap/node-sanitize-filename/blob/master/index.js#L33-L47
+var illegalRe = /[\?<>:\*\|":]/g;
+var controlRe = /[\x00-\x1f\x80-\x9f]/g;
+var reservedRe = /^\.+$/;
+var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+var windowsTrailingRe = /[\. ]+$/;
+
+function sanitize( input ) {
+
+	var sanitized = input
+		.replace( /\//g, "\\" )
+		.replace( illegalRe, "" )
+		.replace( controlRe, "" )
+		.replace( reservedRe, "" )
+		.replace( windowsReservedRe, "" )
+		.replace( windowsTrailingRe, "" );
+	return sanitized;
+
+}
+
+
+
 port = process.argv[ 2 ] ? parseInt( process.argv[ 2 ], 0 ) : port;
 
 function handleRequest( request, response ) {
 
 	var urlObject = urlParser.parse( request.url, true );
-	var pathname = decodeURIComponent( urlObject.pathname );
+	var pathname = decodeURIComponent( sanitize( urlObject.pathname ) );
 
 	console.log( '[' + ( new Date() ).toUTCString() + '] ' + '"' + request.method + ' ' + pathname + '"' );
 
@@ -98,8 +120,8 @@ function handleRequest( request, response ) {
 				files.unshift( '.', '..' );
 				files.forEach( function ( item ) {
 
-					var urlpath = pathname + item,
-						itemStats = fs.statSync( currentDir + urlpath );
+				  var urlpath = path.join( pathname, item ),
+						itemStats = fs.statSync( path.join( currentDir, urlpath ) );
 
 					if ( itemStats.isDirectory() ) {
 
@@ -124,7 +146,7 @@ function handleRequest( request, response ) {
 
 http.createServer( handleRequest ).listen( port );
 
-require( 'dns' ).lookup( require( 'os' ).hostname(), function ( err, addr, fam ) {
+require( 'dns' ).lookup( require( 'os' ).hostname(), function ( err, addr ) {
 
  	console.log( 'Running at http://' + addr + ( ( port === 80 ) ? '' : ':' ) + port + '/' );
 

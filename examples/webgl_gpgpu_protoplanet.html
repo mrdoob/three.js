@@ -4,33 +4,11 @@
 		<title>three.js webgl - gpgpu - protoplanet</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				text-align:center;
-				cursor: pointer;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color: #ffffff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
 			#warning {
 				color: #ff0000;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -47,7 +25,7 @@
 		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
 
-		<script src="js/GPUComputationRenderer.js"></script>
+		<script src="js/misc/GPUComputationRenderer.js"></script>
 
 
 		<!-- Fragment shader for protoplanet's position -->
@@ -375,7 +353,7 @@
 
 			function initComputeRenderer() {
 
-				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new THREE.GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();

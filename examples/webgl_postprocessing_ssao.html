@@ -4,28 +4,10 @@
 		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a { color:#00ff78; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
+				background-color: #aaa;
 			}
 		</style>
 	</head>
@@ -38,7 +20,7 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/SSAOPass.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/SimplexNoise.js"></script>
+		<script src="js/math/SimplexNoise.js"></script>
 
 		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>

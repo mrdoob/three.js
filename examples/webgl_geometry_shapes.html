@@ -4,16 +4,17 @@
 		<title>three.js webgl - geometry - shapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
 		</style>
 	</head>
 	<body>
+
+		<div id="info">Simple procedurally-generated shapes</div>
 
 		<script src="../build/three.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -41,14 +42,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Simple procedurally-generated shapes<br/>Drag to spin';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
