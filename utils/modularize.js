@@ -12,6 +12,7 @@ var dstFolder = __dirname + '/../examples/jsm/';
 var files = [
 	{ path: 'animation/AnimationClipCreator.js', dependencies: [], ignoreList: [] },
 	{ path: 'animation/CCDIKSolver.js', dependencies: [], ignoreList: [ 'SkinnedMesh' ] },
+	{ path: 'animation/MMDPhysics.js', dependencies: [], ignoreList: [ 'SkinnedMesh' ] },
 	{ path: 'animation/TimelinerController.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'cameras/CinematicCamera.js', dependencies: [ { name: 'BokehShader', path: 'shaders/BokehShader2.js' }, { name: 'BokehDepthShader', path: 'shaders/BokehShader2.js' } ], ignoreList: [] },
