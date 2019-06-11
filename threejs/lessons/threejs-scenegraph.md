@@ -380,6 +380,122 @@ that scene graph above is simplified. For example you might extend it
 to cover the every finger (at least another 28 nodes) and every toe
 (yet another 28 nodes) plus ones for the and jaw, the eyes and maybe more.
 
+Let's make one semi-complex scenegraph. We'll make a tank. The tank will have
+6 wheels and a turret. The tank will follow a path. There will be a sphere that
+moves around and the tank will target the sphere.
+
+Here's the scene graph. The meshes are colored in green, the `Object3D`s in blue,
+and the lights in gold, and the cameras in purple. One camera has not been added
+to the scene graph.
+
+<div class="threejs_center"><img src="resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
+
+Look in the code to see the setup of all of these nodes.
+
+For the target, the thing the tank is aiming at, there is a `targetOrbit`
+(`Object3D`) which just rotates similar to the `earthOrbit` above. A
+`targetElevation` (`Object3D`) which is a child of the `targetOrbit` provides an
+offset from the `targetOrbit` and a base elevation. Childed to that is another
+`Object3D` called `targetBob` which just bobs up and down relative to the
+`targetElevation`. Finally there's the `targetMesh` which is just a cube we
+rotate and change it's colors
+
+```js
+// move target
+targetOrbit.rotation.y = time * .27;
+targetBob.position.y = Math.sin(time * 2) * 4;
+targetMesh.rotation.x = time * 7;
+targetMesh.rotation.y = time * 13;
+targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
+targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
+```
+
+For the tank there's an `Object3D` called `tank` which used to move everything
+below it around. The code uses a `SplineCurve` which it can ask for positions
+along that curve. 0.0 is the start of the curve. 1.0 is the end of the curve. It
+asks for the current position where it puts the tank. It then asks for a
+position slightly further down the curve and uses that to point the tank in that
+direction using `Object3D.lookAt`.
+
+```js
+const tankPosition = new THREE.Vector2();
+const tankTarget = new THREE.Vector2();
+
+...
+
+// move tank
+const tankTime = time * .05;
+curve.getPointAt(tankTime % 1, tankPosition);
+curve.getPointAt((tankTime + 0.01) % 1, tankTarget);
+tank.position.set(tankPosition.x, 0, tankPosition.y);
+tank.lookAt(tankTarget.x, 0, tankTarget.y);
+```
+
+The turret on top of the tank is moved automatically by being a child
+of the tank. To point it at the target we just ask for the target's world position
+and then again use `Object3D.lookAt`
+
+```js
+const targetPosition = new THREE.Vector3();
+
+...
+
+// face turret at target
+targetMesh.getWorldPosition(targetPosition);
+turretPivot.lookAt(targetPosition);
+```
+
+There's a `turretCamera` which is a child of the `turretMesh` so
+it will move up and down and rotate with the turret. We make that
+aim at the target.
+
+```js
+// make the turretCamera look at target
+turretCamera.lookAt(targetPosition);
+```
+
+There is also a `targetCameraPivot` which is a child of `targetBob` so it floats
+around with the target. We aim that back at the tank. It's purpose is to allow the
+`targetCamera` to be offset from the target itself. If we instead made the camera
+a child of `targetBob` and just aimed the camera itself it would be inside the
+target.
+
+```js
+// make the targetCameraPivot look at the at the tank
+tank.getWorldPosition(targetPosition);
+targetCameraPivot.lookAt(targetPosition);
+```
+
+Finally we rotate all the wheels
+
+```js
+wheelMeshes.forEach((obj) => {
+  obj.rotation.x = time * 3;
+});
+```
+
+For the cameras we setup an array of all 4 cameras at init time with descriptions.
+
+```js
+const cameras = [
+  { cam: camera, desc: 'detached camera', },
+  { cam: turretCamera, desc: 'on turret looking at target', },
+  { cam: targetCamera, desc: 'near target looking at tank', },
+  { cam: tankCamera, desc: 'above back of tank', },
+];
+
+const infoElem = document.querySelector('#info');
+```
+
+and cycle through our cameras at render time.
+
+```js
+const camera = cameras[time * .25 % cameras.length | 0];
+infoElem.textContent = camera.desc;
+```
+
+{{{example url="../threejs-scenegraph-tank.html"}}}
+
 I hope this gives some idea of how scene graphs work and how you might use them.
 Making `Object3D` nodes and parenting things to them is an important step to using
 a 3D engine like three.js well. Often it might seem like some complex math is necessary
