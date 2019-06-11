@@ -49,7 +49,20 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
-		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
+		if ( this.background !== null ) {
+
+			if ( this.background.texture ) {
+
+				data.object.background = this.background.texture.toJSON( meta );
+
+			} else {
+
+				data.object.background = this.background.toJSON( meta );
+
+			}
+
+		}
+
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
