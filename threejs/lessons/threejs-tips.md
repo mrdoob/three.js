@@ -1,4 +1,4 @@
-Title: Three.js Gotchas
+Title: Three.js Tips
 Description: Small issues that might trip you up using three.js
 
 This article is a collection of small issues you might run into
@@ -47,7 +47,7 @@ const saveBlob = (function() {
 Here's the example from [the article on responsiveness](threejs-responsive.html)
 with the code above added and some CSS to place the button
 
-{{{example url="../threejs-gotchas-screenshot-bad.html"}}}
+{{{example url="../threejs-tips-screenshot-bad.html"}}}
 
 When I tried it I got this screenshot
 
@@ -118,7 +118,7 @@ elem.addEventListener('click', () => {
 
 And now it should work.
 
-{{{example url="../threejs-gotchas-screenshot-good.html" }}}
+{{{example url="../threejs-tips-screenshot-good.html" }}}
 
 For a different solution see the next item.
 
@@ -145,7 +145,7 @@ const canvas = document.querySelector('#c');
 +renderer.autoClearColor = false;
 ```
 
-{{{example url="../threejs-gotchas-preservedrawingbuffer.html" }}}
+{{{example url="../threejs-tips-preservedrawingbuffer.html" }}}
 
 Note that if you were serious about making a drawing program this would not be a
 solution as the browser will still clear the canvas anytime we change its
@@ -232,7 +232,7 @@ Notice you can't get the first canvas to accept keyboard input.
 The second canvas you can but it gets highlighted. The 3rd
 canvas has both solutions applied.
 
-{{{example url="../threejs-gotchas-tabindex.html"}}}
+{{{example url="../threejs-tips-tabindex.html"}}}
 
 ---
 
@@ -333,4 +333,4 @@ body {
 note that `pointer-events: none` makes the canvas invisible to the mouse
 and touch events so you can select the text beneath.
 
-{{{example url="../threejs-gotchas-transparent-canvas.html" }}}
+{{{example url="../threejs-tips-transparent-canvas.html" }}}
