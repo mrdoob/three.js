@@ -17,5 +17,8 @@ export class SphericalHarmonics3 {
 	fromArray(array: number[]): SphericalHarmonics3;
 	toArray(): number[];
 
+	getAt(normal: Vector3, target: Vector3) : Vector3;
+	getIrradianceAt(normal: Vector3, target: Vector3) : Vector3;
+
 	static getBasisAt(normal: Vector3, shBasis: number[]): void;
 };
