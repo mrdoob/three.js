@@ -334,3 +334,65 @@ note that `pointer-events: none` makes the canvas invisible to the mouse
 and touch events so you can select the text beneath.
 
 {{{example url="../threejs-tips-transparent-canvas.html" }}}
+
+---
+
+<a id="html-background"></a>
+
+# Making your background a three.js animation
+
+A common question is how to make a three.js animation be the background of
+a webpage.
+
+There are 2 obvious ways.
+
+* Set the canvas CSS `position` to `fixed` as in
+
+```css
+#c {
+ position: fixed;
+ left: 0;
+ top: 0;
+ ...
+}
+```
+
+You can basically see this exact solution on the previous example. Just set `z-index` to -1
+and the cubes will appear behind the text.
+
+A small disadvantage to this solution is your JavaScript must integrate with the page
+and if you have a complex page then you need to make sure none of the JavaScript in your
+three.js visualization conflict with the JavaScript doing other things in the page.
+
+* Use an `iframe`
+
+This is the solution used on [the front page of this site](/).
+
+In your webpage just insert an iframe, for example
+
+```html
+<iframe id="background" src="threejs-repsonsive.html">
+<div>
+  Your content goes here.
+</div>
+```
+
+Then style the iframe to fill the window and be in the background
+which is basically the same code as we used above for the canvas
+except we also need to set `border` to `none` since iframes have
+a border by default.
+
+```
+#background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    border: none;
+    pointer-events: none;
+}
+```
+
+{{{example url="../threejs-tips-html-background.html"}}}
