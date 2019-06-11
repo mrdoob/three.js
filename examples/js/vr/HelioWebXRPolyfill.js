@@ -149,7 +149,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 							return tempRequestReferenceSpace( {
 								type: "stationary",
-								subtype: "eye-level"
+								subtype: "floor-level"
 							} );
 
 						};
