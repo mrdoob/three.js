@@ -89,6 +89,7 @@ var files = [
 	{ path: 'loaders/LWOLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/KTXLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MD2Loader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/MMDLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'MMDParser', path: 'libs/mmdparser.module.js' } ], ignoreList: [ 'Camera', 'LoadingManager' ] },
 	{ path: 'loaders/MTLLoader.js', dependencies: [], ignoreList: [ 'BackSide', 'DoubleSide', 'ClampToEdgeWrapping', 'MirroredRepeatWrapping' ] },
 	{ path: 'loaders/NRRDLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/gunzip.min.js' }, { name: 'Volume', path: 'misc/Volume.js' } ], ignoreList: [] },
 	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
