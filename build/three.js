@@ -21984,7 +21984,7 @@
 		var bottomFov = -15( projL[ 9 ] - 1 ) / projL[ 5 ];
 
 		var leftFov = -20;//( projL[ 8 ] - 1 ) / projL[ 0 ];
-		var rightFov = -20;//( projR[ 8 ] + 1 ) / projR[ 0 ];
+		var rightFov = 20;//( projR[ 8 ] + 1 ) / projR[ 0 ];
 		var left = near * leftFov;
 		var right = near * rightFov;
 
