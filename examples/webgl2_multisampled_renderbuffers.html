@@ -36,12 +36,6 @@
 		<script src="../build/three.js"></script>
 		<script src="js/WebGL.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
 		<script>
 
 			if ( WEBGL.isWebGL2Available() === false ) {
@@ -50,9 +44,7 @@
 
 			}
 
-			var camera, scene, renderer, clock, group;
-
-			var composer1, composer2;
+			var camera, scene, renderer, clock, group, renderTarget;
 
 			init();
 			animate();
@@ -61,7 +53,7 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -108,32 +100,23 @@
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setScissorTest( true );
 				container.appendChild( renderer.domElement );
+
 
 				//
 
 				var parameters = {
-					format: THREE.RGBFormat,
-					stencilBuffer: false
+					format: THREE.RGBAFormat,
+					stencilBuffer: false,
+					samples: 4
 				};
 
 				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				var renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				renderTarget.directToCanvas = true;
+				renderTarget.directToCanvasMask = renderer.context.COLOR_BUFFER_BIT;
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-
-				//
-
-				composer1 = new THREE.EffectComposer( renderer, renderTarget );
-				composer1.addPass( renderPass );
-				composer1.addPass( copyPass );
-
-				//
-
-				composer2 = new THREE.EffectComposer( renderer );
-				composer2.addPass( renderPass );
-				composer2.addPass( copyPass );
 
 				//
 
@@ -143,12 +126,10 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
+				camera.aspect = container.offsetWidth / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( container.offsetWidth, container.offsetHeight  );
-				composer1.setSize( container.offsetWidth, container.offsetHeight  );
-				composer2.setSize( container.offsetWidth, container.offsetHeight  );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
 
 			}
 
@@ -160,13 +141,15 @@
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
+				renderer.setScissor( 0, 0, halfWidth, container.offsetHeight );
 
-				composer1.render();
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
 
-				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
+				renderer.setScissor( halfWidth, 0, halfWidth, container.offsetHeight );
 
-				composer2.render();
+				renderer.setRenderTarget( null );
+				renderer.render( scene, camera );
 
 			}
 

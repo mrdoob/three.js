@@ -928,6 +928,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 		var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var directToCanvas = ( isMultisample && renderTarget.directToCanvas );
 
 		// Setup framebuffer
 
@@ -943,7 +944,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
+			renderTargetProperties.__webglFramebuffer = directToCanvas ? null : _gl.createFramebuffer();
 
 			if ( isMultisample ) {
 
@@ -1004,7 +1005,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
-		} else {
+		} else if ( ! directToCanvas ) {
 
 			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, supportsMips );
@@ -1022,7 +1023,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		// Setup depth and stencil buffers
 
-		if ( renderTarget.depthBuffer ) {
+		if ( renderTarget.depthBuffer && ! directToCanvas ) {
 
 			setupDepthRenderbuffer( renderTarget );
 
@@ -1066,7 +1067,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
 				if ( renderTarget.stencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
 
+				mask &= renderTarget.directToCanvasMask;
+
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
+				if ( renderTarget.directToCanvas ) _gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 
 			} else {
 
