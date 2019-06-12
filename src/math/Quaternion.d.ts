@@ -44,7 +44,7 @@ export class Quaternion {
 	/**
 	 * Sets this quaternion from rotation specified by Euler angles.
 	 */
-	setFromEuler( euler: Euler, update?: boolean ): Quaternion;
+	setFromEuler( euler: Euler ): Quaternion;
 
 	/**
 	 * Sets this quaternion from rotation specified by axis and angle.
