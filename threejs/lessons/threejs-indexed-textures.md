@@ -300,7 +300,7 @@ To do paletted index graphics requires some custom shader code.
 Let's modify the default shaders in three.js. 
 That way we can use lighting and other features if we want.
 
-Like we covered in [the article on animating lots of objects](threejs-lots-of-objects-animated.html)
+Like we covered in [the article on animating lots of objects](threejs-optimize-lots-of-objects-animated.html)
 we can modify the default shaders by adding a function to a material's
 `onBeforeCompile` property.
 
@@ -356,7 +356,7 @@ so we should be able to modify it after that point.
 our outline texture so we can look up the color from a palette texture 
 and mix them for the final result.
 
-Like we [did before](threejs-lots-of-objects-animated.html) we'll make an array
+Like we [did before](threejs-optimize-lots-of-objects-animated.html) we'll make an array
 of search and replacement strings and apply them to the shader in 
 `Material.onBeforeCompile`.
 
