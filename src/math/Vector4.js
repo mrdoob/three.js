@@ -15,6 +15,42 @@ function Vector4( x, y, z, w ) {
 
 }
 
+Object.defineProperties( Vector4.prototype, {
+
+	"width": {
+
+		get: function () {
+
+			return this.z;
+
+		},
+
+		set: function ( value ) {
+
+			this.z = value;
+
+		}
+
+	},
+
+	"height": {
+
+		get: function () {
+
+			return this.w;
+
+		},
+
+		set: function ( value ) {
+
+			this.w = value;
+
+		}
+
+	}
+
+} );
+
 Object.assign( Vector4.prototype, {
 
 	isVector4: true,
