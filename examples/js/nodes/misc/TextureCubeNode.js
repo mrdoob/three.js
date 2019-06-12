@@ -26,8 +26,12 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 			uv_20 = this.uv.build( builder ) + '.uv_20',
 			t = this.uv.build( builder ) + '.t';
 
-		var color10 = builder.getTexelDecodingFunctionFromTexture( 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )', this.value.value ),
-			color20 = builder.getTexelDecodingFunctionFromTexture( 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )', this.value.value );
+		builder.addContext( { encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader( 'vertex' ) } );
+
+		var color10 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )',
+			color20 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
+
+		builder.removeContext();
 
 		return builder.format( 'vec4( mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb, 1.0 )', this.getType( builder ), output );
 
