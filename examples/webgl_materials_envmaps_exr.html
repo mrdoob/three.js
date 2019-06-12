@@ -83,7 +83,9 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				new THREE.EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
+				new THREE.EXRLoader()
+					.setType( THREE.FloatType )
+					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
 					texture.minFilter = THREE.NearestFilter;
 					// texture.magFilter = THREE.NearestFilter;
