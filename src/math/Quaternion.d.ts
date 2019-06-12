@@ -100,8 +100,8 @@ export class Quaternion {
 	fromArray( xyzw: number[], offset?: number ): Quaternion;
 	toArray( xyzw?: number[], offset?: number ): number[];
 
-	onChange( callback: Function ): Quaternion;
-	onChangeCallback: Function;
+	_onChange( callback: Function ): Quaternion;
+	_onChangeCallback: Function;
 
 	/**
 	 * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/.
