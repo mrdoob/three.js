@@ -98,7 +98,7 @@ LZMA.RangeDecoder.prototype.init = function() {
 
 	this._code = 0;
 	this._range = -1;
-  
+
 	while (i --) {
 		this._code = (this._code << 8) | this._stream.readByte();
 	}
