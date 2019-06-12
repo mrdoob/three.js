@@ -41,11 +41,11 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
-import { TGALoader } from "../loaders/TGALoader.js";
 
 var ColladaLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	this.tgaLoader = null;
 
 };
 
@@ -98,6 +98,13 @@ ColladaLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setTGALoader: function ( tgaLoader ) {
+
+		this.tgaLoader = tgaLoader;
 		return this;
 
 	},
@@ -1509,7 +1516,16 @@ ColladaLoader.prototype = {
 			switch ( extension ) {
 
 				case 'tga':
-					loader = tgaLoader;
+					if ( tgaLoader === null ) {
+
+						console.warn( 'THREE.ColladaLoader: Unable to load TGA texture. Please inject an instance of TGALoader via .setTGALoader()' );
+
+					} else {
+
+						loader = tgaLoader;
+
+					}
+
 					break;
 
 				default:
@@ -3926,11 +3942,11 @@ ColladaLoader.prototype = {
 		var textureLoader = new TextureLoader( this.manager );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		var tgaLoader;
+		var tgaLoader = this.tgaLoader;
 
-		if ( TGALoader ) {
+		if ( tgaLoader ) {
 
-			tgaLoader = new TGALoader( this.manager );
+			tgaLoader.manager = this.manager;
 			tgaLoader.setPath( this.resourcePath || path );
 
 		}

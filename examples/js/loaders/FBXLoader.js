@@ -28,6 +28,7 @@ THREE.FBXLoader = ( function () {
 	function FBXLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.tgaLoader = null;
 
 	}
 
@@ -86,6 +87,13 @@ THREE.FBXLoader = ( function () {
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
+			return this;
+
+		},
+
+		setTGALoader: function ( tgaLoader ) {
+
+			this.tgaLoader = tgaLoader;
 			return this;
 
 		},
@@ -288,16 +296,17 @@ THREE.FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof THREE.TGALoader !== 'function' ) {
+					if ( this.tgaLoader === null ) {
 
-						console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures' );
+						console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures. Please inject an instance via .setTGALoader()' );
 						return;
 
 					} else {
 
 						if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
 
-							var tgaLoader = new THREE.TGALoader();
+							var tgaLoader = this.tgaLoader;
+							tgaLoader.manager = this.manager;
 							tgaLoader.setPath( this.textureLoader.path );
 
 							THREE.Loader.Handlers.add( /\.tga$/i, tgaLoader );

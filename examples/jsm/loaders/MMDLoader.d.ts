@@ -5,6 +5,8 @@ import {
   SkinnedMesh
 } from '../../../src/Three';
 
+import { TGALoader } from './TGALoader';
+
 export interface MMDLoaderAnimationObject {
   animation: AnimationClip;
   mesh: SkinnedMesh;
@@ -21,6 +23,7 @@ export class MMDLoader {
   path: string;
   parser: object | null;
   resourcePath: string;
+  tgaLoader: null | TGALoader;
 
   load(url: string, onLoad: (mesh: SkinnedMesh) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   loadAnimation(url: string, onLoad: (object: SkinnedMesh | AnimationClip) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
@@ -33,4 +36,5 @@ export class MMDLoader {
   setCrossOrigin(crossOrigin: string): this;
   setPath(path: string): this;
   setResoucePath(resourcePath: string): this;
+  setTGALoader(tgaLoader: TGALoader): this;
 }

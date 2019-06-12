@@ -6,6 +6,7 @@
 THREE.ColladaLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.tgaLoader = null;
 
 };
 
@@ -58,6 +59,13 @@ THREE.ColladaLoader.prototype = {
 	setCrossOrigin: function ( value ) {
 
 		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setTGALoader: function ( tgaLoader ) {
+
+		this.tgaLoader = tgaLoader;
 		return this;
 
 	},
@@ -1469,7 +1477,16 @@ THREE.ColladaLoader.prototype = {
 			switch ( extension ) {
 
 				case 'tga':
-					loader = tgaLoader;
+					if ( tgaLoader === null ) {
+
+						console.warn( 'THREE.ColladaLoader: Unable to load TGA texture. Please inject an instance of TGALoader via .setTGALoader()' );
+
+					} else {
+
+						loader = tgaLoader;
+
+					}
+
 					break;
 
 				default:
@@ -3886,11 +3903,11 @@ THREE.ColladaLoader.prototype = {
 		var textureLoader = new THREE.TextureLoader( this.manager );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		var tgaLoader;
+		var tgaLoader = this.tgaLoader;
 
-		if ( THREE.TGALoader ) {
+		if ( tgaLoader ) {
 
-			tgaLoader = new THREE.TGALoader( this.manager );
+			tgaLoader.manager = this.manager;
 			tgaLoader.setPath( this.resourcePath || path );
 
 		}

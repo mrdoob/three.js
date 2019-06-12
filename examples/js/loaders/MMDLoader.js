@@ -39,6 +39,7 @@ THREE.MMDLoader = ( function () {
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 		this.loader = new THREE.FileLoader( this.manager );
+		this.tgaLoader = null;
 
 		this.parser = null; // lazy generation
 		this.meshBuilder = new MeshBuilder( this.manager );
@@ -96,6 +97,17 @@ THREE.MMDLoader = ( function () {
 
 		},
 
+		/**
+		 * @param {THREE.TGALoader} tgaLoader
+		 * @return {THREE.MMDLoader}
+		 */
+		setTGALoader: function ( tgaLoader ) {
+
+			this.tgaLoader = tgaLoader;
+			return this;
+
+		},
+
 		// Load MMD assets as Three.js Object
 
 		/**
@@ -108,7 +120,9 @@ THREE.MMDLoader = ( function () {
 		 */
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var builder = this.meshBuilder.setCrossOrigin( this.crossOrigin );
+			var builder = this.meshBuilder;
+			builder.setCrossOrigin( this.crossOrigin );
+			builder.setTGALoader( this.tgaLoader );
 
 			// resource path
 
@@ -393,6 +407,17 @@ THREE.MMDLoader = ( function () {
 		},
 
 		/**
+		 * @param {THREE.TGALoader} tgaLoader
+		 * @return {MeshBuilder}
+		 */
+		setTGALoader: function ( tgaLoader ) {
+
+			this.tgaLoader = tgaLoader;
+			return this;
+
+		},
+
+		/**
 		 * @param {Object} data - parsed PMD/PMX data
 		 * @param {string} resourcePath
 		 * @param {function} onProgress
@@ -404,6 +429,7 @@ THREE.MMDLoader = ( function () {
 			var geometry = this.geometryBuilder.build( data );
 			var material = this.materialBuilder
 				.setCrossOrigin( this.crossOrigin )
+				.setTGALoader( this.tgaLoader )
 				.setResourcePath( resourcePath )
 				.build( data, geometry, onProgress, onError );
 
@@ -1009,6 +1035,17 @@ THREE.MMDLoader = ( function () {
 		},
 
 		/**
+		 * @param {THREE.TGALoader} tgaLoader
+		 * @return {MaterialBuilder}
+		 */
+		setTGALoader: function ( tgaLoader ) {
+
+			this.tgaLoader = tgaLoader;
+			return this;
+
+		},
+
+		/**
 		 * @param {string} resourcePath
 		 * @return {MaterialBuilder}
 		 */
@@ -1283,15 +1320,11 @@ THREE.MMDLoader = ( function () {
 
 			if ( this.tgaLoader === null ) {
 
-				if ( THREE.TGALoader === undefined ) {
-
-					throw new Error( 'THREE.MMDLoader: Import THREE.TGALoader' );
-
-				}
-
-				this.tgaLoader = new THREE.TGALoader( this.manager );
+				throw new Error( 'THREE.MMDLoader: Please inject an instance of THREE.TGALoader via .setTGALoader()' );
 
 			}
+
+			this.tgaLoader.manager = this.manager;
 
 			return this.tgaLoader;
 

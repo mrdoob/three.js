@@ -64,7 +64,6 @@ import {
 	VertexColors
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.min.js";
-import { TGALoader } from "../loaders/TGALoader.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
 
 
@@ -77,6 +76,7 @@ var FBXLoader = ( function () {
 	function FBXLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		this.tgaLoader = null;
 
 	}
 
@@ -135,6 +135,13 @@ var FBXLoader = ( function () {
 		setCrossOrigin: function ( value ) {
 
 			this.crossOrigin = value;
+			return this;
+
+		},
+
+		setTGALoader: function ( tgaLoader ) {
+
+			this.tgaLoader = tgaLoader;
 			return this;
 
 		},
@@ -337,16 +344,17 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof TGALoader !== 'function' ) {
+					if ( this.tgaLoader === null ) {
 
-						console.warn( 'FBXLoader: TGALoader is required to load TGA textures' );
+						console.warn( 'FBXLoader: TGALoader is required to load TGA textures. Please inject an instance via .setTGALoader()' );
 						return;
 
 					} else {
 
 						if ( Loader.Handlers.get( '.tga' ) === null ) {
 
-							var tgaLoader = new TGALoader();
+							var tgaLoader = this.tgaLoader;
+							tgaLoader.manager = this.manager;
 							tgaLoader.setPath( this.textureLoader.path );
 
 							Loader.Handlers.add( /\.tga$/i, tgaLoader );
