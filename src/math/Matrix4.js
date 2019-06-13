@@ -33,10 +33,10 @@ function Matrix4() {
 }
 
 // Used in makeRotationFromQuaternion()
-var zero = new Vector3(0, 0, 0);
+var zero = new Vector3( 0, 0, 0 );
 
 // Used in makeRotationFromQuaternion()
-var one = new Vector3(1, 1, 1);
+var one = new Vector3( 1, 1, 1 );
 
 // Used in extractRotation(), lookAt(), applyToBufferAttribute() and decompose()
 var x = new Vector3();
