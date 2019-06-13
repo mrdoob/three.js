@@ -4,6 +4,7 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
+import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 
 function TextureCubeNode( value, uv ) {
 
@@ -26,12 +27,19 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 			uv_20 = this.uv.build( builder ) + '.uv_20',
 			t = this.uv.build( builder ) + '.t';
 
-		builder.addContext( { encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader( 'vertex' ) } );
+		var format = this.value.value.encoding || THREE.LinearEncoding;
+		var decoding = ColorSpaceNode.prototype.getDecodingMethod(format);
+		function decode(input) {
+			return decoding[0] + '( ' + input +
+				(decoding[1] !== undefined ? ', ' + decoding[1] : '') +
+				' )';
+		}
 
-		var color10 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )',
-			color20 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
+		var color10 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )';
+		color10 = decode(color10);
 
-		builder.removeContext();
+		var color20 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
+		color20 = decode(color20);
 
 		return builder.format( 'vec4( mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb, 1.0 )', this.getType( builder ), output );
 
