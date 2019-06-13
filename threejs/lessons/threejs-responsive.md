@@ -233,7 +233,7 @@ and pass that to three.js
 
 After that any calls to `renderer.setSize` will magicially
 use the size you request multiplied by whatever pixel ratio
-you passed in.
+you passed in. This is strongly **NOT RECOMMENDED**. See below
 
 The other way is to do it yourself when you resize the canvas.
 
@@ -251,10 +251,14 @@ The other way is to do it yourself when you resize the canvas.
     }
 ```
 
-I prefer this second way. Why? Because it means I get what I ask for.
+This second way is objectively better. Why? Because it means I get what I ask for.
 There are many cases when using three.js where we need to know the actual
 size of the canvas's drawingBuffer. For example when making a post processing filter,
-or if we are making a shader that accesses `gl_FragCoord`, etc...
+or if we are making a shader that accesses `gl_FragCoord`, if we are making
+a screenshot, or reading pixels for GPU picking, for drawing into a 2D canvas,
+etc... There many many cases where if we use `setPixelRatio` then our actual size will be different
+than the size we requested and we'll have to guess when to use the size
+we asked for and when to use the size three.js is actually using.
 By doing it oursevles we always know the size being used is the size we requested.
 There is no special case where magic is happening behind the scenes.
 
