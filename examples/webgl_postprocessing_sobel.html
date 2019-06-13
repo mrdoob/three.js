@@ -8,8 +8,6 @@
 	</head>
 	<body>
 
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - webgl - postprocessing<br/>
 			sobel (edge detection)
@@ -26,6 +24,8 @@
 				TorusKnotBufferGeometry,
 				PointLight
 			} from "../build/three.module.js";
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -108,7 +108,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'enable' );
 				gui.open();
