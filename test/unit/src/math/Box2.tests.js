@@ -69,16 +69,16 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Box2();
 
 			a.setFromCenterAndSize( zero2, two2 );
-			assert.ok(a.min.equals( negOne2 ), "Passed!");
-			assert.ok(a.max.equals( one2 ), "Passed!");
+			assert.ok( a.min.equals( negOne2 ), "Passed!" );
+			assert.ok( a.max.equals( one2 ), "Passed!" );
 
-			a.setFromCenterAndSize(one2, two2);
-			assert.ok(a.min.equals(zero2), "Passed!");
-			assert.ok(a.max.equals(two2), "Passed!");
+			a.setFromCenterAndSize( one2, two2 );
+			assert.ok( a.min.equals( zero2 ), "Passed!" );
+			assert.ok( a.max.equals( two2 ), "Passed!" );
 
-			a.setFromCenterAndSize(zero2, zero2);
-			assert.ok(a.min.equals(zero2), "Passed!");
-			assert.ok(a.max.equals(zero2), "Passed!");
+			a.setFromCenterAndSize( zero2, zero2 );
+			assert.ok( a.min.equals( zero2 ), "Passed!" );
+			assert.ok( a.max.equals( zero2 ), "Passed!" );
 
 		} );
 
@@ -88,13 +88,13 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Box2( zero2, zero2 );
 
 			var b = a.clone();
-			assert.ok(b.min.equals(zero2), "Passed!");
-			assert.ok(b.max.equals(zero2), "Passed!");
+			assert.ok( b.min.equals( zero2 ), "Passed!" );
+			assert.ok( b.max.equals( zero2 ), "Passed!" );
 
-			a = new Box2(zero2, zero2);
+			a = new Box2( zero2, zero2 );
 			var b = a.clone();
-			assert.ok(b.min.equals(posInf2), "Passed!");
-			assert.ok(b.max.equals(negInf2), "Passed!");
+			assert.ok( b.min.equals( posInf2 ), "Passed!" );
+			assert.ok( b.max.equals( negInf2 ), "Passed!" );
 
 		} );
 
@@ -127,19 +127,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test("isEmpty", (assert) => {
+		QUnit.test( "isEmpty", ( assert ) => {
 
-			var a = new Box2(zero2.clone(), zero2.clone());
-			assert.ok(a.isEmpty(), "Passed!");
+			var a = new Box2( zero2.clone(), zero2.clone() );
+			assert.ok( a.isEmpty(), "Passed!" );
 
-			var a = new Box2(zero2.clone(), one2.clone());
-			assert.ok(!a.isEmpty(), "Passed!");
+			var a = new Box2( zero2.clone(), one2.clone() );
+			assert.ok( ! a.isEmpty(), "Passed!" );
 
-			var a = new Box2(two2.clone(), one2.clone());
-			assert.ok(a.isEmpty(), "Passed!");
+			var a = new Box2( two2.clone(), one2.clone() );
+			assert.ok( a.isEmpty(), "Passed!" );
 
-			var a = new Box2(posInf2.clone(), negInf2.clone());
-			assert.ok(a.isEmpty(), "Passed!");
+			var a = new Box2( posInf2.clone(), negInf2.clone() );
+			assert.ok( a.isEmpty(), "Passed!" );
 
 		} );
 
@@ -378,33 +378,33 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Box2();
 			var b = new Box2();
-			assert.ok(b.equals(a), "Passed!");
-			assert.ok(a.equals(b), "Passed!");
+			assert.ok( b.equals( a ), "Passed!" );
+			assert.ok( a.equals( b ), "Passed!" );
 
-			a = new Box2(one2, two2);
-			b = new Box2(one2, two2);
-			assert.ok(b.equals(a), "Passed!");
-			assert.ok(a.equals(b), "Passed!");
+			a = new Box2( one2, two2 );
+			b = new Box2( one2, two2 );
+			assert.ok( b.equals( a ), "Passed!" );
+			assert.ok( a.equals( b ), "Passed!" );
 
-			a = new Box2(one2, two2);
+			a = new Box2( one2, two2 );
 			b = a.clone();
-			assert.ok(b.equals(a), "Passed!");
-			assert.ok(a.equals(b), "Passed!");
+			assert.ok( b.equals( a ), "Passed!" );
+			assert.ok( a.equals( b ), "Passed!" );
 
-			a = new Box2(one2, two2);
-			b = new Box2(one2, one2);
-			assert.ok(!b.equals(a), "Passed!");
-			assert.ok(!a.equals(b), "Passed!");
+			a = new Box2( one2, two2 );
+			b = new Box2( one2, one2 );
+			assert.ok( ! b.equals( a ), "Passed!" );
+			assert.ok( ! a.equals( b ), "Passed!" );
 
 			a = new Box2();
-			b = new Box2(one2, one2);
-			assert.ok(!b.equals(a), "Passed!");
-			assert.ok(!a.equals(b), "Passed!");
+			b = new Box2( one2, one2 );
+			assert.ok( ! b.equals( a ), "Passed!" );
+			assert.ok( ! a.equals( b ), "Passed!" );
 
-			a = new Box2(one2, two2);
-			b = new Box2(one2, one2);
-			assert.ok(!b.equals(a), "Passed!");
-			assert.ok(!a.equals(b), "Passed!");
+			a = new Box2( one2, two2 );
+			b = new Box2( one2, one2 );
+			assert.ok( ! b.equals( a ), "Passed!" );
+			assert.ok( ! a.equals( b ), "Passed!" );
 
 		} );
 
