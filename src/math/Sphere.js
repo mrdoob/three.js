@@ -13,6 +13,7 @@ function Sphere( center, radius ) {
 
 }
 
+// Used in setFromPoints()
 var box = new Box3();
 
 Object.assign( Sphere.prototype, {

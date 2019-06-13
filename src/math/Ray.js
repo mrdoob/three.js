@@ -10,14 +10,17 @@ function Ray( origin, direction ) {
 	this.direction = ( direction !== undefined ) ? direction : new Vector3();
 
 }
-
+//Used in distanceSqToPoint() and intersectSphere()
 var v1 = new Vector3();
 
+//Used in distanceSqToSegment()
 var segCenter = new Vector3();
 var segDir = new Vector3();
+
+//Used in distanceSqToSegment() and intersectTriangle()
 var diff = new Vector3();
 
-var diff = new Vector3();
+//Used in intersectTriangle()
 var edge1 = new Vector3();
 var edge2 = new Vector3();
 var normal = new Vector3();

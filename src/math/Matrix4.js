@@ -32,11 +32,22 @@ function Matrix4() {
 
 }
 
-var zero = new Vector3( 0, 0, 0 );
-var one = new Vector3( 1, 1, 1 );
+// Used in makeRotationFromQuaternion()
+var zero = new Vector3(0, 0, 0);
+
+// Used in makeRotationFromQuaternion()
+var one = new Vector3(1, 1, 1);
+
+// Used in extractRotation(), lookAt(), applyToBufferAttribute() and decompose()
 var x = new Vector3();
+
+// Used in lookAt()
 var y = new Vector3();
+
+// Used in lookAt()
 var z = new Vector3();
+
+// Used in decompose()
 var matrix = new Matrix4();
 
 Object.assign( Matrix4.prototype, {

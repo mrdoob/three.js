@@ -25,7 +25,7 @@ function Matrix3() {
 
 }
 
-
+// Used in applyToBufferAttribute()
 var v1 = new Vector3();
 
 

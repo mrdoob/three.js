@@ -22,8 +22,10 @@ Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 Euler.DefaultOrder = 'XYZ';
 
-
+// Used in setFromQuaternion()
 var matrix = new Matrix4();
+
+// Used in reorder()
 var q = new Quaternion();
 
 Object.defineProperties( Euler.prototype, {

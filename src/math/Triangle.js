@@ -12,12 +12,19 @@ function Triangle( a, b, c ) {
 	this.c = ( c !== undefined ) ? c : new Vector3();
 
 }
-
+// Used in getNormal(), getBarycoord(), isFrontFacing() and getArea()
 var v0 = new Vector3();
+
+// Used in getBarycoord(), isFrontFacing() and getArea()
 var v1 = new Vector3();
+
+// Used in getBarycoord()
 var v2 = new Vector3();
+
+// Used in containsPoint() and getUV()
 var barycoord = new Vector3();
 
+// Used in closestPointToPoint()
 var vab = new Vector3();
 var vac = new Vector3();
 var vbc = new Vector3();

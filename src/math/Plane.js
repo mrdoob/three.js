@@ -14,8 +14,13 @@ function Plane( normal, constant ) {
 
 }
 
+// Used in setFromCoplanarPoints()
 var v1 = new Vector3();
+
+// Used in setFromCoplanarPoints()
 var v2 = new Vector3();
+
+// Used in applyMatrix4()
 var m1 = new Matrix3();
 
 

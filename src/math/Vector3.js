@@ -18,6 +18,7 @@ function Vector3( x, y, z ) {
 
 }
 
+// Used in applyEuler() and applyAxisAngle()
 var quaternion = new Quaternion();
 
 Object.assign( Vector3.prototype, {

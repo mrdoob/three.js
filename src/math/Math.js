@@ -2,8 +2,9 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  */
-var lut = [];
 
+// Used in generateUUID()
+var lut = [];
 for ( var i = 0; i < 256; i ++ ) {
 
 	lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );

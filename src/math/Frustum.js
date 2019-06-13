@@ -23,9 +23,10 @@ function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
 }
 
-
-
+// Used in intersectsObject() and intersectsSprite()
 var sphere = new Sphere();
+
+// Used in intersectsBox()
 var p = new Vector3();
 
 Object.assign( Frustum.prototype, {

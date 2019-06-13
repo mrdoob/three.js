@@ -12,8 +12,10 @@ function Line3( start, end ) {
 
 }
 
-
+// Used in closestPointToPointParameter()
 var startP = new Vector3();
+
+// Used in closestPointToPointParameter()
 var startEnd = new Vector3();
 
 Object.assign( Line3.prototype, {

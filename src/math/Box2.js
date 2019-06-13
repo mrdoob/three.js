@@ -11,6 +11,7 @@ function Box2( min, max ) {
 
 }
 
+// Used in setFromCenterAndSize() and distanceToPoint()
 var v1 = new Vector2();
 
 Object.assign( Box2.prototype, {

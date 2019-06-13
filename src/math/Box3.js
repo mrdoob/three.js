@@ -11,8 +11,10 @@ function Box3( min, max ) {
 	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
 }
-
+// Used in traverse(), setFromCenterAndSize(), intersectsSphere(), distanceToPoint() and getBoundingSphere()
 var v1 = new Vector3();
+
+// Used in applyMatrix4()
 var points = [
 	new Vector3(),
 	new Vector3(),
