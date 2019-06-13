@@ -50,11 +50,17 @@
 		<script>
 
 		function extractQuery() {
+
 			var p = window.location.search.indexOf( '?q=' );
-			if( p !== -1 ) {
+
+			if ( p !== - 1 ) {
+
 				return window.location.search.substr( 3 );
+
 			}
-			return ''
+
+			return '';
+
 		}
 
 		var panel = document.getElementById( 'panel' );
@@ -66,8 +72,10 @@
 
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
+
 			event.preventDefault();
 			panel.classList.toggle( 'open' );
+
 		} );
 
 		var panelScrim = document.getElementById( 'panelScrim' );
@@ -174,27 +182,29 @@
 		// filter
 		filterInput.onfocus = function ( event ) {
 
-			panel.classList.add('searchFocused');
+			panel.classList.add( 'searchFocused' );
 
-		}
+		};
 
 		filterInput.onblur = function ( event ) {
 
-			if(filterInput.value === '') {
-				panel.classList.remove('searchFocused');
+			if ( filterInput.value === '' ) {
+
+				panel.classList.remove( 'searchFocused' );
+
 			}
 
-		}
+		};
 
-		exitSearchButton.onclick = function( event ) {
+		exitSearchButton.onclick = function ( event ) {
 
 			filterInput.value = '';
 			updateFilter();
-			panel.classList.remove('searchFocused');
+			panel.classList.remove( 'searchFocused' );
 
-		}
+		};
 
-		filterInput.addEventListener( 'input', function( e ) {
+		filterInput.addEventListener( 'input', function () {
 
 			updateFilter();
 
@@ -203,10 +213,15 @@
 		function updateFilter() {
 
 			var v = filterInput.value;
-			if( v !== '' ) {
-				window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
 			} else {
-				window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
 			}
 
 			var exp = new RegExp( v, 'gi' );
@@ -227,7 +242,7 @@
 
 		}
 
-		function filterExample( file, exp ){
+		function filterExample( file, exp ) {
 
 			var link = links[ file ];
 			var name = getName( file );
@@ -238,8 +253,10 @@
 
 				link.classList.remove( 'hidden' );
 
-				for( var i = 0; i < res.length; i++ ) {
+				for ( var i = 0; i < res.length; i ++ ) {
+
 					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
+
 				}
 
 				link.innerHTML = text;
@@ -250,13 +267,14 @@
 				link.innerHTML = name;
 
 			}
+
 		}
 
 		function getName( file ) {
 
 			var name = file.split( '_' );
 			name.shift();
-			return name.join( '<span class="spacer">/</span>' );
+			return name.join( ' / ' );
 
 		}
 
@@ -272,7 +290,7 @@
 
 					var file = section[ i ];
 
-					if ( links[ file ].classList.contains( 'hidden' ) === false ){
+					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
 						collapsed = false;
 						break;
