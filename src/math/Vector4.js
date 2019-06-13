@@ -49,7 +49,7 @@ Object.defineProperties( Vector4.prototype, {
 
 	}
 
-});
+} );
 
 var min, max;
 

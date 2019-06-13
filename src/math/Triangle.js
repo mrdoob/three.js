@@ -95,9 +95,9 @@ Object.assign( Triangle, {
 
 	containsPoint: function ( point, a, b, c ) {
 
-		Triangle.getBarycoord(point, a, b, c, barycoord );
+		Triangle.getBarycoord( point, a, b, c, barycoord );
 
-		return (barycoord.x >= 0) && (barycoord.y >= 0) && ((barycoord.x + barycoord.y ) <= 1 );
+		return ( barycoord.x >= 0 ) && ( barycoord.y >= 0 ) && ( ( barycoord.x + barycoord.y ) <= 1 );
 
 	},
 
