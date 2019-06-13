@@ -35,7 +35,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._x = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -52,7 +52,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._y = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -69,7 +69,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._z = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -86,7 +86,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._order = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -105,7 +105,7 @@ Object.assign( Euler.prototype, {
 		this._z = z;
 		this._order = order || this._order;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -124,7 +124,7 @@ Object.assign( Euler.prototype, {
 		this._z = euler._z;
 		this._order = euler._order;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -247,7 +247,7 @@ Object.assign( Euler.prototype, {
 
 		this._order = order;
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) this._onChangeCallback();
 
 		return this;
 
@@ -302,7 +302,7 @@ Object.assign( Euler.prototype, {
 		this._z = array[ 2 ];
 		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -336,15 +336,15 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	onChange: function ( callback ) {
+	_onChange: function ( callback ) {
 
-		this.onChangeCallback = callback;
+		this._onChangeCallback = callback;
 
 		return this;
 
 	},
 
-	onChangeCallback: function () {}
+	_onChangeCallback: function () {}
 
 } );
 

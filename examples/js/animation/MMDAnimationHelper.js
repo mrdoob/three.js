@@ -19,7 +19,7 @@ THREE.MMDAnimationHelper = ( function () {
 	 * @param {Object} params - (optional)
 	 * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
 	 * @param {Number} params.afterglow - Default is 0.0.
-	 * @param {boolean} params resetPhysicsOnLoop - Default is true.
+	 * @param {boolean} params.resetPhysicsOnLoop - Default is true.
 	 */
 	function MMDAnimationHelper( params ) {
 
@@ -53,7 +53,7 @@ THREE.MMDAnimationHelper = ( function () {
 			cameraAnimation: true
 		};
 
-		this.onBeforePhysics = function ( mesh ) {};
+		this.onBeforePhysics = function ( /* mesh */ ) {};
 
 		// experimental
 		this.sharedPhysics = false;
@@ -239,7 +239,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 * Enabes/Disables an animation feature.
 		 *
 		 * @param {string} key
-		 * @param {boolean} enebled
+		 * @param {boolean} enabled
 		 * @return {THREE.MMDAnimationHelper}
 		 */
 		enable: function ( key, enabled ) {
@@ -488,7 +488,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 				var masterPhysics = this._getMasterPhysics();
 
-				if ( masterPhysics !== null ) world = masterPhysics.world;
+				if ( masterPhysics !== null ) world = masterPhysics.world; // eslint-disable-line no-undef
 
 			}
 
@@ -945,7 +945,7 @@ THREE.MMDAnimationHelper = ( function () {
 			}
 
 			if ( this.currentTime < this.delayTime ) return false;
-			
+
 			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
 			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
 

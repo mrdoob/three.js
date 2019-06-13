@@ -14,11 +14,11 @@ import { Matrix4 } from './Matrix4';
 export class Quaternion {
 
 	/**
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param z z coordinate
-   * @param w w coordinate
-   */
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @param z z coordinate
+	 * @param w w coordinate
+	 */
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
 	x: number;
@@ -27,43 +27,43 @@ export class Quaternion {
 	w: number;
 
 	/**
-   * Sets values of this quaternion.
-   */
+	 * Sets values of this quaternion.
+	 */
 	set( x: number, y: number, z: number, w: number ): Quaternion;
 
 	/**
-   * Clones this quaternion.
-   */
+	 * Clones this quaternion.
+	 */
 	clone(): this;
 
 	/**
-   * Copies values of q to this quaternion.
-   */
+	 * Copies values of q to this quaternion.
+	 */
 	copy( q: Quaternion ): this;
 
 	/**
-   * Sets this quaternion from rotation specified by Euler angles.
-   */
-	setFromEuler( euler: Euler, update?: boolean ): Quaternion;
+	 * Sets this quaternion from rotation specified by Euler angles.
+	 */
+	setFromEuler( euler: Euler ): Quaternion;
 
 	/**
-   * Sets this quaternion from rotation specified by axis and angle.
-   * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm.
-   * Axis have to be normalized, angle is in radians.
-   */
+	 * Sets this quaternion from rotation specified by axis and angle.
+	 * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm.
+	 * Axis have to be normalized, angle is in radians.
+	 */
 	setFromAxisAngle( axis: Vector3, angle: number ): Quaternion;
 
 	/**
-   * Sets this quaternion from rotation component of m. Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm.
-   */
+	 * Sets this quaternion from rotation component of m. Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm.
+	 */
 	setFromRotationMatrix( m: Matrix4 ): Quaternion;
 	setFromUnitVectors( vFrom: Vector3, vTo: Vector3 ): Quaternion;
 	angleTo( q: Quaternion ): number;
 	rotateTowards( q: Quaternion, step: number ): Quaternion;
 
 	/**
-   * Inverts this quaternion.
-   */
+	 * Inverts this quaternion.
+	 */
 	inverse(): Quaternion;
 
 	conjugate(): Quaternion;
@@ -71,25 +71,25 @@ export class Quaternion {
 	lengthSq(): number;
 
 	/**
-   * Computes length of this quaternion.
-   */
+	 * Computes length of this quaternion.
+	 */
 	length(): number;
 
 	/**
-   * Normalizes this quaternion.
-   */
+	 * Normalizes this quaternion.
+	 */
 	normalize(): Quaternion;
 
 	/**
-   * Multiplies this quaternion by b.
-   */
+	 * Multiplies this quaternion by b.
+	 */
 	multiply( q: Quaternion ): Quaternion;
 	premultiply( q: Quaternion ): Quaternion;
 
 	/**
-   * Sets this quaternion to a x b
-   * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm.
-   */
+	 * Sets this quaternion to a x b
+	 * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm.
+	 */
 	multiplyQuaternions( a: Quaternion, b: Quaternion ): Quaternion;
 
 	slerp( qb: Quaternion, t: number ): Quaternion;
@@ -100,12 +100,12 @@ export class Quaternion {
 	fromArray( xyzw: number[], offset?: number ): Quaternion;
 	toArray( xyzw?: number[], offset?: number ): number[];
 
-	onChange( callback: Function ): Quaternion;
-	onChangeCallback: Function;
+	_onChange( callback: Function ): Quaternion;
+	_onChangeCallback: Function;
 
 	/**
-   * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/.
-   */
+	 * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/.
+	 */
 	static slerp(
 		qa: Quaternion,
 		qb: Quaternion,
@@ -124,8 +124,8 @@ export class Quaternion {
 	): Quaternion;
 
 	/**
-   * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
-   */
+	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
+	 */
 	multiplyVector3( v: any ): any;
 
 }

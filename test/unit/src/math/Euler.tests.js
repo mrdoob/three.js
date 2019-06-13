@@ -202,7 +202,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "set/get properties, check callbacks", ( assert ) => {
 
 			var a = new Euler();
-			a.onChange( function () {
+			a._onChange( function () {
 
 				assert.step( "set: onChange called" );
 
@@ -237,8 +237,8 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( false );
 
 			};
-			a.onChange( cbFail );
-			b.onChange( cbFail );
+			a._onChange( cbFail );
+			b._onChange( cbFail );
 
 			// clone doesn't trigger onChange
 			a = b.clone();
@@ -246,7 +246,7 @@ export default QUnit.module( 'Maths', () => {
 
 			// copy triggers onChange once
 			a = new Euler( 1, 2, 3, "ZXY" );
-			a.onChange( cbSucceed );
+			a._onChange( cbSucceed );
 			a.copy( b );
 			assert.ok( a.equals( b ), "copy: check if a equals b" );
 			assert.verifySteps( [ "onChange called" ] );
@@ -290,7 +290,7 @@ export default QUnit.module( 'Maths', () => {
 				assert.step( "onChange called" );
 
 			};
-			a.onChange( cb );
+			a._onChange( cb );
 
 			a.fromArray( array );
 			assert.strictEqual( a.x, x, "No order: check x" );
@@ -300,7 +300,7 @@ export default QUnit.module( 'Maths', () => {
 
 			a = new Euler();
 			array = [ x, y, z, "ZXY" ];
-			a.onChange( cb );
+			a._onChange( cb );
 			a.fromArray( array );
 			assert.strictEqual( a.x, x, "With order: check x" );
 			assert.strictEqual( a.y, y, "With order: check y" );
@@ -311,13 +311,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "onChange", ( assert ) => {
+		QUnit.todo( "_onChange", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.todo( "onChangeCallback", ( assert ) => {
+		QUnit.todo( "_onChangeCallback", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

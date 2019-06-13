@@ -41,16 +41,16 @@ export class Box3 {
 	translate( offset: Vector3 ): this;
 	equals( box: Box3 ): boolean;
 	/**
-   * @deprecated Use {@link Box3#isEmpty .isEmpty()} instead.
-   */
+	 * @deprecated Use {@link Box3#isEmpty .isEmpty()} instead.
+	 */
 	empty(): any;
 	/**
-   * @deprecated Use {@link Box3#intersectsBox .intersectsBox()} instead.
-   */
+	 * @deprecated Use {@link Box3#intersectsBox .intersectsBox()} instead.
+	 */
 	isIntersectionBox( b: any ): any;
 	/**
-   * @deprecated Use {@link Box3#intersectsSphere .intersectsSphere()} instead.
-   */
+	 * @deprecated Use {@link Box3#intersectsSphere .intersectsSphere()} instead.
+	 */
 	isIntersectionSphere( s: any ): any;
 
 }

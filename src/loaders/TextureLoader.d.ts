@@ -15,10 +15,10 @@ export class TextureLoader {
 	path: string;
 
 	/**
-   * Begin loading from url
-   *
-   * @param url
-   */
+	 * Begin loading from url
+	 *
+	 * @param url
+	 */
 	load(
 		url: string,
 		onLoad?: ( texture: Texture ) => void,

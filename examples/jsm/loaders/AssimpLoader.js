@@ -558,8 +558,7 @@ AssimpLoader.prototype = {
 			for ( var i in root.children ) {
 
 				var child = cloneTreeToBones( root.children[ i ], scene );
-				if ( child )
-					rootBone.add( child );
+				rootBone.add( child );
 
 			}
 
@@ -1334,6 +1333,10 @@ AssimpLoader.prototype = {
 
 		function aiScene() {
 
+			this.versionMajor = 0;
+			this.versionMinor = 0;
+			this.versionRevision = 0;
+			this.compileFlags = 0;
 			this.mFlags = 0;
 			this.mNumMeshes = 0;
 			this.mNumMaterials = 0;
@@ -2252,13 +2255,13 @@ AssimpLoader.prototype = {
 			extendStream( stream );
 			stream.Seek( 44, aiOrigin_CUR ); // signature
 			/*unsigned int versionMajor =*/
-			var versionMajor = Read_unsigned_int( stream );
+			pScene.versionMajor = Read_unsigned_int( stream );
 			/*unsigned int versionMinor =*/
-			var versionMinor = Read_unsigned_int( stream );
+			pScene.versionMinor = Read_unsigned_int( stream );
 			/*unsigned int versionRevision =*/
-			var versionRevision = Read_unsigned_int( stream );
+			pScene.versionRevision = Read_unsigned_int( stream );
 			/*unsigned int compileFlags =*/
-			var compileFlags = Read_unsigned_int( stream );
+			pScene.compileFlags = Read_unsigned_int( stream );
 			shortened = Read_uint16_t( stream ) > 0;
 			compressed = Read_uint16_t( stream ) > 0;
 			if ( shortened )
@@ -2280,9 +2283,10 @@ AssimpLoader.prototype = {
 			} else {
 
 				ReadBinaryScene( stream, pScene );
-				return pScene.toTHREE();
 
 			}
+
+			return pScene.toTHREE();
 
 		}
 

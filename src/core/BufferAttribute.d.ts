@@ -58,8 +58,8 @@ export class BufferAttribute {
 		w: number
 	): BufferAttribute;
 	/**
-   * @deprecated Use {@link BufferAttribute#count .count} instead.
-   */
+	 * @deprecated Use {@link BufferAttribute#count .count} instead.
+	 */
 	length: number;
 
 }

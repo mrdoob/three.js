@@ -17,44 +17,44 @@ export class Light extends Object3D {
 	receiveShadow: boolean;
 	shadow: LightShadow;
 	/**
-   * @deprecated Use shadow.camera.fov instead.
-   */
+	 * @deprecated Use shadow.camera.fov instead.
+	 */
 	shadowCameraFov: any;
 	/**
-   * @deprecated Use shadow.camera.left instead.
-   */
+	 * @deprecated Use shadow.camera.left instead.
+	 */
 	shadowCameraLeft: any;
 	/**
-   * @deprecated Use shadow.camera.right instead.
-   */
+	 * @deprecated Use shadow.camera.right instead.
+	 */
 	shadowCameraRight: any;
 	/**
-   * @deprecated Use shadow.camera.top instead.
-   */
+	 * @deprecated Use shadow.camera.top instead.
+	 */
 	shadowCameraTop: any;
 	/**
-   * @deprecated Use shadow.camera.bottom instead.
-   */
+	 * @deprecated Use shadow.camera.bottom instead.
+	 */
 	shadowCameraBottom: any;
 	/**
-   * @deprecated Use shadow.camera.near instead.
-   */
+	 * @deprecated Use shadow.camera.near instead.
+	 */
 	shadowCameraNear: any;
 	/**
-   * @deprecated Use shadow.camera.far instead.
-   */
+	 * @deprecated Use shadow.camera.far instead.
+	 */
 	shadowCameraFar: any;
 	/**
-   * @deprecated Use shadow.bias instead.
-   */
+	 * @deprecated Use shadow.bias instead.
+	 */
 	shadowBias: any;
 	/**
-   * @deprecated Use shadow.mapSize.width instead.
-   */
+	 * @deprecated Use shadow.mapSize.width instead.
+	 */
 	shadowMapWidth: any;
 	/**
-   * @deprecated Use shadow.mapSize.height instead.
-   */
+	 * @deprecated Use shadow.mapSize.height instead.
+	 */
 	shadowMapHeight: any;
 
 }

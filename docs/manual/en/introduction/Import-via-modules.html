@@ -66,7 +66,7 @@
 		<p>
 			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
 			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
-			for their project. However, most of these files are not modules which makes their usage in certain cases inconvenient. In order to address this issue,
+			for their project. However, not all files are modules which makes their usage in certain cases inconvenient. In order to address this issue,
 			we are working to provide all the examples as modules in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory.
 			If you install three.js via npm, you can import them like so:
 		</p>
@@ -76,6 +76,15 @@
 		<p>
 			The following examples files are already available as modules:
 			<ul>
+				<li>animation
+					<ul>
+						<li>AnimationClipCreator</li>
+						<li>CCDIKSolver</li>
+						<li>MMDAnimationHelper</li>
+						<li>MMDPhysics</li>
+						<li>TimelinerController</li>
+					</ul>
+				</li>
 				<li>cameras
 					<ul>
 						<li>CinematicCamera</li>
@@ -117,6 +126,7 @@
 				<li>exporters
 					<ul>
 						<li>ColladaExporter</li>
+						<li>DRACOExporter</li>
 						<li>GLTFExporter</li>
 						<li>MMDExporter</li>
 						<li>OBJExporter</li>
@@ -140,6 +150,11 @@
 						<li>SelectionHelper</li>
 					</ul>
 				</li>
+				<li>lights
+					<ul>
+						<li>LightProbeGenerator</li>
+					</ul>
+				</li>
 				<li>lines
 					<ul>
 						<li>Line2</li>
@@ -155,12 +170,14 @@
 					<ul>
 						<li>3MFLoader</li>
 						<li>AMFLoader</li>
+						<li>AWDLoader</li>
 						<li>AssimpJSONLoader</li>
 						<li>AssimpLoader</li>
 						<li>BabylonLoader</li>
 						<li>BVHLoader</li>
 						<li>ColladaLoader</li>
 						<li>DDSLoader</li>
+						<li>DRACOLoader</li>
 						<li>EXRLoader</li>
 						<li>FBXLoader</li>
 						<li>GCodeLoader</li>
@@ -169,7 +186,10 @@
 						<li>KMZLoader</li>
 						<li>KTXLoader</li>
 						<li>LWOLoader</li>
+						<li>MD2Loader</li>
+						<li>MMDLoader</li>
 						<li>MTLLoader</li>
+						<li>NRRDLoader</li>
 						<li>OBJLoader</li>
 						<li>PCDLoader</li>
 						<li>PDBLoader</li>
@@ -182,7 +202,10 @@
 						<li>SVGLoader</li>
 						<li>TDSLoader</li>
 						<li>TGALoader</li>
+						<li>TTFLoader</li>
 						<li>VRMLLoader</li>
+						<li>VTKLoader</li>
+						<li>XLoader</li>
 					</ul>
 				</li>
 				<li>math
@@ -192,6 +215,22 @@
 						<li>ImprovedNoise</li>
 						<li>Lut</li>
 						<li>SimplexNoise</li>
+					</ul>
+				</li>
+				<li>misc
+					<ul>
+						<li>CarControls</li>
+						<li>ConvexObjectBreaker</li>
+						<li>GPUComputationRenderer</li>
+						<li>Gyroscope</li>
+						<li>MD2Character</li>
+						<li>MD2CharacterComplex</li>
+						<li>MorphAnimMesh</li>
+						<li>MorphBlendMesh</li>
+						<li>Ocean</li>
+						<li>RollerCoaster</li>
+						<li>Volume</li>
+						<li>VolumeSlice</li>
 					</ul>
 				</li>
 				<li>modifiers
@@ -292,6 +331,7 @@
 						<li>LuminosityShader</li>
 						<li>MirrorShader</li>
 						<li>NormalMapShader</li>
+						<li>OceanShaders</li>
 						<li>ParallaxShader</li>
 						<li>PixelShader</li>
 						<li>RGBShiftShader</li>
@@ -311,6 +351,7 @@
 						<li>VerticalBlurShader</li>
 						<li>VerticalTiltShiftShader</li>
 						<li>VignetteShader</li>
+						<li>VolumeShader</li>
 						<li>WaterRefractionShader</li>
 					</ul>
 				</li>
