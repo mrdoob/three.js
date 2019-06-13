@@ -130,7 +130,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "isEmpty", ( assert ) => {
 
 			var a = new Box2( zero2.clone(), zero2.clone() );
-			assert.ok( a.isEmpty(), "Passed!" );
+			assert.ok( ! a.isEmpty(), "Passed!" );
 
 			var a = new Box2( zero2.clone(), one2.clone() );
 			assert.ok( ! a.isEmpty(), "Passed!" );
