@@ -82,7 +82,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "clone", ( assert ) => {
+		QUnit.test( "clone", ( assert ) => {
 
 
 			var a = new Box2( zero2, zero2 );
@@ -91,7 +91,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.min.equals( zero2 ), "Passed!" );
 			assert.ok( b.max.equals( zero2 ), "Passed!" );
 
-			a = new Box2( zero2, zero2 );
+			a = new Box2();
 			var b = a.clone();
 			assert.ok( b.min.equals( posInf2 ), "Passed!" );
 			assert.ok( b.max.equals( negInf2 ), "Passed!" );
