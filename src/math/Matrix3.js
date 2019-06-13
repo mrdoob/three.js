@@ -25,6 +25,10 @@ function Matrix3() {
 
 }
 
+
+var v1 = new Vector3();
+
+
 Object.assign( Matrix3.prototype, {
 
 	isMatrix3: true,
@@ -90,29 +94,23 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
-	applyToBufferAttribute: function () {
+	applyToBufferAttribute: function ( attribute ) {
 
-		var v1 = new Vector3();
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-		return function applyToBufferAttribute( attribute ) {
+			v1.x = attribute.getX( i );
+			v1.y = attribute.getY( i );
+			v1.z = attribute.getZ( i );
 
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+			v1.applyMatrix3( this );
 
-				v1.x = attribute.getX( i );
-				v1.y = attribute.getY( i );
-				v1.z = attribute.getZ( i );
+			attribute.setXYZ( i, v1.x, v1.y, v1.z );
 
-				v1.applyMatrix3( this );
+		}
 
-				attribute.setXYZ( i, v1.x, v1.y, v1.z );
+		return attribute;
 
-			}
-
-			return attribute;
-
-		};
-
-	}(),
+	},
 
 	multiply: function ( m ) {
 

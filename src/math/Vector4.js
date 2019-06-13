@@ -49,7 +49,9 @@ Object.defineProperties( Vector4.prototype, {
 
 	}
 
-} );
+});
+
+var min, max;
 
 Object.assign( Vector4.prototype, {
 
@@ -471,27 +473,21 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: function ( minVal, maxVal ) {
 
-		var min, max;
+		if ( min === undefined ) {
 
-		return function clampScalar( minVal, maxVal ) {
+			min = new Vector4();
+			max = new Vector4();
 
-			if ( min === undefined ) {
+		}
 
-				min = new Vector4();
-				max = new Vector4();
+		min.set( minVal, minVal, minVal, minVal );
+		max.set( maxVal, maxVal, maxVal, maxVal );
 
-			}
+		return this.clamp( min, max );
 
-			min.set( minVal, minVal, minVal, minVal );
-			max.set( maxVal, maxVal, maxVal, maxVal );
-
-			return this.clamp( min, max );
-
-		};
-
-	}(),
+	},
 
 	clampLength: function ( min, max ) {
 

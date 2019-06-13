@@ -23,6 +23,11 @@ function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
 }
 
+
+
+var sphere = new Sphere();
+var p = new Vector3();
+
 Object.assign( Frustum.prototype, {
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
@@ -80,41 +85,29 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	intersectsObject: function () {
+	intersectsObject: function ( object ) {
 
-		var sphere = new Sphere();
+		var geometry = object.geometry;
 
-		return function intersectsObject( object ) {
+		if ( geometry.boundingSphere === null )
+			geometry.computeBoundingSphere();
 
-			var geometry = object.geometry;
+		sphere.copy( geometry.boundingSphere )
+			.applyMatrix4( object.matrixWorld );
 
-			if ( geometry.boundingSphere === null )
-				geometry.computeBoundingSphere();
+		return this.intersectsSphere( sphere );
 
-			sphere.copy( geometry.boundingSphere )
-				.applyMatrix4( object.matrixWorld );
+	},
 
-			return this.intersectsSphere( sphere );
+	intersectsSprite: function ( sprite ) {
 
-		};
+		sphere.center.set( 0, 0, 0 );
+		sphere.radius = 0.7071067811865476;
+		sphere.applyMatrix4( sprite.matrixWorld );
 
-	}(),
+		return this.intersectsSphere( sphere );
 
-	intersectsSprite: function () {
-
-		var sphere = new Sphere();
-
-		return function intersectsSprite( sprite ) {
-
-			sphere.center.set( 0, 0, 0 );
-			sphere.radius = 0.7071067811865476;
-			sphere.applyMatrix4( sprite.matrixWorld );
-
-			return this.intersectsSphere( sphere );
-
-		};
-
-	}(),
+	},
 
 	intersectsSphere: function ( sphere ) {
 
@@ -138,37 +131,31 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	intersectsBox: function () {
+	intersectsBox: function ( box ) {
 
-		var p = new Vector3();
+		var planes = this.planes;
 
-		return function intersectsBox( box ) {
+		for ( var i = 0; i < 6; i ++ ) {
 
-			var planes = this.planes;
+			var plane = planes[ i ];
 
-			for ( var i = 0; i < 6; i ++ ) {
+			// corner at max distance
 
-				var plane = planes[ i ];
+			p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+			p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+			p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				// corner at max distance
+			if ( plane.distanceToPoint( p ) < 0 ) {
 
-				p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
-
-				if ( plane.distanceToPoint( p ) < 0 ) {
-
-					return false;
-
-				}
+				return false;
 
 			}
 
-			return true;
+		}
 
-		};
+		return true;
 
-	}(),
+	},
 
 	containsPoint: function ( point ) {
 

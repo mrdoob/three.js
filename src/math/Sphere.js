@@ -13,6 +13,8 @@ function Sphere( center, radius ) {
 
 }
 
+var box = new Box3();
+
 Object.assign( Sphere.prototype, {
 
 	set: function ( center, radius ) {
@@ -24,39 +26,33 @@ Object.assign( Sphere.prototype, {
 
 	},
 
-	setFromPoints: function () {
+	setFromPoints: function ( points, optionalCenter ) {
 
-		var box = new Box3();
+		var center = this.center;
 
-		return function setFromPoints( points, optionalCenter ) {
+		if ( optionalCenter !== undefined ) {
 
-			var center = this.center;
+			center.copy( optionalCenter );
 
-			if ( optionalCenter !== undefined ) {
+		} else {
 
-				center.copy( optionalCenter );
+			box.setFromPoints( points ).getCenter( center );
 
-			} else {
+		}
 
-				box.setFromPoints( points ).getCenter( center );
+		var maxRadiusSq = 0;
 
-			}
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			var maxRadiusSq = 0;
+			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
-			for ( var i = 0, il = points.length; i < il; i ++ ) {
+		}
 
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+		this.radius = Math.sqrt( maxRadiusSq );
 
-			}
+		return this;
 
-			this.radius = Math.sqrt( maxRadiusSq );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	clone: function () {
 

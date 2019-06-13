@@ -11,6 +11,8 @@ function Box2( min, max ) {
 
 }
 
+var v1 = new Vector2();
+
 Object.assign( Box2.prototype, {
 
 	set: function ( min, max ) {
@@ -36,21 +38,15 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: function ( center, size ) {
 
-		var v1 = new Vector2();
+		var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
-		return function setFromCenterAndSize( center, size ) {
+		return this;
 
-			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
-			this.min.copy( center ).sub( halfSize );
-			this.max.copy( center ).add( halfSize );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	clone: function () {
 
@@ -192,18 +188,12 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
 
-		var v1 = new Vector2();
+		var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+		return clampedPoint.sub( point ).length();
 
-		return function distanceToPoint( point ) {
-
-			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
-
-		};
-
-	}(),
+	},
 
 	intersect: function ( box ) {
 

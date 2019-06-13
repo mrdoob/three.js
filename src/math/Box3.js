@@ -12,6 +12,63 @@ function Box3( min, max ) {
 
 }
 
+var v1 = new Vector3();
+var points = [
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3()
+];
+
+function traverse( node ) {
+
+	var i, l;
+	var geometry = node.geometry;
+
+	if ( geometry !== undefined ) {
+
+		if ( geometry.isGeometry ) {
+
+			var vertices = geometry.vertices;
+
+			for ( i = 0, l = vertices.length; i < l; i ++ ) {
+
+				v1.copy( vertices[ i ] );
+				v1.applyMatrix4( node.matrixWorld );
+
+				this.expandByPoint( v1 );
+
+			}
+
+		} else if ( geometry.isBufferGeometry ) {
+
+			var attribute = geometry.attributes.position;
+
+			if ( attribute !== undefined ) {
+
+				for ( i = 0, l = attribute.count; i < l; i ++ ) {
+
+					v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
+
+					this.expandByPoint( v1 );
+
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
+
+
+
 Object.assign( Box3.prototype, {
 
 	isBox3: true,
@@ -105,22 +162,16 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: function ( center, size ) {
 
-		var v1 = new Vector3();
+		var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
-		return function setFromCenterAndSize( center, size ) {
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
-			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+		return this;
 
-			this.min.copy( center ).sub( halfSize );
-			this.max.copy( center ).add( halfSize );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setFromObject: function ( object ) {
 
@@ -215,69 +266,15 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	expandByObject: function () {
+	expandByObject: function ( object ) {
 
-		// Computes the world-axis-aligned bounding box of an object (including its children),
-		// accounting for both the object's, and children's, world transforms
+		object.updateMatrixWorld( true );
 
-		var scope, i, l;
+		object.traverse( traverse.bind( this ) );
 
-		var v1 = new Vector3();
+		return this;
 
-		function traverse( node ) {
-
-			var geometry = node.geometry;
-
-			if ( geometry !== undefined ) {
-
-				if ( geometry.isGeometry ) {
-
-					var vertices = geometry.vertices;
-
-					for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-						v1.copy( vertices[ i ] );
-						v1.applyMatrix4( node.matrixWorld );
-
-						scope.expandByPoint( v1 );
-
-					}
-
-				} else if ( geometry.isBufferGeometry ) {
-
-					var attribute = geometry.attributes.position;
-
-					if ( attribute !== undefined ) {
-
-						for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return function expandByObject( object ) {
-
-			scope = this;
-
-			object.updateMatrixWorld( true );
-
-			object.traverse( traverse );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	containsPoint: function ( point ) {
 
@@ -324,21 +321,15 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	intersectsSphere: ( function () {
+	intersectsSphere: function ( sphere ) {
 
-		var closestPoint = new Vector3();
+		// Find the point on the AABB closest to the sphere center.
+		this.clampPoint( sphere.center, v1 );
 
-		return function intersectsSphere( sphere ) {
+		// If that point is inside the sphere, the AABB and sphere intersect.
+		return v1.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
-			// Find the point on the AABB closest to the sphere center.
-			this.clampPoint( sphere.center, closestPoint );
-
-			// If that point is inside the sphere, the AABB and sphere intersect.
-			return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
-
-		};
-
-	} )(),
+	},
 
 	intersectsPlane: function ( plane ) {
 
@@ -501,41 +492,29 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
 
-		var v1 = new Vector3();
+		var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+		return clampedPoint.sub( point ).length();
 
-		return function distanceToPoint( point ) {
+	},
 
-			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
+	getBoundingSphere: function ( target ) {
 
-		};
+		if ( target === undefined ) {
 
-	}(),
+			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
+			//target = new Sphere(); // removed to avoid cyclic dependency
 
-	getBoundingSphere: function () {
+		}
 
-		var v1 = new Vector3();
+		this.getCenter( target.center );
 
-		return function getBoundingSphere( target ) {
+		target.radius = this.getSize( v1 ).length() * 0.5;
 
-			if ( target === undefined ) {
+		return target;
 
-				console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
-				//target = new Sphere(); // removed to avoid cyclic dependency
-
-			}
-
-			this.getCenter( target.center );
-
-			target.radius = this.getSize( v1 ).length() * 0.5;
-
-			return target;
-
-		};
-
-	}(),
+	},
 
 	intersect: function ( box ) {
 
@@ -558,41 +537,26 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: function ( matrix ) {
 
-		var points = [
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3()
-		];
+		// transform of empty box is an empty box.
+		if ( this.isEmpty() ) return this;
 
-		return function applyMatrix4( matrix ) {
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+		points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+		points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+		points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+		points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+		points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+		points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+		points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
 
-			// transform of empty box is an empty box.
-			if ( this.isEmpty() ) return this;
+		this.setFromPoints( points );
 
-			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
+		return this;
 
-			this.setFromPoints( points );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	translate: function ( offset ) {
 

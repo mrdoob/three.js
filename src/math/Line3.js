@@ -12,6 +12,10 @@ function Line3( start, end ) {
 
 }
 
+
+var startP = new Vector3();
+var startEnd = new Vector3();
+
 Object.assign( Line3.prototype, {
 
 	set: function ( start, end ) {
@@ -89,32 +93,25 @@ Object.assign( Line3.prototype, {
 
 	},
 
-	closestPointToPointParameter: function () {
+	closestPointToPointParameter: function ( point, clampToLine ) {
 
-		var startP = new Vector3();
-		var startEnd = new Vector3();
+		startP.subVectors( point, this.start );
+		startEnd.subVectors( this.end, this.start );
 
-		return function closestPointToPointParameter( point, clampToLine ) {
+		var startEnd2 = startEnd.dot( startEnd );
+		var startEnd_startP = startEnd.dot( startP );
 
-			startP.subVectors( point, this.start );
-			startEnd.subVectors( this.end, this.start );
+		var t = startEnd_startP / startEnd2;
 
-			var startEnd2 = startEnd.dot( startEnd );
-			var startEnd_startP = startEnd.dot( startP );
+		if ( clampToLine ) {
 
-			var t = startEnd_startP / startEnd2;
+			t = _Math.clamp( t, 0, 1 );
 
-			if ( clampToLine ) {
+		}
 
-				t = _Math.clamp( t, 0, 1 );
+		return t;
 
-			}
-
-			return t;
-
-		};
-
-	}(),
+	},
 
 	closestPointToPoint: function ( point, clampToLine, target ) {
 

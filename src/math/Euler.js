@@ -22,6 +22,10 @@ Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 Euler.DefaultOrder = 'XYZ';
 
+
+var matrix = new Matrix4();
+var q = new Quaternion();
+
 Object.defineProperties( Euler.prototype, {
 
 	x: {
@@ -253,19 +257,13 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	setFromQuaternion: function () {
+	setFromQuaternion: function ( q, order, update ) {
 
-		var matrix = new Matrix4();
+		matrix.makeRotationFromQuaternion( q );
 
-		return function setFromQuaternion( q, order, update ) {
+		return this.setFromRotationMatrix( matrix, order, update );
 
-			matrix.makeRotationFromQuaternion( q );
-
-			return this.setFromRotationMatrix( matrix, order, update );
-
-		};
-
-	}(),
+	},
 
 	setFromVector3: function ( v, order ) {
 
@@ -273,21 +271,13 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	reorder: function () {
+	reorder: function ( newOrder ) {
 
-		// WARNING: this discards revolution information -bhouston
+		q.setFromEuler( this );
 
-		var q = new Quaternion();
+		return this.setFromQuaternion( q, newOrder );
 
-		return function reorder( newOrder ) {
-
-			q.setFromEuler( this );
-
-			return this.setFromQuaternion( q, newOrder );
-
-		};
-
-	}(),
+	},
 
 	equals: function ( euler ) {
 

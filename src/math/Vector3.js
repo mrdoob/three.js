@@ -18,6 +18,8 @@ function Vector3( x, y, z ) {
 
 }
 
+var quaternion = new Quaternion();
+
 Object.assign( Vector3.prototype, {
 
 	isVector3: true,
@@ -231,35 +233,23 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
+	applyEuler: function ( euler ) {
 
-		var quaternion = new Quaternion();
+		if ( ! ( euler && euler.isEuler ) ) {
 
-		return function applyEuler( euler ) {
+			console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
-			if ( ! ( euler && euler.isEuler ) ) {
+		}
 
-				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
+		return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
-			}
+	},
 
-			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
+	applyAxisAngle: function ( axis, angle ) {
 
-		};
+		return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
-	}(),
-
-	applyAxisAngle: function () {
-
-		var quaternion = new Quaternion();
-
-		return function applyAxisAngle( axis, angle ) {
-
-			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-		};
-
-	}(),
+	},
 
 	applyMatrix3: function ( m ) {
 
