@@ -27,7 +27,8 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 			uv_20 = this.uv.build( builder ) + '.uv_20',
 			t = this.uv.build( builder ) + '.t';
 
-		var format = this.value.value.encoding || THREE.LinearEncoding;
+		var texture = this.value && this.value.value;
+		var format = texture && texture.encoding || THREE.LinearEncoding;
 		var decoding = ColorSpaceNode.prototype.getDecodingMethod(format);
 		function decode(input) {
 			return decoding[0] + '( ' + input +
