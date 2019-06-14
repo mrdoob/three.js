@@ -76,10 +76,18 @@
 THREE.EXRLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.type = THREE.FloatType;
 
 };
 
 THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
+
+THREE.EXRLoader.prototype.setType = function ( value ) {
+
+	this.type = value;
+	return this;
+
+};
 
 THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
@@ -1079,7 +1087,24 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 	var height = EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1;
 	var numChannels = EXRHeader.channels.length;
 
-	var byteArray = new Float32Array( width * height * numChannels );
+	switch ( this.type ) {
+
+		case THREE.FloatType:
+
+			var byteArray = new Float32Array( width * height * numChannels );
+			break;
+
+		case THREE.HalfFloatType:
+
+			var byteArray = new Uint16Array( width * height * numChannels );
+			break;
+
+		default:
+
+			console.error( 'THREE.EXRLoader: unsupported type: ', this.type );
+			break;
+
+	}
 
 	var channelOffsets = {
 		R: 0,
@@ -1099,12 +1124,23 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 				var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
 
-				if ( EXRHeader.channels[ channelID ].pixelType === 1 ) {
+				if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
 
-					// HALF
 					for ( var x = 0; x < width; x ++ ) {
 
-						var val = parseFloat16( bufferDataView, offset );
+						switch ( this.type ) {
+
+							case THREE.FloatType:
+
+								var val = parseFloat16( bufferDataView, offset );
+								break;
+
+							case THREE.HalfFloatType:
+
+								var val = parseUint16( bufferDataView, offset );
+								break;
+
+						}
 
 						byteArray[ ( ( ( height - y_scanline ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
@@ -1139,12 +1175,25 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 					var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
 
-					if ( EXRHeader.channels[ channelID ].pixelType === 1 ) {
+					if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
 
-						// HALF
 						for ( var x = 0; x < width; x ++ ) {
 
-							var val = decodeFloat16( tmpBuffer[ ( channelID * ( scanlineBlockSize * width ) ) + ( line_y * width ) + x ] );
+							var idx = ( channelID * ( scanlineBlockSize * width ) ) + ( line_y * width ) + x;
+
+							switch ( this.type ) {
+
+								case THREE.FloatType:
+
+									var val = decodeFloat16( tmpBuffer[ idx ] );
+									break;
+
+								case THREE.HalfFloatType:
+
+									var val = tmpBuffer[ idx ];
+									break;
+
+							}
 
 							var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
 
@@ -1176,7 +1225,7 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 		height: height,
 		data: byteArray,
 		format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
-		type: THREE.FloatType
+		type: this.type
 	};
 
 };

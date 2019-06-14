@@ -206,7 +206,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.expect( 8 );
 
 			var a = new Quaternion();
-			a.onChange( function () {
+			a._onChange( function () {
 
 				assert.ok( true, "onChange called" );
 
@@ -558,13 +558,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "onChange", ( assert ) => {
+		QUnit.todo( "_onChange", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
 
-		QUnit.todo( "onChangeCallback", ( assert ) => {
+		QUnit.todo( "_onChangeCallback", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
