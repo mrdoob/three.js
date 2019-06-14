@@ -99,452 +99,9 @@ var VRMLLoader = ( function () {
 
 		},
 
-		parse: function ( data, path ) {
+		parseTree: function ( tree, path ) {
 
 			var nodeMap = {};
-
-			function generateVRMLTree( data ) {
-
-				// create lexer, parser and visitor
-
-				var tokenData = createTokens();
-
-				var lexer = new VRMLLexer( tokenData.tokens );
-				var parser = new VRMLParser( tokenData.tokenVocabulary );
-				var visitor = createVisitor( parser.getBaseCstVisitorConstructor() );
-
-				// lexing
-
-				var lexingResult = lexer.lex( data );
-				parser.input = lexingResult.tokens;
-
-				// parsing
-
-				var cstOutput = parser.vrml();
-
-				if ( parser.errors.length > 0 ) {
-
-					console.error( parser.errors );
-
-					throw Error( 'THREE.VRMLLoader: Parsing errors detected.' );
-
-				}
-
-				// actions
-
-				var ast = visitor.visit( cstOutput );
-
-				return ast;
-
-			}
-
-			function createTokens() {
-
-				var createToken = chevrotain.createToken;
-
-				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
-
-				var RouteIdentifier = createToken( { name: 'RouteIdentifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*[\.][^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/ } );
-				var Identifier = createToken( { name: 'Identifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/, longer_alt: RouteIdentifier } );
-
-				// from http://gun.teipir.gr/VRML-amgem/spec/part1/nodesRef.html
-
-				var nodeTypes = [
-					'Anchor', 'Billboard', 'Collision', 'Group', 'Transform', // grouping nodes
-					'Inline', 'LOD', 'Switch', // special groups
-					'AudioClip', 'DirectionalLight', 'PointLight', 'Script', 'Shape', 'Sound', 'SpotLight', 'WorldInfo', // common nodes
-					'CylinderSensor', 'PlaneSensor', 'ProximitySensor', 'SphereSensor', 'TimeSensor', 'TouchSensor', 'VisibilitySensor', // sensors
-					'Box', 'Cone', 'Cylinder', 'ElevationGrid', 'Extrusion', 'IndexedFaceSet', 'IndexedLineSet', 'PointSet', 'Sphere', // geometries
-					'Color', 'Coordinate', 'Normal', 'TextureCoordinate', // geometric properties
-					'Appearance', 'FontStyle', 'ImageTexture', 'Material', 'MovieTexture', 'PixelTexture', 'TextureTransform', // appearance
-					'ColorInterpolator', 'CoordinateInterpolator', 'NormalInterpolator', 'OrientationInterpolator', 'PositionInterpolator', 'ScalarInterpolator', // interpolators
-					'Background', 'Fog', 'NavigationInfo', 'Viewpoint', // bindable nodes
-					'Text' // Text must be placed at the end of the regex so there are no matches for TextureTransform and TextureCoordinate
-				];
-
-				//
-
-				var Version = createToken( {
-					name: 'Version',
-					pattern: /#VRML.*/,
-					longer_alt: Identifier
-				} );
-
-				var NodeName = createToken( {
-					name: 'NodeName',
-					pattern: new RegExp( nodeTypes.join( '|' ) ),
-					longer_alt: Identifier
-				} );
-
-				var DEF = createToken( {
-					name: 'DEF',
-					pattern: /DEF/,
-					longer_alt: Identifier
-				} );
-
-				var USE = createToken( {
-					name: 'USE',
-					pattern: /USE/,
-					longer_alt: Identifier
-				} );
-
-				var ROUTE = createToken( {
-					name: 'ROUTE',
-					pattern: /ROUTE/,
-					longer_alt: Identifier
-				} );
-
-				var TO = createToken( {
-					name: 'TO',
-					pattern: /TO/,
-					longer_alt: Identifier
-				} );
-
-				//
-
-				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
-				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
-				var BooleanLiteral = createToken( { name: 'BooleanLiteral', pattern: /TRUE|FALSE/ } );
-				var NullLiteral = createToken( { name: 'NullLiteral', pattern: /NULL/ } );
-				var LSquare = createToken( { name: 'LSquare', pattern: /\[/ } );
-				var RSquare = createToken( { name: 'RSquare', pattern: /]/ } );
-				var LCurly = createToken( { name: 'LCurly', pattern: /{/ } );
-				var RCurly = createToken( { name: 'RCurly', pattern: /}/ } );
-				var Comment = createToken( {
-					name: 'Comment',
-					pattern: /#.*/,
-					group: chevrotain.Lexer.SKIPPED
-				} );
-
-				// commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
-
-				var WhiteSpace = createToken( {
-					name: 'WhiteSpace',
-					pattern: /[ ,\s]/,
-					group: chevrotain.Lexer.SKIPPED
-				} );
-
-				var tokens = [
-					WhiteSpace,
-					// keywords appear before the Identifier
-					NodeName,
-					DEF,
-					USE,
-					ROUTE,
-					TO,
-					BooleanLiteral,
-					NullLiteral,
-					// the Identifier must appear after the keywords because all keywords are valid identifiers
-					Version,
-					Identifier,
-					RouteIdentifier,
-					StringLiteral,
-					NumberLiteral,
-					LSquare,
-					RSquare,
-					LCurly,
-					RCurly,
-					Comment
-				];
-
-				var tokenVocabulary = {};
-
-				for ( var i = 0, l = tokens.length; i < l; i ++ ) {
-
-					var token = tokens[ i ];
-
-					tokenVocabulary[ token.name ] = token;
-
-				}
-
-				return { tokens: tokens, tokenVocabulary: tokenVocabulary };
-
-			}
-
-
-			function createVisitor( BaseVRMLVisitor ) {
-
-				// the visitor is created dynmaically based on the given base class
-
-				function VRMLToASTVisitor() {
-
-					BaseVRMLVisitor.call( this );
-
-					this.validateVisitor();
-
-				}
-
-				VRMLToASTVisitor.prototype = Object.assign( Object.create( BaseVRMLVisitor.prototype ), {
-
-					constructor: VRMLToASTVisitor,
-
-					vrml: function ( ctx ) {
-
-						var data = {
-							version: this.visit( ctx.version ),
-							nodes: [],
-							routes: []
-						};
-
-						for ( var i = 0, l = ctx.node.length; i < l; i ++ ) {
-
-							var node = ctx.node[ i ];
-
-							data.nodes.push( this.visit( node ) );
-
-						}
-
-						if ( ctx.route ) {
-
-							for ( var i = 0, l = ctx.route.length; i < l; i ++ ) {
-
-								var route = ctx.route[ i ];
-
-								data.routes.push( this.visit( route ) );
-
-							}
-
-						}
-
-						return data;
-
-					},
-
-					version: function ( ctx ) {
-
-						return ctx.Version[ 0 ].image;
-
-					},
-
-					node: function ( ctx ) {
-
-						var data = {
-							name: ctx.NodeName[ 0 ].image,
-							fields: []
-						};
-
-						if ( ctx.field ) {
-
-							for ( var i = 0, l = ctx.field.length; i < l; i ++ ) {
-
-								var field = ctx.field[ i ];
-
-								data.fields.push( this.visit( field ) );
-
-							}
-
-						}
-
-						// DEF
-
-						if ( ctx.def ) {
-
-							data.DEF = this.visit( ctx.def[ 0 ] );
-
-						}
-
-						return data;
-
-					},
-
-					field: function ( ctx ) {
-
-						var data = {
-							name: ctx.Identifier[ 0 ].image,
-							type: null,
-							values: null
-						};
-
-						var result;
-
-						// SFValue
-
-						if ( ctx.singleFieldValue ) {
-
-							result = this.visit( ctx.singleFieldValue[ 0 ] );
-
-						}
-
-						// MFValue
-
-						if ( ctx.multiFieldValue ) {
-
-							result = this.visit( ctx.multiFieldValue[ 0 ] );
-
-						}
-
-						data.type = result.type;
-						data.values = result.values;
-
-						return data;
-
-					},
-
-					def: function ( ctx ) {
-
-						return ctx.Identifier[ 0 ].image;
-
-					},
-
-					use: function ( ctx ) {
-
-						return { USE: ctx.Identifier[ 0 ].image };
-
-					},
-
-					singleFieldValue: function ( ctx ) {
-
-						return processField( this, ctx );
-
-					},
-
-					multiFieldValue: function ( ctx ) {
-
-						return processField( this, ctx );
-
-					},
-
-					route: function ( ctx ) {
-
-						var data = {
-							FROM: ctx.RouteIdentifier[ 0 ].image,
-							TO: ctx.RouteIdentifier[ 1 ].image
-						};
-
-						return data;
-
-					}
-
-				} );
-
-				function processField( scope, ctx ) {
-
-					var field = {
-						type: null,
-						values: []
-					};
-
-					if ( ctx.node ) {
-
-						field.type = 'node';
-
-						for ( var i = 0, l = ctx.node.length; i < l; i ++ ) {
-
-							var node = ctx.node[ i ];
-
-							field.values.push( scope.visit( node ) );
-
-						}
-
-					}
-
-					if ( ctx.use ) {
-
-						field.type = 'use';
-
-						for ( var i = 0, l = ctx.use.length; i < l; i ++ ) {
-
-							var use = ctx.use[ i ];
-
-							field.values.push( scope.visit( use ) );
-
-						}
-
-					}
-
-					if ( ctx.StringLiteral ) {
-
-						field.type = 'string';
-
-						for ( var i = 0, l = ctx.StringLiteral.length; i < l; i ++ ) {
-
-							var stringLiteral = ctx.StringLiteral[ i ];
-
-							field.values.push( stringLiteral.image.replace( /'|"/g, '' ) );
-
-						}
-
-					}
-
-					if ( ctx.NumberLiteral ) {
-
-						field.type = 'number';
-
-						for ( var i = 0, l = ctx.NumberLiteral.length; i < l; i ++ ) {
-
-							var numberLiteral = ctx.NumberLiteral[ i ];
-
-							field.values.push( parseFloat( numberLiteral.image ) );
-
-						}
-
-					}
-
-					if ( ctx.BooleanLiteral ) {
-
-						field.type = 'boolean';
-
-						for ( var i = 0, l = ctx.BooleanLiteral.length; i < l; i ++ ) {
-
-							var booleanLiteral = ctx.BooleanLiteral[ i ];
-
-							field.values.push( booleanLiteral.image === 'TRUE' );
-
-						}
-
-					}
-
-					if ( ctx.NullLiteral ) {
-
-						field.type = 'null';
-
-						ctx.NullLiteral.forEach( function () {
-
-							field.values.push( null );
-
-						} );
-
-					}
-
-					return field;
-
-				}
-
-				return new VRMLToASTVisitor();
-
-			}
-
-			function parseTree( tree ) {
-
-				// console.log( JSON.stringify( tree, null, 2 ) );
-
-				var nodes = tree.nodes;
-				var scene = new Scene();
-
-				// first iteration: build nodemap based on DEF statements
-
-				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
-
-					var node = nodes[ i ];
-
-					buildNodeMap( node );
-
-				}
-
-				// second iteration: build nodes
-
-				for ( var i = 0, l = nodes.length; i < l; i ++ ) {
-
-					var node = nodes[ i ];
-					var object = getNode( node );
-
-					if ( object instanceof Object3D ) scene.add( object );
-
-				}
-
-				return scene;
-
-			}
 
 			function buildNodeMap( node ) {
 
@@ -576,7 +133,6 @@ var VRMLLoader = ( function () {
 				}
 
 			}
-
 
 			function getNode( node ) {
 
@@ -2338,10 +1894,452 @@ var VRMLLoader = ( function () {
 
 			}
 
-			//
-
 			var textureLoader = new TextureLoader( this.manager );
 			textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+
+			//
+
+			// console.log( JSON.stringify( tree, null, 2 ) );
+
+			var nodes = tree.nodes;
+			var scene = new Scene();
+
+			// first iteration: build nodemap based on DEF statements
+
+			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
+
+				var node = nodes[ i ];
+
+				buildNodeMap( node );
+
+			}
+
+			// second iteration: build nodes
+
+			for ( var i = 0, l = nodes.length; i < l; i ++ ) {
+
+				var node = nodes[ i ];
+				var object = getNode( node );
+
+				if ( object instanceof Object3D ) scene.add( object );
+
+			}
+
+			return scene;
+
+		},
+
+		makeTree: function ( data ) {
+
+			function generateVRMLTree( data ) {
+
+				// create lexer, parser and visitor
+
+				var tokenData = createTokens();
+
+				var lexer = new VRMLLexer( tokenData.tokens );
+				var parser = new VRMLParser( tokenData.tokenVocabulary );
+				var visitor = createVisitor( parser.getBaseCstVisitorConstructor() );
+
+				// lexing
+
+				var lexingResult = lexer.lex( data );
+				parser.input = lexingResult.tokens;
+
+				// parsing
+
+				var cstOutput = parser.vrml();
+
+				if ( parser.errors.length > 0 ) {
+
+					console.error( parser.errors );
+
+					throw Error( 'THREE.VRMLLoader: Parsing errors detected.' );
+
+				}
+
+				// actions
+
+				var ast = visitor.visit( cstOutput );
+
+				return ast;
+
+			}
+
+			function createTokens() {
+
+				var createToken = chevrotain.createToken;
+
+				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
+
+				var RouteIdentifier = createToken( { name: 'RouteIdentifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*[\.][^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/ } );
+				var Identifier = createToken( { name: 'Identifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/, longer_alt: RouteIdentifier } );
+
+				// from http://gun.teipir.gr/VRML-amgem/spec/part1/nodesRef.html
+
+				var nodeTypes = [
+					'Anchor', 'Billboard', 'Collision', 'Group', 'Transform', // grouping nodes
+					'Inline', 'LOD', 'Switch', // special groups
+					'AudioClip', 'DirectionalLight', 'PointLight', 'Script', 'Shape', 'Sound', 'SpotLight', 'WorldInfo', // common nodes
+					'CylinderSensor', 'PlaneSensor', 'ProximitySensor', 'SphereSensor', 'TimeSensor', 'TouchSensor', 'VisibilitySensor', // sensors
+					'Box', 'Cone', 'Cylinder', 'ElevationGrid', 'Extrusion', 'IndexedFaceSet', 'IndexedLineSet', 'PointSet', 'Sphere', // geometries
+					'Color', 'Coordinate', 'Normal', 'TextureCoordinate', // geometric properties
+					'Appearance', 'FontStyle', 'ImageTexture', 'Material', 'MovieTexture', 'PixelTexture', 'TextureTransform', // appearance
+					'ColorInterpolator', 'CoordinateInterpolator', 'NormalInterpolator', 'OrientationInterpolator', 'PositionInterpolator', 'ScalarInterpolator', // interpolators
+					'Background', 'Fog', 'NavigationInfo', 'Viewpoint', // bindable nodes
+					'Text' // Text must be placed at the end of the regex so there are no matches for TextureTransform and TextureCoordinate
+				];
+
+				//
+
+				var Version = createToken( {
+					name: 'Version',
+					pattern: /#VRML.*/,
+					longer_alt: Identifier
+				} );
+
+				var NodeName = createToken( {
+					name: 'NodeName',
+					pattern: new RegExp( nodeTypes.join( '|' ) ),
+					longer_alt: Identifier
+				} );
+
+				var DEF = createToken( {
+					name: 'DEF',
+					pattern: /DEF/,
+					longer_alt: Identifier
+				} );
+
+				var USE = createToken( {
+					name: 'USE',
+					pattern: /USE/,
+					longer_alt: Identifier
+				} );
+
+				var ROUTE = createToken( {
+					name: 'ROUTE',
+					pattern: /ROUTE/,
+					longer_alt: Identifier
+				} );
+
+				var TO = createToken( {
+					name: 'TO',
+					pattern: /TO/,
+					longer_alt: Identifier
+				} );
+
+				//
+
+				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
+				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
+				var BooleanLiteral = createToken( { name: 'BooleanLiteral', pattern: /TRUE|FALSE/ } );
+				var NullLiteral = createToken( { name: 'NullLiteral', pattern: /NULL/ } );
+				var LSquare = createToken( { name: 'LSquare', pattern: /\[/ } );
+				var RSquare = createToken( { name: 'RSquare', pattern: /]/ } );
+				var LCurly = createToken( { name: 'LCurly', pattern: /{/ } );
+				var RCurly = createToken( { name: 'RCurly', pattern: /}/ } );
+				var Comment = createToken( {
+					name: 'Comment',
+					pattern: /#.*/,
+					group: chevrotain.Lexer.SKIPPED
+				} );
+
+				// commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
+
+				var WhiteSpace = createToken( {
+					name: 'WhiteSpace',
+					pattern: /[ ,\s]/,
+					group: chevrotain.Lexer.SKIPPED
+				} );
+
+				var tokens = [
+					WhiteSpace,
+					// keywords appear before the Identifier
+					NodeName,
+					DEF,
+					USE,
+					ROUTE,
+					TO,
+					BooleanLiteral,
+					NullLiteral,
+					// the Identifier must appear after the keywords because all keywords are valid identifiers
+					Version,
+					Identifier,
+					RouteIdentifier,
+					StringLiteral,
+					NumberLiteral,
+					LSquare,
+					RSquare,
+					LCurly,
+					RCurly,
+					Comment
+				];
+
+				var tokenVocabulary = {};
+
+				for ( var i = 0, l = tokens.length; i < l; i ++ ) {
+
+					var token = tokens[ i ];
+
+					tokenVocabulary[ token.name ] = token;
+
+				}
+
+				return { tokens: tokens, tokenVocabulary: tokenVocabulary };
+
+			}
+
+			function createVisitor( BaseVRMLVisitor ) {
+
+				// the visitor is created dynmaically based on the given base class
+
+				function VRMLToASTVisitor() {
+
+					BaseVRMLVisitor.call( this );
+
+					this.validateVisitor();
+
+				}
+
+				VRMLToASTVisitor.prototype = Object.assign( Object.create( BaseVRMLVisitor.prototype ), {
+
+					constructor: VRMLToASTVisitor,
+
+					vrml: function ( ctx ) {
+
+						var data = {
+							version: this.visit( ctx.version ),
+							nodes: [],
+							routes: []
+						};
+
+						for ( var i = 0, l = ctx.node.length; i < l; i ++ ) {
+
+							var node = ctx.node[ i ];
+
+							data.nodes.push( this.visit( node ) );
+
+						}
+
+						if ( ctx.route ) {
+
+							for ( var i = 0, l = ctx.route.length; i < l; i ++ ) {
+
+								var route = ctx.route[ i ];
+
+								data.routes.push( this.visit( route ) );
+
+							}
+
+						}
+
+						return data;
+
+					},
+
+					version: function ( ctx ) {
+
+						return ctx.Version[ 0 ].image;
+
+					},
+
+					node: function ( ctx ) {
+
+						var data = {
+							name: ctx.NodeName[ 0 ].image,
+							fields: []
+						};
+
+						if ( ctx.field ) {
+
+							for ( var i = 0, l = ctx.field.length; i < l; i ++ ) {
+
+								var field = ctx.field[ i ];
+
+								data.fields.push( this.visit( field ) );
+
+							}
+
+						}
+
+						// DEF
+
+						if ( ctx.def ) {
+
+							data.DEF = this.visit( ctx.def[ 0 ] );
+
+						}
+
+						return data;
+
+					},
+
+					field: function ( ctx ) {
+
+						var data = {
+							name: ctx.Identifier[ 0 ].image,
+							type: null,
+							values: null
+						};
+
+						var result;
+
+						// SFValue
+
+						if ( ctx.singleFieldValue ) {
+
+							result = this.visit( ctx.singleFieldValue[ 0 ] );
+
+						}
+
+						// MFValue
+
+						if ( ctx.multiFieldValue ) {
+
+							result = this.visit( ctx.multiFieldValue[ 0 ] );
+
+						}
+
+						data.type = result.type;
+						data.values = result.values;
+
+						return data;
+
+					},
+
+					def: function ( ctx ) {
+
+						return ctx.Identifier[ 0 ].image;
+
+					},
+
+					use: function ( ctx ) {
+
+						return { USE: ctx.Identifier[ 0 ].image };
+
+					},
+
+					singleFieldValue: function ( ctx ) {
+
+						return processField( this, ctx );
+
+					},
+
+					multiFieldValue: function ( ctx ) {
+
+						return processField( this, ctx );
+
+					},
+
+					route: function ( ctx ) {
+
+						var data = {
+							FROM: ctx.RouteIdentifier[ 0 ].image,
+							TO: ctx.RouteIdentifier[ 1 ].image
+						};
+
+						return data;
+
+					}
+
+				} );
+
+				function processField( scope, ctx ) {
+
+					var field = {
+						type: null,
+						values: []
+					};
+
+					if ( ctx.node ) {
+
+						field.type = 'node';
+
+						for ( var i = 0, l = ctx.node.length; i < l; i ++ ) {
+
+							var node = ctx.node[ i ];
+
+							field.values.push( scope.visit( node ) );
+
+						}
+
+					}
+
+					if ( ctx.use ) {
+
+						field.type = 'use';
+
+						for ( var i = 0, l = ctx.use.length; i < l; i ++ ) {
+
+							var use = ctx.use[ i ];
+
+							field.values.push( scope.visit( use ) );
+
+						}
+
+					}
+
+					if ( ctx.StringLiteral ) {
+
+						field.type = 'string';
+
+						for ( var i = 0, l = ctx.StringLiteral.length; i < l; i ++ ) {
+
+							var stringLiteral = ctx.StringLiteral[ i ];
+
+							field.values.push( stringLiteral.image.replace( /'|"/g, '' ) );
+
+						}
+
+					}
+
+					if ( ctx.NumberLiteral ) {
+
+						field.type = 'number';
+
+						for ( var i = 0, l = ctx.NumberLiteral.length; i < l; i ++ ) {
+
+							var numberLiteral = ctx.NumberLiteral[ i ];
+
+							field.values.push( parseFloat( numberLiteral.image ) );
+
+						}
+
+					}
+
+					if ( ctx.BooleanLiteral ) {
+
+						field.type = 'boolean';
+
+						for ( var i = 0, l = ctx.BooleanLiteral.length; i < l; i ++ ) {
+
+							var booleanLiteral = ctx.BooleanLiteral[ i ];
+
+							field.values.push( booleanLiteral.image === 'TRUE' );
+
+						}
+
+					}
+
+					if ( ctx.NullLiteral ) {
+
+						field.type = 'null';
+
+						ctx.NullLiteral.forEach( function () {
+
+							field.values.push( null );
+
+						} );
+
+					}
+
+					return field;
+
+				}
+
+				return new VRMLToASTVisitor();
+
+			}
 
 			// create JSON representing the tree structure of the VRML asset
 
@@ -2355,9 +2353,17 @@ var VRMLLoader = ( function () {
 
 			}
 
+			return tree;
+
+		},
+
+		parse: function ( data, path ) {
+
+			var tree = this.makeTree( data );
+
 			// parse the tree structure to a three.js scene
 
-			var scene = parseTree( tree );
+			var scene = this.parseTree( tree, path );
 
 			return scene;
 
