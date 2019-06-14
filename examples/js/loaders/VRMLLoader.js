@@ -1860,7 +1860,7 @@ THREE.VRMLLoader = ( function () {
 
 					// an index of -1 indicates that the current face has ended and the next one begins
 
-					if ( index[ i + 3 ] === - 1 ) {
+					if ( index[ i + 3 ] === - 1 || i + 3 >= l ) {
 
 						i += 3;
 						start = i + 1;
@@ -1891,7 +1891,7 @@ THREE.VRMLLoader = ( function () {
 
 					// an index of -1 indicates that the current face has ended and the next one begins
 
-					if ( index[ i + 3 ] === - 1 ) {
+					if ( index[ i + 3 ] === - 1 || i + 3 >= l ) {
 
 						i += 3;
 						start ++;
@@ -1939,7 +1939,7 @@ THREE.VRMLLoader = ( function () {
 
 					// an index of -1 indicates that the current line has ended and the next one begins
 
-					if ( index[ i + 2 ] === - 1 ) {
+					if ( index[ i + 2 ] === - 1 || i + 2 >= l ) {
 
 						i += 2;
 
@@ -1969,7 +1969,7 @@ THREE.VRMLLoader = ( function () {
 
 					// an index of -1 indicates that the current line has ended and the next one begins
 
-					if ( index[ i + 2 ] === - 1 ) {
+					if ( index[ i + 2 ] === - 1 || i + 2 >= l ) {
 
 						i += 2;
 						start ++;
