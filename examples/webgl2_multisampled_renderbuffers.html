@@ -108,13 +108,11 @@
 				renderer.setScissorTest( true );
 				container.appendChild( renderer.domElement );
 
-
 				//
 
 				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 				renderTarget.directToCanvas = true;
-
 
 				//
 
