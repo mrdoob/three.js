@@ -115,7 +115,6 @@
 				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 				renderTarget.directToCanvas = true;
-				renderTarget.directToCanvasMask = renderer.context.COLOR_BUFFER_BIT;
 
 
 				//

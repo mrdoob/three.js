@@ -1064,10 +1064,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				var height = renderTarget.height;
 				var mask = _gl.COLOR_BUFFER_BIT;
 
-				if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
-				if ( renderTarget.stencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
+				if ( ! renderTarget.directToCanvas ) {
 
-				mask &= renderTarget.directToCanvasMask;
+					if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
+
+				}
 
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 				if ( renderTarget.directToCanvas ) _gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
