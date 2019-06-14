@@ -45,6 +45,11 @@
 			}
 
 			var camera, scene, renderer, clock, group, renderTarget;
+			var parameters = {
+					format: THREE.RGBAFormat,
+					stencilBuffer: false,
+					samples: 4
+				};
 
 			init();
 			animate();
@@ -106,12 +111,6 @@
 
 				//
 
-				var parameters = {
-					format: THREE.RGBAFormat,
-					stencilBuffer: false,
-					samples: 4
-				};
-
 				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 				renderTarget.directToCanvas = true;
@@ -129,6 +128,13 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
+
+				renderTarget.dispose();
+
+				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+
+				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				renderTarget.directToCanvas = true;
 
 			}
 
