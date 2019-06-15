@@ -5,11 +5,102 @@
  * @author Takahiro / https://github.com/takahirox
  */
 
-THREE.LegacyGLTFLoader = ( function () {
+import {
+	AddEquation,
+	AlphaFormat,
+	AlwaysDepth,
+	AmbientLight,
+	AnimationClip,
+	AnimationUtils,
+	BackSide,
+	Bone,
+	BufferAttribute,
+	BufferGeometry,
+	ClampToEdgeWrapping,
+	Color,
+	CustomBlending,
+	DefaultLoadingManager,
+	DirectionalLight,
+	DoubleSide,
+	DstAlphaFactor,
+	DstColorFactor,
+	EqualDepth,
+	FileLoader,
+	FrontSide,
+	GreaterEqualDepth,
+	Group,
+	InterleavedBuffer,
+	InterleavedBufferAttribute,
+	InterpolateDiscrete,
+	InterpolateLinear,
+	LessDepth,
+	LessEqualDepth,
+	Line,
+	LineLoop,
+	LineSegments,
+	LinearFilter,
+	LinearMipMapLinearFilter,
+	LinearMipMapNearestFilter,
+	Loader,
+	LoaderUtils,
+	LuminanceAlphaFormat,
+	LuminanceFormat,
+	Math as _Math,
+	Matrix3,
+	Matrix4,
+	Mesh,
+	MeshBasicMaterial,
+	MeshLambertMaterial,
+	MeshPhongMaterial,
+	MirroredRepeatWrapping,
+	NearestFilter,
+	NearestMipMapLinearFilter,
+	NearestMipMapNearestFilter,
+	NeverDepth,
+	NoBlending,
+	NotEqualDepth,
+	Object3D,
+	OneFactor,
+	OneMinusDstAlphaFactor,
+	OneMinusDstColorFactor,
+	OneMinusSrcAlphaFactor,
+	OneMinusSrcColorFactor,
+	OrthographicCamera,
+	PerspectiveCamera,
+	PointLight,
+	QuaternionKeyframeTrack,
+	RGBAFormat,
+	RGBFormat,
+	RawShaderMaterial,
+	RepeatWrapping,
+	ReverseSubtractEquation,
+	Scene,
+	Skeleton,
+	SkinnedMesh,
+	SpotLight,
+	SrcAlphaFactor,
+	SrcAlphaSaturateFactor,
+	SrcColorFactor,
+	SubtractEquation,
+	Texture,
+	TextureLoader,
+	UniformsUtils,
+	UnsignedByteType,
+	UnsignedShort4444Type,
+	UnsignedShort5551Type,
+	UnsignedShort565Type,
+	Vector2,
+	Vector3,
+	Vector4,
+	VectorKeyframeTrack,
+	ZeroFactor
+} from "../../../../build/three.module.js";
+
+var LegacyGLTFLoader = ( function () {
 
 	function LegacyGLTFLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	}
 
@@ -35,11 +126,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			} else {
 
-				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
+				resourcePath = LoaderUtils.extractUrlBase( url );
 
 			}
 
-			var loader = new THREE.FileLoader( scope.manager );
+			var loader = new FileLoader( scope.manager );
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
@@ -77,7 +168,7 @@ THREE.LegacyGLTFLoader = ( function () {
 			var content;
 			var extensions = {};
 
-			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
+			var magic = LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
 			if ( magic === BINARY_EXTENSION_HEADER_DEFAULTS.magic ) {
 
@@ -86,7 +177,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			} else {
 
-				content = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
+				content = LoaderUtils.decodeText( new Uint8Array( data ) );
 
 			}
 
@@ -225,7 +316,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		}
 
 		this.boundUniforms = boundUniforms;
-		this._m4 = new THREE.Matrix4();
+		this._m4 = new Matrix4();
 
 	}
 
@@ -329,26 +420,26 @@ THREE.LegacyGLTFLoader = ( function () {
 			var lightNode;
 
 			var lightParams = light[ light.type ];
-			var color = new THREE.Color().fromArray( lightParams.color );
+			var color = new Color().fromArray( lightParams.color );
 
 			switch ( light.type ) {
 
 				case "directional":
-					lightNode = new THREE.DirectionalLight( color );
+					lightNode = new DirectionalLight( color );
 					lightNode.position.set( 0, 0, 1 );
 					break;
 
 				case "point":
-					lightNode = new THREE.PointLight( color );
+					lightNode = new PointLight( color );
 					break;
 
 				case "spot":
-					lightNode = new THREE.SpotLight( color );
+					lightNode = new SpotLight( color );
 					lightNode.position.set( 0, 0, 1 );
 					break;
 
 				case "ambient":
-					lightNode = new THREE.AmbientLight( color );
+					lightNode = new AmbientLight( color );
 					break;
 
 			}
@@ -378,7 +469,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
 		var header = {
-			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true ),
 			contentLength: headerView.getUint32( 12, true ),
@@ -400,7 +491,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH, header.contentLength );
 
 		this.header = header;
-		this.content = THREE.LoaderUtils.decodeText( contentArray );
+		this.content = LoaderUtils.decodeText( contentArray );
 		this.body = data.slice( BINARY_EXTENSION_HEADER_LENGTH + header.contentLength, header.length );
 
 	}
@@ -410,7 +501,7 @@ THREE.LegacyGLTFLoader = ( function () {
 		var bufferView = bufferViews[ shader.extensions[ EXTENSIONS.KHR_BINARY_GLTF ].bufferView ];
 		var array = new Uint8Array( bufferView );
 
-		return THREE.LoaderUtils.decodeText( array );
+		return LoaderUtils.decodeText( array );
 
 	};
 
@@ -442,13 +533,13 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	var WEBGL_TYPE = {
 		5126: Number,
-		//35674: THREE.Matrix2,
-		35675: THREE.Matrix3,
-		35676: THREE.Matrix4,
-		35664: THREE.Vector2,
-		35665: THREE.Vector3,
-		35666: THREE.Vector4,
-		35678: THREE.Texture
+		//35674: Matrix2,
+		35675: Matrix3,
+		35676: Matrix4,
+		35664: Vector2,
+		35665: Vector3,
+		35666: Vector4,
+		35678: Texture
 	};
 
 	var WEBGL_COMPONENT_TYPES = {
@@ -461,70 +552,70 @@ THREE.LegacyGLTFLoader = ( function () {
 	};
 
 	var WEBGL_FILTERS = {
-		9728: THREE.NearestFilter,
-		9729: THREE.LinearFilter,
-		9984: THREE.NearestMipMapNearestFilter,
-		9985: THREE.LinearMipMapNearestFilter,
-		9986: THREE.NearestMipMapLinearFilter,
-		9987: THREE.LinearMipMapLinearFilter
+		9728: NearestFilter,
+		9729: LinearFilter,
+		9984: NearestMipMapNearestFilter,
+		9985: LinearMipMapNearestFilter,
+		9986: NearestMipMapLinearFilter,
+		9987: LinearMipMapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
-		33071: THREE.ClampToEdgeWrapping,
-		33648: THREE.MirroredRepeatWrapping,
-		10497: THREE.RepeatWrapping
+		33071: ClampToEdgeWrapping,
+		33648: MirroredRepeatWrapping,
+		10497: RepeatWrapping
 	};
 
 	var WEBGL_TEXTURE_FORMATS = {
-		6406: THREE.AlphaFormat,
-		6407: THREE.RGBFormat,
-		6408: THREE.RGBAFormat,
-		6409: THREE.LuminanceFormat,
-		6410: THREE.LuminanceAlphaFormat
+		6406: AlphaFormat,
+		6407: RGBFormat,
+		6408: RGBAFormat,
+		6409: LuminanceFormat,
+		6410: LuminanceAlphaFormat
 	};
 
 	var WEBGL_TEXTURE_DATATYPES = {
-		5121: THREE.UnsignedByteType,
-		32819: THREE.UnsignedShort4444Type,
-		32820: THREE.UnsignedShort5551Type,
-		33635: THREE.UnsignedShort565Type
+		5121: UnsignedByteType,
+		32819: UnsignedShort4444Type,
+		32820: UnsignedShort5551Type,
+		33635: UnsignedShort565Type
 	};
 
 	var WEBGL_SIDES = {
-		1028: THREE.BackSide, // Culling front
-		1029: THREE.FrontSide // Culling back
-		//1032: THREE.NoSide   // Culling front and back, what to do?
+		1028: BackSide, // Culling front
+		1029: FrontSide // Culling back
+		//1032: NoSide   // Culling front and back, what to do?
 	};
 
 	var WEBGL_DEPTH_FUNCS = {
-		512: THREE.NeverDepth,
-		513: THREE.LessDepth,
-		514: THREE.EqualDepth,
-		515: THREE.LessEqualDepth,
-		516: THREE.GreaterEqualDepth,
-		517: THREE.NotEqualDepth,
-		518: THREE.GreaterEqualDepth,
-		519: THREE.AlwaysDepth
+		512: NeverDepth,
+		513: LessDepth,
+		514: EqualDepth,
+		515: LessEqualDepth,
+		516: GreaterEqualDepth,
+		517: NotEqualDepth,
+		518: GreaterEqualDepth,
+		519: AlwaysDepth
 	};
 
 	var WEBGL_BLEND_EQUATIONS = {
-		32774: THREE.AddEquation,
-		32778: THREE.SubtractEquation,
-		32779: THREE.ReverseSubtractEquation
+		32774: AddEquation,
+		32778: SubtractEquation,
+		32779: ReverseSubtractEquation
 	};
 
 	var WEBGL_BLEND_FUNCS = {
-		0: THREE.ZeroFactor,
-		1: THREE.OneFactor,
-		768: THREE.SrcColorFactor,
-		769: THREE.OneMinusSrcColorFactor,
-		770: THREE.SrcAlphaFactor,
-		771: THREE.OneMinusSrcAlphaFactor,
-		772: THREE.DstAlphaFactor,
-		773: THREE.OneMinusDstAlphaFactor,
-		774: THREE.DstColorFactor,
-		775: THREE.OneMinusDstColorFactor,
-		776: THREE.SrcAlphaSaturateFactor
+		0: ZeroFactor,
+		1: OneFactor,
+		768: SrcColorFactor,
+		769: OneMinusSrcColorFactor,
+		770: SrcAlphaFactor,
+		771: OneMinusSrcAlphaFactor,
+		772: DstAlphaFactor,
+		773: OneMinusDstAlphaFactor,
+		774: DstColorFactor,
+		775: OneMinusDstColorFactor,
+		776: SrcAlphaSaturateFactor
 		// The followings are not supported by Three.js yet
 		//32769: CONSTANT_COLOR,
 		//32770: ONE_MINUS_CONSTANT_COLOR,
@@ -549,8 +640,8 @@ THREE.LegacyGLTFLoader = ( function () {
 	};
 
 	var INTERPOLATION = {
-		LINEAR: THREE.InterpolateLinear,
-		STEP: THREE.InterpolateDiscrete
+		LINEAR: InterpolateLinear,
+		STEP: InterpolateDiscrete
 	};
 
 	var STATES_ENABLES = {
@@ -782,14 +873,14 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	function createDefaultMaterial() {
 
-		return new THREE.MeshPhongMaterial( {
+		return new MeshPhongMaterial( {
 			color: 0x00000,
 			emissive: 0x888888,
 			specular: 0x000000,
 			shininess: 0,
 			transparent: false,
 			depthTest: true,
-			side: THREE.FrontSide
+			side: FrontSide
 		} );
 
 	}
@@ -805,13 +896,13 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	DeferredShaderMaterial.prototype.create = function () {
 
-		var uniforms = THREE.UniformsUtils.clone( this.params.uniforms );
+		var uniforms = UniformsUtils.clone( this.params.uniforms );
 
 		for ( var uniformId in this.params.uniforms ) {
 
 			var originalUniform = this.params.uniforms[ uniformId ];
 
-			if ( originalUniform.value instanceof THREE.Texture ) {
+			if ( originalUniform.value instanceof Texture ) {
 
 				uniforms[ uniformId ].value = originalUniform.value;
 				uniforms[ uniformId ].value.needsUpdate = true;
@@ -825,7 +916,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		this.params.uniforms = uniforms;
 
-		return new THREE.RawShaderMaterial( this.params );
+		return new RawShaderMaterial( this.params );
 
 	};
 
@@ -947,7 +1038,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader( options.manager );
+					var loader = new FileLoader( options.manager );
 					loader.setResponseType( 'text' );
 					loader.load( resolveURL( shader.uri, options.path ), function ( shaderText ) {
 
@@ -981,7 +1072,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				return new Promise( function ( resolve ) {
 
-					var loader = new THREE.FileLoader( options.manager );
+					var loader = new FileLoader( options.manager );
 					loader.setResponseType( 'arraybuffer' );
 					loader.load( resolveURL( buffer.uri, options.path ), function ( buffer ) {
 
@@ -1052,15 +1143,15 @@ THREE.LegacyGLTFLoader = ( function () {
 					var array = new TypedArray( arraybuffer );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
-					var ib = new THREE.InterleavedBuffer( array, accessor.byteStride / elementBytes );
+					var ib = new InterleavedBuffer( array, accessor.byteStride / elementBytes );
 
-					return new THREE.InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes );
+					return new InterleavedBufferAttribute( ib, itemSize, accessor.byteOffset / elementBytes );
 
 				} else {
 
 					array = new TypedArray( arraybuffer, accessor.byteOffset, accessor.count * itemSize );
 
-					return new THREE.BufferAttribute( array, itemSize );
+					return new BufferAttribute( array, itemSize );
 
 				}
 
@@ -1101,11 +1192,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						}
 
-						var textureLoader = THREE.Loader.Handlers.get( sourceUri );
+						var textureLoader = Loader.Handlers.get( sourceUri );
 
 						if ( textureLoader === null ) {
 
-							textureLoader = new THREE.TextureLoader( options.manager );
+							textureLoader = new TextureLoader( options.manager );
 
 						}
 
@@ -1119,7 +1210,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 							if ( texture.name !== undefined ) _texture.name = texture.name;
 
-							_texture.format = texture.format !== undefined ? WEBGL_TEXTURE_FORMATS[ texture.format ] : THREE.RGBAFormat;
+							_texture.format = texture.format !== undefined ? WEBGL_TEXTURE_FORMATS[ texture.format ] : RGBAFormat;
 
 							if ( texture.internalFormat !== undefined && _texture.format !== WEBGL_TEXTURE_FORMATS[ texture.internalFormat ] ) {
 
@@ -1128,16 +1219,16 @@ THREE.LegacyGLTFLoader = ( function () {
 
 							}
 
-							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : THREE.UnsignedByteType;
+							_texture.type = texture.type !== undefined ? WEBGL_TEXTURE_DATATYPES[ texture.type ] : UnsignedByteType;
 
 							if ( texture.sampler ) {
 
 								var sampler = json.samplers[ texture.sampler ];
 
-								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipMapLinearFilter;
-								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
-								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
+								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || LinearFilter;
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || NearestMipMapLinearFilter;
+								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
+								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
 							}
 
@@ -1195,18 +1286,18 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						case 'BLINN' :
 						case 'PHONG' :
-							materialType = THREE.MeshPhongMaterial;
+							materialType = MeshPhongMaterial;
 							keys.push( 'diffuse', 'specular', 'shininess' );
 							break;
 
 						case 'LAMBERT' :
-							materialType = THREE.MeshLambertMaterial;
+							materialType = MeshLambertMaterial;
 							keys.push( 'diffuse' );
 							break;
 
 						case 'CONSTANT' :
 						default :
-							materialType = THREE.MeshBasicMaterial;
+							materialType = MeshBasicMaterial;
 							break;
 
 					}
@@ -1219,7 +1310,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					if ( khr_material.doubleSided || materialValues.doubleSided ) {
 
-						materialParams.side = THREE.DoubleSide;
+						materialParams.side = DoubleSide;
 
 					}
 
@@ -1232,7 +1323,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				} else if ( material.technique === undefined ) {
 
-					materialType = THREE.MeshPhongMaterial;
+					materialType = MeshPhongMaterial;
 
 					Object.assign( materialValues, material.values );
 
@@ -1253,7 +1344,7 @@ THREE.LegacyGLTFLoader = ( function () {
 						if ( ! materialParams.fragmentShader ) {
 
 							console.warn( "ERROR: Missing fragment shader definition:", program.fragmentShader );
-							materialType = THREE.MeshPhongMaterial;
+							materialType = MeshPhongMaterial;
 
 						}
 
@@ -1262,7 +1353,7 @@ THREE.LegacyGLTFLoader = ( function () {
 						if ( ! vertexShader ) {
 
 							console.warn( "ERROR: Missing vertex shader definition:", program.vertexShader );
-							materialType = THREE.MeshPhongMaterial;
+							materialType = MeshPhongMaterial;
 
 						}
 
@@ -1461,19 +1552,19 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						if ( enableCullFace ) {
 
-							materialParams.side = functions.cullFace !== undefined ? WEBGL_SIDES[ functions.cullFace ] : THREE.FrontSide;
+							materialParams.side = functions.cullFace !== undefined ? WEBGL_SIDES[ functions.cullFace ] : FrontSide;
 
 						} else {
 
-							materialParams.side = THREE.DoubleSide;
+							materialParams.side = DoubleSide;
 
 						}
 
 						materialParams.depthTest = enableDepthTest;
-						materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : THREE.LessDepth;
+						materialParams.depthFunc = functions.depthFunc !== undefined ? WEBGL_DEPTH_FUNCS[ functions.depthFunc ] : LessDepth;
 						materialParams.depthWrite = functions.depthMask !== undefined ? functions.depthMask[ 0 ] : true;
 
-						materialParams.blending = enableBlend ? THREE.CustomBlending : THREE.NoBlending;
+						materialParams.blending = enableBlend ? CustomBlending : NoBlending;
 						materialParams.transparent = enableBlend;
 
 						var blendEquationSeparate = functions.blendEquationSeparate;
@@ -1485,8 +1576,8 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						} else {
 
-							materialParams.blendEquation = THREE.AddEquation;
-							materialParams.blendEquationAlpha = THREE.AddEquation;
+							materialParams.blendEquation = AddEquation;
+							materialParams.blendEquationAlpha = AddEquation;
 
 						}
 
@@ -1501,10 +1592,10 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						} else {
 
-							materialParams.blendSrc = THREE.OneFactor;
-							materialParams.blendDst = THREE.ZeroFactor;
-							materialParams.blendSrcAlpha = THREE.OneFactor;
-							materialParams.blendDstAlpha = THREE.ZeroFactor;
+							materialParams.blendSrc = OneFactor;
+							materialParams.blendDst = ZeroFactor;
+							materialParams.blendSrcAlpha = OneFactor;
+							materialParams.blendDstAlpha = ZeroFactor;
 
 						}
 
@@ -1514,7 +1605,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				if ( Array.isArray( materialValues.diffuse ) ) {
 
-					materialParams.color = new THREE.Color().fromArray( materialValues.diffuse );
+					materialParams.color = new Color().fromArray( materialValues.diffuse );
 
 				} else if ( typeof ( materialValues.diffuse ) === 'string' ) {
 
@@ -1538,19 +1629,19 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				if ( Array.isArray( materialValues.emission ) ) {
 
-					if ( materialType === THREE.MeshBasicMaterial ) {
+					if ( materialType === MeshBasicMaterial ) {
 
-						materialParams.color = new THREE.Color().fromArray( materialValues.emission );
+						materialParams.color = new Color().fromArray( materialValues.emission );
 
 					} else {
 
-						materialParams.emissive = new THREE.Color().fromArray( materialValues.emission );
+						materialParams.emissive = new Color().fromArray( materialValues.emission );
 
 					}
 
 				} else if ( typeof ( materialValues.emission ) === 'string' ) {
 
-					if ( materialType === THREE.MeshBasicMaterial ) {
+					if ( materialType === MeshBasicMaterial ) {
 
 						materialParams.map = dependencies.textures[ materialValues.emission ];
 
@@ -1564,7 +1655,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				if ( Array.isArray( materialValues.specular ) ) {
 
-					materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
+					materialParams.specular = new Color().fromArray( materialValues.specular );
 
 				} else if ( typeof ( materialValues.specular ) === 'string' ) {
 
@@ -1602,7 +1693,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			return _each( json.meshes, function ( mesh ) {
 
-				var group = new THREE.Group();
+				var group = new Group();
 				if ( mesh.name !== undefined ) group.name = mesh.name;
 
 				if ( mesh.extras ) group.userData = mesh.extras;
@@ -1615,7 +1706,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES || primitive.mode === undefined ) {
 
-						var geometry = new THREE.BufferGeometry();
+						var geometry = new BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1693,7 +1784,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						var material = dependencies.materials !== undefined ? dependencies.materials[ primitive.material ] : createDefaultMaterial();
 
-						var meshNode = new THREE.Mesh( geometry, material );
+						var meshNode = new Mesh( geometry, material );
 						meshNode.castShadow = true;
 						meshNode.name = ( name === "0" ? group.name : group.name + name );
 
@@ -1703,7 +1794,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
-						var geometry = new THREE.BufferGeometry();
+						var geometry = new BufferGeometry();
 
 						var attributes = primitive.attributes;
 
@@ -1739,11 +1830,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 							geometry.setIndex( dependencies.accessors[ primitive.indices ] );
 
-							meshNode = new THREE.LineSegments( geometry, material );
+							meshNode = new LineSegments( geometry, material );
 
 						} else {
 
-							meshNode = new THREE.Line( geometry, material );
+							meshNode = new Line( geometry, material );
 
 						}
 
@@ -1784,7 +1875,7 @@ THREE.LegacyGLTFLoader = ( function () {
 				// aspectRatio = xfov / yfov
 				var xfov = yfov * aspectRatio;
 
-				var _camera = new THREE.PerspectiveCamera( THREE.Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
+				var _camera = new PerspectiveCamera( _Math.radToDeg( xfov ), aspectRatio, camera.perspective.znear || 1, camera.perspective.zfar || 2e6 );
 				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
@@ -1793,7 +1884,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			} else if ( camera.type == "orthographic" && camera.orthographic ) {
 
-				var _camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
+				var _camera = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, camera.orthographic.znear, camera.orthographic.zfar );
 				if ( camera.name !== undefined ) _camera.name = camera.name;
 
 				if ( camera.extras ) _camera.userData = camera.extras;
@@ -1818,7 +1909,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			return _each( json.skins, function ( skin ) {
 
-				var bindShapeMatrix = new THREE.Matrix4();
+				var bindShapeMatrix = new Matrix4();
 
 				if ( skin.bindShapeMatrix !== undefined ) bindShapeMatrix.fromArray( skin.bindShapeMatrix );
 
@@ -1874,19 +1965,19 @@ THREE.LegacyGLTFLoader = ( function () {
 							node.matrixAutoUpdate = true;
 
 							var TypedKeyframeTrack = PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.rotation
-								? THREE.QuaternionKeyframeTrack
-								: THREE.VectorKeyframeTrack;
+								? QuaternionKeyframeTrack
+								: VectorKeyframeTrack;
 
 							var targetName = node.name ? node.name : node.uuid;
-							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : THREE.InterpolateLinear;
+							var interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : InterpolateLinear;
 
 							// KeyframeTrack.optimize() will modify given 'times' and 'values'
 							// buffers before creating a truncated copy to keep. Because buffers may
 							// be reused by other tracks, make copies here.
 							tracks.push( new TypedKeyframeTrack(
 								targetName + '.' + PATH_PROPERTIES[ target.path ],
-								THREE.AnimationUtils.arraySlice( inputAccessor.array, 0 ),
-								THREE.AnimationUtils.arraySlice( outputAccessor.array, 0 ),
+								AnimationUtils.arraySlice( inputAccessor.array, 0 ),
+								AnimationUtils.arraySlice( outputAccessor.array, 0 ),
 								interpolation
 							) );
 
@@ -1898,7 +1989,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				var name = animation.name !== undefined ? animation.name : "animation_" + animationId;
 
-				return new THREE.AnimationClip( name, undefined, tracks );
+				return new AnimationClip( name, undefined, tracks );
 
 			} );
 
@@ -1914,19 +2005,19 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		return _each( json.nodes, function ( node ) {
 
-			var matrix = new THREE.Matrix4();
+			var matrix = new Matrix4();
 
 			var _node;
 
 			if ( node.jointName ) {
 
-				_node = new THREE.Bone();
+				_node = new Bone();
 				_node.name = node.name !== undefined ? node.name : node.jointName;
 				_node.jointName = node.jointName;
 
 			} else {
 
-				_node = new THREE.Object3D();
+				_node = new Object3D();
 				if ( node.name !== undefined ) _node.name = node.name;
 
 			}
@@ -2016,19 +2107,19 @@ THREE.LegacyGLTFLoader = ( function () {
 								switch ( child.type ) {
 
 									case 'LineSegments':
-										child = new THREE.LineSegments( originalGeometry, material );
+										child = new LineSegments( originalGeometry, material );
 										break;
 
 									case 'LineLoop':
-										child = new THREE.LineLoop( originalGeometry, material );
+										child = new LineLoop( originalGeometry, material );
 										break;
 
 									case 'Line':
-										child = new THREE.Line( originalGeometry, material );
+										child = new Line( originalGeometry, material );
 										break;
 
 									default:
-										child = new THREE.Mesh( originalGeometry, material );
+										child = new Mesh( originalGeometry, material );
 
 								}
 
@@ -2067,7 +2158,7 @@ THREE.LegacyGLTFLoader = ( function () {
 									var material = originalMaterial;
 									material.skinning = true;
 
-									child = new THREE.SkinnedMesh( geometry, material );
+									child = new SkinnedMesh( geometry, material );
 									child.castShadow = true;
 									child.userData = originalUserData;
 									child.name = originalName;
@@ -2085,7 +2176,7 @@ THREE.LegacyGLTFLoader = ( function () {
 											bones.push( jointNode );
 
 											var m = skinEntry.inverseBindMatrices.array;
-											var mat = new THREE.Matrix4().fromArray( m, i * 16 );
+											var mat = new Matrix4().fromArray( m, i * 16 );
 											boneInverses.push( mat );
 
 										} else {
@@ -2096,7 +2187,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 									}
 
-									child.bind( new THREE.Skeleton( bones, boneInverses ), skinEntry.bindShapeMatrix );
+									child.bind( new Skeleton( bones, boneInverses ), skinEntry.bindShapeMatrix );
 
 									var buildBoneGraph = function ( parentJson, parentObject, property ) {
 
@@ -2198,7 +2289,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			return _each( json.scenes, function ( scene ) {
 
-				var _scene = new THREE.Scene();
+				var _scene = new Scene();
 				if ( scene.name !== undefined ) _scene.name = scene.name;
 
 				if ( scene.extras ) _scene.userData = scene.extras;
@@ -2239,3 +2330,5 @@ THREE.LegacyGLTFLoader = ( function () {
 	return LegacyGLTFLoader;
 
 } )();
+
+export { LegacyGLTFLoader };
