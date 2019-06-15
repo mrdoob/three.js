@@ -247,6 +247,11 @@ var files = [
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
+
+	{ path: 'vr/deprecated/DaydreamController.js', dependencies: [], ignoreList: [] },
+	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
+	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
+	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {

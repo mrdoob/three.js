@@ -1,22 +1,29 @@
 /**
- * @author servinlp
+ * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.GearVRController = function () {
+import {
+	Object3D,
+	Vector3
+} from "../../../../build/three.module.js";
 
-	THREE.Object3D.call( this );
+var DaydreamController = function () {
+
+	Object3D.call( this );
 
 	var scope = this;
 	var gamepad;
 
 	var axes = [ 0, 0 ];
 	var touchpadIsPressed = false;
-	var triggerIsPressed = false;
-	var angularVelocity = new THREE.Vector3();
+	var angularVelocity = new Vector3();
 
-	this.matrixAutoUpdate = true;
+	this.matrixAutoUpdate = false;
 
 	function findGamepad() {
+
+		// iterate across gamepads as the Daydream Controller may not be
+		// in position 0
 
 		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
@@ -24,7 +31,7 @@ THREE.GearVRController = function () {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad && ( gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ) ) {
+			if ( gamepad && ( gamepad.id === 'Daydream Controller' ) ) {
 
 				return gamepad;
 
@@ -87,17 +94,7 @@ THREE.GearVRController = function () {
 			if ( touchpadIsPressed !== gamepad.buttons[ 0 ].pressed ) {
 
 				touchpadIsPressed = gamepad.buttons[ 0 ].pressed;
-				scope.dispatchEvent( { type: touchpadIsPressed ? 'touchpaddown' : 'touchpadup', axes: axes } );
-
-			}
-
-
-			// trigger
-
-			if ( triggerIsPressed !== gamepad.buttons[ 1 ].pressed ) {
-
-				triggerIsPressed = gamepad.buttons[ 1 ].pressed;
-				scope.dispatchEvent( { type: triggerIsPressed ? 'triggerdown' : 'triggerup' } );
+				scope.dispatchEvent( { type: touchpadIsPressed ? 'touchpaddown' : 'touchpadup' } );
 
 			}
 
@@ -115,18 +112,14 @@ THREE.GearVRController = function () {
 
 	this.getTouchPadState = function () {
 
-		console.warn( 'THREE.GearVRController: getTouchPadState() is now getTouchpadState()' );
+		console.warn( 'THREE.DaydreamController: getTouchPadState() is now getTouchpadState()' );
 		return touchpadIsPressed;
-
-	};
-
-	this.setHand = function () {
-
-		console.warn( 'THREE.GearVRController: setHand() has been removed.' );
 
 	};
 
 };
 
-THREE.GearVRController.prototype = Object.create( THREE.Object3D.prototype );
-THREE.GearVRController.prototype.constructor = THREE.GearVRController;
+DaydreamController.prototype = Object.create( Object3D.prototype );
+DaydreamController.prototype.constructor = DaydreamController;
+
+export { DaydreamController };
