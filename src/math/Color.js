@@ -42,6 +42,29 @@ function Color( r, g, b ) {
 
 }
 
+function hue2rgb( p, q, t ) {
+
+	if ( t < 0 ) t += 1;
+	if ( t > 1 ) t -= 1;
+	if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+	if ( t < 1 / 2 ) return q;
+	if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+	return p;
+
+}
+
+function SRGBToLinear( c ) {
+
+	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+}
+
+function LinearToSRGB( c ) {
+
+	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
+
+}
+
 Object.assign( Color.prototype, {
 
 	isColor: true,
@@ -100,46 +123,31 @@ Object.assign( Color.prototype, {
 
 	},
 
-	setHSL: function () {
+	setHSL: function ( h, s, l ) {
 
-		function hue2rgb( p, q, t ) {
+		// h,s,l ranges are in 0.0 - 1.0
+		h = _Math.euclideanModulo( h, 1 );
+		s = _Math.clamp( s, 0, 1 );
+		l = _Math.clamp( l, 0, 1 );
 
-			if ( t < 0 ) t += 1;
-			if ( t > 1 ) t -= 1;
-			if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-			if ( t < 1 / 2 ) return q;
-			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-			return p;
+		if ( s === 0 ) {
+
+			this.r = this.g = this.b = l;
+
+		} else {
+
+			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+			var q = ( 2 * l ) - p;
+
+			this.r = hue2rgb( q, p, h + 1 / 3 );
+			this.g = hue2rgb( q, p, h );
+			this.b = hue2rgb( q, p, h - 1 / 3 );
 
 		}
 
-		return function setHSL( h, s, l ) {
+		return this;
 
-			// h,s,l ranges are in 0.0 - 1.0
-			h = _Math.euclideanModulo( h, 1 );
-			s = _Math.clamp( s, 0, 1 );
-			l = _Math.clamp( l, 0, 1 );
-
-			if ( s === 0 ) {
-
-				this.r = this.g = this.b = l;
-
-			} else {
-
-				var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
-				var q = ( 2 * l ) - p;
-
-				this.r = hue2rgb( q, p, h + 1 / 3 );
-				this.g = hue2rgb( q, p, h );
-				this.b = hue2rgb( q, p, h - 1 / 3 );
-
-			}
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setStyle: function ( style ) {
 
@@ -329,45 +337,25 @@ Object.assign( Color.prototype, {
 
 	},
 
-	copySRGBToLinear: function () {
+	copySRGBToLinear: function ( color ) {
 
-		function SRGBToLinear( c ) {
+		this.r = SRGBToLinear( color.r );
+		this.g = SRGBToLinear( color.g );
+		this.b = SRGBToLinear( color.b );
 
-			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+		return this;
 
-		}
+	},
 
-		return function copySRGBToLinear( color ) {
+	copyLinearToSRGB: function ( color ) {
 
-			this.r = SRGBToLinear( color.r );
-			this.g = SRGBToLinear( color.g );
-			this.b = SRGBToLinear( color.b );
+		this.r = LinearToSRGB( color.r );
+		this.g = LinearToSRGB( color.g );
+		this.b = LinearToSRGB( color.b );
 
-			return this;
+		return this;
 
-		};
-
-	}(),
-
-	copyLinearToSRGB: function () {
-
-		function LinearToSRGB( c ) {
-
-			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
-
-		}
-
-		return function copyLinearToSRGB( color ) {
-
-			this.r = LinearToSRGB( color.r );
-			this.g = LinearToSRGB( color.g );
-			this.b = LinearToSRGB( color.b );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	convertSRGBToLinear: function () {
 
@@ -574,7 +562,7 @@ Object.assign( Color.prototype, {
 		if ( offset === undefined ) offset = 0;
 
 		this.r = array[ offset ];
-		this.g = array[ offset + 1 ];
+		this.g = array[ offset + 1 ];	
 		this.b = array[ offset + 2 ];
 
 		return this;
