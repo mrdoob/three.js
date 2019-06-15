@@ -11,18 +11,18 @@ to the page displaying well on different sized displays from
 desktops to tablets to phones.
 
 For three.js there are even more situations to consider. For
-example a 3D editor with controls on the left, right, top, or
+example, a 3D editor with controls on the left, right, top, or
 bottom is something we might want to handle. A live diagram
 in the middle of a document is another example.
 
-The last sample we had used a plain canvas with no css and
+The last sample we had used a plain canvas with no CSS and
 no size
 
 ```html
 <canvas id="c"></canvas>
 ```
 
-That canvas defaults to 300x150 css pixels in size.
+That canvas defaults to 300x150 CSS pixels in size.
 
 In the web platform the recommended way to set the size
 of something is to use CSS.
@@ -43,7 +43,7 @@ html, body {
 </style>
 ```
 
-In HTML the body has a margin of 5px pixels by default so setting the
+In HTML the body has a margin of 5 pixels by default so setting the
 margin to 0 removes the margin. Setting the html and body height to 100%
 makes them fill the window. Otherwise they are only as large
 as the content that fills them.
@@ -109,7 +109,7 @@ Canvas elements have 2 sizes. One size is the size the canvas is displayed
 on the page. That's what we set with CSS. The other size is the
 number of pixels in the canvas itself. This is no different than an image.
 For example we might have a 128x64 pixel image and using
-css we might display as 400x200 pixels.
+CSS we might display as 400x200 pixels.
 
 ```html
 <img src="some128x64image.jpg" style="width:400px; height:200px">
@@ -194,13 +194,13 @@ changed.
 ## Handling HD-DPI displays
 
 HD-DPI stands for high-density dot per inch displays.
-That's most Mac's now a days and many windows machines
+That's most Macs nowadays and many Windows machines
 as well as pretty much all smartphones.
 
 The way this works in the browser is they use
-CSS pixels to set the sizes which are suppose to be the same
+CSS pixels to set the sizes which are supposed to be the same
 regardless of how high res the display is. The browser
-will the just render text with more detail but the
+will just render text with more detail but the
 same physical size.
 
 There are various ways to handle HD-DPI with three.js.
@@ -210,7 +210,7 @@ is arguably the most common. Rendering 3D graphics
 takes a lot of GPU processing power. Mobile GPUs have
 less power than desktops, at least as of 2018, and yet
 mobile phones often have very high resolution displays.
-The current top of the line phones have a HD-DPI ratio
+The current top of the line phones have an HD-DPI ratio
 of 3x meaning for every one pixel from a non-HD-DPI display
 those phones have 9 pixels. That means they have to do 9x
 the rendering.
@@ -259,7 +259,7 @@ a screenshot, or reading pixels for GPU picking, for drawing into a 2D canvas,
 etc... There many many cases where if we use `setPixelRatio` then our actual size will be different
 than the size we requested and we'll have to guess when to use the size
 we asked for and when to use the size three.js is actually using.
-By doing it oursevles we always know the size being used is the size we requested.
+By doing it ourselves we always know the size being used is the size we requested.
 There is no special case where magic is happening behind the scenes.
 
 Here's an example using the code above.
