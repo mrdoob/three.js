@@ -233,7 +233,7 @@ and pass that to three.js
 
 After that any calls to `renderer.setSize` will magicially
 use the size you request multiplied by whatever pixel ratio
-you passed in. This is strongly **NOT RECOMMENDED**. See below
+you passed in. **This is strongly NOT RECOMMENDED**. See below
 
 The other way is to do it yourself when you resize the canvas.
 
@@ -241,8 +241,8 @@ The other way is to do it yourself when you resize the canvas.
     function resizeRendererToDisplaySize(renderer) {
       const canvas = renderer.domElement;
       const pixelRatio = window.devicePixelRatio;
-      const width = canvas.clientWidth * pixelRatio;
-      const height = canvas.clientHeight * pixelRatio;
+      const width  = canvas.clientWidth  * pixelRatio | 0;
+      const height = canvas.clientHeight * pixelRatio | 0;
       const needResize = canvas.width !== width || canvas.height !== height;
       if (needResize) {
         renderer.setSize(width, height, false);
