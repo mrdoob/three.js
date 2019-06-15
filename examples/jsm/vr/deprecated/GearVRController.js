@@ -2,9 +2,14 @@
  * @author servinlp
  */
 
-THREE.GearVRController = function () {
+import {
+	Object3D,
+	Vector3
+} from "../../../../build/three.module.js";
 
-	THREE.Object3D.call( this );
+var GearVRController = function () {
+
+	Object3D.call( this );
 
 	var scope = this;
 	var gamepad;
@@ -12,7 +17,7 @@ THREE.GearVRController = function () {
 	var axes = [ 0, 0 ];
 	var touchpadIsPressed = false;
 	var triggerIsPressed = false;
-	var angularVelocity = new THREE.Vector3();
+	var angularVelocity = new Vector3();
 
 	this.matrixAutoUpdate = true;
 
@@ -128,5 +133,7 @@ THREE.GearVRController = function () {
 
 };
 
-THREE.GearVRController.prototype = Object.create( THREE.Object3D.prototype );
-THREE.GearVRController.prototype.constructor = THREE.GearVRController;
+GearVRController.prototype = Object.create( Object3D.prototype );
+GearVRController.prototype.constructor = GearVRController;
+
+export { GearVRController };
