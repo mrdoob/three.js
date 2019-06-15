@@ -562,7 +562,7 @@ Object.assign( Color.prototype, {
 		if ( offset === undefined ) offset = 0;
 
 		this.r = array[ offset ];
-		this.g = array[ offset + 1 ];	
+		this.g = array[ offset + 1 ];
 		this.b = array[ offset + 2 ];
 
 		return this;
