@@ -32,17 +32,24 @@
  *
  */
 
+import {
+	BufferAttribute,
+	BufferGeometry,
+	Loader,
+	LoaderUtils
+} from "../../../../build/three.module.js";
+
 /* global CTM */
 
-THREE.CTMLoader = function () {
+var CTMLoader = function () {
 
 	this.workerPath = null;
 
 };
 
-THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
+CTMLoader.prototype.constructor = CTMLoader;
 
-THREE.CTMLoader.prototype.setWorkerPath = function ( workerPath ) {
+CTMLoader.prototype.setWorkerPath = function ( workerPath ) {
 
 	this.workerPath = workerPath;
 
@@ -50,7 +57,7 @@ THREE.CTMLoader.prototype.setWorkerPath = function ( workerPath ) {
 
 // Load multiple CTM parts defined in JSON
 
-THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
+CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 	parameters = parameters || {};
 
@@ -58,7 +65,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 	var xhr = new XMLHttpRequest();
 
-	var basePath = parameters.basePath ? parameters.basePath : THREE.LoaderUtils.extractUrlBase( url );
+	var basePath = parameters.basePath ? parameters.basePath : LoaderUtils.extractUrlBase( url );
 
 	xhr.onreadystatechange = function () {
 
@@ -89,7 +96,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 				for ( var i = 0; i < jsonObject.materials.length; i ++ ) {
 
-					materials[ i ] = THREE.Loader.prototype.createMaterial( jsonObject.materials[ i ], basePath );
+					materials[ i ] = Loader.prototype.createMaterial( jsonObject.materials[ i ], basePath );
 
 				}
 
@@ -116,7 +123,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 //		- url (required)
 //		- callback (required)
 
-THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
+CTMLoader.prototype.load = function ( url, callback, parameters ) {
 
 	parameters = parameters || {};
 
@@ -220,9 +227,9 @@ THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
 };
 
 
-THREE.CTMLoader.prototype._createGeometry = function ( file, callback ) {
+CTMLoader.prototype._createGeometry = function ( file, callback ) {
 
-	var geometry = new THREE.BufferGeometry();
+	var geometry = new BufferGeometry();
 
 	var indices = file.body.indices;
 	var positions = file.body.vertices;
@@ -246,24 +253,24 @@ THREE.CTMLoader.prototype._createGeometry = function ( file, callback ) {
 
 	}
 
-	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+	geometry.setIndex( new BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 	if ( normals !== undefined ) {
 
-		geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+		geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 	}
 
 	if ( uvs !== undefined ) {
 
-		geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+		geometry.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
 	}
 
 	if ( colors !== undefined ) {
 
-		geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
+		geometry.addAttribute( 'color', new BufferAttribute( colors, 4 ) );
 
 	}
 
@@ -277,3 +284,5 @@ THREE.CTMLoader.prototype._createGeometry = function ( file, callback ) {
 	callback( geometry );
 
 };
+
+export { CTMLoader };

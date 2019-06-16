@@ -25,6 +25,12 @@
 
 		<script>
 
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
@@ -127,6 +133,7 @@
 				}
 
 				var loader = new THREE.CTMLoader();
+				loader.setWorkerPath( "js/loaders/ctm/CTMWorker.js" );
 
 				loader.load( "models/ctm/ben.ctm", function ( geometry ) {
 
