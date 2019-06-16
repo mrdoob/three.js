@@ -21,6 +21,8 @@ export class Vector4 implements Vector {
 	y: number;
 	z: number;
 	w: number;
+	width: number;
+	height: number;
 	isVector4: true;
 
 	/**

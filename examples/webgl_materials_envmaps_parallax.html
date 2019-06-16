@@ -422,6 +422,8 @@
 				var height = 50;
 				var intensity = 10;
 
+				THREE.RectAreaLightUniformsLib.init();
+
 				var blueRectLight = new THREE.RectAreaLight( 0xf3aaaa, intensity, width, height );
 				blueRectLight.position.set( 99, 5, 0 );
 				blueRectLight.lookAt( 0, 5, 0 );

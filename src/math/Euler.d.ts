@@ -160,20 +160,20 @@ export class Euler {
 	y: number;
 	z: number;
 	order: string;
-	onChangeCallback: Function;
+	_onChangeCallback: Function;
 
 	set( x: number, y: number, z: number, order?: string ): Euler;
 	clone(): this;
 	copy( euler: Euler ): this;
-	setFromRotationMatrix( m: Matrix4, order?: string, update?: boolean ): Euler;
-	setFromQuaternion( q: Quaternion, order?: string, update?: boolean ): Euler;
+	setFromRotationMatrix( m: Matrix4, order?: string ): Euler;
+	setFromQuaternion( q: Quaternion, order?: string ): Euler;
 	setFromVector3( v: Vector3, order?: string ): Euler;
 	reorder( newOrder: string ): Euler;
 	equals( euler: Euler ): boolean;
 	fromArray( xyzo: any[] ): Euler;
 	toArray( array?: number[], offset?: number ): number[];
 	toVector3( optionalResult?: Vector3 ): Vector3;
-	onChange( callback: Function ): this;
+	_onChange( callback: Function ): this;
 
 	static RotationOrders: string[];
 	static DefaultOrder: string;

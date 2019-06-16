@@ -105,7 +105,7 @@
 					scale.y = Math.random() * 200 + 100;
 					scale.z = Math.random() * 200 + 100;
 
-					quaternion.setFromEuler( rotation, false );
+					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
 					geometry.applyMatrix( matrix );
