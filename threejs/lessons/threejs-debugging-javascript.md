@@ -531,11 +531,11 @@ example you make it much easier for them to help you. You'll also
 learn in the process.
 
 Also important, when you go to Stack Overflow to post your question **put your
-code [in a snippet](https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/)*.
+code [in a snippet](https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/).**
 Of course you are welcome to use JSFiddle or Codepen or similar site to test out
 your MCVE but once you actually get to posting your question on Stack Overflow
-you're required to put the code **in the question itself**. My making
-a snippet you satisfy that requirement.
+you're required to put the code to reproduce your issue **in the question itself**. 
+By making a snippet you satisfy that requirement.
 
 Follow these suggestions and your far more likely to get help
 with your issue.
