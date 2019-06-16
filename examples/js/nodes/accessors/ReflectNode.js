@@ -15,6 +15,7 @@ function ReflectNode( scope ) {
 ReflectNode.CUBE = 'cube';
 ReflectNode.SPHERE = 'sphere';
 ReflectNode.VECTOR = 'vector';
+ReflectNode.VECTOR2 = 'vector2';
 
 ReflectNode.prototype = Object.create( TempNode.prototype );
 ReflectNode.prototype.constructor = ReflectNode;
@@ -47,6 +48,14 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 				builder.addNodeCode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( vViewPosition ), normal ), viewMatrix );' );
 
 				result = 'reflectVec';
+
+				break;
+
+			case ReflectNode.VECTOR2:
+
+				builder.addNodeCode( 'vec3 reflectVec2 = vec3( inverseTransformDirection( geometry.normal, viewMatrix ).x, inverseTransformDirection( geometry.normal, viewMatrix ).yz );' );
+
+				result = 'reflectVec2';
 
 				break;
 

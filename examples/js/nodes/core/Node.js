@@ -54,6 +54,7 @@ Node.prototype = {
 		var data = { result: this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), output ) };
 
 		data.code = builder.clearNodeCode();
+		data.extra = builder.context.extra;
 
 		builder.removeFlow();
 

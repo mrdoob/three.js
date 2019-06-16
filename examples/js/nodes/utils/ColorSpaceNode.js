@@ -4,7 +4,9 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { ConstNode } from '../core/ConstNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
+import { ExpressionNode } from '../core/ExpressionNode.js';
 
 function ColorSpaceNode( input, method ) {
 
@@ -12,7 +14,7 @@ function ColorSpaceNode( input, method ) {
 
 	this.input = input;
 
-	this.method = method || ColorSpaceNode.LINEAR;
+	this.method = method || ColorSpaceNode.LINEAR_TO_LINEAR;
 
 }
 
@@ -203,15 +205,15 @@ ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 
 ColorSpaceNode.prototype = Object.create( TempNode.prototype );
 ColorSpaceNode.prototype.constructor = ColorSpaceNode;
-ColorSpaceNode.prototype.nodeType = "ColorAdjustment";
+ColorSpaceNode.prototype.nodeType = "ColorSpace";
 
 ColorSpaceNode.prototype.generate = function ( builder, output ) {
 
-	var input = builder.context.input || this.input.build( builder, 'v4' ),
-		encodingMethod = builder.context.encoding !== undefined ? this.getEncodingMethod( builder.context.encoding ) : [ this.method ],
-		factor = this.factor ? this.factor.build( builder, 'f' ) : encodingMethod[ 1 ];
+	var input = this.input.build( builder, 'v4' );
+	var method = [ this.method ];
+	var factor = this.factor ? this.factor.build( builder, 'f' ) : method[ 1 ];
 
-	var method = builder.include( ColorSpaceNode.Nodes[ encodingMethod[ 0 ] ] );
+	method = builder.include( ColorSpaceNode.Nodes[ method[ 0 ] ] );
 
 	if ( factor ) {
 
@@ -225,17 +227,7 @@ ColorSpaceNode.prototype.generate = function ( builder, output ) {
 
 };
 
-ColorSpaceNode.prototype.getDecodingMethod = function ( encoding ) {
-
-	var components = this.getEncodingComponents( encoding );
-
-	components[ 0 ] += 'ToLinear';
-
-	return components;
-
-};
-
-ColorSpaceNode.prototype.getEncodingMethod = function ( encoding ) {
+ColorSpaceNode.getEncodingMethodFromEncoding = function ( encoding ) {
 
 	var components = this.getEncodingComponents( encoding );
 
@@ -245,7 +237,7 @@ ColorSpaceNode.prototype.getEncodingMethod = function ( encoding ) {
 
 };
 
-ColorSpaceNode.prototype.getEncodingComponents = function ( encoding ) {
+ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 	switch ( encoding ) {
 
@@ -256,15 +248,26 @@ ColorSpaceNode.prototype.getEncodingComponents = function ( encoding ) {
 		case THREE.RGBEEncoding:
 			return [ 'RGBE' ];
 		case THREE.RGBM7Encoding:
-			return [ 'RGBM', '7.0' ];
+			return [ 'RGBM', new FloatNode( 7.0 ).setReadonly( true ) ];
 		case THREE.RGBM16Encoding:
-			return [ 'RGBM', '16.0' ];
+			return [ 'RGBM', new FloatNode( 16.0 ).setReadonly( true ) ];
 		case THREE.RGBDEncoding:
-			return [ 'RGBD', '256.0' ];
+			return [ 'RGBD', new FloatNode( 256.0 ).setReadonly( true ) ];
 		case THREE.GammaEncoding:
-			return [ 'Gamma', 'float( GAMMA_FACTOR )' ];
+			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )' ) ];
 
 	}
+
+};
+
+ColorSpaceNode.prototype.fromDecoding = function ( encoding ) {
+
+	var components = ColorSpaceNode.getEncodingComponents( encoding );
+
+	components[ 0 ] += 'ToLinear';
+
+	this.method = components[ 0 ];
+	this.factor = components[ 1 ];
 
 };
 

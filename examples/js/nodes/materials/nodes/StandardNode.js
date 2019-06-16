@@ -370,6 +370,12 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push( "radiance += " + environment.result + ";" );
 
+			if ( environment.extra.irradiance ) {
+
+				output.push( "irradiance += " + environment.extra.irradiance + ";" );
+
+			}
+
 		}
 
 		output.push(

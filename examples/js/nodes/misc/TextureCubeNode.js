@@ -3,15 +3,20 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
+import { ExpressionNode } from '../core/ExpressionNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
+import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 
-function TextureCubeNode( value, uv ) {
+function TextureCubeNode( value ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
-	this.uv = uv || new TextureCubeUVNode();
+
+	this.radianceCache = { uv: new TextureCubeUVNode() };
+	this.irradianceCache = { uv: new TextureCubeUVNode( new ReflectNode( ReflectNode.VECTOR2 ), undefined, new FloatNode( 1 ).setReadonly( true ) ) };
 
 }
 
@@ -19,30 +24,50 @@ TextureCubeNode.prototype = Object.create( TempNode.prototype );
 TextureCubeNode.prototype.constructor = TextureCubeNode;
 TextureCubeNode.prototype.nodeType = "TextureCube";
 
+TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache, t ) {
+
+	var uv_10 = cache.uv.build( builder ) + '.uv_10',
+		uv_20 = cache.uv.build( builder ) + '.uv_20',
+		t = cache.uv.build( builder ) + '.t';
+
+	var color10 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )',
+		color20 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
+
+	// add a custom context for fix incompatibility with the core
+	// include ColorSpace function only if is a vertex shader
+	// for optimization this should be removed in the future
+	var context = { include: builder.isShader( 'vertex' ) };
+
+	builder.addContext( context );
+
+	cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( new ExpressionNode('', this.type ) );
+	cache.colorSpace10.input.eval( color10 );
+	cache.colorSpace10.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
+	color10 = cache.colorSpace10.build( builder, this.type );
+
+	cache.colorSpace20 = cache.colorSpace20 || new ColorSpaceNode( new ExpressionNode('', this.type ) );
+	cache.colorSpace20.input.eval( color20 );
+	cache.colorSpace20.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
+	color20 = cache.colorSpace20.build( builder, this.type );
+
+	builder.removeContext();
+
+	// end custom context
+
+	return 'mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb';
+
+};
+
 TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		var uv_10 = this.uv.build( builder ) + '.uv_10',
-			uv_20 = this.uv.build( builder ) + '.uv_20',
-			t = this.uv.build( builder ) + '.t';
+		var radiance = this.generateTextureCubeUV( builder, this.radianceCache );
+		var irradiance = this.generateTextureCubeUV( builder, this.irradianceCache );
 
-		var texture = this.value && this.value.value;
-		var format = texture && texture.encoding || THREE.LinearEncoding;
-		var decoding = ColorSpaceNode.prototype.getDecodingMethod(format);
-		function decode(input) {
-			return decoding[0] + '( ' + input +
-				(decoding[1] !== undefined ? ', ' + decoding[1] : '') +
-				' )';
-		}
+		builder.context.extra.irradiance = '( PI * ' + irradiance + ' )';
 
-		var color10 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )';
-		color10 = decode(color10);
-
-		var color20 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
-		color20 = decode(color20);
-
-		return builder.format( 'vec4( mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb, 1.0 )', this.getType( builder ), output );
+		return builder.format( 'vec4( ' + radiance + ', 1.0 )', this.getType( builder ), output );
 
 	} else {
 
@@ -62,11 +87,7 @@ TextureCubeNode.prototype.toJSON = function ( meta ) {
 
 		data = this.createJSONNode( meta );
 
-		data.uv = this.uv.toJSON( meta ).uuid;
-		data.textureSize = this.textureSize.toJSON( meta ).uuid;
-		data.blinnExponentToRoughness = this.blinnExponentToRoughness.toJSON( meta ).uuid;
-
-		if ( this.roughness ) data.roughness = this.roughness.toJSON( meta ).uuid;
+		data.value = this.value.toJSON( meta ).uuid;
 
 	}
 

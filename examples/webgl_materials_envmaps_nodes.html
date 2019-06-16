@@ -69,8 +69,7 @@
 
 			var container, stats;
 			var camera, scene, renderer, controls;
-			var torusMesh, planeMesh;
-			var nodeMaterial;
+			var torusMesh, torusMeshNode, planeMesh;
 			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
 			var ldrCubeMap, hdrCubeMap, rgbmCubeMap;
 
@@ -94,31 +93,27 @@
 				//
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				//geometry = new THREE.SphereBufferGeometry(20, 100, 100);
-				var material = new THREE.MeshStandardMaterial( {
-					color: 0xffffff,
-					metalness: params.metalness,
-					roughness: params.roughness
-				} );
+				var material;
+
+				material = new THREE.MeshStandardMaterial();
+				material.color = new THREE.Color( 0xffffff );
+				material.roughness = params.metalness;
+				material.metalness = params.roguhness;
 
 				torusMesh = new THREE.Mesh( geometry, material );
 				torusMesh.position.y = 35;
 				scene.add( torusMesh );
 
-				nodeMaterial = new THREE.StandardNodeMaterial();
-				nodeMaterial.color = new THREE.ColorNode(new THREE.Color(1, 1, 1))
-				nodeMaterial.roughness = new THREE.FloatNode(params.metalness);
-				nodeMaterial.metalness = new THREE.FloatNode(params.roguhness);
+				material = new THREE.MeshStandardNodeMaterial();
+				material.color = new THREE.Color( 0xffffff );
+				material.roughness = params.metalness;
+				material.metalness = params.roguhness;
 
-				var torusMeshNode = new THREE.Mesh( geometry, nodeMaterial );
+				torusMeshNode = new THREE.Mesh( geometry, material );
 				torusMeshNode.position.y = -35;
 				scene.add( torusMeshNode );
 
-
-				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var material = new THREE.MeshBasicMaterial();
-
-				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
@@ -244,8 +239,8 @@
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
 
-				nodeMaterial.roughness.value = params.roughness;
-				nodeMaterial.metalness.value = params.metalness;
+				torusMeshNode.material.roughness = params.roughness;
+				torusMeshNode.material.metalness = params.metalness;
 
 				var renderTarget, cubeMap;
 
@@ -272,28 +267,11 @@
 					torusMesh.material.envMap = newEnvMap;
 					torusMesh.material.needsUpdate = true;
 
+					torusMeshNode.material.envMap = newEnvMap;
+					torusMeshNode.material.needsUpdate = true;
+
 					planeMesh.material.map = newEnvMap;
 					planeMesh.material.needsUpdate = true;
-
-					var textureNode = new THREE.TextureNode(newEnvMap);
-					textureNode.encodingOverride = newEnvMap.encoding;
-
-					nodeMaterial.environment = new THREE.TextureCubeNode(
-						textureNode
-					);
-					nodeMaterial.environment.uv.blinnExponentToRoughness = nodeMaterial.roughness;
-
-					nodeMaterial.ambient = new THREE.TextureCubeNode(
-						textureNode
-					);
-					nodeMaterial.ambient.uv.blinnExponentToRoughness = new THREE.FloatNode(1);
-					nodeMaterial.ambient.uv.uv = new THREE.NormalNode(THREE.NormalNode.WORLD);
-					nodeMaterial.ambient = new THREE.OperatorNode(
-						nodeMaterial.ambient,
-						new THREE.FloatNode(Math.PI),
-						THREE.OperatorNode.MUL);
-
-					nodeMaterial.needsUpdate = true;
 
 				}
 
