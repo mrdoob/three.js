@@ -81,6 +81,22 @@ div[data-diagram] {
     max-width: 700px;
     width: calc(100% - 40px);
 }
+.lesson-main>h1,
+.lesson-main>h2,
+.lesson-main>h3,
+.lesson-main>h4,
+.lesson-main>h5,
+.lesson-main>h6 {
+    margin-top: 1.66em;
+}
+.lesson-main>h1:first-child,
+.lesson-main>h2:first-child,
+.lesson-main>h3:first-child,
+.lesson-main>h4:first-child,
+.lesson-main>h5:first-child,
+.lesson-main>h6:first-child {
+    margin-top: 0.83em;
+}
 .lesson-main>.threejs_example_container {
     max-width: 90%;
 }
@@ -479,7 +495,7 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
 @media (prefers-color-scheme: dark) {
   body {
     background: #333;
-    color: #EEE;
+    color: #CCC;
   }
   a {
     color: #56d3fd;
@@ -489,7 +505,7 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   }
   code {
     background: #666;
-    color: #fff;
+    color: #CCC;
   }
   img {
     background: #DDD;
