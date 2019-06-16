@@ -306,7 +306,7 @@ THREE.FBXLoader = ( function () {
 						if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
 
 							var tgaLoader = this.tgaLoader;
-							tgaLoader.manager = this.manager;
+							if ( tgaLoader.manager === THREE.DefaultLoadingManager ) tgaLoader.manager = this.manager;
 							tgaLoader.setPath( this.textureLoader.path );
 
 							THREE.Loader.Handlers.add( /\.tga$/i, tgaLoader );

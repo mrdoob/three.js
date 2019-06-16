@@ -3907,7 +3907,7 @@ THREE.ColladaLoader.prototype = {
 
 		if ( tgaLoader ) {
 
-			tgaLoader.manager = this.manager;
+			if ( tgaLoader.manager === THREE.DefaultLoadingManager ) tgaLoader.manager = this.manager;
 			tgaLoader.setPath( this.resourcePath || path );
 
 		}

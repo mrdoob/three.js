@@ -1324,7 +1324,7 @@ THREE.MMDLoader = ( function () {
 
 			}
 
-			this.tgaLoader.manager = this.manager;
+			if ( this.tgaLoader.manager === THREE.DefaultLoadingManager ) this.tgaLoader.manager = this.manager;
 
 			return this.tgaLoader;
 
