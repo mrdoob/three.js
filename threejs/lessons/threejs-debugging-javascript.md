@@ -72,7 +72,20 @@ Then pick "Disable Cache (while DevTools is open)".
 ## Use the JavaScript console
 
 Inside all devtools is a *console*. It shows warnings and error messages.
-You can print your own info to the console with with `console.log` as in
+
+** READ THE MESSAGES!! **
+
+Typically there should be only 1 or 2 messages.
+
+<div class="threejs_center"><img class="border" src="resources/images/devtools-no-errors.jpg" style="width: 779px"></div>
+
+If you see any others **READ THEM**. For example:
+
+<div class="threejs_center"><img class="border" src="resources/images/devtools-errors.jpg" style="width: 779px"></div>
+
+I mis-spelled "three" as "threee"
+
+You can also print your own info to the console with with `console.log` as in
 
 ```js
 console.log(someObject.position.x, someObject.position.y, someObject.position.z);
