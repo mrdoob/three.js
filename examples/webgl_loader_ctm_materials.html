@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - baked illumination</title>
+		<title>three.js webgl - CTM loader materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -116,6 +116,8 @@
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
 				var loader = new THREE.CTMLoader();
+				loader.setWorkerPath( "js/loaders/ctm/CTMWorker.js" );
+
 				loader.loadParts( "models/ctm/camaro/camaro.js", function ( geometries, materials ) {
 
 					hackMaterials( materials );
