@@ -182,12 +182,12 @@ function main() {
         // set the camera to frame the box
         frameArea(boxSize * 1.1, boxSize, boxCenter, camera);
 
-        await waitSeconds(0);
+        await waitSeconds(2);
         renderer.render(scene, camera);
 
         resMgr.dispose();
 
-        await waitSeconds(0);
+        await waitSeconds(1);
 
       }
     }
