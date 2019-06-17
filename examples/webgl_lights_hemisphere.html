@@ -24,12 +24,6 @@
 			<button id="directionalButton">toggle directional light</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-
 		<script type="x-shader/x-vertex" id="vertexShader">
 
 			varying vec3 vWorldPosition;
@@ -63,19 +57,37 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				AnimationMixer,
+				BackSide,
+				Clock,
+				Color,
+				DirectionalLight,
+				DirectionalLightHelper,
+				Fog,
+				HemisphereLight,
+				HemisphereLightHelper,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				ShaderMaterial,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			}
 
 			var camera, scene, renderer, dirLight, dirLightHeper, hemiLight, hemiLightHelper;
 			var mixers = [];
 			var stats;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -84,27 +96,27 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 0, 0, 250 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
-				scene.fog = new THREE.Fog( scene.background, 1, 5000 );
+				scene = new Scene();
+				scene.background = new Color().setHSL( 0.6, 0, 1 );
+				scene.fog = new Fog( scene.background, 1, 5000 );
 
 				// LIGHTS
 
-				hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+				hemiLight = new HemisphereLight( 0xffffff, 0xffffff, 0.6 );
 				hemiLight.color.setHSL( 0.6, 1, 0.6 );
 				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
 				hemiLight.position.set( 0, 50, 0 );
 				scene.add( hemiLight );
 
-				hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
+				hemiLightHelper = new HemisphereLightHelper( hemiLight, 10 );
 				scene.add( hemiLightHelper );
 
 				//
 
-				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				dirLight = new DirectionalLight( 0xffffff, 1 );
 				dirLight.color.setHSL( 0.1, 1, 0.95 );
 				dirLight.position.set( - 1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 30 );
@@ -125,16 +137,16 @@
 				dirLight.shadow.camera.far = 3500;
 				dirLight.shadow.bias = - 0.0001;
 
-				dirLightHeper = new THREE.DirectionalLightHelper( dirLight, 10 );
+				dirLightHeper = new DirectionalLightHelper( dirLight, 10 );
 				scene.add( dirLightHeper );
 
 				// GROUND
 
-				var groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
-				var groundMat = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+				var groundGeo = new PlaneBufferGeometry( 10000, 10000 );
+				var groundMat = new MeshLambertMaterial( { color: 0xffffff } );
 				groundMat.color.setHSL( 0.095, 1, 0.75 );
 
-				var ground = new THREE.Mesh( groundGeo, groundMat );
+				var ground = new Mesh( groundGeo, groundMat );
 				ground.position.y = - 33;
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
@@ -145,8 +157,8 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					"topColor": { value: new THREE.Color( 0x0077ff ) },
-					"bottomColor": { value: new THREE.Color( 0xffffff ) },
+					"topColor": { value: new Color( 0x0077ff ) },
+					"bottomColor": { value: new Color( 0xffffff ) },
 					"offset": { value: 33 },
 					"exponent": { value: 0.6 }
 				};
@@ -154,20 +166,20 @@
 
 				scene.fog.color.copy( uniforms[ "bottomColor" ].value );
 
-				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
-				var skyMat = new THREE.ShaderMaterial( {
+				var skyGeo = new SphereBufferGeometry( 4000, 32, 15 );
+				var skyMat = new ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
 					fragmentShader: fragmentShader,
-					side: THREE.BackSide
+					side: BackSide
 				} );
 
-				var sky = new THREE.Mesh( skyGeo, skyMat );
+				var sky = new Mesh( skyGeo, skyMat );
 				scene.add( sky );
 
 				// MODEL
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
 
@@ -183,7 +195,7 @@
 
 					scene.add( mesh );
 
-					var mixer = new THREE.AnimationMixer( mesh );
+					var mixer = new AnimationMixer( mesh );
 					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 					mixers.push( mixer );
 
@@ -191,7 +203,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
