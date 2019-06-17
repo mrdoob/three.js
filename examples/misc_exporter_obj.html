@@ -33,10 +33,21 @@
 			<button id="export">export to obj</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/exporters/OBJExporter.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				BufferGeometry,
+				CylinderBufferGeometry,
+				DirectionalLight,
+				Float32BufferAttribute,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { OBJExporter } from './jsm/exporters/OBJExporter.js';
 
 			var camera, scene, light, renderer;
 			var exportButton, floatingDiv;
@@ -44,7 +55,7 @@
 
 			function exportToObj() {
 
-				var exporter = new THREE.OBJExporter();
+				var exporter = new OBJExporter();
 				var result = exporter.parse( scene );
 				floatingDiv.style.display = 'block';
 				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );
@@ -69,39 +80,39 @@
 
 				if ( type === 1 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					var material = new MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = generateTriangleGeometry();
 
-					scene.add( new THREE.Mesh( geometry, material ) );
+					scene.add( new Mesh( geometry, material ) );
 
 
 				} else if ( type === 2 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-					scene.add( new THREE.Mesh( geometry, material ) );
+					var material = new MeshLambertMaterial( { color: 0x00cc00 } );
+					var geometry = new BoxBufferGeometry( 100, 100, 100 );
+					scene.add( new Mesh( geometry, material ) );
 
 				} else if ( type === 3 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
-					scene.add( new THREE.Mesh( geometry, material ) );
+					var material = new MeshLambertMaterial( { color: 0x00cc00 } );
+					var geometry = new CylinderBufferGeometry( 50, 50, 100, 30, 1 );
+					scene.add( new Mesh( geometry, material ) );
 
 				} else if ( type === 4 || type === 5 ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					var material = new MeshLambertMaterial( { color: 0x00cc00 } );
 					var geometry = generateTriangleGeometry();
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = - 200;
 					scene.add( mesh );
 
-					var geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
-					var mesh2 = new THREE.Mesh( geometry2, material );
+					var geometry2 = new BoxBufferGeometry( 100, 100, 100 );
+					var mesh2 = new Mesh( geometry2, material );
 					scene.add( mesh2 );
 
-					var geometry3 = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
-					var mesh3 = new THREE.Mesh( geometry3, material );
+					var geometry3 = new CylinderBufferGeometry( 50, 50, 100, 30, 1 );
+					var mesh3 = new Mesh( geometry3, material );
 					mesh3.position.x = 200;
 					scene.add( mesh3 );
 
@@ -119,17 +130,17 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 400 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new DirectionalLight( 0xffffff );
 				scene.add( light );
 
 				addGeometry( 1 );
@@ -237,14 +248,14 @@
 
 			function generateTriangleGeometry() {
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 				var vertices = [];
 
 				vertices.push( - 50, - 50, 0 );
 				vertices.push( 50, - 50, 0 );
 				vertices.push( 50, 50, 0 );
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 				geometry.computeVertexNormals();
 
 				return geometry;
