@@ -7,19 +7,24 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
 		</div>
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				CanvasTexture,
+				GridHelper,
+				Group,
+				ImageBitmapLoader,
+				ImageLoader,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var container;
 
@@ -31,12 +36,12 @@
 
 			function addImageBitmap() {
 
-				new THREE.ImageBitmapLoader()
+				new ImageBitmapLoader()
 					.setOptions( { imageOrientation: 'none' } )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
-						var texture = new THREE.CanvasTexture( imageBitmap );
-						var material = new THREE.MeshBasicMaterial( { map: texture } );
+						var texture = new CanvasTexture( imageBitmap );
+						var material = new MeshBasicMaterial( { map: texture } );
 
 						/* ImageBitmap should be disposed when done with it
 						   Can't be done until it's actually uploaded to WebGLTexture */
@@ -59,23 +64,23 @@
 
 			function addImage() {
 
-				new THREE.ImageLoader()
+				new ImageLoader()
 					.setCrossOrigin( '*' )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
 
-						var texture = new THREE.CanvasTexture( image );
-						var material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
+						var texture = new CanvasTexture( image );
+						var material = new MeshBasicMaterial( { color: 0xff8888, map: texture } );
 						addCube( material );
 
 					} );
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+			var geometry = new BoxBufferGeometry( 1, 1, 1 );
 
 			function addCube( material ) {
 
-				var cube = new THREE.Mesh( geometry, material );
+				var cube = new Mesh( geometry, material );
 				cube.position.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 				cube.rotation.set( Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI );
 				cubes.add( cube );
@@ -89,27 +94,27 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.set( 0, 4, 7 );
 				camera.lookAt( 0, 0, 0 );
 
 				// SCENE
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
-				group = new THREE.Group();
+				group = new Group();
 				scene.add( group );
 
-				group.add( new THREE.GridHelper( 4, 12 ) );
+				group.add( new GridHelper( 4, 12 ) );
 
-				cubes = new THREE.Group();
+				cubes = new Group();
 				group.add( cubes );
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

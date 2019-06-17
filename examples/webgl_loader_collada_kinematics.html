@@ -12,21 +12,25 @@
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				GridHelper,
+				HemisphereLight,
+				Math as _Math,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
 			var container, stats;
 
@@ -38,7 +42,7 @@
 			var kinematicsTween;
 			var tweenParameters = {};
 
-			var loader = new THREE.ColladaLoader();
+			var loader = new ColladaLoader();
 			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
@@ -46,7 +50,7 @@
 
 				dae.traverse( function ( child ) {
 
-					if ( child instanceof THREE.Mesh ) {
+					if ( child.isMesh ) {
 
 						// model does not have normals
 						child.material.flatShading = true;
@@ -70,32 +74,32 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 2, 2, 3 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// Grid
 
-				var grid = new THREE.GridHelper( 20, 20 );
+				var grid = new GridHelper( 20, 20 );
 				scene.add( grid );
 
 				// Add the COLLADA
 
 				scene.add( dae );
 
-				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
 
-				var light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				var light = new HemisphereLight( 0xffeeee, 0x111122 );
 				scene.add( light );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
+				var pointLight = new PointLight( 0xffffff, 0.3 );
 				particleLight.add( pointLight );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -113,7 +117,7 @@
 
 			function setupTween() {
 
-				var duration = THREE.Math.randInt( 1000, 5000 );
+				var duration = _Math.randInt( 1000, 5000 );
 
 				var target = {};
 
@@ -131,7 +135,7 @@
 
 							tweenParameters[ prop ] = position;
 
-							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
+							target[ prop ] = _Math.randInt( joint.limits.min, joint.limits.max );
 
 						}
 

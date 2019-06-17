@@ -14,20 +14,19 @@
 			<a href="http://www.assimp.org/" target="_blank" rel="noopener">Assimp</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Clock,
+				DirectionalLight,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/AssimpJSONLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AssimpJSONLoader } from './jsm/loaders/AssimpJSONLoader.js';
 
 			/*
 
@@ -63,15 +62,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 				// load jeep model
 
-				var loader = new THREE.AssimpJSONLoader();
+				var loader = new AssimpJSONLoader();
 
 				loader.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
 
@@ -90,17 +89,17 @@
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
+				var directionalLight = new DirectionalLight( 0xeeeeee );
 				directionalLight.position.set( 1, 1, - 1 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
