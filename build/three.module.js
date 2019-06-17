@@ -1066,7 +1066,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._x = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -1083,7 +1083,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._y = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -1100,7 +1100,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._z = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -1117,7 +1117,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._w = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -1136,7 +1136,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = z;
 		this._w = w;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1155,7 +1155,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = quaternion.z;
 		this._w = quaternion.w;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1230,7 +1230,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) this._onChangeCallback();
 
 		return this;
 
@@ -1249,7 +1249,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = axis.z * s;
 		this._w = Math.cos( halfAngle );
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1308,7 +1308,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1391,7 +1391,7 @@ Object.assign( Quaternion.prototype, {
 		this._y *= - 1;
 		this._z *= - 1;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1437,7 +1437,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1474,7 +1474,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
 		this._w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1541,7 +1541,7 @@ Object.assign( Quaternion.prototype, {
 		this._y = ( y * ratioA + this._y * ratioB );
 		this._z = ( z * ratioA + this._z * ratioB );
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1562,7 +1562,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = array[ offset + 2 ];
 		this._w = array[ offset + 3 ];
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -1582,15 +1582,15 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	onChange: function ( callback ) {
+	_onChange: function ( callback ) {
 
-		this.onChangeCallback = callback;
+		this._onChangeCallback = callback;
 
 		return this;
 
 	},
 
-	onChangeCallback: function () {}
+	_onChangeCallback: function () {}
 
 } );
 
@@ -3082,6 +3082,42 @@ function Vector4( x, y, z, w ) {
 	this.w = ( w !== undefined ) ? w : 1;
 
 }
+
+Object.defineProperties( Vector4.prototype, {
+
+	"width": {
+
+		get: function () {
+
+			return this.z;
+
+		},
+
+		set: function ( value ) {
+
+			this.z = value;
+
+		}
+
+	},
+
+	"height": {
+
+		get: function () {
+
+			return this.w;
+
+		},
+
+		set: function ( value ) {
+
+			this.w = value;
+
+		}
+
+	}
+
+} );
 
 Object.assign( Vector4.prototype, {
 
@@ -7909,7 +7945,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._x = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -7926,7 +7962,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._y = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -7943,7 +7979,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._z = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -7960,7 +7996,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._order = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -7979,7 +8015,7 @@ Object.assign( Euler.prototype, {
 		this._z = z;
 		this._order = order || this._order;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -7998,7 +8034,7 @@ Object.assign( Euler.prototype, {
 		this._z = euler._z;
 		this._order = euler._order;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -8121,7 +8157,7 @@ Object.assign( Euler.prototype, {
 
 		this._order = order;
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) this._onChangeCallback();
 
 		return this;
 
@@ -8176,7 +8212,7 @@ Object.assign( Euler.prototype, {
 		this._z = array[ 2 ];
 		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -8210,15 +8246,15 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	onChange: function ( callback ) {
+	_onChange: function ( callback ) {
 
-		this.onChangeCallback = callback;
+		this._onChangeCallback = callback;
 
 		return this;
 
 	},
 
-	onChangeCallback: function () {}
+	_onChangeCallback: function () {}
 
 } );
 
@@ -8307,8 +8343,8 @@ function Object3D() {
 
 	}
 
-	rotation.onChange( onRotationChange );
-	quaternion.onChange( onQuaternionChange );
+	rotation._onChange( onRotationChange );
+	quaternion._onChange( onQuaternionChange );
 
 	Object.defineProperties( this, {
 		position: {
@@ -20693,7 +20729,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.pixelStorei( 37440, texture.flipY );
 
-				var isCompressed = ( texture.image[ 0 ] && texture.image[ 0 ].isCompressedTexture );
+				var isCompressed = ( texture && texture.isCompressedTexture );
 				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 				var cubeImage = [];
