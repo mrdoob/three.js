@@ -8,117 +8,121 @@
 	</head>
 	<body>
 
-			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
-				<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS" target="_blank" rel="noopener">how to build the reflective prism</a>
-			</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
+			<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS" target="_blank" rel="noopener">how to build the reflective prism</a>
+		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/effects/PeppersGhostEffect.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Color,
+				Float32BufferAttribute,
+				Group,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { PeppersGhostEffect } from './jsm/effects/PeppersGhostEffect.js';
 
-				if ( WEBGL.isWebGLAvailable() === false ) {
+			var container;
 
-					document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			var camera, scene, renderer, effect;
+			var group;
 
-				}
+			init();
+			animate();
 
-				var container;
+			function init() {
 
-				var camera, scene, renderer, effect;
-				var group;
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				init();
-				animate();
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 
-				function init() {
+				scene = new Scene();
 
-					container = document.createElement( 'div' );
-					document.body.appendChild( container );
+				group = new Group();
+				scene.add( group );
 
-					camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				// Cube
 
-					scene = new THREE.Scene();
+				var geometry = new BoxBufferGeometry( 1, 1, 1 );
+				geometry = geometry.toNonIndexed(); // ensure unique vertices for each triangle
 
-					group = new THREE.Group();
-					scene.add( group );
+				var position = geometry.attributes.position;
+				var colors = [];
+				var color = new Color();
 
-					// Cube
+				// generate for each side of the cube a different color
 
-					var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-					geometry = geometry.toNonIndexed(); // ensure unique vertices for each triangle
+				for ( var i = 0; i < position.count; i += 6 ) {
 
-					var position = geometry.attributes.position;
-					var colors = [];
-					var color = new THREE.Color();
+					color.setHex( Math.random() * 0xffffff );
 
-					// generate for each side of the cube a different color
+					// first face
 
-					for ( var i = 0; i < position.count; i += 6 ) {
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
-						color.setHex( Math.random() * 0xffffff );
+					// second face
 
-						// first face
-
-						colors.push( color.r, color.g, color.b );
-						colors.push( color.r, color.g, color.b );
-						colors.push( color.r, color.g, color.b );
-
-						// second face
-
-						colors.push( color.r, color.g, color.b );
-						colors.push( color.r, color.g, color.b );
-						colors.push( color.r, color.g, color.b );
-
-					}
-
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-
-					var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-
-					for ( var i = 0; i < 10; i ++ ) {
-
-						var cube = new THREE.Mesh( geometry, material );
-						cube.position.x = Math.random() * 2 - 1;
-						cube.position.y = Math.random() * 2 - 1;
-						cube.position.z = Math.random() * 2 - 1;
-						cube.scale.multiplyScalar( Math.random() + 0.5 );
-						group.add( cube );
-
-					}
-
-					renderer = new THREE.WebGLRenderer();
-					renderer.setPixelRatio( window.devicePixelRatio );
-					container.appendChild( renderer.domElement );
-
-					effect = new THREE.PeppersGhostEffect( renderer );
-					effect.setSize( window.innerWidth, window.innerHeight );
-					effect.cameraDistance = 5;
-
-					window.addEventListener( 'resize', onWindowResize, false );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
-				function onWindowResize() {
+				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-					camera.aspect = window.innerWidth / window.innerHeight;
-					camera.updateProjectionMatrix();
+				var material = new MeshBasicMaterial( { vertexColors: VertexColors } );
 
-					effect.setSize( window.innerWidth, window.innerHeight );
+				for ( var i = 0; i < 10; i ++ ) {
 
-				}
-
-				function animate() {
-
-					requestAnimationFrame( animate );
-
-					group.rotation.y += 0.01;
-
-					effect.render( scene, camera );
+					var cube = new Mesh( geometry, material );
+					cube.position.x = Math.random() * 2 - 1;
+					cube.position.y = Math.random() * 2 - 1;
+					cube.position.z = Math.random() * 2 - 1;
+					cube.scale.multiplyScalar( Math.random() + 0.5 );
+					group.add( cube );
 
 				}
+
+				renderer = new WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				container.appendChild( renderer.domElement );
+
+				effect = new PeppersGhostEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.cameraDistance = 5;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				group.rotation.y += 0.01;
+
+				effect.render( scene, camera );
+
+			}
 
 		</script>
 

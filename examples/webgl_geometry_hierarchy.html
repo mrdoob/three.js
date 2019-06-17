@@ -8,10 +8,20 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Color,
+				Fog,
+				Group,
+				Mesh,
+				MeshNormalMaterial,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, stats, group;
 
@@ -25,21 +35,21 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
+				scene.fog = new Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-				var material = new THREE.MeshNormalMaterial();
+				var geometry = new BoxBufferGeometry( 100, 100, 100 );
+				var material = new MeshNormalMaterial();
 
-				group = new THREE.Group();
+				group = new Group();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = Math.random() * 2000 - 1000;
 					mesh.position.y = Math.random() * 2000 - 1000;
 					mesh.position.z = Math.random() * 2000 - 1000;
@@ -58,7 +68,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
