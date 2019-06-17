@@ -1,4 +1,11 @@
+import { BackSide, NoBlending } from '../constants.js';
+import { Scene } from '../scenes/Scene.js';
+import { Mesh } from '../objects/Mesh.js';
+import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { ShaderMaterial } from '../materials/ShaderMaterial.js';
+import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
+import { CubeCamera } from '../cameras/CubeCamera.js';
 
 /**
  * @author alteredq / http://alteredqualia.com
@@ -22,7 +29,7 @@ WebGLRenderTargetCube.prototype.fromEquirectangularTexture = function ( renderer
 	this.texture.format = texture.format;
 	this.texture.encoding = texture.encoding;
 
-	var scene = new THREE.Scene();
+	var scene = new Scene();
 
 	var shader = {
 
@@ -77,25 +84,25 @@ WebGLRenderTargetCube.prototype.fromEquirectangularTexture = function ( renderer
 		].join( '\n' ),
 	};
 
-	var material = new THREE.ShaderMaterial( {
+	var material = new ShaderMaterial( {
 
 		type: 'CubemapFromEquirect',
 
-		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+		uniforms: cloneUniforms( shader.uniforms ),
 		vertexShader: shader.vertexShader,
 		fragmentShader: shader.fragmentShader,
-		side: THREE.BackSide,
-		blending: THREE.NoBlending
+		side: BackSide,
+		blending: NoBlending
 
 	} );
 
 	material.uniforms.tEquirect.value = texture;
 
-	var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 5, 5, 5 ), material );
+	var mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
 
 	scene.add( mesh );
 
-	var camera = new THREE.CubeCamera( 1, 10, 1 );
+	var camera = new CubeCamera( 1, 10, 1 );
 
 	camera.renderTarget = this;
 	camera.renderTarget.texture.name = 'CubeCameraTexture';
