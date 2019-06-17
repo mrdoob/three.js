@@ -2,23 +2,28 @@
  * @author Takahiro / https://github.com/takahirox
  */
 
+import {
+	DefaultLoadingManager
+} from "../../../build/three.module.js";
+import { GLTFLoader } from "../loaders/GLTFLoader.js";
+
 // VRM Specification: https://dwango.github.io/vrm/vrm_spec/
 //
 // VRM is based on glTF 2.0 and VRM extension is defined
 // in top-level json.extensions.VRM
 
-THREE.VRMLoader = ( function () {
+var VRMLoader = ( function () {
 
 	function VRMLoader( manager ) {
 
-		if ( THREE.GLTFLoader === undefined ) {
+		if ( GLTFLoader === undefined ) {
 
-			throw new Error( 'THREE.VRMLoader: Import THREE.GLTFLoader.' );
+			throw new Error( 'THREE.VRMLoader: Import GLTFLoader.' );
 
 		}
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-		this.gltfLoader = new THREE.GLTFLoader( this.manager );
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		this.gltfLoader = new GLTFLoader( this.manager );
 
 	}
 
@@ -85,3 +90,5 @@ THREE.VRMLoader = ( function () {
 	return VRMLoader;
 
 } )();
+
+export { VRMLoader };
