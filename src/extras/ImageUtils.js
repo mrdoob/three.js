@@ -35,7 +35,18 @@ var ImageUtils = {
 
 			} else {
 
-				context.drawImage( image, 0, 0, image.width, image.height );
+				try {
+
+					// Can throw if `image` is not a drawable type, e.g. HTMLImageElement, HTMLVideoElement,
+					// ImageBitmap; occurs for DataTextures, Textures from WebGLRenderTarget etc..
+
+					context.drawImage( image, 0, 0, image.width, image.height );
+
+				} catch ( e ) {
+
+					return '';
+
+				}
 
 			}
 

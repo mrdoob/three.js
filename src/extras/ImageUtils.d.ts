@@ -8,6 +8,12 @@ import { Texture } from '../textures/Texture';
  */
 export namespace ImageUtils {
 	/**
+	 */
+	export function getDataURL(
+		image: any,
+	): string;
+
+	/**
 	 * @deprecated
 	 */
 	export let crossOrigin: string;
