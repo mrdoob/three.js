@@ -22,23 +22,20 @@
 		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank" rel="noopener">VRML 2.0 Tutorial</a>,-->
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/chevrotain.min.js"></script>
-		<script src="js/loaders/VRMLLoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				DirectionalLight,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
 
 			var camera, scene, renderer, stats;
 
@@ -47,21 +44,21 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 6;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.add( camera );
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				var dirLight = new DirectionalLight( 0xffffff );
 				dirLight.position.set( 200, 200, 1000 ).normalize();
 
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var loader = new THREE.VRMLLoader();
+				var loader = new VRMLLoader();
 				loader.load( 'models/vrml/house.wrl', function ( object ) {
 
 					scene.add( object );
@@ -70,14 +67,14 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				// controls
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

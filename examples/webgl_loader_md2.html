@@ -13,24 +13,29 @@
 			Character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Clock,
+				Color,
+				Fog,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				SpotLight,
+				TextureLoader,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/loaders/MD2Loader.js"></script>
-		<script src="js/misc/MD2Character.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MD2Character } from './jsm/misc/MD2Character.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -48,7 +53,7 @@
 
 			var controls;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			var stats;
 
@@ -62,20 +67,20 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 150, 400 );
 
 				// SCENE
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050505 );
-				scene.fog = new THREE.Fog( 0x050505, 400, 1000 );
+				scene = new Scene();
+				scene.background = new Color( 0x050505 );
+				scene.fog = new Fog( 0x050505, 400, 1000 );
 
 				// LIGHTS
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new AmbientLight( 0x222222 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				var light = new SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( 200, 250, 500 );
 				light.angle = 0.5;
 				light.penumbra = 0.5;
@@ -84,10 +89,10 @@
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				var light = new SpotLight( 0xffffff, 5, 1000 );
 				light.position.set( - 100, 350, 350 );
 				light.angle = 0.5;
 				light.penumbra = 0.5;
@@ -96,26 +101,26 @@
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
 				//  GROUND
 
-				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				var gg = new THREE.PlaneBufferGeometry( 2000, 2000 );
-				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+				var gt = new TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				var gg = new PlaneBufferGeometry( 2000, 2000 );
+				var gm = new MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
-				var ground = new THREE.Mesh( gg, gm );
+				var ground = new Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 8, 8 );
-				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.material.map.wrapS = ground.material.map.wrapT = RepeatWrapping;
 				ground.receiveShadow = true;
 
 				scene.add( ground );
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -137,13 +142,13 @@
 
 				// CONTROLS
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
 				controls.update();
 
 				// GUI
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function () {
 
@@ -180,7 +185,7 @@
 
 				};
 
-				character = new THREE.MD2Character();
+				character = new MD2Character();
 				character.scale = 3;
 
 				character.onLoadComplete = function () {

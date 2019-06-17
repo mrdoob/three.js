@@ -13,12 +13,18 @@
 	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
-<script src="../build/three.js"></script>
-<script src="js/loaders/KTXLoader.js"></script>
+<script type="module">
+	import {
+		BoxBufferGeometry,
+		DoubleSide,
+		PerspectiveCamera,
+		Mesh,
+		MeshBasicMaterial,
+		Scene,
+		WebGLRenderer,
+	} from "../build/three.module.js";
 
-<script src="js/WebGL.js"></script>
-
-<script>
+	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
 
 	/*
 	This is how compressed textures are supposed to be used:
@@ -35,12 +41,6 @@
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
 
-	if ( WEBGL.isWebGLAvailable() === false ) {
-
-		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-	}
-
 	var camera, scene, renderer;
 	var meshes = [];
 
@@ -49,7 +49,7 @@
 
 	function init() {
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer = new WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
@@ -61,75 +61,75 @@
 			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
 		};
 
-		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+		camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 		camera.position.z = 1000;
 
-		scene = new THREE.Scene();
+		scene = new Scene();
 
-		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+		var geometry = new BoxBufferGeometry( 200, 200, 200 );
 		var material1, material2;
 
 		// TODO: add cubemap support
-		var loader = new THREE.KTXLoader();
+		var loader = new KTXLoader();
 
 		if ( formats.pvrtc ) {
 
-			material1 = new THREE.MeshBasicMaterial( {
+			material1 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_PVR2bpp.ktx' )
 			} );
-			material2 = new THREE.MeshBasicMaterial( {
+			material2 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_PVR4bpp.ktx' ),
 				depthTest: false,
 				transparent: true,
-				side: THREE.DoubleSide
+				side: DoubleSide
 			} );
 
-			meshes.push( new THREE.Mesh( geometry, material1 ) );
-			meshes.push( new THREE.Mesh( geometry, material2 ) );
+			meshes.push( new Mesh( geometry, material1 ) );
+			meshes.push( new Mesh( geometry, material2 ) );
 
 		}
 
 		if ( formats.s3tc ) {
 
-			material1 = new THREE.MeshBasicMaterial( {
+			material1 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_BC1.ktx' )
 			} );
-			material2 = new THREE.MeshBasicMaterial( {
+			material2 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_BC3.ktx' ),
 				depthTest: false,
 				transparent: true,
-				side: THREE.DoubleSide
+				side: DoubleSide
 			} );
 
-			meshes.push( new THREE.Mesh( geometry, material1 ) );
-			meshes.push( new THREE.Mesh( geometry, material2 ) );
+			meshes.push( new Mesh( geometry, material1 ) );
+			meshes.push( new Mesh( geometry, material2 ) );
 
 		}
 
 		if ( formats.etc1 ) {
 
-			material1 = new THREE.MeshBasicMaterial( {
+			material1 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_ETC1.ktx' )
 			} );
 
-			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new Mesh( geometry, material1 ) );
 
 		}
 
 		if ( formats.astc ) {
 
-			material1 = new THREE.MeshBasicMaterial( {
+			material1 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_ASTC4x4.ktx' )
 			} );
-			material2 = new THREE.MeshBasicMaterial( {
+			material2 = new MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' ),
 				depthTest: false,
 				transparent: true,
-				side: THREE.DoubleSide
+				side: DoubleSide
 			} );
 
-			meshes.push( new THREE.Mesh( geometry, material1 ) );
-			meshes.push( new THREE.Mesh( geometry, material2 ) );
+			meshes.push( new Mesh( geometry, material1 ) );
+			meshes.push( new Mesh( geometry, material2 ) );
 
 		}
 

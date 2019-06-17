@@ -20,14 +20,25 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Box3,
+				Color,
+				CubeReflectionMapping,
+				CubeTextureLoader,
+				DirectionalLight,
+				PerspectiveCamera,
+				RGBFormat,
+				Scene,
+				Vector3,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/LDrawLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
 			var container, progressBarDiv;
 
@@ -67,29 +78,29 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 150, 200, 250 );
 
 				// scene
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xdeebed );
+				scene = new Scene();
+				scene.background = new Color( 0xdeebed );
 
-				var ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
+				var ambientLight = new AmbientLight( 0xdeebed, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 1000, 1200, 1500 );
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -102,7 +113,7 @@
 					smoothNormals: true
 				};
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
 
@@ -118,25 +129,25 @@
 
 				} );
 
-				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function () {
 
 					reloadObject( false );
 
 				} );
 
-				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function () {
 
 					reloadObject( false );
 
 				} );
 
-				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function () {
 
 					updateLineSegments();
 
 				} );
 
-				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function () {
 
 					updateLineSegments();
 
@@ -195,7 +206,7 @@
 				updateProgressBar( 0 );
 				showProgressBar();
 
-				var lDrawLoader = new THREE.LDrawLoader();
+				var lDrawLoader = new LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
 				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
@@ -228,9 +239,9 @@
 								var urls = [ r + "posx.jpg", r + "negx.jpg",
 									r + "posy.jpg", r + "negy.jpg",
 									r + "posz.jpg", r + "negz.jpg" ];
-								textureCube = new THREE.CubeTextureLoader().load( urls );
-								textureCube.format = THREE.RGBFormat;
-								textureCube.mapping = THREE.CubeReflectionMapping;
+								textureCube = new CubeTextureLoader().load( urls );
+								textureCube.format = RGBFormat;
+								textureCube.mapping = CubeReflectionMapping;
 
 							}
 
@@ -252,13 +263,13 @@
 
 						// Adjust camera and light
 
-						var bbox = new THREE.Box3().setFromObject( model );
-						var size = bbox.getSize( new THREE.Vector3() );
+						var bbox = new Box3().setFromObject( model );
+						var size = bbox.getSize( new Vector3() );
 						var radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
 
 						if ( resetCamera ) {
 
-							controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
+							controls.target0.copy( bbox.getCenter( new Vector3() ) );
 							controls.position0.set( - 2.3, 2, 2 ).multiplyScalar( radius ).add( controls.target0 );
 							controls.reset();
 
