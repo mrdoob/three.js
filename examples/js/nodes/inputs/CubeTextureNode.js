@@ -5,6 +5,7 @@
 import { InputNode } from '../core/InputNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
+import { ExpressionNode } from '../core/ExpressionNode.js';
 
 function CubeTextureNode( value, uv, bias ) {
 
@@ -49,16 +50,27 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	if ( bias ) code = 'texCubeBias( ' + cubetex + ', ' + uv + ', ' + bias + ' )';
 	else code = 'texCube( ' + cubetex + ', ' + uv + ' )';
 
-	// add this context to replace ColorSpaceNode.input to code
+	// add a custom context for fix incompatibility with the core
+	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
+	// this should be removed in the future
+	// context.include =: is used to include or not functions if used FunctionNode
+	// context.ignoreCache =: not create variables nodeT0..9 to optimize the code
+	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
+	var outputType = this.getType( builder );
 
-	builder.addContext( { input: code, encoding: builder.getTextureEncodingFromMap( this.value ), include: builder.isShader( 'vertex' ) } );
+	builder.addContext( context );
 
-	this.colorSpace = this.colorSpace || new ColorSpaceNode( this );
-	code = this.colorSpace.build( builder, this.type );
+	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode('', outputType ) );
+	this.colorSpace.fromEncoding( builder.getTextureEncodingFromMap( this.value ) );
+	this.colorSpace.input.parse( code );
+
+	code = this.colorSpace.build( builder, outputType );
+
+	// end custom context
 
 	builder.removeContext();
 
-	return builder.format( code, this.type, output );
+	return builder.format( code, outputType, output );
 
 };
 

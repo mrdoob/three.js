@@ -203,40 +203,6 @@ ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD';
 ColorSpaceNode.LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
 ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 
-ColorSpaceNode.prototype = Object.create( TempNode.prototype );
-ColorSpaceNode.prototype.constructor = ColorSpaceNode;
-ColorSpaceNode.prototype.nodeType = "ColorSpace";
-
-ColorSpaceNode.prototype.generate = function ( builder, output ) {
-
-	var input = this.input.build( builder, 'v4' );
-	var method = [ this.method ];
-	var factor = this.factor ? this.factor.build( builder, 'f' ) : method[ 1 ];
-
-	method = builder.include( ColorSpaceNode.Nodes[ method[ 0 ] ] );
-
-	if ( factor ) {
-
-		return builder.format( method + '( ' + input + ', ' + factor + ' )', this.getType( builder ), output );
-
-	} else {
-
-		return builder.format( method + '( ' + input + ' )', this.getType( builder ), output );
-
-	}
-
-};
-
-ColorSpaceNode.getEncodingMethodFromEncoding = function ( encoding ) {
-
-	var components = this.getEncodingComponents( encoding );
-
-	components[ 0 ] = 'LinearTo' + components[ 0 ];
-
-	return components;
-
-};
-
 ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 	switch ( encoding ) {
@@ -260,13 +226,53 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 };
 
+ColorSpaceNode.prototype = Object.create( TempNode.prototype );
+ColorSpaceNode.prototype.constructor = ColorSpaceNode;
+ColorSpaceNode.prototype.nodeType = "ColorSpace";
+
+ColorSpaceNode.prototype.generate = function ( builder, output ) {
+
+	var input = this.input.build( builder, 'v4' );
+
+	if ( this.method === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+
+		return builder.format( input, this.getType( builder ), output );
+
+	} else {
+
+		var method = [ this.method ];
+		var factor = this.factor ? this.factor.build( builder, 'f' ) : method[ 1 ];
+
+		method = builder.include( ColorSpaceNode.Nodes[ method[ 0 ] ] );
+
+		if ( factor ) {
+
+			return builder.format( method + '( ' + input + ', ' + factor + ' )', this.getType( builder ), output );
+
+		} else {
+
+			return builder.format( method + '( ' + input + ' )', this.getType( builder ), output );
+
+		}
+
+	}
+
+};
+
+ColorSpaceNode.prototype.fromEncoding = function ( encoding ) {
+
+	var components = ColorSpaceNode.getEncodingComponents( encoding );
+
+	this.method = 'LinearTo' + components[ 0 ];
+	this.factor = components[ 1 ];
+
+};
+
 ColorSpaceNode.prototype.fromDecoding = function ( encoding ) {
 
 	var components = ColorSpaceNode.getEncodingComponents( encoding );
 
-	components[ 0 ] += 'ToLinear';
-
-	this.method = components[ 0 ];
+	this.method = components[ 0 ] + 'ToLinear';
 	this.factor = components[ 1 ];
 
 };
