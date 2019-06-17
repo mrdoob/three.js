@@ -14,20 +14,24 @@
 			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				CubeTextureLoader,
+				CubeRefractionMapping,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/PLYLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
 			var container, stats;
 
@@ -48,7 +52,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = - 4000;
 
 				//
@@ -61,37 +65,37 @@
 					r + "pz.jpg", r + "nz.jpg"
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.mapping = THREE.CubeRefractionMapping;
+				var textureCube = new CubeTextureLoader().load( urls );
+				textureCube.mapping = CubeRefractionMapping;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.background = textureCube;
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0xffffff );
+				var ambient = new AmbientLight( 0xffffff );
 				scene.add( ambient );
 
-				pointLight = new THREE.PointLight( 0xffffff, 2 );
+				pointLight = new PointLight( 0xffffff, 2 );
 				scene.add( pointLight );
 
 				// light representation
 
-				var sphere = new THREE.SphereBufferGeometry( 100, 16, 8 );
+				var sphere = new SphereBufferGeometry( 100, 16, 8 );
 
-				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				var mesh = new Mesh( sphere, new MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
 				pointLight.add( mesh );
 
 				// material samples
 
-				var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
-				var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
+				var cubeMaterial3 = new MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
+				var cubeMaterial2 = new MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				var cubeMaterial1 = new MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -99,7 +103,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var loader = new THREE.PLYLoader();
+				var loader = new PLYLoader();
 				loader.load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
 					createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 );
@@ -132,16 +136,16 @@
 
 				var s = 1.5;
 
-				var mesh = new THREE.Mesh( geometry, m1 );
+				var mesh = new Mesh( geometry, m1 );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( geometry, m2 );
+				var mesh = new Mesh( geometry, m2 );
 				mesh.position.x = - 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( geometry, m3 );
+				var mesh = new Mesh( geometry, m3 );
 				mesh.position.x = 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
