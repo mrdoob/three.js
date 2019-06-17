@@ -5,13 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/objects/Fire.js"></script>
-
 	</head>
 	<body>
 
@@ -19,13 +12,22 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> fire and smoke demo
 		</div>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				PointLight,
+				Scene,
+				Texture,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { Fire } from './jsm/objects/Fire.js';
 
 			var camera, scene, renderer, stats;
 			var fire;
@@ -56,21 +58,21 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
+				camera = new PerspectiveCamera( 70, width / height, 1, 1000 );
 				camera.position.z = 25;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
+				scene = new Scene();
+				scene.background = new Color( 0x000000 );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				var pointLight = new PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
-				var plane = new THREE.PlaneBufferGeometry( 20, 20 );
-				fire = new THREE.Fire( plane, {
+				var plane = new PlaneBufferGeometry( 20, 20 );
+				fire = new Fire( plane, {
 					textureWidth: 512,
 					textureHeight: 512,
 					debug: false
@@ -78,7 +80,7 @@
 				fire.position.z = - 2;
 				scene.add( fire );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
@@ -209,7 +211,7 @@
 					context.fillStyle = "black";
 
 					context.strokeText( text, canvas.width / 2, canvas.height * 0.75 );
-					var texture = new THREE.Texture( canvas );
+					var texture = new Texture( canvas );
 					texture.needsUpdate = true;
 
 					fire.setSourceMap( texture );
@@ -217,7 +219,7 @@
 				};
 
 				// dat.gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, "Single" );
 				gui.add( params, "Multiple" );

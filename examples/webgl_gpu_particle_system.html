@@ -13,16 +13,24 @@
 			by <a href="http://charliehoey.com">Charlie Hoey</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="./js/controls/TrackballControls.js"></script>
-		<script src="./js/libs/dat.gui.min.js"></script>
-		<script src="./js/libs/stats.min.js"></script>
-		<script src="./js/objects/GPUParticleSystem.js"></script>
+		<script type="module">
+			import {
+				Clock,
+				PerspectiveCamera,
+				Scene,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { GPUParticleSystem } from './jsm/objects/GPUParticleSystem.js';
+
 			var camera, tick = 0,
-				scene, renderer, clock = new THREE.Clock(),
-				controls, container, gui = new dat.GUI( { width: 350 } ),
+				scene, renderer, clock = new Clock(),
+				controls, container, gui = new GUI( { width: 350 } ),
 				options, spawnerOptions, particleSystem;
 
 			var stats;
@@ -36,17 +44,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 28, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 28, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// The GPU Particle system extends THREE.Object3D, and so you can use it
 				// as you would any other scene graph component.	Particle positions will be
 				// relative to the position of the particle system, but you will probably only need one
 				// system for your whole scene
 
-				particleSystem = new THREE.GPUParticleSystem( {
+				particleSystem = new GPUParticleSystem( {
 					maxParticles: 250000
 				} );
 
@@ -55,9 +63,9 @@
 				// options passed during each spawned
 
 				options = {
-					position: new THREE.Vector3(),
+					position: new Vector3(),
 					positionRandomness: .3,
-					velocity: new THREE.Vector3(),
+					velocity: new Vector3(),
 					velocityRandomness: .5,
 					color: 0xaa88ff,
 					colorRandomness: .2,
@@ -94,14 +102,14 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 2.2;
 				controls.panSpeed = 1;

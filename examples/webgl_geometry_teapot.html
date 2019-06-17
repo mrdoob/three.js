@@ -12,24 +12,28 @@
 			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				CubeTextureLoader,
+				DirectionalLight,
+				DoubleSide,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				RepeatWrapping,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			////////////////////////////////////////////////////////////////////////////////
-			// Utah/Newell Teapot demo
-			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, dat, window */
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			var camera, scene, renderer;
 			var cameraControls;
@@ -49,8 +53,8 @@
 			var teapot, textureCube;
 
 			// allocate these just once
-			var diffuseColor = new THREE.Color();
-			var specularColor = new THREE.Color();
+			var diffuseColor = new Color();
+			var specularColor = new Color();
 
 			init();
 			render();
@@ -64,17 +68,17 @@
 				var canvasHeight = window.innerHeight;
 
 				// CAMERA
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
 				camera.position.set( - 600, 550, 1300 );
 
 				// LIGHTS
-				ambientLight = new THREE.AmbientLight( 0x333333 );	// 0.2
+				ambientLight = new AmbientLight( 0x333333 );	// 0.2
 
-				light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				light = new DirectionalLight( 0xFFFFFF, 1.0 );
 				// direction is set in GUI
 
 				// RENDERER
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
 				renderer.gammaInput = true;
@@ -85,12 +89,12 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
-				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
+				var textureMap = new TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				textureMap.wrapS = textureMap.wrapT = RepeatWrapping;
 				textureMap.anisotropy = 16;
 
 				// REFLECTION MAP
@@ -101,27 +105,27 @@
 					path + "pz.jpg", path + "nz.jpg"
 				];
 
-				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube = new CubeTextureLoader().load( urls );
 
 				// MATERIALS
-				var materialColor = new THREE.Color();
+				var materialColor = new Color();
 				materialColor.setRGB( 1.0, 1.0, 1.0 );
 
-				wireMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
+				wireMaterial = new MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
 
-				flatMaterial = new THREE.MeshPhongMaterial( { color: materialColor, specular: 0x000000, flatShading: true, side: THREE.DoubleSide } );
+				flatMaterial = new MeshPhongMaterial( { color: materialColor, specular: 0x000000, flatShading: true, side: DoubleSide } );
 
-				gouraudMaterial = new THREE.MeshLambertMaterial( { color: materialColor, side: THREE.DoubleSide } );
+				gouraudMaterial = new MeshLambertMaterial( { color: materialColor, side: DoubleSide } );
 
-				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, side: THREE.DoubleSide } );
+				phongMaterial = new MeshPhongMaterial( { color: materialColor, side: DoubleSide } );
 
-				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, side: THREE.DoubleSide } );
+				texturedMaterial = new MeshPhongMaterial( { color: materialColor, map: textureMap, side: DoubleSide } );
 
-				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, side: THREE.DoubleSide } );
+				reflectiveMaterial = new MeshPhongMaterial( { color: materialColor, envMap: textureCube, side: DoubleSide } );
 
 				// scene itself
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xAAAAAA );
+				scene = new Scene();
+				scene.background = new Color( 0xAAAAAA );
 
 				scene.add( ambientLight );
 				scene.add( light );
@@ -181,7 +185,7 @@
 
 				var h;
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				// material (attributes)
 
@@ -315,7 +319,7 @@
 
 				}
 
-				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
@@ -323,7 +327,7 @@
 					effectController.fitLid,
 					! effectController.nonblinn );
 
-				teapot = new THREE.Mesh(
+				teapot = new Mesh(
 					teapotGeometry,
 					shading === "wireframe" ? wireMaterial : (
 						shading === "flat" ? flatMaterial : (
