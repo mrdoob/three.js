@@ -111,7 +111,7 @@ var files = [
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
-	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VRMLLoader.js', dependencies: [ { name: 'chevrotain', path: 'chevrotain', external: true } ], ignoreList: [] },
 	{ path: 'loaders/VTKLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/XLoader.js', dependencies: [], ignoreList: [] },
 
@@ -368,7 +368,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	for ( var dependency of exampleDependencies ) {
 
-		imports += `\nimport { ${dependency.name} } from "${pathPrefix}${dependency.path}";`;
+		imports += `\nimport { ${dependency.name} } from "${dependency.external ? "" : pathPrefix}${dependency.path}";`;
 
 	}
 
