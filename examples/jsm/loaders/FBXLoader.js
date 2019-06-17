@@ -354,7 +354,7 @@ var FBXLoader = ( function () {
 						if ( Loader.Handlers.get( '.tga' ) === null ) {
 
 							var tgaLoader = this.tgaLoader;
-							tgaLoader.manager = this.manager;
+							if ( tgaLoader.manager === DefaultLoadingManager ) tgaLoader.manager = this.manager;
 							tgaLoader.setPath( this.textureLoader.path );
 
 							Loader.Handlers.add( /\.tga$/i, tgaLoader );

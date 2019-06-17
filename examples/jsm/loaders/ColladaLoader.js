@@ -3946,7 +3946,7 @@ ColladaLoader.prototype = {
 
 		if ( tgaLoader ) {
 
-			tgaLoader.manager = this.manager;
+			if ( tgaLoader.manager === DefaultLoadingManager ) tgaLoader.manager = this.manager;
 			tgaLoader.setPath( this.resourcePath || path );
 
 		}

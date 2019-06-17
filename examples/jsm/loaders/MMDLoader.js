@@ -1360,6 +1360,8 @@ var MMDLoader = ( function () {
 
 			}
 
+			if ( this.tgaLoader.manager === DefaultLoadingManager ) this.tgaLoader.manager = this.manager;
+
 			return this.tgaLoader;
 
 		},
