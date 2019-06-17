@@ -145,7 +145,7 @@ PhongNode.prototype.build = function ( builder ) {
 		var environment = this.environment ? this.environment.flow( builder, 'c', { slot: 'environment' } ) : undefined;
 		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.flow( builder, 'f' ) : undefined;
 
-		builder.requires.transparent = alpha != undefined;
+		builder.requires.transparent = alpha !== undefined;
 
 		builder.addParsCode( [
 			"#include <fog_pars_fragment>",

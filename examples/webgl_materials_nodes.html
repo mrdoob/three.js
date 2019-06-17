@@ -210,7 +210,7 @@
 
 					} );
 
-				} else if ( typeof value == 'object' ) {
+				} else if ( typeof value === 'object' ) {
 
 					param[ name ] = value[ Object.keys( value )[ 0 ] ];
 
@@ -2305,7 +2305,6 @@
 
 						addGui( 'scope', {
 							vector: THREE.ReflectNode.VECTOR,
-							vector2: THREE.ReflectNode.VECTOR2,
 							cube: THREE.ReflectNode.CUBE,
 							sphere: THREE.ReflectNode.SPHERE
 						}, function ( val ) {
