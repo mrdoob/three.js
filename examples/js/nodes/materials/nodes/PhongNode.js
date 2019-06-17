@@ -30,7 +30,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var position = this.position ? this.position.parseAndBuildCode( builder, 'v3', { cache: 'position' } ) : undefined;
+		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', { cache: 'position' } ) : undefined;
 
 		builder.mergeUniform( THREE.UniformsUtils.merge( [
 
@@ -101,49 +101,49 @@ PhongNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		// parse all nodes to reuse generate codes
+		// analyze all nodes to reuse generate codes
 
-		if ( this.mask ) this.mask.parse( builder );
+		if ( this.mask ) this.mask.analyze( builder );
 
-		this.color.parse( builder, { slot: 'color' } );
-		this.specular.parse( builder );
-		this.shininess.parse( builder );
+		this.color.analyze( builder, { slot: 'color' } );
+		this.specular.analyze( builder );
+		this.shininess.analyze( builder );
 
-		if ( this.alpha ) this.alpha.parse( builder );
+		if ( this.alpha ) this.alpha.analyze( builder );
 
-		if ( this.normal ) this.normal.parse( builder );
+		if ( this.normal ) this.normal.analyze( builder );
 
-		if ( this.light ) this.light.parse( builder, { cache: 'light' } );
+		if ( this.light ) this.light.analyze( builder, { cache: 'light' } );
 
-		if ( this.ao ) this.ao.parse( builder );
-		if ( this.ambient ) this.ambient.parse( builder );
-		if ( this.shadow ) this.shadow.parse( builder );
-		if ( this.emissive ) this.emissive.parse( builder, { slot: 'emissive' } );
+		if ( this.ao ) this.ao.analyze( builder );
+		if ( this.ambient ) this.ambient.analyze( builder );
+		if ( this.shadow ) this.shadow.analyze( builder );
+		if ( this.emissive ) this.emissive.analyze( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.parse( builder, { slot: 'environment' } );
-		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.parse( builder );
+		if ( this.environment ) this.environment.analyze( builder, { slot: 'environment' } );
+		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.analyze( builder );
 
 		// build code
 
-		var mask = this.mask ? this.mask.buildCode( builder, 'b' ) : undefined;
+		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
 
-		var color = this.color.buildCode( builder, 'c', { slot: 'color' } );
-		var specular = this.specular.buildCode( builder, 'c' );
-		var shininess = this.shininess.buildCode( builder, 'f' );
+		var color = this.color.flow( builder, 'c', { slot: 'color' } );
+		var specular = this.specular.flow( builder, 'c' );
+		var shininess = this.shininess.flow( builder, 'f' );
 
-		var alpha = this.alpha ? this.alpha.buildCode( builder, 'f' ) : undefined;
+		var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
 
-		var normal = this.normal ? this.normal.buildCode( builder, 'v3' ) : undefined;
+		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
 
-		var light = this.light ? this.light.buildCode( builder, 'v3', { cache: 'light' } ) : undefined;
+		var light = this.light ? this.light.flow( builder, 'v3', { cache: 'light' } ) : undefined;
 
-		var ao = this.ao ? this.ao.buildCode( builder, 'f' ) : undefined;
-		var ambient = this.ambient ? this.ambient.buildCode( builder, 'c' ) : undefined;
-		var shadow = this.shadow ? this.shadow.buildCode( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.buildCode( builder, 'c', { slot: 'emissive' } ) : undefined;
+		var ao = this.ao ? this.ao.flow( builder, 'f' ) : undefined;
+		var ambient = this.ambient ? this.ambient.flow( builder, 'c' ) : undefined;
+		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
+		var emissive = this.emissive ? this.emissive.flow( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.buildCode( builder, 'c', { slot: 'environment' } ) : undefined;
-		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.buildCode( builder, 'f' ) : undefined;
+		var environment = this.environment ? this.environment.flow( builder, 'c', { slot: 'environment' } ) : undefined;
+		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.flow( builder, 'f' ) : undefined;
 
 		builder.requires.transparent = alpha != undefined;
 

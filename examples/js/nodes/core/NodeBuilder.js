@@ -142,8 +142,7 @@ function NodeBuilder() {
 
 	// --
 
-	this.parsing = false;
-	this.optimize = true;
+	this.analyzing = false;
 
 }
 
