@@ -177,6 +177,7 @@
 					'adv / translucent': 'translucent',
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
+					'node / reflect': 'node-reflect',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
 					'misc / reserved-keywords': 'reserved-keywords',
@@ -2290,6 +2291,33 @@
 						} );
 
 						break;
+
+					case 'node-reflect':
+
+						// MATERIAL
+
+						var node = new THREE.ReflectNode();
+
+						mtl = new THREE.PhongNodeMaterial();
+						mtl.environment = new THREE.CubeTextureNode( cubemap, node );
+
+						// GUI
+
+						addGui( 'scope', {
+							vector: THREE.ReflectNode.VECTOR,
+							vector2: THREE.ReflectNode.VECTOR2,
+							cube: THREE.ReflectNode.CUBE,
+							sphere: THREE.ReflectNode.SPHERE
+						}, function ( val ) {
+
+							node.scope = val;
+
+							mtl.needsUpdate = true;
+
+						} );
+
+						break;
+
 
 					case 'varying':
 
