@@ -86,6 +86,9 @@ var OrbitControls = function ( object, domElement ) {
 	// Mouse buttons
 	this.mouseButtons = { LEFT: MOUSE.LEFT, MIDDLE: MOUSE.MIDDLE, RIGHT: MOUSE.RIGHT };
 
+	// Touch fingers
+	this.touches = { ROTATE: 1, DOLLY_PAN: 2 };
+
 	// for reset
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
@@ -842,7 +845,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		switch ( event.touches.length ) {
 
-			case 1:	// one-fingered touch: rotate
+			case scope.touches.ROTATE:
 
 				if ( scope.enableRotate === false ) return;
 
@@ -852,7 +855,7 @@ var OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case 2:	// two-fingered touch: dolly-pan
+			case scope.touches.DOLLY_PAN:
 
 				if ( scope.enableZoom === false && scope.enablePan === false ) return;
 
@@ -885,7 +888,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		switch ( event.touches.length ) {
 
-			case 1: // one-fingered touch: rotate
+			case scope.touches.ROTATE:
 
 				if ( scope.enableRotate === false ) return;
 				if ( state !== STATE.TOUCH_ROTATE ) return; // is this needed?
@@ -894,7 +897,7 @@ var OrbitControls = function ( object, domElement ) {
 
 				break;
 
-			case 2: // two-fingered touch: dolly-pan
+			case scope.touches.DOLLY_PAN:
 
 				if ( scope.enableZoom === false && scope.enablePan === false ) return;
 				if ( state !== STATE.TOUCH_DOLLY_PAN ) return; // is this needed?
