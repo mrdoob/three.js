@@ -397,7 +397,8 @@ const sceneInitFunctionsByName = {
     scene.add(mesh);
     return (time, rect) => {
       mesh.rotation.y = time * .1;
-      camera.aspect = rect.width / rect.height;      camera.updateProjectionMatrix();
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
       renderer.render(scene, camera);
     };
   },
