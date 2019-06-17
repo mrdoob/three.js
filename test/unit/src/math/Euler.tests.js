@@ -70,34 +70,104 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "RotationOrders", ( assert ) => {
+		QUnit.test( "RotationOrders", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( Array.isArray( Euler.RotationOrders ), "Passed!" );
+			assert.deepEqual( Euler.RotationOrders, [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ], "Passed!" );
 
 		} );
 
-		QUnit.todo( "DefaultOrder", ( assert ) => {
+		QUnit.test( "DefaultOrder", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.equal( Euler.DefaultOrder, "XYZ", "Passed!" );
+
 
 		} );
 
 		// PROPERTIES STUFF
-		QUnit.todo( "x", ( assert ) => {
+		QUnit.test( "x", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Euler();
+			assert.ok( a.x === 0, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.x === 1, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "XYZ" );
+			assert.ok( a.x === 4, "Passed!" );
+
+			a = new Euler( 7, 8, 9, "XYZ" );
+			a.x = 10;
+			assert.ok( a.x === 10, "Passed!" );
+
+			a = new Euler( 11, 12, 13, "XYZ" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.x = 14;
+			assert.ok( b, "Passed!" );
+			assert.ok( a.x === 14, "Passed!" );
 
 		} );
 
-		QUnit.todo( "y", ( assert ) => {
+		QUnit.test( "y", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Euler();
+			assert.ok( a.y === 0, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.y === 2, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "XYZ" );
+			assert.ok( a.y === 5, "Passed!" );
+
+			a = new Euler( 7, 8, 9, "XYZ" );
+			a.y = 10;
+			assert.ok( a.y === 10, "Passed!" );
+
+			a = new Euler( 11, 12, 13, "XYZ" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.y = 14;
+			assert.ok( b, "Passed!" );
+			assert.ok( a.y === 14, "Passed!" );
 
 		} );
 
-		QUnit.todo( "z", ( assert ) => {
+		QUnit.test( "z", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Euler();
+			assert.ok( a.z === 0, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.z === 3, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "XYZ" );
+			assert.ok( a.z === 6, "Passed!" );
+
+			a = new Euler( 7, 8, 9, "XYZ" );
+			a.z = 10;
+			assert.ok( a.z === 10, "Passed!" );
+
+			a = new Euler( 11, 12, 13, "XYZ" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.z = 14;
+			assert.ok( b, "Passed!" );
+			assert.ok( a.z === 14, "Passed!" );
 
 		} );
 
