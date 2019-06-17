@@ -64,6 +64,8 @@
 				roughness: 0.0,
 				metalness: 0.0,
 				exposure: 1.0,
+				nodes: true,
+				animate: true,
 				debug: false,
 			};
 
@@ -101,7 +103,6 @@
 				material.metalness = params.roguhness;
 
 				torusMesh = new THREE.Mesh( geometry, material );
-				torusMesh.position.y = 35;
 				scene.add( torusMesh );
 
 				material = new THREE.MeshStandardNodeMaterial();
@@ -110,7 +111,6 @@
 				material.metalness = params.roguhness;
 
 				torusMeshNode = new THREE.Mesh( geometry, material );
-				torusMeshNode.position.y = -35;
 				scene.add( torusMeshNode );
 
 				planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
@@ -207,6 +207,8 @@
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'nodes', true );
+				gui.add( params, 'animate', true );
 				gui.add( params, 'debug', false );
 				gui.open();
 
@@ -242,6 +244,9 @@
 				torusMeshNode.material.roughness = params.roughness;
 				torusMeshNode.material.metalness = params.metalness;
 
+				torusMesh.visible = !params.nodes;
+				torusMeshNode.visible = params.nodes;
+
 				var renderTarget, cubeMap;
 
 				switch ( params.envMap ) {
@@ -275,7 +280,13 @@
 
 				}
 
-				//torusMesh.rotation.y += 0.005;
+				if ( params.animate ) {
+
+					torusMesh.rotation.y += 0.005;
+					torusMeshNode.rotation.y = torusMesh.rotation.y;
+
+				}
+
 				planeMesh.visible = params.debug;
 
 				scene.background = cubeMap;

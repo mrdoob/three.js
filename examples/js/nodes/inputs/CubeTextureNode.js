@@ -54,7 +54,7 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
 	// context.include =: is used to include or not functions if used FunctionNode
-	// context.ignoreCache =: not create variables nodeT0..9 to optimize the code
+	// context.ignoreCache =: not create variables temp nodeT0..9 to optimize the code
 	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
 	var outputType = this.getType( builder );
 

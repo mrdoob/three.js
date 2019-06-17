@@ -220,7 +220,7 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 		case THREE.RGBDEncoding:
 			return [ 'RGBD', new FloatNode( 256.0 ).setReadonly( true ) ];
 		case THREE.GammaEncoding:
-			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )' ) ];
+			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 
 	}
 
@@ -233,25 +233,26 @@ ColorSpaceNode.prototype.nodeType = "ColorSpace";
 ColorSpaceNode.prototype.generate = function ( builder, output ) {
 
 	var input = this.input.build( builder, 'v4' );
+	var outputType = this.getType( builder );
 
-	if ( this.method === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+	var methodNode = ColorSpaceNode.Nodes[ this.method ];
+	var method = builder.include( methodNode );
 
-		return builder.format( input, this.getType( builder ), output );
+	if ( method === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+
+		return builder.format( input, outputType, output );
 
 	} else {
 
-		var method = [ this.method ];
-		var factor = this.factor ? this.factor.build( builder, 'f' ) : method[ 1 ];
+		if ( methodNode.inputs.length === 2 ) {
 
-		method = builder.include( ColorSpaceNode.Nodes[ method[ 0 ] ] );
+			var factor = this.factor.build( builder, 'f' );
 
-		if ( factor ) {
-
-			return builder.format( method + '( ' + input + ', ' + factor + ' )', this.getType( builder ), output );
+			return builder.format( method + '( ' + input + ', ' + factor + ' )', outputType, output );
 
 		} else {
 
-			return builder.format( method + '( ' + input + ' )', this.getType( builder ), output );
+			return builder.format( method + '( ' + input + ' )', outputType, output );
 
 		}
 

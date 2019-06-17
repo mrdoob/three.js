@@ -372,7 +372,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			if ( environment.extra.irradiance ) {
 
-				output.push( "irradiance += " + environment.extra.irradiance + ";" );
+				output.push( "irradiance += PI * " + environment.extra.irradiance + ";" );
 
 			}
 

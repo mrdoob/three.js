@@ -7,16 +7,28 @@ import { FloatNode } from '../inputs/FloatNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
+import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
+import { BlinnExponentToRoughnessNode } from '../bsdfs/BlinnExponentToRoughnessNode.js';
 
-function TextureCubeNode( value ) {
+function TextureCubeNode( value, textureSize ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
+	this.textureSize = textureSize || new FloatNode( 1024 );
 
-	this.radianceCache = { uv: new TextureCubeUVNode() };
-	this.irradianceCache = { uv: new TextureCubeUVNode( new ReflectNode( ReflectNode.VECTOR2 ), undefined, new FloatNode( 1 ).setReadonly( true ) ) };
+	this.radianceCache = { uv: new TextureCubeUVNode( 
+		new ReflectNode( ReflectNode.VECTOR ), 
+		this.textureSize, 
+		new BlinnExponentToRoughnessNode() 
+	) };
+
+	this.irradianceCache = { uv: new TextureCubeUVNode( 
+		new NormalNode( NormalNode.WORLD ), 
+		this.textureSize, 
+		new FloatNode( 1 ).setReadonly( true ) 
+	) };
 
 }
 
@@ -37,7 +49,7 @@ TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache ) {
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
 	// context.include =: is used to include or not functions if used FunctionNode
-	// context.ignoreCache =: not create variables nodeT0..9 to optimize the code
+	// context.ignoreCache =: not create temp variables nodeT0..9 to optimize the code
 	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
 	var outputType = this.getType( builder );
 
@@ -70,7 +82,7 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 		var radiance = this.generateTextureCubeUV( builder, this.radianceCache );
 		var irradiance = this.generateTextureCubeUV( builder, this.irradianceCache );
 
-		builder.context.extra.irradiance = '( PI * ' + irradiance + ' )';
+		builder.context.extra.irradiance = irradiance;
 
 		return builder.format( 'vec4( ' + radiance + ', 1.0 )', this.getType( builder ), output );
 
