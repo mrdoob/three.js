@@ -1,9 +1,9 @@
-Title: Three.js Scenegraph
+Title: Three.js Scene Graph
 Description: What's a scene graph?
 
 This article is part of a series of articles about three.js. The
 first article is [three.js fundamentals](threejs-fundamentals.html). If
-you haven't read yet you might want to consider starting there.
+you haven't read that yet you might want to consider starting there.
 
 Three.js's core is arguably its scene graph. A scene graph in a 3D
 engine is a hierarchy of nodes in a graph where each node represents
@@ -34,18 +34,18 @@ in the Earth's "local space" even though relative to the sun you are
 spinning around the earth at around 1000 miles per hour and around
 the sun at around 67,000 miles per hour. Your position in the solar
 system is similar to that of the moon above but you don't have to concern
-yourself. You just worry about your position relative to the earth its
+yourself. You just worry about your position relative to the earth in its
 "local space".
 
 Let's take it one step at a time. Imagine we want to make
 a diagram of the sun, earth, and moon. We'll start with the sun by
 just making a sphere and putting it at the origin. Note: We're using
-sun, earth, moon as a demonstration of how to use a scenegraph. Of course
+sun, earth, moon as a demonstration of how to use a scene graph. Of course
 the real sun, earth, and moon use physics but for our purposes we'll
-fake it with a scenegraph.
+fake it with a scene graph.
 
 ```js
-// an array of objects who's rotation to update
+// an array of objects whose rotation to update
 const objects = [];
 
 // use just one sphere for everything
@@ -86,11 +86,11 @@ represents light that eminates from a single point.
 ```
 
 To make it easy to see we're going to put the camera directly above the origin
-looking down. The easist way to do that us to use the `lookAt` function. The `lookAt`
-function will orient the camera from its position to "lookAt the position
+looking down. The easist way to do that is to use the `lookAt` function. The `lookAt`
+function will orient the camera from its position to "look at" the position
 we pass to `lookAt`. Before we do that though we need to tell the camera
 which way the top of the camera is facing or rather which way is "up" for the
-camera. For most situations positive Y being up is good enough but since 
+camera. For most situations positive Y being up is good enough but since
 we are looking straight down we need to tell the camera that positive Z is up.
 
 ```js
@@ -139,7 +139,7 @@ going around the sun. Let's make the earth a child of the sun
 ```js
 -scene.add(earthMesh);
 +sunMesh.add(earthMesh);
-``` 
+```
 
 and...
 
@@ -182,7 +182,7 @@ earthMesh.position.x = 10;
 objects.push(earthMesh);
 ```
 
-Here we made a `Object3D`. Like a `Mesh` it is also a node in the scene graph
+Here we made an `Object3D`. Like a `Mesh` it is also a node in the scene graph
 but unlike a `Mesh` it has no material or geometry. It just represents a local space.
 
 Our new scene graph looks like this
@@ -223,7 +223,7 @@ objects.push(earthMesh);
 +objects.push(moonMesh);
 ```
 
-Again we added another invisible scene graph node, a `Object3D` called `earthOrbit`
+Again we added another invisible scene graph node, an `Object3D` called `earthOrbit`
 and added both the `earthMesh` and the `moonMesh` to it. The new scene graph looks like
 this.
 
@@ -264,7 +264,7 @@ all the spheres. Otherwise a sphere might draw over them and cover them up.
 
 {{{example url="../threejs-scenegraph-sun-earth-moon-axes.html" }}}
 
-We can see the 
+We can see the
 <span style="color:red">x (red)</span> and
 <span style="color:blue">z (blue)</span> axes. Since we are looking
 straight down and each of our objects is only rotating around its
@@ -273,7 +273,7 @@ y axis we don't see much of the <span style="color:green">y (green)</span> axes.
 It might be hard to see some of them as there are 2 pairs of overlapping axes. Both the `sunMesh`
 and the `solarSystem` are at the same position. Similarly the `earthMesh` and
 `earthOrbit` are at the same position. Let's add some simple controls to allow us
-to turn them on/off for each node. 
+to turn them on/off for each node.
 While we're at it let's also add another helper called the `GridHelper`. It
 makes a 2D grid on the X,Z plane. By default the grid is 10x10 units.
 
@@ -307,7 +307,7 @@ some function to add the helpers for each node
 +makeAxisGrid(moonMesh, 'moonMesh');
 ```
 
-`makeAxisGrid` makes a `AxisGridHelper` which is class we'll create
+`makeAxisGrid` makes an `AxisGridHelper` which is a class we'll create
 to make dat.GUI happy. Like it says above dat.GUI
 will automagically make a UI that manipulates the named property
 of some object. It will create a different UI depending on the type
@@ -322,7 +322,7 @@ the visible property of both the `AxesHelper` and `GridHelper` for a node.
 // Turns both axes and grid visible on/off
 // dat.GUI requires a property that returns a bool
 // to decide to make a checkbox so we make a setter
-// can getter for `visible` which we can tell dat.GUI
+// and getter for `visible` which we can tell dat.GUI
 // to look at.
 class AxisGridHelper {
   constructor(node, units = 10) {
@@ -377,15 +377,15 @@ Another example is a human in a game world.
 
 You can see the scene graph gets pretty complex for a human. In fact
 that scene graph above is simplified. For example you might extend it
-to cover the every finger (at least another 28 nodes) and every toe
-(yet another 28 nodes) plus ones for the and jaw, the eyes and maybe more.
+to cover every finger (at least another 28 nodes) and every toe
+(yet another 28 nodes) plus ones for the face and jaw, the eyes and maybe more.
 
-Let's make one semi-complex scenegraph. We'll make a tank. The tank will have
+Let's make one semi-complex scene graph. We'll make a tank. The tank will have
 6 wheels and a turret. The tank will follow a path. There will be a sphere that
 moves around and the tank will target the sphere.
 
 Here's the scene graph. The meshes are colored in green, the `Object3D`s in blue,
-and the lights in gold, and the cameras in purple. One camera has not been added
+the lights in gold, and the cameras in purple. One camera has not been added
 to the scene graph.
 
 <div class="threejs_center"><img src="resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
@@ -410,7 +410,7 @@ targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 ```
 
-For the tank there's an `Object3D` called `tank` which used to move everything
+For the tank there's an `Object3D` called `tank` which is used to move everything
 below it around. The code uses a `SplineCurve` which it can ask for positions
 along that curve. 0.0 is the start of the curve. 1.0 is the end of the curve. It
 asks for the current position where it puts the tank. It then asks for a
@@ -461,7 +461,7 @@ a child of `targetBob` and just aimed the camera itself it would be inside the
 target.
 
 ```js
-// make the targetCameraPivot look at the at the tank
+// make the targetCameraPivot look at the tank
 tank.getWorldPosition(targetPosition);
 targetCameraPivot.lookAt(targetPosition);
 ```
