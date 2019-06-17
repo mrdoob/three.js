@@ -1644,6 +1644,8 @@ var GLTFLoader = ( function () {
 
 			addUnknownExtensionsToUserData( extensions, result, json );
 
+			assignExtrasToUserData( result, json );
+
 			onLoad( result );
 
 		} ).catch( onError );
