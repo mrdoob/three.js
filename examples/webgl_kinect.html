@@ -8,12 +8,6 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script src='js/libs/dat.gui.min.js'></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
-
 		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/kinect.webm">
 			<source src="textures/kinect.mp4">
@@ -74,25 +68,31 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				AdditiveBlending,
+				BufferAttribute,
+				BufferGeometry,
+				NearestFilter,
+				PerspectiveCamera,
+				Points,
+				Scene,
+				ShaderMaterial,
+				Vector3,
+				VideoTexture,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var container;
 
 			var scene, camera, renderer;
 			var geometry, mesh, material;
 			var mouse, center;
-			var stats;
 
-			if ( WEBGL.isWebGLAvailable() ) {
-
-				init();
-				animate();
-
-			} else {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			init();
+			animate();
 
 			function init() {
 
@@ -104,26 +104,23 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
 
-				stats = new Stats();
-				// container.appendChild( stats.dom );
-
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );
 
-				scene = new THREE.Scene();
-				center = new THREE.Vector3();
+				scene = new Scene();
+				center = new Vector3();
 				center.z = - 1000;
 
 				var video = document.getElementById( 'video' );
 				video.addEventListener( 'loadedmetadata', function () {
 
-					var texture = new THREE.VideoTexture( video );
-					texture.minFilter = THREE.NearestFilter;
+					var texture = new VideoTexture( video );
+					texture.minFilter = NearestFilter;
 
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
 
-					geometry = new THREE.BufferGeometry();
+					geometry = new BufferGeometry();
 
 					var vertices = new Float32Array( width * height * 3 );
 
@@ -134,9 +131,9 @@
 
 					}
 
-					geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+					geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
-					material = new THREE.ShaderMaterial( {
+					material = new ShaderMaterial( {
 
 						uniforms: {
 
@@ -152,16 +149,16 @@
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
 						fragmentShader: document.getElementById( 'fs' ).textContent,
-						blending: THREE.AdditiveBlending,
+						blending: AdditiveBlending,
 						depthTest: false, depthWrite: false,
 						transparent: true
 
 					} );
 
-					mesh = new THREE.Points( geometry, material );
+					mesh = new Points( geometry, material );
 					scene.add( mesh );
 
-					var gui = new dat.GUI();
+					var gui = new GUI();
 					gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
 					gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
 					gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
@@ -173,12 +170,12 @@
 
 				video.play();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				mouse = new THREE.Vector3( 0, 0, 1 );
+				mouse = new Vector3( 0, 0, 1 );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -209,7 +206,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 
