@@ -5,8 +5,12 @@ module.exports = {
   },
   "parserOptions": {
     "ecmaVersion": 8,
+    "ecmaFeatures": {
+      "jsx": true
+    },
   },
   "plugins": [
+    "eslint-plugin-react",
     "eslint-plugin-html",
     "eslint-plugin-optional-comma-spacing",
     "eslint-plugin-one-variable-per-var",
