@@ -19,11 +19,19 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D.lookAt() example</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Color,
+				CylinderBufferGeometry,
+				Mesh,
+				MeshNormalMaterial,
+				PerspectiveCamera,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, stats;
 
@@ -42,23 +50,23 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 3200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
+				sphere = new Mesh( new SphereBufferGeometry( 100, 20, 20 ), new MeshNormalMaterial() );
 				scene.add( sphere );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
+				var geometry = new CylinderBufferGeometry( 0, 10, 100, 12 );
 				geometry.rotateX( Math.PI / 2 );
 
-				var material = new THREE.MeshNormalMaterial();
+				var material = new MeshNormalMaterial();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4000 - 2000;
 					mesh.position.y = Math.random() * 4000 - 2000;
 					mesh.position.z = Math.random() * 4000 - 2000;
@@ -67,7 +75,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

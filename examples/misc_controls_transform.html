@@ -9,23 +9,26 @@
 	<body>
 
 		<div id="info">
-			<a href="javascript:control.setMode( 'translate' );">"W" translate</a> |
-			<a href="javascript:control.setMode( 'rotate' );">"E" rotate</a> |
-			<a href="javascript:control.setMode( 'scale' );">"R" scale</a> |
-			<a href="javascript:control.setSize( control.size + 0.1 );">"+" increase size</a> |
-			<a href="javascript:control.setSize( Math.max( control.size - 0.1, 0.1 ) );">"-" decrease size</a><br />
-			<a href="javascript:control.setSpace( control.space === 'local' ? 'world' : 'local' );">"Q" toggle world/local space</a> | Hold "Ctrl" down to snap to grid<br />
-			<a href="javascript:control.showX = !control.showX">"X" toggle X</a> |
-			<a href="javascript:control.showY = !control.showY">"Y" toggle Y</a> |
-			<a href="javascript:control.showZ = !control.showZ">"Z" toggle Z</a> |
-			<a href="javascript:control.enabled = !control.enabled">"Spacebar" toggle enabled</a><br />
+			"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
+			"Q" toggle world/local space |  Hold "Ctrl" down to snap to grid<br />
+			"X" toggle X | "Y" toggle Y | "Z" toggle Z | "Spacebar" toggle enabled
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/controls/TransformControls.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				DirectionalLight,
+				GridHelper,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TransformControls } from './jsm/controls/TransformControls.js';
 
 			var camera, scene, renderer, control, orbit;
 
@@ -34,35 +37,35 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.set( 1000, 500, 1000 );
 				camera.lookAt( 0, 200, 0 );
 
-				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 1000, 10 ) );
+				scene = new Scene();
+				scene.add( new GridHelper( 1000, 10 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				var light = new DirectionalLight( 0xffffff, 2 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				var texture = new TextureLoader().load( 'textures/crate.gif', render );
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
+				var geometry = new BoxBufferGeometry( 200, 200, 200 );
+				var material = new MeshLambertMaterial( { map: texture, transparent: true } );
 
-				orbit = new THREE.OrbitControls( camera, renderer.domElement );
+				orbit = new OrbitControls( camera, renderer.domElement );
 				orbit.update();
 				orbit.addEventListener( 'change', render );
 
-				control = new THREE.TransformControls( camera, renderer.domElement );
+				control = new TransformControls( camera, renderer.domElement );
 				control.addEventListener( 'change', render );
 
 				control.addEventListener( 'dragging-changed', function ( event ) {
@@ -71,7 +74,7 @@
 
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				control.attach( mesh );
@@ -89,7 +92,7 @@
 
 						case 17: // Ctrl
 							control.setTranslationSnap( 100 );
-							control.setRotationSnap( THREE.Math.degToRad( 15 ) );
+							control.setRotationSnap( Math.degToRad( 15 ) );
 							break;
 
 						case 87: // W

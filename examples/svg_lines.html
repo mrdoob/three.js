@@ -20,12 +20,19 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> svg - lines
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Color,
+				Float32BufferAttribute,
+				Line,
+				LineBasicMaterial,
+				LineDashedMaterial,
+				PerspectiveCamera,
+				Scene
+			} from "../build/three.module.js";
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SVGRenderer.js"></script>
-
-		<script>
+			import { SVGRenderer } from './jsm/renderers/SVGRenderer.js';
 
 			var camera, scene, renderer;
 
@@ -34,13 +41,13 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 10;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0, 0, 0 );
+				scene = new Scene();
+				scene.background = new Color( 0, 0, 0 );
 
-				renderer = new THREE.SVGRenderer();
+				renderer = new SVGRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -60,30 +67,30 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				var geometry = new BufferGeometry();
+				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 				//
 
 				for ( var i = 1; i <= 3; i ++ ) {
 
-					var material = new THREE.LineBasicMaterial( {
+					var material = new LineBasicMaterial( {
 						color: Math.random() * 0xffffff,
 						linewidth: 10
 					} );
-					var line = new THREE.Line( geometry, material );
+					var line = new Line( geometry, material );
 					line.scale.setScalar( i / 3 );
 					scene.add( line );
 
 				}
 
-				var material = new THREE.LineDashedMaterial( {
+				var material = new LineDashedMaterial( {
 					color: 'blue',
 					linewidth: 1,
 					dashSize: 10,
 					gapSize: 10
 				} );
-				var line = new THREE.Line( geometry, material );
+				var line = new Line( geometry, material );
 				line.scale.setScalar( 2 );
 				scene.add( line );
 
