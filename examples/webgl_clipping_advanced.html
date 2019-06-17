@@ -8,13 +8,31 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				Color,
+				DirectionalLight,
+				DoubleSide,
+				Group,
+				Matrix4,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Plane,
+				PlaneBufferGeometry,
+				Scene,
+				SpotLight,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			function planesFromMesh( vertices, indices ) {
 
@@ -30,7 +48,7 @@
 						b = vertices[ indices[ j + 1 ] ],
 						c = vertices[ indices[ j + 2 ] ];
 
-					result[ i ] = new THREE.Plane().
+					result[ i ] = new Plane().
 						setFromCoplanarPoints( a, b, c );
 
 				}
@@ -46,7 +64,7 @@
 				var result = new Array( n );
 
 				for ( var i = 0; i !== n; ++ i )
-					result[ i ] = new THREE.Plane();
+					result[ i ] = new Plane();
 
 				return result;
 
@@ -86,14 +104,14 @@
 				// creates a matrix that aligns X/Y to a given plane
 
 				// temporaries:
-				var xAxis = new THREE.Vector3(),
-					yAxis = new THREE.Vector3(),
-					trans = new THREE.Vector3();
+				var xAxis = new Vector3(),
+					yAxis = new Vector3(),
+					trans = new Vector3();
 
 				return function planeToMatrix( plane ) {
 
 					var zAxis = plane.normal,
-						matrix = new THREE.Matrix4();
+						matrix = new Matrix4();
 
 					// Hughes & Moeller '99
 					// "Building an Orthonormal Basis from a Unit Vector."
@@ -125,10 +143,10 @@
 			// A regular tetrahedron for the clipping volume:
 
 			var Vertices = [
-					new THREE.Vector3( + 1, 0, + Math.SQRT1_2 ),
-					new THREE.Vector3( - 1, 0, + Math.SQRT1_2 ),
-					new THREE.Vector3( 0, + 1, - Math.SQRT1_2 ),
-					new THREE.Vector3( 0, - 1, - Math.SQRT1_2 )
+					new Vector3( + 1, 0, + Math.SQRT1_2 ),
+					new Vector3( - 1, 0, + Math.SQRT1_2 ),
+					new Vector3( 0, + 1, - Math.SQRT1_2 ),
+					new Vector3( 0, - 1, - Math.SQRT1_2 )
 				],
 
 				Indices = [
@@ -151,18 +169,18 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera(
+				camera = new PerspectiveCamera(
 					36, window.innerWidth / window.innerHeight, 0.25, 16 );
 
 				camera.position.set( 0, 1.5, 3 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new AmbientLight( 0x505050 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff );
+				var spotLight = new SpotLight( 0xffffff );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -173,7 +191,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+				var dirLight = new DirectionalLight( 0x55505a, 1 );
 				dirLight.position.set( 0, 2, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -190,24 +208,24 @@
 
 				// Geometry
 
-				clipMaterial = new THREE.MeshPhongMaterial( {
+				clipMaterial = new MeshPhongMaterial( {
 					color: 0xee0a10,
 					shininess: 100,
-					side: THREE.DoubleSide,
+					side: DoubleSide,
 					// Clipping setup:
 					clippingPlanes: createPlanes( Planes.length ),
 					clipShadows: true
 				} );
 
-				object = new THREE.Group();
+				object = new Group();
 
-				var geometry = new THREE.BoxBufferGeometry( 0.18, 0.18, 0.18 );
+				var geometry = new BoxBufferGeometry( 0.18, 0.18, 0.18 );
 
 				for ( var z = - 2; z <= 2; ++ z )
 					for ( var y = - 2; y <= 2; ++ y )
 						for ( var x = - 2; x <= 2; ++ x ) {
 
-							var mesh = new THREE.Mesh( geometry, clipMaterial );
+							var mesh = new Mesh( geometry, clipMaterial );
 							mesh.position.set( x / 5, y / 5, z / 5 );
 							mesh.castShadow = true;
 							object.add( mesh );
@@ -218,18 +236,18 @@
 
 
 				var planeGeometry =
-						new THREE.PlaneBufferGeometry( 3, 3, 1, 1 ),
+						new PlaneBufferGeometry( 3, 3, 1, 1 ),
 
-					color = new THREE.Color();
+					color = new Color();
 
-				volumeVisualization = new THREE.Group();
+				volumeVisualization = new Group();
 				volumeVisualization.visible = false;
 
 				for ( var i = 0, n = Planes.length; i !== n; ++ i ) {
 
-					var material = new THREE.MeshBasicMaterial( {
+					var material = new MeshBasicMaterial( {
 						color: color.setHSL( i / n, 0.5, 0.5 ).getHex(),
-						side: THREE.DoubleSide,
+						side: DoubleSide,
 
 						opacity: 0.2,
 						transparent: true,
@@ -249,15 +267,15 @@
 					} );
 
 					volumeVisualization.add(
-						new THREE.Mesh( planeGeometry, material ) );
+						new Mesh( planeGeometry, material ) );
 
 				}
 
 				scene.add( volumeVisualization );
 
 
-				var ground = new THREE.Mesh( planeGeometry,
-					new THREE.MeshPhongMaterial( {
+				var ground = new Mesh( planeGeometry,
+					new MeshPhongMaterial( {
 						color: 0xa0adaf, shininess: 150 } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.multiplyScalar( 3 );
@@ -268,7 +286,7 @@
 
 				var container = document.body;
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -286,13 +304,13 @@
 
 				// Controls
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
 				// GUI
 
-				var gui = new dat.GUI(),
+				var gui = new GUI(),
 					folder = gui.addFolder( "Local Clipping" ),
 					props = {
 						get 'Enabled'() {
@@ -377,8 +395,8 @@
 
 			}
 
-			var transform = new THREE.Matrix4(),
-				tmpMatrix = new THREE.Matrix4();
+			var transform = new Matrix4(),
+				tmpMatrix = new Matrix4();
 
 			function animate() {
 
