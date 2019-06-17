@@ -370,7 +370,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
-				var isCompressed = ( texture.image[ 0 ] && texture.image[ 0 ].isCompressedTexture );
+				var isCompressed = ( texture && texture.isCompressedTexture );
 				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
 				var cubeImage = [];
