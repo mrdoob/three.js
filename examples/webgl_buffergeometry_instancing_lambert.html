@@ -26,25 +26,41 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
+	<script type="module">
+		import {
+			AmbientLight,
+			DirectionalLight,
+			FogExp2,
+			InstancedBufferAttribute,
+			InstancedBufferGeometry,
+			Mesh,
+			MeshLambertMaterial,
+			MeshPhongMaterial,
+			MultiplyOperation,
+			PerspectiveCamera,
+			PlaneBufferGeometry,
+			RGBADepthPacking,
+			Scene,
+			ShaderChunk,
+			ShaderLib,
+			ShaderMaterial,
+			SphericalReflectionMapping,
+			sRGBEncoding,
+			TextureLoader,
+			TorusBufferGeometry,
+			UniformsUtils,
+			VertexColors,
+			WebGLRenderer
+		} from "../build/three.module.js";
 
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/curves/CurveExtras.js"></script>
+		import Stats from './jsm/libs/stats.module.js';
 
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { Curves } from './jsm/curves/CurveExtras.js';
 
-	<script>
+		ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
-
-		THREE.ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
-
-			uniforms: THREE.ShaderLib.depth.uniforms,
+			uniforms: ShaderLib.depth.uniforms,
 
 			vertexShader:
 				`
@@ -98,13 +114,13 @@
 				}
 			`,
 
-			fragmentShader: THREE.ShaderChunk.depth_frag
+			fragmentShader: ShaderChunk.depth_frag
 
 		};
 
-		THREE.ShaderLib.lambert = { // this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
+		ShaderLib.lambert = { // this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
 
-			uniforms: THREE.ShaderLib.lambert.uniforms,
+			uniforms: ShaderLib.lambert.uniforms,
 
 			vertexShader:
 				`
@@ -180,7 +196,7 @@
 				}
 				`,
 
-			fragmentShader: THREE.ShaderLib.lambert.fragmentShader
+			fragmentShader: ShaderLib.lambert.fragmentShader
 
 		};
 
@@ -195,30 +211,30 @@
 
 		function init() {
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
 			renderer.gammaOutput = true;
 
-			scene = new THREE.Scene();
+			scene = new Scene();
 
-			scene.fog = new THREE.FogExp2( 0x000000, 0.004 );
+			scene.fog = new FogExp2( 0x000000, 0.004 );
 			renderer.setClearColor( scene.fog.color, 1 );
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.position.set( 80, 40, 80 );
 
 			scene.add( camera );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableZoom = false;
 			controls.maxPolarAngle = Math.PI / 2;
 
-			scene.add( new THREE.AmbientLight( 0xffffff, 0.7 ) );
+			scene.add( new AmbientLight( 0xffffff, 0.7 ) );
 
-			var light = new THREE.DirectionalLight( 0xffffff, 0.4 );
+			var light = new DirectionalLight( 0xffffff, 0.4 );
 			light.position.set( 50, 40, 0 );
 
 			light.castShadow = true;
@@ -236,18 +252,18 @@
 			scene.add( light );
 
 			// light shadow camera helper
-			//light.shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+			//light.shadowCameraHelper = new CameraHelper( light.shadow.camera );
 			//scene.add( light.shadowCameraHelper );
 
 
 			// instanced buffer geometry
 
-			var geometry = new THREE.InstancedBufferGeometry();
-			geometry.copy( new THREE.TorusBufferGeometry( 2, 0.5, 8, 128 ) );
+			var geometry = new InstancedBufferGeometry();
+			geometry.copy( new TorusBufferGeometry( 2, 0.5, 8, 128 ) );
 
 			const INSTANCES = 256;
 
-			var knot = new THREE.Curves.TorusKnot( 10 );
+			var knot = new Curves.TorusKnot( 10 );
 			var positions = knot.getSpacedPoints( INSTANCES );
 
 			var offsets = new Float32Array( INSTANCES * 3 ); // xyz
@@ -273,29 +289,29 @@
 
 			}
 
-			geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
-			geometry.addAttribute( 'instanceColor', new THREE.InstancedBufferAttribute( colors, 3 ) );
-			geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
+			geometry.addAttribute( 'instanceOffset', new InstancedBufferAttribute( offsets, 3 ) );
+			geometry.addAttribute( 'instanceColor', new InstancedBufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'instanceScale', new InstancedBufferAttribute( scales, 1 ) );
 
 
 			// material
 
-			var envMap = new THREE.TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
+			var envMap = new TextureLoader().load( `textures/metal.jpg`, function ( texture ) {
 
-				texture.mapping = THREE.SphericalReflectionMapping;
-				texture.encoding = THREE.sRGBEncoding;
+				texture.mapping = SphericalReflectionMapping;
+				texture.encoding = sRGBEncoding;
 				if ( mesh ) mesh.material.needsUpdate = true;
 
 			} );
 
-			var material = new THREE.MeshLambertMaterial( {
+			var material = new MeshLambertMaterial( {
 
 				color: 0xffb54a,
 				envMap: envMap,
-				combine: THREE.MultiplyOperation,
+				combine: MultiplyOperation,
 				reflectivity: 0.8,
 
-				vertexColors: THREE.VertexColors,
+				vertexColors: VertexColors,
 				fog: true
 
 			} );
@@ -306,15 +322,15 @@
 
 			// custom depth material - required for instanced shadows
 
-			var shader = THREE.ShaderLib[ 'customDepthRGBA' ];
+			var shader = ShaderLib[ 'customDepthRGBA' ];
 
-			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+			var uniforms = UniformsUtils.clone( shader.uniforms );
 
-			var customDepthMaterial = new THREE.ShaderMaterial( {
+			var customDepthMaterial = new ShaderMaterial( {
 
 				defines: {
 					'INSTANCED': "",
-					'DEPTH_PACKING': THREE.RGBADepthPacking
+					'DEPTH_PACKING': RGBADepthPacking
 				},
 				uniforms: uniforms,
 				vertexShader: shader.vertexShader,
@@ -324,7 +340,7 @@
 
 			//
 
-			mesh = new THREE.Mesh( geometry, material );
+			mesh = new Mesh( geometry, material );
 			mesh.scale.set( 1, 1, 2 );
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
@@ -335,9 +351,9 @@
 
 			//
 
-			var ground = new THREE.Mesh(
-				new THREE.PlaneBufferGeometry( 800, 800 ).rotateX( - Math.PI / 2 ),
-				new THREE.MeshPhongMaterial( { color: 0x888888 } )
+			var ground = new Mesh(
+				new PlaneBufferGeometry( 800, 800 ).rotateX( - Math.PI / 2 ),
+				new MeshPhongMaterial( { color: 0x888888 } )
 			);
 			ground.position.set( 0, - 40, 0 );
 			ground.receiveShadow = true;

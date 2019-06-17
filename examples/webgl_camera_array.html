@@ -8,9 +8,20 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				ArrayCamera,
+				CylinderBufferGeometry,
+				DirectionalLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				Vector4,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var camera, scene, renderer;
 			var mesh;
@@ -32,8 +43,8 @@
 
 					for ( var x = 0; x < AMOUNT; x ++ ) {
 
-						var subcamera = new THREE.PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
-						subcamera.viewport = new THREE.Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
+						var subcamera = new PerspectiveCamera( 40, ASPECT_RATIO, 0.1, 10 );
+						subcamera.viewport = new Vector4( Math.floor( x * WIDTH ), Math.floor( y * HEIGHT ), Math.ceil( WIDTH ), Math.ceil( HEIGHT ) );
 						subcamera.position.x = ( x / AMOUNT ) - 0.5;
 						subcamera.position.y = 0.5 - ( y / AMOUNT );
 						subcamera.position.z = 1.5;
@@ -46,36 +57,36 @@
 
 				}
 
-				camera = new THREE.ArrayCamera( cameras );
+				camera = new ArrayCamera( cameras );
 				camera.position.z = 3;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				scene.add( new THREE.AmbientLight( 0x222244 ) );
+				scene.add( new AmbientLight( 0x222244 ) );
 
-				var light = new THREE.DirectionalLight();
+				var light = new DirectionalLight();
 				light.position.set( 0.5, 0.5, 1 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4; // tighter shadow map
 				scene.add( light );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x000066 } );
+				var geometry = new PlaneBufferGeometry( 100, 100 );
+				var material = new MeshPhongMaterial( { color: 0x000066 } );
 
-				var background = new THREE.Mesh( geometry, material );
+				var background = new Mesh( geometry, material );
 				background.receiveShadow = true;
 				background.position.set( 0, 0, - 1 );
 				scene.add( background );
 
-				var geometry = new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 32 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+				var geometry = new CylinderBufferGeometry( 0.5, 0.5, 1, 32 );
+				var material = new MeshPhongMaterial( { color: 0xff0000 } );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -112,6 +123,7 @@
 						subcamera.updateProjectionMatrix();
 
 					}
+
 				}
 
 				renderer.setSize( window.innerWidth, window.innerHeight );

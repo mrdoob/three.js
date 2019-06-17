@@ -14,18 +14,26 @@
 			Soldier model from <a href="https://www.mixamo.com" target="_blank" rel="noopener">https://www.mixamo.com</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/utils/SkeletonUtils.js"></script>
+		<script type="module">
+			import {
+				AnimationClip,
+				AnimationMixer,
+				Clock,
+				Color,
+				DirectionalLight,
+				Fog,
+				HemisphereLight,
+				Mesh,
+				MeshPhongMaterial,
+				PCFSoftShadowMap,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { SkeletonUtils } from './jsm/utils/SkeletonUtils.js';
 
 			//////////////////////////////
 			// Global objects
@@ -33,6 +41,7 @@
 			var worldScene = null; // THREE.Scene where it all will be rendered
 			var renderer = null;
 			var camera = null;
+			var clock = null;
 			var mixers = []; // All the AnimationMixer objects for all the animations in the scene
 			//////////////////////////////
 
@@ -118,7 +127,7 @@
 
 					var m = MODELS[ i ];
 
-					loadGltfModel( m, function ( model ) {
+					loadGltfModel( m, function () {
 
 						++ numLoadedModels;
 
@@ -150,7 +159,7 @@
 
 					if ( model ) {
 
-						var clonedScene = THREE.SkeletonUtils.clone( model.scene );
+						var clonedScene = SkeletonUtils.clone( model.scene );
 
 						if ( clonedScene ) {
 
@@ -220,8 +229,8 @@
 			 */
 			function startAnimation( skinnedMesh, animations, animationName ) {
 
-				var mixer = new THREE.AnimationMixer( skinnedMesh );
-				var clip = THREE.AnimationClip.findByName( animations, animationName );
+				var mixer = new AnimationMixer( skinnedMesh );
+				var clip = AnimationClip.findByName( animations, animationName );
 
 				if ( clip ) {
 
@@ -262,7 +271,7 @@
 			 */
 			function loadGltfModel( model, onLoaded ) {
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				var modelName = "models/gltf/" + model.name + ".glb";
 
 				loader.load( modelName, function ( gltf ) {
@@ -326,13 +335,13 @@
 			function initRenderer() {
 
 				var container = document.getElementById( 'container' );
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
 
 			}
@@ -342,21 +351,21 @@
 			 */
 			function initScene() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 3, 6, - 10 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
-				worldScene = new THREE.Scene();
-				worldScene.background = new THREE.Color( 0xa0a0a0 );
-				worldScene.fog = new THREE.Fog( 0xa0a0a0, 10, 22 );
+				worldScene = new Scene();
+				worldScene.background = new Color( 0xa0a0a0 );
+				worldScene.fog = new Fog( 0xa0a0a0, 10, 22 );
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 20, 0 );
 				worldScene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				var dirLight = new DirectionalLight( 0xffffff );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 10;
@@ -368,9 +377,9 @@
 				worldScene.add( dirLight );
 
 				// ground
-				var groundMesh = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( {
+				var groundMesh = new Mesh(
+					new PlaneBufferGeometry( 40, 40 ),
+					new MeshPhongMaterial( {
 						color: 0x999999,
 						depthWrite: false
 					} )

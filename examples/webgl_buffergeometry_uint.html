@@ -11,18 +11,27 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - uint</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BufferGeometry,
+				Color,
+				DirectionalLight,
+				DoubleSide,
+				Float32BufferAttribute,
+				Fog,
+				Int16BufferAttribute,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Scene,
+				Uint8BufferAttribute,
+				Vector3,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -39,22 +48,22 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
 				camera.position.z = 2750;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050505 );
-				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+				scene = new Scene();
+				scene.background = new Color( 0x050505 );
+				scene.fog = new Fog( 0x050505, 2000, 3500 );
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0x444444 ) );
+				scene.add( new AmbientLight( 0x444444 ) );
 
-				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				var light1 = new DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
 				scene.add( light1 );
 
-				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				var light2 = new DirectionalLight( 0xffffff, 1.5 );
 				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
@@ -62,23 +71,23 @@
 
 				var triangles = 500000;
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 
 				var positions = [];
 				var normals = [];
 				var colors = [];
 
-				var color = new THREE.Color();
+				var color = new Color();
 
 				var n = 800, n2 = n / 2;	// triangles spread in the cube
 				var d = 12, d2 = d / 2;	// individual triangle size
 
-				var pA = new THREE.Vector3();
-				var pB = new THREE.Vector3();
-				var pC = new THREE.Vector3();
+				var pA = new Vector3();
+				var pB = new Vector3();
+				var pC = new Vector3();
 
-				var cb = new THREE.Vector3();
-				var ab = new THREE.Vector3();
+				var cb = new Vector3();
+				var ab = new Vector3();
 
 				for ( var i = 0; i < triangles; i ++ ) {
 
@@ -138,9 +147,9 @@
 
 				}
 
-				var positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
-				var normalAttribute = new THREE.Int16BufferAttribute( normals, 3 );
-				var colorAttribute = new THREE.Uint8BufferAttribute( colors, 3 );
+				var positionAttribute = new Float32BufferAttribute( positions, 3 );
+				var normalAttribute = new Int16BufferAttribute( normals, 3 );
+				var colorAttribute = new Uint8BufferAttribute( colors, 3 );
 
 				normalAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
 				colorAttribute.normalized = true;
@@ -151,17 +160,17 @@
 
 				geometry.computeBoundingSphere();
 
-				var material = new THREE.MeshPhongMaterial( {
+				var material = new MeshPhongMaterial( {
 					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+					side: DoubleSide, vertexColors: VertexColors
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
