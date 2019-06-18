@@ -3000,7 +3000,7 @@
 
 				// update material animation and/or gpu calcs (pre-renderer)
 
-				frame.update( delta ).setRenderer( renderer );
+				frame.setRenderer( renderer ).update( delta );
 
 				if ( mesh.material instanceof THREE.NodeMaterial ) {
 
