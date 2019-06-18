@@ -42,6 +42,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 		] ) );
 
+		if ( THREE.UniformsLib.LTC_1 ) {
+
+			// add ltc data textures to material uniforms
+
+			builder.uniforms.ltc_1 = { value: THREE.UniformsLib.LTC_1 };
+			builder.uniforms.ltc_2 = { value: THREE.UniformsLib.LTC_2 };
+
+		}
+
 		builder.addParsCode( [
 			"varying vec3 vViewPosition;",
 
