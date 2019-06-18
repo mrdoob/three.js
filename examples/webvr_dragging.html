@@ -13,17 +13,38 @@
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="../build/three.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				BufferGeometry,
+				Color,
+				ConeBufferGeometry,
+				CylinderBufferGeometry,
+				DirectionalLight,
+				Group,
+				HemisphereLight,
+				IcosahedronBufferGeometry,
+				Line,
+				Matrix4,
+				Mesh,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Raycaster,
+				Scene,
+				TorusBufferGeometry,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
 
 			var raycaster, intersected = [];
-			var tempMatrix = new THREE.Matrix4();
+			var tempMatrix = new Matrix4();
 
 			var group;
 
@@ -35,25 +56,25 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x808080 );
+				scene = new Scene();
+				scene.background = new Color( 0x808080 );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( {
+				var geometry = new PlaneBufferGeometry( 4, 4 );
+				var material = new MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var floor = new THREE.Mesh( geometry, material );
+				var floor = new Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+				scene.add( new HemisphereLight( 0x808080, 0x606060 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -63,27 +84,27 @@
 				light.shadow.mapSize.set( 4096, 4096 );
 				scene.add( light );
 
-				group = new THREE.Group();
+				group = new Group();
 				scene.add( group );
 
 				var geometries = [
-					new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ),
-					new THREE.ConeBufferGeometry( 0.2, 0.2, 64 ),
-					new THREE.CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
-					new THREE.IcosahedronBufferGeometry( 0.2, 3 ),
-					new THREE.TorusBufferGeometry( 0.2, 0.04, 64, 32 )
+					new BoxBufferGeometry( 0.2, 0.2, 0.2 ),
+					new ConeBufferGeometry( 0.2, 0.2, 64 ),
+					new CylinderBufferGeometry( 0.2, 0.2, 0.2, 64 ),
+					new IcosahedronBufferGeometry( 0.2, 3 ),
+					new TorusBufferGeometry( 0.2, 0.04, 64, 32 )
 				];
 
 				for ( var i = 0; i < 50; i ++ ) {
 
 					var geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					var material = new THREE.MeshStandardMaterial( {
+					var material = new MeshStandardMaterial( {
 						color: Math.random() * 0xffffff,
 						roughness: 0.7,
 						metalness: 0.0
 					} );
 
-					var object = new THREE.Mesh( geometry, material );
+					var object = new Mesh( geometry, material );
 
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 2;
@@ -104,7 +125,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
@@ -129,16 +150,16 @@
 
 				//
 
-				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+				var geometry = new BufferGeometry().setFromPoints( [ new Vector3( 0, 0, 0 ), new Vector3( 0, 0, - 1 ) ] );
 
-				var line = new THREE.Line( geometry );
+				var line = new Line( geometry );
 				line.name = 'line';
 				line.scale.z = 5;
 
 				controller1.add( line.clone() );
 				controller2.add( line.clone() );
 
-				raycaster = new THREE.Raycaster();
+				raycaster = new Raycaster();
 
 				//
 

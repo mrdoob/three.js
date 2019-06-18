@@ -12,14 +12,29 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				BackSide,
+				BufferAttribute,
+				BoxBufferGeometry,
+				ClampToEdgeWrapping,
+				Matrix3,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				TorusKnotBufferGeometry,
+				Vector3,
+				VertexColors,
+				WebGLRenderer,
+				WebGLRenderTarget
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// HACK:
 
-			THREE.Mesh.prototype.clone = function () {
+			Mesh.prototype.clone = function () {
 
 				var newMaterial = ( this.material.isMaterial ) ? this.material.clone() : this.material.slice();
 
@@ -33,24 +48,24 @@
 
 				var SIZE = 32, SIZE2 = SIZE * SIZE;
 
-				var camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
+				var camera = new PerspectiveCamera( 90, 1, 0.01, 100 );
 
 				scene.updateMatrixWorld( true );
 
 				var clone = scene.clone();
 				clone.autoUpdate = false;
 
-				var rt = new THREE.WebGLRenderTarget( SIZE, SIZE, {
-					wrapS: THREE.ClampToEdgeWrapping,
-					wrapT: THREE.ClampToEdgeWrapping,
+				var rt = new WebGLRenderTarget( SIZE, SIZE, {
+					wrapS: ClampToEdgeWrapping,
+					wrapT: ClampToEdgeWrapping,
 					stencilBuffer: false,
 					depthBuffer: true
 				} );
 
-				var normalMatrix = new THREE.Matrix3();
+				var normalMatrix = new Matrix3();
 
-				var position = new THREE.Vector3();
-				var normal = new THREE.Vector3();
+				var position = new Vector3();
+				var normal = new Vector3();
 
 				var bounces = 0;
 				var currentVertex = 0;
@@ -72,7 +87,7 @@
 					if ( attributes.color === undefined ) {
 
 						var colors = new Float32Array( positions.length );
-						geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
+						geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ).setDynamic( true ) );
 
 					}
 
@@ -150,17 +165,17 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 4;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// sphere
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var geometry = new TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
+				var material = new MeshBasicMaterial( { vertexColors: VertexColors } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				// room
@@ -169,25 +184,25 @@
 
 				for ( var i = 0; i < 8; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.BackSide } ) );
+					materials.push( new MeshBasicMaterial( { color: Math.random() * 0xffffff, side: BackSide } ) );
 
 				}
 
-				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+				var geometry = new BoxBufferGeometry( 3, 3, 3 );
 
-				var mesh = new THREE.Mesh( geometry, materials );
+				var mesh = new Mesh( geometry, materials );
 				scene.add( mesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				new SimpleGI( renderer, scene );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
