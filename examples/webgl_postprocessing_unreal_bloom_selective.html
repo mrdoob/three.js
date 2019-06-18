@@ -8,24 +8,9 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a sphere to toggle bloom<br>By <a href="http://github.com/Temdog007" target="_blank" rel="noopener">Temdog007</a>
 		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/LuminosityHighPassShader.js"></script>
-		<script src="js/postprocessing/UnrealBloomPass.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -62,14 +47,37 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				IcosahedronBufferGeometry,
+				Layers,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Raycaster,
+				ReinhardToneMapping,
+				Scene,
+				ShaderMaterial,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			var scene, camera, geometry, controls;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
+
+			var scene, camera, controls;
 			var renderer;
 
 			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
-			var bloomLayer = new THREE.Layers();
+			var bloomLayer = new Layers();
 			bloomLayer.set( BLOOM_SCENE );
 
 			var params = {
@@ -80,45 +88,43 @@
 				scene: "Scene with Glow"
 			};
 
-			var darkMaterial = new THREE.MeshBasicMaterial( { color: "black" } );
+			var darkMaterial = new MeshBasicMaterial( { color: "black" } );
 			var materials = {};
 
-			var container = document.getElementById( 'container' );
-
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.toneMapping = THREE.ReinhardToneMapping;
+			renderer.toneMapping = ReinhardToneMapping;
 			document.body.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
+			scene = new Scene();
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
+			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 			camera.position.set( 0, 0, 20 );
 			camera.lookAt( 0, 0, 0 );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.maxPolarAngle = Math.PI * 0.5;
 			controls.minDistance = 1;
 			controls.maxDistance = 100;
 			controls.addEventListener( 'change', render );
 
-			scene.add( new THREE.AmbientLight( 0x404040 ) );
+			scene.add( new AmbientLight( 0x404040 ) );
 
-			var renderScene = new THREE.RenderPass( scene, camera );
+			var renderScene = new RenderPass( scene, camera );
 
-			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			var bloomPass = new UnrealBloomPass( new Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
-			var bloomComposer = new THREE.EffectComposer( renderer );
+			var bloomComposer = new EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
-			var finalPass = new THREE.ShaderPass(
-				new THREE.ShaderMaterial( {
+			var finalPass = new ShaderPass(
+				new ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
 						bloomTexture: { value: bloomComposer.renderTarget2.texture }
@@ -130,17 +136,17 @@
 			);
 			finalPass.needsSwap = true;
 
-			var finalComposer = new THREE.EffectComposer( renderer );
+			var finalComposer = new EffectComposer( renderer );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
-			var raycaster = new THREE.Raycaster();
+			var raycaster = new Raycaster();
 
-			var mouse = new THREE.Vector2();
+			var mouse = new Vector2();
 
 			window.addEventListener( 'click', onDocumentMouseClick, false );
 
-			var gui = new dat.GUI();
+			var gui = new GUI();
 
 			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Scene only' ] ).onChange( function ( value ) {
 
@@ -232,21 +238,18 @@
 
 			function setupScene() {
 
-				var minLightness = 0;
-				var maxLightness = 0.1;
-
 				scene.traverse( disposeMaterial );
 				scene.children.length = 0;
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 1, 4 );
+				var geometry = new IcosahedronBufferGeometry( 1, 4 );
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					var color = new THREE.Color();
+					var color = new Color();
 					color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
 
-					var material = new THREE.MeshBasicMaterial( { color: color } );
-					var sphere = new THREE.Mesh( geometry, material );
+					var material = new MeshBasicMaterial( { color: color } );
+					var sphere = new Mesh( geometry, material );
 					sphere.position.x = Math.random() * 10 - 5;
 					sphere.position.y = Math.random() * 10 - 5;
 					sphere.position.z = Math.random() * 10 - 5;

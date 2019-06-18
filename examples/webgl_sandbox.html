@@ -10,13 +10,30 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sandbox</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AdditiveBlending,
+				CanvasTexture,
+				Fog,
+				Mesh,
+				MeshDepthMaterial,
+				MeshLambertMaterial,
+				MeshNormalMaterial,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				ShaderMaterial,
+				SphereBufferGeometry,
+				TextureLoader,
+				UVMapping,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/shaders/BasicShader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import { BasicShader } from './jsm/shaders/BasicShader.js';
 
 			var statsEnabled = true;
 
@@ -37,40 +54,40 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.z = 3200;
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1, 20000 );
+				scene = new Scene();
+				scene.fog = new Fog( 0x000000, 1, 20000 );
 
-				var light = new THREE.PointLight( 0xffffff );
+				var light = new PointLight( 0xffffff );
 				scene.add( light );
 
-				var shader = THREE.BasicShader;
+				var shader = BasicShader;
 				var uniforms = shader.uniforms;
 				var vertexShader = shader.vertexShader;
 				var fragmentShader = shader.fragmentShader;
 
-				var texture1 = new THREE.CanvasTexture( generateTexture( 0, 0.5, 1 ), THREE.UVMapping );
-				var texture2 = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+				var texture1 = new CanvasTexture( generateTexture( 0, 0.5, 1 ), UVMapping );
+				var texture2 = new TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 				var materials = [
 
-					new THREE.MeshNormalMaterial(),
-					new THREE.MeshDepthMaterial(),
-					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false } ),
-					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
-					new THREE.MeshBasicMaterial( { map: texture1, fog: false } ),
-					new THREE.MeshBasicMaterial( { map: texture2 } ),
-					new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader, transparent: true } ),
-					new THREE.MeshLambertMaterial( { map: texture2 } ),
-					new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
-					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ),
-					new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30 } )
+					new MeshNormalMaterial(),
+					new MeshDepthMaterial(),
+					new MeshBasicMaterial( { color: 0x0066ff, blending: AdditiveBlending, transparent: true, depthWrite: false } ),
+					new MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
+					new MeshBasicMaterial( { map: texture1, fog: false } ),
+					new MeshBasicMaterial( { map: texture2 } ),
+					new ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader, transparent: true } ),
+					new MeshLambertMaterial( { map: texture2 } ),
+					new MeshLambertMaterial( { color: 0xdddddd } ),
+					new MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ),
+					new MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30 } )
 
 				];
 
-				var geometry = new THREE.SphereBufferGeometry( 50, 32, 16 );
+				var geometry = new SphereBufferGeometry( 50, 32, 16 );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
@@ -82,7 +99,7 @@
 
 					var material = materials[ index ];
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -97,7 +114,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
