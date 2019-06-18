@@ -91,7 +91,7 @@
 					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 					camera.lookAt( scene.position );
 
-					renderer.setViewport( 0, 0, viewWidth, viewHeight );
+					renderer.setViewport( 0, fullHeight - viewHeight, viewWidth, viewHeight );
 					renderer.render( scene, camera );
 
 					context.drawImage( renderer.domElement, 0, 0 );
