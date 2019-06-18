@@ -66,6 +66,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				Color,
 				PerspectiveCamera,
 				Matrix4,
@@ -79,7 +80,7 @@
 			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
-			var controls;
+			var controls, clock;
 			var root;
 
 			var objects = [];
@@ -130,6 +131,8 @@
 
 				root = new Object3D();
 				scene.add( root );
+
+				clock = new Clock();
 
 				//
 
@@ -515,7 +518,7 @@
 				requestAnimationFrame( animate );
 				controls.update();
 
-				var time = Date.now() * 0.0004;
+				var time = clock.getElapsedTime() * 0.4;
 
 				root.rotation.x = time;
 				root.rotation.y = time * 0.7;

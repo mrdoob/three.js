@@ -17,6 +17,7 @@
 			import {
 				BufferGeometry,
 				CatmullRomCurve3,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				Line,
@@ -35,7 +36,7 @@
 				windowHalfX = window.innerWidth / 2,
 				windowHalfY = window.innerHeight / 2,
 
-				camera, scene, renderer;
+				camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -49,6 +50,8 @@
 				camera.position.z = 700;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				renderer = new SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -191,7 +194,7 @@
 
 				camera.lookAt( scene.position );
 
-				var time = Date.now() * 0.0005;
+				var time = clock.getElapsedTime() * 0.5;
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 

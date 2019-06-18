@@ -26,6 +26,7 @@
 				BoxHelper,
 				BufferAttribute,
 				BufferGeometry,
+				Clock,
 				Group,
 				LineBasicMaterial,
 				LineSegments,
@@ -53,6 +54,7 @@
 			var pointCloud;
 			var particlePositions;
 			var linesMesh;
+			var clock;
 
 			var maxParticleCount = 1000;
 			var particleCount = 500;
@@ -110,6 +112,7 @@
 
 				scene = new Scene();
 
+				clock = new Clock();
 
 				group = new Group();
 				scene.add( group );
@@ -297,7 +300,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				group.rotation.y = time * 0.1;
 				renderer.render( scene, camera );

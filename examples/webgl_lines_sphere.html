@@ -15,6 +15,7 @@
 		<script type="module">
 			import {
 				BufferGeometry,
+				Clock,
 				Float32BufferAttribute,
 				LineBasicMaterial,
 				LineSegments,
@@ -33,7 +34,7 @@
 
 				windowHalfY = window.innerHeight / 2,
 
-				camera, scene, renderer;
+				camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -44,6 +45,8 @@
 				camera.position.z = 1000;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var i, line, material, p,
 					parameters = [[ 0.25, 0xff7700, 1 ], [ 0.5, 0xff9900, 1 ], [ 0.75, 0xffaa00, 0.75 ], [ 1, 0xffaa00, 0.5 ], [ 1.25, 0x000833, 0.8 ],
@@ -187,7 +190,7 @@
 
 				renderer.render( scene, camera );
 
-				var time = Date.now() * 0.0001;
+				var time = clock.getElapsedTime() * 0.1;
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 

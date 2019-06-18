@@ -50,6 +50,7 @@
 			import {
 				AdditiveBlending,
 				BufferGeometry,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				PerspectiveCamera,
@@ -64,7 +65,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var particleSystem, uniforms, geometry;
+			var particleSystem, uniforms, geometry, clock;
 
 			var particles = 100000;
 
@@ -77,6 +78,8 @@
 				camera.position.z = 300;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				uniforms = {
 
@@ -166,7 +169,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.005;
+				var time = clock.getElapsedTime() * 5;
 
 				particleSystem.rotation.z = 0.01 * time;
 

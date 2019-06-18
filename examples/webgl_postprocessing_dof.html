@@ -15,6 +15,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				CubeTextureLoader,
 				Mesh,
 				MeshBasicMaterial,
@@ -39,6 +40,8 @@
 
 			var mouseX = 0, mouseY = 0;
 
+			var clock;
+
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
@@ -59,6 +62,8 @@
 				camera.position.z = 200;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -250,7 +255,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00005;
+				var time = clock.getElapsedTime() * 0.05;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;

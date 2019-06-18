@@ -113,7 +113,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0005;
+				var time = clock.getElapsedTime() * 0.5;
 				var delta = clock.getDelta();
 
 				if ( object ) object.rotation.y -= 0.5 * delta;

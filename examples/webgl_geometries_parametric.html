@@ -15,6 +15,7 @@
 			import {
 				AmbientLight,
 				BufferGeometry,
+				Clock,
 				DoubleSide,
 				Mesh,
 				MeshPhongMaterial,
@@ -32,7 +33,7 @@
 			import { Curves } from './jsm/curves/CurveExtras.js';
 			import { ParametricGeometries } from './jsm/geometries/ParametricGeometries.js';
 
-			var camera, scene, renderer, stats;
+			var camera, scene, renderer, stats, clock;
 
 			init();
 			animate();
@@ -45,6 +46,8 @@
 				camera.position.y = 400;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				//
 
@@ -144,7 +147,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				var timer = clock.getElapsedTime() * 0.1;
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;

@@ -50,6 +50,7 @@
 		<script type="module">
 			import {
 				AdditiveBlending,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				FontLoader,
@@ -65,7 +66,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var line, uniforms;
+			var line, uniforms, clock;
 
 			var loader = new FontLoader();
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
@@ -82,6 +83,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0x050505 );
+
+				clock = new Clock();
 
 				uniforms = {
 
@@ -177,7 +180,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				line.rotation.y = 0.25 * time;
 

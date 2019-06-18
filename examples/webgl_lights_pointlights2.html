@@ -206,7 +206,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00025;
+				var time = clock.getElapsedTime() * 0.25;
 				var d = 150;
 
 				light1.position.x = Math.sin( time * 0.7 ) * d;

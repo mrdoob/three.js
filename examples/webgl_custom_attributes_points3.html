@@ -62,6 +62,7 @@
 				BoxGeometry,
 				BufferAttribute,
 				BufferGeometry,
+				Clock,
 				Color,
 				Euler,
 				Matrix4,
@@ -80,7 +81,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var object;
+			var object, clock;
 
 			var vertices1;
 
@@ -96,6 +97,8 @@
 				camera.position.z = 500;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var radius = 100, inner = 0.6 * radius;
 				var vertices = [];
@@ -260,7 +263,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.01;
+				var time = clock.getElapsedTime() * 10;
 
 				object.rotation.y = object.rotation.z = 0.02 * time;
 

@@ -11,6 +11,7 @@
 		<script type="module">
 			import {
 				BoxBufferGeometry,
+				Clock,
 				Color,
 				Mesh,
 				MeshNormalMaterial,
@@ -21,7 +22,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats, root;
+			var camera, scene, renderer, stats, root, clock;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -38,6 +39,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0xffffff );
+
+				clock = new Clock();
 
 				var geometry = new BoxBufferGeometry( 100, 100, 100 );
 				var material = new MeshNormalMaterial();
@@ -172,7 +175,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				var rx = Math.sin( time * 0.7 ) * 0.2;
 				var ry = Math.sin( time * 0.3 ) * 0.1;

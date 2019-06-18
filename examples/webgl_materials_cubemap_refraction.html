@@ -17,6 +17,7 @@
 		<script type="module">
 			import {
 				AmbientLight,
+				Clock,
 				CubeTextureLoader,
 				CubeRefractionMapping,
 				Mesh,
@@ -26,7 +27,7 @@
 				PointLight,
 				Scene,
 				SphereBufferGeometry,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -37,7 +38,7 @@
 
 			var camera, scene, renderer;
 
-			var pointLight;
+			var pointLight, clock;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -70,6 +71,8 @@
 
 				scene = new Scene();
 				scene.background = textureCube;
+
+				clock = new Clock();
 
 				// LIGHTS
 
@@ -172,7 +175,7 @@
 
 			function render() {
 
-				var timer = - 0.0002 * Date.now();
+				var timer = - clock.getElapsedTime() * 0.2;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

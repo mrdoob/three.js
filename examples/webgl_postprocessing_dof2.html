@@ -18,6 +18,7 @@
 				BackSide,
 				BoxBufferGeometry,
 				BufferGeometryLoader,
+				Clock,
 				CubeTextureLoader,
 				DirectionalLight,
 				DoubleSide,
@@ -65,6 +66,7 @@
 			var effectController;
 			var planes = [];
 			var leaves = 100;
+			var clock;
 
 			init();
 			animate();
@@ -81,6 +83,8 @@
 
 				scene = new Scene();
 				scene.add( camera );
+
+				clock = new Clock();
 
 				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -451,7 +455,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00015;
+				var time = clock.getElapsedTime() * 0.15;
 
 				camera.position.x = Math.cos( time ) * 400;
 				camera.position.z = Math.sin( time ) * 500;

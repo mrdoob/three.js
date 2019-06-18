@@ -54,6 +54,7 @@
 				BoxGeometry,
 				BufferAttribute,
 				BufferGeometry,
+				Clock,
 				Color,
 				Matrix4,
 				PerspectiveCamera,
@@ -70,7 +71,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			var renderer, scene, camera, stats;
-			var sphere, length1;
+			var sphere, length1, clock;
 
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight;
@@ -84,6 +85,8 @@
 				camera.position.z = 300;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var radius = 100, segments = 68, rings = 38;
 
@@ -253,7 +256,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.005;
+				var time = clock.getElapsedTime() * 5;
 
 				sphere.rotation.y = 0.02 * time;
 				sphere.rotation.z = 0.02 * time;

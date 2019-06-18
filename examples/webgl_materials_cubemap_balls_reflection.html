@@ -14,18 +14,19 @@
 
 		<script type="module">
 			import {
+				Clock,
 				CubeTextureLoader,
 				Mesh,
 				MeshBasicMaterial,
 				PerspectiveCamera,
 				Scene,
 				SphereBufferGeometry,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			var spheres = [];
 
@@ -52,6 +53,8 @@
 				scene.background = new CubeTextureLoader()
 					.setPath( 'textures/cube/pisa/' )
 					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ] );
+
+				clock = new Clock();
 
 				var geometry = new SphereBufferGeometry( 100, 32, 16 );
 				var material = new MeshBasicMaterial( { color: 0xffffff, envMap: scene.background } );
@@ -116,7 +119,7 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				var timer = clock.getElapsedTime() * 0.1;
 
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 

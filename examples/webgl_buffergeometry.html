@@ -15,6 +15,7 @@
 			import {
 				AmbientLight,
 				BufferGeometry,
+				Clock,
 				Color,
 				DirectionalLight,
 				DoubleSide,
@@ -35,7 +36,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh;
+			var mesh, clock;
 
 			init();
 			animate();
@@ -52,6 +53,8 @@
 				scene = new Scene();
 				scene.background = new Color( 0x050505 );
 				scene.fog = new Fog( 0x050505, 2000, 3500 );
+
+				clock = new Clock();
 
 				//
 
@@ -209,7 +212,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

@@ -14,6 +14,7 @@
 		<script type="module">
 			import {
 				BufferGeometry,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				Fog,
@@ -31,7 +32,7 @@
 
 			var camera, scene, renderer;
 
-			var points;
+			var points, clock;
 
 			init();
 			animate();
@@ -48,6 +49,8 @@
 				scene = new Scene();
 				scene.background = new Color( 0x050505 );
 				scene.fog = new Fog( 0x050505, 2000, 3500 );
+
+				clock = new Clock();
 
 				//
 
@@ -137,7 +140,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				points.rotation.x = time * 0.25;
 				points.rotation.y = time * 0.5;

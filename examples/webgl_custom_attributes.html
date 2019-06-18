@@ -59,6 +59,7 @@
 		<script type="module">
 			import {
 				BufferAttribute,
+				Clock,
 				Color,
 				Math as _Math,
 				Mesh,
@@ -75,7 +76,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var sphere, uniforms;
+			var sphere, uniforms, clock;
 
 			var displacement, noise;
 
@@ -89,6 +90,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0x050505 );
+
+				clock = new Clock();
 
 				uniforms = {
 
@@ -163,7 +166,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.01;
+				var time = clock.getElapsedTime() * 10;
 
 				sphere.rotation.y = sphere.rotation.z = 0.01 * time;
 

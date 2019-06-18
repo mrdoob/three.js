@@ -17,6 +17,7 @@
 			import {
 				AdditiveBlending,
 				BoxBufferGeometry,
+				Clock,
 				CubeReflectionMapping,
 				DoubleSide,
 				LinearFilter,
@@ -25,12 +26,12 @@
 				PerspectiveCamera,
 				Scene,
 				TorusBufferGeometry,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 			var meshes = [];
 
 			init();
@@ -42,6 +43,8 @@
 				camera.position.z = 1000;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var geometry = new BoxBufferGeometry( 200, 200, 200 );
 
@@ -182,7 +185,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				for ( var i = 0; i < meshes.length; i ++ ) {
 

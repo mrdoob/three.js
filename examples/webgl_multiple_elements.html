@@ -71,6 +71,7 @@
 		<script type="module">
 			import {
 				BoxBufferGeometry,
+				Clock,
 				Color,
 				CylinderBufferGeometry,
 				DirectionalLight,
@@ -81,12 +82,12 @@
 				PerspectiveCamera,
 				Scene,
 				SphereBufferGeometry,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var canvas;
+			var canvas, clock;
 
 			var scenes = [], renderer;
 
@@ -110,6 +111,8 @@
 				for ( var i = 0; i < 40; i ++ ) {
 
 					var scene = new Scene();
+
+					clock = new Clock();
 
 					// make a list item
 					var element = document.createElement( "div" );
@@ -199,7 +202,7 @@
 				scenes.forEach( function ( scene ) {
 
 					// so something moves
-					scene.children[ 0 ].rotation.y = Date.now() * 0.001;
+					scene.children[ 0 ].rotation.y = clock.getElapsedTime();
 
 					// get the element that is a place holder for where we want to
 					// draw the scene

@@ -16,6 +16,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				GridHelper,
 				HemisphereLight,
 				Math as _Math,
@@ -35,7 +36,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var particleLight;
+			var particleLight, clock;
 			var dae;
 
 			var kinematics;
@@ -78,6 +79,8 @@
 				camera.position.set( 2, 2, 3 );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				// Grid
 
@@ -192,7 +195,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				var timer = clock.getElapsedTime() * 0.1;
 
 				camera.position.x = Math.cos( timer ) * 20;
 				camera.position.y = 10;

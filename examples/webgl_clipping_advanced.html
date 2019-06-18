@@ -12,6 +12,7 @@
 			import {
 				AmbientLight,
 				BoxBufferGeometry,
+				Clock,
 				Color,
 				DirectionalLight,
 				DoubleSide,
@@ -161,7 +162,7 @@
 				Empty = Object.freeze( [] );
 
 
-			var camera, scene, renderer, startTime, stats,
+			var camera, scene, renderer, clock, stats,
 
 				object, clipMaterial,
 				volumeVisualization,
@@ -175,6 +176,8 @@
 				camera.position.set( 0, 1.5, 3 );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				// Lights
 
@@ -368,11 +371,6 @@
 						}
 					}, "Enabled" );
 
-
-				// Start
-
-				startTime = Date.now();
-
 			}
 
 			function onWindowResize() {
@@ -400,8 +398,7 @@
 
 			function animate() {
 
-				var currentTime = Date.now(),
-					time = ( currentTime - startTime ) / 1000;
+				var time = clock.getElapsedTime();
 
 				requestAnimationFrame( animate );
 

@@ -18,6 +18,7 @@
 				AmbientLight,
 				BackSide,
 				BoxBufferGeometry,
+				Clock,
 				Mesh,
 				MeshBasicMaterial,
 				MeshStandardMaterial,
@@ -42,7 +43,7 @@
 
 			var origin = new Vector3();
 
-			var rectLight;
+			var rectLight, clock;
 
 			var param = {};
 			var stats;
@@ -82,6 +83,8 @@
 				camera.position.set( 0, 20, 35 );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var ambient = new AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
@@ -248,7 +251,7 @@
 
 				if ( param.motion ) {
 
-					var t = ( Date.now() / 2000 );
+					var t = clock.getElapsedTime() / 2;
 
 					// move light in circle around center
 					// change light height with sine curve

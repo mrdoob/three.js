@@ -18,6 +18,7 @@
 			import {
 				AdditiveBlending,
 				CanvasTexture,
+				Clock,
 				Mesh,
 				MeshBasicMaterial,
 				MultiplyBlending,
@@ -29,11 +30,11 @@
 				Scene,
 				SubtractiveBlending,
 				TextureLoader,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			var camera, scene, renderer;
-			var mapBg;
+			var mapBg, clock;
 
 			var textureLoader = new TextureLoader();
 
@@ -50,6 +51,10 @@
 				// SCENE
 
 				scene = new Scene();
+
+				// clock
+
+				clock = new Clock();
 
 				// BACKGROUND
 
@@ -188,7 +193,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.00025;
+				var time = clock.getElapsedTime() * 0.25;
 				var ox = ( time * - 0.01 * mapBg.repeat.x ) % 1;
 				var oy = ( time * - 0.01 * mapBg.repeat.y ) % 1;
 

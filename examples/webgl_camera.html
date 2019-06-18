@@ -23,6 +23,7 @@
 			import {
 				BufferGeometry,
 				CameraHelper,
+				Clock,
 				Float32BufferAttribute,
 				Group,
 				Math as _Math,
@@ -44,7 +45,7 @@
 			var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 			var container, stats;
-			var camera, scene, renderer, mesh;
+			var camera, scene, renderer, mesh, clock;
 			var cameraRig, activeCamera, activeHelper;
 			var cameraPerspective, cameraOrtho;
 			var cameraPerspectiveHelper, cameraOrthoHelper;
@@ -59,6 +60,8 @@
 				document.body.appendChild( container );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				//
 
@@ -217,7 +220,7 @@
 
 			function render() {
 
-				var r = Date.now() * 0.0005;
+				var r = clock.getElapsedTime() * 0.5;
 
 				mesh.position.x = 700 * Math.cos( r );
 				mesh.position.z = 700 * Math.sin( r );

@@ -14,6 +14,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				LinearFilter,
 				Mesh,
 				MeshBasicMaterial,
@@ -46,6 +47,8 @@
 
 			var mouseX = 0, mouseY = 0;
 
+			var clock;
+
 			var postprocessing = { enabled: true };
 
 			var orbitRadius = 200;
@@ -70,6 +73,8 @@
 				camera.position.z = 200;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				//
 
@@ -297,7 +302,7 @@
 
 			function render() {
 
-				var time = Date.now() / 4000;
+				var time = clock.getElapsedTime() / 4;
 
 				sphereMesh.position.x = orbitRadius * Math.cos( time );
 				sphereMesh.position.z = orbitRadius * Math.sin( time ) - 100;

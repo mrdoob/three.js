@@ -308,7 +308,7 @@
 			function update() {
 
 				var delta = clock.getDelta();
-				var time = Date.now() * 0.0005;
+				var time = clock.getElapsedTime() * 0.5;
 
 				mixer.update( delta / 2.0 );
 

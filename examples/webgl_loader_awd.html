@@ -14,11 +14,12 @@
 		<script type="module">
 			import {
 				AmbientLight,
+				Clock,
 				DirectionalLight,
 				PerspectiveCamera,
 				PointLight,
 				Scene,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -30,7 +31,7 @@
 
 			var camera, scene, renderer;
 			var pointLight;
-			var trunk;
+			var trunk, clock;
 
 			var loader = new AWDLoader();
 
@@ -66,6 +67,8 @@
 				camera.position.set( 70, 50, - 100 );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				// Add the AWD SCENE
 
@@ -112,7 +115,7 @@
 
 				requestAnimationFrame( render );
 
-				var timer = Date.now() * 0.0005;
+				var timer = clock.getElapsedTime() * 0.5;
 
 				pointLight.position.x = Math.sin( timer * 4 ) * 3000;
 				pointLight.position.y = 600;

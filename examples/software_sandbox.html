@@ -18,6 +18,7 @@
 				BoxBufferGeometry,
 				BufferGeometry,
 				CatmullRomCurve3,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				Line,
@@ -43,9 +44,7 @@
 
 			var camera, controls, scene, renderer, stats;
 
-			var torus, cube, texCube;
-
-			var start = Date.now();
+			var torus, cube, texCube, clock;
 
 			init();
 			animate();
@@ -59,6 +58,8 @@
 				camera.position.z = 600;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				// Torus
 				var torusGeometry = new TorusKnotBufferGeometry( 150, 10 );
@@ -191,7 +192,7 @@
 
 			function render() {
 
-				var timer = Date.now() - start;
+				var timer = clock.getElapsedTime() * 1000;
 
 				torus.position.y = Math.sin( timer * 0.002 ) * 150;
 				torus.rotation.x = timer * 0.0003;

@@ -14,6 +14,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				Fog,
 				Group,
 				OrthographicCamera,
@@ -31,6 +32,8 @@
 			var spriteTL, spriteTR, spriteBL, spriteBR, spriteC;
 
 			var mapC;
+
+			var clock;
 
 			var group;
 
@@ -52,6 +55,8 @@
 				scene.fog = new Fog( 0x000000, 1500, 2100 );
 
 				sceneOrtho = new Scene();
+
+				clock = new Clock();
 
 				// create sprites
 
@@ -195,7 +200,7 @@
 
 			function render() {
 
-				var time = Date.now() / 1000;
+				var time = clock.getElapsedTime();
 
 				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
 

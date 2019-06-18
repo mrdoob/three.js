@@ -20,6 +20,7 @@
 		<script type="module">
 			import {
 				BufferGeometry,
+				Clock,
 				Float32BufferAttribute,
 				LineBasicMaterial,
 				LineSegments,
@@ -37,7 +38,7 @@
 
 			var camera, scene, renderer;
 
-			var parent_node;
+			var parent_node, clock;
 
 			init();
 			animate();
@@ -50,6 +51,8 @@
 				camera.position.z = 9000;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var geometry = new BufferGeometry();
 				var material = new LineBasicMaterial( { vertexColors: VertexColors } );
@@ -239,7 +242,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				parent_node.rotation.z = time * 0.5;
 

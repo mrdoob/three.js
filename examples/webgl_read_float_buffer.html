@@ -60,6 +60,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				DirectionalLight,
 				FloatType,
 				LinearFilter,
@@ -84,6 +85,8 @@
 
 			var mouseX = 0, mouseY = 0;
 
+			var clock;
+
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
@@ -106,6 +109,8 @@
 
 				sceneRTT = new Scene();
 				sceneScreen = new Scene();
+
+				clock = new Clock();
 
 				var light = new DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();
@@ -196,7 +201,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0015;
+				var time = clock.getElapsedTime() * 1.5;
 
 				if ( zmesh1 && zmesh2 ) {
 

@@ -12,16 +12,17 @@
 		<script type="module">
 			import {
 				CanvasTexture,
+				Clock,
 				Color,
 				Mesh,
 				MeshBasicMaterial,
 				PerspectiveCamera,
 				PlaneBufferGeometry,
 				Scene,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -33,6 +34,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0x003300 );
+
+				clock = new Clock();
 
 				var geometry = new PlaneBufferGeometry( 100, 100 );
 
@@ -115,7 +118,7 @@
 
 			function render() {
 
-				var time = Date.now() / 6000;
+				var time = clock.getElapsedTime() / 6;
 
 				camera.position.x = 80 * Math.cos( time );
 				camera.position.z = 80 * Math.sin( time );

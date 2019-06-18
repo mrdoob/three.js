@@ -17,6 +17,7 @@
 			import {
 				AdditiveBlending,
 				BufferGeometry,
+				Clock,
 				Float32BufferAttribute,
 				FogExp2,
 				PerspectiveCamera,
@@ -33,6 +34,7 @@
 
 			var camera, scene, renderer, stats, materials = [], parameters;
 			var mouseX = 0, mouseY = 0;
+			var clock;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -47,6 +49,8 @@
 
 				scene = new Scene();
 				scene.fog = new FogExp2( 0x000000, 0.0008 );
+
+				clock = new Clock();
 
 				var geometry = new BufferGeometry();
 				var vertices = [];
@@ -199,7 +203,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00005;
+				var time = clock.getElapsedTime() * 0.05;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;

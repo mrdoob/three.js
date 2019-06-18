@@ -21,6 +21,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				Color,
 				CylinderBufferGeometry,
 				Mesh,
@@ -34,8 +35,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, stats;
-
-			var sphere;
+			var sphere, clock;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -55,6 +55,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0xffffff );
+
+				clock = new Clock();
 
 				sphere = new Mesh( new SphereBufferGeometry( 100, 20, 20 ), new MeshNormalMaterial() );
 				scene.add( sphere );
@@ -121,7 +123,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0005;
+				var time = clock.getElapsedTime() * 0.5;
 
 				sphere.position.x = Math.sin( time * 0.7 ) * 2000;
 				sphere.position.y = Math.cos( time * 0.5 ) * 2000;

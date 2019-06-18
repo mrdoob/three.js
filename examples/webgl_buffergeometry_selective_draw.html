@@ -51,6 +51,7 @@
 				AmbientLight,
 				BufferAttribute,
 				BufferGeometry,
+				Clock,
 				Color,
 				LineSegments,
 				PerspectiveCamera,
@@ -62,7 +63,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, stats;
-			var geometry, mesh;
+			var geometry, mesh, clock;
 			var numLat = 100;
 			var numLng = 200;
 			var numLinesCulled = 0;
@@ -83,6 +84,8 @@
 				camera.position.z = 3.5;
 
 				scene.add( new AmbientLight( 0x444444 ) );
+
+				clock = new Clock();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -223,7 +226,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

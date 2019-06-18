@@ -16,6 +16,7 @@
 
 	<script type="module">
 		import {
+			Clock,
 			Color,
 			Fog,
 			HemisphereLight,
@@ -26,12 +27,12 @@
 			PlaneBufferGeometry,
 			Scene,
 			SpotLight,
-			WebGLRenderer,
+			WebGLRenderer
 		} from "../build/three.module.js";
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-		var camera, scene, renderer;
+		var camera, scene, renderer, clock;
 
 		var container = document.querySelector( '#container' );
 
@@ -50,6 +51,8 @@
 			scene = new Scene();
 			scene.background = new Color( 0x443333 );
 			scene.fog = new Fog( 0x443333, 1, 4 );
+
+			clock = new Clock();
 
 			// Ground
 			var plane = new Mesh(
@@ -118,7 +121,7 @@
 
 		function render() {
 
-			var timer = Date.now() * 0.0003;
+			var timer = clock.getElapsedTime() * 0.3;
 
 			camera.position.x = Math.sin( timer ) * 0.5;
 			camera.position.z = Math.cos( timer ) * 0.5;

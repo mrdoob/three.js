@@ -53,6 +53,7 @@
 				AdditiveBlending,
 				BufferAttribute,
 				BufferGeometry,
+				Clock,
 				Color,
 				PerspectiveCamera,
 				Points,
@@ -67,7 +68,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var sphere;
+			var sphere, clock;
 
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight;
@@ -81,6 +82,8 @@
 				camera.position.z = 300;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var amount = 100000;
 				var radius = 200;
@@ -180,7 +183,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.005;
+				var time = clock.getElapsedTime() * 5;
 
 				sphere.rotation.z = 0.01 * time;
 

@@ -17,6 +17,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				Color,
 				DirectionalLight,
 				LinearFilter,
@@ -32,7 +33,7 @@
 				Vector2,
 				Uniform,
 				WebGLRenderer,
-				WebGLRenderTarget,
+				WebGLRenderTarget
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -69,6 +70,8 @@
 
 			var quadBG, quadMask, renderScene;
 
+			var clock;
+
 			var delta = 0.01;
 
 			init();
@@ -90,6 +93,10 @@
 
 				sceneModel = new Scene();
 				sceneBG = new Scene();
+
+				//
+
+				clock = new Clock();
 
 				//
 
@@ -337,7 +344,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0004;
+				var time = clock.getElapsedTime() * 0.4;
 
 				if ( mesh ) mesh.rotation.y = - time;
 

@@ -15,6 +15,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				CubeTextureLoader,
 				Mesh,
 				MeshBasicMaterial,
@@ -26,7 +27,7 @@
 
 			import { ParallaxBarrierEffect } from './jsm/effects/ParallaxBarrierEffect.js';
 
-			var container, camera, scene, renderer, effect;
+			var container, camera, scene, renderer, effect, clock;
 
 			var spheres = [];
 
@@ -62,6 +63,8 @@
 
 				scene = new Scene();
 				scene.background = textureCube;
+
+				clock = new Clock();
 
 				var geometry = new SphereBufferGeometry( 0.1, 32, 16 );
 				var material = new MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
@@ -131,7 +134,7 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				var timer = clock.getElapsedTime() * 0.1;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

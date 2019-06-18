@@ -15,6 +15,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				Color,
 				DirectionalLight,
 				Fog,
@@ -26,7 +27,7 @@
 				Scene,
 				Vector3,
 				VertexColors,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -35,7 +36,7 @@
 
 			var container, stats;
 
-			var camera, cameraTarget, scene, renderer;
+			var camera, cameraTarget, scene, renderer, clock;
 
 			init();
 			animate();
@@ -54,6 +55,7 @@
 				scene.background = new Color( 0x72645b );
 				scene.fog = new Fog( 0x72645b, 2, 15 );
 
+				clock = new Clock();
 
 				// Ground
 
@@ -220,7 +222,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				var timer = clock.getElapsedTime() * 0.5;
 
 				camera.position.x = Math.cos( timer ) * 3;
 				camera.position.z = Math.sin( timer ) * 3;

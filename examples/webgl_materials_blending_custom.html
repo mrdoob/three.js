@@ -80,6 +80,7 @@
 			import {
 				AddEquation,
 				CanvasTexture,
+				Clock,
 				CustomBlending,
 				DstAlphaFactor,
 				DstColorFactor,
@@ -106,7 +107,7 @@
 				ZeroFactor
 			} from "../build/three.module.js";
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			var materialBg;
 			var materials = [];
@@ -130,6 +131,9 @@
 				// SCENE
 
 				scene = new Scene();
+
+				// clock
+				clock = new Clock();
 
 				// TEXTURE LOADER
 
@@ -479,7 +483,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.00025;
+				var time = clock.getElapsedTime() * 0.25;
 				var ox = ( time * - 0.01 * materialBg.map.repeat.x ) % 1;
 				var oy = ( time * - 0.01 * materialBg.map.repeat.y ) % 1;
 

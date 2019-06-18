@@ -12,6 +12,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				Mesh,
 				MeshBasicMaterial,
 				MeshPhongMaterial,
@@ -28,9 +29,7 @@
 
 			var camera, controls, scene, renderer, effect;
 
-			var sphere, plane;
-
-			var start = Date.now();
+			var sphere, plane, clock;
 
 			init();
 			animate();
@@ -42,6 +41,8 @@
 				camera.position.z = 500;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var light = new PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
@@ -104,7 +105,7 @@
 
 			function render() {
 
-				var timer = Date.now() - start;
+				var timer = clock.getElapsedTime() * 1000;
 
 				sphere.position.y = Math.abs( Math.sin( timer * 0.002 ) ) * 150;
 				sphere.rotation.x = timer * 0.0003;

@@ -18,6 +18,7 @@
 		<script type="module">
 			import {
 				BoxBufferGeometry,
+				Clock,
 				HemisphereLight,
 				Mesh,
 				MeshStandardMaterial,
@@ -39,7 +40,7 @@
 
 			var camera, scene, renderer,
 				bulbLight, bulbMat, hemiLight, stats;
-			var ballMat, cubeMat, floorMat;
+			var ballMat, cubeMat, floorMat, clock;
 
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
@@ -93,6 +94,8 @@
 				camera.position.y = 2;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var bulbGeometry = new SphereBufferGeometry( 0.02, 16, 8 );
 				bulbLight = new PointLight( 0xffee88, 1, 100, 2 );
@@ -289,7 +292,7 @@
 				bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 ); // convert from intensity to irradiance at bulb surface
 
 				hemiLight.intensity = hemiLuminousIrradiances[ params.hemiIrradiance ];
-				var time = Date.now() * 0.0005;
+				var time = clock.getElapsedTime() * 0.5;
 
 				bulbLight.position.y = Math.cos( time ) * 0.75 + 1.25;
 

@@ -16,12 +16,13 @@
 <script type="module">
 	import {
 		BoxBufferGeometry,
+		Clock,
 		DoubleSide,
 		PerspectiveCamera,
 		Mesh,
 		MeshBasicMaterial,
 		Scene,
-		WebGLRenderer,
+		WebGLRenderer
 	} from "../build/three.module.js";
 
 	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
@@ -41,7 +42,7 @@
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
 
-	var camera, scene, renderer;
+	var camera, scene, renderer, clock;
 	var meshes = [];
 
 	init();
@@ -65,6 +66,8 @@
 		camera.position.z = 1000;
 
 		scene = new Scene();
+
+		clock = new Clock();
 
 		var geometry = new BoxBufferGeometry( 200, 200, 200 );
 		var material1, material2;
@@ -160,7 +163,7 @@
 
 		requestAnimationFrame( animate );
 
-		var time = Date.now() * 0.001;
+		var time = clock.getElapsedTime();
 
 		for ( var i = 0; i < meshes.length; i ++ ) {
 

@@ -27,6 +27,7 @@
 			import {
 				CameraHelper,
 				CatmullRomCurve3,
+				Clock,
 				Color,
 				DirectionalLight,
 				Mesh,
@@ -49,7 +50,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
+			var camera, scene, renderer, splineCamera, cameraHelper, cameraEye, clock;
 
 			var binormal = new Vector3();
 			var normal = new Vector3();
@@ -181,6 +182,10 @@
 				scene = new Scene();
 				scene.background = new Color( 0xf0f0f0 );
 
+				// clock
+
+				clock = new Clock();
+
 				// light
 
 				var light = new DirectionalLight( 0xffffff );
@@ -300,7 +305,7 @@
 
 				// animate camera along spline
 
-				var time = Date.now();
+				var time = clock.getElapsedTime() * 1000;
 				var looptime = 20 * 1000;
 				var t = ( time % looptime ) / looptime;
 

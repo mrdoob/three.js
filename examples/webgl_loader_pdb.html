@@ -45,6 +45,7 @@
 		<script type="module">
 			import {
 				BoxBufferGeometry,
+				Clock,
 				Color,
 				DirectionalLight,
 				Group,
@@ -54,7 +55,7 @@
 				PerspectiveCamera,
 				Scene,
 				Vector3,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
@@ -62,7 +63,7 @@
 			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
 
 			var camera, scene, renderer, labelRenderer;
-			var controls;
+			var controls, clock;
 
 			var root;
 
@@ -102,6 +103,8 @@
 				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
 				scene.add( camera );
+
+				clock = new Clock();
 
 				var light = new DirectionalLight( 0xffffff, 0.8 );
 				light.position.set( 1, 1, 1 );
@@ -288,7 +291,7 @@
 				requestAnimationFrame( animate );
 				controls.update();
 
-				var time = Date.now() * 0.0004;
+				var time = clock.getElapsedTime() * 0.4;
 
 				root.rotation.x = time;
 				root.rotation.y = time * 0.7;

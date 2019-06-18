@@ -14,6 +14,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				CubeRefractionMapping,
 				CubeTextureLoader,
 				Mesh,
@@ -26,7 +27,7 @@
 
 			import { StereoEffect } from './jsm/effects/StereoEffect.js';
 
-			var container, camera, scene, renderer, effect;
+			var container, camera, scene, renderer, effect, clock;
 
 			var spheres = [];
 
@@ -52,6 +53,8 @@
 				scene.background = new CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+
+				clock = new Clock();
 
 				var geometry = new SphereBufferGeometry( 100, 32, 16 );
 
@@ -121,7 +124,7 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				var timer = clock.getElapsedTime() * 0.1;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

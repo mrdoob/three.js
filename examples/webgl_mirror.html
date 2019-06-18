@@ -23,6 +23,7 @@
 		<script type="module">
 			import {
 				CircleBufferGeometry,
+				Clock,
 				CylinderBufferGeometry,
 				IcosahedronBufferGeometry,
 				Mesh,
@@ -33,7 +34,7 @@
 				PointLight,
 				Scene,
 				SphereBufferGeometry,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -49,7 +50,7 @@
 			var NEAR = 1;
 			var FAR = 500;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			var cameraControls;
 
@@ -70,6 +71,10 @@
 
 				// scene
 				scene = new Scene();
+
+				// clock
+
+				clock = new Clock();
 
 				// camera
 				camera = new PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
@@ -186,7 +191,7 @@
 
 				requestAnimationFrame( animate );
 
-				var timer = Date.now() * 0.01;
+				var timer = clock.getElapsedTime() * 10;
 
 				sphereGroup.rotation.y -= 0.002;
 

@@ -25,6 +25,7 @@
 			import {
 				AmbientLight,
 				BoxBufferGeometry,
+				Clock,
 				Color,
 				DirectionalLight,
 				DoubleSide,
@@ -342,8 +343,8 @@
 
 				// Ball Constraints
 
-				ballPosition.z = - Math.sin( Date.now() / 600 ) * 90; //+ 40;
-				ballPosition.x = Math.cos( Date.now() / 400 ) * 70;
+				ballPosition.z = - Math.sin( clock.getElapsedTime() / 0.6 ) * 90; //+ 40;
+				ballPosition.x = Math.cos( clock.getElapsedTime() / 0.4 ) * 70;
 
 				if ( params.showBall ) {
 
@@ -432,6 +433,7 @@
 			var clothGeometry;
 			var sphere;
 			var object;
+			var clock;
 
 			init();
 			animate();
@@ -446,6 +448,8 @@
 				scene = new Scene();
 				scene.background = new Color( 0xcce0ff );
 				scene.fog = new Fog( 0xcce0ff, 500, 10000 );
+
+				clock = new Clock();
 
 				// camera
 
@@ -626,7 +630,7 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now();
+				var time = clock.getElapsedTime() * 1000;
 
 				var windStrength = Math.cos( time / 7000 ) * 20 + 40;
 

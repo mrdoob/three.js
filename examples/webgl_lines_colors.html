@@ -17,6 +17,7 @@
 			import {
 				BufferGeometry,
 				CatmullRomCurve3,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				Line,
@@ -35,7 +36,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -46,6 +47,8 @@
 				camera.position.z = 1000;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -237,7 +240,7 @@
 
 				camera.lookAt( scene.position );
 
-				var time = Date.now() * 0.0005;
+				var time = clock.getElapsedTime() * 0.5;
 
 				for ( var i = 0; i < scene.children.length; i ++ ) {
 

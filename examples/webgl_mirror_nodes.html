@@ -235,7 +235,7 @@
 				requestAnimationFrame( update );
 
 				var delta = clock.getDelta();
-				var timer = Date.now() * 0.01;
+				var timer = clock.getElapsedTime() * 10;
 
 				sphereGroup.rotation.y -= 0.002;
 

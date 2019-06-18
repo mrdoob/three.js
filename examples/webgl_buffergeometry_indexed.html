@@ -19,6 +19,7 @@
 		<script type="module">
 			import {
 				BufferGeometry,
+				Clock,
 				Color,
 				DoubleSide,
 				Float32BufferAttribute,
@@ -36,7 +37,7 @@
 
 			var camera, scene, renderer, stats;
 
-			var mesh;
+			var mesh, clock;
 
 			init();
 			animate();
@@ -50,6 +51,9 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0x050505 );
+
+
+				clock = new Clock();
 
 				//
 
@@ -174,7 +178,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				mesh.rotation.x = time * 0.25;
 				mesh.rotation.y = time * 0.5;

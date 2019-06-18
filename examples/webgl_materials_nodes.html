@@ -2958,7 +2958,7 @@
 
 				if ( move ) {
 
-					var time = Date.now() * 0.005;
+					var time = clock.getElapsedTime() * 5;
 
 					mesh.position.z = Math.cos( time ) * 10;
 					mesh.position.y = Math.sin( time ) * 10;

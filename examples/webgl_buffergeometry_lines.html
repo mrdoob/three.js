@@ -19,6 +19,7 @@
 		<script type="module">
 			import {
 				BufferGeometry,
+				Clock,
 				Float32BufferAttribute,
 				Line,
 				LineBasicMaterial,
@@ -33,7 +34,7 @@
 
 			var camera, scene, renderer;
 
-			var line;
+			var line, clock;
 
 			init();
 			animate();
@@ -48,6 +49,8 @@
 				camera.position.z = 2750;
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var segments = 10000;
 
@@ -129,7 +132,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				line.rotation.x = time * 0.25;
 				line.rotation.y = time * 0.5;

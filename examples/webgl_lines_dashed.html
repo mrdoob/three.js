@@ -15,6 +15,7 @@
 			import {
 				BufferGeometry,
 				CatmullRomCurve3,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				Fog,
@@ -31,7 +32,7 @@
 
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			var renderer, scene, camera, stats;
+			var renderer, scene, camera, stats, clock;
 			var objects = [];
 
 			var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
@@ -47,6 +48,8 @@
 				scene = new Scene();
 				scene.background = new Color( 0x111111 );
 				scene.fog = new Fog( 0x111111, 150, 200 );
+
+				clock = new Clock();
 
 				var subdivisions = 6;
 				var recursion = 1;
@@ -158,7 +161,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				scene.traverse( function ( object ) {
 

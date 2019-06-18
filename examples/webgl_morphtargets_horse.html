@@ -25,13 +25,14 @@
 		<script type="module">
 			import {
 				AnimationMixer,
+				Clock,
 				Color,
 				DirectionalLight,
 				Math as _Math,
 				PerspectiveCamera,
 				Scene,
 				Vector3,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -40,7 +41,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var mesh, mixer;
+			var mesh, mixer, clock;
 
 			init();
 			animate();
@@ -58,6 +59,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0xf0f0f0 );
+
+				clock = new Clock();
 
 				//
 
@@ -127,8 +130,6 @@
 			var radius = 600;
 			var theta = 0;
 
-			var prevTime = Date.now();
-
 			function render() {
 
 				theta += 0.1;
@@ -140,11 +141,7 @@
 
 				if ( mixer ) {
 
-					var time = Date.now();
-
-					mixer.update( ( time - prevTime ) * 0.001 );
-
-					prevTime = time;
+					mixer.update( clock.getDelta() );
 
 				}
 

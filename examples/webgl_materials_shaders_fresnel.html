@@ -15,6 +15,7 @@
 
 		<script type="module">
 			import {
+				Clock,
 				CubeTextureLoader,
 				Mesh,
 				PerspectiveCamera,
@@ -23,14 +24,14 @@
 				ShaderMaterial,
 				SphereBufferGeometry,
 				UniformsUtils,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import { FresnelShader } from './jsm/shaders/FresnelShader.js';
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			var spheres = [];
 
@@ -67,6 +68,8 @@
 
 				scene = new Scene();
 				scene.background = textureCube;
+
+				clock = new Clock();
 
 				//
 
@@ -143,7 +146,7 @@
 
 			function render() {
 
-				var timer = 0.0001 * Date.now();
+				var timer = clock.getElapsedTime() * 0.1;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

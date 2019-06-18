@@ -14,6 +14,7 @@
 		<script type="module">
 			import {
 				AmbientLight,
+				Clock,
 				Color,
 				CubeTextureLoader,
 				DirectionalLight,
@@ -30,7 +31,7 @@
 				TextureLoader,
 				TextBufferGeometry,
 				Vector3,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -40,7 +41,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var particleLight;
+			var particleLight, clock;
 
 			var loader = new FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
@@ -67,6 +68,8 @@
 
 				scene = new Scene();
 				scene.background = reflectionCube;
+
+				clock = new Clock();
 
 				// Materials
 
@@ -199,7 +202,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.00025;
+				var timer = clock.getElapsedTime() * 0.25;
 
 				//camera.position.x = Math.cos( timer ) * 800;
 				//camera.position.z = Math.sin( timer ) * 800;

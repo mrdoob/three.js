@@ -32,6 +32,7 @@
 				BufferAttribute,
 				BufferGeometry,
 				CircleBufferGeometry,
+				Clock,
 				CylinderBufferGeometry,
 				DirectionalLight,
 				DoubleSide,
@@ -164,7 +165,7 @@
 			var container;
 
 			var camera, object, scene1, scene2, renderer;
-			var gridHelper, sphere, waltHead;
+			var gridHelper, sphere, waltHead, clock;
 
 			init();
 			animate();
@@ -185,6 +186,8 @@
 
 				camera.name = "PerspectiveCamera";
 				scene1.add( camera );
+
+				clock = new Clock();
 
 				// ---------------------------------------------------------------------
 				// Ambient light
@@ -572,7 +575,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				var timer = clock.getElapsedTime() * 0.1;
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;

@@ -11,6 +11,7 @@
 		<script type="module">
 			import {
 				AmbientLight,
+				Clock,
 				DirectionalLight,
 				DoubleSide,
 				Mesh,
@@ -30,7 +31,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, startTime, object, stats;
+			var camera, scene, renderer, clock, object, stats;
 
 			init();
 			animate();
@@ -42,6 +43,8 @@
 				camera.position.set( 0, 1.3, 3 );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				// Lights
 
@@ -207,10 +210,6 @@
 				folderGlobal.add( propsGlobal, 'Enabled' );
 				folderGlobal.add( propsGlobal, 'Plane', - 0.4, 3 );
 
-				// Start
-
-				startTime = Date.now();
-
 			}
 
 			function onWindowResize() {
@@ -224,8 +223,7 @@
 
 			function animate() {
 
-				var currentTime = Date.now();
-				var time = ( currentTime - startTime ) / 1000;
+				var time = clock.getElapsedTime();
 
 				requestAnimationFrame( animate );
 

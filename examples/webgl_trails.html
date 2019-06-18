@@ -10,6 +10,7 @@
 		<script type="module">
 			import {
 				BufferGeometry,
+				Clock,
 				Color,
 				Float32BufferAttribute,
 				PerspectiveCamera,
@@ -24,7 +25,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -38,6 +39,8 @@
 				camera.position.set( 0, 0, 1 );
 
 				scene = new Scene();
+
+				clock = new Clock();
 
 				var colorArray = [ new Color( 0xff0080 ), new Color( 0xffffff ), new Color( 0x8000ff ) ];
 				var positions = [];
@@ -99,7 +102,7 @@
 
 			function render() {
 
-				scene.rotation.y = Date.now() / 2000;
+				scene.rotation.y = clock.getElapsedTime() / 2;
 
 				renderer.render( scene, camera );
 

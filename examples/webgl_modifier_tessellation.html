@@ -57,6 +57,7 @@
 			import {
 				BufferAttribute,
 				BufferGeometry,
+				Clock,
 				Color,
 				FontLoader,
 				Mesh,
@@ -64,7 +65,7 @@
 				Scene,
 				ShaderMaterial,
 				TextGeometry,
-				WebGLRenderer,
+				WebGLRenderer
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -75,7 +76,7 @@
 
 			var renderer, scene, camera, stats;
 
-			var controls;
+			var controls, clock;
 
 			var mesh, uniforms;
 
@@ -97,6 +98,8 @@
 
 				scene = new Scene();
 				scene.background = new Color( 0x050505 );
+
+				clock = new Clock();
 
 				//
 
@@ -225,7 +228,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var time = clock.getElapsedTime();
 
 				uniforms.amplitude.value = 1.0 + Math.sin( time * 0.5 );
 
