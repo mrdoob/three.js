@@ -7,16 +7,16 @@ If you haven't read that yet you might want to start there.
 
 Before we go any further we need to talk about setting up your
 computer to do developement. In particular, for security reasons,
-WebGL can not use images from your hard drive directly. That means
+WebGL cannot use images from your hard drive directly. That means
 in order to do development you need to use a web server. Fortunately
-development webservers are super easy to setup and use.
+development web servers are super easy to setup and use.
 
 First off if you'd like you can download this entire site from [this link](https://github.com/greggman/threejsfundamentals/archive/gh-pages.zip).
 Once downloaded double click the zip file to unpack the files.
 
-Next download one of these simple web servers
+Next download one of these simple web servers.
 
-If you'd prefer a web server with a user interface there's 
+If you'd prefer a web server with a user interface there's
 [Servez](https://greggman.github.io/servez)
 
 {{{image url="resources/servez.gif" className="border" }}}
@@ -50,7 +50,7 @@ Then in your browser go to [`http://localhost:8080/`](http://localhost:8080/).
 
 If you don't specify a path then http-server will serve the current folder.
 
-If either of those options are not to your liking 
+If either of those options are not to your liking
 [there are many other simple servers to choose from](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-http-server-or-simplehttpserver).
 
 Now that you have a server setup we can move on to [textures](threejs-textures.html).
