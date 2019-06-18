@@ -24,9 +24,10 @@
 
 		<script type="module">
 			import {
-				BoxGeometry,
 				BufferGeometry,
+				BufferGeometryLoader,
 				Color,
+				Geometry,
 				Mesh,
 				MeshBasicMaterial,
 				MeshPhongMaterial,
@@ -55,12 +56,11 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.z = 2.5;
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 500 );
+				camera.position.z = 100;
 
 				scene = new Scene();
 				scene.background = new Color( 0xf0f0f0 );
@@ -69,10 +69,32 @@
 				light.position.set( 1000, 1000, 2000 );
 				scene.add( light );
 
-				var geometry = new BoxGeometry( 1, 1, 1, 2, 2, 2 );
-				var material = new MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
-				var mesh = new Mesh( new BufferGeometry().fromGeometry( geometry ), material );
-				scene.add( mesh );
+				var loader = new BufferGeometryLoader();
+				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( bufferGeometry ) {
+
+					// converting to legacy Geometry because SubdivisionModifier only returns Geometry
+
+					var geometry = new Geometry().fromBufferGeometry( bufferGeometry );
+					geometry.mergeVertices();
+
+					var material = new MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
+					var mesh = new Mesh( bufferGeometry, material );
+					scene.add( mesh );
+
+					var gui = new GUI();
+
+					gui.add( params, 'subdivisions', 0, 4 ).step( 1 ).onChange( function ( subdivisions ) {
+
+						subdivide( geometry, subdivisions );
+
+					} );
+
+					//
+
+					subdivide( geometry, params.subdivisions );
+					animate();
+
+				} );
 
 				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -85,27 +107,16 @@
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1;
+				controls.minDistance = 50;
+				controls.maxDistance = 400;
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				//
-
-				var gui = new GUI();
-
-				gui.add( params, 'subdivisions', 0, 6 ).step( 1 ).onChange( function ( subdivisions ) {
-
-					subdivide( geometry, subdivisions );
-
-				} );
 
 				//
 
 				smoothMesh = new Mesh( undefined, smoothMaterial );
 				wireframe = new Mesh( undefined, wireframeMaterial );
 				scene.add( smoothMesh, wireframe );
-
-				subdivide( geometry, params.subdivisions );
 
 			}
 
@@ -126,7 +137,7 @@
 						var vertexIndex = face[ faceIndices[ j ] ];
 						var vertex = smoothGeometry.vertices[ vertexIndex ];
 
-						var hue = vertex.y + 0.5;
+						var hue = ( vertex.y / 200 ) + 0.5;
 						var color = new Color().setHSL( hue, 1, 0.5 );
 						face.vertexColors[ j ] = color;
 
