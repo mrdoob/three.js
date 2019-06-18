@@ -8,18 +8,24 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				CubeTextureLoader,
+				DoubleSide,
+				Mesh,
+				MeshPhongMaterial,
+				MixOperation,
+				PerspectiveCamera,
+				PointLight,
+				RGBFormat,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -42,23 +48,23 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 20000 );
+				camera = new PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 20000 );
 				camera.position.z = 3200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050505 );
+				scene = new Scene();
+				scene.background = new Color( 0x050505 );
 
-				scene.add( new THREE.AmbientLight( 0x050505 ) );
+				scene.add( new AmbientLight( 0x050505 ) );
 
-				var light = new THREE.PointLight( 0x0011ff, 1, 5500 );
+				var light = new PointLight( 0x0011ff, 1, 5500 );
 				light.position.set( 4000, 0, 0 );
 				scene.add( light );
 
-				var light = new THREE.PointLight( 0xff1100, 1, 5500 );
+				var light = new PointLight( 0xff1100, 1, 5500 );
 				light.position.set( - 4000, 0, 0 );
 				scene.add( light );
 
-				var light = new THREE.PointLight( 0xffaa00, 2, 3000 );
+				var light = new PointLight( 0xffaa00, 2, 3000 );
 				light.position.set( 0, 0, 0 );
 				scene.add( light );
 
@@ -70,16 +76,16 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.format = THREE.RGBFormat;
+				var reflectionCube = new CubeTextureLoader().load( urls );
+				reflectionCube.format = RGBFormat;
 
-				var material = new THREE.MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
+				var material = new MeshPhongMaterial( { specular: 0x101010, shininess: 100, envMap: reflectionCube, combine: MixOperation, reflectivity: 0.1, side: DoubleSide } );
 
-				var geometry = new THREE.SphereBufferGeometry( 1, 32, 16, 0, Math.PI );
+				var geometry = new SphereBufferGeometry( 1, 32, 16, 0, Math.PI );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -96,7 +102,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 

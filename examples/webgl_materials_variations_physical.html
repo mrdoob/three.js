@@ -12,32 +12,40 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physical Material Variations by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.<br/><br/>
 		Note: Every second sphere has an IBL environment map on it.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				DirectionalLight,
+				FontLoader,
+				LinearFilter,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhysicalMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				TextBufferGeometry,
+				UnsignedByteType,
+				Uncharted2ToneMapping,
+				Vector3,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var container, stats;
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer;
 			var particleLight;
 
-			var loader = new THREE.FontLoader();
+			var loader = new FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -50,7 +58,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
@@ -65,82 +73,82 @@
 
 				};
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
-				new THREE.HDRCubeTextureLoader()
-					.setType( THREE.UnsignedByteType )
+				new HDRCubeTextureLoader()
+					.setType( UnsignedByteType )
 					.load( hdrUrls, function ( hdrCubeMap ) {
 
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
+						pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					// Materials
+						// Materials
 
-					var cubeWidth = 400;
-					var numberOfSphersPerSide = 5;
-					var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
-					var stepSize = 1.0 / numberOfSphersPerSide;
+						var cubeWidth = 400;
+						var numberOfSphersPerSide = 5;
+						var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
+						var stepSize = 1.0 / numberOfSphersPerSide;
 
-					var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
+						var geometry = new SphereBufferGeometry( sphereRadius, 32, 16 );
 
-					var index = 0;
+						var index = 0;
 
-					for ( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
+						for ( var alpha = 0; alpha <= 1.0; alpha += stepSize ) {
 
-						for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
+							for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-							for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+								for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-								var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, 0.25 );
+									var diffuseColor = new Color().setHSL( alpha, 0.5, 0.25 );
 
-								var material = new THREE.MeshPhysicalMaterial( {
-									color: diffuseColor,
-									metalness: 0,
-									roughness: 0.5,
-									clearCoat: 1.0 - alpha,
-									clearCoatRoughness: 1.0 - beta,
-									reflectivity: 1.0 - gamma,
-									envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
-								} );
+									var material = new MeshPhysicalMaterial( {
+										color: diffuseColor,
+										metalness: 0,
+										roughness: 0.5,
+										clearCoat: 1.0 - alpha,
+										clearCoatRoughness: 1.0 - beta,
+										reflectivity: 1.0 - gamma,
+										envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
+									} );
 
+									index ++;
+
+									var mesh = new Mesh( geometry, material );
+
+									mesh.position.x = alpha * 400 - 200;
+									mesh.position.y = beta * 400 - 200;
+									mesh.position.z = gamma * 400 - 200;
+
+									scene.add( mesh );
+
+								}
 								index ++;
-
-								var mesh = new THREE.Mesh( geometry, material );
-
-								mesh.position.x = alpha * 400 - 200;
-								mesh.position.y = beta * 400 - 200;
-								mesh.position.z = gamma * 400 - 200;
-
-								scene.add( mesh );
 
 							}
 							index ++;
 
 						}
-						index ++;
 
-					}
+						hdrCubeMap.magFilter = LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+						scene.background = hdrCubeMap;
 
-					hdrCubeMap.magFilter = THREE.LinearFilter;
-					hdrCubeMap.needsUpdate = true;
-					scene.background = hdrCubeMap;
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
-				} );
+					} );
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextBufferGeometry( name, {
+					var textGeo = new TextBufferGeometry( name, {
 
 						font: font,
 
@@ -150,45 +158,45 @@
 
 					} );
 
-					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-					var textMesh = new THREE.Mesh( textGeo, textMaterial );
+					var textMaterial = new MeshBasicMaterial( { color: 0xffffff } );
+					var textMesh = new Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
 
 				}
 
-				addLabel( "+clearCoat", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-clearCoat", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( "+clearCoat", new Vector3( - 350, 0, 0 ) );
+				addLabel( "-clearCoat", new Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "-clearCoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( "+clearCoatRoughness", new Vector3( 0, - 300, 0 ) );
+				addLabel( "-clearCoatRoughness", new Vector3( 0, 300, 0 ) );
 
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( "+reflectivity", new Vector3( 0, 0, - 300 ) );
+				addLabel( "-reflectivity", new Vector3( 0, 0, 300 ) );
 
-				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new AmbientLight( 0x222222 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+				var pointLight = new PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaOutput = true;
-				renderer.toneMapping = THREE.Uncharted2ToneMapping;
+				renderer.toneMapping = Uncharted2ToneMapping;
 				renderer.toneMappingExposure = 0.75;
 
 				//
@@ -196,7 +204,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
