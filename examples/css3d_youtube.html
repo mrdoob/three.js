@@ -20,14 +20,18 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-
 		<div id="container"></div>
 		<div id="blocker"></div>
 
-		<script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Group,
+				Scene
+			} from "../build/three.module.js";
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
 			var controls;
@@ -46,7 +50,7 @@
 				iframe.src = [ 'https://www.youtube.com/embed/', id, '?rel=0' ].join( '' );
 				div.appendChild( iframe );
 
-				var object = new THREE.CSS3DObject( div );
+				var object = new CSS3DObject( div );
 				object.position.set( x, y, z );
 				object.rotation.y = ry;
 
@@ -61,23 +65,23 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 500, 350, 750 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var group = new THREE.Group();
+				var group = new Group();
 				group.add( new Element( 'SJOz3qjfQXU', 0, 0, 240, 0 ) );
 				group.add( new Element( 'Y2-xZ-1HE-Q', 240, 0, 0, Math.PI / 2 ) );
 				group.add( new Element( 'IrydklNpcFI', 0, 0, - 240, Math.PI ) );
 				group.add( new Element( '9ubytEsCaS0', - 240, 0, 0, - Math.PI / 2 ) );
 				scene.add( group );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 4;
 
 				window.addEventListener( 'resize', onWindowResize, false );

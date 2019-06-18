@@ -11,21 +11,26 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - parametric geometries</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BufferGeometry,
+				DoubleSide,
+				Mesh,
+				MeshPhongMaterial,
+				ParametricBufferGeometry,
+				PerspectiveCamera,
+				PointLight,
+				RepeatWrapping,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/curves/CurveExtras.js"></script>
-		<script src="js/geometries/ParametricGeometries.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { Curves } from './jsm/curves/CurveExtras.js';
+			import { ParametricGeometries } from './jsm/geometries/ParametricGeometries.js';
 
 			var camera, scene, renderer, stats;
 
@@ -36,78 +41,78 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 400;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				var pointLight = new PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
 				//
 
-				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
-				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				var map = new TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				map.wrapS = map.wrapT = RepeatWrapping;
 				map.anisotropy = 16;
 
-				var material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
+				var material = new MeshPhongMaterial( { map: map, side: DoubleSide } );
 
 				//
 
 				var geometry, object;
 
-				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.plane( 100, 100 ), 10, 10 );
+				geometry = new ParametricBufferGeometry( ParametricGeometries.plane( 100, 100 ), 10, 10 );
 				geometry.center();
-				object = new THREE.Mesh( geometry, material );
+				object = new Mesh( geometry, material );
 				object.position.set( - 200, 0, 200 );
 				scene.add( object );
 
-				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 20, 20 );
-				object = new THREE.Mesh( geometry, material );
+				geometry = new ParametricBufferGeometry( ParametricGeometries.klein, 20, 20 );
+				object = new Mesh( geometry, material );
 				object.position.set( 0, 0, 200 );
 				object.scale.multiplyScalar( 5 );
 				scene.add( object );
 
-				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
-				object = new THREE.Mesh( geometry, material );
+				geometry = new ParametricBufferGeometry( ParametricGeometries.mobius, 20, 20 );
+				object = new Mesh( geometry, material );
 				object.position.set( 200, 0, 200 );
 				object.scale.multiplyScalar( 30 );
 				scene.add( object );
 
 				//
 
-				var GrannyKnot = new THREE.Curves.GrannyKnot();
+				var GrannyKnot = new Curves.GrannyKnot();
 
-				var torus = new THREE.ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
-				var sphere = new THREE.ParametricGeometries.SphereGeometry( 50, 20, 10 );
-				var tube = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true, false );
+				var torus = new ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
+				var sphere = new ParametricGeometries.SphereGeometry( 50, 20, 10 );
+				var tube = new ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true, false );
 
-				torus = new THREE.BufferGeometry().fromGeometry( torus );
-				sphere = new THREE.BufferGeometry().fromGeometry( sphere );
-				tube = new THREE.BufferGeometry().fromGeometry( tube );
+				torus = new BufferGeometry().fromGeometry( torus );
+				sphere = new BufferGeometry().fromGeometry( sphere );
+				tube = new BufferGeometry().fromGeometry( tube );
 
-				object = new THREE.Mesh( torus, material );
+				object = new Mesh( torus, material );
 				object.position.set( - 200, 0, - 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( sphere, material );
+				object = new Mesh( sphere, material );
 				object.position.set( 0, 0, - 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( tube, material );
+				object = new Mesh( tube, material );
 				object.position.set( 200, 0, - 200 );
 				object.scale.multiplyScalar( 2 );
 				scene.add( object );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

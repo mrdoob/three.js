@@ -24,18 +24,29 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/math/Lut.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
+			import {
+				BufferGeometryLoader,
+				CanvasTexture,
+				Color,
+				DoubleSide,
+				Float32BufferAttribute,
+				Mesh,
+				MeshLambertMaterial,
+				OrthographicCamera,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				Sprite,
+				SpriteMaterial,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Lut } from './jsm/math/Lut.js';
 
 			var container;
 
@@ -52,33 +63,33 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				uiScene = new THREE.Scene();
+				uiScene = new Scene();
 
-				lut = new THREE.Lut();
+				lut = new Lut();
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
+				perpCamera = new PerspectiveCamera( 60, width / height, 1, 100 );
 				perpCamera.position.set( 0, 0, 10 );
 				scene.add( perpCamera );
 
-				orthoCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 1, 2 );
+				orthoCamera = new OrthographicCamera( - 1, 1, 1, - 1, 1, 2 );
 				orthoCamera.position.set( 0.5, 0, 1 );
 
-				sprite = new THREE.Sprite( new THREE.SpriteMaterial( {
-					map: new THREE.CanvasTexture( lut.createCanvas() )
+				sprite = new Sprite( new SpriteMaterial( {
+					map: new CanvasTexture( lut.createCanvas() )
 				} ) );
 				sprite.scale.x = 0.125;
 				uiScene.add( sprite );
 
-				mesh = new THREE.Mesh( undefined, new THREE.MeshLambertMaterial( {
-					side: THREE.DoubleSide,
+				mesh = new Mesh( undefined, new MeshLambertMaterial( {
+					side: DoubleSide,
 					color: 0xF5F5F5,
-					vertexColors: THREE.VertexColors
+					vertexColors: VertexColors
 				} ) );
 				scene.add( mesh );
 
@@ -87,10 +98,10 @@
 				};
 				loadModel( );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1 );
+				var pointLight = new PointLight( 0xffffff, 1 );
 				perpCamera.add( pointLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
@@ -98,10 +109,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var controls = new THREE.OrbitControls( perpCamera, renderer.domElement );
+				var controls = new OrbitControls( perpCamera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
 
@@ -135,7 +146,7 @@
 
 			function loadModel( ) {
 
-				var loader = new THREE.BufferGeometryLoader();
+				var loader = new BufferGeometryLoader();
 				loader.load( 'models/json/pressure.json', function ( geometry ) {
 
 					geometry.center();
@@ -148,7 +159,7 @@
 						colors.push( 1, 1, 1 );
 
 					}
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 					mesh.geometry = geometry;
 					updateColors();

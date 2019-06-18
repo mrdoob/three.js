@@ -14,22 +14,24 @@
 			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>, Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				CubeTextureLoader,
+				CubeRefractionMapping,
+				MeshLambertMaterial,
+				MixOperation,
+				PerspectiveCamera,
+				PointLight,
+				RGBFormat,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/loaders/OBJLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var container, stats;
 
@@ -45,7 +47,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
 				//cubemap
@@ -57,30 +59,30 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.format = THREE.RGBFormat;
+				var reflectionCube = new CubeTextureLoader().load( urls );
+				reflectionCube.format = RGBFormat;
 
-				var refractionCube = new THREE.CubeTextureLoader().load( urls );
-				refractionCube.mapping = THREE.CubeRefractionMapping;
-				refractionCube.format = THREE.RGBFormat;
+				var refractionCube = new CubeTextureLoader().load( urls );
+				refractionCube.mapping = CubeRefractionMapping;
+				refractionCube.format = RGBFormat;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.background = reflectionCube;
 
 				//lights
-				var ambient = new THREE.AmbientLight( 0xffffff );
+				var ambient = new AmbientLight( 0xffffff );
 				scene.add( ambient );
 
-				pointLight = new THREE.PointLight( 0xffffff, 2 );
+				pointLight = new PointLight( 0xffffff, 2 );
 				scene.add( pointLight );
 
 				//materials
-				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
-				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
+				var cubeMaterial3 = new MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: MixOperation, reflectivity: 0.3 } );
+				var cubeMaterial2 = new MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
+				var cubeMaterial1 = new MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
 
 				//models
-				var objLoader = new THREE.OBJLoader();
+				var objLoader = new OBJLoader();
 
 				objLoader.setPath( 'models/obj/walt/' );
 				objLoader.load( 'WaltHead.obj', function ( object ) {
@@ -104,13 +106,13 @@
 				} );
 
 				//renderer
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 				controls.minPolarAngle = Math.PI / 4;

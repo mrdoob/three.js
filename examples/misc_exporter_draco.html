@@ -19,27 +19,32 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button onclick="createGeometry()">Geometry</button>
-			<button onclick="createBufferGeometry()">BufferGeometry</button> |
-			<button onclick="exportFile()">Export DRC</button>
+			<button id="createGeometry">Geometry</button>
+			<button id="createBufferGeometry">BufferGeometry</button> |
+			<button id="exportFile">Export DRC</button>
 		</div>
-
-		<script src="../build/three.js"></script>
 
 		<script src="js/libs/draco/draco_encoder.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/exporters/DRACOExporter.js"></script>
+		<script type="module">
+			import {
+				Color,
+				DirectionalLight,
+				Fog,
+				HemisphereLight,
+				GridHelper,
+				MeshPhongMaterial,
+				Mesh,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				TorusKnotGeometry,
+				TorusKnotBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { DRACOExporter } from './jsm/exporters/DRACOExporter.js';
 
 			var scene, camera, renderer, exporter, mesh;
 
@@ -50,9 +55,9 @@
 
 				scene.remove( mesh );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
+				var geometry = new TorusKnotBufferGeometry( 50, 15, 200, 30 );
+				var material = new MeshPhongMaterial( { color: 0x00ff00 } );
+				mesh = new Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.position.y = 25;
 				scene.add( mesh );
@@ -63,9 +68,9 @@
 
 				scene.remove( mesh );
 
-				var geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
+				var geometry = new TorusKnotGeometry( 50, 15, 200, 30 );
+				var material = new MeshPhongMaterial( { color: 0x00ff00 } );
+				mesh = new Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.position.y = 25;
 				scene.add( mesh );
@@ -74,22 +79,22 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 200, 100, 200 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+				scene = new Scene();
+				scene.background = new Color( 0xa0a0a0 );
+				scene.fog = new Fog( 0xa0a0a0, 200, 1000 );
 
-				exporter = new THREE.DRACOExporter();
+				exporter = new DRACOExporter();
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				var directionalLight = new DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 0, 200, 100 );
 				directionalLight.castShadow = true;
 				directionalLight.shadow.camera.top = 180;
@@ -100,16 +105,16 @@
 
 				// ground
 
-				var ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
+				var ground = new Mesh(
+					new PlaneBufferGeometry( 2000, 2000 ),
+					new MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
 				);
 				ground.rotation.x = - Math.PI / 2;
 				ground.position.y = - 75;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				var grid = new GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				grid.position.y = - 75;
@@ -117,16 +122,16 @@
 
 				// export mesh
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
+				var geometry = new TorusKnotBufferGeometry( 50, 15, 200, 30 );
+				var material = new MeshPhongMaterial( { color: 0x00ff00 } );
+				mesh = new Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.position.y = 25;
 				scene.add( mesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -134,13 +139,22 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 25, 0 );
 				controls.update();
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var createGeometryButton = document.getElementById( 'createGeometry' );
+				createGeometryButton.addEventListener( 'click', createGeometry );
+
+				var createBufferGeometryButton = document.getElementById( 'createBufferGeometry' );
+				createBufferGeometryButton.addEventListener( 'click', createBufferGeometry );
+
+				var exportButton = document.getElementById( 'exportFile' );
+				exportButton.addEventListener( 'click', exportFile );
 
 			}
 

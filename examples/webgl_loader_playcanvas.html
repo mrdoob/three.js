@@ -14,20 +14,19 @@
 			Hand by <a href="https://sketchfab.com/anura" target="_blank" rel="noopener">Anura</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/PlayCanvasLoader.js"></script>
-		<script src='js/controls/OrbitControls.js'></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { PlayCanvasLoader } from './jsm/loaders/PlayCanvasLoader.js';
 
 			var camera, scene, renderer, stats;
 
@@ -38,14 +37,14 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( - 1, 2, 4 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
-				var loader = new THREE.PlayCanvasLoader();
+				var loader = new PlayCanvasLoader();
 				loader.load( './models/playcanvas/hand.json', function ( model ) {
 
 					scene.add( model );
@@ -54,23 +53,23 @@
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				var pointLight = new PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

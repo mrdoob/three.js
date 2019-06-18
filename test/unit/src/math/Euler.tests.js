@@ -70,47 +70,145 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.todo( "RotationOrders", ( assert ) => {
+		QUnit.test( "RotationOrders", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( Array.isArray( Euler.RotationOrders ), "Passed!" );
+			assert.deepEqual( Euler.RotationOrders, [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ], "Passed!" );
 
 		} );
 
-		QUnit.todo( "DefaultOrder", ( assert ) => {
+		QUnit.test( "DefaultOrder", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.equal( Euler.DefaultOrder, "XYZ", "Passed!" );
+
 
 		} );
 
 		// PROPERTIES STUFF
-		QUnit.todo( "x", ( assert ) => {
+		QUnit.test( "x", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Euler();
+			assert.ok( a.x === 0, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.x === 1, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "XYZ" );
+			assert.ok( a.x === 4, "Passed!" );
+
+			a = new Euler( 7, 8, 9, "XYZ" );
+			a.x = 10;
+			assert.ok( a.x === 10, "Passed!" );
+
+			a = new Euler( 11, 12, 13, "XYZ" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.x = 14;
+			assert.ok( b, "Passed!" );
+			assert.ok( a.x === 14, "Passed!" );
 
 		} );
 
-		QUnit.todo( "y", ( assert ) => {
+		QUnit.test( "y", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Euler();
+			assert.ok( a.y === 0, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.y === 2, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "XYZ" );
+			assert.ok( a.y === 5, "Passed!" );
+
+			a = new Euler( 7, 8, 9, "XYZ" );
+			a.y = 10;
+			assert.ok( a.y === 10, "Passed!" );
+
+			a = new Euler( 11, 12, 13, "XYZ" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.y = 14;
+			assert.ok( b, "Passed!" );
+			assert.ok( a.y === 14, "Passed!" );
 
 		} );
 
-		QUnit.todo( "z", ( assert ) => {
+		QUnit.test( "z", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Euler();
+			assert.ok( a.z === 0, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.z === 3, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "XYZ" );
+			assert.ok( a.z === 6, "Passed!" );
+
+			a = new Euler( 7, 8, 9, "XYZ" );
+			a.z = 10;
+			assert.ok( a.z === 10, "Passed!" );
+
+			a = new Euler( 11, 12, 13, "XYZ" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.z = 14;
+			assert.ok( b, "Passed!" );
+			assert.ok( a.z === 14, "Passed!" );
 
 		} );
 
-		QUnit.todo( "order", ( assert ) => {
+		QUnit.test( "order", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Euler();
+			assert.ok( a.order === Euler.DefaultOrder, "Passed!" );
+
+			a = new Euler( 1, 2, 3 );
+			assert.ok( a.order === Euler.DefaultOrder, "Passed!" );
+
+			a = new Euler( 4, 5, 6, "YZX" );
+			assert.ok( a.order === "YZX", "Passed!" );
+
+			a = new Euler( 7, 8, 9, "YZX" );
+			a.order = "ZXY";
+			assert.ok( a.order === "ZXY", "Passed!" );
+
+			a = new Euler( 11, 12, 13, "YZX" );
+			var b = false;
+			a._onChange( function () {
+
+				b = true;
+
+			} );
+			a.order = "ZXY";
+			assert.ok( b, "Passed!" );
+			assert.ok( a.order === "ZXY", "Passed!" );
+
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isEuler", ( assert ) => {
+		QUnit.test( "isEuler", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Euler();
+			assert.ok( a.isEuler, "Passed!" );
+			var b = new Vector3();
+			assert.ok( ! b.isEuler, "Passed!" );
+
 
 		} );
 
@@ -311,15 +409,32 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "_onChange", ( assert ) => {
+		QUnit.test( "_onChange", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var f = function () {
+
+				var b = true;
+
+			};
+
+			var a = new Euler( 11, 12, 13, "XYZ" );
+			a._onChange( f );
+			assert.ok( a._onChangeCallback === f, "Passed!" );
 
 		} );
 
-		QUnit.todo( "_onChangeCallback", ( assert ) => {
+		QUnit.test( "_onChangeCallback", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var f = function () {
+
+				var b = true;
+
+			};
+
+			var a = new Euler( 11, 12, 13, "XYZ" );
+			a._onChangeCallback = f;
+			assert.ok( a._onChangeCallback === f, "Passed!" );
+
 
 		} );
 

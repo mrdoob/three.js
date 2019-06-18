@@ -62,6 +62,7 @@ var files = [
 	{ path: 'interactive/SelectionHelper.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'lights/LightProbeGenerator.js', dependencies: [], ignoreList: [] },
+	{ path: 'lights/RectAreaLightUniformsLib.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'lines/Line2.js', dependencies: [ { name: 'LineSegments2', path: 'lines/LineSegments2.js' }, { name: 'LineGeometry', path: 'lines/LineGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/LineGeometry.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
@@ -71,6 +72,9 @@ var files = [
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
+	{ path: 'loaders/ctm/CTMLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/deprecated/LegacyGLTFLoader.js', dependencies: [], ignoreList: [ 'AnimationMixer' ] },
+	{ path: 'loaders/deprecated/LegacyJSONLoader.js', dependencies: [], ignoreList: [ 'ObjectLoader' ] },
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AWDLoader.js', dependencies: [], ignoreList: [] },
@@ -108,6 +112,7 @@ var files = [
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/VRMLoader.js', dependencies: [ { name: 'GLTFLoader', path: 'loaders/GLTFLoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/VTKLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/XLoader.js', dependencies: [], ignoreList: [] },
 
@@ -244,6 +249,11 @@ var files = [
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
+
+	{ path: 'vr/deprecated/DaydreamController.js', dependencies: [], ignoreList: [] },
+	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
+	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
+	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
@@ -346,15 +356,20 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var imports = '';
 
+	// compute path prefix for imports/exports
+
+	var level = path.split( '/' ).length - 1;
+	var pathPrefix = '../'.repeat( level );
+
 	// core imports
 
-	if ( keys ) imports += `import {${keys}\n} from "../../../build/three.module.js";`;
+	if ( keys ) imports += `import {${keys}\n} from "${pathPrefix}../../build/three.module.js";`;
 
 	// example imports
 
 	for ( var dependency of exampleDependencies ) {
 
-		imports += `\nimport { ${dependency.name} } from "../${dependency.path}";`;
+		imports += `\nimport { ${dependency.name} } from "${pathPrefix}${dependency.path}";`;
 
 	}
 

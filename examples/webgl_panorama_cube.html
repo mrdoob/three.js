@@ -12,111 +12,119 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cube panorama demo
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				Texture,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		var camera, controls;
-		var renderer;
-		var scene;
+			var camera, controls;
+			var renderer;
+			var scene;
 
-		init();
-		animate();
+			init();
+			animate();
 
-		function init() {
+			function init() {
 
-			var container = document.getElementById( 'container' );
+				var container = document.getElementById( 'container' );
 
-			renderer = new THREE.WebGLRenderer();
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			container.appendChild( renderer.domElement );
+				renderer = new WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
+				scene = new Scene();
 
-			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.position.z = 0.01;
+				camera = new PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 0.01;
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.enableZoom = false;
-			controls.enablePan = false;
-			controls.enableDamping = true;
-			controls.rotateSpeed = - 0.25;
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.enableDamping = true;
+				controls.rotateSpeed = - 0.25;
 
-			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
 
-			var materials = [];
+				var materials = [];
 
-			for ( var i = 0; i < 6; i ++ ) {
+				for ( var i = 0; i < 6; i ++ ) {
 
-				materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
-
-			}
-
-			var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
-			skyBox.geometry.scale( 1, 1, - 1 );
-			scene.add( skyBox );
-
-			window.addEventListener( 'resize', onWindowResize, false );
-
-		}
-
-		function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
-
-			var textures = [];
-
-			for ( var i = 0; i < tilesNum; i ++ ) {
-
-				textures[ i ] = new THREE.Texture();
-
-			}
-
-			var imageObj = new Image();
-
-			imageObj.onload = function () {
-
-				var canvas, context;
-				var tileWidth = imageObj.height;
-
-				for ( var i = 0; i < textures.length; i ++ ) {
-
-					canvas = document.createElement( 'canvas' );
-					context = canvas.getContext( '2d' );
-					canvas.height = tileWidth;
-					canvas.width = tileWidth;
-					context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-					textures[ i ].image = canvas;
-					textures[ i ].needsUpdate = true;
+					materials.push( new MeshBasicMaterial( { map: textures[ i ] } ) );
 
 				}
 
-			};
+				var skyBox = new Mesh( new BoxBufferGeometry( 1, 1, 1 ), materials );
+				skyBox.geometry.scale( 1, 1, - 1 );
+				scene.add( skyBox );
 
-			imageObj.src = atlasImgUrl;
+				window.addEventListener( 'resize', onWindowResize, false );
 
-			return textures;
+			}
 
-		}
+			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
-		function onWindowResize() {
+				var textures = [];
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
+				for ( var i = 0; i < tilesNum; i ++ ) {
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+					textures[ i ] = new Texture();
 
-		}
+				}
 
-		function animate() {
+				var imageObj = new Image();
 
-			requestAnimationFrame( animate );
+				imageObj.onload = function () {
 
-			controls.update(); // required when damping is enabled
+					var canvas, context;
+					var tileWidth = imageObj.height;
 
-			renderer.render( scene, camera );
+					for ( var i = 0; i < textures.length; i ++ ) {
 
-		}
+						canvas = document.createElement( 'canvas' );
+						context = canvas.getContext( '2d' );
+						canvas.height = tileWidth;
+						canvas.width = tileWidth;
+						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+						textures[ i ].image = canvas;
+						textures[ i ].needsUpdate = true;
+
+					}
+
+				};
+
+				imageObj.src = atlasImgUrl;
+
+				return textures;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update(); // required when damping is enabled
+
+				renderer.render( scene, camera );
+
+			}
 
 		</script>
 	</body>

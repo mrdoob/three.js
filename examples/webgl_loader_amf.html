@@ -19,21 +19,22 @@
 			<div>Rook manufacturing file from <a href="http://amf.wikispaces.com/AMF+test+files" target="_blank" rel="noopener">AMF test files</a></div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/AMFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				GridHelper,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				Vector3,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { AMFLoader } from './jsm/loaders/AMFLoader.js';
 
 			var camera, scene, renderer;
 
@@ -41,32 +42,32 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x999999 );
+				scene = new Scene();
+				scene.background = new Color( 0x999999 );
 
-				scene.add( new THREE.AmbientLight( 0x999999 ) );
+				scene.add( new AmbientLight( 0x999999 ) );
 
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				// Z is up for objects intended to be 3D printed.
 
 				camera.up.set( 0, 0, 1 );
 				camera.position.set( 0, - 9, 6 );
 
-				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
+				camera.add( new PointLight( 0xffffff, 0.8 ) );
 
 				scene.add( camera );
 
-				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
-				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
+				var grid = new GridHelper( 50, 50, 0xffffff, 0x555555 );
+				grid.rotateOnAxis( new Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
 				scene.add( grid );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.AMFLoader();
+				var loader = new AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
 					scene.add( amfobject );
@@ -74,7 +75,7 @@
 
 				} );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.target.set( 0, 1.2, 2 );
 				controls.update();
