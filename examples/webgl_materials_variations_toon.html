@@ -11,28 +11,39 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Toon Material Variantions with OutlineEffect</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				CubeTextureLoader,
+				DirectionalLight,
+				FontLoader,
+				Mesh,
+				MeshBasicMaterial,
+				MeshToonMaterial,
+				PerspectiveCamera,
+				PointLight,
+				RepeatWrapping,
+				RGBFormat,
+				Scene,
+				SphereBufferGeometry,
+				TextureLoader,
+				TextBufferGeometry,
+				Vector3,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/effects/OutlineEffect.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
 
 			var container, stats;
 
-			var camera, scene, renderer, controls, effect;
+			var camera, scene, renderer, effect;
 			var particleLight;
 
-			var loader = new THREE.FontLoader();
+			var loader = new FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -45,23 +56,23 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
 
-				var reflectionCube = new THREE.CubeTextureLoader()
+				var reflectionCube = new CubeTextureLoader()
 					.setPath( 'textures/cube/SwedishRoyalCastle/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				reflectionCube.format = THREE.RGBFormat;
+				reflectionCube.format = RGBFormat;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.background = reflectionCube;
 
 				// Materials
 
-				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
-				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+				var imgTexture = new TextureLoader().load( "textures/planets/moon_1024.jpg" );
+				imgTexture.wrapS = imgTexture.wrapT = RepeatWrapping;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
@@ -71,7 +82,7 @@
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 				var stepSize = 1.0 / numberOfSphersPerSide;
 
-				var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
+				var geometry = new SphereBufferGeometry( sphereRadius, 32, 16 );
 
 				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
@@ -79,14 +90,14 @@
 
 					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-						var specularColor = new THREE.Color( beta * 0.2, beta * 0.2, beta * 0.2 );
+						var specularColor = new Color( beta * 0.2, beta * 0.2, beta * 0.2 );
 
 						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
 							// basic monochromatic energy preservation
-							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
+							var diffuseColor = new Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
 
-							var material = new THREE.MeshToonMaterial( {
+							var material = new MeshToonMaterial( {
 								map: imgTexture,
 								bumpMap: imgTexture,
 								bumpScale: bumpScale,
@@ -97,7 +108,7 @@
 								envMap: alphaIndex % 2 === 0 ? null : reflectionCube
 							} );
 
-							var mesh = new THREE.Mesh( geometry, material );
+							var mesh = new Mesh( geometry, material );
 
 							mesh.position.x = alpha * 400 - 200;
 							mesh.position.y = beta * 400 - 200;
@@ -113,7 +124,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new THREE.TextBufferGeometry( name, {
+					var textGeo = new TextBufferGeometry( name, {
 
 						font: font,
 
@@ -123,39 +134,39 @@
 
 					} );
 
-					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-					var textMesh = new THREE.Mesh( textGeo, textMaterial );
+					var textMaterial = new MeshBasicMaterial( { color: 0xffffff } );
+					var textMesh = new Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
 
 				}
 
-				addLabel( "-shininess", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "+shininess", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( "-shininess", new Vector3( - 350, 0, 0 ) );
+				addLabel( "+shininess", new Vector3( 350, 0, 0 ) );
 
-				addLabel( "-specular, -reflectivity", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "+specular, +reflectivity", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( "-specular, -reflectivity", new Vector3( 0, - 300, 0 ) );
+				addLabel( "+specular, +reflectivity", new Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( "-diffuse", new Vector3( 0, 0, - 300 ) );
+				addLabel( "+diffuse", new Vector3( 0, 0, 300 ) );
 
-				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new AmbientLight( 0x222222 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+				var pointLight = new PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -163,14 +174,14 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				//
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

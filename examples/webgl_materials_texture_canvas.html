@@ -24,20 +24,20 @@
 		</div>
 		<canvas id="drawing-canvas" height="128" width="128"></canvas>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				CanvasTexture,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				Vector2,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
 			var camera, scene, renderer, mesh, material;
-			var drawStartPos = new THREE.Vector2();
+			var drawStartPos = new Vector2();
 
 			init();
 			setupCanvasDrawing();
@@ -45,17 +45,17 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				material = new THREE.MeshBasicMaterial();
+				material = new MeshBasicMaterial();
 
-				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
+				mesh = new Mesh( new BoxBufferGeometry( 200, 200, 200 ), material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -80,7 +80,7 @@
 
 				// set canvas as material.map (this could be done to any map, bump, displacement etc.)
 
-				material.map = new THREE.CanvasTexture( drawingCanvas );
+				material.map = new CanvasTexture( drawingCanvas );
 
 				// set the variable to keep track of when to draw
 
