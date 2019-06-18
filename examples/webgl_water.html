@@ -5,15 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/objects/Reflector.js"></script>
-		<script src="js/objects/Refractor.js"></script>
-		<script src="js/objects/Water2.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 	</head>
 	<body>
 
@@ -22,197 +13,216 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - water
 		</div>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BackSide,
+				BoxBufferGeometry,
+				Clock,
+				CubeTextureLoader,
+				DirectionalLight,
+				Mesh,
+				MeshNormalMaterial,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				ShaderLib,
+				ShaderMaterial,
+				TextureLoader,
+				TorusKnotBufferGeometry,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Water } from './jsm/objects/Water2.js';
+
+			var scene, camera, clock, renderer, water;
+
+			var torusKnot;
+
+			var params = {
+				color: '#ffffff',
+				scale: 4,
+				flowX: 1,
+				flowY: 1
+			};
+
+			init();
+			animate();
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
+			function init() {
+
+				// scene
 
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+				scene = new Scene();
 
-		}
+				// camera
 
-		var scene, camera, clock, renderer, water;
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( - 15, 7, 15 );
+				camera.lookAt( scene.position );
 
-		var torusKnot;
+				// clock
 
-		var params = {
-			color: '#ffffff',
-			scale: 4,
-			flowX: 1,
-			flowY: 1
-		};
+				clock = new Clock();
 
-		init();
-		animate();
+				// mesh
 
-		function init() {
+				var torusKnotGeometry = new TorusKnotBufferGeometry( 3, 1, 256, 32 );
+				var torusKnotMaterial = new MeshNormalMaterial();
 
-			// scene
+				torusKnot = new Mesh( torusKnotGeometry, torusKnotMaterial );
+				torusKnot.position.y = 4;
+				torusKnot.scale.set( 0.5, 0.5, 0.5 );
+				scene.add( torusKnot );
 
-			scene = new THREE.Scene();
+				// ground
 
-			// camera
+				var groundGeometry = new PlaneBufferGeometry( 20, 20 );
+				var groundMaterial = new MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
+				var ground = new Mesh( groundGeometry, groundMaterial );
+				ground.rotation.x = Math.PI * - 0.5;
+				scene.add( ground );
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			camera.position.set( - 15, 7, 15 );
-			camera.lookAt( scene.position );
+				var textureLoader = new TextureLoader();
+				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
 
-			// clock
+					map.wrapS = RepeatWrapping;
+					map.wrapT = RepeatWrapping;
+					map.anisotropy = 16;
+					map.repeat.set( 4, 4 );
+					groundMaterial.map = map;
+					groundMaterial.needsUpdate = true;
 
-			clock = new THREE.Clock();
+				} );
 
-			// mesh
+				// water
 
-			var torusKnotGeometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
-			var torusKnotMaterial = new THREE.MeshNormalMaterial();
+				var waterGeometry = new PlaneBufferGeometry( 20, 20 );
 
-			torusKnot = new THREE.Mesh( torusKnotGeometry, torusKnotMaterial );
-			torusKnot.position.y = 4;
-			torusKnot.scale.set( 0.5, 0.5, 0.5 );
-			scene.add( torusKnot );
+				water = new Water( waterGeometry, {
+					color: params.color,
+					scale: params.scale,
+					flowDirection: new Vector2( params.flowX, params.flowY ),
+					textureWidth: 1024,
+					textureHeight: 1024
+				} );
 
-			// ground
+				water.position.y = 1;
+				water.rotation.x = Math.PI * - 0.5;
+				scene.add( water );
 
-			var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-			var groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
-			var ground = new THREE.Mesh( groundGeometry, groundMaterial );
-			ground.rotation.x = Math.PI * - 0.5;
-			scene.add( ground );
+				// skybox
 
-			var textureLoader = new THREE.TextureLoader();
-			textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
+				var cubeTextureLoader = new CubeTextureLoader();
+				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
 
-				map.wrapS = THREE.RepeatWrapping;
-				map.wrapT = THREE.RepeatWrapping;
-				map.anisotropy = 16;
-				map.repeat.set( 4, 4 );
-				groundMaterial.map = map;
-				groundMaterial.needsUpdate = true;
+				var cubeTexture = cubeTextureLoader.load( [
+					'px.jpg', 'nx.jpg',
+					'py.jpg', 'ny.jpg',
+					'pz.jpg', 'nz.jpg',
+				] );
 
-			} );
+				var cubeShader = ShaderLib[ 'cube' ];
+				cubeShader.uniforms[ 'tCube' ].value = cubeTexture;
 
-			// water
+				var skyBoxMaterial = new ShaderMaterial( {
+					fragmentShader: cubeShader.fragmentShader,
+					vertexShader: cubeShader.vertexShader,
+					uniforms: cubeShader.uniforms,
+					side: BackSide
+				} );
 
-			var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				var skyBox = new Mesh( new BoxBufferGeometry( 1000, 1000, 1000 ), skyBoxMaterial );
+				scene.add( skyBox );
 
-			water = new THREE.Water( waterGeometry, {
-				color: params.color,
-				scale: params.scale,
-				flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
-				textureWidth: 1024,
-				textureHeight: 1024
-			} );
+				// light
 
-			water.position.y = 1;
-			water.rotation.x = Math.PI * - 0.5;
-			scene.add( water );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
 
-			// skybox
+				var directionalLight = new DirectionalLight( 0xffffff, 0.6 );
+				directionalLight.position.set( - 1, 1, 1 );
+				scene.add( directionalLight );
 
-			var cubeTextureLoader = new THREE.CubeTextureLoader();
-			cubeTextureLoader.setPath( 'textures/cube/skybox/' );
+				// renderer
 
-			var cubeTexture = cubeTextureLoader.load( [
-				'px.jpg', 'nx.jpg',
-				'py.jpg', 'ny.jpg',
-				'pz.jpg', 'nz.jpg',
-			] );
+				renderer = new WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				document.body.appendChild( renderer.domElement );
 
-			var cubeShader = THREE.ShaderLib[ 'cube' ];
-			cubeShader.uniforms[ 'tCube' ].value = cubeTexture;
+				// dat.gui
 
-			var skyBoxMaterial = new THREE.ShaderMaterial( {
-				fragmentShader: cubeShader.fragmentShader,
-				vertexShader: cubeShader.vertexShader,
-				uniforms: cubeShader.uniforms,
-				side: THREE.BackSide
-			} );
+				var gui = new GUI();
 
-			var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyBoxMaterial );
-			scene.add( skyBox );
+				gui.addColor( params, 'color' ).onChange( function ( value ) {
 
-			// light
+					water.material.uniforms[ "color" ].value.set( value );
 
-			var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-			scene.add( ambientLight );
+				} );
+				gui.add( params, 'scale', 1, 10 ).onChange( function ( value ) {
 
-			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
-			directionalLight.position.set( - 1, 1, 1 );
-			scene.add( directionalLight );
+					water.material.uniforms[ "config" ].value.w = value;
 
-			// renderer
+				} );
+				gui.add( params, 'flowX', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			document.body.appendChild( renderer.domElement );
+					water.material.uniforms[ "flowDirection" ].value.x = value;
+					water.material.uniforms[ "flowDirection" ].value.normalize();
 
-			// dat.gui
+				} );
+				gui.add( params, 'flowY', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
 
-			var gui = new dat.GUI();
+					water.material.uniforms[ "flowDirection" ].value.y = value;
+					water.material.uniforms[ "flowDirection" ].value.normalize();
 
-			gui.addColor( params, 'color' ).onChange( function ( value ) {
+				} );
 
-				water.material.uniforms[ "color" ].value.set( value );
+				gui.open();
 
-			} );
-			gui.add( params, 'scale', 1, 10 ).onChange( function ( value ) {
+				//
 
-				water.material.uniforms[ "config" ].value.w = value;
+				var controls = new OrbitControls( camera, renderer.domElement );
 
-			} );
-			gui.add( params, 'flowX', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
+				//
 
-				water.material.uniforms[ "flowDirection" ].value.x = value;
-				water.material.uniforms[ "flowDirection" ].value.normalize();
+				window.addEventListener( 'resize', onResize, false );
 
-			} );
-			gui.add( params, 'flowY', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
+			}
 
-				water.material.uniforms[ "flowDirection" ].value.y = value;
-				water.material.uniforms[ "flowDirection" ].value.normalize();
+			function onResize() {
 
-			} );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			gui.open();
+			}
 
-			//
+			function animate() {
 
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				requestAnimationFrame( animate );
 
-			//
+				render();
 
-			window.addEventListener( 'resize', onResize, false );
+			}
 
-		}
+			function render() {
 
-		function onResize() {
+				var delta = clock.getDelta();
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-			renderer.setSize( window.innerWidth, window.innerHeight );
+				torusKnot.rotation.x += delta;
+				torusKnot.rotation.y += delta * 0.5;
 
-		}
+				renderer.render( scene, camera );
 
-		function animate() {
+			}
 
-			requestAnimationFrame( animate );
-
-			render();
-
-		}
-
-		function render() {
-
-			var delta = clock.getDelta();
-
-			torusKnot.rotation.x += delta;
-			torusKnot.rotation.y += delta * 0.5;
-
-			renderer.render( scene, camera );
-
-		}
-
-	</script>
+		</script>
 
 </body>
 </html>
