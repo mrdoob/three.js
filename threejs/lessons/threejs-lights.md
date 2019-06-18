@@ -4,10 +4,10 @@ Description: Setting up Lights
 This article is part of a series of articles about three.js. The
 first article is [three.js fundamentals](threejs-fundamentals.html). If
 you haven't read that yet and you're new to three.js you might want to
-consider starting there. The 
+consider starting there. The
 [previous article was about textures](threejs-textures.html).
 
-Let go over how to use the various kinds of lights in three.
+Let's go over how to use the various kinds of lights in three.
 
 Starting with one of our previous samples let's update the camera.
 We'll set the field of view to 45 degrees, the far plane to 100 units,
@@ -32,7 +32,7 @@ in our page
 +<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
 ```
 
-Then we can use them. We pass the `OrbitControls` a camera to 
+Then we can use them. We pass the `OrbitControls` a camera to
 control and the DOM element to use to get input events
 
 ```js
@@ -74,7 +74,7 @@ const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 ```
 
-We then make a plane geometry, a material for the plane, and mesh
+We then make a plane geometry, a material for the plane, and a mesh
 to insert it in the scene. Planes default to being in the XY plane
 but the ground is in the XZ plane so we rotate it.
 
@@ -126,13 +126,13 @@ scene.add(light);
 ```
 
 Let's also make it so we can adjust the light's parameters.
-We'll use [dat.GUI](https://github.com/dataarts/dat.gui) again. 
+We'll use [dat.GUI](https://github.com/dataarts/dat.gui) again.
 To be able to adjust the color via dat.GUI we need a small helper
 that presents a property to dat.GUI that looks like a CSS hex color string
 (eg: `#FF8844`). Our helper will get the color from a named property,
 convert it to a hex string to offer to dat.GUI. When dat.GUI tries
 to set the helper's property we'll assign the result back to the light's
-color. 
+color.
 
 Here's the helper:
 
@@ -165,13 +165,13 @@ And here's the result
 
 Click and drag in the scene to *orbit* the camera.
 
-Notice there is no defintion. The shapes are flat. The `AmbientLight` effectively
-just multiply's the material's color by the light's color times the
+Notice there is no definition. The shapes are flat. The `AmbientLight` effectively
+just multiplies the material's color by the light's color times the
 intensity.
 
     color = materialColor * light.color * light.intensity;
 
-That's it. It has no direction. 
+That's it. It has no direction.
 This style of ambient lighting is actually not all that
 useful as lighting as it's 100% even so other than changing the color
 of everything in the scene it doesn't look much like *lighting*.
@@ -179,9 +179,9 @@ What it does help with is making the darks not too dark.
 
 ## `HemisphereLight`
 
-Let's switch the code the a `HemisphereLight`. A `HemisphereLight`
+Let's switch the code to a `HemisphereLight`. A `HemisphereLight`
 takes a sky color and a ground color and just multplies the
-material's color between those 2 colors. The sky color if the
+material's color between those 2 colors—the sky color if the
 surface of the object is pointing up and the ground color if
 the surface of the object is pointing down.
 
@@ -255,14 +255,14 @@ of helper objects we can add to our scene to help visualize
 invisible parts of a scene. In this case we'll use the
 `DirectionalLightHelper` which will draw a plane, to represent
 the light, and a line from the light to the target. We just
-pass it the light and add itd add it to the scene.
+pass it the light and add it to the scene.
 
 ```js
 const helper = new THREE.DirectionalLightHelper(light);
 scene.add(helper);
 ```
 
-While we're at it lets make it so we can set both the position
+While we're at it let's make it so we can set both the position
 of the light and the target. To do this we'll make a function
 that given a `Vector3` will adjust its `x`, `y`, and `z` properties
 using `dat.GUI`.
@@ -306,7 +306,7 @@ Now we can move the light, and its target
 
 Orbit the camera and it gets easier to see. The plane
 represents a `DirectionalLight` because a directional
-light computes light comming in one direction. There is no
+light computes light coming in one direction. There is no
 *point* the light comes from, it's an infinite plane of light
 shooting out parallel rays of light.
 
@@ -374,7 +374,7 @@ Notice when `distance` is > 0 how the light fades out.
 
 ## `SpotLight`
 
-Spotlights are affectively a point light with a cone
+Spotlights are effectively a point light with a cone
 attached where the light only shines inside the cone.
 There's actually 2 cones. An outer cone and an inner
 cone. Between the inner cone and the outer cone the
@@ -400,7 +400,7 @@ scene.add(helper);
 ```
 
 The spotlight's cone's angle is set with the [`angle`](Spotlight.angle)
-property in radians. We'll use our `DegRadHelper` from the 
+property in radians. We'll use our `DegRadHelper` from the
 [texture article](threejs-textures.html) to present a UI in
 degrees.
 
@@ -422,7 +422,7 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 {{{example url="../threejs-lights-spot-w-helper.html" }}}
 
 Notice with the default `penumbra` of 0 the spotlight has a very sharp edge
-where as as you adjust the `penumbra` toward 1 edge blurs.
+whereas as you adjust the `penumbra` toward 1 the edge blurs.
 
 It might be hard to see the *cone* of the spotlight. The reason is it's
 below the ground. Shorten the distance to around 5 and you'll see the open
@@ -434,7 +434,7 @@ There's one more type of light, the `RectAreaLight`, which represents
 exactly what it sounds like, a rectangular area of light like a long
 fluorescent light or maybe a frosted sky light in a ceiling.
 
-The `RectAreaLight` only works with the `MeshStandardMaterai` and the
+The `RectAreaLight` only works with the `MeshStandardMaterial` and the
 `MeshPhysicalMaterial` so let's change all our materials to `MeshStandardMaterial`
 
 ```js
@@ -498,7 +498,7 @@ scene.add(light);
 *light.add(helper);
 ```
 
-One thing to notice is that unlike the `DirectionalLight` and the `SpotLight` the
+One thing to notice is that unlike the `DirectionalLight` and the `SpotLight`, the
 `RectAreaLight` does not use a target. It just uses its rotation. Another thing
 to notice is the helper needs to be a child of the light. It is not a child of the
 scene like other helpers.
@@ -527,10 +527,10 @@ One thing we didn't cover is that there is a setting on the `WebGLRenderer`
 called `physicallyCorrectLights`. It effects how light falls off as distance from light.
 It only affects `PointLight` and `SpotLight`. `RectAreaLight` does this automatically.
 
-For lights though the basic idea is you don't set a distance for them to fade out, 
-and you don't set `intensity`. Instead you set the [`power`](PointLight.power) of 
-the light in lumens and then three.js will use physics calculations like real lights. 
-The units of three.js in this case are meters and a 60w light bulb would have 
+For lights though the basic idea is you don't set a distance for them to fade out,
+and you don't set `intensity`. Instead you set the [`power`](PointLight.power) of
+the light in lumens and then three.js will use physics calculations like real lights.
+The units of three.js in this case are meters and a 60w light bulb would have
 around 800 lumens. There's also a [`decay`](PointLight.decay) property. It should
 be set to `2` for realistic decay.
 
@@ -566,9 +566,9 @@ gui.add(light, 'power', 0, 2000);
 
 {{{example url="../threejs-lights-point-physically-correct.html" }}}
 
-It's important to note each light you add to scene slows down how fast
+It's important to note each light you add to the scene slows down how fast
 three.js renders the scene so you should always try to use as few as
-possible to achieve your goals. 
+possible to achieve your goals.
 
 Next up let's go over [dealing with cameras](threejs-cameras.html).
 
