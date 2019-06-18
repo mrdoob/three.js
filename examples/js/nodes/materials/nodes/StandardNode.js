@@ -46,8 +46,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 			// add ltc data textures to material uniforms
 
-			builder.uniforms.ltc_1 = { value: THREE.UniformsLib.LTC_1 };
-			builder.uniforms.ltc_2 = { value: THREE.UniformsLib.LTC_2 };
+			builder.uniforms.ltc_1 = { value: undefined };
+			builder.uniforms.ltc_2 = { value: undefined };
 
 		}
 
