@@ -131,6 +131,18 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function () {
+
+		return {
+			stride: this.data.stride,
+			itemSize: this.itemSize,
+			type: this.data.array.constructor.name,
+			array: Array.prototype.slice.call( this.data.array ),
+			normalized: this.normalized
+		};
+
 	}
 
 } );

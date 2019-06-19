@@ -120,6 +120,17 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "toJSON", ( assert ) => {
+
+			var buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
+			var instance = new InterleavedBufferAttribute( buffer, 2, 1, true );
+			var json = instance.toJSON();
+			assert.ok( json.stride === 3 && json.itemSize === 2 &&
+				json.normalized === true && json.type === 'Float32Array' &&
+				json.array.length === 6, "toJSON has A incorret output" );
+
+		} );
+
 	} );
 
 } );
