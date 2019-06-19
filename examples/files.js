@@ -306,7 +306,6 @@ var files = {
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
-		"webgl_gpu_particle_system",
 		"webgl_lightningstrike",
 		"webgl_lightshafts",
 		"webgl_materials_modified",
