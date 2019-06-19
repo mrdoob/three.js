@@ -4,37 +4,12 @@
 		<title>three.js webgl - interactive particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-			}
-			a {
-				color: #fff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -76,14 +51,23 @@
 
 		</script>
 
+		<script type="module">
+			import {
+				BoxGeometry,
+				BufferAttribute,
+				BufferGeometry,
+				Color,
+				PerspectiveCamera,
+				Points,
+				Raycaster,
+				Scene,
+				ShaderMaterial,
+				TextureLoader,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var renderer, scene, camera, stats;
 
@@ -101,21 +85,21 @@
 
 				var container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 250;
 
 				//
 
-				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
+				var vertices = new BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
 
 				var positions = new Float32Array( vertices.length * 3 );
 				var colors = new Float32Array( vertices.length * 3 );
 				var sizes = new Float32Array( vertices.length );
 
 				var vertex;
-				var color = new THREE.Color();
+				var color = new Color();
 
 				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
@@ -129,18 +113,18 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				var geometry = new BufferGeometry();
+				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'customColor', new BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'size', new BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var material = new THREE.ShaderMaterial( {
+				var material = new ShaderMaterial( {
 
 					uniforms: {
-						color: { value: new THREE.Color( 0xffffff ) },
-						texture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
+						color: { value: new Color( 0xffffff ) },
+						texture: { value: new TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -151,20 +135,20 @@
 
 				//
 
-				particles = new THREE.Points( geometry, material );
+				particles = new Points( geometry, material );
 				scene.add( particles );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				raycaster = new THREE.Raycaster();
-				mouse = new THREE.Vector2();
+				raycaster = new Raycaster();
+				mouse = new Vector2();
 
 				//
 

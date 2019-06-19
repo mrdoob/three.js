@@ -4,43 +4,33 @@
 		<title>three.js - platformer demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: rgb(200,200,200);
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - platformer demo. cubemap by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>.<br />Use arrow keys to look around, WASD to move and SPACE to jump.</div>
 
-		<script src="../build/three.js"></script>
-
-		<script>
+		<script type="module">
+			import {
+				CubeTextureLoader,
+				Euler,
+				Object3D,
+				ObjectLoader,
+				PerspectiveCamera,
+				Raycaster,
+				RGBFormat,
+				Scene,
+				Vector2,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			// player motion parameters
 
 			var motion = {
 				airborne: false,
-				position: new THREE.Vector3(), velocity: new THREE.Vector3(),
-				rotation: new THREE.Vector2(), spinning: new THREE.Vector2()
+				position: new Vector3(), velocity: new Vector3(),
+				rotation: new Vector2(), spinning: new Vector2()
 			};
 
 			motion.position.y = - 150;
@@ -89,8 +79,8 @@
 					keys.SP, keys.W, keys.A, keys.S, keys.D, keys.UP, keys.LT, keys.DN, keys.RT
 				] );
 
-				var forward = new THREE.Vector3();
-				var sideways = new THREE.Vector3();
+				var forward = new Vector3();
+				var sideways = new Vector3();
 
 				return function () {
 
@@ -127,8 +117,8 @@
 
 			var jumpPads = ( function () {
 
-				var pads = [ new THREE.Vector3( - 17.5, 8, - 10 ), new THREE.Vector3( 17.5, 8, - 10 ), new THREE.Vector3( 0, 8, 21 ) ];
-				var temp = new THREE.Vector3();
+				var pads = [ new Vector3( - 17.5, 8, - 10 ), new Vector3( 17.5, 8, - 10 ), new Vector3( 0, 8, 21 ) ];
+				var temp = new Vector3();
 
 				return function () {
 
@@ -166,11 +156,11 @@
 				var birdsEye = 100;
 				var kneeDeep = 0.4;
 
-				var raycaster = new THREE.Raycaster();
+				var raycaster = new Raycaster();
 				raycaster.ray.direction.set( 0, - 1, 0 );
 
-				var angles = new THREE.Vector2();
-				var displacement = new THREE.Vector3();
+				var angles = new Vector2();
+				var displacement = new Vector3();
 
 				return function ( dt ) {
 
@@ -243,7 +233,7 @@
 
 			var updateCamera = ( function () {
 
-				var euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
+				var euler = new Euler( 0, 0, 0, 'YXZ' );
 
 				return function () {
 
@@ -264,9 +254,9 @@
 
 			function makePlatform( url ) {
 
-				var placeholder = new THREE.Object3D();
+				var placeholder = new Object3D();
 
-				var loader = new THREE.ObjectLoader();
+				var loader = new ObjectLoader();
 				loader.load( url, function ( platform ) {
 
 					placeholder.add( platform );
@@ -277,15 +267,15 @@
 
 			}
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
+			var renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			document.body.appendChild( renderer.domElement );
 
-			var camera = new THREE.PerspectiveCamera( 60, 1, 0.1, 9000 );
+			var camera = new PerspectiveCamera( 60, 1, 0.1, 9000 );
 
-			var scene = new THREE.Scene();
+			var scene = new Scene();
 
-			var envMap = new THREE.CubeTextureLoader().load( [
+			var envMap = new CubeTextureLoader().load( [
 				'textures/cube/skybox/px.jpg', // right
 				'textures/cube/skybox/nx.jpg', // left
 				'textures/cube/skybox/py.jpg', // top
@@ -293,7 +283,7 @@
 				'textures/cube/skybox/pz.jpg', // back
 				'textures/cube/skybox/nz.jpg' // front
 			] );
-			envMap.format = THREE.RGBFormat;
+			envMap.format = RGBFormat;
 
 			scene.background = envMap;
 

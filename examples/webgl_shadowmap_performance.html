@@ -4,28 +4,7 @@
 		<title>three.js webgl - shadow map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			a { color: #f00;
-			font-weight: bold;
-			text-decoration: underline;
-			cursor: pointer
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -35,23 +14,32 @@
 		move camera with WASD / RF + mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				AnimationMixer,
+				AnimationObjectGroup,
+				BoxBufferGeometry,
+				Clock,
+				Color,
+				Fog,
+				FontLoader,
+				LightShadow,
+				Mesh,
+				MeshPhongMaterial,
+				PCFSoftShadowMap,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				SpotLight,
+				TextBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
@@ -70,7 +58,7 @@
 
 			var light;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -81,42 +69,38 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE CAMERA
+				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				camera = new PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
 
-				controls = new THREE.FirstPersonControls( camera );
+				// SCENE
+
+				scene = new Scene();
+				scene.background = new Color( 0x59472b );
+				scene.fog = new Fog( 0x59472b, 1000, FAR );
+
+				controls = new FirstPersonControls( camera );
 
 				controls.lookSpeed = 0.0125;
 				controls.movementSpeed = 500;
 				controls.noFly = false;
 				controls.lookVertical = true;
-				controls.constrainVertical = true;
-				controls.verticalMin = 1.5;
-				controls.verticalMax = 2.0;
 
-				controls.lon = 250;
-				controls.lat = 30;
-
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x59472b );
-				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
+				controls.lookAt( scene.position );
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x444444 );
+				var ambient = new AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
+				light = new SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
 				light.castShadow = true;
 
-				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 700, FAR ) );
+				light.shadow = new LightShadow( new PerspectiveCamera( 50, 1, 700, FAR ) );
 
 				light.shadow.bias = 0.0001;
 
@@ -129,7 +113,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -139,7 +123,7 @@
 				//
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = PCFSoftShadowMap;
 
 				// STATS
 
@@ -170,10 +154,10 @@
 
 				// GROUND
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				var geometry = new PlaneBufferGeometry( 100, 100 );
+				var planeMaterial = new MeshPhongMaterial( { color: 0xffdd99 } );
 
-				var ground = new THREE.Mesh( geometry, planeMaterial );
+				var ground = new Mesh( geometry, planeMaterial );
 
 				ground.position.set( 0, FLOOR, 0 );
 				ground.rotation.x = - Math.PI / 2;
@@ -186,10 +170,10 @@
 
 				// TEXT
 
-				var loader = new THREE.FontLoader();
+				var loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					var textGeo = new THREE.TextBufferGeometry( "THREE.JS", {
+					var textGeo = new TextBufferGeometry( "THREE.JS", {
 
 						font: font,
 
@@ -206,9 +190,9 @@
 					textGeo.computeBoundingBox();
 					var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+					var textMaterial = new MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
 
-					var mesh = new THREE.Mesh( textGeo, textMaterial );
+					var mesh = new Mesh( textGeo, textMaterial );
 					mesh.position.x = centerOffset;
 					mesh.position.y = FLOOR + 67;
 
@@ -221,7 +205,7 @@
 
 				// CUBES
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1500, 220, 150 ), planeMaterial );
+				var mesh = new Mesh( new BoxBufferGeometry( 1500, 220, 150 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -231,7 +215,7 @@
 
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1600, 170, 250 ), planeMaterial );
+				var mesh = new Mesh( new BoxBufferGeometry( 1600, 170, 250 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -241,11 +225,11 @@
 
 				scene.add( mesh );
 
-				mixer = new THREE.AnimationMixer( scene );
+				mixer = new AnimationMixer( scene );
 
 				for ( var i = 0; i !== ANIMATION_GROUPS; ++ i ) {
 
-					var group = new THREE.AnimationObjectGroup();
+					var group = new AnimationObjectGroup();
 					animGroups.push( group );
 
 				}
@@ -305,7 +289,7 @@
 
 				}
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 

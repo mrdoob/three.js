@@ -25,7 +25,7 @@ FunctionNode.prototype.nodeType = "Function";
 
 FunctionNode.prototype.useKeywords = true;
 
-FunctionNode.prototype.isShared = function ( builder, output ) {
+FunctionNode.prototype.getShared = function ( builder, output ) {
 
 	return ! this.isMethod;
 
@@ -85,7 +85,13 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	while ( match = propertiesRegexp.exec( this.src ) ) {
+	var matches = [];
+
+	while ( match = propertiesRegexp.exec( this.src ) ) matches.push( match );
+
+	for ( var i = 0; i < matches.length; i++ ) {
+
+		var match = matches[i];
 
 		var prop = match[ 0 ],
 			isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true,

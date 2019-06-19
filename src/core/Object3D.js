@@ -6,6 +6,7 @@ import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { _Math } from '../math/Math.js';
+import { TrianglesDrawMode } from '../constants.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -48,8 +49,8 @@ function Object3D() {
 
 	}
 
-	rotation.onChange( onRotationChange );
-	quaternion.onChange( onQuaternionChange );
+	rotation._onChange( onRotationChange );
+	quaternion._onChange( onQuaternionChange );
 
 	Object.defineProperties( this, {
 		position: {
@@ -113,7 +114,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	applyMatrix: function ( matrix ) {
 
-		this.matrix.multiplyMatrices( matrix, this.matrix );
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+		this.matrix.premultiply( matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
 
@@ -430,6 +433,38 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	attach: function () {
+
+		// adds object as a child of this, while maintaining the object's world transform
+
+		var m = new Matrix4();
+
+		return function attach( object ) {
+
+			this.updateWorldMatrix( true, false );
+
+			m.getInverse( this.matrixWorld );
+
+			if ( object.parent !== null ) {
+
+				object.parent.updateWorldMatrix( true, false );
+
+				m.multiply( object.parent.matrixWorld );
+
+			}
+
+			object.applyMatrix( m );
+
+			object.updateWorldMatrix( false, false );
+
+			this.add( object );
+
+			return this;
+
+		};
+
+	}(),
+
 	getObjectById: function ( id ) {
 
 		return this.getObjectByProperty( 'id', id );
@@ -717,6 +752,10 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		object.matrix = this.matrix.toArray();
 
 		if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
+
+		// object specific properties
+
+		if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) object.drawMode = this.drawMode;
 
 		//
 

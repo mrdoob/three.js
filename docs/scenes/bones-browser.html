@@ -3,22 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Three.js Bones Browser</title>
+		<link rel="shortcut icon" href="../../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../../files/main.css">
 		<style>
-			@font-face {
-				font-family: 'inconsolata';
-				src: url('../files/inconsolata.woff') format('woff');
-				font-weight: normal;
-				font-style: normal;
-			}
-
-			body {
-				margin:0;
-				font-family: 'inconsolata';
-				font-size: 15px;
-				line-height: 18px;
-				overflow: hidden;
-			}
-
 			canvas { width: 100%; height: 100% }
 
 			#newWindow {
@@ -49,7 +36,10 @@
 			function initScene() {
 
 				gui = new dat.GUI();
+
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x444444 );
+
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.z = 30;
 				camera.position.y = 30;
@@ -57,7 +47,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000, 1 );
 				document.body.appendChild( renderer.domElement );
 
 				orbit = new THREE.OrbitControls( camera, renderer.domElement );

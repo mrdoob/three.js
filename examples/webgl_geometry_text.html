@@ -4,53 +4,46 @@
 		<title>three.js webgl - geometry - text</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq
-		<br/>type to enter new text, drag to spin the text
-		<br/><span class="button" id="color">change color</span>,
-			<span class="button" id="font">change font</span>,
-			<span class="button" id="weight">change weight</span>,
-			<span class="button" id="bevel">change bevel</span>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
+			type to enter new text, drag to spin the text<br/>
+			<button id="color">change color</button>
+			<button id="font">change font</button>
+			<button id="weight">change weight</button>
+			<button id="bevel">change bevel</button><br/>
 			<a id="permalink" href="#">permalink</a>
 		</div>
 
+		<script type="module">
+			import {
+				BufferGeometry,
+				Cache as _Cache,
+				Color,
+				DirectionalLight,
+				Fog,
+				FontLoader,
+				Group,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				PointLight,
+				Scene,
+				TextGeometry,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="../build/three.js"></script>
-		<script src="js/utils/GeometryUtils.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			THREE.Cache.enabled = true;
+			_Cache.enabled = true;
 
 			var container, stats, permalink, hex;
 
@@ -132,24 +125,24 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.set( 0, 400, 700 );
 
-				cameraTarget = new THREE.Vector3( 0, 150, 0 );
+				cameraTarget = new Vector3( 0, 150, 0 );
 
 				// SCENE
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
-				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
+				scene = new Scene();
+				scene.background = new Color( 0x000000 );
+				scene.fog = new Fog( 0x000000, 250, 1400 );
 
 				// LIGHTS
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				var dirLight = new DirectionalLight( 0xffffff, 0.125 );
 				dirLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
+				var pointLight = new PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
 				scene.add( pointLight );
 
@@ -185,20 +178,20 @@
 				}
 
 				materials = [
-					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+					new MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+					new MeshPhongMaterial( { color: 0xffffff } ) // side
 				];
 
-				group = new THREE.Group();
+				group = new Group();
 				group.position.y = 100;
 
 				scene.add( group );
 
 				loadFont();
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10000, 10000 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
+				var plane = new Mesh(
+					new PlaneBufferGeometry( 10000, 10000 ),
+					new MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
 				plane.position.y = 100;
 				plane.rotation.x = - Math.PI / 2;
@@ -206,7 +199,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -351,7 +344,7 @@
 
 			function loadFont() {
 
-				var loader = new THREE.FontLoader();
+				var loader = new FontLoader();
 				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
 
 					font = response;
@@ -364,7 +357,7 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextGeometry( text, {
+				textGeo = new TextGeometry( text, {
 
 					font: font,
 
@@ -405,7 +398,7 @@
 							var vb = textGeo.vertices[ face.b ];
 							var vc = textGeo.vertices[ face.c ];
 
-							var s = THREE.GeometryUtils.triangleArea( va, vb, vc );
+							var s = GeometryUtils.triangleArea( va, vb, vc );
 
 							if ( s > triangleAreaHeuristics ) {
 
@@ -425,9 +418,9 @@
 
 				var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				textGeo = new THREE.BufferGeometry().fromGeometry( textGeo );
+				textGeo = new BufferGeometry().fromGeometry( textGeo );
 
-				textMesh1 = new THREE.Mesh( textGeo, materials );
+				textMesh1 = new Mesh( textGeo, materials );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -440,7 +433,7 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new THREE.Mesh( textGeo, materials );
+					textMesh2 = new Mesh( textGeo, materials );
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = - hover;

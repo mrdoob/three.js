@@ -4,52 +4,60 @@
 		<title>three.js webgl - interactive cubes (gpu)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #444;
 			}
-
-			.info {
-				position: absolute;
-				background-color: black;
-				opacity: 0.8;
-				color: white;
-				text-align: center;
-				top: 0px;
-				width: 100%;
-			}
-
-			.info a {
-				color: #00ffff;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
-		<div class="info">
+		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				Color,
+				Euler,
+				Float32BufferAttribute,
+				Matrix4,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Quaternion,
+				Scene,
+				SpotLight,
+				Vector2,
+				Vector3,
+				VertexColors,
+				WebGLRenderer,
+				WebGLRenderTarget
+			} from "../build/three.module.js";
 
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var container, stats;
 			var camera, controls, scene, renderer;
 			var pickingData = [], pickingTexture, pickingScene;
 			var highlightBox;
 
-			var mouse = new THREE.Vector2();
-			var offset = new THREE.Vector3( 10, 10, 10 );
+			var mouse = new Vector2();
+			var offset = new Vector3( 10, 10, 10 );
 
 			init();
 			animate();
@@ -58,32 +66,23 @@
 
 				container = document.getElementById( "container" );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
-				controls = new THREE.TrackballControls( camera );
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				pickingScene = new Scene();
+				pickingTexture = new WebGLRenderTarget( 1, 1 );
 
-				pickingScene = new THREE.Scene();
-				pickingTexture = new THREE.WebGLRenderTarget( 1, 1 );
+				scene.add( new AmbientLight( 0x555555 ) );
 
-				scene.add( new THREE.AmbientLight( 0x555555 ) );
-
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				var light = new SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				scene.add( light );
 
-				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0	} );
+				var pickingMaterial = new MeshBasicMaterial( { vertexColors: VertexColors } );
+				var defaultMaterial = new MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: VertexColors, shininess: 0	} );
 
 				function applyVertexColors( geometry, color ) {
 
@@ -96,37 +95,37 @@
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 				}
 
 				var geometriesDrawn = [];
 				var geometriesPicking = [];
 
-				var matrix = new THREE.Matrix4();
-				var quaternion = new THREE.Quaternion();
-				var color = new THREE.Color();
+				var matrix = new Matrix4();
+				var quaternion = new Quaternion();
+				var color = new Color();
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
-					var geometry = new THREE.BoxBufferGeometry();
+					var geometry = new BoxBufferGeometry();
 
-					var position = new THREE.Vector3();
+					var position = new Vector3();
 					position.x = Math.random() * 10000 - 5000;
 					position.y = Math.random() * 6000 - 3000;
 					position.z = Math.random() * 8000 - 4000;
 
-					var rotation = new THREE.Euler();
+					var rotation = new Euler();
 					rotation.x = Math.random() * 2 * Math.PI;
 					rotation.y = Math.random() * 2 * Math.PI;
 					rotation.z = Math.random() * 2 * Math.PI;
 
-					var scale = new THREE.Vector3();
+					var scale = new Vector3();
 					scale.x = Math.random() * 200 + 100;
 					scale.y = Math.random() * 200 + 100;
 					scale.z = Math.random() * 200 + 100;
 
-					quaternion.setFromEuler( rotation, false );
+					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
 					geometry.applyMatrix( matrix );
@@ -155,21 +154,30 @@
 
 				}
 
-				var objects = new THREE.Mesh( THREE.BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
+				var objects = new Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
 				scene.add( objects );
 
-				pickingScene.add( new THREE.Mesh( THREE.BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
+				pickingScene.add( new Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
 
-				highlightBox = new THREE.Mesh(
-					new THREE.BoxBufferGeometry(),
-					new THREE.MeshLambertMaterial( { color: 0xffff00 }
+				highlightBox = new Mesh(
+					new BoxBufferGeometry(),
+					new MeshLambertMaterial( { color: 0xffff00 }
 					) );
 				scene.add( highlightBox );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				controls = new TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -206,7 +214,8 @@
 
 				// render the scene
 
-				renderer.render( pickingScene, camera, pickingTexture );
+				renderer.setRenderTarget( pickingTexture );
+				renderer.render( pickingScene, camera );
 
 				// clear the view offset so rendering returns to normal
 
@@ -252,6 +261,7 @@
 
 				pick();
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 			}

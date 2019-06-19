@@ -4,19 +4,11 @@
 		<title>three.js webgl - raymarching - reflect</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style type="text/css">
 			html, body {
 				height: 100%;
 			}
-
-			body {
-				background-color: black;
-				margin: 0;
-				padding: 0;
-			}
-
-			a { color: skyblue }
-
 			#container {
 				width: 100%;
 				height: 100%;
@@ -24,22 +16,12 @@
 				align-items: center;
 				justify-content: center;
 			}
-
-			#info {
-				position: absolute;
-				color: white;
-				font-size: 13px;
-				bottom: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-			}
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example<br/>
 			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article</a>)
 		</div>
 		<div id="container">
@@ -254,13 +236,23 @@
 
 		</script>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				Group,
+				Matrix4,
+				Mesh,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RawShaderMaterial,
+				Scene,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var dolly, camera, scene, renderer;
 			var geometry, material, mesh;
@@ -283,41 +275,41 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
+				renderer = new WebGLRenderer( { canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( config.resolution, config.resolution );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				// Scene
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				dolly = new THREE.Group();
+				dolly = new Group();
 				scene.add( dolly );
 
-				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
+				camera = new PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
 				camera.position.z = 4;
 				dolly.add( camera );
 
-				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
-				material = new THREE.RawShaderMaterial( {
+				geometry = new PlaneBufferGeometry( 2.0, 2.0 );
+				material = new RawShaderMaterial( {
 					uniforms: {
-						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
+						resolution: { value: new Vector2( canvas.width, canvas.height ) },
 						cameraWorldMatrix: { value: camera.matrixWorld },
-						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
+						cameraProjectionMatrixInverse: { value: new Matrix4().getInverse( camera.projectionMatrix ) }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
 				} );
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				mesh.frustumCulled = false;
 				scene.add( mesh );
 
 				// Controls
-				var controls = new THREE.OrbitControls( camera, canvas );
+				var controls = new OrbitControls( camera, canvas );
 
 				// GUI
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 

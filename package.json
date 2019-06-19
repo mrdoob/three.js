@@ -1,21 +1,23 @@
 {
   "name": "three",
-  "version": "0.100.0",
+  "version": "0.105.1",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
   "jsnext:main": "build/three.module.js",
   "module": "build/three.module.js",
+  "types": "src/Three.d.ts",
   "files": [
-    "package.json",
-    "LICENSE",
-    "README.md",
     "build/three.js",
     "build/three.min.js",
     "build/three.module.js",
-    "src",
     "examples/js",
-    "examples/fonts"
+    "examples/jsm",
+    "examples/fonts",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "src"
   ],
   "directories": {
     "doc": "docs",
@@ -23,22 +25,34 @@
     "test": "test"
   },
   "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
-      "html"
-    ]
+      "html",
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/indent": [
+        "error",
+        "tab",
+        {
+          "SwitchCase": 1
+        }
+      ]
+    }
   },
   "scripts": {
     "build": "rollup -c",
     "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler-java/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-closure": "rollup -c && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-examples": "rollup -c rollup-examples.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
-    "lint": "eslint src",
-    "test": "npm run build-test && qunit test/unit/three.source.unit.js",
-    "travis": "npm run lint && npm test",
-    "editor": "electron ./editor/main.js"
+    "lint": "eslint src --ext js --ext ts",
+    "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
+    "travis": "npm run lint && npm test"
   },
   "keywords": [
     "three",
@@ -53,15 +67,18 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "concurrently": "^4.1.0",
-    "electron": "^4.0.0",
-    "eslint": "^5.11.1",
+    "eslint": "^5.16.0",
     "eslint-config-mdcs": "^4.2.3",
-    "eslint-plugin-html": "^5.0.0",
-    "google-closure-compiler": "20181210.0.0",
+    "eslint-plugin-html": "^5.0.3",
+    "failonlyreporter": "^1.0.0",
+    "google-closure-compiler": "20190415.0.0",
     "http-server": "^0.11.1",
-    "qunit": "^2.8.0",
-    "rollup": "^1.0.0"
+    "qunit": "^2.9.2",
+    "rollup": "^1.10.1",
+    "typescript": "^3.4.5"
   },
   "jspm": {
     "files": [

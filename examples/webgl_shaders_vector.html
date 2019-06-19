@@ -4,19 +4,14 @@
 		<title>three.js webgl - vector - text</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -24,10 +19,6 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
-		<script src="../build/three.js"></script>
-		<script src="./js/controls/OrbitControls.js"></script>
-
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-fragment" id="fs">
 
@@ -67,8 +58,30 @@
 
 		</script>
 
+		<script type="module">
+			import {
+				BufferGeometry,
+				Color,
+				DoubleSide,
+				Float32BufferAttribute,
+				FontLoader,
+				Group,
+				LineCurve,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				QuadraticBezierCurve,
+				Scene,
+				Shape,
+				ShapeBufferGeometry,
+				ShaderMaterial,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var stats;
 
@@ -76,7 +89,7 @@
 
 			var group;
 
-			var loader = new THREE.FontLoader();
+			var loader = new FontLoader();
 			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -86,39 +99,35 @@
 
 			function init( font ) {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 50, 100, 500 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 50, 100, 0 );
-				controls.update();
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
+				scene = new Scene();
+				scene.background = new Color( 0xf0f0f0 );
 
 				var theText = '&'; // i % & j b 8
 
-				group = new THREE.Group();
+				group = new Group();
 				scene.add( group );
 
-				var textMaterial = new THREE.MeshBasicMaterial( {
-					color: new THREE.Color( 0, 0, 1 ),
-					side: THREE.DoubleSide,
+				var textMaterial = new MeshBasicMaterial( {
+					color: new Color( 0, 0, 1 ),
+					side: DoubleSide,
 					wireframe: true
 				} );
 
 				var textShapes = font.generateShapes( theText, 180 );
 
-				var geometry = new THREE.ShapeBufferGeometry( textShapes );
+				var geometry = new ShapeBufferGeometry( textShapes );
 
-				var text = new THREE.Mesh( geometry, textMaterial );
+				var text = new Mesh( geometry, textMaterial );
 				text.position.x = - 200;
 				group.add( text );
 
 				//
 
-				var vA = new THREE.Vector2();
-				var vB = new THREE.Vector2();
+				var vA = new Vector2();
+				var vB = new Vector2();
 
 				function processShape( path ) {
 
@@ -136,12 +145,12 @@
 					for ( var i = 0; i < path.length; i ++ ) {
 
 						var curve = path[ i ];
-						if ( curve instanceof THREE.LineCurve ) {
+						if ( curve instanceof LineCurve ) {
 
 							pts.push( curve.v2 );
 							pts2.push( curve.v2 );
 
-						} else if ( curve instanceof THREE.QuadraticBezierCurve ) {
+						} else if ( curve instanceof QuadraticBezierCurve ) {
 
 							vA = vA.subVectors( curve.v1, curve.v0 );
 							vB = vB.subVectors( curve.v2, curve.v1 );
@@ -202,8 +211,8 @@
 					beziers = beziers.concat( process.beziers );
 					invert = invert.concat( process.invert );
 
-					convexhullShape = new THREE.Shape( pts );
-					solidShape = new THREE.Shape( pts2 );
+					convexhullShape = new Shape( pts );
+					solidShape = new Shape( pts2 );
 
 					convexhullShapeGroup.push( convexhullShape );
 					solidShapeGroup.push( solidShape );
@@ -219,14 +228,14 @@
 						beziers = beziers.concat( process.beziers );
 						invert = invert.concat( process.invert );
 
-						convexhullShape.holes.push( new THREE.Shape( pts ) );
-						solidShape.holes.push( new THREE.Shape( pts2 ) );
+						convexhullShape.holes.push( new Shape( pts ) );
+						solidShape.holes.push( new Shape( pts2 ) );
 
 					}
 
 				} // end of subshape
 
-				var bezierGeometry = new THREE.BufferGeometry();
+				var bezierGeometry = new BufferGeometry();
 				var vertices = [];
 				var uvs = [];
 
@@ -243,34 +252,34 @@
 
 				}
 
-				bezierGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				bezierGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
+				bezierGeometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				bezierGeometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+				bezierGeometry.addAttribute( 'invert', new Float32BufferAttribute( invert, 1 ) );
 
-				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
+				geometry = new ShapeBufferGeometry( convexhullShapeGroup );
 
-				text = new THREE.Mesh( geometry, textMaterial );
+				text = new Mesh( geometry, textMaterial );
 				text.position.x = 200;
 				group.add( text );
 
-				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
+				geometry = new ShapeBufferGeometry( solidShapeGroup );
 
-				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: new THREE.Color( 1, 0, 0 ), side: THREE.DoubleSide, wireframe: true } ) );
+				text = new Mesh( geometry, new MeshBasicMaterial( { color: new Color( 1, 0, 0 ), side: DoubleSide, wireframe: true } ) );
 				text.position.x = 200;
 				group.add( text );
 
 				//
 
-				var newMaterial = new THREE.ShaderMaterial( {
+				var newMaterial = new ShaderMaterial( {
 					uniforms: {
-						color: { value: new THREE.Color( 0.45 * 0xffffff ) }
+						color: { value: new Color( 0.45 * 0xffffff ) }
 					},
 					vertexShader: document.getElementById( 'vs' ).textContent,
 					fragmentShader: document.getElementById( 'fs' ).textContent,
-					side: THREE.DoubleSide
+					side: DoubleSide
 				} );
 
-				text = new THREE.Mesh( bezierGeometry, newMaterial );
+				text = new Mesh( bezierGeometry, newMaterial );
 				text.rotation.y = Math.PI * 2;
 
 				group.add( text );
@@ -278,19 +287,23 @@
 				//
 
 
-				geometry = new THREE.ShapeBufferGeometry( solidShapeGroup );
+				geometry = new ShapeBufferGeometry( solidShapeGroup );
 
-				text = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0.45 * 0xffffff, side: THREE.DoubleSide } ) );
+				text = new Mesh( geometry, new MeshBasicMaterial( { color: 0.45 * 0xffffff, side: DoubleSide } ) );
 				text.rotation.y = Math.PI * 2;
 
 				group.add( text );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 50, 100, 0 );
+				controls.update();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );

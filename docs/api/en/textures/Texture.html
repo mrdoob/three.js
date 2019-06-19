@@ -55,6 +55,13 @@
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
 		</p>
 
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Used to check whether this or derived classes are Textures. Default is *true*.<br /><br />
+
+			You should not change this, as it is used internally for optimisation.
+		</p>
+
 		<h3>[property:array mipmaps]</h3>
 		<p>
 		Array of user-specified mipmaps (optional).
@@ -180,13 +187,18 @@
 
 		<h3>[property:boolean premultiplyAlpha]</h3>
 		<p>
-		False by default, which is the norm for PNG images. Set to true if the RGB values have
-		been stored premultiplied by alpha.
+		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Defaut is *false*.<br /><br />
+
+		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:boolean flipY]</h3>
 		<p>
-		True by default. Flips the image's Y axis to match the WebGL texture coordinate space.
+		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
+
+		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
+		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
 		<h3>[property:number unpackAlignment]</h3>
@@ -239,10 +251,10 @@
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
 		</p>
 
-		<h3>[method:Texture toJSON]( [param:Object meta] )</h3>
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 		<p>
 		meta -- optional object containing metadata.<br />
-		Convert the material to three.js JSON format.
+		Convert the texture to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
 		</p>
 
 		<h3>[method:null dispose]()</h3>

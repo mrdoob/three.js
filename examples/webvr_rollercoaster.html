@@ -4,63 +4,64 @@
 		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
-		<style>
-			body {
-				margin: 0px;
-				color: #fff;
-				font-family: Monospace;
-				background-color: #444;
-				overflow: hidden;
-			}
-			a {
-				color: #00f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/RollerCoaster.js"></script>
-
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				Color,
+				CylinderBufferGeometry,
+				DoubleSide,
+				HemisphereLight,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				MeshPhongMaterial,
+				Object3D,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				Vector3,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
+			import { RollerCoasterGeometry, RollerCoasterShadowGeometry, RollerCoasterLiftersGeometry, TreesGeometry, SkyGeometry } from './jsm/misc/RollerCoaster.js';
+
+			var renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'eye-level' } ) );
+			document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 			//
 
-			var scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xf0f0ff );
+			var scene = new Scene();
+			scene.background = new Color( 0xf0f0ff );
 
-			var light = new THREE.HemisphereLight( 0xfff0f0, 0x606066 );
+			var light = new HemisphereLight( 0xfff0f0, 0x606066 );
 			light.position.set( 1, 1, 1 );
 			scene.add( light );
 
-			var train = new THREE.Object3D();
+			var train = new Object3D();
 			scene.add( train );
 
-			var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 500 );
+			var camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 500 );
 			train.add( camera );
 
 			// environment
 
-			var geometry = new THREE.PlaneBufferGeometry( 500, 500, 15, 15 );
+			var geometry = new PlaneBufferGeometry( 500, 500, 15, 15 );
 			geometry.rotateX( - Math.PI / 2 );
 
 			var positions = geometry.attributes.position.array;
-			var vertex = new THREE.Vector3();
+			var vertex = new Vector3();
 
 			for ( var i = 0; i < positions.length; i += 3 ) {
 
@@ -78,23 +79,23 @@
 
 			geometry.computeVertexNormals();
 
-			var material = new THREE.MeshLambertMaterial( {
+			var material = new MeshLambertMaterial( {
 				color: 0x407000
 			} );
 
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new Mesh( geometry, material );
 			scene.add( mesh );
 
 			var geometry = new TreesGeometry( mesh );
-			var material = new THREE.MeshBasicMaterial( {
-				side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+			var material = new MeshBasicMaterial( {
+				side: DoubleSide, vertexColors: VertexColors
 			} );
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new Mesh( geometry, material );
 			scene.add( mesh );
 
 			var geometry = new SkyGeometry();
-			var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-			var mesh = new THREE.Mesh( geometry, material );
+			var material = new MeshBasicMaterial( { color: 0xffffff } );
+			var mesh = new Mesh( geometry, material );
 			scene.add( mesh );
 
 			//
@@ -103,8 +104,8 @@
 
 			var curve = ( function () {
 
-				var vector = new THREE.Vector3();
-				var vector2 = new THREE.Vector3();
+				var vector = new Vector3();
+				var vector2 = new Vector3();
 
 				return {
 
@@ -136,23 +137,23 @@
 			} )();
 
 			var geometry = new RollerCoasterGeometry( curve, 1500 );
-			var material = new THREE.MeshPhongMaterial( {
-				vertexColors: THREE.VertexColors
+			var material = new MeshPhongMaterial( {
+				vertexColors: VertexColors
 			} );
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new Mesh( geometry, material );
 			scene.add( mesh );
 
 			var geometry = new RollerCoasterLiftersGeometry( curve, 100 );
-			var material = new THREE.MeshPhongMaterial();
-			var mesh = new THREE.Mesh( geometry, material );
+			var material = new MeshPhongMaterial();
+			var mesh = new Mesh( geometry, material );
 			mesh.position.y = 0.1;
 			scene.add( mesh );
 
 			var geometry = new RollerCoasterShadowGeometry( curve, 500 );
-			var material = new THREE.MeshBasicMaterial( {
+			var material = new MeshBasicMaterial( {
 				color: 0x305000, depthWrite: false, transparent: true
 			} );
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new Mesh( geometry, material );
 			mesh.position.y = 0.1;
 			scene.add( mesh );
 
@@ -160,24 +161,24 @@
 
 			//
 
-			var geometry = new THREE.CylinderBufferGeometry( 10, 10, 5, 15 );
-			var material = new THREE.MeshLambertMaterial( {
+			var geometry = new CylinderBufferGeometry( 10, 10, 5, 15 );
+			var material = new MeshLambertMaterial( {
 				color: 0xff8080,
 				//flatShading: true // Lambert does not support flat shading
 			} );
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new Mesh( geometry, material );
 			mesh.position.set( - 80, 10, - 70 );
 			mesh.rotation.x = Math.PI / 2;
 			scene.add( mesh );
 
 			funfairs.push( mesh );
 
-			var geometry = new THREE.CylinderBufferGeometry( 5, 6, 4, 10 );
-			var material = new THREE.MeshLambertMaterial( {
+			var geometry = new CylinderBufferGeometry( 5, 6, 4, 10 );
+			var material = new MeshLambertMaterial( {
 				color: 0x8080ff,
 				//flatShading: true // Lambert does not support flat shading
 			} );
-			var mesh = new THREE.Mesh( geometry, material );
+			var mesh = new Mesh( geometry, material );
 			mesh.position.set( 50, 2, 30 );
 			scene.add( mesh );
 
@@ -198,10 +199,10 @@
 
 			//
 
-			var position = new THREE.Vector3();
-			var tangent = new THREE.Vector3();
+			var position = new Vector3();
+			var tangent = new Vector3();
 
-			var lookAt = new THREE.Vector3();
+			var lookAt = new Vector3();
 
 			var velocity = 0;
 			var progress = 0;

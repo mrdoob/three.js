@@ -4,45 +4,55 @@
 		<title> three.js webgl - ShadowMesh </title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: rgb(0, 0, 0);
-				margin: 0;
-				padding: 0;
-				overflow: hidden;
-			}
-
-			#lightButton {
-				position: absolute;
-				right: 20px;
-				top: 20px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shadow mesh<br />
+			<input id="lightButton" type="button" value="Switch to PointLight">
+		</div>
 
 		<div id="container"></div>
-		<input id="lightButton" type="button" value="Switch to PointLight" onclick="lightButtonHandler()">
 
-		<script src="../build/three.js"></script>
-		<script src="js/objects/ShadowMesh.js"></script>
-		<script>
+		<script type="module">
+			import {
+				ArrowHelper,
+				BoxBufferGeometry,
+				Clock,
+				Color,
+				CylinderBufferGeometry,
+				DirectionalLight,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Plane,
+				Scene,
+				SphereBufferGeometry,
+				TorusBufferGeometry,
+				Vector3,
+				Vector4,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import { ShadowMesh } from './jsm/objects/ShadowMesh.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera( 55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
-			var clock = new THREE.Clock();
-			var renderer = new THREE.WebGLRenderer();
+			var scene = new Scene();
+			var camera = new PerspectiveCamera( 55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
+			var clock = new Clock();
+			var renderer = new WebGLRenderer();
 
-			var sunLight = new THREE.DirectionalLight( 'rgb(255,255,255)', 1 );
+			var sunLight = new DirectionalLight( 'rgb(255,255,255)', 1 );
 			var useDirectionalLight = true;
 			var arrowHelper1, arrowHelper2, arrowHelper3;
-			var arrowDirection = new THREE.Vector3();
-			var arrowPosition1 = new THREE.Vector3();
-			var arrowPosition2 = new THREE.Vector3();
-			var arrowPosition3 = new THREE.Vector3();
+			var arrowDirection = new Vector3();
+			var arrowPosition1 = new Vector3();
+			var arrowPosition2 = new Vector3();
+			var arrowPosition3 = new Vector3();
 			var groundMesh;
 			var lightSphere, lightHolder;
 			var pyramid, pyramidShadow;
@@ -50,10 +60,10 @@
 			var cube, cubeShadow;
 			var cylinder, cylinderShadow;
 			var torus, torusShadow;
-			var normalVector = new THREE.Vector3( 0, 1, 0 );
+			var normalVector = new Vector3( 0, 1, 0 );
 			var planeConstant = 0.01; // this value must be slightly higher than the groundMesh's y position of 0.0
-			var groundPlane = new THREE.Plane( normalVector, planeConstant );
-			var lightPosition4D = new THREE.Vector4();
+			var groundPlane = new Plane( normalVector, planeConstant );
+			var lightPosition4D = new Vector4();
 			var verticalAngle = 0;
 			var horizontalAngle = 0;
 			var frameTime = 0;
@@ -64,7 +74,7 @@
 
 			function init() {
 
-				scene.background = new THREE.Color( 0x0096ff );
+				scene.background = new Color( 0x0096ff );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -90,86 +100,88 @@
 				arrowDirection.subVectors( scene.position, sunLight.position ).normalize();
 
 				arrowPosition1.copy( sunLight.position );
-				arrowHelper1 = new THREE.ArrowHelper( arrowDirection, arrowPosition1, 0.9, 0xffff00, 0.25, 0.08 );
+				arrowHelper1 = new ArrowHelper( arrowDirection, arrowPosition1, 0.9, 0xffff00, 0.25, 0.08 );
 				scene.add( arrowHelper1 );
 
-				arrowPosition2.copy( sunLight.position ).add( new THREE.Vector3( 0, 0.2, 0 ) );
-				arrowHelper2 = new THREE.ArrowHelper( arrowDirection, arrowPosition2, 0.9, 0xffff00, 0.25, 0.08 );
+				arrowPosition2.copy( sunLight.position ).add( new Vector3( 0, 0.2, 0 ) );
+				arrowHelper2 = new ArrowHelper( arrowDirection, arrowPosition2, 0.9, 0xffff00, 0.25, 0.08 );
 				scene.add( arrowHelper2 );
 
-				arrowPosition3.copy( sunLight.position ).add( new THREE.Vector3( 0, - 0.2, 0 ) );
-				arrowHelper3 = new THREE.ArrowHelper( arrowDirection, arrowPosition3, 0.9, 0xffff00, 0.25, 0.08 );
+				arrowPosition3.copy( sunLight.position ).add( new Vector3( 0, - 0.2, 0 ) );
+				arrowHelper3 = new ArrowHelper( arrowDirection, arrowPosition3, 0.9, 0xffff00, 0.25, 0.08 );
 				scene.add( arrowHelper3 );
 
 				// LIGHTBULB
-				var lightSphereGeometry = new THREE.SphereBufferGeometry( 0.09 );
-				var lightSphereMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(255,255,255)' } );
-				lightSphere = new THREE.Mesh( lightSphereGeometry, lightSphereMaterial );
+				var lightSphereGeometry = new SphereBufferGeometry( 0.09 );
+				var lightSphereMaterial = new MeshBasicMaterial( { color: 'rgb(255,255,255)' } );
+				lightSphere = new Mesh( lightSphereGeometry, lightSphereMaterial );
 				scene.add( lightSphere );
 				lightSphere.visible = false;
 
-				var lightHolderGeometry = new THREE.CylinderBufferGeometry( 0.05, 0.05, 0.13 );
-				var lightHolderMaterial = new THREE.MeshBasicMaterial( { color: 'rgb(75,75,75)' } );
-				lightHolder = new THREE.Mesh( lightHolderGeometry, lightHolderMaterial );
+				var lightHolderGeometry = new CylinderBufferGeometry( 0.05, 0.05, 0.13 );
+				var lightHolderMaterial = new MeshBasicMaterial( { color: 'rgb(75,75,75)' } );
+				lightHolder = new Mesh( lightHolderGeometry, lightHolderMaterial );
 				scene.add( lightHolder );
 				lightHolder.visible = false;
 
 				// GROUND
-				var groundGeometry = new THREE.BoxBufferGeometry( 30, 0.01, 40 );
-				var groundMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
-				groundMesh = new THREE.Mesh( groundGeometry, groundMaterial );
+				var groundGeometry = new BoxBufferGeometry( 30, 0.01, 40 );
+				var groundMaterial = new MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
+				groundMesh = new Mesh( groundGeometry, groundMaterial );
 				groundMesh.position.y = 0.0; //this value must be slightly lower than the planeConstant (0.01) parameter above
 				scene.add( groundMesh );
 
 				// RED CUBE and CUBE's SHADOW
-				var cubeGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-				var cubeMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,0,0)', emissive: 0x200000 } );
-				cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+				var cubeGeometry = new BoxBufferGeometry( 1, 1, 1 );
+				var cubeMaterial = new MeshLambertMaterial( { color: 'rgb(255,0,0)', emissive: 0x200000 } );
+				cube = new Mesh( cubeGeometry, cubeMaterial );
 				cube.position.z = - 1;
 				scene.add( cube );
 
-				cubeShadow = new THREE.ShadowMesh( cube );
+				cubeShadow = new ShadowMesh( cube );
 				scene.add( cubeShadow );
 
 				// BLUE CYLINDER and CYLINDER's SHADOW
-				var cylinderGeometry = new THREE.CylinderBufferGeometry( 0.3, 0.3, 2 );
-				var cylinderMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(0,0,255)', emissive: 0x000020 } );
-				cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+				var cylinderGeometry = new CylinderBufferGeometry( 0.3, 0.3, 2 );
+				var cylinderMaterial = new MeshPhongMaterial( { color: 'rgb(0,0,255)', emissive: 0x000020 } );
+				cylinder = new Mesh( cylinderGeometry, cylinderMaterial );
 				cylinder.position.z = - 2.5;
 				scene.add( cylinder );
 
-				cylinderShadow = new THREE.ShadowMesh( cylinder );
+				cylinderShadow = new ShadowMesh( cylinder );
 				scene.add( cylinderShadow );
 
 				// MAGENTA TORUS and TORUS' SHADOW
-				var torusGeometry = new THREE.TorusBufferGeometry( 1, 0.2, 10, 16, TWO_PI );
-				var torusMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,0,255)', emissive: 0x200020 } );
-				torus = new THREE.Mesh( torusGeometry, torusMaterial );
+				var torusGeometry = new TorusBufferGeometry( 1, 0.2, 10, 16, TWO_PI );
+				var torusMaterial = new MeshPhongMaterial( { color: 'rgb(255,0,255)', emissive: 0x200020 } );
+				torus = new Mesh( torusGeometry, torusMaterial );
 				torus.position.z = - 6;
 				scene.add( torus );
 
-				torusShadow = new THREE.ShadowMesh( torus );
+				torusShadow = new ShadowMesh( torus );
 				scene.add( torusShadow );
 
 				// WHITE SPHERE and SPHERE'S SHADOW
-				var sphereGeometry = new THREE.SphereBufferGeometry( 0.5, 20, 10 );
-				var sphereMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,255)', emissive: 0x222222 } );
-				sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+				var sphereGeometry = new SphereBufferGeometry( 0.5, 20, 10 );
+				var sphereMaterial = new MeshPhongMaterial( { color: 'rgb(255,255,255)', emissive: 0x222222 } );
+				sphere = new Mesh( sphereGeometry, sphereMaterial );
 				sphere.position.set( 4, 0.5, 2 );
 				scene.add( sphere );
 
-				sphereShadow = new THREE.ShadowMesh( sphere );
+				sphereShadow = new ShadowMesh( sphere );
 				scene.add( sphereShadow );
 
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
-				var pyramidGeometry = new THREE.CylinderBufferGeometry( 0, 0.5, 2, 4 );
-				var pyramidMaterial = new THREE.MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
-				pyramid = new THREE.Mesh( pyramidGeometry, pyramidMaterial );
+				var pyramidGeometry = new CylinderBufferGeometry( 0, 0.5, 2, 4 );
+				var pyramidMaterial = new MeshPhongMaterial( { color: 'rgb(255,255,0)', emissive: 0x440000, flatShading: true, shininess: 0 } );
+				pyramid = new Mesh( pyramidGeometry, pyramidMaterial );
 				pyramid.position.set( - 4, 1, 2 );
 				scene.add( pyramid );
 
-				pyramidShadow = new THREE.ShadowMesh( pyramid );
+				pyramidShadow = new ShadowMesh( pyramid );
 				scene.add( pyramidShadow );
+
+				document.getElementById( 'lightButton' ).addEventListener( 'click', lightButtonHandler );
 
 			}
 

@@ -4,41 +4,42 @@
 		<title>three.js - software renderer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color:#0078ff;
-			}
-			#info {
-				position: absolute;
-				top: 10px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index:100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - software renderer</br>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - software renderer<br />
 			drag to change the point of view
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/geometries/hilbert3D.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SoftwareRenderer.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				BufferGeometry,
+				CatmullRomCurve3,
+				Color,
+				Float32BufferAttribute,
+				Line,
+				LineBasicMaterial,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Scene,
+				Sprite,
+				SpriteMaterial,
+				TextureLoader,
+				TorusKnotBufferGeometry,
+				Vector3,
+				VertexColors
+			} from "../build/three.module.js";
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { SoftwareRenderer } from './jsm/renderers/SoftwareRenderer.js';
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			var camera, controls, scene, renderer, stats;
 
@@ -54,19 +55,17 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 600;
 
-				controls = new THREE.TrackballControls( camera );
-
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// Torus
-				var torusGeometry = new THREE.TorusKnotBufferGeometry( 150, 10 );
+				var torusGeometry = new TorusKnotBufferGeometry( 150, 10 );
 				torusGeometry = torusGeometry.toNonIndexed();
 
 				var colors = [];
-				var color = new THREE.Color();
+				var color = new Color();
 
 				for ( var i = 0; i < torusGeometry.attributes.position.count; i ++ ) {
 
@@ -75,13 +74,13 @@
 
 				}
 
-				torusGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				torusGeometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-				torus = new THREE.Mesh( torusGeometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, vertexColors: THREE.VertexColors } ) );
+				torus = new Mesh( torusGeometry, new MeshBasicMaterial( { color: 0x0000ff, vertexColors: VertexColors } ) );
 				scene.add( torus );
 
 				// Cube
-				var boxGeometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				var boxGeometry = new BoxBufferGeometry( 200, 200, 200 );
 				boxGeometry = boxGeometry.toNonIndexed();
 
 				colors = [];
@@ -93,46 +92,46 @@
 
 				}
 
-				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				boxGeometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-				cube = new THREE.Mesh( boxGeometry, new THREE.MeshBasicMaterial( { color: 0x00ff00, vertexColors: THREE.VertexColors } ) );
+				cube = new Mesh( boxGeometry, new MeshBasicMaterial( { color: 0x00ff00, vertexColors: VertexColors } ) );
 				scene.position.set( 100, 0, 0 );
 				scene.add( cube );
 
 				// Cube with texture
-				var loader = new THREE.TextureLoader();
+				var loader = new TextureLoader();
 				var map = loader.load( 'textures/brick_diffuse.jpg' );
-				texCube = new THREE.Mesh( boxGeometry, new THREE.MeshLambertMaterial( { map: map } ) );
+				texCube = new Mesh( boxGeometry, new MeshLambertMaterial( { map: map } ) );
 				texCube.position.set( - 300, 0, 0 );
 				scene.add( texCube );
 
 				// Sprite
-				var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: 0xff0040 } ) );
+				var sprite = new Sprite( new SpriteMaterial( { color: 0xff0040 } ) );
 				sprite.scale.set( 100, 100, 1 );
 				sprite.position.set( - 100, 200, 0 );
 				scene.add( sprite );
 
 				// Sprite with texture
-				var texLoader = new THREE.TextureLoader();
+				var texLoader = new TextureLoader();
 				map = texLoader.load( 'textures/sprite1.png' );
-				var texSprite = new THREE.Sprite( new THREE.SpriteMaterial( { map: map, transparent: true } ) );
+				var texSprite = new Sprite( new SpriteMaterial( { map: map, transparent: true } ) );
 				texSprite.scale.set( 100, 100, 1 );
 				texSprite.position.set( 100, 200, 0 );
 				scene.add( texSprite );
 
 				// Line
-				var hilbertPoints = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = GeometryUtils.hilbert3D( new Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var lineGeometry = new THREE.BufferGeometry();
+				var lineGeometry = new BufferGeometry();
 				var subdivisions = 6;
 
 				var vertices = [];
 				colors = [];
 
-				var point = new THREE.Vector3();
+				var point = new Vector3();
 				color.setHex( 0x88aaff );
 
-				var spline = new THREE.CatmullRomCurve3( hilbertPoints );
+				var spline = new CatmullRomCurve3( hilbertPoints );
 
 				for ( var i = 0; i < hilbertPoints.length * subdivisions; i ++ ) {
 
@@ -144,21 +143,22 @@
 
 				}
 
-				lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				lineGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				lineGeometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				lineGeometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
-				var line = new THREE.Line( lineGeometry, material );
+				var material = new LineBasicMaterial( { opacity: 1, linewidth: 3, vertexColors: VertexColors } );
+				var line = new Line( lineGeometry, material );
 				line.scale.set( 0.5, 0.5, 0.5 );
 				line.position.set( 0, - 200, 0 );
 				scene.add( line );
 
 				//
 
-				renderer = new THREE.SoftwareRenderer();
+				renderer = new SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
+
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

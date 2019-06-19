@@ -4,33 +4,41 @@
 		<title>three.js webvr - cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-01-07 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-01-07" content="ArPzyYNrUDiXsGOh647Ya7MtVUA1nM+WFMnPWu7eoF2nQHOP6mTATIbiv0w+k2kFaPofZG/04ZEQdsACq4IA0wQAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Njg4MzAxOH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2019-01-07 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2019-01-07" content="Av16a8LVXasKVQV9j3u0OlXdTfz5O9qDqhROyL5Up6R3sdOPbtFuc6n6o5DHitwnb5VdirH0GyvROwvz8xxd0AkAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQ2ODgzMDE4fQ==">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes
+		</div>
+
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
-		<script src="js/geometries/BoxLineGeometry.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Clock,
+				Color,
+				DirectionalLight,
+				HemisphereLight,
+				LineBasicMaterial,
+				LineSegments,
+				Math as _Math,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Raycaster,
+				RingBufferGeometry,
+				Scene,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			var container;
 			var camera, scene, raycaster, renderer;
@@ -49,23 +57,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes';
-				container.appendChild( info );
+				scene = new Scene();
+				scene.background = new Color( 0x505050 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x505050 );
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				scene.add( camera );
 
-				crosshair = new THREE.Mesh(
-					new THREE.RingBufferGeometry( 0.02, 0.04, 32 ),
-					new THREE.MeshBasicMaterial( {
+				crosshair = new Mesh(
+					new RingBufferGeometry( 0.02, 0.04, 32 ),
+					new MeshBasicMaterial( {
 						color: 0xffffff,
 						opacity: 0.5,
 						transparent: true
@@ -74,24 +74,24 @@
 				crosshair.position.z = - 2;
 				camera.add( crosshair );
 
-				room = new THREE.LineSegments(
-					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.LineBasicMaterial( { color: 0x808080 } )
+				room = new LineSegments(
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new LineBasicMaterial( { color: 0x808080 } )
 				);
 				room.position.y = 3;
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+				scene.add( new HemisphereLight( 0x606060, 0x404040 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 0.15, 0.15, 0.15 );
+				var geometry = new BoxBufferGeometry( 0.15, 0.15, 0.15 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var object = new Mesh( geometry, new MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 4 - 2;
 					object.position.y = Math.random() * 4 - 2;
@@ -105,7 +105,7 @@
 					object.scale.y = Math.random() + 0.5;
 					object.scale.z = Math.random() + 0.5;
 
-					object.userData.velocity = new THREE.Vector3();
+					object.userData.velocity = new Vector3();
 					object.userData.velocity.x = Math.random() * 0.01 - 0.005;
 					object.userData.velocity.y = Math.random() * 0.01 - 0.005;
 					object.userData.velocity.z = Math.random() * 0.01 - 0.005;
@@ -114,9 +114,9 @@
 
 				}
 
-				raycaster = new THREE.Raycaster();
+				raycaster = new Raycaster();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
@@ -247,21 +247,21 @@
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.position.x = _Math.clamp( cube.position.x, - 3, 3 );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
 					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
+						cube.position.y = _Math.clamp( cube.position.y, - 3, 3 );
 						cube.userData.velocity.y = - cube.userData.velocity.y;
 
 					}
 
 					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.position.z = _Math.clamp( cube.position.z, - 3, 3 );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}

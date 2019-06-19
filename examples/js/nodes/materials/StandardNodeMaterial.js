@@ -34,6 +34,7 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'shadow',
 	'ao',
 	'environment',
+	'mask',
 	'position'
 ] );
 

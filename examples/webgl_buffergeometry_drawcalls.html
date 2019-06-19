@@ -4,43 +4,45 @@
 		<title>three.js webgl - buffergeometry - lines drawcalls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-				color: #0080ff;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry drawcalls - by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry drawcalls<br/>
+			by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
 		</div>
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				AdditiveBlending,
+				BoxBufferGeometry,
+				BoxHelper,
+				BufferAttribute,
+				BufferGeometry,
+				Group,
+				LineBasicMaterial,
+				LineSegments,
+				Mesh,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				Vector3,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var group;
 			var container, stats;
@@ -71,7 +73,7 @@
 
 			function initGUI() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( effectController, "showDots" ).onChange( function ( value ) {
 
@@ -101,20 +103,20 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 1750;
 
-				var controls = new THREE.OrbitControls( camera, container );
+				var controls = new OrbitControls( camera, container );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 
-				group = new THREE.Group();
+				group = new Group();
 				scene.add( group );
 
-				var helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxBufferGeometry( r, r, r ) ) );
-				helper.material.color.setHex( 0x080808 );
-				helper.material.blending = THREE.AdditiveBlending;
+				var helper = new BoxHelper( new Mesh( new BoxBufferGeometry( r, r, r ) ) );
+				helper.material.color.setHex( 0x101010 );
+				helper.material.blending = AdditiveBlending;
 				helper.material.transparent = true;
 				group.add( helper );
 
@@ -123,15 +125,15 @@
 				positions = new Float32Array( segments * 3 );
 				colors = new Float32Array( segments * 3 );
 
-				var pMaterial = new THREE.PointsMaterial( {
+				var pMaterial = new PointsMaterial( {
 					color: 0xFFFFFF,
 					size: 3,
-					blending: THREE.AdditiveBlending,
+					blending: AdditiveBlending,
 					transparent: true,
 					sizeAttenuation: false
 				} );
 
-				particles = new THREE.BufferGeometry();
+				particles = new BufferGeometry();
 				particlePositions = new Float32Array( maxParticleCount * 3 );
 
 				for ( var i = 0; i < maxParticleCount; i ++ ) {
@@ -146,40 +148,40 @@
 
 					// add it to the geometry
 					particlesData.push( {
-						velocity: new THREE.Vector3( - 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2 ),
+						velocity: new Vector3( - 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2 ),
 						numConnections: 0
 					} );
 
 				}
 
 				particles.setDrawRange( 0, particleCount );
-				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
+				particles.addAttribute( 'position', new BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
 
 				// create the particle system
-				pointCloud = new THREE.Points( particles, pMaterial );
+				pointCloud = new Points( particles, pMaterial );
 				group.add( pointCloud );
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setDynamic( true ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ).setDynamic( true ) );
 
 				geometry.computeBoundingSphere();
 
 				geometry.setDrawRange( 0, 0 );
 
-				var material = new THREE.LineBasicMaterial( {
-					vertexColors: THREE.VertexColors,
-					blending: THREE.AdditiveBlending,
+				var material = new LineBasicMaterial( {
+					vertexColors: VertexColors,
+					blending: AdditiveBlending,
 					transparent: true
 				} );
 
-				linesMesh = new THREE.LineSegments( geometry, material );
+				linesMesh = new LineSegments( geometry, material );
 				group.add( linesMesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

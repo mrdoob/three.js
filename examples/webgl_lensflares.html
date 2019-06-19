@@ -4,57 +4,43 @@
 		<title>three.js webgl - lensflares</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index:100;
-			}
-
-			a {
-				color: orange;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares -
-			textures from <a href="http://ro.me">ro.me</a> - fly with WASD/RF/QE + mouse
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares<br/>
+			textures from <a href="http://ro.me">ro.me</a><br/>
+			fly with WASD/RF/QE + mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Clock,
+				Color,
+				DirectionalLight,
+				Fog,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FlyControls.js"></script>
-		<script src="js/objects/Lensflare.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import { FlyControls } from './jsm/controls/FlyControls.js';
+			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
 
 			var container, stats;
 
 			var camera, scene, renderer;
 			var controls;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -66,10 +52,10 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 250;
 
-				controls = new THREE.FlyControls( camera );
+				controls = new FlyControls( camera );
 
 				controls.movementSpeed = 2500;
 				controls.domElement = container;
@@ -79,20 +65,20 @@
 
 				// scene
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color().setHSL( 0.51, 0.4, 0.01 );
-				scene.fog = new THREE.Fog( scene.background, 3500, 15000 );
+				scene = new Scene();
+				scene.background = new Color().setHSL( 0.51, 0.4, 0.01 );
+				scene.fog = new Fog( scene.background, 3500, 15000 );
 
 				// world
 
 				var s = 250;
 
-				var geometry = new THREE.BoxBufferGeometry( s, s, s );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
+				var geometry = new BoxBufferGeometry( s, s, s );
+				var material = new MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 				for ( var i = 0; i < 3000; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = 8000 * ( 2.0 * Math.random() - 1.0 );
 					mesh.position.y = 8000 * ( 2.0 * Math.random() - 1.0 );
@@ -112,13 +98,13 @@
 
 				// lights
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.05 );
+				var dirLight = new DirectionalLight( 0xffffff, 0.05 );
 				dirLight.position.set( 0, - 1, 0 ).normalize();
 				dirLight.color.setHSL( 0.1, 0.7, 0.5 );
 				scene.add( dirLight );
 
 				// lensflares
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
 				var textureFlare0 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
 				var textureFlare3 = textureLoader.load( 'textures/lensflare/lensflare3.png' );
@@ -129,24 +115,24 @@
 
 				function addLight( h, s, l, x, y, z ) {
 
-					var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+					var light = new PointLight( 0xffffff, 1.5, 2000 );
 					light.color.setHSL( h, s, l );
 					light.position.set( x, y, z );
 					scene.add( light );
 
-					var lensflare = new THREE.Lensflare();
-					lensflare.addElement( new THREE.LensflareElement( textureFlare0, 700, 0, light.color ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 60, 0.6 ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 0.7 ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 120, 0.9 ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 1 ) );
+					var lensflare = new Lensflare();
+					lensflare.addElement( new LensflareElement( textureFlare0, 700, 0, light.color ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 60, 0.6 ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 70, 0.7 ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 120, 0.9 ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 70, 1 ) );
 					light.add( lensflare );
 
 				}
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

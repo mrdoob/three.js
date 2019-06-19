@@ -4,37 +4,24 @@
 		<title>three.js webgl - loaders - Babylon loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - BabylonLoader test
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Babylon loader
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/BabylonLoader.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+		<script type="module">
+			import {
+				LoadingManager,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { BabylonLoader } from './jsm/loaders/BabylonLoader.js';
 
 			var camera, controls, scene, renderer;
 
@@ -42,18 +29,16 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 100;
-
-				controls = new THREE.TrackballControls( camera );
 
 				// scene
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// texture
 
-				var manager = new THREE.LoadingManager();
+				var manager = new LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
@@ -73,14 +58,14 @@
 
 				// model
 
-				var loader = new THREE.BabylonLoader( manager );
+				var loader = new BabylonLoader( manager );
 				loader.load( 'models/babylon/skull.babylon', function ( babylonScene ) {
 
 					babylonScene.traverse( function ( object ) {
 
-						if ( object instanceof THREE.Mesh ) {
+						if ( object.isMesh ) {
 
-							object.material = new THREE.MeshPhongMaterial( {
+							object.material = new MeshPhongMaterial( {
 								color: Math.random() * 0xffffff
 							} );
 
@@ -96,10 +81,14 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				//
 

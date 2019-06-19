@@ -4,41 +4,12 @@
 		<title>three.js webgl - materials - shaders [custom]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
 
@@ -160,13 +131,20 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Clock,
+				Mesh,
+				PerspectiveCamera,
+				RepeatWrapping,
+				Scene,
+				ShaderMaterial,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -181,14 +159,14 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
-				var geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
+				var geometry = new BoxBufferGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
 					"time": { value: 1.0 }
@@ -196,10 +174,10 @@
 
 				uniforms2 = {
 					"time": { value: 1.0 },
-					"texture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+					"texture": { value: new TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],
@@ -210,7 +188,7 @@
 
 				for ( var i = 0; i < params.length; i ++ ) {
 
-					var material = new THREE.ShaderMaterial( {
+					var material = new ShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -218,14 +196,14 @@
 
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.add( mesh );
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 

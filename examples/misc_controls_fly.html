@@ -4,69 +4,56 @@
 		<title>three.js webgl - fly controls - earth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
 				background:#000;
 				color: #eee;
-				padding:0;
-				margin:0;
-				font-weight:bold;
-				overflow:hidden;
-
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-				box-sizing: border-box;
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
 			b {
-				color:orange
+				color: orange
 			}
 		</style>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/FlyControls.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 	</head>
 
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/><br/>
-		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw<br/>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/>
+		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw
 		</div>
 
-		<script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Clock,
+				DirectionalLight,
+				Float32BufferAttribute,
+				FogExp2,
+				Mesh,
+				MeshLambertMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				SphereBufferGeometry,
+				TextureLoader,
+				Vector2,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FlyControls } from './jsm/controls/FlyControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
 
 			var radius = 6371;
 			var tilt = 0.41;
@@ -85,82 +72,82 @@
 
 			var composer;
 
-			var textureLoader = new THREE.TextureLoader();
+			var textureLoader = new TextureLoader();
 
-			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
+			var d, dPlanet, dMoon, dMoonVec = new Vector3();
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
+				camera = new PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
 				camera.position.z = radius * 5;
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
+				scene = new Scene();
+				scene.fog = new FogExp2( 0x000000, 0.00000025 );
 
-				dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight = new DirectionalLight( 0xffffff );
 				dirLight.position.set( - 1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var materialNormalMap = new THREE.MeshPhongMaterial( {
+				var materialNormalMap = new MeshPhongMaterial( {
 
 					specular: 0x333333,
 					shininess: 15,
 					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
 					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
 					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
-					normalScale: new THREE.Vector2( 0.85, 0.85 )
+					normalScale: new Vector2( 0.85, 0.85 )
 
 				} );
 
 				// planet
 
-				geometry = new THREE.SphereBufferGeometry( radius, 100, 50 );
+				geometry = new SphereBufferGeometry( radius, 100, 50 );
 
-				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
+				meshPlanet = new Mesh( geometry, materialNormalMap );
 				meshPlanet.rotation.y = 0;
 				meshPlanet.rotation.z = tilt;
 				scene.add( meshPlanet );
 
 				// clouds
 
-				var materialClouds = new THREE.MeshLambertMaterial( {
+				var materialClouds = new MeshLambertMaterial( {
 
 					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
 					transparent: true
 
 				} );
 
-				meshClouds = new THREE.Mesh( geometry, materialClouds );
+				meshClouds = new Mesh( geometry, materialClouds );
 				meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
 				meshClouds.rotation.z = tilt;
 				scene.add( meshClouds );
 
 				// moon
 
-				var materialMoon = new THREE.MeshPhongMaterial( {
+				var materialMoon = new MeshPhongMaterial( {
 
 					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
 
 				} );
 
-				meshMoon = new THREE.Mesh( geometry, materialMoon );
+				meshMoon = new Mesh( geometry, materialMoon );
 				meshMoon.position.set( radius * 5, 0, 0 );
 				meshMoon.scale.set( moonScale, moonScale, moonScale );
 				scene.add( meshMoon );
 
 				// stars
 
-				var i, r = radius, starsGeometry = [ new THREE.BufferGeometry(), new THREE.BufferGeometry() ];
+				var i, r = radius, starsGeometry = [ new BufferGeometry(), new BufferGeometry() ];
 
 				var vertices1 = [];
 				var vertices2 = [];
 
-				var vertex = new THREE.Vector3();
+				var vertex = new Vector3();
 
 				for ( i = 0; i < 250; i ++ ) {
 
@@ -184,22 +171,22 @@
 
 				}
 
-				starsGeometry[ 0 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
-				starsGeometry[ 1 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
+				starsGeometry[ 0 ].addAttribute( 'position', new Float32BufferAttribute( vertices1, 3 ) );
+				starsGeometry[ 1 ].addAttribute( 'position', new Float32BufferAttribute( vertices2, 3 ) );
 
 				var stars;
 				var starsMaterials = [
-					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+					new PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+					new PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+					new PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+					new PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+					new PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+					new PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
 				for ( i = 10; i < 30; i ++ ) {
 
-					stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					stars = new Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
@@ -213,14 +200,14 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.FlyControls( camera );
+				controls = new FlyControls( camera );
 
 				controls.movementSpeed = 1000;
 				controls.domElement = renderer.domElement;
@@ -237,12 +224,10 @@
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
+				var renderModel = new RenderPass( scene, camera );
+				var effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
 
-				effectFilm.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFilm );
@@ -254,12 +239,11 @@
 				SCREEN_HEIGHT = window.innerHeight;
 				SCREEN_WIDTH = window.innerWidth;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				composer.reset();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 

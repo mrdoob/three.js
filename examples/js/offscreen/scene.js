@@ -15,6 +15,7 @@ function init( canvas, width, height, pixelRatio, path ) {
 	// we don't use ImageLoader since it has a DOM dependency (HTML5 image element)
 
 	var loader = new THREE.ImageBitmapLoader().setPath( path );
+	loader.setOptions( { imageOrientation: 'flipY' } );
 	loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function ( imageBitmap ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
@@ -71,7 +72,11 @@ function animate() {
 // PRNG
 
 var seed = 1;
+
 function random() {
-	var x = Math.sin(seed++) * 10000;
-	return x - Math.floor(x);
+
+	var x = Math.sin( seed ++ ) * 10000;
+
+	return x - Math.floor( x );
+
 }

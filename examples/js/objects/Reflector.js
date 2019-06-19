@@ -28,7 +28,6 @@ THREE.Reflector = function ( geometry, options ) {
 	var rotationMatrix = new THREE.Matrix4();
 	var lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	var clipPlane = new THREE.Vector4();
-	var viewport = new THREE.Vector4();
 
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
@@ -63,7 +62,6 @@ THREE.Reflector = function ( geometry, options ) {
 	material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
 	this.material = material;
-	this.renderOrder = - Infinity; // render first
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -161,7 +159,9 @@ THREE.Reflector = function ( geometry, options ) {
 		renderer.vr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
-		renderer.render( scene, virtualCamera, renderTarget, true );
+		renderer.setRenderTarget( renderTarget );
+		renderer.clear();
+		renderer.render( scene, virtualCamera );
 
 		renderer.vr.enabled = currentVrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -170,19 +170,9 @@ THREE.Reflector = function ( geometry, options ) {
 
 		// Restore viewport
 
-		var bounds = camera.bounds;
+		if ( camera.isArrayCamera ) {
 
-		if ( bounds !== undefined ) {
-
-			var size = renderer.getSize();
-			var pixelRatio = renderer.getPixelRatio();
-
-			viewport.x = bounds.x * size.width * pixelRatio;
-			viewport.y = bounds.y * size.height * pixelRatio;
-			viewport.z = bounds.z * size.width * pixelRatio;
-			viewport.w = bounds.w * size.height * pixelRatio;
-
-			renderer.state.viewport( viewport );
+			renderer.state.viewport( camera.viewport );
 
 		}
 
@@ -206,17 +196,14 @@ THREE.Reflector.ReflectorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 

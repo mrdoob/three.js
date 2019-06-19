@@ -4,33 +4,8 @@
 		<title>three.js webgl - cameras - logarithmic depth buffer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index: 100;
-				color: #ddd;
-				text-shadow: 0 0 1px rgba(0,0,0,1);
-			}
-
-			a {
-				color: #0080ff;
-			}
-
-			b { color: lightgreen }
-
 			.renderer_label {
 				position: absolute;
 				bottom: 1em;
@@ -40,24 +15,27 @@
 				display: block;
 				text-align: center;
 			}
+
 			#container {
-				white-space: nowrap;
+				display: flex;
 			}
+
 			#container_normal {
 				width: 50%;
 				display: inline-block;
 				position: relative;
-				overflow: hidden;
 			}
+
 			#container_logzbuf {
 				width: 50%;
 				display: inline-block;
 				position: relative;
-				overflow: hidden;
 			}
+
 			#renderer_border {
 				position: absolute;
 				top: 0;
+				left: 25%;
 				bottom: 0;
 				width: 2px;
 				z-index: 10;
@@ -71,21 +49,34 @@
 	<body>
 
 		<div id="container">
-			<div id="container_normal"><h2 class="renderer_label">normal z-buffer</h2></div><div id="container_logzbuf"><h2 class="renderer_label">logarithmic z-buffer</h2></div>
+			<div id="container_normal"><h2 class="renderer_label">normal z-buffer</h2></div>
+			<div id="container_logzbuf"><h2 class="renderer_label">logarithmic z-buffer</h2></div>
 			<div id="renderer_border"></div>
 		</div>
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
-			Zoom through scene with objects ranging in size from 1µm to 100,000,000 light years using the mousewheel<br/>
-			Linear z-buffer handles close-up objects well, but fails spectacularly at distant objects<br/>
-			Logarithmic handles all but the smallest objects with ease
+			mousewheel to dolly out
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				DirectionalLight,
+				FontLoader,
+				Group,
+				Math as _Math,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Scene,
+				SphereBufferGeometry,
+				TextBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
 			var NEAR = 1e-6, FAR = 1e27;
@@ -128,7 +119,7 @@
 
 				container = document.getElementById( 'container' );
 
-				var loader = new THREE.FontLoader();
+				var loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var scene = initScene( font );
@@ -158,10 +149,10 @@
 
 				var framecontainer = document.getElementById( 'container_' + name );
 
-				var camera = new THREE.PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				var camera = new PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				scene.add( camera );
 
-				var renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
+				var renderer = new WebGLRenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -174,11 +165,11 @@
 
 			function initScene( font ) {
 
-				var scene = new THREE.Scene();
+				var scene = new Scene();
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new AmbientLight( 0x222222 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var light = new DirectionalLight( 0xffffff, 1 );
 				light.position.set( 100, 100, 100 );
 				scene.add( light );
 
@@ -189,13 +180,13 @@
 					emissive: 0x000000
 				};
 
-				var geometry = new THREE.SphereBufferGeometry( 0.5, 24, 12 );
+				var geometry = new SphereBufferGeometry( 0.5, 24, 12 );
 
 				for ( var i = 0; i < labeldata.length; i ++ ) {
 
 					var scale = labeldata[ i ].scale || 1;
 
-					var labelgeo = new THREE.TextBufferGeometry( labeldata[ i ].label, {
+					var labelgeo = new TextBufferGeometry( labeldata[ i ].label, {
 						font: font,
 						size: labeldata[ i ].size,
 						height: labeldata[ i ].size / 2
@@ -206,21 +197,21 @@
 					// center text
 					labelgeo.translate( - labelgeo.boundingSphere.radius, 0, 0 );
 
-					materialargs.color = new THREE.Color().setHSL( Math.random(), 0.5, 0.5 );
+					materialargs.color = new Color().setHSL( Math.random(), 0.5, 0.5 );
 
-					var material = new THREE.MeshPhongMaterial( materialargs );
+					var material = new MeshPhongMaterial( materialargs );
 
-					var group = new THREE.Group();
+					var group = new Group();
 					group.position.z = - labeldata[ i ].size * scale;
 					scene.add( group );
 
-					var textmesh = new THREE.Mesh( labelgeo, material );
+					var textmesh = new Mesh( labelgeo, material );
 					textmesh.scale.set( scale, scale, scale );
 					textmesh.position.z = - labeldata[ i ].size * scale;
 					textmesh.position.y = labeldata[ i ].size / 4 * scale;
 					group.add( textmesh );
 
-					var dotmesh = new THREE.Mesh( geometry, material );
+					var dotmesh = new Mesh( geometry, material );
 					dotmesh.position.y = - labeldata[ i ].size / 4 * scale;
 					dotmesh.scale.multiplyScalar( labeldata[ i ].size * scale );
 					group.add( dotmesh );
@@ -271,7 +262,7 @@
 				var damping = ( Math.abs( zoomspeed ) > minzoomspeed ? .95 : 1.0 );
 
 				// Zoom out faster the further out you go
-				var zoom = THREE.Math.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
+				var zoom = _Math.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
 				zoompos = Math.log( zoom );
 
 				// Slow down quickly at the zoom limits

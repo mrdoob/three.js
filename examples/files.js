@@ -4,6 +4,7 @@ var files = {
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
 		"webgl_animation_skinning_morph",
+		"webgl_animation_multiple",
 		"webgl_camera",
 		"webgl_camera_array",
 		"webgl_camera_cinematic",
@@ -43,7 +44,7 @@ var files = {
 		"webgl_geometry_terrain_raycast",
 		"webgl_geometry_text",
 		"webgl_geometry_text_shapes",
-		"webgl_hdr",
+		"webgl_geometry_text_stroke",
 		"webgl_helpers",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
@@ -58,7 +59,7 @@ var files = {
 		"webgl_kinect",
 		"webgl_layers",
 		"webgl_lensflares",
-		"webgl_lightningstrike",
+		"webgl_lightprobe",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
@@ -73,6 +74,7 @@ var files = {
 		"webgl_lines_sphere",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
+		"webgl_loader_3mf_materials",
 		"webgl_loader_amf",
 		"webgl_loader_assimp",
 		"webgl_loader_assimp2json",
@@ -94,6 +96,7 @@ var files = {
 		"webgl_loader_json_claraio",
 		"webgl_loader_kmz",
 		"webgl_loader_ldraw",
+		"webgl_loader_lwo",
 		"webgl_loader_md2",
 		"webgl_loader_md2_control",
 		"webgl_loader_mmd",
@@ -123,11 +126,13 @@ var files = {
 		"webgl_loader_sea3d_sound",
 		"webgl_loader_stl",
 		"webgl_loader_svg",
+		"webgl_loader_texture_basis",
 		"webgl_loader_texture_dds",
 		"webgl_loader_texture_exr",
 		"webgl_loader_texture_hdr",
 		"webgl_loader_texture_ktx",
 		"webgl_loader_texture_pvrtc",
+		"webgl_loader_texture_rgbm",
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
 		"webgl_loader_vrm",
@@ -154,6 +159,7 @@ var files = {
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_exr",
 		"webgl_materials_envmaps_hdr",
+		"webgl_materials_envmaps_parallax",
 		"webgl_materials_grass",
 		"webgl_materials_lightmap",
 		"webgl_materials_matcap",
@@ -207,40 +213,10 @@ var files = {
 		"webgl_performance_doublesided",
 		"webgl_performance_nodes",
 		"webgl_performance_static",
-		"webgl_physics_cloth",
-		"webgl_physics_convex_break",
-		"webgl_physics_rope",
-		"webgl_physics_terrain",
-		"webgl_physics_volume",
 		"webgl_points_billboards",
 		"webgl_points_dynamic",
 		"webgl_points_sprites",
 		"webgl_points_waves",
-		"webgl_postprocessing",
-		"webgl_postprocessing_advanced",
-		"webgl_postprocessing_afterimage",
-		"webgl_postprocessing_backgrounds",
-		"webgl_postprocessing_crossfade",
-		"webgl_postprocessing_dof",
-		"webgl_postprocessing_dof2",
-		"webgl_postprocessing_fxaa",
-		"webgl_postprocessing_glitch",
-		"webgl_postprocessing_godrays",
-		"webgl_postprocessing_rgb_halftone",
-		"webgl_postprocessing_masking",
-		"webgl_postprocessing_ssaa",
-		"webgl_postprocessing_ssaa_unbiased",
-		"webgl_postprocessing_nodes",
-		"webgl_postprocessing_nodes_pass",
-		"webgl_postprocessing_outline",
-		"webgl_postprocessing_pixel",
-		"webgl_postprocessing_procedural",
-		"webgl_postprocessing_sao",
-		"webgl_postprocessing_smaa",
-		"webgl_postprocessing_sobel",
-		"webgl_postprocessing_ssao",
-		"webgl_postprocessing_taa",
-		"webgl_postprocessing_unreal_bloom",
 		"webgl_raycast_sprite",
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
@@ -273,6 +249,34 @@ var files = {
 		"webgl_water",
 		"webgl_water_flowmap"
 	],
+	"webgl / postprocessing": [
+		"webgl_postprocessing",
+		"webgl_postprocessing_advanced",
+		"webgl_postprocessing_afterimage",
+		"webgl_postprocessing_backgrounds",
+		"webgl_postprocessing_crossfade",
+		"webgl_postprocessing_dof",
+		"webgl_postprocessing_dof2",
+		"webgl_postprocessing_fxaa",
+		"webgl_postprocessing_glitch",
+		"webgl_postprocessing_godrays",
+		"webgl_postprocessing_rgb_halftone",
+		"webgl_postprocessing_masking",
+		"webgl_postprocessing_ssaa",
+		"webgl_postprocessing_ssaa_unbiased",
+		"webgl_postprocessing_nodes",
+		"webgl_postprocessing_nodes_pass",
+		"webgl_postprocessing_outline",
+		"webgl_postprocessing_pixel",
+		"webgl_postprocessing_procedural",
+		"webgl_postprocessing_sao",
+		"webgl_postprocessing_smaa",
+		"webgl_postprocessing_sobel",
+		"webgl_postprocessing_ssao",
+		"webgl_postprocessing_taa",
+		"webgl_postprocessing_unreal_bloom",
+		"webgl_postprocessing_unreal_bloom_selective"
+	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
 		"webgl_buffergeometry_constructed_from_geometry",
@@ -303,19 +307,20 @@ var files = {
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
 		"webgl_gpu_particle_system",
+		"webgl_lightningstrike",
+		"webgl_lightshafts",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
-		"webgl_worker_offscreencanvas"
-	],
-	"webgl deferred": [
+		"webgl_worker_offscreencanvas",
 		"webgldeferred_animation"
 	],
 	"webgl2": [
+		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
-		"webgl2_materials_texture3d_volume",
+		"webgl2_multisampled_renderbuffers",
 		"webgl2_sandbox"
 	],
 	"webaudio": [
@@ -338,6 +343,13 @@ var files = {
 		"webvr_vive_paint",
 		"webvr_vive_sculpt"
 	],
+	"physics": [
+		"webgl_physics_cloth",
+		"webgl_physics_convex_break",
+		"webgl_physics_rope",
+		"webgl_physics_terrain",
+		"webgl_physics_volume"
+	],
 	"misc": [
 		"misc_animation_authoring",
 		"misc_animation_groups",
@@ -351,12 +363,15 @@ var files = {
 		"misc_controls_trackball",
 		"misc_controls_transform",
 		"misc_exporter_collada",
+		"misc_exporter_draco",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
 		"misc_exporter_stl",
 		"misc_fps",
 		"misc_lookat",
-		"misc_uv_tests"
+	],
+	"css2d": [
+		"css2d_label"
 	],
 	"css3d": [
 		"css3d_molecules",
@@ -367,9 +382,6 @@ var files = {
 		"css3d_sandbox",
 		"css3d_sprites",
 		"css3d_youtube"
-	],
-	"css2d": [
-		"css2d_label"
 	],
 	"raytracing": [
 		"raytracing_sandbox"
@@ -382,5 +394,9 @@ var files = {
 	"svg": [
 		"svg_lines",
 		"svg_sandbox"
+	],
+	"tests": [
+		"webgl_furnace_test",
+		"misc_uv_tests"
 	]
 };

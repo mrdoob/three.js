@@ -1,61 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - inline tone mapping</title>
+		<title>three.js webgl - inline tone mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			a { color: #ff2 }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				ACESFilmicToneMapping,
+				BackSide,
+				BoxBufferGeometry,
+				CineonToneMapping,
+				HemisphereLight,
+				LinearToneMapping,
+				Mesh,
+				MeshStandardMaterial,
+				NoToneMapping,
+				PerspectiveCamera,
+				ReinhardToneMapping,
+				RepeatWrapping,
+				Scene,
+				sRGBEncoding,
+				SpotLight,
+				TextureLoader,
+				TorusKnotBufferGeometry,
+				Uncharted2ToneMapping,
+				UnsignedByteType,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var container, stats;
 			var params = {
@@ -69,15 +60,15 @@
 			};
 
 			var toneMappingOptions = {
-				None: THREE.NoToneMapping,
-				Linear: THREE.LinearToneMapping,
-				Reinhard: THREE.ReinhardToneMapping,
-				Uncharted2: THREE.Uncharted2ToneMapping,
-				Cineon: THREE.CineonToneMapping,
-				ACESFilmic: THREE.ACESFilmicToneMapping
+				None: NoToneMapping,
+				Linear: LinearToneMapping,
+				Reinhard: ReinhardToneMapping,
+				Uncharted2: Uncharted2ToneMapping,
+				Cineon: CineonToneMapping,
+				ACESFilmic: ACESFilmicToneMapping
 			};
 
-			var camera, scene, renderer, group;
+			var camera, scene, renderer, mesh;
 			var composer;
 			var standardMaterial, floorMaterial;
 
@@ -89,14 +80,14 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 40, 40 * 3.5 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
+				standardMaterial = new MeshStandardMaterial( {
 					bumpScale: - 0.05,
 					color: 0xffffff,
 					metalness: 0.9,
@@ -105,12 +96,12 @@
 					transparent: true
 				} );
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 				textureLoader.load( "textures/brick_diffuse.jpg", function ( map ) {
 
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.encoding = THREE.sRGBEncoding;
+					map.wrapS = RepeatWrapping;
+					map.wrapT = RepeatWrapping;
+					map.encoding = sRGBEncoding;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.map = map;
@@ -120,8 +111,8 @@
 
 				textureLoader.load( "textures/brick_bump.jpg", function ( map ) {
 
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
+					map.wrapS = RepeatWrapping;
+					map.wrapT = RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.bumpMap = map;
@@ -131,8 +122,8 @@
 
 				textureLoader.load( "textures/brick_roughness.jpg", function ( map ) {
 
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
+					map.wrapS = RepeatWrapping;
+					map.wrapT = RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 9, 0.5 );
 					standardMaterial.roughnessMap = map;
@@ -140,23 +131,23 @@
 
 				} );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				mesh = new THREE.Mesh( geometry, standardMaterial );
+				var geometry = new TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				mesh = new Mesh( geometry, standardMaterial );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				floorMaterial = new THREE.MeshStandardMaterial( {
+				floorMaterial = new MeshStandardMaterial( {
 					map: null,
 					roughnessMap: null,
 					color: 0x888888,
 					metalness: 0.0,
 					roughness: 1.0,
-					side: THREE.BackSide
+					side: BackSide
 				} );
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var floor = new THREE.Mesh( geometry, floorMaterial );
+				var geometry = new BoxBufferGeometry( 200, 200, 200 );
+				var floor = new Mesh( geometry, floorMaterial );
 				floor.position.y = 50;
 				floor.rotation.x = - Math.PI * 0.5;
 				floor.receiveShadow = true;
@@ -165,34 +156,36 @@
 				// Materials
 				var hdrpath = "textures/cube/pisaHDR/";
 				var hdrformat = '.hdr';
-				var hdrurls = [
+				var hdrUrls = [
 					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
 					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrurls, function ( hdrCubeMap ) {
+				new HDRCubeTextureLoader()
+					.setType( UnsignedByteType )
+					.load( hdrUrls, function ( hdrCubeMap ) {
 
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
+						pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-					standardMaterial.needsUpdate = true;
+						standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						standardMaterial.needsUpdate = true;
 
-					hdrCubeMap.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
+						hdrCubeMap.dispose();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-				} );
+					} );
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x111111, 0x000000 ) );
+				scene.add( new HemisphereLight( 0x111111, 0x000000 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff );
+				var spotLight = new SpotLight( 0xffffff );
 				spotLight.position.set( 50, 100, 50 );
 				spotLight.angle = Math.PI / 7;
 				spotLight.decay = 2;
@@ -208,24 +201,23 @@
 
 				renderer.gammaOutput = true;
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				var renderScene = new THREE.RenderPass( scene, camera );
+				var renderScene = new RenderPass( scene, camera );
 				composer.addPass( renderScene );
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) );
 				gui.add( params, 'exposure', 0, 10 );

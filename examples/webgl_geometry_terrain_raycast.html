@@ -4,50 +4,44 @@
 		<title>three.js webgl - geometry - terrain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
 				color: #a06851;
 			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				CanvasTexture,
+				ClampToEdgeWrapping,
+				Color,
+				ConeBufferGeometry,
+				Mesh,
+				MeshBasicMaterial,
+				MeshNormalMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Raycaster,
+				Scene,
+				Vector2,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			var container, stats;
 
@@ -60,8 +54,8 @@
 
 			var helper;
 
-			var raycaster = new THREE.Raycaster();
-			var mouse = new THREE.Vector2();
+			var raycaster = new Raycaster();
+			var mouse = new Vector2();
 
 			init();
 			animate();
@@ -71,17 +65,17 @@
 				container = document.getElementById( 'container' );
 				container.innerHTML = "";
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene = new Scene();
+				scene.background = new Color( 0xbfd1e5 );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1000;
 				controls.maxDistance = 10000;
 				controls.maxPolarAngle = Math.PI / 2;
@@ -95,7 +89,7 @@
 				camera.position.x = 2000;
 				controls.update();
 
-				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				var vertices = geometry.attributes.position.array;
@@ -110,17 +104,17 @@
 
 				//
 
-				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
-				texture.wrapS = THREE.ClampToEdgeWrapping;
-				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture = new CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = ClampToEdgeWrapping;
+				texture.wrapT = ClampToEdgeWrapping;
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				mesh = new Mesh( geometry, new MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				var geometry = new THREE.ConeBufferGeometry( 20, 100, 3 );
+				var geometry = new ConeBufferGeometry( 20, 100, 3 );
 				geometry.translate( 0, 50, 0 );
 				geometry.rotateX( Math.PI / 2 );
-				helper = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
+				helper = new Mesh( geometry, new MeshNormalMaterial() );
 				scene.add( helper );
 
 				container.addEventListener( 'mousemove', onMouseMove, false );
@@ -171,9 +165,9 @@
 
 				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
-				vector3 = new THREE.Vector3( 0, 0, 0 );
+				vector3 = new Vector3( 0, 0, 0 );
 
-				sun = new THREE.Vector3( 1, 1, 1 );
+				sun = new Vector3( 1, 1, 1 );
 				sun.normalize();
 
 				canvas = document.createElement( 'canvas' );

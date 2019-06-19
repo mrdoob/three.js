@@ -21,7 +21,7 @@ NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
 NormalNode.prototype.nodeType = "Normal";
 
-NormalNode.prototype.isShared = function ( builder ) {
+NormalNode.prototype.getShared = function ( builder ) {
 
 	switch ( this.scope ) {
 
@@ -43,7 +43,8 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.LOCAL:
 
-			builder.requires.normal = true;
+			// to use vObjectNormal as vertex normal
+			//builder.requires.normal = true;
 
 			result = 'normal';
 
@@ -51,9 +52,17 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.WORLD:
 
-			builder.requires.worldNormal = true;
+			if ( builder.isShader( 'vertex' ) ) {
 
-			result = builder.isShader( 'vertex' ) ? '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz' : 'vWNormal';
+				return '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz';
+
+			} else {
+
+				builder.requires.worldNormal = true;
+
+				result = 'vWNormal';
+
+			}
 
 			break;
 

@@ -4,26 +4,7 @@
 		<title>threejs webgl - materials - equirectangular exr image based lighting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
-			}
-			a { color: #00f }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -102,7 +83,9 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				new THREE.EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
+				new THREE.EXRLoader()
+					.setType( THREE.FloatType )
+					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
 					texture.minFilter = THREE.NearestFilter;
 					// texture.magFilter = THREE.NearestFilter;
@@ -169,9 +152,9 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'metalness', 0, 1 );
-				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
 				gui.add( params, 'debug', false );
 				gui.open();
 

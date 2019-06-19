@@ -4,46 +4,14 @@
 		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a { color:#00ff78; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
+				background-color: #aaa;
 			}
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/SSAOShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/SSAOPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/SimplexNoise.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
 
@@ -53,18 +21,29 @@
 			</div>
 		</div>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Color,
+				DirectionalLight,
+				Group,
+				HemisphereLight,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
 
 			var container, stats;
 			var camera, scene, renderer;
-			var effectComposer;
-			var ssaoPass;
+			var composer;
 			var group;
 
 			init();
@@ -75,7 +54,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -86,27 +65,27 @@
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
+				camera = new PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xaaaaaa );
+				scene = new Scene();
+				scene.background = new Color( 0xaaaaaa );
 
-				scene.add( new THREE.DirectionalLight() );
-				scene.add( new THREE.HemisphereLight() );
+				scene.add( new DirectionalLight() );
+				scene.add( new HemisphereLight() );
 
-				group = new THREE.Group();
+				group = new Group();
 				scene.add( group );
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				var geometry = new BoxBufferGeometry( 10, 10, 10 );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var material = new THREE.MeshLambertMaterial( {
+					var material = new MeshLambertMaterial( {
 						color: Math.random() * 0xffffff
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = Math.random() * 400 - 200;
 					mesh.position.y = Math.random() * 400 - 200;
 					mesh.position.z = Math.random() * 400 - 200;
@@ -125,23 +104,22 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
-				ssaoPass.kernelRadius = 16;
-				ssaoPass.renderToScreen = true;
+				composer = new EffectComposer( renderer );
 
-				effectComposer = new THREE.EffectComposer( renderer );
-				effectComposer.addPass( ssaoPass );
+				var ssaoPass = new SSAOPass( scene, camera, width, height );
+				ssaoPass.kernelRadius = 16;
+				composer.addPass( ssaoPass );
 
 				// Init gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( ssaoPass, 'output', {
-					'Default': THREE.SSAOPass.OUTPUT.Default,
-					'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
-					'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
-					'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
-					'Depth': THREE.SSAOPass.OUTPUT.Depth,
-					'Normal': THREE.SSAOPass.OUTPUT.Normal
+					'Default': SSAOPass.OUTPUT.Default,
+					'SSAO Only': SSAOPass.OUTPUT.SSAO,
+					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
+					'Beauty': SSAOPass.OUTPUT.Beauty,
+					'Depth': SSAOPass.OUTPUT.Depth,
+					'Normal': SSAOPass.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
 					ssaoPass.output = parseInt( value );
@@ -153,8 +131,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				onWindowResize();
-
 			}
 
 			function onWindowResize() {
@@ -164,9 +140,9 @@
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
-				renderer.setSize( width, height );
 
-				ssaoPass.setSize( width, height );
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
 
 			}
 
@@ -186,7 +162,7 @@
 				group.rotation.x = timer * 0.0002;
 				group.rotation.y = timer * 0.0001;
 
-				effectComposer.render();
+				composer.render();
 
 			}
 

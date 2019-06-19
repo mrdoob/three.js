@@ -4,75 +4,55 @@
 		<title>three.js webgl - lights - spot light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - This animates 3 Spot Lights - by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a><br />
-			Orbit Controls are available to navigate.<br />
-			Where the lights converge to make white light the shadows will appear as C M Y from light color pairing.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - SpotLights<br/>
+			by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				Mesh,
+				MeshPhongMaterial,
+				PCFSoftShadowMap,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				SpotLight,
+				SpotLightHelper,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 
-			}
-
-			var renderer = new THREE.WebGLRenderer();
+			var renderer = new WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 
-			var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
+			var camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
 
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new OrbitControls( camera, renderer.domElement );
 
-			var scene = new THREE.Scene();
+			var scene = new Scene();
 
-			var matFloor = new THREE.MeshPhongMaterial();
-			var matBox = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
+			var matFloor = new MeshPhongMaterial();
+			var matBox = new MeshPhongMaterial( { color: 0xaaaaaa } );
 
-			var geoFloor = new THREE.PlaneBufferGeometry( 2000, 2000 );
-			var geoBox = new THREE.BoxBufferGeometry( 3, 1, 2 );
+			var geoFloor = new PlaneBufferGeometry( 2000, 2000 );
+			var geoBox = new BoxBufferGeometry( 3, 1, 2 );
 
-			var mshFloor = new THREE.Mesh( geoFloor, matFloor );
+			var mshFloor = new Mesh( geoFloor, matFloor );
 			mshFloor.rotation.x = - Math.PI * 0.5;
-			var mshBox = new THREE.Mesh( geoBox, matBox );
+			var mshBox = new Mesh( geoBox, matBox );
 
-			var ambient = new THREE.AmbientLight( 0x111111 );
+			var ambient = new AmbientLight( 0x111111 );
 
 			var spotLight1 = createSpotlight( 0xFF7F00 );
 			var spotLight2 = createSpotlight( 0x00FF7F );
@@ -83,7 +63,7 @@
 			function init() {
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = PCFSoftShadowMap;
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
@@ -94,9 +74,9 @@
 				spotLight2.position.set( 0, 40, 35 );
 				spotLight3.position.set( - 15, 40, 45 );
 
-				lightHelper1 = new THREE.SpotLightHelper( spotLight1 );
-				lightHelper2 = new THREE.SpotLightHelper( spotLight2 );
-				lightHelper3 = new THREE.SpotLightHelper( spotLight3 );
+				lightHelper1 = new SpotLightHelper( spotLight1 );
+				lightHelper2 = new SpotLightHelper( spotLight2 );
+				lightHelper3 = new SpotLightHelper( spotLight3 );
 
 				matFloor.color.set( 0x808080 );
 
@@ -125,7 +105,7 @@
 
 			function createSpotlight( color ) {
 
-				var newObj = new THREE.SpotLight( color, 2 );
+				var newObj = new SpotLight( color, 2 );
 
 				newObj.castShadow = true;
 				newObj.angle = 0.3;

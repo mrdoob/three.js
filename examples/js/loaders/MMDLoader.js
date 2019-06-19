@@ -1026,7 +1026,7 @@ THREE.MMDLoader = ( function () {
 		 * @param {function} onError
 		 * @return {Array<THREE.MeshToonMaterial>}
 		 */
-		build: function ( data, geometry, onProgress, onError ) {
+		build: function ( data, geometry /*, onProgress, onError */ ) {
 
 			var materials = [];
 
@@ -1358,6 +1358,9 @@ THREE.MMDLoader = ( function () {
 				if ( params.isToonTexture === true ) {
 
 					t.image = scope._getRotatedImage( t.image );
+
+					t.magFilter = THREE.NearestFilter;
+					t.minFilter = THREE.NearestFilter;
 
 				}
 

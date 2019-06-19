@@ -4,75 +4,45 @@
 		<title>three.js webgl - materials - bump map - skin [Lee Perry-Smith]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #ffffff;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			#webglmessage {
-				background:rgb(200,100,0) !important;
-				color:#fff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl simple, single-pass, skin material with tangent-less bump mapping</a> -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - single-pass skin material with tangent-less bump mapping</a><br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				DirectionalLight,
+				LinearFilter,
+				Mesh,
+				PerspectiveCamera,
+				RepeatWrapping,
+				RGBFormat,
+				Scene,
+				ShaderMaterial,
+				TextureLoader,
+				UniformsUtils,
+				WebGLRenderer,
+				WebGLRenderTarget
+			} from "../build/three.module.js";
 
-		<script src="js/ShaderSkin.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+			import { SkinShaderBasic, SkinShaderBeckmann } from './jsm/shaders/SkinShader.js';
 
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var statsEnabled = true;
-
-			var container, stats, loader;
-
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 
 			var mesh;
-
-			var directionalLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -91,44 +61,29 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x242a34 );
+				scene = new Scene();
+				scene.background = new Color( 0x242a34 );
 
 				// LIGHTS
 
-				scene.add( new THREE.AmbientLight( 0x333344 ) );
+				scene.add( new AmbientLight( 0x333344 ) );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 500, 0, 500 );
-
-				directionalLight.castShadow = true;
-
-				directionalLight.shadow.mapSize.width = 2048;
-				directionalLight.shadow.mapSize.height = 2048;
-
-				directionalLight.shadow.camera.near = 200;
-				directionalLight.shadow.camera.far = 1500;
-
-				directionalLight.shadow.camera.left = - 500;
-				directionalLight.shadow.camera.right = 500;
-				directionalLight.shadow.camera.top = 500;
-				directionalLight.shadow.camera.bottom = - 500;
-
-				directionalLight.shadow.bias = - 0.005;
 
 				scene.add( directionalLight );
 
 				//
 
-				loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100 );
@@ -137,45 +92,28 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.shadowMap.enabled = true;
-
 				renderer.autoClear = false;
-
-				//
-
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
 				//
 
-				if ( statsEnabled ) {
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-					stats = new Stats();
-					container.appendChild( stats.dom );
-
-				}
-
-
-				// COMPOSER
-
-				renderer.autoClear = false;
 
 				// BECKMANN
 
-				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+				var effectBeckmann = new ShaderPass( SkinShaderBeckmann );
+				var effectCopy = new ShaderPass( CopyShader );
 
-				effectCopy.renderToScreen = true;
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat, stencilBuffer: false };
 				var rtwidth = 512, rtheight = 512;
 
-				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composerBeckmann = new EffectComposer( renderer, new WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerBeckmann.addPass( effectBeckmann );
 				composerBeckmann.addPass( effectCopy );
 
@@ -188,32 +126,32 @@
 
 			function createScene( geometry, scale ) {
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
 				var mapHeight = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				mapHeight.anisotropy = 4;
-				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
-				mapHeight.format = THREE.RGBFormat;
+				mapHeight.wrapS = mapHeight.wrapT = RepeatWrapping;
+				mapHeight.format = RGBFormat;
 
 				var mapSpecular = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
 
 				mapSpecular.anisotropy = 4;
-				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
-				mapSpecular.format = THREE.RGBFormat;
+				mapSpecular.wrapS = mapSpecular.wrapT = RepeatWrapping;
+				mapSpecular.format = RGBFormat;
 
 				var mapColor = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
 
 				mapColor.anisotropy = 4;
-				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
-				mapColor.format = THREE.RGBFormat;
+				mapColor.wrapS = mapColor.wrapT = RepeatWrapping;
+				mapColor.format = RGBFormat;
 
-				var shader = THREE.ShaderSkin[ "skinSimple" ];
+				var shader = SkinShaderBasic;
 
 				var fragmentShader = shader.fragmentShader;
 				var vertexShader = shader.vertexShader;
 
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var uniforms = UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "enableBump" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
@@ -232,16 +170,13 @@
 
 				uniforms[ "bumpScale" ].value = 8;
 
-				var material = new THREE.ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
+				var material = new ShaderMaterial( { fragmentShader: fragmentShader, vertexShader: vertexShader, uniforms: uniforms, lights: true } );
 				material.extensions.derivatives = true;
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );
-
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
 
 				scene.add( mesh );
 
@@ -272,7 +207,8 @@
 				requestAnimationFrame( animate );
 
 				render();
-				if ( statsEnabled ) stats.update();
+
+				stats.update();
 
 			}
 
