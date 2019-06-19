@@ -140,7 +140,6 @@ var files = [
 	{ path: 'modifiers/TessellateModifier.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'objects/Fire.js', dependencies: [], ignoreList: [] },
-	{ path: 'objects/GPUParticleSystem.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/LightningStorm.js', dependencies: [ { name: 'LightningStrike', path: 'geometries/LightningStrike.js' } ], ignoreList: [] },
 	{ path: 'objects/MarchingCubes.js', dependencies: [], ignoreList: [] },
