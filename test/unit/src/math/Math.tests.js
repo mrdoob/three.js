@@ -49,9 +49,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "lerp", ( assert ) => {
+		QUnit.test( "lerp", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			assert.strictEqual(ThreeMath.lerp(1, 2, 0), 1, "Value equal to lower boundary");
+			assert.strictEqual(ThreeMath.lerp(1, 2, 1), 2, "Value equal to upper boundary");
+			assert.strictEqual(ThreeMath.lerp(1, 2, 0.4), 1.4, "Value within range");
+
 
 		} );
 
@@ -67,9 +71,15 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "smootherstep", ( assert ) => {
+		QUnit.test( "smootherstep", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.strictEqual(ThreeMath.smootherstep(- 1, 0, 2), 0, "Value lower than minimum");
+			assert.strictEqual(ThreeMath.smootherstep(0, 0, 2), 0, "Value equal to minimum");
+			assert.strictEqual(ThreeMath.smootherstep(0.5, 0, 2), 0.103515625, "Value within limits");
+			assert.strictEqual(ThreeMath.smootherstep(1, 0, 2), 0.5, "Value within limits");
+			assert.strictEqual(ThreeMath.smootherstep(1.5, 0, 2), 0.896484375, "Value within limits");
+			assert.strictEqual(ThreeMath.smootherstep(2, 0, 2), 1, "Value equal to maximum");
+			assert.strictEqual(ThreeMath.smootherstep(3, 0, 2), 1, "Value highter than maximum");
 
 		} );
 
