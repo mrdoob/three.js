@@ -19,7 +19,7 @@ function WebXRManager( renderer ) {
 
 	var session = null;
 
-	var framebufferScaleFactor = 1.0;
+	var framebufferScaleFactor = 1.0; // eslint-disable-line no-unused-vars
 
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
@@ -137,7 +137,7 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
-			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
+			session.updateRenderState( { baseLayer: new window.XRWebGLLayer( session, gl ) } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
