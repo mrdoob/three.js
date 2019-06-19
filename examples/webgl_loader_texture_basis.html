@@ -9,51 +9,60 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - basis texture loader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - basis texture loader<br />
 			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/BasisTextureLoader.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Clock,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				sRGBEncoding,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { BasisTextureLoader } from './jsm/loaders/BasisTextureLoader.js';
 
 			var camera, scene, renderer;
 			var mesh;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshBasicMaterial();
+				var geometry = new BoxBufferGeometry( 200, 200, 200 );
+				var material = new MeshBasicMaterial();
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 
 				scene.add( mesh );
 
-				var loader = new THREE.BasisTextureLoader();
+				var loader = new BasisTextureLoader();
 				loader.setTranscoderPath( 'js/libs/basis/' );
 				loader.detectSupport( renderer );
 
 				loader.load( 'textures/compressed/PavingStones.basis', function ( texture ) {
 
-					texture.encoding = THREE.sRGBEncoding;
+					texture.encoding = sRGBEncoding;
 					material.map = texture;
 					material.needsUpdate = true;
 

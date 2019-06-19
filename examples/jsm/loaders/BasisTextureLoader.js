@@ -4,6 +4,17 @@
  * @author Shrek Shao / https://github.com/shrekshao
  */
 
+import {
+	CompressedTexture,
+	DefaultLoadingManager,
+	FileLoader,
+	LinearFilter,
+	LinearMipMapLinearFilter,
+	RGB_ETC1_Format,
+	RGB_PVRTC_4BPPV1_Format,
+	UnsignedByteType
+} from "../../../build/three.module.js";
+
 /* global Module, createBasisModule */
 
 /**
@@ -18,9 +29,9 @@
  * of web workers, before transferring the transcoded compressed texture back
  * to the main thread.
  */
-THREE.BasisTextureLoader = function ( manager ) {
+var BasisTextureLoader = function ( manager ) {
 
-	this.manager = manager || THREE.DefaultLoadingManager;
+	this.manager = manager || DefaultLoadingManager;
 
 	this.crossOrigin = 'anonymous';
 
@@ -41,9 +52,9 @@ THREE.BasisTextureLoader = function ( manager ) {
 
 };
 
-THREE.BasisTextureLoader.prototype = {
+BasisTextureLoader.prototype = {
 
-	constructor: THREE.BasisTextureLoader,
+	constructor: BasisTextureLoader,
 
 	setCrossOrigin: function ( crossOrigin ) {
 
@@ -81,15 +92,15 @@ THREE.BasisTextureLoader.prototype = {
 
 		if ( config.etcSupported ) {
 
-			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFETC1;
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFETC1;
 
 		} else if ( config.dxtSupported ) {
 
-			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC1;
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFBC1;
 
 		} else if ( config.pvrtcSupported ) {
 
-			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_OPAQUE_ONLY;
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_OPAQUE_ONLY;
 
 		} else {
 
@@ -103,7 +114,7 @@ THREE.BasisTextureLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new FileLoader( this.manager );
 
 		loader.setResponseType( 'arraybuffer' );
 
@@ -119,7 +130,7 @@ THREE.BasisTextureLoader.prototype = {
 
 	/**
 	 * @param  {ArrayBuffer} buffer
-	 * @return {Promise<THREE.CompressedTexture>}
+	 * @return {Promise<CompressedTexture>}
 	 */
 	_createTexture: function ( buffer ) {
 
@@ -153,15 +164,15 @@ THREE.BasisTextureLoader.prototype = {
 
 				if ( config.etcSupported ) {
 
-					texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.RGB_ETC1_Format );
+					texture = new CompressedTexture( mipmaps, width, height, RGB_ETC1_Format );
 
 				} else if ( config.dxtSupported ) {
 
-					texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.BasisTextureLoader.DXT_FORMAT_MAP[ config.format ], THREE.UnsignedByteType );
+					texture = new CompressedTexture( mipmaps, width, height, BasisTextureLoader.DXT_FORMAT_MAP[ config.format ], UnsignedByteType );
 
 				} else if ( config.pvrtcSupported ) {
 
-					texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.RGB_PVRTC_4BPPV1_Format );
+					texture = new CompressedTexture( mipmaps, width, height, RGB_PVRTC_4BPPV1_Format );
 
 				} else {
 
@@ -169,8 +180,8 @@ THREE.BasisTextureLoader.prototype = {
 
 				}
 
-				texture.minFilter = mipmaps.length === 1 ? THREE.LinearFilter : THREE.LinearMipMapLinearFilter;
-				texture.magFilter = THREE.LinearFilter;
+				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipMapLinearFilter;
+				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
 
@@ -200,7 +211,7 @@ THREE.BasisTextureLoader.prototype = {
 		if ( ! this.transcoderBinary ) {
 
 			// Load transcoder wrapper.
-			var jsLoader = new THREE.FileLoader( this.manager );
+			var jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.transcoderPath );
 			var jsContent = new Promise( ( resolve, reject ) => {
 
@@ -209,7 +220,7 @@ THREE.BasisTextureLoader.prototype = {
 			} );
 
 			// Load transcoder WASM binary.
-			var binaryLoader = new THREE.FileLoader( this.manager );
+			var binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.transcoderPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			var binaryContent = new Promise( ( resolve, reject ) => {
@@ -221,7 +232,7 @@ THREE.BasisTextureLoader.prototype = {
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
 
-					var fn = THREE.BasisTextureLoader.BasisWorker.toString();
+					var fn = BasisTextureLoader.BasisWorker.toString();
 
 					var body = [
 						'/* basis_transcoder.js */',
@@ -320,7 +331,7 @@ THREE.BasisTextureLoader.prototype = {
 
 /* CONSTANTS */
 
-THREE.BasisTextureLoader.BASIS_FORMAT = {
+BasisTextureLoader.BASIS_FORMAT = {
 	cTFETC1: 0,
 	cTFBC1: 1,
 	cTFBC4: 2,
@@ -333,21 +344,21 @@ THREE.BasisTextureLoader.BASIS_FORMAT = {
 
 // DXT formats, from:
 // http://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
-THREE.BasisTextureLoader.DXT_FORMAT = {
+BasisTextureLoader.DXT_FORMAT = {
 	COMPRESSED_RGB_S3TC_DXT1_EXT: 0x83F0,
 	COMPRESSED_RGBA_S3TC_DXT1_EXT: 0x83F1,
 	COMPRESSED_RGBA_S3TC_DXT3_EXT: 0x83F2,
 	COMPRESSED_RGBA_S3TC_DXT5_EXT: 0x83F3,
 };
-THREE.BasisTextureLoader.DXT_FORMAT_MAP = {};
-THREE.BasisTextureLoader.DXT_FORMAT_MAP[ THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC1 ] =
-	THREE.BasisTextureLoader.DXT_FORMAT.COMPRESSED_RGB_S3TC_DXT1_EXT;
-THREE.BasisTextureLoader.DXT_FORMAT_MAP[ THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC3 ] =
-	THREE.BasisTextureLoader.DXT_FORMAT.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+BasisTextureLoader.DXT_FORMAT_MAP = {};
+BasisTextureLoader.DXT_FORMAT_MAP[ BasisTextureLoader.BASIS_FORMAT.cTFBC1 ] =
+	BasisTextureLoader.DXT_FORMAT.COMPRESSED_RGB_S3TC_DXT1_EXT;
+BasisTextureLoader.DXT_FORMAT_MAP[ BasisTextureLoader.BASIS_FORMAT.cTFBC3 ] =
+	BasisTextureLoader.DXT_FORMAT.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
 /* WEB WORKER */
 
-THREE.BasisTextureLoader.BasisWorker = function () {
+BasisTextureLoader.BasisWorker = function () {
 
 	var config;
 	var transcoderPending;
@@ -492,3 +503,5 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 	}
 
 };
+
+export { BasisTextureLoader };
