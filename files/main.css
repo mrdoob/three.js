@@ -255,7 +255,6 @@ h1 a {
 		flex: 1;
 		overflow-y: scroll;
 		overflow-x: hidden;
-		-webkit-overflow-scrolling: touch;
 		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
 
@@ -312,21 +311,15 @@ h1 a {
 	padding-right: 2px;
 }
 
-iframe {
-	border: 0px;
-	width: 100%;
-	height: 100%;
-}
-
 #viewer,
-#iframe-wrapper {
+iframe {
 	position: absolute;
+	border: 0px;
 	left: 0;
 	right: 0;
 	width: 100%;
 	height: 100%;
 	overflow: auto;
-	-webkit-overflow-scrolling: touch;
 }
 
 #viewer {
@@ -507,7 +500,7 @@ iframe {
 		transform: translate3d(-380px, 0 ,0);
 	}
 	#viewer,
-	#iframe-wrapper {
+	iframe {
 		left: 0;
 		top: var(--header-height);
 		width: 100%;
