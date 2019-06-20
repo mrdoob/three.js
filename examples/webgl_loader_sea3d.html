@@ -9,7 +9,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Exported by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Studio</a>.<br/>
-			Asset by <a href="http://vhalldez.cgsociety.org/" target="_blank" rel="noopener">Valdez Araujo</a>. 
+			Asset by <a href="http://vhalldez.cgsociety.org/" target="_blank" rel="noopener">Valdez Araujo</a>.
 			Geometry Compression with <a href="https://github.com/google/draco" target="_blank" rel="noopener">Google Draco</a> and content with LZMA using <a href="http://sunag.github.io/sea3d/IO/index.html" style="color:#FFFFFF" target="_blank">SEA3D I.O.</a> Tools<br>
 		</div>
 
@@ -31,7 +31,6 @@
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { MaskPass } from './jsm/postprocessing/MaskPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
 			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
@@ -46,7 +45,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls;
+			var camera, scene, renderer, composer;
 
 			var loader;
 
@@ -100,7 +99,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
