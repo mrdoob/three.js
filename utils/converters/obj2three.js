@@ -18,11 +18,10 @@ function parseNumber( key, value ) {
 
 }
 
-THREE = require( '../../build/three.js' );
-require( '../../examples/js/loaders/OBJLoader.js' );
+import { OBJLoader } from '../../examples/jsm/loaders/OBJLoader.js';
 
 var file = process.argv[ 2 ];
-var loader = new THREE.OBJLoader();
+var loader = new OBJLoader();
 
 var text = fs.readFileSync( file, 'utf8' );
 

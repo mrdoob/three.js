@@ -1,11 +1,11 @@
-Utilities for converting model files to the Three.js JSON format.
+Utilities for converting model files to the Three.js JSON format. You have to install [esm](https://www.npmjs.com/package/esm) for executing the converters.
 
 ## obj2three.js
 
 Usage:
 
 ```
-node obj2three.js model.obj
+node -r esm obj2three.js model.obj
 ```
 
 ## fbx2three.js
@@ -13,5 +13,5 @@ node obj2three.js model.obj
 Usage:
 
 ```
-node fbx2three.js model.fbx
+node -r esm fbx2three.js model.fbx
 ```

@@ -18,11 +18,8 @@ function parseNumber( key, value ) {
 
 }
 
-THREE = require( '../../build/three.js' );
-require( '../../examples/js/curves/NURBSCurve.js' );
-require( '../../examples/js/curves/NURBSUtils.js' );
-require( '../../examples/js/loaders/FBXLoader.js' );
-global.Zlib = require( '../../examples/js/libs/inflate.min.js' ).Zlib;
+import { ImageLoader, ImageUtils, LoaderUtils, RGBAFormat } from "../../build/three.module.js";
+import { FBXLoader } from '../../examples/jsm/loaders/FBXLoader.js';
 
 global.window = {
 	innerWidth: 1024,
@@ -39,7 +36,7 @@ global.window = {
 };
 
 // HTML Images are not available, so use a Buffer instead.
-THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
+ImageLoader.prototype.load = function ( url, onLoad ) {
 
 	if ( this.path !== undefined ) url = this.path + url;
 
@@ -56,7 +53,7 @@ THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
 };
 
 // Convert image buffer to data URL.
-THREE.ImageUtils.getDataURL = function ( image ) {
+ImageUtils.getDataURL = function ( image ) {
 
 	if ( ! ( image instanceof Buffer ) ) {
 
@@ -65,7 +62,7 @@ THREE.ImageUtils.getDataURL = function ( image ) {
 	}
 
 	var dataURL = 'data:';
-	dataURL += this.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
+	dataURL += this.format === RGBAFormat ? 'image/png' : 'image/jpeg';
 	dataURL += ';base64,';
 	dataURL += image.toString( 'base64' );
 	return dataURL;
@@ -75,8 +72,8 @@ THREE.ImageUtils.getDataURL = function ( image ) {
 //
 
 var file = process.argv[ 2 ];
-var resourceDirectory = THREE.LoaderUtils.extractUrlBase( file );
-var loader = new THREE.FBXLoader();
+var resourceDirectory = LoaderUtils.extractUrlBase( file );
+var loader = new FBXLoader();
 
 var arraybuffer = fs.readFileSync( file ).buffer;
 var object = loader.parse( arraybuffer, resourceDirectory );
