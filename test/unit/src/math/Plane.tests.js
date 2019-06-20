@@ -8,6 +8,7 @@ import { Plane } from '../../../../src/math/Plane';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Line3 } from '../../../../src/math/Line3';
 import { Sphere } from '../../../../src/math/Sphere';
+import { Box3 } from '../../../../src/math/Box3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import {
 	x,
@@ -17,6 +18,7 @@ import {
 	zero3,
 	one3
 } from './Constants.tests';
+import { Cache } from '../../../../build/three';
 
 function comparePlane( a, b, threshold ) {
 
@@ -54,9 +56,14 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isPlane", ( assert ) => {
+		QUnit.test( "isPlane", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Plane();
+			assert.ok( a.isPlane === true, "Passed!" );
+
+			var b = new Vector3();
+			assert.ok( ! b.isPlane, "Passed!" );
+
 
 		} );
 
@@ -118,9 +125,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "clone", ( assert ) => {
+		QUnit.test( "clone", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Plane( 2.0, 0.5, 0.25 );
+			var b = a.clone();
+
+			assert.ok( a.equals( b ), "clones are equal" );
+
 
 		} );
 
@@ -229,15 +240,41 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "intersectsBox", ( assert ) => {
+		QUnit.test( "intersectsBox", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var b = new Plane( new Vector3( 0, 1, 0 ), 1 );
+			var c = new Plane( new Vector3( 0, 1, 0 ), 1.25 );
+			var d = new Plane( new Vector3( 0, - 1, 0 ), 1.25 );
+			var e = new Plane( new Vector3( 0, 1, 0 ), 0.25 );
+			var f = new Plane( new Vector3( 0, 1, 0 ), - 0.25 );
+			var g = new Plane( new Vector3( 0, 1, 0 ), - 0.75 );
+			var h = new Plane( new Vector3( 0, 1, 0 ), - 1 );
+			var i = new Plane( new Vector3( 1, 1, 1 ).normalize(), - 1.732 );
+			var j = new Plane( new Vector3( 1, 1, 1 ).normalize(), - 1.733 );
+
+			assert.ok( ! b.intersectsBox( a ), "Passed!" );
+			assert.ok( ! c.intersectsBox( a ), "Passed!" );
+			assert.ok( ! d.intersectsBox( a ), "Passed!" );
+			assert.ok( ! e.intersectsBox( a ), "Passed!" );
+			assert.ok( f.intersectsBox( a ), "Passed!" );
+			assert.ok( g.intersectsBox( a ), "Passed!" );
+			assert.ok( h.intersectsBox( a ), "Passed!" );
+			assert.ok( i.intersectsBox( a ), "Passed!" );
+			assert.ok( ! j.intersectsBox( a ), "Passed!" );
 
 		} );
 
-		QUnit.todo( "intersectsSphere", ( assert ) => {
+		QUnit.test( "intersectsSphere", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Sphere( zero3.clone(), 1 );
+			var b = new Plane( new Vector3( 0, 1, 0 ), 1 );
+			var c = new Plane( new Vector3( 0, 1, 0 ), 1.25 );
+			var d = new Plane( new Vector3( 0, - 1, 0 ), 1.25 );
+
+			assert.ok( b.intersectsSphere( a ), "Passed!" );
+			assert.ok( ! c.intersectsSphere( a ), "Passed!" );
+			assert.ok( ! d.intersectsSphere( a ), "Passed!" );
 
 		} );
 
