@@ -125,7 +125,7 @@ THREE.DRACOLoader.prototype = {
 	},
 
 	/** @deprecated Kept for backward-compatibility with previous DRACOLoader versions. */
-	decodeDracoFile: function ( rawBuffer, callback, attributeIDs, attributeTypes ) {
+	decodeDracoFile: function ( buffer, callback, attributeIDs, attributeTypes ) {
 
 		var taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
@@ -139,66 +139,84 @@ THREE.DRACOLoader.prototype = {
 	decodeGeometry: function ( buffer, taskConfig ) {
 
 		var worker;
-		var taskID;
+		var taskID = this.workerNextTaskID ++;
+		var taskCost = buffer.byteLength;
 
-		var geometryPending = this._getWorker()
+		// TODO: For backward-compatibility, support 'attributeTypes' objects containing
+		// references (rather than names) to typed array constructors. These must be
+		// serialized before sending them to the worker.
+		for ( var attribute in taskConfig.attributeTypes ) {
+
+			var type = taskConfig.attributeTypes[ attribute ];
+
+			if ( type.BYTES_PER_ELEMENT !== undefined ) {
+
+				taskConfig.attributeTypes[ attribute ] = type.name;
+
+			}
+
+		}
+
+		// Obtain a worker and assign a task, and construct a geometry instance
+		// when the task completes.
+		var geometryPending = this._getWorker( taskID, taskCost )
 			.then( ( _worker ) => {
 
 				worker = _worker;
-				taskID = this.workerNextTaskID ++;
 
 				return new Promise( ( resolve, reject ) => {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
-					worker._taskCosts[ taskID ] = buffer.byteLength;
-					worker._taskLoad += worker._taskCosts[ taskID ];
 
 					worker.postMessage( { type: 'decode', id: taskID, taskConfig, buffer }, [ buffer ] );
+
+					// this.debug();
 
 				} );
 
 			} )
-			.then( ( message ) => {
+			.then( ( message ) => this._createGeometry( message.geometry ) );
 
-				var geometryData = message.geometry;
-
-				var geometry = new THREE.BufferGeometry();
-
-				if ( geometryData.index ) {
-
-					geometry.setIndex( new THREE.BufferAttribute( geometryData.index.array, 1 ) );
-
-				}
-
-				for ( var i = 0; i < geometryData.attributes.length; i++ ) {
-
-					var attribute = geometryData.attributes[ i ];
-					var name = attribute.name;
-					var array = attribute.array;
-					var itemSize = attribute.itemSize;
-
-					geometry.addAttribute( name, new THREE.BufferAttribute( array, itemSize ) );
-
-				}
-
-				return geometry;
-
-			} );
-
+		// Remove task from the task list.
 		geometryPending
 			.finally( () => {
 
 				if ( worker && taskID ) {
 
-					worker._taskLoad -= worker._taskCosts[ taskID ];
-					delete worker._callbacks[ taskID ];
-					delete worker._taskCosts[ taskID ];
+					this._releaseTask( worker, taskID );
+
+					// this.debug();
 
 				}
 
 			} );
 
 		return geometryPending;
+
+	},
+
+	_createGeometry: function ( geometryData ) {
+
+		var geometry = new THREE.BufferGeometry();
+
+		if ( geometryData.index ) {
+
+			geometry.setIndex( new THREE.BufferAttribute( geometryData.index.array, 1 ) );
+
+		}
+
+		for ( var i = 0; i < geometryData.attributes.length; i++ ) {
+
+			var attribute = geometryData.attributes[ i ];
+			var name = attribute.name;
+			var array = attribute.array;
+			var itemSize = attribute.itemSize;
+
+			geometry.addAttribute( name, new THREE.BufferAttribute( array, itemSize ) );
+
+		}
+
+		return geometry;
 
 	},
 
@@ -263,7 +281,7 @@ THREE.DRACOLoader.prototype = {
 
 	},
 
-	_getWorker: function () {
+	_getWorker: function ( taskID, taskCost ) {
 
 		return this._initDecoder().then( () => {
 
@@ -310,9 +328,26 @@ THREE.DRACOLoader.prototype = {
 
 			}
 
-			return this.workerPool[ this.workerPool.length - 1 ];
+			var worker = this.workerPool[ this.workerPool.length - 1 ];
+			worker._taskCosts[ taskID ] = taskCost;
+			worker._taskLoad += taskCost;
+			return worker;
 
 		} );
+
+	},
+
+	_releaseTask: function ( worker, taskID ) {
+
+		worker._taskLoad -= worker._taskCosts[ taskID ];
+		delete worker._callbacks[ taskID ];
+		delete worker._taskCosts[ taskID ];
+
+	},
+
+	debug: function () {
+
+		console.log( 'Task load: ', this.workerPool.map( ( worker ) => worker._taskLoad ) );
 
 	},
 
