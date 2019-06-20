@@ -90,7 +90,7 @@ var files = [
 	{ path: 'loaders/EquirectangularToCubeGenerator.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.js' }, { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'DDSLoader', 'Camera' ] },
+	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ] },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/LDrawLoader.js', dependencies: [], ignoreList: [ 'Cache', 'Material', 'Object3D' ] },
