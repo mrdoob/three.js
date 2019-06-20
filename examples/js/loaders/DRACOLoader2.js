@@ -103,6 +103,12 @@ THREE.DRACOLoader.prototype = {
 
 		loader.setResponseType( 'arraybuffer' );
 
+		if ( this.crossOrigin === 'use-credentials' ) {
+
+			loader.setWithCredentials( true );
+
+		}
+
 		loader.load( url, ( buffer ) => {
 
 			var taskConfig = {
@@ -553,24 +559,28 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 /** Deprecated static methods */
 
+/** @deprecated */
 THREE.DRACOLoader.setDecoderPath = function () {
 
 	console.warn( 'THREE.DRACOLoader: The .setDecoderPath() method has been removed. Use instance methods.' );
 
 };
 
+/** @deprecated */
 THREE.DRACOLoader.setDecoderConfig = function () {
 
 	console.warn( 'THREE.DRACOLoader: The .setDecoderConfig() method has been removed. Use instance methods.' );
 
 };
 
+/** @deprecated */
 THREE.DRACOLoader.releaseDecoderModule = function () {
 
 	console.warn( 'THREE.DRACOLoader: The .releaseDecoderModule() method has been removed. Use instance methods.' );
 
 };
 
+/** @deprecated */
 THREE.DRACOLoader.getDecoderModule = function () {
 
 	console.warn( 'THREE.DRACOLoader: The .getDecoderModule() method has been removed. Use instance methods.' );
