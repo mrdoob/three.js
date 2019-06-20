@@ -60,10 +60,10 @@ past that distance.
 </div>
 
 It's important to note that the fog is applied to *things that are rendered*.
-It is part of the calculation of each pixel of the color of the object. 
-What that means is if you want your scene to fade to a certain color you 
-need to set the fog **and** the background color to the same color. 
-The background color is set using the 
+It is part of the calculation of each pixel of the color of the object.
+What that means is if you want your scene to fade to a certain color you
+need to set the fog **and** the background color to the same color.
+The background color is set using the
 [`scene.background`](Scene.background)
 property. To pick a background color you attach a `THREE.Color` to it. For example
 
@@ -105,7 +105,7 @@ will fade out right around their center.
 
 {{{example url="../threejs-fog.html" }}}
 
-Let's add an interface so we can adjust the fog. Again we'll use 
+Let's add an interface so we can adjust the fog. Again we'll use
 [dat.GUI](https://github.com/dataarts/dat.gui). dat.GUI takes
 an object and a property and automagically makes an interface
 for that type of property. We could just simply let it manipulate
@@ -155,7 +155,7 @@ We can then add it like this
 }
 ```
 
-The `near` and `far` parameter set the minimum and maximum values
+The `near` and `far` parameters set the minimum and maximum values
 for adjusting the fog. They are set when we setup the camera.
 
 The `.listen()` at the end of the last 2 lines tells dat.GUI to *listen*
@@ -168,7 +168,7 @@ mentioned above we need to keep both the fog color and the background
 color in sync. So, let's add another *virtual* property to our helper
 that will set both colors when dat.GUI manipulates it.
 
-dat.GUI can manipulate colors in 4 ways, as a CSS 6 digit hex string (eg: `#112233`). As an hue, saturation, value, object (eg: `{h: 60, s: 1, v: }`). 
+dat.GUI can manipulate colors in 4 ways, as a CSS 6 digit hex string (eg: `#112233`). As an hue, saturation, value, object (eg: `{h: 60, s: 1, v: }`).
 As an RGB array (eg: `[255, 128, 64]`). Or, as an RGBA array (eg: `[127, 200, 75, 0.3]`).
 
 It's easiest for our purpose to use the hex string version since that way
@@ -242,7 +242,7 @@ for most materials. As an example of why you might want
 to turn the fog off, imagine you're making a 3D vehicle
 simulator with a view from the driver's seat or cockpit.
 You probably want the fog off for everything inside the vehicle when
-viewing from inside the vehicle. 
+viewing from inside the vehicle.
 
 A better example might be a house
 and thick fog outside house. Let's say the fog is set to start
@@ -250,7 +250,7 @@ and thick fog outside house. Let's say the fog is set to start
 Rooms are longer than 2 meters and the house is probably longer
 than 4 meters so you need to set the materials for the inside
 of the house to not apply fog otherwise when standing inside the
-house looking outside the wall at the far end of the room will look 
+house looking outside the wall at the far end of the room will look
 like it's in the fog.
 
 <div class="spread">
@@ -261,7 +261,7 @@ like it's in the fog.
 </div>
 
 Notice the walls and ceiling at the far end of the room are getting fog applied.
-By turing fog of on the materials for the house we can fix that issue.
+By turning fog off on the materials for the house we can fix that issue.
 
 <div class="spread">
   <div>
