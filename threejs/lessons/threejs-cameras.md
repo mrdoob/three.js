@@ -5,14 +5,14 @@ This article is one in a series of articles about three.js.
 The first article was [about fundamentals](threejs-fundamentals.html).
 If you haven't read that yet you might want to start there.
 
-Let's talk about Cameras in three.js. We covered some of this in the [first article](threejs-fundamentals.html) but we'll cover it in more detail here.
+Let's talk about cameras in three.js. We covered some of this in the [first article](threejs-fundamentals.html) but we'll cover it in more detail here.
 
 The most common camera in three.js and the one we've been using up to this point is
-the `PerspectiveCamera`. It gives a 3d view where things in the distance appear 
+the `PerspectiveCamera`. It gives a 3d view where things in the distance appear
 smaller than things up close.
 
 The `PerspectiveCamera` defines a *frustum*. [A *frustum* is a solid pyramid shape with
-the tip cut off](https://en.wikipedia.org/wiki/Frustum). 
+the tip cut off](https://en.wikipedia.org/wiki/Frustum).
 By name of a solid I mean for example a cube, a cone, a sphere, a cylinder,
 and a frustum are all names of different kinds of solids.
 
@@ -29,19 +29,19 @@ I only point that out because I didn't know if for years. Some book or page woul
 shape made those descriptions suddenly make more sense &#128517;
 
 A `PerspectiveCamera` defines its frustum based on 4 properties. `near` defines where the
-front of the frustum starts. `far` defines where it ends. `fov`, the field of view, defines 
-how tall the front and back of the frustum are by computing the correct height to get 
-the specified field of view at `near` units from the camera. The `aspect` defines how 
-wide the front and back of the frustum are. The width of the frustum is just the height 
+front of the frustum starts. `far` defines where it ends. `fov`, the field of view, defines
+how tall the front and back of the frustum are by computing the correct height to get
+the specified field of view at `near` units from the camera. The `aspect` defines how
+wide the front and back of the frustum are. The width of the frustum is just the height
 multiplied by the aspect.
 
 <img src="resources/frustum-3d.svg" width="500" class="threejs_center"/>
 
 Let's use the scene from [the previous article](threejs-lights.html) that has a ground
-plane, a sphere, and a cube and make it so we can adjust the camera's settings
+plane, a sphere, and a cube and make it so we can adjust the camera's settings.
 
-To do that we'll make a `MinMaxGUIHelper` for the `near` and `far` settings so `far` 
-is always greater than `near`. It will have `min` and `max` properties that dat.GUI 
+To do that we'll make a `MinMaxGUIHelper` for the `near` and `far` settings so `far`
+is always greater than `near`. It will have `min` and `max` properties that dat.GUI
 will adjust. When adjusted they'll set the 2 properties we specify.
 
 ```js
@@ -83,13 +83,13 @@ gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera
 gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 ```
 
-Anytime the camera's settings change we need to call the camera's 
+Anytime the camera's settings change we need to call the camera's
 [`updateProjectionMatrix`](PerspectiveCamera.updateProjectionMatrix) function
 so we made a function called `updateCamera` add passed it to dat.GUI to call it when things change.
 
 {{{example url="../threejs-cameras-perspective.html" }}}
 
-You can just the values and see how they work. Note we didn't make `aspect` setable since
+You can adjust the values and see how they work. Note we didn't make `aspect` settable since
 it's taken from the size of the window so if you want to adjust the aspect open the example
 in a new window and then size the window.
 
@@ -144,7 +144,7 @@ scene.add(cameraHelper);
 Now let's look up the 2 view elements.
 
 ```js
-const view1Elem = document.querySelector('#view1'); 
+const view1Elem = document.querySelector('#view1');
 const view2Elem = document.querySelector('#view2');
 ```
 
@@ -303,10 +303,10 @@ the frustum.
 
 This brings up the question, why not just set `near` to 0.0000000001 and `far`
 to 10000000000000 or something like that so you can just see everything?
-The reason is your GPU only has so much precision to decide if something 
+The reason is your GPU only has so much precision to decide if something
 is in front or behind something else. That precision is spread out between
 `near` and `far`. Worse, by default the precision close the camera is detailed
-and the precision far from the camera is course. The units use start with `near`
+and the precision far from the camera is coarse. The units start with `near`
 and slowly expand as they approach `far`.
 
 Starting with the top example, let's change the code to insert 20 spheres in a
@@ -359,7 +359,7 @@ Just in case the issue doesn't show on your machine here's what I see on mine
 <div class="threejs_center"><img src="resources/images/z-fighting.png" style="width: 570px;"></div>
 
 One solution is to tell three.js use to a different method to compute which
-pixels are in front and which are behind. We can do that by enabling 
+pixels are in front and which are behind. We can do that by enabling
 `logarithmicDepthBuffer` when we create the `WebGLRenderer`
 
 ```js
@@ -375,9 +375,9 @@ and with that it might work
 {{{example url="../threejs-cameras-logarithmic-depth-buffer.html" }}}
 
 If this didn't fix the issue for you then you've run into one reason why
-you can't always use this solution. That reason is because only certain GPUs 
+you can't always use this solution. That reason is because only certain GPUs
 support it. As of September 2018 almost no mobile devices support this
-solution where as most desktops do.
+solution whereas most desktops do.
 
 Another reason not to choose this solution is it can be significantly slower
 than the standard solution.
@@ -476,7 +476,7 @@ camera.far = 1;
 camera.zoom = 1;
 ```
 
-Or if we wanted the origin to be in the top left just like a 
+Or if we wanted the origin to be in the top left just like a
 2D canvas we could use this
 
 ```js
@@ -593,7 +593,7 @@ In the screenshot above you can see 1 view is a perspective view and 3 views are
 orthographic views.
 
 That's the fundamentals of cameras. We'll cover a few common ways to move cameras
-in other articles. For now lets move on to [shadows](threejs-shadows.html).
+in other articles. For now let's move on to [shadows](threejs-shadows.html).
 
 <canvas id="c"></canvas>
 <script src="../resources/threejs/r105/three.min.js"></script>
