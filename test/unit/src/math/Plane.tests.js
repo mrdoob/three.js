@@ -18,7 +18,6 @@ import {
 	zero3,
 	one3
 } from './Constants.tests';
-import { Cache } from '../../../../build/three';
 
 function comparePlane( a, b, threshold ) {
 
