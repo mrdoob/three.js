@@ -6,7 +6,7 @@ After you render to it you can use that texture like any other texture.
 
 Let's make a simple example. We'll start with an example from [the article on responsiveness](threejs-responsive.html).
 
-Rendering to a render target just almost exactly the same as normal rendering. First we create a `WebGLRenderTarget`.
+Rendering to a render target is almost exactly the same as normal rendering. First we create a `WebGLRenderTarget`.
 
 ```js
 const rtWidth = 512;
@@ -64,7 +64,7 @@ function makeInstance(geometry, color, x) {
 ];
 ```
 
-The `Scene` and `Camera` from previous article are still there. We'll use them to render to the canvas.
+The `Scene` and `Camera` from the previous article are still there. We'll use them to render to the canvas.
 We just need to add stuff to render.
 
 Let's add a cube that uses the render target's texture.
@@ -120,7 +120,7 @@ Render target are used for all kinds of things. Shadows use a render target. [Pi
 
 A few notes about using `WebGLRenderTarget`.
 
-* By default `WebGLRenderTarget` creates 2 textures. A color texture and a depth/stencil texture. If you don't need the depth or stencil textures you can request it not create them by passing in options. Example:
+* By default `WebGLRenderTarget` creates 2 textures. A color texture and a depth/stencil texture. If you don't need the depth or stencil textures you can request to not create them by passing in options. Example:
 
         const rt = new THREE.WebGLRenderTarget(width, height, {
           depthBuffer: false,
@@ -133,7 +133,7 @@ A few notes about using `WebGLRenderTarget`.
 
         function render(time) {
           time *= 0.001;
-      
+
           if (resizeRendererToDisplaySize(renderer)) {
             const canvas = renderer.domElement;
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
