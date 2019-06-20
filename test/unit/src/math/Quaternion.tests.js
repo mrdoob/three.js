@@ -224,27 +224,119 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "x", ( assert ) => {
+		QUnit.test( "x", ( assert ) => {
+			var a = new Quaternion();
+			assert.ok(a.x === 0, "Passed!");
 
-			assert.ok( false, "everything's gonna be alright" );
+			a = new Quaternion(1, 2, 3);
+			assert.ok(a.x === 1, "Passed!");
+
+			a = new Quaternion(4, 5, 6, 1);
+			assert.ok(a.x === 4, "Passed!");
+
+			a = new Quaternion(7, 8, 9);
+			a.x = 10;
+			assert.ok(a.x === 10, "Passed!");
+
+			a = new Quaternion(11, 12, 13);
+			var b = false;
+			a._onChange(function () {
+
+				b = true;
+
+			});
+			assert.ok(!b, "Passed!");
+			a.x = 14;
+			assert.ok(b, "Passed!");
+			assert.ok(a.x === 14, "Passed!");
 
 		} );
 
-		QUnit.todo( "y", ( assert ) => {
+		QUnit.test( "y", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Quaternion();
+			assert.ok(a.y === 0, "Passed!");
+
+			a = new Quaternion(1, 2, 3);
+			assert.ok(a.y === 2, "Passed!");
+
+			a = new Quaternion(4, 5, 6, 1);
+			assert.ok(a.y === 5, "Passed!");
+
+			a = new Quaternion(7, 8, 9);
+			a.y = 10;
+			assert.ok(a.y === 10, "Passed!");
+
+			a = new Quaternion(11, 12, 13);
+			var b = false;
+			a._onChange(function () {
+
+				b = true;
+
+			});
+			assert.ok(!b, "Passed!");
+			a.y = 14;
+			assert.ok(b, "Passed!");
+			assert.ok(a.y === 14, "Passed!");
 
 		} );
 
-		QUnit.todo( "z", ( assert ) => {
+		QUnit.test( "z", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Quaternion();
+			assert.ok(a.z === 0, "Passed!");
+
+			a = new Quaternion(1, 2, 3);
+			assert.ok(a.z === 3, "Passed!");
+
+			a = new Quaternion(4, 5, 6, 1);
+			assert.ok(a.z === 6, "Passed!");
+
+			a = new Quaternion(7, 8, 9);
+			a.z = 10;
+			assert.ok(a.z === 10, "Passed!");
+
+			a = new Quaternion(11, 12, 13);
+			var b = false;
+			a._onChange(function () {
+
+				b = true;
+
+			});
+			assert.ok(!b, "Passed!");
+			a.z = 14;
+			assert.ok(b, "Passed!");
+			assert.ok(a.z === 14, "Passed!");
 
 		} );
 
-		QUnit.todo( "w", ( assert ) => {
+		QUnit.test( "w", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Quaternion();
+			assert.ok(a.w === 1, "Passed!");
+
+			a = new Quaternion(1, 2, 3);
+			assert.ok(a.w === 1, "Passed!");
+
+			a = new Quaternion(4, 5, 6, 1);
+			assert.ok(a.w === 1, "Passed!");
+
+			a = new Quaternion(7, 8, 9);
+			a.w = 10;
+			assert.ok(a.w === 10, "Passed!");
+
+			a = new Quaternion(11, 12, 13);
+			var b = false;
+			a._onChange(function () {
+
+				b = true;
+
+			});
+			assert.ok(!b, "Passed!");
+			a.w = 14;
+			assert.ok(b, "Passed!");
+			assert.ok(a.w === 14, "Passed!");
 
 		} );
 
