@@ -136,7 +136,7 @@ var WEBVR = {
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR );
+			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR ).catch( showVRNotFound );
 
 			return button;
 
