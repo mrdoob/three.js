@@ -419,7 +419,7 @@ var AWDLoader = ( function () {
 
 			while ( methods_parsed < num_methods ) {
 
-				// read method_type before 
+				// read method_type before
 				this.readU16();
 				this.parseProperties( null );
 				this.parseUserAttributes();
@@ -473,7 +473,7 @@ var AWDLoader = ( function () {
 				var url = this.readUTFBytes( data_len );
 				console.log( url );
 
-				asset = this.loadTexture(url);
+				asset = this.loadTexture( url );
 				asset.userData = {};
 				asset.userData.name = name;
 
