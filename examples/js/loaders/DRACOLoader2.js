@@ -2,13 +2,6 @@
  * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-/**
- * Breaking changes from original DRACOLoader:
- * - Removed TriangleStripDrawMode support.
- * - Removed quantization support (what was `attribute.isQuantized`?).
- * - Removed setVerbosity, setDrawMode, and setSkipDequantization methods.
- * - Changed static initialization methods to instance methods.
- */
 THREE.DRACOLoader = function ( manager ) {
 
 	this.manager = manager || THREE.DefaultLoadingManager;
