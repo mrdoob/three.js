@@ -269,6 +269,7 @@
 
 				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 				loader.setDRACOLoader( new THREE.DRACOLoader() );
+				loader.setDDSLoader( new THREE.DDSLoader() );
 
 				var url = sceneInfo.url.replace( /%s/g, state.extension );
 
