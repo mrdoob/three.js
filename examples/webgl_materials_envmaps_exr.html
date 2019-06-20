@@ -11,26 +11,33 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equirectangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				FloatType,
+				HalfFloatType,
+				LinearEncoding,
+				LinearToneMapping,
+				Mesh,
+				MeshBasicMaterial,
+				MeshStandardMaterial,
+				NearestFilter,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				sRGBEncoding,
+				TextureLoader,
+				TorusKnotBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/EXRLoader.js"></script>
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var params = {
 				envMap: 'EXR',
@@ -43,7 +50,6 @@
 			var container, stats;
 			var camera, scene, renderer, controls;
 			var torusMesh, planeMesh;
-			var standardMaterial, floorMaterial;
 			var pngCubeRenderTarget, exrCubeRenderTarget;
 			var pngBackground, exrBackground;
 
@@ -55,73 +61,73 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 120 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer = new WebGLRenderer();
+				renderer.toneMapping = LinearToneMapping;
 
 				//
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				var material = new THREE.MeshStandardMaterial( {
+				var geometry = new TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				var material = new MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
 					envMapIntensity: 1.0
 				} );
 
-				torusMesh = new THREE.Mesh( geometry, material );
+				torusMesh = new Mesh( geometry, material );
 				scene.add( torusMesh );
 
-				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var material = new THREE.MeshBasicMaterial();
+				var geometry = new PlaneBufferGeometry( 200, 200 );
+				var material = new MeshBasicMaterial();
 
-				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh = new Mesh( geometry, material );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				new THREE.EXRLoader()
-					.setType( THREE.FloatType )
+				new EXRLoader()
+					.setType( FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-					texture.minFilter = THREE.NearestFilter;
-					// texture.magFilter = THREE.NearestFilter;
-					texture.encoding = THREE.LinearEncoding;
+						texture.minFilter = NearestFilter;
+						// texture.magFilter = NearestFilter;
+						texture.encoding = LinearEncoding;
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
-					exrBackground = cubemapGenerator.renderTarget;
-					var cubeMapTexture = cubemapGenerator.update( renderer );
+						var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512, type: HalfFloatType } );
+						exrBackground = cubemapGenerator.renderTarget;
+						var cubeMapTexture = cubemapGenerator.update( renderer );
 
-					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
-					pmremGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( cubeMapTexture );
+						pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					texture.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
+						texture.dispose();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-				} );
+					} );
 
-				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
+				new TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
-					texture.encoding = THREE.sRGBEncoding;
+					texture.encoding = sRGBEncoding;
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
+					var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512 } );
 					pngBackground = cubemapGenerator.renderTarget;
 
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
-					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
+					var pmremGenerator = new PMREMGenerator( cubeMapTexture );
 					pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
 					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -143,13 +149,13 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );

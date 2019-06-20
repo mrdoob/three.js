@@ -22,6 +22,6 @@ export class ArrowHelper extends Object3D {
 
 	setDirection( dir: Vector3 ): void;
 	setLength( length: number, headLength?: number, headWidth?: number ): void;
-	setColor( color: Color ): void;
+	setColor( color: Color | string | number ): void;
 
 }
