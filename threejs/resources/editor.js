@@ -50,17 +50,19 @@ function getPrefix(url) {
 }
 
 function fixCSSLinks(url, source) {
-  const cssUrlRE = /(url\()(.*?)(\))/g;
+  const cssUrlRE1 = /(url\(')(.*?)('\))/g;
+  const cssUrlRE2 = /(url\()(.*?)(\))/g;
   const prefix = getPrefix(url);
 
   function addPrefix(url) {
-    return url.indexOf('://') < 0 ? (prefix + url) : url;
+    return url.indexOf('://') < 0 ? `${prefix}/${url}` : url;
   }
   function makeFQ(match, prefix, url, suffix) {
     return `${prefix}${addPrefix(url)}${suffix}`;
   }
 
-  source = source.replace(cssUrlRE, makeFQ);
+  source = source.replace(cssUrlRE1, makeFQ);
+  source = source.replace(cssUrlRE2, makeFQ);
   return source;
 }
 
