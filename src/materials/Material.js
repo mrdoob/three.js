@@ -160,7 +160,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
-		if ( this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
+		if ( this.emissiveIntensity && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
@@ -212,6 +212,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			data.envMap = this.envMap.toJSON( meta ).uuid;
 			data.reflectivity = this.reflectivity; // Scale behind envMap
+			data.refractionRatio = this.refractionRatio;
 
 			if ( this.combine !== undefined ) data.combine = this.combine;
 			if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
@@ -240,13 +241,13 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.depthWrite = this.depthWrite;
 
 		// rotation (SpriteMaterial)
-		if ( this.rotation !== 0 ) data.rotation = this.rotation;
+		if ( this.rotation && this.rotation !== 0 ) data.rotation = this.rotation;
 
 		if ( this.polygonOffset === true ) data.polygonOffset = true;
 		if ( this.polygonOffsetFactor !== 0 ) data.polygonOffsetFactor = this.polygonOffsetFactor;
 		if ( this.polygonOffsetUnits !== 0 ) data.polygonOffsetUnits = this.polygonOffsetUnits;
 
-		if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
+		if ( this.linewidth && this.linewidth !== 1 ) data.linewidth = this.linewidth;
 		if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
 		if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
 		if ( this.scale !== undefined ) data.scale = this.scale;
@@ -262,6 +263,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
 		if ( this.morphTargets === true ) data.morphTargets = true;
+		if ( this.morphNormals === true ) data.morphNormals = true;
 		if ( this.skinning === true ) data.skinning = true;
 
 		if ( this.visible === false ) data.visible = false;
