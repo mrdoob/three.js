@@ -17,7 +17,9 @@ function Scene() {
 	this.autoUpdate = true; // checked by the renderer
 
 	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
-		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
+
+		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+
 	}
 
 }
