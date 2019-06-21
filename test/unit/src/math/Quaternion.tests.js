@@ -225,59 +225,60 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( "x", ( assert ) => {
+
 			var a = new Quaternion();
-			assert.ok(a.x === 0, "Passed!");
+			assert.ok( a.x === 0, "Passed!" );
 
-			a = new Quaternion(1, 2, 3);
-			assert.ok(a.x === 1, "Passed!");
+			a = new Quaternion( 1, 2, 3 );
+			assert.ok( a.x === 1, "Passed!" );
 
-			a = new Quaternion(4, 5, 6, 1);
-			assert.ok(a.x === 4, "Passed!");
+			a = new Quaternion( 4, 5, 6, 1 );
+			assert.ok( a.x === 4, "Passed!" );
 
-			a = new Quaternion(7, 8, 9);
+			a = new Quaternion( 7, 8, 9 );
 			a.x = 10;
-			assert.ok(a.x === 10, "Passed!");
+			assert.ok( a.x === 10, "Passed!" );
 
-			a = new Quaternion(11, 12, 13);
+			a = new Quaternion( 11, 12, 13 );
 			var b = false;
-			a._onChange(function () {
+			a._onChange( function () {
 
 				b = true;
 
-			});
-			assert.ok(!b, "Passed!");
+			} );
+			assert.ok( ! b, "Passed!" );
 			a.x = 14;
-			assert.ok(b, "Passed!");
-			assert.ok(a.x === 14, "Passed!");
+			assert.ok( b, "Passed!" );
+			assert.ok( a.x === 14, "Passed!" );
 
 		} );
 
 		QUnit.test( "y", ( assert ) => {
 
 			var a = new Quaternion();
-			assert.ok(a.y === 0, "Passed!");
+			assert.ok( a.y === 0, "Passed!" );
 
-			a = new Quaternion(1, 2, 3);
-			assert.ok(a.y === 2, "Passed!");
+			a = new Quaternion( 1, 2, 3 );
+			assert.ok( a.y === 2, "Passed!" );
 
-			a = new Quaternion(4, 5, 6, 1);
-			assert.ok(a.y === 5, "Passed!");
+			a = new Quaternion( 4, 5, 6, 1 );
+			assert.ok( a.y === 5, "Passed!" );
 
-			a = new Quaternion(7, 8, 9);
+			a = new Quaternion( 7, 8, 9 );
 			a.y = 10;
-			assert.ok(a.y === 10, "Passed!");
+			assert.ok( a.y === 10, "Passed!" );
 
-			a = new Quaternion(11, 12, 13);
+			a = new Quaternion( 11, 12, 13 );
 			var b = false;
-			a._onChange(function () {
+			a._onChange( function () {
 
 				b = true;
 
-			});
-			assert.ok(!b, "Passed!");
+			} );
+			assert.ok( ! b, "Passed!" );
 			a.y = 14;
-			assert.ok(b, "Passed!");
-			assert.ok(a.y === 14, "Passed!");
+			assert.ok( b, "Passed!" );
+			assert.ok( a.y === 14, "Passed!" );
 
 		} );
 
@@ -285,58 +286,58 @@ export default QUnit.module( 'Maths', () => {
 
 
 			var a = new Quaternion();
-			assert.ok(a.z === 0, "Passed!");
+			assert.ok( a.z === 0, "Passed!" );
 
-			a = new Quaternion(1, 2, 3);
-			assert.ok(a.z === 3, "Passed!");
+			a = new Quaternion( 1, 2, 3 );
+			assert.ok( a.z === 3, "Passed!" );
 
-			a = new Quaternion(4, 5, 6, 1);
-			assert.ok(a.z === 6, "Passed!");
+			a = new Quaternion( 4, 5, 6, 1 );
+			assert.ok( a.z === 6, "Passed!" );
 
-			a = new Quaternion(7, 8, 9);
+			a = new Quaternion( 7, 8, 9 );
 			a.z = 10;
-			assert.ok(a.z === 10, "Passed!");
+			assert.ok( a.z === 10, "Passed!" );
 
-			a = new Quaternion(11, 12, 13);
+			a = new Quaternion( 11, 12, 13 );
 			var b = false;
-			a._onChange(function () {
+			a._onChange( function () {
 
 				b = true;
 
-			});
-			assert.ok(!b, "Passed!");
+			} );
+			assert.ok( ! b, "Passed!" );
 			a.z = 14;
-			assert.ok(b, "Passed!");
-			assert.ok(a.z === 14, "Passed!");
+			assert.ok( b, "Passed!" );
+			assert.ok( a.z === 14, "Passed!" );
 
 		} );
 
 		QUnit.test( "w", ( assert ) => {
 
 			var a = new Quaternion();
-			assert.ok(a.w === 1, "Passed!");
+			assert.ok( a.w === 1, "Passed!" );
 
-			a = new Quaternion(1, 2, 3);
-			assert.ok(a.w === 1, "Passed!");
+			a = new Quaternion( 1, 2, 3 );
+			assert.ok( a.w === 1, "Passed!" );
 
-			a = new Quaternion(4, 5, 6, 1);
-			assert.ok(a.w === 1, "Passed!");
+			a = new Quaternion( 4, 5, 6, 1 );
+			assert.ok( a.w === 1, "Passed!" );
 
-			a = new Quaternion(7, 8, 9);
+			a = new Quaternion( 7, 8, 9 );
 			a.w = 10;
-			assert.ok(a.w === 10, "Passed!");
+			assert.ok( a.w === 10, "Passed!" );
 
-			a = new Quaternion(11, 12, 13);
+			a = new Quaternion( 11, 12, 13 );
 			var b = false;
-			a._onChange(function () {
+			a._onChange( function () {
 
 				b = true;
 
-			});
-			assert.ok(!b, "Passed!");
+			} );
+			assert.ok( ! b, "Passed!" );
 			a.w = 14;
-			assert.ok(b, "Passed!");
-			assert.ok(a.w === 14, "Passed!");
+			assert.ok( b, "Passed!" );
+			assert.ok( a.w === 14, "Passed!" );
 
 		} );
 
@@ -530,9 +531,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "dot", ( assert ) => {
+		QUnit.test( "dot", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Quaternion();
+			var b = new Quaternion();
+
+			assert.ok( a.dot( b ) === 1, "Passed!" );
+			a = new Quaternion( 1, 2, 3, 1 );
+			b = new Quaternion( 3, 2, 1, 1 );
+
+			assert.ok( a.dot( b ) === 11, "Passed!" );
+
 
 		} );
 
@@ -650,15 +659,32 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "_onChange", ( assert ) => {
+		QUnit.test( "_onChange", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var f = function () {
+
+				var b = true;
+
+			};
+
+			var a = new Quaternion( 11, 12, 13, 1 );
+			a._onChange( f );
+			assert.ok( a._onChangeCallback === f, "Passed!" );
 
 		} );
 
-		QUnit.todo( "_onChangeCallback", ( assert ) => {
+		QUnit.test( "_onChangeCallback", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var f = function () {
+
+				var b = true;
+
+			};
+
+			var a = new Quaternion( 11, 12, 13, 1 );
+			a._onChangeCallback = f;
+			assert.ok( a._onChangeCallback === f, "Passed!" );
 
 		} );
 
