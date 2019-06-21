@@ -17,16 +17,16 @@ of the face.
 
 <div class="threejs_center"><img src="resources/threejs-geometry.svg" style="width: 700px"></div>
 
-`BufferGeometry` on the other hand uses *named* `BufferAttribute`s
-Each `BufferAttribute` represents an array of one type of data, positions,
-normals, colors, uv, and togther the all the added `BufferAttribute`s represent
-*parallel arrays*  of all the data for each vertex.
+`BufferGeometry` on the other hand uses *named* `BufferAttribute`s.
+Each `BufferAttribute` represents an array of one type of data: positions,
+normals, colors, and uv. Togther, the added `BufferAttribute`s represent
+*parallel arrays* of all the data for each vertex.
 
 <div class="threejs_center"><img src="resources/threejs-attributes.svg" style="width: 700px"></div>
 
-Above you can see we have 4 attributes, `position`, `normal`, `color`, `uv`.
+Above you can see we have 4 attributes: `position`, `normal`, `color`, `uv`.
 They represent *parallel arrays* which means that the Nth set of data in each
-attribute belongs to the same vertex. Above the vertex at index = 4 is highlighted
+attribute belongs to the same vertex. The vertex at index = 4 is highlighted
 to show that the parallel data across all attributes defines one vertex.
 
 This brings up a point, here's a diagram of a cube with one corner highlighted.
@@ -44,7 +44,7 @@ That is where the extra memory and time comes from when using `Geometry`. Extra
 memory for all the `Vector3`s, `Vector2`s, `Face3`s and array objects and then
 extra time to translate all of that data into parallel arrays in the form of
 `BufferAttribute`s like above. Somtimes that makes using `Geometry` easier.
-With `BufferGeometry` is up to us to supply the data already turned into this format.
+With `BufferGeometry` it is up to us to supply the data already turned into this format.
 
 As a simple example let's make a cube using `BufferGeometry`. A cube is interesting
 because it appears to share vertices at the corners but really
@@ -52,11 +52,11 @@ does not. For our example we'll list out all the vertices with all their data
 and then convert that data into parallel arrays and finally use those to make
 `BufferAttribute`s and add them to a `BufferGeometry`.
 
-Starting with the texture coordinate example from [the previous article](threejs-custom-geometry.html) we've delete all the code related to setting up
+Starting with the texture coordinate example from [the previous article](threejs-custom-geometry.html) we've deleted all the code related to setting up
 a `Geometry`. Then we list all the data needed for the cube. Remember again
 that if a vertex has any unique parts it has to be a separate vertex. As such
-to make a cube requires 36 vertex. 2 triangles per face, 3 vertices per triangle,
-6 faces = 36 vertices
+to make a cube requires 36 vertices. 2 triangles per face, 3 vertices per triangle,
+6 faces = 36 vertices.
 
 ```js
 const vertices = [
@@ -124,7 +124,7 @@ for (const vertex of vertices) {
 }
 ```
 
-Finally we can create a `BufferGeometry` and then a `BufferAttribute` for each array 
+Finally we can create a `BufferGeometry` and then a `BufferAttribute` for each array
 and add it to the `BufferGeometry`.
 
 ```js
@@ -151,8 +151,8 @@ name your attribute `color`.
 Above we created 3 JavaScript native arrays, `positions`, `normals` and `uvs`.
 We then convert those into
 [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
-of type `Float32Array`. A `BufferAttribute` requires a typedarray not a native
-array. A `BufferAttribute` also requires you tell it how many components there
+of type `Float32Array`. A `BufferAttribute` requires a TypedArray not a native
+array. A `BufferAttribute` also requires you to tell it how many components there
 are per vertex. For the positions and normals we have 3 components per vertex,
 x, y, and z. For the UVs we have 2, u and v.
 
@@ -160,8 +160,8 @@ x, y, and z. For the UVs we have 2, u and v.
 
 That's a lot of data. A small thing we can do is use indices to reference
 the vertices. Looking back at our cube data, each face is made from 2 triangles
-with 3 vertices each, 6 vertices total, but 2 of those vertices are exactly the same; 
-The same position, the same normal, and the same uv. 
+with 3 vertices each, 6 vertices total, but 2 of those vertices are exactly the same;
+The same position, the same normal, and the same uv.
 So, we can remove the matching vertices and then
 reference them by index. First we remove the matching vertices.
 
@@ -266,12 +266,12 @@ is no way to share the vertices at the start and end of the cylinder since they
 require different UVs. Just a small thing to be aware of. The solution is
 to supply your own normals.
 
-We can also use [typedarrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) from the start instead of native JavaScript arrays.
-The disadvantage to typedarrays is you must specify their size up front. Of
+We can also use [TypedArrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) from the start instead of native JavaScript arrays.
+The disadvantage to TypedArrays is you must specify their size up front. Of
 course that's not that large of a burden but with native arrays we can just
 `push` values onto them and look at what size they end up by checking their
-`length` at the end. With typedarrays there is no push function so we need
-to do our own bookkeeping when adding values do them.
+`length` at the end. With TypedArrays there is no push function so we need
+to do our own bookkeeping when adding values to them.
 
 In this example knowing the length up front is pretty easy since we're using
 a big block of static data to start.
@@ -328,7 +328,7 @@ geometry.setIndex([
 {{{example url="../threejs-custom-buffergeometry-cube-typedarrays.html"}}}
 
 A good reason to use typedarrays is if you want to dynamically update any
-part of the vertices. 
+part of the vertices.
 
 I couldn't think of a really good example of dynamically updating the vertices
 so I decided to make a sphere and move each quad in and out from the center. Hopefully
@@ -454,9 +454,9 @@ And we set `positionAttribute.needsUpdate` to tell THREE.js to use our changes.
 
 {{{example url="../threejs-custom-buffergeometry-dynamic.html"}}}
 
-I hope these were useful example of how to use `BufferGeometry` directly to
+I hope these were useful examples of how to use `BufferGeometry` directly to
 make your own geometry and how to dynamically update the contents of a
-`BufferAttribute`. Which you use, `Geometry` or `BufferGeometry` really
+`BufferAttribute`. Which you use, `Geometry` or `BufferGeometry`, really
 depends on your needs.
 
 <canvas id="c"></canvas>
