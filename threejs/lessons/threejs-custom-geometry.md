@@ -86,7 +86,7 @@ We do that by creating `Face3` objects and specifying the indices
 of the 3 vertices that make up that face.
 
 The order we specify the vertices is important. To be pointing toward the
-outside of the cube they must be specified in a clockwise direction
+outside of the cube they must be specified in a counter clockwise direction
 when that triangle is facing the camera.
 
 <div class="threejs_center"><img src="resources/cube-vertex-winding-order.svg" style="width: 500px"></div>
