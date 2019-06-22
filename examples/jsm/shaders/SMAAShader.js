@@ -184,9 +184,11 @@ var SMAAWeightsShader = {
 		"varying vec4 vOffset[3];",
 		"varying vec2 vPixcoord;",
 
+		"#if __VERSION__ == 100",
 		"vec2 round( vec2 x ) {",
 			"return sign( x ) * floor( abs( x ) + 0.5 );",
 		"}",
+		"#endif",
 
 		"float SMAASearchLength( sampler2D searchTex, vec2 e, float bias, float scale ) {",
 			// Not required if searchTex accesses are set to point:
