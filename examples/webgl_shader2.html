@@ -56,7 +56,7 @@
 
 			uniform float time;
 
-			uniform sampler2D texture;
+			uniform sampler2D colorTexture;
 
 			varying vec2 vUv;
 
@@ -73,7 +73,7 @@
 				uv /= 10.0;
 				uv += time * 0.05;
 
-				vec3 color = texture2D( texture, uv ).rgb;
+				vec3 color = texture2D( colorTexture, uv ).rgb;
 
 				gl_FragColor = vec4( color * r * 1.5, 1.0 );
 
@@ -174,10 +174,10 @@
 
 				uniforms2 = {
 					"time": { value: 1.0 },
-					"texture": { value: new TextureLoader().load( 'textures/disturb.jpg' ) }
+					"colorTexture": { value: new TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = RepeatWrapping;
+				uniforms2[ "colorTexture" ].value.wrapS = uniforms2[ "colorTexture" ].value.wrapT = RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],
