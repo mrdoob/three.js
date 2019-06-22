@@ -35,13 +35,13 @@
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
 			uniform vec3 color;
-			uniform sampler2D texture;
+			uniform sampler2D pointTexture;
 
 			varying vec3 vColor;
 
 			void main() {
 
-				vec4 color = vec4( color * vColor, 1.0 ) * texture2D( texture, gl_PointCoord );
+				vec4 color = vec4( color * vColor, 1.0 ) * texture2D( pointTexture, gl_PointCoord );
 
 				gl_FragColor = color;
 
@@ -137,7 +137,7 @@
 
 					uniforms: {
 						color: { value: new Color( 0xffffff ) },
-						texture: { value: texture }
+						pointTexture: { value: texture }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
