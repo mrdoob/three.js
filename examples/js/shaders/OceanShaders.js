@@ -110,9 +110,11 @@ THREE.OceanShaders[ 'ocean_initial_spectrum' ] = {
 			'return sqrt(G * k * (1.0 + pow2(k / KM)));',
 		'}',
 
+		'#if __VERSION__ == 100',
 		'float tanh (float x) {',
 			'return (1.0 - exp(-2.0 * x)) / (1.0 + exp(-2.0 * x));',
 		'}',
+		'#endif',
 
 		'void main (void) {',
 			'vec2 coordinates = gl_FragCoord.xy - 0.5;',
