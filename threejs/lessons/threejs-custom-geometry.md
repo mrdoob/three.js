@@ -67,14 +67,14 @@ Centered around the origin we can add the vertex positions like this
 ```js
 const geometry = new THREE.Geometry();
 +geometry.vertices.push(
-+  new THREE.Vector3(-1, -1, -1),  // 0
-+  new THREE.Vector3( 1, -1, -1),  // 1
-+  new THREE.Vector3(-1,  1, -1),  // 2
-+  new THREE.Vector3( 1,  1, -1),  // 3
-+  new THREE.Vector3(-1, -1,  1),  // 4
-+  new THREE.Vector3( 1, -1,  1),  // 5
-+  new THREE.Vector3(-1,  1,  1),  // 6
-+  new THREE.Vector3( 1,  1,  1),  // 7
++  new THREE.Vector3(-1, -1,  1),  // 0
++  new THREE.Vector3( 1, -1,  1),  // 1
++  new THREE.Vector3(-1,  1,  1),  // 2
++  new THREE.Vector3( 1,  1,  1),  // 3
++  new THREE.Vector3(-1, -1, -1),  // 4
++  new THREE.Vector3( 1, -1, -1),  // 5
++  new THREE.Vector3(-1,  1, -1),  // 6
++  new THREE.Vector3( 1,  1, -1),  // 7
 +);
 ```
 
@@ -96,24 +96,24 @@ the cube like this
 
 ```js
 geometry.faces.push(
-   // front
-   new THREE.Face3(0, 2, 3),
-   new THREE.Face3(0, 3, 1),
-   // right
-   new THREE.Face3(1, 3, 7),
-   new THREE.Face3(1, 7, 5),
-   // back
-   new THREE.Face3(5, 7, 6),
-   new THREE.Face3(5, 6, 4),
-   // left
-   new THREE.Face3(4, 6, 2),
-   new THREE.Face3(4, 2, 0),
-   // top
-   new THREE.Face3(2, 6, 7),
-   new THREE.Face3(2, 7, 3),
-   // bottom
-   new THREE.Face3(4, 0, 1),
-   new THREE.Face3(4, 1, 5),
+  // front
+  new THREE.Face3(0, 3, 2),
+  new THREE.Face3(0, 1, 3),
+  // right
+  new THREE.Face3(1, 7, 3),
+  new THREE.Face3(1, 5, 7),
+  // back
+  new THREE.Face3(5, 6, 7),
+  new THREE.Face3(5, 4, 6),
+  // left
+  new THREE.Face3(4, 2, 6),
+  new THREE.Face3(4, 0, 2),
+  // top
+  new THREE.Face3(2, 7, 6),
+  new THREE.Face3(2, 3, 7),
+  // bottom
+  new THREE.Face3(4, 1, 0),
+  new THREE.Face3(4, 5, 1),
 );
 ```
 
@@ -267,25 +267,25 @@ layers of parallel arrays to the `faces` array which is set via `Geometry.faceVe
 For our cube we could do something like
 
 ```js
- geometry.faceVertexUvs[0].push(
-   // front
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(0, 1), new THREE.Vector2(1, 1) ],
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(1, 0) ],
-   // right
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(0, 1), new THREE.Vector2(1, 1) ],
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(1, 0) ],
-   // back
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(0, 1), new THREE.Vector2(1, 1) ],
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(1, 0) ],
-   // left
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(0, 1), new THREE.Vector2(1, 1) ],
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(1, 0) ],
-   // top
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(0, 1), new THREE.Vector2(1, 1) ],
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(1, 0) ],
-   // bottom
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(0, 1), new THREE.Vector2(1, 1) ],
-   [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(1, 0) ],
+geometry.faceVertexUvs[0].push(
+  // front
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(0, 1) ],
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, 1) ],
+  // right
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(0, 1) ],
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, 1) ],
+  // back
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(0, 1) ],
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, 1) ],
+  // left
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(0, 1) ],
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, 1) ],
+  // top
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(0, 1) ],
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, 1) ],
+  // bottom
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 1), new THREE.Vector2(0, 1) ],
+  [ new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(1, 1) ],
 );
 ```
 
