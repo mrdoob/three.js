@@ -366,7 +366,7 @@ and we get labels where the text is centered and scaled to fit
 {{{example url="../threejs-canvas-textured-labels-scale-to-fit.html" }}}
 
 Above we used a new canvas for each texture. Whether or not to use a 
-canvas per texture is up to you. If you need to up them often then 
+canvas per texture is up to you. If you need to update them often then 
 having one canvas per texture is probably the best option. If they are
 rarely or never updated then you can choose to use a single canvas
 for multiple textures by forcing three.js to use the texture.
