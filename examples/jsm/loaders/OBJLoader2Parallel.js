@@ -8,7 +8,7 @@ import {
 	CodeBuilderInstructions,
 	WorkerExecutionSupport
 } from "./obj2/worker/main/WorkerExecutionSupport.js";
-import { CodeSerializer } from "./obj2/worker/main/CodeSerializer.js";
+import { CodeSerializer } from "./obj2/utils/CodeSerializer.js";
 import { OBJLoader2 } from "./OBJLoader2.js";
 
 // Imports only related to worker (when standard workers (modules aren't supported) are used)
@@ -33,6 +33,8 @@ const OBJLoader2Parallel = function ( manager ) {
 	this.executeParallel = true;
 	this.workerExecutionSupport = new WorkerExecutionSupport();
 };
+OBJLoader2.OBJLOADER2_PARALLEL_VERSION = '3.0.0-beta2';
+console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2.OBJLOADER2PARALLEL_VERSION );
 
 OBJLoader2Parallel.prototype = Object.create( OBJLoader2.prototype );
 OBJLoader2Parallel.prototype.constructor = OBJLoader2Parallel;
@@ -57,6 +59,10 @@ OBJLoader2Parallel.prototype.setCallbackOnLoad = function ( callbackOnLoad ) {
 OBJLoader2Parallel.prototype.setExecuteParallel = function ( executeParallel ) {
 	this.executeParallel = executeParallel === true;
 	return this;
+};
+
+OBJLoader2Parallel.prototype.getWorkerExecutionSupport = function () {
+	return this.workerExecutionSupport;
 };
 
 OBJLoader2Parallel.prototype._configure = function () {

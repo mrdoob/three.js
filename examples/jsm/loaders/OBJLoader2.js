@@ -44,7 +44,7 @@ const OBJLoader2 = function ( manager ) {
 	this.materialHandler = new MaterialHandler();
 	this.meshReceiver = new MeshReceiver( this.materialHandler );
 };
-OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta';
+OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta2';
 console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
 OBJLoader2.prototype = {
