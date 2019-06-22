@@ -81,22 +81,15 @@ div[data-diagram] {
     max-width: 700px;
     width: calc(100% - 40px);
 }
-.lesson-main>h1,
-.lesson-main>h2,
-.lesson-main>h3,
-.lesson-main>h4,
-.lesson-main>h5,
-.lesson-main>h6 {
+.lesson-main>h1:not(:first-child),
+.lesson-main>h2:not(:first-child),
+.lesson-main>h3:not(:first-child),
+.lesson-main>h4:not(:first-child),
+.lesson-main>h5:not(:first-child),
+.lesson-main>h6:not(:first-child) {
     margin-top: 1.66em;
 }
-.lesson-main>h1:first-child,
-.lesson-main>h2:first-child,
-.lesson-main>h3:first-child,
-.lesson-main>h4:first-child,
-.lesson-main>h5:first-child,
-.lesson-main>h6:first-child {
-    margin-top: 0.83em;
-}
+
 .lesson-main>.threejs_example_container {
     max-width: 90%;
 }
