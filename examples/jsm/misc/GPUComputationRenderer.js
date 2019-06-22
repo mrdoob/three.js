@@ -124,7 +124,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 	camera.position.z = 1;
 
 	var passThruUniforms = {
-		texture: { value: null }
+		passThruTexture: { value: null }
 	};
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
@@ -163,7 +163,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.extensions.get( "OES_texture_float" ) ) {
+		if ( ! renderer.extensions.get( "OES_texture_float" ) &&
+			 ! renderer.capabilities.isWebGL2 ) {
 
 			return "No OES_texture_float support for float textures.";
 
@@ -347,11 +348,11 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 		// input = Texture
 		// output = RenderTarget
 
-		passThruUniforms.texture.value = input;
+		passThruUniforms.passThruTexture.value = input;
 
 		this.doRenderTarget( passThruShader, output );
 
-		passThruUniforms.texture.value = null;
+		passThruUniforms.passThruTexture.value = null;
 
 	};
 
@@ -382,13 +383,13 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	function getPassThroughFragmentShader() {
 
-		return	"uniform sampler2D texture;\n" +
+		return	"uniform sampler2D passThruTexture;\n" +
 				"\n" +
 				"void main() {\n" +
 				"\n" +
 				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
 				"\n" +
-				"	gl_FragColor = texture2D( texture, uv );\n" +
+				"	gl_FragColor = texture2D( passThruTexture, uv );\n" +
 				"\n" +
 				"}\n";
 
