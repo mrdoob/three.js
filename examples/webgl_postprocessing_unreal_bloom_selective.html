@@ -33,9 +33,9 @@
 
 			varying vec2 vUv;
 
-			vec4 getTexture( sampler2D texture ) {
+			vec4 getTexture( sampler2D texelToLinearTexture ) {
 
-				return mapTexelToLinear( texture2D( texture , vUv ) );
+				return mapTexelToLinear( texture2D( texelToLinearTexture , vUv ) );
 
 			}
 
