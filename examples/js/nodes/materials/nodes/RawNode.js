@@ -18,7 +18,7 @@ RawNode.prototype.nodeType = "Raw";
 
 RawNode.prototype.generate = function ( builder ) {
 
-	var data = this.value.parseAndBuildCode( builder, this.type ),
+	var data = this.value.analyzeAndFlow( builder, this.type ),
 		code = data.code + '\n';
 
 	if ( builder.isShader( 'vertex' ) ) {

@@ -4,32 +4,7 @@
 		<title>three.js webgl - lights - point lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -38,25 +13,36 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - point lights WebGL demo
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Clock,
+				Color,
+				DirectionalLight,
+				Fog,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				RepeatWrapping,
+				RGBFormat,
+				TextureLoader,
+				TorusBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			var camera, scene, renderer, controls;
 			var light1, light2, light3, light4, light5, light6;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			var stats;
 
@@ -69,60 +55,44 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 300 );
 				camera.position.set( 0, 15, 150 );
 				camera.lookAt( 0, 0, 0 );
 
 				// SCENE
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x040306 );
-				scene.fog = new THREE.Fog( 0x040306, 10, 300 );
-
-				// CONTROLS
-
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = false;
-				controls.dynamicDampingFactor = 0.15;
-
-				controls.keys = [ 65, 83, 68 ];
+				scene = new Scene();
+				scene.background = new Color( 0x040306 );
+				scene.fog = new Fog( 0x040306, 10, 300 );
 
 				// TEXTURES
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
 				var texture = textureLoader.load( "textures/disturb.jpg" );
 				texture.repeat.set( 20, 10 );
-				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-				texture.format = THREE.RGBFormat;
+				texture.wrapS = texture.wrapT = RepeatWrapping;
+				texture.format = RGBFormat;
 
 				// MATERIALS
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
-				var objectMaterial = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0.5, metalness: 1.0 } );
+				var groundMaterial = new MeshPhongMaterial( { color: 0xffffff, map: texture } );
+				var objectMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 0.5, metalness: 1.0 } );
 
 				// GROUND
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 800, 400, 2, 2 ), groundMaterial );
+				var mesh = new Mesh( new PlaneBufferGeometry( 800, 400, 2, 2 ), groundMaterial );
 				mesh.position.y = - 5;
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				// OBJECTS
 
-				var objectGeometry = new THREE.TorusBufferGeometry( 1.5, 0.4, 8, 16 );
+				var objectGeometry = new TorusBufferGeometry( 1.5, 0.4, 8, 16 );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
-					var mesh = new THREE.Mesh( objectGeometry, objectMaterial );
+					var mesh = new Mesh( objectGeometry, objectMaterial );
 
 					mesh.position.x = 400 * ( 0.5 - Math.random() );
 					mesh.position.y = 50 * ( 0.5 - Math.random() ) + 25;
@@ -145,45 +115,61 @@
 
 				var c1 = 0xff0040, c2 = 0x0040ff, c3 = 0x80ff80, c4 = 0xffaa00, c5 = 0x00ffaa, c6 = 0xff1100;
 
-				var sphere = new THREE.SphereBufferGeometry( 0.25, 16, 8 );
+				var sphere = new SphereBufferGeometry( 0.25, 16, 8 );
 
-				light1 = new THREE.PointLight( c1, intensity, distance, decay );
-				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c1 } ) ) );
+				light1 = new PointLight( c1, intensity, distance, decay );
+				light1.add( new Mesh( sphere, new MeshBasicMaterial( { color: c1 } ) ) );
 				scene.add( light1 );
 
-				light2 = new THREE.PointLight( c2, intensity, distance, decay );
-				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c2 } ) ) );
+				light2 = new PointLight( c2, intensity, distance, decay );
+				light2.add( new Mesh( sphere, new MeshBasicMaterial( { color: c2 } ) ) );
 				scene.add( light2 );
 
-				light3 = new THREE.PointLight( c3, intensity, distance, decay );
-				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c3 } ) ) );
+				light3 = new PointLight( c3, intensity, distance, decay );
+				light3.add( new Mesh( sphere, new MeshBasicMaterial( { color: c3 } ) ) );
 				scene.add( light3 );
 
-				light4 = new THREE.PointLight( c4, intensity, distance, decay );
-				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c4 } ) ) );
+				light4 = new PointLight( c4, intensity, distance, decay );
+				light4.add( new Mesh( sphere, new MeshBasicMaterial( { color: c4 } ) ) );
 				scene.add( light4 );
 
-				light5 = new THREE.PointLight( c5, intensity, distance, decay );
-				light5.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c5 } ) ) );
+				light5 = new PointLight( c5, intensity, distance, decay );
+				light5.add( new Mesh( sphere, new MeshBasicMaterial( { color: c5 } ) ) );
 				scene.add( light5 );
 
-				light6 = new THREE.PointLight( c6, intensity, distance, decay );
-				light6.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: c6 } ) ) );
+				light6 = new PointLight( c6, intensity, distance, decay );
+				light6.add( new Mesh( sphere, new MeshBasicMaterial( { color: c6 } ) ) );
 				scene.add( light6 );
 
-				var dlight = new THREE.DirectionalLight( 0xffffff, 0.05 );
+				var dlight = new DirectionalLight( 0xffffff, 0.05 );
 				dlight.position.set( 0.5, 1, 0 ).normalize();
 				scene.add( dlight );
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				// CONTROLS
+
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = false;
+				controls.dynamicDampingFactor = 0.15;
+
+				controls.keys = [ 65, 83, 68 ];
 
 				// STATS
 

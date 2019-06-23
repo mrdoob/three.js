@@ -33,6 +33,18 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 		return new this.constructor().copy( this );
 
+	},
+
+	toJSON: function () {
+
+		var data = BufferGeometry.prototype.toJSON.call( this );
+
+		data.maxInstancedCount = this.maxInstancedCount;
+
+		data.isInstancedBufferGeometry = true;
+
+		return data;
+
 	}
 
 } );

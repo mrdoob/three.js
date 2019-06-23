@@ -4,49 +4,27 @@
 		<title>three.js webgl - effects - ascii</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ff0000;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - ascii</div>
-		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/effects/AsciiEffect.js"></script>
+		<script type="module">
+			import {
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			var camera, controls, scene, renderer, effect;
 
@@ -59,36 +37,34 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 
-				controls = new THREE.TrackballControls( camera );
+				scene = new Scene();
 
-				scene = new THREE.Scene();
-
-				var light = new THREE.PointLight( 0xffffff );
+				var light = new PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
 				scene.add( light );
 
-				var light = new THREE.PointLight( 0xffffff, 0.25 );
+				var light = new PointLight( 0xffffff, 0.25 );
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true }) );
+				sphere = new Mesh( new SphereBufferGeometry( 200, 20, 10 ), new MeshPhongMaterial( { flatShading: true } ) );
 				scene.add( sphere );
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				plane = new Mesh( new PlaneBufferGeometry( 400, 400 ), new MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.position.y = - 200;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';
@@ -97,6 +73,8 @@
 				// AsciiEffect creates a custom domElement (a div container) where the ASCII elements are placed.
 
 				document.body.appendChild( effect.domElement );
+
+				controls = new TrackballControls( camera, effect.domElement );
 
 				//
 

@@ -64,7 +64,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var thetaEnd = thetaStart + thetaLength;
+	var thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
 	var ix, iy;
 
@@ -91,7 +91,17 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 		// special case for the poles
 
-		var uOffset = ( iy == 0 ) ? 0.5 / widthSegments : ( ( iy == heightSegments ) ? - 0.5 / widthSegments : 0 );
+		var uOffset = 0;
+
+		if ( iy == 0 && thetaStart == 0 ) {
+
+			uOffset = 0.5 / widthSegments;
+
+		} else if ( iy == heightSegments && thetaEnd == Math.PI ) {
+
+			uOffset = - 0.5 / widthSegments;
+
+		}
 
 		for ( ix = 0; ix <= widthSegments; ix ++ ) {
 

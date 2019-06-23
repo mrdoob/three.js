@@ -38,7 +38,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 		var data = builder.getNodeData( uuid ),
 			type = data.output || this.getType( builder );
 
-		if ( builder.parsing ) {
+		if ( builder.analyzing ) {
 
 			if ( ( data.deps || 0 ) > 0 || this.getLabel() ) {
 
@@ -56,7 +56,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			return data.name;
 
-		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( ! builder.optimize || data.deps === 1 ) ) ) {
+		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( builder.context.ignoreCache || data.deps === 1 ) ) ) {
 
 			return Node.prototype.build.call( this, builder, output, uuid );
 

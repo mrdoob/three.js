@@ -49,8 +49,8 @@ function Object3D() {
 
 	}
 
-	rotation.onChange( onRotationChange );
-	quaternion.onChange( onQuaternionChange );
+	rotation._onChange( onRotationChange );
+	quaternion._onChange( onQuaternionChange );
 
 	Object.defineProperties( this, {
 		position: {
@@ -114,7 +114,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	applyMatrix: function ( matrix ) {
 
-		this.matrix.multiplyMatrices( matrix, this.matrix );
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+		this.matrix.premultiply( matrix );
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
 
@@ -387,9 +389,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			}
 
 			object.parent = this;
-			object.dispatchEvent( { type: 'added' } );
-
 			this.children.push( object );
+
+			object.dispatchEvent( { type: 'added' } );
 
 		} else {
 
@@ -420,16 +422,47 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( index !== - 1 ) {
 
 			object.parent = null;
+			this.children.splice( index, 1 );
 
 			object.dispatchEvent( { type: 'removed' } );
-
-			this.children.splice( index, 1 );
 
 		}
 
 		return this;
 
 	},
+
+	attach: function () {
+
+		// adds object as a child of this, while maintaining the object's world transform
+
+		var m = new Matrix4();
+
+		return function attach( object ) {
+
+			this.updateWorldMatrix( true, false );
+
+			m.getInverse( this.matrixWorld );
+
+			if ( object.parent !== null ) {
+
+				object.parent.updateWorldMatrix( true, false );
+
+				m.multiply( object.parent.matrixWorld );
+
+			}
+
+			object.applyMatrix( m );
+
+			object.updateWorldMatrix( false, false );
+
+			this.add( object );
+
+			return this;
+
+		};
+
+	}(),
 
 	getObjectById: function ( id ) {
 

@@ -1,46 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - extrude shapes from geodata</title>
+		<title>three.js webgl - geometry - shapes extrusion via geodata</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
-		a {
-			color: #ffffff;
-		}
+			body {
+				color: #fff;
+			}
 		</style>
 	</head>
-
 	<body>
-
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Shapes Extrusion via Geo Data
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shapes extrusion via geodata
 		</div>
 
-		<script type="text/javascript" src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				DirectionalLight,
+				ExtrudeBufferGeometry,
+				GridHelper,
+				Group,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Scene,
+				ShapePath,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
 			// From d3-threeD.js
 			/* This Source Code Form is subject to the terms of the Mozilla Public
 			 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -53,7 +50,7 @@
 
 				exports.transformSVGPath = function transformSVGPath( pathStr ) {
 
-					var path = new THREE.ShapePath();
+					var path = new ShapePath();
 
 					var idx = 1, len = pathStr.length, activeCmd,
 						x = 0, y = 0, nx = 0, ny = 0, firstX = null, firstY = null,
@@ -301,8 +298,8 @@
 								cx = Math.cos( xar ) * x2 - Math.sin( xar ) * y2 + ( x + nx ) / 2;
 								cy = Math.sin( xar ) * x2 + Math.cos( xar ) * y2 + ( y + ny ) / 2;
 
-								var u = new THREE.Vector2( 1, 0 );
-								var v = new THREE.Vector2( ( x1 - x2 ) / rx, ( y1 - y2 ) / ry );
+								var u = new Vector2( 1, 0 );
+								var v = new Vector2( ( x1 - x2 ) / rx, ( y1 - y2 ) / ry );
 
 								var startAng = Math.acos( u.dot( v ) / u.length() / v.length() );
 
@@ -360,8 +357,8 @@
 				for ( var i = 0; i < paths.length; i ++ ) {
 
 					var path = $d3g.transformSVGPath( paths[ i ] );
-					var color = new THREE.Color( colors[ i ] );
-					var material = new THREE.MeshLambertMaterial( {
+					var color = new Color( colors[ i ] );
+					var material = new MeshLambertMaterial( {
 						color: color,
 						emissive: color
 					} );
@@ -371,12 +368,12 @@
 					for ( var j = 0; j < simpleShapes.length; j ++ ) {
 
 						var simpleShape = simpleShapes[ j ];
-						var shape3d = new THREE.ExtrudeBufferGeometry( simpleShape, {
+						var shape3d = new ExtrudeBufferGeometry( simpleShape, {
 							depth: depth,
 							bevelEnabled: false
 						} );
 
-						var mesh = new THREE.Mesh( shape3d, material );
+						var mesh = new Mesh( shape3d, material );
 						mesh.rotation.x = Math.PI;
 						mesh.translateZ( - depth - 1 );
 						mesh.translateX( - center.x );
@@ -403,31 +400,31 @@
 
 				//
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xb0b0b0 );
+				scene = new Scene();
+				scene.background = new Color( 0xb0b0b0 );
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 200 );
 
 				//
 
-				var group = new THREE.Group();
+				var group = new Group();
 				scene.add( group );
 
 				//
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
+				var directionalLight = new DirectionalLight( 0xffffff, 0.6 );
 				directionalLight.position.set( 0.75, 0.75, 1.0 ).normalize();
 				scene.add( directionalLight );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.2 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.2 );
 				scene.add( ambientLight );
 
 				//
 
-				var helper = new THREE.GridHelper( 160, 10 );
+				var helper = new GridHelper( 160, 10 );
 				helper.rotation.x = Math.PI / 2;
 				group.add( helper );
 
@@ -438,14 +435,14 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

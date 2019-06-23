@@ -15,7 +15,7 @@ function FunctionNode( src, includes, extensions, keywords, type ) {
 
 	TempNode.call( this, type );
 
-	this.eval( src, includes, extensions, keywords );
+	this.parse( src, includes, extensions, keywords );
 
 }
 
@@ -85,7 +85,13 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	while ( match = propertiesRegexp.exec( this.src ) ) {
+	var matches = [];
+
+	while ( match = propertiesRegexp.exec( this.src ) ) matches.push( match );
+
+	for ( var i = 0; i < matches.length; i++ ) {
+
+		var match = matches[i];
 
 		var prop = match[ 0 ],
 			isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true,
@@ -111,7 +117,7 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 		}
 
-		if ( prop != reference ) {
+		if ( prop !== reference ) {
 
 			src = src.substring( 0, match.index + offset ) + reference + src.substring( match.index + prop.length + offset );
 
@@ -145,7 +151,7 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 };
 
-FunctionNode.prototype.eval = function ( src, includes, extensions, keywords ) {
+FunctionNode.prototype.parse = function ( src, includes, extensions, keywords ) {
 
 	this.src = src || '';
 
@@ -216,7 +222,7 @@ FunctionNode.prototype.copy = function ( source ) {
 	this.isMethod = source.isMethod;
 	this.useKeywords = source.useKeywords;
 
-	this.eval( source.src, source.includes, source.extensions, source.keywords );
+	this.parse( source.src, source.includes, source.extensions, source.keywords );
 
 	if ( source.type !== undefined ) this.type = source.type;
 

@@ -3,58 +3,60 @@
 		<title>Ammo.js softbody volume demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #333;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a { color: #a06851; }
 		</style>
 	</head>
 	<body>
-		<div id="info">Ammo.js physics soft body volume demo<br>Click to throw a ball</div>
-		<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+		<div id="info">
+			Ammo.js physics soft body volume demo<br/>
+			Click to throw a ball
+		</div>
+		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				BufferGeometry,
+				Clock,
+				Color,
+				DirectionalLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Quaternion,
+				Raycaster,
+				RepeatWrapping,
+				Scene,
+				SphereBufferGeometry,
+				TextureLoader,
+				Vector2,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			// Graphics variables
 			var container, stats;
 			var camera, controls, scene, renderer;
 			var textureLoader;
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 			var clickRequest = false;
-			var mouseCoords = new THREE.Vector2();
-			var raycaster = new THREE.Raycaster();
-			var ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
-			var pos = new THREE.Vector3();
-			var quat = new THREE.Quaternion();
+			var mouseCoords = new Vector2();
+			var raycaster = new Raycaster();
+			var ballMaterial = new MeshPhongMaterial( { color: 0x202020 } );
+			var pos = new Vector3();
+			var quat = new Quaternion();
 
 			// Physics variables
 			var gravityConstant = - 9.8;
@@ -65,7 +67,7 @@
 			var transformAux1;
 			var softBodyHelpers;
 
-			Ammo().then( function( AmmoLib ) {
+			Ammo().then( function ( AmmoLib ) {
 
 				Ammo = AmmoLib;
 
@@ -90,28 +92,29 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene = new Scene();
+				scene.background = new Color( 0xbfd1e5 );
 
 				camera.position.set( - 7, 5, 8 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 2, 0 );
-				controls.update();
-
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
 
-				textureLoader = new THREE.TextureLoader();
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
 
-				var ambientLight = new THREE.AmbientLight( 0x404040 );
+				textureLoader = new TextureLoader();
+
+				var ambientLight = new AmbientLight( 0x404040 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var light = new DirectionalLight( 0xffffff, 1 );
 				light.position.set( - 10, 10, 5 );
 				light.castShadow = true;
 				var d = 20;
@@ -127,10 +130,6 @@
 				light.shadow.mapSize.y = 1024;
 
 				scene.add( light );
-
-				container.innerHTML = '';
-
-				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -165,13 +164,13 @@
 				// Ground
 				pos.set( 0, - 0.5, 0 );
 				quat.set( 0, 0, 0, 1 );
-				var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+				var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new MeshPhongMaterial( { color: 0xFFFFFF } ) );
 				ground.castShadow = true;
 				ground.receiveShadow = true;
 				textureLoader.load( "textures/grid.png", function ( texture ) {
 
-					texture.wrapS = THREE.RepeatWrapping;
-					texture.wrapT = THREE.RepeatWrapping;
+					texture.wrapS = RepeatWrapping;
+					texture.wrapT = RepeatWrapping;
 					texture.repeat.set( 40, 40 );
 					ground.material.map = texture;
 					ground.material.needsUpdate = true;
@@ -181,18 +180,18 @@
 				// Create soft volumes
 				var volumeMass = 15;
 
-				var sphereGeometry = new THREE.SphereBufferGeometry( 1.5, 40, 25 );
+				var sphereGeometry = new SphereBufferGeometry( 1.5, 40, 25 );
 				sphereGeometry.translate( 5, 5, 0 );
 				createSoftVolume( sphereGeometry, volumeMass, 250 );
 
-				var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 5, 4, 4, 20 );
+				var boxGeometry = new BoxBufferGeometry( 1, 1, 5, 4, 4, 20 );
 				boxGeometry.translate( - 2, 5, 0 );
 				createSoftVolume( boxGeometry, volumeMass, 120 );
 
 				// Ramp
 				pos.set( 3, 1, 0 );
-				quat.setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), 30 * Math.PI / 180 );
-				var obstacle = createParalellepiped( 10, 1, 4, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0x606060 } ) );
+				quat.setFromAxisAngle( new Vector3( 0, 0, 1 ), 30 * Math.PI / 180 );
+				var obstacle = createParalellepiped( 10, 1, 4, 0, pos, quat, new MeshPhongMaterial( { color: 0x606060 } ) );
 				obstacle.castShadow = true;
 				obstacle.receiveShadow = true;
 
@@ -201,12 +200,12 @@
 			function processGeometry( bufGeometry ) {
 
 				// Ony consider the position values when merging the vertices
-				var posOnlyBufGeometry = new THREE.BufferGeometry();
+				var posOnlyBufGeometry = new BufferGeometry();
 				posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
 				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var indexedBufferGeom = THREE.BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+				var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
 
 				// Create index arrays mapping the indexed vertices to bufGeometry vertices
 				mapIndices( bufGeometry, indexedBufferGeom );
@@ -264,7 +263,7 @@
 
 				processGeometry( bufferGeom );
 
-				var volume = new THREE.Mesh( bufferGeom, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
+				var volume = new Mesh( bufferGeom, new MeshPhongMaterial( { color: 0xFFFFFF } ) );
 				volume.castShadow = true;
 				volume.receiveShadow = true;
 				volume.frustumCulled = false;
@@ -316,7 +315,7 @@
 
 			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-				var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				var threeObject = new Mesh( new BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 				var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
@@ -391,7 +390,7 @@
 					var ballMass = 3;
 					var ballRadius = 0.4;
 
-					var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 18, 16 ), ballMaterial );
+					var ball = new Mesh( new SphereBufferGeometry( ballRadius, 18, 16 ), ballMaterial );
 					ball.castShadow = true;
 					ball.receiveShadow = true;
 					var ballShape = new Ammo.btSphereShape( ballRadius );

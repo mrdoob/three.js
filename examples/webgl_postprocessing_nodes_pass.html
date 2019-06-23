@@ -4,27 +4,7 @@
 		<title>three.js webgl - postprocessing with nodes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -197,11 +177,11 @@
 						var color = new THREE.ColorNode( 0xFFFFFF );
 						var percent = new THREE.FloatNode( .5 );
 
-						var fade = new THREE.Math3Node(
+						var fade = new THREE.MathNode(
 							new THREE.ScreenNode(),
 							color,
 							percent,
-							THREE.Math3Node.MIX
+							THREE.MathNode.MIX
 						);
 
 						nodepass.input = fade;
@@ -229,13 +209,13 @@
 						var alpha = new THREE.FloatNode( 1 );
 
 						var screen = new THREE.ScreenNode();
-						var inverted = new THREE.Math1Node( screen, THREE.Math1Node.INVERT );
+						var inverted = new THREE.MathNode( screen, THREE.MathNode.INVERT );
 
-						var fade = new THREE.Math3Node(
+						var fade = new THREE.MathNode(
 							screen,
 							inverted,
 							alpha,
-							THREE.Math3Node.MIX
+							THREE.MathNode.MIX
 						);
 
 						nodepass.input = fade;
@@ -318,9 +298,9 @@
 						var normalXY = new THREE.SwitchNode( normal, 'xy' );
 						var scale = new THREE.FloatNode( .5 );
 
-						var normalXYFlip = new THREE.Math1Node(
+						var normalXYFlip = new THREE.MathNode(
 							normalXY,
-							THREE.Math1Node.INVERT
+							THREE.MathNode.INVERT
 						);
 
 						var offsetNormal = new THREE.OperatorNode(
@@ -335,11 +315,11 @@
 							THREE.OperatorNode.MUL
 						);
 
-						var scaleNormal = new THREE.Math3Node(
+						var scaleNormal = new THREE.MathNode(
 							new THREE.FloatNode( 1 ),
 							scaleTexture,
 							scale,
-							THREE.Math3Node.MIX
+							THREE.MathNode.MIX
 						);
 
 						var offsetCoord = new THREE.OperatorNode(
@@ -384,9 +364,9 @@
 							THREE.OperatorNode.MUL
 						);
 
-						var blocksSize = new THREE.Math1Node(
+						var blocksSize = new THREE.MathNode(
 							blocks,
-							THREE.Math1Node.FLOOR
+							THREE.MathNode.FLOOR
 						);
 
 						var mosaicUV = new THREE.OperatorNode(
@@ -395,11 +375,11 @@
 							THREE.OperatorNode.DIV
 						);
 
-						var fadeScreen = new THREE.Math3Node(
+						var fadeScreen = new THREE.MathNode(
 							uv,
 							mosaicUV,
 							fade,
-							THREE.Math3Node.MIX
+							THREE.MathNode.MIX
 						);
 
 						nodepass.input = new THREE.ScreenNode( fadeScreen );

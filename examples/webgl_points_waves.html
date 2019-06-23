@@ -4,41 +4,13 @@
 		<title>three.js webgl - particles - waves</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particles waves example
 		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -70,13 +42,19 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				BufferAttribute,
+				BufferGeometry,
+				Color,
+				PerspectiveCamera,
+				Points,
+				Scene,
+				ShaderMaterial,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
 
@@ -98,10 +76,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
@@ -129,14 +107,14 @@
 
 				}
 
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) );
+				var geometry = new BufferGeometry();
+				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'scale', new BufferAttribute( scales, 1 ) );
 
-				var material = new THREE.ShaderMaterial( {
+				var material = new ShaderMaterial( {
 
 					uniforms: {
-						color: { value: new THREE.Color( 0xffffff ) },
+						color: { value: new Color( 0xffffff ) },
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
@@ -145,12 +123,12 @@
 
 				//
 
-				particles = new THREE.Points( geometry, material );
+				particles = new Points( geometry, material );
 				scene.add( particles );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

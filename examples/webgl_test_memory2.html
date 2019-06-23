@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - webgl</title>
+		<title>three.js - webgl memory test II</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
+				background-color: #fff;
+				color: #000;
 			}
-
+			a {
+				color: #08f;
+			}
 		</style>
 	</head>
 
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - memory test II
+		</div>
+
 		<script type="x-shader/x-fragment" id="fragmentShader">
 
 			void main() {
@@ -43,9 +48,16 @@
 
 		</script>
 
-		<script src="../build/three.js"></script>
-
-		<script>
+		<script type="module">
+			import {
+				Color,
+				Mesh,
+				PerspectiveCamera,
+				Scene,
+				ShaderMaterial,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var N = 100;
 
@@ -68,19 +80,19 @@
 				vertexShader = document.getElementById( "vertexShader" ).textContent;
 				fragmentShader = document.getElementById( "fragmentShader" ).textContent;
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 2000;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				geometry = new THREE.SphereBufferGeometry( 15, 64, 32 );
+				geometry = new SphereBufferGeometry( 15, 64, 32 );
 
 				for ( var i = 0; i < N; i ++ ) {
 
-					var material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+					var material = new ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = ( 0.5 - Math.random() ) * 1000;
 					mesh.position.y = ( 0.5 - Math.random() ) * 1000;
@@ -92,7 +104,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -112,7 +124,7 @@
 				for ( var i = 0; i < N; i ++ ) {
 
 					var mesh = meshes[ i ];
-					mesh.material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+					mesh.material = new ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
 				}
 

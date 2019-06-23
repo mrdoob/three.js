@@ -4,31 +4,7 @@
 		<title>three.js webgl - particles - billboards</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -36,19 +12,22 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particle billboards example
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Float32BufferAttribute,
+				FogExp2,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var camera, scene, renderer, stats, material;
 			var mouseX = 0, mouseY = 0;
@@ -61,16 +40,16 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
+				camera = new PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
 				camera.position.z = 1000;
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
+				scene = new Scene();
+				scene.fog = new FogExp2( 0x000000, 0.001 );
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 				var vertices = [];
 
-				var sprite = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
+				var sprite = new TextureLoader().load( 'textures/sprites/disc.png' );
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
@@ -82,17 +61,17 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
-				material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+				material = new PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7 );
 
-				var particles = new THREE.Points( geometry, material );
+				var particles = new Points( geometry, material );
 				scene.add( particles );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -104,7 +83,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( material, 'sizeAttenuation' ).onChange( function () {
 

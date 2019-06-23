@@ -4,32 +4,10 @@
 		<title>three.js css3d - periodic table</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
-			body {
-				background-color: #000000;
-				margin: 0;
-				font-family: Helvetica, sans-serif;;
-				overflow: hidden;
-			}
-
 			a {
-				color: #ffffff;
-			}
-
-			#info {
-				position: absolute;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				font-weight: bold;
-				text-align: center;
-				z-index: 1;
+				color: #8ff;
 			}
 
 			#menu {
@@ -44,7 +22,9 @@
 				height: 160px;
 				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
 				border: 1px solid rgba(127,255,255,0.25);
+				font-family: Helvetica, sans-serif;
 				text-align: center;
+				line-height: normal;
 				cursor: default;
 			}
 
@@ -89,9 +69,11 @@
 				padding: 5px 10px;
 				cursor: pointer;
 			}
+
 			button:hover {
 				background-color: rgba(0,255,255,0.5);
 			}
+
 			button:active {
 				color: #000000;
 				background-color: rgba(0,255,255,0.75);
@@ -99,12 +81,9 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
 		<div id="container"></div>
 		<div id="menu">
 			<button id="table">TABLE</button>
@@ -113,7 +92,16 @@
 			<button id="grid">GRID</button>
 		</div>
 
-		<script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Object3D,
+				Scene,
+				Vector3
+			} from "../build/three.module.js";
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var table = [
 				"H", "Hydrogen", "1.00794", 1, 1,
@@ -247,10 +235,10 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3000;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// table
 
@@ -275,7 +263,7 @@
 					details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
 					element.appendChild( details );
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new CSS3DObject( element );
 					object.position.x = Math.random() * 4000 - 2000;
 					object.position.y = Math.random() * 4000 - 2000;
 					object.position.z = Math.random() * 4000 - 2000;
@@ -285,7 +273,7 @@
 
 					//
 
-					var object = new THREE.Object3D();
+					var object = new Object3D();
 					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
 					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
 
@@ -295,14 +283,14 @@
 
 				// sphere
 
-				var vector = new THREE.Vector3();
+				var vector = new Vector3();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 					var phi = Math.acos( - 1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var object = new THREE.Object3D();
+					var object = new Object3D();
 
 					object.position.setFromSphericalCoords( 800, phi, theta );
 
@@ -316,14 +304,14 @@
 
 				// helix
 
-				var vector = new THREE.Vector3();
+				var vector = new Vector3();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 					var theta = i * 0.175 + Math.PI;
 					var y = - ( i * 8 ) + 450;
 
-					var object = new THREE.Object3D();
+					var object = new Object3D();
 
 					object.position.setFromCylindricalCoords( 900, theta, y );
 
@@ -341,7 +329,7 @@
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
-					var object = new THREE.Object3D();
+					var object = new Object3D();
 
 					object.position.x = ( ( i % 5 ) * 400 ) - 800;
 					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
@@ -353,14 +341,13 @@
 
 				//
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.5;
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 500;
 				controls.maxDistance = 6000;
 				controls.addEventListener( 'change', render );

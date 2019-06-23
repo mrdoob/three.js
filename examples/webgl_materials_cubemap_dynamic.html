@@ -4,40 +4,34 @@
 		<title>three.js webgl - materials - dynamic cube reflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				CubeCamera,
+				IcosahedronBufferGeometry,
+				LinearFilter,
+				LinearMipMapLinearFilter,
+				Math as _Math,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				TextureLoader,
+				TorusKnotBufferGeometry,
+				UVMapping,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 
 			var camera, scene, renderer;
-			var cube, sphere, torus, material, backgroundMesh;
+			var cube, sphere, torus, material;
 
 			var count = 0, cubeCamera1, cubeCamera2;
 
@@ -46,11 +40,11 @@
 			var lon = 0, lat = 0;
 			var phi = 0, theta = 0;
 
-			var textureLoader = new THREE.TextureLoader();
+			var textureLoader = new TextureLoader();
 
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
-				texture.mapping = THREE.UVMapping;
+				texture.mapping = UVMapping;
 
 				init( texture );
 				animate();
@@ -59,13 +53,13 @@
 
 			function init( texture ) {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 
 				// background
 
@@ -73,39 +67,39 @@
 					resolution: 1024,
 
 					generateMipmaps: true,
-					minFilter: THREE.LinearMipMapLinearFilter,
-					magFilter: THREE.LinearFilter
+					minFilter: LinearMipMapLinearFilter,
+					magFilter: LinearFilter
 				};
 
-				scene.background = new THREE.CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+				scene.background = new CubemapGenerator( renderer ).fromEquirectangular( texture, options );
 
 				//
 
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera1 = new CubeCamera( 1, 1000, 256 );
 				cubeCamera1.renderTarget.texture.generateMipmaps = true;
-				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera1.renderTarget.texture.minFilter = LinearMipMapLinearFilter;
 				scene.add( cubeCamera1 );
 
-				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera2 = new CubeCamera( 1, 1000, 256 );
 				cubeCamera2.renderTarget.texture.generateMipmaps = true;
-				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera2.renderTarget.texture.minFilter = LinearMipMapLinearFilter;
 				scene.add( cubeCamera2 );
 
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				material = new THREE.MeshBasicMaterial( {
+				material = new MeshBasicMaterial( {
 					envMap: cubeCamera2.renderTarget.texture
 				} );
 
-				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
+				sphere = new Mesh( new IcosahedronBufferGeometry( 20, 3 ), material );
 				scene.add( sphere );
 
-				cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 20, 20, 20 ), material );
+				cube = new Mesh( new BoxBufferGeometry( 20, 20, 20 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 100, 25 ), material );
+				torus = new Mesh( new TorusKnotBufferGeometry( 10, 5, 100, 25 ), material );
 				scene.add( torus );
 
 				//
@@ -159,7 +153,7 @@
 
 				var fov = camera.fov + event.deltaY * 0.05;
 
-				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+				camera.fov = _Math.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 
@@ -179,8 +173,8 @@
 				lon += .15;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = _Math.degToRad( 90 - lat );
+				theta = _Math.degToRad( lon );
 
 				cube.position.x = Math.cos( time * 0.001 ) * 30;
 				cube.position.y = Math.sin( time * 0.001 ) * 30;

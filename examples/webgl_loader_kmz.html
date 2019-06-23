@@ -4,57 +4,28 @@
 		<title>three.js webgl - KMZ</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: red }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ File format</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ</a> loader
 		</div>
-
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/KMZLoader.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				Color,
+				DirectionalLight,
+				GridHelper,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { KMZLoader } from './jsm/loaders/KMZLoader.js';
 
 			var camera, scene, renderer;
 
@@ -62,30 +33,30 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x999999 );
+				scene = new Scene();
+				scene.background = new Color( 0x999999 );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1.0, 0.5 ).normalize();
 
 				scene.add( light );
 
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				camera.position.y = 5;
 				camera.position.z = 10;
 
 				scene.add( camera );
 
-				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				var grid = new GridHelper( 50, 50, 0xffffff, 0x555555 );
 				scene.add( grid );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.KMZLoader();
+				var loader = new KMZLoader();
 				loader.load( './models/kmz/Box.kmz', function ( kmz ) {
 
 					kmz.scene.position.y = 0.5;
@@ -94,7 +65,7 @@
 
 				} );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.update();
 

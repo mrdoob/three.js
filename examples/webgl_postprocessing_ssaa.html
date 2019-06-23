@@ -4,29 +4,7 @@
 		<title>three.js webgl - postprocessing ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			a { color: #88f; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -37,20 +15,25 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Mesh,
+				MeshBasicMaterial,
+				NearestFilter,
+				PerspectiveCamera,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SSAARenderPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { SSAARenderPass } from './jsm/postprocessing/SSAARenderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var camera, scene, renderer, composer, copyPass, ssaaRenderPass;
 			var gui, stats;
@@ -68,7 +51,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( param, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
@@ -87,7 +70,7 @@
 
 				var container = document.getElementById( "container" );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -95,39 +78,39 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 300;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+				var geometry = new BoxBufferGeometry( 120, 120, 120 );
+				var material = new MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				mesh.position.x = - 100;
 				scene.add( mesh );
 
-				var texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
+				var texture = new TextureLoader().load( "textures/brick_diffuse.jpg" );
+				texture.minFilter = NearestFilter;
+				texture.magFilter = NearestFilter;
 				texture.anisotropy = 1;
 				texture.generateMipmaps = false;
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				var material = new MeshBasicMaterial( { map: texture } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				mesh.position.x = 100;
 				scene.add( mesh );
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				ssaaRenderPass = new THREE.SSAARenderPass( scene, camera );
+				ssaaRenderPass = new SSAARenderPass( scene, camera );
 				ssaaRenderPass.unbiased = false;
 				composer.addPass( ssaaRenderPass );
 
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -143,11 +126,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 

@@ -147,9 +147,23 @@ GLTFExporter.prototype = {
 
 		var cachedCanvas;
 
+		var uids = new Map();
+		var uid = 0;
+
 		/**
-		 * Compare two arrays
+		 * Assign and return a temporal unique id for an object
+		 * especially which doesn't have .uuid
+		 * @param  {Object} object
+		 * @return {Integer}
 		 */
+		function getUID( object ) {
+
+			if ( ! uids.has( object ) ) uids.set( object, uid ++ );
+
+			return uids.get( object );
+
+		}
+
 		/**
 		 * Compare two arrays
 		 * @param  {Array} array1 Array 1 to compare
@@ -1202,9 +1216,9 @@ GLTFExporter.prototype = {
 
 				}
 
-				if ( cachedData.attributes.has( attribute ) ) {
+				if ( cachedData.attributes.has( getUID( attribute ) ) ) {
 
-					attributes[ attributeName ] = cachedData.attributes.get( attribute );
+					attributes[ attributeName ] = cachedData.attributes.get( getUID( attribute ) );
 					continue;
 
 				}
@@ -1225,7 +1239,7 @@ GLTFExporter.prototype = {
 				if ( accessor !== null ) {
 
 					attributes[ attributeName ] = accessor;
-					cachedData.attributes.set( attribute, accessor );
+					cachedData.attributes.set( getUID( attribute ), accessor );
 
 				}
 
@@ -1291,9 +1305,9 @@ GLTFExporter.prototype = {
 
 						var baseAttribute = geometry.attributes[ attributeName ];
 
-						if ( cachedData.attributes.has( attribute ) ) {
+						if ( cachedData.attributes.has( getUID( attribute ) ) ) {
 
-							target[ gltfAttributeName ] = cachedData.attributes.get( attribute );
+							target[ gltfAttributeName ] = cachedData.attributes.get( getUID( attribute ) );
 							continue;
 
 						}
@@ -1313,7 +1327,7 @@ GLTFExporter.prototype = {
 						}
 
 						target[ gltfAttributeName ] = processAccessor( relativeAttribute, geometry );
-						cachedData.attributes.set( baseAttribute, target[ gltfAttributeName ] );
+						cachedData.attributes.set( getUID( baseAttribute ), target[ gltfAttributeName ] );
 
 					}
 
@@ -1382,14 +1396,22 @@ GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					if ( cachedData.attributes.has( geometry.index ) ) {
+					var cacheKey = getUID( geometry.index );
 
-						primitive.indices = cachedData.attributes.get( geometry.index );
+					if ( groups[ i ].start !== undefined || groups[ i ].count !== undefined ) {
+
+						cacheKey += ':' + groups[ i ].start + ':' + groups[ i ].count;
+
+					}
+
+					if ( cachedData.attributes.has( cacheKey ) ) {
+
+						primitive.indices = cachedData.attributes.get( cacheKey );
 
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						cachedData.attributes.set( geometry.index, primitive.indices );
+						cachedData.attributes.set( cacheKey, primitive.indices );
 
 					}
 
@@ -1742,7 +1764,12 @@ GLTFExporter.prototype = {
 
 			} else {
 
-				object.updateMatrix();
+				if ( object.matrixAutoUpdate ) {
+
+					object.updateMatrix();
+
+				}
+
 				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
 
 					gltfNode.matrix = object.matrix.elements;

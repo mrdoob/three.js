@@ -319,6 +319,17 @@ Object.assign( BufferAttribute.prototype, {
 
 		return new this.constructor( this.array, this.itemSize ).copy( this );
 
+	},
+
+	toJSON: function () {
+
+		return {
+			itemSize: this.itemSize,
+			type: this.array.constructor.name,
+			array: Array.prototype.slice.call( this.array ),
+			normalized: this.normalized
+		};
+
 	}
 
 } );

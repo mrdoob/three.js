@@ -2,85 +2,85 @@
  * @author yomboprime https://github.com/yomboprime
  *
  * @fileoverview LightningStrike object for creating lightning strikes and voltaic arcs.
- * 
- * 
+ *
+ *
  * Usage
- * 
+ *
  * var myRay = new THREE.LightningStrike( paramsObject );
  * var myRayMesh = new THREE.Mesh( myRay, myMaterial );
  * scene.add( myRayMesh );
  * ...
  * myRay.update( currentTime );
- * 
+ *
  * The "currentTime" can vary its rate, go forwards, backwards or even jump, but it cannot be negative.
- * 
+ *
  * You should normally leave the ray position to (0, 0, 0). You should control it by changing the sourceOffset and destOffset parameters.
- * 
- * 
+ *
+ *
  * LightningStrike parameters
- * 
+ *
  * The paramsObject can contain any of the following parameters.
- * 
+ *
  * Legend:
  * 'LightningStrike' (also called 'ray'): An independent voltaic arc with its ramifications and defined with a set of parameters.
  * 'Subray': A ramification of the ray. It is not a LightningStrike object.
  * 'Segment': A linear segment piece of a subray.
  * 'Leaf segment': A ray segment which cannot be smaller.
- * 
- * 
+ *
+ *
  * The following parameters can be changed any time and if they vary smoothly, the ray form will also change smoothly:
- * 
+ *
  * @param {Vector3} sourceOffset The point where the ray starts.
- * 
+ *
  * @param {Vector3} destOffset The point where the ray ends.
- * 
+ *
  * @param {double} timeScale The rate at wich the ray form changes in time. Default: 1
- * 
+ *
  * @param {double} roughness From 0 to 1. The higher the value, the more wrinkled is the ray. Default: 0.9
- * 
+ *
  * @param {double} straightness From 0 to 1. The higher the value, the more straight will be a subray path. Default: 0.7
- * 
+ *
  * @param {Vector3} up0 Ray 'up' direction at the ray starting point. Must be normalized. It should be perpendicular to the ray forward direction but it doesn't matter much.
- * 
+ *
  * @param {Vector3} up1 Like the up0 parameter but at the end of the ray. Must be normalized.
- * 
+ *
  * @param {double} radius0 Radius of the main ray trunk at the start point. Default: 1
- * 
+ *
  * @param {double} radius1 Radius of the main ray trunk at the end point. Default: 1
- * 
+ *
  * @param {double} radius0Factor The radius0 of a subray is this factor times the radius0 of its parent subray. Default: 0.5
- * 
+ *
  * @param {double} radius1Factor The radius1 of a subray is this factor times the radius1 of its parent subray. Default: 0.2
- * 
+ *
  * @param {minRadius} Minimum value a subray radius0 or radius1 can get. Default: 0.1
- * 
- * 
+ *
+ *
  * The following parameters should not be changed after lightning creation. They can be changed but the ray will change its form abruptly:
- * 
+ *
  * @param {boolean} isEternal If true the ray never extinguishes. Otherwise its life is controlled by the 'birthTime' and 'deathTime' parameters. Default: true if any of those two parameters is undefined.
- * 
+ *
  * @param {double} birthTime The time at which the ray starts its life and begins propagating. Only if isEternal is false. Default: None.
- * 
+ *
  * @param {double} deathTime The time at which the ray ends vanishing and its life. Only if isEternal is false. Default: None.
- * 
+ *
  * @param {double} propagationTimeFactor From 0 to 1. Lifetime factor at which the ray ends propagating and enters the steady phase. For example, 0.1 means it is propagating 1/10 of its lifetime. Default: 0.1
- * 
+ *
  * @param {double} vanishingTimeFactor From 0 to 1. Lifetime factor at which the ray ends the steady phase and begins vanishing. For example, 0.9 means it is vanishing 1/10 of its lifetime. Default: 0.9
- * 
+ *
  * @param {double} subrayPeriod Subrays cycle periodically. This is their time period. Default: 4
- * 
+ *
  * @param {double} subrayDutyCycle From 0 to 1. This is the fraction of time a subray is active. Default: 0.6
- * 
- * 
+ *
+ *
  * These parameters cannot change after lightning creation:
- * 
+ *
  * @param {integer} maxIterations: Greater than 0. The number of ray's leaf segments is 2**maxIterations. Default: 9
- * 
+ *
  * @param {boolean} isStatic Set to true only for rays which won't change over time and are not attached to moving objects (Rare case). It is used to set the vertex buffers non-dynamic. You can omit calling update() for these rays.
- *  
+ *
  * @param {integer} ramification Greater than 0. Maximum number of child subrays a subray can have. Default: 5
  *
- * @param {integer} maxSubrayRecursion Greater than 0. Maximum level of recursion (subray descendant generations). Default: 3 
+ * @param {integer} maxSubrayRecursion Greater than 0. Maximum level of recursion (subray descendant generations). Default: 3
  *
  * @param {double} recursionProbability From 0 to 1. The lower the value, the less chance each new generation of subrays has to generate new subrays. Default: 0.6
  *
@@ -91,13 +91,13 @@
  * The randomGenerator parameter should be an object with a random() function similar to Math.random, but seedable.
  * It must have also a getSeed() method, which returns the current seed, and a setSeed( seed ) method, which accepts as seed a fractional number from 0 to 1, as well as any other number.
  * The default value is an internal generator for some uses and Math.random for others (It is non-repeatable even if noiseSeed is supplied)
- * 
+ *
  * @param {double} noiseSeed Seed used to make repeatable rays (see the randomGenerator)
- * 
+ *
  * @param {function} onDecideSubrayCreation Set this to change the callback which decides subray creation. You can look at the default callback in the code (createDefaultSubrayCreationCallbacks)for more info.
- * 
+ *
  * @param {function} onSubrayCreation This is another callback, more simple than the previous one. It can be used to adapt the form of subrays or other parameters once a subray has been created and initialized. It is used in the examples to adapt subrays to a sphere or to a plane.
- * 
+ *
  *
 */
 
@@ -138,7 +138,7 @@ THREE.LightningStrike.createRandomGenerator = function () {
 	var numSeeds = 2053;
 	var seeds = [];
 
-	for ( var i = 0; i < numSeeds; i++ ) {
+	for ( var i = 0; i < numSeeds; i ++ ) {
 
 		seeds.push( Math.random() );
 
@@ -176,25 +176,24 @@ THREE.LightningStrike.createRandomGenerator = function () {
 
 };
 
-THREE.LightningStrike.copyParameters = function ( dest, source) {
+THREE.LightningStrike.copyParameters = function ( dest, source ) {
 
 	source = source || {};
 	dest = dest || {};
 
-	var vecCopy = function( v ) {
+	var vecCopy = function ( v ) {
 
 		if ( source === dest ) {
 
 			return v;
 
-		}
-		else {
+		} else {
 
 			return v.clone();
 
 		}
 
-	}
+	};
 
 	dest.sourceOffset = source.sourceOffset !== undefined ? vecCopy( source.sourceOffset ) : new THREE.Vector3( 0, 100, 0 ),
 	dest.destOffset = source.destOffset !== undefined ? vecCopy( source.destOffset ) : new THREE.Vector3( 0, 0, 0 ),
@@ -223,7 +222,7 @@ THREE.LightningStrike.copyParameters = function ( dest, source) {
 
 	// These parameters cannot change after lightning creation:
 
-	dest.maxIterations =  source.maxIterations !== undefined ? source.maxIterations : 9;
+	dest.maxIterations = source.maxIterations !== undefined ? source.maxIterations : 9;
 	dest.isStatic = source.isStatic !== undefined ? source.isStatic : false;
 	dest.ramification = source.ramification !== undefined ? source.ramification : 5;
 	dest.maxSubrayRecursion = source.maxSubrayRecursion !== undefined ? source.maxSubrayRecursion : 3;
@@ -240,25 +239,21 @@ THREE.LightningStrike.copyParameters = function ( dest, source) {
 
 THREE.LightningStrike.prototype.update = function ( time ) {
 
-	if ( this.isStatic ) {
-		return;
-	}
-	
+	if ( this.isStatic ) return;
+
 	if ( this.rayParameters.isEternal || ( this.rayParameters.birthTime <= time && time <= this.rayParameters.deathTime ) ) {
 
 		this.updateMesh( time );
 
 		if ( time < this.subrays[ 0 ].endPropagationTime ) {
-		
+
 			this.state = THREE.LightningStrike.RAY_PROPAGATING;
 
-		}	
-		else if ( time > this.subrays[ 0 ].beginVanishingTime ) {
+		} else if ( time > this.subrays[ 0 ].beginVanishingTime ) {
 
 			this.state = THREE.LightningStrike.RAY_VANISHING;
 
-		}
-		else {
+		} else {
 
 			this.state = THREE.LightningStrike.RAY_STEADY;
 
@@ -266,8 +261,7 @@ THREE.LightningStrike.prototype.update = function ( time ) {
 
 		this.visible = true;
 
-	}
-	else {
+	} else {
 
 		this.visible = false;
 
@@ -275,8 +269,7 @@ THREE.LightningStrike.prototype.update = function ( time ) {
 
 			this.state = THREE.LightningStrike.RAY_UNBORN;
 
-		}
-		else {
+		} else {
 
 			this.state = THREE.LightningStrike.RAY_EXTINGUISHED;
 
@@ -294,7 +287,7 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 
 	// These parameters cannot change after lightning creation:
 
-	this.maxIterations =  rayParameters.maxIterations !== undefined ? Math.floor( rayParameters.maxIterations ) : 9;
+	this.maxIterations = rayParameters.maxIterations !== undefined ? Math.floor( rayParameters.maxIterations ) : 9;
 	rayParameters.maxIterations = this.maxIterations;
 	this.isStatic = rayParameters.isStatic !== undefined ? rayParameters.isStatic : false;
 	rayParameters.isStatic = this.isStatic;
@@ -314,13 +307,12 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 		this.seedGenerator = rayParameters.randomGenerator;
 
 		if ( rayParameters.noiseSeed !== undefined ) {
-		
+
 			this.seedGenerator.setSeed( rayParameters.noiseSeed );
 
 		}
 
-	}
-	else {
+	} else {
 
 		this.randomGenerator = THREE.LightningStrike.createRandomGenerator();
 		this.seedGenerator = Math;
@@ -332,8 +324,7 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 
 		this.onDecideSubrayCreation = rayParameters.onDecideSubrayCreation;
 
-	}
-	else {
+	} else {
 
 		this.createDefaultSubrayCreationCallbacks();
 
@@ -351,12 +342,12 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 
 	this.maxSubrays = Math.ceil( 1 + Math.pow( this.ramification, Math.max( 0, this.maxSubrayRecursion - 1 ) ) );
 	rayParameters.maxSubrays = this.maxSubrays;
-	
+
 	this.maxRaySegments = 2 * ( 1 << this.maxIterations );
 
 	this.subrays = [];
 
-	for ( var i = 0; i < this.maxSubrays; i++ ) {
+	for ( var i = 0; i < this.maxSubrays; i ++ ) {
 
 		this.subrays.push( this.createSubray() );
 
@@ -364,7 +355,7 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 
 	this.raySegments = [];
 
-	for ( var i = 0; i < this.maxRaySegments; i++ ) {
+	for ( var i = 0; i < this.maxRaySegments; i ++ ) {
 
 		this.raySegments.push( this.createSegment() );
 
@@ -389,10 +380,10 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 	this.indices = null;
 	this.positionAttribute = null;
 	this.uvsAttribute = null;
-	
-	this.simplexX = new SimplexNoise( this.seedGenerator );
-	this.simplexY = new SimplexNoise( this.seedGenerator );
-	this.simplexZ = new SimplexNoise( this.seedGenerator );
+
+	this.simplexX = new THREE.SimplexNoise( this.seedGenerator );
+	this.simplexY = new THREE.SimplexNoise( this.seedGenerator );
+	this.simplexZ = new THREE.SimplexNoise( this.seedGenerator );
 
 	// Temp vectors
 	this.forwards = new THREE.Vector3();
@@ -410,46 +401,56 @@ THREE.LightningStrike.prototype.init = function ( rayParameters ) {
 THREE.LightningStrike.prototype.createMesh = function () {
 
 	var maxDrawableSegmentsPerSubRay = 1 << this.maxIterations;
-	
+
 	var maxVerts = 3 * ( maxDrawableSegmentsPerSubRay + 1 ) * this.maxSubrays;
 	var maxIndices = 18 * maxDrawableSegmentsPerSubRay * this.maxSubrays;
 
 	this.vertices = new Float32Array( maxVerts * 3 );
 	this.indices = new Uint32Array( maxIndices );
 	if ( this.generateUVs ) {
+
 		this.uvs = new Float32Array( maxVerts * 2 );
+
 	}
 
 	// Populate the mesh
 	this.fillMesh( 0 );
-	
+
 	this.setIndex( new THREE.Uint32BufferAttribute( this.indices, 1 ) );
 
 	this.positionAttribute = new THREE.Float32BufferAttribute( this.vertices, 3 );
 	this.addAttribute( 'position', this.positionAttribute );
 
-	if ( this.generateUVs ) {1
+	if ( this.generateUVs ) {
+
 		this.uvsAttribute = new THREE.Float32BufferAttribute( new Float32Array( this.uvs ), 2 );
 		this.addAttribute( 'uv', this.uvsAttribute );
+
 	}
 
 	if ( ! this.isStatic ) {
+
 		this.index.dynamic = true;
 		this.positionAttribute.dynamic = true;
 		if ( this.generateUVs ) {
+
 			this.uvsAttribute.dynamic = true;
+
 		}
+
 	}
 
 	// Store buffers for later modification
 	this.vertices = this.positionAttribute.array;
 	this.indices = this.index.array;
 	if ( this.generateUVs ) {
+
 		this.uvs = this.uvsAttribute.array;
+
 	}
 
 };
-	
+
 THREE.LightningStrike.prototype.updateMesh = function ( time ) {
 
 	this.fillMesh( time );
@@ -461,7 +462,9 @@ THREE.LightningStrike.prototype.updateMesh = function ( time ) {
 	this.positionAttribute.needsUpdate = true;
 
 	if ( this.generateUVs ) {
+
 		this.uvsAttribute.needsUpdate = true;
+
 	}
 
 };
@@ -475,16 +478,15 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 	this.currentCoordinate = 0;
 	this.currentUVCoordinate = 0;
 
-	this.fractalRay( time, function fillVertices ( segment ) {
+	this.fractalRay( time, function fillVertices( segment ) {
 
 		var subray = scope.currentSubray;
 
-		if ( time < subray.birthTime ) {//&& ( ! this.rayParameters.isEternal || scope.currentSubray.recursion > 0 ) ) {
+		if ( time < subray.birthTime ) { //&& ( ! this.rayParameters.isEternal || scope.currentSubray.recursion > 0 ) ) {
 
 			return;
 
-		}
-		else if ( this.rayParameters.isEternal && scope.currentSubray.recursion == 0 ) {
+		} else if ( this.rayParameters.isEternal && scope.currentSubray.recursion == 0 ) {
 
 			// Eternal rays don't propagate nor vanish, but its subrays do
 
@@ -492,8 +494,7 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 			scope.onDecideSubrayCreation( segment, scope );
 
-		}
-		else if ( time < subray.endPropagationTime ) {
+		} else if ( time < subray.endPropagationTime ) {
 
 			if ( scope.timeFraction >= segment.fraction0 * subray.propagationTimeFactor ) {
 
@@ -505,8 +506,7 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 			}
 
-		}
-		else if ( time < subray.beginVanishingTime ) {
+		} else if ( time < subray.beginVanishingTime ) {
 
 			// Ray is steady (nor propagating nor vanishing)
 
@@ -514,10 +514,9 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 			scope.onDecideSubrayCreation( segment, scope );
 
-		}
-		else {
+		} else {
 
-			if ( scope.timeFraction <= subray.vanishingTimeFactor + segment.fraction1  * ( 1 - subray.vanishingTimeFactor ) ) {
+			if ( scope.timeFraction <= subray.vanishingTimeFactor + segment.fraction1 * ( 1 - subray.vanishingTimeFactor ) ) {
 
 				// Segment has not yet vanished
 
@@ -535,7 +534,7 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 THREE.LightningStrike.prototype.addNewSubray = function ( rayParameters ) {
 
-	return this.subrays[ this.numSubrays++ ];
+	return this.subrays[ this.numSubrays ++ ];
 
 };
 
@@ -571,7 +570,7 @@ THREE.LightningStrike.prototype.fractalRay = function ( time, segmentCallback ) 
 	this.initSubray( this.addNewSubray(), this.rayParameters );
 
 	// Process all subrays that are being generated until consuming all of them
-	for ( var subrayIndex = 0; subrayIndex < this.numSubrays; subrayIndex++ ) {
+	for ( var subrayIndex = 0; subrayIndex < this.numSubrays; subrayIndex ++ ) {
 
 		var subray = this.subrays[ subrayIndex ];
 		this.currentSubray = subray;
@@ -587,7 +586,7 @@ THREE.LightningStrike.prototype.fractalRay = function ( time, segmentCallback ) 
 
 		this.timeFraction = ( time - subray.birthTime ) / ( subray.deathTime - subray.birthTime );
 
-		this.currentSegmentIndex  = 0;
+		this.currentSegmentIndex = 0;
 		this.isInitialSegment = true;
 
 		var segment = this.getNewSegment();
@@ -630,9 +629,11 @@ THREE.LightningStrike.prototype.fractalRayRecursive = function ( segment ) {
 	this.forwards.subVectors( segment.pos1, segment.pos0 );
 	var lForwards = this.forwards.length();
 
-	if ( lForwards < 0.000001) {
+	if ( lForwards < 0.000001 ) {
+
 		this.forwards.set( 0, 0, 0.01 );
 		lForwards = this.forwards.length();
+
 	}
 
 	var middleRadius = ( segment.radius0 + segment.radius1 ) * 0.5;
@@ -644,10 +645,10 @@ THREE.LightningStrike.prototype.fractalRayRecursive = function ( segment ) {
 	this.middleLinPos.lerpVectors( segment.linPos0, segment.linPos1, 0.5 );
 	var p = this.middleLinPos;
 
-	// Noise	
+	// Noise
 	this.newPos.set( this.simplexX.noise4d( p.x, p.y, p.z, timeDimension ),
-						this.simplexY.noise4d( p.x, p.y, p.z, timeDimension ),
-						this.simplexZ.noise4d( p.x, p.y, p.z, timeDimension ) );
+		this.simplexY.noise4d( p.x, p.y, p.z, timeDimension ),
+		this.simplexZ.noise4d( p.x, p.y, p.z, timeDimension ) );
 
 	this.newPos.multiplyScalar( segment.positionVariationFactor * lForwards );
 	this.newPos.add( this.middlePos );
@@ -698,7 +699,7 @@ THREE.LightningStrike.prototype.createPrism = function ( segment ) {
 	if ( this.isInitialSegment ) {
 
 		this.currentCreateTriangleVertices( segment.pos0, segment.up0, this.forwardsFill, segment.radius0, 0 );
-		
+
 		this.isInitialSegment = false;
 
 	}
@@ -712,7 +713,7 @@ THREE.LightningStrike.prototype.createPrism = function ( segment ) {
 THREE.LightningStrike.prototype.createTriangleVerticesWithoutUVs = function ( pos, up, forwards, radius ) {
 
 	// Create an equilateral triangle (only vertices)
-	
+
 	this.side.crossVectors( up, forwards ).multiplyScalar( radius * THREE.LightningStrike.COS30DEG );
 	this.down.copy( up ).multiplyScalar( - radius * THREE.LightningStrike.SIN30DEG );
 
@@ -721,21 +722,21 @@ THREE.LightningStrike.prototype.createTriangleVerticesWithoutUVs = function ( po
 
 	p.copy( pos ).sub( this.side ).add( this.down );
 
-	v[ this.currentCoordinate++ ] = p.x;
-	v[ this.currentCoordinate++ ] = p.y;
-	v[ this.currentCoordinate++ ] = p.z;
+	v[ this.currentCoordinate ++ ] = p.x;
+	v[ this.currentCoordinate ++ ] = p.y;
+	v[ this.currentCoordinate ++ ] = p.z;
 
 	p.copy( pos ).add( this.side ).add( this.down );
 
-	v[ this.currentCoordinate++ ] = p.x;
-	v[ this.currentCoordinate++ ] = p.y;
-	v[ this.currentCoordinate++ ] = p.z;
+	v[ this.currentCoordinate ++ ] = p.x;
+	v[ this.currentCoordinate ++ ] = p.y;
+	v[ this.currentCoordinate ++ ] = p.z;
 
 	p.copy( up ).multiplyScalar( radius ).add( pos );
-	
-	v[ this.currentCoordinate++ ] = p.x;
-	v[ this.currentCoordinate++ ] = p.y;
-	v[ this.currentCoordinate++ ] = p.z;
+
+	v[ this.currentCoordinate ++ ] = p.x;
+	v[ this.currentCoordinate ++ ] = p.y;
+	v[ this.currentCoordinate ++ ] = p.z;
 
 	this.currentVertex += 3;
 
@@ -744,7 +745,7 @@ THREE.LightningStrike.prototype.createTriangleVerticesWithoutUVs = function ( po
 THREE.LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, up, forwards, radius, u ) {
 
 	// Create an equilateral triangle (only vertices)
-	
+
 	this.side.crossVectors( up, forwards ).multiplyScalar( radius * THREE.LightningStrike.COS30DEG );
 	this.down.copy( up ).multiplyScalar( - radius * THREE.LightningStrike.SIN30DEG );
 
@@ -754,30 +755,30 @@ THREE.LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, 
 
 	p.copy( pos ).sub( this.side ).add( this.down );
 
-	v[ this.currentCoordinate++ ] = p.x;
-	v[ this.currentCoordinate++ ] = p.y;
-	v[ this.currentCoordinate++ ] = p.z;
+	v[ this.currentCoordinate ++ ] = p.x;
+	v[ this.currentCoordinate ++ ] = p.y;
+	v[ this.currentCoordinate ++ ] = p.z;
 
-	uv[ this.currentUVCoordinate++ ] = u;
-	uv[ this.currentUVCoordinate++ ] = 0;
+	uv[ this.currentUVCoordinate ++ ] = u;
+	uv[ this.currentUVCoordinate ++ ] = 0;
 
 	p.copy( pos ).add( this.side ).add( this.down );
 
-	v[ this.currentCoordinate++ ] = p.x;
-	v[ this.currentCoordinate++ ] = p.y;
-	v[ this.currentCoordinate++ ] = p.z;
+	v[ this.currentCoordinate ++ ] = p.x;
+	v[ this.currentCoordinate ++ ] = p.y;
+	v[ this.currentCoordinate ++ ] = p.z;
 
-	uv[ this.currentUVCoordinate++ ] = u;
-	uv[ this.currentUVCoordinate++ ] = 0.5;
+	uv[ this.currentUVCoordinate ++ ] = u;
+	uv[ this.currentUVCoordinate ++ ] = 0.5;
 
 	p.copy( up ).multiplyScalar( radius ).add( pos );
-	
-	v[ this.currentCoordinate++ ] = p.x;
-	v[ this.currentCoordinate++ ] = p.y;
-	v[ this.currentCoordinate++ ] = p.z;
 
-	uv[ this.currentUVCoordinate++ ] = u;
-	uv[ this.currentUVCoordinate++ ] = 1;
+	v[ this.currentCoordinate ++ ] = p.x;
+	v[ this.currentCoordinate ++ ] = p.y;
+	v[ this.currentCoordinate ++ ] = p.z;
+
+	uv[ this.currentUVCoordinate ++ ] = u;
+	uv[ this.currentUVCoordinate ++ ] = 1;
 
 	this.currentVertex += 3;
 
@@ -788,24 +789,24 @@ THREE.LightningStrike.prototype.createPrismFaces = function ( vertex, index ) {
 	var indices = this.indices;
 	var vertex = this.currentVertex - 6;
 
-	indices[ this.currentIndex++ ] = vertex + 1;
-	indices[ this.currentIndex++ ] = vertex + 2;
-	indices[ this.currentIndex++ ] = vertex + 5;
-	indices[ this.currentIndex++ ] = vertex + 1;
-	indices[ this.currentIndex++ ] = vertex + 5;
-	indices[ this.currentIndex++ ] = vertex + 4;
-	indices[ this.currentIndex++ ] = vertex + 0;
-	indices[ this.currentIndex++ ] = vertex + 1;
-	indices[ this.currentIndex++ ] = vertex + 4;
-	indices[ this.currentIndex++ ] = vertex + 0;
-	indices[ this.currentIndex++ ] = vertex + 4;
-	indices[ this.currentIndex++ ] = vertex + 3;
-	indices[ this.currentIndex++ ] = vertex + 2;
-	indices[ this.currentIndex++ ] = vertex + 0;
-	indices[ this.currentIndex++ ] = vertex + 3;
-	indices[ this.currentIndex++ ] = vertex + 2;
-	indices[ this.currentIndex++ ] = vertex + 3;
-	indices[ this.currentIndex++ ] = vertex + 5;
+	indices[ this.currentIndex ++ ] = vertex + 1;
+	indices[ this.currentIndex ++ ] = vertex + 2;
+	indices[ this.currentIndex ++ ] = vertex + 5;
+	indices[ this.currentIndex ++ ] = vertex + 1;
+	indices[ this.currentIndex ++ ] = vertex + 5;
+	indices[ this.currentIndex ++ ] = vertex + 4;
+	indices[ this.currentIndex ++ ] = vertex + 0;
+	indices[ this.currentIndex ++ ] = vertex + 1;
+	indices[ this.currentIndex ++ ] = vertex + 4;
+	indices[ this.currentIndex ++ ] = vertex + 0;
+	indices[ this.currentIndex ++ ] = vertex + 4;
+	indices[ this.currentIndex ++ ] = vertex + 3;
+	indices[ this.currentIndex ++ ] = vertex + 2;
+	indices[ this.currentIndex ++ ] = vertex + 0;
+	indices[ this.currentIndex ++ ] = vertex + 3;
+	indices[ this.currentIndex ++ ] = vertex + 2;
+	indices[ this.currentIndex ++ ] = vertex + 3;
+	indices[ this.currentIndex ++ ] = vertex + 5;
 
 };
 
@@ -821,21 +822,23 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 
 		var period = lightningStrike.rayParameters.subrayPeriod;
 		var dutyCycle = lightningStrike.rayParameters.subrayDutyCycle;
-		
+
 		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : THREE.Math.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
-		
+
 		var phase = lightningStrike.time - phase0;
 		var currentCycle = Math.floor( phase / period );
 
 		var childSubraySeed = random1() * ( currentCycle + 1 );
 
 		var isActive = phase % period <= dutyCycle * period;
-
-		probability = lightningStrike.subrayProbability;
+		
 		var probability = 0;
+
 		if ( isActive ) {
+
 			probability = lightningStrike.subrayProbability;
 			// Distribution test: probability *= segment.fraction0 > 0.5 && segment.fraction0 < 0.9 ? 1 / 0.4 : 0;
+
 		}
 
 		if ( subray.recursion < lightningStrike.maxSubrayRecursion && lightningStrike.numSubrays < lightningStrike.maxSubrays && random1() < probability ) {
@@ -850,12 +853,12 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 			childSubray.maxIterations = Math.max( 1, subray.maxIterations - 1 );
 
 			childSubray.linPos0.set( random1(), random1(), random1() ).multiplyScalar( 1000 );
-			childSubray.linPos1.set( random1(), random1(), random1() ).multiplyScalar( 1000 );;
+			childSubray.linPos1.set( random1(), random1(), random1() ).multiplyScalar( 1000 );
 			childSubray.up0.copy( subray.up0 );
 			childSubray.up1.copy( subray.up1 );
 			childSubray.radius0 = segment.radius0 * lightningStrike.rayParameters.radius0Factor;
 			childSubray.radius1 = Math.min( lightningStrike.rayParameters.minRadius, segment.radius1 * lightningStrike.rayParameters.radius1Factor );
-			
+
 			childSubray.birthTime = phase0 + ( currentCycle ) * period;
 			childSubray.deathTime = childSubray.birthTime + period * dutyCycle;
 
@@ -884,7 +887,7 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 	var vec2Forward = new THREE.Vector3();
 	var vec3Side = new THREE.Vector3();
 	var vec4Up = new THREE.Vector3();
-	
+
 	this.onSubrayCreation = function ( segment, parentSubray, childSubray, lightningStrike ) {
 
 		// Decide childSubray origin and destination positions (pos0 and pos1) and possibly other properties of childSubray
@@ -895,9 +898,9 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 	};
 
 	this.subrayConePosition = function ( segment, parentSubray, childSubray, heightFactor, sideWidthFactor, minSideWidthFactor ) {
-		
+
 		// Sets childSubray pos0 and pos1 in a cone
-		
+
 		childSubray.pos0.copy( segment.pos0 );
 
 		vec1Pos.subVectors( parentSubray.pos1, parentSubray.pos0 );
@@ -906,15 +909,15 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 		var length = vec1Pos.length();
 		vec3Side.crossVectors( parentSubray.up0, vec2Forward );
 		var angle = 2 * Math.PI * random1();
-		vec3Side.multiplyScalar( Math.cos ( angle ) );
-		vec4Up.copy( parentSubray.up0 ).multiplyScalar( Math.sin ( angle ) );
+		vec3Side.multiplyScalar( Math.cos( angle ) );
+		vec4Up.copy( parentSubray.up0 ).multiplyScalar( Math.sin( angle ) );
 
 		childSubray.pos1.copy( vec3Side ).add( vec4Up ).multiplyScalar( length * sideWidthFactor * ( minSideWidthFactor + random1() * ( 1 - minSideWidthFactor ) ) ).add( vec1Pos ).add( parentSubray.pos0 );
 
-	}
+	};
 
 	this.subrayCylinderPosition = function ( segment, parentSubray, childSubray, heightFactor, sideWidthFactor, minSideWidthFactor ) {
-		
+
 		// Sets childSubray pos0 and pos1 in a cylinder
 
 		childSubray.pos0.copy( segment.pos0 );
@@ -925,12 +928,12 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 		var length = vec1Pos.length();
 		vec3Side.crossVectors( parentSubray.up0, vec2Forward );
 		var angle = 2 * Math.PI * random1();
-		vec3Side.multiplyScalar( Math.cos ( angle ) );
-		vec4Up.copy( parentSubray.up0 ).multiplyScalar( Math.sin ( angle ) );
+		vec3Side.multiplyScalar( Math.cos( angle ) );
+		vec4Up.copy( parentSubray.up0 ).multiplyScalar( Math.sin( angle ) );
 
 		childSubray.pos1.copy( vec3Side ).add( vec4Up ).multiplyScalar( length * sideWidthFactor * ( minSideWidthFactor + random1() * ( 1 - minSideWidthFactor ) ) ).add( vec1Pos ).add( parentSubray.pos0 );
 
-	}
+	};
 
 };
 
@@ -978,19 +981,19 @@ THREE.LightningStrike.prototype.createSegment = function () {
 		fraction0: 0,
 		fraction1: 0,
 		positionVariationFactor: 0
-	}
+	};
 
 };
 
 THREE.LightningStrike.prototype.getNewSegment = function () {
 
-	return this.raySegments[ this.currentSegmentIndex++ ];
+	return this.raySegments[ this.currentSegmentIndex ++ ];
 
 };
 
 THREE.LightningStrike.prototype.copy = function ( source ) {
-	
-	BufferGeometry.prototype.copy.call( this, source );
+
+	THREE.BufferGeometry.prototype.copy.call( this, source );
 
 	this.init( THREE.LightningStrike.copyParameters( {}, source.rayParameters ) );
 

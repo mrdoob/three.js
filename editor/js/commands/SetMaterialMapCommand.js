@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param mapName string
  * @param newMap THREE.Texture
  * @constructor
  */
 
-var SetMaterialMapCommand = function ( object, mapName, newMap, materialSlot ) {
+var SetMaterialMapCommand = function ( editor, object, mapName, newMap, materialSlot ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetMaterialMapCommand';
 	this.name = 'Set Material.' + mapName;

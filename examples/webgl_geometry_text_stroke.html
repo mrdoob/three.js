@@ -1,34 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - Simple text from json</title>
+		<title>three.js webgl - simple text from json</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Simple text from json fonts.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple text from json fonts
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/SVGLoader.js"></script>
+		<script type="module">
+			import {
+				Color,
+				DoubleSide,
+				FontLoader,
+				Group,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				ShapeBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
 			var camera, scene, renderer;
 
@@ -37,40 +44,36 @@
 
 			function init( ) {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, - 400, 600 );
 
-				var controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0, 0 );
-				controls.update();
+				scene = new Scene();
+				scene.background = new Color( 0xf0f0f0 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
-
-				var loader = new THREE.FontLoader();
+				var loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var xMid, text;
 
-					var color = new THREE.Color( 0x006699 );
+					var color = new Color( 0x006699 );
 
-					var matDark = new THREE.MeshBasicMaterial( {
+					var matDark = new MeshBasicMaterial( {
 						color: color,
-						side: THREE.DoubleSide
+						side: DoubleSide
 					} );
 
-					var matLite = new THREE.MeshBasicMaterial( {
+					var matLite = new MeshBasicMaterial( {
 						color: color,
 						transparent: true,
 						opacity: 0.4,
-						side: THREE.DoubleSide
+						side: DoubleSide
 					} );
 
 					var message = "   Three.js\nStroke text.";
 
 					var shapes = font.generateShapes( message, 100 );
 
-					var geometry = new THREE.ShapeBufferGeometry( shapes );
+					var geometry = new ShapeBufferGeometry( shapes );
 
 					geometry.computeBoundingBox();
 
@@ -80,7 +83,7 @@
 
 					// make shape ( N.B. edge view not visible )
 
-					text = new THREE.Mesh( geometry, matLite );
+					text = new Mesh( geometry, matLite );
 					text.position.z = - 150;
 					scene.add( text );
 
@@ -107,9 +110,9 @@
 
 					shapes.push.apply( shapes, holeShapes );
 
-					var style = THREE.SVGLoader.getStrokeStyle( 5, color.getStyle() );
+					var style = SVGLoader.getStrokeStyle( 5, color.getStyle() );
 
-					var strokeText = new THREE.Group();
+					var strokeText = new Group();
 
 					for ( var i = 0; i < shapes.length; i ++ ) {
 
@@ -117,11 +120,11 @@
 
 						var points = shape.getPoints();
 
-						var geometry = THREE.SVGLoader.pointsToStroke( points, style );
+						var geometry = SVGLoader.pointsToStroke( points, style );
 
 						geometry.translate( xMid, 0, 0 );
 
-						var strokeMesh = new THREE.Mesh( geometry, matDark );
+						var strokeMesh = new Mesh( geometry, matDark );
 						strokeText.add( strokeMesh );
 
 					}
@@ -130,10 +133,14 @@
 
 				} ); //end load function
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -4,42 +4,14 @@
 		<title>three.js webgl - Light Shafts</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #ffffff;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Light Shafts -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Light Shafts<br/>
 			Model by <a href="https://skfb.ly/6ICER" target="_blank" rel="noopener">Splodeman</a><br />
 		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -77,14 +49,14 @@
 
 		uniform float attenuation;
 		uniform vec3 color;
-		uniform sampler2D texture;
+		uniform sampler2D colorTexture;
 
 		varying vec2 vUv;
 		varying float vAlpha;
 
 		void main() {
 
-			vec4 textureColor = texture2D( texture, vUv );
+			vec4 textureColor = texture2D( colorTexture, vUv );
 			gl_FragColor = vec4( textureColor.rgb * color.rgb, textureColor.a * vAlpha );
 			gl_FragColor.a *= pow( gl_FragCoord.z, attenuation );
 
@@ -92,13 +64,25 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				AdditiveBlending,
+				Clock,
+				Color,
+				DirectionalLight,
+				DoubleSide,
+				HemisphereLight,
+				Mesh,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				ShaderMaterial,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var container, controls, clock;
 			var camera, scene, renderer, uniforms;
@@ -111,31 +95,25 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 3.2, 3, 3.7 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0.5, 1.5, 0 );
-				controls.minDistance = 2;
-				controls.maxDistance = 20;
-				controls.update();
+				clock = new Clock();
 
-				clock = new THREE.Clock();
+				scene = new Scene();
+				scene.background = new Color( 0xcf8b74 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xcf8b74 );
-
-				var	light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var	light = new HemisphereLight( 0xffffff, 0x444444 );
 				light.position.set( 0, 20, 0 );
 				scene.add( light );
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new DirectionalLight( 0xffffff );
 				light.position.set( 0, 20, 10 );
 				scene.add( light );
 
 			 	// light shafts definition
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 				var texture = textureLoader.load( 'textures/lightShaft.png' );
 
 				uniforms = {
@@ -149,10 +127,10 @@
 					},
 					// the color of the ray
 					color: {
-						value: new THREE.Color( 0xdadc9f )
+						value: new Color( 0xdadc9f )
 					},
 					// the visual representation of the ray highly depends on the used texture
-					texture: {
+					colorTexture: {
 						value: texture
 					},
 					// global time value for animation
@@ -165,21 +143,21 @@
 					}
 				};
 
-				var lightShaftMaterial = new THREE.ShaderMaterial( {
+				var lightShaftMaterial = new ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-					blending: THREE.AdditiveBlending,
+					blending: AdditiveBlending,
 					depthWrite: false,
 					transparent: true,
-					side: THREE.DoubleSide
+					side: DoubleSide
 				} );
 
-				var lightShaftGeometry = new THREE.PlaneBufferGeometry( 0.5, 5 );
+				var lightShaftGeometry = new PlaneBufferGeometry( 0.5, 5 );
 
 				// model
 
-				var loader = new THREE.GLTFLoader().setPath( 'models/gltf/Tree/' );
+				var loader = new GLTFLoader().setPath( 'models/gltf/Tree/' );
 				loader.load( 'tree.glb', function ( gltf ) {
 
 					gltf.scene.traverse( function ( child ) {
@@ -199,7 +177,7 @@
 
 					for ( var i = 0; i < 5; i ++ ) {
 
-						var lightShaft = new THREE.Mesh( lightShaftGeometry, lightShaftMaterial );
+						var lightShaft = new Mesh( lightShaftGeometry, lightShaftMaterial );
 						lightShaft.position.x = - 1 + 1.5 * Math.sign( ( i % 2 ) );
 						lightShaft.position.y = 2;
 						lightShaft.position.z = - 1.5 + ( i * 0.5 );
@@ -213,12 +191,18 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0.5, 1.5, 0 );
+				controls.minDistance = 2;
+				controls.maxDistance = 20;
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

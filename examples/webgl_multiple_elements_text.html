@@ -4,6 +4,7 @@
 		<title>three.js webgl - multiple elements with text</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			* {
 				box-sizing: border-box;
@@ -11,15 +12,20 @@
 			}
 
 			body {
-				color: #000;
-				font-family: Monospace;
-				font-size: 13px;
-
 				background-color: #fff;
+				color: #444;
 				margin: auto;
 				padding: .5in;
 				max-width: 7in;
 				text-align: justify;
+			}
+
+			a {
+				color: #08f;
+			}
+
+			#info {
+				left: 0px;
 			}
 
 			.view {
@@ -37,56 +43,34 @@
 				z-index: -1;
 			}
 
-			#info {
-				position: absolute;
-				top: 0px; width: 6.5in;
-				padding: 0px;
-				text-align: center;
-			}
-
-			a { color: #0080ff; }
-
 			.math {
-
 				text-align: center;
-
 			}
 
 			.math-frac {
-
 				display: inline-block;
 				vertical-align: middle;
-
 			}
 
 			.math-num {
-
 				display: block;
-
 			}
 
 			.math-denom {
-
 				display: block;
 				border-top: 1px solid;
-
 			}
 
 			.math-sqrt {
-
 				display: inline-block;
 				transform: scale(1, 1.3);
-
 			}
 
 			.math-sqrt-stem {
-
 				display: inline-block;
 				border-top: 1px solid;
 				margin-top: 5px;
-
 			}
-
 		</style>
 	</head>
 	<body>
@@ -95,18 +79,21 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				CanvasTexture,
+				Color,
+				Float32BufferAttribute,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				Vector3,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var scenes = [], views, t, canvas, renderer;
 
@@ -124,18 +111,18 @@
 
 				canvas = document.getElementById( 'c' );
 
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+				renderer = new WebGLRenderer( { canvas: canvas, antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				views = document.querySelectorAll( '.view' );
 
 				for ( var n = 0; n < views.length; n ++ ) {
 
-					var scene = new THREE.Scene();
-					scene.background = new THREE.Color( 0xffffff );
+					var scene = new Scene();
+					scene.background = new Color( 0xffffff );
 
-					var geometry0 = new THREE.BufferGeometry();
-					var geometry1 = new THREE.BufferGeometry();
+					var geometry0 = new BufferGeometry();
+					var geometry1 = new BufferGeometry();
 
 					var vertices = [];
 
@@ -170,8 +157,8 @@
 
 					}
 
-					geometry0.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-					geometry1.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices.slice(), 3 ) );
+					geometry0.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+					geometry1.addAttribute( 'position', new Float32BufferAttribute( vertices.slice(), 3 ) );
 
 					var index = Math.floor( colors.length * Math.random() );
 
@@ -182,20 +169,20 @@
 					context.arc( 64, 64, 64, 0, 2 * Math.PI );
 					context.fillStyle = colors[ index ];
 					context.fill();
-					var texture = new THREE.CanvasTexture( canvas2 );
+					var texture = new CanvasTexture( canvas2 );
 
-					var material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: 0.1 } );
+					var material = new PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: 0.1 } );
 
-					scene.add( new THREE.Points( geometry0, material ) );
+					scene.add( new Points( geometry0, material ) );
 
 					scene.userData.view = views[ n ];
 					scene.userData.geometry1 = geometry1;
 
-					var camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 100 );
+					var camera = new PerspectiveCamera( 75, 1, 0.1, 100 );
 					camera.position.set( 0, 0, 1.2 * balls );
 					scene.userData.camera = camera;
 
-					var controls = new THREE.OrbitControls( camera, views[ n ] );
+					var controls = new OrbitControls( camera, views[ n ] );
 					scene.userData.controls = controls;
 
 					scenes.push( scene );
@@ -262,8 +249,8 @@
 					var points = scene.children[ 0 ];
 					var position = points.geometry.attributes.position;
 
-					var point = new THREE.Vector3();
-					var offset = new THREE.Vector3();
+					var point = new Vector3();
+					var offset = new Vector3();
 
 					for ( var i = 0; i < position.count; i ++ ) {
 

@@ -4,27 +4,8 @@
 		<title>three.js webgl - materials - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color:#0078ff; }
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 5px; width: 100%;
-				z-index:100;
-			}
 
 			#overlay {
 				position: absolute;
@@ -67,40 +48,38 @@
 		<div id="overlay">
 			<div>
 				<button id="startButton">Click to Play</button>
-				<p>Automatic video playback with audio requires a user interaction.</p>
+				<p>Video playback with audio requires user interaction.</p>
 			</div>
 		</div>
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo<br/>
+			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
 
 		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				DirectionalLight,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Scene,
+				VideoTexture,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var container;
 
@@ -140,16 +119,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -157,7 +136,7 @@
 				video = document.getElementById( 'video' );
 				video.play();
 
-				texture = new THREE.VideoTexture( video );
+				texture = new VideoTexture( video );
 
 				//
 
@@ -181,11 +160,11 @@
 						ox = i;
 						oy = j;
 
-						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
+						geometry = new BoxBufferGeometry( xsize, ysize, xsize );
 
 						change_uvs( geometry, ux, uy, ox, oy );
 
-						materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
+						materials[ cube_count ] = new MeshLambertMaterial( parameters );
 
 						material = materials[ cube_count ];
 
@@ -194,7 +173,7 @@
 
 						material.color.setHSL( material.hue, material.saturation, 0.5 );
 
-						mesh = new THREE.Mesh( geometry, material );
+						mesh = new Mesh( geometry, material );
 
 						mesh.position.x = ( i - xgrid / 2 ) * xsize;
 						mesh.position.y = ( j - ygrid / 2 ) * ysize;
@@ -219,11 +198,11 @@
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 1.3 );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+				var renderModel = new RenderPass( scene, camera );
+				var effectBloom = new BloomPass( 1.3 );
+				var effectCopy = new ShaderPass( CopyShader );
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );
@@ -244,7 +223,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.reset();
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

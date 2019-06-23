@@ -4,51 +4,34 @@
 		<title>three.js - webgl2 sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background: #000;
-				padding: 0;
-				margin: 0;
-				font-weight: bold;
-			}
-
-			canvas {
-				display: block;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox</div>
+
+		<script src="js/WebGL.js"></script>
 
 		<script type="module">
-
-			import { PerspectiveCamera } from '../src/cameras/PerspectiveCamera.js';
-			import { SphereBufferGeometry } from '../src/geometries/SphereGeometry.js';
-			import { MeshNormalMaterial } from '../src/materials/MeshNormalMaterial.js';
-			import { PointLight } from '../src/lights/PointLight.js';
-			import { Color } from '../src/math/Color.js';
-			import { Mesh } from '../src/objects/Mesh.js';
-			import { Fog } from '../src/scenes/Fog.js';
-			import { Scene } from '../src/scenes/Scene.js';
-			import { WebGLRenderer } from '../src/renderers/WebGLRenderer.js';
+			import {
+				Color,
+				PerspectiveCamera,
+				Fog,
+				Mesh,
+				MeshNormalMaterial,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			if ( WEBGL.isWebGL2Available() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+
+			}
 
 			//
 

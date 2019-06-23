@@ -1,0 +1,33 @@
+#VRML V2.0 utf8
+#IndexedLineSet example
+Shape {
+	geometry IndexedLineSet {
+		coord Coordinate {
+			point [
+				-1.0 -1.0 0.0, #vertex 0
+				1.0 1.0 0.0, #vertex 1
+				1.0 -1.0 0.0, #vertex 2
+			]
+		}
+		colorPerVertex FALSE
+		color Color {
+			color [
+				1.0 0.0 0.0, #red
+				0.0 1.0 0.0, #green
+				0.0 0.0 1.0, #blue
+			]
+		}
+		coordIndex [
+			#red line
+			0, 1, -1,
+			#green line
+			1, 2, -1,
+			#blue line
+			2, 0, -1
+		]
+		colorIndex [
+			2, 1, 0
+		]	
+	}
+}
+

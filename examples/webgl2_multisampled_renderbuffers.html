@@ -4,35 +4,22 @@
 		<title>three.js WebGL 2 - Multisampled Renderbuffers</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
 			body {
-				background: #ffffff;
-				padding: 0;
-				margin: 0;
-				font-family: Monospace;
-				font-size: 13px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #222;
 			}
 
-			#info {
-				top: 0px;
-				width: 100%;
-				color: #000000;
-				margin: 6px 0px;
-				text-align: center;
-			}
-
-			#info a {
-				color: #000000;
+			a {
+				color: #08f;
 			}
 
 			#container {
+				position: absolute;
+				top: 80px;
 				width: 100%;
-				height: calc(100% - 80px);
+				bottom: 0px;
 			}
 		</style>
 	</head>
@@ -46,16 +33,31 @@
 		<div id="container">
 		</div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/WebGL.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
+		<script type="module">
+			import {
+				Clock,
+				Color,
+				DirectionalLight,
+				HemisphereLight,
+				PerspectiveCamera,
+				Fog,
+				Group,
+				IcosahedronBufferGeometry,
+				Mesh,
+				MeshStandardMaterial,
+				RGBFormat,
+				Scene,
+				Vector2,
+				WebGLRenderer,
+				WebGLMultisampleRenderTarget
+			} from "../build/three.module.js";
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -63,7 +65,7 @@
 
 			}
 
-			var camera, scene, renderer, clock, group;
+			var camera, scene, renderer, clock, group, container;
 
 			var composer1, composer2;
 
@@ -72,37 +74,37 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( window.innerWidth * 0.5 ) / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
+				scene.fog = new Fog( 0xcccccc, 100, 1500 );
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				var dirLight = new DirectionalLight( 0xffffff, 0.8 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
 				//
 
-				group = new THREE.Group();
+				group = new Group();
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 10, 2 );
-				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				var geometry = new IcosahedronBufferGeometry( 10, 2 );
+				var material = new MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = Math.random() * 500 - 250;
 					mesh.position.y = Math.random() * 500 - 250;
 					mesh.position.z = Math.random() * 500 - 250;
@@ -118,33 +120,33 @@
 				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2', { antialias: false } );
 
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+				renderer = new WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
 				var parameters = {
-					format: THREE.RGBFormat,
+					format: RGBFormat,
 					stencilBuffer: false
 				};
 
-				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				var renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				var size = renderer.getDrawingBufferSize( new Vector2() );
+				var renderTarget = new WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var renderPass = new RenderPass( scene, camera );
+				var copyPass = new ShaderPass( CopyShader );
 
 				//
 
-				composer1 = new THREE.EffectComposer( renderer, renderTarget );
+				composer1 = new EffectComposer( renderer, renderTarget );
 				composer1.addPass( renderPass );
 				composer1.addPass( copyPass );
 
 				//
 
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 
@@ -156,12 +158,12 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( window.innerWidth * 0.5 ) / window.innerHeight;
+				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer1.setSize( window.innerWidth, window.innerHeight );
-				composer2.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				composer1.setSize( container.offsetWidth, container.offsetHeight );
+				composer2.setSize( container.offsetWidth, container.offsetHeight );
 
 			}
 
@@ -169,15 +171,15 @@
 
 				requestAnimationFrame( animate );
 
-				var halfWidth = window.innerWidth / 2;
+				var halfWidth = container.offsetWidth / 2;
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, window.innerHeight );
+				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
 
 				composer1.render();
 
-				renderer.setViewport( halfWidth, 0, halfWidth, window.innerHeight );
+				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
 
 				composer2.render();
 

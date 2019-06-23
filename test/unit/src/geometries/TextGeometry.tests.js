@@ -9,16 +9,7 @@ import {
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'TextBufferGeometry', ( hooks ) => {
-
-		var geometries = undefined;
-		hooks.beforeEach( function () {
-
-			geometries = [
-				new TextBufferGeometry()
-			];
-
-		} );
+	QUnit.module( 'TextBufferGeometry', () => {
 
 		// INHERITANCE
 		QUnit.todo( "Extending", ( assert ) => {

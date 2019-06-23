@@ -21,311 +21,331 @@ export let Object3DIdCount: number;
  * Base class for scene graph objects
  */
 export class Object3D extends EventDispatcher {
-  constructor();
 
-  /**
-   * Unique number of this object instance.
-   */
-  id: number;
+	constructor();
 
-  /**
-   *
-   */
-  uuid: string;
+	/**
+	 * Unique number of this object instance.
+	 */
+	id: number;
 
-  /**
-   * Optional name of the object (doesn't need to be unique).
-   */
-  name: string;
+	/**
+	 *
+	 */
+	uuid: string;
 
-  type: string;
+	/**
+	 * Optional name of the object (doesn't need to be unique).
+	 */
+	name: string;
 
-  /**
-   * Object's parent in the scene graph.
-   */
-  parent: Object3D | null;
+	type: string;
 
-  /**
-   * Array with object's children.
-   */
-  children: Object3D[];
+	/**
+	 * Object's parent in the scene graph.
+	 */
+	parent: Object3D | null;
 
-  /**
-   * Up direction.
-   */
-  up: Vector3;
+	/**
+	 * Array with object's children.
+	 */
+	children: Object3D[];
 
-  /**
-   * Object's local position.
-   */
-  position: Vector3;
+	/**
+	 * Up direction.
+	 */
+	up: Vector3;
 
-  /**
-   * Object's local rotation (Euler angles), in radians.
-   */
-  rotation: Euler;
+	/**
+	 * Object's local position.
+	 */
+	position: Vector3;
 
-  /**
-   * Global rotation.
-   */
-  quaternion: Quaternion;
+	/**
+	 * Object's local rotation (Euler angles), in radians.
+	 */
+	rotation: Euler;
 
-  /**
-   * Object's local scale.
-   */
-  scale: Vector3;
+	/**
+	 * Global rotation.
+	 */
+	quaternion: Quaternion;
 
-  modelViewMatrix: Matrix4;
+	/**
+	 * Object's local scale.
+	 */
+	scale: Vector3;
 
-  normalMatrix: Matrix3;
+	modelViewMatrix: Matrix4;
 
-  /**
-   * Local transform.
-   */
-  matrix: Matrix4;
+	normalMatrix: Matrix3;
 
-  /**
-   * The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
-   */
-  matrixWorld: Matrix4;
+	/**
+	 * Local transform.
+	 */
+	matrix: Matrix4;
 
-  /**
-   * When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
-   */
-  matrixAutoUpdate: boolean;
+	/**
+	 * The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
+	 */
+	matrixWorld: Matrix4;
 
-  /**
-   * When this is set, it calculates the matrixWorld in that frame and resets this property to false.
-   */
-  matrixWorldNeedsUpdate: boolean;
+	/**
+	 * When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
+	 */
+	matrixAutoUpdate: boolean;
 
-  layers: Layers;
-  /**
-   * Object gets rendered if true.
-   */
-  visible: boolean;
+	/**
+	 * When this is set, it calculates the matrixWorld in that frame and resets this property to false.
+	 */
+	matrixWorldNeedsUpdate: boolean;
 
-  /**
-   * Gets rendered into shadow map.
-   */
-  castShadow: boolean;
+	layers: Layers;
+	/**
+	 * Object gets rendered if true.
+	 */
+	visible: boolean;
 
-  /**
-   * Material gets baked in shadow receiving.
-   */
-  receiveShadow: boolean;
+	/**
+	 * Gets rendered into shadow map.
+	 */
+	castShadow: boolean;
 
-  /**
-   * When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
-   */
-  frustumCulled: boolean;
+	/**
+	 * Material gets baked in shadow receiving.
+	 */
+	receiveShadow: boolean;
 
-  /**
-   * Overrides the default rendering order of scene graph objects, from lowest to highest renderOrder. Opaque and transparent objects remain sorted independently though. When this property is set for an instance of Group, all descendants objects will be sorted and rendered together.
-   */
-  renderOrder: number;
+	/**
+	 * When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
+	 */
+	frustumCulled: boolean;
 
-  /**
-   * An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
-   */
-  userData: { [key: string]: any };
+	/**
+	 * Overrides the default rendering order of scene graph objects, from lowest to highest renderOrder. Opaque and transparent objects remain sorted independently though. When this property is set for an instance of Group, all descendants objects will be sorted and rendered together.
+	 */
+	renderOrder: number;
 
-  /**
-   * Used to check whether this or derived classes are Object3Ds. Default is true.
-   * You should not change this, as it is used internally for optimisation.
-   */
-  isObject3D: true;
+	/**
+	 * An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
+	 */
+	userData: { [key: string]: any };
 
-  /**
-   * Calls before rendering object
-   */
-  onBeforeRender: (
-    renderer: WebGLRenderer,
-    scene: Scene,
-    camera: Camera,
-    geometry: Geometry | BufferGeometry,
-    material: Material,
-    group: Group
-  ) => void;
+	/**
+	 * Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
+	 * When shadow-casting with a DirectionalLight or SpotLight, if you are (a) modifying vertex positions in
+	 * the vertex shader, (b) using a displacement map, (c) using an alpha map with alphaTest, or (d) using a
+	 * transparent texture with alphaTest, you must specify a customDepthMaterial for proper shadows.
+	 */
+	customDepthMaterial: Material;
 
-  /**
-   * Calls after rendering object
-   */
-  onAfterRender: (
-    renderer: WebGLRenderer,
-    scene: Scene,
-    camera: Camera,
-    geometry: Geometry | BufferGeometry,
-    material: Material,
-    group: Group
-  ) => void;
+	/**
+	 * Same as customDepthMaterial, but used with PointLight.
+	 */
+	customDistanceMaterial: Material;
 
-  static DefaultUp: Vector3;
-  static DefaultMatrixAutoUpdate: boolean;
+	/**
+	 * Used to check whether this or derived classes are Object3Ds. Default is true.
+	 * You should not change this, as it is used internally for optimisation.
+	 */
+	isObject3D: true;
 
-  /**
-   * This updates the position, rotation and scale with the matrix.
-   */
-  applyMatrix(matrix: Matrix4): void;
+	/**
+	 * Calls before rendering object
+	 */
+	onBeforeRender: (
+		renderer: WebGLRenderer,
+		scene: Scene,
+		camera: Camera,
+		geometry: Geometry | BufferGeometry,
+		material: Material,
+		group: Group
+	) => void;
 
-  applyQuaternion(quaternion: Quaternion): this;
+	/**
+	 * Calls after rendering object
+	 */
+	onAfterRender: (
+		renderer: WebGLRenderer,
+		scene: Scene,
+		camera: Camera,
+		geometry: Geometry | BufferGeometry,
+		material: Material,
+		group: Group
+	) => void;
 
-  /**
-   *
-   */
-  setRotationFromAxisAngle(axis: Vector3, angle: number): void;
+	static DefaultUp: Vector3;
+	static DefaultMatrixAutoUpdate: boolean;
 
-  /**
-   *
-   */
-  setRotationFromEuler(euler: Euler): void;
+	/**
+	 * This updates the position, rotation and scale with the matrix.
+	 */
+	applyMatrix( matrix: Matrix4 ): void;
 
-  /**
-   *
-   */
-  setRotationFromMatrix(m: Matrix4): void;
+	applyQuaternion( quaternion: Quaternion ): this;
 
-  /**
-   *
-   */
-  setRotationFromQuaternion(q: Quaternion): void;
+	/**
+	 *
+	 */
+	setRotationFromAxisAngle( axis: Vector3, angle: number ): void;
 
-  /**
-   * Rotate an object along an axis in object space. The axis is assumed to be normalized.
-   * @param axis  A normalized vector in object space.
-   * @param angle  The angle in radians.
-   */
-  rotateOnAxis(axis: Vector3, angle: number): this;
+	/**
+	 *
+	 */
+	setRotationFromEuler( euler: Euler ): void;
 
-  /**
-   * Rotate an object along an axis in world space. The axis is assumed to be normalized. Method Assumes no rotated parent.
-   * @param axis  A normalized vector in object space.
-   * @param angle  The angle in radians.
-   */
-  rotateOnWorldAxis(axis: Vector3, angle: number): this;
+	/**
+	 *
+	 */
+	setRotationFromMatrix( m: Matrix4 ): void;
 
-  /**
-   *
-   * @param angle
-   */
-  rotateX(angle: number): this;
+	/**
+	 *
+	 */
+	setRotationFromQuaternion( q: Quaternion ): void;
 
-  /**
-   *
-   * @param angle
-   */
-  rotateY(angle: number): this;
+	/**
+	 * Rotate an object along an axis in object space. The axis is assumed to be normalized.
+	 * @param axis	A normalized vector in object space.
+	 * @param angle	The angle in radians.
+	 */
+	rotateOnAxis( axis: Vector3, angle: number ): this;
 
-  /**
-   *
-   * @param angle
-   */
-  rotateZ(angle: number): this;
+	/**
+	 * Rotate an object along an axis in world space. The axis is assumed to be normalized. Method Assumes no rotated parent.
+	 * @param axis	A normalized vector in object space.
+	 * @param angle	The angle in radians.
+	 */
+	rotateOnWorldAxis( axis: Vector3, angle: number ): this;
 
-  /**
-   * @param axis  A normalized vector in object space.
-   * @param distance  The distance to translate.
-   */
-  translateOnAxis(axis: Vector3, distance: number): this;
+	/**
+	 *
+	 * @param angle
+	 */
+	rotateX( angle: number ): this;
 
-  /**
-   * Translates object along x axis by distance.
-   * @param distance Distance.
-   */
-  translateX(distance: number): this;
+	/**
+	 *
+	 * @param angle
+	 */
+	rotateY( angle: number ): this;
 
-  /**
-   * Translates object along y axis by distance.
-   * @param distance Distance.
-   */
-  translateY(distance: number): this;
+	/**
+	 *
+	 * @param angle
+	 */
+	rotateZ( angle: number ): this;
 
-  /**
-   * Translates object along z axis by distance.
-   * @param distance Distance.
-   */
-  translateZ(distance: number): this;
+	/**
+	 * @param axis	A normalized vector in object space.
+	 * @param distance	The distance to translate.
+	 */
+	translateOnAxis( axis: Vector3, distance: number ): this;
 
-  /**
-   * Updates the vector from local space to world space.
-   * @param vector A local vector.
-   */
-  localToWorld(vector: Vector3): Vector3;
+	/**
+	 * Translates object along x axis by distance.
+	 * @param distance Distance.
+	 */
+	translateX( distance: number ): this;
 
-  /**
-   * Updates the vector from world space to local space.
-   * @param vector A world vector.
-   */
-  worldToLocal(vector: Vector3): Vector3;
+	/**
+	 * Translates object along y axis by distance.
+	 * @param distance Distance.
+	 */
+	translateY( distance: number ): this;
 
-  /**
-   * Rotates object to face point in space.
-   * @param vector A world vector to look at.
-   */
-  lookAt(vector: Vector3 | number, y?: number, z?: number): void;
+	/**
+	 * Translates object along z axis by distance.
+	 * @param distance Distance.
+	 */
+	translateZ( distance: number ): this;
 
-  /**
-   * Adds object as child of this object.
-   */
-  add(...object: Object3D[]): this;
+	/**
+	 * Updates the vector from local space to world space.
+	 * @param vector A local vector.
+	 */
+	localToWorld( vector: Vector3 ): Vector3;
 
-  /**
-   * Removes object as child of this object.
-   */
-  remove(...object: Object3D[]): this;
+	/**
+	 * Updates the vector from world space to local space.
+	 * @param vector A world vector.
+	 */
+	worldToLocal( vector: Vector3 ): Vector3;
 
-  /**
-   * Searches through the object's children and returns the first with a matching id.
-   * @param id  Unique number of the object instance
-   */
-  getObjectById(id: number): Object3D | undefined;
+	/**
+	 * Rotates object to face point in space.
+	 * @param vector A world vector to look at.
+	 */
+	lookAt( vector: Vector3 | number, y?: number, z?: number ): void;
 
-  /**
-   * Searches through the object's children and returns the first with a matching name.
-   * @param name  String to match to the children's Object3d.name property.
-   */
-  getObjectByName(name: string): Object3D | undefined;
+	/**
+	 * Adds object as child of this object.
+	 */
+	add( ...object: Object3D[] ): this;
 
-  getObjectByProperty(name: string, value: string): Object3D | undefined;
+	/**
+	 * Removes object as child of this object.
+	 */
+	remove( ...object: Object3D[] ): this;
 
-  getWorldPosition(target: Vector3): Vector3;
-  getWorldQuaternion(target: Quaternion): Quaternion;
-  getWorldScale(target: Vector3): Vector3;
-  getWorldDirection(target: Vector3): Vector3;
+	/**
+	 * Adds object as a child of this, while maintaining the object's world transform.
+	 */
+	attach( object: Object3D ): this;
 
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
+	/**
+	 * Searches through the object's children and returns the first with a matching id.
+	 * @param id	Unique number of the object instance
+	 */
+	getObjectById( id: number ): Object3D | undefined;
 
-  traverse(callback: (object: Object3D) => any): void;
+	/**
+	 * Searches through the object's children and returns the first with a matching name.
+	 * @param name	String to match to the children's Object3d.name property.
+	 */
+	getObjectByName( name: string ): Object3D | undefined;
 
-  traverseVisible(callback: (object: Object3D) => any): void;
+	getObjectByProperty( name: string, value: string ): Object3D | undefined;
 
-  traverseAncestors(callback: (object: Object3D) => any): void;
+	getWorldPosition( target: Vector3 ): Vector3;
+	getWorldQuaternion( target: Quaternion ): Quaternion;
+	getWorldScale( target: Vector3 ): Vector3;
+	getWorldDirection( target: Vector3 ): Vector3;
 
-  /**
-   * Updates local transform.
-   */
-  updateMatrix(): void;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
 
-  /**
-   * Updates global transform of the object and its children.
-   */
-  updateMatrixWorld(force?: boolean): void;
+	traverse( callback: ( object: Object3D ) => any ): void;
 
-  updateWorldMatrix(updateParents: boolean, updateChildren: boolean): void;
+	traverseVisible( callback: ( object: Object3D ) => any ): void;
 
-  toJSON(meta?: {
-    geometries: any;
-    materials: any;
-    textures: any;
-    images: any;
-  }): any;
+	traverseAncestors( callback: ( object: Object3D ) => any ): void;
 
-  clone(recursive?: boolean): this;
+	/**
+	 * Updates local transform.
+	 */
+	updateMatrix(): void;
 
-  /**
-   *
-   * @param object
-   * @param recursive
-   */
-  copy(source: Object3D, recursive?: boolean): this;
+	/**
+	 * Updates global transform of the object and its children.
+	 */
+	updateMatrixWorld( force?: boolean ): void;
+
+	updateWorldMatrix( updateParents: boolean, updateChildren: boolean ): void;
+
+	toJSON( meta?: {
+		geometries: any;
+		materials: any;
+		textures: any;
+		images: any;
+	} ): any;
+
+	clone( recursive?: boolean ): this;
+
+	/**
+	 *
+	 * @param object
+	 * @param recursive
+	 */
+	copy( source: Object3D, recursive?: boolean ): this;
+
 }

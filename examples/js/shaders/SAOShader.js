@@ -1,3 +1,7 @@
+/**
+ * TODO
+ */
+
 THREE.SAOShader = {
 	defines: {
 		'NUM_SAMPLES': 7,

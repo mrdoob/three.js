@@ -4,25 +4,7 @@
 		<title>three.js webgl - loaders - GCode loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -30,11 +12,15 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - GCode loader
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GCodeLoader.js"></script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GCodeLoader } from './jsm/loaders/GCodeLoader.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -47,14 +33,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
-				camera.position.set( 0, 0, 50 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera.position.set( 0, 0, 70 );
 
-				var controls = new THREE.OrbitControls( camera );
+				scene = new Scene();
 
-				scene = new THREE.Scene();
-
-				var loader = new THREE.GCodeLoader();
+				var loader = new GCodeLoader();
 				loader.load( 'models/gcode/benchy.gcode', function ( object ) {
 
 					object.position.set( - 100, - 20, 100 );
@@ -62,10 +46,12 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', resize, false );
 
