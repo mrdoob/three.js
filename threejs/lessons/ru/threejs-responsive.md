@@ -1,5 +1,7 @@
 Title: Three.js Oтзывчивый Дизайн
 Description: Как приспособить three.js под дисплеи разного размера.
+Category: basics
+TOC: Адаптивный дизайн
 
 Это вторая статья в серии статей о three.js.
 Первая была [об основах](threejs-fundamentals.html).

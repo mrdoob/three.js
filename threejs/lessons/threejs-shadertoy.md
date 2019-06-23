@@ -1,5 +1,7 @@
 Title: Three.js and Shadertoy
 Description: How to use Shadertoy shaders in THREE.js
+Category: solutions
+TOC: Using Shadertoy shaders
 
 [Shadertoy](https://shadertoy.com) is a famous website hosting amazing shader experiments. People often ask how they can use those shaders with Three.js.
 

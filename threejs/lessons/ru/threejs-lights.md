@@ -1,5 +1,7 @@
 Title: Three.js - Освещение
 Description: Настройка освещения
+Category: fundamentals
+TOC: Освещение
 
 Эта статья является частью серии статей о three.js. 
 Первая была [об основах](threejs-fundamentals.html).

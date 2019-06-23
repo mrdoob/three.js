@@ -1,5 +1,7 @@
 Title: Three.js Render Targets
 Description: How to render to a texture.
+Category: fundamentals
+TOC: Render Targets
 
 A render target in three.js is basicaly a texture you can render to.
 After you render to it you can use that texture like any other texture.

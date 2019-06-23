@@ -1,5 +1,7 @@
 Title: Three.js Aligning HTML Elements to 3D
 Description: How to line up an HTML Element to match a point in 3D space
+Category: solutions
+TOC: Aligning HTML Elements to 3D
 
 This article is part of a series of articles about three.js. The first article
 is [three.js fundamentals](threejs-fundamentals.html). If you haven't read that

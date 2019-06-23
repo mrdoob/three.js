@@ -1,5 +1,7 @@
 Title: Three.js Loading a .OBJ File
 Description: Loading a .OBJ File
+Category: solutions
+TOC: Load an .OBJ file
 
 One of the most common things people want to do with three.js
 is to load and display 3D models. A common format is the .OBJ

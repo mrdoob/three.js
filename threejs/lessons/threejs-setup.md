@@ -1,5 +1,7 @@
 Title: Three.js Setup
 Description: How to setup your development environment for three.js
+Category: basics
+TOC: Setup
 
 This article is one in a series of articles about three.js.
 The first article was [about three.js fundamentals](threejs-fundamentals.html).

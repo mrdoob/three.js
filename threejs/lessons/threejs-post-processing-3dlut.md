@@ -1,5 +1,7 @@
 Title: Three.js Post Processing 3DLUT
 Description: How to implement a 3DLUT Post Process in THREE.js
+Category: solutions
+TOC: Applying a LUT File for effects
 
 In the last article we went over [post processing](threejs-post-processing.html).
 On of the common ways to post process is called a LUT or 3DLUT. LUT stands for LookUp Table. A 3DLUT is therefore a 3 dimensional look up table.

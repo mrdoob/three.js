@@ -8,6 +8,13 @@
   commentSectionHeader: '<div>Вопросы? <a href="http://stackoverflow.com/questions/tagged/three.js">Спросите на stackoverflow</a>.</div>\n        <div>Нашли ошибку? <a href="http://github.com/greggman/threejsfundamentals/issues">Создайте issue на github</a>.</div>',
   missing: "К сожалению, страница ещё не переведена. [Я всегда рад переводчикам](https://github.com/greggman/threejsfundamentals)! 😄\n\n[А пока можете почитать статью на английском языке]({{{origLink}}}).",
   toc: 'Оглавление',
+  categoryMapping: {
+    'basics': 'Введение',
+    'solutions': 'Решения',
+    'tips': 'Советы',
+    'fundamentals': 'Фунаментальные понятия',
+    'reference': 'Ссылки',
+  },
 }
 
 

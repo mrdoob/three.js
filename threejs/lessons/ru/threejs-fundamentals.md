@@ -1,5 +1,7 @@
 Title: Основы Three.js
 Description: Твой первый урок по Three.js начинаетсся с основ
+Category: basics
+TOC: Базовые принципы
 
 Это первая статья в серии статей о three.js.
 [Three.js](http://threejs.org) это 3D-библиотека, которая максимально 

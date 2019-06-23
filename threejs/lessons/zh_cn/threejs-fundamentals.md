@@ -1,5 +1,7 @@
 Title: Three.js基础
 Description: 学习Three.js的第一篇文章
+Category: basics
+TOC: 基础
 
 这是Three.js系列文章的第一篇。
 [Three.js](http://threejs.org)是一个尽可能简化在网页端获取3D

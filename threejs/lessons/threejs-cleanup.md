@@ -1,5 +1,7 @@
 Title: Three.js Cleanup
 Description: How to use free memory used by Three.js
+Category: solutions
+TOC: Freeing Resources
 
 Three.js apps often use lots of memory. A 3D model
 might be 1 to 20 meg memory for all of its vertices.

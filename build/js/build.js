@@ -2,9 +2,15 @@
 /* eslint no-undef: "error" */
 /* eslint no-console: "off" */
 
+/*
+
+This entire file is one giant hack and really needs to be cleaned up!
+
+*/
+
 'use strict';
 
-const requiredNodeVersion = 11;
+const requiredNodeVersion = 12;
 if (parseInt((/^v(\d+)\./).exec(process.version)[1]) < requiredNodeVersion) {
   throw Error(`requires at least node: ${requiredNodeVersion}`);
 }
@@ -137,7 +143,7 @@ Handlebars.registerHelper('include', function(filename, options) {
   if (options && options.hash && options.hash.filename) {
     const varName = options.hash.filename;
     filename = options.data.root[varName];
-    context = options.hash;
+    context = Object.assign({}, options.data.root, options.hash);
   } else {
     context = options.data.root;
   }
@@ -216,13 +222,16 @@ const Builder = function(outBaseDir, options) {
   const g_articlesByLang = {};
   let g_articles = [];
   let g_langInfo;
+  let g_originalLangInfo;
   const g_langDB = {};
   const g_outBaseDir = outBaseDir;
   const g_origPath = options.origPath;
+  const g_originalByFileName = {};
 
-  // This are the english articles.
-  const g_origArticles = glob.
-      sync(path.join(g_origPath, '*.md'))
+  const toc = hanson.parse(fs.readFileSync('toc.hanson', {encoding: 'utf8'}));
+
+  // These are the english articles.
+  const g_origArticles = glob.sync(path.join(g_origPath, '*.md'))
       .map(a => path.basename(a))
       .filter(a => a !== 'index.md')
       .filter(articleFilter);
@@ -255,7 +264,9 @@ const Builder = function(outBaseDir, options) {
 
   const loadMD = function(contentFileName) {
     const content = cache.readFileSync(contentFileName, 'utf-8');
-    return parseMD(content);
+    const data = parseMD(content);
+    data.link = contentFileName.replace(/\\/g, '/').replace(/\.md$/, '.html');
+    return data;
   };
 
   function extractHandlebars(content) {
@@ -426,6 +437,7 @@ const Builder = function(outBaseDir, options) {
     metaData['dst_file_name'] = relativeOutName;
     metaData['basedir'] = '';
     metaData['toc'] = opt_extra.toc;
+    metaData['tocHtml'] = g_langInfo.tocHtml;
     metaData['templateOptions'] = opt_extra.templateOptions;
     metaData['langInfo'] = g_langInfo;
     metaData['url'] = pageUrl;
@@ -457,6 +469,59 @@ const Builder = function(outBaseDir, options) {
         .sync(filesSpec)
         .sort()
         .filter(articleFilter);
+
+    const byFilename = {};
+    files.forEach((fileName) => {
+      const data = loadMD(fileName);
+      if (!data.headers.category) {
+        throw new Error(`no catgeory for article: ${fileName}`);
+      }
+      byFilename[path.basename(fileName)] = data;
+    });
+
+    // HACK
+    if (extra.lang === 'en') {
+      Object.assign(g_originalByFileName, byFilename);
+      g_originalLangInfo = g_langInfo;
+    }
+
+    function getLocalizedCategory(category) {
+      const localizedCategory = g_langInfo.categoryMapping[category];
+      if (localizedCategory) {
+        return localizedCategory;
+      }
+      console.error(`no localization for category: ${category}`);
+      const categoryName = g_originalLangInfo.categoryMapping[category];
+      if (!categoryName) {
+        throw new Error(`no English mapping for category: ${category}`);
+      }
+      return categoryName;
+    }
+
+    function tocLink(fileName) {
+      let data = byFilename[fileName];
+      if (!data) {
+        data = g_originalByFileName[fileName];
+      }
+      const toc = data.headers.toc;
+      if (toc === '#') {
+        return [...data.content.matchAll(/<a\s*id="(.*?)"\s*data-toc="(.*?)"\s*><\/a>/g)].map(([, id, title]) => {
+          const link = `${data.link}#${id}`;
+          return `<li><a href="${link}">${title}</a></li>`;
+        }).join('\n');
+      }
+      const link = data.link;
+      return `<li><a href="${link}">${toc}</a></li>`;
+    }
+
+    g_langInfo.tocHtml = `<ul>${
+      Object.entries(toc).map(([category, files]) => `  <li>${getLocalizedCategory(category)}</li>
+      <ul>
+        ${files.map(tocLink).join('\n')}
+      </ul>`
+      ).join('\n')
+    }</ul>`;
+
     files.forEach(function(fileName) {
       const ext = path.extname(fileName);
       const baseName = fileName.substr(0, fileName.length - ext.length);
@@ -677,6 +742,7 @@ const Builder = function(outBaseDir, options) {
       applyTemplateToFile('build/templates/index.template', path.join(options.lessons, 'index.md'), path.join(g_outBaseDir, options.lessons, 'index.html'), {
         table_of_contents: '',
         templateOptions: g_langInfo,
+        tocHtml: g_langInfo.tocHtml,
       });
       return Promise.resolve();
     }, function(err) {

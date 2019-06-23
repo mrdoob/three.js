@@ -1,5 +1,7 @@
 Title: Three.js WebVR
 Description: How to use Virtual Reality in Three.js.
+Category: webvr
+TOC: WebVR - Basics
 
 Making WebVR apps in three.js is pretty simple. You basically just have to tell
 three.js you want to use WebVR. If you think about it a few things about WebVR

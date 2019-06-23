@@ -1,5 +1,7 @@
 Title: Three.js Voxel(Minecraft Like) Geometry
 Description: How to make voxel geometry like Minecraft
+Category: solutions
+TOC: Making Voxel Geometry (Minecraft)
 
 I've seen this topic come up more than once in various places.
 That is basically, "How do I make a voxel display like Minecraft".

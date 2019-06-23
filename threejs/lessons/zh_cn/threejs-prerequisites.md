@@ -1,5 +1,7 @@
 Title: Three.js先决条件
 Description: 使用此网站你需要了解的。
+Category: basics
+TOC: 先决条件
 
 这些文章意在帮助你学习如何使用three.js。
 假设你知道怎么使用JavaScript编程。假设

@@ -1,5 +1,7 @@
 Title: Three.js - Камера
 Description: Как использовать камеру в Three.js
+Category: fundamentals
+TOC: Камера
 
 Эта статья является частью серии статей о three.js. 
 Первая была [об основах](threejs-fundamentals.html).

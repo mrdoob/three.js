@@ -1,5 +1,7 @@
 Title: Three.js设置
 Description: 如何为你的three.js设置开发环境
+Category: basics
+TOC: 设置
 
 这是three.js系列文章的其中之一。
 第一篇是[关于three.js基础](threejs-fundamentals.html)。

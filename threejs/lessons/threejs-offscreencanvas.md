@@ -1,5 +1,7 @@
 Title: Three.js OffscreenCanvas
 Description: How to use three.js in a web worker
+Category: optimization
+TOC: Using OffscreenCanvas in a Web Worker
 
 [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas)
 is a relatively new browser feature currently only available in Chrome but apparently

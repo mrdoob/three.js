@@ -1,5 +1,7 @@
 Title: Three.js Optimize Lots of Objects
 Description: Optimize by merging Objects
+Category: optimization
+TOC: Optimizing Lots of Objects
 
 This article is part of a series of articles about three.js. The first article
 is [three.js fundamentals](threejs-fundamentals.html). If you haven't read that

@@ -1,5 +1,7 @@
 Title: Three.js Fog
 Description: Fog in Three.js
+Category: fundamentals
+TOC: Fog
 
 This article is part of a series of articles about three.js. The
 first article is [three.js fundamentals](threejs-fundamentals.html). If

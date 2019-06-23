@@ -1,5 +1,7 @@
 Title: Three.js Debugging JavaScript
 Description: How to debug JavaScript with THREE.js
+Category: tips
+TOC: Debugging JavaScript
 
 Most of this article is not directly about THREE.js but is
 rather about debugging JavaScript in general. It seemed important in

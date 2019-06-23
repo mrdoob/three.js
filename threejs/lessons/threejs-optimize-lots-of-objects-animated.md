@@ -1,5 +1,7 @@
 Title: Three.js Optimize Lots of Objects Animated
 Description: Animated merged objects with Morphtargets
+Category: optimization
+TOC: Optimizing Lots of Objects Animated
 
 This article is a continuation of [an article about optimizing lots of objects
 ](threejs-optimize-lots-of-objects.html). If you haven't read that

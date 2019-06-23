@@ -1,5 +1,7 @@
 Title: Three.js Transparency
 Description: How to deal with transparency issues in THREE.js
+Category: solutions
+TOC: How to Draw Transparent Objects
 
 Transparency in three.js is both easy and hard.
 

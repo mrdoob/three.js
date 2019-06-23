@@ -1,5 +1,7 @@
 Title: Three.js Cameras
 Description: How to use Cameras in Three.js
+Category: fundamentals
+TOC: Cameras
 
 This article is one in a series of articles about three.js.
 The first article was [about fundamentals](threejs-fundamentals.html).

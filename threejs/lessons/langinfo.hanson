@@ -8,6 +8,15 @@
   commentSectionHeader: '<div>Questions? <a href="http://stackoverflow.com/questions/tagged/three.js">Ask on stackoverflow</a>.</div>\n        <div><a href="https://github.com/greggman/threejsfundamentals/issues/new?assignees=&labels=suggested+topic&template=suggest-topic.md&title=%5BSUGGESTION%5D">Suggestion</a>? <a href="https://github.com/greggman/threejsfundamentals/issues/new?assignees=&labels=&template=request.md&title=">Request</a>? <a href="https://github.com/greggman/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Issue</a>? <a href="https://github.com/greggman/threejsfundamentals/issues/new?assignees=&labels=bug+%2F+issue&template=bug-issue-report.md&title=">Bug</a>?</div>',
   missing: "Sorry this article has not been translated yet. [Translations Welcome](https://github.com/greggman/threejsfundamentals)! 😄\n\n[Here's the original English article for now]({{{origLink}}}).",
   toc: 'Table of Contents',
+  categoryMapping: {
+    'basics': 'Basics',
+    'solutions': 'Solutions',
+    'webvr': 'WebVR',
+    'optimization': 'Optimization',
+    'tips': 'Tips',
+    'fundamentals': 'Fundamentals',
+    'reference': 'Reference',
+  },
 }
 
 

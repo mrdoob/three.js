@@ -1,5 +1,7 @@
 Title: Three.js Post Processing
 Description: How to Post Process in THREE.js
+Category: solutions
+TOC: Post Processing
 
 *Post processing* generally refers to applying some kind of effect or filter to
 a 2D image. In the case of THREE.js we have a scene with a bunch of meshes in

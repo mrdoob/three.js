@@ -1,12 +1,14 @@
 Title: Three.js Tips
 Description: Small issues that might trip you up using three.js
+Category: tips
+TOC: #
 
 This article is a collection of small issues you might run into
 using three.js that seemed too small to have their own article.
 
 ---
 
-<a id="screenshot"></a>
+<a id="screenshot" data-toc="Taking a screenshot"></a>
 
 # Taking A Screenshot of the Canvas
 
@@ -124,7 +126,7 @@ For a different solution see the next item.
 
 ---
 
-<a id="preservedrawingbuffer"></a>
+<a id="preservedrawingbuffer" data-toc="Prevent the Canvas Being Cleared"></a>
 
 # Preventing the canvas being cleared
 
@@ -159,7 +161,7 @@ If you really wanted to make a drawing program you'd
 
 ---
 
-<a id="tabindex"></a>
+<a id="tabindex" data-toc="Get Keyboard Input From a Canvas"></a>
 
 # Getting Keyboard Input
 
@@ -236,7 +238,7 @@ canvas has both solutions applied.
 
 ---
 
-<a id="transparent-canvas"></a>
+<a id="transparent-canvas" data-toc="Make the Canvas Transparent"></a>
  
 # Making the Canvas Transparent
 
@@ -337,7 +339,7 @@ and touch events so you can select the text beneath.
 
 ---
 
-<a id="html-background"></a>
+<a id="html-background" data-toc="Use three.js as Background in HTML"></a>
 
 # Making your background a three.js animation
 

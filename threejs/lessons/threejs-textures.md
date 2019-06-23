@@ -1,5 +1,7 @@
 Title: Three.js Textures
 Description: Using textures in three.js
+Category: fundamentals
+TOC: Textures
 
 This article is one in a series of articles about three.js.
 The first article was [about three.js fundamentals](threejs-fundamentals.html).

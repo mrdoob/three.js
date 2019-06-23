@@ -1,5 +1,7 @@
 Title: Three.js Custom Geometry
 Description: How to make your own geometry.
+Category: fundamentals
+TOC: Custom Geometry
 
 A [previous article](threejs-primitives.html) gave a tour of
 the various built in primitives included in THREE.js. In this

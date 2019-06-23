@@ -1,5 +1,7 @@
 Title: Three.js Multiple Canvases Multiple Scenes
 Description: How to draw stuff all over the page with THREE.js
+Category: solutions
+TOC: Multiple Canvases, Multiple Scenes
 
 A common question is how to use THREE.js with multiple canvases.
 Let's say you want to make an e-commerce site or you want to make

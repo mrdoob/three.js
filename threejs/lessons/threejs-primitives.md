@@ -1,5 +1,7 @@
 Title: Three.js Primitives
 Description: A tour of three.js primitives.
+Category: fundamentals
+TOC: Primitives
 
 This article is one in a series of articles about three.js.
 The first article was [about fundamentals](threejs-fundamentals.html).

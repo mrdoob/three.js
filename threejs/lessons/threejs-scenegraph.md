@@ -1,5 +1,7 @@
 Title: Three.js Scene Graph
 Description: What's a scene graph?
+Category: fundamentals
+TOC: Scenegraph
 
 This article is part of a series of articles about three.js. The
 first article is [three.js fundamentals](threejs-fundamentals.html). If
