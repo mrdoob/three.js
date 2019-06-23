@@ -1259,6 +1259,10 @@ function WebGLRenderer( parameters ) {
 
 				groupOrder = object.renderOrder;
 
+			} else if ( object.isLOD ) {
+
+				if ( object.autoUpdate ) object.update( camera );
+
 			} else if ( object.isLight ) {
 
 				currentRenderState.pushLight( object );
