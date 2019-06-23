@@ -24230,6 +24230,10 @@
 
 					groupOrder = object.renderOrder;
 
+				} else if ( object.isLOD ) {
+
+					if ( object.autoUpdate === true ) object.update( camera );
+
 				} else if ( object.isLight ) {
 
 					currentRenderState.pushLight( object );
@@ -26132,6 +26136,8 @@
 				value: []
 			}
 		} );
+
+		this.autoUpdate = true;
 
 	}
 
