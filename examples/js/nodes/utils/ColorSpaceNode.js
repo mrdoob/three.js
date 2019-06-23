@@ -4,7 +4,9 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { ConstNode } from '../core/ConstNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
+import { ExpressionNode } from '../core/ExpressionNode.js';
 
 function ColorSpaceNode( input, method ) {
 
@@ -12,7 +14,7 @@ function ColorSpaceNode( input, method ) {
 
 	this.input = input;
 
-	this.method = method || ColorSpaceNode.LINEAR;
+	this.method = method || ColorSpaceNode.LINEAR_TO_LINEAR;
 
 }
 
@@ -201,51 +203,7 @@ ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD';
 ColorSpaceNode.LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
 ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
 
-ColorSpaceNode.prototype = Object.create( TempNode.prototype );
-ColorSpaceNode.prototype.constructor = ColorSpaceNode;
-ColorSpaceNode.prototype.nodeType = "ColorAdjustment";
-
-ColorSpaceNode.prototype.generate = function ( builder, output ) {
-
-	var input = builder.context.input || this.input.build( builder, 'v4' ),
-		encodingMethod = builder.context.encoding !== undefined ? this.getEncodingMethod( builder.context.encoding ) : [ this.method ],
-		factor = this.factor ? this.factor.build( builder, 'f' ) : encodingMethod[ 1 ];
-
-	var method = builder.include( ColorSpaceNode.Nodes[ encodingMethod[ 0 ] ] );
-
-	if ( factor ) {
-
-		return builder.format( method + '( ' + input + ', ' + factor + ' )', this.getType( builder ), output );
-
-	} else {
-
-		return builder.format( method + '( ' + input + ' )', this.getType( builder ), output );
-
-	}
-
-};
-
-ColorSpaceNode.prototype.getDecodingMethod = function ( encoding ) {
-
-	var components = this.getEncodingComponents( encoding );
-
-	components[ 0 ] += 'ToLinear';
-
-	return components;
-
-};
-
-ColorSpaceNode.prototype.getEncodingMethod = function ( encoding ) {
-
-	var components = this.getEncodingComponents( encoding );
-
-	components[ 0 ] = 'LinearTo' + components[ 0 ];
-
-	return components;
-
-};
-
-ColorSpaceNode.prototype.getEncodingComponents = function ( encoding ) {
+ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 	switch ( encoding ) {
 
@@ -256,15 +214,67 @@ ColorSpaceNode.prototype.getEncodingComponents = function ( encoding ) {
 		case THREE.RGBEEncoding:
 			return [ 'RGBE' ];
 		case THREE.RGBM7Encoding:
-			return [ 'RGBM', '7.0' ];
+			return [ 'RGBM', new FloatNode( 7.0 ).setReadonly( true ) ];
 		case THREE.RGBM16Encoding:
-			return [ 'RGBM', '16.0' ];
+			return [ 'RGBM', new FloatNode( 16.0 ).setReadonly( true ) ];
 		case THREE.RGBDEncoding:
-			return [ 'RGBD', '256.0' ];
+			return [ 'RGBD', new FloatNode( 256.0 ).setReadonly( true ) ];
 		case THREE.GammaEncoding:
-			return [ 'Gamma', 'float( GAMMA_FACTOR )' ];
+			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 
 	}
+
+};
+
+ColorSpaceNode.prototype = Object.create( TempNode.prototype );
+ColorSpaceNode.prototype.constructor = ColorSpaceNode;
+ColorSpaceNode.prototype.nodeType = "ColorSpace";
+
+ColorSpaceNode.prototype.generate = function ( builder, output ) {
+
+	var input = this.input.build( builder, 'v4' );
+	var outputType = this.getType( builder );
+
+	var methodNode = ColorSpaceNode.Nodes[ this.method ];
+	var method = builder.include( methodNode );
+
+	if ( method === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+
+		return builder.format( input, outputType, output );
+
+	} else {
+
+		if ( methodNode.inputs.length === 2 ) {
+
+			var factor = this.factor.build( builder, 'f' );
+
+			return builder.format( method + '( ' + input + ', ' + factor + ' )', outputType, output );
+
+		} else {
+
+			return builder.format( method + '( ' + input + ' )', outputType, output );
+
+		}
+
+	}
+
+};
+
+ColorSpaceNode.prototype.fromEncoding = function ( encoding ) {
+
+	var components = ColorSpaceNode.getEncodingComponents( encoding );
+
+	this.method = 'LinearTo' + components[ 0 ];
+	this.factor = components[ 1 ];
+
+};
+
+ColorSpaceNode.prototype.fromDecoding = function ( encoding ) {
+
+	var components = ColorSpaceNode.getEncodingComponents( encoding );
+
+	this.method = components[ 0 ] + 'ToLinear';
+	this.factor = components[ 1 ];
 
 };
 

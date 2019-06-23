@@ -21,19 +21,29 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				Color,
+				DirectionalLight,
+				Math as _Math,
+				Mesh,
+				MeshLambertMaterial,
+				Raycaster,
+				Scene,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/shaders/BokehShader2.js"></script>
-		<script src="js/cameras/CinematicCamera.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script>
+			import { CinematicCamera } from './jsm/cameras/CinematicCamera.js';
 
 			var camera, scene, raycaster, renderer, stats;
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
+			var mouse = new Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
 
 			init();
@@ -41,24 +51,24 @@
 
 			function init() {
 
-				camera = new THREE.CinematicCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new CinematicCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.setLens( 5 );
 				camera.position.set( 2, 1, 500 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
+				scene = new Scene();
+				scene.background = new Color( 0xf0f0f0 );
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
+				scene.add( new AmbientLight( 0xffffff, 0.3 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 0.35 );
+				var light = new DirectionalLight( 0xffffff, 0.35 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				var geometry = new BoxBufferGeometry( 20, 20, 20 );
 
 				for ( var i = 0; i < 1500; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var object = new Mesh( geometry, new MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -68,9 +78,9 @@
 
 				}
 
-				raycaster = new THREE.Raycaster();
+				raycaster = new Raycaster();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -131,7 +141,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( effectController, 'focalLength', 1, 135, 0.01 ).onChange( matChanger );
 				gui.add( effectController, 'fstop', 1.8, 22, 0.01 ).onChange( matChanger );
@@ -176,9 +186,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( _Math.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( _Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( _Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();

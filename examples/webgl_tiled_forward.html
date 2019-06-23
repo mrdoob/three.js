@@ -11,370 +11,389 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Tiled forward lighting<br/>
 			Created by <a href="https://github.com/wizgrav" target="_blank" rel="noopener">wizgrav</a>.
 		</div>
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/LuminosityHighPassShader.js"></script>
-		<script src="js/postprocessing/UnrealBloomPass.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				DataTexture,
+				DoubleSide,
+				FloatType,
+				FrontSide,
+				LinearToneMapping,
+				Group,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				PointLight,
+				RGBAFormat,
+				Scene,
+				ShaderChunk,
+				ShaderLib,
+				ShaderMaterial,
+				SphereBufferGeometry,
+				Vector2,
+				Vector3,
+				UniformsUtils,
+				WebGLRenderer,
+				WebGLRenderTarget
+			} from "../build/three.module.js";
 
-		// Simple form of tiled forward lighting
-		// using texels as bitmasks of 32 lights
+			import Stats from './jsm/libs/stats.module.js';
 
-		var RADIUS = 75;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-		THREE.ShaderChunk[ 'lights_pars_begin' ] += [
-			'',
-			'#if defined TILED_FORWARD',
-			'uniform vec4 tileData;',
-			'uniform sampler2D tileTexture;',
-			'uniform sampler2D lightTexture;',
-			'#endif'
-		].join( '\n' );
+			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
 
-		THREE.ShaderChunk[ 'lights_fragment_end' ] += [
-			'',
-			'#if defined TILED_FORWARD',
-			'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
-			'vec4 tile = texture2D(tileTexture, tUv);',
-			'for (int i=0; i < 4; i++) {',
-			'	float tileVal = tile.x * 255.;',
-			'  	tile.xyzw = tile.yzwx;',
-			'	if(tileVal == 0.){ continue; }',
-			'  	float tileDiv = 128.;',
-			'	for (int j=0; j < 8; j++) {',
-			'  		if (tileVal < tileDiv) {  tileDiv *= 0.5; continue; }',
-			'		tileVal -= tileDiv;',
-			'		tileDiv *= 0.5;',
-			'  		PointLight pointlight;',
-			'		float uvx = (float(8 * i + j) + 0.5) / 32.;',
-			'  		vec4 lightData = texture2D(lightTexture, vec2(uvx, 0.));',
-			'  		vec4 lightColor = texture2D(lightTexture, vec2(uvx, 1.));',
-			'  		pointlight.position = lightData.xyz;',
-			'  		pointlight.distance = lightData.w;',
-			'  		pointlight.color = lightColor.rgb;',
-			'  		pointlight.decay = lightColor.a;',
-			'  		getPointDirectLightIrradiance( pointlight, geometry, directLight );',
-			'		RE_Direct( directLight, geometry, material, reflectedLight );',
-			'	}',
-			'}',
-			'#endif'
-		].join( '\n' );
+			// Simple form of tiled forward lighting
+			// using texels as bitmasks of 32 lights
 
-		var lights = [];
+			var RADIUS = 75;
 
-		var State = {
-			rows: 0,
-			cols: 0,
-			width: 0,
-			height: 0,
-			tileData: { value: null },
-			tileTexture: { value: null },
-			lightTexture: {
-				value: new THREE.DataTexture( new Float32Array( 32 * 2 * 4 ), 32, 2, THREE.RGBAFormat, THREE.FloatType )
-			},
-		};
+			ShaderChunk[ 'lights_pars_begin' ] += [
+				'',
+				'#if defined TILED_FORWARD',
+				'uniform vec4 tileData;',
+				'uniform sampler2D tileTexture;',
+				'uniform sampler2D lightTexture;',
+				'#endif'
+			].join( '\n' );
 
-		function resizeTiles() {
+			ShaderChunk[ 'lights_fragment_end' ] += [
+				'',
+				'#if defined TILED_FORWARD',
+				'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
+				'vec4 tile = texture2D(tileTexture, tUv);',
+				'for (int i=0; i < 4; i++) {',
+				'	float tileVal = tile.x * 255.;',
+				'  	tile.xyzw = tile.yzwx;',
+				'	if(tileVal == 0.){ continue; }',
+				'  	float tileDiv = 128.;',
+				'	for (int j=0; j < 8; j++) {',
+				'  		if (tileVal < tileDiv) {  tileDiv *= 0.5; continue; }',
+				'		tileVal -= tileDiv;',
+				'		tileDiv *= 0.5;',
+				'  		PointLight pointlight;',
+				'		float uvx = (float(8 * i + j) + 0.5) / 32.;',
+				'  		vec4 lightData = texture2D(lightTexture, vec2(uvx, 0.));',
+				'  		vec4 lightColor = texture2D(lightTexture, vec2(uvx, 1.));',
+				'  		pointlight.position = lightData.xyz;',
+				'  		pointlight.distance = lightData.w;',
+				'  		pointlight.color = lightColor.rgb;',
+				'  		pointlight.decay = lightColor.a;',
+				'  		getPointDirectLightIrradiance( pointlight, geometry, directLight );',
+				'		RE_Direct( directLight, geometry, material, reflectedLight );',
+				'	}',
+				'}',
+				'#endif'
+			].join( '\n' );
 
-			var width = window.innerWidth;
-			var height = window.innerHeight;
+			var lights = [];
 
-			State.width = width;
-			State.height = height;
-			State.cols = Math.ceil( width / 32 );
-			State.rows = Math.ceil( height / 32 );
-			State.tileData.value = [ width, height, 0.5 / Math.ceil( width / 32 ), 0.5 / Math.ceil( height / 32 ) ];
-			State.tileTexture.value = new THREE.DataTexture( new Uint8Array( State.cols * State.rows * 4 ), State.cols, State.rows );
-
-		}
-
-		// Generate the light bitmasks and store them in the tile texture
-		function tileLights( renderer, scene, camera ) {
-
-			if ( ! camera.projectionMatrix ) return;
-
-			var d = State.tileTexture.value.image.data;
-			var ld = State.lightTexture.value.image.data;
-
-			var viewMatrix = camera.matrixWorldInverse;
-
-			d.fill( 0 );
-
-			var vector = new THREE.Vector3();
-
-			lights.forEach( function ( light, index ) {
-
-				vector.setFromMatrixPosition( light.matrixWorld );
-
-				var bs = lightBounds( camera, vector, light._light.radius );
-
-				vector.applyMatrix4( viewMatrix );
-				vector.toArray( ld, 4 * index );
-				ld[ 4 * index + 3 ] = light._light.radius;
-				light._light.color.toArray( ld, 32 * 4 + 4 * index );
-				ld[ 32 * 4 + 4 * index + 3 ] = light._light.decay;
-
-				if ( bs[ 1 ] < 0 || bs[ 0 ] > State.width || bs[ 3 ] < 0 || bs[ 2 ] > State.height ) return;
-				if ( bs[ 0 ] < 0 ) bs[ 0 ] = 0;
-				if ( bs[ 1 ] > State.width ) bs[ 1 ] = State.width;
-				if ( bs[ 2 ] < 0 ) bs[ 2 ] = 0;
-				if ( bs[ 3 ] > State.height ) bs[ 3 ] = State.height;
-
-				var i4 = Math.floor( index / 8 ), i8 = 7 - ( index % 8 );
-
-				for ( var i = Math.floor( bs[ 2 ] / 32 ); i <= Math.ceil( bs[ 3 ] / 32 ); i ++ ) {
-
-					for ( var j = Math.floor( bs[ 0 ] / 32 ); j <= Math.ceil( bs[ 1 ] / 32 ); j ++ ) {
-
-						d[ ( State.cols * i + j ) * 4 + i4 ] |= 1 << i8;
-
-					}
-
-				}
-
-			} );
-
-			State.tileTexture.value.needsUpdate = true;
-			State.lightTexture.value.needsUpdate = true;
-
-		}
-
-		// Screen rectangle bounds from light sphere's world AABB
-		var lightBounds = function () {
-
-			var v = new THREE.Vector3();
-			return function ( camera, pos, r ) {
-
-				var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
-
-				for ( var i = 0; i < 8; i ++ ) {
-
-					v.copy( pos );
-					v.x += i & 1 ? r : - r;
-					v.y += i & 2 ? r : - r;
-					v.z += i & 4 ? r : - r;
-					var vector = v.project( camera );
-					var x = ( vector.x * hw ) + hw;
-					var y = ( vector.y * hh ) + hh;
-					minX = Math.min( minX, x );
-					maxX = Math.max( maxX, x );
-					minY = Math.min( minY, y );
-					maxY = Math.max( maxY, y );
-
-				}
-
-				return [ minX, maxX, minY, maxY ];
-
+			var State = {
+				rows: 0,
+				cols: 0,
+				width: 0,
+				height: 0,
+				tileData: { value: null },
+				tileTexture: { value: null },
+				lightTexture: {
+					value: new DataTexture( new Float32Array( 32 * 2 * 4 ), 32, 2, RGBAFormat, FloatType )
+				},
 			};
 
-		}();
+			function resizeTiles() {
 
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 
-		// Rendering
+				State.width = width;
+				State.height = height;
+				State.cols = Math.ceil( width / 32 );
+				State.rows = Math.ceil( height / 32 );
+				State.tileData.value = [ width, height, 0.5 / Math.ceil( width / 32 ), 0.5 / Math.ceil( height / 32 ) ];
+				State.tileTexture.value = new DataTexture( new Uint8Array( State.cols * State.rows * 4 ), State.cols, State.rows );
 
-		var container = document.createElement( 'div' );
-		document.body.appendChild( container );
-		var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-		camera.position.set( 0.0, 0.0, 240.0 );
-		var scene = new THREE.Scene();
-		scene.background = new THREE.Color( 0x111111 );
+			}
 
-		var renderer = new THREE.WebGLRenderer();
-		renderer.toneMapping = THREE.LinearToneMapping;
-		container.appendChild( renderer.domElement );
+			// Generate the light bitmasks and store them in the tile texture
+			function tileLights( renderer, scene, camera ) {
 
-		var renderTarget = new THREE.WebGLRenderTarget();
+				if ( ! camera.projectionMatrix ) return;
 
-		scene.add( new THREE.AmbientLight( 0xffffff, 0.33 ) );
-		// At least one regular Pointlight is needed to activate light support
-		scene.add( new THREE.PointLight( 0xff0000, 0.1, 0.1 ) );
+				var d = State.tileTexture.value.image.data;
+				var ld = State.lightTexture.value.image.data;
 
-		var bloom = new THREE.UnrealBloomPass( new THREE.Vector2(), 0.8, 0.6, 0.8 );
-		bloom.renderToScreen = true;
+				var viewMatrix = camera.matrixWorldInverse;
 
-		var stats = new Stats();
-		container.appendChild( stats.dom );
+				d.fill( 0 );
 
-		var controls = new THREE.OrbitControls( camera, renderer.domElement );
-		controls.minDistance = 120;
-		controls.maxDistance = 320;
+				var vector = new Vector3();
 
-		var materials = [];
+				lights.forEach( function ( light, index ) {
 
-		var Heads = [
-			{ type: 'physical', uniforms: { "diffuse": 0x888888, "metalness": 1.0, "roughness": 0.66 }, defines: {} },
-			{ type: 'standard', uniforms: { "diffuse": 0x666666, "metalness": 0.1, "roughness": 0.33 }, defines: {} },
-			{ type: 'phong', uniforms: { "diffuse": 0x777777, "shininess": 20 }, defines: {} },
-			{ type: 'phong', uniforms: { "diffuse": 0x555555, "shininess": 10 }, defines: { TOON: 1 } }
-		];
+					vector.setFromMatrixPosition( light.matrixWorld );
 
-		function init( geom ) {
+					var bs = lightBounds( camera, vector, light._light.radius );
 
-			var sphereGeom = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
-			var tIndex = Math.round( Math.random() * 3 );
+					vector.applyMatrix4( viewMatrix );
+					vector.toArray( ld, 4 * index );
+					ld[ 4 * index + 3 ] = light._light.radius;
+					light._light.color.toArray( ld, 32 * 4 + 4 * index );
+					ld[ 32 * 4 + 4 * index + 3 ] = light._light.decay;
 
-			Object.keys( Heads ).forEach( function ( t, index ) {
+					if ( bs[ 1 ] < 0 || bs[ 0 ] > State.width || bs[ 3 ] < 0 || bs[ 2 ] > State.height ) return;
+					if ( bs[ 0 ] < 0 ) bs[ 0 ] = 0;
+					if ( bs[ 1 ] > State.width ) bs[ 1 ] = State.width;
+					if ( bs[ 2 ] < 0 ) bs[ 2 ] = 0;
+					if ( bs[ 3 ] > State.height ) bs[ 3 ] = State.height;
 
-				var g = new THREE.Group();
-				var conf = Heads[ t ];
-				var ml = THREE.ShaderLib[ conf.type ];
-				var mtl = new THREE.ShaderMaterial( {
-					lights: true,
-					fragmentShader: ml.fragmentShader,
-					vertexShader: ml.vertexShader,
-					uniforms: THREE.UniformsUtils.clone( ml.uniforms ),
-					defines: conf.defines,
-					transparent: tIndex === index ? true : false,
-				} );
+					var i4 = Math.floor( index / 8 ), i8 = 7 - ( index % 8 );
 
-				mtl.uniforms[ "opacity" ].value = tIndex === index ? 0.9 : 1;
-				mtl.uniforms[ "tileData" ] = State.tileData;
-				mtl.uniforms[ "tileTexture" ] = State.tileTexture;
-				mtl.uniforms[ "lightTexture" ] = State.lightTexture;
+					for ( var i = Math.floor( bs[ 2 ] / 32 ); i <= Math.ceil( bs[ 3 ] / 32 ); i ++ ) {
 
-				for ( var u in conf.uniforms ) {
+						for ( var j = Math.floor( bs[ 0 ] / 32 ); j <= Math.ceil( bs[ 1 ] / 32 ); j ++ ) {
 
-					var vu = conf.uniforms[ u ];
+							d[ ( State.cols * i + j ) * 4 + i4 ] |= 1 << i8;
 
-					if ( mtl.uniforms[ u ].value.set ) {
-
-						mtl.uniforms[ u ].value.set( vu );
-
-					} else {
-
-						mtl.uniforms[ u ].value = vu;
+						}
 
 					}
 
-				}
+				} );
 
-				mtl.defines[ 'TILED_FORWARD' ] = 1;
-				materials.push( mtl );
+				State.tileTexture.value.needsUpdate = true;
+				State.lightTexture.value.needsUpdate = true;
 
-				var obj = new THREE.Mesh( geom, mtl );
-				obj.position.y = - 37;
-				mtl.side = tIndex === index ? THREE.FrontSide : THREE.DoubleSide;
+			}
 
-				g.rotation.y = index * Math.PI / 2;
-				g.position.x = Math.sin( index * Math.PI / 2 ) * RADIUS;
-				g.position.z = Math.cos( index * Math.PI / 2 ) * RADIUS;
-				g.add( obj );
+			// Screen rectangle bounds from light sphere's world AABB
+			var lightBounds = function () {
 
-				for ( var i = 0; i < 8; i ++ ) {
+				var v = new Vector3();
+				return function ( camera, pos, r ) {
 
-					var color = new THREE.Color().setHSL( Math.random(), 1.0, 0.5 );
-					var l = new THREE.Group();
+					var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
 
-					l.add( new THREE.Mesh(
-						sphereGeom,
-						new THREE.MeshBasicMaterial( {
-							color: color
-						} )
-					) );
+					for ( var i = 0; i < 8; i ++ ) {
 
-					l.add( new THREE.Mesh(
-						sphereGeom,
-						new THREE.MeshBasicMaterial( {
+						v.copy( pos );
+						v.x += i & 1 ? r : - r;
+						v.y += i & 2 ? r : - r;
+						v.z += i & 4 ? r : - r;
+						var vector = v.project( camera );
+						var x = ( vector.x * hw ) + hw;
+						var y = ( vector.y * hh ) + hh;
+						minX = Math.min( minX, x );
+						maxX = Math.max( maxX, x );
+						minY = Math.min( minY, y );
+						maxY = Math.max( maxY, y );
+
+					}
+
+					return [ minX, maxX, minY, maxY ];
+
+				};
+
+			}();
+
+
+			// Rendering
+
+			var container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			var camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+			camera.position.set( 0.0, 0.0, 240.0 );
+			var scene = new Scene();
+			scene.background = new Color( 0x111111 );
+
+			var renderer = new WebGLRenderer();
+			renderer.toneMapping = LinearToneMapping;
+			container.appendChild( renderer.domElement );
+
+			var renderTarget = new WebGLRenderTarget();
+
+			scene.add( new AmbientLight( 0xffffff, 0.33 ) );
+			// At least one regular Pointlight is needed to activate light support
+			scene.add( new PointLight( 0xff0000, 0.1, 0.1 ) );
+
+			var bloom = new UnrealBloomPass( new Vector2(), 0.8, 0.6, 0.8 );
+			bloom.renderToScreen = true;
+
+			var stats = new Stats();
+			container.appendChild( stats.dom );
+
+			var controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 120;
+			controls.maxDistance = 320;
+
+			var materials = [];
+
+			var Heads = [
+				{ type: 'physical', uniforms: { "diffuse": 0x888888, "metalness": 1.0, "roughness": 0.66 }, defines: {} },
+				{ type: 'standard', uniforms: { "diffuse": 0x666666, "metalness": 0.1, "roughness": 0.33 }, defines: {} },
+				{ type: 'phong', uniforms: { "diffuse": 0x777777, "shininess": 20 }, defines: {} },
+				{ type: 'phong', uniforms: { "diffuse": 0x555555, "shininess": 10 }, defines: { TOON: 1 } }
+			];
+
+			function init( geom ) {
+
+				var sphereGeom = new SphereBufferGeometry( 0.5, 32, 32 );
+				var tIndex = Math.round( Math.random() * 3 );
+
+				Object.keys( Heads ).forEach( function ( t, index ) {
+
+					var g = new Group();
+					var conf = Heads[ t ];
+					var ml = ShaderLib[ conf.type ];
+					var mtl = new ShaderMaterial( {
+						lights: true,
+						fragmentShader: ml.fragmentShader,
+						vertexShader: ml.vertexShader,
+						uniforms: UniformsUtils.clone( ml.uniforms ),
+						defines: conf.defines,
+						transparent: tIndex === index ? true : false,
+					} );
+
+					mtl.uniforms[ "opacity" ].value = tIndex === index ? 0.9 : 1;
+					mtl.uniforms[ "tileData" ] = State.tileData;
+					mtl.uniforms[ "tileTexture" ] = State.tileTexture;
+					mtl.uniforms[ "lightTexture" ] = State.lightTexture;
+
+					for ( var u in conf.uniforms ) {
+
+						var vu = conf.uniforms[ u ];
+
+						if ( mtl.uniforms[ u ].value.set ) {
+
+							mtl.uniforms[ u ].value.set( vu );
+
+						} else {
+
+							mtl.uniforms[ u ].value = vu;
+
+						}
+
+					}
+
+					mtl.defines[ 'TILED_FORWARD' ] = 1;
+					materials.push( mtl );
+
+					var obj = new Mesh( geom, mtl );
+					obj.position.y = - 37;
+					mtl.side = tIndex === index ? FrontSide : DoubleSide;
+
+					g.rotation.y = index * Math.PI / 2;
+					g.position.x = Math.sin( index * Math.PI / 2 ) * RADIUS;
+					g.position.z = Math.cos( index * Math.PI / 2 ) * RADIUS;
+					g.add( obj );
+
+					for ( var i = 0; i < 8; i ++ ) {
+
+						var color = new Color().setHSL( Math.random(), 1.0, 0.5 );
+						var l = new Group();
+
+						l.add( new Mesh(
+							sphereGeom,
+							new MeshBasicMaterial( {
+								color: color
+							} )
+						) );
+
+						l.add( new Mesh(
+							sphereGeom,
+							new MeshBasicMaterial( {
+								color: color,
+								transparent: true,
+								opacity: 0.033
+							} )
+						) );
+
+						l.children[ 1 ].scale.set( 6.66, 6.66, 6.66 );
+
+						l._light = {
 							color: color,
-							transparent: true,
-							opacity: 0.033
-						} )
-					) );
+							radius: RADIUS,
+							decay: 1,
+							sy: Math.random(),
+							sr: Math.random(),
+							sc: Math.random(),
+							py: Math.random() * Math.PI,
+							pr: Math.random() * Math.PI,
+							pc: Math.random() * Math.PI,
+							dir: Math.random() > 0.5 ? 1 : - 1
+						};
 
-					l.children[ 1 ].scale.set( 6.66, 6.66, 6.66 );
+						lights.push( l );
+						g.add( l );
 
-					l._light = {
-						color: color,
-						radius: RADIUS,
-						decay: 1,
-						sy: Math.random(),
-						sr: Math.random(),
-						sc: Math.random(),
-						py: Math.random() * Math.PI,
-						pr: Math.random() * Math.PI,
-						pc: Math.random() * Math.PI,
-						dir: Math.random() > 0.5 ? 1 : - 1
-					};
+					}
 
-					lights.push( l );
-					g.add( l );
+					scene.add( g );
 
-				}
+				} );
 
-				scene.add( g );
+			}
 
-			} );
+			function update( now ) {
 
-		}
+				lights.forEach( function ( l ) {
 
-		function update( now ) {
+					var ld = l._light;
+					var radius = 0.8 + 0.2 * Math.sin( ld.pr + ( 0.6 + 0.3 * ld.sr ) * now );
+					l.position.x = ( Math.sin( ld.pc + ( 0.8 + 0.2 * ld.sc ) * now * ld.dir ) ) * radius * RADIUS;
+					l.position.z = ( Math.cos( ld.pc + ( 0.8 + 0.2 * ld.sc ) * now * ld.dir ) ) * radius * RADIUS;
+					l.position.y = Math.sin( ld.py + ( 0.8 + 0.2 * ld.sy ) * now ) * radius * 32;
 
-			lights.forEach( function ( l ) {
+				} );
 
-				var ld = l._light;
-				var radius = 0.8 + 0.2 * Math.sin( ld.pr + ( 0.6 + 0.3 * ld.sr ) * now );
-				l.position.x = ( Math.sin( ld.pc + ( 0.8 + 0.2 * ld.sc ) * now * ld.dir ) ) * radius * RADIUS;
-				l.position.z = ( Math.cos( ld.pc + ( 0.8 + 0.2 * ld.sc ) * now * ld.dir ) ) * radius * RADIUS;
-				l.position.y = Math.sin( ld.py + ( 0.8 + 0.2 * ld.sy ) * now ) * radius * 32;
+			}
 
-			} );
+			function resize() {
 
-		}
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderTarget.setSize( window.innerWidth, window.innerHeight );
+				bloom.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				resizeTiles();
 
-		function resize() {
+			}
 
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderTarget.setSize( window.innerWidth, window.innerHeight );
-			bloom.setSize( window.innerWidth, window.innerHeight );
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-			resizeTiles();
+			function postEffect( renderer ) {
 
-		}
+				bloom.render( renderer, null, renderTarget );
 
-		function postEffect( renderer ) {
+			}
 
-			bloom.render( renderer, null, renderTarget );
+			scene.onBeforeRender = tileLights;
 
-		}
+			scene.onAfterRender = postEffect;
 
-		scene.onBeforeRender = tileLights;
+			var loader = new OBJLoader();
 
-		scene.onAfterRender = postEffect;
+			loader.load( 'models/obj/walt/WaltHead.obj', function ( object ) {
 
-		var loader = new THREE.OBJLoader();
+				var geometry = object.children[ 0 ].geometry;
 
-		loader.load( 'models/obj/walt/WaltHead.obj', function ( object ) {
+				window.addEventListener( 'resize', resize );
 
-			var geometry = object.children[ 0 ].geometry;
+				init( geometry );
+				resize();
 
-			window.addEventListener( 'resize', resize );
+				renderer.setAnimationLoop( function ( time ) {
 
-			init( geometry );
-			resize();
+					update( time / 1000 );
+					stats.begin();
+					renderer.setRenderTarget( renderTarget );
+					renderer.render( scene, camera );
+					stats.end();
 
-			renderer.setAnimationLoop( function ( time ) {
-
-				update( time / 1000 );
-				stats.begin();
-				renderer.setRenderTarget( renderTarget );
-				renderer.render( scene, camera );
-				stats.end();
+				} );
 
 			} );
-
-		} );
 
 		</script>
 	</body>

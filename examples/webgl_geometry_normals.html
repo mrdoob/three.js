@@ -13,35 +13,53 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - normals</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="./js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				CircleBufferGeometry,
+				CylinderBufferGeometry,
+				IcosahedronBufferGeometry,
+				Mesh,
+				MeshBasicMaterial,
+				OctahedronBufferGeometry,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RingBufferGeometry,
+				Scene,
+				SphereBufferGeometry,
+				TorusBufferGeometry,
+				TorusKnotBufferGeometry,
+				VertexNormalsHelper,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, stats, gui;
 			var camera, scene, renderer;
 			var mesh, geometry;
 
 			var geometries = [
-				new THREE.BoxBufferGeometry( 200, 200, 200, 2, 2, 2 ),
-				new THREE.CircleBufferGeometry( 200, 32 ),
-				new THREE.CylinderBufferGeometry( 75, 75, 200, 8, 8 ),
-				new THREE.IcosahedronBufferGeometry( 100, 1 ),
-				new THREE.OctahedronBufferGeometry( 200, 0 ),
-				new THREE.PlaneBufferGeometry( 200, 200, 4, 4 ),
-				new THREE.RingBufferGeometry( 32, 64, 16 ),
-				new THREE.SphereBufferGeometry( 100, 12, 12 ),
-				new THREE.TorusBufferGeometry( 64, 16, 12, 12 ),
-				new THREE.TorusKnotBufferGeometry( 64, 16 )
+				new BoxBufferGeometry( 200, 200, 200, 2, 2, 2 ),
+				new CircleBufferGeometry( 200, 32 ),
+				new CylinderBufferGeometry( 75, 75, 200, 8, 8 ),
+				new IcosahedronBufferGeometry( 100, 1 ),
+				new OctahedronBufferGeometry( 200, 0 ),
+				new PlaneBufferGeometry( 200, 200, 4, 4 ),
+				new RingBufferGeometry( 32, 64, 16 ),
+				new SphereBufferGeometry( 100, 12, 12 ),
+				new TorusBufferGeometry( 64, 16, 12, 12 ),
+				new TorusKnotBufferGeometry( 64, 16 )
 			];
 
 			var options = {
 				Geometry: 0
 			};
 
-			var material = new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } );
+			var material = new MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } );
 
 			init();
 			animate();
@@ -64,10 +82,10 @@
 				var scaleFactor = 160 / geometry.boundingSphere.radius;
 				geometry.scale( scaleFactor, scaleFactor, scaleFactor );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
-				var vertexNormalsHelper = new THREE.VertexNormalsHelper( mesh, 10 );
+				var vertexNormalsHelper = new VertexNormalsHelper( mesh, 10 );
 				mesh.add( vertexNormalsHelper );
 
 			}
@@ -76,16 +94,16 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				addMesh();
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -110,7 +128,7 @@
 					TorusKnotBufferGeometry: 9
 				};
 
-				gui = new dat.GUI( { width: 350 } );
+				gui = new GUI( { width: 350 } );
 				gui.add( options, 'Geometry', geometries ).onChange( function () {
 
 					addMesh();
@@ -119,7 +137,7 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

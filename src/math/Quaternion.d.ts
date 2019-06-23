@@ -44,7 +44,7 @@ export class Quaternion {
 	/**
 	 * Sets this quaternion from rotation specified by Euler angles.
 	 */
-	setFromEuler( euler: Euler, update?: boolean ): Quaternion;
+	setFromEuler( euler: Euler ): Quaternion;
 
 	/**
 	 * Sets this quaternion from rotation specified by axis and angle.
@@ -100,8 +100,8 @@ export class Quaternion {
 	fromArray( xyzw: number[], offset?: number ): Quaternion;
 	toArray( xyzw?: number[], offset?: number ): number[];
 
-	onChange( callback: Function ): Quaternion;
-	onChangeCallback: Function;
+	_onChange( callback: Function ): Quaternion;
+	_onChangeCallback: Function;
 
 	/**
 	 * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/.

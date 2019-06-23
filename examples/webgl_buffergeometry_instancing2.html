@@ -26,12 +26,6 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-
-	<script src="js/controls/TrackballControls.js"></script>
-
 	<script id="vertexShader" type="x-shader/x-vertex">
 		precision highp float;
 
@@ -74,13 +68,24 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import {
+			Float32BufferAttribute,
+			IcosahedronBufferGeometry,
+			InstancedBufferAttribute,
+			InstancedBufferGeometry,
+			Mesh,
+			MeshBasicMaterial,
+			PerspectiveCamera,
+			Scene,
+			ShaderMaterial,
+			VertexColors,
+			WebGLRenderer
+		} from "../build/three.module.js";
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
+		import Stats from './jsm/libs/stats.module.js';
 
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 		var container, stats;
 
@@ -95,14 +100,14 @@
 
 			container = document.getElementById( 'container' );
 
-			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+			camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 			camera.position.z = 4;
 
-			scene = new THREE.Scene();
+			scene = new Scene();
 
 			//
 
-			var geometry = new THREE.IcosahedronBufferGeometry( 0.1, 1 );
+			var geometry = new IcosahedronBufferGeometry( 0.1, 1 );
 
 			var colors = [];
 
@@ -112,9 +117,9 @@
 
 			}
 
-			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-			var material = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.VertexColors } );
+			var material = new MeshBasicMaterial( { color: 0xff0000, vertexColors: VertexColors } );
 
 			//
 
@@ -130,7 +135,7 @@
 
 				// the red meshes are drawn with separate draw calls
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				var position = mesh.position;
@@ -152,17 +157,17 @@
 
 			}
 
-			var instancedGeometry = new THREE.InstancedBufferGeometry();
+			var instancedGeometry = new InstancedBufferGeometry();
 			instancedGeometry.attributes.position = geometry.attributes.position;
 			instancedGeometry.attributes.color = geometry.attributes.color;
 
-			instancedGeometry.addAttribute( 'instancePosition', new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
-			instancedGeometry.addAttribute( 'instanceQuaternion', new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 ) );
-			instancedGeometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 ) );
+			instancedGeometry.addAttribute( 'instancePosition', new InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
+			instancedGeometry.addAttribute( 'instanceQuaternion', new InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 ) );
+			instancedGeometry.addAttribute( 'instanceScale', new InstancedBufferAttribute( new Float32Array( instanceScales ), 3 ) );
 
 			//
 
-			var shaderMaterial = new THREE.ShaderMaterial( {
+			var shaderMaterial = new ShaderMaterial( {
 
 				uniforms: {},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -173,18 +178,18 @@
 
 			// counterparts are drawn all at once with a single draw call (via instanced rendering)
 
-			var instancedMesh = new THREE.Mesh( instancedGeometry, shaderMaterial );
+			var instancedMesh = new Mesh( instancedGeometry, shaderMaterial );
 			instancedMesh.position.x = 0.1;
 			scene.add( instancedMesh );
 
 			//
 
-			renderer = new THREE.WebGLRenderer();
+			renderer = new WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
+			controls = new TrackballControls( camera, renderer.domElement );
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 

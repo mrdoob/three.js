@@ -8,11 +8,26 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
+			import {
+				Color,
+				DoubleSide,
+				Group,
+				HemisphereLight,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				Plane,
+				PlaneHelper,
+				Scene,
+				SphereBufferGeometry,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer;
 
@@ -23,9 +38,9 @@
 			};
 
 			var clipPlanes = [
-				new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 ),
-				new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
-				new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
+				new Plane( new Vector3( 1, 0, 0 ), 0 ),
+				new Plane( new Vector3( 0, - 1, 0 ), 0 ),
+				new Plane( new Vector3( 0, 0, - 1 ), 0 )
 			];
 
 			init();
@@ -33,49 +48,49 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.localClippingEnabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 
 				camera.position.set( - 1.5, 2.5, 3.0 );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use only if there is no animation loop
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 				controls.enablePan = false;
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
+				var light = new HemisphereLight( 0xffffff, 0x080808, 1.5 );
 				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
 
-				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				//
 
-				var group = new THREE.Group();
+				var group = new Group();
 
 				for ( var i = 1; i <= 30; i += 2 ) {
 
-					var geometry = new THREE.SphereBufferGeometry( i / 30, 48, 24 );
+					var geometry = new SphereBufferGeometry( i / 30, 48, 24 );
 
-					var material = new THREE.MeshLambertMaterial( {
+					var material = new MeshLambertMaterial( {
 
-						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5 ),
-						side: THREE.DoubleSide,
+						color: new Color().setHSL( Math.random(), 0.5, 0.5 ),
+						side: DoubleSide,
 						clippingPlanes: clipPlanes,
 						clipIntersection: params.clipIntersection
 
 					} );
 
-					group.add( new THREE.Mesh( geometry, material ) );
+					group.add( new Mesh( geometry, material ) );
 
 				}
 
@@ -83,16 +98,16 @@
 
 				// helpers
 
-				var helpers = new THREE.Group();
-				helpers.add( new THREE.PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
-				helpers.add( new THREE.PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
-				helpers.add( new THREE.PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
+				var helpers = new Group();
+				helpers.add( new PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
+				helpers.add( new PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
+				helpers.add( new PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
 				helpers.visible = false;
 				scene.add( helpers );
 
 				// gui
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 

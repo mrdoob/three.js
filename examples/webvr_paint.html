@@ -13,11 +13,32 @@
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="../build/three.js"></script>
 		<script src="js/vr/WebVR.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				BufferAttribute,
+				BufferGeometry,
+				Color,
+				DirectionalLight,
+				DoubleSide,
+				GridHelper,
+				HemisphereLight,
+				IcosahedronBufferGeometry,
+				Matrix4,
+				Mesh,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				TextureLoader,
+				VertexColors,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -26,12 +47,12 @@
 			var line;
 			var shapes = {};
 
-			var up = new THREE.Vector3( 0, 1, 0 );
+			var up = new Vector3( 0, 1, 0 );
 
-			var vector1 = new THREE.Vector3();
-			var vector2 = new THREE.Vector3();
-			var vector3 = new THREE.Vector3();
-			var vector4 = new THREE.Vector3();
+			var vector1 = new Vector3();
+			var vector2 = new Vector3();
+			var vector3 = new Vector3();
+			var vector4 = new Vector3();
 
 			init();
 			initGeometry();
@@ -42,18 +63,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
+				scene = new Scene();
+				scene.background = new Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 
-				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
-				var material = new THREE.MeshStandardMaterial( {
+				var geometry = new BoxBufferGeometry( 0.5, 0.8, 0.5 );
+				var material = new MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var table = new THREE.Mesh( geometry, material );
+				var table = new Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
 				table.castShadow = true;
@@ -61,7 +82,7 @@
 				scene.add( table );
 
 				/*
-				var table = new THREE.Mesh( geometry, material );
+				var table = new Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = -0.85;
 				table.castShadow = true;
@@ -69,22 +90,22 @@
 				scene.add( table );
 				*/
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( {
+				var geometry = new PlaneBufferGeometry( 4, 4 );
+				var material = new MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var floor = new THREE.Mesh( geometry, material );
+				var floor = new Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
+				scene.add( new GridHelper( 20, 40, 0x111111, 0x111111 ) );
 
-				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
+				scene.add( new HemisphereLight( 0x888877, 0x777788 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -94,12 +115,12 @@
 				light.shadow.mapSize.set( 4096, 4096 );
 				scene.add( light );
 
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new DirectionalLightHelper( light ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
@@ -127,22 +148,22 @@
 				controller1 = renderer.vr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
-				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
-				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
+				controller1.userData.points = [ new Vector3(), new Vector3() ];
+				controller1.userData.matrices = [ new Matrix4(), new Matrix4() ];
 				scene.add( controller1 );
 
 				controller2 = renderer.vr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
-				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
-				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
+				controller2.userData.points = [ new Vector3(), new Vector3() ];
+				controller2.userData.matrices = [ new Matrix4(), new Matrix4() ];
 				scene.add( controller2 );
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
 				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 
-					var loader = new THREE.TextureLoader();
+					var loader = new TextureLoader();
 					loader.setPath( 'models/obj/vive-controller/' );
 
 					var controller = object.children[ 0 ];
@@ -151,9 +172,9 @@
 					controller.castShadow = true;
 					controller.receiveShadow = true;
 
-					// var pivot = new THREE.Group();
-					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
+					// var pivot = new Group();
+					// var pivot = new Mesh( new BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new Mesh( new IcosahedronBufferGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
 					pivot.position.y = - 0.016;
 					pivot.position.z = - 0.043;
@@ -175,17 +196,17 @@
 
 			function initGeometry() {
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 
-				var positions = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				var positions = new BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
 				positions.dynamic = true;
 				geometry.addAttribute( 'position', positions );
 
-				var normals = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				var normals = new BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
 				normals.dynamic = true;
 				geometry.addAttribute( 'normal', normals );
 
-				var colors = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
+				var colors = new BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
 				colors.dynamic = true;
 				geometry.addAttribute( 'color', colors );
 
@@ -202,18 +223,18 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				var reflectionCube = new CubeTextureLoader().load( urls );
 				*/
 
-				var material = new THREE.MeshStandardMaterial( {
+				var material = new MeshStandardMaterial( {
 					roughness: 0.9,
 					metalness: 0.0,
 					// envMap: reflectionCube,
-					vertexColors: THREE.VertexColors,
-					side: THREE.DoubleSide
+					vertexColors: VertexColors,
+					side: DoubleSide
 				} );
 
-				line = new THREE.Mesh( geometry, material );
+				line = new Mesh( geometry, material );
 				line.frustumCulled = false;
 				line.castShadow = true;
 				line.receiveShadow = true;
@@ -235,7 +256,7 @@
 				for ( var i = 0; i < sides; i ++ ) {
 
 					var angle = ( i / sides ) * PI2;
-					array.push( new THREE.Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
+					array.push( new Vector3( Math.sin( angle ) * radius, Math.cos( angle ) * radius, 0 ) );
 
 				}
 
@@ -245,7 +266,7 @@
 
 			function stroke( controller, point1, point2, matrix1, matrix2 ) {
 
-				var color = new THREE.Color( 0xffffff );
+				var color = new Color( 0xffffff );
 				var size = 1;
 
 				var shapes = getTubeShapes( size );

@@ -8,17 +8,18 @@
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+		<script type="module">
+			import {
+				CanvasTexture,
+				Color,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
 			var camera, scene, renderer;
 
@@ -27,27 +28,27 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 75, 100 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x003300 );
+				scene = new Scene();
+				scene.background = new Color( 0x003300 );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var geometry = new PlaneBufferGeometry( 100, 100 );
 
-				var texture = new THREE.CanvasTexture( generateTexture() );
+				var texture = new CanvasTexture( generateTexture() );
 
 				for ( var i = 0; i < 15; i ++ ) {
 
-					var material = new THREE.MeshBasicMaterial( {
-						color: new THREE.Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
+					var material = new MeshBasicMaterial( {
+						color: new Color().setHSL( 0.3, 0.75, ( i / 15 ) * 0.4 + 0.1 ),
 						map: texture,
 						depthTest: false,
 						depthWrite: false,
 						transparent: true
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.y = i * 0.25;
 					mesh.rotation.x = - Math.PI / 2;
@@ -58,7 +59,7 @@
 
 				scene.children.reverse();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

@@ -63,22 +63,28 @@
 			<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements - webgl</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<script id="template" type="notjs">
 			<div class="scene"></div>
 			<div class="description">Scene $</div>
 		</script>
-		<script>
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Color,
+				CylinderBufferGeometry,
+				DirectionalLight,
+				DodecahedronBufferGeometry,
+				HemisphereLight,
+				Mesh,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var canvas;
 
@@ -92,10 +98,10 @@
 				canvas = document.getElementById( "c" );
 
 				var geometries = [
-					new THREE.BoxBufferGeometry( 1, 1, 1 ),
-					new THREE.SphereBufferGeometry( 0.5, 12, 8 ),
-					new THREE.DodecahedronBufferGeometry( 0.5 ),
-					new THREE.CylinderBufferGeometry( 0.5, 0.5, 1, 12 )
+					new BoxBufferGeometry( 1, 1, 1 ),
+					new SphereBufferGeometry( 0.5, 12, 8 ),
+					new DodecahedronBufferGeometry( 0.5 ),
+					new CylinderBufferGeometry( 0.5, 0.5, 1, 12 )
 				];
 
 				var template = document.getElementById( "template" ).text;
@@ -103,7 +109,7 @@
 
 				for ( var i = 0; i < 40; i ++ ) {
 
-					var scene = new THREE.Scene();
+					var scene = new Scene();
 
 					// make a list item
 					var element = document.createElement( "div" );
@@ -115,11 +121,11 @@
 					scene.userData.element = element.querySelector( ".scene" );
 					content.appendChild( element );
 
-					var camera = new THREE.PerspectiveCamera( 50, 1, 1, 10 );
+					var camera = new PerspectiveCamera( 50, 1, 1, 10 );
 					camera.position.z = 2;
 					scene.userData.camera = camera;
 
-					var controls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
+					var controls = new OrbitControls( scene.userData.camera, scene.userData.element );
 					controls.minDistance = 2;
 					controls.maxDistance = 5;
 					controls.enablePan = false;
@@ -129,20 +135,20 @@
 					// add one random mesh to each scene
 					var geometry = geometries[ geometries.length * Math.random() | 0 ];
 
-					var material = new THREE.MeshStandardMaterial( {
+					var material = new MeshStandardMaterial( {
 
-						color: new THREE.Color().setHSL( Math.random(), 1, 0.75 ),
+						color: new Color().setHSL( Math.random(), 1, 0.75 ),
 						roughness: 0.5,
 						metalness: 0,
 						flatShading: true
 
 					} );
 
-					scene.add( new THREE.Mesh( geometry, material ) );
+					scene.add( new Mesh( geometry, material ) );
 
-					scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
+					scene.add( new HemisphereLight( 0xaaaaaa, 0x444444 ) );
 
-					var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+					var light = new DirectionalLight( 0xffffff, 0.5 );
 					light.position.set( 1, 1, 1 );
 					scene.add( light );
 
@@ -151,7 +157,7 @@
 				}
 
 
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+				renderer = new WebGLRenderer( { canvas: canvas, antialias: true } );
 				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 

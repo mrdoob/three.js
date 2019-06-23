@@ -314,9 +314,10 @@ export class WebGLRenderer implements Renderer {
 	renderBufferDirect(
 		camera: Camera,
 		fog: Fog,
+		geometry: Geometry | BufferGeometry,
 		material: Material,
-		geometryGroup: any,
-		object: Object3D
+		object: Object3D,
+		geometryGroup: any
 	): void;
 
 	/**

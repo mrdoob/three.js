@@ -43,23 +43,29 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+		<script type="module">
+			import {
+				CanvasTexture,
+				Color,
+				Fog,
+				LinearFilter,
+				Mesh,
+				MeshBasicMaterial,
+				NearestFilter,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				Texture,
+				TextureLoader,
+				UVMapping,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container, stats;
+			var container;
 
 			var camera, scene, scene2, renderer;
 
@@ -77,16 +83,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
+				camera = new PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
 				camera.position.z = 1500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
-				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
+				scene = new Scene();
+				scene.background = new Color( 0x000000 );
+				scene.fog = new Fog( 0x000000, 1500, 4000 );
 
-				scene2 = new THREE.Scene();
-				scene2.background = new THREE.Color( 0x000000 );
-				scene2.fog = new THREE.Fog( 0x000000, 1500, 4000 );
+				scene2 = new Scene();
+				scene2.background = new Color( 0x000000 );
+				scene2.fog = new Fog( 0x000000, 1500, 4000 );
 
 				// GROUND
 
@@ -102,25 +108,25 @@
 				context.fillRect( 0, 0, 64, 64 );
 				context.fillRect( 64, 64, 64, 64 );
 
-				var textureCanvas = new THREE.CanvasTexture( imageCanvas );
+				var textureCanvas = new CanvasTexture( imageCanvas );
 				textureCanvas.repeat.set( 1000, 1000 );
-				textureCanvas.wrapS = THREE.RepeatWrapping;
-				textureCanvas.wrapT = THREE.RepeatWrapping;
+				textureCanvas.wrapS = RepeatWrapping;
+				textureCanvas.wrapT = RepeatWrapping;
 
 				var textureCanvas2 = textureCanvas.clone();
-				textureCanvas2.magFilter = THREE.NearestFilter;
-				textureCanvas2.minFilter = THREE.NearestFilter;
+				textureCanvas2.magFilter = NearestFilter;
+				textureCanvas2.minFilter = NearestFilter;
 
-				var	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
-				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
+				var	materialCanvas = new MeshBasicMaterial( { map: textureCanvas } );
+				var materialCanvas2 = new MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var geometry = new PlaneBufferGeometry( 100, 100 );
 
-				var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
+				var meshCanvas = new Mesh( geometry, materialCanvas );
 				meshCanvas.rotation.x = - Math.PI / 2;
 				meshCanvas.scale.set( 1000, 1000, 1000 );
 
-				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
+				var meshCanvas2 = new Mesh( geometry, materialCanvas2 );
 				meshCanvas2.rotation.x = - Math.PI / 2;
 				meshCanvas2.scale.set( 1000, 1000, 1000 );
 
@@ -137,9 +143,9 @@
 					scene.add( meshCanvas );
 					scene2.add( meshCanvas2 );
 
-					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-					var mesh = new THREE.Mesh( geometry, materialPainting );
-					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
+					var geometry = new PlaneBufferGeometry( 100, 100 );
+					var mesh = new Mesh( geometry, materialPainting );
+					var mesh2 = new Mesh( geometry, materialPainting2 );
 
 					addPainting( scene, mesh );
 					addPainting( scene2, mesh2 );
@@ -151,13 +157,13 @@
 
 						zscene.add( zmesh );
 
-						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+						var meshFrame = new Mesh( geometry, new MeshBasicMaterial( { color: 0x000000 } ) );
 						meshFrame.position.z = - 10.0;
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshFrame );
 
-						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
+						var meshShadow = new Mesh( geometry, new MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
 						meshShadow.position.y = - 1.1 * image.height / 2;
 						meshShadow.position.z = - 1.1 * image.height / 2;
 						meshShadow.rotation.x = - Math.PI / 2;
@@ -173,26 +179,23 @@
 
 				};
 
-				var texturePainting = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
-				var texturePainting2 = new THREE.Texture();
-				var materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
-				var materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
+				var texturePainting = new TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
+				var texturePainting2 = new Texture();
+				var materialPainting = new MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
+				var materialPainting2 = new MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
-				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
-				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
-				texturePainting.mapping = THREE.UVMapping;
+				texturePainting2.minFilter = texturePainting2.magFilter = NearestFilter;
+				texturePainting.minFilter = texturePainting.magFilter = LinearFilter;
+				texturePainting.mapping = UVMapping;
 
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
-
-				stats = new Stats();
-				//container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -212,7 +215,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 

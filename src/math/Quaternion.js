@@ -101,7 +101,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._x = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -118,7 +118,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._y = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -135,7 +135,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._z = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -152,7 +152,7 @@ Object.defineProperties( Quaternion.prototype, {
 		set: function ( value ) {
 
 			this._w = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -171,7 +171,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = z;
 		this._w = w;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -190,7 +190,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = quaternion.z;
 		this._w = quaternion.w;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -265,7 +265,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) this._onChangeCallback();
 
 		return this;
 
@@ -284,7 +284,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = axis.z * s;
 		this._w = Math.cos( halfAngle );
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -343,7 +343,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -426,7 +426,7 @@ Object.assign( Quaternion.prototype, {
 		this._y *= - 1;
 		this._z *= - 1;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -472,7 +472,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -509,7 +509,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
 		this._w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -576,7 +576,7 @@ Object.assign( Quaternion.prototype, {
 		this._y = ( y * ratioA + this._y * ratioB );
 		this._z = ( z * ratioA + this._z * ratioB );
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -597,7 +597,7 @@ Object.assign( Quaternion.prototype, {
 		this._z = array[ offset + 2 ];
 		this._w = array[ offset + 3 ];
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -617,15 +617,15 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
-	onChange: function ( callback ) {
+	_onChange: function ( callback ) {
 
-		this.onChangeCallback = callback;
+		this._onChangeCallback = callback;
 
 		return this;
 
 	},
 
-	onChangeCallback: function () {}
+	_onChangeCallback: function () {}
 
 } );
 

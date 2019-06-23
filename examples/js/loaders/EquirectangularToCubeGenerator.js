@@ -197,29 +197,29 @@ THREE.EquirectangularToCubeGenerator = ( function () {
 			},
 
 			vertexShader:
-        "varying vec3 localPosition;\n\
-        \n\
-        void main() {\n\
-          localPosition = position;\n\
-          gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-        }",
+				"varying vec3 localPosition;\n\
+				\n\
+				void main() {\n\
+					localPosition = position;\n\
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
+				}",
 
 			fragmentShader:
-        "#include <common>\n\
-        varying vec3 localPosition;\n\
-        uniform sampler2D equirectangularMap;\n\
-        \n\
-        vec2 EquirectangularSampleUV(vec3 v) {\n\
-          vec2 uv = vec2(atan(v.z, v.x), asin(v.y));\n\
-          uv *= vec2(0.1591, 0.3183); // inverse atan\n\
-          uv += 0.5;\n\
-          return uv;\n\
-        }\n\
-        \n\
-        void main() {\n\
-          vec2 uv = EquirectangularSampleUV(normalize(localPosition));\n\
-          gl_FragColor = texture2D(equirectangularMap, uv);\n\
-        }",
+				"#include <common>\n\
+				varying vec3 localPosition;\n\
+				uniform sampler2D equirectangularMap;\n\
+				\n\
+				vec2 EquirectangularSampleUV(vec3 v) {\n\
+					vec2 uv = vec2(atan(v.z, v.x), asin(v.y));\n\
+					uv *= vec2(0.1591, 0.3183); // inverse atan\n\
+					uv += 0.5;\n\
+					return uv;\n\
+				}\n\
+				\n\
+				void main() {\n\
+					vec2 uv = EquirectangularSampleUV(normalize(localPosition));\n\
+					gl_FragColor = texture2D(equirectangularMap, uv);\n\
+				}",
 
 			blending: THREE.NoBlending
 

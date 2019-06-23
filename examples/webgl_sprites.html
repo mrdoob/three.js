@@ -8,9 +8,22 @@
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - sprites
+		</div>
 
-		<script>
+		<script type="module">
+			import {
+				Fog,
+				Group,
+				OrthographicCamera,
+				PerspectiveCamera,
+				Scene,
+				Sprite,
+				SpriteMaterial,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var camera, scene, renderer;
 			var cameraOrtho, sceneOrtho;
@@ -29,32 +42,32 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
+				camera = new PerspectiveCamera( 60, width / height, 1, 2100 );
 				camera.position.z = 1500;
 
-				cameraOrtho = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
+				cameraOrtho = new OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
 				cameraOrtho.position.z = 10;
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
+				scene = new Scene();
+				scene.fog = new Fog( 0x000000, 1500, 2100 );
 
-				sceneOrtho = new THREE.Scene();
+				sceneOrtho = new Scene();
 
 				// create sprites
 
 				var amount = 200;
 				var radius = 500;
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
 				textureLoader.load( "textures/sprite0.png", createHUDSprites );
 				var mapB = textureLoader.load( "textures/sprite1.png" );
 				mapC = textureLoader.load( "textures/sprite2.png" );
 
-				group = new THREE.Group();
+				group = new Group();
 
-				var materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
-				var materialB = new THREE.SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
+				var materialC = new SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
+				var materialB = new SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
 
 				for ( var a = 0; a < amount; a ++ ) {
 
@@ -77,7 +90,7 @@
 
 					}
 
-					var sprite = new THREE.Sprite( material );
+					var sprite = new Sprite( material );
 
 					sprite.position.set( x, y, z );
 					sprite.position.normalize();
@@ -91,7 +104,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
@@ -106,32 +119,32 @@
 
 			function createHUDSprites( texture ) {
 
-				var material = new THREE.SpriteMaterial( { map: texture } );
+				var material = new SpriteMaterial( { map: texture } );
 
 				var width = material.map.image.width;
 				var height = material.map.image.height;
 
-				spriteTL = new THREE.Sprite( material );
+				spriteTL = new Sprite( material );
 				spriteTL.center.set( 0.0, 1.0 );
 				spriteTL.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteTL );
 
-				spriteTR = new THREE.Sprite( material );
+				spriteTR = new Sprite( material );
 				spriteTR.center.set( 1.0, 1.0 );
 				spriteTR.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteTR );
 
-				spriteBL = new THREE.Sprite( material );
+				spriteBL = new Sprite( material );
 				spriteBL.center.set( 0.0, 0.0 );
 				spriteBL.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteBL );
 
-				spriteBR = new THREE.Sprite( material );
+				spriteBR = new Sprite( material );
 				spriteBR.center.set( 1.0, 0.0 );
 				spriteBR.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteBR );
 
-				spriteC = new THREE.Sprite( material );
+				spriteC = new Sprite( material );
 				spriteC.center.set( 0.5, 0.5 );
 				spriteC.scale.set( width, height, 1 );
 				sceneOrtho.add( spriteC );

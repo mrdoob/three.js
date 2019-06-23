@@ -7,19 +7,31 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl materials
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				AdditiveBlending,
+				DirectionalLight,
+				GridHelper,
+				Mesh,
+				MeshBasicMaterial,
+				MeshLambertMaterial,
+				MeshPhongMaterial,
+				MeshNormalMaterial,
+				MeshDepthMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				Texture,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -36,39 +48,39 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 200, 800 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// Grid
 
-				var helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
+				var helper = new GridHelper( 1000, 40, 0x303030, 0x303030 );
 				helper.position.y = - 75;
 				scene.add( helper );
 
 				// Materials
 
-				var texture = new THREE.Texture( generateTexture() );
+				var texture = new Texture( generateTexture() );
 				texture.needsUpdate = true;
 
-				materials.push( new THREE.MeshLambertMaterial( { map: texture, transparent: true } ) );
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd } ) );
-				materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ) );
-				materials.push( new THREE.MeshNormalMaterial() );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: THREE.AdditiveBlending } ) );
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd } ) );
-				materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, map: texture, transparent: true } ) );
-				materials.push( new THREE.MeshNormalMaterial( { flatShading: true } ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
-				materials.push( new THREE.MeshDepthMaterial() );
-				materials.push( new THREE.MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000 } ) );
-				materials.push( new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x666666, emissive: 0xff0000, shininess: 10, opacity: 0.9, transparent: true } ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: texture, transparent: true } ) );
+				materials.push( new MeshLambertMaterial( { map: texture, transparent: true } ) );
+				materials.push( new MeshLambertMaterial( { color: 0xdddddd } ) );
+				materials.push( new MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ) );
+				materials.push( new MeshNormalMaterial() );
+				materials.push( new MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: AdditiveBlending } ) );
+				materials.push( new MeshLambertMaterial( { color: 0xdddddd } ) );
+				materials.push( new MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, map: texture, transparent: true } ) );
+				materials.push( new MeshNormalMaterial( { flatShading: true } ) );
+				materials.push( new MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
+				materials.push( new MeshDepthMaterial() );
+				materials.push( new MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000 } ) );
+				materials.push( new MeshPhongMaterial( { color: 0x000000, specular: 0x666666, emissive: 0xff0000, shininess: 10, opacity: 0.9, transparent: true } ) );
+				materials.push( new MeshBasicMaterial( { map: texture, transparent: true } ) );
 
 				// Spheres geometry
 
-				var geometry = new THREE.SphereBufferGeometry( 70, 32, 16 );
+				var geometry = new SphereBufferGeometry( 70, 32, 16 );
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
@@ -78,9 +90,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x111111 ) );
+				scene.add( new AmbientLight( 0x111111 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				var directionalLight = new DirectionalLight( 0xffffff, 0.125 );
 
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
@@ -89,14 +101,14 @@
 
 				scene.add( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1 );
+				pointLight = new PointLight( 0xffffff, 1 );
 				scene.add( pointLight );
 
-				pointLight.add( new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
+				pointLight.add( new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0xffffff } ) ) );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -114,7 +126,7 @@
 
 			function addMesh( geometry, material ) {
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 
 				mesh.position.x = ( objects.length % 4 ) * 200 - 400;
 				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;

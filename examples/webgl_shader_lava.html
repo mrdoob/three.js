@@ -11,21 +11,6 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank" rel="noopener">TheGameMaker</a></div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
 			uniform float time;
@@ -89,13 +74,25 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				Clock,
+				Mesh,
+				PerspectiveCamera,
+				RepeatWrapping,
+				Scene,
+				ShaderMaterial,
+				TextureLoader,
+				TorusBufferGeometry,
+				Vector2,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
 
 			var container;
 
@@ -110,32 +107,32 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
 				uniforms = {
 
 					"fogDensity": { value: 0.45 },
-					"fogColor": { value: new THREE.Vector3( 0, 0, 0 ) },
+					"fogColor": { value: new Vector3( 0, 0, 0 ) },
 					"time": { value: 1.0 },
-					"uvScale": { value: new THREE.Vector2( 3.0, 1.0 ) },
+					"uvScale": { value: new Vector2( 3.0, 1.0 ) },
 					"texture1": { value: textureLoader.load( 'textures/lava/cloud.png' ) },
 					"texture2": { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
 
 				};
 
-				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = THREE.RepeatWrapping;
-				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = RepeatWrapping;
+				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = RepeatWrapping;
 
 				var size = 0.65;
 
-				var material = new THREE.ShaderMaterial( {
+				var material = new ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -143,13 +140,13 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( size, 0.3, 30, 30 ), material );
+				mesh = new Mesh( new TorusBufferGeometry( size, 0.3, 30, 30 ), material );
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 				renderer.autoClear = false;
@@ -157,11 +154,11 @@
 
 				//
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 1.25 );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.95, 2048, false );
+				var renderModel = new RenderPass( scene, camera );
+				var effectBloom = new BloomPass( 1.25 );
+				var effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );

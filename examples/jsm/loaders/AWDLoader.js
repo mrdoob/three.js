@@ -63,6 +63,8 @@ var AWDLoader = ( function () {
 
 		this.id = 0;
 		this.data = null;
+		this.namespace = 0;
+		this.flags = 0;
 
 	}
 
@@ -181,7 +183,7 @@ var AWDLoader = ( function () {
 		parseNextBlock: function () {
 
 			var assetData,
-				ns, type, len, block,
+				block,
 				blockId = this.readU32(),
 				ns = this.readU8(),
 				type = this.readU8(),
@@ -247,6 +249,8 @@ var AWDLoader = ( function () {
 			this._blocks[ blockId ] = block = new Block();
 			block.data = assetData;
 			block.id = blockId;
+			block.namespace = ns;
+			block.flags = flags;
 
 
 		},
@@ -415,7 +419,8 @@ var AWDLoader = ( function () {
 
 			while ( methods_parsed < num_methods ) {
 
-				var method_type = this.readU16();
+				// read method_type before
+				this.readU16();
 				this.parseProperties( null );
 				this.parseUserAttributes();
 
@@ -469,6 +474,8 @@ var AWDLoader = ( function () {
 				console.log( url );
 
 				asset = this.loadTexture( url );
+				asset.userData = {};
+				asset.userData.name = name;
 
 			} else {
 				// embed texture not supported
@@ -501,8 +508,9 @@ var AWDLoader = ( function () {
 		parseSkeleton: function () {
 
 			// Array<Bone>
-			var name = this.readUTF(),
-				num_joints = this.readU16(),
+			//
+			this.readUTF();
+			var	num_joints = this.readU16(),
 				skeleton = [],
 				joints_parsed = 0;
 

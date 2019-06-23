@@ -41,9 +41,6 @@
 				}
 		</style>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-
 		<script id="vertexShader" type="x-shader/x-vertex">
 
 			varying vec2 vUv;
@@ -92,110 +89,117 @@
 			music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
 		</div>
 
-	<script>
+		<script type="module">
+			import {
+				Audio as _Audio,
+				AudioAnalyser,
+				AudioListener as _AudioListener,
+				Camera,
+				DataTexture,
+				LuminanceFormat,
+				Mesh,
+				PlaneBufferGeometry,
+				Scene,
+				ShaderMaterial,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-	if ( WEBGL.isWebGLAvailable() === false ) {
+			var scene, camera, renderer, analyser, uniforms;
 
-		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
 
-	}
+			function init() {
 
-	var scene, camera, renderer, analyser, uniforms;
+				var fftSize = 128;
 
-	var startButton = document.getElementById( 'startButton' );
-	startButton.addEventListener( 'click', init );
+				//
 
-	function init() {
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
-		var fftSize = 128;
+				//
 
-		//
+				var container = document.getElementById( 'container' );
 
-		var overlay = document.getElementById( 'overlay' );
-		overlay.remove();
+				renderer = new WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				container.appendChild( renderer.domElement );
 
-		//
+				scene = new Scene();
 
-		var container = document.getElementById( 'container' );
+				camera = new Camera();
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		renderer.setClearColor( 0x000000 );
-		renderer.setPixelRatio( window.devicePixelRatio );
-		container.appendChild( renderer.domElement );
+				//
 
-		scene = new THREE.Scene();
+				var listener = new _AudioListener();
 
-		camera = new THREE.Camera();
+				var audio = new _Audio( listener );
 
-		//
+				var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
+				mediaElement.loop = true;
+				mediaElement.play();
 
-		var listener = new THREE.AudioListener();
+				audio.setMediaElementSource( mediaElement );
 
-		var audio = new THREE.Audio( listener );
+				analyser = new AudioAnalyser( audio, fftSize );
 
-		var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
-		mediaElement.loop = true;
-		mediaElement.play();
+				//
 
-		audio.setMediaElementSource( mediaElement );
+				uniforms = {
 
-		analyser = new THREE.AudioAnalyser( audio, fftSize );
+					tAudioData: { value: new DataTexture( analyser.data, fftSize / 2, 1, LuminanceFormat ) }
 
-		//
+				};
 
-		uniforms = {
+				var material = new ShaderMaterial( {
 
-			tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.LuminanceFormat ) }
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
-		};
+				} );
 
-		var material = new THREE.ShaderMaterial( {
+				var geometry = new PlaneBufferGeometry( 1, 1 );
 
-			uniforms: uniforms,
-			vertexShader: document.getElementById( 'vertexShader' ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+				var mesh = new Mesh( geometry, material );
+				scene.add( mesh );
 
-		} );
+				//
 
-		var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+				window.addEventListener( 'resize', onResize, false );
 
-		var mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+				animate();
 
-		//
+			}
 
-		window.addEventListener( 'resize', onResize, false );
+			function onResize() {
 
-		animate();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-	}
+			}
 
-	function onResize() {
+			function animate() {
 
-		renderer.setSize( window.innerWidth, window.innerHeight );
+				requestAnimationFrame( animate );
 
-	}
+				render();
 
-	function animate() {
+			}
 
-		requestAnimationFrame( animate );
+			function render() {
 
-		render();
+				analyser.getFrequencyData();
 
-	}
+				uniforms.tAudioData.value.needsUpdate = true;
 
-	function render() {
+				renderer.render( scene, camera );
 
-		analyser.getFrequencyData();
+			}
 
-		uniforms.tAudioData.value.needsUpdate = true;
-
-		renderer.render( scene, camera );
-
-	}
-
-	</script>
+		</script>
 
 	</body>
 </html>

@@ -7,13 +7,17 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/DeviceOrientationControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - panorama - device orientation.<br/>cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
 
-		<script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Object3D,
+				Scene
+			} from "../build/three.module.js";
+
+			import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
 			var controls;
@@ -23,11 +27,11 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 
-				controls = new THREE.DeviceOrientationControls( camera );
+				controls = new DeviceOrientationControls( camera );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				var sides = [
 					{
@@ -62,7 +66,7 @@
 					}
 				];
 
-				var cube = new THREE.Object3D();
+				var cube = new Object3D();
 				scene.add( cube );
 
 				for ( var i = 0; i < sides.length; i ++ ) {
@@ -73,14 +77,14 @@
 					element.width = 1026; // 2 pixels extra to close the gap.
 					element.src = side.url;
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new CSS3DObject( element );
 					object.position.fromArray( side.position );
 					object.rotation.fromArray( side.rotation );
 					cube.add( object );
 
 				}
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

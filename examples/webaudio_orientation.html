@@ -39,12 +39,6 @@
 					font-size: 12px;
 				}
 		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-
 	</head>
 <body>
 
@@ -65,162 +59,179 @@
 		music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener noreferrer">skullbeatz</a>
 	</div>
 
-	<script>
+	<script type="module">
+		import {
+			AudioListener as _AudioListener, // we don't want to override the native AudioListener function
+			BoxBufferGeometry,
+			Color,
+			CubeTextureLoader,
+			DirectionalLight,
+			Fog,
+			HemisphereLight,
+			GridHelper,
+			MeshBasicMaterial,
+			MeshPhongMaterial,
+			Mesh,
+			PerspectiveCamera,
+			PlaneBufferGeometry,
+			PositionalAudio,
+			PositionalAudioHelper,
+			RGBFormat,
+			Scene,
+			WebGLRenderer
+		} from "../build/three.module.js";
 
-	if ( WEBGL.isWebGLAvailable() === false ) {
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+		var scene, camera, renderer;
 
-	}
+		var startButton = document.getElementById( 'startButton' );
+		startButton.addEventListener( 'click', init );
 
-	var scene, camera, renderer;
+		function init() {
 
-	var startButton = document.getElementById( 'startButton' );
-	startButton.addEventListener( 'click', init );
+			var overlay = document.getElementById( 'overlay' );
+			overlay.remove();
 
-	function init() {
+			var container = document.getElementById( 'container' );
 
-		var overlay = document.getElementById( 'overlay' );
-		overlay.remove();
+			//
 
-		var container = document.getElementById( 'container' );
+			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+			camera.position.set( 3, 2, 3 );
 
-		//
+			var reflectionCube = new CubeTextureLoader()
+				.setPath( 'textures/cube/SwedishRoyalCastle/' )
+				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
+			reflectionCube.format = RGBFormat;
 
-		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
-		camera.position.set( 3, 2, 3 );
+			scene = new Scene();
+			scene.background = new Color( 0xa0a0a0 );
+			scene.fog = new Fog( 0xa0a0a0, 2, 20 );
 
-		var reflectionCube = new THREE.CubeTextureLoader()
-			.setPath( 'textures/cube/SwedishRoyalCastle/' )
-			.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-		reflectionCube.format = THREE.RGBFormat;
+			//
 
-		scene = new THREE.Scene();
-		scene.background = new THREE.Color( 0xa0a0a0 );
-		scene.fog = new THREE.Fog( 0xa0a0a0, 2, 20 );
+			var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+			hemiLight.position.set( 0, 20, 0 );
+			scene.add( hemiLight );
 
-		//
+			var dirLight = new DirectionalLight( 0xffffff );
+			dirLight.position.set( 5, 5, 0 );
+			dirLight.castShadow = true;
+			dirLight.shadow.camera.top = 1;
+			dirLight.shadow.camera.bottom = - 1;
+			dirLight.shadow.camera.left = - 1;
+			dirLight.shadow.camera.right = 1;
+			dirLight.shadow.camera.near = 0.1;
+			dirLight.shadow.camera.far = 20;
+			scene.add( dirLight );
 
-		var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-		hemiLight.position.set( 0, 20, 0 );
-		scene.add( hemiLight );
+			// scene.add( new CameraHelper( dirLight.shadow.camera ) );
 
-		var dirLight = new THREE.DirectionalLight( 0xffffff );
-		dirLight.position.set( 5, 5, 0 );
-		dirLight.castShadow = true;
-		dirLight.shadow.camera.top = 1;
-		dirLight.shadow.camera.bottom = - 1;
-		dirLight.shadow.camera.left = - 1;
-		dirLight.shadow.camera.right = 1;
-		dirLight.shadow.camera.near = 0.1;
-		dirLight.shadow.camera.far = 20;
-		scene.add( dirLight );
+			//
 
-		// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+			var mesh = new Mesh( new PlaneBufferGeometry( 50, 50 ), new MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+			mesh.rotation.x = - Math.PI / 2;
+			mesh.receiveShadow = true;
+			scene.add( mesh );
 
-		//
+			var grid = new GridHelper( 50, 50, 0x888888, 0x888888 );
+			scene.add( grid );
 
-		var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
-		mesh.rotation.x = - Math.PI / 2;
-		mesh.receiveShadow = true;
-		scene.add( mesh );
+			//
 
-		var grid = new THREE.GridHelper( 50, 50, 0x888888, 0x888888 );
-		scene.add( grid );
+			var listener = new _AudioListener();
+			camera.add( listener );
 
-		//
+			var audioElement = document.getElementById( 'music' );
+			audioElement.play();
 
-		var listener = new THREE.AudioListener();
-		camera.add( listener );
+			var positionalAudio = new PositionalAudio( listener );
+			positionalAudio.setMediaElementSource( audioElement );
+			positionalAudio.setRefDistance( 1 );
+			positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-		var audioElement = document.getElementById( 'music' );
-		audioElement.play();
+			var helper = new PositionalAudioHelper( positionalAudio, 0.1 );
+			positionalAudio.add( helper );
 
-		var positionalAudio = new THREE.PositionalAudio( listener );
-		positionalAudio.setMediaElementSource( audioElement );
-		positionalAudio.setRefDistance( 1 );
-		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+			//
 
-		var helper = new THREE.PositionalAudioHelper( positionalAudio, 0.1 );
-		positionalAudio.add( helper );
+			var gltfLoader = new GLTFLoader();
+			gltfLoader.load( 'models/gltf/BoomBox/glTF-Binary/BoomBox.glb', function ( gltf ) {
 
-		//
+				var boomBox = gltf.scene;
+				boomBox.position.set( 0, 0.2, 0 );
+				boomBox.scale.set( 20, 20, 20 );
 
-		var gltfLoader = new THREE.GLTFLoader();
-		gltfLoader.load( 'models/gltf/BoomBox/glTF-Binary/BoomBox.glb', function ( gltf ) {
+				boomBox.traverse( function ( object ) {
 
-			var boomBox = gltf.scene;
-			boomBox.position.set( 0, 0.2, 0 );
-			boomBox.scale.set( 20, 20, 20 );
+					if ( object.isMesh ) {
 
-			boomBox.traverse( function ( object ) {
+						object.material.envMap = reflectionCube;
+						object.geometry.rotateY( - Math.PI );
+						object.castShadow = true;
 
-				if ( object.isMesh ) {
+					}
 
-					object.material.envMap = reflectionCube;
-					object.geometry.rotateY( - Math.PI );
-					object.castShadow = true;
+				} );
 
-				}
+				boomBox.add( positionalAudio );
+				scene.add( boomBox );
+				animate();
 
 			} );
 
-			boomBox.add( positionalAudio );
-			scene.add( boomBox );
-			animate();
+			// sound is damped behind this wall
 
-		} );
+			var wallGeometry = new BoxBufferGeometry( 2, 1, 0.1 );
+			var wallMaterial = new MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.5 } );
 
-		// sound is damped behind this wall
-
-		var wallGeometry = new THREE.BoxBufferGeometry( 2, 1, 0.1 );
-		var wallMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.5 } );
-
-		var wall = new THREE.Mesh( wallGeometry, wallMaterial );
-		wall.position.set( 0, 0.5, - 0.5 );
-		scene.add( wall );
+			var wall = new Mesh( wallGeometry, wallMaterial );
+			wall.position.set( 0, 0.5, - 0.5 );
+			scene.add( wall );
 
 
-		//
+			//
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		renderer.setPixelRatio( window.devicePixelRatio );
-		renderer.gammaOutput = true;
-		renderer.gammaFactor = 2.2;
-		renderer.shadowMap.enabled = true;
-		container.appendChild( renderer.domElement );
+			renderer = new WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.gammaOutput = true;
+			renderer.gammaFactor = 2.2;
+			renderer.shadowMap.enabled = true;
+			container.appendChild( renderer.domElement );
 
-		//
+			//
 
-		var controls = new THREE.OrbitControls( camera, renderer.domElement );
-		controls.target.set( 0, 0.1, 0 );
-		controls.update();
-		controls.minDistance = 0.5;
-		controls.maxDistance = 10;
-		controls.maxPolarAngle = 0.5 * Math.PI;
+			var controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0.1, 0 );
+			controls.update();
+			controls.minDistance = 0.5;
+			controls.maxDistance = 10;
+			controls.maxPolarAngle = 0.5 * Math.PI;
 
-		//
+			//
 
-		window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize, false );
 
-	}
+		}
 
-	function onWindowResize() {
+		function onWindowResize() {
 
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
 
-		renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
-	}
+		}
 
-	function animate() {
+		function animate() {
 
-		requestAnimationFrame( animate );
-		renderer.render( scene, camera );
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
 
-	}
+		}
 
 	</script>
 
