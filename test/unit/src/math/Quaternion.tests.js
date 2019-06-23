@@ -358,9 +358,20 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "clone", ( assert ) => {
+		QUnit.test( "clone", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+
+			var a = new Quaternion().clone();
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z == 0, "Passed!" );
+			assert.ok( a.w == 1, "Passed!" );
+
+			var b = a.set( x, y, z, w ).clone();
+			assert.ok( b.x == x, "Passed!" );
+			assert.ok( b.y == y, "Passed!" );
+			assert.ok( b.z === z, "Passed!" );
+			assert.ok( b.w === w, "Passed!" );
 
 		} );
 
@@ -600,9 +611,39 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "slerp", ( assert ) => {
+		QUnit.test( "slerp", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Quaternion( x, y, z, w );
+			var b = new Quaternion( - x, - y, - z, - w );
+
+			var c = a.clone().slerp( b, 0 );
+			var d = a.clone().slerp( b, 1 );
+
+			assert.ok( a.equals( c ), "Passed" );
+			assert.ok( b.equals( d ), "Passed" );
+
+
+			var D = Math.SQRT1_2;
+
+			var e = new Quaternion( 1, 0, 0, 0 );
+			var f = new Quaternion( 0, 0, 1, 0 );
+			var expected = new Quaternion( D, 0, D, 0 );
+			var result = e.clone().slerp( f, 0.5 );
+			assert.ok( Math.abs( result.x - expected.x ) <= eps, "Check x" );
+			assert.ok( Math.abs( result.y - expected.y ) <= eps, "Check y" );
+			assert.ok( Math.abs( result.z - expected.z ) <= eps, "Check z" );
+			assert.ok( Math.abs( result.w - expected.w ) <= eps, "Check w" );
+
+
+			var g = new Quaternion( 0, D, 0, D );
+			var h = new Quaternion( 0, - D, 0, D );
+			expected = new Quaternion( 0, 0, 0, 1 );
+			result = g.clone().slerp( h, 0.5 );
+
+			assert.ok( Math.abs( result.x - expected.x ) <= eps, "Check x" );
+			assert.ok( Math.abs( result.y - expected.y ) <= eps, "Check y" );
+			assert.ok( Math.abs( result.z - expected.z ) <= eps, "Check z" );
+			assert.ok( Math.abs( result.w - expected.w ) <= eps, "Check w" );
 
 		} );
 
@@ -626,9 +667,20 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "fromArray", ( assert ) => {
+		QUnit.test( "fromArray", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Quaternion();
+			a.fromArray( [ x, y, z, w ] );
+			assert.ok( a.x == x, "Passed!" );
+			assert.ok( a.y == y, "Passed!" );
+			assert.ok( a.z === z, "Passed!" );
+			assert.ok( a.w === w, "Passed!" );
+
+			a.fromArray( [ undefined, x, y, z, w, undefined ], 1 );
+			assert.ok( a.x == x, "Passed!" );
+			assert.ok( a.y == y, "Passed!" );
+			assert.ok( a.z === z, "Passed!" );
+			assert.ok( a.w === w, "Passed!" );
 
 		} );
 
@@ -661,10 +713,10 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "_onChange", ( assert ) => {
 
-
+			var b = false;
 			var f = function () {
 
-				var b = true;
+				b = true;
 
 			};
 
@@ -672,19 +724,28 @@ export default QUnit.module( 'Maths', () => {
 			a._onChange( f );
 			assert.ok( a._onChangeCallback === f, "Passed!" );
 
+			a._onChangeCallback();
+			assert.ok( b, "Passed!" );
+
+
 		} );
 
 		QUnit.test( "_onChangeCallback", ( assert ) => {
 
+			var b = false;
 			var f = function () {
 
-				var b = true;
+				b = true;
 
 			};
 
 			var a = new Quaternion( 11, 12, 13, 1 );
 			a._onChangeCallback = f;
 			assert.ok( a._onChangeCallback === f, "Passed!" );
+
+
+			a._onChangeCallback();
+			assert.ok( b, "Passed!" );
 
 		} );
 
