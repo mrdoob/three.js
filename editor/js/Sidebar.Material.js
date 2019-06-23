@@ -40,7 +40,7 @@ Sidebar.Material = function ( editor ) {
 	managerRow.add( new UI.Button( strings.getKey( 'sidebar/material/new' ) ).onClick( function () {
 
 		var material = new THREE[ materialClass.getValue() ]();
-		editor.execute( new SetMaterialCommand( currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
+		editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 		update();
 
 	} ) );
@@ -63,7 +63,7 @@ Sidebar.Material = function ( editor ) {
 
 		if ( copiedMaterial === undefined ) return;
 
-		editor.execute( new SetMaterialCommand( currentObject, copiedMaterial, currentMaterialSlot ), 'Pasted Material: ' + materialClass.getValue() );
+		editor.execute( new SetMaterialCommand( editor, currentObject, copiedMaterial, currentMaterialSlot ), 'Pasted Material: ' + materialClass.getValue() );
 		refreshUI();
 		update();
 
@@ -122,7 +122,7 @@ Sidebar.Material = function ( editor ) {
 	var materialNameRow = new UI.Row();
 	var materialName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.execute( new SetMaterialValueCommand( editor.selected, 'name', materialName.getValue(), currentMaterialSlot ) );
+		editor.execute( new SetMaterialValueCommand( editor, editor.selected, 'name', materialName.getValue(), currentMaterialSlot ) );
 
 	} );
 
@@ -575,7 +575,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.uuid !== undefined && material.uuid !== materialUUID.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'uuid', materialUUID.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'uuid', materialUUID.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -589,7 +589,7 @@ Sidebar.Material = function ( editor ) {
 
 				}
 
-				editor.execute( new SetMaterialCommand( currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
+				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
 				// Also there should be means to create a unique
@@ -600,49 +600,49 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.color !== undefined && material.color.getHex() !== materialColor.getHexValue() ) {
 
-				editor.execute( new SetMaterialColorCommand( currentObject, 'color', materialColor.getHexValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'color', materialColor.getHexValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'roughness', materialRoughness.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'roughness', materialRoughness.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'metalness', materialMetalness.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'metalness', materialMetalness.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
 
-				editor.execute( new SetMaterialColorCommand( currentObject, 'emissive', materialEmissive.getHexValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'emissive', materialEmissive.getHexValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.specular !== undefined && material.specular.getHex() !== materialSpecular.getHexValue() ) {
 
-				editor.execute( new SetMaterialColorCommand( currentObject, 'specular', materialSpecular.getHexValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'specular', materialSpecular.getHexValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'shininess', materialShininess.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'shininess', materialShininess.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.clearCoat !== undefined && Math.abs( material.clearCoat - materialClearCoat.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'clearCoat', materialClearCoat.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearCoat', materialClearCoat.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.clearCoatRoughness !== undefined && Math.abs( material.clearCoatRoughness - materialClearCoatRoughness.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'clearCoatRoughness', materialClearCoatRoughness.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearCoatRoughness', materialClearCoatRoughness.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -652,7 +652,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.vertexColors !== vertexColors ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'vertexColors', vertexColors, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'vertexColors', vertexColors, currentMaterialSlot ) );
 
 				}
 
@@ -663,7 +663,7 @@ Sidebar.Material = function ( editor ) {
 				var depthPacking = parseInt( materialDepthPacking.getValue() );
 				if ( material.depthPacking !== depthPacking ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthPacking', depthPacking, currentMaterialSlot ) );
 
 				}
 
@@ -671,7 +671,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.skinning !== undefined && material.skinning !== materialSkinning.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'skinning', materialSkinning.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'skinning', materialSkinning.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -684,7 +684,7 @@ Sidebar.Material = function ( editor ) {
 					var map = mapEnabled ? materialMap.getValue() : null;
 					if ( material.map !== map ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'map', map, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'map', map, currentMaterialSlot ) );
 
 					}
 
@@ -705,7 +705,7 @@ Sidebar.Material = function ( editor ) {
 					var matcap = mapEnabled ? materialMatcapMap.getValue() : null;
 					if ( material.matcap !== matcap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'matcap', matcap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'matcap', matcap, currentMaterialSlot ) );
 
 					}
 
@@ -726,7 +726,7 @@ Sidebar.Material = function ( editor ) {
 					var alphaMap = mapEnabled ? materialAlphaMap.getValue() : null;
 					if ( material.alphaMap !== alphaMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'alphaMap', alphaMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'alphaMap', alphaMap, currentMaterialSlot ) );
 
 					}
 
@@ -747,13 +747,13 @@ Sidebar.Material = function ( editor ) {
 					var bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
 					if ( material.bumpMap !== bumpMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'bumpMap', bumpMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'bumpMap', bumpMap, currentMaterialSlot ) );
 
 					}
 
 					if ( material.bumpScale !== materialBumpScale.getValue() ) {
 
-						editor.execute( new SetMaterialValueCommand( currentObject, 'bumpScale', materialBumpScale.getValue(), currentMaterialSlot ) );
+						editor.execute( new SetMaterialValueCommand( editor, currentObject, 'bumpScale', materialBumpScale.getValue(), currentMaterialSlot ) );
 
 					}
 
@@ -774,7 +774,7 @@ Sidebar.Material = function ( editor ) {
 					var normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
 					if ( material.normalMap !== normalMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'normalMap', normalMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'normalMap', normalMap, currentMaterialSlot ) );
 
 					}
 
@@ -795,13 +795,13 @@ Sidebar.Material = function ( editor ) {
 					var displacementMap = displacementMapEnabled ? materialDisplacementMap.getValue() : null;
 					if ( material.displacementMap !== displacementMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'displacementMap', displacementMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'displacementMap', displacementMap, currentMaterialSlot ) );
 
 					}
 
 					if ( material.displacementScale !== materialDisplacementScale.getValue() ) {
 
-						editor.execute( new SetMaterialValueCommand( currentObject, 'displacementScale', materialDisplacementScale.getValue(), currentMaterialSlot ) );
+						editor.execute( new SetMaterialValueCommand( editor, currentObject, 'displacementScale', materialDisplacementScale.getValue(), currentMaterialSlot ) );
 
 					}
 
@@ -822,7 +822,7 @@ Sidebar.Material = function ( editor ) {
 					var roughnessMap = roughnessMapEnabled ? materialRoughnessMap.getValue() : null;
 					if ( material.roughnessMap !== roughnessMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'roughnessMap', roughnessMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'roughnessMap', roughnessMap, currentMaterialSlot ) );
 
 					}
 
@@ -843,7 +843,7 @@ Sidebar.Material = function ( editor ) {
 					var metalnessMap = metalnessMapEnabled ? materialMetalnessMap.getValue() : null;
 					if ( material.metalnessMap !== metalnessMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'metalnessMap', metalnessMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'metalnessMap', metalnessMap, currentMaterialSlot ) );
 
 					}
 
@@ -864,7 +864,7 @@ Sidebar.Material = function ( editor ) {
 					var specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
 					if ( material.specularMap !== specularMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'specularMap', specularMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'specularMap', specularMap, currentMaterialSlot ) );
 
 					}
 
@@ -884,7 +884,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.envMap !== envMap ) {
 
-					editor.execute( new SetMaterialMapCommand( currentObject, 'envMap', envMap, currentMaterialSlot ) );
+					editor.execute( new SetMaterialMapCommand( editor, currentObject, 'envMap', envMap, currentMaterialSlot ) );
 
 				}
 
@@ -896,7 +896,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.reflectivity !== reflectivity ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'reflectivity', reflectivity, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'reflectivity', reflectivity, currentMaterialSlot ) );
 
 				}
 
@@ -911,7 +911,7 @@ Sidebar.Material = function ( editor ) {
 					var lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
 					if ( material.lightMap !== lightMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'lightMap', lightMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'lightMap', lightMap, currentMaterialSlot ) );
 
 					}
 
@@ -932,13 +932,13 @@ Sidebar.Material = function ( editor ) {
 					var aoMap = aoMapEnabled ? materialAOMap.getValue() : null;
 					if ( material.aoMap !== aoMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'aoMap', aoMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'aoMap', aoMap, currentMaterialSlot ) );
 
 					}
 
 					if ( material.aoMapIntensity !== materialAOScale.getValue() ) {
 
-						editor.execute( new SetMaterialValueCommand( currentObject, 'aoMapIntensity', materialAOScale.getValue(), currentMaterialSlot ) );
+						editor.execute( new SetMaterialValueCommand( editor, currentObject, 'aoMapIntensity', materialAOScale.getValue(), currentMaterialSlot ) );
 
 					}
 
@@ -959,7 +959,7 @@ Sidebar.Material = function ( editor ) {
 					var emissiveMap = emissiveMapEnabled ? materialEmissiveMap.getValue() : null;
 					if ( material.emissiveMap !== emissiveMap ) {
 
-						editor.execute( new SetMaterialMapCommand( currentObject, 'emissiveMap', emissiveMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'emissiveMap', emissiveMap, currentMaterialSlot ) );
 
 					}
 
@@ -979,7 +979,7 @@ Sidebar.Material = function ( editor ) {
 
 				if ( material.gradientMap !== gradientMap ) {
 
-					editor.execute( new SetMaterialMapCommand( currentObject, 'gradientMap', gradientMap, currentMaterialSlot ) );
+					editor.execute( new SetMaterialMapCommand( editor, currentObject, 'gradientMap', gradientMap, currentMaterialSlot ) );
 
 				}
 
@@ -990,7 +990,7 @@ Sidebar.Material = function ( editor ) {
 				var side = parseInt( materialSide.getValue() );
 				if ( material.side !== side ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'side', side, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'side', side, currentMaterialSlot ) );
 
 				}
 
@@ -1002,7 +1002,7 @@ Sidebar.Material = function ( editor ) {
 				var flatShading = materialShading.getValue();
 				if ( material.flatShading != flatShading ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'flatShading', flatShading, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'flatShading', flatShading, currentMaterialSlot ) );
 
 				}
 
@@ -1013,7 +1013,7 @@ Sidebar.Material = function ( editor ) {
 				var blending = parseInt( materialBlending.getValue() );
 				if ( material.blending !== blending ) {
 
-					editor.execute( new SetMaterialValueCommand( currentObject, 'blending', blending, currentMaterialSlot ) );
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'blending', blending, currentMaterialSlot ) );
 
 				}
 
@@ -1021,31 +1021,31 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'opacity', materialOpacity.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'opacity', materialOpacity.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.transparent !== undefined && material.transparent !== materialTransparent.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'transparent', materialTransparent.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'transparent', materialTransparent.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'alphaTest', materialAlphaTest.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'alphaTest', materialAlphaTest.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.wireframeLinewidth !== undefined && Math.abs( material.wireframeLinewidth - materialWireframeLinewidth.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue(), currentMaterialSlot ) );
 
 			}
 

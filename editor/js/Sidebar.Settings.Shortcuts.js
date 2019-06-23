@@ -108,7 +108,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 				if ( object === null ) return;
 
 				var parent = object.parent;
-				if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
+				if ( parent !== null ) editor.execute( new RemoveObjectCommand( editor, object ) );
 
 				break;
 
