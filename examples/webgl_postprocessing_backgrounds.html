@@ -48,6 +48,9 @@
 		<script src="js/postprocessing/CubeTexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 
+		<script src="js/loaders/RGBELoader.js"></script>
+		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+
 		<script src="js/controls/OrbitControls.js"></script>
 
 		<script>
@@ -70,7 +73,9 @@
 				cubeTexturePass: true,
 				cubeTexturePassOpacity: 1.0,
 
-				renderPass: true
+				renderPass: true,
+
+				exposure: 1,
 
 				//autoRotate: true,
 
@@ -100,6 +105,8 @@
 				gui.add( params, "cubeTexturePassOpacity", 0, 1 );
 
 				gui.add( params, "renderPass" );
+
+				gui.add( params, "exposure", 0, 2 );
 
 				//gui.add( params, "autoRotate" );
 
@@ -202,13 +209,23 @@
 				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
-				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
-				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+				// var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
+				// new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
-					cubeTexturePassP.envMap = ldrCubeMap;
-					console.log( "loaded envmap" );
+				// 	cubeTexturePassP.envMap = ldrCubeMap;
+				// 	console.log( "loaded envmap" );
 
-				} );
+				// } );
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+
+				var hdrCubeMap = new THREE.HDRCubeTextureLoader( THREE.UnsignedByteType )
+					.setPath( './textures/cube/pisaHDR/' )
+					.load( hdrUrls, function () {
+
+						cubeTexturePassP.envMap = hdrCubeMap;
+
+					} );
 
 				renderPass = new THREE.RenderPass( scene, cameraP );
 				renderPass.clear = false;
@@ -277,6 +294,8 @@
 				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
 
 				renderPass.enabled = params.renderPass;
+
+				renderer.toneMappingExposure = params.exposure;
 
 				composer.render();
 

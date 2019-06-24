@@ -267,6 +267,29 @@ var ShaderLib = {
 
 };
 
+/* -------------------------------------------------------------------------
+//	Cube map shader
+ ------------------------------------------------------------------------- */
+
+ ShaderLib.cubeEnv = {
+
+	uniforms: mergeUniforms( [
+		UniformsLib.common,
+		ShaderLib.standard.uniforms,
+		{
+			envMap: { value: null },
+			envMapIntensity: { value: 1.0 },
+			tFlip: { value: - 1 },
+			opacity: { value: 1.0 },
+			roughness: { value: 0.0 }
+		}
+	] ),
+
+	vertexShader: ShaderChunk.cubeEnv_vert,
+	fragmentShader: ShaderChunk.cubeEnv_frag
+
+};
+
 ShaderLib.physical = {
 
 	uniforms: mergeUniforms( [

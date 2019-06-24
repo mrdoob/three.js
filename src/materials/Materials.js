@@ -15,4 +15,5 @@ export { MeshBasicMaterial } from './MeshBasicMaterial.js';
 export { MeshMatcapMaterial } from './MeshMatcapMaterial.js';
 export { LineDashedMaterial } from './LineDashedMaterial.js';
 export { LineBasicMaterial } from './LineBasicMaterial.js';
+export { MeshCubeMaterial } from './MeshCubeMaterial.js';
 export { Material } from './Material.js';
