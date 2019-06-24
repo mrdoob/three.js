@@ -4,7 +4,7 @@ import { TypedArray } from '../polyfills';
 export class DataTexture2DArray extends Texture {
 
 	constructor(
-		data: ArrayBuffer | TypedArray,
+		data: TypedArray,
 		width: number,
 		height: number,
 		depth: number
