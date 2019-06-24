@@ -13,6 +13,7 @@ Sidebar.Settings.Viewport = function ( editor ) {
 	container.add( new UI.Text( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
 
 	var show = new UI.THREE.Boolean( true ).onChange( update );
+	show.setPosition( 'absolute' ).setLeft( '97px' );
 	container.add( show );
 
 	/*

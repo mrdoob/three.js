@@ -30,6 +30,7 @@ var Editor = function () {
 		savingFinished: new Signal(),
 
 		themeChanged: new Signal(),
+		layoutChanged: new Signal(),
 
 		transformModeChanged: new Signal(),
 		snapChanged: new Signal(),
@@ -114,6 +115,14 @@ Editor.prototype = {
 		document.getElementById( 'theme' ).href = value;
 
 		this.signals.themeChanged.dispatch( value );
+
+	},
+
+	setLayout: function ( value ) {
+
+		document.getElementById( 'layout' ).href = value;
+
+		this.signals.layoutChanged.dispatch( value );
 
 	},
 

@@ -277,6 +277,9 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
+			'sidebar/settings/layout': 'Layout',
+			'sidebar/settings/layout/normal': 'normal',
+			'sidebar/settings/layout/wide': 'wide',
 			'sidebar/settings/theme': 'Theme',
 			'sidebar/settings/theme/light': 'light',
 			'sidebar/settings/theme/dark': 'dark',
@@ -547,6 +550,9 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
+			'sidebar/settings/layout': '布局',
+			'sidebar/settings/layout/normal': '正常',
+			'sidebar/settings/layout/wide': '宽',
 			'sidebar/settings/theme': '主题',
 			'sidebar/settings/theme/light': '浅色',
 			'sidebar/settings/theme/dark': '深色',

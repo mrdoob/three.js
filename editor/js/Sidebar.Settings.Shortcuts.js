@@ -18,7 +18,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Div();
-	container.add( new UI.Break() );
+	container.setPaddingTop( '8px' );
 
 	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 

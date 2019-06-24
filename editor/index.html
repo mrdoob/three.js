@@ -10,6 +10,7 @@
 	</head>
 	<body ontouchstart="">
 		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" id="layout" href="css/normal.css">
 		<link rel="stylesheet" id="theme" href="css/light.css">
 
 		<script src="../build/three.js"></script>
@@ -178,8 +179,10 @@
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
-			Number.prototype.format = function (){
-				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			Number.prototype.format = function () {
+
+				return this.toString().replace( /(\d)(?=(\d{3})+(?!\d))/g, "$1," );
+
 			};
 
 			//
@@ -206,6 +209,7 @@
 
 			//
 
+			editor.setLayout( editor.config.getKey( 'layout' ) );
 			editor.setTheme( editor.config.getKey( 'theme' ) );
 
 			editor.storage.init( function () {
@@ -301,6 +305,15 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
+
+
+			function delayedWindowResize( event ) {
+
+				setTimeout( editor.signals.windowResize.dispatch, 1000 );
+
+			}
+
+			editor.signals.layoutChanged.add( delayedWindowResize );
 
 			//
 

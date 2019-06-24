@@ -10,8 +10,7 @@ Sidebar.Settings = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
-	container.setPaddingBottom( '20px' );
+	container.setPadding( '10px' );
 
 	// language
 
@@ -42,6 +41,40 @@ Sidebar.Settings = function ( editor ) {
 	languageRow.add( language );
 
 	container.add( languageRow );
+
+	// layout
+
+	var options = {
+		'css/normal.css': strings.getKey( 'sidebar/settings/layout/normal' ),
+		'css/wide.css': strings.getKey( 'sidebar/settings/layout/wide' )
+	};
+
+	var layoutRow = new UI.Row();
+	var layout = new UI.Select().setWidth( '150px' );
+	layout.setOptions( options );
+
+	if ( config.getKey( 'layout' ) !== undefined ) {
+
+		layout.setValue( config.getKey( 'layout' ) );
+
+	}
+
+	layout.onChange( function () {
+
+		var value = this.getValue();
+
+		editor.setLayout( value );
+		editor.setTheme( theme.getValue() );
+
+		editor.config.setKey( 'layout', value );
+		editor.config.setKey( 'theme', theme.getValue() );
+
+	} );
+
+	layoutRow.add( new UI.Text( strings.getKey( 'sidebar/settings/layout' ) ).setWidth( '90px' ) );
+	layoutRow.add( layout );
+
+	container.add( layoutRow );
 
 	// theme
 
@@ -74,8 +107,14 @@ Sidebar.Settings = function ( editor ) {
 
 	container.add( themeRow );
 
+	container.add( new UI.HorizontalRule() );
+
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new Sidebar.History( editor ) );
 
 	return container;
 

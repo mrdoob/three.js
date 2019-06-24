@@ -13,14 +13,14 @@ Sidebar.History = function ( editor ) {
 
 	var history = editor.history;
 
-	var container = new UI.Panel();
+	var container = new UI.Span();
 
 	container.add( new UI.Text( strings.getKey( 'sidebar/history/history' ) ) );
 
 	//
 
 	var persistent = new UI.THREE.Boolean( config.getKey( 'settings/history' ), strings.getKey( 'sidebar/history/persistent' ) );
-	persistent.setPosition( 'absolute' ).setRight( '8px' );
+	persistent.setPosition( 'absolute' ).setRight( '0px' );
 	persistent.onChange( function () {
 
 		var value = this.getValue();

@@ -19,7 +19,7 @@ Sidebar.Project = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
+	container.setPadding( '10px' );
 
 	// Title
 

@@ -10,6 +10,7 @@ var Config = function () {
 		'language': 'en',
 
 		'autosave': true,
+		'layout': 'css/normal.css',
 		'theme': 'css/light.css',
 
 		'project/title': '',

@@ -8,8 +8,15 @@ Sidebar.Scene = function ( editor ) {
 	var strings = editor.strings;
 
 	var container = new UI.Panel();
+	container.setId( 'scene' );
 	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
+	container.setPaddingTop( '10px' );
+
+	var left = new UI.Span();
+	left.setId( 'sceneLeft' );
+
+	var right = new UI.Span();
+	right.setId( 'sceneRight' );
 
 	// outliner
 
@@ -105,8 +112,7 @@ Sidebar.Scene = function ( editor ) {
 		editor.focusById( parseInt( outliner.getValue() ) );
 
 	} );
-	container.add( outliner );
-	container.add( new UI.Break() );
+	left.add( outliner );
 
 	// background
 
@@ -123,7 +129,7 @@ Sidebar.Scene = function ( editor ) {
 	backgroundRow.add( new UI.Text( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundColor );
 
-	container.add( backgroundRow );
+	left.add( backgroundRow );
 
 	// fog
 
@@ -157,14 +163,13 @@ Sidebar.Scene = function ( editor ) {
 	fogTypeRow.add( new UI.Text( strings.getKey( 'sidebar/scene/fog' ) ).setWidth( '90px' ) );
 	fogTypeRow.add( fogType );
 
-	container.add( fogTypeRow );
+	left.add( fogTypeRow );
 
 	// fog color
 
 	var fogPropertiesRow = new UI.Row();
 	fogPropertiesRow.setDisplay( 'none' );
 	fogPropertiesRow.setMarginLeft( '90px' );
-	container.add( fogPropertiesRow );
 
 	var fogColor = new UI.Color().setValue( '#aaaaaa' );
 	fogColor.onChange( onFogChanged );
@@ -184,6 +189,18 @@ Sidebar.Scene = function ( editor ) {
 
 	var fogDensity = new UI.Number( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogDensity );
+
+	left.add( fogPropertiesRow );
+
+	container.add( left );
+
+	//
+
+	right.add( new Sidebar.Properties( editor ) );
+	right.add( new Sidebar.Animation( editor ) );
+	right.add( new Sidebar.Script( editor ) );
+
+	container.add( right );
 
 	//
 

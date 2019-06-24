@@ -22,28 +22,33 @@ var Sidebar = function ( editor ) {
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
+	tabs.setClass( 'tabs' );
 	tabs.add( sceneTab, projectTab, settingsTab );
 	container.add( tabs );
 
 	//
 
-	var scene = new UI.Span().add(
-		new Sidebar.Scene( editor ),
-		new Sidebar.Properties( editor ),
-		new Sidebar.Animation( editor ),
-		new Sidebar.Script( editor )
-	);
+	var scene = new Sidebar.Scene( editor );
+	// var scene = new UI.Span().add(
+	// 	new Sidebar.Scene( editor ),
+	// 	new Sidebar.Properties( editor ),
+	// 	new Sidebar.Animation( editor ),
+	// 	new Sidebar.Script( editor )
+	// );
 	container.add( scene );
+	//
+	// var project = new UI.Span().add(
+	// 	new Sidebar.Project( editor )
+	// );
 
-	var project = new UI.Span().add(
-		new Sidebar.Project( editor )
-	);
+	var project = new Sidebar.Project( editor );
 	container.add( project );
 
-	var settings = new UI.Span().add(
-		new Sidebar.Settings( editor ),
-		new Sidebar.History( editor )
-	);
+	// var settings = new UI.Span().add(
+	// 	new Sidebar.Settings( editor ),
+	// 	new Sidebar.History( editor )
+	// );
+	var settings = new Sidebar.Settings( editor );
 	container.add( settings );
 
 	//
@@ -59,6 +64,7 @@ var Sidebar = function ( editor ) {
 		settings.setDisplay( 'none' );
 
 		switch ( section ) {
+
 			case 'SCENE':
 				sceneTab.setClass( 'selected' );
 				scene.setDisplay( '' );
@@ -71,6 +77,7 @@ var Sidebar = function ( editor ) {
 				settingsTab.setClass( 'selected' );
 				settings.setDisplay( '' );
 				break;
+
 		}
 
 	}

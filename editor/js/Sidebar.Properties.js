@@ -7,7 +7,10 @@ Sidebar.Properties = function ( editor ) {
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Span();
+	// var container = new UI.Span();
+	var container = new UI.Panel();
+	container.setId( 'properties' );
+	container.setBorderTop( '0' );
 
 	var objectTab = new UI.Text( strings.getKey( 'sidebar/properties/object' ) ).setTextTransform( 'uppercase' );
 	objectTab.onClick( function () { select( 'OBJECT' ) } );
@@ -19,7 +22,8 @@ Sidebar.Properties = function ( editor ) {
 	materialTab.onClick( function () { select( 'MATERIAL' ) } );
 
 	var tabs = new UI.Div();
-	tabs.setId( 'tabs' );
+	tabs.setId( 'proptabs' );
+	tabs.setClass( 'tabs' );
 	tabs.add( objectTab, geometryTab, materialTab );
 	container.add( tabs );
 
@@ -53,6 +57,7 @@ Sidebar.Properties = function ( editor ) {
 		material.setDisplay( 'none' );
 
 		switch ( section ) {
+
 			case 'OBJECT':
 				objectTab.setClass( 'selected' );
 				object.setDisplay( '' );
@@ -65,6 +70,7 @@ Sidebar.Properties = function ( editor ) {
 				materialTab.setClass( 'selected' );
 				material.setDisplay( '' );
 				break;
+
 		}
 
 	}

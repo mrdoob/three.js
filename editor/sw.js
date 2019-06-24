@@ -94,6 +94,8 @@ const staticAssets = [
 	//
 
 	'./css/main.css',
+	'./css/normal.css',
+	'./css/wide.css',
 	'./css/dark.css',
 	'./css/light.css',
 

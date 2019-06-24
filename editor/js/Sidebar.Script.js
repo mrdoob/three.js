@@ -10,7 +10,8 @@ Sidebar.Script = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
-
+	container.setPaddingTop( '8px' );
+	container.setPaddingBottom( '20px' );
 	container.add( new UI.Text( strings.getKey( 'sidebar/script' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UI.Break() );
 	container.add( new UI.Break() );
@@ -92,7 +93,7 @@ Sidebar.Script = function ( editor ) {
 
 					scriptsContainer.add( new UI.Break() );
 
-				} )( object, scripts[ i ] )
+				} )( object, scripts[ i ] );
 
 			}
 

@@ -1,0 +1,110 @@
+body {
+	min-width: 600px;
+}
+
+#viewport, #player, #script {
+	right: 600px;
+}
+
+#toolbar {
+	left: calc(50% - 440px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
+}
+
+#sidebar {
+	width: 600px;
+}
+
+#scene {
+	height: calc(100% - 47px);
+}
+
+#sceneLeft {
+	height: 100%;
+	max-width: 280px;
+}
+
+#sceneLeft > .Outliner {
+	height: calc(100% - 100px);
+}
+
+#sceneRight {
+	height: 100%;
+	margin-top: -47px;
+	max-width: 300px;
+}
+
+/* */
+
+@media all and ( max-width: 600px ) {
+
+	#viewport, #player, #script {
+		right: 300px;
+	}
+
+	#sidebar {
+		width: 300px;
+	}
+
+	#scene {
+		height: auto;
+	}
+
+	#sceneLeft {
+		height: auto;
+		max-width: 100%;
+	}
+
+	#sceneLeft > .Outliner {
+		height: 140px;
+		max-width: calc(100% - 20px);
+	}
+
+	#sceneRight {
+		height: auto;
+		margin-top: 0;
+		max-width: 100%;
+	}
+
+	#menubar .menu .options {
+		max-height: calc(100% - 372px);
+	}
+
+	#menubar .menu.right {
+		display: none;
+	}
+
+	#viewport {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#script {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#player {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#sidebar {
+		left: 0;
+		width: 100%;
+		top: calc(100% - 320px);
+		bottom: 0;
+	}
+
+	#toolbar {
+		left: calc(50% - 140px);
+		width: 280px;
+		top: 68px;
+	}
+
+}
