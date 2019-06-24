@@ -284,8 +284,8 @@
 					.setModelName( local.name )
 					.setBaseObject3d( local );
 
-					// Configure WorkerExecutionSupport to disregard worker after execution
-					objLoader2Parallel.getWorkerExecutionSupport().setTerminateWorkerOnLoad( true );
+					// Configure WorkerExecutionSupport to not disregard worker after execution
+					objLoader2Parallel.getWorkerExecutionSupport().setTerminateWorkerOnLoad( false );
 
 					function callbackMeshAlter ( event ) {
 						let override = new LoadedMeshUserOverride( false, true );

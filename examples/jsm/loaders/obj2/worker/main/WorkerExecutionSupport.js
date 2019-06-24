@@ -3,12 +3,22 @@
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
-const CodeBuilderInstructions = function () {
+/**
+ * These instructions are used by {WorkerExecutionSupport} to build code for the web worker or to assign code
+ *
+ * @param {boolean} supportsStandardWorker
+ * @param {boolean} supportsJsmWorker
+ * @constructor
+ */
+const CodeBuilderInstructions = function ( supportsStandardWorker, supportsJsmWorker, preferJsmWorker ) {
+	this.supportsStandardWorker = supportsStandardWorker;
+	this.supportsJsmWorker = supportsJsmWorker;
+	this.preferJsmWorker = preferJsmWorker;
 	this.startCode = '';
 	this.codeFragments = [];
 	this.importStatements = [];
+
 	this.jsmWorkerFile;
-	this.jsmWorker = false;
 	this.defaultGeometryType = 0;
 };
 
@@ -16,16 +26,20 @@ CodeBuilderInstructions.prototype = {
 
 	constructor: CodeBuilderInstructions,
 
+	isSupportsStandardWorker: function () {
+		return this.supportsStandardWorker;
+	},
+
+	isSupportsJsmWorker: function () {
+		return this.supportsJsmWorker;
+	},
+
+	isPreferJsmWorker: function () {
+		return this.preferJsmWorker;
+	},
+
 	setJsmWorkerFile: function ( jsmWorkerFile ) {
 		this.jsmWorkerFile = jsmWorkerFile;
-	},
-
-	setJsmWorker: function ( jsmWorker ) {
-		this.jsmWorker = jsmWorker;
-	},
-
-	isJsmWorker: function () {
-		return this.jsmWorker;
 	},
 
 	addStartCode: function ( startCode ) {
@@ -68,7 +82,7 @@ const WorkerExecutionSupport = function () {
 
 	this._reset();
 };
-WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.0.0-beta2';
+WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.0.0-preview';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
 
@@ -95,7 +109,7 @@ WorkerExecutionSupport.prototype = {
 				usesMeshDisassembler: false,
 				defaultGeometryType: 0
 			},
-			terminateWorkerOnLoad: false,
+			terminateWorkerOnLoad: true,
 			forceWorkerDataCopy: false,
 			started: false,
 			queuedMessage: null,
@@ -179,7 +193,33 @@ WorkerExecutionSupport.prototype = {
 		}
 	},
 
-	buildWorkerJsm: function ( codeBuilderInstructions ) {
+	/**
+	 * Builds the worker code according the provided Instructions.
+	 * If jsm worker code shall be built, then function may fall back to standard if lag is set
+	 *
+ 	 * @param {CodeBuilderInstructions} codeBuilderInstructions
+	 */
+	buildWorker: function ( codeBuilderInstructions ) {
+		let jsmSuccess = false;
+
+		if ( codeBuilderInstructions.isSupportsJsmWorker() && codeBuilderInstructions.isPreferJsmWorker() ) {
+			jsmSuccess = this._buildWorkerJsm( codeBuilderInstructions );
+		}
+
+		if ( ! jsmSuccess && codeBuilderInstructions.isSupportsStandardWorker() ) {
+
+			this._buildWorkerStandard( codeBuilderInstructions );
+
+		}
+	},
+
+	/**
+	 *
+	 * @param {CodeBuilderInstructions} codeBuilderInstructions
+	 * @return {boolean} Whether loading of jsm worker was successful
+	 * @private
+	 */
+	_buildWorkerJsm: function ( codeBuilderInstructions ) {
 		let jsmSuccess = true;
 		this._buildWorkerCheckPreconditions( true, 'buildWorkerJsm' );
 
@@ -187,9 +227,7 @@ WorkerExecutionSupport.prototype = {
 		try {
 
 			let worker = new Worker( workerFileUrl, { type: "module" } );
-			codeBuilderInstructions.setJsmWorker( true );
-
-			this._configureWorkerCommunication( worker, codeBuilderInstructions, 'buildWorkerJsm' );
+			this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, 'buildWorkerJsm' );
 
 		}
 		catch ( e ) {
@@ -201,7 +239,6 @@ WorkerExecutionSupport.prototype = {
 
 			}
 		}
-
 		return jsmSuccess;
 	},
 
@@ -210,7 +247,13 @@ WorkerExecutionSupport.prototype = {
 	 *
 	 * @param {CodeBuilderIns} buildWorkerCode The function that is invoked to create the worker code of the parser.
 	 */
-	buildWorkerStandard: function ( codeBuilderInstructions ) {
+
+	/**
+	 *
+	 * @param {CodeBuilderInstructions} codeBuilderInstructions
+	 * @private
+	 */
+	_buildWorkerStandard: function ( codeBuilderInstructions ) {
 		this._buildWorkerCheckPreconditions( false,'buildWorkerStandard' );
 
 		let concatenateCode = '';
@@ -226,9 +269,8 @@ WorkerExecutionSupport.prototype = {
 
 		let blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
 		let worker = new Worker( window.URL.createObjectURL( blob ) );
-		codeBuilderInstructions.setJsmWorker( false );
 
-		this._configureWorkerCommunication( worker, codeBuilderInstructions, 'buildWorkerStandard' );
+		this._configureWorkerCommunication( worker, false, codeBuilderInstructions.defaultGeometryType, 'buildWorkerStandard' );
 	},
 
 	_buildWorkerCheckPreconditions: function ( requireJsmWorker, timeLabel ) {
@@ -242,18 +284,18 @@ WorkerExecutionSupport.prototype = {
 		}
 	},
 
-	_configureWorkerCommunication: function ( worker, codeBuilderInstructions, timeLabel ) {
+	_configureWorkerCommunication: function ( worker, haveJsmWorker, defaultGeometryType, timeLabel ) {
 		this.worker.native = worker;
-		this.worker.jsmWorker = codeBuilderInstructions.isJsmWorker();
+		this.worker.jsmWorker = haveJsmWorker;
 
 		let scope = this;
 		let scopedReceiveWorkerMessage = function ( event ) {
 			scope._receiveWorkerMessage( event );
 		};
 		this.worker.native.onmessage = scopedReceiveWorkerMessage;
-		if ( codeBuilderInstructions.defaultGeometryType !== undefined && codeBuilderInstructions.defaultGeometryType !== null ) {
+		if ( defaultGeometryType !== undefined && defaultGeometryType !== null ) {
 
-			this.worker.workerRunner.defaultGeometryType = codeBuilderInstructions.defaultGeometryType;
+			this.worker.workerRunner.defaultGeometryType = defaultGeometryType;
 		}
 
 		if ( this.logging.enabled ) {
@@ -263,6 +305,11 @@ WorkerExecutionSupport.prototype = {
 		}
 	},
 
+	/**
+	 * Returns if Worker code is available and complies with expectation.
+	 * @param {boolean} requireJsmWorker
+	 * @return {boolean|*}
+	 */
 	isWorkerLoaded: function ( requireJsmWorker ) {
 		return this.worker.native !== null &&
 			( ( requireJsmWorker && this.worker.jsmWorker ) || ( ! requireJsmWorker && ! this.worker.jsmWorker ) );
