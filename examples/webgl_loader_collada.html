@@ -4,51 +4,30 @@
 		<title>three.js webgl - collada</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader
-			| Elf Girl by <a href="https://sketchfab.com/yellow09" target="_blank" rel="noopener">halloween</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader<br/>
+			Elf Girl by <a href="https://sketchfab.com/yellow09" target="_blank" rel="noopener">halloween</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Clock,
+				DirectionalLight,
+				LoadingManager,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/ColladaLoader.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
 			var container, stats, clock;
 			var camera, scene, renderer, elf;
@@ -60,17 +39,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( 8, 10, 8 );
 				camera.lookAt( 0, 3, 0 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 				// loading manager
 
-				var loadingManager = new THREE.LoadingManager( function () {
+				var loadingManager = new LoadingManager( function () {
 
 					scene.add( elf );
 
@@ -78,7 +57,7 @@
 
 				// collada
 
-				var loader = new THREE.ColladaLoader( loadingManager );
+				var loader = new ColladaLoader( loadingManager );
 				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
 
 					elf = collada.scene;
@@ -87,16 +66,16 @@
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				var directionalLight = new DirectionalLight( 0xffffff, 0.8 );
 				directionalLight.position.set( 1, 1, 0 ).normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

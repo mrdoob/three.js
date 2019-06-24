@@ -4,41 +4,21 @@
 		<title>three.js webgl - node material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
+			#waitScreen {
 				color: #fff;
 				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
+				top: 50%;
+				left: 50%;
+				margin-top: -50px;
+				margin-left: -50px;
+				width: 100px;
+				height: 100px;
 			}
-
-			#waitScreen {
-				color: #000;
-			    position: absolute;
-			    top: 50%;
-			    left: 50%;
-			    margin-top: -50px;
-			    margin-left: -50px;
-			    width: 100px;
-			    height: 100px;
-			}
-
 			.hide {
 				display:none;
 			}
-
-			a { color: white }
 		</style>
 	</head>
 	<body>
@@ -195,7 +175,7 @@
 				THREE.OperatorNode.MUL
 			);
 
-			var cycle = new THREE.Math1Node( sinCycleInSecs, THREE.Math1Node.SIN );
+			var cycle = new THREE.MathNode( sinCycleInSecs, THREE.MathNode.SIN );
 
 			var cycleColor = new THREE.OperatorNode(
 				cycle,
@@ -203,7 +183,7 @@
 				THREE.OperatorNode.MUL
 			);
 
-			var cos = new THREE.Math1Node( cycleColor, THREE.Math1Node.SIN );
+			var cos = new THREE.MathNode( cycleColor, THREE.MathNode.SIN );
 
 			mtl.color = new THREE.ColorNode( 0 );
 			mtl.emissive = cos;

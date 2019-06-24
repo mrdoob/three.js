@@ -4,6 +4,7 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param script javascript object
  * @param attributeName string
@@ -11,9 +12,9 @@
  * @constructor
  */
 
-var SetScriptValueCommand = function ( object, script, attributeName, newValue ) {
+var SetScriptValueCommand = function ( editor, object, script, attributeName, newValue ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetScriptValueCommand';
 	this.name = 'Set Script.' + attributeName;

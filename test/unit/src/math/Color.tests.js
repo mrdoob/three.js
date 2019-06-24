@@ -29,9 +29,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isColor", ( assert ) => {
+		QUnit.test( "isColor", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Color();
+			assert.ok( a.isColor === true, "Passed!" );
+
+			var b = new Object();
+			assert.ok( ! b.isColor, "Passed!" );
 
 		} );
 
@@ -53,9 +57,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "setScalar", ( assert ) => {
+		QUnit.test( "setScalar", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var c = new Color();
+			c.setScalar( 0.5 );
+			assert.ok( c.r == 0.5, "Red: " + c.r );
+			assert.ok( c.g == 0.5, "Green: " + c.g );
+			assert.ok( c.b == 0.5, "Blue: " + c.b );
 
 		} );
 
@@ -64,12 +72,19 @@ export default QUnit.module( 'Maths', () => {
 			var c = new Color();
 			c.setHex( 0xFA8072 );
 			assert.ok( c.getHex() == 0xFA8072, "Hex: " + c.getHex() );
+			assert.ok( c.r == 0xFA / 0xFF, "Red: " + c.r );
+			assert.ok( c.g == 0x80 / 0xFF, "Green: " + c.g );
+			assert.ok( c.b == 0x72 / 0xFF, "Blue: " + c.b );
 
 		} );
 
-		QUnit.todo( "setRGB", ( assert ) => {
+		QUnit.test( "setRGB", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var c = new Color();
+			c.setRGB( 0.3, 0.5, 0.7 );
+			assert.ok( c.r == 0.3, "Red: " + c.r );
+			assert.ok( c.g == 0.5, "Green: " + c.g );
+			assert.ok( c.b == 0.7, "Blue: " + c.b );
 
 		} );
 
@@ -86,9 +101,41 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "setStyle", ( assert ) => {
+		QUnit.test( "setStyle", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Color();
+
+			var b = new Color( 8 / 255, 25 / 255, 178 / 255 );
+			a.setStyle( "rgb(8,25,178)" );
+			assert.ok( a.equals( b ), "Passed" );
+
+			b = new Color( 8 / 255, 25 / 255, 178 / 255 );
+			a.setStyle( "rgba(8,25,178,200)" );
+			assert.ok( a.equals( b ), "Passed" );
+
+			var hsl = { h: 0, s: 0, l: 0 };
+			a.setStyle( "hsl(270,50%,75%)" );
+			a.getHSL( hsl );
+			assert.ok( hsl.h == 0.75, "hue: " + hsl.h );
+			assert.ok( hsl.s == 0.5, "saturation: " + hsl.s );
+			assert.ok( hsl.l == 0.75, "lightness: " + hsl.l );
+
+			hsl = { h: 0, s: 0, l: 0 };
+			a.setStyle( "hsl(270,50%,75%,0.5)" );
+			a.getHSL( hsl );
+			assert.ok( hsl.h == 0.75, "hue: " + hsl.h );
+			assert.ok( hsl.s == 0.5, "saturation: " + hsl.s );
+			assert.ok( hsl.l == 0.75, "lightness: " + hsl.l );
+
+			a.setStyle( "#F8A" );
+			assert.ok( a.r == 0xFF / 255, "Red: " + a.r );
+			assert.ok( a.g == 0x88 / 255, "Green: " + a.g );
+			assert.ok( a.b == 0xAA / 255, "Blue: " + a.b );
+
+			a.setStyle( "#F8ABC1" );
+			assert.ok( a.r == 0xF8 / 255, "Red: " + a.r );
+			assert.ok( a.g == 0xAB / 255, "Green: " + a.g );
+			assert.ok( a.b == 0xC1 / 255, "Blue: " + a.b );
 
 		} );
 
@@ -100,9 +147,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "copy", ( assert ) => {
+		QUnit.test( "copy", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Color( 'teal' );
+			var b = new Color();
+			b.copy( a );
+			assert.ok( b.r == 0x00 / 255, "Red: " + b.r );
+			assert.ok( b.g == 0x80 / 255, "Green: " + b.g );
+			assert.ok( b.b == 0x80 / 255, "Blue: " + b.b );
 
 		} );
 
@@ -213,9 +265,17 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "addColors", ( assert ) => {
+		QUnit.test( "addColors", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Color( 0x0000FF );
+			var b = new Color( 0xFF0000 );
+			var c = new Color( 0xFF00FF );
+			var d = new Color();
+
+			d.addColors( a, b );
+
+			assert.ok( d.equals( c ), "Passed" );
+
 
 		} );
 

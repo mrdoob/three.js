@@ -15,7 +15,7 @@ THREE.HorizontalBlurShader = {
 	uniforms: {
 
 		"tDiffuse": { value: null },
-		"h":        { value: 1.0 / 512.0 }
+		"h": { value: 1.0 / 512.0 }
 
 	},
 

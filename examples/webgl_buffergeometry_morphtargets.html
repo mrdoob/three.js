@@ -4,79 +4,72 @@
 		<title>three.js webgl - buffergeometry - morph targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				font-family: Monospace;
-				font-size: 13px;
-				margin: 0px;
-				overflow: hidden;
-				text-align: center;
+			a {
+				color: #f00;
 			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
 		</style>
 	</head>
 
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - buffergeometry - morph targets
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - buffergeometry - morph targets<br/>
+			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				Color,
+				Float32BufferAttribute,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, camera, scene, renderer, mesh;
 
 			function init() {
 
-				if ( WEBGL.isWebGLAvailable() === false ) {
+				scene = new Scene();
+				scene.background = new Color( 0x8FBCD4 );
 
-					document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-					return false;
-
-				}
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x8FBCD4 );
-
-				scene.add( new THREE.AmbientLight( 0x8FBCD4, 0.4 ) );
+				scene.add( new AmbientLight( 0x8FBCD4, 0.4 ) );
 
 				container = document.getElementById( 'container' );
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.z = 8;
 				scene.add( camera );
 
-				var controls = new THREE.OrbitControls( camera, container );
+				var controls = new OrbitControls( camera, container );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1 );
+				var pointLight = new PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
 
 				var geometry = createGeometry();
 
-				var material = new THREE.MeshPhongMaterial( {
+				var material = new MeshPhongMaterial( {
 					color: 0xff0000,
 					flatShading: true,
 					morphTargets: true
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				initGUI();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -95,7 +88,7 @@
 
 			function createGeometry() {
 
-				var geometry = new THREE.BoxBufferGeometry( 2, 2, 2, 32, 32, 32 );
+				var geometry = new BoxBufferGeometry( 2, 2, 2, 32, 32, 32 );
 
 				// create an empty array to  hold targets for the attribute we want to morph
 				// morphing positions and normals is supported
@@ -109,8 +102,8 @@
 
 				// for the second morph target, we'll twist the cubes vertices
 				var twistPositions = [];
-				var direction = new THREE.Vector3( 1, 0, 0 ).normalize();
-				var vertex = new THREE.Vector3();
+				var direction = new Vector3( 1, 0, 0 ).normalize();
+				var vertex = new Vector3();
 
 				for ( var i = 0; i < positions.length; i += 3 ) {
 
@@ -134,10 +127,10 @@
 				}
 
 				// add the spherical positions as the first morph target
-				geometry.morphAttributes.position[ 0 ] = new THREE.Float32BufferAttribute( spherePositions, 3 );
+				geometry.morphAttributes.position[ 0 ] = new Float32BufferAttribute( spherePositions, 3 );
 
 				// add the twisted positions as the second morph target
-				geometry.morphAttributes.position[ 1 ] = new THREE.Float32BufferAttribute( twistPositions, 3 );
+				geometry.morphAttributes.position[ 1 ] = new Float32BufferAttribute( twistPositions, 3 );
 
 				return geometry;
 
@@ -150,7 +143,7 @@
 					Spherify: 0,
 					Twist: 0,
 				};
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var folder = gui.addFolder( 'Morph Targets' );
 
 				folder.add( params, 'Spherify', 0, 1 ).step( 0.01 ).onChange( function ( value ) {

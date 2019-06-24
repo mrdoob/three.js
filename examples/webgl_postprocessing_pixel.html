@@ -4,49 +4,9 @@
 		<title>three.js webgl - postprocessing - pixel shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				/*text-align:center;*/
-				font-weight: lighter;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display: block;
-			}
-
-			#info a {
-				color: #f88;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer;
-			}
-
-			.dg.ac {
-				z-index: 1 !important;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/PixelShader.js"></script>
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="container"></div>
 
@@ -54,7 +14,33 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader by <a href="http://wongbryan.github.io">wongbryan</a>
 		</div>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Color,
+				ConeBufferGeometry,
+				DirectionalLight,
+				Group,
+				HemisphereLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Scene,
+				SphereBufferGeometry,
+				TetrahedronBufferGeometry,
+				TorusKnotBufferGeometry,
+				Vector2,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { PixelShader } from './jsm/shaders/PixelShader.js';
+
 
 			var camera, scene, renderer, gui, composer, controls;
 			var pixelPass, params;
@@ -83,52 +69,52 @@
 			function init() {
 
 				var container = document.getElementById( 'container' );
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 30 );
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 2.0;
 				controls.panSpeed = 0.8;
 				controls.zoomSpeed = 1.5;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
+				var hemisphereLight = new HemisphereLight( 0xfceafc, 0x000000, .8 );
 				scene.add( hemisphereLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
+				var dirLight = new DirectionalLight( 0xffffff, .5 );
 				dirLight.position.set( 150, 75, 150 );
 				scene.add( dirLight );
 
-				var dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
+				var dirLight2 = new DirectionalLight( 0xffffff, .2 );
 				dirLight2.position.set( - 150, 75, - 150 );
 				scene.add( dirLight2 );
 
-				var dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
+				var dirLight3 = new DirectionalLight( 0xffffff, .1 );
 				dirLight3.position.set( 0, 125, 0 );
 				scene.add( dirLight3 );
 
 				var geometries = [
-					new THREE.SphereBufferGeometry( 1, 64, 64 ),
-					new THREE.BoxBufferGeometry( 1, 1, 1 ),
-					new THREE.ConeBufferGeometry( 1, 1, 32 ),
-					new THREE.TetrahedronBufferGeometry( 1 ),
-					new THREE.TorusKnotBufferGeometry( 1, .4 )
+					new SphereBufferGeometry( 1, 64, 64 ),
+					new BoxBufferGeometry( 1, 1, 1 ),
+					new ConeBufferGeometry( 1, 1, 32 ),
+					new TetrahedronBufferGeometry( 1 ),
+					new TorusKnotBufferGeometry( 1, .4 )
 				];
 
-				group = new THREE.Group();
+				group = new Group();
 
 				for ( var i = 0; i < 25; i ++ ) {
 
 					var geom = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					var color = new THREE.Color();
+					var color = new Color();
 					color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
-					var mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
-					var mesh = new THREE.Mesh( geom, mat );
+					var mat = new MeshPhongMaterial( { color: color, shininess: 200 } );
+					var mesh = new Mesh( geom, mat );
 					var s = 4 + Math.random() * 10;
 					mesh.scale.set( s, s, s );
 
@@ -141,13 +127,12 @@
 
 				scene.add( group );
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				pixelPass = new THREE.ShaderPass( THREE.PixelShader );
-				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				pixelPass = new ShaderPass( PixelShader );
+				pixelPass.uniforms[ "resolution" ].value = new Vector2( window.innerWidth, window.innerHeight );
 				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
-				pixelPass.renderToScreen = true;
 				composer.addPass( pixelPass );
 
 				window.addEventListener( 'resize', resize );
@@ -156,7 +141,7 @@
 					pixelSize: 16,
 					postprocessing: true
 				};
-				gui = new dat.GUI();
+				gui = new GUI();
 				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 				gui.add( params, 'postprocessing' );
 

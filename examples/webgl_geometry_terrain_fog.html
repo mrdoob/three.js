@@ -4,50 +4,42 @@
 		<title>three.js webgl - geometry - terrain + fog</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #efd1b5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
 				color: #a06851;
 			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				CanvasTexture,
+				ClampToEdgeWrapping,
+				Clock,
+				Color,
+				FogExp2,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/WebGL.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			var container, stats;
 
@@ -59,7 +51,7 @@
 			var worldHalfWidth = worldWidth / 2;
 			var worldHalfDepth = worldDepth / 2;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -68,21 +60,21 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xefd1b5 );
-				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
+				scene = new Scene();
+				scene.background = new Color( 0xefd1b5 );
+				scene.fog = new FogExp2( 0xefd1b5, 0.0025 );
 
 				var data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
-				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				var vertices = geometry.attributes.position.array;
@@ -93,19 +85,16 @@
 
 				}
 
-				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
-				texture.wrapS = THREE.ClampToEdgeWrapping;
-				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture = new CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = ClampToEdgeWrapping;
+				texture.wrapT = ClampToEdgeWrapping;
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				mesh = new Mesh( geometry, new MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -155,9 +144,9 @@
 
 				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
-				vector3 = new THREE.Vector3( 0, 0, 0 );
+				vector3 = new Vector3( 0, 0, 0 );
 
-				sun = new THREE.Vector3( 1, 1, 1 );
+				sun = new Vector3( 1, 1, 1 );
 				sun.normalize();
 
 				canvas = document.createElement( 'canvas' );

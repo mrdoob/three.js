@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - webgl</title>
+		<title>three.js - webgl memory test I</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
+				background-color: #fff;
+				color: #000;
 			}
-
+			a {
+				color: #08f;
+			}
 		</style>
 	</head>
 
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - memory test I
+		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script>
+		<script type="module">
+			import {
+				CanvasTexture,
+				Color,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var container;
 
@@ -33,13 +45,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -72,13 +84,13 @@
 
 			function render() {
 
-				var geometry = new THREE.SphereBufferGeometry( 50, Math.random() * 64, Math.random() * 32 );
+				var geometry = new SphereBufferGeometry( 50, Math.random() * 64, Math.random() * 32 );
 
-				var texture = new THREE.CanvasTexture( createImage() );
+				var texture = new CanvasTexture( createImage() );
 
-				var material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } );
+				var material = new MeshBasicMaterial( { map: texture, wireframe: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 
 				scene.add( mesh );
 

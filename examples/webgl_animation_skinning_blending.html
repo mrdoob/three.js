@@ -4,23 +4,10 @@
 		<title>three.js webgl - animation - skinning</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
 			a {
-				color: #ff0000;
+				color: #f00;
 			}
 			.ac {  /* prevent dat-gui from being selected */
 				-webkit-user-select: none;
@@ -41,24 +28,31 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Skeletal Animation Blending
-			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)
-			<br/><br/>Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
+			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)<br/>
+			Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AnimationMixer,
+				Clock,
+				Color,
+				DirectionalLight,
+				Fog,
+				HemisphereLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				SkeletonHelper,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var scene, renderer, camera, stats;
 			var model, skeleton, mixer, clock;
@@ -78,21 +72,21 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 1, 2, - 3 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
+				scene = new Scene();
+				scene.background = new Color( 0xa0a0a0 );
+				scene.fog = new Fog( 0xa0a0a0, 10, 50 );
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				var dirLight = new DirectionalLight( 0xffffff );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 2;
@@ -103,16 +97,16 @@
 				dirLight.shadow.camera.far = 40;
 				scene.add( dirLight );
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				// ground
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				var mesh = new Mesh( new PlaneBufferGeometry( 100, 100 ), new MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( 'models/gltf/Soldier.glb', function ( gltf ) {
 
 					model = gltf.scene;
@@ -126,7 +120,7 @@
 
 					//
 
-					skeleton = new THREE.SkeletonHelper( model );
+					skeleton = new SkeletonHelper( model );
 					skeleton.visible = false;
 					scene.add( skeleton );
 
@@ -139,7 +133,7 @@
 
 					var animations = gltf.animations;
 
-					mixer = new THREE.AnimationMixer( model );
+					mixer = new AnimationMixer( model );
 
 					idleAction = mixer.clipAction( animations[ 0 ] );
 					walkAction = mixer.clipAction( animations[ 3 ] );
@@ -153,7 +147,7 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
@@ -170,7 +164,7 @@
 
 			function createPanel() {
 
-				var panel = new dat.GUI( { width: 310 } );
+				var panel = new GUI( { width: 310 } );
 
 				var folder1 = panel.addFolder( 'Visibility' );
 				var folder2 = panel.addFolder( 'Activation/Deactivation' );

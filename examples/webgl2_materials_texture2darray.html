@@ -4,29 +4,7 @@
 		<title>three.js webgl - 2D texture array</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			#info a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<script id="vs" type="x-shader/x-vertex">
 	#version 300 es
@@ -76,14 +54,25 @@
 			<a href="https://www.codeproject.com/info/cpol10.aspx" target="_blank" rel="noopener">CPOL</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<!--<script src="js/controls/OrbitControls.js"></script>-->
-
 		<script src="js/libs/jszip.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="js/WebGL.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				DataTexture2DArray,
+				FileLoader,
+				Mesh,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RedFormat,
+				Scene,
+				ShaderMaterial,
+				Vector2,
+				UnsignedByteType,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import Stats from './jsm/libs/stats.module.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -106,53 +95,51 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.z = 70;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// width 256, height 256, depth 109, 8-bit, zip archived raw data
 
-				new THREE.FileLoader()
+				new FileLoader()
 					.setResponseType( 'arraybuffer' )
 					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
 						var zip = new JSZip( data );
 						var array = zip.files[ 'head256x256x109' ].asUint8Array();
 
-						var texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
+						var texture = new DataTexture2DArray( array, 256, 256, 109 );
 
-						texture.format = THREE.RedFormat;
-						texture.type = THREE.UnsignedByteType;
+						texture.format = RedFormat;
+						texture.type = UnsignedByteType;
 
 						texture.needsUpdate = true;
 
-						var material = new THREE.ShaderMaterial( {
+						var material = new ShaderMaterial( {
 							uniforms: {
 								diffuse: { value: texture },
 								depth: { value: 0 },
-								size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
+								size: { value: new Vector2( planeWidth, planeHeight ) }
 							},
 							vertexShader: document.getElementById( 'vs' ).textContent.trim(),
 							fragmentShader: document.getElementById( 'fs' ).textContent.trim()
 						} );
 
-						var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
+						var geometry = new PlaneBufferGeometry( planeWidth, planeHeight );
 
-						mesh = new THREE.Mesh( geometry, material );
+						mesh = new Mesh( geometry, material );
 
 						scene.add( mesh );
 
 					} );
-
-				// var controls = new THREE.OrbitControls( camera );
 
 				// 2D Texture array is available on WebGL 2.0
 
 				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2' );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas, context: context } );
+				renderer = new WebGLRenderer( { antialias: true, canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

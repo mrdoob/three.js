@@ -4,24 +4,7 @@
 		<title>three.js webgl - shaders - ocean</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-
-			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				text-align:center;
-				padding: 5px;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -30,23 +13,32 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Color,
+				CubeCamera,
+				DirectionalLight,
+				DoubleSide,
+				Float32BufferAttribute,
+				IcosahedronBufferGeometry,
+				LinearMipMapLinearFilter,
+				Mesh,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				TextureLoader,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/objects/Water.js"></script>
-		<script src="js/objects/Sky.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Water } from './jsm/objects/Water.js';
+			import { Sky } from './jsm/objects/Sky.js';
 
 			var container, stats;
 			var camera, scene, renderer, light;
@@ -61,37 +53,37 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( 30, 30, 100 );
 
 				//
 
-				light = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				light = new DirectionalLight( 0xffffff, 0.8 );
 				scene.add( light );
 
 				// Water
 
-				var waterGeometry = new THREE.PlaneBufferGeometry( 10000, 10000 );
+				var waterGeometry = new PlaneBufferGeometry( 10000, 10000 );
 
-				water = new THREE.Water(
+				water = new Water(
 					waterGeometry,
 					{
 						textureWidth: 512,
 						textureHeight: 512,
-						waterNormals: new THREE.TextureLoader().load( 'textures/waternormals.jpg', function ( texture ) {
+						waterNormals: new TextureLoader().load( 'textures/waternormals.jpg', function ( texture ) {
 
-							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+							texture.wrapS = texture.wrapT = RepeatWrapping;
 
 						} ),
 						alpha: 1.0,
@@ -109,7 +101,7 @@
 
 				// Skybox
 
-				var sky = new THREE.Sky();
+				var sky = new Sky();
 
 				var uniforms = sky.material.uniforms;
 
@@ -125,9 +117,9 @@
 					azimuth: 0.205
 				};
 
-				var cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
+				var cubeCamera = new CubeCamera( 0.1, 1, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = LinearMipMapLinearFilter;
 
 				scene.background = cubeCamera.renderTarget;
 
@@ -151,11 +143,11 @@
 
 				//
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 20, 1 );
+				var geometry = new IcosahedronBufferGeometry( 20, 1 );
 				var count = geometry.attributes.position.count;
 
 				var colors = [];
-				var color = new THREE.Color();
+				var color = new Color();
 
 				for ( var i = 0; i < count; i += 3 ) {
 
@@ -167,22 +159,22 @@
 
 				}
 
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshStandardMaterial( {
-					vertexColors: THREE.VertexColors,
+				var material = new MeshStandardMaterial( {
+					vertexColors: VertexColors,
 					roughness: 0.0,
 					flatShading: true,
 					envMap: cubeCamera.renderTarget.texture,
-					side: THREE.DoubleSide
+					side: DoubleSide
 				} );
 
-				sphere = new THREE.Mesh( geometry, material );
+				sphere = new Mesh( geometry, material );
 				scene.add( sphere );
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.495;
 				controls.target.set( 0, 10, 0 );
 				controls.minDistance = 40.0;
@@ -196,7 +188,7 @@
 
 				// GUI
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var folder = gui.addFolder( 'Sky' );
 				folder.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateSun );

@@ -2,9 +2,9 @@ export const REVISION: string;
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 export enum MOUSE {
-  LEFT,
-  MIDDLE,
-  RIGHT,
+	LEFT,
+	MIDDLE,
+	RIGHT,
 }
 
 // GL STATE CONSTANTS
@@ -54,7 +54,7 @@ export const CustomBlending: Blending;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other
-//  mappings to OpenGL constants defined in Texture.js)
+// mappings to OpenGL constants defined in Texture.js)
 export enum BlendingEquation {}
 export const AddEquation: BlendingEquation;
 export const SubtractEquation: BlendingEquation;
@@ -233,3 +233,8 @@ export const RGBDEncoding: TextureEncoding;
 export enum DepthPackingStrategies {}
 export const BasicDepthPacking: DepthPackingStrategies;
 export const RGBADepthPacking: DepthPackingStrategies;
+
+// Normal Map types
+export enum NormalMapTypes {}
+export const TangentSpaceNormalMap: NormalMapTypes;
+export const ObjectSpaceNormalMap: NormalMapTypes;

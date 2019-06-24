@@ -4,23 +4,15 @@
 		<title>three.js webgl - loaders - MMD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #fff;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
+			a {
+				color: #08f;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
 	</head>
 
@@ -35,21 +27,26 @@
 		Camera is customized from <a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">this Data</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/libs/mmdparser.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
 
-		<script src="js/loaders/TGALoader.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
-		<script src="js/effects/OutlineEffect.js"></script>
-		<script src="js/animation/CCDIKSolver.js"></script>
-		<script src="js/animation/MMDPhysics.js"></script>
-		<script src="js/animation/MMDAnimationHelper.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				AudioLoader,
+				AudioListener as _AudioListener,
+				Audio as _Audio,
+				Clock,
+				Color,
+				DirectionalLight,
+				PerspectiveCamera,
+				PolarGridHelper,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
 			var container;
 
@@ -58,40 +55,46 @@
 
 			var ready = false;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
-			init();
-			animate();
+			Ammo().then( function ( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 
 				// scene
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
+				scene.add( new PolarGridHelper( 30, 10 ) );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				var ambient = new AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				var directionalLight = new DirectionalLight( 0x887766 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				// model
 
@@ -112,9 +115,9 @@
 				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
 				var audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDAnimationHelper();
+				helper = new MMDAnimationHelper();
 
-				var loader = new THREE.MMDLoader();
+				var loader = new MMDLoader();
 
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
@@ -131,10 +134,10 @@
 							animation: cameraAnimation
 						} );
 
-						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
+						new AudioLoader().load( audioFile, function ( buffer ) {
 
-							var listener = new THREE.AudioListener();
-							var audio = new THREE.Audio( listener ).setBuffer( buffer );
+							var listener = new _AudioListener();
+							var audio = new _Audio( listener ).setBuffer( buffer );
 
 							listener.position.z = 1;
 

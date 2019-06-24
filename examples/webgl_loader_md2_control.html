@@ -4,28 +4,15 @@
 		<title>three.js webgl - morphtargets - MD2 controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
 				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #000;
+			a {
+				color: #08f;
 			}
-
-			a { color: skyblue; }
 		</style>
 	</head>
 
@@ -36,25 +23,29 @@
 			use arrows to control characters, mouse for camera
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Clock,
+				Color,
+				DirectionalLight,
+				Fog,
+				Mesh,
+				MeshPhongMaterial,
+				PCFSoftShadowMap,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				TextureLoader,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/loaders/MD2Loader.js"></script>
-		<script src="js/MorphBlendMesh.js"></script>
-		<script src="js/MD2CharacterComplex.js"></script>
-		<script src="js/Gyroscope.js"></script>
-
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MD2CharacterComplex } from './jsm/misc/MD2CharacterComplex.js';
+			import { Gyroscope } from './jsm/misc/Gyroscope.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -76,7 +67,7 @@
 
 			};
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -88,22 +79,22 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.set( 0, 150, 1300 );
 
 				// SCENE
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
+				scene.fog = new Fog( 0xffffff, 1000, 4000 );
 
 				scene.add( camera );
 
 				// LIGHTS
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new AmbientLight( 0x222222 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2.25 );
+				var light = new DirectionalLight( 0xffffff, 2.25 );
 				light.position.set( 200, 450, 500 );
 
 				light.castShadow = true;
@@ -120,20 +111,20 @@
 				light.shadow.camera.bottom = - 350;
 
 				scene.add( light );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 
 				//  GROUND
 
-				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+				var gt = new TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				var gg = new PlaneBufferGeometry( 16000, 16000 );
+				var gm = new MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
-				var ground = new THREE.Mesh( gg, gm );
+				var ground = new Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
-				ground.material.map.wrapS = THREE.RepeatWrapping;
-				ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.material.map.wrapS = RepeatWrapping;
+				ground.material.map.wrapT = RepeatWrapping;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -141,7 +132,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -152,7 +143,7 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+				renderer.shadowMap.type = PCFSoftShadowMap;
 
 				// STATS
 
@@ -167,7 +158,7 @@
 
 				// CONTROLS
 
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
 				cameraControls.update();
 
@@ -204,14 +195,14 @@
 
 				for ( var i = 0; i < nCharacters; i ++ ) {
 
-					var character = new THREE.MD2CharacterComplex();
+					var character = new MD2CharacterComplex();
 					character.scale = 3;
 					character.controls = controls;
 					characters.push( character );
 
 				}
 
-				var baseCharacter = new THREE.MD2CharacterComplex();
+				var baseCharacter = new MD2CharacterComplex();
 				baseCharacter.scale = 3;
 
 				baseCharacter.onLoadComplete = function () {
@@ -243,7 +234,7 @@
 
 					}
 
-					var gyro = new THREE.Gyroscope();
+					var gyro = new Gyroscope();
 					gyro.add( camera );
 					gyro.add( light, light.target );
 

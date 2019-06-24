@@ -4,41 +4,12 @@
 		<title>three.js webgl - raw shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raw shader demo</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -86,13 +57,21 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Color,
+				DoubleSide,
+				Float32BufferAttribute,
+				Mesh,
+				PerspectiveCamera,
+				RawShaderMaterial,
+				Scene,
+				Uint8BufferAttribute,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -105,17 +84,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
 				camera.position.z = 2;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x101010 );
+				scene = new Scene();
+				scene.background = new Color( 0x101010 );
 
 				// geometry
 
 				var triangles = 500;
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 
 				var positions = [];
 				var colors = [];
@@ -133,8 +112,8 @@
 
 				}
 
-				var positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
-				var colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
+				var positionAttribute = new Float32BufferAttribute( positions, 3 );
+				var colorAttribute = new Uint8BufferAttribute( colors, 4 );
 
 				colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
 
@@ -143,22 +122,22 @@
 
 				// material
 
-				var material = new THREE.RawShaderMaterial( {
+				var material = new RawShaderMaterial( {
 
 					uniforms: {
 						time: { value: 1.0 }
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-					side: THREE.DoubleSide,
+					side: DoubleSide,
 					transparent: true
 
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

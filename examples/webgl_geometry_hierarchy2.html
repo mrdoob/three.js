@@ -4,22 +4,22 @@
 		<title>three.js webgl - geometry hierarchy 2</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Color,
+				Mesh,
+				MeshNormalMaterial,
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, stats, root;
 
@@ -33,16 +33,16 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
 
-				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-				var material = new THREE.MeshNormalMaterial();
+				var geometry = new BoxBufferGeometry( 100, 100, 100 );
+				var material = new MeshNormalMaterial();
 
-				root = new THREE.Mesh( geometry, material );
+				root = new Mesh( geometry, material );
 				root.position.x = 1000;
 				scene.add( root );
 
@@ -50,7 +50,7 @@
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					object = new THREE.Mesh( geometry, material );
+					object = new Mesh( geometry, material );
 					object.position.x = 100;
 
 					parent.add( object );
@@ -62,7 +62,7 @@
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					object = new THREE.Mesh( geometry, material );
+					object = new Mesh( geometry, material );
 					object.position.x = - 100;
 
 					parent.add( object );
@@ -74,7 +74,7 @@
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					object = new THREE.Mesh( geometry, material );
+					object = new Mesh( geometry, material );
 					object.position.y = - 100;
 
 					parent.add( object );
@@ -86,7 +86,7 @@
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					object = new THREE.Mesh( geometry, material );
+					object = new Mesh( geometry, material );
 					object.position.y = 100;
 
 					parent.add( object );
@@ -98,7 +98,7 @@
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					object = new THREE.Mesh( geometry, material );
+					object = new Mesh( geometry, material );
 					object.position.z = - 100;
 
 					parent.add( object );
@@ -110,7 +110,7 @@
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					object = new THREE.Mesh( geometry, material );
+					object = new Mesh( geometry, material );
 					object.position.z = 100;
 
 					parent.add( object );
@@ -120,7 +120,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

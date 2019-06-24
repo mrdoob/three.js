@@ -4,71 +4,49 @@
 		<title>three.js css3d - molecules</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
 			body {
 				background-color: #050505;
 				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%);
-
-				margin: 0;
-				font-family: Arial;
-				overflow: hidden;
 			}
 
-			a {
-				color: #ffffff;
-			}
-
-			#info {
+			#topmenu {
 				position: absolute;
-				top: 0px;
+				top: 50px;
 				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				font-weight: bold;
+				padding: 10px;
+				box-sizing: border-box;
 				text-align: center;
-				z-index: 1;
 			}
 
 			#menu {
 				position: absolute;
 				bottom: 20px;
 				width: 100%;
+				padding: 10px;
+				box-sizing: border-box;
 				text-align: center;
-				padding: 0;
-				margin: 0;
-			}
-
-			#topmenu {
-				position: absolute;
-				top: 10px;
-				right: 10px;
-				width: 100%;
-				text-align: right;
-				padding: 0;
-				margin: 0;
-				z-index: 1;
 			}
 
 			button {
 				color: rgb(255,255,255);
-				background: transparent;
+				background: rgb(255,255,255,0.1);
 				border: 0px;
 				padding: 5px 10px;
+				margin: 2px;
+				font-size: 14px;
 				cursor: pointer;
 			}
-			button:hover {
-				background-color: rgba(0,255,255,0.5);
-			}
-			button:active {
-				color: #000000;
-				background-color: rgba(0,255,255,1);
-			}
+
+				button:hover {
+					background-color: rgba(0,255,255,0.5);
+				}
+
+				button:active {
+					color: #000000;
+					background-color: rgba(0,255,255,1);
+				}
 
 			.bond {
 				width: 5px;
@@ -79,31 +57,37 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-		<script src="js/loaders/PDBLoader.js"></script>
-
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - molecules</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - molecules</div>
 		<div id="topmenu">
-			<button id="b_a">Atoms</button>
-			<button id="b_b">Bonds</button>
-			<button id="b_ab">Atoms + Bonds</button>
+			<button id="b_a">Atoms</button><button id="b_b">Bonds</button><button id="b_ab">Atoms + Bonds</button>
 		</div>
 		<div id="menu"></div>
 
-		<script>
+		<script type="module">
+			import {
+				Color,
+				PerspectiveCamera,
+				Matrix4,
+				Object3D,
+				Scene,
+				Vector3
+			} from "../build/three.module.js";
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
+			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
+
 			var camera, scene, renderer;
 			var controls;
 			var root;
 
 			var objects = [];
-			var tmpVec1 = new THREE.Vector3();
-			var tmpVec2 = new THREE.Vector3();
-			var tmpVec3 = new THREE.Vector3();
-			var tmpVec4 = new THREE.Vector3();
-			var offset = new THREE.Vector3();
+			var tmpVec1 = new Vector3();
+			var tmpVec2 = new Vector3();
+			var tmpVec3 = new Vector3();
+			var tmpVec4 = new Vector3();
+			var offset = new Vector3();
 
 			var visualizationType = 2;
 
@@ -128,7 +112,7 @@
 				"Graphite": "graphite.pdb"
 			};
 
-			var loader = new THREE.PDBLoader();
+			var loader = new PDBLoader();
 			var colorSpriteMap = {};
 			var baseSprite = document.createElement( 'img' );
 
@@ -139,23 +123,23 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1500;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				root = new THREE.Object3D();
+				root = new Object3D();
 				scene.add( root );
 
 				//
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
 				controls.addEventListener( 'change', render );
 
@@ -235,7 +219,7 @@
 
 					var object = objects[ i ];
 
-					if ( object instanceof THREE.CSS3DSprite ) {
+					if ( object instanceof CSS3DSprite ) {
 
 						object.element.style.display = "";
 						object.visible = true;
@@ -257,7 +241,7 @@
 
 					var object = objects[ i ];
 
-					if ( object instanceof THREE.CSS3DSprite ) {
+					if ( object instanceof CSS3DSprite ) {
 
 						object.element.style.display = "none";
 						object.visible = false;
@@ -283,7 +267,7 @@
 					object.element.style.display = "";
 					object.visible = true;
 
-					if ( ! ( object instanceof THREE.CSS3DSprite ) ) {
+					if ( ! ( object instanceof CSS3DSprite ) ) {
 
 						object.element.style.height = object.userData.bondLengthShort;
 
@@ -359,8 +343,8 @@
 					var positions = geometryAtoms.getAttribute( 'position' );
 					var colors = geometryAtoms.getAttribute( 'color' );
 
-					var position = new THREE.Vector3();
-					var color = new THREE.Color();
+					var position = new Vector3();
+					var color = new Color();
 
 					for ( var i = 0; i < positions.count; i ++ ) {
 
@@ -393,7 +377,7 @@
 						var atom = document.createElement( 'img' );
 						atom.src = colorSprite;
 
-						var object = new THREE.CSS3DSprite( atom );
+						var object = new CSS3DSprite( atom );
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
 
@@ -408,8 +392,8 @@
 
 					positions = geometryBonds.getAttribute( 'position' );
 
-					var start = new THREE.Vector3();
-					var end = new THREE.Vector3();
+					var start = new Vector3();
+					var end = new Vector3();
 
 					for ( var i = 0; i < positions.count; i += 2 ) {
 
@@ -433,7 +417,7 @@
 						bond.className = "bond";
 						bond.style.height = bondLength + "px";
 
-						var object = new THREE.CSS3DObject( bond );
+						var object = new CSS3DObject( bond );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 
@@ -445,7 +429,7 @@
 						var axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
 						var radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
 
-						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+						var objMatrix = new Matrix4().makeRotationAxis( axis.normalize(), radians );
 						object.matrix = objMatrix;
 						object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
 
@@ -462,7 +446,7 @@
 						bond.className = "bond";
 						bond.style.height = bondLength + "px";
 
-						var joint = new THREE.Object3D( bond );
+						var joint = new Object3D( bond );
 						joint.position.copy( start );
 						joint.position.lerp( end, 0.5 );
 
@@ -472,7 +456,7 @@
 						joint.matrixAutoUpdate = false;
 						joint.updateMatrix();
 
-						var object = new THREE.CSS3DObject( bond );
+						var object = new CSS3DObject( bond );
 						object.rotation.y = Math.PI / 2;
 
 						object.matrixAutoUpdate = false;

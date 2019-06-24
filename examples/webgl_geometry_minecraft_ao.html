@@ -4,60 +4,51 @@
 		<title>three.js webgl - geometry - minecraft - ao</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
+				background-color: #fff;
 				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				/* background-color: #bfd1e5; */
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
 			}
-
-			a {	color: #a06851;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+			a {
+				color: #a06851;
 			}
-
-			#webglmessage {
-				background:rgb(100,0,0) !important;
-				color:#fff !important;
-				margin-top:10em !important;
-			}
-			#webglmessage a { color:#fff }
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo [ambient occlusion]. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BufferGeometry,
+				Clock,
+				Color,
+				DirectionalLight,
+				DoubleSide,
+				FogExp2,
+				Geometry,
+				LinearMipMapLinearFilter,
+				Matrix4,
+				Mesh,
+				MeshLambertMaterial,
+				NearestFilter,
+				PerspectiveCamera,
+				PlaneGeometry,
+				Scene,
+				TextureLoader,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/ImprovedNoise.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			var container, stats;
 
@@ -68,7 +59,7 @@
 			var worldHalfDepth = worldDepth / 2;
 			var data = generateHeight( worldWidth, worldDepth );
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -77,10 +68,10 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 
 				controls.movementSpeed = 1000;
 				controls.lookSpeed = 0.125;
@@ -89,18 +80,18 @@
 				controls.verticalMin = 1.1;
 				controls.verticalMax = 2.2;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
+				scene.fog = new FogExp2( 0xffffff, 0.00015 );
 
 				// sides
 
-				var light = new THREE.Color( 0xffffff );
-				var shadow = new THREE.Color( 0x505050 );
+				var light = new Color( 0xffffff );
+				var shadow = new Color( 0x505050 );
 
-				var matrix = new THREE.Matrix4();
+				var matrix = new Matrix4();
 
-				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var pxGeometry = new PlaneGeometry( 100, 100 );
 				pxGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
 				pxGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
 				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
@@ -109,7 +100,7 @@
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var nxGeometry = new PlaneGeometry( 100, 100 );
 				nxGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
 				nxGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
 				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
@@ -118,7 +109,7 @@
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var pyGeometry = new PlaneGeometry( 100, 100 );
 				pyGeometry.faces[ 0 ].vertexColors = [ light, light, light ];
 				pyGeometry.faces[ 1 ].vertexColors = [ light, light, light ];
 				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
@@ -127,7 +118,7 @@
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				var py2Geometry = new THREE.PlaneGeometry( 100, 100 );
+				var py2Geometry = new PlaneGeometry( 100, 100 );
 				py2Geometry.faces[ 0 ].vertexColors = [ light, light, light ];
 				py2Geometry.faces[ 1 ].vertexColors = [ light, light, light ];
 				py2Geometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
@@ -137,7 +128,7 @@
 				py2Geometry.rotateY( Math.PI / 2 );
 				py2Geometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var pzGeometry = new PlaneGeometry( 100, 100 );
 				pzGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
 				pzGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
 				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
@@ -145,7 +136,7 @@
 				pzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
+				var nzGeometry = new PlaneGeometry( 100, 100 );
 				nzGeometry.faces[ 0 ].vertexColors = [ light, shadow, light ];
 				nzGeometry.faces[ 1 ].vertexColors = [ shadow, shadow, light ];
 				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
@@ -156,7 +147,7 @@
 
 				//
 
-				var geometry = new THREE.Geometry();
+				var geometry = new Geometry();
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -271,31 +262,28 @@
 
 				}
 
-				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+				geometry = new BufferGeometry().fromGeometry( geometry );
 
-				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
-				texture.magFilter = THREE.NearestFilter;
-				texture.minFilter = THREE.LinearMipMapLinearFilter;
+				var texture = new TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.magFilter = NearestFilter;
+				texture.minFilter = LinearMipMapLinearFilter;
 
-				var mesh = new THREE.Mesh(
+				var mesh = new Mesh(
 					geometry,
-					new THREE.MeshLambertMaterial( { map: texture, vertexColors: THREE.VertexColors, side: THREE.DoubleSide } )
+					new MeshLambertMaterial( { map: texture, vertexColors: VertexColors, side: DoubleSide } )
 				);
 				scene.add( mesh );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				var ambientLight = new AmbientLight( 0xcccccc );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				var directionalLight = new DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

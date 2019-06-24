@@ -4,82 +4,65 @@
 		<title>three.js - webgl2 sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl2 sandbox</div>
+
+		<script src="js/WebGL.js"></script>
 
 		<script type="module">
+			import {
+				Color,
+				PerspectiveCamera,
+				Fog,
+				Mesh,
+				MeshNormalMaterial,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			import { PerspectiveCamera } from '../src/cameras/PerspectiveCamera.js';
-			import { SphereBufferGeometry } from '../src/geometries/SphereGeometry.js';
-			import { MeshNormalMaterial } from '../src/materials/MeshNormalMaterial.js';
-			import { PointLight } from '../src/lights/PointLight.js';
-			import { Color } from '../src/math/Color.js';
-			import { Mesh } from '../src/objects/Mesh.js';
-			import { Fog } from '../src/scenes/Fog.js';
-			import { Scene } from '../src/scenes/Scene.js';
-			import { WebGLRenderer } from '../src/renderers/WebGLRenderer.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			if ( WEBGL.isWebGL2Available() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+
+			}
 
 			//
 
 			var camera, scene, renderer;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var controls;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
-				camera.position.z = 3200;
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 3;
 
 				scene = new Scene();
 				scene.background = new Color( 0, 0, 0.5 );
-				scene.fog = new Fog( 0x000000, 1, 20000 );
+				scene.fog = new Fog( 0x000000, 0.1, 3 );
 
 				var light = new PointLight( 0xffffff );
 				scene.add( light );
 
-				var geometry = new SphereBufferGeometry( 50, 32, 16 );
+				var geometry = new SphereBufferGeometry( 0.05, 32, 16 );
 				var material = new MeshNormalMaterial();
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
 					var mesh = new Mesh( geometry, material );
 
-					mesh.position.x = Math.random() * 10000 - 5000;
-					mesh.position.y = Math.random() * 10000 - 5000;
-					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.position.x = Math.random() * 10 - 5;
+					mesh.position.y = Math.random() * 10 - 5;
+					mesh.position.z = Math.random() * 10 - 5;
 
 					mesh.rotation.y = Math.random() * 2 * Math.PI;
 
@@ -97,18 +80,16 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
 
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -117,29 +98,9 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
-
-			}
-
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
 			function render() {
-
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

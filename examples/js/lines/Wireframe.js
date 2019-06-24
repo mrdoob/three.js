@@ -54,7 +54,7 @@ THREE.Wireframe.prototype = Object.assign( Object.create( THREE.Mesh.prototype )
 
 	}() ),
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 
