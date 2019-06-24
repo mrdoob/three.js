@@ -11,10 +11,6 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<script id="vertexShader" type="x-shader/x-vertex">
 
 			varying vec2 vUv;
@@ -67,13 +63,15 @@
 
 		</script>
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+		<script type="module">
+			import {
+				Mesh,
+				OrthographicCamera,
+				PlaneBufferGeometry,
+				Scene,
+				ShaderMaterial,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
 			var container;
 
@@ -88,17 +86,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				var geometry = new PlaneBufferGeometry( 2, 2 );
 
 				uniforms = {
 					"time": { value: 1.0 }
 				};
 
-				var material = new THREE.ShaderMaterial( {
+				var material = new ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -106,10 +104,10 @@
 
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 

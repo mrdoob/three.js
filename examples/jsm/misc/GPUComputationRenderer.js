@@ -112,7 +112,7 @@ import {
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
 
-var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
+var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.variables = [];
 
@@ -124,7 +124,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 	camera.position.z = 1;
 
 	var passThruUniforms = {
-		texture: { value: null }
+		passThruTexture: { value: null }
 	};
 
 	var passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
@@ -133,7 +133,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 	scene.add( mesh );
 
 
-	this.addVariable = function( variableName, computeFragmentShader, initialValueTexture ) {
+	this.addVariable = function ( variableName, computeFragmentShader, initialValueTexture ) {
 
 		var material = this.createShaderMaterial( computeFragmentShader );
 
@@ -155,15 +155,16 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 	};
 
-	this.setVariableDependencies = function( variable, dependencies ) {
+	this.setVariableDependencies = function ( variable, dependencies ) {
 
 		variable.dependencies = dependencies;
 
 	};
 
-	this.init = function() {
+	this.init = function () {
 
-		if ( ! renderer.extensions.get( "OES_texture_float" ) ) {
+		if ( ! renderer.extensions.get( "OES_texture_float" ) &&
+			 ! renderer.capabilities.isWebGL2 ) {
 
 			return "No OES_texture_float support for float textures.";
 
@@ -175,7 +176,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 		}
 
-		for ( var i = 0; i < this.variables.length; i++ ) {
+		for ( var i = 0; i < this.variables.length; i ++ ) {
 
 			var variable = this.variables[ i ];
 
@@ -190,7 +191,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 			var uniforms = material.uniforms;
 			if ( variable.dependencies !== null ) {
 
-				for ( var d = 0; d < variable.dependencies.length; d++ ) {
+				for ( var d = 0; d < variable.dependencies.length; d ++ ) {
 
 					var depVar = variable.dependencies[ d ];
 
@@ -198,16 +199,21 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 						// Checks if variable exists
 						var found = false;
-						for ( var j = 0; j < this.variables.length; j++ ) {
+						for ( var j = 0; j < this.variables.length; j ++ ) {
 
 							if ( depVar.name === this.variables[ j ].name ) {
+
 								found = true;
 								break;
+
 							}
 
 						}
+
 						if ( ! found ) {
+
 							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
+
 						}
 
 					}
@@ -217,7 +223,9 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 					material.fragmentShader = "\nuniform sampler2D " + depVar.name + ";\n" + material.fragmentShader;
 
 				}
+
 			}
+
 		}
 
 		this.currentTextureIndex = 0;
@@ -226,12 +234,12 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 	};
 
-	this.compute = function() {
+	this.compute = function () {
 
 		var currentTextureIndex = this.currentTextureIndex;
 		var nextTextureIndex = this.currentTextureIndex === 0 ? 1 : 0;
 
-		for ( var i = 0, il = this.variables.length; i < il; i++ ) {
+		for ( var i = 0, il = this.variables.length; i < il; i ++ ) {
 
 			var variable = this.variables[ i ];
 
@@ -239,7 +247,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 			if ( variable.dependencies !== null ) {
 
 				var uniforms = variable.material.uniforms;
-				for ( var d = 0, dl = variable.dependencies.length; d < dl; d++ ) {
+				for ( var d = 0, dl = variable.dependencies.length; d < dl; d ++ ) {
 
 					var depVar = variable.dependencies[ d ];
 
@@ -255,15 +263,16 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 		}
 
 		this.currentTextureIndex = nextTextureIndex;
+
 	};
 
-	this.getCurrentRenderTarget = function( variable ) {
+	this.getCurrentRenderTarget = function ( variable ) {
 
 		return variable.renderTargets[ this.currentTextureIndex ];
 
 	};
 
-	this.getAlternateRenderTarget = function( variable ) {
+	this.getAlternateRenderTarget = function ( variable ) {
 
 		return variable.renderTargets[ this.currentTextureIndex === 0 ? 1 : 0 ];
 
@@ -297,7 +306,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 	this.createShaderMaterial = createShaderMaterial;
 
-	this.createRenderTarget = function( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter ) {
+	this.createRenderTarget = function ( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter ) {
 
 		sizeXTexture = sizeXTexture || sizeX;
 		sizeYTexture = sizeYTexture || sizeY;
@@ -323,7 +332,7 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 	};
 
-	this.createTexture = function() {
+	this.createTexture = function () {
 
 		var a = new Float32Array( sizeX * sizeY * 4 );
 		var texture = new DataTexture( a, sizeX, sizeY, RGBAFormat, FloatType );
@@ -333,21 +342,21 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 	};
 
-	this.renderTexture = function( input, output ) {
+	this.renderTexture = function ( input, output ) {
 
 		// Takes a texture, and render out in rendertarget
 		// input = Texture
 		// output = RenderTarget
 
-		passThruUniforms.texture.value = input;
+		passThruUniforms.passThruTexture.value = input;
 
-		this.doRenderTarget( passThruShader, output);
+		this.doRenderTarget( passThruShader, output );
 
-		passThruUniforms.texture.value = null;
+		passThruUniforms.passThruTexture.value = null;
 
 	};
 
-	this.doRenderTarget = function( material, output ) {
+	this.doRenderTarget = function ( material, output ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
@@ -374,13 +383,13 @@ var GPUComputationRenderer = function( sizeX, sizeY, renderer ) {
 
 	function getPassThroughFragmentShader() {
 
-		return	"uniform sampler2D texture;\n" +
+		return	"uniform sampler2D passThruTexture;\n" +
 				"\n" +
 				"void main() {\n" +
 				"\n" +
 				"	vec2 uv = gl_FragCoord.xy / resolution.xy;\n" +
 				"\n" +
-				"	gl_FragColor = texture2D( texture, uv );\n" +
+				"	gl_FragColor = texture2D( passThruTexture, uv );\n" +
 				"\n" +
 				"}\n";
 

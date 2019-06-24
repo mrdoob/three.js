@@ -4,6 +4,8 @@
  * @author Shrek Shao / https://github.com/shrekshao
  */
 
+/* global Module, createBasisModule */
+
 /**
  * Loader for Basis Universal GPU Texture Codec.
  *

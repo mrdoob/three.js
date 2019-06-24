@@ -3,13 +3,13 @@
  * 	@author Sunag / http://www.sunag.com.br/
  */
 
-'use strict';
+import { SEA3D } from "./SEA3DLoader.js";
 
 //
 //	Lossy Compression
 //
 
-SEA3D.GeometryDraco = function ( name, data, sea3d ) {
+function GeometryDraco( name, data, sea3d ) {
 
 	this.name = name;
 	this.data = data;
@@ -51,7 +51,7 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 
 	}
 
-	var module = SEA3D.GeometryDraco.getModule(),
+	var module = GeometryDraco.getModule(),
 		dracoData = new Int8Array( data.concat( data.position, data.bytesAvailable ).buffer );
 
 	var decoder = new module.Decoder();
@@ -110,7 +110,7 @@ SEA3D.GeometryDraco = function ( name, data, sea3d ) {
 
 };
 
-SEA3D.GeometryDraco.getModule = function () {
+GeometryDraco.getModule = function () {
 
 	if ( ! this.module ) {
 
@@ -122,9 +122,9 @@ SEA3D.GeometryDraco.getModule = function () {
 
 };
 
-SEA3D.GeometryDraco.prototype.type = "sdrc";
+GeometryDraco.prototype.type = "sdrc";
 
-SEA3D.GeometryDraco.prototype.readIndices = function ( module, decoder, mesh ) {
+GeometryDraco.prototype.readIndices = function ( module, decoder, mesh ) {
 
 	var numFaces = mesh.num_faces(),
 		numIndices = numFaces * 3,
@@ -150,7 +150,7 @@ SEA3D.GeometryDraco.prototype.readIndices = function ( module, decoder, mesh ) {
 
 };
 
-SEA3D.GeometryDraco.prototype.readFloat32Array = function ( module, decoder, mesh, attrib ) {
+GeometryDraco.prototype.readFloat32Array = function ( module, decoder, mesh, attrib ) {
 
 	var attribute = decoder.GetAttribute( mesh, attrib ),
 		numPoints = mesh.num_points();
@@ -173,7 +173,7 @@ SEA3D.GeometryDraco.prototype.readFloat32Array = function ( module, decoder, mes
 
 };
 
-SEA3D.GeometryDraco.prototype.readUint16Array = function ( module, decoder, mesh, attrib, type ) {
+GeometryDraco.prototype.readUint16Array = function ( module, decoder, mesh, attrib, type ) {
 
 	var attribute = decoder.GetAttribute( mesh, attrib ),
 		numPoints = mesh.num_points();
@@ -200,12 +200,12 @@ SEA3D.GeometryDraco.prototype.readUint16Array = function ( module, decoder, mesh
 //	Extension
 //
 
-THREE.SEA3D.EXTENSIONS_LOADER.push( {
+SEA3D.EXTENSIONS_LOADER.push( {
 
 	setTypeRead: function () {
 
-		this.file.addClass( SEA3D.GeometryDraco, true );
-		this.file.typeRead[ SEA3D.GeometryDraco.prototype.type ] = this.readGeometryBuffer;
+		this.file.addClass( GeometryDraco, true );
+		this.file.typeRead[ GeometryDraco.prototype.type ] = this.readGeometryBuffer;
 
 	}
 

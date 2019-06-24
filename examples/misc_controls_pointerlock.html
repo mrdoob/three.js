@@ -101,6 +101,7 @@
 			function init() {
 
 				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.y = 10;
 
 				scene = new Scene();
 				scene.background = new Color( 0xffffff );

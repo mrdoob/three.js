@@ -15,27 +15,22 @@
 			<a href="https://hdrihaven.com/hdri/?h=pedestrian_overpass" target="_blank" rel="noopener">Pedestrian Overpass</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Scene,
+				UnsignedByteType,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer;
@@ -48,60 +43,60 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.9, 2.7 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				new THREE.RGBELoader()
-					.setType( THREE.UnsignedByteType )
+				new RGBELoader()
+					.setType( UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
-					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
-					cubeGenerator.update( renderer );
+						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
+						cubeGenerator.update( renderer );
 
-					var pmremGenerator = new THREE.PMREMGenerator( cubeGenerator.renderTarget.texture );
-					pmremGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
+						pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
-					// model
+						// model
 
-					var loader = new THREE.GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-					loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
-						gltf.scene.traverse( function ( child ) {
+							gltf.scene.traverse( function ( child ) {
 
-							if ( child.isMesh ) {
+								if ( child.isMesh ) {
 
-								child.material.envMap = envMap;
+									child.material.envMap = envMap;
 
-							}
+								}
+
+							} );
+
+							scene.add( gltf.scene );
 
 						} );
 
-						scene.add( gltf.scene );
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+						scene.background = cubeGenerator.renderTarget;
 
 					} );
 
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
-					scene.background = cubeGenerator.renderTarget;
-
-				} );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, - 0.2, - 0.2 );
 				controls.update();
 

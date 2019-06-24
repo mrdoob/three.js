@@ -19,12 +19,6 @@
 	<body>
 		<div id="info">Percent Closer Soft-Shadows (PCSS) by <a href="http://eduperiment.com">spidersharma03</a></div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<script type="x-shader/x-fragment" id="PCSS">
 
 				#define LIGHT_WORLD_SIZE 0.005
@@ -120,13 +114,27 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				CameraHelper,
+				DirectionalLight,
+				Fog,
+				Group,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				ShaderChunk,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -143,21 +151,21 @@
 
 				// scene
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xcce0ff, 5, 100 );
+				scene = new Scene();
+				scene.fog = new Fog( 0xcce0ff, 5, 100 );
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 5;
 				camera.position.z = 15;
 				scene.add( camera );
 
 				// lights
 
-				scene.add( new THREE.AmbientLight( 0x666666 ) );
+				scene.add( new AmbientLight( 0x666666 ) );
 
-				var light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+				var light = new DirectionalLight( 0xdfebff, 1.75 );
 				light.position.set( 2, 8, 4 );
 
 				light.castShadow = true;
@@ -167,21 +175,21 @@
 
 				scene.add( light );
 
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
-				scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new DirectionalLightHelper( light ) );
+				scene.add( new CameraHelper( light.shadow.camera ) );
 
 				// group
 
-				group = new THREE.Group();
+				group = new Group();
 				scene.add( group );
 
-				var geometry = new THREE.SphereBufferGeometry( 0.3, 20, 20 );
+				var geometry = new SphereBufferGeometry( 0.3, 20, 20 );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
+					var material = new MeshPhongMaterial( { color: Math.random() * 0xffffff } );
 
-					var sphere = new THREE.Mesh( geometry, material );
+					var sphere = new Mesh( geometry, material );
 					sphere.position.x = Math.random() - 0.5;
 					sphere.position.z = Math.random() - 0.5;
 					sphere.position.normalize();
@@ -195,16 +203,16 @@
 
 				// ground
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
+				var groundMaterial = new MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+				var mesh = new Mesh( new PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				// column
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 4, 1 ), groundMaterial );
+				var mesh = new Mesh( new BoxBufferGeometry( 1, 4, 1 ), groundMaterial );
 				mesh.position.y = 2;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
@@ -212,7 +220,7 @@
 
 				// overwrite shadowmap code
 
-				var shader = THREE.ShaderChunk.shadowmap_pars_fragment;
+				var shader = ShaderChunk.shadowmap_pars_fragment;
 
 				shader = shader.replace(
 					'#ifdef USE_SHADOWMAP',
@@ -226,11 +234,11 @@
 					'#if defined( SHADOWMAP_TYPE_PCF )'
 				);
 
-				THREE.ShaderChunk.shadowmap_pars_fragment = shader;
+				ShaderChunk.shadowmap_pars_fragment = shader;
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color );
@@ -243,7 +251,7 @@
 				renderer.shadowMap.enabled = true;
 
 				// controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.5;
 				controls.minDistance = 10;
 				controls.maxDistance = 75;

@@ -33,25 +33,29 @@
 		<div id="container">
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
+			import {
+				Clock,
+				Color,
+				DirectionalLight,
+				Fog,
+				Group,
+				HemisphereLight,
+				Mesh,
+				MeshStandardMaterial,
+				PerspectiveCamera,
+				Scene,
+				TetrahedronBufferGeometry,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var camera, scene, renderer, clock, group;
+			var camera, scene, renderer, clock, group, container;
 
 			var composer1, composer2, fxaaPass;
 
@@ -60,37 +64,37 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
+				scene.fog = new Fog( 0xcccccc, 100, 1500 );
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				var dirLight = new DirectionalLight( 0xffffff, 0.8 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
 				//
 
-				group = new THREE.Group();
+				group = new Group();
 
-				var geometry = new THREE.TetrahedronBufferGeometry( 10 );
-				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				var geometry = new TetrahedronBufferGeometry( 10 );
+				var material = new MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 500 - 250;
 					mesh.position.y = Math.random() * 500 - 250;
@@ -110,7 +114,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
@@ -118,26 +122,26 @@
 
 				//
 
-				var renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new RenderPass( scene, camera );
 
 				//
 
-				fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
+				fxaaPass = new ShaderPass( FXAAShader );
 
 				var pixelRatio = renderer.getPixelRatio();
 
 				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
 				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
-				composer1 = new THREE.EffectComposer( renderer );
+				composer1 = new EffectComposer( renderer );
 				composer1.addPass( renderPass );
 				composer1.addPass( fxaaPass );
 
 				//
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var copyPass = new ShaderPass( CopyShader );
 
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 

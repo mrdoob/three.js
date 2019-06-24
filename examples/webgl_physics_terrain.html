@@ -15,19 +15,30 @@
 		<div id="container"></div>
 		<div id="info">Ammo.js physics terrain heightfield demo</div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Clock,
+				Color,
+				ConeBufferGeometry,
+				CylinderBufferGeometry,
+				DirectionalLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				SphereBufferGeometry,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// Heightfield parameters
 			var terrainWidthExtents = 100;
@@ -43,7 +54,7 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var terrainMesh;
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			// Physics variables
 			var collisionConfiguration;
@@ -62,7 +73,7 @@
 			var timeNextSpawn = time + objectTimePeriod;
 			var maxNumObjects = 30;
 
-			Ammo().then( function( AmmoLib ) {
+			Ammo().then( function ( AmmoLib ) {
 
 				Ammo = AmmoLib;
 
@@ -85,7 +96,7 @@
 
 				container = document.getElementById( 'container' );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -96,19 +107,19 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene = new Scene();
+				scene.background = new Color( 0xbfd1e5 );
 
 				camera.position.y = heightData[ terrainHalfWidth + terrainHalfDepth * terrainWidth ] * ( terrainMaxHeight - terrainMinHeight ) + 5;
 
 				camera.position.z = terrainDepthExtents / 2;
 				camera.lookAt( 0, 0, 0 );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
-				var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
+				var geometry = new PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				var vertices = geometry.attributes.position.array;
@@ -122,25 +133,25 @@
 
 				geometry.computeVertexNormals();
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xC7C7C7 } );
-				terrainMesh = new THREE.Mesh( geometry, groundMaterial );
+				var groundMaterial = new MeshPhongMaterial( { color: 0xC7C7C7 } );
+				terrainMesh = new Mesh( geometry, groundMaterial );
 				terrainMesh.receiveShadow = true;
 				terrainMesh.castShadow = true;
 
 				scene.add( terrainMesh );
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 				textureLoader.load( "textures/grid.png", function ( texture ) {
 
-					texture.wrapS = THREE.RepeatWrapping;
-					texture.wrapT = THREE.RepeatWrapping;
+					texture.wrapS = RepeatWrapping;
+					texture.wrapT = RepeatWrapping;
 					texture.repeat.set( terrainWidth - 1, terrainDepth - 1 );
 					groundMaterial.map = texture;
 					groundMaterial.needsUpdate = true;
 
 				} );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var light = new DirectionalLight( 0xffffff, 1 );
 				light.position.set( 100, 100, 50 );
 				light.castShadow = true;
 				var dLight = 200;
@@ -311,7 +322,7 @@
 					case 1:
 						// Sphere
 						var radius = 1 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.SphereBufferGeometry( radius, 20, 20 ), createObjectMaterial() );
+						threeObject = new Mesh( new SphereBufferGeometry( radius, 20, 20 ), createObjectMaterial() );
 						shape = new Ammo.btSphereShape( radius );
 						shape.setMargin( margin );
 						break;
@@ -320,7 +331,7 @@
 						var sx = 1 + Math.random() * objectSize;
 						var sy = 1 + Math.random() * objectSize;
 						var sz = 1 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
+						threeObject = new Mesh( new BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), createObjectMaterial() );
 						shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 						shape.setMargin( margin );
 						break;
@@ -328,7 +339,7 @@
 						// Cylinder
 						var radius = 1 + Math.random() * objectSize;
 						var height = 1 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.CylinderBufferGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
+						threeObject = new Mesh( new CylinderBufferGeometry( radius, radius, height, 20, 1 ), createObjectMaterial() );
 						shape = new Ammo.btCylinderShape( new Ammo.btVector3( radius, height * 0.5, radius ) );
 						shape.setMargin( margin );
 						break;
@@ -336,7 +347,7 @@
 						// Cone
 						var radius = 1 + Math.random() * objectSize;
 						var height = 2 + Math.random() * objectSize;
-						threeObject = new THREE.Mesh( new THREE.ConeBufferGeometry( radius, height, 20, 2 ), createObjectMaterial() );
+						threeObject = new Mesh( new ConeBufferGeometry( radius, height, 20, 2 ), createObjectMaterial() );
 						shape = new Ammo.btConeShape( radius, height );
 						break;
 
@@ -372,7 +383,7 @@
 			function createObjectMaterial() {
 
 				var c = Math.floor( Math.random() * ( 1 << 24 ) );
-				return new THREE.MeshPhongMaterial( { color: c } );
+				return new MeshPhongMaterial( { color: c } );
 
 			}
 

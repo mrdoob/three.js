@@ -13,6 +13,8 @@ import { Vector3Node } from '../inputs/Vector3Node.js';
 import { Vector4Node } from '../inputs/Vector4Node.js';
 import { TextureNode } from '../inputs/TextureNode.js';
 import { CubeTextureNode } from '../inputs/CubeTextureNode.js';
+import { TextureCubeNode } from '../misc/TextureCubeNode.js';
+
 
 var elements = NodeUtils.elements,
 	constructors = [ 'float', 'vec2', 'vec3', 'vec4' ],
@@ -140,8 +142,7 @@ function NodeBuilder() {
 
 	// --
 
-	this.parsing = false;
-	this.optimize = true;
+	this.analyzing = false;
 
 }
 
@@ -278,6 +279,8 @@ NodeBuilder.prototype = {
 	addContext: function ( context ) {
 
 		this.context = Object.assign( {}, this.context, context );
+		this.context.extra = this.context.extra || {};
+
 		this.contexts.push( this.context );
 
 		return this;

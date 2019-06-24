@@ -33,10 +33,31 @@
 		<div id="container">
 		</div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/WebGL.js"></script>
 
-		<script>
+		<script type="module">
+			import {
+				Clock,
+				Color,
+				DirectionalLight,
+				HemisphereLight,
+				PerspectiveCamera,
+				Fog,
+				Group,
+				IcosahedronBufferGeometry,
+				Mesh,
+				MeshStandardMaterial,
+				RGBAFormat,
+				Scene,
+				Vector2,
+				WebGLRenderer,
+				WebGLMultisampleRenderTarget
+			} from "../build/three.module.js";
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -44,49 +65,50 @@
 
 			}
 
-			var camera, scene, renderer, clock, group, renderTarget;
+			var camera, scene, renderer, clock, group, container, renderTarget;
+
 			var parameters = {
-					format: THREE.RGBAFormat,
-					stencilBuffer: false,
-					samples: 4
-				};
+				format: RGBAFormat,
+				stencilBuffer: false,
+				samples: 4
+			};
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
+				scene = new Scene();
+				scene.background = new Color( 0xffffff );
+				scene.fog = new Fog( 0xcccccc, 100, 1500 );
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				var dirLight = new DirectionalLight( 0xffffff, 0.8 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
 				//
 
-				group = new THREE.Group();
+				group = new Group();
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 10, 2 );
-				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				var geometry = new IcosahedronBufferGeometry( 10, 2 );
+				var material = new MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 					mesh.position.x = Math.random() * 500 - 250;
 					mesh.position.y = Math.random() * 500 - 250;
 					mesh.position.z = Math.random() * 500 - 250;
@@ -102,7 +124,7 @@
 				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2', { antialias: false } );
 
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+				renderer = new WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				renderer.setScissorTest( true );
@@ -110,8 +132,8 @@
 
 				//
 
-				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				var size = renderer.getDrawingBufferSize( new Vector2() );
+				renderTarget = new WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 				renderTarget.directToCanvas = true;
 
 				//
@@ -129,9 +151,9 @@
 
 				renderTarget.dispose();
 
-				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				var size = renderer.getDrawingBufferSize( new Vector2() );
 
-				renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				renderTarget = new WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 				renderTarget.directToCanvas = true;
 
 			}

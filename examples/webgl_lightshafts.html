@@ -49,14 +49,14 @@
 
 		uniform float attenuation;
 		uniform vec3 color;
-		uniform sampler2D texture;
+		uniform sampler2D colorTexture;
 
 		varying vec2 vUv;
 		varying float vAlpha;
 
 		void main() {
 
-			vec4 textureColor = texture2D( texture, vUv );
+			vec4 textureColor = texture2D( colorTexture, vUv );
 			gl_FragColor = vec4( textureColor.rgb * color.rgb, textureColor.a * vAlpha );
 			gl_FragColor.a *= pow( gl_FragCoord.z, attenuation );
 
@@ -130,7 +130,7 @@
 						value: new Color( 0xdadc9f )
 					},
 					// the visual representation of the ray highly depends on the used texture
-					texture: {
+					colorTexture: {
 						value: texture
 					},
 					// global time value for animation
