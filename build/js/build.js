@@ -67,6 +67,15 @@ function readFile(fileName) {
   return cache.readFileSync(fileName, 'utf-8');
 }
 
+function readHANSON(fileName) {
+  const text = readFile(fileName);
+  try {
+    return hanson.parse(text);
+  } catch (e) {
+    throw new Error(`can not parse: ${fileName}: ${e}`);
+  }
+}
+
 function writeFileIfChanged(fileName, content) {
   if (fs.existsSync(fileName)) {
     const old = readFile(fileName);
@@ -228,7 +237,7 @@ const Builder = function(outBaseDir, options) {
   const g_origPath = options.origPath;
   const g_originalByFileName = {};
 
-  const toc = hanson.parse(fs.readFileSync('toc.hanson', {encoding: 'utf8'}));
+  const toc = readHANSON('toc.hanson');
 
   // These are the english articles.
   const g_origArticles = glob.sync(path.join(g_origPath, '*.md'))
@@ -498,29 +507,45 @@ const Builder = function(outBaseDir, options) {
       return categoryName;
     }
 
+    function addLangToLink(link) {
+      return extra.lang === 'en'
+        ? link
+        : `${path.dirname(link)}/${extra.lang}/${path.basename(link)}`;
+    }
+
     function tocLink(fileName) {
       let data = byFilename[fileName];
-      if (!data) {
+      let link;
+      if (data) {
+        link = data.link;
+      } else {
         data = g_originalByFileName[fileName];
+        link = addLangToLink(data.link);
       }
       const toc = data.headers.toc;
       if (toc === '#') {
         return [...data.content.matchAll(/<a\s*id="(.*?)"\s*data-toc="(.*?)"\s*><\/a>/g)].map(([, id, title]) => {
-          const link = `${data.link}#${id}`;
-          return `<li><a href="${link}">${title}</a></li>`;
+          const hashlink = `${link}#${id}`;
+          return `<li><a href="/${hashlink}">${title}</a></li>`;
         }).join('\n');
       }
-      const link = data.link;
-      return `<li><a href="${link}">${toc}</a></li>`;
+      return `<li><a href="/${link}">${toc}</a></li>`;
     }
 
-    g_langInfo.tocHtml = `<ul>${
-      Object.entries(toc).map(([category, files]) => `  <li>${getLocalizedCategory(category)}</li>
-      <ul>
-        ${files.map(tocLink).join('\n')}
-      </ul>`
-      ).join('\n')
-    }</ul>`;
+    function makeToc(toc) {
+      return `<ul>${
+        Object.entries(toc).map(([category, files]) => `  <li>${getLocalizedCategory(category)}</li>
+        <ul>
+          ${Array.isArray(files)
+            ? files.map(tocLink).join('\n')
+            : makeToc(files)
+          }
+        </ul>`
+        ).join('\n')
+      }</ul>`;
+    }
+
+    g_langInfo.tocHtml = makeToc(toc);
 
     files.forEach(function(fileName) {
       const ext = path.extname(fileName);
@@ -551,7 +576,7 @@ const Builder = function(outBaseDir, options) {
 
   const getLanguageSelection = function(lang) {
     const lessons = lang.lessons;
-    const langInfo = hanson.parse(fs.readFileSync(path.join(lessons, 'langinfo.hanson'), {encoding: 'utf8'}));
+    const langInfo = readHANSON(path.join(lessons, 'langinfo.hanson'));
     langInfo.langCode = langInfo.langCode || lang.lang;
     langInfo.home = lang.home;
     g_langDB[lang.lang] = {
