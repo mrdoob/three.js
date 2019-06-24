@@ -1164,7 +1164,7 @@ function WebGLRenderer( parameters ) {
 
 		var shadowsArray = currentRenderState.state.shadowsArray;
 
-		shadowMap.render( shadowsArray, scene, camera );
+		shadowMap.render( shadowsArray, scene );
 
 		currentRenderState.setupLights( camera );
 

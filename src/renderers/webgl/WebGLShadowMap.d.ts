@@ -1,7 +1,7 @@
 import { Scene } from './../../scenes/Scene';
-import { Camera } from './../../cameras/Camera';
 import { WebGLRenderer } from '../WebGLRenderer';
 import { ShadowMapType } from '../../constants';
+import { Light } from '../../lights/Light';
 
 export class WebGLShadowMap {
 
@@ -17,7 +17,7 @@ export class WebGLShadowMap {
 	needsUpdate: boolean;
 	type: ShadowMapType;
 
-	render( scene: Scene, camera: Camera ): void;
+	render( lights: Light[], scene: Scene ): void;
 
 	/**
 	 * @deprecated Use {@link WebGLShadowMap#renderReverseSided .shadowMap.renderReverseSided} instead.
