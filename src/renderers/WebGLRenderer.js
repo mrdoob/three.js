@@ -2082,7 +2082,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function refreshUniformsCube ( uniforms, material ) {
+	function refreshUniformsCube( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.opacity.value = material.opacity;

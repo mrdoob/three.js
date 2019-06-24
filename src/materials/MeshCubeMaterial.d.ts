@@ -1,7 +1,5 @@
-import { Color } from './../math/Color';
 import { Texture } from './../textures/Texture';
 import { MaterialParameters, Material } from './Material';
-import { Combine } from '../constants';
 /**
  * parameters is an object with one or more properties defining the material's appearance.
  */

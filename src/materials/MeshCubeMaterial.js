@@ -9,7 +9,7 @@ import { BackSide } from '../constants';
  * }
  */
 
-function MeshCubeMaterial ( parameters ) {
+function MeshCubeMaterial( parameters ) {
 
 	Material.call( this );
 
@@ -28,7 +28,7 @@ function MeshCubeMaterial ( parameters ) {
 
 	this.setValues( parameters );
 
-};
+}
 
 MeshCubeMaterial.prototype = Object.create( Material.prototype );
 MeshCubeMaterial.prototype.constructor = MeshCubeMaterial;

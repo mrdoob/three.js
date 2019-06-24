@@ -271,7 +271,7 @@ var ShaderLib = {
 //	Cube map shader
  ------------------------------------------------------------------------- */
 
- ShaderLib.cubeEnv = {
+ShaderLib.cubeEnv = {
 
 	uniforms: mergeUniforms( [
 		UniformsLib.common,
