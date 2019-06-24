@@ -50,7 +50,7 @@ then use a similar GPU picking technique. We'd draw the globe off screen using
 this index texture. Looking at the color of the pixel the user clicks would 
 tell us the country id.
 
-So, I [wrote some code](https://github.com/greggman/threejsfundamentals/blob/master/threejs/lessons/tools/geo-picking/) 
+So, I [wrote some code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/lessons/tools/geo-picking/) 
 to generate such a texture. Here it is. 
 
 <div class="threejs_center"><img src="../resources/data/world/country-index-texture.png" style="width: 700px;"></div>

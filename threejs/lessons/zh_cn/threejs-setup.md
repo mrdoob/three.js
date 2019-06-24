@@ -13,7 +13,7 @@ WebGL不能直接从你的硬件使用图片。意思是说
 为了能开发你需要使用web服务。幸运的是
 web服务很容易设置和使用。
 
-首先如果你喜欢你可以从[这个链接](https://github.com/greggman/threejsfundamentals/archive/gh-pages.zip)
+首先如果你喜欢你可以从[这个链接](https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip)
 下载整个网站。
 一旦下载完成双击文件来解压。
 

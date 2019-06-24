@@ -601,7 +601,7 @@ of the DOM events they use. Maybe we could pass in our own
 object that has the same API surface as a DOM element. 
 We only need to support the features the OrbitControls need.
 
-Digging through the [OrbitControls source code](https://github.com/greggman/threejsfundamentals/blob/master/threejs/resources/threejs/r105/js/controls/OrbitControls.js)
+Digging through the [OrbitControls source code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r105/js/controls/OrbitControls.js)
 it looks like we need to handle the following events.
 
 * contextmenu

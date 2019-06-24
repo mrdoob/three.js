@@ -13,7 +13,7 @@ WebGL cannot use images from your hard drive directly. That means
 in order to do development you need to use a web server. Fortunately
 development web servers are super easy to setup and use.
 
-First off if you'd like you can download this entire site from [this link](https://github.com/greggman/threejsfundamentals/archive/gh-pages.zip).
+First off if you'd like you can download this entire site from [this link](https://github.com/gfxfundamentals/threejsfundamentals/archive/gh-pages.zip).
 Once downloaded double click the zip file to unpack the files.
 
 Next download one of these simple web servers.

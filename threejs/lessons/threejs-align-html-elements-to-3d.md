@@ -375,7 +375,7 @@ I found [this data](http://thematicmapping.org/downloads/world_borders.php)
 which contains the borders of countries. It's licensed as
 [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/).
 
-I [wrote some code](https://github.com/greggman/threejsfundamentals/blob/master/threejs/lessons/tools/geo-picking/)
+I [wrote some code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/lessons/tools/geo-picking/)
 to load the data, and generate country outlines and some JSON data with the names
 of the countries and their locations.
 
