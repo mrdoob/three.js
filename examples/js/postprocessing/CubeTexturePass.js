@@ -32,7 +32,7 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 
 	constructor: THREE.CubeTexturePass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
 		var camera = this.camera;
 

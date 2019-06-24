@@ -4,55 +4,35 @@
 		<title>three.js webgl - deferred rendering [morphing + skinning]</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 20px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-			a:hover {
-				color: #0080ff;
-			}
-			#stats { position: absolute; top:10px; left: 5px }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AnimationMixer,
+				Clock,
+				DirectionalLight,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				Object3D,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				PointLight,
+				Scene,
+				SphereBufferGeometry,
+				SpotLight,
+				Vector3
+			} from "../build/three.module.js";
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
-
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script>
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { WebGLDeferredRenderer } from './jsm/renderers/WebGLDeferredRenderer.js';
 
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight;
@@ -78,18 +58,15 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLDeferredRenderer();
+				renderer = new WebGLDeferredRenderer();
 				renderer.setSize( WIDTH, HEIGHT );
 
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
+				camera = new PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
 				camera.position.z = 150;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '8px';
-				stats.domElement.style.zIndex = 100;
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -103,13 +80,13 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 			}
 
 			function initModel() {
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function ( gltf ) {
 
@@ -119,13 +96,13 @@
 
 					model.traverse( function ( o ) {
 
-						if ( !o.isMesh ) return;
+						if ( ! o.isMesh ) return;
 
 						o.material.emissive = o.material.color.clone().multiplyScalar( 0.3 );
 
 					} );
 
-					mixer = new THREE.AnimationMixer( model );
+					mixer = new AnimationMixer( model );
 
 					var dance = gltf.animations.find( function ( clip ) {
 
@@ -149,28 +126,28 @@
 
 				var distance = 20;
 
-				var c = new THREE.Vector3();
-				var geometry = new THREE.SphereBufferGeometry( 1, 1, 1 );
+				var c = new Vector3();
+				var geometry = new SphereBufferGeometry( 1, 1, 1 );
 
 				for ( var i = 0; i < numLights; i ++ ) {
 
-					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
+					var light = new PointLight( 0xffffff, 2.0, distance );
 					c.set( Math.random(), Math.random(), Math.random() ).normalize();
 					light.color.setRGB( c.x, c.y, c.z );
 					scene.add( light );
 					lights.push( light );
 
-					var material = new THREE.MeshBasicMaterial( { color: light.color } );
-					var emitter = new THREE.Mesh( geometry, material );
+					var material = new MeshBasicMaterial( { color: light.color } );
+					var emitter = new Mesh( geometry, material );
 					light.add( emitter );
 
 				}
 
-				var directionalLight = new THREE.DirectionalLight( 0x101010 );
+				var directionalLight = new DirectionalLight( 0x101010 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var spotLight = new THREE.SpotLight( 0x404040 );
+				var spotLight = new SpotLight( 0x404040 );
 				spotLight.position.set( 0, 50, 0 );
 				scene.add( spotLight );
 
@@ -179,44 +156,44 @@
 			function initRoom() {
 
 				var size = 100;
-				var geometry = new THREE.PlaneBufferGeometry( size, size );
-				var material = new THREE.MeshPhongMaterial( { color: 0x222222, specular: 0x222222, shininess: 75 } );
-				var transparentMaterial = new THREE.MeshPhongMaterial( { color: 0x222222, emissive: 0x88888888, specular: 0x222222, shininess: 75, opacity: 0.3, transparent: true } );
+				var geometry = new PlaneBufferGeometry( size, size );
+				var material = new MeshPhongMaterial( { color: 0x222222, specular: 0x222222, shininess: 75 } );
+				var transparentMaterial = new MeshPhongMaterial( { color: 0x222222, emissive: 0x88888888, specular: 0x222222, shininess: 75, opacity: 0.3, transparent: true } );
 
-				var room = new THREE.Object3D();
+				var room = new Object3D();
 				room.position.y = size / 2 - 30;
 
 				// top
-				var mesh = new THREE.Mesh( geometry, material );
+				var mesh = new Mesh( geometry, material );
 				mesh.rotation.x = Math.PI / 2;
 				mesh.position.y = size / 2;
 				room.add( mesh );
 
 				// bottom
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.position.y = - size / 2;
 				room.add( mesh );
 
 				// left
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				mesh.position.x = - size / 2;
 				mesh.rotation.y = Math.PI / 2;
 				room.add( mesh );
 
 				// right
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				mesh.position.x = size / 2;
 				mesh.rotation.y = - Math.PI / 2;
 				room.add( mesh );
 
 				// back
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				mesh.position.z = - size / 2;
 				room.add( mesh );
 
 				// front, to check if transparency works
-				mesh = new THREE.Mesh( geometry, transparentMaterial );
+				mesh = new Mesh( geometry, transparentMaterial );
 				mesh.position.z = size / 2;
 				mesh.scale.multiplyScalar( 0.33 );
 				mesh.visible = false;
@@ -224,7 +201,7 @@
 				room.add( mesh );
 
 				// back2, to check if transparency works
-				mesh = new THREE.Mesh( geometry, transparentMaterial );
+				mesh = new Mesh( geometry, transparentMaterial );
 				mesh.position.z = - size / 4;
 				mesh.scale.multiplyScalar( 0.75 );
 				mesh.visible = false;
@@ -237,7 +214,7 @@
 
 			function initGui() {
 
-				var gui = new dat.GUI( { width: 280 } );
+				var gui = new GUI( { width: 280 } );
 
 				var api = {
 					'mode': 0,

@@ -3,9 +3,7 @@
  * See https://github.com/kchapelier/PRWM for more informations about this file format
  */
 
-( function ( THREE ) {
-
-	'use strict';
+THREE.PRWMLoader = ( function () {
 
 	var bigEndianPlatform = null;
 
@@ -224,13 +222,13 @@
 
 	// Define the public interface
 
-	THREE.PRWMLoader = function PRWMLoader( manager ) {
+	function PRWMLoader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-	};
+	}
 
-	THREE.PRWMLoader.prototype = {
+	PRWMLoader.prototype = {
 
 		constructor: THREE.PRWMLoader,
 
@@ -261,8 +259,6 @@
 
 		parse: function ( arrayBuffer ) {
 
-			console.time( 'PRWMLoader' );
-
 			var data = decodePrwm( arrayBuffer ),
 				attributesKey = Object.keys( data.attributes ),
 				bufferGeometry = new THREE.BufferGeometry(),
@@ -282,18 +278,18 @@
 
 			}
 
-			console.timeEnd( 'PRWMLoader' );
-
 			return bufferGeometry;
 
 		}
 
 	};
 
-	THREE.PRWMLoader.isBigEndianPlatform = function () {
+	PRWMLoader.isBigEndianPlatform = function () {
 
 		return isBigEndianPlatform();
 
 	};
 
-} )( THREE );
+	return PRWMLoader;
+
+} )();

@@ -4,28 +4,11 @@
 		<title>three.js webgl - buffergeometry - indexed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-				color: #0080ff;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -33,19 +16,23 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - indexed</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Color,
+				DoubleSide,
+				Float32BufferAttribute,
+				HemisphereLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Scene,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="./js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var camera, scene, renderer, stats;
 
@@ -58,28 +45,20 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
 				camera.position.z = 64;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050505 );
+				scene = new Scene();
+				scene.background = new Color( 0x050505 );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambientLight );
-
-				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				light1.position.set( 1, 1, 1 );
-				scene.add( light1 );
-
-				var light2 = new THREE.DirectionalLight( 0xffffff, 1 );
-				light2.position.set( 0, - 1, 0 );
-				scene.add( light2 );
+				var light = new HemisphereLight();
+				scene.add( light );
 
 				//
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 
 				var indices = [];
 
@@ -138,21 +117,21 @@
 				//
 
 				geometry.setIndex( indices );
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshPhongMaterial( {
-					specular: 0x111111, shininess: 250,
-					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+				var material = new MeshPhongMaterial( {
+					side: DoubleSide,
+					vertexColors: VertexColors
 				} );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -164,7 +143,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( material, 'wireframe' );
 
 				//

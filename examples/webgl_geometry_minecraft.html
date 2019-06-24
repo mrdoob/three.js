@@ -4,60 +4,45 @@
 		<title>three.js webgl - geometry - minecraft</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
 				color: #a06851;
 			}
-
-			#webglmessage {
-				background:rgb(100,0,0) !important;
-				color:#fff !important;
-				margin-top:10em !important;
-			}
-			#webglmessage a { color:#fff }
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Clock,
+				Color,
+				DirectionalLight,
+				DoubleSide,
+				Matrix4,
+				Mesh,
+				MeshLambertMaterial,
+				NearestFilter,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var container, stats;
 
@@ -68,7 +53,7 @@
 			var worldHalfDepth = worldDepth / 2;
 			var data = generateHeight( worldWidth, worldDepth );
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			init();
 			animate();
@@ -77,46 +62,46 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 
 				controls.movementSpeed = 1000;
 				controls.lookSpeed = 0.125;
 				controls.lookVertical = true;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene = new Scene();
+				scene.background = new Color( 0xbfd1e5 );
 
 				// sides
 
-				var matrix = new THREE.Matrix4();
+				var matrix = new Matrix4();
 
-				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var pxGeometry = new PlaneBufferGeometry( 100, 100 );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var nxGeometry = new PlaneBufferGeometry( 100, 100 );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var pyGeometry = new PlaneBufferGeometry( 100, 100 );
 				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
 				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var pzGeometry = new PlaneBufferGeometry( 100, 100 );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var nzGeometry = new PlaneBufferGeometry( 100, 100 );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
@@ -173,28 +158,25 @@
 
 				}
 
-				var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries );
+				var geometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
 				geometry.computeBoundingSphere();
 
-				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
-				texture.magFilter = THREE.NearestFilter;
+				var texture = new TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.magFilter = NearestFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
+				var mesh = new Mesh( geometry, new MeshLambertMaterial( { map: texture, side: DoubleSide } ) );
 				scene.add( mesh );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				var ambientLight = new AmbientLight( 0xcccccc );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				var directionalLight = new DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

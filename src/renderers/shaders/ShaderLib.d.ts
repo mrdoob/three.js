@@ -1,9 +1,9 @@
 import { IUniform } from './UniformsLib';
 
 export interface Shader {
-  uniforms: { [uniform: string]: IUniform };
-  vertexShader: string;
-  fragmentShader: string;
+	uniforms: { [uniform: string]: IUniform };
+	vertexShader: string;
+	fragmentShader: string;
 }
 
 export let ShaderLib: {

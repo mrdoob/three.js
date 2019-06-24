@@ -4,28 +4,11 @@
 		<title>three.js webgl - buffergeometry - lines - indexed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-				color: #0080ff;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -33,24 +16,28 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - lines - indexed</div>
 
-		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Float32BufferAttribute,
+				LineBasicMaterial,
+				LineSegments,
+				Object3D,
+				PerspectiveCamera,
+				Scene,
+				Vector3,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var mesh, parent_node;
+			var parent_node;
 
 			init();
 			animate();
@@ -59,13 +46,13 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 9000;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var geometry = new BufferGeometry();
+				var material = new LineBasicMaterial( { vertexColors: VertexColors } );
 
 				var indices = [];
 				var positions = [];
@@ -151,8 +138,8 @@
 				var y = 0;
 				snowflake(
 					[
-						new THREE.Vector3( 0, y, 0 ),
-						new THREE.Vector3( 500, y, 0 )
+						new Vector3( 0, y, 0 ),
+						new Vector3( 500, y, 0 )
 					],
 					false, 600
 				);
@@ -160,9 +147,9 @@
 				y += 600;
 				snowflake(
 					[
-						new THREE.Vector3( 0, y, 0 ),
-						new THREE.Vector3( 250, y + 400, 0 ),
-						new THREE.Vector3( 500, y, 0 )
+						new Vector3( 0, y, 0 ),
+						new Vector3( 250, y + 400, 0 ),
+						new Vector3( 500, y, 0 )
 					],
 					true, 600
 				);
@@ -170,10 +157,10 @@
 				y += 600;
 				snowflake(
 					[
-						new THREE.Vector3( 0, y, 0 ),
-						new THREE.Vector3( 500, y, 0 ),
-						new THREE.Vector3( 500, y + 500, 0 ),
-						new THREE.Vector3( 0, y + 500, 0 )
+						new Vector3( 0, y, 0 ),
+						new Vector3( 500, y, 0 ),
+						new Vector3( 500, y + 500, 0 ),
+						new Vector3( 0, y + 500, 0 )
 					],
 					true, 600
 				);
@@ -181,15 +168,15 @@
 				y += 1000;
 				snowflake(
 					[
-						new THREE.Vector3( 250, y, 0 ),
-						new THREE.Vector3( 500, y, 0 ),
-						new THREE.Vector3( 250, y, 0 ),
-						new THREE.Vector3( 250, y + 250, 0 ),
-						new THREE.Vector3( 250, y, 0 ),
-						new THREE.Vector3( 0, y, 0 ),
-						new THREE.Vector3( 250, y, 0 ),
-						new THREE.Vector3( 250, y - 250, 0 ),
-						new THREE.Vector3( 250, y, 0 )
+						new Vector3( 250, y, 0 ),
+						new Vector3( 500, y, 0 ),
+						new Vector3( 250, y, 0 ),
+						new Vector3( 250, y + 250, 0 ),
+						new Vector3( 250, y, 0 ),
+						new Vector3( 0, y, 0 ),
+						new Vector3( 250, y, 0 ),
+						new Vector3( 250, y - 250, 0 ),
+						new Vector3( 250, y, 0 )
 					],
 					false, 600
 				);
@@ -197,20 +184,20 @@
 				//
 
 				geometry.setIndex( indices );
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.LineSegments( geometry, material );
-				mesh.position.x -= 1200;
-				mesh.position.y -= 1200;
+				var lineSegments = new LineSegments( geometry, material );
+				lineSegments.position.x -= 1200;
+				lineSegments.position.y -= 1200;
 
-				parent_node = new THREE.Object3D();
-				parent_node.add( mesh );
+				parent_node = new Object3D();
+				parent_node.add( lineSegments );
 
 				scene.add( parent_node );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

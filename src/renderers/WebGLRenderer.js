@@ -67,7 +67,8 @@ function WebGLRenderer( parameters ) {
 		_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
-		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default';
+		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
+		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
 
 	var currentRenderList = null;
 	var currentRenderState = null;
@@ -84,7 +85,7 @@ function WebGLRenderer( parameters ) {
 		 * Enables error checking and reporting when shader programs are being compiled
 		 * @type {boolean}
 		 */
-		checkShaderErrors: false
+		checkShaderErrors: true
 	};
 
 	// clearing
@@ -134,6 +135,8 @@ function WebGLRenderer( parameters ) {
 
 		_framebuffer = null,
 
+		_currentActiveCubeFace = 0,
+		_currentActiveMipmapLevel = 0,
 		_currentRenderTarget = null,
 		_currentFramebuffer = null,
 		_currentMaterialId = - 1,
@@ -199,7 +202,9 @@ function WebGLRenderer( parameters ) {
 			antialias: _antialias,
 			premultipliedAlpha: _premultipliedAlpha,
 			preserveDrawingBuffer: _preserveDrawingBuffer,
-			powerPreference: _powerPreference
+			powerPreference: _powerPreference,
+			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat,
+			xrCompatible: true
 		};
 
 		// event listeners must be registered before WebGL context is created, see #12753
@@ -283,7 +288,7 @@ function WebGLRenderer( parameters ) {
 		geometries = new WebGLGeometries( _gl, attributes, info );
 		objects = new WebGLObjects( geometries, info );
 		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, extensions, capabilities, textures );
+		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates();
 
@@ -308,7 +313,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -1254,6 +1259,10 @@ function WebGLRenderer( parameters ) {
 
 				groupOrder = object.renderOrder;
 
+			} else if ( object.isLOD ) {
+
+				if ( object.autoUpdate === true ) object.update( camera );
+
 			} else if ( object.isLight ) {
 
 				currentRenderState.pushLight( object );
@@ -1439,8 +1448,7 @@ function WebGLRenderer( parameters ) {
 		var lights = currentRenderState.state.lights;
 		var shadowsArray = currentRenderState.state.shadowsArray;
 
-		var lightsHash = materialProperties.lightsHash;
-		var lightsStateHash = lights.state.hash;
+		var lightsStateVersion = lights.state.version;
 
 		var parameters = programCache.getParameters(
 			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
@@ -1460,21 +1468,9 @@ function WebGLRenderer( parameters ) {
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
 
-		} else if ( lightsHash.stateID !== lightsStateHash.stateID ||
-			lightsHash.directionalLength !== lightsStateHash.directionalLength ||
-			lightsHash.pointLength !== lightsStateHash.pointLength ||
-			lightsHash.spotLength !== lightsStateHash.spotLength ||
-			lightsHash.rectAreaLength !== lightsStateHash.rectAreaLength ||
-			lightsHash.hemiLength !== lightsStateHash.hemiLength ||
-			lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) {
+		} else if ( materialProperties.lightsStateVersion !== lightsStateVersion ) {
 
-			lightsHash.stateID = lightsStateHash.stateID;
-			lightsHash.directionalLength = lightsStateHash.directionalLength;
-			lightsHash.pointLength = lightsStateHash.pointLength;
-			lightsHash.spotLength = lightsStateHash.spotLength;
-			lightsHash.rectAreaLength = lightsStateHash.rectAreaLength;
-			lightsHash.hemiLength = lightsStateHash.hemiLength;
-			lightsHash.shadowsLength = lightsStateHash.shadowsLength;
+			materialProperties.lightsStateVersion = lightsStateVersion;
 
 			programChange = false;
 
@@ -1575,19 +1571,8 @@ function WebGLRenderer( parameters ) {
 		materialProperties.fog = fog;
 
 		// store the light setup it was created for
-		if ( lightsHash === undefined ) {
 
-			materialProperties.lightsHash = lightsHash = {};
-
-		}
-
-		lightsHash.stateID = lightsStateHash.stateID;
-		lightsHash.directionalLength = lightsStateHash.directionalLength;
-		lightsHash.pointLength = lightsStateHash.pointLength;
-		lightsHash.spotLength = lightsStateHash.spotLength;
-		lightsHash.rectAreaLength = lightsStateHash.rectAreaLength;
-		lightsHash.hemiLength = lightsStateHash.hemiLength;
-		lightsHash.shadowsLength = lightsStateHash.shadowsLength;
+		materialProperties.lightsStateVersion = lightsStateVersion;
 
 		if ( material.lights ) {
 
@@ -1626,9 +1611,6 @@ function WebGLRenderer( parameters ) {
 		var materialProperties = properties.get( material );
 		var lights = currentRenderState.state.lights;
 
-		var lightsHash = materialProperties.lightsHash;
-		var lightsStateHash = lights.state.hash;
-
 		if ( _clippingEnabled ) {
 
 			if ( _localClippingEnabled || camera !== _currentCamera ) {
@@ -1658,13 +1640,7 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.lights && ( lightsHash.stateID !== lightsStateHash.stateID ||
-				lightsHash.directionalLength !== lightsStateHash.directionalLength ||
-				lightsHash.pointLength !== lightsStateHash.pointLength ||
-				lightsHash.spotLength !== lightsStateHash.spotLength ||
-				lightsHash.rectAreaLength !== lightsStateHash.rectAreaLength ||
-				lightsHash.hemiLength !== lightsStateHash.hemiLength ||
-				lightsHash.shadowsLength !== lightsStateHash.shadowsLength ) ) {
+			} else if ( material.lights && materialProperties.lightsStateVersion !== lights.state.version ) {
 
 				material.needsUpdate = true;
 
@@ -2422,10 +2398,23 @@ function WebGLRenderer( parameters ) {
 	}
 
 	//
-
 	this.setFramebuffer = function ( value ) {
 
+		if ( _framebuffer !== value ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
+
 		_framebuffer = value;
+
+	};
+
+	this.getActiveCubeFace = function () {
+
+		return _currentActiveCubeFace;
+
+	};
+
+	this.getActiveMipMapLevel = function () {
+
+		return _currentActiveMipmapLevel;
 
 	};
 
@@ -2438,6 +2427,8 @@ function WebGLRenderer( parameters ) {
 	this.setRenderTarget = function ( renderTarget, activeCubeFace, activeMipMapLevel ) {
 
 		_currentRenderTarget = renderTarget;
+		_currentActiveCubeFace = activeCubeFace;
+		_currentActiveMipmapLevel = activeMipMapLevel;
 
 		if ( renderTarget && properties.get( renderTarget ).__webglFramebuffer === undefined ) {
 
@@ -2499,7 +2490,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer ) {
+	this.readRenderTargetPixels = function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
 		if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
@@ -2509,6 +2500,12 @@ function WebGLRenderer( parameters ) {
 		}
 
 		var framebuffer = properties.get( renderTarget ).__webglFramebuffer;
+
+		if ( renderTarget.isWebGLRenderTargetCube && activeCubeFaceIndex !== undefined ) {
+
+			framebuffer = framebuffer[ activeCubeFaceIndex ];
+
+		}
 
 		if ( framebuffer ) {
 
@@ -2606,6 +2603,12 @@ function WebGLRenderer( parameters ) {
 		}
 
 	};
+
+	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+
+	}
 
 }
 

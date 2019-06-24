@@ -4,28 +4,11 @@
 	<title>three.js webgl - interactive instances (gpu)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			font-family: Monospace;
-			background-color: #f0f0f0;
-			margin: 0px;
-			overflow: hidden;
+		#info {
+			background-color: rgba(0,0,0,0.75);
 		}
-
-		.info {
-			position: absolute;
-			background-color: black;
-			opacity: 0.8;
-			color: white;
-			text-align: center;
-			top: 0px;
-			width: 100%;
-		}
-
-		.info a {
-			color: #00ffff;
-		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
@@ -37,7 +20,7 @@
 </head>
 <body>
 
-	<div class="info">
+	<div id="info">
 
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking of geometry instances
 
@@ -45,15 +28,10 @@
 
 		<br/><br/>
 
-		<div>This demo compares different methods of constructing and rendering many instances of a single geometry.</div>
-
-		<br/>
-
 		<div>
 
-			<div style="display:inline-block;">
-				<span>number of<br/>geometry instances</span>
-				<br/>
+			<div>
+				number of instances:
 				<select id="instanceCount">
 					<option>100</option>
 					<option>500</option>
@@ -69,11 +47,8 @@
 				</select>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>method of<br/>construction/rendering</span>
-				<br/>
+			<div>
+				method:
 				<select id="method">
 					<option>instanced</option>
 					<option>merged</option>
@@ -82,27 +57,18 @@
 				</select>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>render continuously<br/>(to get fps reading)</span>
-				<br/>
+			<div>
+				render continuously:
 				<input id="animate" type="checkbox" />
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>use override material<br/>(only effects singleMaterial method)</span>
-				<br/>
+			<div>
+				override material (only affects singleMaterial):
 				<input id="override" type="checkbox" checked/>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>construct anew<br/>(to get additional timings)</span>
-				<br/>
+			<div>
+				construct anew(to get additional timings):
 				<button id="construct" type="button">do it</button>
 			</div>
 
@@ -133,10 +99,6 @@
 	</div>
 
 	<div id="container"></div>
-
-	<script src="../build/three.js"></script>
-	<script src="js/controls/TrackballControls.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vertMerged" type="x-shader/x-vertex">
 		#define SHADER_NAME vertMerged
@@ -339,7 +301,35 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import {
+			BoxBufferGeometry,
+			BufferAttribute,
+			BufferGeometry,
+			BufferGeometryLoader,
+			Cache as _Cache,
+			Color,
+			Euler,
+			InstancedBufferAttribute,
+			InstancedBufferGeometry,
+			Matrix4,
+			Mesh,
+			MeshLambertMaterial,
+			NearestFilter,
+			Object3D,
+			PerspectiveCamera,
+			RawShaderMaterial,
+			Quaternion,
+			Scene,
+			Vector2,
+			Vector3,
+			WebGLRenderer,
+			WebGLRenderTarget
+		} from "../build/three.module.js";
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 		var container, stats;
 		var camera, controls, scene, renderer;
@@ -350,11 +340,11 @@
 		var materialList = [];
 		var geometryList = [];
 		var objectCount = 0;
-		var geometrySize = new THREE.Vector3();
-		var mouse = new THREE.Vector2();
+		var geometrySize = new Vector3();
+		var mouse = new Vector2();
 		var scale = 1.03;
 
-		var loader = new THREE.BufferGeometryLoader();
+		var loader = new BufferGeometryLoader();
 
 		//create buffer for reading a single pixel
 		var pixelBuffer = new Uint8Array( 4 );
@@ -437,7 +427,7 @@
 
 		function clean() {
 
-			THREE.Cache.clear();
+			_Cache.clear();
 
 			materialList.forEach( function ( m ) {
 
@@ -451,13 +441,13 @@
 
 			} );
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xffffff );
+			scene = new Scene();
+			scene.background = new Color( 0xffffff );
 
 			scene.add( camera );
 			scene.add( highlightBox );
 
-			pickingScene = new THREE.Scene();
+			pickingScene = new Scene();
 			pickingData = {};
 			materialList = [];
 			geometryList = [];
@@ -470,10 +460,10 @@
 
 		var randomizeMatrix = function () {
 
-			var position = new THREE.Vector3();
-			var rotation = new THREE.Euler();
-			var quaternion = new THREE.Quaternion();
-			var scale = new THREE.Vector3();
+			var position = new Vector3();
+			var rotation = new Euler();
+			var quaternion = new Quaternion();
+			var scale = new Vector3();
 
 			return function ( matrix ) {
 
@@ -485,7 +475,7 @@
 				rotation.y = Math.random() * 2 * Math.PI;
 				rotation.z = Math.random() * 2 * Math.PI;
 
-				quaternion.setFromEuler( rotation, false );
+				quaternion.setFromEuler( rotation );
 
 				scale.x = scale.y = scale.z = Math.random() * 1;
 
@@ -549,33 +539,33 @@
 			var vert = document.getElementById( 'vertMaterial' ).textContent;
 			var frag = document.getElementById( 'fragMaterial' ).textContent;
 
-			var material = new THREE.RawShaderMaterial( {
+			var material = new RawShaderMaterial( {
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
 					color: {
-						value: new THREE.Color()
+						value: new Color()
 					}
 				}
 			} );
 
-			var pickingMaterial = new THREE.RawShaderMaterial( {
+			var pickingMaterial = new RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
 					pickingColor: {
-						value: new THREE.Color()
+						value: new Color()
 					}
 				}
 			} );
 
 			// geometry / mesh
 
-			var matrix = new THREE.Matrix4();
+			var matrix = new Matrix4();
 
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
-				var object = new THREE.Mesh( geo, material );
+				var object = new Mesh( geo, material );
 				objectCount ++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
@@ -609,23 +599,23 @@
 			var vert = document.getElementById( 'vertMaterial' ).textContent;
 			var frag = document.getElementById( 'fragMaterial' ).textContent;
 
-			var material = new THREE.RawShaderMaterial( {
+			var material = new RawShaderMaterial( {
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
 					"color": {
-						value: new THREE.Color()
+						value: new Color()
 					}
 				}
 			} );
 			materialList.push( material );
 
-			var pickingMaterial = new THREE.RawShaderMaterial( {
+			var pickingMaterial = new RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
 					"pickingColor": {
-						value: new THREE.Color()
+						value: new Color()
 					}
 				}
 			} );
@@ -641,7 +631,7 @@
 
 			// geometry / mesh
 
-			var matrix = new THREE.Matrix4();
+			var matrix = new Matrix4();
 
 			function onBeforeRender( renderer, scene, camera, geometry, material ) {
 
@@ -688,7 +678,7 @@
 
 			for ( var i = 0; i < instanceCount; i ++ ) {
 
-				var object = new THREE.Mesh( geo, material );
+				var object = new Mesh( geo, material );
 				objectCount ++;
 				randomizeMatrix( matrix );
 				object.applyMatrix( matrix );
@@ -733,13 +723,13 @@
 			var vert = document.getElementById( 'vertMerged' ).textContent;
 			var frag = document.getElementById( 'fragMerged' ).textContent;
 
-			var material = new THREE.RawShaderMaterial( {
+			var material = new RawShaderMaterial( {
 				vertexShader: vert,
 				fragmentShader: frag
 			} );
 			materialList.push( material );
 
-			var pickingMaterial = new THREE.RawShaderMaterial( {
+			var pickingMaterial = new RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag
 			} );
@@ -747,24 +737,24 @@
 
 			// geometry
 
-			var mgeo = new THREE.BufferGeometry();
+			var mgeo = new BufferGeometry();
 			geometryList.push( mgeo );
 
 			var pos = geo.attributes.position;
 			var posLen = geo.attributes.position.count * 3;
-			var vertices = new THREE.BufferAttribute(
+			var vertices = new BufferAttribute(
 				new Float32Array( instanceCount * posLen ), 3
 			);
 
-			var vertex = new THREE.Vector3();
-			var matrix = new THREE.Matrix4();
+			var vertex = new Vector3();
+			var matrix = new Matrix4();
 
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
 
 				var offset = i * posLen;
 
 				randomizeMatrix( matrix );
-				var object = new THREE.Object3D();
+				var object = new Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
@@ -783,7 +773,7 @@
 			mgeo.addAttribute( 'position', vertices );
 
 			var colCount = posLen / 3;
-			var colors = new THREE.BufferAttribute(
+			var colors = new BufferAttribute(
 				new Float32Array( instanceCount * colCount * 3 ), 3
 			);
 			var randCol = function () {
@@ -803,8 +793,8 @@
 			}
 			mgeo.addAttribute( 'color', colors );
 
-			var col = new THREE.Color();
-			var pickingColors = new THREE.BufferAttribute(
+			var col = new Color();
+			var pickingColors = new BufferAttribute(
 				new Float32Array( instanceCount * colCount * 3 ), 3
 			);
 			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
@@ -821,10 +811,10 @@
 
 			// mesh
 
-			var mesh = new THREE.Mesh( mgeo, material );
+			var mesh = new Mesh( mgeo, material );
 			scene.add( mesh );
 
-			var pickingMesh = new THREE.Mesh( mgeo, pickingMaterial );
+			var pickingMesh = new Mesh( mgeo, pickingMaterial );
 			pickingScene.add( pickingMesh );
 
 		}
@@ -836,13 +826,13 @@
 			var vert = document.getElementById( 'vertInstanced' ).textContent;
 			var frag = document.getElementById( 'fragInstanced' ).textContent;
 
-			var material = new THREE.RawShaderMaterial( {
+			var material = new RawShaderMaterial( {
 				vertexShader: vert,
 				fragmentShader: frag,
 			} );
 			materialList.push( material );
 
-			var pickingMaterial = new THREE.RawShaderMaterial( {
+			var pickingMaterial = new RawShaderMaterial( {
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag
 			} );
@@ -850,33 +840,33 @@
 
 			// geometry
 
-			var igeo = new THREE.InstancedBufferGeometry();
+			var igeo = new InstancedBufferGeometry();
 			geometryList.push( igeo );
 
 			var vertices = geo.attributes.position.clone();
 			igeo.addAttribute( 'position', vertices );
 
-			// var matrices = new THREE.InstancedBufferAttribute(
+			// var matrices = new InstancedBufferAttribute(
 			// 	new Float32Array( instanceCount * 16 ), 16
 			// );
-			var mcol0 = new THREE.InstancedBufferAttribute(
+			var mcol0 = new InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3
 			);
-			var mcol1 = new THREE.InstancedBufferAttribute(
+			var mcol1 = new InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3
 			);
-			var mcol2 = new THREE.InstancedBufferAttribute(
+			var mcol2 = new InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3
 			);
-			var mcol3 = new THREE.InstancedBufferAttribute(
+			var mcol3 = new InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3
 			);
-			var matrix = new THREE.Matrix4();
+			var matrix = new Matrix4();
 			var me = matrix.elements;
 			for ( var i = 0, ul = mcol0.count; i < ul; i ++ ) {
 
 				randomizeMatrix( matrix );
-				var object = new THREE.Object3D();
+				var object = new Object3D();
 				objectCount ++;
 				object.applyMatrix( matrix );
 				pickingData[ i + 1 ] = object;
@@ -898,7 +888,7 @@
 				return Math.random();
 
 			};
-			var colors = new THREE.InstancedBufferAttribute(
+			var colors = new InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3
 			);
 			for ( var i = 0, ul = colors.count; i < ul; i ++ ) {
@@ -908,8 +898,8 @@
 			}
 			igeo.addAttribute( 'color', colors );
 
-			var col = new THREE.Color();
-			var pickingColors = new THREE.InstancedBufferAttribute(
+			var col = new Color();
+			var pickingColors = new InstancedBufferAttribute(
 				new Float32Array( instanceCount * 3 ), 3
 			);
 			for ( var i = 0, ul = pickingColors.count; i < ul; i ++ ) {
@@ -922,10 +912,10 @@
 
 			// mesh
 
-			var mesh = new THREE.Mesh( igeo, material );
+			var mesh = new Mesh( igeo, material );
 			scene.add( mesh );
 
-			var pickingMesh = new THREE.Mesh( igeo, pickingMaterial );
+			var pickingMesh = new Mesh( igeo, pickingMaterial );
 			pickingScene.add( pickingMesh );
 
 		}
@@ -934,24 +924,24 @@
 
 			// camera
 
-			camera = new THREE.PerspectiveCamera(
+			camera = new PerspectiveCamera(
 				70, window.innerWidth / window.innerHeight, 1, 100
 			);
 			camera.position.z = 40;
 
 			// picking render target
 
-			pickingRenderTarget = new THREE.WebGLRenderTarget(
+			pickingRenderTarget = new WebGLRenderTarget(
 				window.innerWidth, window.innerHeight
 			);
 			pickingRenderTarget.texture.generateMipmaps = false;
-			pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
+			pickingRenderTarget.texture.minFilter = NearestFilter;
 
 			// highlight box
 
-			highlightBox = new THREE.Mesh(
-				new THREE.BoxBufferGeometry( 1, 1, 1 ),
-				new THREE.MeshLambertMaterial( {
+			highlightBox = new Mesh(
+				new BoxBufferGeometry( 1, 1, 1 ),
+				new MeshLambertMaterial( {
 					emissive: 0xffff00,
 					transparent: true,
 					opacity: 0.5
@@ -961,7 +951,7 @@
 			// renderer
 
 			container = document.getElementById( "container" );
-			renderer = new THREE.WebGLRenderer( {
+			renderer = new WebGLRenderer( {
 				antialias: true,
 				alpha: true
 			} );
@@ -984,7 +974,7 @@
 
 			// controls
 
-			controls = new THREE.TrackballControls(
+			controls = new TrackballControls(
 				camera, renderer.domElement
 			);
 			controls.staticMoving = true;

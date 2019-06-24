@@ -4,31 +4,7 @@
 	<title>three.js webgl - loaders - Draco loader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			font-family: Monospace;
-			background-color: #000;
-			color: #fff;
-			margin: 0px;
-			overflow: hidden;
-		}
-		#info {
-			color: #fff;
-			position: absolute;
-			top: 10px;
-			width: 100%;
-			text-align: center;
-			z-index: 100;
-			display: block;
-		}
-		#info a,
-		.button {
-			color: #f00;
-			font-weight: bold;
-			text-decoration: underline;
-			cursor: pointer
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
 <body>
@@ -37,34 +13,48 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
-	<script src="../build/three.js"></script>
-	<script src="js/loaders/DRACOLoader.js"></script>
-	<script>
+
+	<script type="module">
+		import {
+			Color,
+			Fog,
+			HemisphereLight,
+			Mesh,
+			MeshPhongMaterial,
+			MeshStandardMaterial,
+			PerspectiveCamera,
+			PlaneBufferGeometry,
+			Scene,
+			SpotLight,
+			WebGLRenderer,
+		} from "../build/three.module.js";
+
+		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 		var camera, scene, renderer;
 
 		var container = document.querySelector( '#container' );
 
 		// Configure and create Draco decoder.
-		THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/' );
-		THREE.DRACOLoader.setDecoderConfig( { type: 'js' } );
-		var dracoLoader = new THREE.DRACOLoader();
+		DRACOLoader.setDecoderPath( 'js/libs/draco/' );
+		DRACOLoader.setDecoderConfig( { type: 'js' } );
+		var dracoLoader = new DRACOLoader();
 		init();
 		animate();
 
 		function init() {
 
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
+			camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
 			camera.position.set( 3, 0.25, 3 );
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x443333 );
-			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
+			scene = new Scene();
+			scene.background = new Color( 0x443333 );
+			scene.fog = new Fog( 0x443333, 1, 4 );
 
 			// Ground
-			var plane = new THREE.Mesh(
-				new THREE.PlaneBufferGeometry( 8, 8 ),
-				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+			var plane = new Mesh(
+				new PlaneBufferGeometry( 8, 8 ),
+				new MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 			);
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = 0.03;
@@ -72,10 +62,10 @@
 			scene.add( plane );
 
 			// Lights
-			var light = new THREE.HemisphereLight( 0x443333, 0x111122 );
+			var light = new HemisphereLight( 0x443333, 0x111122 );
 			scene.add( light );
 
-			var light = new THREE.SpotLight();
+			var light = new SpotLight();
 			light.angle = Math.PI / 16;
 			light.penumbra = 0.5;
 			light.castShadow = true;
@@ -86,19 +76,19 @@
 
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				var mesh = new THREE.Mesh( geometry, material );
+				var material = new MeshStandardMaterial( { color: 0x606060 } );
+				var mesh = new Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				// Release decoder resources.
-				THREE.DRACOLoader.releaseDecoderModule();
+				DRACOLoader.releaseDecoderModule();
 
 			} );
 
 			// renderer
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.gammaInput = true;

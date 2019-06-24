@@ -86,7 +86,7 @@ var Script = function ( editor ) {
 
 				if ( value !== currentScript.source ) {
 
-					editor.execute( new SetScriptValueCommand( currentObject, currentScript, 'source', value ) );
+					editor.execute( new SetScriptValueCommand( editor, currentObject, currentScript, 'source', value ) );
 
 				}
 				return;
@@ -99,21 +99,21 @@ var Script = function ( editor ) {
 
 			if ( JSON.stringify( currentObject.material.defines ) !== JSON.stringify( json.defines ) ) {
 
-				var cmd = new SetMaterialValueCommand( currentObject, 'defines', json.defines );
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'defines', json.defines );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
 			}
 			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
 
-				var cmd = new SetMaterialValueCommand( currentObject, 'uniforms', json.uniforms );
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
 			}
 			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
 
-				var cmd = new SetMaterialValueCommand( currentObject, 'attributes', json.attributes );
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
 				cmd.updatable = false;
 				editor.execute( cmd );
 

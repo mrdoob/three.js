@@ -77,7 +77,7 @@ Sidebar.Geometry.RingGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
 			innerRadius.getValue(),
 			outerRadius.getValue(),
 			thetaSegments.getValue(),

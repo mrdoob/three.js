@@ -4,62 +4,42 @@
 		<title>three.js webgl - particles - dynamic - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #046;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic particles + postprocessing
-			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank" rel="noopener">Reallusion</a>
-			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>,
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl dynamic particles + postprocessing<br/>
+			models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank" rel="noopener">Reallusion</a>
+			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BufferAttribute,
+				BufferGeometry,
+				Clock,
+				Color,
+				FogExp2,
+				Object3D,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Points,
+				PointsMaterial,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-		<script src="js/shaders/FocusShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
+			import { FocusShader } from './jsm/shaders/FocusShader.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var camera, scene, renderer, mesh;
 
@@ -67,7 +47,7 @@
 
 			var composer, effectFocus;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			var stats;
 
@@ -78,16 +58,16 @@
 
 				var container = document.querySelector( '#container' );
 
-				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 50000 );
+				camera = new PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 50000 );
 				camera.position.set( 0, 700, 7000 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000104 );
-				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
+				scene = new Scene();
+				scene.background = new Color( 0x000104 );
+				scene.fog = new FogExp2( 0x000104, 0.0000675 );
 
 				camera.lookAt( scene.position );
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 
 				loader.load( 'models/obj/male02/male02.obj', function ( object ) {
 
@@ -113,32 +93,32 @@
 				} );
 
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
-				parent = new THREE.Object3D();
+				parent = new Object3D();
 				scene.add( parent );
 
-				var grid = new THREE.Points( new THREE.PlaneBufferGeometry( 15000, 15000, 64, 64 ), new THREE.PointsMaterial( { color: 0xff0000, size: 10 } ) );
+				var grid = new Points( new PlaneBufferGeometry( 15000, 15000, 64, 64 ), new PointsMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = - 400;
 				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 0.75 );
-				var effectFilm = new THREE.FilmPass( 0.5, 0.5, 1448, false );
+				var renderModel = new RenderPass( scene, camera );
+				var effectBloom = new BloomPass( 0.75 );
+				var effectFilm = new FilmPass( 0.5, 0.5, 1448, false );
 
-				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
+				effectFocus = new ShaderPass( FocusShader );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );
@@ -156,17 +136,16 @@
 
 			function onWindowResize() {
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				camera.lookAt( scene.position );
 
-				composer.reset();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
+				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
 			}
 
@@ -203,13 +182,13 @@
 
 				} );
 
-				return new THREE.BufferAttribute( combined, 3 );
+				return new BufferAttribute( combined, 3 );
 
 			}
 
 			function createMesh( positions, scene, scale, x, y, z, color ) {
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 				geometry.addAttribute( 'position', positions.clone() );
 				geometry.addAttribute( 'initialPosition', positions.clone() );
 
@@ -233,7 +212,7 @@
 
 					var c = ( i < clones.length - 1 ) ? 0x252525 : color;
 
-					mesh = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 30, color: c } ) );
+					mesh = new Points( geometry, new PointsMaterial( { size: 30, color: c } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
 					mesh.position.x = x + clones[ i ][ 0 ];

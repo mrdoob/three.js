@@ -12,9 +12,9 @@ THREE.SelectionHelper = ( function () {
 
 		this.renderer = renderer;
 
-		this.startPoint = { x: 0, y: 0 };
-		this.pointTopLeft = { x: 0, y: 0 };
-		this.pointBottomRight = { x: 0, y: 0 };
+		this.startPoint = new THREE.Vector2();
+		this.pointTopLeft = new THREE.Vector2();
+		this.pointBottomRight = new THREE.Vector2();
 
 		this.isDown = false;
 

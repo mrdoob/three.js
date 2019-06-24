@@ -4,21 +4,10 @@
 	<title>three.js webgl - multiple canvases - circle</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style type="text/css" media="screen">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
 		body {
 			background-color: #555;
-			color: white;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			margin: 0px;
-			overflow: hidden;
-			width: 100%;
-			height: 100%;
-		}
-
-		a {
-			color: yellow;
 		}
 
 		#container {
@@ -118,7 +107,6 @@
 				background-color: rgba(0,0,0,0.3);
 				width: 50%;
 		}
-
 	</style>
 </head>
 <body>
@@ -138,193 +126,200 @@
 	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple canvases - circle</div>
 	<div id="help" gstyle="display: none">
 		<div>
-		This example is shows how to setup multi-monitor displays like <a href="https://www.google.com/earth/explore/showcase/liquidgalaxy.html">Google's Liquid Galaxy</a>.
+		<a href="https://www.google.com/earth/explore/showcase/liquidgalaxy.html">Google's Liquid Galaxy</a> simulator.<br/>
 		Here 5 monitors are simulated using 3d css. WebGL is then rendered onto each one.
 		</div>
 	</div>
 
-		<script src="../build/three.js"></script>
+	<script type="module">
+		import {
+			BufferAttribute,
+			Camera,
+			CanvasTexture,
+			Color,
+			DirectionalLight,
+			IcosahedronBufferGeometry,
+			Math as _Math,
+			Mesh,
+			MeshBasicMaterial,
+			MeshPhongMaterial,
+			PerspectiveCamera,
+			PlaneBufferGeometry,
+			Scene,
+			VertexColors,
+			WebGLRenderer,
+		} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
+		var views = [];
 
-		<script>
+		var scene, renderer;
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+		var mouseX = 0, mouseY = 0;
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
 
-			}
+		init();
+		animate();
 
-			var views = [];
+		//
 
-			var scene, renderer;
+		function View( canvas, rotateY ) {
 
-			var mouseX = 0, mouseY = 0;
+			canvas.width = canvas.clientWidth * window.devicePixelRatio;
+			canvas.height = canvas.clientHeight * window.devicePixelRatio;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var context = canvas.getContext( '2d' );
 
-			init();
-			animate();
+			var camera = new PerspectiveCamera( 20, canvas.clientWidth / canvas.clientHeight, 1, 20000 );
+			camera.rotation.y = rotateY;
+
+			// Think of the virtual camera as a post with 5 cameras on it (even though those cameras happen to live in difference scenes)
+			// You need to move the post (ie, the virtualCamera) to move all 5 cameras together.
+
+			var virtualCamera = new Camera();
+			virtualCamera.add( camera );
+
+			this.render = function () {
+
+				virtualCamera.position.x = - mouseX * 4;
+				virtualCamera.position.y = - mouseY * 4;
+				virtualCamera.position.z = 1800;
+
+				virtualCamera.lookAt( scene.position );
+				virtualCamera.updateMatrixWorld( true );
+
+				renderer.render( scene, camera );
+
+				context.drawImage( renderer.domElement, 0, 0 );
+
+			};
+
+		}
+
+		function init() {
+
+			var canvas1 = document.getElementById( 'canvas1' );
+			var canvas2 = document.getElementById( 'canvas2' );
+			var canvas3 = document.getElementById( 'canvas3' );
+			var canvas4 = document.getElementById( 'canvas4' );
+			var canvas5 = document.getElementById( 'canvas5' );
+
+			var fudge = 0.45; // I don't know why this is needed :-(
+			var rot = 30 * _Math.DEG2RAD;
+
+			views.push( new View( canvas1, rot * - 2 * fudge ) );
+			views.push( new View( canvas2, rot * - 1 * fudge ) );
+			views.push( new View( canvas3, rot *	0 * fudge ) );
+			views.push( new View( canvas4, rot *	1 * fudge ) );
+			views.push( new View( canvas5, rot *	2 * fudge ) );
 
 			//
 
-			function View( canvas, rotateY ) {
+			scene = new Scene();
+			scene.background = new Color( 0xffffff );
 
-				canvas.width = canvas.clientWidth * window.devicePixelRatio;
-				canvas.height = canvas.clientHeight * window.devicePixelRatio;
+			var light = new DirectionalLight( 0xffffff );
+			light.position.set( 0, 0, 1 ).normalize();
+			scene.add( light );
 
-				var context = canvas.getContext( '2d' );
+			var noof_balls = 51;
 
-				var camera = new THREE.PerspectiveCamera( 20, canvas.clientWidth / canvas.clientHeight, 1, 20000 );
-				camera.rotation.y = rotateY;
+			// shadow
 
-				// Think of the virtual camera as a post with 5 cameras on it (even though those cameras happen to live in difference scenes)
-				// You need to move the post (ie, the virtualCamera) to move all 5 cameras together.
+			var canvas = document.createElement( 'canvas' );
+			canvas.width = 128;
+			canvas.height = 128;
 
-				var virtualCamera = new THREE.Camera();
-				virtualCamera.add( camera );
+			var context = canvas.getContext( '2d' );
+			var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+			gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
+			gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
 
-				this.render = function () {
+			context.fillStyle = gradient;
+			context.fillRect( 0, 0, canvas.width, canvas.height );
 
-					virtualCamera.position.x = - mouseX * 4;
-					virtualCamera.position.y = - mouseY * 4;
-					virtualCamera.position.z = 1800;
+			var shadowTexture = new CanvasTexture( canvas );
 
-					virtualCamera.lookAt( scene.position );
-					virtualCamera.updateMatrixWorld( true );
+			var shadowMaterial = new MeshBasicMaterial( { map: shadowTexture } );
+			var shadowGeo = new PlaneBufferGeometry( 300, 300, 1, 1 );
 
-					renderer.render( scene, camera );
+			for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
 
-					context.drawImage( renderer.domElement, 0, 0 );
-
-				};
-
-			}
-
-			function init() {
-
-				var canvas1 = document.getElementById( 'canvas1' );
-				var canvas2 = document.getElementById( 'canvas2' );
-				var canvas3 = document.getElementById( 'canvas3' );
-				var canvas4 = document.getElementById( 'canvas4' );
-				var canvas5 = document.getElementById( 'canvas5' );
-
-				var fudge = 0.45; // I don't know why this is needed :-(
-				var rot = 30 * THREE.Math.DEG2RAD;
-
-				views.push( new View( canvas1, rot * - 2 * fudge ) );
-				views.push( new View( canvas2, rot * - 1 * fudge ) );
-				views.push( new View( canvas3, rot *	0 * fudge ) );
-				views.push( new View( canvas4, rot *	1 * fudge ) );
-				views.push( new View( canvas5, rot *	2 * fudge ) );
-
-				//
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 ).normalize();
-				scene.add( light );
-
-				var noof_balls = 51;
-
-				// shadow
-
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = 128;
-				canvas.height = 128;
-
-				var context = canvas.getContext( '2d' );
-				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
-				gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
-				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
-
-				context.fillStyle = gradient;
-				context.fillRect( 0, 0, canvas.width, canvas.height );
-
-				var shadowTexture = new THREE.CanvasTexture( canvas );
-
-				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
-				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
-
-				for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
-
-					var shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-					shadowMesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
-					shadowMesh.position.y = - 250;
-					shadowMesh.rotation.x = - Math.PI / 2;
-					scene.add( shadowMesh );
-
-				}
-
-				var radius = 200;
-
-				var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
-
-				var count = geometry1.attributes.position.count;
-				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
-
-				var color = new THREE.Color();
-				var positions = geometry1.attributes.position;
-				var colors = geometry1.attributes.color;
-
-				for ( var i = 0; i < count; i ++ ) {
-
-					color.setHSL( ( positions.getY( i ) / radius + 1 ) / 2, 1.0, 0.5 );
-
-					colors.setXYZ( i, color.r, color.g, color.b );
-
-				}
-
-				var material = new THREE.MeshPhongMaterial( {
-					color: 0xffffff,
-					flatShading: true,
-					vertexColors: THREE.VertexColors,
-					shininess: 0
-				} );
-
-				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
-
-				for ( var i = 0; i < noof_balls; i ++ ) { // create balls
-
-					var mesh = new THREE.Mesh( geometry1, material );
-					var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
-					mesh.add( wireframe );
-
-					mesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
-					mesh.rotation.x = i * 0.5;
-					scene.add( mesh );
-
-				}
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( 200, 300 );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				var shadowMesh = new Mesh( shadowGeo, shadowMaterial );
+				shadowMesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
+				shadowMesh.position.y = - 250;
+				shadowMesh.rotation.x = - Math.PI / 2;
+				scene.add( shadowMesh );
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			var radius = 200;
 
-				mouseX = event.clientX - windowHalfX;
-				mouseY = event.clientY - windowHalfY;
+			var geometry1 = new IcosahedronBufferGeometry( radius, 1 );
+
+			var count = geometry1.attributes.position.count;
+			geometry1.addAttribute( 'color', new BufferAttribute( new Float32Array( count * 3 ), 3 ) );
+
+			var color = new Color();
+			var positions = geometry1.attributes.position;
+			var colors = geometry1.attributes.color;
+
+			for ( var i = 0; i < count; i ++ ) {
+
+				color.setHSL( ( positions.getY( i ) / radius + 1 ) / 2, 1.0, 0.5 );
+
+				colors.setXYZ( i, color.r, color.g, color.b );
 
 			}
 
-			function animate() {
+			var material = new MeshPhongMaterial( {
+				color: 0xffffff,
+				flatShading: true,
+				vertexColors: VertexColors,
+				shininess: 0
+			} );
 
-				for ( var i = 0; i < views.length; ++ i ) {
+			var wireframeMaterial = new MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-					views[ i ].render();
+			for ( var i = 0; i < noof_balls; i ++ ) { // create balls
 
-				}
+				var mesh = new Mesh( geometry1, material );
+				var wireframe = new Mesh( geometry1, wireframeMaterial );
+				mesh.add( wireframe );
 
-				requestAnimationFrame( animate );
+				mesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
+				mesh.rotation.x = i * 0.5;
+				scene.add( mesh );
 
 			}
+
+			renderer = new WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( 200, 300 );
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+		}
+
+		function onDocumentMouseMove( event ) {
+
+			mouseX = event.clientX - windowHalfX;
+			mouseY = event.clientY - windowHalfY;
+
+		}
+
+		function animate() {
+
+			for ( var i = 0; i < views.length; ++ i ) {
+
+				views[ i ].render();
+
+			}
+
+			requestAnimationFrame( animate );
+
+		}
 
 		</script>
 </body>

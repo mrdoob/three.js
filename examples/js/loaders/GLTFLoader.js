@@ -12,6 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 		this.dracoLoader = null;
+		this.ddsLoader = null;
 
 	}
 
@@ -68,6 +69,12 @@ THREE.GLTFLoader = ( function () {
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
+			if ( scope.crossOrigin === 'use-credentials' ) {
+
+				loader.setWithCredentials( true );
+
+			}
+
 			loader.load( url, function ( data ) {
 
 				try {
@@ -114,6 +121,13 @@ THREE.GLTFLoader = ( function () {
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.dracoLoader = dracoLoader;
+			return this;
+
+		},
+
+		setDDSLoader: function ( ddsLoader ) {
+
+			this.ddsLoader = ddsLoader;
 			return this;
 
 		},
@@ -177,11 +191,11 @@ THREE.GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.KHR_MATERIALS_UNLIT:
-							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension( json );
+							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
 							break;
 
 						case EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS:
-							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension( json );
+							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
 							break;
 
 						case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
@@ -189,11 +203,11 @@ THREE.GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.MSFT_TEXTURE_DDS:
-							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension();
+							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension( this.ddsLoader );
 							break;
 
 						case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
-							extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension( json );
+							extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension();
 							break;
 
 						default:
@@ -281,16 +295,16 @@ THREE.GLTFLoader = ( function () {
 	 * https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds
 	 *
 	 */
-	function GLTFTextureDDSExtension() {
+	function GLTFTextureDDSExtension( ddsLoader ) {
 
-		if ( ! THREE.DDSLoader ) {
+		if ( ! ddsLoader ) {
 
 			throw new Error( 'THREE.GLTFLoader: Attempting to load .dds texture without importing THREE.DDSLoader' );
 
 		}
 
 		this.name = EXTENSIONS.MSFT_TEXTURE_DDS;
-		this.ddsLoader = new THREE.DDSLoader();
+		this.ddsLoader = ddsLoader;
 
 	}
 
@@ -413,8 +427,6 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	/* BINARY EXTENSION */
-
-	var BINARY_EXTENSION_BUFFER_NAME = 'binary_glTF';
 	var BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
 	var BINARY_EXTENSION_HEADER_LENGTH = 12;
 	var BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4E4F534A, BIN: 0x004E4942 };
@@ -841,7 +853,8 @@ THREE.GLTFLoader = ( function () {
 
 				for ( var i = 0, il = params.length; i < il; i ++ ) {
 
-					target[ params[ i ] ] = source[ params[ i ] ];
+					var value = source[ params[ i ] ];
+					target[ params[ i ] ] = ( value && value.isColor ) ? value.clone() : value;
 
 				}
 
@@ -850,7 +863,7 @@ THREE.GLTFLoader = ( function () {
 			},
 
 			// Here's based on refreshUniformsCommon() and refreshUniformsStandard() in WebGLRenderer.
-			refreshUniforms: function ( renderer, scene, camera, geometry, material, group ) {
+			refreshUniforms: function ( renderer, scene, camera, geometry, material ) {
 
 				if ( material.isGLTFSpecularGlossinessMaterial !== true ) {
 
@@ -1098,17 +1111,6 @@ THREE.GLTFLoader = ( function () {
 		UNSIGNED_SHORT: 5123
 	};
 
-	var WEBGL_TYPE = {
-		5126: Number,
-		//35674: THREE.Matrix2,
-		35675: THREE.Matrix3,
-		35676: THREE.Matrix4,
-		35664: THREE.Vector2,
-		35665: THREE.Vector3,
-		35666: THREE.Vector4,
-		35678: THREE.Texture
-	};
-
 	var WEBGL_COMPONENT_TYPES = {
 		5120: Int8Array,
 		5121: Uint8Array,
@@ -1131,48 +1133,6 @@ THREE.GLTFLoader = ( function () {
 		33071: THREE.ClampToEdgeWrapping,
 		33648: THREE.MirroredRepeatWrapping,
 		10497: THREE.RepeatWrapping
-	};
-
-	var WEBGL_SIDES = {
-		1028: THREE.BackSide, // Culling front
-		1029: THREE.FrontSide // Culling back
-		//1032: THREE.NoSide   // Culling front and back, what to do?
-	};
-
-	var WEBGL_DEPTH_FUNCS = {
-		512: THREE.NeverDepth,
-		513: THREE.LessDepth,
-		514: THREE.EqualDepth,
-		515: THREE.LessEqualDepth,
-		516: THREE.GreaterEqualDepth,
-		517: THREE.NotEqualDepth,
-		518: THREE.GreaterEqualDepth,
-		519: THREE.AlwaysDepth
-	};
-
-	var WEBGL_BLEND_EQUATIONS = {
-		32774: THREE.AddEquation,
-		32778: THREE.SubtractEquation,
-		32779: THREE.ReverseSubtractEquation
-	};
-
-	var WEBGL_BLEND_FUNCS = {
-		0: THREE.ZeroFactor,
-		1: THREE.OneFactor,
-		768: THREE.SrcColorFactor,
-		769: THREE.OneMinusSrcColorFactor,
-		770: THREE.SrcAlphaFactor,
-		771: THREE.OneMinusSrcAlphaFactor,
-		772: THREE.DstAlphaFactor,
-		773: THREE.OneMinusDstAlphaFactor,
-		774: THREE.DstColorFactor,
-		775: THREE.OneMinusDstColorFactor,
-		776: THREE.SrcAlphaSaturateFactor
-		// The followings are not supported by Three.js yet
-		//32769: CONSTANT_COLOR,
-		//32770: ONE_MINUS_CONSTANT_COLOR,
-		//32771: CONSTANT_ALPHA,
-		//32772: ONE_MINUS_CONSTANT_COLOR
 	};
 
 	var WEBGL_TYPE_SIZES = {
@@ -1208,15 +1168,6 @@ THREE.GLTFLoader = ( function () {
 		                        // keyframe track will be initialized with a default interpolation type, then modified.
 		LINEAR: THREE.InterpolateLinear,
 		STEP: THREE.InterpolateDiscrete
-	};
-
-	var STATES_ENABLES = {
-		2884: 'CULL_FACE',
-		2929: 'DEPTH_TEST',
-		3042: 'BLEND',
-		3089: 'SCISSOR_TEST',
-		32823: 'POLYGON_OFFSET_FILL',
-		32926: 'SAMPLE_ALPHA_TO_COVERAGE'
 	};
 
 	var ALPHA_MODES = {
@@ -1299,7 +1250,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( typeof gltfDef.extras === 'object' ) {
 
-				object.userData = gltfDef.extras;
+				Object.assign( object.userData, gltfDef.extras );
 
 			} else {
 
@@ -1512,19 +1463,6 @@ THREE.GLTFLoader = ( function () {
 		}
 
 	}
-	function isObjectEqual( a, b ) {
-
-		if ( Object.keys( a ).length !== Object.keys( b ).length ) return false;
-
-		for ( var key in a ) {
-
-			if ( a[ key ] !== b[ key ] ) return false;
-
-		}
-
-		return true;
-
-	}
 
 	function createPrimitiveKey( primitiveDef ) {
 
@@ -1608,6 +1546,12 @@ THREE.GLTFLoader = ( function () {
 		this.fileLoader = new THREE.FileLoader( this.options.manager );
 		this.fileLoader.setResponseType( 'arraybuffer' );
 
+		if ( this.options.crossOrigin === 'use-credentials' ) {
+
+			this.fileLoader.setWithCredentials( true );
+
+		}
+
 	}
 
 	GLTFParser.prototype.parse = function ( onLoad, onError ) {
@@ -1641,6 +1585,8 @@ THREE.GLTFLoader = ( function () {
 			};
 
 			addUnknownExtensionsToUserData( extensions, result, json );
+
+			assignExtrasToUserData( result, json );
 
 			onLoad( result );
 
@@ -2568,7 +2514,6 @@ THREE.GLTFLoader = ( function () {
 
 		var parser = this;
 		var json = this.json;
-		var extensions = this.extensions;
 
 		var meshDef = json.meshes[ meshIndex ];
 		var primitives = meshDef.primitives;
@@ -2612,7 +2557,13 @@ THREE.GLTFLoader = ( function () {
 							? new THREE.SkinnedMesh( geometry, material )
 							: new THREE.Mesh( geometry, material );
 
-						if ( mesh.isSkinnedMesh === true ) mesh.normalizeSkinWeights(); // #15319
+						if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
+
+							// we normalize floating point skin weight array to fix malformed assets (see #15319)
+							// it's important to skip this for non-float32 data since normalizeSkinWeights assumes non-normalized inputs
+							mesh.normalizeSkinWeights();
+
+						}
 
 						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 
@@ -2862,12 +2813,52 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
+				var outputArray = outputAccessor.array;
+
+				if ( outputAccessor.normalized ) {
+
+					var scale;
+
+					if ( outputArray.constructor === Int8Array ) {
+
+						scale = 1 / 127;
+
+					} else if ( outputArray.constructor === Uint8Array ) {
+
+						scale = 1 / 255;
+
+					} else if ( outputArray.constructor == Int16Array ) {
+
+						scale = 1 / 32767;
+
+					} else if ( outputArray.constructor === Uint16Array ) {
+
+						scale = 1 / 65535;
+
+					} else {
+
+						throw new Error( 'THREE.GLTFLoader: Unsupported output accessor component type.' );
+
+					}
+
+					var scaled = new Float32Array( outputArray.length );
+
+					for ( var j = 0, jl = outputArray.length; j < jl; j ++ ) {
+
+						scaled[ j ] = outputArray[ j ] * scale;
+
+					}
+
+					outputArray = scaled;
+
+				}
+
 				for ( var j = 0, jl = targetNames.length; j < jl; j ++ ) {
 
 					var track = new TypedKeyframeTrack(
 						targetNames[ j ] + '.' + PATH_PROPERTIES[ target.path ],
 						inputAccessor.array,
-						outputAccessor.array,
+						outputArray,
 						interpolation
 					);
 
@@ -2996,6 +2987,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( nodeDef.name !== undefined ) {
 
+				node.userData.name = nodeDef.name;
 				node.name = THREE.PropertyBinding.sanitizeNodeName( nodeDef.name );
 
 			}

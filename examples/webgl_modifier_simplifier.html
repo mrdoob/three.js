@@ -4,26 +4,22 @@
 		<title>three.js webgl - modifier - Subdivisions using Loop Subdivision Scheme</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/modifiers/SimplifyModifier.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { SimplifyModifier } from './jsm/modifiers/SimplifyModifier.js';
 
 			var renderer, scene, camera;
 
@@ -39,35 +35,35 @@
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Vertex Reduction using SimplifyModifier';
 				document.body.appendChild( info );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 15;
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.enablePan = false;
 				controls.enableZoom = false;
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
+				scene.add( new AmbientLight( 0xffffff, 0.2 ) );
 
-				var light = new THREE.PointLight( 0xffffff, 0.7 );
+				var light = new PointLight( 0xffffff, 0.7 );
 				camera.add( light );
 				scene.add( camera );
 
-				new THREE.GLTFLoader().load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+				new GLTFLoader().load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 					mesh.position.x = - 3;
 					mesh.rotation.y = Math.PI / 2;
 					scene.add( mesh );
 
-					var modifier = new THREE.SimplifyModifier();
+					var modifier = new SimplifyModifier();
 
 					var simplified = mesh.clone();
 					simplified.material = simplified.material.clone();

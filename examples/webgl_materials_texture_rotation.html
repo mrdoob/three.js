@@ -4,50 +4,28 @@
 		<title>three.js webgl - materials - texture - rotation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #050505;
-				color: #fff;
-				overflow: hidden;
-			}
-
-			a { color: #e00 }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - texture rotation
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - texture rotation
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BoxBufferGeometry,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				RepeatWrapping,
+				Scene,
+				TextureLoader,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var mesh, renderer, scene, camera;
 
@@ -67,35 +45,35 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 10, 15, 25 );
 				scene.add( camera );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				var geometry = new BoxBufferGeometry( 10, 10, 10 );
 
-				new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg', function ( texture ) {
+				new TextureLoader().load( 'textures/UV_Grid_Sm.jpg', function ( texture ) {
 
-					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+					texture.wrapS = texture.wrapT = RepeatWrapping;
 					texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 					//texture.matrixAutoUpdate = false; // default true; set to false to update texture.matrix manually
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+					var material = new MeshBasicMaterial( { map: texture } );
 
-					mesh = new THREE.Mesh( geometry, material );
+					mesh = new Mesh( geometry, material );
 					scene.add( mesh );
 
 					updateUvTransform();
@@ -161,7 +139,7 @@
 
 			function initGui() {
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( API, 'offsetX', 0.0, 1.0 ).name( 'offset.x' ).onChange( updateUvTransform );
 				gui.add( API, 'offsetY', 0.0, 1.0 ).name( 'offset.y' ).onChange( updateUvTransform );

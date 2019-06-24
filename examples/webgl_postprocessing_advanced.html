@@ -4,76 +4,56 @@
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#fff;
-				background-color: rgba( 0, 0, 0, 0.5 );
-				position: relative;
-				margin: 0 auto -2.1em;
-				top: 0px;
-				width: 550px;
-				padding: 5px;
-				z-index:100;
-			}
-
-			a { color: red; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
 			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Color,
+				DirectionalLight,
+				LinearFilter,
+				Mesh,
+				MeshBasicMaterial,
+				MeshPhongMaterial,
+				OrthographicCamera,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RGBFormat,
+				Scene,
+				TextureLoader,
+				Vector2,
+				Uniform,
+				WebGLRenderer,
+				WebGLRenderTarget,
+			} from "../build/three.module.js";
 
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/ColorifyShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/DotScreenShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-		<script src="js/shaders/HorizontalBlurShader.js"></script>
-		<script src="js/shaders/SepiaShader.js"></script>
-		<script src="js/shaders/VerticalBlurShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-		<script src="js/postprocessing/DotScreenPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
+			import { DotScreenPass } from './jsm/postprocessing/DotScreenPass.js';
+			import { MaskPass, ClearMaskPass } from './jsm/postprocessing/MaskPass.js';
+			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
 
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
+			import { ColorifyShader } from './jsm/shaders/ColorifyShader.js';
+			import { HorizontalBlurShader } from './jsm/shaders/HorizontalBlurShader.js';
+			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
+			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
+			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var container, stats;
 
@@ -100,24 +80,24 @@
 
 				//
 
-				cameraOrtho = new THREE.OrthographicCamera( - halfWidth, halfWidth, halfHeight, - halfHeight, - 10000, 10000 );
+				cameraOrtho = new OrthographicCamera( - halfWidth, halfWidth, halfHeight, - halfHeight, - 10000, 10000 );
 				cameraOrtho.position.z = 100;
 
-				cameraPerspective = new THREE.PerspectiveCamera( 50, width / height, 1, 10000 );
+				cameraPerspective = new PerspectiveCamera( 50, width / height, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
 				//
 
-				sceneModel = new THREE.Scene();
-				sceneBG = new THREE.Scene();
+				sceneModel = new Scene();
+				sceneBG = new Scene();
 
 				//
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight = new DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, - 0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
@@ -126,28 +106,28 @@
 
 				//
 
-				var materialColor = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+				var materialColor = new MeshBasicMaterial( {
+					map: new TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
 					depthTest: false
 				} );
 
-				quadBG = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), materialColor );
+				quadBG = new Mesh( new PlaneBufferGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = - 500;
 				quadBG.scale.set( width, height, 1 );
 				sceneBG.add( quadBG );
 
 				//
 
-				var sceneMask = new THREE.Scene();
+				var sceneMask = new Scene();
 
-				quadMask = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				quadMask = new Mesh( new PlaneBufferGeometry( 1, 1 ), new MeshBasicMaterial( { color: 0xffaa00 } ) );
 				quadMask.position.z = - 300;
 				quadMask.scale.set( width / 2, height / 2, 1 );
 				sceneMask.add( quadMask );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.autoClear = false;
@@ -168,15 +148,15 @@
 
 				//
 
-				var shaderBleach = THREE.BleachBypassShader;
-				var shaderSepia = THREE.SepiaShader;
-				var shaderVignette = THREE.VignetteShader;
-				// var shaderCopy = THREE.CopyShader;
+				var shaderBleach = BleachBypassShader;
+				var shaderSepia = SepiaShader;
+				var shaderVignette = VignetteShader;
+				// var shaderCopy = CopyShader;
 
-				var effectBleach = new THREE.ShaderPass( shaderBleach );
-				var effectSepia = new THREE.ShaderPass( shaderSepia );
-				var effectVignette = new THREE.ShaderPass( shaderVignette );
-				// var effectCopy = new THREE.ShaderPass( shaderCopy );
+				var effectBleach = new ShaderPass( shaderBleach );
+				var effectSepia = new ShaderPass( shaderSepia );
+				var effectVignette = new ShaderPass( shaderVignette );
+				// var effectCopy = new ShaderPass( shaderCopy );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
 
@@ -185,33 +165,33 @@
 				effectVignette.uniforms[ "offset" ].value = 0.95;
 				effectVignette.uniforms[ "darkness" ].value = 1.6;
 
-				var effectBloom = new THREE.BloomPass( 0.5 );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.025, 648, false );
-				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
-				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
+				var effectBloom = new BloomPass( 0.5 );
+				var effectFilm = new FilmPass( 0.35, 0.025, 648, false );
+				var effectFilmBW = new FilmPass( 0.35, 0.5, 2048, true );
+				var effectDotScreen = new DotScreenPass( new Vector2( 0, 0 ), 0.5, 0.8 );
 
-				var effectHBlur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
-				var effectVBlur = new THREE.ShaderPass( THREE.VerticalBlurShader );
+				var effectHBlur = new ShaderPass( HorizontalBlurShader );
+				var effectVBlur = new ShaderPass( VerticalBlurShader );
 				effectHBlur.uniforms[ 'h' ].value = 2 / ( width / 2 );
 				effectVBlur.uniforms[ 'v' ].value = 2 / ( height / 2 );
 
-				var effectColorify1 = new THREE.ShaderPass( THREE.ColorifyShader );
-				var effectColorify2 = new THREE.ShaderPass( THREE.ColorifyShader );
-				effectColorify1.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.8, 0.8 ) );
-				effectColorify2.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.75, 0.5 ) );
+				var effectColorify1 = new ShaderPass( ColorifyShader );
+				var effectColorify2 = new ShaderPass( ColorifyShader );
+				effectColorify1.uniforms[ 'color' ] = new Uniform( new Color( 1, 0.8, 0.8 ) );
+				effectColorify2.uniforms[ 'color' ] = new Uniform( new Color( 1, 0.75, 0.5 ) );
 
-				var clearMask = new THREE.ClearMaskPass();
-				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
-				var renderMaskInverse = new THREE.MaskPass( sceneModel, cameraPerspective );
+				var clearMask = new ClearMaskPass();
+				var renderMask = new MaskPass( sceneModel, cameraPerspective );
+				var renderMaskInverse = new MaskPass( sceneModel, cameraPerspective );
 
 				renderMaskInverse.inverse = true;
 
 				//
 
 				var rtParameters = {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBFormat,
+					minFilter: LinearFilter,
+					magFilter: LinearFilter,
+					format: RGBFormat,
 					stencilBuffer: true
 				};
 
@@ -220,12 +200,12 @@
 
 				//
 
-				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
-				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
+				var renderBackground = new RenderPass( sceneBG, cameraOrtho );
+				var renderModel = new RenderPass( sceneModel, cameraPerspective );
 
 				renderModel.clear = false;
 
-				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
+				composerScene = new EffectComposer( renderer, new WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
 
 				composerScene.addPass( renderBackground );
 				composerScene.addPass( renderModel );
@@ -236,11 +216,11 @@
 
 				//
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget2.texture );
+				renderScene = new TexturePass( composerScene.renderTarget2.texture );
 
 				//
 
-				composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+				composer1 = new EffectComposer( renderer, new WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
 				//composer1.addPass( renderMask );
@@ -250,7 +230,7 @@
 
 				//
 
-				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+				composer2 = new EffectComposer( renderer, new WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
 				composer2.addPass( effectDotScreen );
@@ -264,7 +244,7 @@
 
 				//
 
-				composer3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+				composer3 = new EffectComposer( renderer, new WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer3.addPass( renderScene );
 				//composer3.addPass( renderMask );
@@ -275,7 +255,7 @@
 
 				//
 
-				composer4 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+				composer4 = new EffectComposer( renderer, new WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer4.addPass( renderScene );
 				//composer4.addPass( renderMask );
@@ -324,18 +304,18 @@
 
 			function createMesh( geometry, scene, scale ) {
 
-				var mat2 = new THREE.MeshPhongMaterial( {
+				var mat2 = new MeshPhongMaterial( {
 
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
-					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
-					normalScale: new THREE.Vector2( 0.75, 0.75 )
+					map: new TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					normalMap: new TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalScale: new Vector2( 0.75, 0.75 )
 
 				} );
 
-				mesh = new THREE.Mesh( geometry, mat2 );
+				mesh = new Mesh( geometry, mat2 );
 				mesh.position.set( 0, - 50, 0 );
 				mesh.scale.set( scale, scale, scale );
 

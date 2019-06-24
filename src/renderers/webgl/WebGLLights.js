@@ -100,7 +100,7 @@ function UniformsCache() {
 
 }
 
-var count = 0;
+var nextVersion = 0;
 
 function WebGLLights() {
 
@@ -108,16 +108,15 @@ function WebGLLights() {
 
 	var state = {
 
-		id: count ++,
+		version: 0,
 
 		hash: {
-			stateID: - 1,
 			directionalLength: - 1,
 			pointLength: - 1,
 			spotLength: - 1,
 			rectAreaLength: - 1,
 			hemiLength: - 1,
-			shadowsLength: - 1
+			shadowsLength: - 1,
 		},
 
 		ambient: [ 0, 0, 0 ],
@@ -331,19 +330,31 @@ function WebGLLights() {
 		state.ambient[ 1 ] = g;
 		state.ambient[ 2 ] = b;
 
-		state.directional.length = directionalLength;
-		state.spot.length = spotLength;
-		state.rectArea.length = rectAreaLength;
-		state.point.length = pointLength;
-		state.hemi.length = hemiLength;
+		var hash = state.hash;
 
-		state.hash.stateID = state.id;
-		state.hash.directionalLength = directionalLength;
-		state.hash.pointLength = pointLength;
-		state.hash.spotLength = spotLength;
-		state.hash.rectAreaLength = rectAreaLength;
-		state.hash.hemiLength = hemiLength;
-		state.hash.shadowsLength = shadows.length;
+		if ( hash.directionalLength !== directionalLength ||
+			hash.pointLength !== pointLength ||
+			hash.spotLength !== spotLength ||
+			hash.rectAreaLength !== rectAreaLength ||
+			hash.hemiLength !== hemiLength ||
+			hash.shadowsLength !== shadows.length ) {
+
+			state.directional.length = directionalLength;
+			state.spot.length = spotLength;
+			state.rectArea.length = rectAreaLength;
+			state.point.length = pointLength;
+			state.hemi.length = hemiLength;
+
+			hash.directionalLength = directionalLength;
+			hash.pointLength = pointLength;
+			hash.spotLength = spotLength;
+			hash.rectAreaLength = rectAreaLength;
+			hash.hemiLength = hemiLength;
+			hash.shadowsLength = shadows.length;
+
+			state.version = nextVersion ++;
+
+		}
 
 	}
 

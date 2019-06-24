@@ -4,29 +4,7 @@
 		<title>three.js webgl - animation - basic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #f00;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -34,17 +12,28 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - basic use
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				AnimationClip,
+				AnimationMixer,
+				AxesHelper,
+				BoxBufferGeometry,
+				Clock,
+				ColorKeyframeTrack,
+				InterpolateDiscrete,
+				Mesh,
+				MeshBasicMaterial,
+				NumberKeyframeTrack,
+				PerspectiveCamera,
+				Quaternion,
+				QuaternionKeyframeTrack,
+				Scene,
+				Vector3,
+				VectorKeyframeTrack,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var stats, clock;
 			var scene, camera, renderer, mixer;
@@ -54,58 +43,58 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 50, 50, 100 );
 				camera.lookAt( scene.position );
 
 				//
 
-				var axesHelper = new THREE.AxesHelper( 10 );
+				var axesHelper = new AxesHelper( 10 );
 				scene.add( axesHelper );
 
 				//
 
-				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true } );
-				var mesh = new THREE.Mesh( geometry, material );
+				var geometry = new BoxBufferGeometry( 5, 5, 5 );
+				var material = new MeshBasicMaterial( { color: 0xffffff, transparent: true } );
+				var mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
 				// create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
 				// Note: the keyframe track type should correspond to the type of the property being animated
 
 				// POSITION
-				var positionKF = new THREE.VectorKeyframeTrack( '.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
+				var positionKF = new VectorKeyframeTrack( '.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
 
 				// SCALE
-				var scaleKF = new THREE.VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
+				var scaleKF = new VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
 
 				// ROTATION
 				// Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
 				// Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
 
 				// set up rotation about x axis
-				var xAxis = new THREE.Vector3( 1, 0, 0 );
+				var xAxis = new Vector3( 1, 0, 0 );
 
-				var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
-				var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
-				var quaternionKF = new THREE.QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+				var qInitial = new Quaternion().setFromAxisAngle( xAxis, 0 );
+				var qFinal = new Quaternion().setFromAxisAngle( xAxis, Math.PI );
+				var quaternionKF = new QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
 
 				// COLOR
-				var colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
+				var colorKF = new ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], InterpolateDiscrete );
 
 				// OPACITY
-				var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+				var opacityKF = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
 
 				// create an animation sequence with the tracks
 				// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
+				var clip = new AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
 
 				// setup the AnimationMixer
-				mixer = new THREE.AnimationMixer( mesh );
+				mixer = new AnimationMixer( mesh );
 
 				// create a ClipAction and set it to play
 				var clipAction = mixer.clipAction( clip );
@@ -113,7 +102,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -125,7 +114,7 @@
 
 				//
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
 				//
 

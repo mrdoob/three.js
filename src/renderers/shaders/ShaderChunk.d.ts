@@ -1,6 +1,6 @@
 // Renderers / Shaders /////////////////////////////////////////////////////////////////////
 export let ShaderChunk: {
-  [name: string]: string;
+	[name: string]: string;
 
 	alphamap_fragment: string;
 	alphamap_pars_fragment: string;
@@ -91,27 +91,27 @@ export let ShaderChunk: {
 	shadow_frag: string;
 	shadow_vert: string;
 
-  premultiplied_alpha_fragment: string;
-  project_vertex: string;
-  roughnessmap_fragment: string;
-  roughnessmap_pars_fragment: string;
-  shadowmap_pars_fragment: string;
-  shadowmap_pars_vertex: string;
-  shadowmap_vertex: string;
-  shadowmask_pars_fragment: string;
-  skinbase_vertex: string;
-  skinning_pars_vertex: string;
-  skinning_vertex: string;
-  skinnormal_vertex: string;
-  specularmap_fragment: string;
-  specularmap_pars_fragment: string;
-  tonemapping_fragment: string;
-  tonemapping_pars_fragment: string;
-  uv2_pars_fragment: string;
-  uv2_pars_vertex: string;
-  uv2_vertex: string;
-  uv_pars_fragment: string;
-  uv_pars_vertex: string;
-  uv_vertex: string;
-  worldpos_vertex: string;
+	premultiplied_alpha_fragment: string;
+	project_vertex: string;
+	roughnessmap_fragment: string;
+	roughnessmap_pars_fragment: string;
+	shadowmap_pars_fragment: string;
+	shadowmap_pars_vertex: string;
+	shadowmap_vertex: string;
+	shadowmask_pars_fragment: string;
+	skinbase_vertex: string;
+	skinning_pars_vertex: string;
+	skinning_vertex: string;
+	skinnormal_vertex: string;
+	specularmap_fragment: string;
+	specularmap_pars_fragment: string;
+	tonemapping_fragment: string;
+	tonemapping_pars_fragment: string;
+	uv2_pars_fragment: string;
+	uv2_pars_vertex: string;
+	uv2_vertex: string;
+	uv_pars_fragment: string;
+	uv_pars_vertex: string;
+	uv_vertex: string;
+	worldpos_vertex: string;
 };

@@ -4,83 +4,44 @@
 	<title>three.js webgl - loaders - X-File loader</title>
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0'>
-	<style>
-		body {
-			color: #ffffff;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-		#info {
-			color: #fff;
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
-		}
-		a {
-			color: #ff0000
-		}
-
-		#info2 {
-			color: #fff;
-			background-color: #000;
-			position: absolute;
-			top: 3em;
-			right : 0px;
-			width: 10em;
-			z-index: 200;
-			display: block;
-		}
-
-		td {
-			padding: 0.5em;
-		}
-
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
 	<div id="info">
 		<a href="http://threejs.org" target="_blank">three.js</a> - X-File Loader <br>
-		<a href="https://github.com/adrs2002/threeXfileLoader" target="_new">see more info and samples</a> <br />
-	</div>
-
-	<div id="info2">
-		<table>
-			<tr>
-				<td>mech 1</td>
-				<td><select id="mech1_anime" onchange="mech1_changeAnime(this.value)">
-						<option value="stand">stand</option>
-						<option value="wark">walk</option>
-						<option value="attack">attack</option>
-					  </select>
-					</td>
-			</tr>
-		</table>
+		<a href="https://github.com/adrs2002/threeXfileLoader" target="_new">see more info and samples</a> <br /><br/>
+		<select id="mech1_anime">
+			<option value="stand">stand</option>
+			<option value="wark">walk</option>
+			<option value="attack">attack</option>
+		</select>
 	</div>
 
 	<div id="canvase3d"></div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/loaders/XLoader.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/WebGL.js"></script>
+	<script type="module">
+		import {
+			AmbientLight,
+			Clock,
+			DirectionalLight,
+			GridHelper,
+			LoadingManager,
+			LoopOnce,
+			PerspectiveCamera,
+			Scene,
+			SkeletonHelper,
+			SkinnedMesh,
+			WebGLRenderer,
+		} from "../build/three.module.js";
 
-	<script>
+		import Stats from './jsm/libs/stats.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { XLoader } from './jsm/loaders/XLoader.js';
 
 		var container, stats, controls;
 		var camera, scene, renderer;
-		var clock = new THREE.Clock();
+		var clock = new Clock();
 		var manager = null;
 
 		var skeletonHelper = null;
@@ -108,12 +69,12 @@
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			scene = new THREE.Scene();
-			scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
+			scene = new Scene();
+			scene.add( new AmbientLight( 0xaaaaaa ) );
 
 			// grid
 
-			var gridHelper = new THREE.GridHelper( 14, 1, 0x303030, 0x303030 );
+			var gridHelper = new GridHelper( 14, 1, 0x303030, 0x303030 );
 			scene.add( gridHelper );
 
 			// stats
@@ -121,25 +82,25 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new THREE.WebGLRenderer();
+			renderer = new WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x666666 );
 			container.appendChild( renderer.domElement );
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 			camera.position.set( 2, 10, - 28 );
 			camera.up.set( 0, 1, 0 );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 5, 0 );
 			controls.update();
 
-			var light = new THREE.DirectionalLight( 0xffffff, 1 );
+			var light = new DirectionalLight( 0xffffff, 1 );
 			light.position.set( 10, 100, - 10 ).normalize();
 			scene.add( light );
 
-			var light2 = new THREE.DirectionalLight( 0x777666, 1 );
+			var light2 = new DirectionalLight( 0x777666, 1 );
 			light2.position.set( - 1, - 1, - 1 ).normalize();
 			scene.add( light2 );
 
@@ -149,14 +110,14 @@
 
 			// model loading
 
-			manager = new THREE.LoadingManager();
+			manager = new LoadingManager();
 			manager.onProgress = function ( item, loaded, total ) {
 
 				console.log( item, loaded, total );
 
 			};
 
-			var loader = new THREE.XLoader( manager );
+			var loader = new XLoader( manager );
 
 			actions[ 0 ] = {};
 
@@ -178,9 +139,9 @@
 
 					scene.add( Models[ 0 ] );
 
-					if ( Models[ 0 ] instanceof THREE.SkinnedMesh ) {
+					if ( Models[ 0 ] instanceof SkinnedMesh ) {
 
-						skeletonHelper = new THREE.SkeletonHelper( Models[ 0 ] );
+						skeletonHelper = new SkeletonHelper( Models[ 0 ] );
 						scene.add( skeletonHelper );
 
 					}
@@ -192,6 +153,11 @@
 				object = null;
 
 			}, onProgress, onError );
+
+			//
+
+			var animationSelection = document.getElementById( 'mech1_anime' );
+			animationSelection.addEventListener( 'change', mech1_changeAnime );
 
 		}
 
@@ -243,7 +209,7 @@
 
 			} else {
 
-				var loader2 = new THREE.XLoader( manager );
+				var loader2 = new XLoader( manager );
 				loader2.load( [ 'models/xfile/' + animeName + '.x', { putPos: false, putScl: false } ], function () {
 
 					// !! important!
@@ -259,7 +225,7 @@
 
 					if ( animeName == 'stand' ) {
 
-						actions[ modelId ][ animeName ].setLoop( THREE.LoopOnce );
+						actions[ modelId ][ animeName ].setLoop( LoopOnce );
 
 					}
 
@@ -279,7 +245,9 @@
 
 		}
 
-		function mech1_changeAnime( val ) {
+		function mech1_changeAnime( event ) {
+
+			var val = event.target.value;
 
 			loadAnimation( val, 0, function () {
 

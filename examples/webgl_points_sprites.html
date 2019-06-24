@@ -4,52 +4,32 @@
 		<title>three.js webgl - particles - sprites</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particle sprites example -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particle sprites example<br/>
 			snowflakes by <a href="http://en.wikipedia.org/wiki/File:Sketch_of_snow_crystal_by_Ren%C3%A9_Descartes.jpg">Ren&eacute;  Descartes</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AdditiveBlending,
+				BufferGeometry,
+				Float32BufferAttribute,
+				FogExp2,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var camera, scene, renderer, stats, materials = [], parameters;
 			var mouseX = 0, mouseY = 0;
@@ -62,16 +42,16 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 1000;
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
+				scene = new Scene();
+				scene.fog = new FogExp2( 0x000000, 0.0008 );
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 				var vertices = [];
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
 				var sprite1 = textureLoader.load( 'textures/sprites/snowflake1.png' );
 				var sprite2 = textureLoader.load( 'textures/sprites/snowflake2.png' );
@@ -89,7 +69,7 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 				parameters = [
 					[[ 1.0, 0.2, 0.5 ], sprite2, 20 ],
@@ -105,10 +85,10 @@
 					var sprite = parameters[ i ][ 1 ];
 					var size = parameters[ i ][ 2 ];
 
-					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+					materials[ i ] = new PointsMaterial( { size: size, map: sprite, blending: AdditiveBlending, depthTest: false, transparent: true } );
 					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
 
-					var particles = new THREE.Points( geometry, materials[ i ] );
+					var particles = new Points( geometry, materials[ i ] );
 
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
@@ -120,7 +100,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -132,7 +112,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var params = {
 					texture: true
@@ -230,7 +210,7 @@
 
 					var object = scene.children[ i ];
 
-					if ( object instanceof THREE.Points ) {
+					if ( object instanceof Points ) {
 
 						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
 

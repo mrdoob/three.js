@@ -16,6 +16,8 @@ function Plane( normal, constant ) {
 
 Object.assign( Plane.prototype, {
 
+	isPlane: true,
+
 	set: function ( normal, constant ) {
 
 		this.normal.copy( normal );

@@ -4,55 +4,41 @@
 		<title>three.js webgl - geometry - dynamic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #aaccff;
-				margin: 0px;
-				overflow: hidden;
+				color: #666;
 			}
-
-			#info {
-				color: #ffffff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
-				color: yellow;
+				color: #08f;
 			}
-
-			#webglmessage {
-				background:rgb(0,0,50) !important;
-				color:#fff !important;
-			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dynamic geometry<br />
+			left click: forward, right click: backward
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Clock,
+				Color,
+				FogExp2,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				RepeatWrapping,
+				Scene,
+				TextureLoader,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
 			var camera, controls, scene, renderer, stats;
 
@@ -65,21 +51,21 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = 200;
 
-				clock = new THREE.Clock();
+				clock = new Clock();
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 
 				controls.movementSpeed = 500;
 				controls.lookSpeed = 0.1;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xaaccff );
-				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
+				scene = new Scene();
+				scene.background = new Color( 0xaaccff );
+				scene.fog = new FogExp2( 0xaaccff, 0.0007 );
 
-				geometry = new THREE.PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				var position = geometry.attributes.position;
@@ -92,16 +78,16 @@
 
 				}
 
-				var texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
-				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				var texture = new TextureLoader().load( 'textures/water.jpg' );
+				texture.wrapS = texture.wrapT = RepeatWrapping;
 				texture.repeat.set( 5, 5 );
 
-				material = new THREE.MeshBasicMaterial( { color: 0x0044ff, map: texture } );
+				material = new MeshBasicMaterial( { color: 0x0044ff, map: texture } );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

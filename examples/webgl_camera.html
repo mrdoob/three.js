@@ -4,27 +4,14 @@
 		<title>three.js webgl - cameras</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+			a {
+				color: #08f;
 			}
-
-			#info {
-				position: absolute;
-				top: 5px; width: 100%;
-				z-index: 100;
+			b {
+				color: lightgreen;
 			}
-
-			a {color: #0080ff; }
-			b { color: lightgreen }
-
 		</style>
 	</head>
 	<body>
@@ -32,10 +19,25 @@
 		<b>O</b> orthographic <b>P</b> perspective
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				CameraHelper,
+				Float32BufferAttribute,
+				Group,
+				Math as _Math,
+				Mesh,
+				MeshBasicMaterial,
+				OrthographicCamera,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -56,22 +58,22 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
+				camera = new PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
 				camera.position.z = 2500;
 
-				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
+				cameraPerspective = new PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
 
-				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
+				cameraPerspectiveHelper = new CameraHelper( cameraPerspective );
 				scene.add( cameraPerspectiveHelper );
 
 				//
-				cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
+				cameraOrtho = new OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
 
-				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
+				cameraOrthoHelper = new CameraHelper( cameraOrtho );
 				scene.add( cameraOrthoHelper );
 
 				//
@@ -85,7 +87,7 @@
 				cameraOrtho.rotation.y = Math.PI;
 				cameraPerspective.rotation.y = Math.PI;
 
-				cameraRig = new THREE.Group();
+				cameraRig = new Group();
 
 				cameraRig.add( cameraPerspective );
 				cameraRig.add( cameraOrtho );
@@ -94,47 +96,47 @@
 
 				//
 
-				mesh = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 100, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
+				mesh = new Mesh(
+					new SphereBufferGeometry( 100, 16, 8 ),
+					new MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
 				);
 				scene.add( mesh );
 
-				var mesh2 = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 50, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
+				var mesh2 = new Mesh(
+					new SphereBufferGeometry( 50, 16, 8 ),
+					new MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
 				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 5, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
+				var mesh3 = new Mesh(
+					new SphereBufferGeometry( 5, 16, 8 ),
+					new MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
 				);
 				mesh3.position.z = 150;
 				cameraRig.add( mesh3 );
 
 				//
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 				var vertices = [];
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // x
-					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // y
-					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // z
+					vertices.push( _Math.randFloatSpread( 2000 ) ); // x
+					vertices.push( _Math.randFloatSpread( 2000 ) ); // y
+					vertices.push( _Math.randFloatSpread( 2000 ) ); // z
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
-				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
+				var particles = new Points( geometry, new PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );

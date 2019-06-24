@@ -4,32 +4,8 @@
 		<title>three.js webaudio - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family: Monospace;
-			}
-
-			#info {
-				position: absolute;
-				z-index: 2;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
 			#overlay {
 				position: absolute;
 				z-index: 1;
@@ -45,54 +21,63 @@
 				color: #ffffff;
 			}
 
-			#overlay > div {
-				text-align: center;
-			}
+				#overlay > div {
+					text-align: center;
+				}
 
-			#overlay > div > button {
-				height: 20px;
-				width: 100px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
+				#overlay > div > button {
+					height: 20px;
+					width: 100px;
+					background: transparent;
+					color: #ffffff;
+					outline: 1px solid #ffffff;
+					border: 0px;
+					cursor: pointer;
+				}
 
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
+				#overlay > div > p {
+					color: #777777;
+					font-size: 12px;
+				}
 		</style>
 	</head>
 	<body>
 		<div id="overlay">
 			<div>
 				<button id="startButton">Click to Play</button>
-				<p>Automatic audio playback requires a user interaction.</p>
+				<p>Audio playback requires user interaction.</p>
 			</div>
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox |
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox<br/>
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener">larrylarrybb</a>,
 			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a> and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Audio as _Audio,
+				AudioAnalyser,
+				AudioListener as _AudioListener,
+				AudioLoader,
+				Clock,
+				DirectionalLight,
+				FogExp2,
+				GridHelper,
+				MeshPhongMaterial,
+				Mesh,
+				PerspectiveCamera,
+				PositionalAudio,
+				SphereBufferGeometry,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
 			var camera, controls, scene, renderer, light;
 
@@ -100,7 +85,7 @@
 
 			var analyser1, analyser2, analyser3;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 
 			var startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
@@ -110,34 +95,34 @@
 				var overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
 
-				var listener = new THREE.AudioListener();
+				var listener = new _AudioListener();
 				camera.add( listener );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.0025 );
+				scene = new Scene();
+				scene.fog = new FogExp2( 0x000000, 0.0025 );
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new DirectionalLight( 0xffffff );
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
-				var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
+				var sphere = new SphereBufferGeometry( 20, 32, 16 );
 
-				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
-				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
-				material3 = new THREE.MeshPhongMaterial( { color: 0x6622aa, flatShading: true, shininess: 0 } );
+				material1 = new MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
+				material2 = new MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
+				material3 = new MeshPhongMaterial( { color: 0x6622aa, flatShading: true, shininess: 0 } );
 
 				// sound spheres
 
-				var audioLoader = new THREE.AudioLoader();
+				var audioLoader = new AudioLoader();
 
-				var mesh1 = new THREE.Mesh( sphere, material1 );
+				var mesh1 = new Mesh( sphere, material1 );
 				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
-				var sound1 = new THREE.PositionalAudio( listener );
+				var sound1 = new PositionalAudio( listener );
 				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
 
 					sound1.setBuffer( buffer );
@@ -149,11 +134,11 @@
 
 				//
 
-				var mesh2 = new THREE.Mesh( sphere, material2 );
+				var mesh2 = new Mesh( sphere, material2 );
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
-				var sound2 = new THREE.PositionalAudio( listener );
+				var sound2 = new PositionalAudio( listener );
 				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
 
 					sound2.setBuffer( buffer );
@@ -165,11 +150,11 @@
 
 				//
 
-				var mesh3 = new THREE.Mesh( sphere, material3 );
+				var mesh3 = new Mesh( sphere, material3 );
 				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
-				var sound3 = new THREE.PositionalAudio( listener );
+				var sound3 = new PositionalAudio( listener );
 				var oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
 				oscillator.frequency.setValueAtTime( 144, sound3.context.currentTime );
@@ -181,13 +166,13 @@
 
 				// analysers
 
-				analyser1 = new THREE.AudioAnalyser( sound1, 32 );
-				analyser2 = new THREE.AudioAnalyser( sound2, 32 );
-				analyser3 = new THREE.AudioAnalyser( sound3, 32 );
+				analyser1 = new AudioAnalyser( sound1, 32 );
+				analyser2 = new AudioAnalyser( sound2, 32 );
+				analyser3 = new AudioAnalyser( sound3, 32 );
 
 				// global ambient audio
 
-				var sound4 = new THREE.Audio( listener );
+				var sound4 = new _Audio( listener );
 				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
 
 					sound4.setBuffer( buffer );
@@ -199,7 +184,7 @@
 
 				// ground
 
-				var helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
+				var helper = new GridHelper( 1000, 10, 0x444444, 0x444444 );
 				helper.position.y = 0.1;
 				scene.add( helper );
 
@@ -222,7 +207,7 @@
 
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var soundControls = new SoundControls();
 				var generatorControls = new GeneratorControls();
 				var volumeFolder = gui.addFolder( 'sound volume' );
@@ -270,14 +255,14 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+				controls = new FirstPersonControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 70;
 				controls.lookSpeed = 0.05;

@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param attributeName string
  * @param newValue number, string, boolean or object
  * @constructor
  */
 
-var SetValueCommand = function ( object, attributeName, newValue ) {
+var SetValueCommand = function ( editor, object, attributeName, newValue ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetValueCommand';
 	this.name = 'Set ' + attributeName;
