@@ -20,16 +20,16 @@
 	font-weight: 400;
 }
 @font-face {
-  font-family: 'Roboto Mono';
-  src: local('Roboto Mono Medium'), local('RobotoMono-Medium'), url('../files/RobotoMono-Medium.woff2') format('woff2');
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono Medium'), local('RobotoMono-Medium'), url('../files/RobotoMono-Medium.woff2') format('woff2');
 	font-style: normal;
-  font-weight: 500;
+	font-weight: 500;
 }
 
 * {
 	box-sizing: border-box;
 	-webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
@@ -44,7 +44,6 @@ html {
 body {
 	font-family: 'Roboto Mono', monospace;
 	margin: 0px;
-	overflow: hidden;
 	color: var(--text-color);
 	background-color: #ffffff;
 }
@@ -253,7 +252,7 @@ h1 a {
 	}
 	#panel #content {
 		flex: 1;
-		overflow-y: scroll;
+		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
@@ -270,7 +269,7 @@ h1 a {
 		#panel #content h2 {
 			margin-top: 32px;
 			border-top: var(--border-style);
-	    padding-top: 12px;
+			padding-top: 12px;
 		}
 
 		#panel #content h2:first-child {
@@ -352,7 +351,7 @@ iframe {
 
 	#button.text {
 		padding-right: 20px;
-    padding-left: 20px;
+		padding-left: 20px;
 		color: var(--color-blue);
 		opacity: 1;
 		font-weight: 500;
