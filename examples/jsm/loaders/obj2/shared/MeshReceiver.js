@@ -11,8 +11,6 @@ import {
 	Points
 } from "../../../../../build/three.module.js";
 
-import { MaterialHandler } from "./MaterialHandler.js";
-
 
 /**
  *

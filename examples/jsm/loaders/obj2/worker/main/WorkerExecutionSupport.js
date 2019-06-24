@@ -18,7 +18,7 @@ const CodeBuilderInstructions = function ( supportsStandardWorker, supportsJsmWo
 	this.codeFragments = [];
 	this.importStatements = [];
 
-	this.jsmWorkerFile;
+	this.jsmWorkerFile = null;
 	this.defaultGeometryType = 0;
 };
 
@@ -38,18 +38,37 @@ CodeBuilderInstructions.prototype = {
 		return this.preferJsmWorker;
 	},
 
+	/**
+	 * Set the full path to the module that contains the worker code.
+	 *
+	 * @param {String} jsmWorkerFile
+	 */
 	setJsmWorkerFile: function ( jsmWorkerFile ) {
-		this.jsmWorkerFile = jsmWorkerFile;
+		if ( jsmWorkerFile !== undefined && jsmWorkerFile !== null ) {
+			this.jsmWorkerFile = jsmWorkerFile;
+		}
 	},
 
+	/**
+	 * Add code that is contained in addition to fragments and libraries
+	 * @param {String} startCode
+	 */
 	addStartCode: function ( startCode ) {
 		this.startCode = startCode;
 	},
 
+	/**
+	 * Add code fragment that is included in the provided order
+	 * @param {String} code
+	 */
 	addCodeFragment: function ( code ) {
 		this.codeFragments.push( code );
 	},
 
+	/**
+	 * Add full path to a library that is contained at the start of the worker via "importScripts"
+	 * @param {String} libraryPath
+	 */
 	addLibraryImport: function ( libraryPath ) {
 		let libraryUrl = new URL( libraryPath, window.location.href ).href;
 		let code = 'importScripts( "' + libraryUrl + '" );';
@@ -82,7 +101,7 @@ const WorkerExecutionSupport = function () {
 
 	this._reset();
 };
-WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.0.0-preview';
+WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.0.0-beta2';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
 
@@ -221,24 +240,30 @@ WorkerExecutionSupport.prototype = {
 	 */
 	_buildWorkerJsm: function ( codeBuilderInstructions ) {
 		let jsmSuccess = true;
-		this._buildWorkerCheckPreconditions( true, 'buildWorkerJsm' );
+		let timeLabel = 'buildWorkerJsm';
+		let workerAvailable = this._buildWorkerCheckPreconditions( true, timeLabel );
+		if ( ! workerAvailable ) {
 
-		let workerFileUrl = new URL( codeBuilderInstructions.jsmWorkerFile, window.location.href ).href;
-		try {
+			let workerFileUrl = new URL( codeBuilderInstructions.jsmWorkerFile, window.location.href ).href;
+			try {
 
-			let worker = new Worker( workerFileUrl, { type: "module" } );
-			this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, 'buildWorkerJsm' );
-
-		}
-		catch ( e ) {
-
-			jsmSuccess = false;
-			if ( e instanceof TypeError || e instanceof  SyntaxError ) {
-
-				console.error( "Modules are not supported in workers." );
+				let worker = new Worker( workerFileUrl, { type: "module" } );
+				this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
 			}
+			catch ( e ) {
+
+				jsmSuccess = false;
+				// Chrome throws this exception, but Firefox currently does not complain, but can't execute the worker afterwards
+				if ( e instanceof TypeError || e instanceof SyntaxError ) {
+
+					console.error( "Modules are not supported in workers." );
+
+				}
+			}
+
 		}
+
 		return jsmSuccess;
 	},
 
@@ -254,34 +279,45 @@ WorkerExecutionSupport.prototype = {
 	 * @private
 	 */
 	_buildWorkerStandard: function ( codeBuilderInstructions ) {
-		this._buildWorkerCheckPreconditions( false,'buildWorkerStandard' );
+		let timeLabel = 'buildWorkerStandard';
+		let workerAvailable = this._buildWorkerCheckPreconditions( false, timeLabel );
+		if ( ! workerAvailable ) {
 
-		let concatenateCode = '';
-		codeBuilderInstructions.getImportStatements().forEach( function ( element ) {
-			concatenateCode += element + '\n';
-		} );
-		concatenateCode += '\n';
-		codeBuilderInstructions.getCodeFragments().forEach( function ( element ) {
-			concatenateCode += element+ '\n';
-		} );
-		concatenateCode += '\n';
-		concatenateCode += codeBuilderInstructions.getStartCode();
+			let concatenateCode = '';
+			codeBuilderInstructions.getImportStatements().forEach( function ( element ) {
+				concatenateCode += element + '\n';
+			} );
+			concatenateCode += '\n';
+			codeBuilderInstructions.getCodeFragments().forEach( function ( element ) {
+				concatenateCode += element + '\n';
+			} );
+			concatenateCode += '\n';
+			concatenateCode += codeBuilderInstructions.getStartCode();
 
-		let blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
-		let worker = new Worker( window.URL.createObjectURL( blob ) );
+			let blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
+			let worker = new Worker( window.URL.createObjectURL( blob ) );
 
-		this._configureWorkerCommunication( worker, false, codeBuilderInstructions.defaultGeometryType, 'buildWorkerStandard' );
+			this._configureWorkerCommunication( worker, false, codeBuilderInstructions.defaultGeometryType, timeLabel );
+
+		}
 	},
 
 	_buildWorkerCheckPreconditions: function ( requireJsmWorker, timeLabel ) {
-		if ( this.isWorkerLoaded( requireJsmWorker ) ) return;
+		let workerAvailable = false;
+		if ( this.isWorkerLoaded( requireJsmWorker ) ) {
 
-		if ( this.logging.enabled ) {
+			workerAvailable = true;
 
-			console.info( 'WorkerExecutionSupport: Building ' + ( requireJsmWorker ? 'jsm' : 'standard' ) + ' worker code...' );
-			console.time( timeLabel );
+		} else {
+			if ( this.logging.enabled ) {
+
+				console.info( 'WorkerExecutionSupport: Building ' + ( requireJsmWorker ? 'jsm' : 'standard' ) + ' worker code...' );
+				console.time( timeLabel );
+
+			}
 
 		}
+		return workerAvailable;
 	},
 
 	_configureWorkerCommunication: function ( worker, haveJsmWorker, defaultGeometryType, timeLabel ) {
@@ -402,7 +438,7 @@ WorkerExecutionSupport.prototype = {
 	},
 
 	_postMessage: function () {
-		if ( this.worker.queuedMessage !== null && this.isWorkerLoaded( this.worker.jsmWorker ) ) {
+		if ( this.worker.queuedMessage !== null ) {
 
 			if ( this.worker.queuedMessage.payload.data.input instanceof ArrayBuffer ) {
 

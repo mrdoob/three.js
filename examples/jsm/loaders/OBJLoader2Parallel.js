@@ -56,11 +56,6 @@ OBJLoader2Parallel.prototype.setCallbackOnParseComplete = function ( onParseComp
 	if ( onParseComplete !== undefined && onParseComplete !== null ) {
 		this.callbacks.onParseComplete = onParseComplete;
 	}
-	else {
-
-		throw "No callbackOnLoad was provided! Aborting!";
-
-	}
 	return this;
 };
 
@@ -121,7 +116,7 @@ OBJLoader2Parallel.prototype.buildWorkerCode = function () {
  */
 OBJLoader2Parallel.prototype._configure = function () {
 	if ( this.callbacks.onParseComplete === null ) {
-		"No callbackOnLoad was provided! Aborting!"
+		throw "No callbackOnLoad was provided! Aborting!";
 	}
 	// check if worker is already available and if so, then fast-fail
 	if ( this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) return;
