@@ -58,6 +58,8 @@
 			var scene, renderer, composer;
 			var clearPass, texturePass, renderPass;
 			var cameraP, cubeTexturePassP;
+			var material;
+			var ldrCubeMap, hdrCubeMap;
 			//var cameraO, cubeTexturePassO;
 			var gui, stats;
 
@@ -76,6 +78,8 @@
 				renderPass: true,
 
 				exposure: 1,
+
+				hdr: true
 
 				//autoRotate: true,
 
@@ -107,6 +111,8 @@
 				gui.add( params, "renderPass" );
 
 				gui.add( params, "exposure", 0, 2 );
+
+				gui.add( params, "hdr" );
 
 				//gui.add( params, "autoRotate" );
 
@@ -171,7 +177,7 @@
 
 				var geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
 
-				var material = new THREE.MeshStandardMaterial();
+				material = new THREE.MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
 				material.metalness = 0;
 				material.color.setHSL( Math.random(), 1.0, 0.3 );
@@ -209,21 +215,20 @@
 				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
-				// var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
-				// new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
+				ldrCubeMap = new THREE.CubeTextureLoader().load( ldrUrls, function ( ) {
 
-				// 	cubeTexturePassP.envMap = ldrCubeMap;
-				// 	console.log( "loaded envmap" );
+					console.log( "loaded ldr envmap" );
 
-				// } );
+				} );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-
-				var hdrCubeMap = new THREE.HDRCubeTextureLoader( THREE.UnsignedByteType )
+				hdrCubeMap = new THREE.HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.load( hdrUrls, function () {
+					.load( THREE.UnsignedByteType, hdrUrls, function () {
 
-						cubeTexturePassP.envMap = hdrCubeMap;
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						console.log( "loaded hdr envmap" );
 
 					} );
 
@@ -296,6 +301,7 @@
 				renderPass.enabled = params.renderPass;
 
 				renderer.toneMappingExposure = params.exposure;
+				cubeTexturePassP.envMap = params.hdr ? hdrCubeMap : ldrCubeMap;
 
 				composer.render();
 

@@ -1921,6 +1921,11 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
+			} else if ( material.isMeshCubeMaterial ) {
+
+				refreshUniformsCommon( m_uniforms, material );
+				refreshUniformsCube( m_uniforms, material );
+
 			} else if ( material.isSpriteMaterial ) {
 
 				refreshUniformsSprites( m_uniforms, material );
@@ -2098,6 +2103,14 @@ function WebGLRenderer( parameters ) {
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
+
+	}
+
+	function refreshUniformsCube ( uniforms, material ) {
+
+		uniforms.roughness.value = material.roughness;
+		uniforms.opacity.value = material.opacity;
+		uniforms.envMapIntensity.value = material.envMapIntensity;
 
 	}
 
