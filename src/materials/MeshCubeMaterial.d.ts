@@ -18,6 +18,7 @@ export class MeshCubeMaterial extends Material {
 	envMap?: Texture;
 	envMapIntensity?: number;
 	opacity: number;
+	roughness: number;
 
 	setValues( parameters: MeshCubeMaterialParameters ): void;
 

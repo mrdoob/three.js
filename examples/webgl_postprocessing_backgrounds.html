@@ -25,7 +25,9 @@
 				Scene,
 				SphereBufferGeometry,
 				TextureLoader,
-				WebGLRenderer
+				WebGLRenderer,
+				UnsignedByteType,
+				LinearFilter
 			} from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -39,6 +41,7 @@
 			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 
 			var scene, renderer, composer;
 			var clearPass, texturePass, renderPass;
@@ -154,7 +157,7 @@
 
 				var geometry = new SphereBufferGeometry( 1, 48, 24 );
 
-				material = new THREE.MeshStandardMaterial();
+				material = new MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
 				material.metalness = 0;
 				material.color.setHSL( Math.random(), 1.0, 0.3 );
@@ -193,23 +196,24 @@
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
-				ldrCubeMap = new THREE.CubeTextureLoader().load( ldrUrls, function ( ) {
+				ldrCubeMap = new CubeTextureLoader().load( ldrUrls, function ( ) {
 
 					console.log( "loaded ldr envmap" );
 
 				} );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-				hdrCubeMap = new THREE.HDRCubeTextureLoader()
+				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.load( THREE.UnsignedByteType, hdrUrls, function () {
+					.setType( UnsignedByteType )
+					.load( hdrUrls, function () {
 
-						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.magFilter = LinearFilter;
 						console.log( "loaded hdr envmap" );
 
 					} );
 
-				renderPass = new THREE.RenderPass( scene, cameraP );
+				renderPass = new RenderPass( scene, cameraP );
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 

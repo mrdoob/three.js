@@ -3,13 +3,11 @@
  */
 
 import {
-	BackSide,
 	BoxBufferGeometry,
 	Mesh,
 	PerspectiveCamera,
 	Scene,
-	ShaderLib,
-	ShaderMaterial
+	MeshCubeMaterial
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 
@@ -21,21 +19,17 @@ var CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	this.needsSwap = false;
 
-	this.cubeShader = ShaderLib[ 'cube' ];
+	this.cubeMaterial = new MeshCubeMaterial();
+
 	this.cubeMesh = new Mesh(
 		new BoxBufferGeometry( 10, 10, 10 ),
-		new ShaderMaterial( {
-			uniforms: this.cubeShader.uniforms,
-			vertexShader: this.cubeShader.vertexShader,
-			fragmentShader: this.cubeShader.fragmentShader,
-			depthTest: false,
-			depthWrite: false,
-			side: BackSide
-		} )
+		this.cubeMaterial
 	);
 
 	this.envMap = envMap;
+	this.envMapIntensity = 1.0;
 	this.opacity = ( opacity !== undefined ) ? opacity : 1.0;
+	this.roughness = 0.0;
 
 	this.cubeScene = new Scene();
 	this.cubeCamera = new PerspectiveCamera();
@@ -49,19 +43,29 @@ CubeTexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
+		var camera = this.camera;
+
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
-		this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
+		this.cubeCamera.projectionMatrix.copy( camera.projectionMatrix );
+		this.cubeCamera.near = 0.01;
+		this.cubeCamera.far = 20;
+		this.cubeCamera.aspect = camera.aspect;
+		this.cubeCamera.updateProjectionMatrix();
+		this.cubeCamera.quaternion.setFromRotationMatrix( camera.matrixWorld );
+		if( this.cubeMaterial.envMap != this.envMap ) {
+			this.cubeMaterial.envMap = this.envMap;
+			this.cubeMaterial.needsUpdate = true;
+		}
+		this.cubeMaterial.envMapIntensity = this.envMapIntensity;
+		this.cubeMaterial.roughness = this.roughness;
+		this.cubeMaterial.opacity = this.opacity;
+		this.cubeMaterial.transparent = ( this.opacity < 1.0 );
 
-		this.cubeMesh.material.uniforms[ "tCube" ].value = this.envMap;
-		this.cubeMesh.material.uniforms[ "opacity" ].value = this.opacity;
-		this.cubeMesh.material.transparent = ( this.opacity < 1.0 );
-
-		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
-		if ( this.clear ) renderer.clear();
-		renderer.render( this.cubeScene, this.cubeCamera );
+		renderer.setRenderTarget(this.renderToScreen ? null : readBuffer);
+		if(this.clear) renderer.clear();
+		renderer.render( this.cubeScene, this.cubeCamera);
 
 		renderer.autoClear = oldAutoClear;
 
