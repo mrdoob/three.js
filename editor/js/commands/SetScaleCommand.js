@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newScale THREE.Vector3
  * @param optionalOldScale THREE.Vector3
  * @constructor
  */
 
-var SetScaleCommand = function ( object, newScale, optionalOldScale ) {
+var SetScaleCommand = function ( editor, object, newScale, optionalOldScale ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetScaleCommand';
 	this.name = 'Set Scale';

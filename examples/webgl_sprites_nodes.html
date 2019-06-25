@@ -82,9 +82,9 @@
 						THREE.OperatorNode.MUL
 					);
 
-					var uvIntegerTimer = new THREE.Math1Node(
+					var uvIntegerTimer = new THREE.MathNode(
 						uvTimer,
-						THREE.Math1Node.FLOOR
+						THREE.MathNode.FLOOR
 					);
 
 					var uvFrameOffset = new THREE.OperatorNode(
@@ -126,12 +126,12 @@
 				sprite2.scale.y = spriteHeight;
 				sprite2.material.color = new THREE.TextureNode( walkingManTexture );
 				sprite2.material.color.uv = createHorizontalSpriteSheetNode( 8, 30 );
-				sprite2.material.color = new THREE.Math1Node( sprite2.material.color, THREE.Math1Node.INVERT );
+				sprite2.material.color = new THREE.MathNode( sprite2.material.color, THREE.MathNode.INVERT );
 				sprite2.material.spherical = false; // look at camera horizontally only, very used in vegetation
 				// horizontal zigzag sprite
 				sprite2.material.position = new THREE.OperatorNode(
 					new THREE.OperatorNode(
-						new THREE.Math1Node( new THREE.TimerNode( 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
+						new THREE.MathNode( new THREE.TimerNode( 3 ), THREE.MathNode.SIN ), // 3 is speed (time scale)
 						new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
 						THREE.OperatorNode.MUL
 					),

@@ -27,61 +27,70 @@
 			<a href="https://www.artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				AnimationMixer,
+				Clock,
+				Color,
+				CubeTextureLoader,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 			var scene, camera, pointLight, stats;
 			var renderer, mixer, controls;
 
-			var clock = new THREE.Clock();
+			var clock = new Clock();
 			var container = document.getElementById( 'container' );
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.gammaOutput = true;
 			renderer.gammaFactor = 2.2;
 			container.appendChild( renderer.domElement );
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xbfe3dd );
+			scene = new Scene();
+			scene.background = new Color( 0xbfe3dd );
 
-			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
 			controls.enablePan = false;
 
-			scene.add( new THREE.AmbientLight( 0x404040 ) );
+			scene.add( new AmbientLight( 0x404040 ) );
 
-			pointLight = new THREE.PointLight( 0xffffff, 1 );
+			pointLight = new PointLight( 0xffffff, 1 );
 			pointLight.position.copy( camera.position );
 			scene.add( pointLight );
 
 			// envmap
 			var path = 'textures/cube/Park2/';
 			var format = '.jpg';
-			var envMap = new THREE.CubeTextureLoader().load( [
+			var envMap = new CubeTextureLoader().load( [
 				path + 'posx' + format, path + 'negx' + format,
 				path + 'posy' + format, path + 'negy' + format,
 				path + 'posz' + format, path + 'negz' + format
 			] );
 
-			THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+			DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
-			var loader = new THREE.GLTFLoader();
-			loader.setDRACOLoader( new THREE.DRACOLoader() );
+			var loader = new GLTFLoader();
+			loader.setDRACOLoader( new DRACOLoader() );
 			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
 
 				var model = gltf.scene;
@@ -95,7 +104,7 @@
 
 				scene.add( model );
 
-				mixer = new THREE.AnimationMixer( model );
+				mixer = new AnimationMixer( model );
 				mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 				animate();

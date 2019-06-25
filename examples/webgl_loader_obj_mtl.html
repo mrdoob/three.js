@@ -12,17 +12,21 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader + MTLLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Loader,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/DDSLoader.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { MTLLoader } from './jsm/loaders/MTLLoader.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -41,17 +45,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 250;
 
 				// scene
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				var pointLight = new PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -70,15 +74,15 @@
 
 				var onError = function () { };
 
-				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+				Loader.Handlers.add( /\.dds$/i, new DDSLoader() );
 
-				new THREE.MTLLoader()
+				new MTLLoader()
 					.setPath( 'models/obj/male02/' )
 					.load( 'male02_dds.mtl', function ( materials ) {
 
 						materials.preload();
 
-						new THREE.OBJLoader()
+						new OBJLoader()
 							.setMaterials( materials )
 							.setPath( 'models/obj/male02/' )
 							.load( 'male02.obj', function ( object ) {
@@ -92,7 +96,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

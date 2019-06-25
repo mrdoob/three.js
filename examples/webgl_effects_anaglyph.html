@@ -12,17 +12,18 @@
 			skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/effects/AnaglyphEffect.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
+			import {
+				CubeTextureLoader,
+				Mesh,
+				MeshBasicMaterial,
+				PerspectiveCamera,
+				Scene,
+				SphereBufferGeometry,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AnaglyphEffect } from './jsm/effects/AnaglyphEffect.js';
 
 			var container, camera, scene, renderer, effect;
 
@@ -44,7 +45,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.z = 3;
 				camera.focalLength = 3;
 
@@ -56,17 +57,17 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				var textureCube = new CubeTextureLoader().load( urls );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.background = textureCube;
 
-				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+				var geometry = new SphereBufferGeometry( 0.1, 32, 16 );
+				var material = new MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10 - 5;
 					mesh.position.y = Math.random() * 10 - 5;
@@ -82,14 +83,14 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
 
-				effect = new THREE.AnaglyphEffect( renderer );
+				effect = new AnaglyphEffect( renderer );
 				effect.setSize( width, height );
 
 				//

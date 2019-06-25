@@ -16,15 +16,19 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
 		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - sprites</div>
 		<div id="container"></div>
 
-		<script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Scene
+			} from "../build/three.module.js";
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
 			var controls;
@@ -39,18 +43,18 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 600, 400, 1500 );
 				camera.lookAt( 0, 0, 0 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function () {
 
 					for ( var i = 0; i < particlesTotal; i ++ ) {
 
-						var object = new THREE.CSS3DSprite( image.cloneNode() );
+						var object = new CSS3DSprite( image.cloneNode() );
 						object.position.x = Math.random() * 4000 - 2000,
 						object.position.y = Math.random() * 4000 - 2000,
 						object.position.z = Math.random() * 4000 - 2000;
@@ -130,13 +134,13 @@
 
 				//
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				//
 

@@ -28,10 +28,18 @@
 			See your console for stats.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PRWMLoader.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				DirectionalLight,
+				PerspectiveCamera,
+				Mesh,
+				MeshPhongMaterial,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { PRWMLoader } from './jsm/loaders/PRWMLoader.js';
 
 			var container;
 
@@ -49,28 +57,28 @@
 
 			function init() {
 
-				document.getElementById( 'endianness' ).innerHTML = THREE.PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
+				document.getElementById( 'endianness' ).innerHTML = PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 250;
 
 				// scene
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var ambient = new THREE.AmbientLight( 0x101030 );
+				var ambient = new AmbientLight( 0x101030 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				var directionalLight = new DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 1 );
 				scene.add( directionalLight );
 
 				// model
 
-				var loader = new THREE.PRWMLoader();
-				var material = new THREE.MeshPhongMaterial( {} );
+				var loader = new PRWMLoader();
+				var material = new MeshPhongMaterial( {} );
 				var busy = false;
 				var mesh = null;
 
@@ -116,7 +124,7 @@
 
 					loader.load( url, function ( geometry ) {
 
-						mesh = new THREE.Mesh( geometry, material );
+						mesh = new Mesh( geometry, material );
 						mesh.scale.set( 50, 50, 50 );
 						scene.add( mesh );
 
@@ -131,7 +139,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

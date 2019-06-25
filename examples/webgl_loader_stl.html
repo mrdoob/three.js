@@ -13,20 +13,25 @@
 			PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				Color,
+				DirectionalLight,
+				Fog,
+				HemisphereLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PlaneBufferGeometry,
+				Scene,
+				Vector3,
+				VertexColors,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/STLLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { STLLoader } from './jsm/loaders/STLLoader.js';
 
 			var container, stats;
 
@@ -40,21 +45,21 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
+				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.15, 3 );
 
-				cameraTarget = new THREE.Vector3( 0, - 0.25, 0 );
+				cameraTarget = new Vector3( 0, - 0.25, 0 );
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x72645b );
-				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
+				scene = new Scene();
+				scene.background = new Color( 0x72645b );
+				scene.fog = new Fog( 0x72645b, 2, 15 );
 
 
 				// Ground
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+				var plane = new Mesh(
+					new PlaneBufferGeometry( 40, 40 ),
+					new MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
 				plane.position.y = - 0.5;
@@ -65,11 +70,11 @@
 
 				// ASCII file
 
-				var loader = new THREE.STLLoader();
+				var loader = new STLLoader();
 				loader.load( './models/stl/ascii/slotted_disk.stl', function ( geometry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
-					var mesh = new THREE.Mesh( geometry, material );
+					var material = new MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.set( 0, - 0.25, 0.6 );
 					mesh.rotation.set( 0, - Math.PI / 2, 0 );
@@ -85,11 +90,11 @@
 
 				// Binary files
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+				var material = new MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
 
 				loader.load( './models/stl/binary/pr2_head_pan.stl', function ( geometry ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.set( 0, - 0.37, - 0.6 );
 					mesh.rotation.set( - Math.PI / 2, 0, 0 );
@@ -104,7 +109,7 @@
 
 				loader.load( './models/stl/binary/pr2_head_tilt.stl', function ( geometry ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.set( 0.136, - 0.37, - 0.6 );
 					mesh.rotation.set( - Math.PI / 2, 0.3, 0 );
@@ -123,11 +128,11 @@
 					var meshMaterial = material;
 					if ( geometry.hasColors ) {
 
-						meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: THREE.VertexColors } );
+						meshMaterial = new MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: VertexColors } );
 
 					}
 
-					var mesh = new THREE.Mesh( geometry, meshMaterial );
+					var mesh = new Mesh( geometry, meshMaterial );
 
 					mesh.position.set( 0.5, 0.2, 0 );
 					mesh.rotation.set( - Math.PI / 2, Math.PI / 2, 0 );
@@ -143,13 +148,13 @@
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
 				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -173,7 +178,7 @@
 
 			function addShadowedLight( x, y, z, color, intensity ) {
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
+				var directionalLight = new DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 

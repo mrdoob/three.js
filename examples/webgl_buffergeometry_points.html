@@ -11,18 +11,21 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - particles</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BufferGeometry,
+				Color,
+				Float32BufferAttribute,
+				Fog,
+				PerspectiveCamera,
+				Points,
+				PointsMaterial,
+				Scene,
+				VertexColors,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -39,23 +42,23 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 5, 3500 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 5, 3500 );
 				camera.position.z = 2750;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050505 );
-				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+				scene = new Scene();
+				scene.background = new Color( 0x050505 );
+				scene.fog = new Fog( 0x050505, 2000, 3500 );
 
 				//
 
 				var particles = 500000;
 
-				var geometry = new THREE.BufferGeometry();
+				var geometry = new BufferGeometry();
 
 				var positions = [];
 				var colors = [];
 
-				var color = new THREE.Color();
+				var color = new Color();
 
 				var n = 1000, n2 = n / 2; // particles spread in the cube
 
@@ -81,21 +84,21 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 
 				//
 
-				var material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
+				var material = new PointsMaterial( { size: 15, vertexColors: VertexColors } );
 
-				points = new THREE.Points( geometry, material );
+				points = new Points( geometry, material );
 				scene.add( points );
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

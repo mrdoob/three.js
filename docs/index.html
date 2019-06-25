@@ -51,15 +51,15 @@
 
 			var language = 'en';
 
-			if ( /^(api|manual)/.test( hash ) ) {
+			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				var hashLanguage = /^(api|manual)\/(en|zh)\//.exec( hash );
+				var hashLanguage = /^(api|manual|examples)\/(en|zh)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
 					// Route old non-localised api links
 
-					window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+					window.location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
 
 				} else {
 

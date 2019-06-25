@@ -21,7 +21,7 @@ export class EffectComposer {
   swapBuffers(): void;
   addPass(pass: Pass): void;
   insertPass(pass: Pass, index: number): void;
-  isLastEnabledPass(): boolean;
+  isLastEnabledPass(passIndex: number): boolean;
   render(deltaTime?: number): void;
   reset(renderTarget?: WebGLRenderTarget): void;
   setSize(width: number, height: number): void;

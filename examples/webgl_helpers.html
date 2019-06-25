@@ -7,12 +7,28 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - helpers
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				BoxHelper,
+				EdgesGeometry,
+				GridHelper,
+				Group,
+				LineSegments,
+				PerspectiveCamera,
+				PointLight,
+				PointLightHelper,
+				PolarGridHelper,
+				Scene,
+				VertexNormalsHelper,
+				WebGLRenderer,
+				WireframeGeometry
+			} from "../build/three.module.js";
 
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script>
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var scene, renderer;
 			var camera, light;
@@ -23,40 +39,40 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 400;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				light = new THREE.PointLight();
+				light = new PointLight();
 				light.position.set( 200, 100, 150 );
 				scene.add( light );
 
-				scene.add( new THREE.PointLightHelper( light, 15 ) );
+				scene.add( new PointLightHelper( light, 15 ) );
 
-				var gridHelper = new THREE.GridHelper( 400, 40, 0x0000ff, 0x808080 );
+				var gridHelper = new GridHelper( 400, 40, 0x0000ff, 0x808080 );
 				gridHelper.position.y = - 150;
 				gridHelper.position.x = - 150;
 				scene.add( gridHelper );
 
-				var polarGridHelper = new THREE.PolarGridHelper( 200, 16, 8, 64, 0x0000ff, 0x808080 );
+				var polarGridHelper = new PolarGridHelper( 200, 16, 8, 64, 0x0000ff, 0x808080 );
 				polarGridHelper.position.y = - 150;
 				polarGridHelper.position.x = 200;
 				scene.add( polarGridHelper );
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					var mesh = gltf.scene.children[ 0 ];
 
-					var group = new THREE.Group();
+					var group = new Group();
 					group.scale.multiplyScalar( 50 );
 					scene.add( group );
 
@@ -65,31 +81,31 @@
 
 					group.add( mesh );
 
-					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
+					vnh = new VertexNormalsHelper( mesh, 5 );
 					scene.add( vnh );
 
-					scene.add( new THREE.BoxHelper( mesh ) );
+					scene.add( new BoxHelper( mesh ) );
 
-					var wireframe = new THREE.WireframeGeometry( mesh.geometry );
-					var line = new THREE.LineSegments( wireframe );
+					var wireframe = new WireframeGeometry( mesh.geometry );
+					var line = new LineSegments( wireframe );
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
 					line.material.transparent = true;
 					line.position.x = 4;
 					group.add( line );
-					scene.add( new THREE.BoxHelper( line ) );
+					scene.add( new BoxHelper( line ) );
 
-					var edges = new THREE.EdgesGeometry( mesh.geometry );
-					var line = new THREE.LineSegments( edges );
+					var edges = new EdgesGeometry( mesh.geometry );
+					var line = new LineSegments( edges );
 					line.material.depthTest = false;
 					line.material.opacity = 0.25;
 					line.material.transparent = true;
 					line.position.x = - 4;
 					group.add( line );
-					scene.add( new THREE.BoxHelper( line ) );
+					scene.add( new BoxHelper( line ) );
 
-					scene.add( new THREE.BoxHelper( group ) );
-					scene.add( new THREE.BoxHelper( scene ) );
+					scene.add( new BoxHelper( group ) );
+					scene.add( new BoxHelper( scene ) );
 
 
 				} );

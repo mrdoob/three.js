@@ -831,8 +831,7 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 		var childSubraySeed = random1() * ( currentCycle + 1 );
 
 		var isActive = phase % period <= dutyCycle * period;
-
-		probability = lightningStrike.subrayProbability;
+		
 		var probability = 0;
 
 		if ( isActive ) {

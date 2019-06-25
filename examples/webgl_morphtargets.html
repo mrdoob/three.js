@@ -12,26 +12,31 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxGeometry,
+				BufferGeometry,
+				Color,
+				Fog,
+				Mesh,
+				MeshLambertMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Raycaster,
+				Scene,
+				Vector2,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container;
 
 			var camera, scene, renderer, raycaster;
 
-			var mesh, mouse = new THREE.Vector2();
+			var mesh, mouse = new Vector2();
 
 			init();
 			animate();
@@ -40,23 +45,23 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
-				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
+				scene = new Scene();
+				scene.background = new Color( 0x222222 );
+				scene.fog = new Fog( 0x000000, 1, 15000 );
 
-				var light = new THREE.PointLight( 0xffffff );
+				var light = new PointLight( 0xffffff );
 				light.position.z = 500;
 				camera.add( light );
 				scene.add( camera );
 
-				var light = new THREE.AmbientLight( 0x111111 );
+				var light = new AmbientLight( 0x111111 );
 				scene.add( light );
 
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xff0000, morphTargets: true } );
+				var geometry = new BoxGeometry( 100, 100, 100 );
+				var material = new MeshLambertMaterial( { color: 0xff0000, morphTargets: true } );
 
 				// construct 8 blend shapes
 
@@ -82,9 +87,9 @@
 
 				}
 
-				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+				geometry = new BufferGeometry().fromGeometry( geometry );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 
 				scene.add( mesh );
 
@@ -101,7 +106,7 @@
 					influence8: 0
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var folder = gui.addFolder( 'Morph Targets' );
 				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
@@ -148,16 +153,16 @@
 
 				//
 
-				raycaster = new THREE.Raycaster();
+				raycaster = new Raycaster();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 400;
 				controls.maxDistance = 1000;
 

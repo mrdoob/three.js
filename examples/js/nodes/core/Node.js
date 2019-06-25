@@ -20,11 +20,11 @@ Node.prototype = {
 
 	isNode: true,
 
-	parse: function ( builder, settings ) {
+	analyze: function ( builder, settings ) {
 
 		settings = settings || {};
 
-		builder.parsing = true;
+		builder.analyzing = true;
 
 		this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), 'v4' );
 
@@ -33,31 +33,34 @@ Node.prototype = {
 
 		builder.removeFlow();
 
-		builder.parsing = false;
+		builder.analyzing = false;
 
 	},
 
-	parseAndBuildCode: function ( builder, output, settings ) {
+	analyzeAndFlow: function ( builder, output, settings ) {
 
 		settings = settings || {};
 
-		this.parse( builder, settings );
+		this.analyze( builder, settings );
 
-		return this.buildCode( builder, output, settings );
+		return this.flow( builder, output, settings );
 
 	},
 
-	buildCode: function ( builder, output, settings ) {
+	flow: function ( builder, output, settings ) {
 
 		settings = settings || {};
 
-		var data = { result: this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), output ) };
+		builder.addFlow( settings.slot, settings.cache, settings.context )
 
-		data.code = builder.clearNodeCode();
+		var flow = {};
+		flow.result = this.build( builder, output );
+		flow.code = builder.clearNodeCode();
+		flow.extra = builder.context.extra;
 
 		builder.removeFlow();
 
-		return data;
+		return flow;
 
 	},
 
@@ -67,7 +70,7 @@ Node.prototype = {
 
 		var data = builder.getNodeData( uuid || this );
 
-		if ( builder.parsing ) {
+		if ( builder.analyzing ) {
 
 			this.appendDepsNode( builder, data, output );
 

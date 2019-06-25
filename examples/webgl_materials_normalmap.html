@@ -22,29 +22,30 @@
 			</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Color,
+				DirectionalLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				TextureLoader,
+				Vector2,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
+			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
+			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
 			var container, stats, loader;
 
@@ -73,46 +74,46 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
+				scene = new Scene();
+				scene.background = new Color( 0x111111 );
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x444444 );
+				ambientLight = new AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
+				pointLight = new PointLight( 0xffffff, 1.25, 1000 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight = new DirectionalLight( 0xffffff );
 				directionalLight.position.set( 1, - 0.5, - 1 );
 				scene.add( directionalLight );
 
-				var textureLoader = new THREE.TextureLoader();
+				var textureLoader = new TextureLoader();
 
-				var material = new THREE.MeshPhongMaterial( {
+				var material = new MeshPhongMaterial( {
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
 					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
 					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
 					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
-					normalScale: new THREE.Vector2( 0.8, 0.8 )
+					normalScale: new Vector2( 0.8, 0.8 )
 				} );
 
-				loader = new THREE.GLTFLoader();
+				loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -131,11 +132,11 @@
 
 				renderer.autoClear = false;
 
-				var renderModel = new THREE.RenderPass( scene, camera );
+				var renderModel = new RenderPass( scene, camera );
 
-				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
-				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				var effectBleach = new ShaderPass( BleachBypassShader );
+				var effectColor = new ShaderPass( ColorCorrectionShader );
+				effectFXAA = new ShaderPass( FXAAShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
@@ -144,7 +145,7 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );
@@ -160,7 +161,7 @@
 
 			function createScene( geometry, scale, material ) {
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 
 				mesh.position.y = - 50;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;

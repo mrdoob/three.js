@@ -12,11 +12,15 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - GCode loader
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GCodeLoader.js"></script>
+		<script type="module">
+			import {
+				PerspectiveCamera,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GCodeLoader } from './jsm/loaders/GCodeLoader.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -29,12 +33,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
 				camera.position.set( 0, 0, 70 );
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 
-				var loader = new THREE.GCodeLoader();
+				var loader = new GCodeLoader();
 				loader.load( 'models/gcode/benchy.gcode', function ( object ) {
 
 					object.position.set( - 100, - 20, 100 );
@@ -42,12 +46,12 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', resize, false );
 

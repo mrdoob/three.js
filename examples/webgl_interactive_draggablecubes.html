@@ -21,14 +21,24 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - draggable cubes
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				BoxBufferGeometry,
+				Color,
+				Mesh,
+				MeshLambertMaterial,
+				PCFShadowMap,
+				PerspectiveCamera,
+				Scene,
+				SpotLight,
+				WebGLRenderer
+			} from "../build/three.module.js";
 
-		<script src="js/controls/DragControls.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { DragControls } from './jsm/controls/DragControls.js';
 
 			var container, stats;
 			var camera, controls, scene, renderer;
@@ -42,15 +52,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xf0f0f0 );
+				scene = new Scene();
+				scene.background = new Color( 0xf0f0f0 );
 
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new AmbientLight( 0x505050 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				var light = new SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.angle = Math.PI / 9;
 
@@ -62,11 +72,11 @@
 
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
+				var geometry = new BoxBufferGeometry( 40, 40, 40 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var object = new Mesh( geometry, new MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
@@ -89,16 +99,16 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFShadowMap;
+				renderer.shadowMap.type = PCFShadowMap;
 
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
@@ -107,7 +117,7 @@
 				controls.staticMoving = true;
 				controls.dynamicDampingFactor = 0.3;
 
-				var dragControls = new THREE.DragControls( objects, camera, renderer.domElement );
+				var dragControls = new DragControls( objects, camera, renderer.domElement );
 				dragControls.addEventListener( 'dragstart', function () {
 
 					controls.enabled = false;

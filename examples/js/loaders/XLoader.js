@@ -204,7 +204,7 @@ THREE.XLoader = ( function () {
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
-			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
+			this.manager = manager !== undefined ? manager : THREE.DefaultLoadingManager;
 			this.texloader = new THREE.TextureLoader( this.manager );
 			this.url = "";
 			this._putMatLength = 0;

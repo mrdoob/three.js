@@ -13,19 +13,20 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube Fresnel shader demo.<br/>texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				CubeTextureLoader,
+				Mesh,
+				PerspectiveCamera,
+				RGBFormat,
+				Scene,
+				ShaderMaterial,
+				SphereBufferGeometry,
+				UniformsUtils,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/shaders/FresnelShader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FresnelShader } from './jsm/shaders/FresnelShader.js';
 
 			var container;
 
@@ -48,7 +49,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
 				//
@@ -61,22 +62,22 @@
 					path + 'posz' + format, path + 'negz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
+				var textureCube = new CubeTextureLoader().load( urls );
+				textureCube.format = RGBFormat;
 
-				scene = new THREE.Scene();
+				scene = new Scene();
 				scene.background = textureCube;
 
 				//
 
-				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+				var geometry = new SphereBufferGeometry( 100, 32, 16 );
 
-				var shader = THREE.FresnelShader;
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var shader = FresnelShader;
+				var uniforms = UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tCube" ].value = textureCube;
 
-				var material = new THREE.ShaderMaterial( {
+				var material = new ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
@@ -84,7 +85,7 @@
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = new Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -100,7 +101,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

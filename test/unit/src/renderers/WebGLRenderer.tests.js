@@ -5,45 +5,6 @@
 
 import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
 
-var customDocument = function () {
-
-	this.createElementNS = function ( namespace, elementName ) {
-
-		if ( namespace === "http://www.w3.org/1999/xhtml" && elementName === "canvas" ) {
-
-			return new customCanvas();
-
-		} else {
-
-			throw new Error( "customDocument.CreateElementNS has not implemented following element " + elementName + " from namespace " + namespace + "." );
-
-		}
-
-	};
-
-};
-
-var customCanvas = function () {
-
-	this.width = 200;
-	this.height = 200;
-	this.addEventListener = function () {};
-	this.getContext = function ( contextName ) {
-
-		if ( contextName === "webgl" ) {
-
-			return new customWebGLContext();
-
-		} else {
-
-			throw new Error( "customCanvas.getContext has not implemented following context " + contextName + "." );
-
-		}
-
-	};
-
-};
-
 var customWebGLContext = function () {
 
 	this.DEPTH_BUFFER_BIT = 256;
@@ -498,48 +459,9 @@ var customWebGLContext = function () {
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module( 'WebGLRenderer', ( hooks ) => {
+	QUnit.module( 'WebGLRenderer', () => {
 
-		// You can invoke the hooks methods more than once.
-		hooks.beforeEach( function () {
-
-			global.__old__document__ = global.document;
-			global.document = new customDocument();
-
-		} );
-
-		hooks.afterEach( function () {
-
-			global.document = global.__old__document__;
-			global.__old__document__ = undefined;
-
-		} );
-
-
-		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
-
-			var webGLRenderer = new WebGLRenderer();
-			assert.ok( webGLRenderer, "webGLRenderer instanciated" );
-			assert.ok( webGLRenderer.domElement instanceof customCanvas, "webGLRenderer instanciated" );
-			assert.ok( webGLRenderer.context instanceof customWebGLContext, "webGLRenderer instanciated" );
-
-			var canvas = new customCanvas();
-			webGLRenderer = new WebGLRenderer( { canvas: canvas } );
-			assert.ok( webGLRenderer, "webGLRenderer instanciated" );
-			assert.ok( webGLRenderer.domElement === canvas, "webGLRenderer instanciated" );
-			assert.ok( webGLRenderer.context instanceof customWebGLContext, "webGLRenderer instanciated" );
-
-			var context = new customWebGLContext();
-			webGLRenderer = new WebGLRenderer( { canvas: canvas, context: context } );
-			assert.ok( webGLRenderer, "webGLRenderer instanciated" );
-			assert.ok( webGLRenderer.domElement === canvas, "webGLRenderer instanciated" );
-			assert.ok( webGLRenderer.context === context, "webGLRenderer instanciated" );
-
-		} );
-
-		// PUBLIC STUFF
-		QUnit.todo( "PrayForUs", ( assert ) => {
+		QUnit.todo( "Instancing", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

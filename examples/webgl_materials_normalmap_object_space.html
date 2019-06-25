@@ -15,20 +15,20 @@
 
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import {
+				AmbientLight,
+				Box3,
+				DoubleSide,
+				ObjectSpaceNormalMap,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var renderer, scene, camera;
 
@@ -37,36 +37,36 @@
 			function init() {
 
 				// renderer
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.gammaOutput = true;
 
 				// scene
-				scene = new THREE.Scene();
+				scene = new Scene();
 
 				// camera
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( - 10, 0, 23 );
 				scene.add( camera );
 
 				// controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;
 				controls.enablePan = false;
 
 				// ambient
-				scene.add( new THREE.AmbientLight( 0xffffff, .2 ) );
+				scene.add( new AmbientLight( 0xffffff, .2 ) );
 
 				// light
-				var light = new THREE.PointLight( 0xffffff, 1.5 );
+				var light = new PointLight( 0xffffff, 1.5 );
 				camera.add( light );
 
 				// model
-				new THREE.GLTFLoader().load( 'models/gltf/Nefertiti/Nefertiti.glb', function ( gltf ) {
+				new GLTFLoader().load( 'models/gltf/Nefertiti/Nefertiti.glb', function ( gltf ) {
 
 					gltf.scene.traverse( function ( child ) {
 
@@ -75,7 +75,7 @@
 							// glTF currently supports only tangent-space normal maps.
 							// this model has been modified to demonstrate the use of an object-space normal map.
 
-							child.material.normalMapType = THREE.ObjectSpaceNormalMap;
+							child.material.normalMapType = ObjectSpaceNormalMap;
 
 							// attribute normals are not required with an object-space normal map. remove them.
 
@@ -83,13 +83,13 @@
 
 							//
 
-							child.material.side = THREE.DoubleSide;
+							child.material.side = DoubleSide;
 
 							child.scale.multiplyScalar( 0.5 );
 
 							// recenter
 
-							new THREE.Box3().setFromObject( child ).getCenter( child.position ).multiplyScalar( - 1 );
+							new Box3().setFromObject( child ).getCenter( child.position ).multiplyScalar( - 1 );
 
 							scene.add( child );
 

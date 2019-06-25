@@ -13,19 +13,22 @@
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
+			import {
+				Color,
+				HemisphereLight,
+				Mesh,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				Scene,
+				SpotLight,
+				TextureLoader,
+				WebGLRenderer,
+			} from "../build/three.module.js";
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var statsEnabled = true;
 
@@ -56,17 +59,17 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x060708 );
+				scene = new Scene();
+				scene.background = new Color( 0x060708 );
 
 				// LIGHTS
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new HemisphereLight( 0x443333, 0x111122 ) );
 
-				spotLight = new THREE.SpotLight( 0xffffbb, 2 );
+				spotLight = new SpotLight( 0xffffbb, 2 );
 				spotLight.position.set( 0.5, 0, 1 );
 				spotLight.position.multiplyScalar( 700 );
 				scene.add( spotLight );
@@ -85,9 +88,9 @@
 
 				//
 
-				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = new TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				var material = new THREE.MeshPhongMaterial( {
+				var material = new MeshPhongMaterial( {
 					color: 0x552811,
 					specular: 0x222222,
 					shininess: 25,
@@ -95,14 +98,14 @@
 					bumpScale: 12
 				} );
 
-				loader = new THREE.GLTFLoader();
+				loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -132,7 +135,7 @@
 
 			function createScene( geometry, scale, material ) {
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new Mesh( geometry, material );
 
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );

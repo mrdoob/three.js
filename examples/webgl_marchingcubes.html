@@ -16,24 +16,34 @@
 		based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård
 	</div>
 
-	<script src="../build/three.js"></script>
+	<script type="module">
+		import {
+			AmbientLight,
+			Clock,
+			Color,
+			CubeRefractionMapping,
+			CubeTextureLoader,
+			DirectionalLight,
+			MeshLambertMaterial,
+			MeshPhongMaterial,
+			MeshStandardMaterial,
+			PerspectiveCamera,
+			PointLight,
+			RepeatWrapping,
+			Scene,
+			ShaderMaterial,
+			TextureLoader,
+			UniformsUtils,
+			VertexColors,
+			WebGLRenderer,
+		} from "../build/three.module.js";
 
-	<script src="js/controls/OrbitControls.js"></script>
+		import Stats from './jsm/libs/stats.module.js';
 
-	<script src="js/objects/MarchingCubes.js"></script>
-	<script src="js/shaders/ToonShader.js"></script>
-
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-
-
-	<script>
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
+		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
 
 		var container, stats;
 
@@ -48,7 +58,7 @@
 		var effectController;
 
 		var time = 0;
-		var clock = new THREE.Clock();
+		var clock = new Clock();
 
 		init();
 		animate();
@@ -59,25 +69,25 @@
 
 			// CAMERA
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.set( - 500, 500, 1500 );
 
 			// SCENE
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x050505 );
+			scene = new Scene();
+			scene.background = new Color( 0x050505 );
 
 			// LIGHTS
 
-			light = new THREE.DirectionalLight( 0xffffff );
+			light = new DirectionalLight( 0xffffff );
 			light.position.set( 0.5, 0.5, 1 );
 			scene.add( light );
 
-			pointLight = new THREE.PointLight( 0xff3300 );
+			pointLight = new PointLight( 0xff3300 );
 			pointLight.position.set( 0, 0, 100 );
 			scene.add( pointLight );
 
-			ambientLight = new THREE.AmbientLight( 0x080808 );
+			ambientLight = new AmbientLight( 0x080808 );
 			scene.add( ambientLight );
 
 			// MATERIALS
@@ -89,7 +99,7 @@
 
 			resolution = 28;
 
-			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true, true );
+			effect = new MarchingCubes( resolution, materials[ current_material ].m, true, true );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
 
@@ -100,7 +110,7 @@
 
 			// RENDERER
 
-			renderer = new THREE.WebGLRenderer();
+			renderer = new WebGLRenderer();
 			renderer.gammaOutput = true;
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -113,7 +123,7 @@
 
 			// CONTROLS
 
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new OrbitControls( camera, renderer.domElement );
 
 			// STATS
 
@@ -153,67 +163,67 @@
 				path + 'pz' + format, path + 'nz' + format
 			];
 
-			var cubeTextureLoader = new THREE.CubeTextureLoader();
+			var cubeTextureLoader = new CubeTextureLoader();
 
 			var reflectionCube = cubeTextureLoader.load( urls );
 			var refractionCube = cubeTextureLoader.load( urls );
-			refractionCube.mapping = THREE.CubeRefractionMapping;
+			refractionCube.mapping = CubeRefractionMapping;
 
 			// toons
 
-			var toonMaterial1 = createShaderMaterial( THREE.ToonShader1, light, ambientLight );
-			var toonMaterial2 = createShaderMaterial( THREE.ToonShader2, light, ambientLight );
-			var hatchingMaterial = createShaderMaterial( THREE.ToonShaderHatching, light, ambientLight );
-			var dottedMaterial = createShaderMaterial( THREE.ToonShaderDotted, light, ambientLight );
+			var toonMaterial1 = createShaderMaterial( ToonShader1, light, ambientLight );
+			var toonMaterial2 = createShaderMaterial( ToonShader2, light, ambientLight );
+			var hatchingMaterial = createShaderMaterial( ToonShaderHatching, light, ambientLight );
+			var dottedMaterial = createShaderMaterial( ToonShaderDotted, light, ambientLight );
 
-			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
-			texture.wrapS = THREE.RepeatWrapping;
-			texture.wrapT = THREE.RepeatWrapping;
+			var texture = new TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
+			texture.wrapS = RepeatWrapping;
+			texture.wrapT = RepeatWrapping;
 
 			var materials = {
 
 				"chrome": {
-					m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
+					m: new MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"liquid": {
-					m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
+					m: new MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"shiny": {
-					m: new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
+					m: new MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
 					h: 0, s: 0.8, l: 0.2
 				},
 
 				"matte": {
-					m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
+					m: new MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"flat": {
-					m: new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: true } ),
+					m: new MeshLambertMaterial( { color: 0x000000, flatShading: true } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"textured": {
-					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
+					m: new MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"colors": {
-					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors } ),
+					m: new MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: VertexColors } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"multiColors": {
-					m: new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: THREE.VertexColors } ),
+					m: new MeshPhongMaterial( { shininess: 2, vertexColors: VertexColors } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"plastic": {
-					m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, shininess: 250 } ),
+					m: new MeshPhongMaterial( { color: 0x000000, specular: 0x888888, shininess: 250 } ),
 					h: 0.6, s: 0.8, l: 0.1
 				},
 
@@ -245,12 +255,12 @@
 
 		function createShaderMaterial( shader, light, ambientLight ) {
 
-			var u = THREE.UniformsUtils.clone( shader.uniforms );
+			var u = UniformsUtils.clone( shader.uniforms );
 
 			var vs = shader.vertexShader;
 			var fs = shader.fragmentShader;
 
-			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
+			var material = new ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
 
 			material.uniforms[ "uDirLightPos" ].value = light.position;
 			material.uniforms[ "uDirLightColor" ].value = light.color;
@@ -321,7 +331,7 @@
 
 			var h, m_h, m_s, m_l;
 
-			var gui = new dat.GUI();
+			var gui = new GUI();
 
 			// material (type)
 
@@ -383,14 +393,14 @@
 
 			var i, ballx, bally, ballz, subtract, strength;
 			var rainbow = [
-					new THREE.Color(0xff0000),
-					new THREE.Color(0xff7f00),
-					new THREE.Color(0xffff00),
-					new THREE.Color(0x00ff00),
-					new THREE.Color(0x0000ff),
-					new THREE.Color(0x4b0082),
-					new THREE.Color(0x9400d3)
-				];
+				new Color( 0xff0000 ),
+				new Color( 0xff7f00 ),
+				new Color( 0xffff00 ),
+				new Color( 0x00ff00 ),
+				new Color( 0x0000ff ),
+				new Color( 0x4b0082 ),
+				new Color( 0x9400d3 )
+			];
 			subtract = 12;
 			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
 
@@ -402,7 +412,7 @@
 
 				if ( current_material === 'multiColors' ) {
 
-					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[i % 7] );
+					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[ i % 7 ] );
 
 				} else {
 
@@ -454,7 +464,7 @@
 
 			// materials
 
-			if ( effect.material instanceof THREE.ShaderMaterial ) {
+			if ( effect.material instanceof ShaderMaterial ) {
 
 				effect.material.uniforms[ "uBaseColor" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 

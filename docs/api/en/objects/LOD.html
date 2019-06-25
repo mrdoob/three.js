@@ -43,13 +43,6 @@ for( var i = 0; i < 3; i++ ) {
 scene.add( lod );
 		</code>
 
-		<p>
-		Note that for the LOD to switch between the different detail levels, you will
-		have to call [page:.update update]( camera ) in your render loop. See the source code
-		for this example for details:
-		[example:webgl_lod WebGL / LOD]
-		</div>
-
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
 		<p>
@@ -59,6 +52,13 @@ scene.add( lod );
 
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:boolean autoUpdate]</h3>
+		<p>
+		Whether the LOD object is updated automatically by the renderer per frame or not.
+		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
+		Default is true.
+		</p>
 
 		<h3>[property:array levels]</h3>
 		<p>
@@ -108,8 +108,7 @@ scene.add( lod );
 		<h3>[method:null update]( [param:Camera camera] )</h3>
 		<p>
 			Set the visibility of each [page:levels level]'s [page:Object3D object] based on
-			distance from the [page:Camera camera]. This needs to be called in the render loop
-			for levels of detail to be updated dynamically.
+			distance from the [page:Camera camera]. 
 		</p>
 
 		<h2>Source</h2>
