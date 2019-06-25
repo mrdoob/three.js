@@ -253,8 +253,6 @@ function WebGLRenderer( parameters ) {
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
-	var opaqueSort, transparentSort;
-
 	var utils;
 
 	function initGLContext() {
@@ -504,18 +502,6 @@ function WebGLRenderer( parameters ) {
 	this.setScissorTest = function ( boolean ) {
 
 		state.setScissorTest( _scissorTest = boolean );
-
-	};
-
-	this.setOpaqueSort = function ( method ) {
-
-		opaqueSort = method;
-
-	};
-
-	this.setTransparentSort = function ( method ) {
-
-		transparentSort = method;
 
 	};
 
@@ -1168,7 +1154,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _this.sortObjects === true ) {
 
-			currentRenderList.sort( opaqueSort, transparentSort );
+			currentRenderList.sort();
 
 		}
 
