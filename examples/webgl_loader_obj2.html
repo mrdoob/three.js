@@ -48,18 +48,28 @@
 			<div id="feedback"></div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/loaders/LoaderSupport.js"></script>
-		<script src="js/loaders/OBJLoader2.js"></script>
-		<script>
+		<script type="module">
 
 			'use strict';
 
-			var OBJLoader2Example = function ( elementToBindTo ) {
+			import {
+				AmbientLight,
+				DirectionalLight,
+				GridHelper,
+				PerspectiveCamera,
+				Scene,
+				Vector3,
+				WebGLRenderer
+			} from "../build/three.module.js";
+
+			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
+
+			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
+			import { OBJLoader2 } from "./jsm/loaders/OBJLoader2.js";
+			import { MtlObjBridge } from "./jsm/loaders/obj2/bridge/MtlObjBridge.js";
+
+
+			const OBJLoader2Example = function ( elementToBindTo ) {
 				this.renderer = null;
 				this.canvas = elementToBindTo;
 				this.aspectRatio = 1;
@@ -67,8 +77,8 @@
 
 				this.scene = null;
 				this.cameraDefaults = {
-					posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
-					posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
+					posCamera: new Vector3( 0.0, 175.0, 500.0 ),
+					posCameraTarget: new Vector3( 0, 0, 0 ),
 					near: 0.1,
 					far: 10000,
 					fov: 45
@@ -84,57 +94,64 @@
 				constructor: OBJLoader2Example,
 
 				initGL: function () {
-					this.renderer = new THREE.WebGLRenderer( {
+					this.renderer = new WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
 						autoClear: true
 					} );
 					this.renderer.setClearColor( 0x050505 );
 
-					this.scene = new THREE.Scene();
+					this.scene = new Scene();
 
-					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
+					this.camera = new PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();
-					this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
+					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
 
-					var ambientLight = new THREE.AmbientLight( 0x404040 );
-					var directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
-					var directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
+					let ambientLight = new AmbientLight( 0x404040 );
+					let directionalLight1 = new DirectionalLight( 0xC0C090 );
+					let directionalLight2 = new DirectionalLight( 0xC0C090 );
 
-					directionalLight1.position.set( -100, -50, 100 );
-					directionalLight2.position.set( 100, 50, -100 );
+					directionalLight1.position.set( - 100, - 50, 100 );
+					directionalLight2.position.set( 100, 50, - 100 );
 
 					this.scene.add( directionalLight1 );
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					var helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
+					let helper = new GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
 				},
 
 				initContent: function () {
-					var modelName = 'female02';
+					let modelName = 'female02';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var callbackOnLoad = function ( event ) {
-						scope.scene.add( event.detail.loaderRootNode );
-						console.log( 'Loading complete: ' + event.detail.modelName );
+
+					let scope = this;
+					let objLoader2 = new OBJLoader2();
+					let callbackOnLoad = function ( object3d ) {
+						scope.scene.add( object3d );
+						console.log( 'Loading complete: ' + modelName );
 						scope._reportProgress( { detail: { text: '' } } );
 					};
 
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
-						objLoader.setLogging( true, true );
-						objLoader.load( 'models/obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
+					let onLoadMtl = function ( mtlParseResult ) {
+						objLoader2.setModelName( modelName );
+						objLoader2.setLogging( true, true );
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2.load( 'models/obj/female02/female02.obj', callbackOnLoad, null, null, null );
 					};
-					objLoader.loadMtl( 'models/obj/female02/female02.mtl', null, onLoadMtl );
+					let mtlLoader = new MTLLoader();
+					mtlLoader.load( 'models/obj/female02/female02.mtl', onLoadMtl );
 				},
 
-				_reportProgress: function( event ) {
-					var output = THREE.LoaderSupport.Validator.verifyInput( event.detail.text, '' );
+				_reportProgress: function ( event ) {
+					let output = '';
+					if ( event.detail !== null && event.detail !== undefined && event.detail.text ) {
+
+						output = event.detail.text;
+
+					}
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
 				},
@@ -149,7 +166,7 @@
 				},
 
 				recalcAspectRatio: function () {
-					this.aspectRatio = ( this.canvas.offsetHeight === 0 ) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+					this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
 				},
 
 				resetCamera: function () {
@@ -166,20 +183,19 @@
 				},
 
 				render: function () {
-					if ( ! this.renderer.autoClear ) this.renderer.clear();
+					if ( !this.renderer.autoClear ) this.renderer.clear();
 					this.controls.update();
 					this.renderer.render( this.scene, this.camera );
 				}
-
 			};
 
-			var app = new OBJLoader2Example( document.getElementById( 'example' ) );
+			let app = new OBJLoader2Example( document.getElementById( 'example' ) );
 
-			var resizeWindow = function () {
+			let resizeWindow = function () {
 				app.resizeDisplayGL();
 			};
 
-			var render = function () {
+			let render = function () {
 				requestAnimationFrame( render );
 				app.render();
 			};

@@ -1,13 +1,12 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
+ * @author Kai Salmen / www.kaisalmen.de
  */
 
 /**
  * Parse OBJ data either from ArrayBuffer or string
  * @class
  */
-const Parser = function() {
+const OBJLoader2Parser = function() {
 	this.callbacks = {
 		onProgress: null,
 		onAssetAvailable: null,
@@ -67,9 +66,9 @@ const Parser = function() {
 	};
 };
 
-Parser.prototype = {
+OBJLoader2Parser.prototype = {
 
-	constructor: Parser,
+	constructor: OBJLoader2Parser,
 
 	resetRawMesh: function () {
 		// faces are stored according combined index of group, material and smoothingGroup (0 or not)
@@ -764,7 +763,7 @@ Parser.prototype = {
 					}
 				};
 				let payload = {
-					cmd: 'data',
+					cmd: 'assetAvailable',
 					type: 'material',
 					materials: {
 						materialCloneInstructions: materialCloneInstructions
@@ -863,7 +862,7 @@ Parser.prototype = {
 		this.outputObjectCount ++;
 		this.callbacks.onAssetAvailable(
 			{
-				cmd: 'data',
+				cmd: 'assetAvailable',
 				type: 'mesh',
 				progress: {
 					numericalValue: this.globalCounts.currentByte / this.globalCounts.totalBytes
@@ -908,4 +907,4 @@ Parser.prototype = {
 	}
 };
 
-export { Parser };
+export { OBJLoader2Parser };
