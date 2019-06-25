@@ -1527,7 +1527,10 @@ Object.assign( Quaternion.prototype, {
 			this._y = s * y + t * this._y;
 			this._z = s * z + t * this._z;
 
-			return this.normalize();
+			this.normalize();
+			this._onChangeCallback();
+
+			return this;
 
 		}
 
@@ -18728,10 +18731,10 @@ function WebGLRenderList() {
 
 	}
 
-	function sort() {
+	function sort( costumeOpaqueSort, costumeTransparentSort ) {
 
-		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
+		if ( opaque.length > 1 ) opaque.sort( typeof costumeOpaqueSort === 'function' ? costumeOpaqueSort : painterSortStable );
+		if ( transparent.length > 1 ) transparent.sort( typeof costumeTransparentSort === 'function' ? costumeTransparentSort : reversePainterSortStable );
 
 	}
 
@@ -23218,6 +23221,8 @@ function WebGLRenderer( parameters ) {
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
+	var opaqueSort, transparentSort;
+
 	var utils;
 
 	function initGLContext() {
@@ -23467,6 +23472,18 @@ function WebGLRenderer( parameters ) {
 	this.setScissorTest = function ( boolean ) {
 
 		state.setScissorTest( _scissorTest = boolean );
+
+	};
+
+	this.setOpaqueSort = function ( method ) {
+
+		opaqueSort = method;
+
+	};
+
+	this.setTransparentSort = function ( method ) {
+
+		transparentSort = method;
 
 	};
 
@@ -24119,7 +24136,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _this.sortObjects === true ) {
 
-			currentRenderList.sort();
+			currentRenderList.sort( opaqueSort, transparentSort );
 
 		}
 
@@ -46765,13 +46782,13 @@ BoxHelper.prototype.clone = function () {
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function Box3Helper( box, hex ) {
+function Box3Helper( box, color ) {
 
 	this.type = 'Box3Helper';
 
 	this.box = box;
 
-	var color = ( hex !== undefined ) ? hex : 0xffff00;
+	color = color || 0xffff00;
 
 	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
