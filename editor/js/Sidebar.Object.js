@@ -455,13 +455,13 @@ Sidebar.Object = function ( editor ) {
 
 			if ( object.width !== undefined && Math.abs( object.width - objectWidth.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'width', objectWidth.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'width', objectWidth.getValue() ) );
 
 			}
 
 			if ( object.height !== undefined && Math.abs( object.height - objectHeight.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'height', objectHeight.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'height', objectHeight.getValue() ) );
 
 			}
 
