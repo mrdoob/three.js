@@ -2087,6 +2087,7 @@ function WebGLRenderer( parameters ) {
 		uniforms.roughness.value = material.roughness;
 		uniforms.opacity.value = material.opacity;
 		uniforms.envMapIntensity.value = material.envMapIntensity;
+		uniforms.tFlip.value = material.envMap.isCubeTexture ? - 1 : 1;
 
 	}
 
