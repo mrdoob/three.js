@@ -44,13 +44,13 @@
         <text x="57.318px" y="454.45px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:50px;">6</text>
     </g>
     <g transform="matrix(1,0,0,1,7.70655,-21.9953)">
-        <path d="M83.292,417.79L259.669,221.801" style="fill:none;stroke:rgb(217,217,217);stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
-        <path d="M398.693,346.316L222.074,84.559" style="fill:none;stroke:rgb(217,217,217);stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
-        <path d="M83.292,186.444L222.074,308.849" style="fill:none;stroke:rgb(217,217,217);stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
-        <path d="M83.292,186.444L398.693,110.189" style="fill:none;stroke:rgb(217,217,217);stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
-        <path d="M83.292,417.79L398.693,346.316" style="fill:none;stroke:rgb(217,217,217);stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
+        <path d="M83.292,417.79L259.669,221.801" style="fill:none;stroke:#AAA;stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
+        <path d="M398.693,346.316L222.074,84.559" style="fill:none;stroke:#AAA;stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
+        <path d="M83.292,186.444L222.074,308.849" style="fill:none;stroke:#AAA;stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
+        <path d="M83.292,186.444L398.693,110.189" style="fill:none;stroke:#AAA;stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
+        <path d="M83.292,417.79L398.693,346.316" style="fill:none;stroke:#AAA;stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
         <g transform="matrix(1,0,0,1,78.7109,30.7734)">
-            <path d="M180.958,439.917L319.982,79.416" style="fill:none;stroke:rgb(217,217,217);stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
+            <path d="M180.958,439.917L319.982,79.416" style="fill:none;stroke:#AAA;stroke-width:1px;stroke-dasharray:5,5,0,0;"/>
         </g>
     </g>
     <g transform="matrix(1,0,0,1,-139.162,105.803)">
