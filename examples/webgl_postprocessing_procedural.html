@@ -55,14 +55,7 @@
 		<div id="container"></div>
 
 		<script type="module">
-			import {
-				Mesh,
-				OrthographicCamera,
-				PlaneBufferGeometry,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -89,7 +82,7 @@
 
 				var container = document.getElementById( "container" );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -98,23 +91,23 @@
 				container.appendChild( stats.dom );
 
 				// Setup post processing stage
-				postCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				noiseRandom1DMaterial = new ShaderMaterial( {
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				noiseRandom1DMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#noiseRandom1D-frag' ).textContent.trim()
 				} );
-				noiseRandom2DMaterial = new ShaderMaterial( {
+				noiseRandom2DMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#noiseRandom2D-frag' ).textContent.trim()
 				} );
-				noiseRandom3DMaterial = new ShaderMaterial( {
+				noiseRandom3DMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#noiseRandom3D-frag' ).textContent.trim()
 				} );
 				postMaterial = noiseRandom3DMaterial;
-				var postPlane = new PlaneBufferGeometry( 2, 2 );
-				postQuad = new Mesh( postPlane, postMaterial );
-				postScene = new Scene();
+				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				postQuad = new THREE.Mesh( postPlane, postMaterial );
+				postScene = new THREE.Scene();
 				postScene.add( postQuad );
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -14,17 +14,7 @@
 
 		<script type="module">
 
-			import {
-				Vector3,
-				Color,
-				Clock,
-				Group,
-				AnimationMixer,
-				SkeletonHelper,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -131,10 +121,10 @@
 				var loader = new BVHLoader();
 				loader.load( "models/bvh/pirouette.bvh", function ( result ) {
 
-					bvhSkeletonHelper = new SkeletonHelper( result.skeleton.bones[ 0 ] );
-					bvhSkeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+					bvhSkeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+					bvhSkeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to THREE.SkeletonHelper directly
 
-					var boneContainer = new Group();
+					var boneContainer = new THREE.Group();
 					boneContainer.add( result.skeleton.bones[ 0 ] );
 					boneContainer.position.z = - 100;
 					boneContainer.position.y = - 100;
@@ -146,7 +136,7 @@
 					options.offsets = SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
 
 					// play animation
-					bvhMixer = new AnimationMixer( bvhSkeletonHelper );
+					bvhMixer = new THREE.AnimationMixer( bvhSkeletonHelper );
 					bvhMixer.clipAction( result.clip ).setEffectiveWeight( 1.0 ).play();
 
 				} );
@@ -155,16 +145,16 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x333333 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( 1000, - 300, 1000 );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -183,8 +173,8 @@
 				var vh = 1.4, vl = 1.2;
 
 				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
-				colorCorrectionPass.uniforms[ "powRGB" ].value = new Vector3( vh, vh, vh );
-				colorCorrectionPass.uniforms[ "mulRGB" ].value = new Vector3( vl, vl, vl );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
 				var vignettePass = new ShaderPass( VignetteShader );
@@ -211,7 +201,7 @@
 
 			//
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			function animate() {
 

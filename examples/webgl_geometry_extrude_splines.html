@@ -24,22 +24,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				CameraHelper,
-				CatmullRomCurve3,
-				Color,
-				DirectionalLight,
-				Mesh,
-				MeshBasicMaterial,
-				MeshLambertMaterial,
-				Object3D,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				TubeBufferGeometry,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -51,32 +36,32 @@
 
 			var camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
 
-			var binormal = new Vector3();
-			var normal = new Vector3();
+			var binormal = new THREE.Vector3();
+			var normal = new THREE.Vector3();
 
-			var pipeSpline = new CatmullRomCurve3( [
-				new Vector3( 0, 10, - 10 ), new Vector3( 10, 0, - 10 ),
-				new Vector3( 20, 0, 0 ), new Vector3( 30, 0, 10 ),
-				new Vector3( 30, 0, 20 ), new Vector3( 20, 0, 30 ),
-				new Vector3( 10, 0, 30 ), new Vector3( 0, 0, 30 ),
-				new Vector3( - 10, 10, 30 ), new Vector3( - 10, 20, 30 ),
-				new Vector3( 0, 30, 30 ), new Vector3( 10, 30, 30 ),
-				new Vector3( 20, 30, 15 ), new Vector3( 10, 30, 10 ),
-				new Vector3( 0, 30, 10 ), new Vector3( - 10, 20, 10 ),
-				new Vector3( - 10, 10, 10 ), new Vector3( 0, 0, 10 ),
-				new Vector3( 10, - 10, 10 ), new Vector3( 20, - 15, 10 ),
-				new Vector3( 30, - 15, 10 ), new Vector3( 40, - 15, 10 ),
-				new Vector3( 50, - 15, 10 ), new Vector3( 60, 0, 10 ),
-				new Vector3( 70, 0, 0 ), new Vector3( 80, 0, 0 ),
-				new Vector3( 90, 0, 0 ), new Vector3( 100, 0, 0 )
+			var pipeSpline = new THREE.CatmullRomCurve3( [
+				new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
+				new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
+				new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
+				new THREE.Vector3( 10, 0, 30 ), new THREE.Vector3( 0, 0, 30 ),
+				new THREE.Vector3( - 10, 10, 30 ), new THREE.Vector3( - 10, 20, 30 ),
+				new THREE.Vector3( 0, 30, 30 ), new THREE.Vector3( 10, 30, 30 ),
+				new THREE.Vector3( 20, 30, 15 ), new THREE.Vector3( 10, 30, 10 ),
+				new THREE.Vector3( 0, 30, 10 ), new THREE.Vector3( - 10, 20, 10 ),
+				new THREE.Vector3( - 10, 10, 10 ), new THREE.Vector3( 0, 0, 10 ),
+				new THREE.Vector3( 10, - 10, 10 ), new THREE.Vector3( 20, - 15, 10 ),
+				new THREE.Vector3( 30, - 15, 10 ), new THREE.Vector3( 40, - 15, 10 ),
+				new THREE.Vector3( 50, - 15, 10 ), new THREE.Vector3( 60, 0, 10 ),
+				new THREE.Vector3( 70, 0, 0 ), new THREE.Vector3( 80, 0, 0 ),
+				new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
 			] );
 
-			var sampleClosedSpline = new CatmullRomCurve3( [
-				new Vector3( 0, - 40, - 40 ),
-				new Vector3( 0, 40, - 40 ),
-				new Vector3( 0, 140, - 40 ),
-				new Vector3( 0, 40, 40 ),
-				new Vector3( 0, - 40, 40 )
+			var sampleClosedSpline = new THREE.CatmullRomCurve3( [
+				new THREE.Vector3( 0, - 40, - 40 ),
+				new THREE.Vector3( 0, 40, - 40 ),
+				new THREE.Vector3( 0, 140, - 40 ),
+				new THREE.Vector3( 0, 40, 40 ),
+				new THREE.Vector3( 0, - 40, 40 )
 			] );
 
 			sampleClosedSpline.curveType = 'catmullrom';
@@ -115,9 +100,9 @@
 				cameraHelper: false,
 			};
 
-			var material = new MeshLambertMaterial( { color: 0xff00ff } );
+			var material = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
 
-			var wireframeMaterial = new MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
+			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
 
 			function addTube() {
 
@@ -130,7 +115,7 @@
 
 				var extrudePath = splines[ params.spline ];
 
-				tubeGeometry = new TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
+				tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
 
 				addGeometry( tubeGeometry );
 
@@ -149,8 +134,8 @@
 
 				// 3D shape
 
-				mesh = new Mesh( geometry, material );
-				var wireframe = new Mesh( geometry, wireframeMaterial );
+				mesh = new THREE.Mesh( geometry, material );
+				var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
 				mesh.add( wireframe );
 
 				parent.add( mesh );
@@ -173,36 +158,36 @@
 
 				// camera
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10000 );
 				camera.position.set( 0, 50, 500 );
 
 				// scene
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// light
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
 				// tube
 
-				parent = new Object3D();
+				parent = new THREE.Object3D();
 				scene.add( parent );
 
-				splineCamera = new PerspectiveCamera( 84, window.innerWidth / window.innerHeight, 0.01, 1000 );
+				splineCamera = new THREE.PerspectiveCamera( 84, window.innerWidth / window.innerHeight, 0.01, 1000 );
 				parent.add( splineCamera );
 
-				cameraHelper = new CameraHelper( splineCamera );
+				cameraHelper = new THREE.CameraHelper( splineCamera );
 				scene.add( cameraHelper );
 
 				addTube();
 
 				// debug camera
 
-				cameraEye = new Mesh( new SphereBufferGeometry( 5 ), new MeshBasicMaterial( { color: 0xdddddd } ) );
+				cameraEye = new THREE.Mesh( new THREE.SphereBufferGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
 				parent.add( cameraEye );
 
 				cameraHelper.visible = params.cameraHelper;
@@ -210,7 +195,7 @@
 
 				// renderer
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

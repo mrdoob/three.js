@@ -132,17 +132,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Clock,
-				Mesh,
-				PerspectiveCamera,
-				RepeatWrapping,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -159,14 +149,14 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
-				var geometry = new BoxBufferGeometry( 0.75, 0.75, 0.75 );
+				var geometry = new THREE.BoxBufferGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
 					"time": { value: 1.0 }
@@ -174,10 +164,10 @@
 
 				uniforms2 = {
 					"time": { value: 1.0 },
-					"colorTexture": { value: new TextureLoader().load( 'textures/disturb.jpg' ) }
+					"colorTexture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2[ "colorTexture" ].value.wrapS = uniforms2[ "colorTexture" ].value.wrapT = RepeatWrapping;
+				uniforms2[ "colorTexture" ].value.wrapS = uniforms2[ "colorTexture" ].value.wrapT = THREE.RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],
@@ -188,7 +178,7 @@
 
 				for ( var i = 0; i < params.length; i ++ ) {
 
-					var material = new ShaderMaterial( {
+					var material = new THREE.ShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -196,14 +186,14 @@
 
 					} );
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.add( mesh );
 
 				}
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 

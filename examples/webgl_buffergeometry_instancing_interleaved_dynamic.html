@@ -75,23 +75,7 @@
 	</script>
 
 	<script type="module">
-		import {
-			BufferAttribute,
-			Color,
-			DoubleSide,
-			InstancedBufferGeometry,
-			InstancedInterleavedBuffer,
-			InterleavedBuffer,
-			InterleavedBufferAttribute,
-			Mesh,
-			PerspectiveCamera,
-			Quaternion,
-			Scene,
-			RawShaderMaterial,
-			TextureLoader,
-			Vector4,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -105,22 +89,22 @@
 
 			container = document.getElementById( 'container' );
 
-			camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 
-			scene = new Scene();
-			scene.background = new Color( 0x101010 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x101010 );
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 
 			// geometry
 
 			var instances = 5000;
 
-			var geometry = new InstancedBufferGeometry();
+			var geometry = new THREE.InstancedBufferGeometry();
 
 			// per mesh data x,y,z,w,u,v,s,t for 4-element alignment
 			// only use x,y,z and u,v; but x, y, z, nx, ny, nz, u, v would be a good layout
-			var vertexBuffer = new InterleavedBuffer( new Float32Array( [
+			var vertexBuffer = new THREE.InterleavedBuffer( new Float32Array( [
 				// Front
 				- 1, 1, 1, 0, 0, 0, 0, 0,
 				1, 1, 1, 0, 1, 0, 0, 0,
@@ -154,10 +138,10 @@
 			] ), 8 );
 
 			// Use vertexBuffer, starting at offset 0, 3 items in position attribute
-			var positions = new InterleavedBufferAttribute( vertexBuffer, 3, 0 );
+			var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
 			geometry.addAttribute( 'position', positions );
 			// Use vertexBuffer, starting at offset 4, 2 items in uv attribute
-			var uvs = new InterleavedBufferAttribute( vertexBuffer, 2, 4 );
+			var uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 4 );
 			geometry.addAttribute( 'uv', uvs );
 
 			var indices = new Uint16Array( [
@@ -175,13 +159,13 @@
 				22, 21, 23
 			] );
 
-			geometry.setIndex( new BufferAttribute( indices, 1 ) );
+			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 			// per instance data
-			instanceBuffer = new InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setDynamic( true );
-			var offsets = new InterleavedBufferAttribute( instanceBuffer, 3, 0 );
+			instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setDynamic( true );
+			var offsets = new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 );
 
-			var vector = new Vector4();
+			var vector = new THREE.Vector4();
 			for ( var i = 0, ul = offsets.count; i < ul; i ++ ) {
 
 				var x = Math.random() * 100 - 50;
@@ -195,7 +179,7 @@
 
 			geometry.addAttribute( 'offset', offsets ); // per mesh translation
 
-			orientations = new InterleavedBufferAttribute( instanceBuffer, 4, 4 );
+			orientations = new THREE.InterleavedBufferAttribute( instanceBuffer, 4, 4 );
 
 			for ( var i = 0, ul = orientations.count; i < ul; i ++ ) {
 
@@ -209,22 +193,22 @@
 			geometry.addAttribute( 'orientation', orientations ); // per mesh orientation
 
 			// material
-			var texture = new TextureLoader().load( 'textures/crate.gif' );
+			var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 			texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-			var material = new RawShaderMaterial( {
+			var material = new THREE.RawShaderMaterial( {
 
 				uniforms: {
 					map: { value: texture }
 				},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-				side: DoubleSide,
+				side: THREE.DoubleSide,
 				transparent: false
 
 			} );
 
-			var mesh = new Mesh( geometry, material );
+			var mesh = new THREE.Mesh( geometry, material );
 			mesh.frustumCulled = false;
 			scene.add( mesh );
 
@@ -269,9 +253,9 @@
 
 		var lastTime = 0;
 
-		var moveQ = ( new Quaternion( .5, .5, .5, 0.0 ) ).normalize();
-		var tmpQ = new Quaternion();
-		var currentQ = new Quaternion();
+		var moveQ = ( new THREE.Quaternion( .5, .5, .5, 0.0 ) ).normalize();
+		var tmpQ = new THREE.Quaternion();
+		var currentQ = new THREE.Quaternion();
 		function render() {
 
 			var time = performance.now();

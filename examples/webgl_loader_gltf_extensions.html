@@ -17,24 +17,7 @@
 		<div id="container"></div>
 
 		<script type="module">
-			import {
-				AnimationMixer,
-				AmbientLight,
-				Clock,
-				Color,
-				DirectionalLight,
-				Euler,
-				Mesh,
-				MeshPhongMaterial,
-				PCFSoftShadowMap,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				SpotLight,
-				UnsignedByteType,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -50,7 +33,7 @@
 			var container, camera, scene, renderer, loader;
 			var gltf, background, envMap, mixer, gui, extensionControls;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			var scenes = {
 				Boombox: {
@@ -58,8 +41,8 @@
 					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
 					author: 'Microsoft',
 					authorURL: 'https://www.microsoft.com/',
-					cameraPos: new Vector3( 0.02, 0.01, 0.03 ),
-					objectRotation: new Euler( 0, Math.PI, 0 ),
+					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
+					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
 					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
 					addEnvMap: true
 				},
@@ -68,9 +51,9 @@
 					url: './models/gltf/BotSkinned/%s/Bot_Skinned.gltf',
 					author: 'MozillaVR',
 					authorURL: 'https://vr.mozilla.org/',
-					cameraPos: new Vector3( 0.5, 2, 2 ),
-					center: new Vector3( 0, 1.2, 0 ),
-					objectRotation: new Euler( 0, 0, 0 ),
+					cameraPos: new THREE.Vector3( 0.5, 2, 2 ),
+					center: new THREE.Vector3( 0, 1.2, 0 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
 					addLights: true,
 					addGround: true,
 					shadows: true,
@@ -81,8 +64,8 @@
 					url: './models/gltf/MetalRoughSpheres/%s/MetalRoughSpheres.gltf',
 					author: '@emackey',
 					authorURL: 'https://twitter.com/emackey',
-					cameraPos: new Vector3( 2, 1, 15 ),
-					objectRotation: new Euler( 0, 0, 0 ),
+					cameraPos: new THREE.Vector3( 2, 1, 15 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
 					extensions: [ 'glTF', 'glTF-Embedded' ],
 					addEnvMap: true
 				},
@@ -91,7 +74,7 @@
 					url: './models/gltf/Duck/%s/Duck.gltf',
 					author: 'Sony',
 					authorURL: 'https://www.playstation.com/en-us/corporate/about/',
-					cameraPos: new Vector3( 0, 3, 5 ),
+					cameraPos: new THREE.Vector3( 0, 3, 5 ),
 					addLights: true,
 					addGround: true,
 					shadows: true,
@@ -102,10 +85,10 @@
 					url: './models/gltf/Monster/%s/Monster.gltf',
 					author: '3drt.com',
 					authorURL: 'http://www.3drt.com/downloads.htm',
-					cameraPos: new Vector3( 3, 1, 7 ),
-					objectScale: new Vector3( 0.04, 0.04, 0.04 ),
-					objectPosition: new Vector3( 0.2, 0.1, 0 ),
-					objectRotation: new Euler( 0, - 3 * Math.PI / 4, 0 ),
+					cameraPos: new THREE.Vector3( 3, 1, 7 ),
+					objectScale: new THREE.Vector3( 0.04, 0.04, 0.04 ),
+					objectPosition: new THREE.Vector3( 0.2, 0.1, 0 ),
+					objectRotation: new THREE.Euler( 0, - 3 * Math.PI / 4, 0 ),
 					animationTime: 3,
 					addLights: true,
 					shadows: true,
@@ -117,8 +100,8 @@
 					url: './models/gltf/CesiumMan/%s/CesiumMan.gltf',
 					author: 'Cesium',
 					authorURL: 'https://cesiumjs.org/',
-					cameraPos: new Vector3( 0, 3, 10 ),
-					objectRotation: new Euler( 0, 0, 0 ),
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
+					objectRotation: new THREE.Euler( 0, 0, 0 ),
 					addLights: true,
 					addGround: true,
 					shadows: true,
@@ -129,7 +112,7 @@
 					url: './models/gltf/CesiumMilkTruck/%s/CesiumMilkTruck.gltf',
 					author: 'Cesium',
 					authorURL: 'https://cesiumjs.org/',
-					cameraPos: new Vector3( 0, 3, 10 ),
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
 					addLights: true,
 					addGround: true,
 					shadows: true,
@@ -140,9 +123,9 @@
 					url: './models/gltf/OutlinedBox/OutlinedBox.gltf',
 					author: '@twittmann',
 					authorURL: 'https://github.com/twittmann',
-					cameraPos: new Vector3( 0, 5, 15 ),
-					objectScale: new Vector3( 0.01, 0.01, 0.01 ),
-					objectRotation: new Euler( 0, 90, 0 ),
+					cameraPos: new THREE.Vector3( 0, 5, 15 ),
+					objectScale: new THREE.Vector3( 0.01, 0.01, 0.01 ),
+					objectRotation: new THREE.Euler( 0, 90, 0 ),
 					addLights: true,
 					shadows: true,
 					extensions: [ 'glTF' ]
@@ -159,7 +142,7 @@
 
 				container = document.getElementById( 'container' );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
@@ -171,7 +154,7 @@
 				// Load background and generate envMap
 
 				new RGBELoader()
-					.setType( UnsignedByteType )
+					.setType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_2k.hdr', function ( texture ) {
 
@@ -211,24 +194,24 @@
 
 				}
 
-				scene = new Scene();
-				scene.background = new Color( 0x222222 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
 				scene.add( camera );
 
 				var spot1;
 
 				if ( sceneInfo.addLights ) {
 
-					var ambient = new AmbientLight( 0x222222 );
+					var ambient = new THREE.AmbientLight( 0x222222 );
 					scene.add( ambient );
 
-					var directionalLight = new DirectionalLight( 0xdddddd, 4 );
+					var directionalLight = new THREE.DirectionalLight( 0xdddddd, 4 );
 					directionalLight.position.set( 0, 0, 1 ).normalize();
 					scene.add( directionalLight );
 
-					spot1 = new SpotLight( 0xffffff, 1 );
+					spot1 = new THREE.SpotLight( 0xffffff, 1 );
 					spot1.position.set( 5, 10, 5 );
 					spot1.angle = 0.50;
 					spot1.penumbra = 0.75;
@@ -251,7 +234,7 @@
 				if ( sceneInfo.shadows ) {
 
 					renderer.shadowMap.enabled = true;
-					renderer.shadowMap.type = PCFSoftShadowMap;
+					renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				}
 
@@ -261,8 +244,8 @@
 
 				if ( sceneInfo.addGround ) {
 
-					var groundMaterial = new MeshPhongMaterial( { color: 0xFFFFFF } );
-					var ground = new Mesh( new PlaneBufferGeometry( 512, 512 ), groundMaterial );
+					var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF } );
+					var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 512, 512 ), groundMaterial );
 					ground.receiveShadow = !! sceneInfo.shadows;
 
 					if ( sceneInfo.groundPos ) {
@@ -369,7 +352,7 @@
 
 					if ( animations && animations.length ) {
 
-						mixer = new AnimationMixer( object );
+						mixer = new THREE.AnimationMixer( object );
 
 						for ( var i = 0; i < animations.length; i ++ ) {
 

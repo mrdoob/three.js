@@ -14,23 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				CubeCamera,
-				CubeReflectionMapping,
-				LinearMipMapLinearFilter,
-				Mesh,
-				MeshPhysicalMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RectAreaLight,
-				RectAreaLightHelper,
-				RepeatWrapping,
-				Scene,
-				TextureLoader,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -278,7 +262,7 @@
 				var container = document.getElementById( 'container' );
 
 				// renderer
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -307,10 +291,10 @@
 				} );
 
 				// scene
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// camera
-				camera = new PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 280, 106, - 5 );
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
@@ -321,29 +305,29 @@
 				cameraControls.update();
 
 				// cube camera for environment map
-				cubeCamera = new CubeCamera( 1, 1000, 512 );
+				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = LinearMipMapLinearFilter;
-				cubeCamera.renderTarget.texture.mapping = CubeReflectionMapping;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
 
 				cubeCamera.position.set( 0, - 100, 0 );
 				scene.add( cubeCamera );
 
 				// ground floor ( with box projected environment mapping )
-				var loader = new TextureLoader();
+				var loader = new THREE.TextureLoader();
 				var rMap = loader.load( 'textures/lava/lavatile.jpg' );
-				rMap.wrapS = RepeatWrapping;
-				rMap.wrapT = RepeatWrapping;
+				rMap.wrapS = THREE.RepeatWrapping;
+				rMap.wrapT = THREE.RepeatWrapping;
 				rMap.repeat.set( 2, 1 );
 
-				var defaultMat = new MeshPhysicalMaterial( {
+				var defaultMat = new THREE.MeshPhysicalMaterial( {
 					roughness: 1,
 					envMap: cubeCamera.renderTarget.texture,
 					roughnessMap: rMap
 				} );
 
-				var boxProjectedMat = new MeshPhysicalMaterial( {
-					color: new Color( '#ffffff' ),
+				var boxProjectedMat = new THREE.MeshPhysicalMaterial( {
+					color: new THREE.Color( '#ffffff' ),
 					roughness: 1,
 					envMap: cubeCamera.renderTarget.texture,
 					roughnessMap: rMap
@@ -352,8 +336,8 @@
 				boxProjectedMat.onBeforeCompile = function ( shader ) {
 
 					//these parameters are for the cubeCamera texture
-					shader.uniforms.cubeMapSize = { value: new Vector3( 200, 200, 100 ) };
-					shader.uniforms.cubeMapPos = { value: new Vector3( 0, - 50, 0 ) };
+					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
+					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
 					shader.uniforms.flipEnvMap.value = true;
 
 					//replace shader chunks with box projection chunks
@@ -376,7 +360,7 @@
 
 				};
 
-				groundPlane = new Mesh( new PlaneBufferGeometry( 200, 100, 100 ), boxProjectedMat );
+				groundPlane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 100, 100 ), boxProjectedMat );
 				groundPlane.rotateX( - Math.PI / 2 );
 				groundPlane.position.set( 0, - 49, 0 );
 				scene.add( groundPlane );
@@ -393,42 +377,42 @@
 
 				} );
 
-				wallMat = new MeshPhysicalMaterial( {
+				wallMat = new THREE.MeshPhysicalMaterial( {
 					map: diffuseTex,
 					bumpMap: bumpTex,
 					bumpScale: 0.3,
 				} );
 
-				var planeGeo = new PlaneBufferGeometry( 100, 100 );
+				var planeGeo = new THREE.PlaneBufferGeometry( 100, 100 );
 
-				var planeBack1 = new Mesh( planeGeo, wallMat );
+				var planeBack1 = new THREE.Mesh( planeGeo, wallMat );
 				planeBack1.position.z = - 50;
 				planeBack1.position.x = - 50;
 				scene.add( planeBack1 );
 
-				var planeBack2 = new Mesh( planeGeo, wallMat );
+				var planeBack2 = new THREE.Mesh( planeGeo, wallMat );
 				planeBack2.position.z = - 50;
 				planeBack2.position.x = 50;
 				scene.add( planeBack2 );
 
-				var planeFront1 = new Mesh( planeGeo, wallMat );
+				var planeFront1 = new THREE.Mesh( planeGeo, wallMat );
 				planeFront1.position.z = 50;
 				planeFront1.position.x = - 50;
 				planeFront1.rotateY( Math.PI );
 				scene.add( planeFront1 );
 
-				var planeFront2 = new Mesh( planeGeo, wallMat );
+				var planeFront2 = new THREE.Mesh( planeGeo, wallMat );
 				planeFront2.position.z = 50;
 				planeFront2.position.x = 50;
 				planeFront2.rotateY( Math.PI );
 				scene.add( planeFront2 );
 
-				var planeRight = new Mesh( planeGeo, wallMat );
+				var planeRight = new THREE.Mesh( planeGeo, wallMat );
 				planeRight.position.x = 100;
 				planeRight.rotateY( - Math.PI / 2 );
 				scene.add( planeRight );
 
-				var planeLeft = new Mesh( planeGeo, wallMat );
+				var planeLeft = new THREE.Mesh( planeGeo, wallMat );
 				planeLeft.position.x = - 100;
 				planeLeft.rotateY( Math.PI / 2 );
 				scene.add( planeLeft );
@@ -440,20 +424,20 @@
 
 				RectAreaLightUniformsLib.init();
 
-				var blueRectLight = new RectAreaLight( 0xf3aaaa, intensity, width, height );
+				var blueRectLight = new THREE.RectAreaLight( 0xf3aaaa, intensity, width, height );
 				blueRectLight.position.set( 99, 5, 0 );
 				blueRectLight.lookAt( 0, 5, 0 );
 				scene.add( blueRectLight );
 
-				var blueRectLightHelper = new RectAreaLightHelper( blueRectLight, 0xffffff );
+				var blueRectLightHelper = new THREE.RectAreaLightHelper( blueRectLight, 0xffffff );
 				blueRectLight.add( blueRectLightHelper );
 
-				var redRectLight = new RectAreaLight( 0x9aaeff, intensity, width, height );
+				var redRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
 				redRectLight.position.set( - 99, 5, 0 );
 				redRectLight.lookAt( 0, 5, 0 );
 				scene.add( redRectLight );
 
-				var redRectLightHelper = new RectAreaLightHelper( redRectLight, 0xffffff );
+				var redRectLightHelper = new THREE.RectAreaLightHelper( redRectLight, 0xffffff );
 				redRectLight.add( redRectLightHelper );
 
 				render();

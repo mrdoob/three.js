@@ -13,21 +13,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				AxesHelper,
-				BoxBufferGeometry,
-				CameraHelper,
-				Mesh,
-				MeshPhongMaterial,
-				PCFSoftShadowMap,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				SpotLight,
-				SpotLightHelper,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -41,19 +27,19 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 65, 8, - 10 );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
@@ -62,10 +48,10 @@
 				controls.maxDistance = 500;
 				controls.enablePan = false;
 
-				var ambient = new AmbientLight( 0xffffff, 0.1 );
+				var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
-				spotLight = new SpotLight( 0xffffff, 1 );
+				spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( 15, 40, 35 );
 				spotLight.angle = Math.PI / 4;
 				spotLight.penumbra = 0.05;
@@ -79,29 +65,29 @@
 				spotLight.shadow.camera.far = 200;
 				scene.add( spotLight );
 
-				lightHelper = new SpotLightHelper( spotLight );
+				lightHelper = new THREE.SpotLightHelper( spotLight );
 				scene.add( lightHelper );
 
-				shadowCameraHelper = new CameraHelper( spotLight.shadow.camera );
+				shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
 				scene.add( shadowCameraHelper );
 
-				scene.add( new AxesHelper( 10 ) );
+				scene.add( new THREE.AxesHelper( 10 ) );
 
-				var material = new MeshPhongMaterial( { color: 0x808080, dithering: true } );
+				var material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
 
-				var geometry = new PlaneBufferGeometry( 2000, 2000 );
+				var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );
 				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var material = new MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
+				var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
 
-				var geometry = new BoxBufferGeometry( 3, 1, 2 );
+				var geometry = new THREE.BoxBufferGeometry( 3, 1, 2 );
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 40, 2, 0 );
 				mesh.castShadow = true;
 				scene.add( mesh );

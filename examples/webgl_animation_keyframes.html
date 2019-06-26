@@ -28,17 +28,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				AnimationMixer,
-				Clock,
-				Color,
-				CubeTextureLoader,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -49,39 +39,39 @@
 			var scene, camera, pointLight, stats;
 			var renderer, mixer, controls;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 			var container = document.getElementById( 'container' );
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.gammaOutput = true;
 			renderer.gammaFactor = 2.2;
 			container.appendChild( renderer.domElement );
 
-			scene = new Scene();
-			scene.background = new Color( 0xbfe3dd );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfe3dd );
 
-			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
 			controls.enablePan = false;
 
-			scene.add( new AmbientLight( 0x404040 ) );
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
-			pointLight = new PointLight( 0xffffff, 1 );
+			pointLight = new THREE.PointLight( 0xffffff, 1 );
 			pointLight.position.copy( camera.position );
 			scene.add( pointLight );
 
 			// envmap
 			var path = 'textures/cube/Park2/';
 			var format = '.jpg';
-			var envMap = new CubeTextureLoader().load( [
+			var envMap = new THREE.CubeTextureLoader().load( [
 				path + 'posx' + format, path + 'negx' + format,
 				path + 'posy' + format, path + 'negy' + format,
 				path + 'posz' + format, path + 'negz' + format
@@ -104,7 +94,7 @@
 
 				scene.add( model );
 
-				mixer = new AnimationMixer( model );
+				mixer = new THREE.AnimationMixer( model );
 				mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 				animate();

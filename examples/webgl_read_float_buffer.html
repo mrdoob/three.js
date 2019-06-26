@@ -59,22 +59,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				DirectionalLight,
-				FloatType,
-				LinearFilter,
-				Mesh,
-				MeshPhongMaterial,
-				NearestFilter,
-				OrthographicCamera,
-				PlaneBufferGeometry,
-				RGBAFormat,
-				Scene,
-				ShaderMaterial,
-				TorusBufferGeometry,
-				WebGLRenderer,
-				WebGLRenderTarget
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -99,25 +84,25 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraRTT = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
+				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				cameraRTT.position.z = 100;
 
 				//
 
-				sceneRTT = new Scene();
-				sceneScreen = new Scene();
+				sceneRTT = new THREE.Scene();
+				sceneScreen = new THREE.Scene();
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();
 				sceneRTT.add( light );
 
-				light = new DirectionalLight( 0xffaaaa, 1.5 );
+				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
 				light.position.set( 0, 0, - 1 ).normalize();
 				sceneRTT.add( light );
 
-				rtTexture = new WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: LinearFilter, magFilter: NearestFilter, format: RGBAFormat, type: FloatType } );
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type: THREE.FloatType } );
 
-				material = new ShaderMaterial( {
+				material = new THREE.ShaderMaterial( {
 
 					uniforms: { "time": { value: 0.0 } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -125,7 +110,7 @@
 
 				} );
 
-				var materialScreen = new ShaderMaterial( {
+				var materialScreen = new THREE.ShaderMaterial( {
 
 					uniforms: { "tDiffuse": { value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -135,32 +120,32 @@
 
 				} );
 
-				var plane = new PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
 
-				quad = new Mesh( plane, material );
+				quad = new THREE.Mesh( plane, material );
 				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
-				var geometry = new TorusBufferGeometry( 100, 25, 15, 30 );
+				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
 
-				var mat1 = new MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
-				var mat2 = new MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
+				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
 
-				zmesh1 = new Mesh( geometry, mat1 );
+				zmesh1 = new THREE.Mesh( geometry, mat1 );
 				zmesh1.position.set( 0, 0, 100 );
 				zmesh1.scale.set( 1.5, 1.5, 1.5 );
 				sceneRTT.add( zmesh1 );
 
-				zmesh2 = new Mesh( geometry, mat2 );
+				zmesh2 = new THREE.Mesh( geometry, mat2 );
 				zmesh2.position.set( 0, 150, 100 );
 				zmesh2.scale.set( 0.75, 0.75, 0.75 );
 				sceneRTT.add( zmesh2 );
 
-				quad = new Mesh( plane, materialScreen );
+				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = - 100;
 				sceneScreen.add( quad );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;

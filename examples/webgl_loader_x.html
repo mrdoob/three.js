@@ -20,19 +20,7 @@
 	<div id="canvase3d"></div>
 
 	<script type="module">
-		import {
-			AmbientLight,
-			Clock,
-			DirectionalLight,
-			GridHelper,
-			LoadingManager,
-			LoopOnce,
-			PerspectiveCamera,
-			Scene,
-			SkeletonHelper,
-			SkinnedMesh,
-			WebGLRenderer,
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -41,7 +29,7 @@
 
 		var container, stats, controls;
 		var camera, scene, renderer;
-		var clock = new Clock();
+		var clock = new THREE.Clock();
 		var manager = null;
 
 		var skeletonHelper = null;
@@ -69,12 +57,12 @@
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			scene = new Scene();
-			scene.add( new AmbientLight( 0xaaaaaa ) );
+			scene = new THREE.Scene();
+			scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
 
 			// grid
 
-			var gridHelper = new GridHelper( 14, 1, 0x303030, 0x303030 );
+			var gridHelper = new THREE.GridHelper( 14, 1, 0x303030, 0x303030 );
 			scene.add( gridHelper );
 
 			// stats
@@ -82,13 +70,13 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x666666 );
 			container.appendChild( renderer.domElement );
 
-			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 			camera.position.set( 2, 10, - 28 );
 			camera.up.set( 0, 1, 0 );
 
@@ -96,11 +84,11 @@
 			controls.target.set( 0, 5, 0 );
 			controls.update();
 
-			var light = new DirectionalLight( 0xffffff, 1 );
+			var light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( 10, 100, - 10 ).normalize();
 			scene.add( light );
 
-			var light2 = new DirectionalLight( 0x777666, 1 );
+			var light2 = new THREE.DirectionalLight( 0x777666, 1 );
 			light2.position.set( - 1, - 1, - 1 ).normalize();
 			scene.add( light2 );
 
@@ -110,7 +98,7 @@
 
 			// model loading
 
-			manager = new LoadingManager();
+			manager = new THREE.LoadingManager();
 			manager.onProgress = function ( item, loaded, total ) {
 
 				console.log( item, loaded, total );
@@ -139,9 +127,9 @@
 
 					scene.add( Models[ 0 ] );
 
-					if ( Models[ 0 ] instanceof SkinnedMesh ) {
+					if ( Models[ 0 ] instanceof THREE.SkinnedMesh ) {
 
-						skeletonHelper = new SkeletonHelper( Models[ 0 ] );
+						skeletonHelper = new THREE.SkeletonHelper( Models[ 0 ] );
 						scene.add( skeletonHelper );
 
 					}
@@ -225,7 +213,7 @@
 
 					if ( animeName == 'stand' ) {
 
-						actions[ modelId ][ animeName ].setLoop( LoopOnce );
+						actions[ modelId ][ animeName ].setLoop( THREE.LoopOnce );
 
 					}
 

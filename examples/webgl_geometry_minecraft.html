@@ -21,22 +21,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Clock,
-				Color,
-				DirectionalLight,
-				DoubleSide,
-				Matrix4,
-				Mesh,
-				MeshLambertMaterial,
-				NearestFilter,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -53,7 +38,7 @@
 			var worldHalfDepth = worldDepth / 2;
 			var data = generateHeight( worldWidth, worldDepth );
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -62,7 +47,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 
 				controls = new FirstPersonControls( camera );
@@ -71,37 +56,37 @@
 				controls.lookSpeed = 0.125;
 				controls.lookVertical = true;
 
-				scene = new Scene();
-				scene.background = new Color( 0xbfd1e5 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				// sides
 
-				var matrix = new Matrix4();
+				var matrix = new THREE.Matrix4();
 
-				var pxGeometry = new PlaneBufferGeometry( 100, 100 );
+				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new PlaneBufferGeometry( 100, 100 );
+				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new PlaneBufferGeometry( 100, 100 );
+				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
 				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new PlaneBufferGeometry( 100, 100 );
+				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new PlaneBufferGeometry( 100, 100 );
+				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
@@ -161,20 +146,20 @@
 				var geometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
 				geometry.computeBoundingSphere();
 
-				var texture = new TextureLoader().load( 'textures/minecraft/atlas.png' );
-				texture.magFilter = NearestFilter;
+				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.magFilter = THREE.NearestFilter;
 
-				var mesh = new Mesh( geometry, new MeshLambertMaterial( { map: texture, side: DoubleSide } ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
-				var ambientLight = new AmbientLight( 0xcccccc );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc );
 				scene.add( ambientLight );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 2 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

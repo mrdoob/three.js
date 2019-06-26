@@ -52,23 +52,7 @@
 
 			'use strict';
 
-			import {
-				AmbientLight,
-				DirectionalLight,
-				GridHelper,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				BoxBufferGeometry,
-				WebGLRenderer,
-				Object3D,
-				MeshNormalMaterial,
-				Mesh,
-				VertexNormalsHelper,
-				FileLoader,
-				DoubleSide,
-				FrontSide
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
@@ -87,8 +71,8 @@
 
 				this.scene = null;
 				this.cameraDefaults = {
-					posCamera: new Vector3( 0.0, 175.0, 500.0 ),
-					posCameraTarget: new Vector3( 0, 0, 0 ),
+					posCamera: new THREE.Vector3( 0.0, 175.0, 500.0 ),
+					posCameraTarget: new THREE.Vector3( 0, 0, 0 ),
 					near: 0.1,
 					far: 10000,
 					fov: 45
@@ -110,22 +94,22 @@
 				constructor: WWOBJLoader2Example,
 
 				initGL: function () {
-					this.renderer = new WebGLRenderer( {
+					this.renderer = new THREE.WebGLRenderer( {
 						canvas: this.canvas,
 						antialias: true,
 						autoClear: true
 					} );
 					this.renderer.setClearColor( 0x050505 );
 
-					this.scene = new Scene();
+					this.scene = new THREE.Scene();
 
-					this.camera = new PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
+					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();
 					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
 
-					let ambientLight = new AmbientLight( 0x404040 );
-					let directionalLight1 = new DirectionalLight( 0xC0C090 );
-					let directionalLight2 = new DirectionalLight( 0xC0C090 );
+					let ambientLight = new THREE.AmbientLight( 0x404040 );
+					let directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
+					let directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
 
 					directionalLight1.position.set( -100, -50, 100 );
 					directionalLight2.position.set( 100, 50, -100 );
@@ -134,16 +118,16 @@
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					let helper = new GridHelper( 1200, 60, 0xFF4444, 0x404040 );
+					let helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
 
-					let geometry = new BoxBufferGeometry( 10, 10, 10 );
-					let material = new MeshNormalMaterial();
-					this.cube = new Mesh( geometry, material );
+					let geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+					let material = new THREE.MeshNormalMaterial();
+					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );
 					this.scene.add( this.cube );
 
-					this.pivot = new Object3D();
+					this.pivot = new THREE.Object3D();
 					this.pivot.name = 'Pivot';
 					this.scene.add( this.pivot );
 				},
@@ -159,12 +143,12 @@
 					function onLoadMtl ( mtlParseResult ) {
 						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
 
-						let fileLoader = new FileLoader();
+						let fileLoader = new THREE.FileLoader();
 						fileLoader.setPath( '' );
 						fileLoader.setResponseType( 'arraybuffer' );
 						fileLoader.load( 'models/obj/female02/female02.obj',
 							function ( content ) {
-								let local = new Object3D();
+								let local = new THREE.Object3D();
 								local.name = 'Pivot_female02';
 								local.position.set( 75, 0, 0 );
 								scope.pivot.add( local );
@@ -207,7 +191,7 @@
 
 					let scope = this;
 					function callbackOnLoad ( object3d ) {
-						let local = new Object3D();
+						let local = new THREE.Object3D();
 						local.name = 'Pivot_male02';
 						local.position.set( 0, 0, -75 );
 						scope.pivot.add( local );
@@ -229,7 +213,7 @@
 					let modelName = 'WaltHead';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					let local = new Object3D();
+					let local = new THREE.Object3D();
 					local.name = 'Pivot_WaltHead';
 					local.position.set( -125, 50, 0 );
 					let scale = 0.5;
@@ -254,7 +238,7 @@
 				},
 
 				useLoadMainFallback: function () {
-					let local = new Object3D();
+					let local = new THREE.Object3D();
 					local.name = 'Pivot_Cerberus';
 					local.position.set( 0, 0, 100 );
 					let scale = 50;
@@ -275,7 +259,7 @@
 				},
 
 				useLoadParallelMeshAlter: function () {
-					let local = new Object3D();
+					let local = new THREE.Object3D();
 					local.position.set( 125, 50, 0 );
 					local.name = 'Pivot_vive-controller';
 					this.pivot.add( local );
@@ -290,11 +274,11 @@
 					function callbackMeshAlter ( event ) {
 						let override = new LoadedMeshUserOverride( false, true );
 
-						let mesh = new Mesh( event.detail.bufferGeometry, event.detail.material );
+						let mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
 						let scale = 200.0;
 						mesh.scale.set( scale, scale, scale );
 						mesh.name = event.detail.meshName;
-						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new THREE.VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );
@@ -382,10 +366,10 @@
 				alterDouble: function () {
 					let scope = this;
 					scope.doubleSide = ! scope.doubleSide;
-					console.log( scope.doubleSide ? 'Enabling DoubleSide materials' : 'Enabling FrontSide materials');
+					console.log( scope.doubleSide ? 'Enabling THREE.DoubleSide materials' : 'Enabling THREE.FrontSide materials');
 
 					scope.traversalFunction = function ( material ) {
-						material.side = scope.doubleSide ? DoubleSide : FrontSide;
+						material.side = scope.doubleSide ? THREE.DoubleSide : THREE.FrontSide;
 					};
 
 					function scopeTraverse ( object3d ) {

@@ -17,13 +17,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				DirectionalLight,
-				HemisphereLight,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -39,22 +33,22 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
-				camera = new PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 600, 1150, 5 );
 				camera.up.set( 0, 0, 1 );
 				camera.lookAt( - 100, 0, 0 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var ambient = new HemisphereLight( 0x8888fff, 0xff8888, 0.5 );
+				var ambient = new THREE.HemisphereLight( 0x8888fff, 0xff8888, 0.5 );
 				ambient.position.set( 0, 1, 0 );
 				scene.add( ambient );
 
-				var light = new DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, 4, 4 ).normalize();
 				scene.add( light );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

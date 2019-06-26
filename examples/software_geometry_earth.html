@@ -17,18 +17,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth demo</div>
 
 		<script type="module">
-			import {
-				CanvasTexture,
-				Group,
-				Mesh,
-				MeshBasicMaterial,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				SphereBufferGeometry,
-				TextureLoader
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -49,23 +38,23 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				group = new Group();
+				group = new THREE.Group();
 				scene.add( group );
 
 				// earth
 
-				var loader = new TextureLoader();
+				var loader = new THREE.TextureLoader();
 				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
 
-					var geometry = new SphereBufferGeometry( 200, 20, 20 );
+					var geometry = new THREE.SphereBufferGeometry( 200, 20, 20 );
 
-					var material = new MeshLambertMaterial( { map: texture } );
-					var mesh = new Mesh( geometry, material );
+					var material = new THREE.MeshLambertMaterial( { map: texture } );
+					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 
 				} );
@@ -91,12 +80,12 @@
 				context.fillStyle = gradient;
 				context.fillRect( 0, 0, canvas.width, canvas.height );
 
-				var texture = new CanvasTexture( canvas );
+				var texture = new THREE.CanvasTexture( canvas );
 
-				var geometry = new PlaneBufferGeometry( 300, 300, 3, 3 );
-				var material = new MeshBasicMaterial( { map: texture } );
+				var geometry = new THREE.PlaneBufferGeometry( 300, 300, 3, 3 );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - Math.PI / 2;
 				group.add( mesh );

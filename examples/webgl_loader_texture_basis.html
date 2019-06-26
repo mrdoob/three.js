@@ -14,45 +14,36 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Clock,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				sRGBEncoding,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { BasisTextureLoader } from './jsm/loaders/BasisTextureLoader.js';
 
 			var camera, scene, renderer;
 			var mesh;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				document.body.appendChild( renderer.domElement );
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var geometry = new BoxBufferGeometry( 200, 200, 200 );
-				var material = new MeshBasicMaterial();
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				var material = new THREE.MeshBasicMaterial();
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 
 				scene.add( mesh );
 
@@ -62,7 +53,7 @@
 
 				loader.load( 'textures/compressed/PavingStones.basis', function ( texture ) {
 
-					texture.encoding = sRGBEncoding;
+					texture.encoding = THREE.sRGBEncoding;
 					material.map = texture;
 					material.needsUpdate = true;
 

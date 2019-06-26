@@ -15,22 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AnimationClip,
-				AnimationMixer,
-				Clock,
-				Color,
-				DirectionalLight,
-				Fog,
-				HemisphereLight,
-				Mesh,
-				MeshPhongMaterial,
-				PCFSoftShadowMap,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { SkeletonUtils } from './jsm/utils/SkeletonUtils.js';
@@ -42,7 +27,7 @@
 			var renderer = null;
 			var camera = null;
 			var clock = null;
-			var mixers = []; // All the AnimationMixer objects for all the animations in the scene
+			var mixers = []; // All the THREE.AnimationMixer objects for all the animations in the scene
 			//////////////////////////////
 
 
@@ -163,7 +148,7 @@
 
 						if ( clonedScene ) {
 
-							// Scene is cloned properly, let's find one mesh and launch animation for it
+							// THREE.Scene is cloned properly, let's find one mesh and launch animation for it
 							var clonedMesh = clonedScene.getObjectByName( u.meshName );
 
 							if ( clonedMesh ) {
@@ -229,8 +214,8 @@
 			 */
 			function startAnimation( skinnedMesh, animations, animationName ) {
 
-				var mixer = new AnimationMixer( skinnedMesh );
-				var clip = AnimationClip.findByName( animations, animationName );
+				var mixer = new THREE.AnimationMixer( skinnedMesh );
+				var clip = THREE.AnimationClip.findByName( animations, animationName );
 
 				if ( clip ) {
 
@@ -335,37 +320,37 @@
 			function initRenderer() {
 
 				var container = document.getElementById( 'container' );
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				container.appendChild( renderer.domElement );
 
 			}
 
 			/**
-			 * Initialize ThreeJS Scene
+			 * Initialize ThreeJS THREE.Scene
 			 */
 			function initScene() {
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 3, 6, - 10 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
-				worldScene = new Scene();
-				worldScene.background = new Color( 0xa0a0a0 );
-				worldScene.fog = new Fog( 0xa0a0a0, 10, 22 );
+				worldScene = new THREE.Scene();
+				worldScene.background = new THREE.Color( 0xa0a0a0 );
+				worldScene.fog = new THREE.Fog( 0xa0a0a0, 10, 22 );
 
-				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 20, 0 );
 				worldScene.add( hemiLight );
 
-				var dirLight = new DirectionalLight( 0xffffff );
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 10;
@@ -377,9 +362,9 @@
 				worldScene.add( dirLight );
 
 				// ground
-				var groundMesh = new Mesh(
-					new PlaneBufferGeometry( 40, 40 ),
-					new MeshPhongMaterial( {
+				var groundMesh = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 40, 40 ),
+					new THREE.MeshPhongMaterial( {
 						color: 0x999999,
 						depthWrite: false
 					} )

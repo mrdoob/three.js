@@ -21,21 +21,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Color,
-				DoubleSide,
-				FontLoader,
-				Line,
-				LineBasicMaterial,
-				Mesh,
-				MeshBasicMaterial,
-				Object3D,
-				PerspectiveCamera,
-				Scene,
-				ShapeBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -46,36 +32,36 @@
 
 			function init( ) {
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, - 400, 600 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var loader = new FontLoader();
+				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var xMid, text;
 
 					var color = 0x006699;
 
-					var matDark = new LineBasicMaterial( {
+					var matDark = new THREE.LineBasicMaterial( {
 						color: color,
-						side: DoubleSide
+						side: THREE.DoubleSide
 					} );
 
-					var matLite = new MeshBasicMaterial( {
+					var matLite = new THREE.MeshBasicMaterial( {
 						color: color,
 						transparent: true,
 						opacity: 0.4,
-						side: DoubleSide
+						side: THREE.DoubleSide
 					} );
 
 					var message = "   Three.js\nSimple text.";
 
 					var shapes = font.generateShapes( message, 100 );
 
-					var geometry = new ShapeBufferGeometry( shapes );
+					var geometry = new THREE.ShapeBufferGeometry( shapes );
 
 					geometry.computeBoundingBox();
 
@@ -85,7 +71,7 @@
 
 					// make shape ( N.B. edge view not visible )
 
-					text = new Mesh( geometry, matLite );
+					text = new THREE.Mesh( geometry, matLite );
 					text.position.z = - 150;
 					scene.add( text );
 
@@ -112,18 +98,18 @@
 
 					shapes.push.apply( shapes, holeShapes );
 
-					var lineText = new Object3D();
+					var lineText = new THREE.Object3D();
 
 					for ( var i = 0; i < shapes.length; i ++ ) {
 
 						var shape = shapes[ i ];
 
 						var points = shape.getPoints();
-						var geometry = new BufferGeometry().setFromPoints( points );
+						var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
 						geometry.translate( xMid, 0, 0 );
 
-						var lineMesh = new Line( geometry, matDark );
+						var lineMesh = new THREE.Line( geometry, matDark );
 						lineText.add( lineMesh );
 
 					}
@@ -132,7 +118,7 @@
 
 				} ); //end load function
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

@@ -17,16 +17,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - lines</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Float32BufferAttribute,
-				Line,
-				LineBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				VertexColors,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			var container, stats;
@@ -44,15 +35,15 @@
 
 				//
 
-				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 2750;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var segments = 10000;
 
-				var geometry = new BufferGeometry();
-				var material = new LineBasicMaterial( { vertexColors: VertexColors } );
+				var geometry = new THREE.BufferGeometry();
+				var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 
 				var positions = [];
 				var colors = [];
@@ -77,17 +68,17 @@
 
 				}
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 
-				line = new Line( geometry, material );
+				line = new THREE.Line( geometry, material );
 				scene.add( line );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

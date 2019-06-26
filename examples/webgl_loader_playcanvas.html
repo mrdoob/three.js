@@ -15,13 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -37,10 +31,10 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( - 1, 2, 4 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
@@ -53,16 +47,16 @@
 
 				//
 
-				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new PointLight( 0xffffff, 0.8 );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

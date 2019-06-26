@@ -14,20 +14,7 @@
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				CatmullRomCurve3,
-				Color,
-				Float32BufferAttribute,
-				Line,
-				LineBasicMaterial,
-				LineDashedMaterial,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				VertexColors,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -53,18 +40,18 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setClearColor( 0x000000, 0.0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( - 40, 0, 60 );
 
-				camera2 = new PerspectiveCamera( 40, 1, 1, 1000 );
+				camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
 				camera2.position.copy( camera.position );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -72,16 +59,16 @@
 				controls.maxDistance = 500;
 
 
-				// Position and Color Data
+				// Position and THREE.Color Data
 
 				var positions = [];
 				var colors = [];
 
-				var points = GeometryUtils.hilbert3D( new Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var spline = new CatmullRomCurve3( points );
+				var spline = new THREE.CatmullRomCurve3( points );
 				var divisions = Math.round( 12 * points.length );
-				var color = new Color();
+				var color = new THREE.Color();
 
 				for ( var i = 0, l = divisions; i < l; i ++ ) {
 
@@ -104,7 +91,7 @@
 
 					color: 0xffffff,
 					linewidth: 5, // in pixels
-					vertexColors: VertexColors,
+					vertexColors: THREE.VertexColors,
 					//resolution:  // to be set by renderer, eventually
 					dashed: false
 
@@ -116,16 +103,16 @@
 				scene.add( line );
 
 
-				// Line ( BufferGeometry, LineBasicMaterial ) - rendered with gl.LINE_STRIP
+				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE_STRIP
 
-				var geo = new BufferGeometry();
-				geo.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-				geo.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				var geo = new THREE.BufferGeometry();
+				geo.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				matLineBasic = new LineBasicMaterial( { vertexColors: VertexColors } );
-				matLineDashed = new LineDashedMaterial( { vertexColors: VertexColors, scale: 2, dashSize: 1, gapSize: 1 } );
+				matLineBasic = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+				matLineDashed = new THREE.LineDashedMaterial( { vertexColors: THREE.VertexColors, scale: 2, dashSize: 1, gapSize: 1 } );
 
-				line1 = new Line( geo, matLineBasic );
+				line1 = new THREE.Line( geo, matLineBasic );
 				line1.computeLineDistances();
 				line1.visible = false;
 				scene.add( line1 );
@@ -246,7 +233,7 @@
 					matLine.dashed = val;
 
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or LineDashedMaterial could be implemented as a separate material
+					// ... or THREE.LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
 					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
 					matLine.needsUpdate = true;

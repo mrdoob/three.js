@@ -14,21 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AnimationMixer,
-				Clock,
-				Color,
-				DirectionalLight,
-				Fog,
-				GridHelper,
-				HemisphereLight,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -38,7 +24,7 @@
 			var container, stats, controls;
 			var camera, scene, renderer, light;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			var mixer;
 
@@ -50,18 +36,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 100, 200, 300 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xa0a0a0 );
-				scene.fog = new Fog( 0xa0a0a0, 200, 1000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-				light = new HemisphereLight( 0xffffff, 0x444444 );
+				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				light.position.set( 0, 200, 0 );
 				scene.add( light );
 
-				light = new DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 200, 100 );
 				light.castShadow = true;
 				light.shadow.camera.top = 180;
@@ -73,12 +59,12 @@
 				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				// ground
-				var mesh = new Mesh( new PlaneBufferGeometry( 2000, 2000 ), new MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var grid = new GridHelper( 2000, 20, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
@@ -87,7 +73,7 @@
 				var loader = new FBXLoader();
 				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
 
-					mixer = new AnimationMixer( object );
+					mixer = new THREE.AnimationMixer( object );
 
 					var action = mixer.clipAction( object.animations[ 0 ] );
 					action.play();
@@ -107,7 +93,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;

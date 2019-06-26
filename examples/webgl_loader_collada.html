@@ -15,15 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Clock,
-				DirectionalLight,
-				LoadingManager,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -39,17 +31,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( 8, 10, 8 );
 				camera.lookAt( 0, 3, 0 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				// loading manager
 
-				var loadingManager = new LoadingManager( function () {
+				var loadingManager = new THREE.LoadingManager( function () {
 
 					scene.add( elf );
 
@@ -66,16 +58,16 @@
 
 				//
 
-				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 0.8 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				directionalLight.position.set( 1, 1, 0 ).normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

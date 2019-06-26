@@ -43,18 +43,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				BackSide,
-				Color,
-				DirectionalLight,
-				Mesh,
-				ObjectLoader,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -76,16 +65,16 @@
 
 				// CAMERA
 
-				camera = new PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 700, 200, - 500 );
 
 				// SCENE
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
-				var light = new DirectionalLight( 0xaabbff, 0.3 );
+				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
 				light.position.x = 300;
 				light.position.y = 250;
 				light.position.z = - 500;
@@ -96,27 +85,27 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: { value: new Color( 0x0077ff ) },
-					bottomColor: { value: new Color( 0xffffff ) },
+					topColor: { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
 					offset: { value: 400 },
 					exponent: { value: 0.6 }
 				};
 				uniforms.topColor.value.copy( light.color );
 
-				var skyGeo = new SphereBufferGeometry( 4000, 32, 15 );
-				var skyMat = new ShaderMaterial( {
+				var skyGeo = new THREE.SphereBufferGeometry( 4000, 32, 15 );
+				var skyMat = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: vertexShader,
 					fragmentShader: fragmentShader,
-					side: BackSide
+					side: THREE.BackSide
 				} );
 
-				var sky = new Mesh( skyGeo, skyMat );
+				var sky = new THREE.Mesh( skyGeo, skyMat );
 				scene.add( sky );
 
 				// RENDERER
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -137,7 +126,7 @@
 
 				// MODEL
 
-				var loader = new ObjectLoader();
+				var loader = new THREE.ObjectLoader();
 				loader.load( "models/json/lightmap/lightmap.json", function ( object ) {
 
 					scene.add( object );

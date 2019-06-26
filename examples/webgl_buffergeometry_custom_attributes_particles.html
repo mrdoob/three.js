@@ -47,18 +47,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				AdditiveBlending,
-				BufferGeometry,
-				Color,
-				Float32BufferAttribute,
-				PerspectiveCamera,
-				Points,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -73,24 +62,24 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 300;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				uniforms = {
 
-					pointTexture: { value: new TextureLoader().load( "textures/sprites/spark1.png" ) }
+					pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 
 				};
 
-				var shaderMaterial = new ShaderMaterial( {
+				var shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-					blending: AdditiveBlending,
+					blending: THREE.AdditiveBlending,
 					depthTest: false,
 					transparent: true,
 					vertexColors: true
@@ -100,13 +89,13 @@
 
 				var radius = 200;
 
-				geometry = new BufferGeometry();
+				geometry = new THREE.BufferGeometry();
 
 				var positions = [];
 				var colors = [];
 				var sizes = [];
 
-				var color = new Color();
+				var color = new THREE.Color();
 
 				for ( var i = 0; i < particles; i ++ ) {
 
@@ -122,15 +111,15 @@
 
 				}
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
 
-				particleSystem = new Points( geometry, shaderMaterial );
+				particleSystem = new THREE.Points( geometry, shaderMaterial );
 
 				scene.add( particleSystem );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

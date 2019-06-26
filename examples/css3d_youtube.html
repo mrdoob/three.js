@@ -24,11 +24,7 @@
 		<div id="blocker"></div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Group,
-				Scene
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
@@ -65,16 +61,16 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 500, 350, 750 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var group = new Group();
+				var group = new THREE.Group();
 				group.add( new Element( 'SJOz3qjfQXU', 0, 0, 240, 0 ) );
 				group.add( new Element( 'Y2-xZ-1HE-Q', 240, 0, 0, Math.PI / 2 ) );
 				group.add( new Element( 'IrydklNpcFI', 0, 0, - 240, Math.PI ) );

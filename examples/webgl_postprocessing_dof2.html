@@ -13,32 +13,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BackSide,
-				BoxBufferGeometry,
-				BufferGeometryLoader,
-				CubeTextureLoader,
-				DirectionalLight,
-				DoubleSide,
-				LinearFilter,
-				Mesh,
-				MeshPhongMaterial,
-				OrthographicCamera,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Raycaster,
-				RGBFormat,
-				Scene,
-				ShaderLib,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				UniformsUtils,
-				Vector2,
-				Vector3,
-				WebGLRenderer,
-				WebGLRenderTarget
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -58,10 +33,10 @@
 				samples: 4
 			};
 
-			var mouse = new Vector2();
-			var raycaster = new Raycaster();
+			var mouse = new THREE.Vector2();
+			var raycaster = new THREE.Raycaster();
 			var distance = 100;
-			var target = new Vector3( 0, 20, - 50 );
+			var target = new THREE.Vector3( 0, 20, - 50 );
 			var effectController;
 			var planes = [];
 			var leaves = 100;
@@ -74,15 +49,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
 
 				camera.position.y = 150;
 				camera.position.z = 450;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 				scene.add( camera );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
@@ -90,7 +65,7 @@
 
 				var depthShader = BokehDepthShader;
 
-				materialDepth = new ShaderMaterial( {
+				materialDepth = new THREE.ShaderMaterial( {
 					uniforms: depthShader.uniforms,
 					vertexShader: depthShader.vertexShader,
 					fragmentShader: depthShader.fragmentShader
@@ -106,42 +81,42 @@
 							 r + 'posy.jpg', r + 'negy.jpg',
 							 r + 'posz.jpg', r + 'negz.jpg' ];
 
-				var textureCube = new CubeTextureLoader().load( urls );
-				textureCube.format = RGBFormat;
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.format = THREE.RGBFormat;
 
-				var shader = ShaderLib[ 'cube' ];
+				var shader = THREE.ShaderLib[ 'cube' ];
 				shader.uniforms[ 'tCube' ].value = textureCube;
 
-				var skyMaterial = new ShaderMaterial( {
+				var skyMaterial = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
 					depthWrite: false,
-					side: BackSide
+					side: THREE.BackSide
 
 				} );
 
-				var sky = new Mesh( new BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
+				var sky = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
 				scene.add( sky );
 
 				// plane particles
 
-				var planePiece = new PlaneBufferGeometry( 10, 10, 1, 1 );
+				var planePiece = new THREE.PlaneBufferGeometry( 10, 10, 1, 1 );
 
-				var planeMat = new MeshPhongMaterial( {
+				var planeMat = new THREE.MeshPhongMaterial( {
 					color: 0xffffff * 0.4,
 					shininess: 0.5,
 					specular: 0xffffff,
 					envMap: textureCube,
-					side: DoubleSide
+					side: THREE.DoubleSide
 				} );
 
 				var rand = Math.random;
 
 				for ( var i = 0; i < leaves; i ++ ) {
 
-					var plane = new Mesh( planePiece, planeMat );
+					var plane = new THREE.Mesh( planePiece, planeMat );
 					plane.rotation.set( rand(), rand(), rand() );
 					plane.rotation.dx = rand() * 0.1;
 					plane.rotation.dy = rand() * 0.1;
@@ -157,12 +132,12 @@
 
 				// adding Monkeys
 
-				var loader2 = new BufferGeometryLoader();
+				var loader2 = new THREE.BufferGeometryLoader();
 				loader2.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					var material = new MeshPhongMaterial( {
+					var material = new THREE.MeshPhongMaterial( {
 						specular: 0xffffff,
 						envMap: textureCube,
 						shininess: 50,
@@ -174,7 +149,7 @@
 
 					for ( var i = 0; i < monkeys; i ++ ) {
 
-						var mesh = new Mesh( geometry, material );
+						var mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.z = Math.cos( i / monkeys * Math.PI * 2 ) * 200;
 						mesh.position.y = Math.sin( i / monkeys * Math.PI * 3 ) * 20;
@@ -192,17 +167,17 @@
 
 				// add balls
 
-				var geometry = new SphereBufferGeometry( 1, 20, 20 );
+				var geometry = new THREE.SphereBufferGeometry( 1, 20, 20 );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
-					var ballmaterial = new MeshPhongMaterial( {
+					var ballmaterial = new THREE.MeshPhongMaterial( {
 						color: 0xffffff * Math.random(),
 						shininess: 0.5,
 						specular: 0xffffff,
 						envMap: textureCube } );
 
-					var mesh = new Mesh( geometry, ballmaterial );
+					var mesh = new THREE.Mesh( geometry, ballmaterial );
 
 					mesh.position.x = ( Math.random() - 0.5 ) * 200;
 					mesh.position.y = Math.random() * 50;
@@ -214,13 +189,13 @@
 
 				// lights
 
-				scene.add( new AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 2 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 2, 1.2, 10 ).normalize();
 				scene.add( directionalLight );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 2, 1.2, - 10 ).normalize();
 				scene.add( directionalLight );
 
@@ -373,27 +348,27 @@
 
 			function initPostprocessing() {
 
-				postprocessing.scene = new Scene();
+				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
+				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				postprocessing.scene.add( postprocessing.camera );
 
-				var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat };
-				postprocessing.rtTextureDepth = new WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				postprocessing.rtTextureColor = new WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 
 				var bokeh_shader = BokehShader;
 
-				postprocessing.bokeh_uniforms = UniformsUtils.clone( bokeh_shader.uniforms );
+				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
 				postprocessing.bokeh_uniforms[ 'tColor' ].value = postprocessing.rtTextureColor.texture;
 				postprocessing.bokeh_uniforms[ 'tDepth' ].value = postprocessing.rtTextureDepth.texture;
 				postprocessing.bokeh_uniforms[ 'textureWidth' ].value = window.innerWidth;
 				postprocessing.bokeh_uniforms[ 'textureHeight' ].value = window.innerHeight;
 
-				postprocessing.materialBokeh = new ShaderMaterial( {
+				postprocessing.materialBokeh = new THREE.ShaderMaterial( {
 
 					uniforms: postprocessing.bokeh_uniforms,
 					vertexShader: bokeh_shader.vertexShader,
@@ -405,7 +380,7 @@
 
 				} );
 
-				postprocessing.quad = new Mesh( new PlaneBufferGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.add( postprocessing.quad );
 

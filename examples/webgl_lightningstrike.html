@@ -12,36 +12,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lightning strike</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				BufferGeometry,
-				Clock,
-				Color,
-				ConeBufferGeometry,
-				CubeReflectionMapping,
-				CubeTextureLoader,
-				CylinderBufferGeometry,
-				DirectionalLight,
-				DoubleSide,
-				Float32BufferAttribute,
-				Mesh,
-				MeshBasicMaterial,
-				MeshLambertMaterial,
-				MeshPhongMaterial,
-				MeshPhysicalMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				PointLight,
-				Raycaster,
-				RGBFormat,
-				Scene,
-				Sphere,
-				SphereBufferGeometry,
-				Vector2,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -67,10 +38,10 @@
 				createStormScene
 			];
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
-			var raycaster = new Raycaster();
-			var mouse = new Vector2();
+			var raycaster = new THREE.Raycaster();
+			var mouse = new THREE.Vector2();
 
 			init();
 			animate();
@@ -79,7 +50,7 @@
 
 				container = document.getElementById( 'container' );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -245,7 +216,7 @@
 
 			function createOutline( scene, objectsArray, visibleColor ) {
 
-				var outlinePass = new OutlinePass( new Vector2( window.innerWidth, window.innerHeight ), scene, scene.userData.camera, objectsArray );
+				var outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, scene.userData.camera, objectsArray );
 				outlinePass.edgeStrength = 2.5;
 				outlinePass.edgeGlow = 0.7;
 				outlinePass.edgeThickness = 2.8;
@@ -263,24 +234,24 @@
 
 			function createConesScene() {
 
-				var scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				var scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				scene.userData.canGoBackwardsInTime = true;
 
-				scene.userData.camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 200, 100000 );
+				scene.userData.camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 200, 100000 );
 
 				// Lights
 
-				scene.userData.lightningColor = new Color( 0xB0FFFF );
-				scene.userData.outlineColor = new Color( 0x00FFFF );
+				scene.userData.lightningColor = new THREE.Color( 0xB0FFFF );
+				scene.userData.outlineColor = new THREE.Color( 0x00FFFF );
 
-				var posLight = new PointLight( 0x00ffff, 1, 5000, 2 );
+				var posLight = new THREE.PointLight( 0x00ffff, 1, 5000, 2 );
 				scene.add( posLight );
 
 				// Ground
 
-				var ground = new Mesh( new PlaneBufferGeometry( 200000, 200000 ), new MeshPhongMaterial( { color: 0xC0C0C0, shininess: 0 } ) );
+				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200000, 200000 ), new THREE.MeshPhongMaterial( { color: 0xC0C0C0, shininess: 0 } ) );
 				ground.rotation.x = - Math.PI * 0.5;
 				scene.add( ground );
 
@@ -295,23 +266,23 @@
 
 				scene.userData.camera.position.set( 5 * coneHeight, 4 * coneHeight, 18 * coneHeight );
 
-				var coneMesh1 = new Mesh( new ConeBufferGeometry( coneHeight, coneHeight, 30, 1, false ), new MeshPhongMaterial( { color: 0xFFFF00, emissive: 0x1F1F00 } ) );
+				var coneMesh1 = new THREE.Mesh( new THREE.ConeBufferGeometry( coneHeight, coneHeight, 30, 1, false ), new THREE.MeshPhongMaterial( { color: 0xFFFF00, emissive: 0x1F1F00 } ) );
 				coneMesh1.rotation.x = Math.PI;
 				coneMesh1.position.y = conesDistance + coneHeight;
 				scene.add( coneMesh1 );
 
-				var coneMesh2 = new Mesh( coneMesh1.geometry.clone(), new MeshPhongMaterial( { color: 0xFF2020, emissive: 0x1F0202 } ) );
+				var coneMesh2 = new THREE.Mesh( coneMesh1.geometry.clone(), new THREE.MeshPhongMaterial( { color: 0xFF2020, emissive: 0x1F0202 } ) );
 				coneMesh2.position.y = coneHeightHalf;
 				scene.add( coneMesh2 );
 
 				// Lightning strike
 
-				scene.userData.lightningMaterial = new MeshBasicMaterial( { color: scene.userData.lightningColor } );
+				scene.userData.lightningMaterial = new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor } );
 
 				scene.userData.rayParams = {
 
-					sourceOffset: new Vector3(),
-					destOffset: new Vector3(),
+					sourceOffset: new THREE.Vector3(),
+					destOffset: new THREE.Vector3(),
 					radius0: 4,
 					radius1: 4,
 					minRadius: 2.5,
@@ -346,7 +317,7 @@
 					}
 
 					lightningStrike = new LightningStrike( scene.userData.rayParams );
-					lightningStrikeMesh = new Mesh( lightningStrike, scene.userData.lightningMaterial );
+					lightningStrikeMesh = new THREE.Mesh( lightningStrike, scene.userData.lightningMaterial );
 
 					outlineMeshArray.length = 0;
 					outlineMeshArray.push( lightningStrikeMesh );
@@ -407,48 +378,48 @@
 
 			function createPlasmaBallScene() {
 
-				var scene = new Scene();
+				var scene = new THREE.Scene();
 
 				scene.userData.canGoBackwardsInTime = true;
 
-				scene.userData.camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 100, 50000 );
+				scene.userData.camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 100, 50000 );
 
-				var ballScene = new Scene();
-				ballScene.background = new Color( 0x454545 );
+				var ballScene = new THREE.Scene();
+				ballScene.background = new THREE.Color( 0x454545 );
 
 				// Lights
 
-				var ambientLight = new AmbientLight( 0x444444 );
+				var ambientLight = new THREE.AmbientLight( 0x444444 );
 				ballScene.add( ambientLight );
 				scene.add( ambientLight );
 
-				var light1 = new DirectionalLight( 0xffffff, 0.5 );
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
 				ballScene.add( light1 );
 				scene.add( light1 );
 
-				var light2 = new DirectionalLight( 0xffffff, 1.5 );
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light2.position.set( - 0.5, 1, 0.2 );
 				ballScene.add( light2 );
 				scene.add( light2 );
 
 				// Plasma ball
 
-				scene.userData.lightningColor = new Color( 0xFFB0FF );
-				scene.userData.outlineColor = new Color( 0xFF00FF );
+				scene.userData.lightningColor = new THREE.Color( 0xFFB0FF );
+				scene.userData.outlineColor = new THREE.Color( 0xFF00FF );
 
-				scene.userData.lightningMaterial = new MeshBasicMaterial( { color: scene.userData.lightningColor, side: DoubleSide } );
+				scene.userData.lightningMaterial = new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor, side: THREE.DoubleSide } );
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				var textureCube = new CubeTextureLoader().load( urls );
-				textureCube.format = RGBFormat;
-				textureCube.mapping = CubeReflectionMapping;
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.format = THREE.RGBFormat;
+				textureCube.mapping = THREE.CubeReflectionMapping;
 
-				var sphereMaterial = new MeshPhysicalMaterial( {
+				var sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,
 					depthWrite: false,
 					opacity: 0.15,
@@ -464,37 +435,37 @@
 
 				scene.userData.camera.position.set( 5 * sphereRadius, 2 * sphereHeight, 6 * sphereRadius );
 
-				var sphereMesh = new Mesh( new SphereBufferGeometry( sphereRadius, 80, 40 ), sphereMaterial );
+				var sphereMesh = new THREE.Mesh( new THREE.SphereBufferGeometry( sphereRadius, 80, 40 ), sphereMaterial );
 				sphereMesh.position.set( 0, sphereHeight, 0 );
 				ballScene.add( sphereMesh );
 
-				var sphere = new Sphere( sphereMesh.position, sphereRadius );
+				var sphere = new THREE.Sphere( sphereMesh.position, sphereRadius );
 
-				var spherePlasma = new Mesh( new SphereBufferGeometry( sphereRadius * 0.05, 24, 12 ), scene.userData.lightningMaterial );
+				var spherePlasma = new THREE.Mesh( new THREE.SphereBufferGeometry( sphereRadius * 0.05, 24, 12 ), scene.userData.lightningMaterial );
 				spherePlasma.position.copy( sphereMesh.position );
 				spherePlasma.scale.y = 0.6;
 				scene.add( spherePlasma );
 
-				var post = new Mesh(
-					new CylinderBufferGeometry( sphereRadius * 0.06, sphereRadius * 0.06, sphereHeight, 6, 1, true ),
-					new MeshLambertMaterial( { color: 0x020202 } )
+				var post = new THREE.Mesh(
+					new THREE.CylinderBufferGeometry( sphereRadius * 0.06, sphereRadius * 0.06, sphereHeight, 6, 1, true ),
+					new THREE.MeshLambertMaterial( { color: 0x020202 } )
 				);
 				post.position.y = sphereHeight * 0.5 - sphereRadius * 0.05 * 1.2;
 				scene.add( post );
 
-				var box = new Mesh( new BoxBufferGeometry( sphereHeight * 0.5, sphereHeight * 0.1, sphereHeight * 0.5 ), post.material );
+				var box = new THREE.Mesh( new THREE.BoxBufferGeometry( sphereHeight * 0.5, sphereHeight * 0.1, sphereHeight * 0.5 ), post.material );
 				box.position.y = sphereHeight * 0.05 * 0.5;
 				scene.add( box );
 
-				var rayDirection = new Vector3();
+				var rayDirection = new THREE.Vector3();
 				var rayLength = 0;
-				var vec1 = new Vector3();
-				var vec2 = new Vector3();
+				var vec1 = new THREE.Vector3();
+				var vec2 = new THREE.Vector3();
 
 				scene.userData.rayParams = {
 
 					sourceOffset: sphereMesh.position,
-					destOffset: new Vector3( sphereRadius, 0, 0 ).add( sphereMesh.position ),
+					destOffset: new THREE.Vector3( sphereRadius, 0, 0 ).add( sphereMesh.position ),
 					radius0: 4,
 					radius1: 4,
 					radius0Factor: 0.82,
@@ -516,7 +487,7 @@
 
 						lightningStrike.subrayConePosition( segment, parentSubray, childSubray, 0.6, 0.9, 0.7 );
 
-						// Sphere projection
+						// THREE.Sphere projection
 
 						vec1.subVectors( childSubray.pos1, lightningStrike.rayParameters.sourceOffset );
 						vec2.set( 0, 0, 0 );
@@ -545,7 +516,7 @@
 					}
 
 					lightningStrike = new LightningStrike( scene.userData.rayParams );
-					lightningStrikeMesh = new Mesh( lightningStrike, scene.userData.lightningMaterial );
+					lightningStrikeMesh = new THREE.Mesh( lightningStrike, scene.userData.lightningMaterial );
 
 					outlineMeshArray.length = 0;
 					outlineMeshArray.push( lightningStrikeMesh );
@@ -592,7 +563,7 @@
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 
-				// Sphere mouse raycasting
+				// THREE.Sphere mouse raycasting
 
 				window.addEventListener( 'mousemove', onTouchMove );
 				window.addEventListener( 'touchmove', onTouchMove );
@@ -620,7 +591,7 @@
 
 				}
 
-				var intersection = new Vector3();
+				var intersection = new THREE.Vector3();
 
 				function checkIntersection() {
 
@@ -644,22 +615,22 @@
 
 			function createStormScene() {
 
-				var scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				var scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				scene.userData.canGoBackwardsInTime = false;
 
-				scene.userData.camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 20, 10000 );
+				scene.userData.camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 20, 10000 );
 
 				// Lights
 
-				scene.add( new AmbientLight( 0x444444 ) );
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				var light1 = new DirectionalLight( 0xffffff, 0.5 );
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
 				scene.add( light1 );
 
-				var posLight = new PointLight( 0x00ffff );
+				var posLight = new THREE.PointLight( 0x00ffff );
 				posLight.position.set( 0, 100, 0 );
 				scene.add( posLight );
 
@@ -669,21 +640,21 @@
 
 				scene.userData.camera.position.set( 0, 0.2, 1.6 ).multiplyScalar( GROUND_SIZE * 0.5 );
 
-				var ground = new Mesh( new PlaneBufferGeometry( GROUND_SIZE, GROUND_SIZE ), new MeshLambertMaterial( { color: 0x072302 } ) );
+				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( GROUND_SIZE, GROUND_SIZE ), new THREE.MeshLambertMaterial( { color: 0x072302 } ) );
 				ground.rotation.x = - Math.PI * 0.5;
 				scene.add( ground );
 
 				// Storm
 
-				scene.userData.lightningColor = new Color( 0xB0FFFF );
-				scene.userData.outlineColor = new Color( 0x00FFFF );
+				scene.userData.lightningColor = new THREE.Color( 0xB0FFFF );
+				scene.userData.outlineColor = new THREE.Color( 0x00FFFF );
 
-				scene.userData.lightningMaterial = new MeshBasicMaterial( { color: scene.userData.lightningColor } );
+				scene.userData.lightningMaterial = new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor } );
 
-				var rayDirection = new Vector3( 0, - 1, 0 );
+				var rayDirection = new THREE.Vector3( 0, - 1, 0 );
 				var rayLength = 0;
-				var vec1 = new Vector3();
-				var vec2 = new Vector3();
+				var vec1 = new THREE.Vector3();
+				var vec2 = new THREE.Vector3();
 
 				scene.userData.rayParams = {
 
@@ -727,8 +698,8 @@
 
 				// Black star mark
 				var starVertices = [];
-				var prevPoint = new Vector3( 0, 0, 1 );
-				var currPoint = new Vector3();
+				var prevPoint = new THREE.Vector3( 0, 0, 1 );
+				var currPoint = new THREE.Vector3();
 				for ( var i = 1; i <= 16; i ++ ) {
 
 					currPoint.set( Math.sin( 2 * Math.PI * i / 16 ), 0, Math.cos( 2 * Math.PI * i / 16 ) );
@@ -747,9 +718,9 @@
 
 				}
 
-				var starGeometry = new BufferGeometry();
-				starGeometry.addAttribute( 'position', new Float32BufferAttribute( starVertices, 3 ) );
-				var starMesh = new Mesh( starGeometry, new MeshBasicMaterial( { color: 0x020900 } ) );
+				var starGeometry = new THREE.BufferGeometry();
+				starGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( starVertices, 3 ) );
+				var starMesh = new THREE.Mesh( starGeometry, new THREE.MeshBasicMaterial( { color: 0x020900 } ) );
 				starMesh.scale.multiplyScalar( 6 );
 
 				//

@@ -12,16 +12,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				DirectionalLight,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -38,22 +29,22 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( 0, 50, 250 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
 				var loader = new TGALoader();
-				var geometry = new BoxBufferGeometry( 50, 50, 50 );
+				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
 
 				// add box 1 - grey8 texture
 
 				var texture1 = loader.load( 'textures/crate_grey8.tga' );
-				var material1 = new MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
+				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
-				var mesh1 = new Mesh( geometry, material1 );
+				var mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.position.x = - 50;
 
 				scene.add( mesh1 );
@@ -61,25 +52,25 @@
 				// add box 2 - tga texture
 
 				var texture2 = loader.load( 'textures/crate_color8.tga' );
-				var material2 = new MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
+				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
-				var mesh2 = new Mesh( geometry, material2 );
+				var mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.position.x = 50;
 
 				scene.add( mesh2 );
 
 				//
 
-				var ambientLight = new AmbientLight( 0xffffff, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
 				scene.add( ambientLight );
 
-				var light = new DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

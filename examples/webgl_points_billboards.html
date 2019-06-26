@@ -13,17 +13,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Float32BufferAttribute,
-				FogExp2,
-				PerspectiveCamera,
-				Points,
-				PointsMaterial,
-				Scene,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -40,16 +30,16 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
+				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
 				camera.position.z = 1000;
 
-				scene = new Scene();
-				scene.fog = new FogExp2( 0x000000, 0.001 );
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
 
-				var geometry = new BufferGeometry();
+				var geometry = new THREE.BufferGeometry();
 				var vertices = [];
 
-				var sprite = new TextureLoader().load( 'textures/sprites/disc.png' );
+				var sprite = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
@@ -61,17 +51,17 @@
 
 				}
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-				material = new PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
+				material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: false, map: sprite, alphaTest: 0.5, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7 );
 
-				var particles = new Points( geometry, material );
+				var particles = new THREE.Points( geometry, material );
 				scene.add( particles );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

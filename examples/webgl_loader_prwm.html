@@ -29,15 +29,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				DirectionalLight,
-				PerspectiveCamera,
-				Mesh,
-				MeshPhongMaterial,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { PRWMLoader } from './jsm/loaders/PRWMLoader.js';
 
@@ -61,24 +53,24 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 250;
 
 				// scene
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var ambient = new AmbientLight( 0x101030 );
+				var ambient = new THREE.AmbientLight( 0x101030 );
 				scene.add( ambient );
 
-				var directionalLight = new DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 1 );
 				scene.add( directionalLight );
 
 				// model
 
 				var loader = new PRWMLoader();
-				var material = new MeshPhongMaterial( {} );
+				var material = new THREE.MeshPhongMaterial( {} );
 				var busy = false;
 				var mesh = null;
 
@@ -124,7 +116,7 @@
 
 					loader.load( url, function ( geometry ) {
 
-						mesh = new Mesh( geometry, material );
+						mesh = new THREE.Mesh( geometry, material );
 						mesh.scale.set( 50, 50, 50 );
 						scene.add( mesh );
 
@@ -139,7 +131,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

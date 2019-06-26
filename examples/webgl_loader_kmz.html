@@ -15,14 +15,7 @@
 		<script src="js/libs/jszip.min.js"></script>
 
 		<script type="module">
-			import {
-				Color,
-				DirectionalLight,
-				GridHelper,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { KMZLoader } from './jsm/loaders/KMZLoader.js';
@@ -33,25 +26,25 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x999999 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x999999 );
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1.0, 0.5 ).normalize();
 
 				scene.add( light );
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				camera.position.y = 5;
 				camera.position.z = 10;
 
 				scene.add( camera );
 
-				var grid = new GridHelper( 50, 50, 0xffffff, 0x555555 );
+				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
 				scene.add( grid );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

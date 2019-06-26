@@ -12,21 +12,7 @@
 		<script src="js/vr/WebVR.js"></script>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				CubeTextureLoader,
-				DirectionalLight,
-				Mesh,
-				MeshPhongMaterial,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RGBFormat,
-				Scene,
-				TextureLoader,
-				TorusKnotBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
 			import { Reflector } from './jsm/objects/Reflector.js';
@@ -40,35 +26,35 @@
 
 			function init() {
 
-				var background = new CubeTextureLoader()
+				var background = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/MilkyWay/' )
 					.load( [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ] );
-				background.format = RGBFormat;
+				background.format = THREE.RGBFormat;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 				scene.background = background;
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 
-				var geometry = new TorusKnotBufferGeometry( 0.4, 0.15, 150, 20 );
-				var material = new MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
-				var mesh = new Mesh( geometry, material );
+				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.15, 150, 20 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 0.01, metalness: 0.2, envMap: background } );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = 0.75;
 				mesh.position.z = - 2;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var geometry = new BoxBufferGeometry( 1.5, 0.1, 1.5 );
-				var material = new MeshPhongMaterial();
-				var mesh = new Mesh( geometry, material );
+				var geometry = new THREE.BoxBufferGeometry( 1.5, 0.1, 1.5 );
+				var material = new THREE.MeshPhongMaterial();
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 0.2;
 				mesh.position.z = - 2;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var light = new DirectionalLight( 0x8800ff );
+				var light = new THREE.DirectionalLight( 0x8800ff );
 				light.position.set( - 1, 1.5, - 1.5 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4;
@@ -79,7 +65,7 @@
 				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
-				var light = new DirectionalLight( 0xff0000 );
+				var light = new THREE.DirectionalLight( 0xff0000 );
 				light.position.set( 1, 1.5, - 2.5 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4;
@@ -91,7 +77,7 @@
 				// scene.add( helper );
 
 				// lensflare
-				var loader = new TextureLoader();
+				var loader = new THREE.TextureLoader();
 				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
@@ -106,7 +92,7 @@
 
 				//
 
-				var geometry = new PlaneBufferGeometry( 1.4, 1.4 );
+				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
 				reflector = new Reflector( geometry, {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
@@ -117,9 +103,9 @@
 				reflector.rotation.y = - Math.PI / 4;
 				scene.add( reflector );
 
-				var geometry = new BoxBufferGeometry( 1.5, 1.5, 0.1 );
-				var material = new MeshPhongMaterial();
-				var mesh = new Mesh( geometry, material );
+				var geometry = new THREE.BoxBufferGeometry( 1.5, 1.5, 0.1 );
+				var material = new THREE.MeshPhongMaterial();
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.z = - 0.07;
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
@@ -127,7 +113,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

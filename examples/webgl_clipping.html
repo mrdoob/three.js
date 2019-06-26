@@ -9,21 +9,7 @@
 	<body>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				DirectionalLight,
-				DoubleSide,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Plane,
-				PlaneBufferGeometry,
-				Scene,
-				SpotLight,
-				TorusKnotBufferGeometry,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -37,17 +23,17 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 0.25, 16 );
+				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 0.25, 16 );
 
 				camera.position.set( 0, 1.3, 3 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// Lights
 
-				scene.add( new AmbientLight( 0x505050 ) );
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				var spotLight = new SpotLight( 0xffffff );
+				var spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -58,7 +44,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				var dirLight = new DirectionalLight( 0x55505a, 1 );
+				var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
 				dirLight.position.set( 0, 3, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -75,15 +61,15 @@
 
 				// ***** Clipping planes: *****
 
-				var localPlane = new Plane( new Vector3( 0, - 1, 0 ), 0.8 );
-				var globalPlane = new Plane( new Vector3( - 1, 0, 0 ), 0.1 );
+				var localPlane = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
+				var globalPlane = new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0.1 );
 
 				// Geometry
 
-				var material = new MeshPhongMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0x80ee10,
 					shininess: 100,
-					side: DoubleSide,
+					side: THREE.DoubleSide,
 
 					// ***** Clipping setup (material): *****
 					clippingPlanes: [ localPlane ],
@@ -91,15 +77,15 @@
 
 				} );
 
-				var geometry = new TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
+				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
 
-				object = new Mesh( geometry, material );
+				object = new THREE.Mesh( geometry, material );
 				object.castShadow = true;
 				scene.add( object );
 
-				var ground = new Mesh(
-					new PlaneBufferGeometry( 9, 9, 1, 1 ),
-					new MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
+					new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
 				);
 
 				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
@@ -113,7 +99,7 @@
 
 				// Renderer
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

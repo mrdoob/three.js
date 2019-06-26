@@ -20,22 +20,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				CameraHelper,
-				Float32BufferAttribute,
-				Group,
-				Math as _Math,
-				Mesh,
-				MeshBasicMaterial,
-				OrthographicCamera,
-				PerspectiveCamera,
-				Points,
-				PointsMaterial,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -58,22 +43,22 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
-				camera = new PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
 				camera.position.z = 2500;
 
-				cameraPerspective = new PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
 
-				cameraPerspectiveHelper = new CameraHelper( cameraPerspective );
+				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
 				scene.add( cameraPerspectiveHelper );
 
 				//
-				cameraOrtho = new OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
+				cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
 
-				cameraOrthoHelper = new CameraHelper( cameraOrtho );
+				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
 				scene.add( cameraOrthoHelper );
 
 				//
@@ -87,7 +72,7 @@
 				cameraOrtho.rotation.y = Math.PI;
 				cameraPerspective.rotation.y = Math.PI;
 
-				cameraRig = new Group();
+				cameraRig = new THREE.Group();
 
 				cameraRig.add( cameraPerspective );
 				cameraRig.add( cameraOrtho );
@@ -96,47 +81,47 @@
 
 				//
 
-				mesh = new Mesh(
-					new SphereBufferGeometry( 100, 16, 8 ),
-					new MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
+				mesh = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 100, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
 				);
 				scene.add( mesh );
 
-				var mesh2 = new Mesh(
-					new SphereBufferGeometry( 50, 16, 8 ),
-					new MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
+				var mesh2 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 50, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
 				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
-				var mesh3 = new Mesh(
-					new SphereBufferGeometry( 5, 16, 8 ),
-					new MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
+				var mesh3 = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 5, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
 				);
 				mesh3.position.z = 150;
 				cameraRig.add( mesh3 );
 
 				//
 
-				var geometry = new BufferGeometry();
+				var geometry = new THREE.BufferGeometry();
 				var vertices = [];
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					vertices.push( _Math.randFloatSpread( 2000 ) ); // x
-					vertices.push( _Math.randFloatSpread( 2000 ) ); // y
-					vertices.push( _Math.randFloatSpread( 2000 ) ); // z
+					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // x
+					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // y
+					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // z
 
 				}
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-				var particles = new Points( geometry, new PointsMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );

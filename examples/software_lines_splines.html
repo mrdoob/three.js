@@ -14,18 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				CatmullRomCurve3,
-				Color,
-				Float32BufferAttribute,
-				Line,
-				LineBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				VertexColors
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 			import { SoftwareRenderer } from './jsm/renderers/SoftwareRenderer.js';
@@ -45,10 +34,10 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				renderer = new SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -57,11 +46,11 @@
 
 				//
 
-				var hilbertPoints = GeometryUtils.hilbert3D( new Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var hilbertPoints = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
-				var geometry1 = new BufferGeometry();
-				var geometry2 = new BufferGeometry();
-				var geometry3 = new BufferGeometry();
+				var geometry1 = new THREE.BufferGeometry();
+				var geometry2 = new THREE.BufferGeometry();
+				var geometry3 = new THREE.BufferGeometry();
 
 				var subdivisions = 6;
 
@@ -70,10 +59,10 @@
 				var colors2 = [];
 				var colors3 = [];
 
-				var point = new Vector3();
-				var color = new Color();
+				var point = new THREE.Vector3();
+				var color = new THREE.Color();
 
-				var spline = new CatmullRomCurve3( hilbertPoints );
+				var spline = new THREE.CatmullRomCurve3( hilbertPoints );
 
 				for ( var i = 0; i < hilbertPoints.length * subdivisions; i ++ ) {
 
@@ -93,17 +82,17 @@
 
 				}
 
-				geometry1.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-				geometry2.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-				geometry3.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				geometry1.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry2.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry3.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-				geometry1.addAttribute( 'color', new Float32BufferAttribute( colors1, 3 ) );
-				geometry2.addAttribute( 'color', new Float32BufferAttribute( colors2, 3 ) );
-				geometry3.addAttribute( 'color', new Float32BufferAttribute( colors3, 3 ) );
+				geometry1.addAttribute( 'color', new THREE.Float32BufferAttribute( colors1, 3 ) );
+				geometry2.addAttribute( 'color', new THREE.Float32BufferAttribute( colors2, 3 ) );
+				geometry3.addAttribute( 'color', new THREE.Float32BufferAttribute( colors3, 3 ) );
 
 				// lines
 
-				var material = new LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: VertexColors } );
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
 				var line, p, scale = 0.3, d = 225;
 				var parameters = [
@@ -115,7 +104,7 @@
 				for ( var i = 0; i < parameters.length; ++ i ) {
 
 					p = parameters[ i ];
-					line = new Line( p[ 3 ], p[ 0 ] );
+					line = new THREE.Line( p[ 3 ], p[ 0 ] );
 					line.scale.x = line.scale.y = line.scale.z = p[ 1 ];
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
@@ -197,7 +186,7 @@
 
 					var object = scene.children[ i ];
 
-					if ( object instanceof Line ) {
+					if ( object instanceof THREE.Line ) {
 
 						object.rotation.y = time * ( i % 2 ? 1 : - 1 );
 

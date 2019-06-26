@@ -58,23 +58,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				BoxGeometry,
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				Euler,
-				Matrix4,
-				PerspectiveCamera,
-				Points,
-				Quaternion,
-				RepeatWrapping,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -92,17 +76,17 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 1000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var radius = 100, inner = 0.6 * radius;
 				var vertices = [];
 
 				for ( var i = 0; i < 100000; i ++ ) {
 
-					var vertex = new Vector3();
+					var vertex = new THREE.Vector3();
 					vertex.x = Math.random() * 2 - 1;
 					vertex.y = Math.random() * 2 - 1;
 					vertex.z = Math.random() * 2 - 1;
@@ -119,13 +103,13 @@
 				vertices1 = vertices.length;
 
 				radius = 200;
-				var geometry2 = new BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
+				var geometry2 = new THREE.BoxGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
 
-				var matrix = new Matrix4();
-				var position = new Vector3();
-				var rotation = new Euler();
-				var quaternion = new Quaternion();
-				var scale = new Vector3( 1, 1, 1 );
+				var matrix = new THREE.Matrix4();
+				var position = new THREE.Vector3();
+				var rotation = new THREE.Euler();
+				var quaternion = new THREE.Quaternion();
+				var scale = new THREE.Vector3( 1, 1, 1 );
 
 				function addGeo( geo, x, y, z, ry ) {
 
@@ -159,7 +143,7 @@
 
 				// corner edges
 
-				var geometry3 = new BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
+				var geometry3 = new THREE.BoxGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
 
 				addGeo( geometry3, 110, 0, 110, 0 );
 				addGeo( geometry3, 110, 0, - 110, 0 );
@@ -171,7 +155,7 @@
 				var sizes = new Float32Array( vertices.length );
 
 				var vertex;
-				var color = new Color();
+				var color = new THREE.Color();
 
 				for ( var i = 0; i < vertices.length; i ++ ) {
 
@@ -194,22 +178,22 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'ca', new BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new BufferAttribute( sizes, 1 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'ca', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var texture = new TextureLoader().load( "textures/sprites/ball.png" );
-				texture.wrapS = RepeatWrapping;
-				texture.wrapT = RepeatWrapping;
+				var texture = new THREE.TextureLoader().load( "textures/sprites/ball.png" );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						amplitude: { value: 1.0 },
-						color: { value: new Color( 0xffffff ) },
+						color: { value: new THREE.Color( 0xffffff ) },
 						pointTexture: { value: texture }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -219,12 +203,12 @@
 
 				//
 
-				object = new Points( geometry, material );
+				object = new THREE.Points( geometry, material );
 				scene.add( object );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 

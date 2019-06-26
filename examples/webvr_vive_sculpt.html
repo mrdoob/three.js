@@ -16,23 +16,7 @@
 		<script src="js/vr/WebVR.js"></script>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Color,
-				DirectionalLight,
-				GridHelper,
-				HemisphereLight,
-				IcosahedronBufferGeometry,
-				Mesh,
-				MeshBasicMaterial,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				TextureLoader,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
@@ -55,40 +39,40 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new Scene();
-				scene.background = new Color( 0x222222 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 
-				var geometry = new BoxBufferGeometry( 0.5, 0.8, 0.5 );
-				var material = new MeshStandardMaterial( {
+				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
+				var material = new THREE.MeshStandardMaterial( {
 					color: 0x444444,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var table = new Mesh( geometry, material );
+				var table = new THREE.Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
 				table.castShadow = true;
 				table.receiveShadow = true;
 				scene.add( table );
 
-				var geometry = new PlaneBufferGeometry( 4, 4 );
-				var material = new MeshStandardMaterial( {
+				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				var material = new THREE.MeshStandardMaterial( {
 					color: 0x222222,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var floor = new Mesh( geometry, material );
+				var floor = new THREE.Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new GridHelper( 20, 40, 0x111111, 0x111111 ) );
+				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
 
-				scene.add( new HemisphereLight( 0x888877, 0x777788 ) );
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -104,7 +88,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
@@ -129,7 +113,7 @@
 				loader.setPath( 'models/obj/vive-controller/' );
 				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 
-					var loader = new TextureLoader();
+					var loader = new THREE.TextureLoader();
 					loader.setPath( 'models/obj/vive-controller/' );
 
 					var controller = object.children[ 0 ];
@@ -138,15 +122,15 @@
 					controller.castShadow = true;
 					controller.receiveShadow = true;
 
-					// var pivot = new Mesh( new BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new Mesh( new IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
+					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
+					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
 					pivot.name = 'pivot';
 					pivot.position.y = - 0.016;
 					pivot.position.z = - 0.043;
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
-					var range = new Mesh( new IcosahedronBufferGeometry( 0.03, 3 ), new MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
+					var range = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
 					pivot.add( range );
 
 					controller1.add( controller.clone() );
@@ -174,7 +158,7 @@
 				var reflectionCube = new CubeTextureLoader().load( urls );
 				*/
 
-				var material = new MeshStandardMaterial( {
+				var material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					// envMap: reflectionCube,
 					roughness: 0.9,
@@ -192,8 +176,8 @@
 			function initPoints() {
 
 				points = [
-					{ position: new Vector3(), strength: - 0.08, subtract: 10 },
-					{ position: new Vector3(), strength: 0.04, subtract: 10 }
+					{ position: new THREE.Vector3(), strength: - 0.08, subtract: 10 },
+					{ position: new THREE.Vector3(), strength: 0.04, subtract: 10 }
 				];
 
 			}
@@ -246,7 +230,7 @@
 
 						var strength = points[ id ].strength / 2;
 
-						var vector = new Vector3().setFromMatrixPosition( matrix );
+						var vector = new THREE.Vector3().setFromMatrixPosition( matrix );
 
 						transformPoint( vector );
 
@@ -264,7 +248,7 @@
 							updateBlob();
 
 							var geometry = blob.generateBufferGeometry();
-							var mesh = new Mesh( geometry, blob.material.clone() );
+							var mesh = new THREE.Mesh( geometry, blob.material.clone() );
 							mesh.position.y = 1;
 							mesh.castShadow = true;
 							mesh.receiveShadow = true;

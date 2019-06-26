@@ -20,24 +20,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AdditiveBlending,
-				BoxBufferGeometry,
-				BoxHelper,
-				BufferAttribute,
-				BufferGeometry,
-				Group,
-				LineBasicMaterial,
-				LineSegments,
-				Mesh,
-				PerspectiveCamera,
-				Points,
-				PointsMaterial,
-				Scene,
-				Vector3,
-				VertexColors,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -103,20 +86,20 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 1750;
 
 				var controls = new OrbitControls( camera, container );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 
-				group = new Group();
+				group = new THREE.Group();
 				scene.add( group );
 
-				var helper = new BoxHelper( new Mesh( new BoxBufferGeometry( r, r, r ) ) );
+				var helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxBufferGeometry( r, r, r ) ) );
 				helper.material.color.setHex( 0x101010 );
-				helper.material.blending = AdditiveBlending;
+				helper.material.blending = THREE.AdditiveBlending;
 				helper.material.transparent = true;
 				group.add( helper );
 
@@ -125,15 +108,15 @@
 				positions = new Float32Array( segments * 3 );
 				colors = new Float32Array( segments * 3 );
 
-				var pMaterial = new PointsMaterial( {
+				var pMaterial = new THREE.PointsMaterial( {
 					color: 0xFFFFFF,
 					size: 3,
-					blending: AdditiveBlending,
+					blending: THREE.AdditiveBlending,
 					transparent: true,
 					sizeAttenuation: false
 				} );
 
-				particles = new BufferGeometry();
+				particles = new THREE.BufferGeometry();
 				particlePositions = new Float32Array( maxParticleCount * 3 );
 
 				for ( var i = 0; i < maxParticleCount; i ++ ) {
@@ -148,40 +131,40 @@
 
 					// add it to the geometry
 					particlesData.push( {
-						velocity: new Vector3( - 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2 ),
+						velocity: new THREE.Vector3( - 1 + Math.random() * 2, - 1 + Math.random() * 2, - 1 + Math.random() * 2 ),
 						numConnections: 0
 					} );
 
 				}
 
 				particles.setDrawRange( 0, particleCount );
-				particles.addAttribute( 'position', new BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
+				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
 
 				// create the particle system
-				pointCloud = new Points( particles, pMaterial );
+				pointCloud = new THREE.Points( particles, pMaterial );
 				group.add( pointCloud );
 
-				var geometry = new BufferGeometry();
+				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ).setDynamic( true ) );
-				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
 
 				geometry.computeBoundingSphere();
 
 				geometry.setDrawRange( 0, 0 );
 
-				var material = new LineBasicMaterial( {
-					vertexColors: VertexColors,
-					blending: AdditiveBlending,
+				var material = new THREE.LineBasicMaterial( {
+					vertexColors: THREE.VertexColors,
+					blending: THREE.AdditiveBlending,
 					transparent: true
 				} );
 
-				linesMesh = new LineSegments( geometry, material );
+				linesMesh = new THREE.LineSegments( geometry, material );
 				group.add( linesMesh );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

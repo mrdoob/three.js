@@ -15,15 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				DirectionalLight,
-				DoubleSide,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -39,22 +31,22 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 0.2;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				scene.add( camera );
 
 				// light
 
-				var dirLight = new DirectionalLight( 0xffffff );
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( 200, 200, 1000 ).normalize();
 
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var material = new MeshLambertMaterial( { color: 0xffffff, side: DoubleSide } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
 
 				var loader = new VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
@@ -62,7 +54,7 @@
 					geometry.center();
 					geometry.computeVertexNormals();
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( - 0.075, 0.005, 0 );
 					mesh.scale.multiplyScalar( 0.2 );
 					scene.add( mesh );
@@ -75,8 +67,8 @@
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new MeshLambertMaterial( { color: 0x00ff00, side: DoubleSide } );
-					var mesh = new Mesh( geometry, material );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( - 0.025, 0, 0 );
 					mesh.scale.multiplyScalar( 0.01 );
@@ -92,8 +84,8 @@
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new MeshLambertMaterial( { color: 0x0000ff, side: DoubleSide } );
-					var mesh = new Mesh( geometry, material );
+					var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, side: THREE.DoubleSide } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.025, 0, 0 );
 					mesh.scale.multiplyScalar( 0.01 );
@@ -109,8 +101,8 @@
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new MeshLambertMaterial( { color: 0xff0000, side: DoubleSide } );
-					var mesh = new Mesh( geometry, material );
+					var material = new THREE.MeshLambertMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.075, 0, 0 );
 					mesh.scale.multiplyScalar( 0.01 );
@@ -122,7 +114,7 @@
 
 				// renderer
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

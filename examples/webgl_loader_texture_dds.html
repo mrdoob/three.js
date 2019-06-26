@@ -14,19 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AdditiveBlending,
-				BoxBufferGeometry,
-				CubeReflectionMapping,
-				DoubleSide,
-				LinearFilter,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				TorusBufferGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 
@@ -38,12 +26,12 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 1000;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var geometry = new BoxBufferGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 
 				/*
 				This is how compressed textures are supposed to be used:
@@ -56,7 +44,7 @@
 				var loader = new DDSLoader();
 
 				var map1 = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
-				map1.minFilter = map1.magFilter = LinearFilter;
+				map1.minFilter = map1.magFilter = THREE.LinearFilter;
 				map1.anisotropy = 4;
 
 				var map2 = loader.load( 'textures/compressed/disturb_dxt1_mip.dds' );
@@ -69,7 +57,7 @@
 				map4.anisotropy = 4;
 
 				var map5 = loader.load( 'textures/compressed/disturb_argb_nomip.dds' );
-				map5.minFilter = map5.magFilter = LinearFilter;
+				map5.minFilter = map5.magFilter = THREE.LinearFilter;
 				map5.anisotropy = 4;
 
 				var map6 = loader.load( 'textures/compressed/disturb_argb_mip.dds' );
@@ -77,90 +65,90 @@
 
 				var cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
 
-					texture.magFilter = LinearFilter;
-					texture.minFilter = LinearFilter;
-					texture.mapping = CubeReflectionMapping;
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
 					material1.needsUpdate = true;
 
 				} );
 
 				var cubemap2 = loader.load( 'textures/compressed/Mountains_argb_mip.dds', function ( texture ) {
 
-					texture.magFilter = LinearFilter;
-					texture.minFilter = LinearFilter;
-					texture.mapping = CubeReflectionMapping;
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
 					material5.needsUpdate = true;
 
 				} );
 
 				var cubemap3 = loader.load( 'textures/compressed/Mountains_argb_nomip.dds', function ( texture ) {
 
-					texture.magFilter = LinearFilter;
-					texture.minFilter = LinearFilter;
-					texture.mapping = CubeReflectionMapping;
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
 					material6.needsUpdate = true;
 
 				} );
 
-				var material1 = new MeshBasicMaterial( { map: map1, envMap: cubemap1 } );
-				var material2 = new MeshBasicMaterial( { map: map2 } );
-				var material3 = new MeshBasicMaterial( { map: map3, alphaTest: 0.5, side: DoubleSide } );
-				var material4 = new MeshBasicMaterial( { map: map4, side: DoubleSide, blending: AdditiveBlending, depthTest: false, transparent: true } );
-				var material5 = new MeshBasicMaterial( { envMap: cubemap2 } );
-				var material6 = new MeshBasicMaterial( { envMap: cubemap3 } );
-				var material7 = new MeshBasicMaterial( { map: map5 } );
-				var material8 = new MeshBasicMaterial( { map: map6 } );
+				var material1 = new THREE.MeshBasicMaterial( { map: map1, envMap: cubemap1 } );
+				var material2 = new THREE.MeshBasicMaterial( { map: map2 } );
+				var material3 = new THREE.MeshBasicMaterial( { map: map3, alphaTest: 0.5, side: THREE.DoubleSide } );
+				var material4 = new THREE.MeshBasicMaterial( { map: map4, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
+				var material5 = new THREE.MeshBasicMaterial( { envMap: cubemap2 } );
+				var material6 = new THREE.MeshBasicMaterial( { envMap: cubemap3 } );
+				var material7 = new THREE.MeshBasicMaterial( { map: map5 } );
+				var material8 = new THREE.MeshBasicMaterial( { map: map6 } );
 
 
-				var mesh = new Mesh( new TorusBufferGeometry( 100, 50, 32, 16 ), material1 );
+				var mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( 100, 50, 32, 16 ), material1 );
 				mesh.position.x = - 600;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material2 );
+				mesh = new THREE.Mesh( geometry, material2 );
 				mesh.position.x = - 200;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material3 );
+				mesh = new THREE.Mesh( geometry, material3 );
 				mesh.position.x = - 200;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material4 );
+				mesh = new THREE.Mesh( geometry, material4 );
 				mesh.position.x = - 600;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material5 );
+				mesh = new THREE.Mesh( geometry, material5 );
 				mesh.position.x = 200;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material6 );
+				mesh = new THREE.Mesh( geometry, material6 );
 				mesh.position.x = 200;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material7 );
+				mesh = new THREE.Mesh( geometry, material7 );
 				mesh.position.x = 600;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material8 );
+				mesh = new THREE.Mesh( geometry, material8 );
 				mesh.position.x = 600;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

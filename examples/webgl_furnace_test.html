@@ -23,18 +23,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				CubeCamera,
-				DoubleSide,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhysicalMaterial,
-				OrthographicCamera,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
@@ -50,7 +39,7 @@
 
 				// renderer
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( width, height );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
@@ -59,22 +48,22 @@
 
 				// scene
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// camera
 
-				camera = new OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
+				camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
 				camera.position.set( 0, 0, 9 );
 
 			}
 
 			function createObjects() {
 
-				var geo = new SphereBufferGeometry( 0.4, 32, 32 );
+				var geo = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
 				var count = 10;
 				for ( var x = 0; x <= count; x ++ ) {
 
-					var mesh = new Mesh( geo, new MeshPhysicalMaterial( {
+					var mesh = new THREE.Mesh( geo, new THREE.MeshPhysicalMaterial( {
 						roughness: x / count,
 						metalness: 1,
 						color: 0xffffff,
@@ -91,17 +80,17 @@
 
 			function createEnvironment() {
 
-				var color = new Color( 0xcccccc );
-				var sky = new Mesh( new SphereBufferGeometry( 1, 32, 32 ), new MeshBasicMaterial( {
+				var color = new THREE.Color( 0xcccccc );
+				var sky = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), new THREE.MeshBasicMaterial( {
 					color: color,
-					side: DoubleSide,
+					side: THREE.DoubleSide,
 				} ) );
 				sky.scale.setScalar( 100 );
 
-				var envScene = new Scene();
+				var envScene = new THREE.Scene();
 				envScene.add( sky );
 				envScene.background = color;
-				var cubeCamera = new CubeCamera( 1, 100, 256, 256 );
+				var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
 				cubeCamera.update( renderer, envScene );
 
 				envMap = cubeCamera.renderTarget.texture;

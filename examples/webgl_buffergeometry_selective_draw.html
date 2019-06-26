@@ -47,17 +47,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				LineSegments,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -72,17 +62,17 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.z = 3.5;
 
-				scene.add( new AmbientLight( 0x444444 ) );
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -101,7 +91,7 @@
 
 			function addLines( radius ) {
 
-				geometry = new BufferGeometry();
+				geometry = new THREE.BufferGeometry();
 				var linePositions = new Float32Array( numLat * numLng * 3 * 2 );
 				var lineColors = new Float32Array( numLat * numLng * 3 * 2 );
 				var visible = new Float32Array( numLat * numLng * 2 );
@@ -122,7 +112,7 @@
 						linePositions[ index * 6 + 4 ] = radius * Math.cos( lat );
 						linePositions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
 
-						var color = new Color( 0xffffff );
+						var color = new THREE.Color( 0xffffff );
 
 						color.setHSL( lat / Math.PI, 1.0, 0.2 );
 						lineColors[ index * 6 + 0 ] = color.r;
@@ -142,19 +132,19 @@
 
 				}
 
-				geometry.addAttribute( 'position', new BufferAttribute( linePositions, 3 ) );
-				geometry.addAttribute( 'vertColor', new BufferAttribute( lineColors, 3 ) );
-				geometry.addAttribute( 'visible', new BufferAttribute( visible, 1 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+				geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
+				geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
 
 				geometry.computeBoundingSphere();
 
-				var shaderMaterial = new ShaderMaterial( {
+				var shaderMaterial = new THREE.ShaderMaterial( {
 
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 				} );
 
-				mesh = new LineSegments( geometry, shaderMaterial );
+				mesh = new THREE.LineSegments( geometry, shaderMaterial );
 				scene.add( mesh );
 
 				updateCount();

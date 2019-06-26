@@ -49,19 +49,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				AdditiveBlending,
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				PerspectiveCamera,
-				Points,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -77,10 +65,10 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
 				camera.position.z = 300;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var amount = 100000;
 				var radius = 200;
@@ -89,8 +77,8 @@
 				var colors = new Float32Array( amount * 3 );
 				var sizes = new Float32Array( amount );
 
-				var vertex = new Vector3();
-				var color = new Color( 0xffffff );
+				var vertex = new THREE.Vector3();
+				var color = new THREE.Color( 0xffffff );
 
 				for ( var i = 0; i < amount; i ++ ) {
 
@@ -115,23 +103,23 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'customColor', new BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new BufferAttribute( sizes, 1 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color: { value: new Color( 0xffffff ) },
-						pointTexture: { value: new TextureLoader().load( "textures/sprites/spark1.png" ) }
+						color: { value: new THREE.Color( 0xffffff ) },
+						pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/spark1.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-					blending: AdditiveBlending,
+					blending: THREE.AdditiveBlending,
 					depthTest: false,
 					transparent: true
 
@@ -139,12 +127,12 @@
 
 				//
 
-				sphere = new Points( geometry, material );
+				sphere = new THREE.Points( geometry, material );
 				scene.add( sphere );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 

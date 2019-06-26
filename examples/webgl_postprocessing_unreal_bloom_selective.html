@@ -48,21 +48,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				IcosahedronBufferGeometry,
-				Layers,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Raycaster,
-				ReinhardToneMapping,
-				Scene,
-				ShaderMaterial,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -77,7 +63,7 @@
 
 			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
-			var bloomLayer = new Layers();
+			var bloomLayer = new THREE.Layers();
 			bloomLayer.set( BLOOM_SCENE );
 
 			var params = {
@@ -88,18 +74,18 @@
 				scene: "Scene with Glow"
 			};
 
-			var darkMaterial = new MeshBasicMaterial( { color: "black" } );
+			var darkMaterial = new THREE.MeshBasicMaterial( { color: "black" } );
 			var materials = {};
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.toneMapping = ReinhardToneMapping;
+			renderer.toneMapping = THREE.ReinhardToneMapping;
 			document.body.appendChild( renderer.domElement );
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 
-			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 			camera.position.set( 0, 0, 20 );
 			camera.lookAt( 0, 0, 0 );
 
@@ -109,11 +95,11 @@
 			controls.maxDistance = 100;
 			controls.addEventListener( 'change', render );
 
-			scene.add( new AmbientLight( 0x404040 ) );
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
 			var renderScene = new RenderPass( scene, camera );
 
-			var bloomPass = new UnrealBloomPass( new Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			var bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
@@ -124,7 +110,7 @@
 			bloomComposer.addPass( bloomPass );
 
 			var finalPass = new ShaderPass(
-				new ShaderMaterial( {
+				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
 						bloomTexture: { value: bloomComposer.renderTarget2.texture }
@@ -140,9 +126,9 @@
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
-			var raycaster = new Raycaster();
+			var raycaster = new THREE.Raycaster();
 
-			var mouse = new Vector2();
+			var mouse = new THREE.Vector2();
 
 			window.addEventListener( 'click', onDocumentMouseClick, false );
 
@@ -241,15 +227,15 @@
 				scene.traverse( disposeMaterial );
 				scene.children.length = 0;
 
-				var geometry = new IcosahedronBufferGeometry( 1, 4 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 1, 4 );
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					var color = new Color();
+					var color = new THREE.Color();
 					color.setHSL( Math.random(), 0.7, Math.random() * 0.2 + 0.05 );
 
-					var material = new MeshBasicMaterial( { color: color } );
-					var sphere = new Mesh( geometry, material );
+					var material = new THREE.MeshBasicMaterial( { color: color } );
+					var sphere = new THREE.Mesh( geometry, material );
 					sphere.position.x = Math.random() * 10 - 5;
 					sphere.position.y = Math.random() * 10 - 5;
 					sphere.position.z = Math.random() * 10 - 5;

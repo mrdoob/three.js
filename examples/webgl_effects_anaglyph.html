@@ -13,15 +13,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				CubeTextureLoader,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { AnaglyphEffect } from './jsm/effects/AnaglyphEffect.js';
 
@@ -45,7 +37,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 100 );
 				camera.position.z = 3;
 				camera.focalLength = 3;
 
@@ -57,17 +49,17 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = new CubeTextureLoader().load( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 				scene.background = textureCube;
 
-				var geometry = new SphereBufferGeometry( 0.1, 32, 16 );
-				var material = new MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+				var geometry = new THREE.SphereBufferGeometry( 0.1, 32, 16 );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10 - 5;
 					mesh.position.y = Math.random() * 10 - 5;
@@ -83,7 +75,7 @@
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 

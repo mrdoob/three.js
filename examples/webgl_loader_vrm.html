@@ -16,14 +16,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				HemisphereLight,
-				Material,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -41,12 +34,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( 0, 1.6, - 2.2 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				light = new HemisphereLight( 0xbbbbff, 0x444422 );
+				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
@@ -55,7 +48,7 @@
 				loader.load( 'models/vrm/Alicia/AliciaSolid.vrm', function ( vrm ) {
 
 					// VRMLoader doesn't support VRM Unlit extension yet so
-					// converting all materials to MeshBasicMaterial here as workaround so far.
+					// converting all materials to THREE.MeshBasicMaterial here as workaround so far.
 					vrm.scene.traverse( function ( object ) {
 
 						if ( object.material ) {
@@ -64,8 +57,8 @@
 
 								for ( var i = 0, il = object.material.length; i < il; i ++ ) {
 
-									var material = new MeshBasicMaterial();
-									Material.prototype.copy.call( material, object.material[ i ] );
+									var material = new THREE.MeshBasicMaterial();
+									THREE.Material.prototype.copy.call( material, object.material[ i ] );
 									material.color.copy( object.material[ i ].color );
 									material.map = object.material[ i ].map;
 									material.lights = false;
@@ -78,8 +71,8 @@
 
 							} else {
 
-								var material = new MeshBasicMaterial();
-								Material.prototype.copy.call( material, object.material );
+								var material = new THREE.MeshBasicMaterial();
+								THREE.Material.prototype.copy.call( material, object.material );
 								material.color.copy( object.material.color );
 								material.map = object.material.map;
 								material.lights = false;
@@ -98,7 +91,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;

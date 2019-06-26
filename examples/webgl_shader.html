@@ -64,14 +64,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				Mesh,
-				OrthographicCamera,
-				PlaneBufferGeometry,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			var container;
 
@@ -86,17 +79,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var geometry = new PlaneBufferGeometry( 2, 2 );
+				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
 				uniforms = {
 					"time": { value: 1.0 }
 				};
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -104,10 +97,10 @@
 
 				} );
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 

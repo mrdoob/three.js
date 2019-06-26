@@ -12,20 +12,7 @@
 		<div id="container"></div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				CatmullRomCurve3,
-				Color,
-				Float32BufferAttribute,
-				Fog,
-				Line,
-				LineDashedMaterial,
-				LineSegments,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -41,23 +28,23 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 200 );
+				camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 200 );
 				camera.position.z = 150;
 
-				scene = new Scene();
-				scene.background = new Color( 0x111111 );
-				scene.fog = new Fog( 0x111111, 150, 200 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
+				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
 
 				var subdivisions = 6;
 				var recursion = 1;
 
-				var points = GeometryUtils.hilbert3D( new Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
-				var spline = new CatmullRomCurve3( points );
+				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var spline = new THREE.CatmullRomCurve3( points );
 
 				var samples = spline.getPoints( points.length * subdivisions );
-				var geometrySpline = new BufferGeometry().setFromPoints( samples );
+				var geometrySpline = new THREE.BufferGeometry().setFromPoints( samples );
 
-				var line = new Line( geometrySpline, new LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
+				var line = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ) );
 				line.computeLineDistances();
 
 				objects.push( line );
@@ -65,13 +52,13 @@
 
 				var geometryCube = cube( 50 );
 
-				var lineSegments = new LineSegments( geometryCube, new LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
+				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
 				lineSegments.computeLineDistances();
 
 				objects.push( lineSegments );
 				scene.add( lineSegments );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 
@@ -91,7 +78,7 @@
 
 				var h = size * 0.5;
 
-				var geometry = new BufferGeometry();
+				var geometry = new THREE.BufferGeometry();
 				var position = [];
 
 				position.push(
@@ -132,7 +119,7 @@
 					h, - h, h
 				 );
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
 
 				return geometry;
 

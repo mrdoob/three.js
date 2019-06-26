@@ -13,19 +13,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Clock,
-				Color,
-				Group,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -39,13 +27,13 @@
 
 			var renderer, clock, camera, controls, stats, rotationSpeed;
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
-			clock = new Clock();
+			clock = new THREE.Clock();
 
-			camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera.position.z = 12;
 
 			rotationSpeed = Math.PI / 64;
@@ -62,17 +50,17 @@
 			// scene
 			var scene, group, mat, floor, light;
 
-			scene = new Scene();
-			scene.background = new Color( 0x444444 );
-			group = new Group();
-			floor = new Mesh( new BoxBufferGeometry( 100, 1, 100 ), new MeshPhongMaterial( {} ) );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x444444 );
+			group = new THREE.Group();
+			floor = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 1, 100 ), new THREE.MeshPhongMaterial( {} ) );
 			floor.position.y = - 10;
-			light = new PointLight( 0xffffff, 1.0, 50, 2 );
+			light = new THREE.PointLight( 0xffffff, 1.0, 50, 2 );
 			light.position.y = 2;
 			group.add( floor, light );
 			scene.add( group );
 
-			mat = new ShaderMaterial( {
+			mat = new THREE.ShaderMaterial( {
 
 				uniforms: {},
 
@@ -105,7 +93,7 @@
 			for ( var i = 0; i < 50; ++ i ) {
 
 				// fill scene with coloured cubes
-				var mesh = new Mesh( new BoxBufferGeometry( 2, 2, 2 ), mat );
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 2, 2, 2 ), mat );
 				mesh.position.set( Math.random() * 16 - 8, Math.random() * 16 - 8, Math.random() * 16 - 8 );
 				mesh.rotation.set( Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2 );
 				group.add( mesh );

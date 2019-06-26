@@ -15,19 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				CubeTextureLoader,
-				CubeRefractionMapping,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -52,7 +40,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = - 4000;
 
 				//
@@ -65,37 +53,37 @@
 					r + "pz.jpg", r + "nz.jpg"
 				];
 
-				var textureCube = new CubeTextureLoader().load( urls );
-				textureCube.mapping = CubeRefractionMapping;
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.mapping = THREE.CubeRefractionMapping;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 				scene.background = textureCube;
 
 				// LIGHTS
 
-				var ambient = new AmbientLight( 0xffffff );
+				var ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
-				pointLight = new PointLight( 0xffffff, 2 );
+				pointLight = new THREE.PointLight( 0xffffff, 2 );
 				scene.add( pointLight );
 
 				// light representation
 
-				var sphere = new SphereBufferGeometry( 100, 16, 8 );
+				var sphere = new THREE.SphereBufferGeometry( 100, 16, 8 );
 
-				var mesh = new Mesh( sphere, new MeshBasicMaterial( { color: 0xffffff } ) );
+				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
 				pointLight.add( mesh );
 
 				// material samples
 
-				var cubeMaterial3 = new MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
-				var cubeMaterial2 = new MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
+				var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
+				var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -136,16 +124,16 @@
 
 				var s = 1.5;
 
-				var mesh = new Mesh( geometry, m1 );
+				var mesh = new THREE.Mesh( geometry, m1 );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				var mesh = new Mesh( geometry, m2 );
+				var mesh = new THREE.Mesh( geometry, m2 );
 				mesh.position.x = - 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				var mesh = new Mesh( geometry, m3 );
+				var mesh = new THREE.Mesh( geometry, m3 );
 				mesh.position.x = 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );

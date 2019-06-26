@@ -23,18 +23,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				Color,
-				DirectionalLight,
-				FogExp2,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -48,16 +37,16 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0xcccccc );
-				scene.fog = new FogExp2( 0xcccccc, 0.002 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xcccccc );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 400, 200, 0 );
 
 				// controls
@@ -78,13 +67,13 @@
 
 				// world
 
-				var geometry = new BoxBufferGeometry( 1, 1, 1 );
+				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				geometry.translate( 0, 0.5, 0 );
-				var material = new MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 1600 - 800;
 					mesh.position.y = 0;
 					mesh.position.z = Math.random() * 1600 - 800;
@@ -99,15 +88,15 @@
 
 				// lights
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var light = new DirectionalLight( 0x002288 );
+				var light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( - 1, - 1, - 1 );
 				scene.add( light );
 
-				var light = new AmbientLight( 0x222222 );
+				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
 
 				//

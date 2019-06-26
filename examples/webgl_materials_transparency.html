@@ -12,17 +12,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)<br /> using RGBA8 Buffers by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
 		<script type="module">
-			import {
-				Mesh,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				SphereBufferGeometry,
-				SpotLight,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -42,27 +32,27 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 40, 40 * 3.5 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
-				var geometry = new SphereBufferGeometry( 18, 30, 30 );
+				var geometry = new THREE.SphereBufferGeometry( 18, 30, 30 );
 
-				var material1 = new MeshStandardMaterial( {
+				var material1 = new THREE.MeshStandardMaterial( {
 					opacity: params.opacity,
 					transparent: true
 				} );
 
-				var material2 = new MeshStandardMaterial( {
+				var material2 = new THREE.MeshStandardMaterial( {
 					opacity: params.opacity,
 					premultipliedAlpha: true,
 					transparent: true
 				} );
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
 
 					map.anisotropy = 8;
@@ -74,7 +64,7 @@
 
 				} );
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 				textureLoader.load( "textures/hardwood2_roughness.jpg", function ( map ) {
 
 					map.anisotropy = 8;
@@ -86,32 +76,32 @@
 
 				} );
 
-				var mesh = new Mesh( geometry, material1 );
+				var mesh = new THREE.Mesh( geometry, material1 );
 				mesh.position.x = - 25.0;
 				scene.add( mesh );
 
-				var mesh = new Mesh( geometry, material2 );
+				var mesh = new THREE.Mesh( geometry, material2 );
 				mesh.position.x = 25.0;
 				scene.add( mesh );
 
 				//
 
-				var geometry = new PlaneBufferGeometry( 800, 800 );
-				var material = new MeshStandardMaterial( { color: 0x333333 } );
-				var mesh = new Mesh( geometry, material );
+				var geometry = new THREE.PlaneBufferGeometry( 800, 800 );
+				var material = new THREE.MeshStandardMaterial( { color: 0x333333 } );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;
 				mesh.rotation.x = - Math.PI * 0.5;
 				scene.add( mesh );
 
 				// Lights
 
-				var spotLight = new SpotLight( 0xff8888 );
+				var spotLight = new THREE.SpotLight( 0xff8888 );
 				spotLight.position.set( 100, 200, 100 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 0.9;
 				scene.add( spotLight );
 
-				var spotLight = new SpotLight( 0x8888ff );
+				var spotLight = new THREE.SpotLight( 0x8888ff );
 				spotLight.position.set( - 100, - 200, - 100 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 0.9;
@@ -119,7 +109,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -176,7 +166,7 @@
 
 					var object = scene.children[ i ];
 
-					if ( object.geometry instanceof SphereBufferGeometry ) {
+					if ( object.geometry instanceof THREE.SphereBufferGeometry ) {
 
 						object.rotation.x = performance.now() * 0.0002;
 						object.rotation.y = - performance.now() * 0.0002;

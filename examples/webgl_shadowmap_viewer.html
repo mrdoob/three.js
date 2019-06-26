@@ -12,21 +12,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BasicShadowMap,
-				BoxBufferGeometry,
-				CameraHelper,
-				Clock,
-				DirectionalLight,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Scene,
-				SpotLight,
-				TorusKnotBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -55,16 +41,16 @@
 
 			function initScene() {
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 15, 35 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// Lights
 
-				scene.add( new AmbientLight( 0x404040 ) );
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
-				spotLight = new SpotLight( 0xffffff );
+				spotLight = new THREE.SpotLight( 0xffffff );
 				spotLight.name = 'Spot Light';
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
@@ -76,9 +62,9 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				scene.add( new CameraHelper( spotLight.shadow.camera ) );
+				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
 
-				dirLight = new DirectionalLight( 0xffffff, 1 );
+				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				dirLight.name = 'Dir. Light';
 				dirLight.position.set( 0, 10, 0 );
 				dirLight.castShadow = true;
@@ -92,38 +78,38 @@
 				dirLight.shadow.mapSize.height = 1024;
 				scene.add( dirLight );
 
-				scene.add( new CameraHelper( dirLight.shadow.camera ) );
+				scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 				// Geometry
-				var geometry = new TorusKnotBufferGeometry( 25, 8, 75, 20 );
-				var material = new MeshPhongMaterial( {
+				var geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
 					shininess: 150,
 					specular: 0x222222
 				} );
 
-				torusKnot = new Mesh( geometry, material );
+				torusKnot = new THREE.Mesh( geometry, material );
 				torusKnot.scale.multiplyScalar( 1 / 18 );
 				torusKnot.position.y = 3;
 				torusKnot.castShadow = true;
 				torusKnot.receiveShadow = true;
 				scene.add( torusKnot );
 
-				var geometry = new BoxBufferGeometry( 3, 3, 3 );
-				cube = new Mesh( geometry, material );
+				var geometry = new THREE.BoxBufferGeometry( 3, 3, 3 );
+				cube = new THREE.Mesh( geometry, material );
 				cube.position.set( 8, 3, 8 );
 				cube.castShadow = true;
 				cube.receiveShadow = true;
 				scene.add( cube );
 
-				var geometry = new BoxBufferGeometry( 10, 0.15, 10 );
-				var material = new MeshPhongMaterial( {
+				var geometry = new THREE.BoxBufferGeometry( 10, 0.15, 10 );
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xa0adaf,
 					shininess: 150,
 					specular: 0x111111
 				} );
 
-				var ground = new Mesh( geometry, material );
+				var ground = new THREE.Mesh( geometry, material );
 				ground.scale.multiplyScalar( 3 );
 				ground.castShadow = false;
 				ground.receiveShadow = true;
@@ -149,18 +135,18 @@
 
 			function initMisc() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = BasicShadowMap;
+				renderer.shadowMap.type = THREE.BasicShadowMap;
 
 				// Mouse control
 				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );

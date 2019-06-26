@@ -14,15 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				CubeTextureLoader,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -55,12 +47,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 70, width / height, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 3000 );
 				camera.position.z = 200;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
@@ -73,16 +65,16 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = new CubeTextureLoader().load( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
 				parameters = { color: 0xff1100, envMap: textureCube };
-				cubeMaterial = new MeshBasicMaterial( parameters );
+				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
 
 				if ( singleMaterial ) zmaterial = [ cubeMaterial ];
 
-				var geo = new SphereBufferGeometry( 1, 20, 10 );
+				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
 
 				var xgrid = 14,
 					ygrid = 9,
@@ -101,11 +93,11 @@
 
 							if ( singleMaterial ) {
 
-								mesh = new Mesh( geo, zmaterial );
+								mesh = new THREE.Mesh( geo, zmaterial );
 
 							} else {
 
-								mesh = new Mesh( geo, new MeshBasicMaterial( parameters ) );
+								mesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( parameters ) );
 								materials[ count ] = mesh.material;
 
 							}

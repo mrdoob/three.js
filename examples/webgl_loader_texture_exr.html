@@ -14,17 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				FloatType,
-				Mesh,
-				MeshBasicMaterial,
-				NearestFilter,
-				OrthographicCamera,
-				PlaneBufferGeometry,
-				ReinhardToneMapping,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -40,31 +30,31 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.toneMapping = ReinhardToneMapping;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
 				renderer.gammaOutput = true;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var aspect = window.innerWidth / window.innerHeight;
 
-				camera = new OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
+				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
 				new EXRLoader()
-					.setType( FloatType )
+					.setType( THREE.FloatType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
 						//console.log( textureData );
 						//console.log( texture );
 
-						texture.minFilter = NearestFilter;
-						texture.magFilter = NearestFilter;
+						texture.minFilter = THREE.NearestFilter;
+						texture.magFilter = THREE.NearestFilter;
 
 						// these setting are currently set correctly by default
 						//texture.encoding = LinearEncoding;
@@ -72,11 +62,11 @@
 						//texture.magFilter = LinearFilter;
 						//texture.flipY = true;
 
-						var material = new MeshBasicMaterial( { map: texture } );
+						var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-						var quad = new PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
+						var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
-						var mesh = new Mesh( quad, material );
+						var mesh = new THREE.Mesh( quad, material );
 
 						scene.add( mesh );
 

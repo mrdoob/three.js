@@ -22,19 +22,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Clock,
-				Color,
-				FogExp2,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RepeatWrapping,
-				Scene,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -51,21 +39,21 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = 200;
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				controls = new FirstPersonControls( camera );
 
 				controls.movementSpeed = 500;
 				controls.lookSpeed = 0.1;
 
-				scene = new Scene();
-				scene.background = new Color( 0xaaccff );
-				scene.fog = new FogExp2( 0xaaccff, 0.0007 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaccff );
+				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
-				geometry = new PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.PlaneBufferGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				var position = geometry.attributes.position;
@@ -78,16 +66,16 @@
 
 				}
 
-				var texture = new TextureLoader().load( 'textures/water.jpg' );
-				texture.wrapS = texture.wrapT = RepeatWrapping;
+				var texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
+				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
 
-				material = new MeshBasicMaterial( { color: 0x0044ff, map: texture } );
+				material = new THREE.MeshBasicMaterial( { color: 0x0044ff, map: texture } );
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
