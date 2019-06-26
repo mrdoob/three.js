@@ -193,6 +193,7 @@
 
 				var param = {
 					'line type': 0,
+					'screen space width': true,
 					'width (px)': 5,
 					'dashed': false,
 					'dash scale': 1,
@@ -222,7 +223,13 @@
 
 				} );
 
-				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
+				gui.add( param, 'screen space width' ).onChange( function ( val ) {
+
+					matLine.screenSpaceWidth = val;
+
+				} );
+
+				gui.add( param, 'width (px)', 1, 500 ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 
