@@ -242,8 +242,8 @@ geometry.computeFaceNormals();
 Removing the vertex color stuff and changing the material back to `MeshPhongMaterial`
 
 ```js
-+const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
--const material = new THREE.MeshPhongMaterial({color});
+-const material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors});
++const material = new THREE.MeshPhongMaterial({color});
 ```
 
 and now our cubes can be lit.
