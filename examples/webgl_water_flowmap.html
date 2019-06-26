@@ -14,16 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RepeatWrapping,
-				Scene,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -38,27 +29,27 @@
 
 				// scene
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// camera
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
 				camera.position.set( 0, 25, 0 );
 				camera.lookAt( scene.position );
 
 				// ground
 
-				var groundGeometry = new PlaneBufferGeometry( 20, 20, 10, 10 );
-				var groundMaterial = new MeshBasicMaterial( { color: 0xcccccc } );
-				var ground = new Mesh( groundGeometry, groundMaterial );
+				var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20, 10, 10 );
+				var groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
+				var ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
 				scene.add( ground );
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 				textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
 
-					map.wrapS = RepeatWrapping;
-					map.wrapT = RepeatWrapping;
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 16;
 					map.repeat.set( 4, 4 );
 					groundMaterial.map = map;
@@ -68,7 +59,7 @@
 
 				// water
 
-				var waterGeometry = new PlaneBufferGeometry( 20, 20 );
+				var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
 				var flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
 
 				water = new Water( waterGeometry, {
@@ -84,9 +75,9 @@
 
 				// flow map helper
 
-				var helperGeometry = new PlaneBufferGeometry( 20, 20 );
-				var helperMaterial = new MeshBasicMaterial( { map: flowMap } );
-				var helper = new Mesh( helperGeometry, helperMaterial );
+				var helperGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				var helperMaterial = new THREE.MeshBasicMaterial( { map: flowMap } );
+				var helper = new THREE.Mesh( helperGeometry, helperMaterial );
 				helper.position.y = 1.01;
 				helper.rotation.x = Math.PI * - 0.5;
 				helper.visible = false;
@@ -94,7 +85,7 @@
 
 				// renderer
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );

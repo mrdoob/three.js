@@ -69,19 +69,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				AdditiveBlending,
-				BufferAttribute,
-				BufferGeometry,
-				NearestFilter,
-				PerspectiveCamera,
-				Points,
-				Scene,
-				ShaderMaterial,
-				Vector3,
-				VideoTexture,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -104,23 +92,23 @@
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );
 
-				scene = new Scene();
-				center = new Vector3();
+				scene = new THREE.Scene();
+				center = new THREE.Vector3();
 				center.z = - 1000;
 
 				var video = document.getElementById( 'video' );
 				video.addEventListener( 'loadedmetadata', function () {
 
-					var texture = new VideoTexture( video );
-					texture.minFilter = NearestFilter;
+					var texture = new THREE.VideoTexture( video );
+					texture.minFilter = THREE.NearestFilter;
 
 					var width = 640, height = 480;
 					var nearClipping = 850, farClipping = 4000;
 
-					geometry = new BufferGeometry();
+					geometry = new THREE.BufferGeometry();
 
 					var vertices = new Float32Array( width * height * 3 );
 
@@ -131,9 +119,9 @@
 
 					}
 
-					geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+					geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
-					material = new ShaderMaterial( {
+					material = new THREE.ShaderMaterial( {
 
 						uniforms: {
 
@@ -149,13 +137,13 @@
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
 						fragmentShader: document.getElementById( 'fs' ).textContent,
-						blending: AdditiveBlending,
+						blending: THREE.AdditiveBlending,
 						depthTest: false, depthWrite: false,
 						transparent: true
 
 					} );
 
-					mesh = new Points( geometry, material );
+					mesh = new THREE.Points( geometry, material );
 					scene.add( mesh );
 
 					var gui = new GUI();
@@ -170,12 +158,12 @@
 
 				video.play();
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				mouse = new Vector3( 0, 0, 1 );
+				mouse = new THREE.Vector3( 0, 0, 1 );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 

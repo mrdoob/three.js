@@ -43,15 +43,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				Mesh,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -124,15 +116,15 @@
 			//initialize the scene
 			function init() {
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 				camera.position.x = - 23;
 				camera.position.y = 2;
 				camera.position.z = 24;
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
@@ -157,21 +149,21 @@
 								var array = bufferGeo.attributes.position.array;
 								var normArray = bufferGeo.attributes.normal.array;
 
-								var posA = new Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
-								var posB = new Vector3( array[ 3 * ( i + 1 ) ], array[ 3 * ( i + 1 ) + 1 ], array[ 3 * ( i + 1 ) + 2 ] );
-								var posC = new Vector3( array[ 3 * ( i + 2 ) ], array[ 3 * ( i + 2 ) + 1 ], array[ 3 * ( i + 2 ) + 2 ] );
+								var posA = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
+								var posB = new THREE.Vector3( array[ 3 * ( i + 1 ) ], array[ 3 * ( i + 1 ) + 1 ], array[ 3 * ( i + 1 ) + 2 ] );
+								var posC = new THREE.Vector3( array[ 3 * ( i + 2 ) ], array[ 3 * ( i + 2 ) + 1 ], array[ 3 * ( i + 2 ) + 2 ] );
 
-								var normA = new Vector3( normArray[ 3 * i ], normArray[ 3 * i + 1 ], normArray[ 3 * i + 2 ] ).normalize();
-								var normB = new Vector3( normArray[ 3 * ( i + 1 ) ], normArray[ 3 * ( i + 1 ) + 1 ], normArray[ 3 * ( i + 1 ) + 2 ] ).normalize();
-								var normC = new Vector3( normArray[ 3 * ( i + 2 ) ], normArray[ 3 * ( i + 2 ) + 1 ], normArray[ 3 * ( i + 2 ) + 2 ] ).normalize();
+								var normA = new THREE.Vector3( normArray[ 3 * i ], normArray[ 3 * i + 1 ], normArray[ 3 * i + 2 ] ).normalize();
+								var normB = new THREE.Vector3( normArray[ 3 * ( i + 1 ) ], normArray[ 3 * ( i + 1 ) + 1 ], normArray[ 3 * ( i + 1 ) + 2 ] ).normalize();
+								var normC = new THREE.Vector3( normArray[ 3 * ( i + 2 ) ], normArray[ 3 * ( i + 2 ) + 1 ], normArray[ 3 * ( i + 2 ) + 2 ] ).normalize();
 
 								var strA = posA.toArray().toString();
 								var strB = posB.toArray().toString();
 								var strC = posC.toArray().toString();
 
-								var posB_A = new Vector3().subVectors( posB, posA );
-								var posB_C = new Vector3().subVectors( posB, posC );
-								var posC_A = new Vector3().subVectors( posC, posA );
+								var posB_A = new THREE.Vector3().subVectors( posB, posA );
+								var posB_C = new THREE.Vector3().subVectors( posB, posC );
+								var posC_A = new THREE.Vector3().subVectors( posC, posA );
 
 								var b2a = normB.dot( posB_A.normalize() );
 								var b2c = normB.dot( posB_C.normalize() );
@@ -265,26 +257,26 @@
 							for ( var i = 0; i < bufferGeo.attributes.position.count; i ++ ) {
 
 								array = bufferGeo.attributes.position.array;
-								var pos = new Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
+								var pos = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
 								var str = pos.toArray().toString();
 								curvatureAttribute[ i ] = curvatureDict[ str ];
 
 							}
 
-							bufferGeo.addAttribute( 'curvature', new BufferAttribute( curvatureAttribute, 1 ) );
+							bufferGeo.addAttribute( 'curvature', new THREE.BufferAttribute( curvatureAttribute, 1 ) );
 
 							//starting filter is to show both concave and convex
 							var curvatureFiltered = new Float32Array( curvatureAttribute );
 							filterBoth( curvatureFiltered );
 
-							var materialRaw = new ShaderMaterial( {
+							var materialRaw = new THREE.ShaderMaterial( {
 
 								vertexShader: document.getElementById( 'vertexShaderRaw' ).textContent,
 								fragmentShader: document.getElementById( 'fragmentShaderRaw' ).textContent
 
 							} );
 
-							ninjaMeshRaw = new Mesh( bufferGeo, materialRaw );
+							ninjaMeshRaw = new THREE.Mesh( bufferGeo, materialRaw );
 
 						}
 

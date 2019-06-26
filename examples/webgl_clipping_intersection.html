@@ -9,21 +9,7 @@
 	<body>
 
 		<script type="module">
-			import {
-				Color,
-				DoubleSide,
-				Group,
-				HemisphereLight,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				Plane,
-				PlaneHelper,
-				Scene,
-				SphereBufferGeometry,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -38,9 +24,9 @@
 			};
 
 			var clipPlanes = [
-				new Plane( new Vector3( 1, 0, 0 ), 0 ),
-				new Plane( new Vector3( 0, - 1, 0 ), 0 ),
-				new Plane( new Vector3( 0, 0, - 1 ), 0 )
+				new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 ),
+				new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0 ),
+				new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0 )
 			];
 
 			init();
@@ -48,15 +34,15 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.localClippingEnabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
 
 				camera.position.set( - 1.5, 2.5, 3.0 );
 
@@ -66,7 +52,7 @@
 				controls.maxDistance = 10;
 				controls.enablePan = false;
 
-				var light = new HemisphereLight( 0xffffff, 0x080808, 1.5 );
+				var light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
 				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
 
@@ -75,22 +61,22 @@
 
 				//
 
-				var group = new Group();
+				var group = new THREE.Group();
 
 				for ( var i = 1; i <= 30; i += 2 ) {
 
-					var geometry = new SphereBufferGeometry( i / 30, 48, 24 );
+					var geometry = new THREE.SphereBufferGeometry( i / 30, 48, 24 );
 
-					var material = new MeshLambertMaterial( {
+					var material = new THREE.MeshLambertMaterial( {
 
-						color: new Color().setHSL( Math.random(), 0.5, 0.5 ),
-						side: DoubleSide,
+						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5 ),
+						side: THREE.DoubleSide,
 						clippingPlanes: clipPlanes,
 						clipIntersection: params.clipIntersection
 
 					} );
 
-					group.add( new Mesh( geometry, material ) );
+					group.add( new THREE.Mesh( geometry, material ) );
 
 				}
 
@@ -98,10 +84,10 @@
 
 				// helpers
 
-				var helpers = new Group();
-				helpers.add( new PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
-				helpers.add( new PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
-				helpers.add( new PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
+				var helpers = new THREE.Group();
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 0 ], 2, 0xff0000 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 1 ], 2, 0x00ff00 ) );
+				helpers.add( new THREE.PlaneHelper( clipPlanes[ 2 ], 2, 0x0000ff ) );
 				helpers.visible = false;
 				scene.add( helpers );
 

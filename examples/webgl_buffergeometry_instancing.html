@@ -79,18 +79,7 @@
 	</script>
 
 	<script type="module">
-		import {
-			DoubleSide,
-			Float32BufferAttribute,
-			InstancedBufferAttribute,
-			InstancedBufferGeometry,
-			Mesh,
-			PerspectiveCamera,
-			RawShaderMaterial,
-			Scene,
-			Vector4,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 		import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -106,14 +95,14 @@
 
 			container = document.getElementById( 'container' );
 
-			camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
 			camera.position.z = 2;
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 
 			// geometry
 
-			var vector = new Vector4();
+			var vector = new THREE.Vector4();
 
 			var instances = 50000;
 
@@ -155,19 +144,19 @@
 
 			}
 
-			var geometry = new InstancedBufferGeometry();
+			var geometry = new THREE.InstancedBufferGeometry();
 			geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
-			geometry.addAttribute( 'offset', new InstancedBufferAttribute( new Float32Array( offsets ), 3 ) );
-			geometry.addAttribute( 'color', new InstancedBufferAttribute( new Float32Array( colors ), 4 ) );
-			geometry.addAttribute( 'orientationStart', new InstancedBufferAttribute( new Float32Array( orientationsStart ), 4 ) );
-			geometry.addAttribute( 'orientationEnd', new InstancedBufferAttribute( new Float32Array( orientationsEnd ), 4 ) );
+			geometry.addAttribute( 'offset', new THREE.InstancedBufferAttribute( new Float32Array( offsets ), 3 ) );
+			geometry.addAttribute( 'color', new THREE.InstancedBufferAttribute( new Float32Array( colors ), 4 ) );
+			geometry.addAttribute( 'orientationStart', new THREE.InstancedBufferAttribute( new Float32Array( orientationsStart ), 4 ) );
+			geometry.addAttribute( 'orientationEnd', new THREE.InstancedBufferAttribute( new Float32Array( orientationsEnd ), 4 ) );
 
 			// material
 
-			var material = new RawShaderMaterial( {
+			var material = new THREE.RawShaderMaterial( {
 
 				uniforms: {
 					"time": { value: 1.0 },
@@ -175,19 +164,19 @@
 				},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-				side: DoubleSide,
+				side: THREE.DoubleSide,
 				transparent: true
 
 			} );
 
 			//
 
-			var mesh = new Mesh( geometry, material );
+			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
 			//
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );

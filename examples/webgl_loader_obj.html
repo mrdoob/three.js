@@ -13,15 +13,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				LoadingManager,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
@@ -45,17 +37,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 250;
 
 				// scene
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new PointLight( 0xffffff, 0.8 );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -74,7 +66,7 @@
 
 				}
 
-				var manager = new LoadingManager( loadModel );
+				var manager = new THREE.LoadingManager( loadModel );
 
 				manager.onProgress = function ( item, loaded, total ) {
 
@@ -84,7 +76,7 @@
 
 				// texture
 
-				var textureLoader = new TextureLoader( manager );
+				var textureLoader = new THREE.TextureLoader( manager );
 
 				var texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 
@@ -113,7 +105,7 @@
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

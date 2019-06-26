@@ -19,17 +19,7 @@
 		</video>
 
 		<script type="module">
-			import {
-				Math as _Math,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				Vector3,
-				VideoTexture,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 
@@ -51,26 +41,26 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
-				camera.target = new Vector3( 0, 0, 0 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera.target = new THREE.Vector3( 0, 0, 0 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var geometry = new SphereBufferGeometry( 500, 60, 40 );
+				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale( - 1, 1, 1 );
 
 				var video = document.getElementById( 'video' );
 				video.play();
 
-				var texture = new VideoTexture( video );
-				var material = new MeshBasicMaterial( { map: texture } );
+				var texture = new THREE.VideoTexture( video );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -130,7 +120,7 @@
 
 				distance += event.deltaY * 0.05;
 
-				distance = _Math.clamp( distance, 1, 50 );
+				distance = THREE.Math.clamp( distance, 1, 50 );
 
 			}
 
@@ -144,8 +134,8 @@
 			function update() {
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = _Math.degToRad( 90 - lat );
-				theta = _Math.degToRad( lon );
+				phi = THREE.Math.degToRad( 90 - lat );
+				theta = THREE.Math.degToRad( lon );
 
 				camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
 				camera.position.y = distance * Math.cos( phi );

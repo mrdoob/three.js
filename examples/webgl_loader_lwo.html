@@ -16,15 +16,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DirectionalLight,
-				GridHelper,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { LWOLoader } from './jsm/loaders/LWOLoader.js';
@@ -37,16 +29,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
 				camera.position.set( - 0.7, 14.6, 43.2 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xa0a0a0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				var ambientLight = new AmbientLight( 0xaaaaaa, 1.75 );
+				var ambientLight = new THREE.AmbientLight( 0xaaaaaa, 1.75 );
 				scene.add( ambientLight );
 
-				var light = new DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, 200, 100 );
 				light.castShadow = true;
 				light.shadow.camera.top = 180;
@@ -55,19 +47,19 @@
 				light.shadow.camera.right = 120;
 				scene.add( light );
 
-				light = new DirectionalLight( 0xffffff, 0.7 );
+				light = new THREE.DirectionalLight( 0xffffff, 0.7 );
 				light.position.set( - 100, 200, - 100 );
 				scene.add( light );
 
-				light = new DirectionalLight( 0xffffff, 0.4 );
+				light = new THREE.DirectionalLight( 0xffffff, 0.4 );
 				light.position.set( 100, - 200, 100 );
 				scene.add( light );
 
-				light = new DirectionalLight( 0xffffff, 1 );
+				light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( - 100, - 100, 100 );
 				scene.add( light );
 
-				var grid = new GridHelper( 200, 20, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.3;
 				grid.material.transparent = true;
 				scene.add( grid );
@@ -88,7 +80,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;

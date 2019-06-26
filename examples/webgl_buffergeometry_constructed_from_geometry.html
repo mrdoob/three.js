@@ -18,23 +18,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BufferGeometry,
-				Color,
-				ExtrudeGeometry,
-				Float32BufferAttribute,
-				Geometry,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				Shape,
-				Vector3,
-				VertexColors,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -47,14 +31,14 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 45.0, window.innerWidth / window.innerHeight, 100, 1500.0 );
+				camera = new THREE.PerspectiveCamera( 45.0, window.innerWidth / window.innerHeight, 100, 1500.0 );
 				camera.position.z = 480.0;
 				scene.add( camera );
 
@@ -63,9 +47,9 @@
 				controls.maxDistance = 800.0;
 				controls.dynamicDampingFactor = 0.1;
 
-				scene.add( new AmbientLight( 0xffffff, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
-				var light = new PointLight( 0xffffff, 0.7 );
+				var light = new THREE.PointLight( 0xffffff, 0.7 );
 				camera.add( light );
 
 				createScene();
@@ -79,7 +63,7 @@
 
 			function createGeometry() {
 
-				var heartShape = new Shape(); // From http://blog.burlock.org/html5/130-paths
+				var heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
 				var x = 0, y = 0;
 
 				heartShape.moveTo( x + 25, y + 25 );
@@ -99,7 +83,7 @@
 					bevelThickness: 1
 				};
 
-				var geometry = new ExtrudeGeometry( heartShape, extrudeSettings );
+				var geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
 				geometry.rotateX( Math.PI );
 				geometry.scale( 0.4, 0.4, 0.4 );
 
@@ -109,7 +93,7 @@
 
 			function createScene() {
 
-				var bufferGeometry = new BufferGeometry();
+				var bufferGeometry = new THREE.BufferGeometry();
 
 				var radius = 125;
 				var count = 80;
@@ -118,11 +102,11 @@
 				var normals = [];
 				var colors = [];
 
-				var vector = new Vector3();
+				var vector = new THREE.Vector3();
 
-				var color = new Color( 0xffffff );
+				var color = new THREE.Color( 0xffffff );
 				var heartGeometry = createGeometry();
-				var geometry = new Geometry();
+				var geometry = new THREE.Geometry();
 
 				for ( var i = 1, l = count; i <= l; i ++ ) {
 
@@ -173,13 +157,13 @@
 
 				}
 
-				bufferGeometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-				bufferGeometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-				bufferGeometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new MeshPhongMaterial( { shininess: 80, vertexColors: VertexColors } );
+				var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: THREE.VertexColors } );
 
-				var mesh = new Mesh( bufferGeometry, material );
+				var mesh = new THREE.Mesh( bufferGeometry, material );
 				scene.add( mesh );
 
 			}

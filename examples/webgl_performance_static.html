@@ -14,15 +14,7 @@
 	<body>
 
 		<script type="module">
-			import {
-				BufferGeometryLoader,
-				Color,
-				Mesh,
-				MeshNormalMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -46,23 +38,23 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 				scene.matrixAutoUpdate = false;
 
-				var material = new MeshNormalMaterial();
+				var material = new THREE.MeshNormalMaterial();
 
-				var loader = new BufferGeometryLoader();
+				var loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
 					for ( var i = 0; i < 7700; i ++ ) {
 
-						var mesh = new Mesh( geometry, material );
+						var mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.x = Math.random() * 10000 - 5000;
 						mesh.position.y = Math.random() * 10000 - 5000;
@@ -79,7 +71,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				//renderer.sortObjects = false;

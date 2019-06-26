@@ -16,12 +16,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Scene,
-				UnsignedByteType,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -43,13 +38,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.9, 2.7 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				new RGBELoader()
-					.setType( UnsignedByteType )
+					.setType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
@@ -90,7 +85,7 @@
 
 					} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;

@@ -14,22 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Clock,
-				Color,
-				DataTexture,
-				LinearFilter,
-				Math as _Math,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RGBFormat,
-				Scene,
-				TextureLoader,
-				Vector2,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer, clock, dataTexture, diffuseMap;
 
@@ -37,22 +22,22 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.z = 2;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
-				var loader = new TextureLoader();
+				var loader = new THREE.TextureLoader();
 				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
-				diffuseMap.minFilter = LinearFilter;
+				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
 
-				var geometry = new PlaneBufferGeometry( 2, 2 );
-				var material = new MeshBasicMaterial( { map: diffuseMap } );
+				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				var material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
@@ -61,11 +46,11 @@
 				var height = 32;
 
 				var data = new Uint8Array( width * height * 3 );
-				dataTexture = new DataTexture( data, width, height, RGBFormat );
+				dataTexture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -86,7 +71,7 @@
 			}
 
 			var last = 0;
-			var position = new Vector2();
+			var position = new THREE.Vector2();
 
 			function animate() {
 
@@ -98,8 +83,8 @@
 
 					last = elapsedTime;
 
-					position.x = ( 32 * _Math.randInt( 1, 16 ) ) - 32;
-					position.y = ( 32 * _Math.randInt( 1, 16 ) ) - 32;
+					position.x = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32;
+					position.y = ( 32 * THREE.Math.randInt( 1, 16 ) ) - 32;
 
 					// generate new color data
 
@@ -115,7 +100,7 @@
 
 			}
 
-			var color = new Color();
+			var color = new THREE.Color();
 
 			function updateDataTexture( texture ) {
 

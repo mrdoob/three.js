@@ -90,19 +90,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Audio as _Audio,
-				AudioAnalyser,
-				AudioListener as _AudioListener,
-				Camera,
-				DataTexture,
-				LuminanceFormat,
-				Mesh,
-				PlaneBufferGeometry,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			var scene, camera, renderer, analyser, uniforms;
 
@@ -122,21 +110,21 @@
 
 				var container = document.getElementById( 'container' );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new Camera();
+				camera = new THREE.Camera();
 
 				//
 
-				var listener = new _AudioListener();
+				var listener = new THREE.AudioListener();
 
-				var audio = new _Audio( listener );
+				var audio = new THREE.Audio( listener );
 
 				var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
 				mediaElement.loop = true;
@@ -144,17 +132,17 @@
 
 				audio.setMediaElementSource( mediaElement );
 
-				analyser = new AudioAnalyser( audio, fftSize );
+				analyser = new THREE.AudioAnalyser( audio, fftSize );
 
 				//
 
 				uniforms = {
 
-					tAudioData: { value: new DataTexture( analyser.data, fftSize / 2, 1, LuminanceFormat ) }
+					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.LuminanceFormat ) }
 
 				};
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -162,9 +150,9 @@
 
 				} );
 
-				var geometry = new PlaneBufferGeometry( 1, 1 );
+				var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//

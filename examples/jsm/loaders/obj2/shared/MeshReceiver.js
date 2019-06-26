@@ -9,9 +9,7 @@ import {
 	LineSegments,
 	Mesh,
 	Points
-} from "../../../../build/three.module.js";
-
-import { MaterialHandler } from "./MaterialHandler.js";
+} from "../../../../../build/three.module.js";
 
 
 /**
@@ -20,8 +18,6 @@ import { MaterialHandler } from "./MaterialHandler.js";
  * @constructor
  */
 const MeshReceiver = function( materialHandler ) {
-	console.info( 'Using MeshReceiver version: ' + MeshReceiver.MESH_RECEIVER_VERSION );
-
 	this.logging = {
 		enabled: true,
 		debug: false
@@ -33,8 +29,6 @@ const MeshReceiver = function( materialHandler ) {
 	};
 	this.materialHandler = materialHandler;
 };
-MeshReceiver.MESH_RECEIVER_VERSION = '2.0.0-preview';
-
 
 MeshReceiver.prototype = {
 

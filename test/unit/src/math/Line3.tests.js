@@ -81,27 +81,19 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "getCenter", ( assert ) => {
 
+			var center = new Vector3();
 
 			var a = new Line3( zero3.clone(), two3.clone() );
-			assert.ok( a.getCenter().equals( one3.clone() ), "Passed" );
-
-
-			var a = new Line3( zero3.clone(), two3.clone() );
-			var b = new Vector3();
-			assert.ok( a.getCenter( b ).equals( one3.clone() ), "Passed" );
-
+			assert.ok( a.getCenter( center ).equals( one3.clone() ), "Passed" );
 
 		} );
 
 		QUnit.test( "delta", ( assert ) => {
 
+			var delta = new Vector3();
 
 			var a = new Line3( zero3.clone(), two3.clone() );
-			assert.ok( a.delta().equals( two3.clone() ), "Passed" );
-			var a = new Line3( one3.clone(), two3.clone() );
-			var b = new Vector3();
-			assert.ok( a.delta( b ).equals( one3.clone() ), "Passed" );
-
+			assert.ok( a.delta( delta ).equals( two3.clone() ), "Passed" );
 
 		} );
 

@@ -64,22 +64,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				DepthTexture,
-				Mesh,
-				MeshBasicMaterial,
-				NearestFilter,
-				OrthographicCamera,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RGBFormat,
-				Scene,
-				ShaderMaterial,
-				TorusKnotBufferGeometry,
-				UnsignedShortType,
-				WebGLRenderer,
-				WebGLRenderTarget
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -95,7 +80,7 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
+				renderer = new THREE.WebGLRenderer( { canvas: document.querySelector( 'canvas' ) } );
 
 				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
 
@@ -113,7 +98,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 				camera.position.z = 4;
 
 				var controls = new OrbitControls( camera, renderer.domElement );
@@ -122,18 +107,18 @@
 				controls.rotateSpeed = 0.35;
 
 				// Create a multi render target with Float buffers
-				target = new WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				target.texture.format = RGBFormat;
-				target.texture.minFilter = NearestFilter;
-				target.texture.magFilter = NearestFilter;
+				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				target.texture.format = THREE.RGBFormat;
+				target.texture.minFilter = THREE.NearestFilter;
+				target.texture.magFilter = THREE.NearestFilter;
 				target.texture.generateMipmaps = false;
 				target.stencilBuffer = false;
 				target.depthBuffer = true;
-				target.depthTexture = new DepthTexture();
-				target.depthTexture.type = UnsignedShortType;
+				target.depthTexture = new THREE.DepthTexture();
+				target.depthTexture.type = THREE.UnsignedShortType;
 
 				// Our scene
-				scene = new Scene();
+				scene = new THREE.Scene();
 				setupScene();
 
 				// Setup post-processing step
@@ -147,8 +132,8 @@
 			function setupPost() {
 
 				// Setup post processing stage
-				postCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				var postMaterial = new ShaderMaterial( {
+				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				var postMaterial = new THREE.ShaderMaterial( {
 					vertexShader: document.querySelector( '#post-vert' ).textContent.trim(),
 					fragmentShader: document.querySelector( '#post-frag' ).textContent.trim(),
 					uniforms: {
@@ -158,9 +143,9 @@
 						tDepth: { value: target.depthTexture }
 					}
 				} );
-				var postPlane = new PlaneBufferGeometry( 2, 2 );
-				var postQuad = new Mesh( postPlane, postMaterial );
-				postScene = new Scene();
+				var postPlane = new THREE.PlaneBufferGeometry( 2, 2 );
+				var postQuad = new THREE.Mesh( postPlane, postMaterial );
+				postScene = new THREE.Scene();
 				postScene.add( postQuad );
 
 			}
@@ -171,8 +156,8 @@
 				//diffuse.wrapS = diffuse.wrapT = RepeatWrapping;
 
 				// Setup some geometries
-				var geometry = new TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
-				var material = new MeshBasicMaterial( { color: 'blue' } );
+				var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
+				var material = new THREE.MeshBasicMaterial( { color: 'blue' } );
 
 				var count = 50;
 				var scale = 5;
@@ -183,7 +168,7 @@
 					var z = ( Math.random() * 2.0 ) - 1.0;
 					var zScale = Math.sqrt( 1.0 - z * z ) * scale;
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set(
 						Math.cos( r ) * zScale,
 						Math.sin( r ) * zScale,

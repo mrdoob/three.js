@@ -14,17 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				LinearToneMapping,
-				LoadingManager,
-				MeshMatcapMaterial,
-				PerspectiveCamera,
-				Scene,
-				sRGBEncoding,
-				Texture,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -44,22 +34,22 @@
 			function init() {
 
 				// renderer
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				// tone mapping
-				renderer.toneMapping = LinearToneMapping;
+				renderer.toneMapping = THREE.LinearToneMapping;
 			 	renderer.toneMappingExposure = API.exposure;
 
 				renderer.gammaOutput = true;
 
 				// scene
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// camera
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( 0, 0, 12 );
 
 				// controls
@@ -68,14 +58,14 @@
 				controls.enableZoom = false;
 
 				// manager
-				var manager = new LoadingManager( render );
+				var manager = new THREE.LoadingManager( render );
 
 				// matcap
-				var loader = new TextureLoader( manager );
+				var loader = new THREE.TextureLoader( manager );
 
 				var matcap = loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function () {
 
-					matcap.encoding = sRGBEncoding;
+					matcap.encoding = THREE.sRGBEncoding;
 
 				} );
 
@@ -84,7 +74,7 @@
 
 					mesh = gltf.scene.children[ 0 ];
 
-					mesh.material = new MeshMatcapMaterial( {
+					mesh.material = new THREE.MeshMatcapMaterial( {
 
 						color: API.color,
 						matcap: matcap
@@ -166,10 +156,10 @@
 
 				}
 
-				mesh.material.matcap = new Texture( event.target );
+				mesh.material.matcap = new THREE.Texture( event.target );
 				mesh.material.matcap.needsUpdate = true;
 
-				mesh.material.matcap.encoding = sRGBEncoding; // assume it is sRGB
+				mesh.material.matcap.encoding = THREE.sRGBEncoding; // assume it is sRGB
 				mesh.material.needsUpdate = true;
 
 				image.src = mesh.material.matcap.image.src; // corner div

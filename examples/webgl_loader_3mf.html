@@ -22,14 +22,7 @@
 		<script src="js/libs/jszip.min.js"></script>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
@@ -40,17 +33,17 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
-				scene.background = new Color( 0x333333 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
-				scene.add( new AmbientLight( 0xffffff, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				// Z is up for objects intended to be 3D printed.
 
@@ -66,7 +59,7 @@
 				controls.target.set( 80, 65, 20 );
 				controls.update();
 
-				var pointLight = new PointLight( 0xffffff, 0.8 );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				var loader = new ThreeMFLoader();
 				loader.load( './models/3mf/cube_gears.3mf', function ( object ) {

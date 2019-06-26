@@ -12,23 +12,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equirectangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
 
 		<script type="module">
-			import {
-				FloatType,
-				HalfFloatType,
-				LinearEncoding,
-				LinearToneMapping,
-				Mesh,
-				MeshBasicMaterial,
-				MeshStandardMaterial,
-				NearestFilter,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				sRGBEncoding,
-				TextureLoader,
-				TorusKnotBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -61,43 +45,43 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 120 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				renderer = new WebGLRenderer();
-				renderer.toneMapping = LinearToneMapping;
+				renderer = new THREE.WebGLRenderer();
+				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
 
-				var geometry = new TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				var material = new MeshStandardMaterial( {
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				var material = new THREE.MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
 					envMapIntensity: 1.0
 				} );
 
-				torusMesh = new Mesh( geometry, material );
+				torusMesh = new THREE.Mesh( geometry, material );
 				scene.add( torusMesh );
 
-				var geometry = new PlaneBufferGeometry( 200, 200 );
-				var material = new MeshBasicMaterial();
+				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var material = new THREE.MeshBasicMaterial();
 
-				planeMesh = new Mesh( geometry, material );
+				planeMesh = new THREE.Mesh( geometry, material );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
 				new EXRLoader()
-					.setType( FloatType )
+					.setType( THREE.FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						texture.minFilter = NearestFilter;
-						// texture.magFilter = NearestFilter;
-						texture.encoding = LinearEncoding;
+						texture.minFilter = THREE.NearestFilter;
+						// texture.magFilter = THREE.NearestFilter;
+						texture.encoding = THREE.LinearEncoding;
 
-						var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512, type: HalfFloatType } );
+						var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
 						exrBackground = cubemapGenerator.renderTarget;
 						var cubeMapTexture = cubemapGenerator.update( renderer );
 
@@ -115,9 +99,9 @@
 
 					} );
 
-				new TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
+				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
-					texture.encoding = sRGBEncoding;
+					texture.encoding = THREE.sRGBEncoding;
 
 					var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512 } );
 					pngBackground = cubemapGenerator.renderTarget;

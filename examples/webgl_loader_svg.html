@@ -20,18 +20,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				DoubleSide,
-				GridHelper,
-				Group,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				ShapeBufferGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -52,12 +41,12 @@
 
 				//
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 200 );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -133,12 +122,12 @@
 
 				//
 
-				scene = new Scene();
-				scene.background = new Color( 0xb0b0b0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xb0b0b0 );
 
 				//
 
-				var helper = new GridHelper( 160, 10 );
+				var helper = new THREE.GridHelper( 160, 10 );
 				helper.rotation.x = Math.PI / 2;
 				scene.add( helper );
 
@@ -150,7 +139,7 @@
 
 					var paths = data.paths;
 
-					var group = new Group();
+					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.25 );
 					group.position.x = - 70;
 					group.position.y = 70;
@@ -163,11 +152,11 @@
 						var fillColor = path.userData.style.fill;
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
-							var material = new MeshBasicMaterial( {
-								color: new Color().setStyle( fillColor ),
+							var material = new THREE.MeshBasicMaterial( {
+								color: new THREE.Color().setStyle( fillColor ),
 								opacity: path.userData.style.fillOpacity,
 								transparent: path.userData.style.fillOpacity < 1,
-								side: DoubleSide,
+								side: THREE.DoubleSide,
 								depthWrite: false,
 								wireframe: guiData.fillShapesWireframe
 							} );
@@ -178,8 +167,8 @@
 
 								var shape = shapes[ j ];
 
-								var geometry = new ShapeBufferGeometry( shape );
-								var mesh = new Mesh( geometry, material );
+								var geometry = new THREE.ShapeBufferGeometry( shape );
+								var mesh = new THREE.Mesh( geometry, material );
 
 								group.add( mesh );
 
@@ -191,11 +180,11 @@
 
 						if ( guiData.drawStrokes && strokeColor !== undefined && strokeColor !== 'none' ) {
 
-							var material = new MeshBasicMaterial( {
-								color: new Color().setStyle( strokeColor ),
+							var material = new THREE.MeshBasicMaterial( {
+								color: new THREE.Color().setStyle( strokeColor ),
 								opacity: path.userData.style.strokeOpacity,
 								transparent: path.userData.style.strokeOpacity < 1,
-								side: DoubleSide,
+								side: THREE.DoubleSide,
 								depthWrite: false,
 								wireframe: guiData.strokesWireframe
 							} );
@@ -208,7 +197,7 @@
 
 								if ( geometry ) {
 
-									var mesh = new Mesh( geometry, material );
+									var mesh = new THREE.Mesh( geometry, material );
 
 									group.add( mesh );
 

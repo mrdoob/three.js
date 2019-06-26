@@ -23,20 +23,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				BufferGeometryLoader,
-				Color,
-				Geometry,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				VertexColors,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -46,8 +33,8 @@
 
 			var camera, scene, renderer, stats, smoothMesh, wireframe;
 
-			var smoothMaterial = new MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: VertexColors } );
-			var wireframeMaterial = new MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
+			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
 
 			var faceIndices = [ 'a', 'b', 'c' ];
 
@@ -59,26 +46,26 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 500 );
 				camera.position.z = 100;
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var light = new PointLight( 0xffffff, 1.5 );
+				var light = new THREE.PointLight( 0xffffff, 1.5 );
 				light.position.set( 1000, 1000, 2000 );
 				scene.add( light );
 
-				var loader = new BufferGeometryLoader();
+				var loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( bufferGeometry ) {
 
-					// converting to legacy Geometry because SubdivisionModifier only returns Geometry
+					// converting to legacy THREE.Geometry because SubdivisionModifier only returns THREE.Geometry
 
-					var geometry = new Geometry().fromBufferGeometry( bufferGeometry );
+					var geometry = new THREE.Geometry().fromBufferGeometry( bufferGeometry );
 					geometry.mergeVertices();
 
-					var material = new MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
-					var mesh = new Mesh( bufferGeometry, material );
+					var material = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
+					var mesh = new THREE.Mesh( bufferGeometry, material );
 					scene.add( mesh );
 
 					var gui = new GUI();
@@ -96,7 +83,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -114,8 +101,8 @@
 
 				//
 
-				smoothMesh = new Mesh( undefined, smoothMaterial );
-				wireframe = new Mesh( undefined, wireframeMaterial );
+				smoothMesh = new THREE.Mesh( undefined, smoothMaterial );
+				wireframe = new THREE.Mesh( undefined, wireframeMaterial );
 				scene.add( smoothMesh, wireframe );
 
 			}
@@ -138,18 +125,18 @@
 						var vertex = smoothGeometry.vertices[ vertexIndex ];
 
 						var hue = ( vertex.y / 200 ) + 0.5;
-						var color = new Color().setHSL( hue, 1, 0.5 );
+						var color = new THREE.Color().setHSL( hue, 1, 0.5 );
 						face.vertexColors[ j ] = color;
 
 					}
 
 				}
 
-				// convert to BufferGeometry
+				// convert to THREE.BufferGeometry
 
 				if ( smoothMesh.geometry ) smoothMesh.geometry.dispose();
 
-				smoothMesh.geometry = new BufferGeometry().fromGeometry( smoothGeometry );
+				smoothMesh.geometry = new THREE.BufferGeometry().fromGeometry( smoothGeometry );
 				wireframe.geometry = smoothMesh.geometry;
 
 				//

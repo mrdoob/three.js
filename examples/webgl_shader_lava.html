@@ -75,19 +75,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				Clock,
-				Mesh,
-				PerspectiveCamera,
-				RepeatWrapping,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				TorusBufferGeometry,
-				Vector2,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -107,32 +95,32 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 4;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				uniforms = {
 
 					"fogDensity": { value: 0.45 },
-					"fogColor": { value: new Vector3( 0, 0, 0 ) },
+					"fogColor": { value: new THREE.Vector3( 0, 0, 0 ) },
 					"time": { value: 1.0 },
-					"uvScale": { value: new Vector2( 3.0, 1.0 ) },
+					"uvScale": { value: new THREE.Vector2( 3.0, 1.0 ) },
 					"texture1": { value: textureLoader.load( 'textures/lava/cloud.png' ) },
 					"texture2": { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
 
 				};
 
-				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = RepeatWrapping;
-				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = RepeatWrapping;
+				uniforms[ "texture1" ].value.wrapS = uniforms[ "texture1" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms[ "texture2" ].value.wrapS = uniforms[ "texture2" ].value.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.65;
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -140,13 +128,13 @@
 
 				} );
 
-				mesh = new Mesh( new TorusBufferGeometry( size, 0.3, 30, 30 ), material );
+				mesh = new THREE.Mesh( new THREE.TorusBufferGeometry( size, 0.3, 30, 30 ), material );
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 				renderer.autoClear = false;

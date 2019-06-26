@@ -20,19 +20,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				Color,
-				Float32BufferAttribute,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -41,35 +29,35 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x8FBCD4 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x8FBCD4 );
 
-				scene.add( new AmbientLight( 0x8FBCD4, 0.4 ) );
+				scene.add( new THREE.AmbientLight( 0x8FBCD4, 0.4 ) );
 
 				container = document.getElementById( 'container' );
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.z = 8;
 				scene.add( camera );
 
 				var controls = new OrbitControls( camera, container );
 
-				var pointLight = new PointLight( 0xffffff, 1 );
+				var pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
 
 				var geometry = createGeometry();
 
-				var material = new MeshPhongMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xff0000,
 					flatShading: true,
 					morphTargets: true
 				} );
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				initGUI();
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -88,7 +76,7 @@
 
 			function createGeometry() {
 
-				var geometry = new BoxBufferGeometry( 2, 2, 2, 32, 32, 32 );
+				var geometry = new THREE.BoxBufferGeometry( 2, 2, 2, 32, 32, 32 );
 
 				// create an empty array to  hold targets for the attribute we want to morph
 				// morphing positions and normals is supported
@@ -102,8 +90,8 @@
 
 				// for the second morph target, we'll twist the cubes vertices
 				var twistPositions = [];
-				var direction = new Vector3( 1, 0, 0 ).normalize();
-				var vertex = new Vector3();
+				var direction = new THREE.Vector3( 1, 0, 0 ).normalize();
+				var vertex = new THREE.Vector3();
 
 				for ( var i = 0; i < positions.length; i += 3 ) {
 
@@ -127,10 +115,10 @@
 				}
 
 				// add the spherical positions as the first morph target
-				geometry.morphAttributes.position[ 0 ] = new Float32BufferAttribute( spherePositions, 3 );
+				geometry.morphAttributes.position[ 0 ] = new THREE.Float32BufferAttribute( spherePositions, 3 );
 
 				// add the twisted positions as the second morph target
-				geometry.morphAttributes.position[ 1 ] = new Float32BufferAttribute( twistPositions, 3 );
+				geometry.morphAttributes.position[ 1 ] = new THREE.Float32BufferAttribute( twistPositions, 3 );
 
 				return geometry;
 

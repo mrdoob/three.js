@@ -14,25 +14,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BackSide,
-				BasicDepthPacking,
-				DoubleSide,
-				FrontSide,
-				Mesh,
-				MeshDepthMaterial,
-				MeshNormalMaterial,
-				MeshStandardMaterial,
-				OrthographicCamera,
-				PerspectiveCamera,
-				PointLight,
-				RGBADepthPacking,
-				Scene,
-				TextureLoader,
-				Vector2,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -51,9 +33,9 @@
 			};
 
 			var sides = {
-				'front': FrontSide,
-				'back': BackSide,
-				'double': DoubleSide
+				'front': THREE.FrontSide,
+				'back': THREE.BackSide,
+				'double': THREE.DoubleSide
 			};
 
 			var cameraOrtho, cameraPerspective;
@@ -85,21 +67,21 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var aspect = window.innerWidth / window.innerHeight;
-				cameraPerspective = new PerspectiveCamera( 45, aspect, 1000, 2500 );
+				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 1000, 2500 );
 				cameraPerspective.position.z = 1500;
 				scene.add( cameraPerspective );
 
-				cameraOrtho = new OrthographicCamera( - height * aspect, height * aspect, height, - height, 1000, 2500 );
+				cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1000, 2500 );
 				cameraOrtho.position.z = 1500;
 				scene.add( cameraOrtho );
 
@@ -119,31 +101,31 @@
 
 				// lights
 
-				var ambientLight = new AmbientLight( 0xffffff, 0.1 );
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambientLight );
 
-				var pointLight = new PointLight( 0xff0000, 0.5 );
+				var pointLight = new THREE.PointLight( 0xff0000, 0.5 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				var pointLight2 = new PointLight( 0xff6666, 1 );
+				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
 				camera.add( pointLight2 );
 
-				var pointLight3 = new PointLight( 0x0000ff, 0.5 );
+				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
 
 				// textures
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
 				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
 				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
 
 				// material
 
-				materialStandard = new MeshStandardMaterial( {
+				materialStandard = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 
 					metalness: 0.5,
@@ -156,44 +138,44 @@
 					aoMap: aoMap,
 
 					normalMap: normalMap,
-					normalScale: new Vector2( 1, - 1 ),
+					normalScale: new THREE.Vector2( 1, - 1 ),
 
 					//flatShading: true,
 
-					side: DoubleSide
+					side: THREE.DoubleSide
 				} );
 
-				materialDepthBasic = new MeshDepthMaterial( {
-					depthPacking: BasicDepthPacking,
+				materialDepthBasic = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.BasicDepthPacking,
 
 					displacementMap: displacementMap,
 					displacementScale: SCALE,
 					displacementBias: BIAS,
 
-					side: DoubleSide
+					side: THREE.DoubleSide
 				} );
 
-				materialDepthRGBA = new MeshDepthMaterial( {
-					depthPacking: RGBADepthPacking,
+				materialDepthRGBA = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.RGBADepthPacking,
 
 					displacementMap: displacementMap,
 					displacementScale: SCALE,
 					displacementBias: BIAS,
 
-					side: DoubleSide
+					side: THREE.DoubleSide
 				} );
 
-				materialNormal = new MeshNormalMaterial( {
+				materialNormal = new THREE.MeshNormalMaterial( {
 					displacementMap: displacementMap,
 					displacementScale: SCALE,
 					displacementBias: BIAS,
 
 					normalMap: normalMap,
-					normalScale: new Vector2( 1, - 1 ),
+					normalScale: new THREE.Vector2( 1, - 1 ),
 
 					//flatShading: true,
 
-					side: DoubleSide
+					side: THREE.DoubleSide
 				} );
 
 				//
@@ -205,7 +187,7 @@
 					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
-					mesh = new Mesh( geometry, materialNormal );
+					mesh = new THREE.Mesh( geometry, materialNormal );
 					mesh.scale.multiplyScalar( 25 );
 					scene.add( mesh );
 
@@ -273,9 +255,9 @@
 
 						switch ( params.side ) {
 
-							case 'front': material.side = FrontSide; break;
-							case 'back': material.side = BackSide; break;
-							case 'double': material.side = DoubleSide; break;
+							case 'front': material.side = THREE.FrontSide; break;
+							case 'back': material.side = THREE.BackSide; break;
+							case 'double': material.side = THREE.DoubleSide; break;
 
 						}
 

@@ -9,7 +9,7 @@ import {
 	MeshStandardMaterial,
 	PointsMaterial,
 	VertexColors
-} from "../../../../build/three.module.js";
+} from "../../../../../build/three.module.js";
 
 
 const MaterialHandler = function () {
@@ -85,9 +85,9 @@ MaterialHandler.prototype = {
 		if ( materialCloneInstructions !== undefined && materialCloneInstructions !== null ) {
 
 			let materialNameOrg = materialCloneInstructions.materialNameOrg;
-			if ( materialNameOrg !== undefined && materialNameOrg !== null ) {
-
-				let materialOrg = this.materials[ materialNameOrg ];
+			materialNameOrg = (materialNameOrg !== undefined && materialNameOrg !== null) ? materialNameOrg : "";
+			let materialOrg = this.materials[ materialNameOrg ];
+			if ( materialOrg ) {
 				material = materialOrg.clone();
 
 				materialName = materialCloneInstructions.materialName;

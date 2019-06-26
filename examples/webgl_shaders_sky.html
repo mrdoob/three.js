@@ -15,15 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				GridHelper,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -44,9 +36,9 @@
 				scene.add( sky );
 
 				// Add Sun Helper
-				sunSphere = new Mesh(
-					new SphereBufferGeometry( 20000, 16, 8 ),
-					new MeshBasicMaterial( { color: 0xffffff } )
+				sunSphere = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 20000, 16, 8 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				sunSphere.position.y = - 700000;
 				sunSphere.visible = false;
@@ -108,17 +100,17 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
 				camera.position.set( 0, 100, 2000 );
 
 				//camera.setLens(20);
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var helper = new GridHelper( 10000, 2, 0xffffff, 0xffffff );
+				var helper = new THREE.GridHelper( 10000, 2, 0xffffff, 0xffffff );
 				scene.add( helper );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

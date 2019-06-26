@@ -15,14 +15,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Clock,
-				DirectionalLight,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -62,11 +55,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				// load jeep model
 
@@ -89,17 +82,17 @@
 
 				//
 
-				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new DirectionalLight( 0xeeeeee );
+				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
 				directionalLight.position.set( 1, 1, - 1 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

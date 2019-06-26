@@ -43,16 +43,7 @@
 		</script>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				PerspectiveCamera,
-				Points,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -76,10 +67,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
@@ -107,14 +98,14 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'scale', new BufferAttribute( scales, 1 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) );
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color: { value: new Color( 0xffffff ) },
+						color: { value: new THREE.Color( 0xffffff ) },
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
@@ -123,12 +114,12 @@
 
 				//
 
-				particles = new Points( geometry, material );
+				particles = new THREE.Points( geometry, material );
 				scene.add( particles );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

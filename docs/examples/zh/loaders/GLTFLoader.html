@@ -58,7 +58,7 @@
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
 		THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
 		loader.setDRACOLoader( new THREE.DRACOLoader() );
-			
+
 		// Optional: Pre-fetch Draco WASM/JS module, to save time while parsing.
 		THREE.DRACOLoader.getDecoderModule();
 
@@ -205,6 +205,11 @@
 		</p>
 		<p>
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
+		</p>
+
+		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
+		<p>
+		[page:DDSLoader ddsLoader] — Instance of THREE.DDSLoader, to be used for loading compressed textures with the MSFT_TEXTURE_DDS extension.
 		</p>
 
 		<h3>[method:null parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>

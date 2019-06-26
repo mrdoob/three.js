@@ -21,19 +21,7 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				CubeTextureLoader,
-				DoubleSide,
-				Mesh,
-				MeshStandardMaterial,
-				OrthographicCamera,
-				PointLight,
-				Scene,
-				TextureLoader,
-				Vector2,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -119,7 +107,7 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -129,10 +117,10 @@
 
 				//
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var aspect = window.innerWidth / window.innerHeight;
-				camera = new OrthographicCamera( - height * aspect, height * aspect, height, - height, 1, 10000 );
+				camera = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1, 10000 );
 				camera.position.z = 1500;
 				scene.add( camera );
 
@@ -142,17 +130,17 @@
 
 				// lights
 
-				ambientLight = new AmbientLight( 0xffffff, settings.ambientIntensity );
+				ambientLight = new THREE.AmbientLight( 0xffffff, settings.ambientIntensity );
 				scene.add( ambientLight );
 
-				pointLight = new PointLight( 0xff0000, 0.5 );
+				pointLight = new THREE.PointLight( 0xff0000, 0.5 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				var pointLight2 = new PointLight( 0xff6666, 1 );
+				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
 				camera.add( pointLight2 );
 
-				var pointLight3 = new PointLight( 0x0000ff, 0.5 );
+				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
@@ -167,25 +155,25 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new CubeTextureLoader().load( urls );
+				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// textures
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 				var normalMap = textureLoader.load( "models/obj/ninja/normal.jpg" );
 				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
 				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
 
 				// material
 
-				material = new MeshStandardMaterial( {
+				material = new THREE.MeshStandardMaterial( {
 
 					color: 0x888888,
 					roughness: settings.roughness,
 					metalness: settings.metalness,
 
 					normalMap: normalMap,
-					normalScale: new Vector2( 1, - 1 ), // why does the normal map require negation in this case?
+					normalScale: new THREE.Vector2( 1, - 1 ), // why does the normal map require negation in this case?
 
 					aoMap: aoMap,
 					aoMapIntensity: 1,
@@ -197,7 +185,7 @@
 					envMap: reflectionCube,
 					envMapIntensity: settings.envMapIntensity,
 
-					side: DoubleSide
+					side: THREE.DoubleSide
 
 				} );
 
@@ -210,7 +198,7 @@
 					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
-					mesh = new Mesh( geometry, material );
+					mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.multiplyScalar( 25 );
 					scene.add( mesh );
 
