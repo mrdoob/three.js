@@ -503,6 +503,13 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   img {
     background: #DDD;
   }
+  img[src$=".svg"] {
+    filter: invert(1) hue-rotate(180deg);
+    background: none;
+  }
+  .noinvertdark {
+    filter: none !important;
+  }
   .lesson-sidebar {
     background: #222;
   }

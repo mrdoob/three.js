@@ -16,27 +16,27 @@ Of course a 256x256x256 array would be rather large but as we pointed out in [th
 
 Let's imagine an 8x8x8 cube.
 
-<div class="threejs_center"><img src="resources/images/3dlut-rgb.svg" style="width: 500px"></div>
+<div class="threejs_center"><img src="resources/images/3dlut-rgb.svg" class="noinvertdark" style="width: 500px"></div>
 
-First we might fill in the corners with 0,0,0 corner being pure black, the opposite 1,1,1 corner pure white. 1,0,0 being pure <span style"color:red;">red</span>. 0,1,0 being pure <span style"color:green;">green</span> and 0,0,1 being <span style"color:blue;">blue</span>. 
+First we might fill in the corners with 0,0,0 corner being pure black, the opposite 1,1,1 corner pure white. 1,0,0 being pure <span style="color:red;">red</span>. 0,1,0 being pure <span style="color:green;">green</span> and 0,0,1 being <span style="color:blue;">blue</span>. 
 
-<div class="threejs_center"><img src="resources/images/3dlut-axis.svg" style="width: 500px"></div>
+<div class="threejs_center"><img src="resources/images/3dlut-axis.svg" class="noinvertdark" style="width: 500px"></div>
 
 We'd add in the colors down each axis.
 
-<div class="threejs_center"><img src="resources/images/3dlut-edges.svg" style="width: 500px"></div>
+<div class="threejs_center"><img src="resources/images/3dlut-edges.svg" class="noinvertdark" style="width: 500px"></div>
 
 And the colors on edges that use 2 or more channels.
 
-<div class="threejs_center"><img src="resources/images/3dlut-standard.svg" style="width: 500px"></div>
+<div class="threejs_center"><img src="resources/images/3dlut-standard.svg" class="noinvertdark" style="width: 500px"></div>
 
 And finally fill in all the colors in between. This is an "identity" 3DLUT. It produces the exact same output as input. If you look up a color you'll get the same color out.
 
-<div class="threejs_center"><object type="image/svg+xml" data="resources/images/3dlut-standard-lookup.svg" data-diagram="lookup" style="width: 600px"></object></div>
+<div class="threejs_center"><object type="image/svg+xml" data="resources/images/3dlut-standard-lookup.svg" class="noinvertdark" data-diagram="lookup" style="width: 600px"></object></div>
 
 If we change the cube to shades of amber though then as we look up colors, we look up the same locations in the 3D lookup table but they produce different output.
 
-<div class="threejs_center"><object type="image/svg+xml" data="resources/images/3dlut-amber-lookup.svg" data-diagram="lookup" style="width: 600px"></object></div>
+<div class="threejs_center"><object type="image/svg+xml" data="resources/images/3dlut-amber-lookup.svg" class="noinvertdark" data-diagram="lookup" style="width: 600px"></object></div>
 
 Using this techinque by supplying a different lookup table we can apply all kinds of effects. Basically any effect that can be computed based only on a single color input. Those effects include adjusting hue, contrast, saturation, color cast, tint, brightness, exposure, levels, curves, posterize, shadows, highlghts, and many others. Even better they can all be combined into a single look up table.
 
@@ -48,7 +48,7 @@ We'll also add a background image like we covered in [backgrounds and skyboxs](t
 
 Now that we have a scene we need a 3DLUT. The simplest 3DLUT is a 2x2x2 identity LUT where *identity* means nothing happens. It's like multiplying by 1 or doing nothign, even though we're looking up colors in the LUT each color in maps to the same color out.
 
-<div class="threejs_center"><img src="resources/images/3dlut-standard-2x2.svg" style="width: 200px"></div>
+<div class="threejs_center"><img src="resources/images/3dlut-standard-2x2.svg" class="noinvertdark" style="width: 200px"></div>
 
 WebGL1 doesn't support 3D textures so we'll use 4x2 2D texture and treat it as a 3D texture inside a custom shader where each slice of the cube is spread out horizontally across the texture.
 
