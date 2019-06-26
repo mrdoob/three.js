@@ -25,6 +25,7 @@
     "test": "test"
   },
   "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
     "extends": "mdcs",
     "plugins": [
       "html",
@@ -66,6 +67,8 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
     "concurrently": "^4.1.1",
     "eslint": "^6.0.1",
     "eslint-config-mdcs": "^4.2.3",
