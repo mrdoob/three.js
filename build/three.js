@@ -23252,8 +23252,8 @@
 			utils = new WebGLUtils( _gl, extensions, capabilities );
 
 			state = new WebGLState( _gl, extensions, utils, capabilities );
-			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
-			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -23367,8 +23367,8 @@
 			_width = width;
 			_height = height;
 
-			_canvas.width = width * _pixelRatio;
-			_canvas.height = height * _pixelRatio;
+			_canvas.width = Math.floor( width * _pixelRatio );
+			_canvas.height = Math.floor( height * _pixelRatio );
 
 			if ( updateStyle !== false ) {
 
@@ -23391,7 +23391,7 @@
 
 			}
 
-			return target.set( _width * _pixelRatio, _height * _pixelRatio );
+			return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
 
 		};
 
@@ -23402,8 +23402,8 @@
 
 			_pixelRatio = pixelRatio;
 
-			_canvas.width = width * pixelRatio;
-			_canvas.height = height * pixelRatio;
+			_canvas.width = Math.floor( width * pixelRatio );
+			_canvas.height = Math.floor( height * pixelRatio );
 
 			this.setViewport( 0, 0, width, height );
 
@@ -23441,7 +23441,7 @@
 
 			}
 
-			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ) );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
 		};
 
@@ -23463,7 +23463,7 @@
 
 			}
 
-			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ) );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
 
 		};
 
@@ -25425,8 +25425,8 @@
 
 			} else {
 
-				_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio );
-				_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio );
+				_currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor();
+				_currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor();
 				_currentScissorTest = _scissorTest;
 
 			}
