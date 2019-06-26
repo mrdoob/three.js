@@ -12,7 +12,7 @@ export const SMAAEdgesShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const SMAAWeightsShader: {
   defines: {
@@ -29,7 +29,7 @@ export const SMAAWeightsShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const SMAABlendShader: {
   uniforms: {
@@ -39,4 +39,4 @@ export const SMAABlendShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

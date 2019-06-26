@@ -24,7 +24,7 @@ export const SSAOShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const SSAODepthShader: {
   defines: {
@@ -37,7 +37,7 @@ export const SSAODepthShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const SSAOBlurShader: {
   uniforms: {
@@ -46,4 +46,4 @@ export const SSAOBlurShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -12,4 +12,4 @@ export const WaterRefractionShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

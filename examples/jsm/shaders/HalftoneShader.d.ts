@@ -20,4 +20,4 @@ export const HalftoneShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

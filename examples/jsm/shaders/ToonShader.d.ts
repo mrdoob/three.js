@@ -11,7 +11,7 @@ export const ToonShader1: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const ToonShader2: {
   uniforms: {
@@ -26,7 +26,7 @@ export const ToonShader2: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const ToonShaderHatching: {
   uniforms: {
@@ -41,7 +41,7 @@ export const ToonShaderHatching: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const ToonShaderDotted: {
   uniforms: {
@@ -53,4 +53,4 @@ export const ToonShaderDotted: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

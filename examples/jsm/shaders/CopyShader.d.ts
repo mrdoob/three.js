@@ -9,4 +9,4 @@ export const CopyShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -9,4 +9,4 @@ export const TriangleBlurShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

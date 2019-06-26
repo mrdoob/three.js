@@ -9,4 +9,4 @@ export const VerticalBlurShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -38,7 +38,7 @@ export const SkinShaderBasic: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const SkinShaderAdvanced: {
   uniforms: {
@@ -76,10 +76,10 @@ export const SkinShaderAdvanced: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
 export const SkinShaderBeckmann: {
   uniforms: {};
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -9,4 +9,4 @@ export const UnpackDepthRGBAShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

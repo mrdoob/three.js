@@ -10,4 +10,4 @@ export const VerticalTiltShiftShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

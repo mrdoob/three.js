@@ -13,4 +13,4 @@ export const VolumeShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

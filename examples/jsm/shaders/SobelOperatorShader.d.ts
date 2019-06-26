@@ -9,4 +9,4 @@ export const SobelOperatorShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -8,4 +8,4 @@ export const TechnicolorShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

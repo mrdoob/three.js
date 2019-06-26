@@ -44,4 +44,4 @@ export const TerrainShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

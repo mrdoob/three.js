@@ -13,4 +13,4 @@ export const ToneMapShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

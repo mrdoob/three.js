@@ -10,4 +10,4 @@ export const VignetteShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -9,4 +9,4 @@ export const HorizontalBlurShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

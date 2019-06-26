@@ -36,4 +36,4 @@ export const TranslucentShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
