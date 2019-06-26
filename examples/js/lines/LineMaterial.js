@@ -14,6 +14,7 @@
 
 THREE.UniformsLib.line = {
 
+	screenSpaceWidth: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new THREE.Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
@@ -38,6 +39,7 @@ THREE.ShaderLib[ 'line' ] = {
 		#include <logdepthbuf_pars_vertex>
 		#include <clipping_planes_pars_vertex>
 
+		uniform float screenSpaceWidth;
 		uniform float linewidth;
 		uniform vec2 resolution;
 
@@ -162,7 +164,7 @@ THREE.ShaderLib[ 'line' ] = {
 			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
 
 			// back to clip space
-			offset *= clip.w;
+			offset = mix(offset * 50.0, offset * clip.w, screenSpaceWidth);
 
 			clip.xy += offset;
 
@@ -267,6 +269,24 @@ THREE.LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.diffuse.value = value;
+
+			}
+
+		},
+
+		screenSpaceWidth: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.screenSpaceWidth.value === 1;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.screenSpaceWidth.value = value ? 1 : 0;
 
 			}
 
