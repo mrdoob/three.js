@@ -31,33 +31,18 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<script type="module">
-			/*
-			 * COPIED FROM webgl_materials_envmaps_hdr.html
-			 *
-			 *
-			 *
-			 */
-			import './js/nodes/THREE.Nodes.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { MeshStandardNodeMaterial } from './jsm/nodes/materials/MeshStandardNodeMaterial.js';
 
 			var params = {
 				envMap: 'HDR',
@@ -105,7 +90,7 @@
 				torusMesh = new THREE.Mesh( geometry, material );
 				scene.add( torusMesh );
 
-				material = new THREE.MeshStandardNodeMaterial();
+				material = new MeshStandardNodeMaterial();
 				material.color = new THREE.Color( 0xffffff );
 				material.roughness = params.metalness;
 				material.metalness = params.roguhness;
@@ -119,14 +104,15 @@
 				scene.add( planeMesh );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-				hdrCubeMap = new THREE.HDRCubeTextureLoader()
+				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.load( THREE.UnsignedByteType, hdrUrls, function () {
+					.setType( THREE.UnsignedByteType )
+					.load( hdrUrls, function () {
 
-						var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
 						pmremGenerator.update( renderer );
 
-						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 						pmremCubeUVPacker.update( renderer );
 
 						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -146,10 +132,10 @@
 
 						ldrCubeMap.encoding = THREE.GammaEncoding;
 
-						var pmremGenerator = new THREE.PMREMGenerator( ldrCubeMap );
+						var pmremGenerator = new PMREMGenerator( ldrCubeMap );
 						pmremGenerator.update( renderer );
 
-						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 						pmremCubeUVPacker.update( renderer );
 
 						ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -168,10 +154,10 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
+						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
 						pmremGenerator.update( renderer );
 
-						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 						pmremCubeUVPacker.update( renderer );
 
 						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -195,13 +181,13 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
@@ -244,7 +230,7 @@
 				torusMeshNode.material.roughness = params.roughness;
 				torusMeshNode.material.metalness = params.metalness;
 
-				torusMesh.visible = !params.nodes;
+				torusMesh.visible = ! params.nodes;
 				torusMeshNode.visible = params.nodes;
 
 				var renderTarget, cubeMap;
@@ -263,6 +249,7 @@
 						renderTarget = rgbmCubeRenderTarget;
 						cubeMap = rgbmCubeMap;
 						break;
+
 				}
 
 				var newEnvMap = renderTarget ? renderTarget.texture : null;
