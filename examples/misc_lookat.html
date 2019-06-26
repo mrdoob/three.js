@@ -19,11 +19,10 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D.lookAt() example</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, stats;
 

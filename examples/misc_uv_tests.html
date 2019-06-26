@@ -8,10 +8,10 @@
 
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/utils/UVsDebug.js"></script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { UVsDebug } from './jsm/utils/UVsDebug.js';
 
 			/*
 			 * This is to help debug UVs problems in geometry,
@@ -24,7 +24,7 @@
 
 				d.innerHTML = '<br><br>' + name + '<br>';
 
-				d.appendChild( THREE.UVsDebug( geometry ) );
+				d.appendChild( UVsDebug( geometry ) );
 
 				document.body.appendChild( d );
 

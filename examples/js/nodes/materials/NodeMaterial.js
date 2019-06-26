@@ -18,6 +18,22 @@ function NodeMaterial( vertex, fragment ) {
 
 	this.updaters = [];
 
+	// onBeforeCompile can't be in the prototype because onBeforeCompile.toString varies per material
+
+	this.onBeforeCompile = function ( shader, renderer ) {
+
+		if ( this.needsUpdate ) {
+
+			this.build( { renderer: renderer } );
+
+			shader.uniforms = this.uniforms;
+			shader.vertexShader = this.vertexShader;
+			shader.fragmentShader = this.fragmentShader;
+
+		}
+
+	};
+
 	// it fix the programCache and share the code with others materials
 
 	this.onBeforeCompile.toString = function() {
@@ -69,20 +85,6 @@ NodeMaterial.prototype.updateFrame = function ( frame ) {
 	for ( var i = 0; i < this.updaters.length; ++ i ) {
 
 		frame.updateNode( this.updaters[ i ] );
-
-	}
-
-};
-
-NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
-
-	if ( this.needsUpdate ) {
-
-		this.build( { renderer: renderer } );
-
-		shader.uniforms = this.uniforms;
-		shader.vertexShader = this.vertexShader;
-		shader.fragmentShader = this.fragmentShader;
 
 	}
 

@@ -10,7 +10,7 @@ function ConstNode( src, useDefine ) {
 
 	TempNode.call( this );
 
-	this.eval( src || ConstNode.PI, useDefine );
+	this.parse( src || ConstNode.PI, useDefine );
 
 }
 
@@ -31,7 +31,7 @@ ConstNode.prototype.getType = function ( builder ) {
 
 };
 
-ConstNode.prototype.eval = function ( src, useDefine ) {
+ConstNode.prototype.parse = function ( src, useDefine ) {
 
 	this.src = src || '';
 
@@ -100,7 +100,7 @@ ConstNode.prototype.copy = function ( source ) {
 
 	TempNode.prototype.copy.call( this, source );
 
-	this.eval( source.src, source.useDefine );
+	this.parse( source.src, source.useDefine );
 
 };
 

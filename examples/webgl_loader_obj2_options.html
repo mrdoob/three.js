@@ -48,18 +48,22 @@
 			<div id="feedback"></div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/loaders/LoaderSupport.js"></script>
-		<script src="js/loaders/OBJLoader2.js"></script>
-		<script>
+		<script type="module">
 
 			'use strict';
 
-			var WWOBJLoader2Example = function ( elementToBindTo ) {
+			import * as THREE from '../build/three.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
+
+			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
+			import { MtlObjBridge } from "./jsm/loaders/obj2/bridge/MtlObjBridge.js";
+			import { OBJLoader2 } from "./jsm/loaders/OBJLoader2.js";
+			import { OBJLoader2Parallel } from "./jsm/loaders/OBJLoader2Parallel.js";
+			import { LoadedMeshUserOverride } from "./jsm/loaders/obj2/shared/MeshReceiver.js";
+
+			const WWOBJLoader2Example = function ( elementToBindTo ) {
 				this.renderer = null;
 				this.canvas = elementToBindTo;
 				this.aspectRatio = 1;
@@ -101,11 +105,11 @@
 
 					this.camera = new THREE.PerspectiveCamera( this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far );
 					this.resetCamera();
-					this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
+					this.controls = new TrackballControls( this.camera, this.renderer.domElement );
 
-					var ambientLight = new THREE.AmbientLight( 0x404040 );
-					var directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
-					var directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
+					let ambientLight = new THREE.AmbientLight( 0x404040 );
+					let directionalLight1 = new THREE.DirectionalLight( 0xC0C090 );
+					let directionalLight2 = new THREE.DirectionalLight( 0xC0C090 );
 
 					directionalLight1.position.set( -100, -50, 100 );
 					directionalLight2.position.set( 100, 50, -100 );
@@ -114,11 +118,11 @@
 					this.scene.add( directionalLight2 );
 					this.scene.add( ambientLight );
 
-					var helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
+					let helper = new THREE.GridHelper( 1200, 60, 0xFF4444, 0x404040 );
 					this.scene.add( helper );
 
-					var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
-					var material = new THREE.MeshNormalMaterial();
+					let geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+					let material = new THREE.MeshNormalMaterial();
 					this.cube = new THREE.Mesh( geometry, material );
 					this.cube.position.set( 0, 0, 0 );
 					this.scene.add( this.cube );
@@ -128,179 +132,168 @@
 					this.scene.add( this.pivot );
 				},
 
-				useParseSync: function () {
-					var modelName = 'female02';
+				useParseMain: function () {
+					let modelName = 'female02';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
+					let objLoader2 = new OBJLoader2()
+						.setModelName( modelName );
 
-						var fileLoader = new THREE.FileLoader();
+					let scope = this;
+					function onLoadMtl ( mtlParseResult ) {
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+
+						let fileLoader = new THREE.FileLoader();
 						fileLoader.setPath( '' );
 						fileLoader.setResponseType( 'arraybuffer' );
 						fileLoader.load( 'models/obj/female02/female02.obj',
 							function ( content ) {
-								var local = new THREE.Object3D();
+								let local = new THREE.Object3D();
 								local.name = 'Pivot_female02';
 								local.position.set( 75, 0, 0 );
 								scope.pivot.add( local );
-								local.add( objLoader.parse( content ) );
+								local.add( objLoader2.parse( content ) );
 
 								scope._reportProgress( { detail: { text: 'Loading complete: ' + modelName } } );
 							}
 						);
-					};
-					var onError = function ( event ) {
-						console.error( 'Error occurred: ' + event );
-					};
-					objLoader.loadMtl( 'models/obj/female02/female02.mtl', null, onLoadMtl, null, onError );
+					}
+
+					let mtlLoader = new MTLLoader();
+					mtlLoader.load( 'models/obj/female02/female02.mtl', onLoadMtl );
 				},
 
-				useParseAsync: function () {
-					var modelName = 'female02_vertex' ;
+				useParseParallel: function () {
+					let modelName = 'female02_vertex' ;
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					var callbackOnLoad = function ( event ) {
-						var local = new THREE.Object3D();
-						local.name = 'Pivot_female02_vertex';
-						local.position.set( -75, 0, 0 );
-						scope.pivot.add( local );
-						local.add( event.detail.loaderRootNode );
+					let scope = this;
 
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
-					};
+					let objLoader2Parallel = new OBJLoader2Parallel();
+					objLoader2Parallel.setModelName( modelName );
 
-					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					objLoader.setModelName( modelName );
+					function callbackOnLoad ( message ) {
+						scope.scene.add( objLoader2Parallel.baseObject3d  );
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + message } } );
+					}
 
-					var fileLoader = new THREE.FileLoader();
-					fileLoader.setPath( '' );
-					fileLoader.setResponseType( 'arraybuffer' );
-					var filename = 'models/obj/female02/female02_vertex_colors.obj';
-					fileLoader.load( filename,
-						function ( content ) {
-							objLoader.parseAsync( content, callbackOnLoad );
-							scope._reportProgress( { detail: { text: 'File loading complete: ' + filename } } );
-						}
-					);
+					let filename = 'models/obj/female02/female02_vertex_colors.obj';
+					objLoader2Parallel.load( filename, callbackOnLoad );
 				},
 
-				useLoadSync: function () {
-					var modelName = 'male02';
+				useLoadMain: function () {
+					let modelName = 'male02';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var callbackOnLoad = function ( event ) {
-						var local = new THREE.Object3D();
+					let objLoader2 = new OBJLoader2()
+					.setModelName( modelName )
+					.setUseIndices( true );
+
+					let scope = this;
+					function callbackOnLoad ( object3d ) {
+						let local = new THREE.Object3D();
 						local.name = 'Pivot_male02';
 						local.position.set( 0, 0, -75 );
 						scope.pivot.add( local );
-						local.add( event.detail.loaderRootNode );
+						local.add( object3d );
 
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
-					};
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + objLoader2.modelName } } );
+					}
 
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
-						objLoader.setUseIndices( true );
-						objLoader.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null, false );
-					};
-					objLoader.loadMtl( 'models/obj/male02/male02.mtl', null, onLoadMtl );
+					function onLoadMtl ( mtlParseResult ) {
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null );
+					}
+
+					let mtlLoader = new MTLLoader();
+					mtlLoader.load( 'models/obj/male02/male02.mtl', onLoadMtl );
 				},
 
-				useLoadAsync: function () {
-					var modelName = 'WaltHead';
+				useLoadParallel: function () {
+					let modelName = 'WaltHead';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
-					var scope = this;
-					var objLoader = new THREE.OBJLoader2();
-					var callbackOnLoad = function ( event ) {
-						objLoader.workerSupport.setTerminateRequested( true );
-
-						var local = new THREE.Object3D();
-						local.name = 'Pivot_WaltHead';
-						local.position.set( -125, 50, 0 );
-						var scale = 0.5;
-						local.scale.set( scale, scale, scale );
-						scope.pivot.add( local );
-						local.add( event.detail.loaderRootNode );
-
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
-					};
-
-					var onLoadMtl = function ( materials ) {
-						objLoader.setModelName( modelName );
-						objLoader.setMaterials( materials );
-						objLoader.terminateWorkerOnLoad = false;
-						objLoader.load( 'models/obj/walt/WaltHead.obj', callbackOnLoad, null, null, null, true );
-
-					};
-					objLoader.loadMtl( 'models/obj/walt/WaltHead.mtl', null, onLoadMtl );
-				},
-
-				useRunSync: function () {
-					var scope = this;
-					var callbackOnLoad = function ( event ) {
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
-					};
-
-					var prepData = new THREE.LoaderSupport.PrepData( 'cerberus' );
-					var local = new THREE.Object3D();
-					local.position.set( 0, 0, 100 );
-					local.scale.set( 50.0, 50.0, 50.0 );
+					let local = new THREE.Object3D();
+					local.name = 'Pivot_WaltHead';
+					local.position.set( -125, 50, 0 );
+					let scale = 0.5;
+					local.scale.set( scale, scale, scale );
 					this.pivot.add( local );
-					prepData.streamMeshesTo = local;
-					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/cerberus/Cerberus.obj', 'OBJ' ) );
-					var callbacks = prepData.getCallbacks();
-					callbacks.setCallbackOnProgress( this._reportProgress );
-					callbacks.setCallbackOnLoad( callbackOnLoad );
 
-					var objLoader = new THREE.OBJLoader2();
-					objLoader.run( prepData );
+					let objLoader2Parallel = new OBJLoader2Parallel()
+					.setModelName( modelName )
+					.setBaseObject3d( local );
+
+					let scope = this;
+					function callbackOnLoad ( message ) {
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + message } } );
+					}
+					function onLoadMtl ( mtlParseResult ) {
+						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2Parallel.load( 'models/obj/walt/WaltHead.obj', callbackOnLoad );
+					}
+
+					let mtlLoader = new MTLLoader();
+					mtlLoader.load( 'models/obj/walt/WaltHead.mtl', onLoadMtl );
 				},
 
-				useRunAsyncMeshAlter: function () {
-					var scope = this;
-					var callbackOnLoad = function ( event ) {
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + event.detail.modelName } } );
-					};
+				useLoadMainFallback: function () {
+					let local = new THREE.Object3D();
+					local.name = 'Pivot_Cerberus';
+					local.position.set( 0, 0, 100 );
+					let scale = 50;
+					local.scale.set( scale, scale, scale );
+					this.pivot.add( local );
 
-					var prepData = new THREE.LoaderSupport.PrepData( 'vive-controller' );
-					var local = new THREE.Object3D();
+					let objLoader2Parallel = new OBJLoader2Parallel()
+					.setModelName( local.name )
+					.setExecuteParallel( false );
+
+					let scope = this;
+					function callbackOnLoad ( object3d ) {
+						local.add( object3d );
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + local.name } } );
+					}
+
+					objLoader2Parallel.load( 'models/obj/cerberus/Cerberus.obj', callbackOnLoad );
+				},
+
+				useLoadParallelMeshAlter: function () {
+					let local = new THREE.Object3D();
 					local.position.set( 125, 50, 0 );
 					local.name = 'Pivot_vive-controller';
 					this.pivot.add( local );
-					prepData.streamMeshesTo = local;
-					prepData.addResource( new THREE.LoaderSupport.ResourceDescriptor( 'models/obj/vive-controller/vr_controller_vive_1_5.obj', 'OBJ' ) );
-					prepData.useAsync = true;
-					var callbacks = prepData.getCallbacks();
-					var callbackMeshAlter = function ( event ) {
-						var override = new THREE.LoaderSupport.LoadedMeshUserOverride( false, true );
 
-						var mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
-						var scale = 200.0;
+					let objLoader2Parallel = new OBJLoader2Parallel()
+					.setModelName( local.name )
+					.setBaseObject3d( local );
+
+					// Configure WorkerExecutionSupport to not disregard worker after execution
+					objLoader2Parallel.getWorkerExecutionSupport().setTerminateWorkerOnLoad( false );
+
+					function callbackMeshAlter ( event ) {
+						let override = new LoadedMeshUserOverride( false, true );
+
+						let mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
+						let scale = 200.0;
 						mesh.scale.set( scale, scale, scale );
 						mesh.name = event.detail.meshName;
-						var helper = new THREE.VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new THREE.VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );
 						override.addMesh( helper );
 
 						return override;
-					};
-					callbacks.setCallbackOnMeshAlter( callbackMeshAlter );
-					callbacks.setCallbackOnProgress( this._reportProgress );
-					callbacks.setCallbackOnLoad( callbackOnLoad );
+					}
+					objLoader2Parallel._setCallbacks( null, callbackMeshAlter );
 
-					var objLoader = new THREE.OBJLoader2();
-					objLoader.run( prepData );
+					let scope = this;
+					function callbackOnLoad ( message ) {
+						scope._reportProgress( { detail: { text: 'Loading complete: ' + message } } );
+					}
+
+					objLoader2Parallel.load( 'models/obj/vive-controller/vr_controller_vive_1_5.obj', callbackOnLoad );
 				},
 
 				finalize: function () {
@@ -308,7 +301,12 @@
 				},
 
 				_reportProgress: function( event ) {
-					var output = THREE.LoaderSupport.Validator.verifyInput( event.detail.text, '' );
+					let output = '';
+					if ( event.detail !== null && event.detail !== undefined && event.detail.text ) {
+
+						output = event.detail.text;
+
+					}
 					console.log( 'Progress: ' + output );
 					document.getElementById( 'feedback' ).innerHTML = output;
 				},
@@ -351,7 +349,7 @@
 				},
 
 				alterShading: function () {
-					var scope = this;
+					let scope = this;
 					scope.flatShading = ! scope.flatShading;
 					console.log( scope.flatShading ? 'Enabling flat shading' : 'Enabling smooth shading');
 
@@ -359,32 +357,32 @@
 						material.flatShading = scope.flatShading;
 						material.needsUpdate = true;
 					};
-					var scopeTraverse = function ( object3d ) {
+					function scopeTraverse ( object3d ) {
 						scope.traverseScene( object3d );
-					};
+					}
 					scope.pivot.traverse( scopeTraverse );
 				},
 
 				alterDouble: function () {
-					var scope = this;
+					let scope = this;
 					scope.doubleSide = ! scope.doubleSide;
-					console.log( scope.doubleSide ? 'Enabling DoubleSide materials' : 'Enabling FrontSide materials' );
+					console.log( scope.doubleSide ? 'Enabling THREE.DoubleSide materials' : 'Enabling THREE.FrontSide materials');
 
 					scope.traversalFunction = function ( material ) {
 						material.side = scope.doubleSide ? THREE.DoubleSide : THREE.FrontSide;
 					};
 
-					var scopeTraverse = function ( object3d ) {
+					function scopeTraverse ( object3d ) {
 						scope.traverseScene( object3d );
-					};
+					}
 					scope.pivot.traverse( scopeTraverse );
 				},
 
 				traverseScene: function ( object3d ) {
-					if ( object3d.material instanceof THREE.MultiMaterial ) {
+					if ( Array.isArray( object3d.material ) ) {
 
-						var materials = object3d.material.materials;
-						for ( var name in materials ) {
+						let materials = object3d.material.materials;
+						for ( let name in materials ) {
 
 							if ( materials.hasOwnProperty( name ) )	this.traversalFunction( materials[ name ] );
 
@@ -399,29 +397,28 @@
 
 			};
 
+			let app = new WWOBJLoader2Example( document.getElementById( 'example' ) );
 
-			var app = new WWOBJLoader2Example( document.getElementById( 'example' ) );
-
-			var wwObjLoader2Control = {
+			let wwObjLoader2Control = {
 				flatShading: app.flatShading,
 				doubleSide: app.doubleSide
 			};
 
-			var menuDiv = document.getElementById( 'dat' );
-			var gui = new dat.GUI( {
+			let menuDiv = document.getElementById( 'dat' );
+			let gui = new GUI( {
 				autoPlace: false,
 				width: 320
 			} );
 			menuDiv.appendChild( gui.domElement );
 
-			var folderOptions = gui.addFolder( 'WWOBJLoader2 Options' );
-			var controlFlat = folderOptions.add( wwObjLoader2Control, 'flatShading' ).name( 'Flat Shading' );
+			let folderOptions = gui.addFolder( 'WWOBJLoader2 Options' );
+			let controlFlat = folderOptions.add( wwObjLoader2Control, 'flatShading' ).name( 'Flat Shading' );
 			controlFlat.onChange( function( value ) {
 				console.log( 'Setting flatShading to: ' + value );
 				app.alterShading();
 			});
 
-			var controlDouble = folderOptions.add( wwObjLoader2Control, 'doubleSide' ).name( 'Double Side Materials' );
+			let controlDouble = folderOptions.add( wwObjLoader2Control, 'doubleSide' ).name( 'Double Side Materials' );
 			controlDouble.onChange( function( value ) {
 				console.log( 'Setting doubleSide to: ' + value );
 				app.alterDouble();
@@ -430,14 +427,14 @@
 
 
 			// init three.js example application
-			var resizeWindow = function () {
+			function resizeWindow () {
 				app.resizeDisplayGL();
-			};
+			}
 
-			var render = function () {
+			function render () {
 				requestAnimationFrame( render );
 				app.render();
-			};
+			}
 			window.addEventListener( 'resize', resizeWindow, false );
 
 			console.log( 'Starting initialisation phase...' );
@@ -447,25 +444,23 @@
 			// kick render loop
 			render();
 
+			// Load a file with OBJLoader2.parse on main
+			app.useParseMain();
 
-			// Load a file with OBJLoader.parse synchronously
-			app.useParseSync();
+			// Load a file with OBJLoader2Parallel.parse in parallel in worker
+			app.useParseParallel();
 
-			// Load a file with OBJLoader.parseAsync asynchronously using a worker
-			app.useParseAsync();
+			// Load a file with OBJLoader.load on main
+			app.useLoadMain();
 
-			// Load a file with OBJLoader.load synchronously
-			app.useLoadSync();
+			// Load a file with OBJLoader2Parallel.load in parallel in worker
+			app.useLoadParallel();
 
-			// Load a file with OBJLoader.load asynchronously
-			app.useLoadAsync();
+			// Load a file with OBJLoader2Parallel.load on main with fallback to OBJLoader2.parse
+			app.useLoadMainFallback();
 
-			// Load a file with OBJLoader.run synchronously
-			app.useRunSync();
-
-			// Load a file with OBJLoader.run asynchronously and add normals during onMeshAlter
-			app.useRunAsyncMeshAlter();
-
+			// Load a file with OBJLoader2Parallel.load in parallel in worker and add normals during onMeshAlter
+			app.useLoadParallelMeshAlter();
 			app.finalize();
 
 		</script>

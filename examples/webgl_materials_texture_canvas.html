@@ -24,17 +24,8 @@
 		</div>
 		<canvas id="drawing-canvas" height="128" width="128"></canvas>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer, mesh, material;
 			var drawStartPos = new THREE.Vector2();

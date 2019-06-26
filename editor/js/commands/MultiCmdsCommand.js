@@ -4,13 +4,14 @@
  */
 
 /**
+ * @param editor Editor
  * @param cmdArray array containing command objects
  * @constructor
  */
 
-var MultiCmdsCommand = function ( cmdArray ) {
+var MultiCmdsCommand = function ( editor, cmdArray ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'MultiCmdsCommand';
 	this.name = 'Multiple Changes';

@@ -8,9 +8,8 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 			var mesh;
@@ -112,6 +111,7 @@
 						subcamera.updateProjectionMatrix();
 
 					}
+
 				}
 
 				renderer.setSize( window.innerWidth, window.innerHeight );

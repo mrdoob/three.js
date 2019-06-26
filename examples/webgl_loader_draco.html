@@ -13,18 +13,20 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
-	<script src="../build/three.js"></script>
-	<script src="js/loaders/DRACOLoader.js"></script>
-	<script>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 		var camera, scene, renderer;
 
 		var container = document.querySelector( '#container' );
 
 		// Configure and create Draco decoder.
-		THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/' );
-		THREE.DRACOLoader.setDecoderConfig( { type: 'js' } );
-		var dracoLoader = new THREE.DRACOLoader();
+		DRACOLoader.setDecoderPath( 'js/libs/draco/' );
+		DRACOLoader.setDecoderConfig( { type: 'js' } );
+		var dracoLoader = new DRACOLoader();
 		init();
 		animate();
 
@@ -69,7 +71,7 @@
 				scene.add( mesh );
 
 				// Release decoder resources.
-				THREE.DRACOLoader.releaseDecoderModule();
+				DRACOLoader.releaseDecoderModule();
 
 			} );
 

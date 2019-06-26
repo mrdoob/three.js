@@ -13,17 +13,10 @@
 			skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/effects/ParallaxBarrierEffect.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { ParallaxBarrierEffect } from './jsm/effects/ParallaxBarrierEffect.js';
 
 			var container, camera, scene, renderer, effect;
 
@@ -90,7 +83,7 @@
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
 
-				effect = new THREE.ParallaxBarrierEffect( renderer );
+				effect = new ParallaxBarrierEffect( renderer );
 				effect.setSize( width, height );
 
 				//

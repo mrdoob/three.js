@@ -28,7 +28,7 @@ export class TransformControls extends Object3D {
   isTransformControls: boolean;
   visible: boolean;
 
-  attach(object: Object3D): void;
+  attach(object: Object3D): this;
   detach(): void;
   pointerHover(pointer: Object): void;
   pointerDown(pointer: Object): void;

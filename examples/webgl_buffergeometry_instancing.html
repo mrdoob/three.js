@@ -26,11 +26,6 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="js/libs/dat.gui.min.js"></script>
-	<script src="../build/three.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/WebGL.js"></script>
-
 	<script id="vertexShader" type="x-shader/x-vertex">
 		precision highp float;
 
@@ -83,13 +78,11 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import Stats from './jsm/libs/stats.module.js';
+		import { GUI } from './jsm/libs/dat.gui.module.js';
 
 		var container, stats;
 
@@ -197,7 +190,7 @@
 
 			//
 
-			var gui = new dat.GUI( { width: 350 } );
+			var gui = new GUI( { width: 350 } );
 			gui.add( geometry, 'maxInstancedCount', 0, instances );
 
 			//

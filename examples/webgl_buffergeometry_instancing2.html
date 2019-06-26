@@ -26,12 +26,6 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-
-	<script src="js/controls/TrackballControls.js"></script>
-
 	<script id="vertexShader" type="x-shader/x-vertex">
 		precision highp float;
 
@@ -74,13 +68,12 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
+		import Stats from './jsm/libs/stats.module.js';
 
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 		var container, stats;
 
@@ -184,7 +177,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
+			controls = new TrackballControls( camera, renderer.domElement );
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 

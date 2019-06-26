@@ -19,21 +19,13 @@
 			<div>Rook manufacturing file from <a href="http://amf.wikispaces.com/AMF+test+files" target="_blank" rel="noopener">AMF test files</a></div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/AMFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { AMFLoader } from './jsm/loaders/AMFLoader.js';
 
 			var camera, scene, renderer;
 
@@ -66,7 +58,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.AMFLoader();
+				var loader = new AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
 					scene.add( amfobject );
@@ -74,7 +66,7 @@
 
 				} );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.target.set( 0, 1.2, 2 );
 				controls.update();
