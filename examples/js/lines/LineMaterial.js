@@ -158,7 +158,7 @@ THREE.ShaderLib[ 'line' ] = {
 			offset *= linewidth;
 
 			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-			if (screenSpaceWidth == 1.0) offset /= resolution.y;
+			offset = mix(offset, offset / resolution.y, screenSpaceWidth);
 
 			// select end
 			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
