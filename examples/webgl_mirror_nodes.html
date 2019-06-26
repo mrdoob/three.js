@@ -26,17 +26,20 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { ReflectorRTT } from './jsm/objects/ReflectorRTT.js';
-			import { NodeFrame } from './jsm/nodes/core/NodeFrame.js';
-			import { ExpressionNode } from './jsm/nodes/core/ExpressionNode.js';
-			import { PhongNodeMaterial } from './jsm/nodes/materials/PhongNodeMaterial.js';
-			import { MathNode } from './jsm/nodes/math/MathNode.js';
-			import { OperatorNode } from './jsm/nodes/math/OperatorNode.js';
-			import { TextureNode } from './jsm/nodes/inputs/TextureNode.js';
-			import { BlurNode } from './jsm/nodes/effects/BlurNode.js';
-			import { FloatNode } from './jsm/nodes/inputs/FloatNode.js';
-			import { ReflectorNode } from './jsm/nodes/inputs/ReflectorNode.js';
-			import { SwitchNode } from './jsm/nodes/utils/SwitchNode.js';
-			import { NormalMapNode } from './jsm/nodes/misc/NormalMapNode.js';
+
+			import {
+				NodeFrame,
+				ExpressionNode,
+				PhongNodeMaterial,
+				MathNode,
+				OperatorNode,
+				TextureNode,
+				BlurNode,
+				FloatNode,
+				ReflectorNode,
+				SwitchNode,
+				NormalMapNode,
+			} from './jsm/nodes/Nodes.js';
 
 			// scene size
 			var WIDTH = window.innerWidth;

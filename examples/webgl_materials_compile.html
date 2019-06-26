@@ -39,15 +39,18 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
-			import { NodeFrame } from './jsm/nodes/core/NodeFrame.js';
-			import { MathNode } from './jsm/nodes/math/MathNode.js';
-			import { OperatorNode } from './jsm/nodes/math/OperatorNode.js';
-			import { ConstNode } from './jsm/nodes/core/ConstNode.js';
-			import { ColorNode } from './jsm/nodes/inputs/ColorNode.js';
-			import { ExpressionNode } from './jsm/nodes/core/ExpressionNode.js';
-			import { TimerNode } from './jsm/nodes/utils/TimerNode.js';
-			import { FloatNode } from './jsm/nodes/inputs/FloatNode.js';
-			import { PhongNodeMaterial } from './jsm/nodes/materials/PhongNodeMaterial.js';
+
+			import {
+				NodeFrame,
+				FloatNode,
+				ColorNode,
+				ConstNode,
+				ExpressionNode,
+				MathNode,
+				OperatorNode,
+				TimerNode,
+				PhongNodeMaterial
+			} from './jsm/nodes/Nodes.js';
 
 			var container = document.getElementById( 'container' );
 
