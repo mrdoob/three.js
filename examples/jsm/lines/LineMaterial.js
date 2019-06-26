@@ -22,6 +22,7 @@ import {
 
 UniformsLib.line = {
 
+	screenSpaceWidth: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
@@ -46,6 +47,7 @@ ShaderLib[ 'line' ] = {
 		#include <logdepthbuf_pars_vertex>
 		#include <clipping_planes_pars_vertex>
 
+		uniform float screenSpaceWidth;
 		uniform float linewidth;
 		uniform vec2 resolution;
 
@@ -164,13 +166,13 @@ ShaderLib[ 'line' ] = {
 			offset *= linewidth;
 
 			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-			offset /= resolution.y;
+			offset = mix(offset, offset / resolution.y, screenSpaceWidth);
 
 			// select end
 			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
 
 			// back to clip space
-			offset *= clip.w;
+			offset = mix(offset * 1.0, offset * clip.w, screenSpaceWidth);
 
 			clip.xy += offset;
 
@@ -275,6 +277,24 @@ var LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.diffuse.value = value;
+
+			}
+
+		},
+
+		screenSpaceWidth: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.screenSpaceWidth.value === 1;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.screenSpaceWidth.value = value ? 1 : 0;
 
 			}
 
