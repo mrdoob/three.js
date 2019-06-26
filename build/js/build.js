@@ -64,7 +64,12 @@ function mergeObjects() {
 }
 
 function readFile(fileName) {
-  return cache.readFileSync(fileName, 'utf-8');
+  try {
+    return cache.readFileSync(fileName, 'utf-8');
+  } catch (e) {
+    console.error('could not read:', fileName);
+    throw e;
+  }
 }
 
 function readHANSON(fileName) {
