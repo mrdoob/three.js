@@ -70,7 +70,7 @@
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
     "concurrently": "^4.1.0",
-    "eslint": "^6.0.1",
+    "eslint": "^5.16.0",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^5.0.3",
     "failonlyreporter": "^1.0.0",
