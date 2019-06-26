@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface VerticalBlurShader {
+export const VerticalBlurShader: {
   uniforms: {
     tDiffuse: Uniform;
     v: Uniform;

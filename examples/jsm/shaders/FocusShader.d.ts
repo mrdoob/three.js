@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface FocusShader {
+export const FocusShader: {
   uniforms: {
     tDiffuse: Uniform;
     screenWidth: Uniform;
@@ -12,4 +12,4 @@ export interface FocusShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

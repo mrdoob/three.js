@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface SSAOShader {
+export const SSAOShader: {
   defines: {
     PERSPECTIVE_CAMERA: number;
     KERNEL_SIZE: number;
@@ -26,7 +26,7 @@ export interface SSAOShader {
   fragmentShader: string;
 }
 
-export interface SSAODepthShader {
+export const SSAODepthShader: {
   defines: {
     PERSPECTIVE_CAMERA: number;
   };
@@ -39,7 +39,7 @@ export interface SSAODepthShader {
   fragmentShader: string;
 }
 
-export interface SSAOBlurShader {
+export const SSAOBlurShader: {
   uniforms: {
     tDiffuse: Uniform;
     resolution: Uniform;

@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface SkinShaderBasic {
+export const SkinShaderBasic: {
   uniforms: {
     ambientLightColor: Uniform;
     bumpMap: Uniform;
@@ -40,7 +40,7 @@ export interface SkinShaderBasic {
   fragmentShader: string;
 }
 
-export interface SkinShaderAdvanced {
+export const SkinShaderAdvanced: {
   uniforms: {
     ambientLightColor: Uniform;
     diffuse: Uniform;
@@ -78,7 +78,7 @@ export interface SkinShaderAdvanced {
   fragmentShader: string;
 }
 
-export interface SkinShaderBeckmann {
+export const SkinShaderBeckmann: {
   uniforms: {};
   vertexShader: string;
   fragmentShader: string;

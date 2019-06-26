@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface UnpackDepthRGBAShader {
+export const UnpackDepthRGBAShader: {
   uniforms: {
     tDiffuse: Uniform;
     opacity: Uniform;

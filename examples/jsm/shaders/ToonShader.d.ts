@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface ToonShader1 {
+export const ToonShader1: {
   uniforms: {
     uDirLightPos: Uniform;
     uDirLightColor: Uniform;
@@ -13,7 +13,7 @@ export interface ToonShader1 {
   fragmentShader: string;
 }
 
-export interface ToonShader2 {
+export const ToonShader2: {
   uniforms: {
     uDirLightPos: Uniform;
     uDirLightColor: Uniform;
@@ -28,7 +28,7 @@ export interface ToonShader2 {
   fragmentShader: string;
 }
 
-export interface ToonShaderHatching {
+export const ToonShaderHatching: {
   uniforms: {
     uDirLightPos: Uniform;
     uDirLightColor: Uniform;
@@ -43,7 +43,7 @@ export interface ToonShaderHatching {
   fragmentShader: string;
 }
 
-export interface ToonShaderDotted {
+export const ToonShaderDotted: {
   uniforms: {
     uDirLightPos: Uniform;
     uDirLightColor: Uniform;

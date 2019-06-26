@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface TerrainShader {
+export const TerrainShader: {
   uniforms: {
     ambientLightColor: Uniform;
     diffuse: Uniform;

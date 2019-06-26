@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface VignetteShader {
+export const VignetteShader: {
   uniforms: {
     tDiffuse: Uniform;
     offset: Uniform;
