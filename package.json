@@ -27,19 +27,8 @@
   "eslintConfig": {
     "extends": "mdcs",
     "plugins": [
-      "html",
-      "@typescript-eslint"
-    ],
-    "rules": {
-      "@typescript-eslint/no-unused-vars": 1,
-      "@typescript-eslint/indent": [
-        "error",
-        "tab",
-        {
-          "SwitchCase": 1
-        }
-      ]
-    }
+      "html"
+    ]
   },
   "scripts": {
     "build": "rollup -c",
