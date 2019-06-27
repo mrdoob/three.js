@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface FilmShader {
+export const FilmShader: {
   uniforms: {
     tDiffuse: Uniform;
     time: Uniform;
@@ -13,4 +13,4 @@ export interface FilmShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
