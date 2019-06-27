@@ -1,4 +1,5 @@
 import { Matrix3 } from './Matrix3';
+import { Vector3 } from "./Vector3";
 import { BufferAttribute } from './../core/BufferAttribute';
 
 /**
@@ -24,21 +25,21 @@ export interface Vector {
 	/**
 	 * copy(v:T):T;
 	 */
-	copy( v: Vector ): this;
+	copy( v: this ): this;
 
 	/**
 	 * NOTE: The second argument is deprecated.
 	 *
 	 * add(v:T):T;
 	 */
-	add( v: Vector, w?: Vector ): this;
+	add( v: this, w?: this ): this;
 
 	/**
 	 * addVectors(a:T, b:T):T;
 	 */
-	addVectors( a: Vector, b: Vector ): this;
+	addVectors( a: this, b: this ): this;
 
-	addScaledVector( vector: Vector, scale: number ): this;
+	addScaledVector( vector: this, scale: number ): this;
 
 	/**
 	 * Adds the scalar value s to this vector's values.
@@ -48,12 +49,12 @@ export interface Vector {
 	/**
 	 * sub(v:T):T;
 	 */
-	sub( v: Vector ): this;
+	sub( v: this ): this;
 
 	/**
 	 * subVectors(a:T, b:T):T;
 	 */
-	subVectors( a: Vector, b: Vector ): this;
+	subVectors( a: this, b: this ): this;
 
 	/**
 	 * multiplyScalar(s:number):T;
@@ -73,7 +74,7 @@ export interface Vector {
 	/**
 	 * dot(v:T):T;
 	 */
-	dot( v: Vector ): number;
+	dot( v: this ): number;
 
 	/**
 	 * lengthSq():number;
@@ -95,14 +96,14 @@ export interface Vector {
 	 *
 	 * distanceTo(v:T):number;
 	 */
-	distanceTo?( v: Vector ): number;
+	distanceTo?( v: this ): number;
 
 	/**
 	 * NOTE: Vector4 doesn't have the property.
 	 *
 	 * distanceToSquared(v:T):number;
 	 */
-	distanceToSquared?( v: Vector ): number;
+	distanceToSquared?( v: this ): number;
 
 	/**
 	 * setLength(l:number):T;
@@ -112,17 +113,18 @@ export interface Vector {
 	/**
 	 * lerp(v:T, alpha:number):T;
 	 */
-	lerp( v: Vector, alpha: number ): this;
+	lerp( v: this, alpha: number ): this;
 
 	/**
 	 * equals(v:T):boolean;
 	 */
-	equals( v: Vector ): boolean;
+	equals( v: this ): boolean;
 
 	/**
 	 * clone():T;
 	 */
 	clone(): this;
+
 }
 
 /**
@@ -174,6 +176,8 @@ export class Vector2 implements Vector {
 	 * Returns a new Vector2 instance with the same `x` and `y` values.
 	 */
 	clone(): this;
+
+	asVector3(): Vector3;
 
 	/**
 	 * Copies value of v to this vector.
@@ -347,12 +351,12 @@ export class Vector2 implements Vector {
 	/**
 	 * Computes distance of this vector to v.
 	 */
-	distanceTo( v: Vector2 ): number;
+	distanceTo( v: this ): number;
 
 	/**
 	 * Computes squared distance of this vector to v.
 	 */
-	distanceToSquared( v: Vector2 ): number;
+	distanceToSquared( v: this ): number;
 
 	/**
 	 * @deprecated Use {@link Vector2#manhattanDistanceTo .manhattanDistanceTo()} instead.

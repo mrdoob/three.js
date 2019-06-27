@@ -6,7 +6,7 @@ import { Camera } from './../cameras/Camera';
 import { Spherical } from './Spherical';
 import { Cylindrical } from './Cylindrical';
 import { BufferAttribute } from './../core/BufferAttribute';
-import { Vector } from './Vector2';
+import { Vector, Vector2 } from './Vector2';
 /**
  * 3D vector.
  *
@@ -62,6 +62,8 @@ export class Vector3 implements Vector {
 	 * Clones this vector.
 	 */
 	clone(): this;
+
+	asVector2(): Vector2;
 
 	/**
 	 * Copies value of v to this vector.
