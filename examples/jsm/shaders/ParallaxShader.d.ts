@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface ParallaxShader {
+export const ParallaxShader: {
   modes: {
     none: string;
     basic: string;
@@ -19,4 +19,4 @@ export interface ParallaxShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

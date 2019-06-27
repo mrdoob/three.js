@@ -279,6 +279,7 @@ h1 a {
 		}
 
 		#panel #content a {
+			position: relative;
 			color: var(--text-color);
 		}
 
