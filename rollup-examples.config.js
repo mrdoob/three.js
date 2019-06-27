@@ -1,35 +1,95 @@
 var path = require( 'path' );
 var fs = require( 'fs' );
+var glob = require('glob');
 
-// Creates a rollup config object for the given file to
-// be converted to umd
-function createOutput( file ) {
+var sourceDir = path.resolve( 'examples/jsm/' );
+var outputDir = path.resolve( 'examples/js/' );
 
-	var inputPath = path.resolve( file );
-	var outputPath = inputPath.replace( /[\\\/]examples[\\\/]jsm[\\\/]/, '/examples/js/' );
+var mergedFiles = [{
 
-	// Every import is marked as external so the output is 1-to-1. We
-	// assume that that global object should be the THREE object so we
-	// replicate the existing behavior.
+	paths: [
+		'postprocessing/Pass.js',
+	],
+	input: 'postprocessing/EffectComposer.js',
+	output: 'postprocessing/EffectComposer.js'
+
+}, {
+
+	paths: [
+		'nodes/**/*.js'
+	],
+	input: 'nodes/Nodes.js',
+	output: 'nodes/Nodes.js'
+
+}];
+
+var fileToOutput = {};
+
+const threeGlobalPlugin = {
+
+	bundle: function ( options, bundle ) {
+
+		for ( var key in bundle ) {
+
+			bundle[ key ].code = bundle[ key ].code.replace( /three_module_js/g, 'THREE' );
+
+		}
+
+	}
+
+};
+
+function resolveDependencyPath( p ) {
+
+	if ( /three\.module\.js$/.test( p ) ) {
+
+		return 'three';
+
+	} else if ( p in fileToOutput ) {
+
+		return fileToOutput[ p ];
+
+	} else {
+
+		return p;
+
+	}
+
+}
+
+function createOutputFileMap() {
+
+	mergedFiles.forEach( f => {
+
+		const paths = f.paths;
+		const output = f.output;
+		paths.forEach( p => {
+
+			glob.sync( path.join( sourceDir, p ) ).forEach( fullPath => {
+
+				fileToOutput[ fullPath ] = path.join( outputDir, output );
+
+			} );
+
+		} );
+
+	} );
+
+}
+
+function createMergedFileConfig( f ) {
+
+	const inputPath = path.join( sourceDir, f.input );
+	const outputPath = path.join( outputDir, f.output );
+	const internalFiles = [ f.input, ...f.paths ].map( p => path.join( sourceDir, p ) );
+
 	return {
 
 		input: inputPath,
 		treeshake: false,
-		external: p => p !== inputPath,
+		external: p => ! internalFiles.includes( p ),
 
-		plugins: [ {
-
-			generateBundle: function ( options, bundle ) {
-
-				for ( var key in bundle ) {
-
-					bundle[ key ].code = bundle[ key ].code.replace( /three_module_js/g, 'THREE' );
-
-				}
-
-			}
-
-		} ],
+		plugins: [ threeGlobalPlugin ],
 
 		output: {
 
@@ -38,7 +98,7 @@ function createOutput( file ) {
 			file: outputPath,
 
 			globals: () => 'THREE',
-			paths: p => /three\.module\.js$/.test( p ) ? 'three' : p,
+			paths: p => resolveDependencyPath( p ),
 			extend: true,
 
 			banner:
@@ -53,33 +113,53 @@ function createOutput( file ) {
 
 }
 
-// Walk the file structure starting at the given directory and fire
-// the callback for every js file.
-function walk( dir, cb ) {
+function createSingleFileConfig( inputPath ) {
 
-	var files = fs.readdirSync( dir );
-	files.forEach( f => {
+	var relativePath = path.relative( sourceDir, inputPath );
+	var outputPath = path.join( outputDir, relativePath );
 
-		var p = path.join( dir, f );
-		var stats = fs.statSync( p );
+	return {
 
-		if ( stats.isDirectory() ) {
+		input: inputPath,
+		treeshake: false,
+		external: p => p !== inputPath,
 
-			walk( p, cb );
+		plugins: [ threeGlobalPlugin ],
 
-		} else if ( f.endsWith( '.js' ) ) {
+		output: {
 
-			cb( p );
+			format: 'umd',
+			name: 'THREE',
+			file: outputPath,
+
+			globals: () => 'THREE',
+			paths: p => resolveDependencyPath( p ),
+			extend: true,
+
+			banner:
+				'/**\n' +
+				` * Generated from '${ path.relative( '.', inputPath ).replace( /\\/g, '/' ) }'\n` +
+				' */\n',
+			esModule: false
+
+		}
+
+	};
+
+}
+
+createOutputFileMap();
+
+var configs = mergedFiles.map( f => createMergedFileConfig( f ) );
+glob.sync( path.join( sourceDir, '**/*.js' ) )
+	.forEach( p => {
+
+		if ( ! ( p in fileToOutput ) ) {
+
+			configs.push( createSingleFileConfig( p ) );
 
 		}
 
 	} );
 
-}
-
-// Gather up all the files
-var files = [];
-walk( 'examples/jsm/', p => files.push( p ) );
-
-// Create a rollup config for each module.js file
-export default files.map( p => createOutput( p ) );
+export default configs;

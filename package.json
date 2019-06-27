@@ -78,7 +78,8 @@
     "http-server": "^0.11.1",
     "qunit": "^2.9.2",
     "rollup": "^1.16.2",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.2",
+    "glob": "^7.1.4"
   },
   "jspm": {
     "files": [
