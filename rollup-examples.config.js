@@ -1,5 +1,4 @@
 var path = require( 'path' );
-var fs = require( 'fs' );
 var glob = require('glob');
 
 var sourceDir = path.resolve( 'examples/jsm/' );
@@ -27,7 +26,7 @@ var fileToOutput = {};
 
 const threeGlobalPlugin = {
 
-	bundle: function ( options, bundle ) {
+	generateBundle: function ( options, bundle ) {
 
 		for ( var key in bundle ) {
 
@@ -96,6 +95,7 @@ function createMergedFileConfig( f ) {
 			format: 'umd',
 			name: 'THREE',
 			file: outputPath,
+			indent: false,
 
 			globals: () => 'THREE',
 			paths: p => resolveDependencyPath( p ),
@@ -131,6 +131,7 @@ function createSingleFileConfig( inputPath ) {
 			format: 'umd',
 			name: 'THREE',
 			file: outputPath,
+			indent: false,
 
 			globals: () => 'THREE',
 			paths: p => resolveDependencyPath( p ),
