@@ -170,7 +170,8 @@ THREE.VRMLLoader = ( function () {
 
 				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
 				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
-				var BooleanLiteral = createToken( { name: 'BooleanLiteral', pattern: /TRUE|FALSE/ } );
+				var TrueLiteral = createToken( { name: 'TrueLiteral', pattern: /TRUE/ } );
+				var FalseLiteral = createToken( { name: 'FalseLiteral', pattern: /FALSE/ } );
 				var NullLiteral = createToken( { name: 'NullLiteral', pattern: /NULL/ } );
 				var LSquare = createToken( { name: 'LSquare', pattern: /\[/ } );
 				var RSquare = createToken( { name: 'RSquare', pattern: /]/ } );
@@ -198,7 +199,8 @@ THREE.VRMLLoader = ( function () {
 					USE,
 					ROUTE,
 					TO,
-					BooleanLiteral,
+					TrueLiteral,
+					FalseLiteral,
 					NullLiteral,
 					// the Identifier must appear after the keywords because all keywords are valid identifiers
 					Version,
@@ -446,15 +448,29 @@ THREE.VRMLLoader = ( function () {
 
 					}
 
-					if ( ctx.BooleanLiteral ) {
+					if ( ctx.TrueLiteral ) {
 
 						field.type = 'boolean';
 
-						for ( var i = 0, l = ctx.BooleanLiteral.length; i < l; i ++ ) {
+						for ( var i = 0, l = ctx.TrueLiteral.length; i < l; i ++ ) {
 
-							var booleanLiteral = ctx.BooleanLiteral[ i ];
+							var trueLiteral = ctx.TrueLiteral[ i ];
 
-							field.values.push( booleanLiteral.image === 'TRUE' );
+							if ( trueLiteral.image === 'TRUE' ) field.values.push( true );
+
+						}
+
+					}
+
+					if ( ctx.FalseLiteral ) {
+
+						field.type = 'boolean';
+
+						for ( var i = 0, l = ctx.FalseLiteral.length; i < l; i ++ ) {
+
+							var falseLiteral = ctx.FalseLiteral[ i ];
+
+							if ( falseLiteral.image === 'FALSE' ) field.values.push( false );
 
 						}
 
@@ -2374,7 +2390,8 @@ THREE.VRMLLoader = ( function () {
 		var RouteIdentifier = tokenVocabulary[ 'RouteIdentifier' ];
 		var StringLiteral = tokenVocabulary[ 'StringLiteral' ];
 		var NumberLiteral = tokenVocabulary[ 'NumberLiteral' ];
-		var BooleanLiteral = tokenVocabulary[ 'BooleanLiteral' ];
+		var TrueLiteral = tokenVocabulary[ 'TrueLiteral' ];
+		var FalseLiteral = tokenVocabulary[ 'FalseLiteral' ];
 		var NullLiteral = tokenVocabulary[ 'NullLiteral' ];
 		var DEF = tokenVocabulary[ 'DEF' ];
 		var USE = tokenVocabulary[ 'USE' ];
@@ -2483,7 +2500,12 @@ THREE.VRMLLoader = ( function () {
 					} },
 					{ ALT: function () {
 
-						$.CONSUME( BooleanLiteral );
+						$.CONSUME( TrueLiteral );
+
+					} },
+					{ ALT: function () {
+
+						$.CONSUME( FalseLiteral );
 
 					} },
 					{ ALT: function () {
