@@ -119,6 +119,8 @@ function createOutputFileMap() {
 
 			glob.sync( path.join( sourceDir, depPath ) ).forEach( fullPath => {
 
+				fullPath = path.normalize( fullPath );
+
 				fileToOutput[ fullPath ] = path.join( outputDir, output );
 
 			} );
