@@ -1,5 +1,6 @@
 import { _Math } from './Math.js';
 import { Quaternion } from './Quaternion.js';
+import { Vector2 } from "./Vector2";
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -98,6 +99,10 @@ Object.assign( Vector3.prototype, {
 
 		return new this.constructor( this.x, this.y, this.z );
 
+	},
+
+	asVector2: function() {
+		return new Vector2( this.x, this.y );
 	},
 
 	copy: function ( v ) {
