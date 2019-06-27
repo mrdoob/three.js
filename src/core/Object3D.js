@@ -392,7 +392,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			this.children.push( object );
 
 			object.dispatchEvent( { type: 'added' } );
-			this.dispatchEvent( { type: 'addchild', child: object } );
+			this.dispatchEvent( { type: 'childadded', child: object } );
 
 		} else {
 
@@ -426,7 +426,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			this.children.splice( index, 1 );
 
 			object.dispatchEvent( { type: 'removed' } );
-			this.dispatchEvent( { type: 'removechild', child: object } );
+			this.dispatchEvent( { type: 'childremoved', child: object } );
 
 		}
 
