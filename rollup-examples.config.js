@@ -54,6 +54,8 @@ mergedFiles.forEach( mergedFileInfo => {
 glob.sync( path.join( sourceDir, '**/*.js' ) )
 	.forEach( p => {
 
+		p = path.normalize( p );
+
 		if ( ! isLibrary( p ) && ! ( p in fileToOutput ) ) {
 
 			configs.push( createSingleFileConfig( p ) );
