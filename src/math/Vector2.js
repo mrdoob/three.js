@@ -120,8 +120,10 @@ Object.assign( Vector2.prototype, {
 
 	},
 
-	asVector3: function() {
+	asVector3: function () {
+
 		return new Vector3( this.x, this.y );
+		
 	},
 
 	copy: function ( v ) {
