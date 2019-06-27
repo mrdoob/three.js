@@ -151,7 +151,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
 </style>
-<div id="forkongithub"><a href="https://github.com/greggman/threejsfundamentals">Fix or Fork me on GitHub</a></div>
+<div id="forkongithub"><a href="https://github.com/gfxfundamentals/threejsfundamentals">Fix or Fork me on GitHub</a></div>
 </body>
 <script src="/3rdparty/jquery-3.3.1.slim.min.js"></script>
 <script src="/threejs/lessons/resources/lesson.js"></script>
