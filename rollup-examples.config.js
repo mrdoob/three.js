@@ -54,7 +54,7 @@ mergedFiles.forEach( mergedFileInfo => {
 glob.sync( path.join( sourceDir, '**/*.js' ) )
 	.forEach( p => {
 
-		if ( ! ( p in fileToOutput ) ) {
+		if ( ! isLibrary( p ) && ! ( p in fileToOutput ) ) {
 
 			configs.push( createSingleFileConfig( p ) );
 
@@ -64,11 +64,17 @@ glob.sync( path.join( sourceDir, '**/*.js' ) )
 
 export default configs;
 
+function isLibrary( depPath ) {
+
+	return depPath.indexOf( libsDir ) === 0;
+
+}
+
 // Resolve which global variable to reference for a given depdency. If a dependency is
 // a library we assume it comes from "window" otherwise it is expected to be on "THREE".
 function resolveGlobalObject( depPath ) {
 
-	if ( depPath.indexOf( libsDir ) === 0 ) {
+	if ( isLibrary( depPath ) ) {
 
 		return 'window';
 
