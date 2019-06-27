@@ -1,3 +1,5 @@
+import { Vector3 } from "./Vector3";
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
@@ -116,6 +118,10 @@ Object.assign( Vector2.prototype, {
 
 		return new this.constructor( this.x, this.y );
 
+	},
+
+	asVector3: function() {
+		return new Vector3( this.x, this.y );
 	},
 
 	copy: function ( v ) {
