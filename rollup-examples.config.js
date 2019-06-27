@@ -30,9 +30,9 @@ createOutputFileMap();
 // covered in a merged file.
 var configs = [];
 
-mergedFiles.forEach( f => {
+mergedFiles.forEach( mergedFileInfo => {
 
-	configs.push( createMergedFileConfig( f ) );
+	configs.push( createMergedFileConfig( mergedFileInfo ) );
 
 } );
 
@@ -66,9 +66,9 @@ var threeGlobalPlugin = {
 
 // Resolve which global variable to reference for a given depdency. If a dependency is
 // a library we assume it comes from "window" otherwise it is expected to be on "THREE".
-function resolveGlobalObject( p ) {
+function resolveGlobalObject( depPath ) {
 
-	if ( p.indexOf( libsDir ) === 0 ) {
+	if ( depPath.indexOf( libsDir ) === 0 ) {
 
 		return 'window';
 
@@ -80,34 +80,36 @@ function resolveGlobalObject( p ) {
 
 }
 
-function resolveDependencyPath( p, inputPath ) {
+function resolveDependencyPath( depPath, inputPath ) {
 
-	if ( /three\.module\.js$/.test( p ) ) {
+	if ( /three\.module\.js$/.test( depPath ) ) {
 
 		// If importing three.js
 		return 'three';
 
-	} else if ( p in fileToOutput ) {
+	} else if ( depPath in fileToOutput ) {
 
-		return path.relative( inputPath, fileToOutput[ p ] ) ;
+		// If the file is included in a merged file
+		return path.relative( inputPath, fileToOutput[ depPath ] ) ;
 
 	} else {
 
-		return path.relative( inputPath, p );
+		return path.relative( inputPath, depPath );
 
 	}
 
 }
 
+// Generate the map the stores the name of each file to the file it is merged into.
 function createOutputFileMap() {
 
-	mergedFiles.forEach( f => {
+	mergedFiles.forEach( mergedFileInfo => {
 
-		const paths = f.paths;
-		const output = f.output;
-		paths.forEach( p => {
+		const paths = mergedFileInfo.paths;
+		const output = mergedFileInfo.output;
+		paths.forEach( depPath => {
 
-			glob.sync( path.join( sourceDir, p ) ).forEach( fullPath => {
+			glob.sync( path.join( sourceDir, depPath ) ).forEach( fullPath => {
 
 				fileToOutput[ fullPath ] = path.join( outputDir, output );
 
@@ -119,11 +121,11 @@ function createOutputFileMap() {
 
 }
 
-function createMergedFileConfig( f ) {
+function createMergedFileConfig( mergedFileInfo ) {
 
-	const inputPath = path.join( sourceDir, f.input );
-	const outputPath = path.join( outputDir, f.output );
-	const internalFiles = [ f.input, ...f.paths ].map( p => path.join( sourceDir, p ) );
+	const inputPath = path.join( sourceDir, mergedFileInfo.input );
+	const outputPath = path.join( outputDir, mergedFileInfo.output );
+	const internalFiles = [ mergedFileInfo.input, ...mergedFileInfo.paths ].map( p => path.join( sourceDir, p ) );
 
 	return {
 
