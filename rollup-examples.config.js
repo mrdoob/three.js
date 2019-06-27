@@ -1,30 +1,56 @@
 var path = require( 'path' );
 var glob = require('glob');
 
+var libsDir = path.resolve( 'examples/jsm/libs/' );
 var sourceDir = path.resolve( 'examples/jsm/' );
 var outputDir = path.resolve( 'examples/js/' );
 
+// How to merge output files.
+// "input": Which jsm file to process.
+// "output": The name and location to output the resultant UMD file.
+// "paths": Which files should be merged into the file. Any other files
+// not in the list will be considered external.
 var mergedFiles = [{
 
+	input: 'postprocessing/EffectComposer.js',
+	output: 'postprocessing/EffectComposer.js',
 	paths: [
 		'postprocessing/Pass.js',
-	],
-	input: 'postprocessing/EffectComposer.js',
-	output: 'postprocessing/EffectComposer.js'
-
-}, {
-
-	paths: [
-		'nodes/**/*.js'
-	],
-	input: 'nodes/Nodes.js',
-	output: 'nodes/Nodes.js'
+	]
 
 }];
 
+// A map of processed files to the output file that they have been rolled up
+// in so references can be corrected.
 var fileToOutput = {};
 
-const threeGlobalPlugin = {
+createOutputFileMap();
+
+// Generate the configs for every merged output and individual file not
+// covered in a merged file.
+var configs = [];
+
+mergedFiles.forEach( f => {
+
+	configs.push( createMergedFileConfig( f ) );
+
+} );
+
+glob.sync( path.join( sourceDir, '**/*.js' ) )
+	.forEach( p => {
+
+		if ( ! ( p in fileToOutput ) ) {
+
+			configs.push( createSingleFileConfig( p ) );
+
+		}
+
+	} );
+
+export default configs;
+
+// Plugin to convert the dfeault "three_module_js" variable name to THREE.
+var threeGlobalPlugin = {
 
 	generateBundle: function ( options, bundle ) {
 
@@ -38,19 +64,36 @@ const threeGlobalPlugin = {
 
 };
 
-function resolveDependencyPath( p ) {
+// Resolve which global variable to reference for a given depdency. If a dependency is
+// a library we assume it comes from "window" otherwise it is expected to be on "THREE".
+function resolveGlobalObject( p ) {
+
+	if ( p.indexOf( libsDir ) === 0 ) {
+
+		return 'window';
+
+	} else {
+
+		return 'THREE';
+
+	}
+
+}
+
+function resolveDependencyPath( p, inputPath ) {
 
 	if ( /three\.module\.js$/.test( p ) ) {
 
+		// If importing three.js
 		return 'three';
 
 	} else if ( p in fileToOutput ) {
 
-		return fileToOutput[ p ];
+		return path.relative( inputPath, fileToOutput[ p ] ) ;
 
 	} else {
 
-		return p;
+		return path.relative( inputPath, p );
 
 	}
 
@@ -97,8 +140,8 @@ function createMergedFileConfig( f ) {
 			file: outputPath,
 			indent: false,
 
-			globals: () => 'THREE',
-			paths: p => resolveDependencyPath( p ),
+			globals: p => resolveGlobalObject( p ),
+			paths: p => resolveDependencyPath( p, inputPath ),
 			extend: true,
 
 			banner:
@@ -133,8 +176,8 @@ function createSingleFileConfig( inputPath ) {
 			file: outputPath,
 			indent: false,
 
-			globals: () => 'THREE',
-			paths: p => resolveDependencyPath( p ),
+			globals: p => resolveGlobalObject( p ),
+			paths: p => resolveDependencyPath( p, inputPath ),
 			extend: true,
 
 			banner:
@@ -148,19 +191,3 @@ function createSingleFileConfig( inputPath ) {
 	};
 
 }
-
-createOutputFileMap();
-
-var configs = mergedFiles.map( f => createMergedFileConfig( f ) );
-glob.sync( path.join( sourceDir, '**/*.js' ) )
-	.forEach( p => {
-
-		if ( ! ( p in fileToOutput ) ) {
-
-			configs.push( createSingleFileConfig( p ) );
-
-		}
-
-	} );
-
-export default configs;
