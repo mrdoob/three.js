@@ -24,6 +24,21 @@ var mergedFiles = [{
 // in so references can be corrected.
 var fileToOutput = {};
 
+// Plugin to convert the dfeault "three_module_js" variable name to THREE.
+var threeGlobalPlugin = {
+
+	generateBundle: function ( options, bundle ) {
+
+		for ( var key in bundle ) {
+
+			bundle[ key ].code = bundle[ key ].code.replace( /three_module_js/g, 'THREE' );
+
+		}
+
+	}
+
+};
+
 createOutputFileMap();
 
 // Generate the configs for every merged output and individual file not
@@ -48,21 +63,6 @@ glob.sync( path.join( sourceDir, '**/*.js' ) )
 	} );
 
 export default configs;
-
-// Plugin to convert the dfeault "three_module_js" variable name to THREE.
-var threeGlobalPlugin = {
-
-	generateBundle: function ( options, bundle ) {
-
-		for ( var key in bundle ) {
-
-			bundle[ key ].code = bundle[ key ].code.replace( /three_module_js/g, 'THREE' );
-
-		}
-
-	}
-
-};
 
 // Resolve which global variable to reference for a given depdency. If a dependency is
 // a library we assume it comes from "window" otherwise it is expected to be on "THREE".
