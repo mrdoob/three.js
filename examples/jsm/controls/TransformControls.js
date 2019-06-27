@@ -167,6 +167,8 @@ var TransformControls = function ( camera, domElement ) {
 		this.object = object;
 		this.visible = true;
 
+		return this;
+
 	};
 
 	// Detatch from object
@@ -175,6 +177,8 @@ var TransformControls = function ( camera, domElement ) {
 		this.object = undefined;
 		this.visible = false;
 		this.axis = null;
+
+		return this;
 
 	};
 
