@@ -659,8 +659,6 @@ var MapControls = function ( object, domElement ) {
 
 		}
 
-		scope.update();
-
 	}
 
 	function handleTouchMovePan( event ) {
@@ -849,9 +847,6 @@ var MapControls = function ( object, domElement ) {
 
 				if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 
-				// handleTouchStartRotate( event );
-				// handleTouchStartDolly( event );
-
 				handleTouchStartDollyRotate( event );
 
 				state = STATE.DOLLY_ROTATE;
@@ -896,9 +891,6 @@ var MapControls = function ( object, domElement ) {
 
 				if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 				if ( ( state & STATE.DOLLY_ROTATE ) === 0 ) return; // is this needed?
-
-				// handleTouchMoveRotate( event );
-				// handleTouchMoveDolly( event );
 
 				handleTouchMoveDollyRotate( event );
 
