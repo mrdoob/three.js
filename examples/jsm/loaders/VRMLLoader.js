@@ -963,7 +963,7 @@ var VRMLLoader = ( function () {
 
 				var object;
 
-				if ( geometry ) {
+				if ( geometry && geometry.attributes.position ) {
 
 					var type = geometry._type;
 
@@ -1037,7 +1037,7 @@ var VRMLLoader = ( function () {
 
 					object = new Object3D();
 
-					// if the geometry field is NULL the object is not drawn
+					// if the geometry field is NULL or no vertices are defined the object is not drawn
 
 					object.visible = false;
 
@@ -1387,6 +1387,14 @@ var VRMLLoader = ( function () {
 
 				}
 
+				if ( coordIndex === undefined ) {
+
+					console.warn( 'THREE.VRMLLoader: Missing coordIndex.' );
+
+					return new BufferGeometry(); // handle VRML files with incomplete geometry definition
+
+				}
+
 				var triangulatedCoordIndex = triangulateFaceIndex( coordIndex, ccw );
 
 				var positionAttribute;
@@ -1398,7 +1406,7 @@ var VRMLLoader = ( function () {
 
 					if ( colorPerVertex === true ) {
 
-						if ( colorIndex.length > 0 ) {
+						if ( colorIndex && colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then it is used to choose colors for each vertex of the IndexedFaceSet.
 
@@ -1415,7 +1423,7 @@ var VRMLLoader = ( function () {
 
 					} else {
 
-						if ( colorIndex.length > 0 ) {
+						if ( colorIndex && colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then they are used to choose one color for each face of the IndexedFaceSet
 
@@ -1443,7 +1451,7 @@ var VRMLLoader = ( function () {
 
 						// consider vertex normals
 
-						if ( normalIndex.length > 0 ) {
+						if ( normalIndex && normalIndex.length > 0 ) {
 
 							// if the normalIndex field is not empty, then it is used to choose normals for each vertex of the IndexedFaceSet.
 
@@ -1462,7 +1470,7 @@ var VRMLLoader = ( function () {
 
 						// consider face normals
 
-						if ( normalIndex.length > 0 ) {
+						if ( normalIndex && normalIndex.length > 0 ) {
 
 							// if the normalIndex field is not empty, then they are used to choose one normal for each face of the IndexedFaceSet
 
@@ -1493,7 +1501,7 @@ var VRMLLoader = ( function () {
 
 					// texture coordinates are always defined on vertex level
 
-					if ( texCoordIndex.length > 0 ) {
+					if ( texCoordIndex && texCoordIndex.length > 0 ) {
 
 						// if the texCoordIndex field is not empty, then it is used to choose texture coordinates for each vertex of the IndexedFaceSet.
 
