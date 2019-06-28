@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author mudcube / http://mudcu.be/
  * @author Mugen87 / https://github.com/Mugen87
+ * @author cioddi / https://github.com/cioddi
  *
  * Usage:
  *  var exporter = new THREE.STLExporter();
@@ -52,6 +53,7 @@ THREE.STLExporter.prototype = {
 
 						objects.push( {
 
+							obj: object,
 							geometry: geometry,
 							matrixWorld: object.matrixWorld
 
@@ -96,6 +98,14 @@ THREE.STLExporter.prototype = {
 						for ( var k = 0; k < 3; k ++ ) {
 
 							vector.copy( vertices[ indices[ k ] ] ).applyMatrix4( matrixWorld );
+
+							if(
+								typeof object.obj.geometry.attributes.skinIndex !== 'undefined' &&
+								typeof object.obj.geometry.attributes.skinWeight !== 'undefined' &&
+								typeof object.obj.skeleton !== 'undefined'
+							){
+								vector = this.boneTransform( object.obj , vertices[ indices[ k ] ] , indices[ k ] );
+							}
 
 							output.setFloat32( offset, vector.x, true ); offset += 4; // vertices
 							output.setFloat32( offset, vector.y, true ); offset += 4;
@@ -142,6 +152,14 @@ THREE.STLExporter.prototype = {
 
 							vector.copy( vertices[ indices[ k ] ] ).applyMatrix4( matrixWorld );
 
+							if(
+								typeof object.obj.geometry.attributes.skinIndex !== 'undefined' &&
+								typeof object.obj.geometry.attributes.skinWeight !== 'undefined' &&
+								typeof object.obj.skeleton !== 'undefined'
+							){
+								vector = this.boneTransform( object.obj , vertices[ indices[ k ] ] , indices[ k ] );
+							}
+
 							output += '\t\t\tvertex ' + vector.x + ' ' + vector.y + ' ' + vector.z + '\n';
 
 						}
@@ -161,6 +179,47 @@ THREE.STLExporter.prototype = {
 
 		};
 
-	}() )
+	}() ),
+	boneTransform: ( function() {
+
+		var clone = new THREE.Vector3(), result = new THREE.Vector3(), skinIndices = new THREE.Vector4(), skinWeights = new THREE.Vector4();
+		var temp = new THREE.Vector3(), tempMatrix = new THREE.Matrix4(), properties = [ 'x', 'y', 'z', 'w' ];
+
+		return function( object, vertex, index ) {
+
+			if ( object.geometry.isBufferGeometry ) {
+
+				var index4 = index * 4;
+				skinIndices.fromArray( object.geometry.attributes.skinIndex.array, index4 );
+				skinWeights.fromArray( object.geometry.attributes.skinWeight.array, index4 );
+
+			} else if ( object.geometry.isGeometry ) {
+
+				skinIndices.copy( object.geometry.skinIndices[ index ] );
+				skinWeights.copy( object.geometry.skinWeights[ index ] );
+
+			}
+
+			var clone = vertex.clone().applyMatrix4( object.bindMatrix ); result.set( 0, 0, 0 );
+
+			for ( var i = 0; i < 4; i ++ ) {
+
+				var skinWeight = skinWeights[ properties[ i ] ];
+
+				if ( skinWeight != 0 ) {
+
+					var boneIndex = skinIndices[ properties[ i ] ];
+					tempMatrix.multiplyMatrices( object.skeleton.bones[ boneIndex ].matrixWorld, object.skeleton.boneInverses[ boneIndex ] );
+					result.add( temp.copy( clone ).applyMatrix4( tempMatrix ).multiplyScalar( skinWeight ) );
+
+				}
+
+			}
+
+			return clone.copy( result.applyMatrix4( object.bindMatrixInverse ) );
+
+		};
+
+	})(),
 
 };
