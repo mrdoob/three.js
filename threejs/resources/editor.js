@@ -370,7 +370,11 @@ function getSourceBlob(htmlParts) {
   g.rootScriptInfo.source = htmlParts.js;
   makeBlobURLsForSources(g.rootScriptInfo);
 
-  const prefix = dirname(g.url);
+  const dname = dirname(g.url);
+  // HACK! for webgl-2d-vs... those examples are not in /webgl they're in /webgl/resources
+  // We basically assume url is https://foo/base/example.html so there will be 4 slashes
+  // If the path is longer than then we need '../' to back up so prefix works below
+  const prefix = `${dname}${dname.split('/').slice(4).map(() => '/..').join('')}`;
   let source = g.html;
   source = source.replace('${hackedParams}', JSON.stringify(g.query));
   source = source.replace('${html}', htmlParts.html);
