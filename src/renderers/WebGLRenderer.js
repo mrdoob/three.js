@@ -509,13 +509,13 @@ function WebGLRenderer( parameters ) {
 
 	this.setOpaqueSort = function ( method ) {
 
-		opaqueSort = method;
+		opaqueSort = typeof method === 'function' ? method : null;
 
 	};
 
 	this.setTransparentSort = function ( method ) {
 
-		transparentSort = method;
+		transparentSort = typeof method === 'function' ? method : null;
 
 	};
 
