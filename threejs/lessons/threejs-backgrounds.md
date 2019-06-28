@@ -1,7 +1,7 @@
 Title: Three.js Backgrounds and Skyboxes
 Description: How to add a background in THREE.js
 Category: solutions
-TOC: Load a .GLTF file
+TOC: Add a Background or Skybox
 
 Most of the articles here use a solid color for a background.
 
