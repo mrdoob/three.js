@@ -550,7 +550,9 @@ const Builder = function(outBaseDir, options) {
       }</ul>`;
     }
 
-    g_langInfo.tocHtml = makeToc(toc);
+    if (!hackyProcessSelectFiles) {
+      g_langInfo.tocHtml = makeToc(toc);
+    }
 
     files.forEach(function(fileName) {
       const ext = path.extname(fileName);
