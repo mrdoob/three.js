@@ -285,13 +285,8 @@ var MapControls = function ( object, domElement ) {
 	var zoomChanged = false;
 
 	var rotateStart = new Vector2();
-	var rotateStart2 = new Vector2();
 	var rotateEnd = new Vector2();
-	var rotateEnd2 = new Vector2();
 	var rotateDelta = new Vector2();
-	var rotateDelta2 = new Vector2();
-	var rotateDeltaStartFingers = new Vector2();
-	var rotateDeltaEndFingers = new Vector2();
 
 	var panStart = new Vector2();
 	var panEnd = new Vector2();
@@ -590,23 +585,9 @@ var MapControls = function ( object, domElement ) {
 
 	}
 
-	function handleTouchStartRotate( event ) {
-
-		// console.log( 'handleTouchStartRotate' );
-
-		// First finger
-		rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
-
-		// Second finger
-		rotateStart2.set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY );
-
-	}
-
-	function handleTouchStartDolly( event ) {
+	function handleTouchStartDollyRotate( event ) {
 
 		if ( scope.enableZoom ) {
-
-			// console.log( 'handleTouchStartDolly' );
 
 			var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 			var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
@@ -614,6 +595,15 @@ var MapControls = function ( object, domElement ) {
 			var distance = Math.sqrt( dx * dx + dy * dy );
 
 			dollyStart.set( 0, distance );
+
+		}
+
+		if ( scope.enableRotate ) {
+
+			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+
+			rotateStart.set( x, y );
 
 		}
 
@@ -631,121 +621,45 @@ var MapControls = function ( object, domElement ) {
 
 	}
 
-	function handleTouchMoveRotate( event ) {
+	function handleTouchMoveDollyRotate( event ) {
 
-		if ( scope.enableRotate === false ) return;
-		if ( ( state & STATE.ROTATE ) === 0 ) return;
+		if ( scope.enableZoom ) {
 
-		// First finger
-		rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+			var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+			var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 
-		// Second finger
-		rotateEnd2.set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY );
+			var distance = Math.sqrt( dx * dx + dy * dy );
 
-		rotateDelta.subVectors( rotateEnd, rotateStart );
-		rotateDelta2.subVectors( rotateEnd2, rotateStart2 );
-		rotateDeltaStartFingers.subVectors( rotateStart2, rotateStart );
-		rotateDeltaEndFingers.subVectors( rotateEnd2, rotateEnd );
+			dollyEnd.set( 0, distance );
 
-		if ( isRotateUp() ) {
+			dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
+
+			dollyIn( dollyDelta.y );
+
+			dollyStart.copy( dollyEnd );
+
+		}
+
+		if ( scope.enableRotate ) {
+
+			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+
+			rotateEnd.set( x, y );
+
+			rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
 			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-			// rotating up and down along whole screen attempts to go 360, but limited to 180
+			rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
+
 			rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
 
-			// Start rotateUp ==> disable all movement to prevent flickering
-			state = STATE.ROTATE_UP;
-
-		} else if ( ( state & STATE.ROTATE_LEFT ) !== 0 ) {
-
-			rotateLeft( ( rotateDeltaStartFingers.angle() - rotateDeltaEndFingers.angle() ) * scope.rotateSpeed );
+			rotateStart.copy( rotateEnd );
 
 		}
 
-		rotateStart.copy( rotateEnd );
-		rotateStart2.copy( rotateEnd2 );
-
-	}
-
-	function isRotateUp() {
-
-		// At start, does the two fingers are aligned horizontally
-		if ( ! isHorizontal( rotateDeltaStartFingers ) ) {
-
-			return false;
-
-		}
-
-		// At end, does the two fingers are aligned horizontally
-		if ( ! isHorizontal( rotateDeltaEndFingers ) ) {
-
-			return false;
-
-		}
-
-		// does the first finger moved vertically between start and end
-		if ( ! isVertical( rotateDelta ) ) {
-
-			return false;
-
-		}
-
-		// does the second finger moved vertically between start and end
-		if ( ! isVertical( rotateDelta2 ) ) {
-
-			return false;
-
-		}
-
-		// Does the two finger moved in the same direction (prevent moving one finger vertically up while the other goes down)
-		return rotateDelta.dot( rotateDelta2 ) > 0;
-
-	}
-
-	var isHorizontal = function () {
-
-		var precision = Math.sin( Math.PI / 6 );
-
-		return function isHorizontal( vector ) {
-
-			return Math.abs( Math.sin( vector.angle() ) ) < precision;
-
-		};
-
-	}();
-
-	var isVertical = function () {
-
-		var precision = Math.cos( Math.PI / 2 - Math.PI / 6 );
-
-		return function isVertical( vector ) {
-
-			return Math.abs( Math.cos( vector.angle() ) ) < precision;
-
-		};
-
-	}();
-
-	function handleTouchMoveDolly( event ) {
-
-		if ( scope.enableZoom === false ) return;
-		if ( ( state & STATE.DOLLY ) === 0 ) return;
-
-		// console.log( 'handleTouchMoveDolly' );
-
-		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
-		var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
-
-		var distance = Math.sqrt( dx * dx + dy * dy );
-
-		dollyEnd.set( 0, distance );
-
-		dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
-
-		dollyIn( dollyDelta.y );
-
-		dollyStart.copy( dollyEnd );
+		scope.update();
 
 	}
 
@@ -935,8 +849,10 @@ var MapControls = function ( object, domElement ) {
 
 				if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 
-				handleTouchStartRotate( event );
-				handleTouchStartDolly( event );
+				// handleTouchStartRotate( event );
+				// handleTouchStartDolly( event );
+
+				handleTouchStartDollyRotate( event );
 
 				state = STATE.DOLLY_ROTATE;
 
@@ -981,8 +897,10 @@ var MapControls = function ( object, domElement ) {
 				if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 				if ( ( state & STATE.DOLLY_ROTATE ) === 0 ) return; // is this needed?
 
-				handleTouchMoveRotate( event );
-				handleTouchMoveDolly( event );
+				// handleTouchMoveRotate( event );
+				// handleTouchMoveDolly( event );
+
+				handleTouchMoveDollyRotate( event );
 
 				scope.update();
 
