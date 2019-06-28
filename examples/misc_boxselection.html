@@ -142,7 +142,7 @@
 
 				for ( var item of selectionBox.collection ) {
 
-					item.material.emissive = new THREE.Color( 0x000000 );
+					item.material.emissive.set( 0x000000 );
 
 				}
 
@@ -159,7 +159,7 @@
 
 					for ( var i = 0; i < selectionBox.collection.length; i ++ ) {
 
-						selectionBox.collection[ i ].material.emissive = new THREE.Color( 0x000000 );
+						selectionBox.collection[ i ].material.emissive.set( 0x000000 );
 
 					}
 
@@ -172,7 +172,7 @@
 
 					for ( var i = 0; i < allSelected.length; i ++ ) {
 
-						allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+						allSelected[ i ].material.emissive.set( 0x0000ff );
 
 					}
 
@@ -191,7 +191,7 @@
 
 				for ( var i = 0; i < allSelected.length; i ++ ) {
 
-					allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+					allSelected[ i ].material.emissive.set( 0x0000ff );
 
 				}
 
