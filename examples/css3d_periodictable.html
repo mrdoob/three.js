@@ -81,7 +81,6 @@
 		</style>
 	</head>
 	<body>
-		<script src="js/libs/tween.min.js"></script>
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
 		<div id="container"></div>
@@ -96,6 +95,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
