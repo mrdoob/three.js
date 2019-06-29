@@ -432,7 +432,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.RectAreaLight( color, intensity, width, height );
 		light.name = 'RectAreaLight';
 
-		editor.execute( new AddObjectCommand( light ) );
+		editor.execute( new AddObjectCommand( editor, light ) );
 
 	} );
 	options.add( option );
