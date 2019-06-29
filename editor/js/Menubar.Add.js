@@ -323,7 +323,7 @@ Menubar.Add = function ( editor ) {
 		var points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3() ] ), new THREE.PointsMaterial() );
 		points.name = 'Points';
 
-		editor.execute( new AddObjectCommand( points ) );
+		editor.execute( new AddObjectCommand( editor, points ) );
 
 	} );
 	options.add( option );

@@ -38,7 +38,7 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 				var points = new UI.Points3().setValue( positions ).onChange( function () {
 
-					editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ]().setFromPoints( points.getValue() ) ) );
+					editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ]().setFromPoints( points.getValue() ) ) );
 
 				} );
 

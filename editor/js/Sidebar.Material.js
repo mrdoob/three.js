@@ -1008,13 +1008,13 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.size !== undefined && Math.abs( material.size - materialSize.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'size', materialSize.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'size', materialSize.getValue(), currentMaterialSlot ) );
 
 			}
 
 			if ( material.sizeAttenuation !== undefined && material.sizeAttenuation !== materialSizeAttenuation.getValue() ) {
 
-				editor.execute( new SetMaterialValueCommand( currentObject, 'sizeAttenuation', materialSizeAttenuation.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'sizeAttenuation', materialSizeAttenuation.getValue(), currentMaterialSlot ) );
 
 			}
 
