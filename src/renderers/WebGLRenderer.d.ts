@@ -17,6 +17,8 @@ import { Fog } from './../scenes/Fog';
 import { ToneMapping, ShadowMapType, CullFace } from '../constants';
 import { WebVRManager } from '../renderers/webvr/WebVRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
+import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
 export interface Renderer {
 	domElement: HTMLCanvasElement;
@@ -314,9 +316,10 @@ export class WebGLRenderer implements Renderer {
 	renderBufferDirect(
 		camera: Camera,
 		fog: Fog,
+		geometry: Geometry | BufferGeometry,
 		material: Material,
-		geometryGroup: any,
-		object: Object3D
+		object: Object3D,
+		geometryGroup: any
 	): void;
 
 	/**

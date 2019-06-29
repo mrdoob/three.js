@@ -22,16 +22,8 @@
 		<script src="js/libs/jszip.min.js"></script>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				GridHelper,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { AMFLoader } from './jsm/loaders/AMFLoader.js';
@@ -42,27 +34,27 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x999999 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x999999 );
 
-				scene.add( new AmbientLight( 0x999999 ) );
+				scene.add( new THREE.AmbientLight( 0x999999 ) );
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
 				// Z is up for objects intended to be 3D printed.
 
 				camera.up.set( 0, 0, 1 );
 				camera.position.set( 0, - 9, 6 );
 
-				camera.add( new PointLight( 0xffffff, 0.8 ) );
+				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
 
 				scene.add( camera );
 
-				var grid = new GridHelper( 50, 50, 0xffffff, 0x555555 );
-				grid.rotateOnAxis( new Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
+				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
 				scene.add( grid );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

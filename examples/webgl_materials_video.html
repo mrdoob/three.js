@@ -64,16 +64,8 @@
 		</video>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				DirectionalLight,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				Scene,
-				VideoTexture,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -119,16 +111,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -136,7 +128,7 @@
 				video = document.getElementById( 'video' );
 				video.play();
 
-				texture = new VideoTexture( video );
+				texture = new THREE.VideoTexture( video );
 
 				//
 
@@ -160,11 +152,11 @@
 						ox = i;
 						oy = j;
 
-						geometry = new BoxBufferGeometry( xsize, ysize, xsize );
+						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
 
 						change_uvs( geometry, ux, uy, ox, oy );
 
-						materials[ cube_count ] = new MeshLambertMaterial( parameters );
+						materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
 
 						material = materials[ cube_count ];
 
@@ -173,7 +165,7 @@
 
 						material.color.setHSL( material.hue, material.saturation, 0.5 );
 
-						mesh = new Mesh( geometry, material );
+						mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.x = ( i - xgrid / 2 ) * xsize;
 						mesh.position.y = ( j - ygrid / 2 ) * ysize;

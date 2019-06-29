@@ -59,25 +59,13 @@
 
 		<script type="module">
 
-			import {
-				Vector3,
-				Color,
-				Euler,
-				Clock,
-				AudioAnalyser,
-				AudioLoader,
-				Raycaster,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { MaskPass } from './jsm/postprocessing/MaskPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
 			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
@@ -131,14 +119,14 @@
 				lightOutside = loader.getLight( "Light1" );
 
 				var soundOutside = loader.getSound3D( "Point001" );
-				soundOutsideAnalyser = new AudioAnalyser( soundOutside, 32 );
+				soundOutsideAnalyser = new THREE.AudioAnalyser( soundOutside, 32 );
 
 				// sound asset 2 + area
 
 				lightArea = loader.getLight( "Light2" );
 
 				soundArea = loader.getSound3D( "Point002" );
-				soundAreaAnalyser = new AudioAnalyser( soundArea, 512 );
+				soundAreaAnalyser = new THREE.AudioAnalyser( soundArea, 512 );
 
 				collisionArea = loader.getMesh( "Torus003" );
 
@@ -283,17 +271,17 @@
 
 			function init() {
 
-				raycaster = new Raycaster();
+				raycaster = new THREE.Raycaster();
 
-				scene = new Scene();
-				scene.background = new Color( 0x333333 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
-				velocity = new Vector3();
+				velocity = new THREE.Vector3();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 
 				controls = new PointerLockControls( camera );
 				scene.add( controls.getObject() );
@@ -301,7 +289,7 @@
 				controls.getObject().translateX( 250 );
 				controls.getObject().translateZ( 250 );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -320,8 +308,8 @@
 				var vh = 1.4, vl = 1.2;
 
 				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
-				colorCorrectionPass.uniforms[ "powRGB" ].value = new Vector3( vh, vh, vh );
-				colorCorrectionPass.uniforms[ "mulRGB" ].value = new Vector3( vl, vl, vl );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
 				var vignettePass = new ShaderPass( VignetteShader );
@@ -369,14 +357,14 @@
 
 			}
 
-			var clock = new Clock();
-			var audioPos = new Vector3();
-			var audioRot = new Euler();
+			var clock = new THREE.Clock();
+			var audioPos = new THREE.Vector3();
+			var audioRot = new THREE.Euler();
 
 			function updateSoundFilter() {
 
 				// difference position between sound and listener
-				var difPos = new Vector3().setFromMatrixPosition( soundArea.matrixWorld ).sub( audioPos );
+				var difPos = new THREE.Vector3().setFromMatrixPosition( soundArea.matrixWorld ).sub( audioPos );
 				var length = difPos.length();
 
 				// pick a vector from camera to sound

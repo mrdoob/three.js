@@ -101,7 +101,8 @@ export class Matrix3 implements Matrix {
 	 */
 	transposeIntoArray( r: number[] ): number[];
 	fromArray( array: number[], offset?: number ): Matrix3;
-	toArray(): number[];
+
+	toArray( array?: number[], offset?: number ): number[];
 
 	/**
 	 * Multiplies this matrix by m.

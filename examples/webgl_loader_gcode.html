@@ -13,11 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GCodeLoader } from './jsm/loaders/GCodeLoader.js';
@@ -33,10 +30,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
 				camera.position.set( 0, 0, 70 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var loader = new GCodeLoader();
 				loader.load( 'models/gcode/benchy.gcode', function ( object ) {
@@ -46,7 +43,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

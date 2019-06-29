@@ -25,19 +25,11 @@
 		<canvas id="drawing-canvas" height="128" width="128"></canvas>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				CanvasTexture,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				Vector2,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer, mesh, material;
-			var drawStartPos = new Vector2();
+			var drawStartPos = new THREE.Vector2();
 
 			init();
 			setupCanvasDrawing();
@@ -45,17 +37,17 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				material = new MeshBasicMaterial();
+				material = new THREE.MeshBasicMaterial();
 
-				mesh = new Mesh( new BoxBufferGeometry( 200, 200, 200 ), material );
+				mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 200, 200, 200 ), material );
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -80,7 +72,7 @@
 
 				// set canvas as material.map (this could be done to any map, bump, displacement etc.)
 
-				material.map = new CanvasTexture( drawingCanvas );
+				material.map = new THREE.CanvasTexture( drawingCanvas );
 
 				// set the variable to keep track of when to draw
 

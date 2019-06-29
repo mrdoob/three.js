@@ -16,20 +16,20 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/DDSLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-		<script>
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
 			var gltf, background, envMap, mixer, gui, extensionControls;
@@ -154,34 +154,34 @@
 
 				// Load background and generate envMap
 
-				new THREE.RGBELoader()
+				new RGBELoader()
 					.setType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_2k.hdr', function ( texture ) {
 
-					var cubeGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
-					cubeGenerator.update( renderer );
+						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
+						cubeGenerator.update( renderer );
 
-					background = cubeGenerator.renderTarget;
+						background = cubeGenerator.renderTarget;
 
-					var pmremGenerator = new THREE.PMREMGenerator( cubeGenerator.renderTarget.texture );
-					pmremGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
+						pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-					//
+						//
 
-					buildGUI();
-					initScene( scenes[ state.scene ] );
-					animate();
+						buildGUI();
+						initScene( scenes[ state.scene ] );
+						animate();
 
-				} );
+					} );
 
 			}
 
@@ -241,7 +241,7 @@
 
 				// TODO: Reuse existing OrbitControls, GLTFLoaders, and so on
 
-				orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
+				orbitControls = new OrbitControls( camera, renderer.domElement );
 
 				if ( sceneInfo.addGround ) {
 
@@ -265,10 +265,11 @@
 
 				}
 
-				loader = new THREE.GLTFLoader();
+				loader = new GLTFLoader();
 
-				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
-				loader.setDRACOLoader( new THREE.DRACOLoader() );
+				DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				loader.setDRACOLoader( new DRACOLoader() );
+				loader.setDDSLoader( new DDSLoader() );
 
 				var url = sceneInfo.url.replace( /%s/g, state.extension );
 
@@ -414,7 +415,7 @@
 
 			function buildGUI() {
 
-				gui = new dat.GUI( { width: 330 } );
+				gui = new GUI( { width: 330 } );
 				gui.domElement.parentElement.style.zIndex = 101;
 
 				var sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );

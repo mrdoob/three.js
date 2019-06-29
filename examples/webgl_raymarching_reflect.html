@@ -237,17 +237,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				Group,
-				Matrix4,
-				Mesh,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RawShaderMaterial,
-				Scene,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -275,33 +266,33 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { canvas: canvas } );
+				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( config.resolution, config.resolution );
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				// Scene
-				scene = new Scene();
+				// THREE.Scene
+				scene = new THREE.Scene();
 
-				dolly = new Group();
+				dolly = new THREE.Group();
 				scene.add( dolly );
 
-				camera = new PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
 				camera.position.z = 4;
 				dolly.add( camera );
 
-				geometry = new PlaneBufferGeometry( 2.0, 2.0 );
-				material = new RawShaderMaterial( {
+				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
+				material = new THREE.RawShaderMaterial( {
 					uniforms: {
-						resolution: { value: new Vector2( canvas.width, canvas.height ) },
+						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
 						cameraWorldMatrix: { value: camera.matrixWorld },
-						cameraProjectionMatrixInverse: { value: new Matrix4().getInverse( camera.projectionMatrix ) }
+						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
 				} );
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.frustumCulled = false;
 				scene.add( mesh );
 

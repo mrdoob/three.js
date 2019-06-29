@@ -14,27 +14,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BackSide,
-				BoxBufferGeometry,
-				Clock,
-				CubeTextureLoader,
-				DirectionalLight,
-				Mesh,
-				MeshNormalMaterial,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RepeatWrapping,
-				Scene,
-				ShaderLib,
-				ShaderMaterial,
-				TextureLoader,
-				TorusKnotBufferGeometry,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -58,41 +39,41 @@
 
 				// scene
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// camera
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
 				camera.position.set( - 15, 7, 15 );
 				camera.lookAt( scene.position );
 
 				// clock
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				// mesh
 
-				var torusKnotGeometry = new TorusKnotBufferGeometry( 3, 1, 256, 32 );
-				var torusKnotMaterial = new MeshNormalMaterial();
+				var torusKnotGeometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
+				var torusKnotMaterial = new THREE.MeshNormalMaterial();
 
-				torusKnot = new Mesh( torusKnotGeometry, torusKnotMaterial );
+				torusKnot = new THREE.Mesh( torusKnotGeometry, torusKnotMaterial );
 				torusKnot.position.y = 4;
 				torusKnot.scale.set( 0.5, 0.5, 0.5 );
 				scene.add( torusKnot );
 
 				// ground
 
-				var groundGeometry = new PlaneBufferGeometry( 20, 20 );
-				var groundMaterial = new MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
-				var ground = new Mesh( groundGeometry, groundMaterial );
+				var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				var groundMaterial = new THREE.MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
+				var ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
 				scene.add( ground );
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
 
-					map.wrapS = RepeatWrapping;
-					map.wrapT = RepeatWrapping;
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 16;
 					map.repeat.set( 4, 4 );
 					groundMaterial.map = map;
@@ -102,12 +83,12 @@
 
 				// water
 
-				var waterGeometry = new PlaneBufferGeometry( 20, 20 );
+				var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
 
 				water = new Water( waterGeometry, {
 					color: params.color,
 					scale: params.scale,
-					flowDirection: new Vector2( params.flowX, params.flowY ),
+					flowDirection: new THREE.Vector2( params.flowX, params.flowY ),
 					textureWidth: 1024,
 					textureHeight: 1024
 				} );
@@ -118,7 +99,7 @@
 
 				// skybox
 
-				var cubeTextureLoader = new CubeTextureLoader();
+				var cubeTextureLoader = new THREE.CubeTextureLoader();
 				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
 
 				var cubeTexture = cubeTextureLoader.load( [
@@ -127,31 +108,20 @@
 					'pz.jpg', 'nz.jpg',
 				] );
 
-				var cubeShader = ShaderLib[ 'cube' ];
-				cubeShader.uniforms[ 'tCube' ].value = cubeTexture;
-
-				var skyBoxMaterial = new ShaderMaterial( {
-					fragmentShader: cubeShader.fragmentShader,
-					vertexShader: cubeShader.vertexShader,
-					uniforms: cubeShader.uniforms,
-					side: BackSide
-				} );
-
-				var skyBox = new Mesh( new BoxBufferGeometry( 1000, 1000, 1000 ), skyBoxMaterial );
-				scene.add( skyBox );
+				scene.background = cubeTexture;
 
 				// light
 
-				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 0.6 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
 				directionalLight.position.set( - 1, 1, 1 );
 				scene.add( directionalLight );
 
 				// renderer
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
@@ -162,24 +132,24 @@
 
 				gui.addColor( params, 'color' ).onChange( function ( value ) {
 
-					water.material.uniforms[ "color" ].value.set( value );
+					water.material.uniforms[ 'color' ].value.set( value );
 
 				} );
 				gui.add( params, 'scale', 1, 10 ).onChange( function ( value ) {
 
-					water.material.uniforms[ "config" ].value.w = value;
+					water.material.uniforms[ 'config' ].value.w = value;
 
 				} );
 				gui.add( params, 'flowX', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
 
-					water.material.uniforms[ "flowDirection" ].value.x = value;
-					water.material.uniforms[ "flowDirection" ].value.normalize();
+					water.material.uniforms[ 'flowDirection' ].value.x = value;
+					water.material.uniforms[ 'flowDirection' ].value.normalize();
 
 				} );
 				gui.add( params, 'flowY', - 1, 1 ).step( 0.01 ).onChange( function ( value ) {
 
-					water.material.uniforms[ "flowDirection" ].value.y = value;
-					water.material.uniforms[ "flowDirection" ].value.normalize();
+					water.material.uniforms[ 'flowDirection' ].value.y = value;
+					water.material.uniforms[ 'flowDirection' ].value.normalize();
 
 				} );
 

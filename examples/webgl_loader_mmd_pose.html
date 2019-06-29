@@ -28,14 +28,8 @@
 		<script src="js/libs/ammo.js"></script>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DirectionalLight,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -64,24 +58,24 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 25;
 
 				// scene
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				var ambient = new AmbientLight( 0x666666 );
+				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new DirectionalLight( 0x887766 );
+				var directionalLight = new THREE.DirectionalLight( 0x887766 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

@@ -38,7 +38,7 @@
 			varying vec2 vUv;
 
 			uniform vec3 color;
-			uniform sampler2D texture;
+			uniform sampler2D colorTexture;
 
 			void main() {
 
@@ -47,7 +47,7 @@
 
 				float dProd = dot( vNormal, light ) * 0.5 + 0.5;
 
-				vec4 tcolor = texture2D( texture, vUv );
+				vec4 tcolor = texture2D( colorTexture, vUv );
 				vec4 gray = vec4( vec3( tcolor.r * 0.3 + tcolor.g * 0.59 + tcolor.b * 0.11 ), 1.0 );
 
 				gl_FragColor = gray * vec4( vec3( dProd ) * vec3( color ), 1.0 );
@@ -57,19 +57,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				Color,
-				Math as _Math,
-				Mesh,
-				PerspectiveCamera,
-				RepeatWrapping,
-				Scene,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				TextureLoader,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -84,23 +73,23 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 300;
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				uniforms = {
 
 					"amplitude": { value: 1.0 },
-					"color": { value: new Color( 0xff2200 ) },
-					"texture": { value: new TextureLoader().load( "textures/water.jpg" ) }
+					"color": { value: new THREE.Color( 0xff2200 ) },
+					"colorTexture": { value: new THREE.TextureLoader().load( "textures/water.jpg" ) }
 
 				};
 
-				uniforms[ "texture" ].value.wrapS = uniforms[ "texture" ].value.wrapT = RepeatWrapping;
+				uniforms[ "colorTexture" ].value.wrapS = uniforms[ "colorTexture" ].value.wrapT = THREE.RepeatWrapping;
 
-				var shaderMaterial = new ShaderMaterial( {
+				var shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -111,7 +100,7 @@
 
 				var radius = 50, segments = 128, rings = 64;
 
-				var geometry = new SphereBufferGeometry( radius, segments, rings );
+				var geometry = new THREE.SphereBufferGeometry( radius, segments, rings );
 
 				displacement = new Float32Array( geometry.attributes.position.count );
 				noise = new Float32Array( geometry.attributes.position.count );
@@ -122,12 +111,12 @@
 
 				}
 
-				geometry.addAttribute( 'displacement', new BufferAttribute( displacement, 1 ) );
+				geometry.addAttribute( 'displacement', new THREE.BufferAttribute( displacement, 1 ) );
 
-				sphere = new Mesh( geometry, shaderMaterial );
+				sphere = new THREE.Mesh( geometry, shaderMaterial );
 				scene.add( sphere );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -175,7 +164,7 @@
 					displacement[ i ] = Math.sin( 0.1 * i + time );
 
 					noise[ i ] += 0.5 * ( 0.5 - Math.random() );
-					noise[ i ] = _Math.clamp( noise[ i ], - 5, 5 );
+					noise[ i ] = THREE.Math.clamp( noise[ i ], - 5, 5 );
 
 					displacement[ i ] += noise[ i ];
 

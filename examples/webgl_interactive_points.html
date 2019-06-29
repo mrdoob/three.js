@@ -35,7 +35,7 @@
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
 			uniform vec3 color;
-			uniform sampler2D texture;
+			uniform sampler2D pointTexture;
 
 			varying vec3 vColor;
 
@@ -43,7 +43,7 @@
 
 				gl_FragColor = vec4( color * vColor, 1.0 );
 
-				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
 
 				if ( gl_FragColor.a < ALPHATEST ) discard;
 
@@ -52,20 +52,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				BoxGeometry,
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				PerspectiveCamera,
-				Points,
-				Raycaster,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -85,21 +73,21 @@
 
 				var container = document.getElementById( 'container' );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 250;
 
 				//
 
-				var vertices = new BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
+				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
 
 				var positions = new Float32Array( vertices.length * 3 );
 				var colors = new Float32Array( vertices.length * 3 );
 				var sizes = new Float32Array( vertices.length );
 
 				var vertex;
-				var color = new Color();
+				var color = new THREE.Color();
 
 				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
@@ -113,18 +101,18 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'customColor', new BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new BufferAttribute( sizes, 1 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
 				//
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color: { value: new Color( 0xffffff ) },
-						texture: { value: new TextureLoader().load( "textures/sprites/disc.png" ) }
+						color: { value: new THREE.Color( 0xffffff ) },
+						pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
@@ -135,20 +123,20 @@
 
 				//
 
-				particles = new Points( geometry, material );
+				particles = new THREE.Points( geometry, material );
 				scene.add( particles );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				raycaster = new Raycaster();
-				mouse = new Vector2();
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
 
 				//
 

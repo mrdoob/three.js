@@ -13,31 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				AnimationMixer,
-				BoxBufferGeometry,
-				CameraHelper,
-				Clock,
-				CubeCamera,
-				Fog,
-				LightShadow,
-				Mesh,
-				MeshPhongMaterial,
-				NearestFilter,
-				PCFSoftShadowMap,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				PointLight,
-				RepeatWrapping,
-				RGBFormat,
-				Scene,
-				SphereBufferGeometry,
-				SpotLight,
-				TextureLoader,
-				TorusBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -59,7 +36,7 @@
 
 			var mixer;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			var gui, shadowCameraHelper, shadowConfig = {
 
@@ -81,49 +58,49 @@
 
 				// CAMERA
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 2, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 2, 10000 );
 				camera.position.set( 500, 400, 1200 );
 
 				// SCENE
 
-				scene = new Scene();
-				scene.fog = new Fog( 0, 1000, 10000 );
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0, 1000, 10000 );
 
 				// CUBE CAMERA
 
-				cubeCamera = new CubeCamera( 1, 10000, 128 );
+				cubeCamera = new THREE.CubeCamera( 1, 10000, 128 );
 
 				// TEXTURES
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				var textureSquares = textureLoader.load( "textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );
-				textureSquares.wrapS = textureSquares.wrapT = RepeatWrapping;
-				textureSquares.magFilter = NearestFilter;
-				textureSquares.format = RGBFormat;
+				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
+				textureSquares.magFilter = THREE.NearestFilter;
+				textureSquares.format = THREE.RGBFormat;
 
 				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
-				textureNoiseColor.wrapS = textureNoiseColor.wrapT = RepeatWrapping;
-				textureNoiseColor.format = RGBFormat;
+				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
+				textureNoiseColor.format = THREE.RGBFormat;
 
 				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
-				textureLava.wrapS = textureLava.wrapT = RepeatWrapping;
-				textureLava.format = RGBFormat;
+				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
+				textureLava.format = THREE.RGBFormat;
 
 				// GROUND
 
-				var groundMaterial = new MeshPhongMaterial( {
+				var groundMaterial = new THREE.MeshPhongMaterial( {
 					shininess: 80,
 					color: 0xffffff,
 					specular: 0xffffff,
 					map: textureSquares
 				} );
 
-				var planeGeometry = new PlaneBufferGeometry( 100, 100 );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
-				var ground = new Mesh( planeGeometry, groundMaterial );
+				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
@@ -132,15 +109,15 @@
 
 				// MATERIALS
 
-				var materialLambert = new MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
-				var materialPhong = new MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget.texture } );
+				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
+				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget.texture } );
 
 				// OBJECTS
 
-				var sphereGeometry = new SphereBufferGeometry( 100, 64, 32 );
-				var torusGeometry = new TorusBufferGeometry( 240, 60, 32, 64 );
-				var cubeGeometry = new BoxBufferGeometry( 150, 150, 150 );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 100, 64, 32 );
+				var torusGeometry = new THREE.TorusBufferGeometry( 240, 60, 32, 64 );
+				var cubeGeometry = new THREE.BoxBufferGeometry( 150, 150, 150 );
 
 				addObject( torusGeometry, materialPhong, 0, 100, 0, 0 );
 				addObject( cubeGeometry, materialLambert, 350, 75, 300, 0 );
@@ -150,7 +127,7 @@
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
-					var material = new MeshPhongMaterial( { color: 0xffffff } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
 
 					return addObject( geometry, material, x, y, z, ry );
 
@@ -158,7 +135,7 @@
 
 				function addObject( geometry, material, x, y, z, ry ) {
 
-					var tmpMesh = new Mesh( geometry, material );
+					var tmpMesh = new THREE.Mesh( geometry, material );
 
 					tmpMesh.material.color.offsetHSL( 0.1, - 0.1, 0 );
 
@@ -175,9 +152,9 @@
 
 				}
 
-				var bigCube = new BoxBufferGeometry( 50, 500, 50 );
-				var midCube = new BoxBufferGeometry( 50, 200, 50 );
-				var smallCube = new BoxBufferGeometry( 100, 100, 100 );
+				var bigCube = new THREE.BoxBufferGeometry( 50, 500, 50 );
+				var midCube = new THREE.BoxBufferGeometry( 50, 200, 50 );
+				var smallCube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				addObjectColor( bigCube, 0xff0000, - 500, 250, 0, 0 );
 				addObjectColor( smallCube, 0xff0000, - 500, 50, - 150, 0 );
@@ -191,10 +168,10 @@
 				addObjectColor( midCube, 0xff00ff, 0, 100, 500, 0 );
 				addObjectColor( smallCube, 0xff00ff, - 150, 50, 500, 0 );
 
-				addObjectColor( new BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
-				addObjectColor( new BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
+				addObjectColor( new THREE.BoxBufferGeometry( 500, 10, 10 ), 0xffff00, 0, 600, 0, Math.PI / 4 );
+				addObjectColor( new THREE.BoxBufferGeometry( 250, 10, 10 ), 0xffff00, 0, 600, 0, 0 );
 
-				addObjectColor( new SphereBufferGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
+				addObjectColor( new THREE.SphereBufferGeometry( 100, 32, 26 ), 0xffffff, - 300, 100, 300, 0 );
 
 				// MORPHS
 
@@ -204,7 +181,7 @@
 
 					var mesh = gltf.scene.children[ 0 ];
 
-					mixer = new AnimationMixer( mesh );
+					mixer = new THREE.AnimationMixer( mesh );
 
 					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 10 ).play();
 
@@ -223,31 +200,31 @@
 
 				// LIGHTS
 
-				ambientLight = new AmbientLight( 0x3f2806 );
+				ambientLight = new THREE.AmbientLight( 0x3f2806 );
 				scene.add( ambientLight );
 
-				pointLight = new PointLight( 0xffaa00, 1, 5000 );
+				pointLight = new THREE.PointLight( 0xffaa00, 1, 5000 );
 				scene.add( pointLight );
 
-				sunLight = new SpotLight( 0xffffff, 0.3, 0, Math.PI / 2 );
+				sunLight = new THREE.SpotLight( 0xffffff, 0.3, 0, Math.PI / 2 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
 
-				sunLight.shadow = new LightShadow( new PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
+				sunLight.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( shadowConfig.shadowCameraFov, 1, shadowConfig.shadowCameraNear, shadowConfig.shadowCameraFar ) );
 				sunLight.shadow.bias = shadowConfig.shadowBias;
 
 				scene.add( sunLight );
 
 				// SHADOW CAMERA HELPER
 
-				shadowCameraHelper = new CameraHelper( sunLight.shadow.camera );
+				shadowCameraHelper = new THREE.CameraHelper( sunLight.shadow.camera );
 				shadowCameraHelper.visible = shadowConfig.shadowCameraVisible;
 				scene.add( shadowCameraHelper );
 
 				// RENDERER
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -255,7 +232,7 @@
 				//
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				//
 

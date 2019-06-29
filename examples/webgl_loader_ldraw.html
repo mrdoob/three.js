@@ -21,19 +21,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Box3,
-				Color,
-				CubeReflectionMapping,
-				CubeTextureLoader,
-				DirectionalLight,
-				PerspectiveCamera,
-				RGBFormat,
-				Scene,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -78,24 +67,24 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 150, 200, 250 );
 
 				// scene
 
-				scene = new Scene();
-				scene.background = new Color( 0xdeebed );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xdeebed );
 
-				var ambientLight = new AmbientLight( 0xdeebed, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xdeebed, 0.4 );
 				scene.add( ambientLight );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 1000, 1200, 1500 );
 				scene.add( directionalLight );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -110,48 +99,11 @@
 					separateObjects: false,
 					displayLines: true,
 					conditionalLines: true,
-					smoothNormals: true
+					smoothNormals: true,
+					constructionStep: 0,
+					noConstructionSteps: "No steps."
 				};
 
-				gui = new GUI();
-
-				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
-
-					reloadObject( true );
-
-				} );
-
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
-
-					envMapActivated = value;
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function () {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function () {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function () {
-
-					updateLineSegments();
-
-				} );
-
-				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function () {
-
-					updateLineSegments();
-
-				} );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
@@ -171,7 +123,7 @@
 
 			}
 
-			function updateLineSegments() {
+			function updateObjectsVisibility() {
 
 				model.traverse( c => {
 
@@ -186,6 +138,12 @@
 							c.visible = guiData.displayLines;
 
 						}
+
+					}
+					else if ( c.isGroup ) {
+
+						// Hide objects with construction step > gui setting
+						c.visible = c.userData.constructionStep <= guiData.constructionStep;
 
 					}
 
@@ -239,9 +197,9 @@
 								var urls = [ r + "posx.jpg", r + "negx.jpg",
 									r + "posy.jpg", r + "negy.jpg",
 									r + "posz.jpg", r + "negz.jpg" ];
-								textureCube = new CubeTextureLoader().load( urls );
-								textureCube.format = RGBFormat;
-								textureCube.mapping = CubeReflectionMapping;
+								textureCube = new THREE.CubeTextureLoader().load( urls );
+								textureCube.format = THREE.RGBFormat;
+								textureCube.mapping = THREE.CubeReflectionMapping;
 
 							}
 
@@ -259,21 +217,25 @@
 
 						}
 
-						updateLineSegments();
+						guiData.constructionStep = model.userData.numConstructionSteps - 1;
+
+						updateObjectsVisibility();
 
 						// Adjust camera and light
 
-						var bbox = new Box3().setFromObject( model );
-						var size = bbox.getSize( new Vector3() );
+						var bbox = new THREE.Box3().setFromObject( model );
+						var size = bbox.getSize( new THREE.Vector3() );
 						var radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
 
 						if ( resetCamera ) {
 
-							controls.target0.copy( bbox.getCenter( new Vector3() ) );
+							controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
 							controls.position0.set( - 2.3, 2, 2 ).multiplyScalar( radius ).add( controls.target0 );
 							controls.reset();
 
 						}
+
+						createGUI();
 
 						hideProgressBar();
 
@@ -287,6 +249,59 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function createGUI() {
+
+				if ( gui ) {
+
+					gui.destroy();
+				}
+
+				gui = new GUI();
+
+				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+
+					reloadObject( true );
+
+				} );
+
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				if ( guiData.separateObjects ) {
+
+					if ( model.userData.numConstructionSteps > 1  ) {
+
+						gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+					else {
+
+						gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+				}
+
+				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function changeEnvMap ( value ) {
+
+					envMapActivated = value;
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( updateObjectsVisibility );
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
 
 			}
 

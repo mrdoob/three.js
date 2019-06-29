@@ -17,22 +17,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				CubeTextureLoader,
-				Fog,
-				Mesh,
-				MeshLambertMaterial,
-				MeshPhongMaterial,
-				MixOperation,
-				PerspectiveCamera,
-				Scene,
-				SpotLight,
-				TextureLoader,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -50,8 +36,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var textureLoader = new TextureLoader();
-			var cubeTextureLoader = new CubeTextureLoader();
+			var textureLoader = new THREE.TextureLoader();
+			var cubeTextureLoader = new THREE.CubeTextureLoader();
 			var reflectionCube;
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -65,12 +51,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
 				camera.position.z = 800;
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
-				scene.fog = new Fog( 0x050505, 800, 2000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 800, 2000 );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -84,10 +70,10 @@
 
 				// LIGHTS
 
-				var ambient = new AmbientLight( 0x040404 );
+				var ambient = new THREE.AmbientLight( 0x040404 );
 				scene.add( ambient );
 
-				var light = new SpotLight( 0xffeedd, 1.2, 650, Math.PI / 6 );
+				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, Math.PI / 6 );
 				light.position.set( 0, - 100, 500 );
 
 				light.castShadow = true;
@@ -100,7 +86,7 @@
 
 				// RENDERER
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -144,7 +130,7 @@
 
 				loader.load( "models/ctm/ben.ctm", function ( geometry ) {
 
-					var material = new MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, - 200, 0, 0, 0 );
 					checkTime();
 
@@ -152,9 +138,9 @@
 
 				loader.load( "models/ctm/WaltHead.ctm", function ( geometry ) {
 
-					var material1 = new MeshLambertMaterial( { color: 0xffffff } );
-					var material2 = new MeshPhongMaterial( { color: 0xff4400, specular: 0x333333, shininess: 100 } );
-					var material3 = new MeshPhongMaterial( { color: 0x00ff44, specular: 0x333333, shininess: 100 } );
+					var material1 = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+					var material2 = new THREE.MeshPhongMaterial( { color: 0xff4400, specular: 0x333333, shininess: 100 } );
+					var material3 = new THREE.MeshPhongMaterial( { color: 0x00ff44, specular: 0x333333, shininess: 100 } );
 
 					callbackModel( geometry, 5, material1, - 200, 0, - 50, 0, 0 );
 					callbackModel( geometry, 2, material2, 100, 0, 125, 0, 0 );
@@ -166,14 +152,14 @@
 
 				loader.load( "models/ctm/LeePerry.ctm", function ( geometry ) {
 
-					var material = new MeshPhongMaterial( {
+					var material = new THREE.MeshPhongMaterial( {
 
 						specular: 0x303030,
 						shininess: 50,
 						map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
 						specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
 						normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
-						normalScale: new Vector2( 0.8, 0.8 )
+						normalScale: new THREE.Vector2( 0.8, 0.8 )
 
 					} );
 
@@ -186,7 +172,7 @@
 
 			function callbackModel( geometry, s, material, x, y, z, rx, ry ) {
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );

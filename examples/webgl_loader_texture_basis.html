@@ -9,14 +9,15 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - basis texture loader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - basis texture loader<br />
 			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/BasisTextureLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { BasisTextureLoader } from './jsm/loaders/BasisTextureLoader.js';
 
 			var camera, scene, renderer;
 			var mesh;
@@ -47,7 +48,7 @@
 
 				scene.add( mesh );
 
-				var loader = new THREE.BasisTextureLoader();
+				var loader = new BasisTextureLoader();
 				loader.setTranscoderPath( 'js/libs/basis/' );
 				loader.detectSupport( renderer );
 

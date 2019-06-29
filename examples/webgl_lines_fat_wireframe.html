@@ -14,16 +14,8 @@
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
 		<script type="module">
-			import {
-				IcosahedronBufferGeometry,
-				LineBasicMaterial,
-				LineDashedMaterial,
-				LineSegments,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-				WireframeGeometry
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -48,18 +40,18 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setClearColor( 0x000000, 0.0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( - 50, 0, 50 );
 
-				camera2 = new PerspectiveCamera( 40, 1, 1, 1000 );
+				camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
 				camera2.position.copy( camera.position );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -69,7 +61,7 @@
 
 				// Wireframe ( WireframeGeometry2, LineMaterial )
 
-				var geo = new IcosahedronBufferGeometry( 20, 1 );
+				var geo = new THREE.IcosahedronBufferGeometry( 20, 1 );
 
 				var geometry = new WireframeGeometry2( geo );
 
@@ -88,14 +80,14 @@
 				scene.add( wireframe );
 
 
-				// Line ( WireframeGeometry, LineBasicMaterial ) - rendered with gl.LINE
+				// Line ( THREE.WireframeGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE
 
-				geo = new WireframeGeometry( geo );
+				geo = new THREE.WireframeGeometry( geo );
 
-				matLineBasic = new LineBasicMaterial( { color: 0x4080ff } );
-				matLineDashed = new LineDashedMaterial( { scale: 2, dashSize: 1, gapSize: 1 } );
+				matLineBasic = new THREE.LineBasicMaterial( { color: 0x4080ff } );
+				matLineDashed = new THREE.LineDashedMaterial( { scale: 2, dashSize: 1, gapSize: 1 } );
 
-				wireframe1 = new LineSegments( geo, matLineBasic );
+				wireframe1 = new THREE.LineSegments( geo, matLineBasic );
 				wireframe1.computeLineDistances();
 				wireframe1.visible = false;
 				scene.add( wireframe1 );
@@ -216,7 +208,7 @@
 					matLine.dashed = val;
 
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or LineDashedMaterial could be implemented as a separate material
+					// ... or THREE.LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
 					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
 					matLine.needsUpdate = true;

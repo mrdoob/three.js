@@ -9,7 +9,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Exported by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Studio</a>.<br/>
-			Asset by <a href="http://vhalldez.cgsociety.org/" target="_blank" rel="noopener">Valdez Araujo</a>. 
+			Asset by <a href="http://vhalldez.cgsociety.org/" target="_blank" rel="noopener">Valdez Araujo</a>.
 			Geometry Compression with <a href="https://github.com/google/draco" target="_blank" rel="noopener">Google Draco</a> and content with LZMA using <a href="http://sunag.github.io/sea3d/IO/index.html" style="color:#FFFFFF" target="_blank">SEA3D I.O.</a> Tools<br>
 		</div>
 
@@ -17,21 +17,13 @@
 
 		<script type="module">
 
-			import {
-				Vector3,
-				Color,
-				Clock,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { MaskPass } from './jsm/postprocessing/MaskPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
 			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
@@ -46,7 +38,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls;
+			var camera, scene, renderer, composer;
 
 			var loader;
 
@@ -85,22 +77,22 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x333333 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 1000, 1000, 1000 );
 				camera.lookAt( 0, 0, 0 );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -116,8 +108,8 @@
 				var vh = 1.4, vl = 1.2;
 
 				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
-				colorCorrectionPass.uniforms[ "powRGB" ].value = new Vector3( vh, vh, vh );
-				colorCorrectionPass.uniforms[ "mulRGB" ].value = new Vector3( vl, vl, vl );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
 				var vignettePass = new ShaderPass( VignetteShader );
@@ -145,7 +137,7 @@
 
 			//
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			function animate() {
 

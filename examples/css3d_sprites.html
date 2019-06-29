@@ -22,10 +22,8 @@
 		<div id="container"></div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Scene
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
@@ -43,11 +41,11 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.set( 600, 400, 1500 );
 				camera.lookAt( 0, 0, 0 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function () {
