@@ -15,25 +15,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				BufferGeometry,
-				DirectionalLight,
-				Euler,
-				Line,
-				LineBasicMaterial,
-				Mesh,
-				MeshNormalMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Raycaster,
-				Scene,
-				TextureLoader,
-				Vector2,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -51,20 +34,20 @@
 
 			var intersection = {
 				intersects: false,
-				point: new Vector3(),
-				normal: new Vector3()
+				point: new THREE.Vector3(),
+				normal: new THREE.Vector3()
 			};
-			var mouse = new Vector2();
+			var mouse = new THREE.Vector2();
 
-			var textureLoader = new TextureLoader();
+			var textureLoader = new THREE.TextureLoader();
 			var decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
 			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 
-			var decalMaterial = new MeshPhongMaterial( {
+			var decalMaterial = new THREE.MeshPhongMaterial( {
 				specular: 0x444444,
 				map: decalDiffuse,
 				normalMap: decalNormal,
-				normalScale: new Vector2( 1, 1 ),
+				normalScale: new THREE.Vector2( 1, 1 ),
 				shininess: 30,
 				transparent: true,
 				depthTest: true,
@@ -76,9 +59,9 @@
 
 			var decals = [];
 			var mouseHelper;
-			var position = new Vector3();
-			var orientation = new Euler();
-			var size = new Vector3( 10, 10, 10 );
+			var position = new THREE.Vector3();
+			var orientation = new THREE.Euler();
+			var size = new THREE.Vector3( 10, 10, 10 );
 
 			var params = {
 				minScale: 10,
@@ -95,7 +78,7 @@
 
 			function init() {
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -103,37 +86,37 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 120;
-				camera.target = new Vector3();
+				camera.target = new THREE.Vector3();
 
 				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
-				scene.add( new AmbientLight( 0x443333 ) );
+				scene.add( new THREE.AmbientLight( 0x443333 ) );
 
-				var light = new DirectionalLight( 0xffddcc, 1 );
+				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
 				light.position.set( 1, 0.75, 0.5 );
 				scene.add( light );
 
-				var light = new DirectionalLight( 0xccccff, 1 );
+				var light = new THREE.DirectionalLight( 0xccccff, 1 );
 				light.position.set( - 1, 0.75, - 0.5 );
 				scene.add( light );
 
-				var geometry = new BufferGeometry();
-				geometry.setFromPoints( [ new Vector3(), new Vector3() ] );
+				var geometry = new THREE.BufferGeometry();
+				geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
-				line = new Line( geometry, new LineBasicMaterial() );
+				line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
 				scene.add( line );
 
 				loadLeePerrySmith();
 
-				raycaster = new Raycaster();
+				raycaster = new THREE.Raycaster();
 
-				mouseHelper = new Mesh( new BoxBufferGeometry( 1, 1, 10 ), new MeshNormalMaterial() );
+				mouseHelper = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
 				mouseHelper.visible = false;
 				scene.add( mouseHelper );
 
@@ -243,7 +226,7 @@
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					mesh = gltf.scene.children[ 0 ];
-					mesh.material = new MeshPhongMaterial( {
+					mesh.material = new THREE.MeshPhongMaterial( {
 						specular: 0x111111,
 						map: textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
 						specularMap: textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' ),
@@ -271,7 +254,7 @@
 				var material = decalMaterial.clone();
 				material.color.setHex( Math.random() * 0xffffff );
 
-				var m = new Mesh( new DecalGeometry( mesh, position, orientation, size ), material );
+				var m = new THREE.Mesh( new DecalGeometry( mesh, position, orientation, size ), material );
 
 				decals.push( m );
 				scene.add( m );

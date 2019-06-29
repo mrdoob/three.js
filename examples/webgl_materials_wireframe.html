@@ -46,18 +46,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				BufferAttribute,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 
@@ -70,28 +60,28 @@
 
 				var size = 150;
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 800;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
-				geometry = new BoxBufferGeometry( size, size, size );
-				material = new MeshBasicMaterial( { wireframe: true } );
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
+				material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = - 150;
 				scene.add( mesh );
 
 				//
 
-				geometry = new BoxBufferGeometry( size, size, size );
+				geometry = new THREE.BoxBufferGeometry( size, size, size );
 				geometry = geometry.toNonIndexed();
 
 				setupAttributes( geometry );
 
-				material = new ShaderMaterial( {
+				material = new THREE.ShaderMaterial( {
 					uniforms: {},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
@@ -99,18 +89,18 @@
 
 				material.extensions.derivatives = true;
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = 150;
 				scene.add( mesh );
 
 				//
 
-				geometry = new SphereBufferGeometry( size / 2, 32, 16 );
+				geometry = new THREE.SphereBufferGeometry( size / 2, 32, 16 );
 				geometry = geometry.toNonIndexed();
 
 				setupAttributes( geometry );
 
-				material = new ShaderMaterial( {
+				material = new THREE.ShaderMaterial( {
 					uniforms: {},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
@@ -118,13 +108,13 @@
 
 				material.extensions.derivatives = true;
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = - 150;
 				scene.add( mesh );
 
 				// renderer
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -140,9 +130,9 @@
 				// TODO: Bring back quads
 
 				var vectors = [
-					new Vector3( 1, 0, 0 ),
-					new Vector3( 0, 1, 0 ),
-					new Vector3( 0, 0, 1 )
+					new THREE.Vector3( 1, 0, 0 ),
+					new THREE.Vector3( 0, 1, 0 ),
+					new THREE.Vector3( 0, 0, 1 )
 				];
 
 				var position = geometry.attributes.position;
@@ -154,7 +144,7 @@
 
 				}
 
-				geometry.addAttribute( 'center', new BufferAttribute( centers, 3 ) );
+				geometry.addAttribute( 'center', new THREE.BufferAttribute( centers, 3 ) );
 
 			}
 

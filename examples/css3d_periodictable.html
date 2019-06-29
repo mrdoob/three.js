@@ -93,12 +93,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Object3D,
-				Scene,
-				Vector3
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
@@ -235,10 +231,10 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3000;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// table
 
@@ -273,7 +269,7 @@
 
 					//
 
-					var object = new Object3D();
+					var object = new THREE.Object3D();
 					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
 					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
 
@@ -283,14 +279,14 @@
 
 				// sphere
 
-				var vector = new Vector3();
+				var vector = new THREE.Vector3();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 					var phi = Math.acos( - 1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var object = new Object3D();
+					var object = new THREE.Object3D();
 
 					object.position.setFromSphericalCoords( 800, phi, theta );
 
@@ -304,14 +300,14 @@
 
 				// helix
 
-				var vector = new Vector3();
+				var vector = new THREE.Vector3();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 					var theta = i * 0.175 + Math.PI;
 					var y = - ( i * 8 ) + 450;
 
-					var object = new Object3D();
+					var object = new THREE.Object3D();
 
 					object.position.setFromCylindricalCoords( 900, theta, y );
 
@@ -329,7 +325,7 @@
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
-					var object = new Object3D();
+					var object = new THREE.Object3D();
 
 					object.position.x = ( ( i % 5 ) * 400 ) - 800;
 					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;

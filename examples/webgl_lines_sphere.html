@@ -13,16 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Float32BufferAttribute,
-				LineBasicMaterial,
-				LineSegments,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth,
 				SCREEN_HEIGHT = window.innerHeight,
@@ -40,10 +32,10 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 80, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 80, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
 				camera.position.z = 1000;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var i, line, material, p,
 					parameters = [[ 0.25, 0xff7700, 1 ], [ 0.5, 0xff9900, 1 ], [ 0.75, 0xffaa00, 0.75 ], [ 1, 0xffaa00, 0.5 ], [ 1.25, 0x000833, 0.8 ],
@@ -55,9 +47,9 @@
 
 					p = parameters[ i ];
 
-					material = new LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ] } );
+					material = new THREE.LineBasicMaterial( { color: p[ 1 ], opacity: p[ 2 ] } );
 
-					line = new LineSegments( geometry, material );
+					line = new THREE.LineSegments( geometry, material );
 					line.scale.x = line.scale.y = line.scale.z = p[ 0 ];
 					line.userData.originalScale = p[ 0 ];
 					line.rotation.y = Math.random() * Math.PI;
@@ -66,7 +58,7 @@
 
 				}
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.body.appendChild( renderer.domElement );
@@ -102,10 +94,10 @@
 
 			function createGeometry() {
 
-				var geometry = new BufferGeometry();
+				var geometry = new THREE.BufferGeometry();
 				var vertices = [];
 
-				var vertex = new Vector3();
+				var vertex = new THREE.Vector3();
 
 				for ( var i = 0; i < 1500; i ++ ) {
 
@@ -123,7 +115,7 @@
 
 				}
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 

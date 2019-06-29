@@ -31,33 +31,24 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<script type="module">
-			/*
-			 * COPIED FROM webgl_materials_envmaps_hdr.html
-			 *
-			 *
-			 *
-			 */
-			import './js/nodes/THREE.Nodes.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
+			import {
+				StandardNodeMaterial,
+				FloatNode,
+				TextureNode,
+				TextureCubeNode
+			} from './jsm/nodes/Nodes.js';
 
 			var params = {
 				textureSize: 1024,
@@ -71,8 +62,8 @@
 			var container, stats;
 			var camera, scene, renderer, controls;
 			var nodeMaterial, nodeTexture, nodeTextureSize, torusMesh, planeMesh;
-			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
-			var ldrCubeMap, hdrCubeMap, rgbmCubeMap;
+			var hdrCubeRenderTarget;
+			var hdrCubeMap;
 
 			init();
 			animate();
@@ -81,10 +72,10 @@
 
 				nodeTextureSize.value = textureSize;
 
-				var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap, undefined, textureSize / 4 );
+				var pmremGenerator = new PMREMGenerator( hdrCubeMap, undefined, textureSize / 4 );
 				pmremGenerator.update( renderer );
 
-				var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 				pmremCubeUVPacker.update( renderer );
 
 				hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -119,16 +110,16 @@
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
 
-				nodeMaterial = new THREE.StandardNodeMaterial();
+				nodeMaterial = new StandardNodeMaterial();
 				nodeMaterial.color.value = new THREE.Color( 0xffffff );
 				nodeMaterial.roughness.value = params.metalness;
 				nodeMaterial.metalness.value = params.roguhness;
 				nodeMaterial.visible = false;
 
-				nodeTexture = new THREE.TextureNode();
-				nodeTextureSize = new THREE.FloatNode( 1024 );
+				nodeTexture = new TextureNode();
+				nodeTextureSize = new FloatNode( 1024 );
 
-				nodeMaterial.environment = new THREE.TextureCubeNode( nodeTexture, nodeTextureSize );
+				nodeMaterial.environment = new TextureCubeNode( nodeTexture, nodeTextureSize );
 
 				torusMesh = new THREE.Mesh( geometry, nodeMaterial );
 				scene.add( torusMesh );
@@ -139,9 +130,10 @@
 				scene.add( planeMesh );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-				hdrCubeMap = new THREE.HDRCubeTextureLoader()
+				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.load( THREE.UnsignedByteType, hdrUrls, function () {
+					.setType( THREE.UnsignedByteType )
+					.load( hdrUrls, function () {
 
 						generate( params.textureSize );
 
@@ -160,13 +152,13 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'textureSize', [ 128, 256, 512, 1024, 2048, 4096 ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );

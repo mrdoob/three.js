@@ -9,9 +9,9 @@ import {
 	Group
 } from "../../../build/three.module.js";
 
-import { Parser } from "./worker/independent/OBJLoader2Parser.js";
-import { MeshReceiver } from "./shared/MeshReceiver.js";
-import { MaterialHandler } from "./shared/MaterialHandler.js";
+import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
+import { MeshReceiver } from "./obj2/shared/MeshReceiver.js";
+import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
 
 /**
  * Use this class to load OBJ data from files or to parse OBJ data from an arraybuffer
@@ -44,9 +44,8 @@ const OBJLoader2 = function ( manager ) {
 	this.materialHandler = new MaterialHandler();
 	this.meshReceiver = new MeshReceiver( this.materialHandler );
 };
-OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta';
+OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta2';
 console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
-
 
 OBJLoader2.prototype = {
 
@@ -320,7 +319,7 @@ OBJLoader2.prototype = {
 			console.time( 'OBJLoader parse: ' + this.modelName );
 
 		}
-		let parser = new Parser();
+		let parser = new OBJLoader2Parser();
 		parser.setLogging( this.logging.enabled, this.logging.debug );
 		parser.setMaterialPerSmoothingGroup( this.materialPerSmoothingGroup );
 		parser.setUseOAsMesh( this.useOAsMesh );
@@ -330,22 +329,8 @@ OBJLoader2.prototype = {
 		parser.setMaterials( this.materialHandler.getMaterials() );
 
 		let scope = this;
-		let onMeshLoaded = function ( payload ) {
-
-			if ( payload.cmd !== 'data' ) return;
-
-			if ( payload.type === 'mesh' ) {
-
-				let meshes = scope.meshReceiver.buildMeshes( payload );
-				for ( let mesh of meshes ) {
-					scope.baseObject3d.add( mesh );
-				}
-
-			} else if ( payload.type === 'material' ) {
-
-				scope.materialHandler.addPayloadMaterials( payload );
-
-			}
+		let scopedOnAssetAvailable = function ( payload ) {
+			scope._onAssetAvailable( payload );
 		};
 		let onProgressScoped = function ( text, numericalValue ) {
 			scope._onProgress( 'progressParse', text, numericalValue );
@@ -353,7 +338,7 @@ OBJLoader2.prototype = {
 		let onErrorScoped = function ( message ) {
 			scope._onError( message );
 		};
-		parser.setCallbackOnAssetAvailable( onMeshLoaded );
+		parser.setCallbackOnAssetAvailable( scopedOnAssetAvailable );
 		parser.setCallbackOnProgress( onProgressScoped );
 		parser.setCallbackOnError( onErrorScoped );
 		if ( content instanceof ArrayBuffer || content instanceof Uint8Array ) {
@@ -377,6 +362,24 @@ OBJLoader2.prototype = {
 
 		}
 		return this.baseObject3d;
+	},
+
+	_onAssetAvailable: function ( payload ) {
+
+		if ( payload.cmd !== 'assetAvailable' ) return;
+
+		if ( payload.type === 'mesh' ) {
+
+			let meshes = this.meshReceiver.buildMeshes( payload );
+			for ( let mesh of meshes ) {
+				this.baseObject3d.add( mesh );
+			}
+
+		} else if ( payload.type === 'material' ) {
+
+			this.materialHandler.addPayloadMaterials( payload );
+
+		}
 	}
 };
 

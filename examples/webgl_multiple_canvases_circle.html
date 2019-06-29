@@ -132,23 +132,7 @@
 	</div>
 
 	<script type="module">
-		import {
-			BufferAttribute,
-			Camera,
-			CanvasTexture,
-			Color,
-			DirectionalLight,
-			IcosahedronBufferGeometry,
-			Math as _Math,
-			Mesh,
-			MeshBasicMaterial,
-			MeshPhongMaterial,
-			PerspectiveCamera,
-			PlaneBufferGeometry,
-			Scene,
-			VertexColors,
-			WebGLRenderer,
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		var views = [];
 
@@ -171,13 +155,13 @@
 
 			var context = canvas.getContext( '2d' );
 
-			var camera = new PerspectiveCamera( 20, canvas.clientWidth / canvas.clientHeight, 1, 20000 );
+			var camera = new THREE.PerspectiveCamera( 20, canvas.clientWidth / canvas.clientHeight, 1, 20000 );
 			camera.rotation.y = rotateY;
 
 			// Think of the virtual camera as a post with 5 cameras on it (even though those cameras happen to live in difference scenes)
 			// You need to move the post (ie, the virtualCamera) to move all 5 cameras together.
 
-			var virtualCamera = new Camera();
+			var virtualCamera = new THREE.Camera();
 			virtualCamera.add( camera );
 
 			this.render = function () {
@@ -206,7 +190,7 @@
 			var canvas5 = document.getElementById( 'canvas5' );
 
 			var fudge = 0.45; // I don't know why this is needed :-(
-			var rot = 30 * _Math.DEG2RAD;
+			var rot = 30 * THREE.Math.DEG2RAD;
 
 			views.push( new View( canvas1, rot * - 2 * fudge ) );
 			views.push( new View( canvas2, rot * - 1 * fudge ) );
@@ -216,10 +200,10 @@
 
 			//
 
-			scene = new Scene();
-			scene.background = new Color( 0xffffff );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );
 
-			var light = new DirectionalLight( 0xffffff );
+			var light = new THREE.DirectionalLight( 0xffffff );
 			light.position.set( 0, 0, 1 ).normalize();
 			scene.add( light );
 
@@ -239,14 +223,14 @@
 			context.fillStyle = gradient;
 			context.fillRect( 0, 0, canvas.width, canvas.height );
 
-			var shadowTexture = new CanvasTexture( canvas );
+			var shadowTexture = new THREE.CanvasTexture( canvas );
 
-			var shadowMaterial = new MeshBasicMaterial( { map: shadowTexture } );
-			var shadowGeo = new PlaneBufferGeometry( 300, 300, 1, 1 );
+			var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
+			var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 
 			for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
 
-				var shadowMesh = new Mesh( shadowGeo, shadowMaterial );
+				var shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
 				shadowMesh.position.y = - 250;
 				shadowMesh.rotation.x = - Math.PI / 2;
@@ -256,12 +240,12 @@
 
 			var radius = 200;
 
-			var geometry1 = new IcosahedronBufferGeometry( radius, 1 );
+			var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
 			var count = geometry1.attributes.position.count;
-			geometry1.addAttribute( 'color', new BufferAttribute( new Float32Array( count * 3 ), 3 ) );
+			geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
-			var color = new Color();
+			var color = new THREE.Color();
 			var positions = geometry1.attributes.position;
 			var colors = geometry1.attributes.color;
 
@@ -273,19 +257,19 @@
 
 			}
 
-			var material = new MeshPhongMaterial( {
+			var material = new THREE.MeshPhongMaterial( {
 				color: 0xffffff,
 				flatShading: true,
-				vertexColors: VertexColors,
+				vertexColors: THREE.VertexColors,
 				shininess: 0
 			} );
 
-			var wireframeMaterial = new MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
+			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
 			for ( var i = 0; i < noof_balls; i ++ ) { // create balls
 
-				var mesh = new Mesh( geometry1, material );
-				var wireframe = new Mesh( geometry1, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry1, material );
+				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
 				mesh.add( wireframe );
 
 				mesh.position.x = - ( noof_balls - 1 ) / 2 * 400 + i * 400;
@@ -294,7 +278,7 @@
 
 			}
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( 200, 300 );
 

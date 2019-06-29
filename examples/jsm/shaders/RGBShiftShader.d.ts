@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface RGBShiftShader {
+export const RGBShiftShader: {
   uniforms: {
     tDiffuse: Uniform;
     amount: Uniform;
@@ -10,4 +10,4 @@ export interface RGBShiftShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

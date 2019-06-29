@@ -40,17 +40,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Color,
-				DirectionalLight,
-				IcosahedronBufferGeometry,
-				Mesh,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -64,13 +55,13 @@
 
 				container = document.querySelector( '.container' );
 
-				sceneL = new Scene();
-				sceneL.background = new Color( 0xff00ff );
+				sceneL = new THREE.Scene();
+				sceneL.background = new THREE.Color( 0xff00ff );
 
-				sceneR = new Scene();
-				sceneR.background = new Color( 0x8FBCD4 );
+				sceneR = new THREE.Scene();
+				sceneR.background = new THREE.Color( 0x8FBCD4 );
 
-				camera = new PerspectiveCamera( 35, container.clientWidth / container.clientHeight, 0.1, 10 );
+				camera = new THREE.PerspectiveCamera( 35, container.clientWidth / container.clientHeight, 0.1, 10 );
 				camera.position.set( 2, 4, 7 );
 
 				controls = new OrbitControls( camera, container );
@@ -78,7 +69,7 @@
 				initMeshes();
 				initLights();
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( container.clientWidth, container.clientHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setScissorTest( true );
@@ -97,26 +88,26 @@
 
 			function initMeshes() {
 
-				var geoB = new BoxBufferGeometry( 2, 2, 2 );
-				var matB = new MeshStandardMaterial( { color: 0x0000ff } );
-				var meshB = new Mesh( geoB, matB );
+				var geoB = new THREE.BoxBufferGeometry( 2, 2, 2 );
+				var matB = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+				var meshB = new THREE.Mesh( geoB, matB );
 				sceneL.add( meshB );
 
-				var geoA = new IcosahedronBufferGeometry( 1, 0 );
-				var matA = new MeshStandardMaterial( { color: 0xff0000 } );
-				var meshA = new Mesh( geoA, matA );
+				var geoA = new THREE.IcosahedronBufferGeometry( 1, 0 );
+				var matA = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				var meshA = new THREE.Mesh( geoA, matA );
 				sceneR.add( meshA );
 
 			}
 
 			function initLights() {
 
-				var light1 = new DirectionalLight();
+				var light1 = new THREE.DirectionalLight();
 				light1.position.set( 20, 20, 20 );
 				sceneL.add( light1 );
 				sceneR.add( light1.clone() );
 
-				var light2 = new DirectionalLight();
+				var light2 = new THREE.DirectionalLight();
 				light2.position.set( - 20, 20, 20 );
 				sceneL.add( light2 );
 				sceneR.add( light2.clone() );

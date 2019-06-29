@@ -16,25 +16,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				AnimationMixer,
-				BoxBufferGeometry,
-				Clock,
-				Color,
-				Fog,
-				FontLoader,
-				LightShadow,
-				Mesh,
-				MeshPhongMaterial,
-				PCFShadowMap,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				SpotLight,
-				TextBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -58,7 +41,7 @@
 			var light;
 			var lightShadowMapViewer;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			var showHUD = false;
 
@@ -73,14 +56,14 @@
 
 				// CAMERA
 
-				camera = new PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
 
 				// SCENE
 
-				scene = new Scene();
-				scene.background = new Color( 0x59472b );
-				scene.fog = new Fog( 0x59472b, 1000, FAR );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x59472b );
+				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
 				controls = new FirstPersonControls( camera );
 
@@ -93,16 +76,16 @@
 
 				// LIGHTS
 
-				var ambient = new AmbientLight( 0x444444 );
+				var ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
+				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
 				light.castShadow = true;
 
-				light.shadow = new LightShadow( new PerspectiveCamera( 50, 1, 1200, 2500 ) );
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
 				light.shadow.bias = 0.0001;
 
 				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
@@ -115,7 +98,7 @@
 
 				// RENDERER
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -127,7 +110,7 @@
 				//
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = PCFShadowMap;
+				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				// STATS
 
@@ -182,10 +165,10 @@
 
 				// GROUND
 
-				var geometry = new PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new MeshPhongMaterial( { color: 0xffb851 } );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
 
-				var ground = new Mesh( geometry, planeMaterial );
+				var ground = new THREE.Mesh( geometry, planeMaterial );
 
 				ground.position.set( 0, FLOOR, 0 );
 				ground.rotation.x = - Math.PI / 2;
@@ -198,10 +181,10 @@
 
 				// TEXT
 
-				var loader = new FontLoader();
+				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					var textGeo = new TextBufferGeometry( "THREE.JS", {
+					var textGeo = new THREE.TextBufferGeometry( "THREE.JS", {
 
 						font: font,
 
@@ -218,9 +201,9 @@
 					textGeo.computeBoundingBox();
 					var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-					var textMaterial = new MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
+					var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff } );
 
-					var mesh = new Mesh( textGeo, textMaterial );
+					var mesh = new THREE.Mesh( textGeo, textMaterial );
 					mesh.position.x = centerOffset;
 					mesh.position.y = FLOOR + 67;
 
@@ -233,7 +216,7 @@
 
 				// CUBES
 
-				var mesh = new Mesh( new BoxBufferGeometry( 1500, 220, 150 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1500, 220, 150 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -243,7 +226,7 @@
 
 				scene.add( mesh );
 
-				var mesh = new Mesh( new BoxBufferGeometry( 1600, 170, 250 ), planeMaterial );
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1600, 170, 250 ), planeMaterial );
 
 				mesh.position.y = FLOOR - 50;
 				mesh.position.z = 20;
@@ -255,7 +238,7 @@
 
 				// MORPHS
 
-				mixer = new AnimationMixer( scene );
+				mixer = new THREE.AnimationMixer( scene );
 
 				function addMorph( mesh, clip, speed, duration, x, y, z, fudgeColor ) {
 

@@ -14,18 +14,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Color,
-				Float32BufferAttribute,
-				Group,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				VertexColors,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { PeppersGhostEffect } from './jsm/effects/PeppersGhostEffect.js';
 
@@ -42,21 +32,21 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				group = new Group();
+				group = new THREE.Group();
 				scene.add( group );
 
 				// Cube
 
-				var geometry = new BoxBufferGeometry( 1, 1, 1 );
+				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				geometry = geometry.toNonIndexed(); // ensure unique vertices for each triangle
 
 				var position = geometry.attributes.position;
 				var colors = [];
-				var color = new Color();
+				var color = new THREE.Color();
 
 				// generate for each side of the cube a different color
 
@@ -78,13 +68,13 @@
 
 				}
 
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new MeshBasicMaterial( { vertexColors: VertexColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					var cube = new Mesh( geometry, material );
+					var cube = new THREE.Mesh( geometry, material );
 					cube.position.x = Math.random() * 2 - 1;
 					cube.position.y = Math.random() * 2 - 1;
 					cube.position.z = Math.random() * 2 - 1;
@@ -93,7 +83,7 @@
 
 				}
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 

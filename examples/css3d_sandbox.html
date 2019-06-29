@@ -17,16 +17,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - sandbox</div>
 
 		<script type="module">
-			import {
-				Color,
-				DoubleSide,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Mesh,
-				MeshBasicMaterial,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
@@ -42,15 +34,15 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 200, 200, 200 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				scene2 = new Scene();
+				scene2 = new THREE.Scene();
 
-				var material = new MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: DoubleSide } );
+				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
 
 				//
 
@@ -60,7 +52,7 @@
 					element.style.width = '100px';
 					element.style.height = '100px';
 					element.style.opacity = ( i < 5 ) ? 0.5 : 1;
-					element.style.background = new Color( Math.random() * 0xffffff ).getStyle();
+					element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
 
 					var object = new CSS3DObject( element );
 					object.position.x = Math.random() * 200 - 100;
@@ -73,8 +65,8 @@
 					object.scale.y = Math.random() + 0.5;
 					scene2.add( object );
 
-					var geometry = new PlaneBufferGeometry( 100, 100 );
-					var mesh = new Mesh( geometry, material );
+					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
 					mesh.scale.copy( object.scale );
@@ -84,7 +76,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

@@ -13,18 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				CubeReflectionMapping,
-				DoubleSide,
-				LinearFilter,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				TorusBufferGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { PVRLoader } from './jsm/loaders/PVRLoader.js';
 
@@ -36,30 +26,30 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 1000;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var geometry = new BoxBufferGeometry( 200, 200, 200 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 
 				//
 
 				var onCube1Loaded = function ( texture ) {
 
-					texture.magFilter = LinearFilter;
-					texture.minFilter = LinearFilter;
-					texture.mapping = CubeReflectionMapping;
+					texture.magFilter = THREE.LinearFilter;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
 					material6.needsUpdate = true;
 
 				};
 
 				var onCube2Loaded = function ( texture ) {
 
-					texture.magFilter = LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
 					// texture.minFilter = LinearMipMapNearestFilter;
-					texture.minFilter = LinearFilter;
-					texture.mapping = CubeReflectionMapping;
+					texture.minFilter = THREE.LinearFilter;
+					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;
 
 				};
@@ -86,65 +76,65 @@
 				disturb_4bpp_rgb_v3.minFilter =
 				disturb_4bpp_rgb_v3.magFilter =
 				flare_2bpp_rgba.minFilter =
-				flare_2bpp_rgba.magFilter = LinearFilter;
+				flare_2bpp_rgba.magFilter = THREE.LinearFilter;
 
-				var material1 = new MeshBasicMaterial( { map: disturb_4bpp_rgb } );
-				var material2 = new MeshBasicMaterial( { map: disturb_4bpp_rgb_mips } );
-				var material3 = new MeshBasicMaterial( { map: disturb_2bpp_rgb } );
-				var material4 = new MeshBasicMaterial( { map: flare_4bpp_rgba, side: DoubleSide, depthTest: false, transparent: true } );
-				var material5 = new MeshBasicMaterial( { map: flare_2bpp_rgba, side: DoubleSide, depthTest: false, transparent: true } );
-				var material6 = new MeshBasicMaterial( { envMap: park3_cube_nomip_4bpp_rgb } );
-				var material8 = new MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
+				var material1 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb } );
+				var material2 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_mips } );
+				var material3 = new THREE.MeshBasicMaterial( { map: disturb_2bpp_rgb } );
+				var material4 = new THREE.MeshBasicMaterial( { map: flare_4bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
+				var material5 = new THREE.MeshBasicMaterial( { map: flare_2bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
+				var material6 = new THREE.MeshBasicMaterial( { envMap: park3_cube_nomip_4bpp_rgb } );
+				var material8 = new THREE.MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
 
-				var material7 = new MeshBasicMaterial( { map: disturb_4bpp_rgb_v3 } );
+				var material7 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_v3 } );
 
 				//
 
-				var mesh = new Mesh( geometry, material1 );
+				var mesh = new THREE.Mesh( geometry, material1 );
 				mesh.position.x = - 500;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material2 );
+				mesh = new THREE.Mesh( geometry, material2 );
 				mesh.position.x = - 166;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material3 );
+				mesh = new THREE.Mesh( geometry, material3 );
 				mesh.position.x = 166;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material7 );
+				mesh = new THREE.Mesh( geometry, material7 );
 				mesh.position.x = 500;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material4 );
+				mesh = new THREE.Mesh( geometry, material4 );
 				mesh.position.x = - 500;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( geometry, material5 );
+				mesh = new THREE.Mesh( geometry, material5 );
 				mesh.position.x = - 166;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				var torus = new TorusBufferGeometry( 100, 50, 32, 24 );
+				var torus = new THREE.TorusBufferGeometry( 100, 50, 32, 24 );
 
-				mesh = new Mesh( torus, material6 );
+				mesh = new THREE.Mesh( torus, material6 );
 				mesh.position.x = 166;
 				mesh.position.y = - 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new Mesh( torus, material8 );
+				mesh = new THREE.Mesh( torus, material8 );
 				mesh.position.x = 500;
 				mesh.position.y = - 200;
 				scene.add( mesh );
@@ -152,7 +142,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

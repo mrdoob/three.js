@@ -2,10 +2,10 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface TechnicolorShader {
+export const TechnicolorShader: {
   uniforms: {
     tDiffuse: Uniform;
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

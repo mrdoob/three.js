@@ -13,25 +13,8 @@
 		Note: Every second sphere has an IBL environment map on it.</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DirectionalLight,
-				FontLoader,
-				LinearFilter,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhysicalMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				SphereBufferGeometry,
-				TextBufferGeometry,
-				UnsignedByteType,
-				Uncharted2ToneMapping,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -45,7 +28,7 @@
 			var camera, scene, renderer;
 			var particleLight;
 
-			var loader = new FontLoader();
+			var loader = new THREE.FontLoader();
 			loader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
 
 				init( font );
@@ -58,7 +41,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
@@ -73,13 +56,13 @@
 
 				};
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
 				new HDRCubeTextureLoader()
-					.setType( UnsignedByteType )
+					.setType( THREE.UnsignedByteType )
 					.load( hdrUrls, function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
@@ -97,7 +80,7 @@
 						var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 						var stepSize = 1.0 / numberOfSphersPerSide;
 
-						var geometry = new SphereBufferGeometry( sphereRadius, 32, 16 );
+						var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
 
 						var index = 0;
 
@@ -107,9 +90,9 @@
 
 								for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-									var diffuseColor = new Color().setHSL( alpha, 0.5, 0.25 );
+									var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, 0.25 );
 
-									var material = new MeshPhysicalMaterial( {
+									var material = new THREE.MeshPhysicalMaterial( {
 										color: diffuseColor,
 										metalness: 0,
 										roughness: 0.5,
@@ -121,7 +104,7 @@
 
 									index ++;
 
-									var mesh = new Mesh( geometry, material );
+									var mesh = new THREE.Mesh( geometry, material );
 
 									mesh.position.x = alpha * 400 - 200;
 									mesh.position.y = beta * 400 - 200;
@@ -137,7 +120,7 @@
 
 						}
 
-						hdrCubeMap.magFilter = LinearFilter;
+						hdrCubeMap.magFilter = THREE.LinearFilter;
 						hdrCubeMap.needsUpdate = true;
 						scene.background = hdrCubeMap;
 
@@ -148,7 +131,7 @@
 
 				function addLabel( name, location ) {
 
-					var textGeo = new TextBufferGeometry( name, {
+					var textGeo = new THREE.TextBufferGeometry( name, {
 
 						font: font,
 
@@ -158,45 +141,45 @@
 
 					} );
 
-					var textMaterial = new MeshBasicMaterial( { color: 0xffffff } );
-					var textMesh = new Mesh( textGeo, textMaterial );
+					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+					var textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
 
 				}
 
-				addLabel( "+clearCoat", new Vector3( - 350, 0, 0 ) );
-				addLabel( "-clearCoat", new Vector3( 350, 0, 0 ) );
+				addLabel( "+clearCoat", new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( "-clearCoat", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearCoatRoughness", new Vector3( 0, - 300, 0 ) );
-				addLabel( "-clearCoatRoughness", new Vector3( 0, 300, 0 ) );
+				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( "-clearCoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "+reflectivity", new Vector3( 0, 0, - 300 ) );
-				addLabel( "-reflectivity", new Vector3( 0, 0, 300 ) );
+				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
+				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );
 
-				particleLight = new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
 
-				scene.add( new AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var directionalLight = new DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var pointLight = new PointLight( 0xffffff, 2, 800 );
+				var pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				renderer.gammaOutput = true;
-				renderer.toneMapping = Uncharted2ToneMapping;
+				renderer.toneMapping = THREE.Uncharted2ToneMapping;
 				renderer.toneMappingExposure = 0.75;
 
 				//

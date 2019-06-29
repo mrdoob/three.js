@@ -9,13 +9,8 @@
 	<body>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
@@ -35,14 +30,14 @@
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Vertex Reduction using SimplifyModifier';
 				document.body.appendChild( info );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 15;
 
 				var controls = new OrbitControls( camera, renderer.domElement );
@@ -50,9 +45,9 @@
 				controls.enablePan = false;
 				controls.enableZoom = false;
 
-				scene.add( new AmbientLight( 0xffffff, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
-				var light = new PointLight( 0xffffff, 0.7 );
+				var light = new THREE.PointLight( 0xffffff, 0.7 );
 				camera.add( light );
 				scene.add( camera );
 

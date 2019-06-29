@@ -50,39 +50,6 @@
 			[example:webgl_buffergeometry_rawshader Raw Shaders]
 		</p>
 
-
-		<h2>访问属性值</h2>
-		<p>
-			WebGL 将与每个顶点相关的数据保存为 <em>attributes</em>. 这些属性例如，顶点位置、顶点法向量、顶点颜色等等。
-			当使用 [page:Geometry] 时，[page:WebGLRenderer renderer] 将数据包装为有类型的队列的缓存，并将数据送往着色器。有了
-			BufferGeometry 这些数据都被存储到相应类型的属性的缓存中。这就意味着，如果想要获得顶点的位置信息，你必须调用
-			[page:.getAttribute] 访问位置信息的 page:BufferAttribute attribute]，之后再访问位置矢量中每一维坐标值（x，y，z 值）。
-		</p>
-		<p>
-			通过该类提供的下属方法设置以下属性值:
-		</p>
-		<h3>[page:BufferAttribute position] (itemSize: 3)</h3>
-		<p>
-			存储当前几何体中每个顶点的坐标，包含 x，y，z 三维数据。通过 [page:.fromGeometry]() 设置。
-		</p>
-
-		<h3>[page:BufferAttribute normal] (itemSize: 3)</h3>
-		<p>
-			存储当前几何体中每个顶点的法向量，包含 x，y，z 三维数据。通过 [page:.fromGeometry]() 设置。
-		</p>
-
-		<h3>[page:BufferAttribute color] (itemSize: 3)</h3>
-		<p>
-			存储当前几何体中每个顶点的颜色值，包含 R，G，B 三通道颜色值。通过 [page:.fromGeometry]() 设置。
-		</p>
-
-		<p>
-			除了上述已有的属性，你可以通过 addAttribute 方法自定义属性。通过 [page:Geometry]，这些自定义属性被存储到
-			[page:Material] 中。在 BufferGeometry 中，属性则被存储到几何体本身。注意，你依然需要在材质中设置属性信息，
-			但是属性的值则被存储到 BufferGeometry。
-		</p>
-
-
 		<h2>构造函数</h2>
 
 

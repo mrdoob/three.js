@@ -14,21 +14,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				DirectionalLight,
-				LinearFilter,
-				LinearMipMapLinearFilter,
-				Mesh,
-				PerspectiveCamera,
-				RGBFormat,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				UniformsUtils,
-				WebGLRenderer,
-				WebGLRenderTarget
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -69,19 +56,19 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				// LIGHTS
 
-				directionalLight = new DirectionalLight( 0xffeedd, 1.5 );
+				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1.5 );
 				directionalLight.position.set( 1, 0.5, 1 );
 				scene.add( directionalLight );
 
-				directionalLight = new DirectionalLight( 0xddddff, 0.5 );
+				directionalLight = new THREE.DirectionalLight( 0xddddff, 0.5 );
 				directionalLight.position.set( - 1, 0.5, - 1 );
 				scene.add( directionalLight );
 
@@ -91,9 +78,9 @@
 
 				var shader = SkinShaderAdvanced;
 
-				var uniformsUV = UniformsUtils.clone( shader.uniforms );
+				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				uniformsUV[ "tNormal" ].value = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = - 1.5;
@@ -109,7 +96,7 @@
 				uniformsUV[ "uSpecularBrightness" ].value = 0.7;
 
 
-				var uniforms = UniformsUtils.clone( uniformsUV );
+				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
 				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
 				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
 				uniforms[ "passID" ].value = 1;
@@ -118,10 +105,10 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
-				var material = new ShaderMaterial( parameters );
+				var material = new THREE.ShaderMaterial( parameters );
 				material.extensions.derivatives = true;
 
-				var materialUV = new ShaderMaterial( parametersUV );
+				var materialUV = new THREE.ShaderMaterial( parametersUV );
 				materialUV.extensions.derivatives = true;
 
 				// LOADER
@@ -135,7 +122,7 @@
 
 				// RENDERER
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
@@ -157,7 +144,7 @@
 
 				// POSTPROCESSING
 
-				var renderModelUV = new RenderPass( scene, camera, materialUV, new Color( 0x575757 ) );
+				var renderModelUV = new RenderPass( scene, camera, materialUV, new THREE.Color( 0x575757 ) );
 
 				var effectBloom1 = new BloomPass( 1, 15, 2, 512 );
 				var effectBloom2 = new BloomPass( 1, 25, 3, 512 );
@@ -171,9 +158,9 @@
 
 				var pars = {
 					generateMipmaps: true,
-					minFilter: LinearMipMapLinearFilter,
-					magFilter: LinearFilter,
-					format: RGBFormat,
+					minFilter: THREE.LinearMipMapLinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBFormat,
 					stencilBuffer: false
 				};
 
@@ -182,7 +169,7 @@
 
 				//
 
-				composer = new EffectComposer( renderer, new WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composer = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composer.addPass( renderModelUV );
 				composer.renderToScreen = false;
 
@@ -190,19 +177,19 @@
 
 				//
 
-				composerUV1 = new EffectComposer( renderer, new WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composerUV1 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV1.addPass( renderScene );
 				composerUV1.addPass( effectBloom1 );
 				composerUV1.renderToScreen = false;
 
-				composerUV2 = new EffectComposer( renderer, new WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composerUV2 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV2.addPass( renderScene );
 				composerUV2.addPass( effectBloom2 );
 				composerUV2.renderToScreen = false;
 
-				composerUV3 = new EffectComposer( renderer, new WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composerUV3 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 
 				composerUV3.addPass( renderScene );
 				composerUV3.addPass( effectBloom3 );
@@ -211,7 +198,7 @@
 				//
 
 				var effectBeckmann = new ShaderPass( SkinShaderBeckmann );
-				composerBeckmann = new EffectComposer( renderer, new WebGLRenderTarget( rtwidth, rtheight, pars ) );
+				composerBeckmann = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerBeckmann.addPass( effectBeckmann );
 
 				//
@@ -243,7 +230,7 @@
 
 			function createScene( geometry, scale, material ) {
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );
 

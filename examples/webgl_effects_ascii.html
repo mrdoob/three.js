@@ -11,17 +11,8 @@
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - ascii</div>
 
 		<script type="module">
-			import {
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				PointLight,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
@@ -37,31 +28,31 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var light = new PointLight( 0xffffff );
+				var light = new THREE.PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
 				scene.add( light );
 
-				var light = new PointLight( 0xffffff, 0.25 );
+				var light = new THREE.PointLight( 0xffffff, 0.25 );
 				light.position.set( - 500, - 500, - 500 );
 				scene.add( light );
 
-				sphere = new Mesh( new SphereBufferGeometry( 200, 20, 10 ), new MeshPhongMaterial( { flatShading: true } ) );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
 				scene.add( sphere );
 
 				// Plane
 
-				plane = new Mesh( new PlaneBufferGeometry( 400, 400 ), new MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.position.y = - 200;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
