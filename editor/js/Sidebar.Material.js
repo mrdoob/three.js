@@ -88,6 +88,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshToonMaterial': 'MeshToonMaterial',
 		'MeshStandardMaterial': 'MeshStandardMaterial',
 		'MeshPhysicalMaterial': 'MeshPhysicalMaterial',
+		'PointsMaterial': 'PointsMaterial',
 		'RawShaderMaterial': 'RawShaderMaterial',
 		'ShaderMaterial': 'ShaderMaterial',
 		'ShadowMaterial': 'ShadowMaterial',
@@ -461,6 +462,26 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialGradientMapRow );
 
+	// size
+
+	var materialSizeRow = new UI.Row();
+	var materialSize = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( update );
+
+	materialSizeRow.add( new UI.Text( strings.getKey( 'sidebar/material/size' ) ).setWidth( '90px' ) );
+	materialSizeRow.add( materialSize );
+
+	container.add( materialSizeRow );
+
+	// sizeAttenuation
+
+	var materialSizeAttenuationRow = new UI.Row();
+	var materialSizeAttenuation = new UI.Checkbox( true ).onChange( update );
+
+	materialSizeAttenuationRow.add( new UI.Text( strings.getKey( 'sidebar/material/sizeAttenuation' ) ).setWidth( '90px' ) );
+	materialSizeAttenuationRow.add( materialSizeAttenuation );
+
+	container.add( materialSizeAttenuationRow );
+
 	// side
 
 	var materialSideRow = new UI.Row();
@@ -567,7 +588,7 @@ Sidebar.Material = function ( editor ) {
 		var textureWarning = false;
 		var objectHasUvs = false;
 
-		if ( object.isSprite ) objectHasUvs = true;
+		if ( object.isSprite || object.isPoints ) objectHasUvs = true;
 		if ( geometry.isGeometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
 		if ( geometry.isBufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
@@ -985,6 +1006,18 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.size !== undefined && Math.abs( material.size - materialSize.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'size', materialSize.getValue(), currentMaterialSlot ) );
+
+			}
+
+			if ( material.sizeAttenuation !== undefined && material.sizeAttenuation !== materialSizeAttenuation.getValue() ) {
+
+				editor.execute( new SetMaterialValueCommand( currentObject, 'sizeAttenuation', materialSizeAttenuation.getValue(), currentMaterialSlot ) );
+
+			}
+
 			if ( material.side !== undefined ) {
 
 				var side = parseInt( materialSide.getValue() );
@@ -1115,6 +1148,8 @@ Sidebar.Material = function ( editor ) {
 			'aoMap': materialAOMapRow,
 			'emissiveMap': materialEmissiveMapRow,
 			'gradientMap': materialGradientMapRow,
+			'size': materialSize,
+			'sizeAttenuation': materialSizeAttenuation,
 			'side': materialSideRow,
 			'flatShading': materialShadingRow,
 			'blending': materialBlendingRow,
@@ -1430,6 +1465,18 @@ Sidebar.Material = function ( editor ) {
 				materialEmissiveMap.setValue( material.emissiveMap );
 
 			}
+
+		}
+
+		if ( material.size !== undefined ) {
+
+			materialSize.setValue( material.size );
+
+		}
+
+		if ( material.sizeAttenuation !== undefined ) {
+
+			materialSizeAttenuation.setValue( material.sizeAttenuation );
 
 		}
 
