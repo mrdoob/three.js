@@ -14,8 +14,6 @@ const staticAssets = [
 	'../examples/js/libs/chevrotain.min.js',
 	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/inflate.min.js',
-	'../examples/js/libs/lzma.js',
-	'../examples/js/libs/ctm.js',
 
 	'../examples/js/loaders/AMFLoader.js',
 	'../examples/js/loaders/AWDLoader.js',
@@ -37,7 +35,6 @@ const staticAssets = [
 	'../examples/js/loaders/TDSLoader.js',
 	'../examples/js/loaders/VRMLLoader.js',
 	'../examples/js/loaders/VTKLoader.js',
-	'../examples/js/loaders/ctm/CTMLoader.js',
 
 	'../examples/js/exporters/ColladaExporter.js',
 	'../examples/js/exporters/GLTFExporter.js',
