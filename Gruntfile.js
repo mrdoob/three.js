@@ -5,6 +5,8 @@
 const fs = require('fs');
 const path = require('path');
 const semver = require('semver');
+const liveEditor = require('@gfxfundamentals/live-editor');
+const liveEditorPath = path.dirname(require.resolve('@gfxfundamentals/live-editor'));
 
 module.exports = function(grunt) {
 
@@ -54,8 +56,9 @@ module.exports = function(grunt) {
       main: {
         files: [
           { expand: false, src: '*', dest: 'out/', filter: noMdsNoFolders, },
+          { expand: true, cwd: `${liveEditor.monacoEditor}/`, src: 'min/**', dest: 'out/monaco-editor/', nonull: true, },
+          { expand: true, cwd: `${liveEditorPath}/src/`, src: '**', dest: 'out/threejs/resources/', nonull: true, },
           { expand: true, src: 'threejs/**', dest: 'out/', filter: noMds, },
-          { expand: true, src: 'monaco-editor/**', dest: 'out/', },
           { expand: true, src: '3rdparty/**', dest: 'out/', },
         ],
       },
