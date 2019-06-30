@@ -144,9 +144,9 @@
 
 				renderer.setScissorTest( true );
 
-				renderer.setScissor( 20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight );
+				renderer.setScissor( 20, 20, insetWidth, insetHeight );
 
-				renderer.setViewport( 20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight );
+				renderer.setViewport( 20, 20, insetWidth, insetHeight );
 
 				camera2.position.copy( camera.position );
 				camera2.quaternion.copy( camera.quaternion );
@@ -217,7 +217,7 @@
 
 				} );
 
-				gui.add( param, 'dash scale', 1, 8, 0.1 ).onChange( function ( val ) {
+				gui.add( param, 'dash scale', 0.5, 1, 0.1 ).onChange( function ( val ) {
 
 					matLine.dashScale = val;
 					matLineDashed.scale = val;
