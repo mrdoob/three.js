@@ -59,12 +59,12 @@ HTML中的body默认有5个像素的margin值所以设置margin为0来移除marg
 太高或者太宽。 在新标签中打开它然后改变尺寸你就能看到立方体
 是怎么在宽高上被拉伸的。
 
-<img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center">
+<img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg">
 
 另一个问题是立方体看起来分辨率太低或者说块状化或者有点模糊。
 将窗口拉伸的非常大你就能看到问题。
 
-<img src="resources/images/resize-low-res.png" class="threejs_center">
+<img src="resources/images/resize-low-res.png" class="threejs_center nobg">
 
 我们先解决拉伸的问题。为此我们要将相机的aspect设置为canvas的宽高比。
 我们可以通过canvas的`clientWidth`和`clientHeight`属性来实现。
@@ -89,7 +89,7 @@ function render(time) {
 在新标签页中打开例子你应该能看到立方体的宽高不会再被拉伸了。
 他们都会保持正确的比例不管窗口的尺寸如何。
 
-<img src="resources/images/resize-correct-aspect.png" width="407" class="threejs_center">
+<img src="resources/images/resize-correct-aspect.png" width="407" class="threejs_center nobg">
 
 我们现在来解决块状化的问题。
 
