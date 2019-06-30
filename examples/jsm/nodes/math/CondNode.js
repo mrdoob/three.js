@@ -99,6 +99,8 @@ CondNode.prototype.copy = function ( source ) {
 	this.ifNode = source.ifNode;
 	this.elseNode = source.elseNode;
 
+	return this;
+
 };
 
 CondNode.prototype.toJSON = function ( meta ) {

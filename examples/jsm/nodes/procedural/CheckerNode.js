@@ -54,6 +54,8 @@ CheckerNode.prototype.copy = function ( source ) {
 
 	this.uv = source.uv;
 
+	return this;
+
 };
 
 CheckerNode.prototype.toJSON = function ( meta ) {

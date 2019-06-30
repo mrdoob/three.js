@@ -459,6 +459,8 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.environment ) this.environment = source.environment;
 
+	return this;
+
 };
 
 StandardNode.prototype.toJSON = function ( meta ) {
