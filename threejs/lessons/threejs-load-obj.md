@@ -1,6 +1,5 @@
 Title: Three.js Loading a .OBJ File
 Description: Loading a .OBJ File
-Category: solutions
 TOC: Load an .OBJ file
 
 One of the most common things people want to do with three.js

@@ -1,6 +1,5 @@
 Title: Material Feature Table
 Description: A Table showing which matierals have which features
-Category: reference
 TOC: Material Table
 
 The most common materials in three.js are the Mesh materials. Here

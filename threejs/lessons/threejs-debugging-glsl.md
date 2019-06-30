@@ -1,6 +1,5 @@
 Title: Debugging Three.js - GLSL
 Description: How to debug GLSL Shaders
-Category: tips
 TOC: Debugging GLSL
 
 This site so far does not teach GLSL just like it does not teach JavaScript.

@@ -1,6 +1,5 @@
 Title: Three.js Prerequisites
 Description: What you need to know to use this site.
-Category: basics
 TOC: Prerequisites
 
 These articles are meant to help you learn how to use three.js.

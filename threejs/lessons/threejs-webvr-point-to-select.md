@@ -1,6 +1,5 @@
 Title: Three.js WebVR - 3DOF Point to Select
 Description: How to implement 3DOF Point to Select.
-Category: webvr
 TOC: WebVR - Point To Select
 
 **NOTE: The examples on this page require a VR capable

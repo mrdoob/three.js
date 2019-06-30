@@ -1,6 +1,5 @@
 Title: Three.js Responsive Design
 Description: How to make your three.js fit different sized displays.
-Category: basics
 TOC: Responsive Design
 
 This is the second article in a series of articles about three.js.

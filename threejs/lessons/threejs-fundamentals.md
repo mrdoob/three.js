@@ -1,6 +1,5 @@
 Title: Three.js Fundamentals
 Description: Your first Three.js lesson starting with the fundamentals
-Category: basics
 TOC: Fundamentals
 
 This is the first article in a series of articles about three.js.

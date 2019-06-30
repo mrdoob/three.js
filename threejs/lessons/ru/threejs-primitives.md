@@ -1,6 +1,5 @@
 Title: Примитивы Three.js
 Description: Обзор примитивов three.js.
-Category: fundamentals
 TOC: Примитивы
 
 Эта статья является частью серии статей о three.js. 

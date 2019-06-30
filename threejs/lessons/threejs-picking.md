@@ -1,6 +1,5 @@
 Title: Three.js Picking
 Description: Selecting Objects with the Mouse in Three.js
-Category: solutions
 TOC: Picking Objects with the mouse
 
 *Picking* refers to the process of figuring out which object a user clicked on or touched. There are tons of ways to implement picking each with their tradeoffs. Let's go over the 2 most common.

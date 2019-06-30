@@ -1,6 +1,5 @@
 Title: Three.js Billboards
 Description: How to make things always face the camera.
-Category: solutions
 TOC: Billboards and Facades
 
 In [a previous article](threejs-canvas-textures.html) we used a `CanvasTexture`

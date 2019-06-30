@@ -1,6 +1,5 @@
 Title: Граф сцены Three.js
 Description: Что такое граф сцены?
-Category: fundamentals
 TOC: Граф сцены
 
 Эта статья является частью серии статей о three.js. 

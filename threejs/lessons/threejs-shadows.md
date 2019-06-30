@@ -1,6 +1,5 @@
 Title: Three.js Shadows
 Description: Shadows in Three.js
-Category: fundamentals
 TOC: Shadows
 
 This article is part of a series of articles about three.js. The

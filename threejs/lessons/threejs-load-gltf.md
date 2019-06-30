@@ -1,6 +1,5 @@
 Title: Three.js Loading a .GLTF File
 Description: Loading a .GLTF File
-Category: solutions
 TOC: Load a .GLTF file
 
 In a previous lesson we [loaded an .OBJ file](threejs-load-obj.html). If

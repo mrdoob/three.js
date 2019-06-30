@@ -1,6 +1,5 @@
 Title: Материалы Three.js
 Description: Материалы в Three.js
-Category: fundamentals
 TOC: Материалы
 
 Эта статья является частью серии статей о three.js. 

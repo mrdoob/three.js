@@ -1,6 +1,5 @@
 Title: Three.js基础
 Description: 学习Three.js的第一篇文章
-Category: basics
 TOC: 基础
 
 这是Three.js系列文章的第一篇。

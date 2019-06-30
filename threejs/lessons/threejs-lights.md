@@ -1,6 +1,5 @@
 Title: Three.js Lights
 Description: Setting up Lights
-Category: fundamentals
 TOC: Lights
 
 This article is part of a series of articles about three.js. The

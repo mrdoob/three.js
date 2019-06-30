@@ -1,6 +1,5 @@
 Title: Three.js Текстуры
 Description: Использование текстур в three.js
-Category: fundamentals
 TOC: Текстуры
 
 Эта статья является частью серии статей о three.js. 

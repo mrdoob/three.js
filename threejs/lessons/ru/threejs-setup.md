@@ -1,6 +1,5 @@
 Title: Настройка окружения Three.js
 Description: Как настроить разрабочее окружение для Three.js
-Category: basics
 TOC: Настройка
 
 Эта статья является частью серии статей о three.js. 

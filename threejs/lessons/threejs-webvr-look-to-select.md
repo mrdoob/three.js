@@ -1,6 +1,5 @@
 Title: Three.js WebVR - Look to Select
 Description: How to implement Look to Select.
-Category: webvr
 TOC: WebVR - Look To Select
 
 **NOTE: The examples on this page require a VR capable

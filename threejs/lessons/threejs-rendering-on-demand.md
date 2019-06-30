@@ -1,6 +1,5 @@
 Title: Three.js Rendering on Demand
 Description: How to use less energy.
-Category: tips
 TOC: Rendering On Demand
 
 The topic might be obvious to many people but just in case ... most Three.js

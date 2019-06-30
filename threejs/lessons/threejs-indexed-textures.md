@@ -1,6 +1,5 @@
 Title: Three.js Indexed Textures for Picking and Color
 Description: Using Indexed Textures for Picking and Color
-Category: solutions
 TOC: Using Indexed Textures for Picking and Color
 
 This article is a continuation of [an article about aligning html elements to 3d](threejs-align-html-elements-to-3d.html).

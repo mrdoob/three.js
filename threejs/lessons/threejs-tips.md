@@ -1,6 +1,5 @@
 Title: Three.js Tips
 Description: Small issues that might trip you up using three.js
-Category: tips
 TOC: #
 
 This article is a collection of small issues you might run into

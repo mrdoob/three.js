@@ -1,6 +1,5 @@
 Title: Three.js响应式设计
 Description: 如何让你的three.js适应不同尺寸的显示器。
-Category: basics
 TOC: 响应式设计
 
 这是three.js系列文章的第二篇。
