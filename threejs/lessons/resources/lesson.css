@@ -510,6 +510,9 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   .noinvertdark {
     filter: none !important;
   }
+  .nobg {
+    background: none;
+  }
   .lesson-sidebar {
     background: #222;
   }

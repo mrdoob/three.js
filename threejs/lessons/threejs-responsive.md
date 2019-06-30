@@ -68,13 +68,13 @@ are more like boxes. Too tall or too wide. Open the
 example in its own window and resize it. You'll see how
 the cubes get stretched wide and tall.
 
-<img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center">
+<img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg">
 
 The second problem is they look low resolution or blocky and
 blurry. Stretch the window really large and you'll really see
 the issue.
 
-<img src="resources/images/resize-low-res.png" class="threejs_center">
+<img src="resources/images/resize-low-res.png" class="threejs_center nobg">
 
 Let's fix the stretchy problem first. To do that we need
 to set the aspect of the camera to the aspect of the canvas's
@@ -102,7 +102,7 @@ Open the example in a separate window and resize the window
 and you should see the cubes are no longer stretched tall or wide.
 They stay the correct aspect regardless of window size.
 
-<img src="resources/images/resize-correct-aspect.png" width="407" class="threejs_center">
+<img src="resources/images/resize-correct-aspect.png" width="407" class="threejs_center nobg">
 
 Now let's fix the blockiness.
 
