@@ -6,7 +6,6 @@ const staticAssets = [
 	'../files/favicon.ico',
 
 	'../build/three.js',
-	'../examples/js/libs/system.min.js',
 
 	'../examples/js/controls/EditorControls.js',
 	'../examples/js/controls/TransformControls.js',
@@ -56,6 +55,7 @@ const staticAssets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
+	'./js/libs/system.min.js',
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
 	'./js/libs/glslprep.min.js',
