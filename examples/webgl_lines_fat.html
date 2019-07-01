@@ -90,7 +90,7 @@
 				matLine = new LineMaterial( {
 
 					color: 0xffffff,
-					linewidth: 5, // in pixels
+					linewidth: 5, // in world units with size attenuation, pixels otherwise
 					vertexColors: THREE.VertexColors,
 					//resolution:  // to be set by renderer, eventually
 					dashed: false
@@ -194,7 +194,7 @@
 				var param = {
 					'line type': 0,
 					'size attenuation': false,
-					'width (px)': 5,
+					'width': 5,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
@@ -230,7 +230,7 @@
 
 				} );
 
-				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
+				gui.add( param, 'width', 1, 10 ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 

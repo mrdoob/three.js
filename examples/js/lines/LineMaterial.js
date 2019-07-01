@@ -122,8 +122,6 @@ THREE.ShaderLib[ 'line' ] = {
 
 			// direction
 			vec2 dir = end.xy - start.xy;
-
-			// account for clip-space aspect ratio
 			dir = normalize( dir );
 
 			// perpendicular to dir
