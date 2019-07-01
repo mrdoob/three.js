@@ -22,7 +22,7 @@ import {
 
 UniformsLib.line = {
 
-	sizeAttenuation: { value: 1 },
+	worldUnits: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
@@ -47,7 +47,7 @@ ShaderLib[ 'line' ] = {
 		#include <logdepthbuf_pars_vertex>
 		#include <clipping_planes_pars_vertex>
 
-		uniform float sizeAttenuation;
+		uniform float worldUnits;
 		uniform float linewidth;
 		uniform vec2 resolution;
 
@@ -126,7 +126,7 @@ ShaderLib[ 'line' ] = {
 
 			}
 
-			#ifdef SIZE_ATTENUATION
+			#ifdef WORLD_UNITS
 
 			// direction
 			vec2 dir = end.xy - start.xy;
@@ -319,13 +319,13 @@ var LineMaterial = function ( parameters ) {
 
 		},
 
-		sizeAttenuation: {
+		worldUnits: {
 
 			enumerable: true,
 
 			get: function () {
 
-				return 'SIZE_ATTENUATION' in this.defines;
+				return 'WORLD_UNITS' in this.defines;
 
 			},
 
@@ -333,11 +333,11 @@ var LineMaterial = function ( parameters ) {
 
 				if ( value === true ) {
 
-					this.defines.SIZE_ATTENUATION = '';
+					this.defines.WORLD_UNITS = '';
 
 				} else {
 
-					delete this.defines.SIZE_ATTENUATION;
+					delete this.defines.WORLD_UNITS;
 
 				}
 

@@ -193,7 +193,7 @@
 
 				var param = {
 					'line type': 0,
-					'size attenuation': false,
+					'world units': false,
 					'width': 5,
 					'dashed': false,
 					'dash scale': 1,
@@ -223,9 +223,9 @@
 
 				} );
 
-				gui.add( param, 'size attenuation' ).onChange( function ( val ) {
+				gui.add( param, 'world units' ).onChange( function ( val ) {
 
-					matLine.sizeAttenuation = val;
+					matLine.worldUnits = val;
 					matLine.needsUpdate = true;
 
 				} );
