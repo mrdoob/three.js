@@ -2,8 +2,6 @@
  * @author sunag / http://www.sunag.com.br
  */
 
-'use strict';
-
 THREE.SkeletonUtils = {
 
 	retarget: function () {
