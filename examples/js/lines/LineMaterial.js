@@ -118,6 +118,43 @@ THREE.ShaderLib[ 'line' ] = {
 
 			}
 
+			#ifdef SIZE_ATTENUATION
+
+			// direction
+			vec2 dir = end.xy - start.xy;
+
+			// account for clip-space aspect ratio
+			dir = normalize( dir );
+
+			// perpendicular to dir
+			vec2 offset = vec2( dir.y, - dir.x );
+
+			// sign flip
+			if ( position.x < 0.0 ) offset *= - 1.0;
+
+			// endcaps
+			if ( position.y < 0.0 ) {
+
+				offset += - dir;
+
+			} else if ( position.y > 1.0 ) {
+
+				offset += dir;
+
+			}
+
+			// adjust for linewidth
+			offset *= linewidth * 0.5;
+
+			// select end
+			vec4 clip = ( position.y < 0.5 ) ? start : end;
+
+			clip.xy += offset;
+
+			clip = projectionMatrix * clip;
+
+			#else
+
 			// clip space
 			vec4 clipStart = projectionMatrix * start;
 			vec4 clipEnd = projectionMatrix * end;
@@ -157,27 +194,18 @@ THREE.ShaderLib[ 'line' ] = {
 			// adjust for linewidth
 			offset *= linewidth;
 
-
 			// select end
 			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
 
-			#ifdef SIZE_ATTENUATION
-			if (!perspective) {
-				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset /= resolution.y;
-
-				// back to clip space
-				offset *= clip.w;
-			}
-			#else
 			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
 			offset /= resolution.y;
 
 			// back to clip space
 			offset *= clip.w;
-			#endif
 
 			clip.xy += offset;
+
+			#endif
 
 			gl_Position = clip;
 
