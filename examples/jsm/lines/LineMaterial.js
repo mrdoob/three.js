@@ -22,7 +22,7 @@ import {
 
 UniformsLib.line = {
 
-	screenSpaceWidth: { value: 1 },
+	sizeAttenuation: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
@@ -47,7 +47,7 @@ ShaderLib[ 'line' ] = {
 		#include <logdepthbuf_pars_vertex>
 		#include <clipping_planes_pars_vertex>
 
-		uniform float screenSpaceWidth;
+		uniform float sizeAttenuation;
 		uniform float linewidth;
 		uniform vec2 resolution;
 
@@ -126,6 +126,41 @@ ShaderLib[ 'line' ] = {
 
 			}
 
+			#ifdef SIZE_ATTENUATION
+
+			// direction
+			vec2 dir = end.xy - start.xy;
+			dir = normalize( dir );
+
+			// perpendicular to dir
+			vec2 offset = vec2( dir.y, - dir.x );
+
+			// sign flip
+			if ( position.x < 0.0 ) offset *= - 1.0;
+
+			// endcaps
+			if ( position.y < 0.0 ) {
+
+				offset += - dir;
+
+			} else if ( position.y > 1.0 ) {
+
+				offset += dir;
+
+			}
+
+			// adjust for linewidth
+			offset *= linewidth * 0.5;
+
+			// select end
+			vec4 clip = ( position.y < 0.5 ) ? start : end;
+
+			clip.xy += offset;
+
+			clip = projectionMatrix * clip;
+
+			#else
+
 			// clip space
 			vec4 clipStart = projectionMatrix * start;
 			vec4 clipEnd = projectionMatrix * end;
@@ -165,16 +200,18 @@ ShaderLib[ 'line' ] = {
 			// adjust for linewidth
 			offset *= linewidth;
 
-			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-			offset = mix(offset, offset / resolution.y, screenSpaceWidth);
-
 			// select end
 			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
 
+			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
+			offset /= resolution.y;
+
 			// back to clip space
-			offset = mix(offset * 1.0, offset * clip.w, screenSpaceWidth);
+			offset *= clip.w;
 
 			clip.xy += offset;
+
+			#endif
 
 			gl_Position = clip;
 
@@ -282,19 +319,27 @@ var LineMaterial = function ( parameters ) {
 
 		},
 
-		screenSpaceWidth: {
+		sizeAttenuation: {
 
 			enumerable: true,
 
 			get: function () {
 
-				return this.uniforms.screenSpaceWidth.value === 1;
+				return 'SIZE_ATTENUATION' in this.defines;
 
 			},
 
 			set: function ( value ) {
 
-				this.uniforms.screenSpaceWidth.value = value ? 1 : 0;
+				if ( value === true ) {
+
+					this.defines.SIZE_ATTENUATION = '';
+
+				} else {
+
+					delete this.defines.SIZE_ATTENUATION;
+
+				}
 
 			}
 
