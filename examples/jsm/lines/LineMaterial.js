@@ -200,11 +200,11 @@ ShaderLib[ 'line' ] = {
 			// adjust for linewidth
 			offset *= linewidth;
 
-			// select end
-			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
-
 			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
 			offset /= resolution.y;
+
+			// select end
+			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
 
 			// back to clip space
 			offset *= clip.w;
