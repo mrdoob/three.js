@@ -1089,73 +1089,45 @@ var OrbitControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		switch ( event.touches.length ) {
+		switch ( state ) {
 
-			case 1:
+			case STATE.TOUCH_ROTATE:
 
-				switch ( scope.touches.ONE ) {
+				if ( scope.enableRotate === false ) return;
 
-					case TOUCH.ROTATE:
+				handleTouchMoveRotate( event );
 
-						if ( scope.enableRotate === false ) return;
-						if ( state !== STATE.TOUCH_ROTATE ) return;
-
-						handleTouchMoveRotate( event );
-
-						scope.update();
-
-						break;
-
-					case TOUCH.PAN:
-
-						if ( scope.enablePan === false ) return;
-						if ( state !== STATE.TOUCH_PAN ) return;
-
-						handleTouchMovePan( event );
-
-						scope.update();
-
-						break;
-
-					default:
-
-						state = STATE.NONE;
-
-				}
+				scope.update();
 
 				break;
 
-			case 2:
+			case STATE.TOUCH_PAN:
 
-				switch ( scope.touches.TWO ) {
+				if ( scope.enablePan === false ) return;
 
-					case TOUCH.DOLLY_PAN:
+				handleTouchMovePan( event );
 
-						if ( scope.enableZoom === false && scope.enablePan === false ) return;
-						if ( state !== STATE.TOUCH_DOLLY_PAN ) return;
+				scope.update();
 
-						handleTouchMoveDollyPan( event );
+				break;
 
-						scope.update();
+			case STATE.TOUCH_DOLLY_PAN:
 
-						break;
+				if ( scope.enableZoom === false && scope.enablePan === false ) return;
 
-					case TOUCH.DOLLY_ROTATE:
+				handleTouchMoveDollyPan( event );
 
-						if ( scope.enableZoom === false && scope.enableRotate === false ) return;
-						if ( state !== STATE.TOUCH_DOLLY_ROTATE ) return;
+				scope.update();
 
-						handleTouchMoveDollyRotate( event );
+				break;
 
-						scope.update();
+			case STATE.TOUCH_DOLLY_ROTATE:
 
-						break;
+				if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 
-					default:
+				handleTouchMoveDollyRotate( event );
 
-						state = STATE.NONE;
-
-				}
+				scope.update();
 
 				break;
 
