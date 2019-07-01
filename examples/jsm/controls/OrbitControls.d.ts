@@ -1,6 +1,6 @@
 import { Camera, MOUSE, Object3D, TOUCH, Vector3 } from '../../../src/Three';
 
-export class MapControls {
+export class OrbitControls {
 	constructor(object: Camera, domElement?: HTMLElement);
 
 	object: Camera;
@@ -81,7 +81,7 @@ export class MapControls {
 	dispatchEvent(event: { type: string; target: any; }): void;
 }
 
-export class OrbitControls {
+export class MapControls {
 	constructor(object: Camera, domElement?: HTMLElement);
 
 	object: Camera;
