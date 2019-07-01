@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface DOFMipMapShader {
+export const DOFMipMapShader: {
   uniforms: {
     tColor: Uniform;
     tDepth: Uniform;
@@ -11,4 +11,4 @@ export interface DOFMipMapShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface AfterimageShader {
+export const AfterimageShader: {
   uniforms: {
     damp: Uniform;
     tOld: Uniform;
@@ -10,4 +10,4 @@ export interface AfterimageShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
