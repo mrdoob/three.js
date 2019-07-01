@@ -193,7 +193,7 @@
 
 				var param = {
 					'line type': 0,
-					'screen space width': true,
+					'size attenuation': false,
 					'width (px)': 5,
 					'dashed': false,
 					'dash scale': 1,
@@ -223,9 +223,10 @@
 
 				} );
 
-				gui.add( param, 'screen space width' ).onChange( function ( val ) {
+				gui.add( param, 'size attenuation' ).onChange( function ( val ) {
 
-					matLine.screenSpaceWidth = val;
+					matLine.sizeAttenuation = val;
+					matLine.needsUpdate = true;
 
 				} );
 

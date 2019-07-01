@@ -14,7 +14,7 @@
 
 THREE.UniformsLib.line = {
 
-	screenSpaceWidth: { value: 1 },
+	sizeAttenuation: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new THREE.Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
@@ -39,7 +39,7 @@ THREE.ShaderLib[ 'line' ] = {
 		#include <logdepthbuf_pars_vertex>
 		#include <clipping_planes_pars_vertex>
 
-		uniform float screenSpaceWidth;
+		uniform float sizeAttenuation;
 		uniform float linewidth;
 		uniform vec2 resolution;
 
@@ -157,14 +157,25 @@ THREE.ShaderLib[ 'line' ] = {
 			// adjust for linewidth
 			offset *= linewidth;
 
-			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-			offset = mix(offset, offset / resolution.y, screenSpaceWidth);
 
 			// select end
 			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
 
+			#ifdef SIZE_ATTENUATION
+			if (!perspective) {
+				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
+				offset /= resolution.y;
+
+				// back to clip space
+				offset *= clip.w;
+			}
+			#else
+			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
+			offset /= resolution.y;
+
 			// back to clip space
-			offset = mix(offset * 1.0, offset * clip.w, screenSpaceWidth);
+			offset *= clip.w;
+			#endif
 
 			clip.xy += offset;
 
@@ -274,19 +285,27 @@ THREE.LineMaterial = function ( parameters ) {
 
 		},
 
-		screenSpaceWidth: {
+		sizeAttenuation: {
 
 			enumerable: true,
 
 			get: function () {
 
-				return this.uniforms.screenSpaceWidth.value === 1;
+				return 'SIZE_ATTENUATION' in this.defines;
 
 			},
 
 			set: function ( value ) {
 
-				this.uniforms.screenSpaceWidth.value = value ? 1 : 0;
+				if ( value === true ) {
+
+					this.defines.SIZE_ATTENUATION = '';
+
+				} else {
+
+					delete this.defines.SIZE_ATTENUATION;
+
+				}
 
 			}
 
