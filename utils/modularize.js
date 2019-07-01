@@ -255,6 +255,8 @@ var files = [
 	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
 	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
 	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {
