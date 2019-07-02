@@ -336,4 +336,30 @@ float GGXRoughnessToBlinnExponent( const in float ggxRoughness ) {
 float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
 	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
 }
+
+// inverted Guassian distribution
+float D_Inv(float b, float thetaH) {
+
+	float cot2ThetaH = pow2( 1. / tan( thetaH ) );
+
+	return ( 1. / ( PI * ( 1. + 4. * pow2( b ) ) ) ) *
+		( 1. + 4. * exp( -cot2ThetaH / pow2(b) ) / pow( sin( thetaH ), 4. ) );
+
+}
+
+float BDRF_Diffuse_Sheen( const in float sheen, const in IncidentLight incidentLight, const in GeometricContext geometry ) {
+
+	vec3 N = geometry.normal;
+	vec3 V = geometry.viewDir;
+	vec3 L = incidentLight.direction;
+	vec3 H = normalize( V + L );
+	float dotNH = saturate( dot( N, H ) );
+
+	float thetaH = acos( dotNH );
+
+	return D_Inv( sheen, thetaH ) / (
+		4. * ( dot( N, L ) + dot( N, V ) - dot( N, L ) * dot( N, V ) )
+	);
+
+}
 `;

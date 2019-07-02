@@ -2276,6 +2276,7 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
+		uniforms.sheen.value = material.sheen;
 
 	}
 

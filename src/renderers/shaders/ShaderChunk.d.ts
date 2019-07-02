@@ -88,6 +88,7 @@ export let ShaderChunk: {
 	points_vert: string;
 	shadow_frag: string;
 	shadow_vert: string;
+	sheen_pars_fragment: sheen_pars_fragment;
 
 	premultiplied_alpha_fragment: string;
 	project_vertex: string;
