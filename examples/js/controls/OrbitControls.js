@@ -76,10 +76,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// Mouse buttons
-	this.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+	this.mouseButtons = { LEFT: THREE.OrbitControls.CLICK.ROTATE, MIDDLE: THREE.OrbitControls.CLICK.DOLLY, RIGHT: THREE.OrbitControls.CLICK.PAN };
 
 	// Touch fingers
-	this.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+	this.touches = { ONE: THREE.OrbitControls.TOUCH.ROTATE, TWO: THREE.OrbitControls.TOUCH.DOLLY_PAN };
 
 	// for reset
 	this.target0 = this.target.clone();
@@ -791,7 +791,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.mouseButtons.LEFT ) {
 
-					case THREE.MOUSE.ROTATE:
+					case THREE.OrbitControls.CLICK.ROTATE:
 
 						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
@@ -813,7 +813,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 						break;
 
-					case THREE.MOUSE.PAN:
+					case THREE.OrbitControls.CLICK.PAN:
 
 						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
@@ -848,7 +848,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.mouseButtons.MIDDLE ) {
 
-					case THREE.MOUSE.DOLLY:
+					case THREE.OrbitControls.CLICK.DOLLY:
 
 						if ( scope.enableZoom === false ) return;
 
@@ -871,7 +871,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.mouseButtons.RIGHT ) {
 
-					case THREE.MOUSE.ROTATE:
+					case THREE.OrbitControls.CLICK.ROTATE:
 
 						if ( scope.enableRotate === false ) return;
 
@@ -881,7 +881,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 						break;
 
-					case THREE.MOUSE.PAN:
+					case THREE.OrbitControls.CLICK.PAN:
 
 						if ( scope.enablePan === false ) return;
 
@@ -998,7 +998,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.touches.ONE ) {
 
-					case TOUCH.ROTATE:
+					case THREE.OrbitControls.TOUCH.ROTATE:
 
 						if ( scope.enableRotate === false ) return;
 
@@ -1008,7 +1008,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 						break;
 
-					case TOUCH.PAN:
+					case THREE.OrbitControls.TOUCH.PAN:
 
 						if ( scope.enablePan === false ) return;
 
@@ -1030,7 +1030,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.touches.TWO ) {
 
-					case TOUCH.DOLLY_PAN:
+					case THREE.OrbitControls.TOUCH.DOLLY_PAN:
 
 						if ( scope.enableZoom === false && scope.enablePan === false ) return;
 
@@ -1040,7 +1040,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 						break;
 
-					case TOUCH.DOLLY_ROTATE:
+					case THREE.OrbitControls.TOUCH.DOLLY_ROTATE:
 
 						if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 
@@ -1167,6 +1167,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.update();
 
 };
+
+THREE.OrbitControls.CLICK = { ROTATE: 0, DOLLY: 1, PAN: 2 };
+THREE.OrbitControls.TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 
 THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
@@ -1308,11 +1311,11 @@ THREE.MapControls = function ( object, domElement ) {
 
 	THREE.OrbitControls.call( this, object, domElement );
 
-	this.mouseButtons.LEFT = THREE.MOUSE.PAN;
-	this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+	this.mouseButtons.LEFT = THREE.OrbitControls.CLICK.PAN;
+	this.mouseButtons.RIGHT = THREE.OrbitControls.CLICK.ROTATE;
 
-	this.touches.ONE = THREE.TOUCH.PAN;
-	this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+	this.touches.ONE = THREE.OrbitControls.TOUCH.PAN;
+	this.touches.TWO = THREE.OrbitControls.TOUCH.DOLLY_ROTATE;
 
 }
 

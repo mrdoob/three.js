@@ -5,16 +5,6 @@ export enum MOUSE {
 	LEFT,
 	MIDDLE,
 	RIGHT,
-	ROTATE,
-	DOLLY,
-	PAN,
-}
-
-export enum TOUCH {
-	ROTATE,
-	PAN,
-	DOLLY_PAN,
-	DOLLY_ROTATE,
 }
 
 // GL STATE CONSTANTS
