@@ -2,14 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Break, UIText } from './libs/ui.js';
+import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 
 var ViewportInfo = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
@@ -22,11 +22,11 @@ var ViewportInfo = function ( editor ) {
 	var trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
 
 	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
-	container.add( objectsText, new Break() );
+	container.add( objectsText, new UIBreak() );
 	container.add( new UIText( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
-	container.add( verticesText, new Break() );
+	container.add( verticesText, new UIBreak() );
 	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
-	container.add( trianglesText, new Break() );
+	container.add( trianglesText, new UIBreak() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );

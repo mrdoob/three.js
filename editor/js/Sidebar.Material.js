@@ -25,7 +25,7 @@ import {
 	sRGBEncoding
 } from '../../build/three.module.js';
 
-import { Panel, Row, Input, Button, Color, Checkbox, Select, UIText, UINumber } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -61,7 +61,7 @@ var SidebarMaterial = function ( editor ) {
 
 	var currentMaterialSlot = 0;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
@@ -70,15 +70,15 @@ var SidebarMaterial = function ( editor ) {
 
 	var copiedMaterial;
 
-	var managerRow = new Row();
+	var managerRow = new UIRow();
 
 	// Current material slot
 
-	var materialSlotRow = new Row();
+	var materialSlotRow = new UIRow();
 
 	materialSlotRow.add( new UIText( 'Slot' ).setWidth( '90px' ) );
 
-	var materialSlotSelect = new Select().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
+	var materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
 	materialSlotRow.add( materialSlotSelect );
 
@@ -86,7 +86,7 @@ var SidebarMaterial = function ( editor ) {
 
 	managerRow.add( new UIText( '' ).setWidth( '90px' ) );
 
-	managerRow.add( new Button( strings.getKey( 'sidebar/material/new' ) ).onClick( function () {
+	managerRow.add( new UIButton( strings.getKey( 'sidebar/material/new' ) ).onClick( function () {
 
 		var material = new materialClasses[ materialClass.getValue() ]();
 		editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
@@ -94,7 +94,7 @@ var SidebarMaterial = function ( editor ) {
 
 	} ) );
 
-	managerRow.add( new Button( strings.getKey( 'sidebar/material/copy' ) ).setMarginLeft( '4px' ).onClick( function () {
+	managerRow.add( new UIButton( strings.getKey( 'sidebar/material/copy' ) ).setMarginLeft( '4px' ).onClick( function () {
 
 		copiedMaterial = currentObject.material;
 
@@ -108,7 +108,7 @@ var SidebarMaterial = function ( editor ) {
 
 	} ) );
 
-	managerRow.add( new Button( strings.getKey( 'sidebar/material/paste' ) ).setMarginLeft( '4px' ).onClick( function () {
+	managerRow.add( new UIButton( strings.getKey( 'sidebar/material/paste' ) ).setMarginLeft( '4px' ).onClick( function () {
 
 		if ( copiedMaterial === undefined ) return;
 
@@ -123,8 +123,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// type
 
-	var materialClassRow = new Row();
-	var materialClass = new Select().setOptions( {
+	var materialClassRow = new UIRow();
+	var materialClass = new UISelect().setOptions( {
 
 		'LineBasicMaterial': 'LineBasicMaterial',
 		'LineDashedMaterial': 'LineDashedMaterial',
@@ -151,9 +151,9 @@ var SidebarMaterial = function ( editor ) {
 
 	// uuid
 
-	var materialUUIDRow = new Row();
-	var materialUUID = new Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
-	var materialUUIDRenew = new Button( strings.getKey( 'sidebar/material/new' ) ).setMarginLeft( '7px' ).onClick( function () {
+	var materialUUIDRow = new UIRow();
+	var materialUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	var materialUUIDRenew = new UIButton( strings.getKey( 'sidebar/material/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
 		materialUUID.setValue( _Math.generateUUID() );
 		update();
@@ -168,8 +168,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// name
 
-	var materialNameRow = new Row();
-	var materialName = new Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
+	var materialNameRow = new UIRow();
+	var materialName = new UIInput().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.execute( new SetMaterialValueCommand( editor, editor.selected, 'name', materialName.getValue(), currentMaterialSlot ) );
 
@@ -182,10 +182,10 @@ var SidebarMaterial = function ( editor ) {
 
 	// program
 
-	var materialProgramRow = new Row();
+	var materialProgramRow = new UIRow();
 	materialProgramRow.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setWidth( '90px' ) );
 
-	var materialProgramInfo = new Button( strings.getKey( 'sidebar/material/info' ) );
+	var materialProgramInfo = new UIButton( strings.getKey( 'sidebar/material/info' ) );
 	materialProgramInfo.setMarginLeft( '4px' );
 	materialProgramInfo.onClick( function () {
 
@@ -194,7 +194,7 @@ var SidebarMaterial = function ( editor ) {
 	} );
 	materialProgramRow.add( materialProgramInfo );
 
-	var materialProgramVertex = new Button( strings.getKey( 'sidebar/material/vertex' ) );
+	var materialProgramVertex = new UIButton( strings.getKey( 'sidebar/material/vertex' ) );
 	materialProgramVertex.setMarginLeft( '4px' );
 	materialProgramVertex.onClick( function () {
 
@@ -203,7 +203,7 @@ var SidebarMaterial = function ( editor ) {
 	} );
 	materialProgramRow.add( materialProgramVertex );
 
-	var materialProgramFragment = new Button( strings.getKey( 'sidebar/material/fragment' ) );
+	var materialProgramFragment = new UIButton( strings.getKey( 'sidebar/material/fragment' ) );
 	materialProgramFragment.setMarginLeft( '4px' );
 	materialProgramFragment.onClick( function () {
 
@@ -216,8 +216,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// color
 
-	var materialColorRow = new Row();
-	var materialColor = new Color().onChange( update );
+	var materialColorRow = new UIRow();
+	var materialColor = new UIColor().onChange( update );
 
 	materialColorRow.add( new UIText( strings.getKey( 'sidebar/material/color' ) ).setWidth( '90px' ) );
 	materialColorRow.add( materialColor );
@@ -226,7 +226,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// roughness
 
-	var materialRoughnessRow = new Row();
+	var materialRoughnessRow = new UIRow();
 	var materialRoughness = new UINumber( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialRoughnessRow.add( new UIText( strings.getKey( 'sidebar/material/roughness' ) ).setWidth( '90px' ) );
@@ -236,7 +236,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// metalness
 
-	var materialMetalnessRow = new Row();
+	var materialMetalnessRow = new UIRow();
 	var materialMetalness = new UINumber( 0.5 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialMetalnessRow.add( new UIText( strings.getKey( 'sidebar/material/metalness' ) ).setWidth( '90px' ) );
@@ -246,8 +246,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// emissive
 
-	var materialEmissiveRow = new Row();
-	var materialEmissive = new Color().setHexValue( 0x000000 ).onChange( update );
+	var materialEmissiveRow = new UIRow();
+	var materialEmissive = new UIColor().setHexValue( 0x000000 ).onChange( update );
 
 	materialEmissiveRow.add( new UIText( strings.getKey( 'sidebar/material/emissive' ) ).setWidth( '90px' ) );
 	materialEmissiveRow.add( materialEmissive );
@@ -256,8 +256,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// specular
 
-	var materialSpecularRow = new Row();
-	var materialSpecular = new Color().setHexValue( 0x111111 ).onChange( update );
+	var materialSpecularRow = new UIRow();
+	var materialSpecular = new UIColor().setHexValue( 0x111111 ).onChange( update );
 
 	materialSpecularRow.add( new UIText( strings.getKey( 'sidebar/material/specular' ) ).setWidth( '90px' ) );
 	materialSpecularRow.add( materialSpecular );
@@ -266,7 +266,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// shininess
 
-	var materialShininessRow = new Row();
+	var materialShininessRow = new UIRow();
 	var materialShininess = new UINumber( 30 ).onChange( update );
 
 	materialShininessRow.add( new UIText( strings.getKey( 'sidebar/material/shininess' ) ).setWidth( '90px' ) );
@@ -276,7 +276,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// clearCoat
 
-	var materialClearCoatRow = new Row();
+	var materialClearCoatRow = new UIRow();
 	var materialClearCoat = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialClearCoatRow.add( new UIText( strings.getKey( 'sidebar/material/clearcoat' ) ).setWidth( '90px' ) );
@@ -286,7 +286,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// clearCoatRoughness
 
-	var materialClearCoatRoughnessRow = new Row();
+	var materialClearCoatRoughnessRow = new UIRow();
 	var materialClearCoatRoughness = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialClearCoatRoughnessRow.add( new UIText( strings.getKey( 'sidebar/material/clearcoatroughness' ) ).setWidth( '90px' ) );
@@ -296,8 +296,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// vertex colors
 
-	var materialVertexColorsRow = new Row();
-	var materialVertexColors = new Select().setOptions( {
+	var materialVertexColorsRow = new UIRow();
+	var materialVertexColors = new UISelect().setOptions( {
 
 		0: strings.getKey( 'sidebar/material/vertexcolors/no' ),
 		1: strings.getKey( 'sidebar/material/vertexcolors/face' ),
@@ -312,8 +312,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// depth packing
 
-	var materialDepthPackingRow = new Row();
-	var materialDepthPacking = new Select().setOptions( {
+	var materialDepthPackingRow = new UIRow();
+	var materialDepthPacking = new UISelect().setOptions( {
 		[ BasicDepthPacking ]: 'BasicDepthPacking',
 		[ RGBADepthPacking ]: 'RGBADepthPacking'
 	} );
@@ -326,8 +326,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// skinning
 
-	var materialSkinningRow = new Row();
-	var materialSkinning = new Checkbox( false ).onChange( update );
+	var materialSkinningRow = new UIRow();
+	var materialSkinning = new UICheckbox( false ).onChange( update );
 
 	materialSkinningRow.add( new UIText( strings.getKey( 'sidebar/material/skinning' ) ).setWidth( '90px' ) );
 	materialSkinningRow.add( materialSkinning );
@@ -336,8 +336,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// map
 
-	var materialMapRow = new Row();
-	var materialMapEnabled = new Checkbox( false ).onChange( update );
+	var materialMapRow = new UIRow();
+	var materialMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialMap = new UITexture().onChange( updateMaterial );
 
 	materialMapRow.add( new UIText( strings.getKey( 'sidebar/material/map' ) ).setWidth( '90px' ) );
@@ -348,8 +348,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// matcap map
 
-	var materialMatcapMapRow = new Row();
-	var materialMatcapMapEnabled = new Checkbox( false ).onChange( update );
+	var materialMatcapMapRow = new UIRow();
+	var materialMatcapMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialMatcapMap = new UITexture().onChange( update );
 
 	materialMatcapMapRow.add( new UIText( strings.getKey( 'sidebar/material/matcap' ) ).setWidth( '90px' ) );
@@ -360,8 +360,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// alpha map
 
-	var materialAlphaMapRow = new Row();
-	var materialAlphaMapEnabled = new Checkbox( false ).onChange( update );
+	var materialAlphaMapRow = new UIRow();
+	var materialAlphaMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialAlphaMap = new UITexture().onChange( update );
 
 	materialAlphaMapRow.add( new UIText( strings.getKey( 'sidebar/material/alphamap' ) ).setWidth( '90px' ) );
@@ -372,8 +372,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// bump map
 
-	var materialBumpMapRow = new Row();
-	var materialBumpMapEnabled = new Checkbox( false ).onChange( update );
+	var materialBumpMapRow = new UIRow();
+	var materialBumpMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialBumpMap = new UITexture().onChange( update );
 	var materialBumpScale = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
 
@@ -386,8 +386,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// normal map
 
-	var materialNormalMapRow = new Row();
-	var materialNormalMapEnabled = new Checkbox( false ).onChange( update );
+	var materialNormalMapRow = new UIRow();
+	var materialNormalMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialNormalMap = new UITexture().onChange( update );
 
 	materialNormalMapRow.add( new UIText( strings.getKey( 'sidebar/material/normalmap' ) ).setWidth( '90px' ) );
@@ -398,8 +398,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// displacement map
 
-	var materialDisplacementMapRow = new Row();
-	var materialDisplacementMapEnabled = new Checkbox( false ).onChange( update );
+	var materialDisplacementMapRow = new UIRow();
+	var materialDisplacementMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialDisplacementMap = new UITexture().onChange( update );
 	var materialDisplacementScale = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
 
@@ -412,8 +412,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// roughness map
 
-	var materialRoughnessMapRow = new Row();
-	var materialRoughnessMapEnabled = new Checkbox( false ).onChange( update );
+	var materialRoughnessMapRow = new UIRow();
+	var materialRoughnessMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialRoughnessMap = new UITexture().onChange( update );
 
 	materialRoughnessMapRow.add( new UIText( strings.getKey( 'sidebar/material/roughmap' ) ).setWidth( '90px' ) );
@@ -424,8 +424,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// metalness map
 
-	var materialMetalnessMapRow = new Row();
-	var materialMetalnessMapEnabled = new Checkbox( false ).onChange( update );
+	var materialMetalnessMapRow = new UIRow();
+	var materialMetalnessMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialMetalnessMap = new UITexture().onChange( update );
 
 	materialMetalnessMapRow.add( new UIText( strings.getKey( 'sidebar/material/metalmap' ) ).setWidth( '90px' ) );
@@ -436,8 +436,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// specular map
 
-	var materialSpecularMapRow = new Row();
-	var materialSpecularMapEnabled = new Checkbox( false ).onChange( update );
+	var materialSpecularMapRow = new UIRow();
+	var materialSpecularMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialSpecularMap = new UITexture().onChange( update );
 
 	materialSpecularMapRow.add( new UIText( strings.getKey( 'sidebar/material/specularmap' ) ).setWidth( '90px' ) );
@@ -448,8 +448,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// env map
 
-	var materialEnvMapRow = new Row();
-	var materialEnvMapEnabled = new Checkbox( false ).onChange( update );
+	var materialEnvMapRow = new UIRow();
+	var materialEnvMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialEnvMap = new UITexture( SphericalReflectionMapping ).onChange( updateMaterial );
 	var materialReflectivity = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
 
@@ -462,8 +462,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// light map
 
-	var materialLightMapRow = new Row();
-	var materialLightMapEnabled = new Checkbox( false ).onChange( update );
+	var materialLightMapRow = new UIRow();
+	var materialLightMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialLightMap = new UITexture().onChange( update );
 
 	materialLightMapRow.add( new UIText( strings.getKey( 'sidebar/material/lightmap' ) ).setWidth( '90px' ) );
@@ -474,8 +474,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// ambient occlusion map
 
-	var materialAOMapRow = new Row();
-	var materialAOMapEnabled = new Checkbox( false ).onChange( update );
+	var materialAOMapRow = new UIRow();
+	var materialAOMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialAOMap = new UITexture().onChange( update );
 	var materialAOScale = new UINumber( 1 ).setRange( 0, 1 ).setWidth( '30px' ).onChange( update );
 
@@ -488,8 +488,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// emissive map
 
-	var materialEmissiveMapRow = new Row();
-	var materialEmissiveMapEnabled = new Checkbox( false ).onChange( update );
+	var materialEmissiveMapRow = new UIRow();
+	var materialEmissiveMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialEmissiveMap = new UITexture().onChange( updateMaterial );
 
 	materialEmissiveMapRow.add( new UIText( strings.getKey( 'sidebar/material/emissivemap' ) ).setWidth( '90px' ) );
@@ -500,8 +500,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// gradient map
 
-	var materialGradientMapRow = new Row();
-	var materialGradientMapEnabled = new Checkbox( false ).onChange( update );
+	var materialGradientMapRow = new UIRow();
+	var materialGradientMapEnabled = new UICheckbox( false ).onChange( update );
 	var materialGradientMap = new UITexture().onChange( update );
 
 	materialGradientMapRow.add( new UIText( strings.getKey( 'sidebar/material/gradientmap' ) ).setWidth( '90px' ) );
@@ -512,8 +512,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// side
 
-	var materialSideRow = new Row();
-	var materialSide = new Select().setOptions( {
+	var materialSideRow = new UIRow();
+	var materialSide = new UISelect().setOptions( {
 
 		0: strings.getKey( 'sidebar/material/side/front' ),
 		1: strings.getKey( 'sidebar/material/side/back' ),
@@ -528,8 +528,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// shading
 
-	var materialShadingRow = new Row();
-	var materialShading = new Checkbox( false ).setLeft( '100px' ).onChange( update );
+	var materialShadingRow = new UIRow();
+	var materialShading = new UICheckbox( false ).setLeft( '100px' ).onChange( update );
 
 	materialShadingRow.add( new UIText( strings.getKey( 'sidebar/material/flatshaded' ) ).setWidth( '90px' ) );
 	materialShadingRow.add( materialShading );
@@ -538,8 +538,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// blending
 
-	var materialBlendingRow = new Row();
-	var materialBlending = new Select().setOptions( {
+	var materialBlendingRow = new UIRow();
+	var materialBlending = new UISelect().setOptions( {
 
 		0: strings.getKey( 'sidebar/material/blending/no' ),
 		1: strings.getKey( 'sidebar/material/blending/normal' ),
@@ -557,7 +557,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// opacity
 
-	var materialOpacityRow = new Row();
+	var materialOpacityRow = new UIRow();
 	var materialOpacity = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialOpacityRow.add( new UIText( strings.getKey( 'sidebar/material/opacity' ) ).setWidth( '90px' ) );
@@ -567,8 +567,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// transparent
 
-	var materialTransparentRow = new Row();
-	var materialTransparent = new Checkbox().setLeft( '100px' ).onChange( update );
+	var materialTransparentRow = new UIRow();
+	var materialTransparent = new UICheckbox().setLeft( '100px' ).onChange( update );
 
 	materialTransparentRow.add( new UIText( strings.getKey( 'sidebar/material/transparent' ) ).setWidth( '90px' ) );
 	materialTransparentRow.add( materialTransparent );
@@ -577,7 +577,7 @@ var SidebarMaterial = function ( editor ) {
 
 	// alpha test
 
-	var materialAlphaTestRow = new Row();
+	var materialAlphaTestRow = new UIRow();
 	var materialAlphaTest = new UINumber().setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialAlphaTestRow.add( new UIText( strings.getKey( 'sidebar/material/alphatest' ) ).setWidth( '90px' ) );
@@ -587,8 +587,8 @@ var SidebarMaterial = function ( editor ) {
 
 	// wireframe
 
-	var materialWireframeRow = new Row();
-	var materialWireframe = new Checkbox( false ).onChange( update );
+	var materialWireframeRow = new UIRow();
+	var materialWireframe = new UICheckbox( false ).onChange( update );
 	var materialWireframeLinewidth = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, 100 ).onChange( update );
 
 	materialWireframeRow.add( new UIText( strings.getKey( 'sidebar/material/wireframe' ) ).setWidth( '90px' ) );

@@ -13,7 +13,7 @@ import {
 
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
-import { UIElement, Span, Div, Row, Button, Checkbox, UIText, UINumber } from './ui.js';
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
 var UITexture = function ( mapping ) {
@@ -196,9 +196,9 @@ UITexture.prototype.onChange = function ( callback ) {
 
 };
 
-// Outliner
+// UIOutliner
 
-var Outliner = function ( editor ) {
+var UIOutliner = function ( editor ) {
 
 	UIElement.call( this );
 
@@ -253,10 +253,10 @@ var Outliner = function ( editor ) {
 
 };
 
-Outliner.prototype = Object.create( UIElement.prototype );
-Outliner.prototype.constructor = Outliner;
+UIOutliner.prototype = Object.create( UIElement.prototype );
+UIOutliner.prototype.constructor = UIOutliner;
 
-Outliner.prototype.selectIndex = function ( index ) {
+UIOutliner.prototype.selectIndex = function ( index ) {
 
 	if ( index >= 0 && index < this.options.length ) {
 
@@ -270,7 +270,7 @@ Outliner.prototype.selectIndex = function ( index ) {
 
 };
 
-Outliner.prototype.setOptions = function ( options ) {
+UIOutliner.prototype.setOptions = function ( options ) {
 
 	var scope = this;
 
@@ -420,13 +420,13 @@ Outliner.prototype.setOptions = function ( options ) {
 
 };
 
-Outliner.prototype.getValue = function () {
+UIOutliner.prototype.getValue = function () {
 
 	return this.selectedValue;
 
 };
 
-Outliner.prototype.setValue = function ( value ) {
+UIOutliner.prototype.setValue = function ( value ) {
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
@@ -468,19 +468,19 @@ Outliner.prototype.setValue = function ( value ) {
 
 };
 
-var Points = function ( onAddClicked ) {
+var UIPoints = function ( onAddClicked ) {
 
 	UIElement.call( this );
 
-	var span = new Span().setDisplay( 'inline-block' );
+	var span = new UISpan().setDisplay( 'inline-block' );
 
-	this.pointsList = new Div();
+	this.pointsList = new UIDiv();
 	span.add( this.pointsList );
 
-	var row = new Row();
+	var row = new UIRow();
 	span.add( row );
 
-	var addPointButton = new Button( '+' ).onClick( onAddClicked );
+	var addPointButton = new UIButton( '+' ).onClick( onAddClicked );
 	row.add( addPointButton );
 
 	this.update = function () {
@@ -501,10 +501,10 @@ var Points = function ( onAddClicked ) {
 
 };
 
-Points.prototype = Object.create( UIElement.prototype );
-Points.prototype.constructor = Points;
+UIPoints.prototype = Object.create( UIElement.prototype );
+UIPoints.prototype.constructor = UIPoints;
 
-Points.prototype.onChange = function ( callback ) {
+UIPoints.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -512,7 +512,7 @@ Points.prototype.onChange = function ( callback ) {
 
 };
 
-Points.prototype.clear = function () {
+UIPoints.prototype.clear = function () {
 
 	for ( var i = 0; i < this.pointslength; ++ i ) {
 
@@ -528,7 +528,7 @@ Points.prototype.clear = function () {
 
 };
 
-Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
+UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 	if ( ! this.pointsUI[ idx ] ) return;
 
@@ -543,18 +543,18 @@ Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 };
 
-var Points2 = function () {
+var UIPoints2 = function () {
 
-	Points.call( this, Points2.addRow.bind( this ) );
+	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
 
 	return this;
 
 };
 
-Points2.prototype = Object.create( Points.prototype );
-Points2.prototype.constructor = Points2;
+UIPoints2.prototype = Object.create( UIPoints.prototype );
+UIPoints2.prototype.constructor = UIPoints2;
 
-Points2.addRow = function () {
+UIPoints2.addRow = function () {
 
 	if ( this.pointslength === 0 ) {
 
@@ -572,7 +572,7 @@ Points2.addRow = function () {
 
 };
 
-Points2.prototype.getValue = function () {
+UIPoints2.prototype.getValue = function () {
 
 	var points = [];
 
@@ -590,7 +590,7 @@ Points2.prototype.getValue = function () {
 
 };
 
-Points2.prototype.setValue = function ( points ) {
+UIPoints2.prototype.setValue = function ( points ) {
 
 	this.clear();
 
@@ -606,16 +606,16 @@ Points2.prototype.setValue = function ( points ) {
 
 };
 
-Points2.prototype.createPointRow = function ( x, y ) {
+UIPoints2.prototype.createPointRow = function ( x, y ) {
 
-	var pointRow = new Div();
+	var pointRow = new UIDiv();
 	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
 	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
 	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
 
 	var idx = this.lastPointIdx;
 	var scope = this;
-	var btn = new Button( '-' ).onClick( function () {
+	var btn = new UIButton( '-' ).onClick( function () {
 
 		if ( scope.isEditing ) return;
 		scope.deletePointRow( idx );
@@ -630,18 +630,18 @@ Points2.prototype.createPointRow = function ( x, y ) {
 
 };
 
-var Points3 = function () {
+var UIPoints3 = function () {
 
-	Points.call( this, Points3.addRow.bind( this ) );
+	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
 
 	return this;
 
 };
 
-Points3.prototype = Object.create( Points.prototype );
-Points3.prototype.constructor = Points3;
+UIPoints3.prototype = Object.create( UIPoints.prototype );
+UIPoints3.prototype.constructor = UIPoints3;
 
-Points3.addRow = function () {
+UIPoints3.addRow = function () {
 
 	if ( this.pointslength === 0 ) {
 
@@ -659,7 +659,7 @@ Points3.addRow = function () {
 
 };
 
-Points3.prototype.getValue = function () {
+UIPoints3.prototype.getValue = function () {
 
 	var points = [];
 
@@ -677,7 +677,7 @@ Points3.prototype.getValue = function () {
 
 };
 
-Points3.prototype.setValue = function ( points ) {
+UIPoints3.prototype.setValue = function ( points ) {
 
 	this.clear();
 
@@ -693,9 +693,9 @@ Points3.prototype.setValue = function ( points ) {
 
 };
 
-Points3.prototype.createPointRow = function ( x, y, z ) {
+UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 
-	var pointRow = new Div();
+	var pointRow = new UIDiv();
 	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
 	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
 	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
@@ -703,7 +703,7 @@ Points3.prototype.createPointRow = function ( x, y, z ) {
 
 	var idx = this.lastPointIdx;
 	var scope = this;
-	var btn = new Button( '-' ).onClick( function () {
+	var btn = new UIButton( '-' ).onClick( function () {
 
 		if ( scope.isEditing ) return;
 		scope.deletePointRow( idx );
@@ -718,13 +718,13 @@ Points3.prototype.createPointRow = function ( x, y, z ) {
 
 };
 
-var Boolean = function ( boolean, text ) {
+var UIBoolean = function ( boolean, text ) {
 
-	Span.call( this );
+	UISpan.call( this );
 
 	this.setMarginRight( '10px' );
 
-	this.checkbox = new Checkbox( boolean );
+	this.checkbox = new UICheckbox( boolean );
 	this.text = new UIText( text ).setMarginLeft( '3px' );
 
 	this.add( this.checkbox );
@@ -732,19 +732,19 @@ var Boolean = function ( boolean, text ) {
 
 };
 
-Boolean.prototype = Object.create( Span.prototype );
-Boolean.prototype.constructor = Boolean;
+UIBoolean.prototype = Object.create( UISpan.prototype );
+UIBoolean.prototype.constructor = UIBoolean;
 
-Boolean.prototype.getValue = function () {
+UIBoolean.prototype.getValue = function () {
 
 	return this.checkbox.getValue();
 
 };
 
-Boolean.prototype.setValue = function ( value ) {
+UIBoolean.prototype.setValue = function ( value ) {
 
 	return this.checkbox.setValue( value );
 
 };
 
-export { UITexture, Outliner, Points, Points2, Points3, Boolean };
+export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

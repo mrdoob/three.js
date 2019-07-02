@@ -2,19 +2,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel } from './libs/ui.js';
+import { UIPanel } from './libs/ui.js';
 
 var MenubarPlay = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
 	var isPlaying = false;
 
-	var title = new Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/play' ) );
 	title.onClick( function () {

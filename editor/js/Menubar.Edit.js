@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Row, HorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
@@ -13,21 +13,21 @@ var MenubarEdit = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/edit' ) );
 	container.add( title );
 
-	var options = new Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// Undo
 
-	var undo = new Row();
+	var undo = new UIRow();
 	undo.setClass( 'option' );
 	undo.setTextContent( strings.getKey( 'menubar/edit/undo' ) );
 	undo.onClick( function () {
@@ -39,7 +39,7 @@ var MenubarEdit = function ( editor ) {
 
 	// Redo
 
-	var redo = new Row();
+	var redo = new UIRow();
 	redo.setClass( 'option' );
 	redo.setTextContent( strings.getKey( 'menubar/edit/redo' ) );
 	redo.onClick( function () {
@@ -51,7 +51,7 @@ var MenubarEdit = function ( editor ) {
 
 	// Clear History
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/clear_history' ) );
 	option.onClick( function () {
@@ -89,11 +89,11 @@ var MenubarEdit = function ( editor ) {
 
 	// ---
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Clone
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/clone' ) );
 	option.onClick( function () {
@@ -111,7 +111,7 @@ var MenubarEdit = function ( editor ) {
 
 	// Delete
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/delete' ) );
 	option.onClick( function () {
@@ -128,7 +128,7 @@ var MenubarEdit = function ( editor ) {
 
 	// Minify shaders
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/minify_shaders' ) );
 	option.onClick( function () {
@@ -206,11 +206,11 @@ var MenubarEdit = function ( editor ) {
 	} );
 	options.add( option );
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Set textures to sRGB. See #15903
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
 	option.onClick( function () {

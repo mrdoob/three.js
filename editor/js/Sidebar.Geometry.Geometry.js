@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Row, UIText } from './libs/ui.js';
+import { UIRow, UIText } from './libs/ui.js';
 
 var SidebarGeometryGeometry = function ( editor ) {
 
@@ -10,11 +10,11 @@ var SidebarGeometryGeometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	// vertices
 
-	var verticesRow = new Row();
+	var verticesRow = new UIRow();
 	var vertices = new UIText();
 
 	verticesRow.add( new UIText( strings.getKey( 'sidebar/geometry/geometry/vertices' ) ).setWidth( '90px' ) );
@@ -24,7 +24,7 @@ var SidebarGeometryGeometry = function ( editor ) {
 
 	// faces
 
-	var facesRow = new Row();
+	var facesRow = new UIRow();
 	var faces = new UIText();
 
 	facesRow.add( new UIText( strings.getKey( 'sidebar/geometry/geometry/faces' ) ).setWidth( '90px' ) );

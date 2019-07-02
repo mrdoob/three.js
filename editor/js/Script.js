@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIElement, Panel, UIText } from './libs/ui.js';
+import { UIElement, UIPanel, UIText } from './libs/ui.js';
 
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
@@ -11,13 +11,13 @@ var Script = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setId( 'script' );
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#272822' );
 	container.setDisplay( 'none' );
 
-	var header = new Panel();
+	var header = new UIPanel();
 	header.setPadding( '10px' );
 	container.add( header );
 

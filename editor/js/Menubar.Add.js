@@ -34,7 +34,7 @@ import {
 	Vector3
 } from '../../build/three.module.js';
 
-import { Panel, Row, HorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 
@@ -42,21 +42,21 @@ var MenubarAdd = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/add' ) );
 	container.add( title );
 
-	var options = new Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// Group
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/group' ) );
 	option.onClick( function () {
@@ -71,11 +71,11 @@ var MenubarAdd = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Box
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/box' ) );
 	option.onClick( function () {
@@ -91,7 +91,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Circle
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/circle' ) );
 	option.onClick( function () {
@@ -107,7 +107,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Cylinder
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/cylinder' ) );
 	option.onClick( function () {
@@ -123,7 +123,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Icosahedron
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/icosahedron' ) );
 	option.onClick( function () {
@@ -139,7 +139,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Lathe
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/lathe' ) );
 	option.onClick( function () {
@@ -169,7 +169,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Octahedron
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/octahedron' ) );
 	option.onClick( function () {
@@ -185,7 +185,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Plane
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/plane' ) );
 	option.onClick( function () {
@@ -202,7 +202,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Ring
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/ring' ) );
 	option.onClick( function () {
@@ -218,7 +218,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Sphere
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/sphere' ) );
 	option.onClick( function () {
@@ -234,7 +234,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Sprite
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/sprite' ) );
 	option.onClick( function () {
@@ -249,7 +249,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Tetrahedron
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/tetrahedron' ) );
 	option.onClick( function () {
@@ -265,7 +265,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Torus
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/torus' ) );
 	option.onClick( function () {
@@ -281,7 +281,7 @@ var MenubarAdd = function ( editor ) {
 
 	// TorusKnot
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/torusknot' ) );
 	option.onClick( function () {
@@ -297,7 +297,7 @@ var MenubarAdd = function ( editor ) {
 
 	// Tube
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/tube' ) );
 	option.onClick( function () {
@@ -321,7 +321,7 @@ var MenubarAdd = function ( editor ) {
 	/*
 	// Teapot
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( 'Teapot' );
 	option.onClick( function () {
@@ -349,11 +349,11 @@ var MenubarAdd = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// AmbientLight
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/ambientlight' ) );
 	option.onClick( function () {
@@ -370,7 +370,7 @@ var MenubarAdd = function ( editor ) {
 
 	// DirectionalLight
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/directionallight' ) );
 	option.onClick( function () {
@@ -391,7 +391,7 @@ var MenubarAdd = function ( editor ) {
 
 	// HemisphereLight
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/hemispherelight' ) );
 	option.onClick( function () {
@@ -412,7 +412,7 @@ var MenubarAdd = function ( editor ) {
 
 	// PointLight
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/pointlight' ) );
 	option.onClick( function () {
@@ -431,7 +431,7 @@ var MenubarAdd = function ( editor ) {
 
 	// SpotLight
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/spotlight' ) );
 	option.onClick( function () {
@@ -455,11 +455,11 @@ var MenubarAdd = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// OrthographicCamera
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/orthographiccamera' ) );
 	option.onClick( function () {
@@ -474,7 +474,7 @@ var MenubarAdd = function ( editor ) {
 
 	// PerspectiveCamera
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/perspectivecamera' ) );
 	option.onClick( function () {

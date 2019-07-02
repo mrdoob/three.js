@@ -4,7 +4,7 @@
 
 import { BoxBufferGeometry } from '../../build/three.module.js';
 
-import { Row, UIText, UINumber, Integer } from './libs/ui.js';
+import { UIRow, UIText, UINumber, UIInteger } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -12,14 +12,14 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// width
 
-	var widthRow = new Row();
+	var widthRow = new UIRow();
 	var width = new UINumber( parameters.width ).onChange( update );
 
 	widthRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/width' ) ).setWidth( '90px' ) );
@@ -29,7 +29,7 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	// height
 
-	var heightRow = new Row();
+	var heightRow = new UIRow();
 	var height = new UINumber( parameters.height ).onChange( update );
 
 	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/height' ) ).setWidth( '90px' ) );
@@ -39,7 +39,7 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	// depth
 
-	var depthRow = new Row();
+	var depthRow = new UIRow();
 	var depth = new UINumber( parameters.depth ).onChange( update );
 
 	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/depth' ) ).setWidth( '90px' ) );
@@ -49,8 +49,8 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	// widthSegments
 
-	var widthSegmentsRow = new Row();
-	var widthSegments = new Integer( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
+	var widthSegmentsRow = new UIRow();
+	var widthSegments = new UIInteger( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	widthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/widthseg' ) ).setWidth( '90px' ) );
 	widthSegmentsRow.add( widthSegments );
@@ -59,8 +59,8 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new Row();
-	var heightSegments = new Integer( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	var heightSegmentsRow = new UIRow();
+	var heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/heightseg' ) ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
@@ -69,8 +69,8 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	// depthSegments
 
-	var depthSegmentsRow = new Row();
-	var depthSegments = new Integer( parameters.depthSegments ).setRange( 1, Infinity ).onChange( update );
+	var depthSegmentsRow = new UIRow();
+	var depthSegments = new UIInteger( parameters.depthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	depthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/depthseg' ) ).setWidth( '90px' ) );
 	depthSegmentsRow.add( depthSegments );

@@ -6,8 +6,8 @@ import {
 	LatheBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
-import { Points2 } from './libs/ui.three.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+import { UIPoints2 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -15,15 +15,15 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// segments
 
-	var segmentsRow = new Row();
-	var segments = new Integer( parameters.segments ).onChange( update );
+	var segmentsRow = new UIRow();
+	var segments = new UIInteger( parameters.segments ).onChange( update );
 
 	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
@@ -32,7 +32,7 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	// phiStart
 
-	var phiStartRow = new Row();
+	var phiStartRow = new UIRow();
 	var phiStart = new UINumber( parameters.phiStart * 180 / Math.PI ).onChange( update );
 
 	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setWidth( '90px' ) );
@@ -42,7 +42,7 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	// phiLength
 
-	var phiLengthRow = new Row();
+	var phiLengthRow = new UIRow();
 	var phiLength = new UINumber( parameters.phiLength * 180 / Math.PI ).onChange( update );
 
 	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setWidth( '90px' ) );
@@ -52,10 +52,10 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	// points
 
-	var pointsRow = new Row();
+	var pointsRow = new UIRow();
 	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
 
-	var points = new Points2().setValue( parameters.points ).onChange( update );
+	var points = new UIPoints2().setValue( parameters.points ).onChange( update );
 	pointsRow.add( points );
 
 	container.add( pointsRow );

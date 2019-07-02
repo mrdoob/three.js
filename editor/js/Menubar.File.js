@@ -12,7 +12,7 @@ import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
 import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
 
-import { Panel, Row, HorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 var MenubarFile = function ( editor ) {
 
@@ -29,21 +29,21 @@ var MenubarFile = function ( editor ) {
 	var config = editor.config;
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
-	var options = new Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// New
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
@@ -59,7 +59,7 @@ var MenubarFile = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Import
 
@@ -78,7 +78,7 @@ var MenubarFile = function ( editor ) {
 	} );
 	form.appendChild( fileInput );
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
@@ -90,11 +90,11 @@ var MenubarFile = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Export Geometry
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/geometry' ) );
 	option.onClick( function () {
@@ -137,7 +137,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export Object
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/object' ) );
 	option.onClick( function () {
@@ -171,7 +171,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export Scene
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/scene' ) );
 	option.onClick( function () {
@@ -196,11 +196,11 @@ var MenubarFile = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Export DAE
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
 	option.onClick( function () {
@@ -218,7 +218,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export GLB
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
@@ -239,7 +239,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export GLTF
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
@@ -258,7 +258,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export OBJ
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
 	option.onClick( function () {
@@ -281,7 +281,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export STL (ASCII)
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
 	option.onClick( function () {
@@ -295,7 +295,7 @@ var MenubarFile = function ( editor ) {
 
 	// Export STL (Binary)
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
 	option.onClick( function () {
@@ -309,11 +309,11 @@ var MenubarFile = function ( editor ) {
 
 	//
 
-	options.add( new HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Publish
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {

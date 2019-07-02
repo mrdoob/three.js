@@ -6,7 +6,7 @@ import {
 	RingBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -14,14 +14,14 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// innerRadius
 
-	var innerRadiusRow = new Row();
+	var innerRadiusRow = new UIRow();
 	var innerRadius = new UINumber( parameters.innerRadius ).onChange( update );
 
 	innerRadiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/innerRadius' ) ).setWidth( '90px' ) );
@@ -31,7 +31,7 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	// outerRadius
 
-	var outerRadiusRow = new Row();
+	var outerRadiusRow = new UIRow();
 	var outerRadius = new UINumber( parameters.outerRadius ).onChange( update );
 
 	outerRadiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/outerRadius' ) ).setWidth( '90px' ) );
@@ -41,8 +41,8 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	// thetaSegments
 
-	var thetaSegmentsRow = new Row();
-	var thetaSegments = new Integer( parameters.thetaSegments ).setRange( 3, Infinity ).onChange( update );
+	var thetaSegmentsRow = new UIRow();
+	var thetaSegments = new UIInteger( parameters.thetaSegments ).setRange( 3, Infinity ).onChange( update );
 
 	thetaSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetaSegments' ) ).setWidth( '90px' ) );
 	thetaSegmentsRow.add( thetaSegments );
@@ -51,8 +51,8 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	// phiSegments
 
-	var phiSegmentsRow = new Row();
-	var phiSegments = new Integer( parameters.phiSegments ).setRange( 3, Infinity ).onChange( update );
+	var phiSegmentsRow = new UIRow();
+	var phiSegments = new UIInteger( parameters.phiSegments ).setRange( 3, Infinity ).onChange( update );
 
 	phiSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/phiSegments' ) ).setWidth( '90px' ) );
 	phiSegmentsRow.add( phiSegments );
@@ -61,7 +61,7 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	// thetaStart
 
-	var thetaStartRow = new Row();
+	var thetaStartRow = new UIRow();
 	var thetaStart = new UINumber( parameters.thetaStart * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetastart' ) ).setWidth( '90px' ) );
@@ -71,7 +71,7 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	// thetaLength
 
-	var thetaLengthRow = new Row();
+	var thetaLengthRow = new UIRow();
 	var thetaLength = new UINumber( parameters.thetaLength * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetalength' ) ).setWidth( '90px' ) );

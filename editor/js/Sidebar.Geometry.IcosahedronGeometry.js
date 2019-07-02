@@ -6,7 +6,7 @@ import {
 	IcosahedronBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -16,14 +16,14 @@ var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	var signals = editor.signals;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new Row();
+	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
@@ -33,8 +33,8 @@ var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	// detail
 
-	var detailRow = new Row();
-	var detail = new Integer( parameters.detail ).setRange( 0, Infinity ).onChange( update );
+	var detailRow = new UIRow();
+	var detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
 	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
 	detailRow.add( detail );

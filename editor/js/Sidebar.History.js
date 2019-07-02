@@ -3,8 +3,8 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-import { Panel, Break, UIText } from './libs/ui.js';
-import { Boolean, Outliner } from './libs/ui.three.js';
+import { UIPanel, UIBreak, UIText } from './libs/ui.js';
+import { UIBoolean, UIOutliner } from './libs/ui.three.js';
 
 var SidebarHistory = function ( editor ) {
 
@@ -16,13 +16,13 @@ var SidebarHistory = function ( editor ) {
 
 	var history = editor.history;
 
-	var container = new Panel();
+	var container = new UIPanel();
 
 	container.add( new UIText( strings.getKey( 'sidebar/history/history' ) ) );
 
 	//
 
-	var persistent = new Boolean( config.getKey( 'settings/history' ), strings.getKey( 'sidebar/history/persistent' ) );
+	var persistent = new UIBoolean( config.getKey( 'settings/history' ), strings.getKey( 'sidebar/history/persistent' ) );
 	persistent.setPosition( 'absolute' ).setRight( '8px' );
 	persistent.onChange( function () {
 
@@ -47,9 +47,9 @@ var SidebarHistory = function ( editor ) {
 	} );
 	container.add( persistent );
 
-	container.add( new Break(), new Break() );
+	container.add( new UIBreak(), new UIBreak() );
 
-	var outliner = new Outliner( editor );
+	var outliner = new UIOutliner( editor );
 	container.add( outliner );
 
 	//

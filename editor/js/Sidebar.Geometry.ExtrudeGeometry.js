@@ -7,7 +7,7 @@ import {
 	ShapeBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, Checkbox, Button, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UICheckbox, UIButton, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -15,7 +15,7 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
@@ -31,8 +31,8 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	// curveSegments
 
-	var curveSegmentsRow = new Row();
-	var curveSegments = new Integer( options.curveSegments ).onChange( update ).setRange( 1, Infinity );
+	var curveSegmentsRow = new UIRow();
+	var curveSegments = new UIInteger( options.curveSegments ).onChange( update ).setRange( 1, Infinity );
 
 	curveSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/curveSegments' ) ).setWidth( '90px' ) );
 	curveSegmentsRow.add( curveSegments );
@@ -41,8 +41,8 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	// steps
 
-	var stepsRow = new Row();
-	var steps = new Integer( options.steps ).onChange( update ).setRange( 1, Infinity );
+	var stepsRow = new UIRow();
+	var steps = new UIInteger( options.steps ).onChange( update ).setRange( 1, Infinity );
 
 	stepsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/steps' ) ).setWidth( '90px' ) );
 	stepsRow.add( steps );
@@ -51,7 +51,7 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	// depth
 
-	var depthRow = new Row();
+	var depthRow = new UIRow();
 	var depth = new UINumber( options.depth ).onChange( update ).setRange( 1, Infinity );
 
 	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/depth' ) ).setWidth( '90px' ) );
@@ -61,8 +61,8 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	// enabled
 
-	var enabledRow = new Row();
-	var enabled = new Checkbox( options.bevelEnabled ).onChange( update );
+	var enabledRow = new UIRow();
+	var enabled = new UICheckbox( options.bevelEnabled ).onChange( update );
 
 	enabledRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelEnabled' ) ).setWidth( '90px' ) );
 	enabledRow.add( enabled );
@@ -73,7 +73,7 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 		// thickness
 
-		var thicknessRow = new Row();
+		var thicknessRow = new UIRow();
 		var thickness = new UINumber( options.bevelThickness ).onChange( update );
 
 		thicknessRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setWidth( '90px' ) );
@@ -83,7 +83,7 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 		// size
 
-		var sizeRow = new Row();
+		var sizeRow = new UIRow();
 		var size = new UINumber( options.bevelSize ).onChange( update );
 
 		sizeRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setWidth( '90px' ) );
@@ -93,7 +93,7 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 		// offset
 
-		var offsetRow = new Row();
+		var offsetRow = new UIRow();
 		var offset = new UINumber( options.bevelOffset ).onChange( update );
 
 		offsetRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setWidth( '90px' ) );
@@ -103,8 +103,8 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 		// segments
 
-		var segmentsRow = new Row();
-		var segments = new Integer( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
+		var segmentsRow = new UIRow();
+		var segments = new UIInteger( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
 
 		segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setWidth( '90px' ) );
 		segmentsRow.add( segments );
@@ -113,7 +113,7 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	}
 
-	var button = new Button( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setWidth( '90px' ).setMarginLeft( '90px' );
+	var button = new UIButton( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setWidth( '90px' ).setMarginLeft( '90px' );
 	container.add( button );
 
 	//

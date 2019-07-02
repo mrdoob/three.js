@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Div, Span, UIText } from './libs/ui.js';
+import { UIPanel, UIDiv, UISpan, UIText } from './libs/ui.js';
 
 import { SidebarScene } from './Sidebar.Scene.js';
 import { SidebarProperties } from './Sidebar.Properties.js';
@@ -16,7 +16,7 @@ var Sidebar = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setId( 'sidebar' );
 
 	//
@@ -42,14 +42,14 @@ var Sidebar = function ( editor ) {
 
 	 } );
 
-	var tabs = new Div();
+	var tabs = new UIDiv();
 	tabs.setId( 'tabs' );
 	tabs.add( sceneTab, projectTab, settingsTab );
 	container.add( tabs );
 
 	//
 
-	var scene = new Span().add(
+	var scene = new UISpan().add(
 		new SidebarScene( editor ),
 		new SidebarProperties( editor ),
 		new SidebarAnimation( editor ),
@@ -57,12 +57,12 @@ var Sidebar = function ( editor ) {
 	);
 	container.add( scene );
 
-	var project = new Span().add(
+	var project = new UISpan().add(
 		new SidebarProject( editor )
 	);
 	container.add( project );
 
-	var settings = new Span().add(
+	var settings = new UISpan().add(
 		new SidebarSettings( editor ),
 		new SidebarHistory( editor )
 	);

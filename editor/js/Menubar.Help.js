@@ -2,27 +2,27 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Row } from './libs/ui.js';
+import { UIPanel, UIRow } from './libs/ui.js';
 
 var MenubarHelp = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/help' ) );
 	container.add( title );
 
-	var options = new Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// Source code
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/help/source_code' ) );
 	option.onClick( function () {
@@ -34,7 +34,7 @@ var MenubarHelp = function ( editor ) {
 
 	// About
 
-	var option = new Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/help/about' ) );
 	option.onClick( function () {

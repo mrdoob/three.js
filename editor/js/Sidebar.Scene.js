@@ -2,15 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Break, Row, Color, Select, UIText, UINumber } from './libs/ui.js';
-import { Outliner } from './libs/ui.three.js';
+import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
+import { UIOutliner } from './libs/ui.three.js';
 
 var SidebarScene = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
@@ -92,7 +92,7 @@ var SidebarScene = function ( editor ) {
 
 	var ignoreObjectSelectedSignal = false;
 
-	var outliner = new Outliner( editor );
+	var outliner = new UIOutliner( editor );
 	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
 
@@ -109,7 +109,7 @@ var SidebarScene = function ( editor ) {
 
 	} );
 	container.add( outliner );
-	container.add( new Break() );
+	container.add( new UIBreak() );
 
 	// background
 
@@ -119,9 +119,9 @@ var SidebarScene = function ( editor ) {
 
 	}
 
-	var backgroundRow = new Row();
+	var backgroundRow = new UIRow();
 
-	var backgroundColor = new Color().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
+	var backgroundColor = new UIColor().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
 
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundColor );
@@ -142,8 +142,8 @@ var SidebarScene = function ( editor ) {
 
 	}
 
-	var fogTypeRow = new Row();
-	var fogType = new Select().setOptions( {
+	var fogTypeRow = new UIRow();
+	var fogType = new UISelect().setOptions( {
 
 		'None': 'None',
 		'Fog': 'Linear',
@@ -164,12 +164,12 @@ var SidebarScene = function ( editor ) {
 
 	// fog color
 
-	var fogPropertiesRow = new Row();
+	var fogPropertiesRow = new UIRow();
 	fogPropertiesRow.setDisplay( 'none' );
 	fogPropertiesRow.setMarginLeft( '90px' );
 	container.add( fogPropertiesRow );
 
-	var fogColor = new Color().setValue( '#aaaaaa' );
+	var fogColor = new UIColor().setValue( '#aaaaaa' );
 	fogColor.onChange( onFogChanged );
 	fogPropertiesRow.add( fogColor );
 

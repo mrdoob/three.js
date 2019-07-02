@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Select } from './libs/ui.js';
+import { UISelect } from './libs/ui.js';
 
 var ViewportCamera = function ( editor ) {
 
@@ -10,7 +10,7 @@ var ViewportCamera = function ( editor ) {
 
 	//
 
-	var cameraSelect = new Select();
+	var cameraSelect = new UISelect();
 	cameraSelect.setPosition( 'absolute' );
 	cameraSelect.setRight( '10px' );
 	cameraSelect.setTop( '10px' );

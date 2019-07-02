@@ -16,7 +16,7 @@ import { TransformControls } from '../../examples/jsm/controls/TransformControls
 import { EditorControls } from '../../examples/jsm/controls/EditorControls.js';
 import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
 
-import { Panel } from './libs/ui.js';
+import { UIPanel } from './libs/ui.js';
 
 import { ViewportCamera } from './Viewport.Camera.js';
 import { ViewportInfo } from './Viewport.Info.js';
@@ -29,7 +29,7 @@ var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 

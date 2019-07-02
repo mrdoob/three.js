@@ -8,8 +8,8 @@ import { SVGRenderer } from '../../examples/jsm/renderers/SVGRenderer.js';
 import { SoftwareRenderer } from '../../examples/jsm/renderers/SoftwareRenderer.js';
 import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
 
-import { Panel, Row, Input, Checkbox, Select, UIText } from './libs/ui.js';
-import { Boolean } from './libs/ui.three.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UISelect, UIText } from './libs/ui.js';
+import { UIBoolean } from './libs/ui.three.js';
 
 var SidebarProject = function ( editor ) {
 
@@ -26,14 +26,14 @@ var SidebarProject = function ( editor ) {
 
 	};
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
 	// Title
 
-	var titleRow = new Row();
-	var title = new Input( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
+	var titleRow = new UIRow();
+	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/title', this.getValue() );
 
@@ -46,8 +46,8 @@ var SidebarProject = function ( editor ) {
 
 	// Editable
 
-	var editableRow = new Row();
-	var editable = new Checkbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
+	var editableRow = new UIRow();
+	var editable = new UICheckbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/editable', this.getValue() );
 
@@ -60,8 +60,8 @@ var SidebarProject = function ( editor ) {
 
 	// VR
 
-	var vrRow = new Row();
-	var vr = new Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
+	var vrRow = new UIRow();
+	var vr = new UICheckbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/vr', this.getValue() );
 
@@ -84,8 +84,8 @@ var SidebarProject = function ( editor ) {
 
 	}
 
-	var rendererTypeRow = new Row();
-	var rendererType = new Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
+	var rendererTypeRow = new UIRow();
+	var rendererType = new UISelect().setOptions( options ).setWidth( '150px' ).onChange( function () {
 
 		var value = this.getValue();
 
@@ -108,9 +108,9 @@ var SidebarProject = function ( editor ) {
 
 	// Renderer / Antialias
 
-	var rendererPropertiesRow = new Row().setMarginLeft( '90px' );
+	var rendererPropertiesRow = new UIRow().setMarginLeft( '90px' );
 
-	var rendererAntialias = new Boolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
+	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
 		updateRenderer();
@@ -120,7 +120,7 @@ var SidebarProject = function ( editor ) {
 
 	// Renderer / Shadows
 
-	var rendererShadows = new Boolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
+	var rendererShadows = new UIBoolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();

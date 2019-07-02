@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Div, Break, Select, Button, UIText } from './libs/ui.js';
+import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.js';
 
 var SidebarAnimation = function ( editor ) {
 
@@ -66,20 +66,20 @@ var SidebarAnimation = function ( editor ) {
 
 	}
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setDisplay( 'none' );
 
 	container.add( new UIText( 'Animations' ).setTextTransform( 'uppercase' ) );
-	container.add( new Break() );
-	container.add( new Break() );
+	container.add( new UIBreak() );
+	container.add( new UIBreak() );
 
-	var div = new Div();
+	var div = new UIDiv();
 	container.add( div );
 
-	var animationsSelect = new Select().setFontSize( '12px' );
+	var animationsSelect = new UISelect().setFontSize( '12px' );
 	div.add( animationsSelect );
-	div.add( new Button( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
-	div.add( new Button( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
+	div.add( new UIButton( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
+	div.add( new UIButton( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
 
 	return container;
 

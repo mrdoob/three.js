@@ -7,7 +7,7 @@ import {
 	Math as _Math
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -15,14 +15,14 @@ var SidebarGeometryCircleGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new Row();
+	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/circle_geometry/radius' ) ).setWidth( '90px' ) );
@@ -32,8 +32,8 @@ var SidebarGeometryCircleGeometry = function ( editor, object ) {
 
 	// segments
 
-	var segmentsRow = new Row();
-	var segments = new Integer( parameters.segments ).setRange( 3, Infinity ).onChange( update );
+	var segmentsRow = new UIRow();
+	var segments = new UIInteger( parameters.segments ).setRange( 3, Infinity ).onChange( update );
 
 	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/circle_geometry/segments' ) ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
@@ -42,7 +42,7 @@ var SidebarGeometryCircleGeometry = function ( editor, object ) {
 
 	// thetaStart
 
-	var thetaStartRow = new Row();
+	var thetaStartRow = new UIRow();
 	var thetaStart = new UINumber( parameters.thetaStart * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/circle_geometry/thetastart' ) ).setWidth( '90px' ) );
@@ -52,7 +52,7 @@ var SidebarGeometryCircleGeometry = function ( editor, object ) {
 
 	// thetaLength
 
-	var thetaLengthRow = new Row();
+	var thetaLengthRow = new UIRow();
 	var thetaLength = new UINumber( parameters.thetaLength * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/circle_geometry/thetalength' ) ).setWidth( '90px' ) );

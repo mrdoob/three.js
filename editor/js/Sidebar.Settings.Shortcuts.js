@@ -2,7 +2,7 @@
  * @author TyLindberg / https://github.com/TyLindberg
  */
 
-import { Div, Break, UIText, Row, Input } from './libs/ui.js';
+import { UIDiv, UIBreak, UIText, UIRow, UIInput } from './libs/ui.js';
 
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
@@ -21,17 +21,17 @@ var SidebarSettingsShortcuts = function ( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 
-	var container = new Div();
-	container.add( new Break() );
+	var container = new UIDiv();
+	container.add( new UIBreak() );
 
 	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 
 	function createShortcutInput( name ) {
 
 		var configName = 'settings/shortcuts/' + name;
-		var shortcutRow = new Row();
+		var shortcutRow = new UIRow();
 
-		var shortcutInput = new Input().setWidth( '150px' ).setFontSize( '12px' );
+		var shortcutInput = new UIInput().setWidth( '150px' ).setFontSize( '12px' );
 		shortcutInput.setTextTransform( 'lowercase' );
 		shortcutInput.onChange( function () {
 

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Break, UIText, Button, Row, Input } from './libs/ui.js';
+import { UIPanel, UIBreak, UIText, UIButton, UIRow, UIInput } from './libs/ui.js';
 
 import { AddScriptCommand } from './commands/AddScriptCommand.js';
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
@@ -14,19 +14,19 @@ var SidebarScript = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setDisplay( 'none' );
 
 	container.add( new UIText( strings.getKey( 'sidebar/script' ) ).setTextTransform( 'uppercase' ) );
-	container.add( new Break() );
-	container.add( new Break() );
+	container.add( new UIBreak() );
+	container.add( new UIBreak() );
 
 	//
 
-	var scriptsContainer = new Row();
+	var scriptsContainer = new UIRow();
 	container.add( scriptsContainer );
 
-	var newScript = new Button( strings.getKey( 'sidebar/script/new' ) );
+	var newScript = new UIButton( strings.getKey( 'sidebar/script/new' ) );
 	newScript.onClick( function () {
 
 		var script = { name: '', source: 'function update( event ) {}' };
@@ -60,7 +60,7 @@ var SidebarScript = function ( editor ) {
 
 				( function ( object, script ) {
 
-					var name = new Input( script.name ).setWidth( '130px' ).setFontSize( '12px' );
+					var name = new UIInput( script.name ).setWidth( '130px' ).setFontSize( '12px' );
 					name.onChange( function () {
 
 						editor.execute( new SetScriptValueCommand( editor, editor.selected, script, 'name', this.getValue() ) );
@@ -68,7 +68,7 @@ var SidebarScript = function ( editor ) {
 					} );
 					scriptsContainer.add( name );
 
-					var edit = new Button( strings.getKey( 'sidebar/script/edit' ) );
+					var edit = new UIButton( strings.getKey( 'sidebar/script/edit' ) );
 					edit.setMarginLeft( '4px' );
 					edit.onClick( function () {
 
@@ -77,7 +77,7 @@ var SidebarScript = function ( editor ) {
 					} );
 					scriptsContainer.add( edit );
 
-					var remove = new Button( strings.getKey( 'sidebar/script/remove' ) );
+					var remove = new UIButton( strings.getKey( 'sidebar/script/remove' ) );
 					remove.setMarginLeft( '4px' );
 					remove.onClick( function () {
 
@@ -90,7 +90,7 @@ var SidebarScript = function ( editor ) {
 					} );
 					scriptsContainer.add( remove );
 
-					scriptsContainer.add( new Break() );
+					scriptsContainer.add( new UIBreak() );
 
 				} )( object, scripts[ i ] );
 

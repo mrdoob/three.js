@@ -6,7 +6,7 @@ import {
 	PlaneBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -14,14 +14,14 @@ var SidebarGeometryPlaneGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// width
 
-	var widthRow = new Row();
+	var widthRow = new UIRow();
 	var width = new UINumber( parameters.width ).onChange( update );
 
 	widthRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/width' ) ).setWidth( '90px' ) );
@@ -31,7 +31,7 @@ var SidebarGeometryPlaneGeometry = function ( editor, object ) {
 
 	// height
 
-	var heightRow = new Row();
+	var heightRow = new UIRow();
 	var height = new UINumber( parameters.height ).onChange( update );
 
 	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/height' ) ).setWidth( '90px' ) );
@@ -41,8 +41,8 @@ var SidebarGeometryPlaneGeometry = function ( editor, object ) {
 
 	// widthSegments
 
-	var widthSegmentsRow = new Row();
-	var widthSegments = new Integer( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
+	var widthSegmentsRow = new UIRow();
+	var widthSegments = new UIInteger( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	widthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/widthsegments' ) ).setWidth( '90px' ) );
 	widthSegmentsRow.add( widthSegments );
@@ -51,8 +51,8 @@ var SidebarGeometryPlaneGeometry = function ( editor, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new Row();
-	var heightSegments = new Integer( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	var heightSegmentsRow = new UIRow();
+	var heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/heightsegments' ) ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );

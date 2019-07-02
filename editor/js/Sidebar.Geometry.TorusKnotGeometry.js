@@ -6,7 +6,7 @@ import {
 	TorusKnotBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -14,14 +14,14 @@ var SidebarGeometryTorusKnotGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new Row();
+	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/radius' ) ).setWidth( '90px' ) );
@@ -31,7 +31,7 @@ var SidebarGeometryTorusKnotGeometry = function ( editor, object ) {
 
 	// tube
 
-	var tubeRow = new Row();
+	var tubeRow = new UIRow();
 	var tube = new UINumber( parameters.tube ).onChange( update );
 
 	tubeRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/tube' ) ).setWidth( '90px' ) );
@@ -41,8 +41,8 @@ var SidebarGeometryTorusKnotGeometry = function ( editor, object ) {
 
 	// tubularSegments
 
-	var tubularSegmentsRow = new Row();
-	var tubularSegments = new Integer( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+	var tubularSegmentsRow = new UIRow();
+	var tubularSegments = new UIInteger( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/tubularsegments' ) ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
@@ -51,8 +51,8 @@ var SidebarGeometryTorusKnotGeometry = function ( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new Row();
-	var radialSegments = new Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegmentsRow = new UIRow();
+	var radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/radialsegments' ) ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -61,7 +61,7 @@ var SidebarGeometryTorusKnotGeometry = function ( editor, object ) {
 
 	// p
 
-	var pRow = new Row();
+	var pRow = new UIRow();
 	var p = new UINumber( parameters.p ).onChange( update );
 
 	pRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/p' ) ).setWidth( '90px' ) );
@@ -71,7 +71,7 @@ var SidebarGeometryTorusKnotGeometry = function ( editor, object ) {
 
 	// q
 
-	var qRow = new Row();
+	var qRow = new UIRow();
 	var q = new UINumber( parameters.q ).onChange( update );
 
 	qRow.add( new UIText( strings.getKey( 'sidebar/geometry/torusKnot_geometry/q' ) ).setWidth( '90px' ) );

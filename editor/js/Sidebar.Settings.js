@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel, Row, Select, UIText } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
@@ -12,7 +12,7 @@ var SidebarSettings = function ( editor ) {
 	var config = editor.config;
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 	container.setPaddingBottom( '20px' );
@@ -24,8 +24,8 @@ var SidebarSettings = function ( editor ) {
 		zh: '中文'
 	};
 
-	var languageRow = new Row();
-	var language = new Select().setWidth( '150px' );
+	var languageRow = new UIRow();
+	var language = new UISelect().setWidth( '150px' );
 	language.setOptions( options );
 
 	if ( config.getKey( 'language' ) !== undefined ) {
@@ -54,8 +54,8 @@ var SidebarSettings = function ( editor ) {
 		'css/dark.css': strings.getKey( 'sidebar/settings/theme/dark' )
 	};
 
-	var themeRow = new Row();
-	var theme = new Select().setWidth( '150px' );
+	var themeRow = new UIRow();
+	var theme = new UISelect().setWidth( '150px' );
 	theme.setOptions( options );
 
 	if ( config.getKey( 'theme' ) !== undefined ) {

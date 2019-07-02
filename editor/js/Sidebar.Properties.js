@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Span, Div, UIText } from './libs/ui.js';
+import { UISpan, UIDiv, UIText } from './libs/ui.js';
 
 import { SidebarObject } from './Sidebar.Object.js';
 import { SidebarGeometry } from './Sidebar.Geometry.js';
@@ -12,7 +12,7 @@ var SidebarProperties = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new Span();
+	var container = new UISpan();
 
 	var objectTab = new UIText( strings.getKey( 'sidebar/properties/object' ) ).setTextTransform( 'uppercase' );
 	objectTab.onClick( function () {
@@ -35,24 +35,24 @@ var SidebarProperties = function ( editor ) {
 
 	} );
 
-	var tabs = new Div();
+	var tabs = new UIDiv();
 	tabs.setId( 'tabs' );
 	tabs.add( objectTab, geometryTab, materialTab );
 	container.add( tabs );
 
 	//
 
-	var object = new Span().add(
+	var object = new UISpan().add(
 		new SidebarObject( editor )
 	);
 	container.add( object );
 
-	var geometry = new Span().add(
+	var geometry = new UISpan().add(
 		new SidebarGeometry( editor )
 	);
 	container.add( geometry );
 
-	var material = new Span().add(
+	var material = new UISpan().add(
 		new SidebarMaterial( editor )
 	);
 	container.add( material );

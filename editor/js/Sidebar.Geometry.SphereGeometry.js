@@ -7,7 +7,7 @@ import {
 	SphereBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -15,14 +15,14 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new Row();
+	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/radius' ) ).setWidth( '90px' ) );
@@ -32,8 +32,8 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	// widthSegments
 
-	var widthSegmentsRow = new Row();
-	var widthSegments = new Integer( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
+	var widthSegmentsRow = new UIRow();
+	var widthSegments = new UIInteger( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
 	widthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/widthsegments' ) ).setWidth( '90px' ) );
 	widthSegmentsRow.add( widthSegments );
@@ -42,8 +42,8 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	// heightSegments
 
-	var heightSegmentsRow = new Row();
-	var heightSegments = new Integer( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
+	var heightSegmentsRow = new UIRow();
+	var heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
 	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/heightsegments' ) ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
@@ -52,7 +52,7 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	// phiStart
 
-	var phiStartRow = new Row();
+	var phiStartRow = new UIRow();
 	var phiStart = new UINumber( parameters.phiStart * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/phistart' ) ).setWidth( '90px' ) );
@@ -62,7 +62,7 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	// phiLength
 
-	var phiLengthRow = new Row();
+	var phiLengthRow = new UIRow();
 	var phiLength = new UINumber( parameters.phiLength * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/philength' ) ).setWidth( '90px' ) );
@@ -72,7 +72,7 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	// thetaStart
 
-	var thetaStartRow = new Row();
+	var thetaStartRow = new UIRow();
 	var thetaStart = new UINumber( parameters.thetaStart * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/thetastart' ) ).setWidth( '90px' ) );
@@ -82,7 +82,7 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	// thetaLength
 
-	var thetaLengthRow = new Row();
+	var thetaLengthRow = new UIRow();
 	var thetaLength = new UINumber( parameters.thetaLength * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/sphere_geometry/thetalength' ) ).setWidth( '90px' ) );

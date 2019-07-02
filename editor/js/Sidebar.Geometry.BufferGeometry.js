@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Row, UIText, Span, Break } from './libs/ui.js';
+import { UIRow, UIText, UISpan, UIBreak } from './libs/ui.js';
 
 var SidebarGeometryBufferGeometry = function ( editor ) {
 
@@ -10,7 +10,7 @@ var SidebarGeometryBufferGeometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	function update( object ) {
 
@@ -27,7 +27,7 @@ var SidebarGeometryBufferGeometry = function ( editor ) {
 			var text = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
 			container.add( text );
 
-			var container2 = new Span().setDisplay( 'inline-block' ).setWidth( '160px' );
+			var container2 = new UISpan().setDisplay( 'inline-block' ).setWidth( '160px' );
 			container.add( container2 );
 
 			var index = geometry.index;
@@ -36,7 +36,7 @@ var SidebarGeometryBufferGeometry = function ( editor ) {
 
 				container2.add( new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/index' ) ).setWidth( '80px' ) );
 				container2.add( new UIText( ( index.count ).format() ).setFontSize( '12px' ) );
-				container2.add( new Break() );
+				container2.add( new UIBreak() );
 
 			}
 
@@ -48,7 +48,7 @@ var SidebarGeometryBufferGeometry = function ( editor ) {
 
 				container2.add( new UIText( name ).setWidth( '80px' ) );
 				container2.add( new UIText( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );
-				container2.add( new Break() );
+				container2.add( new UIBreak() );
 
 			}
 

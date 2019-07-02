@@ -7,7 +7,7 @@ import {
 	ShapeBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, Button } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UIButton } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -15,15 +15,15 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// curveSegments
 
-	var curveSegmentsRow = new Row();
-	var curveSegments = new Integer( parameters.curveSegments || 12 ).onChange( changeShape ).setRange( 1, Infinity );
+	var curveSegmentsRow = new UIRow();
+	var curveSegments = new UIInteger( parameters.curveSegments || 12 ).onChange( changeShape ).setRange( 1, Infinity );
 
 	curveSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/shape_geometry/curveSegments' ) ).setWidth( '90px' ) );
 	curveSegmentsRow.add( curveSegments );
@@ -31,7 +31,7 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 	container.add( curveSegmentsRow );
 
 	// to extrude
-	var button = new Button( strings.getKey( 'sidebar/geometry/shape_geometry/extrude' ) ).onClick( toExtrude ).setWidth( '90px' ).setMarginLeft( '90px' );
+	var button = new UIButton( strings.getKey( 'sidebar/geometry/shape_geometry/extrude' ) ).onClick( toExtrude ).setWidth( '90px' ).setMarginLeft( '90px' );
 	container.add( button );
 
 	//

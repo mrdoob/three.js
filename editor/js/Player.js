@@ -2,13 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Panel } from './libs/ui.js';
+import { UIPanel } from './libs/ui.js';
 
 var Player = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setId( 'player' );
 	container.setPosition( 'absolute' );
 	container.setDisplay( 'none' );

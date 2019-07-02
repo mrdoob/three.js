@@ -7,7 +7,7 @@ import {
 	TorusBufferGeometry
 } from '../../build/three.module.js';
 
-import { Row, UIText, Integer, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
@@ -15,14 +15,14 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new Row();
+	var radiusRow = new UIRow();
 	var radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radius' ) ).setWidth( '90px' ) );
@@ -32,7 +32,7 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 
 	// tube
 
-	var tubeRow = new Row();
+	var tubeRow = new UIRow();
 	var tube = new UINumber( parameters.tube ).onChange( update );
 
 	tubeRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tube' ) ).setWidth( '90px' ) );
@@ -42,8 +42,8 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new Row();
-	var radialSegments = new Integer( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegmentsRow = new UIRow();
+	var radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radialsegments' ) ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -52,8 +52,8 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 
 	// tubularSegments
 
-	var tubularSegmentsRow = new Row();
-	var tubularSegments = new Integer( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+	var tubularSegmentsRow = new UIRow();
+	var tubularSegments = new UIInteger( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tubularsegments' ) ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
@@ -62,7 +62,7 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 
 	// arc
 
-	var arcRow = new Row();
+	var arcRow = new UIRow();
 	var arc = new UINumber( parameters.arc * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setWidth( '90px' ) );

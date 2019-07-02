@@ -4,7 +4,7 @@
 
 import { Math as _Math } from '../../build/three.module.js';
 
-import { Panel, Row, UIText, Input, Button, Span } from './libs/ui.js';
+import { UIPanel, UIRow, UIText, UIInput, UIButton, UISpan } from './libs/ui.js';
 
 import { SetGeometryValueCommand } from './commands/SetGeometryValueCommand.js';
 
@@ -54,7 +54,7 @@ var SidebarGeometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
@@ -62,7 +62,7 @@ var SidebarGeometry = function ( editor ) {
 	// Actions
 
 	/*
-	var objectActions = new Select().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
+	var objectActions = new UISelect().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
 		'Actions': 'Actions',
@@ -134,7 +134,7 @@ var SidebarGeometry = function ( editor ) {
 
 	// type
 
-	var geometryTypeRow = new Row();
+	var geometryTypeRow = new UIRow();
 	var geometryType = new UIText();
 
 	geometryTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/type' ) ).setWidth( '90px' ) );
@@ -144,9 +144,9 @@ var SidebarGeometry = function ( editor ) {
 
 	// uuid
 
-	var geometryUUIDRow = new Row();
-	var geometryUUID = new Input().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
-	var geometryUUIDRenew = new Button( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
+	var geometryUUIDRow = new UIRow();
+	var geometryUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	var geometryUUIDRenew = new UIButton( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( _Math.generateUUID() );
 
@@ -162,8 +162,8 @@ var SidebarGeometry = function ( editor ) {
 
 	// name
 
-	var geometryNameRow = new Row();
-	var geometryName = new Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
+	var geometryNameRow = new UIRow();
+	var geometryName = new UIInput().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.execute( new SetGeometryValueCommand( editor, editor.selected, 'name', geometryName.getValue() ) );
 
@@ -176,7 +176,7 @@ var SidebarGeometry = function ( editor ) {
 
 	// parameters
 
-	var parameters = new Span();
+	var parameters = new UISpan();
 	container.add( parameters );
 
 	// geometry

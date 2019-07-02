@@ -6,21 +6,21 @@ import {
 	FileLoader
 } from '../../build/three.module.js';
 
-import { Panel, Row } from './libs/ui.js';
+import { UIPanel, UIRow } from './libs/ui.js';
 
 var MenubarExamples = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/examples' ) );
 	container.add( title );
 
-	var options = new Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
@@ -42,7 +42,7 @@ var MenubarExamples = function ( editor ) {
 
 			var item = items[ i ];
 
-			var option = new Row();
+			var option = new UIRow();
 			option.setClass( 'option' );
 			option.setTextContent( item.title );
 			option.onClick( function () {

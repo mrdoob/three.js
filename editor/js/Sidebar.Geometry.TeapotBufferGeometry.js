@@ -3,19 +3,19 @@
  */
 
 
-import { Row, UIText, Integer, Checkbox, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
 import { TeapotBufferGeometry } from '../../examples/jsm/geometries/TeapotBufferGeometry.js';
 
 var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
-	var container = new Row();
+	var container = new UIRow();
 
 	var parameters = object.geometry.parameters;
 
 	// size
 
-	var sizeRow = new Row();
+	var sizeRow = new UIRow();
 	var size = new UINumber( parameters.size ).onChange( update );
 
 	sizeRow.add( new UIText( 'Size' ).setWidth( '90px' ) );
@@ -25,8 +25,8 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	// segments
 
-	var segmentsRow = new Row();
-	var segments = new Integer( parameters.segments ).setRange( 1, Infinity ).onChange( update );
+	var segmentsRow = new UIRow();
+	var segments = new UIInteger( parameters.segments ).setRange( 1, Infinity ).onChange( update );
 
 	segmentsRow.add( new UIText( 'Segments' ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
@@ -35,8 +35,8 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	// bottom
 
-	var bottomRow = new Row();
-	var bottom = new Checkbox( parameters.bottom ).onChange( update );
+	var bottomRow = new UIRow();
+	var bottom = new UICheckbox( parameters.bottom ).onChange( update );
 
 	bottomRow.add( new UIText( 'Bottom' ).setWidth( '90px' ) );
 	bottomRow.add( bottom );
@@ -45,8 +45,8 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	// lid
 
-	var lidRow = new Row();
-	var lid = new Checkbox( parameters.lid ).onChange( update );
+	var lidRow = new UIRow();
+	var lid = new UICheckbox( parameters.lid ).onChange( update );
 
 	lidRow.add( new UIText( 'Lid' ).setWidth( '90px' ) );
 	lidRow.add( lid );
@@ -55,8 +55,8 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	// body
 
-	var bodyRow = new Row();
-	var body = new Checkbox( parameters.body ).onChange( update );
+	var bodyRow = new UIRow();
+	var body = new UICheckbox( parameters.body ).onChange( update );
 
 	bodyRow.add( new UIText( 'Body' ).setWidth( '90px' ) );
 	bodyRow.add( body );
@@ -65,8 +65,8 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	// fitted lid
 
-	var fitLidRow = new Row();
-	var fitLid = new Checkbox( parameters.fitLid ).onChange( update );
+	var fitLidRow = new UIRow();
+	var fitLid = new UICheckbox( parameters.fitLid ).onChange( update );
 
 	fitLidRow.add( new UIText( 'Fitted Lid' ).setWidth( '90px' ) );
 	fitLidRow.add( fitLid );
@@ -75,8 +75,8 @@ var SidebarGeometryTeapotBufferGeometry = function ( signals, object ) {
 
 	// blinn-sized
 
-	var blinnRow = new Row();
-	var blinn = new Checkbox( parameters.blinn ).onChange( update );
+	var blinnRow = new UIRow();
+	var blinn = new UICheckbox( parameters.blinn ).onChange( update );
 
 	blinnRow.add( new UIText( 'Blinn-scaled' ).setWidth( '90px' ) );
 	blinnRow.add( blinn );
