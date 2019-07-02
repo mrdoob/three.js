@@ -88,8 +88,9 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	float sheenMix;
 	#ifndef STANDARD
-		if(sheen == 0.) sheenMix = 0.;
-		else sheenMix = 1. - pow(1. - material.sheen, 5.);
+		float sheenFactor = material.sheen;
+		if(sheenFactor == 0.) sheenMix = 0.;
+		else sheenMix = 1. - pow(1. - sheenFactor, 5.);
 	#else
 		sheenMix = 0.;
 	#endif
@@ -97,7 +98,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor ) * (1. - sheenMix);
 	#ifndef STANDARD
 		// avoid expensive calculation
-		if(sheenMix > 0.) reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * material.diffuseColor * irradiance * sheenMix * BDRF_Diffuse_Sheen( sheen, directLight, geometry );
+		if(sheenMix > 0.) reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * material.diffuseColor * irradiance * sheenMix * BDRF_Diffuse_Sheen( sheenFactor, directLight, geometry );
 	#endif
 
 	#ifndef STANDARD
