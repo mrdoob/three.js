@@ -1,4 +1,4 @@
-import { Camera, Object3D, Vector3 } from '../../../src/Three';
+import { Camera, MOUSE, Object3D, TOUCH, Vector3 } from '../../../src/Three';
 
 export class OrbitControls {
 	constructor(object: Camera, domElement?: HTMLElement);
@@ -44,21 +44,8 @@ export class OrbitControls {
 
 	enableKeys: boolean;
 	keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number; };
-	mouseButtons: { LEFT: number; MIDDLE: number; RIGHT: number;  };
-	touches: { ONE: number; TWO: number };
-
-	static CLICK: {
-		ROTATE: number;
-		DOLLY: number;
-		PAN: number;
-	};
-
-	static TOUCH: {
-		ROTATE: number;
-		PAN: number;
-		DOLLY_PAN: number;
-		DOLLY_ROTATE: number;
-	};
+	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE;  };
+	touches: { ONE: TOUCH; TWO: TOUCH };
 
 	rotateLeft(angle?: number): void;
 
@@ -138,8 +125,8 @@ export class MapControls {
 
 	enableKeys: boolean;
 	keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number; };
-	mouseButtons: { LEFT: number; MIDDLE: number; RIGHT: number;  };
-	touches: { ONE: number; TWO: number };
+	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE;  };
+	touches: { ONE: TOUCH; TWO: TOUCH };
 
 	rotateLeft(angle?: number): void;
 
