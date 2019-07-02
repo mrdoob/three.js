@@ -2,14 +2,21 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Menubar.Status = function ( editor ) {
+import {
+	REVISION
+} from '../../build/three.module.js';
+
+import { Panel, UIText } from './libs/ui.js';
+import { Boolean } from './libs/ui.three.js';
+
+var MenubarStatus = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new Panel();
 	container.setClass( 'menu right' );
 
-	var autosave = new UI.THREE.Boolean( editor.config.getKey( 'autosave' ), strings.getKey( 'menubar/status/autosave' ) );
+	var autosave = new Boolean( editor.config.getKey( 'autosave' ), strings.getKey( 'menubar/status/autosave' ) );
 	autosave.text.setColor( '#888' );
 	autosave.onChange( function () {
 
@@ -38,7 +45,7 @@ Menubar.Status = function ( editor ) {
 
 	} );
 
-	var version = new UI.Text( 'r' + THREE.REVISION );
+	var version = new UIText( 'r' + REVISION );
 	version.setClass( 'title' );
 	version.setOpacity( 0.5 );
 	container.add( version );
@@ -46,3 +53,5 @@ Menubar.Status = function ( editor ) {
 	return container;
 
 };
+
+export { MenubarStatus };

@@ -2,24 +2,27 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Settings.Viewport = function ( editor ) {
+import { Div, Break, UIText } from './libs/ui.js';
+import { Boolean } from './libs/ui.three.js';
+
+var SidebarSettingsViewport = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Div();
-	container.add( new UI.Break() );
+	var container = new Div();
+	container.add( new Break() );
 
-	container.add( new UI.Text( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
 
-	var show = new UI.THREE.Boolean( true ).onChange( update );
+	var show = new Boolean( true ).onChange( update );
 	container.add( show );
 
 	/*
-	var snapSize = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );
+	var snapSize = new UINumber( 25 ).setWidth( '40px' ).onChange( update );
 	container.add( snapSize );
 
-	var snap = new UI.THREE.Boolean( false, 'snap' ).onChange( update );
+	var snap = new THREE.Boolean( false, 'snap' ).onChange( update );
 	container.add( snap );
 	*/
 
@@ -34,3 +37,5 @@ Sidebar.Settings.Viewport = function ( editor ) {
 	return container;
 
 };
+
+export { SidebarSettingsViewport };

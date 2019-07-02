@@ -3,7 +3,7 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-History = function ( editor ) {
+var History = function ( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -317,3 +317,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

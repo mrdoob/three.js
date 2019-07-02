@@ -2,19 +2,25 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Menubar.Examples = function ( editor ) {
+import {
+	FileLoader
+} from '../../build/three.module.js';
+
+import { Panel, Row } from './libs/ui.js';
+
+var MenubarExamples = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new Panel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new Panel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/examples' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new Panel();
 	options.setClass( 'options' );
 	container.add( options );
 
@@ -28,7 +34,7 @@ Menubar.Examples = function ( editor ) {
 		{ title: 'Shaders', file: 'shaders.app.json' }
 	];
 
-	var loader = new THREE.FileLoader();
+	var loader = new FileLoader();
 
 	for ( var i = 0; i < items.length; i ++ ) {
 
@@ -36,7 +42,7 @@ Menubar.Examples = function ( editor ) {
 
 			var item = items[ i ];
 
-			var option = new UI.Row();
+			var option = new Row();
 			option.setClass( 'option' );
 			option.setTextContent( item.title );
 			option.onClick( function () {
@@ -62,3 +68,5 @@ Menubar.Examples = function ( editor ) {
 	return container;
 
 };
+
+export { MenubarExamples };

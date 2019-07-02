@@ -77,3 +77,5 @@ var Config = function () {
 	};
 
 };
+
+export { Config };

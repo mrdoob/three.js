@@ -2,16 +2,39 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import {
+	Box3,
+	BoxHelper,
+	GridHelper,
+	Vector2,
+	Raycaster,
+	Fog,
+	FogExp2
+} from '../../build/three.module.js';
+
+import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
+import { EditorControls } from '../../examples/jsm/controls/EditorControls.js';
+import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
+
+import { Panel } from './libs/ui.js';
+
+import { ViewportCamera } from './Viewport.Camera.js';
+import { ViewportInfo } from './Viewport.Info.js';
+
+import { SetPositionCommand } from './commands/SetPositionCommand.js';
+import { SetRotationCommand } from './commands/SetRotationCommand.js';
+import { SetScaleCommand } from './commands/SetScaleCommand.js';
+
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new Panel();
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
-	container.add( new Viewport.Camera( editor ) );
-	container.add( new Viewport.Info( editor ) );
+	container.add( new ViewportCamera( editor ) );
+	container.add( new ViewportInfo( editor ) );
 
 	//
 
@@ -25,7 +48,7 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
+	var grid = new GridHelper( 30, 30, 0x444444, 0x888888 );
 	sceneHelpers.add( grid );
 
 	var array = grid.geometry.attributes.color.array;
@@ -42,9 +65,9 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var box = new THREE.Box3();
+	var box = new Box3();
 
-	var selectionBox = new THREE.BoxHelper();
+	var selectionBox = new BoxHelper();
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
@@ -54,7 +77,7 @@ var Viewport = function ( editor ) {
 	var objectRotationOnDown = null;
 	var objectScaleOnDown = null;
 
-	var transformControls = new THREE.TransformControls( camera, container.dom );
+	var transformControls = new TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
 		var object = transformControls.object;
@@ -137,8 +160,8 @@ var Viewport = function ( editor ) {
 
 	// object picking
 
-	var raycaster = new THREE.Raycaster();
-	var mouse = new THREE.Vector2();
+	var raycaster = new Raycaster();
+	var mouse = new Vector2();
 
 	// events
 
@@ -152,9 +175,9 @@ var Viewport = function ( editor ) {
 
 	}
 
-	var onDownPosition = new THREE.Vector2();
-	var onUpPosition = new THREE.Vector2();
-	var onDoubleClickPosition = new THREE.Vector2();
+	var onDownPosition = new Vector2();
+	var onUpPosition = new Vector2();
+	var onDoubleClickPosition = new Vector2();
 
 	function getMousePosition( dom, x, y ) {
 
@@ -267,7 +290,7 @@ var Viewport = function ( editor ) {
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	var controls = new THREE.EditorControls( camera, container.dom );
+	var controls = new EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
 		signals.cameraChanged.dispatch( camera );
@@ -440,7 +463,7 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.materialChanged.add( function ( material ) {
+	signals.materialChanged.add( function () {
 
 		render();
 
@@ -468,10 +491,10 @@ var Viewport = function ( editor ) {
 					scene.fog = null;
 					break;
 				case 'Fog':
-					scene.fog = new THREE.Fog();
+					scene.fog = new Fog();
 					break;
 				case 'FogExp2':
-					scene.fog = new THREE.FogExp2();
+					scene.fog = new FogExp2();
 					break;
 
 			}
@@ -575,7 +598,7 @@ var Viewport = function ( editor ) {
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+		if ( renderer instanceof RaytracingRenderer === false ) {
 
 			if ( camera === editor.camera ) {
 
@@ -591,3 +614,5 @@ var Viewport = function ( editor ) {
 	return container;
 
 };
+
+export { Viewport };

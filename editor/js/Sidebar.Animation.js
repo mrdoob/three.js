@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Animation = function ( editor ) {
+import { Panel, Div, Break, Select, Button, UIText } from './libs/ui.js';
+
+var SidebarAnimation = function ( editor ) {
 
 	var signals = editor.signals;
 	var mixer = editor.mixer;
@@ -64,21 +66,23 @@ Sidebar.Animation = function ( editor ) {
 
 	}
 
-	var container = new UI.Panel();
+	var container = new Panel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Animations' ).setTextTransform( 'uppercase' ) );
-	container.add( new UI.Break() );
-	container.add( new UI.Break() );
+	container.add( new UIText( 'Animations' ).setTextTransform( 'uppercase' ) );
+	container.add( new Break() );
+	container.add( new Break() );
 
-	var div = new UI.Div();
+	var div = new Div();
 	container.add( div );
 
-	var animationsSelect = new UI.Select().setFontSize( '12px' );
+	var animationsSelect = new Select().setFontSize( '12px' );
 	div.add( animationsSelect );
-	div.add( new UI.Button( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
-	div.add( new UI.Button( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
+	div.add( new Button( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
+	div.add( new Button( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
 
 	return container;
 
 };
+
+export { SidebarAnimation };

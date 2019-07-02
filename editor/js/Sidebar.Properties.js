@@ -2,41 +2,58 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Properties = function ( editor ) {
+import { Span, Div, UIText } from './libs/ui.js';
 
-	var signals = editor.signals;
+import { SidebarObject } from './Sidebar.Object.js';
+import { SidebarGeometry } from './Sidebar.Geometry.js';
+import { SidebarMaterial } from './Sidebar.Material.js';
+
+var SidebarProperties = function ( editor ) {
+
 	var strings = editor.strings;
 
-	var container = new UI.Span();
+	var container = new Span();
 
-	var objectTab = new UI.Text( strings.getKey( 'sidebar/properties/object' ) ).setTextTransform( 'uppercase' );
-	objectTab.onClick( function () { select( 'OBJECT' ) } );
+	var objectTab = new UIText( strings.getKey( 'sidebar/properties/object' ) ).setTextTransform( 'uppercase' );
+	objectTab.onClick( function () {
 
-	var geometryTab = new UI.Text( strings.getKey( 'sidebar/properties/geometry' ) ).setTextTransform( 'uppercase' );
-	geometryTab.onClick( function () { select( 'GEOMETRY' ) } );
+		select( 'OBJECT' );
 
-	var materialTab = new UI.Text( strings.getKey( 'sidebar/properties/material' ) ).setTextTransform( 'uppercase' );
-	materialTab.onClick( function () { select( 'MATERIAL' ) } );
+	} );
 
-	var tabs = new UI.Div();
+	var geometryTab = new UIText( strings.getKey( 'sidebar/properties/geometry' ) ).setTextTransform( 'uppercase' );
+	geometryTab.onClick( function () {
+
+		select( 'GEOMETRY' );
+
+	} );
+
+	var materialTab = new UIText( strings.getKey( 'sidebar/properties/material' ) ).setTextTransform( 'uppercase' );
+	materialTab.onClick( function () {
+
+		select( 'MATERIAL' );
+
+	} );
+
+	var tabs = new Div();
 	tabs.setId( 'tabs' );
 	tabs.add( objectTab, geometryTab, materialTab );
 	container.add( tabs );
 
 	//
 
-	var object = new UI.Span().add(
-		new Sidebar.Object( editor )
+	var object = new Span().add(
+		new SidebarObject( editor )
 	);
 	container.add( object );
 
-	var geometry = new UI.Span().add(
-		new Sidebar.Geometry( editor )
+	var geometry = new Span().add(
+		new SidebarGeometry( editor )
 	);
 	container.add( geometry );
 
-	var material = new UI.Span().add(
-		new Sidebar.Material( editor )
+	var material = new Span().add(
+		new SidebarMaterial( editor )
 	);
 	container.add( material );
 
@@ -53,6 +70,7 @@ Sidebar.Properties = function ( editor ) {
 		material.setDisplay( 'none' );
 
 		switch ( section ) {
+
 			case 'OBJECT':
 				objectTab.setClass( 'selected' );
 				object.setDisplay( '' );
@@ -65,6 +83,7 @@ Sidebar.Properties = function ( editor ) {
 				materialTab.setClass( 'selected' );
 				material.setDisplay( '' );
 				break;
+
 		}
 
 	}
@@ -74,3 +93,5 @@ Sidebar.Properties = function ( editor ) {
 	return container;
 
 };
+
+export { SidebarProperties };

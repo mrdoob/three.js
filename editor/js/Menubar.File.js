@@ -2,7 +2,19 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Menubar.File = function ( editor ) {
+import {
+	FileLoader,
+	LoadingManager
+} from '../../build/three.module.js';
+
+import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
+import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
+import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
+import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
+
+import { Panel, Row, HorizontalRule } from './libs/ui.js';
+
+var MenubarFile = function ( editor ) {
 
 	var NUMBER_PRECISION = 6;
 
@@ -17,21 +29,21 @@ Menubar.File = function ( editor ) {
 	var config = editor.config;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new Panel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new Panel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new Panel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// New
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
@@ -47,7 +59,7 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new HorizontalRule() );
 
 	// Import
 
@@ -58,7 +70,7 @@ Menubar.File = function ( editor ) {
 	var fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
-	fileInput.addEventListener( 'change', function ( event ) {
+	fileInput.addEventListener( 'change', function () {
 
 		editor.loader.loadFiles( fileInput.files );
 		form.reset();
@@ -66,7 +78,7 @@ Menubar.File = function ( editor ) {
 	} );
 	form.appendChild( fileInput );
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
@@ -78,11 +90,11 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new HorizontalRule() );
 
 	// Export Geometry
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/geometry' ) );
 	option.onClick( function () {
@@ -125,7 +137,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Object
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/object' ) );
 	option.onClick( function () {
@@ -159,7 +171,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Scene
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/scene' ) );
 	option.onClick( function () {
@@ -184,16 +196,16 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new HorizontalRule() );
 
 	// Export DAE
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.ColladaExporter();
+		var exporter = new ColladaExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -206,12 +218,12 @@ Menubar.File = function ( editor ) {
 
 	// Export GLB
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.GLTFExporter();
+		var exporter = new GLTFExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -219,6 +231,7 @@ Menubar.File = function ( editor ) {
 
 			// forceIndices: true, forcePowerOfTwoTextures: true
 			// to allow compatibility with facebook
+
 		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
 
 	} );
@@ -226,12 +239,12 @@ Menubar.File = function ( editor ) {
 
 	// Export GLTF
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.GLTFExporter();
+		var exporter = new GLTFExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -245,7 +258,7 @@ Menubar.File = function ( editor ) {
 
 	// Export OBJ
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
 	option.onClick( function () {
@@ -259,7 +272,7 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		var exporter = new THREE.OBJExporter();
+		var exporter = new OBJExporter();
 
 		saveString( exporter.parse( object ), 'model.obj' );
 
@@ -268,12 +281,12 @@ Menubar.File = function ( editor ) {
 
 	// Export STL (ASCII)
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.STLExporter();
+		var exporter = new STLExporter();
 
 		saveString( exporter.parse( editor.scene ), 'model.stl' );
 
@@ -282,12 +295,12 @@ Menubar.File = function ( editor ) {
 
 	// Export STL (Binary)
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.STLExporter();
+		var exporter = new STLExporter();
 
 		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
 
@@ -296,11 +309,11 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new HorizontalRule() );
 
 	// Publish
 
-	var option = new UI.Row();
+	var option = new Row();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
@@ -324,13 +337,13 @@ Menubar.File = function ( editor ) {
 
 		var title = config.getKey( 'project/title' );
 
-		var manager = new THREE.LoadingManager( function () {
+		var manager = new LoadingManager( function () {
 
 			save( zip.generate( { type: 'blob' } ), ( title !== '' ? title : 'untitled' ) + '.zip' );
 
 		} );
 
-		var loader = new THREE.FileLoader( manager );
+		var loader = new FileLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
 
 			content = content.replace( '<!-- title -->', title );
@@ -359,6 +372,7 @@ Menubar.File = function ( editor ) {
 					'			document.body.appendChild( button );',
 					''
 				].join( '\n' );
+
 			}
 
 			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
@@ -418,3 +432,5 @@ Menubar.File = function ( editor ) {
 	return container;
 
 };
+
+export { MenubarFile };

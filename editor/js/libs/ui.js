@@ -2,15 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var UI = {};
-
-UI.Element = function ( dom ) {
+var UIElement = function ( dom ) {
 
 	this.dom = dom;
 
 };
 
-UI.Element.prototype = {
+UIElement.prototype = {
 
 	add: function () {
 
@@ -18,13 +16,13 @@ UI.Element.prototype = {
 
 			var argument = arguments[ i ];
 
-			if ( argument instanceof UI.Element ) {
+			if ( argument instanceof UIElement ) {
 
 				this.dom.appendChild( argument.dom );
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
 
 			}
 
@@ -40,13 +38,13 @@ UI.Element.prototype = {
 
 			var argument = arguments[ i ];
 
-			if ( argument instanceof UI.Element ) {
+			if ( argument instanceof UIElement ) {
 
 				this.dom.removeChild( argument.dom );
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
 
 			}
 
@@ -122,7 +120,7 @@ properties.forEach( function ( property ) {
 
 	var method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
 
-	UI.Element.prototype[ method ] = function () {
+	UIElement.prototype[ method ] = function () {
 
 		this.setStyle( property, arguments );
 
@@ -140,7 +138,7 @@ events.forEach( function ( event ) {
 
 	var method = 'on' + event;
 
-	UI.Element.prototype[ method ] = function ( callback ) {
+	UIElement.prototype[ method ] = function ( callback ) {
 
 		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
 
@@ -152,9 +150,9 @@ events.forEach( function ( event ) {
 
 // Span
 
-UI.Span = function () {
+var Span = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	this.dom = document.createElement( 'span' );
 
@@ -162,14 +160,14 @@ UI.Span = function () {
 
 };
 
-UI.Span.prototype = Object.create( UI.Element.prototype );
-UI.Span.prototype.constructor = UI.Span;
+Span.prototype = Object.create( UIElement.prototype );
+Span.prototype.constructor = Span;
 
 // Div
 
-UI.Div = function () {
+var Div = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	this.dom = document.createElement( 'div' );
 
@@ -177,14 +175,14 @@ UI.Div = function () {
 
 };
 
-UI.Div.prototype = Object.create( UI.Element.prototype );
-UI.Div.prototype.constructor = UI.Div;
+Div.prototype = Object.create( UIElement.prototype );
+Div.prototype.constructor = Div;
 
 // Row
 
-UI.Row = function () {
+var Row = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Row';
@@ -195,14 +193,14 @@ UI.Row = function () {
 
 };
 
-UI.Row.prototype = Object.create( UI.Element.prototype );
-UI.Row.prototype.constructor = UI.Row;
+Row.prototype = Object.create( UIElement.prototype );
+Row.prototype.constructor = Row;
 
 // Panel
 
-UI.Panel = function () {
+var Panel = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
@@ -213,14 +211,14 @@ UI.Panel = function () {
 
 };
 
-UI.Panel.prototype = Object.create( UI.Element.prototype );
-UI.Panel.prototype.constructor = UI.Panel;
+Panel.prototype = Object.create( UIElement.prototype );
+Panel.prototype.constructor = Panel;
 
 // Text
 
-UI.Text = function ( text ) {
+var UIText = function ( text ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'span' );
 	dom.className = 'Text';
@@ -235,16 +233,16 @@ UI.Text = function ( text ) {
 
 };
 
-UI.Text.prototype = Object.create( UI.Element.prototype );
-UI.Text.prototype.constructor = UI.Text;
+UIText.prototype = Object.create( UIElement.prototype );
+UIText.prototype.constructor = UIText;
 
-UI.Text.prototype.getValue = function () {
+UIText.prototype.getValue = function () {
 
 	return this.dom.textContent;
 
 };
 
-UI.Text.prototype.setValue = function ( value ) {
+UIText.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -259,11 +257,9 @@ UI.Text.prototype.setValue = function ( value ) {
 
 // Input
 
-UI.Input = function ( text ) {
+var Input = function ( text ) {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
@@ -283,16 +279,16 @@ UI.Input = function ( text ) {
 
 };
 
-UI.Input.prototype = Object.create( UI.Element.prototype );
-UI.Input.prototype.constructor = UI.Input;
+Input.prototype = Object.create( UIElement.prototype );
+Input.prototype.constructor = Input;
 
-UI.Input.prototype.getValue = function () {
+Input.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.Input.prototype.setValue = function ( value ) {
+Input.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
 
@@ -303,11 +299,9 @@ UI.Input.prototype.setValue = function ( value ) {
 
 // TextArea
 
-UI.TextArea = function () {
+var TextArea = function () {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'textarea' );
 	dom.className = 'TextArea';
@@ -338,16 +332,16 @@ UI.TextArea = function () {
 
 };
 
-UI.TextArea.prototype = Object.create( UI.Element.prototype );
-UI.TextArea.prototype.constructor = UI.TextArea;
+TextArea.prototype = Object.create( UIElement.prototype );
+TextArea.prototype.constructor = TextArea;
 
-UI.TextArea.prototype.getValue = function () {
+TextArea.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.TextArea.prototype.setValue = function ( value ) {
+TextArea.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
 
@@ -358,11 +352,9 @@ UI.TextArea.prototype.setValue = function ( value ) {
 
 // Select
 
-UI.Select = function () {
+var Select = function () {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'select' );
 	dom.className = 'Select';
@@ -374,10 +366,10 @@ UI.Select = function () {
 
 };
 
-UI.Select.prototype = Object.create( UI.Element.prototype );
-UI.Select.prototype.constructor = UI.Select;
+Select.prototype = Object.create( UIElement.prototype );
+Select.prototype.constructor = Select;
 
-UI.Select.prototype.setMultiple = function ( boolean ) {
+Select.prototype.setMultiple = function ( boolean ) {
 
 	this.dom.multiple = boolean;
 
@@ -385,7 +377,7 @@ UI.Select.prototype.setMultiple = function ( boolean ) {
 
 };
 
-UI.Select.prototype.setOptions = function ( options ) {
+Select.prototype.setOptions = function ( options ) {
 
 	var selected = this.dom.value;
 
@@ -410,13 +402,13 @@ UI.Select.prototype.setOptions = function ( options ) {
 
 };
 
-UI.Select.prototype.getValue = function () {
+Select.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.Select.prototype.setValue = function ( value ) {
+Select.prototype.setValue = function ( value ) {
 
 	value = String( value );
 
@@ -432,11 +424,9 @@ UI.Select.prototype.setValue = function ( value ) {
 
 // Checkbox
 
-UI.Checkbox = function ( boolean ) {
+var Checkbox = function ( boolean ) {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Checkbox';
@@ -449,16 +439,16 @@ UI.Checkbox = function ( boolean ) {
 
 };
 
-UI.Checkbox.prototype = Object.create( UI.Element.prototype );
-UI.Checkbox.prototype.constructor = UI.Checkbox;
+Checkbox.prototype = Object.create( UIElement.prototype );
+Checkbox.prototype.constructor = Checkbox;
 
-UI.Checkbox.prototype.getValue = function () {
+Checkbox.prototype.getValue = function () {
 
 	return this.dom.checked;
 
 };
 
-UI.Checkbox.prototype.setValue = function ( value ) {
+Checkbox.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -473,11 +463,9 @@ UI.Checkbox.prototype.setValue = function ( value ) {
 
 // Color
 
-UI.Color = function () {
+var Color = function () {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Color';
@@ -500,22 +488,22 @@ UI.Color = function () {
 
 };
 
-UI.Color.prototype = Object.create( UI.Element.prototype );
-UI.Color.prototype.constructor = UI.Color;
+Color.prototype = Object.create( UIElement.prototype );
+Color.prototype.constructor = Color;
 
-UI.Color.prototype.getValue = function () {
+Color.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.Color.prototype.getHexValue = function () {
+Color.prototype.getHexValue = function () {
 
 	return parseInt( this.dom.value.substr( 1 ), 16 );
 
 };
 
-UI.Color.prototype.setValue = function ( value ) {
+Color.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
 
@@ -523,7 +511,7 @@ UI.Color.prototype.setValue = function ( value ) {
 
 };
 
-UI.Color.prototype.setHexValue = function ( hex ) {
+Color.prototype.setHexValue = function ( hex ) {
 
 	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( - 6 );
 
@@ -534,9 +522,9 @@ UI.Color.prototype.setHexValue = function ( hex ) {
 
 // Number
 
-UI.Number = function ( number ) {
+var UINumber = function ( number ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -611,7 +599,7 @@ UI.Number = function ( number ) {
 
 	}
 
-	function onMouseUp( event ) {
+	function onMouseUp() {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -675,20 +663,20 @@ UI.Number = function ( number ) {
 
 	}
 
-	function onChange( event ) {
+	function onChange() {
 
 		scope.setValue( dom.value );
 
 	}
 
-	function onFocus( event ) {
+	function onFocus() {
 
 		dom.style.backgroundColor = '';
 		dom.style.cursor = '';
 
 	}
 
-	function onBlur( event ) {
+	function onBlur() {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.cursor = 'col-resize';
@@ -707,16 +695,16 @@ UI.Number = function ( number ) {
 
 };
 
-UI.Number.prototype = Object.create( UI.Element.prototype );
-UI.Number.prototype.constructor = UI.Number;
+UINumber.prototype = Object.create( UIElement.prototype );
+UINumber.prototype.constructor = Number;
 
-UI.Number.prototype.getValue = function () {
+UINumber.prototype.getValue = function () {
 
 	return this.value;
 
 };
 
-UI.Number.prototype.setValue = function ( value ) {
+UINumber.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -736,7 +724,7 @@ UI.Number.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setPrecision = function ( precision ) {
+UINumber.prototype.setPrecision = function ( precision ) {
 
 	this.precision = precision;
 
@@ -744,7 +732,7 @@ UI.Number.prototype.setPrecision = function ( precision ) {
 
 };
 
-UI.Number.prototype.setStep = function ( step ) {
+UINumber.prototype.setStep = function ( step ) {
 
 	this.step = step;
 
@@ -752,7 +740,7 @@ UI.Number.prototype.setStep = function ( step ) {
 
 };
 
-UI.Number.prototype.setRange = function ( min, max ) {
+UINumber.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
@@ -761,7 +749,7 @@ UI.Number.prototype.setRange = function ( min, max ) {
 
 };
 
-UI.Number.prototype.setUnit = function ( unit ) {
+UINumber.prototype.setUnit = function ( unit ) {
 
 	this.unit = unit;
 
@@ -771,9 +759,9 @@ UI.Number.prototype.setUnit = function ( unit ) {
 
 // Integer
 
-UI.Integer = function ( number ) {
+var Integer = function ( number ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -844,7 +832,7 @@ UI.Integer = function ( number ) {
 
 	}
 
-	function onMouseUp( event ) {
+	function onMouseUp() {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -858,20 +846,20 @@ UI.Integer = function ( number ) {
 
 	}
 
-	function onChange( event ) {
+	function onChange() {
 
 		scope.setValue( dom.value );
 
 	}
 
-	function onFocus( event ) {
+	function onFocus() {
 
 		dom.style.backgroundColor = '';
 		dom.style.cursor = '';
 
 	}
 
-	function onBlur( event ) {
+	function onBlur() {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.cursor = 'col-resize';
@@ -889,16 +877,16 @@ UI.Integer = function ( number ) {
 
 };
 
-UI.Integer.prototype = Object.create( UI.Element.prototype );
-UI.Integer.prototype.constructor = UI.Integer;
+Integer.prototype = Object.create( UIElement.prototype );
+Integer.prototype.constructor = Integer;
 
-UI.Integer.prototype.getValue = function () {
+Integer.prototype.getValue = function () {
 
 	return this.value;
 
 };
 
-UI.Integer.prototype.setValue = function ( value ) {
+Integer.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -913,7 +901,7 @@ UI.Integer.prototype.setValue = function ( value ) {
 
 };
 
-UI.Integer.prototype.setStep = function ( step ) {
+Integer.prototype.setStep = function ( step ) {
 
 	this.step = parseInt( step );
 
@@ -921,7 +909,7 @@ UI.Integer.prototype.setStep = function ( step ) {
 
 };
 
-UI.Integer.prototype.setRange = function ( min, max ) {
+Integer.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
@@ -933,9 +921,9 @@ UI.Integer.prototype.setRange = function ( min, max ) {
 
 // Break
 
-UI.Break = function () {
+var Break = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'br' );
 	dom.className = 'Break';
@@ -946,15 +934,15 @@ UI.Break = function () {
 
 };
 
-UI.Break.prototype = Object.create( UI.Element.prototype );
-UI.Break.prototype.constructor = UI.Break;
+Break.prototype = Object.create( UIElement.prototype );
+Break.prototype.constructor = Break;
 
 
 // HorizontalRule
 
-UI.HorizontalRule = function () {
+var HorizontalRule = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'hr' );
 	dom.className = 'HorizontalRule';
@@ -965,15 +953,15 @@ UI.HorizontalRule = function () {
 
 };
 
-UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
-UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
+HorizontalRule.prototype = Object.create( UIElement.prototype );
+HorizontalRule.prototype.constructor = HorizontalRule;
 
 
 // Button
 
-UI.Button = function ( value ) {
+var Button = function ( value ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'button' );
 	dom.className = 'Button';
@@ -985,13 +973,15 @@ UI.Button = function ( value ) {
 
 };
 
-UI.Button.prototype = Object.create( UI.Element.prototype );
-UI.Button.prototype.constructor = UI.Button;
+Button.prototype = Object.create( UIElement.prototype );
+Button.prototype.constructor = Button;
 
-UI.Button.prototype.setLabel = function ( value ) {
+Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
 
 	return this;
 
 };
+
+export { UIElement, Span, Div, Row, Panel, UIText, Input, TextArea, Select, Checkbox, Color, UINumber, Integer, Break, HorizontalRule, Button };

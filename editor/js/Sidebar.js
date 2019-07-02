@@ -2,47 +2,69 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { Panel, Div, Span, UIText } from './libs/ui.js';
+
+import { SidebarScene } from './Sidebar.Scene.js';
+import { SidebarProperties } from './Sidebar.Properties.js';
+import { SidebarScript } from './Sidebar.Script.js';
+import { SidebarAnimation } from './Sidebar.Animation.js';
+import { SidebarProject } from './Sidebar.Project.js';
+import { SidebarHistory } from './Sidebar.History.js';
+import { SidebarSettings } from './Sidebar.Settings.js';
+
 var Sidebar = function ( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new Panel();
 	container.setId( 'sidebar' );
 
 	//
 
-	var sceneTab = new UI.Text( strings.getKey( 'sidebar/scene' ) ).setTextTransform( 'uppercase' );
-	sceneTab.onClick( function () { select( 'SCENE' ) } );
+	var sceneTab = new UIText( strings.getKey( 'sidebar/scene' ) ).setTextTransform( 'uppercase' );
+	sceneTab.onClick( function () {
 
-	var projectTab = new UI.Text( strings.getKey( 'sidebar/project' ) ).setTextTransform( 'uppercase' );
-	projectTab.onClick( function () { select( 'PROJECT' ) } );
+		select( 'SCENE' );
 
-	var settingsTab = new UI.Text( strings.getKey( 'sidebar/settings' ) ).setTextTransform( 'uppercase' );
-	settingsTab.onClick( function () { select( 'SETTINGS' ) } );
+	} );
 
-	var tabs = new UI.Div();
+	var projectTab = new UIText( strings.getKey( 'sidebar/project' ) ).setTextTransform( 'uppercase' );
+	projectTab.onClick( function () {
+
+		select( 'PROJECT' );
+
+	 } );
+
+	var settingsTab = new UIText( strings.getKey( 'sidebar/settings' ) ).setTextTransform( 'uppercase' );
+	settingsTab.onClick( function () {
+
+		select( 'SETTINGS' );
+
+	 } );
+
+	var tabs = new Div();
 	tabs.setId( 'tabs' );
 	tabs.add( sceneTab, projectTab, settingsTab );
 	container.add( tabs );
 
 	//
 
-	var scene = new UI.Span().add(
-		new Sidebar.Scene( editor ),
-		new Sidebar.Properties( editor ),
-		new Sidebar.Animation( editor ),
-		new Sidebar.Script( editor )
+	var scene = new Span().add(
+		new SidebarScene( editor ),
+		new SidebarProperties( editor ),
+		new SidebarAnimation( editor ),
+		new SidebarScript( editor )
 	);
 	container.add( scene );
 
-	var project = new UI.Span().add(
-		new Sidebar.Project( editor )
+	var project = new Span().add(
+		new SidebarProject( editor )
 	);
 	container.add( project );
 
-	var settings = new UI.Span().add(
-		new Sidebar.Settings( editor ),
-		new Sidebar.History( editor )
+	var settings = new Span().add(
+		new SidebarSettings( editor ),
+		new SidebarHistory( editor )
 	);
 	container.add( settings );
 
@@ -59,6 +81,7 @@ var Sidebar = function ( editor ) {
 		settings.setDisplay( 'none' );
 
 		switch ( section ) {
+
 			case 'SCENE':
 				sceneTab.setClass( 'selected' );
 				scene.setDisplay( '' );
@@ -71,6 +94,7 @@ var Sidebar = function ( editor ) {
 				settingsTab.setClass( 'selected' );
 				settings.setDisplay( '' );
 				break;
+
 		}
 
 	}
@@ -80,3 +104,5 @@ var Sidebar = function ( editor ) {
 	return container;
 
 };
+
+export { Sidebar };
