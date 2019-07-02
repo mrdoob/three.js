@@ -8,6 +8,7 @@ struct PhysicalMaterial {
 	#ifndef STANDARD
 		float clearCoat;
 		float clearCoatRoughness;
+		float sheen;
 	#endif
 
 };
@@ -86,15 +87,15 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 
 	float sheenMix;
-	#ifdef SHEEN
+	#ifndef STANDARD
 		if(sheen == 0.) sheenMix = 0.;
-		else sheenMix = 1. - pow(1. - sheen, 5.);
+		else sheenMix = 1. - pow(1. - material.sheen, 5.);
 	#else
 		sheenMix = 0.;
 	#endif
 
 	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor ) * (1. - sheenMix);
-	#ifdef SHEEN
+	#ifndef STANDARD
 		// avoid expensive calculation
 		if(sheenMix > 0.) reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * material.diffuseColor * irradiance * sheenMix * BDRF_Diffuse_Sheen( sheen, directLight, geometry );
 	#endif
