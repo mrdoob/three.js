@@ -13,31 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DataTexture,
-				DoubleSide,
-				FloatType,
-				FrontSide,
-				LinearToneMapping,
-				Group,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				PointLight,
-				RGBAFormat,
-				Scene,
-				ShaderChunk,
-				ShaderLib,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				Vector2,
-				Vector3,
-				UniformsUtils,
-				WebGLRenderer,
-				WebGLRenderTarget
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -51,7 +28,7 @@
 
 			var RADIUS = 75;
 
-			ShaderChunk[ 'lights_pars_begin' ] += [
+			THREE.ShaderChunk[ 'lights_pars_begin' ] += [
 				'',
 				'#if defined TILED_FORWARD',
 				'uniform vec4 tileData;',
@@ -60,7 +37,7 @@
 				'#endif'
 			].join( '\n' );
 
-			ShaderChunk[ 'lights_fragment_end' ] += [
+			THREE.ShaderChunk[ 'lights_fragment_end' ] += [
 				'',
 				'#if defined TILED_FORWARD',
 				'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
@@ -99,7 +76,7 @@
 				tileData: { value: null },
 				tileTexture: { value: null },
 				lightTexture: {
-					value: new DataTexture( new Float32Array( 32 * 2 * 4 ), 32, 2, RGBAFormat, FloatType )
+					value: new THREE.DataTexture( new Float32Array( 32 * 2 * 4 ), 32, 2, THREE.RGBAFormat, THREE.FloatType )
 				},
 			};
 
@@ -113,7 +90,7 @@
 				State.cols = Math.ceil( width / 32 );
 				State.rows = Math.ceil( height / 32 );
 				State.tileData.value = [ width, height, 0.5 / Math.ceil( width / 32 ), 0.5 / Math.ceil( height / 32 ) ];
-				State.tileTexture.value = new DataTexture( new Uint8Array( State.cols * State.rows * 4 ), State.cols, State.rows );
+				State.tileTexture.value = new THREE.DataTexture( new Uint8Array( State.cols * State.rows * 4 ), State.cols, State.rows );
 
 			}
 
@@ -129,7 +106,7 @@
 
 				d.fill( 0 );
 
-				var vector = new Vector3();
+				var vector = new THREE.Vector3();
 
 				lights.forEach( function ( light, index ) {
 
@@ -171,7 +148,7 @@
 			// Screen rectangle bounds from light sphere's world AABB
 			var lightBounds = function () {
 
-				var v = new Vector3();
+				var v = new THREE.Vector3();
 				return function ( camera, pos, r ) {
 
 					var minX = State.width, maxX = 0, minY = State.height, maxY = 0, hw = State.width / 2, hh = State.height / 2;
@@ -203,22 +180,22 @@
 
 			var container = document.createElement( 'div' );
 			document.body.appendChild( container );
-			var camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+			var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 			camera.position.set( 0.0, 0.0, 240.0 );
-			var scene = new Scene();
-			scene.background = new Color( 0x111111 );
+			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x111111 );
 
-			var renderer = new WebGLRenderer();
-			renderer.toneMapping = LinearToneMapping;
+			var renderer = new THREE.WebGLRenderer();
+			renderer.toneMapping = THREE.LinearToneMapping;
 			container.appendChild( renderer.domElement );
 
-			var renderTarget = new WebGLRenderTarget();
+			var renderTarget = new THREE.WebGLRenderTarget();
 
-			scene.add( new AmbientLight( 0xffffff, 0.33 ) );
+			scene.add( new THREE.AmbientLight( 0xffffff, 0.33 ) );
 			// At least one regular Pointlight is needed to activate light support
-			scene.add( new PointLight( 0xff0000, 0.1, 0.1 ) );
+			scene.add( new THREE.PointLight( 0xff0000, 0.1, 0.1 ) );
 
-			var bloom = new UnrealBloomPass( new Vector2(), 0.8, 0.6, 0.8 );
+			var bloom = new UnrealBloomPass( new THREE.Vector2(), 0.8, 0.6, 0.8 );
 			bloom.renderToScreen = true;
 
 			var stats = new Stats();
@@ -239,19 +216,19 @@
 
 			function init( geom ) {
 
-				var sphereGeom = new SphereBufferGeometry( 0.5, 32, 32 );
+				var sphereGeom = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
 				var tIndex = Math.round( Math.random() * 3 );
 
 				Object.keys( Heads ).forEach( function ( t, index ) {
 
-					var g = new Group();
+					var g = new THREE.Group();
 					var conf = Heads[ t ];
-					var ml = ShaderLib[ conf.type ];
-					var mtl = new ShaderMaterial( {
+					var ml = THREE.ShaderLib[ conf.type ];
+					var mtl = new THREE.ShaderMaterial( {
 						lights: true,
 						fragmentShader: ml.fragmentShader,
 						vertexShader: ml.vertexShader,
-						uniforms: UniformsUtils.clone( ml.uniforms ),
+						uniforms: THREE.UniformsUtils.clone( ml.uniforms ),
 						defines: conf.defines,
 						transparent: tIndex === index ? true : false,
 					} );
@@ -280,9 +257,9 @@
 					mtl.defines[ 'TILED_FORWARD' ] = 1;
 					materials.push( mtl );
 
-					var obj = new Mesh( geom, mtl );
+					var obj = new THREE.Mesh( geom, mtl );
 					obj.position.y = - 37;
-					mtl.side = tIndex === index ? FrontSide : DoubleSide;
+					mtl.side = tIndex === index ? THREE.FrontSide : THREE.DoubleSide;
 
 					g.rotation.y = index * Math.PI / 2;
 					g.position.x = Math.sin( index * Math.PI / 2 ) * RADIUS;
@@ -291,19 +268,19 @@
 
 					for ( var i = 0; i < 8; i ++ ) {
 
-						var color = new Color().setHSL( Math.random(), 1.0, 0.5 );
-						var l = new Group();
+						var color = new THREE.Color().setHSL( Math.random(), 1.0, 0.5 );
+						var l = new THREE.Group();
 
-						l.add( new Mesh(
+						l.add( new THREE.Mesh(
 							sphereGeom,
-							new MeshBasicMaterial( {
+							new THREE.MeshBasicMaterial( {
 								color: color
 							} )
 						) );
 
-						l.add( new Mesh(
+						l.add( new THREE.Mesh(
 							sphereGeom,
-							new MeshBasicMaterial( {
+							new THREE.MeshBasicMaterial( {
 								color: color,
 								transparent: true,
 								opacity: 0.033

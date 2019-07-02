@@ -15,21 +15,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BackSide,
-				Color,
-				FrontSide,
-				Group,
-				LoadingManager,
-				Mesh,
-				MeshPhysicalMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				UnsignedByteType,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -61,40 +48,40 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0.0, - 10, 20 * 3.5 );
 
-				scene = new Scene();
-				scene.background = new Color( 0x000000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
-				gemBackMaterial = new MeshPhysicalMaterial( {
+				gemBackMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
 					color: 0x0000ff,
 					metalness: 1.0,
 					roughness: 0,
 					opacity: 0.5,
-					side: BackSide,
+					side: THREE.BackSide,
 					transparent: true,
 					envMapIntensity: 5,
 					premultipliedAlpha: true
 					// TODO: Add custom blend mode that modulates background color by this materials color.
 				} );
 
-				gemFrontMaterial = new MeshPhysicalMaterial( {
+				gemFrontMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
 					color: 0x0000ff,
 					metalness: 0.0,
 					roughness: 0,
 					opacity: 0.15,
-					side: FrontSide,
+					side: THREE.FrontSide,
 					transparent: true,
 					envMapIntensity: 5,
 					premultipliedAlpha: true
 				} );
 
-				var manager = new LoadingManager();
+				var manager = new THREE.LoadingManager();
 				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
@@ -106,13 +93,13 @@
 
 					object.traverse( function ( child ) {
 
-						if ( child instanceof Mesh ) {
+						if ( child instanceof THREE.Mesh ) {
 
 							child.material = gemBackMaterial;
 							var second = child.clone();
 							second.material = gemFrontMaterial;
 
-							var parent = new Group();
+							var parent = new THREE.Group();
 							parent.add( second );
 							parent.add( child );
 							scene.add( parent );
@@ -139,7 +126,7 @@
 				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
 
 				new HDRCubeTextureLoader()
-					.setType( UnsignedByteType )
+					.setType( THREE.UnsignedByteType )
 					.load( hdrUrls, function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
@@ -162,22 +149,22 @@
 
 				// Lights
 
-				scene.add( new AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var pointLight1 = new PointLight( 0xffffff );
+				var pointLight1 = new THREE.PointLight( 0xffffff );
 				pointLight1.position.set( 150, 10, 0 );
 				pointLight1.castShadow = false;
 				scene.add( pointLight1 );
 
-				var pointLight2 = new PointLight( 0xffffff );
+				var pointLight2 = new THREE.PointLight( 0xffffff );
 				pointLight2.position.set( - 150, 0, 0 );
 				scene.add( pointLight2 );
 
-				var pointLight3 = new PointLight( 0xffffff );
+				var pointLight3 = new THREE.PointLight( 0xffffff );
 				pointLight3.position.set( 0, - 10, - 150 );
 				scene.add( pointLight3 );
 
-				var pointLight4 = new PointLight( 0xffffff );
+				var pointLight4 = new THREE.PointLight( 0xffffff );
 				pointLight4.position.set( 0, 0, 150 );
 				scene.add( pointLight4 );
 
@@ -238,11 +225,11 @@
 					var newColor = gemBackMaterial.color;
 					switch ( params.gemColor ) {
 
-						case 'Blue': newColor = new Color( 0x000088 ); break;
-						case 'Red': newColor = new Color( 0x880000 ); break;
-						case 'Green': newColor = new Color( 0x008800 ); break;
-						case 'White': newColor = new Color( 0x888888 ); break;
-						case 'Black': newColor = new Color( 0x0f0f0f ); break;
+						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
+						case 'Red': newColor = new THREE.Color( 0x880000 ); break;
+						case 'Green': newColor = new THREE.Color( 0x008800 ); break;
+						case 'White': newColor = new THREE.Color( 0x888888 ); break;
+						case 'Black': newColor = new THREE.Color( 0x0f0f0f ); break;
 
 		}
 					gemBackMaterial.color = gemFrontMaterial.color = newColor;

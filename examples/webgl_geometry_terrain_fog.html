@@ -21,20 +21,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
 
 		<script type="module">
-			import {
-				CanvasTexture,
-				ClampToEdgeWrapping,
-				Clock,
-				Color,
-				FogExp2,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -51,7 +39,7 @@
 			var worldHalfWidth = worldWidth / 2;
 			var worldHalfDepth = worldDepth / 2;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -60,21 +48,21 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				controls = new FirstPersonControls( camera );
 				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
 
-				scene = new Scene();
-				scene.background = new Color( 0xefd1b5 );
-				scene.fog = new FogExp2( 0xefd1b5, 0.0025 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xefd1b5 );
+				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
 				var data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
-				var geometry = new PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				var vertices = geometry.attributes.position.array;
@@ -85,14 +73,14 @@
 
 				}
 
-				texture = new CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
-				texture.wrapS = ClampToEdgeWrapping;
-				texture.wrapT = ClampToEdgeWrapping;
+				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
 
-				mesh = new Mesh( geometry, new MeshBasicMaterial( { map: texture } ) );
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -144,9 +132,9 @@
 
 				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
-				vector3 = new Vector3( 0, 0, 0 );
+				vector3 = new THREE.Vector3( 0, 0, 0 );
 
-				sun = new Vector3( 1, 1, 1 );
+				sun = new THREE.Vector3( 1, 1, 1 );
 				sun.normalize();
 
 				canvas = document.createElement( 'canvas' );

@@ -22,18 +22,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Color,
-				DirectionalLight,
-				Group,
-				HemisphereLight,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -54,7 +44,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -65,27 +55,27 @@
 
 				}
 
-				camera = new PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;
 
-				scene = new Scene();
-				scene.background = new Color( 0xaaaaaa );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xaaaaaa );
 
-				scene.add( new DirectionalLight() );
-				scene.add( new HemisphereLight() );
+				scene.add( new THREE.DirectionalLight() );
+				scene.add( new THREE.HemisphereLight() );
 
-				group = new Group();
+				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new BoxBufferGeometry( 10, 10, 10 );
+				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var material = new MeshLambertMaterial( {
+					var material = new THREE.MeshLambertMaterial( {
 						color: Math.random() * 0xffffff
 					} );
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 400 - 200;
 					mesh.position.y = Math.random() * 400 - 200;
 					mesh.position.z = Math.random() * 400 - 200;

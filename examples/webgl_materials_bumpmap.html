@@ -14,17 +14,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				HemisphereLight,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Scene,
-				SpotLight,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -59,17 +50,17 @@
 
 				//
 
-				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
 
-				scene = new Scene();
-				scene.background = new Color( 0x060708 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x060708 );
 
 				// LIGHTS
 
-				scene.add( new HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
-				spotLight = new SpotLight( 0xffffbb, 2 );
+				spotLight = new THREE.SpotLight( 0xffffbb, 2 );
 				spotLight.position.set( 0.5, 0, 1 );
 				spotLight.position.multiplyScalar( 700 );
 				scene.add( spotLight );
@@ -88,9 +79,9 @@
 
 				//
 
-				var mapHeight = new TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				var material = new MeshPhongMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
 					specular: 0x222222,
 					shininess: 25,
@@ -105,7 +96,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -135,7 +126,7 @@
 
 			function createScene( geometry, scale, material ) {
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );

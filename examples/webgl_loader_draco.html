@@ -15,19 +15,7 @@
 	</div>
 
 	<script type="module">
-		import {
-			Color,
-			Fog,
-			HemisphereLight,
-			Mesh,
-			MeshPhongMaterial,
-			MeshStandardMaterial,
-			PerspectiveCamera,
-			PlaneBufferGeometry,
-			Scene,
-			SpotLight,
-			WebGLRenderer,
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
@@ -44,17 +32,17 @@
 
 		function init() {
 
-			camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
+			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
 			camera.position.set( 3, 0.25, 3 );
 
-			scene = new Scene();
-			scene.background = new Color( 0x443333 );
-			scene.fog = new Fog( 0x443333, 1, 4 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x443333 );
+			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
 
 			// Ground
-			var plane = new Mesh(
-				new PlaneBufferGeometry( 8, 8 ),
-				new MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+			var plane = new THREE.Mesh(
+				new THREE.PlaneBufferGeometry( 8, 8 ),
+				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 			);
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = 0.03;
@@ -62,10 +50,10 @@
 			scene.add( plane );
 
 			// Lights
-			var light = new HemisphereLight( 0x443333, 0x111122 );
+			var light = new THREE.HemisphereLight( 0x443333, 0x111122 );
 			scene.add( light );
 
-			var light = new SpotLight();
+			var light = new THREE.SpotLight();
 			light.angle = Math.PI / 16;
 			light.penumbra = 0.5;
 			light.castShadow = true;
@@ -76,8 +64,8 @@
 
 				geometry.computeVertexNormals();
 
-				var material = new MeshStandardMaterial( { color: 0x606060 } );
-				var mesh = new Mesh( geometry, material );
+				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
@@ -88,7 +76,7 @@
 			} );
 
 			// renderer
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.gammaInput = true;

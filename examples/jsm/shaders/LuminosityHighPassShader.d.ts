@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface LuminosityHighPassShader {
+export const LuminosityHighPassShader: {
   shaderID: string;
   uniforms: {
     tDiffuse: Uniform;
@@ -13,4 +13,4 @@ export interface LuminosityHighPassShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

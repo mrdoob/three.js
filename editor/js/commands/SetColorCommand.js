@@ -13,7 +13,7 @@
 
 var SetColorCommand = function ( editor, object, attributeName, newValue ) {
 
-	Command.call( editor, this );
+	Command.call( this, editor );
 
 	this.type = 'SetColorCommand';
 	this.name = 'Set ' + attributeName;

@@ -17,14 +17,7 @@
 
 		<script type="module">
 
-			import {
-				Vector3,
-				Color,
-				Clock,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -122,16 +115,16 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x333333 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.set( 300, 200, - 300 );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -150,8 +143,8 @@
 				var vh = 1.4, vl = 1.2;
 
 				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
-				colorCorrectionPass.uniforms[ "powRGB" ].value = new Vector3( vh, vh, vh );
-				colorCorrectionPass.uniforms[ "mulRGB" ].value = new Vector3( vl, vl, vl );
+				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
+				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
 				var vignettePass = new ShaderPass( VignetteShader );
@@ -178,7 +171,7 @@
 
 			//
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			function animate() {
 

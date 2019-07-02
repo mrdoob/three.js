@@ -49,15 +49,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				Color,
-				Mesh,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var N = 100;
 
@@ -80,19 +73,19 @@
 				vertexShader = document.getElementById( "vertexShader" ).textContent;
 				fragmentShader = document.getElementById( "fragmentShader" ).textContent;
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 2000;
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				geometry = new SphereBufferGeometry( 15, 64, 32 );
+				geometry = new THREE.SphereBufferGeometry( 15, 64, 32 );
 
 				for ( var i = 0; i < N; i ++ ) {
 
-					var material = new ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+					var material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = ( 0.5 - Math.random() ) * 1000;
 					mesh.position.y = ( 0.5 - Math.random() ) * 1000;
@@ -104,7 +97,7 @@
 
 				}
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -124,7 +117,7 @@
 				for ( var i = 0; i < N; i ++ ) {
 
 					var mesh = meshes[ i ];
-					mesh.material = new ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
+					mesh.material = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: generateFragmentShader() } );
 
 				}
 

@@ -36,23 +36,8 @@
 		<script src="js/WebGL.js"></script>
 
 		<script type="module">
-			import {
-				Clock,
-				Color,
-				DirectionalLight,
-				HemisphereLight,
-				PerspectiveCamera,
-				Fog,
-				Group,
-				IcosahedronBufferGeometry,
-				Mesh,
-				MeshStandardMaterial,
-				RGBFormat,
-				Scene,
-				Vector2,
-				WebGLRenderer,
-				WebGLMultisampleRenderTarget
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -76,35 +61,35 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
-				scene.fog = new Fog( 0xcccccc, 100, 1500 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				//
 
-				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new DirectionalLight( 0xffffff, 0.8 );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
 				//
 
-				group = new Group();
+				group = new THREE.Group();
 
-				var geometry = new IcosahedronBufferGeometry( 10, 2 );
-				var material = new MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				var geometry = new THREE.IcosahedronBufferGeometry( 10, 2 );
+				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 500 - 250;
 					mesh.position.y = Math.random() * 500 - 250;
 					mesh.position.z = Math.random() * 500 - 250;
@@ -120,7 +105,7 @@
 				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2', { antialias: false } );
 
-				renderer = new WebGLRenderer( { canvas: canvas, context: context } );
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				container.appendChild( renderer.domElement );
@@ -128,12 +113,12 @@
 				//
 
 				var parameters = {
-					format: RGBFormat,
+					format: THREE.RGBFormat,
 					stencilBuffer: false
 				};
 
-				var size = renderer.getDrawingBufferSize( new Vector2() );
-				var renderTarget = new WebGLMultisampleRenderTarget( size.width, size.height, parameters );
+				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
+				var renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 
 				var renderPass = new RenderPass( scene, camera );
 				var copyPass = new ShaderPass( CopyShader );

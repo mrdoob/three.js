@@ -51,23 +51,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				BufferGeometry,
-				Clock,
-				CubeTextureLoader,
-				Frustum,
-				LinearFilter,
-				LinearMipMapLinearFilter,
-				Matrix4,
-				PerspectiveCamera,
-				Points,
-				Scene,
-				ShaderMaterial,
-				TextureLoader,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 			import { TypedArrayUtils } from './jsm/utils/TypedArrayUtils.js';
@@ -79,13 +64,13 @@
 			var positions, alphas, particles, _particleGeom;
 			var kdtree;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			function init() {
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000000 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				controls = new FirstPersonControls( camera );
 				controls.movementSpeed = 100;
@@ -95,7 +80,7 @@
 
 
 				// add a skybox background
-				var cubeTextureLoader = new CubeTextureLoader();
+				var cubeTextureLoader = new THREE.CubeTextureLoader();
 
 				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
 
@@ -109,21 +94,21 @@
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				// create the custom shader
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				var imagePreviewTexture = textureLoader.load( 'textures/crate.gif' );
 
-				imagePreviewTexture.minFilter = LinearMipMapLinearFilter;
-				imagePreviewTexture.magFilter = LinearFilter;
+				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
+				imagePreviewTexture.magFilter = THREE.LinearFilter;
 
-				var pointShaderMaterial = new ShaderMaterial( {
+				var pointShaderMaterial = new THREE.ShaderMaterial( {
 					uniforms: {
 						tex1: { value: imagePreviewTexture },
 						zoom: { value: 9.0 }
@@ -144,11 +129,11 @@
 				positions = new Float32Array( amountOfParticles * 3 );
 				alphas = new Float32Array( amountOfParticles );
 
-				_particleGeom = new BufferGeometry();
-				_particleGeom.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				_particleGeom.addAttribute( 'alpha', new BufferAttribute( alphas, 1 ) );
+				_particleGeom = new THREE.BufferGeometry();
+				_particleGeom.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				_particleGeom.addAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
 
-				particles = new Points( _particleGeom, pointShaderMaterial );
+				particles = new THREE.Points( _particleGeom, pointShaderMaterial );
 
 				for ( var x = 0; x < amountOfParticles; x ++ ) {
 
@@ -205,8 +190,8 @@
 				var imagePositionsInRange = kdtree.nearest( [ position.x, position.y, position.z ], 100, maxDistance );
 
 				// We combine the nearest neighbour with a view frustum. Doesn't make sense if we change the sprites not in our view... well maybe it does. Whatever you want.
-				var _frustum = new Frustum();
-				var _projScreenMatrix = new Matrix4();
+				var _frustum = new THREE.Frustum();
+				var _projScreenMatrix = new THREE.Matrix4();
 
 				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 				_frustum.setFromMatrix( _projScreenMatrix );
@@ -214,7 +199,7 @@
 				for ( var i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 
 					var object = imagePositionsInRange[ i ];
-					var objectPoint = new Vector3().fromArray( object[ 0 ].obj );
+					var objectPoint = new THREE.Vector3().fromArray( object[ 0 ].obj );
 
 					if ( _frustum.containsPoint( objectPoint ) ) {
 
