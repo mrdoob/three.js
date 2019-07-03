@@ -6,14 +6,10 @@ uniform float roughness;
 varying vec3 vWorldPosition;
 
 #include <common>
-#include <logdepthbuf_pars_fragment>
-#include <clipping_planes_pars_fragment>
 #include <envmap_pars_fragment>
 #include <cube_uv_reflection_fragment>
 
 void main() {
-
-	#include <clipping_planes_fragment>
 
 	vec3 queryReflectVec = vec3( tFlip * vWorldPosition.x, vWorldPosition.yz );
 
@@ -46,7 +42,6 @@ void main() {
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
-	#include <logdepthbuf_fragment>
 
 }
 `;
