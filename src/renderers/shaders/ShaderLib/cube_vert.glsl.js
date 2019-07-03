@@ -11,8 +11,6 @@ void main() {
 	#include <project_vertex>
 
 	gl_Position.z = gl_Position.w; // set z to camera.far
-	// important because otherwise the cube used for rendering the cubeMap might
-	// get clipped
 
 }
 `;
