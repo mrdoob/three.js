@@ -183,7 +183,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
-		var sheen = ! builder.isDefined( 'STANDARD' ) && this.sheen ? this.sheen.buildCode( builder, 'f' ) : undefined;
+		var sheen = ! builder.isDefined( 'STANDARD' ) && this.sheen ? this.sheen.flow( builder, 'f' ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -293,13 +293,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push( 'material.clearCoatRoughness = 0.0;' );
 
-		} else {
+		}
 
-			output.push( 'float sheen = 0.;' );
+		if ( sheen ) {
 
-		} else {
-
-			output.push( 'float sheen = 0.;' );
+			output.push( 'material.sheen = ' + sheen.result + ';' );
 
 		}
 

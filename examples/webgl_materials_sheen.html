@@ -14,22 +14,16 @@
 		<div id="info">Sheen demo by <a href="https://github.com/DanielSturk">DanielSturk</a><br>Demo copied from <a href="./?q=cloth#webgl_physics_cloth">webgl_physics_cloth.html</a></div>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			// Detects webgl
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// Graphics variables
 			var container, stats;
@@ -91,7 +85,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
@@ -100,7 +94,7 @@
 				var ambientLight = new THREE.AmbientLight( 0x404040 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( - 7, 10, 15 );
 				light.castShadow = true;
 				var d = 10;
@@ -125,7 +119,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'sheen', 0, 1 );
 				gui.add( params, 'hue', 0, 360 );
