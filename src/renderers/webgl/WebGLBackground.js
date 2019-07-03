@@ -2,11 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { FrontSide } from '../../constants.js';
+import { BackSide, FrontSide } from '../../constants.js';
 import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { SkyboxMaterial } from '../../materials/SkyboxMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
@@ -67,7 +66,16 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 				boxMesh = new Mesh(
 					new BoxBufferGeometry( 1, 1, 1 ),
-					new SkyboxMaterial()
+					new ShaderMaterial( {
+						type: 'BackgroundCubeMaterial',
+						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
+						vertexShader: ShaderLib.cube.vertexShader,
+						fragmentShader: ShaderLib.cube.fragmentShader,
+						side: BackSide,
+						depthTest: false,
+						depthWrite: false,
+						fog: false
+					} )
 				);
 
 				boxMesh.geometry.removeAttribute( 'normal' );
@@ -79,12 +87,24 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 				};
 
+				// enable code injection for non-built-in material
+				Object.defineProperty( boxMesh.material, 'map', {
+
+					get: function () {
+
+						return this.uniforms.tCube.value;
+
+					}
+
+				} );
+
 				objects.update( boxMesh );
 
 			}
 
 			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
-			boxMesh.material.envMap = texture;
+			boxMesh.material.uniforms.tCube.value = texture;
+			boxMesh.material.uniforms.tFlip.value = ( background.isWebGLRenderTargetCube ) ? 1 : - 1;
 
 			if ( currentBackground !== background ||
 			     currentBackgroundVersion !== texture.version ) {
