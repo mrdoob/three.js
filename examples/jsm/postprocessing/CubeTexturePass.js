@@ -65,7 +65,7 @@ CubeTexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
 		if( this.clear ) renderer.clear();
-		renderer.render( this.cubeScene, this.cubeCamera);
+		renderer.render( this.cubeScene, this.cubeCamera );
 
 		renderer.autoClear = oldAutoClear;
 
