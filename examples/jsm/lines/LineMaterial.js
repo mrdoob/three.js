@@ -126,14 +126,25 @@ ShaderLib[ 'line' ] = {
 
 			}
 
-			#ifdef WORLD_UNITS
+			// clip space
+			vec4 clipStart = projectionMatrix * start;
+			vec4 clipEnd = projectionMatrix * end;
+
+			// ndc space
+			vec2 ndcStart = clipStart.xy / clipStart.w;
+			vec2 ndcEnd = clipEnd.xy / clipEnd.w;
 
 			// direction
-			vec2 dir = end.xy - start.xy;
+			vec2 dir = ndcEnd - ndcStart;
+
+			// account for clip-space aspect ratio
+			dir.x *= aspect;
 			dir = normalize( dir );
 
 			// perpendicular to dir
 			vec2 offset = vec2( dir.y, - dir.x );
+
+			#ifdef WORLD_UNITS
 
 			// sign flip
 			if ( position.x < 0.0 ) offset *= - 1.0;
@@ -160,24 +171,6 @@ ShaderLib[ 'line' ] = {
 			clip = projectionMatrix * clip;
 
 			#else
-
-			// clip space
-			vec4 clipStart = projectionMatrix * start;
-			vec4 clipEnd = projectionMatrix * end;
-
-			// ndc space
-			vec2 ndcStart = clipStart.xy / clipStart.w;
-			vec2 ndcEnd = clipEnd.xy / clipEnd.w;
-
-			// direction
-			vec2 dir = ndcEnd - ndcStart;
-
-			// account for clip-space aspect ratio
-			dir.x *= aspect;
-			dir = normalize( dir );
-
-			// perpendicular to dir
-			vec2 offset = vec2( dir.y, - dir.x );
 
 			// undo aspect ratio adjustment
 			dir.x /= aspect;
