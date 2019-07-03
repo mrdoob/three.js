@@ -297,6 +297,10 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push( 'float sheen = 0.;' );
 
+		} else {
+
+			output.push( 'float sheen = 0.;' );
+
 		}
 
 		if ( reflectivity ) {
