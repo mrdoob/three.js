@@ -11,7 +11,7 @@ varying vec3 vWorldPosition;
 
 void main() {
 
-	vec3 queryReflectVec = vec3( tFlip * vWorldPosition.x, vWorldPosition.yz );
+	vec3 queryVec = vec3( tFlip * vWorldPosition.x, vWorldPosition.yz );
 
 	vec4 envMapColor = vec4( 0.0 );
 
@@ -19,11 +19,11 @@ void main() {
 
 		#ifdef TEXTURE_LOD_EXT
 
-			envMapColor = textureCubeLodEXT( envMap, queryReflectVec, roughness * 8.0 );
+			envMapColor = textureCubeLodEXT( envMap, queryVec, roughness * 8.0 );
 
 		#else
 
-			envMapColor = textureCube( envMap, queryReflectVec, roughness * 8.0 );
+			envMapColor = textureCube( envMap, queryVec, roughness * 8.0 );
 
 		#endif
 
@@ -32,7 +32,7 @@ void main() {
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-		envMapColor = textureCubeUV( queryReflectVec, queryReflectVec, roughness );
+		envMapColor = textureCubeUV( queryVec, queryVec, roughness );
 		envMapColor.rgb *= envMapIntensity;
 
 	#endif
