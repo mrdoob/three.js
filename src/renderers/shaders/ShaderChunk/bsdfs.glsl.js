@@ -337,16 +337,6 @@ float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
 	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
 }
 
-// inverted Guassian distribution
-float D_Inv(float b, float thetaH) {
-
-	float cot2ThetaH = pow2( 1. / tan( thetaH ) );
-
-	return ( 1. / ( PI * ( 1. + 4. * pow2( b ) ) ) ) *
-		( 1. + 4. * exp( -cot2ThetaH / pow2(b) ) / pow( sin( thetaH ), 4. ) );
-
-}
-
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L94
 float D_Charlie(float roughness, float NoH) {
 	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
