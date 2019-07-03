@@ -347,19 +347,33 @@ float D_Inv(float b, float thetaH) {
 
 }
 
+// https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L94
+float D_Charlie(float roughness, float NoH) {
+	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
+	float invAlpha  = 1.0 / roughness;
+	float cos2h = NoH * NoH;
+	float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
+	return (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);
+}
+
+// https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L136
+float V_Neubelt(float NoV, float NoL) {
+	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
+	return saturate(1.0 / (4.0 * (NoL + NoV - NoL * NoV)));
+}
+
 float BDRF_Diffuse_Sheen( const in float sheen, const in IncidentLight incidentLight, const in GeometricContext geometry ) {
 
 	vec3 N = geometry.normal;
 	vec3 V = geometry.viewDir;
 	vec3 L = incidentLight.direction;
+
 	vec3 H = normalize( V + L );
 	float dotNH = saturate( dot( N, H ) );
 
 	float thetaH = acos( dotNH );
 
-	return D_Inv( sheen, thetaH ) / (
-		4. * ( dot( N, L ) + dot( N, V ) - dot( N, L ) * dot( N, V ) )
-	);
+	return D_Charlie( sheen, dot(N, H) ) * V_Neubelt( dot(N, V), dot(N, L) );
 
 }
 `;
