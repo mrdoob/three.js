@@ -293,6 +293,10 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push( 'material.clearCoatRoughness = 0.0;' );
 
+		} else {
+
+			output.push( 'float sheen = 0.;' );
+
 		}
 
 		if ( reflectivity ) {

@@ -49,7 +49,9 @@
 			var clothMaterial;
 
 			var params = {
-				sheen: .5
+				sheen: .5,
+				hue: 0,
+				roughness: 1
 			};
 
 			Ammo().then( function( AmmoLib ) {
@@ -98,7 +100,7 @@
 				var ambientLight = new THREE.AmbientLight( 0x404040 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 2 );
 				light.position.set( - 7, 10, 15 );
 				light.castShadow = true;
 				var d = 10;
@@ -126,6 +128,8 @@
 				var gui = new dat.GUI();
 
 				gui.add( params, 'sheen', 0, 1 );
+				gui.add( params, 'hue', 0, 360 );
+				gui.add( params, 'roughness', 0, 1 );
 				gui.open();
 
 			}
@@ -165,7 +169,7 @@
 				clothGeometry.rotateY( Math.PI * 0.5 );
 				clothGeometry.translate( clothPos.x, clothPos.y + clothHeight * 0.5, clothPos.z - clothWidth * 0.5 );
 				clothMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0xFFFFFF,
+					color: 0x8000FF,
 					side: THREE.DoubleSide,
 					roughness: 1,
 					sheen: .9
@@ -179,7 +183,7 @@
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.repeat.set( clothNumSegmentsZ, clothNumSegmentsY );
-					cloth.material.map = texture;
+					// cloth.material.map = texture;
 					cloth.material.needsUpdate = true;
 
 				} );
@@ -322,6 +326,8 @@
 				updatePhysics( deltaTime );
 
 				clothMaterial.sheen = params.sheen;
+				clothMaterial.color = new THREE.Color().setHSL(params.hue / 360, 1, .5);
+				clothMaterial.roughness = params.roughness;
 
 				renderer.render( scene, camera );
 
