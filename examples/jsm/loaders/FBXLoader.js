@@ -962,7 +962,8 @@ var FBXLoader = ( function () {
 
 					}
 
-					model.name = PropertyBinding.sanitizeNodeName( node.attrName );
+					if ( node.attrName )
+						model.name = PropertyBinding.sanitizeNodeName( node.attrName );
 					model.ID = id;
 
 				}
