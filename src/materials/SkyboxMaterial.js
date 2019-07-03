@@ -9,11 +9,11 @@ import { BackSide } from '../constants';
  * }
  */
 
-function MeshCubeMaterial( parameters ) {
+function SkyboxMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.type = 'MeshCubeMaterial';
+	this.type = 'SkyboxMaterial';
 
 	this.envMap = null;
 	this.envMapIntensity = 1.0;
@@ -30,12 +30,12 @@ function MeshCubeMaterial( parameters ) {
 
 }
 
-MeshCubeMaterial.prototype = Object.create( Material.prototype );
-MeshCubeMaterial.prototype.constructor = MeshCubeMaterial;
+SkyboxMaterial.prototype = Object.create( Material.prototype );
+SkyboxMaterial.prototype.constructor = SkyboxMaterial;
 
-MeshCubeMaterial.prototype.isMeshCubeMaterial = true;
+SkyboxMaterial.prototype.isSkyboxMaterial = true;
 
-MeshCubeMaterial.prototype.copy = function ( source ) {
+SkyboxMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
@@ -48,4 +48,4 @@ MeshCubeMaterial.prototype.copy = function ( source ) {
 
 };
 
-export { MeshCubeMaterial };
+export { SkyboxMaterial };

@@ -10,7 +10,7 @@ THREE.CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	this.needsSwap = false;
 
-	this.cubeMaterial = new THREE.MeshCubeMaterial();
+	this.cubeMaterial = new THREE.SkyboxMaterial();
 
 	this.cubeMesh = new THREE.Mesh(
 		new THREE.BoxBufferGeometry( 10, 10, 10 ),

@@ -15,5 +15,5 @@ export * from './MeshBasicMaterial';
 export * from './MeshMatcapMaterial';
 export * from './LineDashedMaterial';
 export * from './LineBasicMaterial';
-export * from './MeshCubeMaterial';
+export * from './SkyboxMaterial';
 export * from './Material';

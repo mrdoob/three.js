@@ -267,11 +267,7 @@ var ShaderLib = {
 
 };
 
-/* -------------------------------------------------------------------------
-//	Cube map shader
- ------------------------------------------------------------------------- */
-
-ShaderLib.cubeEnv = {
+ShaderLib.skybox = {
 
 	uniforms: mergeUniforms( [
 		UniformsLib.common,
@@ -285,8 +281,8 @@ ShaderLib.cubeEnv = {
 		}
 	] ),
 
-	vertexShader: ShaderChunk.cubeEnv_vert,
-	fragmentShader: ShaderChunk.cubeEnv_frag
+	vertexShader: ShaderChunk.skybox_vert,
+	fragmentShader: ShaderChunk.skybox_frag
 
 };
 

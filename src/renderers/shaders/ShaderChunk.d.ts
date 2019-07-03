@@ -22,8 +22,8 @@ export let ShaderChunk: {
 	common: string;
 	cube_frag: string;
 	cube_vert: string;
-	cubeEnv_frag: string;
-	cubeEnv_vert: string;
+	skybox_frag: string;
+	skybox_vert: string;
 	cube_uv_reflection_fragment: string;
 	defaultnormal_vertex: string;
 	depth_frag: string;

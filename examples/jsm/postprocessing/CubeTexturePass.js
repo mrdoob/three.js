@@ -7,7 +7,7 @@ import {
 	Mesh,
 	PerspectiveCamera,
 	Scene,
-	MeshCubeMaterial
+	SkyboxMaterial
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 
@@ -19,7 +19,7 @@ var CubeTexturePass = function ( camera, envMap, opacity ) {
 
 	this.needsSwap = false;
 
-	this.cubeMaterial = new MeshCubeMaterial();
+	this.cubeMaterial = new SkyboxMaterial();
 
 	this.cubeMesh = new Mesh(
 		new BoxBufferGeometry( 10, 10, 10 ),
@@ -63,8 +63,8 @@ CubeTexturePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.cubeMaterial.opacity = this.opacity;
 		this.cubeMaterial.transparent = ( this.opacity < 1.0 );
 
-		renderer.setRenderTarget(this.renderToScreen ? null : readBuffer);
-		if(this.clear) renderer.clear();
+		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
+		if( this.clear ) renderer.clear();
 		renderer.render( this.cubeScene, this.cubeCamera);
 
 		renderer.autoClear = oldAutoClear;

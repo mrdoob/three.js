@@ -1897,10 +1897,10 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
-			} else if ( material.isMeshCubeMaterial ) {
+			} else if ( material.isSkyboxMaterial ) {
 
 				refreshUniformsCommon( m_uniforms, material );
-				refreshUniformsCube( m_uniforms, material );
+				refreshUniformsSkybox( m_uniforms, material );
 
 			} else if ( material.isSpriteMaterial ) {
 
@@ -2082,7 +2082,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function refreshUniformsCube( uniforms, material ) {
+	function refreshUniformsSkybox( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.opacity.value = material.opacity;

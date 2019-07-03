@@ -25,7 +25,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		PointsMaterial: 'points',
 		ShadowMaterial: 'shadow',
 		SpriteMaterial: 'sprite',
-		MeshCubeMaterial: 'cubeEnv',
+		SkyboxMaterial: 'skybox',
 	};
 
 	var parameterNames = [

@@ -6,7 +6,7 @@ import { FrontSide } from '../../constants.js';
 import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { MeshCubeMaterial } from '../../materials/MeshCubeMaterial.js';
+import { SkyboxMaterial } from '../../materials/SkyboxMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
@@ -67,7 +67,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 				boxMesh = new Mesh(
 					new BoxBufferGeometry( 1, 1, 1 ),
-					new MeshCubeMaterial()
+					new SkyboxMaterial()
 				);
 
 				boxMesh.geometry.removeAttribute( 'normal' );
