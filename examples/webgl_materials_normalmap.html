@@ -23,19 +23,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DirectionalLight,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				TextureLoader,
-				Vector2,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -74,36 +63,36 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
 
-				scene = new Scene();
-				scene.background = new Color( 0x111111 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x111111 );
 
 				// LIGHTS
 
-				ambientLight = new AmbientLight( 0x444444 );
+				ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				pointLight = new PointLight( 0xffffff, 1.25, 1000 );
+				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
 
-				directionalLight = new DirectionalLight( 0xffffff );
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 1, - 0.5, - 1 );
 				scene.add( directionalLight );
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
-				var material = new MeshPhongMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
 					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
 					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
 					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
-					normalScale: new Vector2( 0.8, 0.8 )
+					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
 				loader = new GLTFLoader();
@@ -113,7 +102,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -161,7 +150,7 @@
 
 			function createScene( geometry, scale, material ) {
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 
 				mesh.position.y = - 50;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;

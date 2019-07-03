@@ -15,22 +15,7 @@
 	</div>
 
 	<script type="module">
-		import {
-			AmbientLight,
-			DirectionalLight,
-			Mesh,
-			MeshBasicMaterial,
-			PerspectiveCamera,
-			PointLight,
-			RepeatWrapping,
-			Scene,
-			ShaderMaterial,
-			SphereBufferGeometry,
-			TextureLoader,
-			UniformsUtils,
-			Vector3,
-			WebGLRenderer,
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -51,34 +36,34 @@
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 5000 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 5000 );
 			camera.position.set( 0.0, 300, 400 * 4 );
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 
 			// Lights
 
-			scene.add( new AmbientLight( 0x888888 ) );
+			scene.add( new THREE.AmbientLight( 0x888888 ) );
 
-			var directionalLight = new DirectionalLight( 0xffffff, 0.03 );
+			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.03 );
 			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
 			scene.add( directionalLight );
 
-			var pointLight1 = new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0x888888 } ) );
-			pointLight1.add( new PointLight( 0x888888, 7.0, 300 ) );
+			var pointLight1 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
+			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
 			scene.add( pointLight1 );
 			pointLight1.position.x = 0;
 			pointLight1.position.y = - 50;
 			pointLight1.position.z = 350;
 
-			var pointLight2 = new Mesh( new SphereBufferGeometry( 4, 8, 8 ), new MeshBasicMaterial( { color: 0x888800 } ) );
-			pointLight2.add( new PointLight( 0x888800, 1.0, 500 ) );
+			var pointLight2 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
+			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
 			scene.add( pointLight2 );
 			pointLight2.position.x = - 100;
 			pointLight2.position.y = 20;
 			pointLight2.position.z = - 260;
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
@@ -101,28 +86,28 @@
 
 		function initMaterial() {
 
-			var loader = new TextureLoader();
+			var loader = new THREE.TextureLoader();
 			var imgTexture = loader.load( 'models/fbx/white.jpg' );
 			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
-			imgTexture.wrapS = imgTexture.wrapT = RepeatWrapping;
+			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
 			var shader = TranslucentShader;
-			var uniforms = UniformsUtils.clone( shader.uniforms );
+			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;
 
-			uniforms[ 'diffuse' ].value = new Vector3( 1.0, 0.2, 0.2 );
+			uniforms[ 'diffuse' ].value = new THREE.Vector3( 1.0, 0.2, 0.2 );
 			uniforms[ 'shininess' ].value = 500;
 
 			uniforms[ 'thicknessMap' ].value = thicknessTexture;
-			uniforms[ 'thicknessColor' ].value = new Vector3( 0.5, 0.3, 0.0 );
+			uniforms[ 'thicknessColor' ].value = new THREE.Vector3( 0.5, 0.3, 0.0 );
 			uniforms[ 'thicknessDistortion' ].value = 0.1;
 			uniforms[ 'thicknessAmbient' ].value = 0.4;
 			uniforms[ 'thicknessAttenuation' ].value = 0.8;
 			uniforms[ 'thicknessPower' ].value = 2.0;
 			uniforms[ 'thicknessScale' ].value = 16.0;
 
-			var material = new ShaderMaterial( {
+			var material = new THREE.ShaderMaterial( {
 				uniforms: uniforms,
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader,

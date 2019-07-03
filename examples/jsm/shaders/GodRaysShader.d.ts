@@ -2,15 +2,15 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface GodRaysDepthMaskShader {
+export const GodRaysDepthMaskShader: {
   uniforms: {
     tInput: Uniform;
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
-export interface GodRaysGenerateShader {
+export const GodRaysGenerateShader: {
   uniforms: {
     tInput: Uniform;
     fStepSize: Uniform;
@@ -18,9 +18,9 @@ export interface GodRaysGenerateShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
-export interface GodRaysCombineShader {
+export const GodRaysCombineShader: {
   uniforms: {
     tColors: Uniform;
     tGodRays: Uniform;
@@ -31,7 +31,7 @@ export interface GodRaysCombineShader {
   fragmentShader: string;
 }
 
-export interface GodRaysFakeSunShader {
+export const GodRaysFakeSunShader: {
   uniforms: {
     vSunPositionScreenSpace: Uniform;
     fAspect: Uniform;
@@ -40,4 +40,4 @@ export interface GodRaysFakeSunShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface HalftoneShader {
+export const HalftoneShader: {
   uniforms: {
     tDiffuse: Uniform;
     shape: Uniform;
@@ -20,4 +20,4 @@ export interface HalftoneShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

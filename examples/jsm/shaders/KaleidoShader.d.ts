@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface KaleidoShader {
+export const KaleidoShader: {
   uniforms: {
     tDiffuse: Uniform;
     sides: Uniform;
@@ -10,4 +10,4 @@ export interface KaleidoShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

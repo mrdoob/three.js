@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface TranslucentShader {
+export const TranslucentShader: {
   uniforms: {
     alphaMap: Uniform;
     ambientLightColor: Uniform;
@@ -36,4 +36,4 @@ export interface TranslucentShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

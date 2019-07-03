@@ -13,14 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				DirectionalLight,
-				HemisphereLight,
-				PerspectiveCamera,
-				Scene,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { TDSLoader } from './jsm/loaders/TDSLoader.js';
@@ -36,18 +30,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 2;
 
-				scene = new Scene();
-				scene.add( new HemisphereLight() );
+				scene = new THREE.Scene();
+				scene.add( new THREE.HemisphereLight() );
 
-				var directionalLight = new DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 2 );
 				scene.add( directionalLight );
 
 				//3ds files dont store normal maps
-				var loader = new TextureLoader();
+				var loader = new THREE.TextureLoader();
 				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
 
 				var loader = new TDSLoader( );
@@ -68,7 +62,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

@@ -10,11 +10,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - panorama - device orientation.<br/>cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Object3D,
-				Scene
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
@@ -27,11 +24,11 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 
 				controls = new DeviceOrientationControls( camera );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				var sides = [
 					{
@@ -66,7 +63,7 @@
 					}
 				];
 
-				var cube = new Object3D();
+				var cube = new THREE.Object3D();
 				scene.add( cube );
 
 				for ( var i = 0; i < sides.length; i ++ ) {

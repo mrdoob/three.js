@@ -23,16 +23,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AnimationMixer,
-				Color,
-				DirectionalLight,
-				Math as _Math,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -52,20 +44,20 @@
 
 				//
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
-				camera.target = new Vector3( 0, 150, 0 );
+				camera.target = new THREE.Vector3( 0, 150, 0 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				//
 
-				var light = new DirectionalLight( 0xefefff, 1.5 );
+				var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var light = new DirectionalLight( 0xffefef, 1.5 );
+				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
 				light.position.set( - 1, - 1, - 1 ).normalize();
 				scene.add( light );
 
@@ -76,7 +68,7 @@
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
-					mixer = new AnimationMixer( mesh );
+					mixer = new THREE.AnimationMixer( mesh );
 
 					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 
@@ -84,7 +76,7 @@
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -133,8 +125,8 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( _Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( _Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 
 				camera.lookAt( camera.target );
 

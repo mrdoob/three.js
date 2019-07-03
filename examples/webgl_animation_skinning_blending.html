@@ -33,21 +33,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AnimationMixer,
-				Clock,
-				Color,
-				DirectionalLight,
-				Fog,
-				HemisphereLight,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				SkeletonHelper,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -72,21 +59,21 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 1, 2, - 3 );
 				camera.lookAt( 0, 1, 0 );
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
-				scene = new Scene();
-				scene.background = new Color( 0xa0a0a0 );
-				scene.fog = new Fog( 0xa0a0a0, 10, 50 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
 
-				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new DirectionalLight( 0xffffff );
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 2;
@@ -101,7 +88,7 @@
 
 				// ground
 
-				var mesh = new Mesh( new PlaneBufferGeometry( 100, 100 ), new MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
@@ -120,7 +107,7 @@
 
 					//
 
-					skeleton = new SkeletonHelper( model );
+					skeleton = new THREE.SkeletonHelper( model );
 					skeleton.visible = false;
 					scene.add( skeleton );
 
@@ -133,7 +120,7 @@
 
 					var animations = gltf.animations;
 
-					mixer = new AnimationMixer( model );
+					mixer = new THREE.AnimationMixer( model );
 
 					idleAction = mixer.clipAction( animations[ 0 ] );
 					walkAction = mixer.clipAction( animations[ 3 ] );
@@ -147,7 +134,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;

@@ -23,27 +23,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				BufferAttribute,
-				BufferGeometry,
-				CatmullRomCurve3,
-				Color,
-				GridHelper,
-				LightShadow,
-				Line,
-				LineBasicMaterial,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				ShadowMaterial,
-				SpotLight,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -70,9 +51,9 @@
 			var splineHelperObjects = [];
 			var splinePointsLength = 4;
 			var positions = [];
-			var point = new Vector3();
+			var point = new THREE.Vector3();
 
-			var geometry = new BoxBufferGeometry( 20, 20, 20 );
+			var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 			var transformControl;
 
 			var ARC_SEGMENTS = 200;
@@ -96,33 +77,33 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 250, 1000 );
 				scene.add( camera );
 
-				scene.add( new AmbientLight( 0xf0f0f0 ) );
-				var light = new SpotLight( 0xffffff, 1.5 );
+				scene.add( new THREE.AmbientLight( 0xf0f0f0 ) );
+				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1500, 200 );
 				light.castShadow = true;
-				light.shadow = new LightShadow( new PerspectiveCamera( 70, 1, 200, 2000 ) );
+				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 70, 1, 200, 2000 ) );
 				light.shadow.bias = - 0.000222;
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 				scene.add( light );
 
-				var planeGeometry = new PlaneBufferGeometry( 2000, 2000 );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				var planeMaterial = new ShadowMaterial( { opacity: 0.2 } );
+				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
 
-				var plane = new Mesh( planeGeometry, planeMaterial );
+				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = - 200;
 				plane.receiveShadow = true;
 				scene.add( plane );
 
-				var helper = new GridHelper( 2000, 100 );
+				var helper = new THREE.GridHelper( 2000, 100 );
 				helper.position.y = - 199;
 				helper.material.opacity = 0.25;
 				helper.material.transparent = true;
@@ -132,7 +113,7 @@
 				//axes.position.set( - 500, - 500, - 500 );
 				//scene.add( axes );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -266,30 +247,30 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( ARC_SEGMENTS * 3 ), 3 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ARC_SEGMENTS * 3 ), 3 ) );
 
-				var curve = new CatmullRomCurve3( positions );
+				var curve = new THREE.CatmullRomCurve3( positions );
 				curve.curveType = 'catmullrom';
-				curve.mesh = new Line( geometry.clone(), new LineBasicMaterial( {
+				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0xff0000,
 					opacity: 0.35
 				} ) );
 				curve.mesh.castShadow = true;
 				splines.uniform = curve;
 
-				curve = new CatmullRomCurve3( positions );
+				curve = new THREE.CatmullRomCurve3( positions );
 				curve.curveType = 'centripetal';
-				curve.mesh = new Line( geometry.clone(), new LineBasicMaterial( {
+				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x00ff00,
 					opacity: 0.35
 				} ) );
 				curve.mesh.castShadow = true;
 				splines.centripetal = curve;
 
-				curve = new CatmullRomCurve3( positions );
+				curve = new THREE.CatmullRomCurve3( positions );
 				curve.curveType = 'chordal';
-				curve.mesh = new Line( geometry.clone(), new LineBasicMaterial( {
+				curve.mesh = new THREE.Line( geometry.clone(), new THREE.LineBasicMaterial( {
 					color: 0x0000ff,
 					opacity: 0.35
 				} ) );
@@ -303,17 +284,17 @@
 
 				}
 
-				load( [ new Vector3( 289.76843686945404, 452.51481137238443, 56.10018915737797 ),
-					new Vector3( - 53.56300074753207, 171.49711742836848, - 14.495472686253045 ),
-					new Vector3( - 91.40118730204415, 176.4306956436485, - 6.958271935582161 ),
-					new Vector3( - 383.785318791128, 491.1365363371675, 47.869296953772746 ) ] );
+				load( [ new THREE.Vector3( 289.76843686945404, 452.51481137238443, 56.10018915737797 ),
+					new THREE.Vector3( - 53.56300074753207, 171.49711742836848, - 14.495472686253045 ),
+					new THREE.Vector3( - 91.40118730204415, 176.4306956436485, - 6.958271935582161 ),
+					new THREE.Vector3( - 383.785318791128, 491.1365363371675, 47.869296953772746 ) ] );
 
 			}
 
 			function addSplineObject( position ) {
 
-				var material = new MeshLambertMaterial( { color: Math.random() * 0xffffff } );
-				var object = new Mesh( geometry, material );
+				var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+				var object = new THREE.Mesh( geometry, material );
 
 				if ( position ) {
 
@@ -390,7 +371,7 @@
 				for ( var i = 0; i < splinePointsLength; i ++ ) {
 
 					var p = splineHelperObjects[ i ].position;
-					strplace.push( 'new Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) );
+					strplace.push( 'new THREE.Vector3({0}, {1}, {2})'.format( p.x, p.y, p.z ) );
 
 				}
 

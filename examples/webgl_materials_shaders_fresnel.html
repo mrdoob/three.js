@@ -14,17 +14,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				CubeTextureLoader,
-				Mesh,
-				PerspectiveCamera,
-				RGBFormat,
-				Scene,
-				ShaderMaterial,
-				SphereBufferGeometry,
-				UniformsUtils,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { FresnelShader } from './jsm/shaders/FresnelShader.js';
 
@@ -49,7 +40,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
 				//
@@ -62,22 +53,22 @@
 					path + 'posz' + format, path + 'negz' + format
 				];
 
-				var textureCube = new CubeTextureLoader().load( urls );
-				textureCube.format = RGBFormat;
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.format = THREE.RGBFormat;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 				scene.background = textureCube;
 
 				//
 
-				var geometry = new SphereBufferGeometry( 100, 32, 16 );
+				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
 				var shader = FresnelShader;
-				var uniforms = UniformsUtils.clone( shader.uniforms );
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tCube" ].value = textureCube;
 
-				var material = new ShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
@@ -85,7 +76,7 @@
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
@@ -101,7 +92,7 @@
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

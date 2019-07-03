@@ -37,7 +37,7 @@
  *
  * @param {Object} lightningParameters The parameters for created rays. See LightningStrike (geometry)
  *
- * @param {Material} lightningMaterial The Material used for the created rays.
+ * @param {Material} lightningMaterial The THREE.Material used for the created rays.
  *
  * @param {function} onRayPosition Optional callback with two Vector3 parameters (source, dest). You can set here the start and end points for each created ray, using the standard size, minHeight, etc parameters and other values in your algorithm.
  *
@@ -47,7 +47,6 @@
 */
 
 import {
-	Material,
 	Math as _Math,
 	Mesh,
 	MeshBasicMaterial,

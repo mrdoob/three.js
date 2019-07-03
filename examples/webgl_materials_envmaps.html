@@ -15,30 +15,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BackSide,
-				BoxBufferGeometry,
-				CubeReflectionMapping,
-				CubeRefractionMapping,
-				CubeTextureLoader,
-				EquirectangularReflectionMapping,
-				EquirectangularRefractionMapping,
-				LinearFilter,
-				LinearMipMapLinearFilter,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				RGBFormat,
-				Scene,
-				ShaderLib,
-				ShaderMaterial,
-				SphericalReflectionMapping,
-				SphereBufferGeometry,
-				sRGBEncoding,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -56,18 +34,18 @@
 
 				// CAMERAS
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.set( 0, 0, 1000 );
-				cameraCube = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
 				// SCENE
 
-				scene = new Scene();
-				sceneCube = new Scene();
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
 
 				// Lights
 
-				var ambient = new AmbientLight( 0xffffff );
+				var ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
 				// Textures
@@ -77,33 +55,33 @@
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				textureCube = new CubeTextureLoader().load( urls );
-				textureCube.format = RGBFormat;
-				textureCube.mapping = CubeReflectionMapping;
-				textureCube.encoding = sRGBEncoding;
+				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.format = THREE.RGBFormat;
+				textureCube.mapping = THREE.CubeReflectionMapping;
+				textureCube.encoding = THREE.sRGBEncoding;
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
-				textureEquirec.mapping = EquirectangularReflectionMapping;
-				textureEquirec.magFilter = LinearFilter;
-				textureEquirec.minFilter = LinearMipMapLinearFilter;
-				textureEquirec.encoding = sRGBEncoding;
+				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
+				textureEquirec.magFilter = THREE.LinearFilter;
+				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
+				textureEquirec.encoding = THREE.sRGBEncoding;
 
 				textureSphere = textureLoader.load( "textures/metal.jpg" );
-				textureSphere.mapping = SphericalReflectionMapping;
-				textureSphere.encoding = sRGBEncoding;
+				textureSphere.mapping = THREE.SphericalReflectionMapping;
+				textureSphere.encoding = THREE.sRGBEncoding;
 
 				// Materials
 
-				var equirectShader = ShaderLib[ "equirect" ];
+				var equirectShader = THREE.ShaderLib[ "equirect" ];
 
-				var equirectMaterial = new ShaderMaterial( {
+				var equirectMaterial = new THREE.ShaderMaterial( {
 					fragmentShader: equirectShader.fragmentShader,
 					vertexShader: equirectShader.vertexShader,
 					uniforms: equirectShader.uniforms,
 					depthWrite: false,
-					side: BackSide
+					side: THREE.BackSide
 				} );
 
 				equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
@@ -118,13 +96,13 @@
 
 				} );
 
-				var cubeShader = ShaderLib[ "cube" ];
-				var cubeMaterial = new ShaderMaterial( {
+				var cubeShader = THREE.ShaderLib[ "cube" ];
+				var cubeMaterial = new THREE.ShaderMaterial( {
 					fragmentShader: cubeShader.fragmentShader,
 					vertexShader: cubeShader.vertexShader,
 					uniforms: cubeShader.uniforms,
 					depthWrite: false,
-					side: BackSide
+					side: THREE.BackSide
 				} );
 
 				cubeMaterial.uniforms[ "tCube" ].value = textureCube;
@@ -140,20 +118,20 @@
 
 				// Skybox
 
-				cubeMesh = new Mesh( new BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
+				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
 				sceneCube.add( cubeMesh );
 
 				//
 
-				var geometry = new SphereBufferGeometry( 400.0, 48, 24 );
-				sphereMaterial = new MeshLambertMaterial( { envMap: textureCube } );
-				sphereMesh = new Mesh( geometry, sphereMaterial );
+				var geometry = new THREE.SphereBufferGeometry( 400.0, 48, 24 );
+				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
+				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 
 				scene.add( sphereMesh );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -204,13 +182,13 @@
 
 					if ( value ) {
 
-						textureEquirec.mapping = EquirectangularRefractionMapping;
-						textureCube.mapping = CubeRefractionMapping;
+						textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
+						textureCube.mapping = THREE.CubeRefractionMapping;
 
 					} else {
 
-						textureEquirec.mapping = EquirectangularReflectionMapping;
-						textureCube.mapping = CubeReflectionMapping;
+						textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
+						textureCube.mapping = THREE.CubeReflectionMapping;
 
 					}
 

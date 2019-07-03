@@ -56,20 +56,7 @@
 	</div>
 
 	<script type="module">
-		import {
-			AmbientLight,
-			AudioListener as _AudioListener,
-			AudioLoader,
-			DirectionalLight,
-			Mesh,
-			MeshLambertMaterial,
-			PerspectiveCamera,
-			PlaneBufferGeometry,
-			PositionalAudio,
-			SphereBufferGeometry,
-			Scene,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -87,19 +74,19 @@
 
 			var container = document.getElementById( 'container' );
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 
 			//
 
-			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 			camera.position.set( 7, 3, 7 );
 
 			// lights
 
-			var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+			var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 			scene.add( ambientLight );
 
-			var directionalLight = new DirectionalLight( 0xffffff, 0.7 );
+			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
 			directionalLight.position.set( 0, 5, 5 );
 			scene.add( directionalLight );
 
@@ -118,17 +105,17 @@
 
 			// audio
 
-			var audioLoader = new AudioLoader();
+			var audioLoader = new THREE.AudioLoader();
 
-			var listener = new _AudioListener();
+			var listener = new THREE.AudioListener();
 			camera.add( listener );
 
 			// floor
 
-			var floorGeometry = new PlaneBufferGeometry( 10, 10 );
-			var floorMaterial = new MeshLambertMaterial( { color: 0x4676b6 } );
+			var floorGeometry = new THREE.PlaneBufferGeometry( 10, 10 );
+			var floorMaterial = new THREE.MeshLambertMaterial( { color: 0x4676b6 } );
 
-			var floor = new Mesh( floorGeometry, floorMaterial );
+			var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 			floor.rotation.x = Math.PI * - 0.5;
 			floor.receiveShadow = true;
 			scene.add( floor );
@@ -138,9 +125,9 @@
 			var count = 5;
 			var radius = 3;
 
-			var ballGeometry = new SphereBufferGeometry( 0.3, 32, 16 );
+			var ballGeometry = new THREE.SphereBufferGeometry( 0.3, 32, 16 );
 			ballGeometry.translate( 0, 0.3, 0 );
-			var ballMaterial = new MeshLambertMaterial( { color: 0xcccccc } );
+			var ballMaterial = new THREE.MeshLambertMaterial( { color: 0xcccccc } );
 
 			// create objects when audio buffer is loaded
 
@@ -150,14 +137,14 @@
 
 					var s = i / count * Math.PI * 2;
 
-					var ball = new Mesh( ballGeometry, ballMaterial );
+					var ball = new THREE.Mesh( ballGeometry, ballMaterial );
 					ball.castShadow = true;
 					ball.userData.down = false;
 
 					ball.position.x = radius * Math.cos( s );
 					ball.position.z = radius * Math.sin( s );
 
-					var audio = new PositionalAudio( listener );
+					var audio = new THREE.PositionalAudio( listener );
 					audio.setBuffer( buffer );
 					ball.add( audio );
 
@@ -172,7 +159,7 @@
 
 			//
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.shadowMap.enabled = true;
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setClearColor( 0x000000 );

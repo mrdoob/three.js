@@ -14,27 +14,15 @@
 		</div>
 
 		<script type="module">
-			import {
-				ConeBufferGeometry,
-				Clock,
-				Matrix4,
-				Mesh,
-				MeshBasicMaterial,
-				MeshNormalMaterial,
-				PerspectiveCamera,
-				Quaternion,
-				Scene,
-				SphereBufferGeometry,
-				Spherical,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer, mesh, target;
 
-			var spherical = new Spherical();
-			var rotationMatrix = new Matrix4();
-			var targetRotation = new Quaternion();
-			var clock = new Clock();
+			var spherical = new THREE.Spherical();
+			var rotationMatrix = new THREE.Matrix4();
+			var targetRotation = new THREE.Quaternion();
+			var clock = new THREE.Clock();
 			var speed = 2;
 
 			init();
@@ -42,35 +30,35 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.z = 5;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var geometry = new ConeBufferGeometry( 0.1, 0.5, 8 );
+				var geometry = new THREE.ConeBufferGeometry( 0.1, 0.5, 8 );
 				geometry.rotateX( Math.PI * 0.5 );
-				var material = new MeshNormalMaterial();
+				var material = new THREE.MeshNormalMaterial();
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				var targetGeometry = new SphereBufferGeometry( 0.05 );
-				var targetMaterial = new MeshBasicMaterial( { color: 0xff0000 } );
-				target = new Mesh( targetGeometry, targetMaterial );
+				var targetGeometry = new THREE.SphereBufferGeometry( 0.05 );
+				var targetMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+				target = new THREE.Mesh( targetGeometry, targetMaterial );
 				scene.add( target );
 
 				//
 
-				var sphereGeometry = new SphereBufferGeometry( 2, 32, 32 );
-				var sphereMaterial = new MeshBasicMaterial( { color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 } );
-				var sphere = new Mesh( sphereGeometry, sphereMaterial );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
+				var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 } );
+				var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
 				scene.add( sphere );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

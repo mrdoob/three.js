@@ -15,15 +15,8 @@
 		<video id="video" autoplay style="display:none"></video>
 
 		<script type="module">
-			import {
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				VideoTexture,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -34,18 +27,18 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 0.01;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				video = document.getElementById( 'video' );
 
-				var texture = new VideoTexture( video );
+				var texture = new THREE.VideoTexture( video );
 
-				var geometry = new PlaneBufferGeometry( 16, 9 );
+				var geometry = new THREE.PlaneBufferGeometry( 16, 9 );
 				geometry.scale( 0.5, 0.5, 0.5 );
-				var material = new MeshBasicMaterial( { map: texture } );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				var count = 128;
 				var radius = 32;
@@ -55,14 +48,14 @@
 					var phi = Math.acos( - 1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.setFromSphericalCoords( radius, phi, theta );
 					mesh.lookAt( camera.position );
 					scene.add( mesh );
 
 				}
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

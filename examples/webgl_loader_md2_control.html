@@ -24,22 +24,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Clock,
-				Color,
-				DirectionalLight,
-				Fog,
-				Mesh,
-				MeshPhongMaterial,
-				PCFSoftShadowMap,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RepeatWrapping,
-				Scene,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -67,7 +53,7 @@
 
 			};
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -79,22 +65,22 @@
 
 				// CAMERA
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.set( 0, 150, 1300 );
 
 				// SCENE
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
-				scene.fog = new Fog( 0xffffff, 1000, 4000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
 
 				scene.add( camera );
 
 				// LIGHTS
 
-				scene.add( new AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var light = new DirectionalLight( 0xffffff, 2.25 );
+				var light = new THREE.DirectionalLight( 0xffffff, 2.25 );
 				light.position.set( 200, 450, 500 );
 
 				light.castShadow = true;
@@ -116,15 +102,15 @@
 
 				//  GROUND
 
-				var gt = new TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				var gg = new PlaneBufferGeometry( 16000, 16000 );
-				var gm = new MeshPhongMaterial( { color: 0xffffff, map: gt } );
+				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
+				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
-				var ground = new Mesh( gg, gm );
+				var ground = new THREE.Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
-				ground.material.map.wrapS = RepeatWrapping;
-				ground.material.map.wrapT = RepeatWrapping;
+				ground.material.map.wrapS = THREE.RepeatWrapping;
+				ground.material.map.wrapT = THREE.RepeatWrapping;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -132,7 +118,7 @@
 
 				// RENDERER
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
@@ -143,7 +129,7 @@
 				renderer.gammaOutput = true;
 
 				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = PCFSoftShadowMap;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				// STATS
 

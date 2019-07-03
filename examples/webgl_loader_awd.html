@@ -12,14 +12,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				DirectionalLight,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -62,10 +56,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 70, 50, - 100 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// Add the AWD SCENE
 
@@ -73,17 +67,17 @@
 
 				// Lights
 
-				scene.add( new AmbientLight( 0x606060 ) );
+				scene.add( new THREE.AmbientLight( 0x606060 ) );
 
-				var directionalLight = new DirectionalLight( /*Math.random() * 0xffffff*/0xeeeeee );
+				var directionalLight = new THREE.DirectionalLight( /*Math.random() * 0xffffff*/0xeeeeee );
 				directionalLight.position.set( .2, - 1, .2 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
-				pointLight = new PointLight( 0xffffff, .6 );
+				pointLight = new THREE.PointLight( 0xffffff, .6 );
 				scene.add( pointLight );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

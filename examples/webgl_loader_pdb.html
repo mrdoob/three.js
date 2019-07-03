@@ -43,19 +43,8 @@
 		<div id="menu"></div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Color,
-				DirectionalLight,
-				Group,
-				IcosahedronBufferGeometry,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
@@ -87,7 +76,7 @@
 			};
 
 			var loader = new PDBLoader();
-			var offset = new Vector3();
+			var offset = new THREE.Vector3();
 
 			var menu = document.getElementById( 'menu' );
 
@@ -96,27 +85,27 @@
 
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
 				scene.add( camera );
 
-				var light = new DirectionalLight( 0xffffff, 0.8 );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var light = new DirectionalLight( 0xffffff, 0.5 );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light.position.set( - 1, - 1, 1 );
 				scene.add( light );
 
-				root = new Group();
+				root = new THREE.Group();
 				scene.add( root );
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
@@ -190,8 +179,8 @@
 					var geometryBonds = pdb.geometryBonds;
 					var json = pdb.json;
 
-					var boxGeometry = new BoxBufferGeometry( 1, 1, 1 );
-					var sphereGeometry = new IcosahedronBufferGeometry( 1, 2 );
+					var boxGeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+					var sphereGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
 
 					geometryAtoms.computeBoundingBox();
 					geometryAtoms.boundingBox.getCenter( offset ).negate();
@@ -202,8 +191,8 @@
 					var positions = geometryAtoms.getAttribute( 'position' );
 					var colors = geometryAtoms.getAttribute( 'color' );
 
-					var position = new Vector3();
-					var color = new Color();
+					var position = new THREE.Vector3();
+					var color = new THREE.Color();
 
 					for ( var i = 0; i < positions.count; i ++ ) {
 
@@ -215,9 +204,9 @@
 						color.g = colors.getY( i );
 						color.b = colors.getZ( i );
 
-						var material = new MeshPhongMaterial( { color: color } );
+						var material = new THREE.MeshPhongMaterial( { color: color } );
 
-						var object = new Mesh( sphereGeometry, material );
+						var object = new THREE.Mesh( sphereGeometry, material );
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
 						object.scale.multiplyScalar( 25 );
@@ -238,8 +227,8 @@
 
 					positions = geometryBonds.getAttribute( 'position' );
 
-					var start = new Vector3();
-					var end = new Vector3();
+					var start = new THREE.Vector3();
+					var end = new THREE.Vector3();
 
 					for ( var i = 0; i < positions.count; i += 2 ) {
 
@@ -254,7 +243,7 @@
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
-						var object = new Mesh( boxGeometry, new MeshPhongMaterial( 0xffffff ) );
+						var object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( 0xffffff ) );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 						object.scale.set( 5, 5, start.distanceTo( end ) );

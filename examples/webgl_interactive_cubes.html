@@ -22,26 +22,15 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Color,
-				DirectionalLight,
-				Math as _Math,
-				Mesh,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				Raycaster,
-				Scene,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 			var camera, scene, raycaster, renderer;
 
-			var mouse = new Vector2(), INTERSECTED;
+			var mouse = new THREE.Vector2(), INTERSECTED;
 			var radius = 100, theta = 0;
 
 			init();
@@ -52,20 +41,20 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var light = new DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new BoxBufferGeometry( 20, 20, 20 );
+				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 
 				for ( var i = 0; i < 2000; i ++ ) {
 
-					var object = new Mesh( geometry, new MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -83,9 +72,9 @@
 
 				}
 
-				raycaster = new Raycaster();
+				raycaster = new THREE.Raycaster();
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -134,9 +123,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( _Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( _Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( _Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();

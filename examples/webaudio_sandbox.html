@@ -57,23 +57,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Audio as _Audio,
-				AudioAnalyser,
-				AudioListener as _AudioListener,
-				AudioLoader,
-				Clock,
-				DirectionalLight,
-				FogExp2,
-				GridHelper,
-				MeshPhongMaterial,
-				Mesh,
-				PerspectiveCamera,
-				PositionalAudio,
-				SphereBufferGeometry,
-				Scene,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -85,7 +70,7 @@
 
 			var analyser1, analyser2, analyser3;
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			var startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
@@ -95,34 +80,34 @@
 				var overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
-				camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
 
-				var listener = new _AudioListener();
+				var listener = new THREE.AudioListener();
 				camera.add( listener );
 
-				scene = new Scene();
-				scene.fog = new FogExp2( 0x000000, 0.0025 );
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0025 );
 
-				light = new DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
-				var sphere = new SphereBufferGeometry( 20, 32, 16 );
+				var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
 
-				material1 = new MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
-				material2 = new MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
-				material3 = new MeshPhongMaterial( { color: 0x6622aa, flatShading: true, shininess: 0 } );
+				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
+				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
+				material3 = new THREE.MeshPhongMaterial( { color: 0x6622aa, flatShading: true, shininess: 0 } );
 
 				// sound spheres
 
-				var audioLoader = new AudioLoader();
+				var audioLoader = new THREE.AudioLoader();
 
-				var mesh1 = new Mesh( sphere, material1 );
+				var mesh1 = new THREE.Mesh( sphere, material1 );
 				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
-				var sound1 = new PositionalAudio( listener );
+				var sound1 = new THREE.PositionalAudio( listener );
 				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
 
 					sound1.setBuffer( buffer );
@@ -134,11 +119,11 @@
 
 				//
 
-				var mesh2 = new Mesh( sphere, material2 );
+				var mesh2 = new THREE.Mesh( sphere, material2 );
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
-				var sound2 = new PositionalAudio( listener );
+				var sound2 = new THREE.PositionalAudio( listener );
 				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
 
 					sound2.setBuffer( buffer );
@@ -150,11 +135,11 @@
 
 				//
 
-				var mesh3 = new Mesh( sphere, material3 );
+				var mesh3 = new THREE.Mesh( sphere, material3 );
 				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
-				var sound3 = new PositionalAudio( listener );
+				var sound3 = new THREE.PositionalAudio( listener );
 				var oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
 				oscillator.frequency.setValueAtTime( 144, sound3.context.currentTime );
@@ -166,13 +151,13 @@
 
 				// analysers
 
-				analyser1 = new AudioAnalyser( sound1, 32 );
-				analyser2 = new AudioAnalyser( sound2, 32 );
-				analyser3 = new AudioAnalyser( sound3, 32 );
+				analyser1 = new THREE.AudioAnalyser( sound1, 32 );
+				analyser2 = new THREE.AudioAnalyser( sound2, 32 );
+				analyser3 = new THREE.AudioAnalyser( sound3, 32 );
 
 				// global ambient audio
 
-				var sound4 = new _Audio( listener );
+				var sound4 = new THREE.Audio( listener );
 				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
 
 					sound4.setBuffer( buffer );
@@ -184,7 +169,7 @@
 
 				// ground
 
-				var helper = new GridHelper( 1000, 10, 0x444444, 0x444444 );
+				var helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
 				helper.position.y = 0.1;
 				scene.add( helper );
 
@@ -255,7 +240,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

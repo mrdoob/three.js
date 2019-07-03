@@ -65,14 +65,8 @@
 		<div id="menu"></div>
 
 		<script type="module">
-			import {
-				Color,
-				PerspectiveCamera,
-				Matrix4,
-				Object3D,
-				Scene,
-				Vector3
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
@@ -83,11 +77,11 @@
 			var root;
 
 			var objects = [];
-			var tmpVec1 = new Vector3();
-			var tmpVec2 = new Vector3();
-			var tmpVec3 = new Vector3();
-			var tmpVec4 = new Vector3();
-			var offset = new Vector3();
+			var tmpVec1 = new THREE.Vector3();
+			var tmpVec2 = new THREE.Vector3();
+			var tmpVec3 = new THREE.Vector3();
+			var tmpVec4 = new THREE.Vector3();
+			var offset = new THREE.Vector3();
 
 			var visualizationType = 2;
 
@@ -123,12 +117,12 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1500;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				root = new Object3D();
+				root = new THREE.Object3D();
 				scene.add( root );
 
 				//
@@ -343,8 +337,8 @@
 					var positions = geometryAtoms.getAttribute( 'position' );
 					var colors = geometryAtoms.getAttribute( 'color' );
 
-					var position = new Vector3();
-					var color = new Color();
+					var position = new THREE.Vector3();
+					var color = new THREE.Color();
 
 					for ( var i = 0; i < positions.count; i ++ ) {
 
@@ -392,8 +386,8 @@
 
 					positions = geometryBonds.getAttribute( 'position' );
 
-					var start = new Vector3();
-					var end = new Vector3();
+					var start = new THREE.Vector3();
+					var end = new THREE.Vector3();
 
 					for ( var i = 0; i < positions.count; i += 2 ) {
 
@@ -429,7 +423,7 @@
 						var axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
 						var radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
 
-						var objMatrix = new Matrix4().makeRotationAxis( axis.normalize(), radians );
+						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 						object.matrix = objMatrix;
 						object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
 
@@ -446,7 +440,7 @@
 						bond.className = "bond";
 						bond.style.height = bondLength + "px";
 
-						var joint = new Object3D( bond );
+						var joint = new THREE.Object3D( bond );
 						joint.position.copy( start );
 						joint.position.lerp( end, 0.5 );
 

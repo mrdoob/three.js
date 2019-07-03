@@ -11,12 +11,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				PerspectiveCamera,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -38,16 +34,16 @@
 
 				Initialize: function () {
 
-					this.ms_Renderer = new WebGLRenderer();
+					this.ms_Renderer = new THREE.WebGLRenderer();
 					this.ms_Renderer.setPixelRatio( window.devicePixelRatio );
 					this.ms_Renderer.context.getExtension( 'OES_texture_float' );
 					this.ms_Renderer.context.getExtension( 'OES_texture_float_linear' );
 
 					document.body.appendChild( this.ms_Renderer.domElement );
 
-					this.ms_Scene = new Scene();
+					this.ms_Scene = new THREE.Scene();
 
-					this.ms_Camera = new PerspectiveCamera( 55.0, window.innerWidth / window.innerHeight, 0.5, 300000 );
+					this.ms_Camera = new THREE.PerspectiveCamera( 55.0, window.innerWidth / window.innerHeight, 0.5, 300000 );
 					this.ms_Camera.position.set( 450, 350, 450 );
 					this.ms_Camera.lookAt( 0, 0, 0 );
 
@@ -74,8 +70,8 @@
 							CLEAR_COLOR: [ 1.0, 1.0, 1.0, 0.0 ],
 							GEOMETRY_ORIGIN: [ origx, origz ],
 							SUN_DIRECTION: [ - 1.0, 1.0, 1.0 ],
-							OCEAN_COLOR: new Vector3( 0.004, 0.016, 0.047 ),
-							SKY_COLOR: new Vector3( 3.2, 9.6, 12.8 ),
+							OCEAN_COLOR: new THREE.Vector3( 0.004, 0.016, 0.047 ),
+							SKY_COLOR: new THREE.Vector3( 3.2, 9.6, 12.8 ),
 							EXPOSURE: 0.35,
 							GEOMETRY_RESOLUTION: gres,
 							GEOMETRY_SIZE: gsize,

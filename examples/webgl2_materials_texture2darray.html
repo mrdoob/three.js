@@ -58,19 +58,8 @@
 		<script src="js/WebGL.js"></script>
 
 		<script type="module">
-			import {
-				DataTexture2DArray,
-				FileLoader,
-				Mesh,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RedFormat,
-				Scene,
-				ShaderMaterial,
-				Vector2,
-				UnsignedByteType,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -95,40 +84,40 @@
 				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.z = 70;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// width 256, height 256, depth 109, 8-bit, zip archived raw data
 
-				new FileLoader()
+				new THREE.FileLoader()
 					.setResponseType( 'arraybuffer' )
 					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
 						var zip = new JSZip( data );
 						var array = zip.files[ 'head256x256x109' ].asUint8Array();
 
-						var texture = new DataTexture2DArray( array, 256, 256, 109 );
+						var texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
 
-						texture.format = RedFormat;
-						texture.type = UnsignedByteType;
+						texture.format = THREE.RedFormat;
+						texture.type = THREE.UnsignedByteType;
 
 						texture.needsUpdate = true;
 
-						var material = new ShaderMaterial( {
+						var material = new THREE.ShaderMaterial( {
 							uniforms: {
 								diffuse: { value: texture },
 								depth: { value: 0 },
-								size: { value: new Vector2( planeWidth, planeHeight ) }
+								size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
 							},
 							vertexShader: document.getElementById( 'vs' ).textContent.trim(),
 							fragmentShader: document.getElementById( 'fs' ).textContent.trim()
 						} );
 
-						var geometry = new PlaneBufferGeometry( planeWidth, planeHeight );
+						var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
 
-						mesh = new Mesh( geometry, material );
+						mesh = new THREE.Mesh( geometry, material );
 
 						scene.add( mesh );
 
@@ -139,7 +128,7 @@
 				var canvas = document.createElement( 'canvas' );
 				var context = canvas.getContext( 'webgl2' );
 
-				renderer = new WebGLRenderer( { antialias: true, canvas: canvas, context: context } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
