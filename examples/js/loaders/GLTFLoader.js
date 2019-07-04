@@ -2997,7 +2997,7 @@ THREE.GLTFLoader = ( function () {
 
 			} else if ( objects.length === 1 ) {
 
-				node = objects[0];
+				node = objects[ 0 ];
 
 			} else {
 
@@ -3005,11 +3005,11 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if (node !== objects[0]) {
+			if ( node !== objects[ 0 ] ) {
 
 				for ( var i = 0, il = objects.length; i < il; i ++ ) {
 
-					node.add( objects[i] );
+					node.add( objects[ i ] );
 
 				}
 
