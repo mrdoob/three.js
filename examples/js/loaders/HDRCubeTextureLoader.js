@@ -15,9 +15,9 @@ THREE.HDRCubeTextureLoader.prototype.load = function ( urls, onLoad, onProgress,
 
 	if ( ! Array.isArray( urls ) ) {
 
-		console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setType() instead.' );
+		console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.' );
 
-		this.setType( urls );
+		this.setDataType( urls );
 
 		urls = onLoad;
 		onLoad = onProgress;
@@ -121,10 +121,18 @@ THREE.HDRCubeTextureLoader.prototype.setPath = function ( value ) {
 
 };
 
-THREE.HDRCubeTextureLoader.prototype.setType = function ( value ) {
+THREE.HDRCubeTextureLoader.prototype.setDataType = function ( value ) {
 
 	this.type = value;
-	this.hdrLoader.setType( value );
+	this.hdrLoader.setDataType( value );
 	return this;
+
+};
+
+THREE.HDRCubeTextureLoader.prototype.setType = function ( value ) {
+
+	console.warn( 'THREE.HDRCubeTextureLoader: .setType() has been renamed to .setDataType().' );
+
+	return this.setDataType( value );
 
 };
