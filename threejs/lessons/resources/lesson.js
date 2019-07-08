@@ -304,7 +304,7 @@ $(document).ready(function($){
     return a;
   });
 
-  const methodPropertyRE = /^(\w+).(\w+)$/;
+  const methodPropertyRE = /^(\w+)\.(\w+)$/;
   const classRE = /^(\w+)$/;
   $('a').each(function() {
     const href = this.getAttribute('href');
