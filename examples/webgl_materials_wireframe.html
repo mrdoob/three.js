@@ -28,11 +28,11 @@
 
 		<script type="x-shader/x-fragment" id="fragmentShader">
 
+			uniform float widthFactor;
+
 			varying vec3 vCenter;
 
 			float edgeFactorTri() {
-
-				const float widthFactor = 1.0;
 
 				vec3 d = fwidth( vCenter.xyz );
 
@@ -55,6 +55,12 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			var API = {
+				widthFactor: 1
+			};
 
 			var renderer, scene, camera, mesh1, mesh2;
 
@@ -83,16 +89,18 @@
 
 					} );
 
-					mesh2 = new THREE.Mesh( geometry, material );
-					mesh2.position.set( - 40, 0, 0 );
+					mesh1 = new THREE.Mesh( geometry, material );
+					mesh1.position.set( - 40, 0, 0 );
 
-					scene.add( mesh2 );
+					scene.add( mesh1 );
 
 					// on the right
 
+					var uniforms = { 'widthFactor': { value: API.widthFactor } };
+
 					var material = new THREE.ShaderMaterial( {
 
-						uniforms: {},
+						uniforms: uniforms,
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
 						side: THREE.DoubleSide
@@ -106,16 +114,30 @@
 
 					setupAttributes( geometry );
 
-					mesh1 = new THREE.Mesh( geometry, material );
-					mesh1.position.set( 40, 0, 0 );
+					mesh2 = new THREE.Mesh( geometry, material );
+					mesh2.position.set( 40, 0, 0 );
 
-					scene.add( mesh1 );
+					scene.add( mesh2 );
 
 					//
 
 					animate();
 
 				} );
+
+				//
+
+				var gui = new GUI();
+
+				gui.add( API, 'widthFactor', 0.4, 4 ).onChange( function () {
+
+					mesh2.material.uniforms.widthFactor.value = API.widthFactor;
+
+				} );
+
+				gui.open();
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
