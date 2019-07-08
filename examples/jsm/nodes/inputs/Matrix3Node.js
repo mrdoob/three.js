@@ -51,6 +51,8 @@ Matrix3Node.prototype.copy = function ( source ) {
 
 	this.value.fromArray( source.elements );
 
+	return this;
+
 };
 
 Matrix3Node.prototype.toJSON = function ( meta ) {

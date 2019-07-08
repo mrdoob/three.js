@@ -28,6 +28,8 @@ IntNode.prototype.copy = function ( source ) {
 
 	this.value = source.value;
 
+	return this;
+
 };
 
 IntNode.prototype.toJSON = function ( meta ) {

@@ -102,6 +102,8 @@ ConstNode.prototype.copy = function ( source ) {
 
 	this.parse( source.src, source.useDefine );
 
+	return this;
+
 };
 
 ConstNode.prototype.toJSON = function ( meta ) {

@@ -36,6 +36,8 @@ UVNode.prototype.copy = function ( source ) {
 
 	this.index = source.index;
 
+	return this;
+
 };
 
 UVNode.prototype.toJSON = function ( meta ) {
