@@ -109,7 +109,7 @@ let's also add some CSS for the labels themselves
 
 Now into our code we don't have to add too much. We had a function
 `makeInstance` that we used to generate cubes. Let's make it
-so we it also adds a label element.
+so it also adds a label element.
 
 ```js
 +const labelContainerElem = document.querySelector('#labels');
