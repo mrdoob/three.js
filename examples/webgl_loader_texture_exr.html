@@ -48,7 +48,7 @@
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
 				new EXRLoader()
-					.setType( THREE.FloatType )
+					.setDataType( THREE.FloatType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
 						//console.log( textureData );
