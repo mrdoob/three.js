@@ -4,66 +4,31 @@
 		<title>three.js webgl - postprocessing - depth-of-field</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color:#fff;
-				position: relative;
-				top: 0px;
-				width: 50em;
-				margin: 0 auto -2.1em;
-				padding: 5px;
-				z-index:100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<script src="../build/three.min.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/BokehShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/BokehPass.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl depth-of-field with bokeh example<br/>
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { BokehPass } from './jsm/postprocessing/BokehPass.js';
 
 			var container, stats;
 			var camera, scene, renderer,
 				materials = [], objects = [],
 				singleMaterial, zmaterial = [],
-				parameters, i, j, k, h, color, x, y, z, s, n, nobjects,
-				material_depth, cubeMaterial;
+				parameters, i, j, k, h, x, y, z, nobjects, cubeMaterial;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -88,35 +53,29 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				renderer.sortObjects = false;
-
-				material_depth = new THREE.MeshDepthMaterial();
-
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
+				parameters = { color: 0xff1100, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
 
-				if( singleMaterial ) zmaterial = [ cubeMaterial ];
+				if ( singleMaterial ) zmaterial = [ cubeMaterial ];
 
-				var geo = new THREE.SphereGeometry( 1, 20, 10 );
-
-				var start = Date.now();
+				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
 
 				var xgrid = 14,
 					ygrid = 9,
@@ -124,55 +83,49 @@
 
 				nobjects = xgrid * ygrid * zgrid;
 
-				c = 0;
-
-				//var s = 0.25;
 				var s = 60;
+				var count = 0;
 
 				for ( i = 0; i < xgrid; i ++ )
-				for ( j = 0; j < ygrid; j ++ )
-				for ( k = 0; k < zgrid; k ++ ) {
+					for ( j = 0; j < ygrid; j ++ )
+						for ( k = 0; k < zgrid; k ++ ) {
 
-					if ( singleMaterial ) {
+							var mesh;
 
-						mesh = new THREE.Mesh( geo, zmaterial );
+							if ( singleMaterial ) {
 
-					} else {
+								mesh = new THREE.Mesh( geo, zmaterial );
 
-						materials[ c ] = new THREE.MeshBasicMaterial( parameters );
-						mesh = new THREE.Mesh( geo, materials[ c ] );
+							} else {
 
-					}
+								mesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( parameters ) );
+								materials[ count ] = mesh.material;
 
-					x = 200 * ( i - xgrid/2 );
-					y = 200 * ( j - ygrid/2 );
-					z = 200 * ( k - zgrid/2 );
+							}
 
-					mesh.position.set( x, y, z );
-					mesh.scale.set( s, s, s );
+							x = 200 * ( i - xgrid / 2 );
+							y = 200 * ( j - ygrid / 2 );
+							z = 200 * ( k - zgrid / 2 );
 
-					mesh.matrixAutoUpdate = false;
-					mesh.updateMatrix();
+							mesh.position.set( x, y, z );
+							mesh.scale.set( s, s, s );
 
-					scene.add( mesh );
-					objects.push( mesh );
+							mesh.matrixAutoUpdate = false;
+							mesh.updateMatrix();
 
-					c ++;
+							scene.add( mesh );
+							objects.push( mesh );
 
-				}
+							count ++;
 
-				//console.log("init time: ", Date.now() - start );
-
-				scene.matrixAutoUpdate = false;
+						}
 
 				initPostprocessing();
 
 				renderer.autoClear = false;
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -180,27 +133,29 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var effectController  = {
+				var effectController = {
 
-					focus: 		1.0,
-					aperture:	0.025,
+					focus: 500.0,
+					aperture:	5,
 					maxblur:	1.0
 
 				};
 
-				var matChanger = function( ) {
+				var matChanger = function ( ) {
 
 					postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
-					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture;
+					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture * 0.00001;
 					postprocessing.bokeh.uniforms[ "maxblur" ].value = effectController.maxblur;
 
 				};
 
-				var gui = new dat.GUI();
-				gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
-				gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
+				var gui = new GUI();
+				gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
+				gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
 				gui.close();
+
+				matChanger();
 
 			}
 
@@ -221,6 +176,7 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -253,10 +209,11 @@
 			}
 
 			function initPostprocessing() {
-				var renderPass = new THREE.RenderPass( scene, camera );
 
-				var bokehPass = new THREE.BokehPass( scene, camera, {
-					focus: 		1.0,
+				var renderPass = new RenderPass( scene, camera );
+
+				var bokehPass = new BokehPass( scene, camera, {
+					focus: 1.0,
 					aperture:	0.025,
 					maxblur:	1.0,
 
@@ -264,9 +221,7 @@
 					height: height
 				} );
 
-				bokehPass.renderToScreen = true;
-
-				var composer = new THREE.EffectComposer( renderer );
+				var composer = new EffectComposer( renderer );
 
 				composer.addPass( renderPass );
 				composer.addPass( bokehPass );
@@ -280,8 +235,9 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 
+				stats.begin();
 				render();
-				stats.update();
+				stats.end();
 
 			}
 
@@ -290,13 +246,13 @@
 				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
 
 				camera.lookAt( scene.position );
 
-				if ( !singleMaterial ) {
+				if ( ! singleMaterial ) {
 
-					for( i = 0; i < nobjects; i ++ ) {
+					for ( i = 0; i < nobjects; i ++ ) {
 
 						h = ( 360 * ( i / nobjects + time ) % 360 ) / 360;
 						materials[ i ].color.setHSL( h, 1, 0.5 );

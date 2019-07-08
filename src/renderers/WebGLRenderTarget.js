@@ -1,43 +1,51 @@
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { Texture } from '../textures/Texture.js';
+import { LinearFilter } from '../constants.js';
+import { Vector4 } from '../math/Vector4.js';
+
 /**
  * @author szimek / https://github.com/szimek/
  * @author alteredq / http://alteredqualia.com/
+ * @author Marius Kintel / https://github.com/kintel
  */
 
-THREE.WebGLRenderTarget = function ( width, height, options ) {
-
-	this.uuid = THREE.Math.generateUUID();
+/*
+ In options, we can specify:
+ * Texture parameters for an auto-generated target texture
+ * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
+*/
+function WebGLRenderTarget( width, height, options ) {
 
 	this.width = width;
 	this.height = height;
 
+	this.scissor = new Vector4( 0, 0, width, height );
+	this.scissorTest = false;
+
+	this.viewport = new Vector4( 0, 0, width, height );
+
 	options = options || {};
 
-	this.wrapS = options.wrapS !== undefined ? options.wrapS : THREE.ClampToEdgeWrapping;
-	this.wrapT = options.wrapT !== undefined ? options.wrapT : THREE.ClampToEdgeWrapping;
+	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
-	this.magFilter = options.magFilter !== undefined ? options.magFilter : THREE.LinearFilter;
-	this.minFilter = options.minFilter !== undefined ? options.minFilter : THREE.LinearMipMapLinearFilter;
+	this.texture.image = {};
+	this.texture.image.width = width;
+	this.texture.image.height = height;
 
-	this.anisotropy = options.anisotropy !== undefined ? options.anisotropy : 1;
-
-	this.offset = new THREE.Vector2( 0, 0 );
-	this.repeat = new THREE.Vector2( 1, 1 );
-
-	this.format = options.format !== undefined ? options.format : THREE.RGBAFormat;
-	this.type = options.type !== undefined ? options.type : THREE.UnsignedByteType;
+	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+	this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
+	this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
-	this.generateMipmaps = true;
+}
 
-	this.shareDepthFrom = options.shareDepthFrom !== undefined ? options.shareDepthFrom : null;
+WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-};
+	constructor: WebGLRenderTarget,
 
-THREE.WebGLRenderTarget.prototype = {
-
-	constructor: THREE.WebGLRenderTarget,
+	isWebGLRenderTarget: true,
 
 	setSize: function ( width, height ) {
 
@@ -46,9 +54,15 @@ THREE.WebGLRenderTarget.prototype = {
 			this.width = width;
 			this.height = height;
 
+			this.texture.image.width = width;
+			this.texture.image.height = height;
+
 			this.dispose();
 
 		}
+
+		this.viewport.set( 0, 0, width, height );
+		this.scissor.set( 0, 0, width, height );
 
 	},
 
@@ -63,26 +77,13 @@ THREE.WebGLRenderTarget.prototype = {
 		this.width = source.width;
 		this.height = source.height;
 
-		this.wrapS = source.wrapS;
-		this.wrapT = source.wrapT;
+		this.viewport.copy( source.viewport );
 
-		this.magFilter = source.magFilter;
-		this.minFilter = source.minFilter;
-
-		this.anisotropy = source.anisotropy;
-
-		this.offset.copy( source.offset );
-		this.repeat.copy( source.repeat );
-
-		this.format = source.format;
-		this.type = source.type;
+		this.texture = source.texture.clone();
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-
-		this.generateMipmaps = source.generateMipmaps;
-
-		this.shareDepthFrom = source.shareDepthFrom;
+		this.depthTexture = source.depthTexture;
 
 		return this;
 
@@ -94,6 +95,7 @@ THREE.WebGLRenderTarget.prototype = {
 
 	}
 
-};
+} );
 
-THREE.EventDispatcher.prototype.apply( THREE.WebGLRenderTarget.prototype );
+
+export { WebGLRenderTarget };

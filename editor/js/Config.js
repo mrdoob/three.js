@@ -7,20 +7,27 @@ var Config = function () {
 	var name = 'threejs-editor';
 
 	var storage = {
+		'language': 'en',
+
 		'autosave': true,
 		'theme': 'css/light.css',
 
+		'project/title': '',
+		'project/editable': false,
+
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
+		'project/renderer/shadows': true,
+
 		'project/vr': false,
 
-		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/geometry/collapsed': true,
-		'ui/sidebar/material/collapsed': true,
-		'ui/sidebar/object3d/collapsed': false,
-		'ui/sidebar/project/collapsed': true,
-		'ui/sidebar/scene/collapsed': false,
-		'ui/sidebar/script/collapsed': true
+		'settings/history': false,
+
+		'settings/shortcuts/translate': 'w',
+		'settings/shortcuts/rotate': 'e',
+		'settings/shortcuts/scale': 'r',
+		'settings/shortcuts/undo': 'z',
+		'settings/shortcuts/focus': 'f'
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
@@ -67,6 +74,6 @@ var Config = function () {
 
 		}
 
-	}
+	};
 
 };

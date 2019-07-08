@@ -2,24 +2,37 @@
  * @author mrdoob / http://mrdoob.com/
  * @author marklundin / http://mark-lundin.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author tschw
  */
 
 THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
-	var eyeRight = new THREE.Matrix4();
-	var eyeLeft = new THREE.Matrix4();
-	var focalLength = 125;
-	var _aspect, _near, _far, _fov;
+	// Matrices generated with angler.js https://github.com/tschw/angler.js/
+	// (in column-major element order, as accepted by WebGL)
 
-	var _cameraL = new THREE.PerspectiveCamera();
-	_cameraL.matrixAutoUpdate = false;
+	this.colorMatrixLeft = new THREE.Matrix3().fromArray( [
 
-	var _cameraR = new THREE.PerspectiveCamera();
-	_cameraR.matrixAutoUpdate = false;
+		1.0671679973602295, - 0.0016435992438346148, 0.0001777536963345483, // r out
+		- 0.028107794001698494, - 0.00019593400065787137, - 0.0002875397040043026, // g out
+		- 0.04279090091586113, 0.000015809757314855233, - 0.00024287120322696865 // b out
+
+	] );
+
+	//		red						green 						blue  						in
+
+	this.colorMatrixRight = new THREE.Matrix3().fromArray( [
+
+		- 0.0355340838432312, - 0.06440307199954987, 0.018319187685847282, // r out
+		- 0.10269022732973099, 0.8079727292060852, - 0.04835830628871918, // g out
+		0.0001224992738571018, - 0.009558862075209618, 0.567823588848114 // b out
+
+	] );
 
 	var _camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 	var _scene = new THREE.Scene();
+
+	var _stereo = new THREE.StereoCamera();
 
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
@@ -33,8 +46,11 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 		uniforms: {
 
-			"mapLeft": { type: "t", value: _renderTargetL },
-			"mapRight": { type: "t", value: _renderTargetR }
+			"mapLeft": { value: _renderTargetL.texture },
+			"mapRight": { value: _renderTargetR.texture },
+
+			"colorMatrixLeft": { value: this.colorMatrixLeft },
+			"colorMatrixRight": { value: this.colorMatrixRight }
 
 		},
 
@@ -57,17 +73,40 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 			"uniform sampler2D mapRight;",
 			"varying vec2 vUv;",
 
+			"uniform mat3 colorMatrixLeft;",
+			"uniform mat3 colorMatrixRight;",
+
+			// These functions implement sRGB linearization and gamma correction
+
+			"float lin( float c ) {",
+			"	return c <= 0.04045 ? c * 0.0773993808 :",
+			"			pow( c * 0.9478672986 + 0.0521327014, 2.4 );",
+			"}",
+
+			"vec4 lin( vec4 c ) {",
+			"	return vec4( lin( c.r ), lin( c.g ), lin( c.b ), c.a );",
+			"}",
+
+			"float dev( float c ) {",
+			"	return c <= 0.0031308 ? c * 12.92",
+			"			: pow( c, 0.41666 ) * 1.055 - 0.055;",
+			"}",
+
+
 			"void main() {",
 
-			"	vec4 colorL, colorR;",
 			"	vec2 uv = vUv;",
 
-			"	colorL = texture2D( mapLeft, uv );",
-			"	colorR = texture2D( mapRight, uv );",
+			"	vec4 colorL = lin( texture2D( mapLeft, uv ) );",
+			"	vec4 colorR = lin( texture2D( mapRight, uv ) );",
 
-				// http://3dtv.at/Knowhow/AnaglyphComparison_en.aspx
+			"	vec3 color = clamp(",
+			"			colorMatrixLeft * colorL.rgb +",
+			"			colorMatrixRight * colorR.rgb, 0., 1. );",
 
-			"	gl_FragColor = vec4( colorL.g * 0.7 + colorL.b * 0.3, colorR.g, colorR.b, colorL.a + colorR.a ) * 1.1;",
+			"	gl_FragColor = vec4(",
+			"			dev( color.r ), dev( color.g ), dev( color.b ),",
+			"			max( colorL.a, colorR.a ) );",
 
 			"}"
 
@@ -75,103 +114,52 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
-	_scene.add( mesh );
+	var _mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
+	_scene.add( _mesh );
 
 	this.setSize = function ( width, height ) {
 
-		if ( _renderTargetL ) _renderTargetL.dispose();
-		if ( _renderTargetR ) _renderTargetR.dispose();
-		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
-		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
-
-		_material.uniforms[ "mapLeft" ].value = _renderTargetL;
-		_material.uniforms[ "mapRight" ].value = _renderTargetR;
-
 		renderer.setSize( width, height );
+
+		var pixelRatio = renderer.getPixelRatio();
+
+		_renderTargetL.setSize( width * pixelRatio, height * pixelRatio );
+		_renderTargetR.setSize( width * pixelRatio, height * pixelRatio );
 
 	};
 
-	/*
-	 * Renderer now uses an asymmetric perspective projection
-	 * (http://paulbourke.net/miscellaneous/stereographics/stereorender/).
-	 *
-	 * Each camera is offset by the eye seperation and its projection matrix is
-	 * also skewed asymetrically back to converge on the same projection plane.
-	 * Added a focal length parameter to, this is where the parallax is equal to 0.
-	 */
-
 	this.render = function ( scene, camera ) {
+
+		var currentRenderTarget = renderer.getRenderTarget();
 
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
+		_stereo.update( camera );
 
-		if ( hasCameraChanged ) {
+		renderer.setRenderTarget( _renderTargetL );
+		renderer.clear();
+		renderer.render( scene, _stereo.cameraL );
 
-			_aspect = camera.aspect;
-			_near = camera.near;
-			_far = camera.far;
-			_fov = camera.fov;
+		renderer.setRenderTarget( _renderTargetR );
+		renderer.clear();
+		renderer.render( scene, _stereo.cameraR );
 
-			var projectionMatrix = camera.projectionMatrix.clone();
-			var eyeSep = focalLength / 30 * 0.5;
-			var eyeSepOnProjection = eyeSep * _near / focalLength;
-			var ymax = _near * Math.tan( THREE.Math.degToRad( _fov * 0.5 ) );
-			var xmin, xmax;
-
-			// translate xOffset
-
-			eyeRight.elements[ 12 ] = eyeSep;
-			eyeLeft.elements[ 12 ] = - eyeSep;
-
-			// for left eye
-
-			xmin = - ymax * _aspect + eyeSepOnProjection;
-			xmax = ymax * _aspect + eyeSepOnProjection;
-
-			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
-			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
-
-			_cameraL.projectionMatrix.copy( projectionMatrix );
-
-			// for right eye
-
-			xmin = - ymax * _aspect - eyeSepOnProjection;
-			xmax = ymax * _aspect - eyeSepOnProjection;
-
-			projectionMatrix.elements[ 0 ] = 2 * _near / ( xmax - xmin );
-			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
-
-			_cameraR.projectionMatrix.copy( projectionMatrix );
-
-		}
-
-		_cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
-		_cameraL.position.copy( camera.position );
-		_cameraL.near = camera.near;
-		_cameraL.far = camera.far;
-
-		renderer.render( scene, _cameraL, _renderTargetL, true );
-
-		_cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
-		_cameraR.position.copy( camera.position );
-		_cameraR.near = camera.near;
-		_cameraR.far = camera.far;
-
-		renderer.render( scene, _cameraR, _renderTargetR, true );
-
+		renderer.setRenderTarget( null );
 		renderer.render( _scene, _camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		if ( _renderTargetL ) _renderTargetL.dispose();
 		if ( _renderTargetR ) _renderTargetR.dispose();
+		if ( _mesh ) _mesh.geometry.dispose();
+		if ( _material ) _material.dispose();
 
-	}
+	};
 
 };

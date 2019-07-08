@@ -1,84 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - baked illumination</title>
+		<title>three.js webgl - CTM loader materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#000;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a { color:skyblue }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #fff;
-				background:rgba(0,0,0,0.65);
-				padding: 5px;
-				text-align: center;
-				z-index:100;
-				display:block;
-			}
-
-			#stats { position: absolute; top:5px; left: 0; z-index: 100 }
-			#stats #fps { background: transparent !important }
-			#stats #fps #fpsText { color: #aaa !important }
-			#stats #fps #fpsGraph { display: none }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - baked + real-time illumination -
-		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
-		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a> -
-		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -
+			using <a href="https://github.com/jcmellado/js-openctm"  target="_blank" rel="noopener">js-openctm</a><br/>
+			camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank" rel="noopener">dskfnwn</a> -
+			skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/ctm/lzma.js"></script>
-		<script src="js/loaders/ctm/ctm.js"></script>
-		<script src="js/loaders/ctm/CTMLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { CTMLoader } from './jsm/loaders/ctm/CTMLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -250;
 
 			var container, stats;
 
 			var camera, scene, controls;
 			var renderer;
 
-			var mesh;
-
 			var textureCube;
-			var cameraCube, sceneCube;
-
-			var loader;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -90,47 +43,22 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 185, 40, 170 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = Math.PI / 2;
-				controls.minDistance = 200;
-				controls.maxDistance = 500;
 
 				// SCENE
 
-				scene = new THREE.Scene();
-
-				// SKYBOX
-
-				sceneCube = new THREE.Scene();
-				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				sceneCube.add( cameraCube );
-
 				var r = "textures/cube/pisa/";
-				var urls = [ r + "px.png", r + "nx.png",
-							 r + "py.png", r + "ny.png",
-							 r + "pz.png", r + "nz.png" ];
+				var urls = [
+					r + "px.png", r + "nx.png",
+					r + "py.png", r + "ny.png",
+					r + "pz.png", r + "nz.png"
+				];
 
+				textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				textureCube = THREE.ImageUtils.loadTextureCube( urls );
-
-				var shader = THREE.ShaderLib[ "cube" ];
-				shader.uniforms[ "tCube" ].value = textureCube;
-
-				var material = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} ),
-
-				mesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), material );
-				sceneCube.add( mesh );
+				scene = new THREE.Scene();
+				scene.background = textureCube;
 
 				// LIGHTS
 
@@ -140,7 +68,7 @@
 				scene.add( light );
 
 				var light = new THREE.PointLight( 0xffffff, 0.75 );
-				light.position.set( -12, 4.6, 2.4 );
+				light.position.set( - 12, 4.6, 2.4 );
 				light.position.multiplyScalar( 30 );
 				scene.add( light );
 
@@ -151,26 +79,24 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-
-				renderer.autoClear = false;
-
-				container.appendChild( renderer.domElement );
-
-				//
-
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.minDistance = 150;
+				controls.maxDistance = 500;
 
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				// LOADER
 
@@ -178,12 +104,13 @@
 
 				// new way via CTMLoader and separate parts
 
-				loaderCTM = new THREE.CTMLoader();
-
-				var position = new THREE.Vector3( -105, -78, -40 );
+				var position = new THREE.Vector3( - 105, - 78, - 30 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
-				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
+				var loader = new CTMLoader();
+				loader.setWorkerPath( "js/loaders/ctm/CTMWorker.js" );
+
+				loader.loadParts( "models/ctm/camaro/camaro.js", function ( geometries, materials ) {
 
 					hackMaterials( materials );
 
@@ -212,45 +139,61 @@
 
 					var m = materials[ i ];
 
-					if ( m.name.indexOf( "Body" ) !== -1 ) {
+					if ( m.name.indexOf( "Body" ) !== - 1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
+						mm.color.setHex( 0x000000 );
+						mm.lightMap = m.map;
 						mm.envMap = textureCube;
-						mm.combine = THREE.MixOperation;
-						mm.reflectivity = 0.75;
+						mm.metalness = 0.5;
+						mm.roughness = 0.3;
 
 						materials[ i ] = mm;
 
-					} else if ( m.name.indexOf( "mirror" ) !== -1 ) {
+					} else if ( m.name.indexOf( "tire_car" ) !== - 1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
-						mm.envMap = textureCube;
-						mm.combine = THREE.MultiplyOperation;
+						mm.color.setHex( 0x000000 );
+						mm.lightMap = m.map;
+						mm.metalness = 0.1;
+						mm.roughness = 0.9;
 
 						materials[ i ] = mm;
 
-					} else if ( m.name.indexOf( "glass" ) !== -1 ) {
+					} else if ( m.name.indexOf( "mirror" ) !== - 1 ) {
 
-						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
+						var mm = new THREE.MeshStandardMaterial();
 
+						mm.color.setHex( 0x808080 );
+						mm.lightMap = m.map;
 						mm.envMap = textureCube;
+						mm.metalness = 0.9;
+						mm.roughness = 0.5;
+
+						materials[ i ] = mm;
+
+					} else if ( m.name.indexOf( "glass" ) !== - 1 ) {
+
+						var mm = new THREE.MeshStandardMaterial();
+
 						mm.color.copy( m.color );
-						mm.combine = THREE.MixOperation;
-						mm.reflectivity = 0.25;
+						mm.envMap = textureCube;
+						mm.metalness = 1;
+						mm.roughtness = 0.1;
 						mm.opacity = m.opacity;
 						mm.transparent = true;
 
 						materials[ i ] = mm;
 
-					} else if ( m.name.indexOf( "Material.001" ) !== -1 ) {
+					} else if ( m.name.indexOf( "Material.001" ) !== - 1 ) {
 
 						var mm = new THREE.MeshPhongMaterial( { map: m.map } );
 
+						mm.specularMap = m.map;
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
-						mm.metal = true;
 
 						materials[ i ] = mm;
 
@@ -264,24 +207,7 @@
 
 			//
 
-			function createScene( geometry, materials, x, y, z, s ) {
-
-				geometry.center();
-
-				hackMaterials( materials );
-
-				var material = new THREE.MeshFaceMaterial( materials );
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set( x, y, z );
-				mesh.scale.set( s, s, s );
-				scene.add( mesh );
-
-			}
-
-			//
-
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
@@ -290,17 +216,6 @@
 
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-				cameraCube.updateProjectionMatrix();
-
-			}
-
-
-			function onDocumentMouseMove(event) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
 
 			}
 
@@ -317,12 +232,6 @@
 
 			function render() {
 
-				controls.update();
-
-				cameraCube.rotation.copy( camera.rotation );
-
-				renderer.clear();
-				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
 			}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>动画系统（[name]）</h1>
+
+		<h2>概述</h2>
+
+		<p class="desc">
+			在three.js动画系统中，您可以为模型的各种属性设置动画：
+			[page:SkinnedMesh]（蒙皮和装配模型）的骨骼，[page:Geometry.morphTargets]（变形目标），
+			不同的材料属性（颜色，不透明度，布尔运算），可见性和变换。动画属性可以淡入、淡出、交叉淡化和扭曲。
+			在相同或不同物体上同时发生的动画的权重和时间比例的变化可以独立地进行。
+			相同或不同物体的动画也可以同步发生。
+			<br /><br />
+			为了在一个同构系统中实现所有这一切，
+			three.js的动画系统<a href="https://github.com/mrdoob/three.js/issues/6881">在2015年彻底改变</a>（注意过时的信息！），
+			它现在有一个与Unity/虚幻4引擎类似的架构。此页面简要阐述了这个系统中的主要组件以及它们如何协同工作。
+		</p>
+
+		<h3>动画片段（Animation Clips）</h3>
+
+		<p class="desc">
+			如果您已成功导入3D动画对象（无论它是否有骨骼或变形目标或两者皆有都不要紧）——
+			例如使用<a href="https://github.com/KhronosGroup/glTF-Blender-Exporter">glTF Blender导出器</a>
+			从Blender导出它并使用[page:GLTFLoader]将其加载到three.js场景中
+			—— 其中一个响应字段应该是一个名为“animations”的数组，
+			其中包含此模型的[page:AnimationClip AnimationClips]（请参阅下面可用的加载器列表）。
+			<br /><br />
+			每个*AnimationClip*通常保存对象某个活动的数据。
+			举个例子，假如mesh是一个角色，可能有一个AnimationClip实现步行循环，
+			第二个AnimationClip实现跳跃，第三个AnimationClip实现闪避等等。
+		</p>
+
+		<h3>关键帧轨道（Keyframe Tracks）</h3>
+
+		<p class="desc">
+			在这样的*AnimationClip*里面，每个动画属性的数据都存储在一个单独的[page:KeyframeTrack]中。
+			假设一个角色对象有[page:Skeleton]（骨架），
+			一个关键帧轨道可以存储下臂骨骼位置随时间变化的数据，
+			另一个轨道追踪同一块骨骼的旋转变化，第三个追踪另外一块骨骼的位置、转角和尺寸，等等。
+			应该很清楚，AnimationClip可以由许多这样的轨道组成。
+			<br /><br />
+			假设模型具有[page:Geometry.morphTargets]（变形目标）——
+			例如一个变形目标显示一个笑脸，另一个显示愤怒的脸 ——
+			每个轨道都持有某个变形目标在AnimationClip运行期间产生的[page:Mesh.morphTargetInfluences]（变形目标影响）如何变化的信息。
+		</p>
+
+		<h3>动画混合器（Animation Mixer）</h3>
+
+		<p class="desc">
+			存储的数据仅构成动画的基础 —— 实际播放由[page:AnimationMixer]控制。
+			你可以想象这不仅仅是动画的播放器，而是作为硬件的模拟，如真正的调音台，可以同时控制和混合若干动画。
+		</p>
+
+		<h3>动画行为（Animation Actions）</h3>
+
+		<p class="desc">
+			*AnimationMixer*本身只有很少的（大体上）属性和方法，
+			因为它可以通过[page:AnimationAction AnimationActions]来控制。
+			通过配置*AnimationAction*，您可以决定何时播放、暂停或停止其中一个混合器中的某个*AnimationClip*，
+			这个*AnimationClip*是否需要重复播放以及重复的频率，
+			是否需要使用淡入淡出或时间缩放，以及一些其他内容（例如交叉渐变和同步）。
+		</p>
+
+		<h3>动画对象组（Animation Object Groups）</h3>
+
+		<p class="desc">
+			如果您希望一组对象接收共享的动画状态，则可以使用[page:AnimationObjectGroup]。
+		</p>
+
+		<h3>支持的格式和加载器（Supported Formats and Loaders）</h3>
+
+		<p class="desc">
+			请注意，并非所有模型格式都包含动画（尤其是OBJ，没有），
+			而且只有某些three.js加载器支持[page:AnimationClip AnimationClip]序列。
+			以下几个<i>确实</i>支持此动画类型：
+		</p>
+
+			<ul>
+				<li>[page:ObjectLoader THREE.ObjectLoader]</li>
+				<li>THREE.BVHLoader</li>
+				<li>THREE.ColladaLoader</li>
+				<li>THREE.FBXLoader</li>
+				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
+				<li>THREE.MMDLoader</li>
+				<li>THREE.SEA3DLoader</li>
+			</ul>
+
+		<p class="desc">
+			请注意，3ds max和Maya当前无法直接导出多个动画（这意味着动画不是在同一时间线上）到一个文件中。
+		</p>
+
+		<h2>范例</h2>
+
+		<code>
+		var mesh;
+
+		// 新建一个AnimationMixer, 并取得AnimationClip实例列表
+		var mixer = new THREE.AnimationMixer( mesh );
+		var clips = mesh.animations;
+
+		// 在每一帧中更新mixer
+		function update () {
+			mixer.update( deltaSeconds );
+		}
+
+		// 播放一个特定的动画
+		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		var action = mixer.clipAction( clip );
+		action.play();
+
+		// 播放所有动画
+		clips.forEach( function ( clip ) {
+			mixer.clipAction( clip ).play();
+		} );
+		</code>
+
+	</body>
+</html>

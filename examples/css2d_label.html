@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>three.js css2d - label</title>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			.label {
+				color: #FFF;
+				font-family: sans-serif;
+				padding: 2px;
+				background: rgba( 0, 0, 0, .6 );
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css2d - label</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
+
+			var camera, scene, renderer, labelRenderer;
+
+			var clock = new THREE.Clock();
+			var textureLoader = new THREE.TextureLoader();
+
+			var earth, moon;
+
+			init();
+			animate();
+
+			function init() {
+
+				var EARTH_RADIUS = 1;
+				var MOON_RADIUS = 0.27;
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 10, 5, 20 );
+
+				scene = new THREE.Scene();
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 0, 1 );
+				scene.add( dirLight );
+
+				var axesHelper = new THREE.AxesHelper( 5 );
+				scene.add( axesHelper );
+
+				//
+
+				var earthGeometry = new THREE.SphereBufferGeometry( EARTH_RADIUS, 16, 16 );
+				var earthMaterial = new THREE.MeshPhongMaterial( {
+					specular: 0x333333,
+					shininess: 5,
+					map: textureLoader.load( 'textures/planets/earth_atmos_2048.jpg' ),
+					specularMap: textureLoader.load( 'textures/planets/earth_specular_2048.jpg' ),
+					normalMap: textureLoader.load( 'textures/planets/earth_normal_2048.jpg' ),
+					normalScale: new THREE.Vector2( 0.85, 0.85 )
+				} );
+				earth = new THREE.Mesh( earthGeometry, earthMaterial );
+				scene.add( earth );
+
+				var moonGeometry = new THREE.SphereBufferGeometry( MOON_RADIUS, 16, 16 );
+				var moonMaterial = new THREE.MeshPhongMaterial( {
+					shininess: 5,
+					map: textureLoader.load( 'textures/planets/moon_1024.jpg' )
+				} );
+				moon = new THREE.Mesh( moonGeometry, moonMaterial );
+				scene.add( moon );
+
+				//
+
+				var earthDiv = document.createElement( 'div' );
+				earthDiv.className = 'label';
+				earthDiv.textContent = 'Earth';
+				earthDiv.style.marginTop = '-1em';
+				var earthLabel = new CSS2DObject( earthDiv );
+				earthLabel.position.set( 0, EARTH_RADIUS, 0 );
+				earth.add( earthLabel );
+
+				var moonDiv = document.createElement( 'div' );
+				moonDiv.className = 'label';
+				moonDiv.textContent = 'Moon';
+				moonDiv.style.marginTop = '-1em';
+				var moonLabel = new CSS2DObject( moonDiv );
+				moonLabel.position.set( 0, MOON_RADIUS, 0 );
+				moon.add( moonLabel );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				labelRenderer = new CSS2DRenderer();
+				labelRenderer.setSize( window.innerWidth, window.innerHeight );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = 0;
+				document.body.appendChild( labelRenderer.domElement );
+
+				var controls = new OrbitControls( camera, labelRenderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var elapsed = clock.getElapsedTime();
+
+				moon.position.set( Math.sin( elapsed ) * 5, 0, Math.cos( elapsed ) * 5 );
+
+				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - percent closer soft-shadows</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #cce0ff;
+				color: #000;
+			}
+			a {
+				color: #08f;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">Percent Closer Soft-Shadows (PCSS) by <a href="http://eduperiment.com">spidersharma03</a></div>
+
+		<script type="x-shader/x-fragment" id="PCSS">
+
+				#define LIGHT_WORLD_SIZE 0.005
+				#define LIGHT_FRUSTUM_WIDTH 3.75
+				#define LIGHT_SIZE_UV (LIGHT_WORLD_SIZE / LIGHT_FRUSTUM_WIDTH)
+				#define NEAR_PLANE 9.5
+
+				#define NUM_SAMPLES 17
+				#define NUM_RINGS 11
+				#define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES
+				#define PCF_NUM_SAMPLES NUM_SAMPLES
+
+				vec2 poissonDisk[NUM_SAMPLES];
+
+				void initPoissonSamples( const in vec2 randomSeed ) {
+					float ANGLE_STEP = PI2 * float( NUM_RINGS ) / float( NUM_SAMPLES );
+					float INV_NUM_SAMPLES = 1.0 / float( NUM_SAMPLES );
+
+					// jsfiddle that shows sample pattern: https://jsfiddle.net/a16ff1p7/
+					float angle = rand( randomSeed ) * PI2;
+					float radius = INV_NUM_SAMPLES;
+					float radiusStep = radius;
+
+					for( int i = 0; i < NUM_SAMPLES; i ++ ) {
+						poissonDisk[i] = vec2( cos( angle ), sin( angle ) ) * pow( radius, 0.75 );
+						radius += radiusStep;
+						angle += ANGLE_STEP;
+					}
+				}
+
+				float penumbraSize( const in float zReceiver, const in float zBlocker ) { // Parallel plane estimation
+					return (zReceiver - zBlocker) / zBlocker;
+				}
+
+				float findBlocker( sampler2D shadowMap, const in vec2 uv, const in float zReceiver ) {
+					// This uses similar triangles to compute what
+					// area of the shadow map we should search
+					float searchRadius = LIGHT_SIZE_UV * ( zReceiver - NEAR_PLANE ) / zReceiver;
+					float blockerDepthSum = 0.0;
+					int numBlockers = 0;
+
+					for( int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES; i++ ) {
+						float shadowMapDepth = unpackRGBAToDepth(texture2D(shadowMap, uv + poissonDisk[i] * searchRadius));
+						if ( shadowMapDepth < zReceiver ) {
+							blockerDepthSum += shadowMapDepth;
+							numBlockers ++;
+						}
+					}
+
+					if( numBlockers == 0 ) return -1.0;
+
+					return blockerDepthSum / float( numBlockers );
+				}
+
+				float PCF_Filter(sampler2D shadowMap, vec2 uv, float zReceiver, float filterRadius ) {
+					float sum = 0.0;
+					for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
+						float depth = unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ) );
+						if( zReceiver <= depth ) sum += 1.0;
+					}
+					for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
+						float depth = unpackRGBAToDepth( texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ) );
+						if( zReceiver <= depth ) sum += 1.0;
+					}
+					return sum / ( 2.0 * float( PCF_NUM_SAMPLES ) );
+				}
+
+				float PCSS ( sampler2D shadowMap, vec4 coords ) {
+					vec2 uv = coords.xy;
+					float zReceiver = coords.z; // Assumed to be eye-space z in this code
+
+					initPoissonSamples( uv );
+					// STEP 1: blocker search
+					float avgBlockerDepth = findBlocker( shadowMap, uv, zReceiver );
+
+					//There are no occluders so early out (this saves filtering)
+					if( avgBlockerDepth == -1.0 ) return 1.0;
+
+					// STEP 2: penumbra size
+					float penumbraRatio = penumbraSize( zReceiver, avgBlockerDepth );
+					float filterRadius = penumbraRatio * LIGHT_SIZE_UV * NEAR_PLANE / zReceiver;
+
+					// STEP 3: filtering
+					//return avgBlockerDepth;
+					return PCF_Filter( shadowMap, uv, zReceiver, filterRadius );
+				}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="PCSSGetShadow">
+
+			return PCSS( shadowMap, shadowCoord );
+
+		</script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			var container, stats;
+			var camera, scene, renderer;
+
+			var group;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xcce0ff, 5, 100 );
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.y = 5;
+				camera.position.z = 15;
+				scene.add( camera );
+
+				// lights
+
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
+
+				var light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+				light.position.set( 2, 8, 4 );
+
+				light.castShadow = true;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+				light.shadow.camera.far = 20;
+
+				scene.add( light );
+
+				// scene.add( new DirectionalLightHelper( light ) );
+				scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+
+				// group
+
+				group = new THREE.Group();
+				scene.add( group );
+
+				var geometry = new THREE.SphereBufferGeometry( 0.3, 20, 20 );
+
+				for ( var i = 0; i < 20; i ++ ) {
+
+					var material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
+
+					var sphere = new THREE.Mesh( geometry, material );
+					sphere.position.x = Math.random() - 0.5;
+					sphere.position.z = Math.random() - 0.5;
+					sphere.position.normalize();
+					sphere.position.multiplyScalar( Math.random() * 2 + 1 );
+					sphere.castShadow = true;
+					sphere.receiveShadow = true;
+					sphere.userData.phase = Math.random() * Math.PI;
+					group.add( sphere );
+
+				}
+
+				// ground
+
+				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
+
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				// column
+
+				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 4, 1 ), groundMaterial );
+				mesh.position.y = 2;
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				// overwrite shadowmap code
+
+				var shader = THREE.ShaderChunk.shadowmap_pars_fragment;
+
+				shader = shader.replace(
+					'#ifdef USE_SHADOWMAP',
+					'#ifdef USE_SHADOWMAP' +
+					document.getElementById( 'PCSS' ).textContent
+				);
+
+				shader = shader.replace(
+					'#if defined( SHADOWMAP_TYPE_PCF )',
+					document.getElementById( 'PCSSGetShadow' ).textContent +
+					'#if defined( SHADOWMAP_TYPE_PCF )'
+				);
+
+				THREE.ShaderChunk.shadowmap_pars_fragment = shader;
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( scene.fog.color );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				renderer.shadowMap.enabled = true;
+
+				// controls
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.5;
+				controls.minDistance = 10;
+				controls.maxDistance = 75;
+				controls.target.set( 0, 2.5, 0 );
+				controls.update();
+
+				// performance monitor
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				var time = performance.now() / 1000;
+
+				group.traverse( function ( child ) {
+
+					if ( 'phase' in child.userData ) {
+
+						child.position.y = Math.abs( Math.sin( time + child.userData.phase ) ) * 4 + 0.3;
+
+					}
+
+				} );
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+				requestAnimationFrame( animate );
+
+			}
+
+		</script>
+	</body>
+</html>

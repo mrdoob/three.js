@@ -1,23 +1,30 @@
+import { Sphere } from '../math/Sphere.js';
+import { Vector3 } from '../math/Vector3.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { FileLoader } from './FileLoader.js';
+import { DefaultLoadingManager } from './LoadingManager.js';
+import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
+import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BufferGeometryLoader = function ( manager ) {
+function BufferGeometryLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-};
+}
 
-THREE.BufferGeometryLoader.prototype = {
-
-	constructor: THREE.BufferGeometryLoader,
+Object.assign( BufferGeometryLoader.prototype, {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
+		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( JSON.parse( text ) ) );
@@ -26,24 +33,56 @@ THREE.BufferGeometryLoader.prototype = {
 
 	},
 
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-
-	},
-
 	parse: function ( json ) {
 
-		var geometry = new THREE.BufferGeometry();
+		var geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
+
+		var index = json.data.index;
+
+		if ( index !== undefined ) {
+
+			var typedArray = new TYPED_ARRAYS[ index.type ]( index.array );
+			geometry.setIndex( new BufferAttribute( typedArray, 1 ) );
+
+		}
 
 		var attributes = json.data.attributes;
 
 		for ( var key in attributes ) {
 
 			var attribute = attributes[ key ];
-			var typedArray = new self[ attribute.type ]( attribute.array );
+			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
+			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+			geometry.addAttribute( key, bufferAttribute );
 
-			geometry.addAttribute( key, new THREE.BufferAttribute( typedArray, attribute.itemSize ) );
+		}
+
+		var morphAttributes = json.data.morphAttributes;
+
+		if ( morphAttributes ) {
+
+			for ( var key in morphAttributes ) {
+
+				var attributeArray = morphAttributes[ key ];
+
+				var array = [];
+
+				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+
+					var attribute = attributeArray[ i ];
+					var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+
+					var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+					array.push( bufferAttribute );
+
+				}
+
+				geometry.morphAttributes[ key ] = array;
+
+			}
 
 		}
 
@@ -55,7 +94,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 				var group = groups[ i ];
 
-				geometry.addGroup( group.start, group.count );
+				geometry.addGroup( group.start, group.count, group.materialIndex );
 
 			}
 
@@ -65,7 +104,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		if ( boundingSphere !== undefined ) {
 
-			var center = new THREE.Vector3();
+			var center = new Vector3();
 
 			if ( boundingSphere.center !== undefined ) {
 
@@ -73,12 +112,37 @@ THREE.BufferGeometryLoader.prototype = {
 
 			}
 
-			geometry.boundingSphere = new THREE.Sphere( center, boundingSphere.radius );
+			geometry.boundingSphere = new Sphere( center, boundingSphere.radius );
 
 		}
 
+		if ( json.name ) geometry.name = json.name;
+		if ( json.userData ) geometry.userData = json.userData;
+
 		return geometry;
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	}
 
+} );
+
+var TYPED_ARRAYS = {
+	Int8Array: Int8Array,
+	Uint8Array: Uint8Array,
+	// Workaround for IE11 pre KB2929437. See #11440
+	Uint8ClampedArray: typeof Uint8ClampedArray !== 'undefined' ? Uint8ClampedArray : Uint8Array,
+	Int16Array: Int16Array,
+	Uint16Array: Uint16Array,
+	Int32Array: Int32Array,
+	Uint32Array: Uint32Array,
+	Float32Array: Float32Array,
+	Float64Array: Float64Array
 };
+
+export { BufferGeometryLoader };

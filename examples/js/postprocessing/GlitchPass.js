@@ -1,19 +1,21 @@
 /**
- 
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.GlitchPass = function ( dt_size ) {
 
+	THREE.Pass.call( this );
+
 	if ( THREE.DigitalGlitch === undefined ) console.error( "THREE.GlitchPass relies on THREE.DigitalGlitch" );
-	
+
 	var shader = THREE.DigitalGlitch;
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	if ( dt_size == undefined ) dt_size = 64;
-	
-	
+
+
 	this.uniforms[ "tDisp" ].value = this.generateHeightmap( dt_size );
-	
+
 
 	this.material = new THREE.ShaderMaterial( {
 		uniforms: this.uniforms,
@@ -21,33 +23,24 @@ THREE.GlitchPass = function ( dt_size ) {
 		fragmentShader: shader.fragmentShader
 	} );
 
-	console.log( this.material );
-	
-	this.enabled = true;
-	this.renderToScreen = false;
-	this.needsSwap = true;
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
-
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
-	
 	this.goWild = false;
 	this.curF = 0;
 	this.generateTrigger();
-	
+
 };
 
-THREE.GlitchPass.prototype = {
+THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.GlitchPass,
 
-		this.uniforms[ "tDiffuse" ].value = readBuffer;
+	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+
+		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ 'seed' ].value = Math.random();//default seeding
 		this.uniforms[ 'byp' ].value = 0;
-		
+
 		if ( this.curF % this.randX == 0 || this.goWild == true ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 30;
@@ -73,31 +66,35 @@ THREE.GlitchPass.prototype = {
 			this.uniforms[ 'byp' ].value = 1;
 
 		}
+
 		this.curF ++;
-		
-		this.quad.material = this.material;
+
 		if ( this.renderToScreen ) {
 
-			renderer.render( this.scene, this.camera );
+			renderer.setRenderTarget( null );
+			this.fsQuad.render( renderer );
 
 		} else {
 
-			renderer.render( this.scene, this.camera, writeBuffer, false );
+			renderer.setRenderTarget( writeBuffer );
+			if ( this.clear ) renderer.clear();
+			this.fsQuad.render( renderer );
 
 		}
 
 	},
-	generateTrigger: function() {
+
+	generateTrigger: function () {
 
 		this.randX = THREE.Math.randInt( 120, 240 );
 
 	},
-	generateHeightmap: function( dt_size ) {
+
+	generateHeightmap: function ( dt_size ) {
 
 		var data_arr = new Float32Array( dt_size * dt_size * 3 );
-		console.log( dt_size );
 		var length = dt_size * dt_size;
-		
+
 		for ( var i = 0; i < length; i ++ ) {
 
 			var val = THREE.Math.randFloat( 0, 1 );
@@ -106,15 +103,11 @@ THREE.GlitchPass.prototype = {
 			data_arr[ i * 3 + 2 ] = val;
 
 		}
-		
+
 		var texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RGBFormat, THREE.FloatType );
-		console.log( texture );
-		console.log( dt_size );
-		texture.minFilter = THREE.NearestFilter;
-		texture.magFilter = THREE.NearestFilter;
 		texture.needsUpdate = true;
-		texture.flipY = false;
 		return texture;
 
 	}
-};
+
+} );

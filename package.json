@@ -1,19 +1,58 @@
 {
-  "name": "three.js",
-  "version": "0.71.0",
+  "name": "three",
+  "version": "0.106.2",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
+  "repository": "mrdoob/three.js",
+  "jsnext:main": "build/three.module.js",
+  "module": "build/three.module.js",
+  "types": "src/Three.d.ts",
+  "files": [
+    "build/three.js",
+    "build/three.min.js",
+    "build/three.module.js",
+    "examples/js",
+    "examples/jsm",
+    "examples/fonts",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "src"
+  ],
   "directories": {
     "doc": "docs",
     "example": "examples",
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": "mdcs",
+    "plugins": [
+      "html",
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/indent": [
+        "error",
+        "tab",
+        {
+          "SwitchCase": 1
+        }
+      ]
+    }
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mrdoob/three.js"
+  "scripts": {
+    "build": "rollup -c",
+    "build-test": "rollup -c test/rollup.unit.config.js",
+    "build-closure": "rollup -c && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-examples": "rollup -c rollup-examples.config.js",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
+    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
+    "start": "npm run dev",
+    "lint": "eslint src --ext js --ext ts",
+    "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
+    "travis": "npm run lint && npm test"
   },
   "keywords": [
     "three",
@@ -26,9 +65,30 @@
   "bugs": {
     "url": "https://github.com/mrdoob/three.js/issues"
   },
-  "homepage": "http://threejs.org/",
+  "homepage": "https://threejs.org/",
   "devDependencies": {
-    "jscs": "^1.13.1",
-    "lodash": "^3.10.0"
+    "@typescript-eslint/eslint-plugin": "^1.11.0",
+    "@typescript-eslint/parser": "^1.11.0",
+    "concurrently": "^4.1.1",
+    "eslint": "^6.0.1",
+    "eslint-config-mdcs": "^4.2.3",
+    "eslint-plugin-html": "^6.0.0",
+    "failonlyreporter": "^1.0.0",
+    "google-closure-compiler": "20190618.0.0",
+    "http-server": "^0.11.1",
+    "qunit": "^2.9.2",
+    "rollup": "^1.16.2",
+    "typescript": "^3.5.2"
+  },
+  "jspm": {
+    "files": [
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "build/three.js",
+      "build/three.min.js",
+      "build/three.module.js"
+    ],
+    "directories": {}
   }
 }

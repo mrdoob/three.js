@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<title>three.js webgl - Assimp</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<a href="https://github.com/Virtulous" target="_blank" rel="noopener">Assimp File format</a>
+			<div>Assimp loader by <a href="https://virtulo.us" target="_blank" rel="noopener">Virtulous</a></div>
+			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank" rel="noopener">Teh_Bucket and raymoohawk</a></div>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { AssimpLoader } from './jsm/loaders/AssimpLoader.js';
+
+			var container, stats;
+			var camera, scene, renderer;
+			var animation;
+
+			init();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 600, 1150, 5 );
+				camera.up.set( 0, 0, 1 );
+				camera.lookAt( - 100, 0, 0 );
+
+				scene = new THREE.Scene();
+
+				var ambient = new THREE.HemisphereLight( 0x8888fff, 0xff8888, 0.5 );
+				ambient.position.set( 0, 1, 0 );
+				scene.add( ambient );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 0, 4, 4 ).normalize();
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				var loader = new AssimpLoader();
+				loader.load( './models/assimp/octaminator/Octaminator.assimp', function ( result ) {
+
+					var object = result.object;
+
+					object.position.y = - 100;
+					object.rotation.x = Math.PI / 2;
+					scene.add( object );
+
+					animation = result.animation;
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				animate();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate, renderer.domElement );
+				renderer.render( scene, camera );
+
+				if ( animation ) animation.setTime( performance.now() / 1000 );
+
+				stats.update();
+
+			}
+		</script>
+</body>
+
+</html>

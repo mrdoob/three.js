@@ -3,19 +3,40 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Fog = function ( color, near, far ) {
+import { Color } from '../math/Color.js';
+
+function Fog( color, near, far ) {
 
 	this.name = '';
 
-	this.color = new THREE.Color( color );
+	this.color = new Color( color );
 
 	this.near = ( near !== undefined ) ? near : 1;
 	this.far = ( far !== undefined ) ? far : 1000;
 
-};
+}
 
-THREE.Fog.prototype.clone = function () {
+Object.assign( Fog.prototype, {
 
-	return new THREE.Fog( this.color.getHex(), this.near, this.far );
+	isFog: true,
 
-};
+	clone: function () {
+
+		return new Fog( this.color, this.near, this.far );
+
+	},
+
+	toJSON: function ( /* meta */ ) {
+
+		return {
+			type: 'Fog',
+			color: this.color.getHex(),
+			near: this.near,
+			far: this.far
+		};
+
+	}
+
+} );
+
+export { Fog };

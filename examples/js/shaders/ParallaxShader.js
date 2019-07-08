@@ -10,15 +10,15 @@ THREE.ParallaxShader = {
 		basic: 'USE_BASIC_PARALLAX',
 		steep: 'USE_STEEP_PARALLAX',
 		occlusion: 'USE_OCLUSION_PARALLAX', // a.k.a. POM
-		relief: 'USE_RELIEF_PARALLAX',
+		relief: 'USE_RELIEF_PARALLAX'
 	},
 
 	uniforms: {
-		"bumpMap": { type: "t", value: null },
-		"map": { type: "t", value: null },
-		"parallaxScale": { type: "f", value: null },
-		"parallaxMinLayers": { type: "f", value: null },
-		"parallaxMaxLayers": { type: "f", value: null }
+		"bumpMap": { value: null },
+		"map": { value: null },
+		"parallaxScale": { value: null },
+		"parallaxMinLayers": { value: null },
+		"parallaxMaxLayers": { value: null }
 	},
 
 	vertexShader: [
@@ -177,7 +177,7 @@ THREE.ParallaxShader = {
 			"vec2 mapUv = perturbUv( -vViewPosition, normalize( vNormal ), normalize( vViewPosition ) );",
 			"gl_FragColor = texture2D( map, mapUv );",
 
-		"}",
+		"}"
 
   ].join( "\n" )
 

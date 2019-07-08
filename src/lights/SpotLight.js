@@ -1,90 +1,72 @@
+import { Light } from './Light.js';
+import { SpotLightShadow } from './SpotLightShadow.js';
+import { Object3D } from '../core/Object3D.js';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( color, intensity, distance, angle, exponent, decay ) {
+function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 
-	THREE.Light.call( this, color );
+	Light.call( this, color, intensity );
 
 	this.type = 'SpotLight';
 
-	this.position.set( 0, 1, 0 );
+	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
 
-	this.target = new THREE.Object3D();
+	this.target = new Object3D();
 
-	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+	Object.defineProperty( this, 'power', {
+		get: function () {
+
+			// intensity = power per solid angle.
+			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+			return this.intensity * Math.PI;
+
+		},
+		set: function ( power ) {
+
+			// intensity = power per solid angle.
+			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+			this.intensity = power / Math.PI;
+
+		}
+	} );
+
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
-	this.exponent = ( exponent !== undefined ) ? exponent : 10;
+	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-	this.castShadow = false;
-	this.onlyShadow = false;
+	this.shadow = new SpotLightShadow();
 
-	this.shadowCameraNear = 50;
-	this.shadowCameraFar = 5000;
-	this.shadowCameraFov = 50;
-
-	this.shadowCameraVisible = false;
-
-	this.shadowBias = 0;
-	this.shadowDarkness = 0.5;
-
-	this.shadowMapWidth = 512;
-	this.shadowMapHeight = 512;
-
-	this.shadowMap = null;
-	this.shadowMapSize = null;
-	this.shadowCamera = null;
-	this.shadowMatrix = null;
-
-};
-
-THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );
-THREE.SpotLight.prototype.constructor = THREE.SpotLight;
-
-THREE.SpotLight.prototype.copy = function ( source ) {
-
-	THREE.Light.prototype.copy.call( this, source );
-
-	this.intensity = source.intensity;
-	this.distance = source.distance;
-	this.angle = source.angle;
-	this.exponent = source.exponent;
-	this.decay = source.decay;
-
-	this.target = source.target.clone();
-
-	this.castShadow = source.castShadow;
-	this.onlyShadow = source.onlyShadow;
-
-	this.shadowCameraNear = source.shadowCameraNear;
-	this.shadowCameraFar = source.shadowCameraFar;
-	this.shadowCameraFov = source.shadowCameraFov;
-
-	this.shadowCameraVisible = source.shadowCameraVisible;
-
-	this.shadowBias = source.shadowBias;
-	this.shadowDarkness = source.shadowDarkness;
-
-	this.shadowMapWidth = source.shadowMapWidth;
-	this.shadowMapHeight = source.shadowMapHeight;
-
-	return this;
 }
 
-THREE.SpotLight.prototype.toJSON = function ( meta ) {
+SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
-	var data = THREE.Object3D.prototype.toJSON.call( this, meta );
+	constructor: SpotLight,
 
-	data.object.color = this.color.getHex();
-	data.object.intensity = this.intensity;
-	data.object.distance = this.distance;
-	data.object.angle = this.angle;
-	data.object.exponent = this.exponent;
-	data.object.decay = this.decay;
+	isSpotLight: true,
 
-	return data;
+	copy: function ( source ) {
 
-};
+		Light.prototype.copy.call( this, source );
+
+		this.distance = source.distance;
+		this.angle = source.angle;
+		this.penumbra = source.penumbra;
+		this.decay = source.decay;
+
+		this.target = source.target.clone();
+
+		this.shadow = source.shadow.clone();
+
+		return this;
+
+	}
+
+} );
+
+
+export { SpotLight };

@@ -1,0 +1,276 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "max": [
+        0.009999998,
+        0.009999991,
+        0.01
+      ],
+      "min": [
+        -0.0100000026,
+        -0.0100000035,
+        -0.01
+      ]
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "name": "Ship"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "max": [
+        0.0313265175,
+        0.0226246975,
+        0.008465132
+      ],
+      "min": [
+        -0.0313265137,
+        -0.022857653,
+        0.0
+      ],
+      "name": "Ship"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "name": "Ship"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "name": "Blob"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "max": [
+        0.008781092,
+        0.0,
+        0.0
+      ],
+      "min": [
+        -0.008781091,
+        -0.0007655843,
+        0.0
+      ],
+      "name": "Blob"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 1876,
+      "type": "VEC3",
+      "name": "Blob"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5123,
+      "count": 2880,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 217,
+      "type": "SCALAR",
+      "max": [
+        7.19999456
+      ],
+      "min": [
+        0.0
+      ]
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5126,
+      "count": 434,
+      "type": "SCALAR"
+    }
+  ],
+  "animations": [
+    {
+      "channels": [
+        {
+          "sampler": 0,
+          "target": {
+            "node": 0,
+            "path": "weights"
+          }
+        }
+      ],
+      "samplers": [
+        {
+          "input": 10,
+          "interpolation": "LINEAR",
+          "output": 11
+        }
+      ],
+      "name": "Globe"
+    }
+  ],
+  "asset": {
+    "generator": "glTF Tools for Unity",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 22512,
+      "byteLength": 30016
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 52528,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 75040,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 97552,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 120064,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 142576,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 165088,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 187600,
+      "byteLength": 22512
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 210112,
+      "byteLength": 5760
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 215872,
+      "byteLength": 868
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 216740,
+      "byteLength": 1736
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "AnimatedMorphSphere.bin",
+      "byteLength": 218476
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 0,
+            "TANGENT": 1,
+            "POSITION": 2
+          },
+          "indices": 9,
+          "material": 0,
+          "targets": [
+            {
+              "NORMAL": 3,
+              "POSITION": 4,
+              "TANGENT": 5
+            },
+            {
+              "NORMAL": 6,
+              "POSITION": 7,
+              "TANGENT": 8
+            }
+          ]
+        }
+      ],
+      "weights": [
+        0.0,
+        0.0
+      ],
+      "name": "Sphere"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.5
+      },
+      "name": "No Name"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "rotation": [
+        0.0,
+        0.7071067,
+        -0.7071068,
+        0.0
+      ],
+      "scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "name": "AnimatedMorphSphere"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}

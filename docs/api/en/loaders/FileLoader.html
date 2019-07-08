@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.
+			It can also be used directly to load any file type that does not have a loader.
+		</p>
+
+		<h2>Example</h2>
+		<code>
+		var loader = new THREE.FileLoader();
+
+		//load a text file and output the result to the console
+		loader.load(
+			// resource URL
+			'example.txt',
+
+			// onLoad callback
+			function ( data ) {
+				// output the text to the console
+				console.log( data )
+			},
+
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
+		</code>
+
+		<p>
+			<em>Note:</em> The cache must be enabled using
+			<code>THREE.Cache.enabled = true;</code>
+			This is a global property and only needs to be set once to be used by all loaders that use FileLoader internally.
+			[page:Cache Cache] is a cache module that holds the response from each request made through this loader, so each file is requested once.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name] ( [param:LoadingManager manager] )</h3>
+		<p>
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use.
+			Default is [page:DefaultLoadingManager].
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<p>
+			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+		</p>
+
+		<h3>[property:String mimeType]</h3>
+		<p>
+			The expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
+			See [page:.setMimeType]. Default is *undefined*.
+		</p>
+
+		<h3>[property:String path]</h3>
+		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
+
+		<h3>[property:Object requestHeader]</h3>
+		<p>The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is *undefined*.</p>
+
+		<h3>[property:String responseType]</h3>
+		<p>The expected response type. See [page:.setResponseType]. Default is *undefined*.</p>
+
+		<h3>[property:String withCredentials]</h3>
+		<p>
+			Whether the XMLHttpRequest uses credentials. See [page:.setWithCredentials].
+			Default is *undefined*.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:XMLHttpRequest load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+			[page:String url] — the path or URL to the file. This can also be a
+				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+			[page:Function onLoad] (optional) — Will be called when loading completes. The argument will be the loaded response.<br />
+			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the XMLHttpRequest instance,
+				which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+			[page:Function onError] (optional) — Will be called if an error occurs.<br /><br />
+
+			Load the URL and pass the response to the onLoad function.
+		</p>
+
+		<h3>[method:FileLoader setMimeType]( [param:String mimeType] )</h3>
+		<p>
+			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
+			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
+		</p>
+
+		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
+		<p>
+			Set the base path or URL from which to load files. This can be useful if
+			you are loading many models from the same directory.
+		</p>
+
+		<h3>[method:FileLoader setRequestHeader]( [param:Object requestHeader] )</h3>
+		<p>
+			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
+
+			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
+		</p>
+
+		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
+		<p>
+			Change the response type. Valid values are:<br />
+			[page:String text] or empty string (default) - returns the data as [page:String String].<br />
+			[page:String arraybuffer] - loads the data into a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer] and returns that.<br />
+			[page:String blob] - returns the data as a [link:https://developer.mozilla.org/en/docs/Web/API/Blob Blob].<br />
+			[page:String document] - parses the file using the [link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser].<br />
+			[page:String json] - parses the file using [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse JSON.parse].<br />
+		</p>
+
+		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
+		<p>
+			Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
+			TLS client certificates. See [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+			Note that this has no effect if you are loading files locally or from the same domain.
+		</p>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

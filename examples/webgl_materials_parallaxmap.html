@@ -4,38 +4,8 @@
 		<title>three.js webgl - parallax mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #ffffff;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:10px;
-				text-align:center;
-			}
-
-			#oldie {
-				background:rgb(200,100,0) !important;
-				color:#fff;
-			}
-
-			#vt { display:none }
-			#vt, #vt a { color:orange; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="info">
@@ -46,26 +16,23 @@
 			Texture by <a href="http://agf81.deviantart.com/">AGF81</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/shaders/ParallaxShader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ParallaxShader } from './jsm/shaders/ParallaxShader.js';
 
-			var stats;
-			var camera, scene, material, renderer;
+			var camera, scene, material, renderer, stats;
 
 			var effectController = {
 				'mode': 'relief',
 				'scale': 0.005,
 				'minLayers': 20,
-				'maxLayers': 25,
+				'maxLayers': 25
 			};
 
 			init();
@@ -81,7 +48,35 @@
 				camera.position.z = 2;
 				scene = new THREE.Scene();
 
-				initScene();
+				//
+
+				var shader = ParallaxShader;
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				var parameters = {
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: uniforms
+				};
+
+				//
+
+				var textureLoader = new THREE.TextureLoader();
+
+				material = new THREE.ShaderMaterial( parameters );
+				material.map = textureLoader.load( 'textures/brick_diffuse.jpg' );
+				material.bumpMap = textureLoader.load( 'textures/brick_bump.jpg' );
+				material.map.anisotropy = 4;
+				material.bumpMap.anisotropy = 4;
+				uniforms[ 'map' ].value = material.map;
+				uniforms[ 'bumpMap' ].value = material.bumpMap;
+
+				//
+
+				var geometry = new THREE.BoxBufferGeometry( 1.0, 1.0, 1.0 );
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -91,13 +86,16 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				//
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+
+				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -107,26 +105,27 @@
 
 				var uniforms = material.uniforms;
 
-				uniforms[ 'parallaxScale' ].value = -1.0 * effectController.scale;
+				uniforms[ 'parallaxScale' ].value = - 1.0 * effectController.scale;
 				uniforms[ 'parallaxMinLayers' ].value = effectController.minLayers;
 				uniforms[ 'parallaxMaxLayers' ].value = effectController.maxLayers;
 
 				material.defines = {};
-				material.defines[THREE.ParallaxShader.modes[effectController.mode]] = '';
+				material.defines[ ParallaxShader.modes[ effectController.mode ] ] = '';
 				material.needsUpdate = true;
 
 			}
 
 			function initGUI() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
-				gui.add( effectController, 'mode', Object.keys( THREE.ParallaxShader.modes ) ).onChange( guiChanged );
+				gui.add( effectController, 'mode', Object.keys( ParallaxShader.modes ) ).onChange( guiChanged );
 				gui.add( effectController, 'scale', 0.0, 0.01, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, 'minLayers', 1.0, 30, 1 ).onChange( guiChanged );
 				gui.add( effectController, 'maxLayers', 1.0, 30, 1 ).onChange( guiChanged );
 
 				guiChanged();
+
 			}
 
 			function onWindowResize() {
@@ -135,29 +134,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function initScene() {
-
-				var shader = THREE.ParallaxShader;
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-				var parameters = {
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: uniforms
-				};
-				material = new THREE.ShaderMaterial( parameters );
-				material.map = THREE.ImageUtils.loadTexture( 'textures/brick_diffuse.jpg' );
-				material.bumpMap = THREE.ImageUtils.loadTexture( 'textures/brick_bump.jpg' );
-				material.map.anisotropy = 4;
-				material.bumpMap.anisotropy = 4;
-				uniforms[ 'map' ].value = material.map;
-				uniforms[ 'bumpMap' ].value = material.bumpMap;
-
-				var geometry = new THREE.BoxGeometry( 1.0, 1.0, 1.0 );
-				var mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
 
 			}
 
@@ -175,6 +151,7 @@
 				renderer.render( scene, camera );
 
 			}
+
 		</script>
 
 	</body>

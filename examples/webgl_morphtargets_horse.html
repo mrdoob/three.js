@@ -4,26 +4,35 @@
 		<title>three.js webgl - morph targets - horse</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
+			}
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
+			model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>
+		</div>
 
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var container, stats;
-			var camera, scene, projector, renderer;
-			var mesh, animation;
+			var camera, scene, renderer;
+			var mesh, mixer;
 
 			init();
 			animate();
@@ -33,14 +42,6 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - morph targets - horse. model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>';
-				container.appendChild( info );
-
 				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -48,43 +49,46 @@
 				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				//
 
-				var light = new THREE.DirectionalLight( 0xefefff, 2 );
+				var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var light = new THREE.DirectionalLight( 0xffefef, 2 );
-				light.position.set( -1, -1, -1 ).normalize();
+				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
+				light.position.set( - 1, - 1, - 1 ).normalize();
 				scene.add( light );
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/animated/horse.js", function( geometry ) {
+				var loader = new GLTFLoader();
+				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x606060, morphTargets: true } ) );
+					mesh = gltf.scene.children[ 0 ];
 					mesh.scale.set( 1.5, 1.5, 1.5 );
 					scene.add( mesh );
 
-					animation = new THREE.MorphAnimation( mesh );
-					animation.play();
+					mixer = new THREE.AnimationMixer( mesh );
+
+					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 
 				} );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
+
+				container.appendChild( renderer.domElement );
 
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				container.appendChild( stats.dom );
 
 				//
 
@@ -126,11 +130,11 @@
 
 				camera.lookAt( camera.target );
 
-				if ( animation ) {
+				if ( mixer ) {
 
 					var time = Date.now();
 
-					animation.update( time - prevTime );
+					mixer.update( ( time - prevTime ) * 0.001 );
 
 					prevTime = time;
 

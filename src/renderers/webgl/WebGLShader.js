@@ -1,43 +1,16 @@
-THREE.WebGLShader = ( function () {
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-	var addLineNumbers = function ( string ) {
+function WebGLShader( gl, type, string ) {
 
-		var lines = string.split( '\n' );
+	var shader = gl.createShader( type );
 
-		for ( var i = 0; i < lines.length; i ++ ) {
+	gl.shaderSource( shader, string );
+	gl.compileShader( shader );
 
-			lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
+	return shader;
 
-		}
+}
 
-		return lines.join( '\n' );
-
-	};
-
-	return function WebGLShader( gl, type, string ) {
-
-		var shader = gl.createShader( type );
-
-		gl.shaderSource( shader, string );
-		gl.compileShader( shader );
-
-		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
-
-			console.error( 'THREE.WebGLShader: Shader couldn\'t compile.' );
-
-		}
-
-		if ( gl.getShaderInfoLog( shader ) !== '' ) {
-
-			console.warn( 'THREE.WebGLShader: gl.getShaderInfoLog()', type === gl.VERTEX_SHADER ? 'vertex' : 'fragment', gl.getShaderInfoLog( shader ), addLineNumbers( string ) );
-
-		}
-
-		// --enable-privileged-webgl-extension
-		// console.log( type, gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
-
-		return shader;
-
-	};
-
-} )();
+export { WebGLShader };

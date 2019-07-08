@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - MMD loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #fff;
+				color: #444;
+			}
+			a {
+				color: #08f;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
+		Copyright
+		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
+		</div>
+
+		<script src="js/libs/ammo.js"></script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+
+			var container;
+
+			var camera, scene, renderer, effect;
+			var mesh, helper;
+
+			var vpds = [];
+
+			Ammo().then( function ( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 25;
+
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				var ambient = new THREE.AmbientLight( 0x666666 );
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				directionalLight.position.set( - 1, 1, 1 ).normalize();
+				scene.add( directionalLight );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				effect = new OutlineEffect( renderer );
+
+				// model
+
+				function onProgress( xhr ) {
+
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
+				}
+
+				var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				var vpdFiles = [
+					'models/mmd/vpds/01.vpd',
+					'models/mmd/vpds/02.vpd',
+					'models/mmd/vpds/03.vpd',
+					'models/mmd/vpds/04.vpd',
+					'models/mmd/vpds/05.vpd',
+					'models/mmd/vpds/06.vpd',
+					'models/mmd/vpds/07.vpd',
+					'models/mmd/vpds/08.vpd',
+					//'models/mmd/vpds/09.vpd',
+					//'models/mmd/vpds/10.vpd',
+					'models/mmd/vpds/11.vpd'
+				];
+
+				helper = new MMDAnimationHelper();
+
+				var loader = new MMDLoader();
+
+				loader.load( modelFile, function ( object ) {
+
+					mesh = object;
+					mesh.position.y = - 10;
+
+					scene.add( mesh );
+
+					var vpdIndex = 0;
+
+					function loadVpd() {
+
+						var vpdFile = vpdFiles[ vpdIndex ];
+
+						loader.loadVPD( vpdFile, false, function ( vpd ) {
+
+							vpds.push( vpd );
+
+							vpdIndex ++;
+
+							if ( vpdIndex < vpdFiles.length ) {
+
+								loadVpd();
+
+							} else {
+
+								initGui();
+
+							}
+
+						}, onProgress, null );
+
+					}
+
+					loadVpd();
+
+				}, onProgress, null );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				function initGui() {
+
+					var gui = new GUI();
+
+					var dictionary = mesh.morphTargetDictionary;
+
+					var controls = {};
+					var keys = [];
+
+					var poses = gui.addFolder( 'Poses' );
+					var morphs = gui.addFolder( 'Morphs' );
+
+					function getBaseName( s ) {
+
+						return s.slice( s.lastIndexOf( '/' ) + 1 );
+
+					}
+
+					function initControls() {
+
+						for ( var key in dictionary ) {
+
+							controls[ key ] = 0.0;
+
+						}
+
+						controls.pose = - 1;
+
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
+
+							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
+
+						}
+
+					}
+
+					function initKeys() {
+
+						for ( var key in dictionary ) {
+
+							keys.push( key );
+
+						}
+
+					}
+
+					function initPoses() {
+
+						var files = { default: - 1 };
+
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
+
+							files[ getBaseName( vpdFiles[ i ] ) ] = i;
+
+						}
+
+						poses.add( controls, 'pose', files ).onChange( onChangePose );
+
+					}
+
+					function initMorphs() {
+
+						for ( var key in dictionary ) {
+
+							morphs.add( controls, key, 0.0, 1.0, 0.01 ).onChange( onChangeMorph );
+
+						}
+
+					}
+
+					function onChangeMorph() {
+
+						for ( var i = 0; i < keys.length; i ++ ) {
+
+							var key = keys[ i ];
+							var value = controls[ key ];
+							mesh.morphTargetInfluences[ i ] = value;
+
+						}
+
+					}
+
+					function onChangePose() {
+
+						var index = parseInt( controls.pose );
+
+						if ( index === - 1 ) {
+
+							mesh.pose();
+
+						} else {
+
+							helper.pose( mesh, vpds[ index ] );
+
+						}
+
+					}
+
+					initControls();
+					initKeys();
+					initPoses();
+					initMorphs();
+
+					onChangeMorph();
+					onChangePose();
+
+					poses.open();
+					morphs.open();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				effect.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -4,27 +4,14 @@
 		<title>three.js webgl - materials - grass</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#030;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<script src="../build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script type="module">
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 
@@ -37,6 +24,7 @@
 				camera.position.set( 0, 75, 100 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x003300 );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
@@ -64,7 +52,6 @@
 				scene.children.reverse();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0x003300 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

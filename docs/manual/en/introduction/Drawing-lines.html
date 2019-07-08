@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+		<div>
+			<p>
+				Let's say you want to draw a line or a circle, not a wireframe [page:Mesh].
+				First we need to set up the [page:WebGLRenderer renderer], [page:Scene scene] and camera (see the Creating a scene page).
+			</p>
+
+			<p>Here is the code that we will use:</p>
+			<code>
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+camera.position.set( 0, 0, 100 );
+camera.lookAt( 0, 0, 0 );
+
+var scene = new THREE.Scene();
+			</code>
+			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] or [page:LineDashedMaterial].</p>
+			<code>
+//create a blue LineBasicMaterial
+var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+			</code>
+
+			<p>
+				After material we will need a [page:Geometry] or [page:BufferGeometry] with some vertices
+				(it's recommended to use a BufferGeometry as it's more performant, however for simplicity we'll use a Geometry here):
+			</p>
+
+			<code>
+var geometry = new THREE.Geometry();
+geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
+geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
+geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
+			</code>
+
+			<p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
+
+			<p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
+			<code>
+var line = new THREE.Line( geometry, material );
+			</code>
+			<p>All that's left is to add it to the scene and call [page:WebGLRenderer.render render].</p>
+
+			<code>
+scene.add( line );
+renderer.render( scene, camera );
+			</code>
+
+			<p>You should now be seeing an arrow pointing upwards, made from two blue lines.</p>
+		</div>
+	</body>
+</html>

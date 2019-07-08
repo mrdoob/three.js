@@ -20,6 +20,7 @@ var Script = function ( editor ) {
 	header.add( title );
 
 	var buttonSVG = ( function () {
+
 		var svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 		svg.setAttribute( 'width', 32 );
 		svg.setAttribute( 'height', 32 );
@@ -28,6 +29,7 @@ var Script = function ( editor ) {
 		path.setAttribute( 'stroke', '#fff' );
 		svg.appendChild( path );
 		return svg;
+
 	} )();
 
 	var close = new UI.Element( buttonSVG );
@@ -71,6 +73,8 @@ var Script = function ( editor ) {
 	codemirror.setOption( 'theme', 'monokai' );
 	codemirror.on( 'change', function () {
 
+		if ( codemirror.state.focused === false ) return;
+
 		clearTimeout( delay );
 		delay = setTimeout( function () {
 
@@ -78,26 +82,46 @@ var Script = function ( editor ) {
 
 			if ( ! validate( value ) ) return;
 
-			if ( typeof( currentScript ) === 'object' ) {
+			if ( typeof ( currentScript ) === 'object' ) {
 
-				currentScript.source = value;
-				signals.scriptChanged.dispatch( currentScript );
+				if ( value !== currentScript.source ) {
+
+					editor.execute( new SetScriptValueCommand( editor, currentObject, currentScript, 'source', value ) );
+
+				}
 				return;
+
 			}
 
 			if ( currentScript !== 'programInfo' ) return;
 
 			var json = JSON.parse( value );
-			currentObject.defines = json.defines;
-			currentObject.uniforms = json.uniforms;
-			currentObject.attributes = json.attributes;
 
-			currentObject.needsUpdate = true;
-			signals.materialChanged.dispatch( currentObject );
+			if ( JSON.stringify( currentObject.material.defines ) !== JSON.stringify( json.defines ) ) {
+
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'defines', json.defines );
+				cmd.updatable = false;
+				editor.execute( cmd );
+
+			}
+			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
+
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
+				cmd.updatable = false;
+				editor.execute( cmd );
+
+			}
+			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
+
+				var cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
+				cmd.updatable = false;
+				editor.execute( cmd );
+
+			}
 
 		}, 300 );
 
-	});
+	} );
 
 	// prevent backspace from deleting objects
 	var wrapper = codemirror.getWrapperElement();
@@ -156,7 +180,7 @@ var Script = function ( editor ) {
 					for ( var i = 0; i < errors.length; i ++ ) {
 
 						var error = errors[ i ];
-						error.message = error.message.replace(/Line [0-9]+: /, '');
+						error.message = error.message.replace( /Line [0-9]+: /, '' );
 
 					}
 
@@ -168,7 +192,7 @@ var Script = function ( editor ) {
 
 					jsonlint.parseError = function ( message, info ) {
 
-						message = message.split('\n')[3];
+						message = message.split( '\n' )[ 3 ];
 
 						errors.push( {
 
@@ -196,11 +220,11 @@ var Script = function ( editor ) {
 					try {
 
 						var shaderType = currentScript === 'vertexShader' ?
-								glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
+							glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
 
 						glslprep.parseGlsl( string, shaderType );
 
-					} catch( error ) {
+					} catch ( error ) {
 
 						if ( error instanceof glslprep.SyntaxError ) {
 
@@ -222,9 +246,9 @@ var Script = function ( editor ) {
 					if ( errors.length !== 0 ) break;
 					if ( renderer instanceof THREE.WebGLRenderer === false ) break;
 
-					currentObject[ currentScript ] = string;
-					currentObject.needsUpdate = true;
-					signals.materialChanged.dispatch( currentObject );
+					currentObject.material[ currentScript ] = string;
+					currentObject.material.needsUpdate = true;
+					signals.materialChanged.dispatch( currentObject.material );
 
 					var programs = renderer.info.programs;
 
@@ -233,15 +257,15 @@ var Script = function ( editor ) {
 
 					for ( var i = 0, n = programs.length; i !== n; ++ i ) {
 
-						var diagnostics = programs[i].diagnostics;
+						var diagnostics = programs[ i ].diagnostics;
 
 						if ( diagnostics === undefined ||
-								diagnostics.material !== currentObject ) continue;
+								diagnostics.material !== currentObject.material ) continue;
 
 						if ( ! diagnostics.runnable ) valid = false;
 
 						var shaderInfo = diagnostics[ currentScript ];
-						var lineOffset = shaderInfo.prefix.split(/\r\n|\r|\n/).length;
+						var lineOffset = shaderInfo.prefix.split( /\r\n|\r|\n/ ).length;
 
 						while ( true ) {
 
@@ -284,7 +308,7 @@ var Script = function ( editor ) {
 
 			return valid !== undefined ? valid : errors.length === 0;
 
-		});
+		} );
 
 	};
 
@@ -296,23 +320,23 @@ var Script = function ( editor ) {
 	} );
 
 	codemirror.setOption( 'extraKeys', {
-		'Ctrl-Space': function(cm) { server.complete(cm); },
-		'Ctrl-I': function(cm) { server.showType(cm); },
-		'Ctrl-O': function(cm) { server.showDocs(cm); },
-		'Alt-.': function(cm) { server.jumpToDef(cm); },
-		'Alt-,': function(cm) { server.jumpBack(cm); },
-		'Ctrl-Q': function(cm) { server.rename(cm); },
-		'Ctrl-.': function(cm) { server.selectName(cm); }
+		'Ctrl-Space': function ( cm ) { server.complete( cm ); },
+		'Ctrl-I': function ( cm ) { server.showType( cm ); },
+		'Ctrl-O': function ( cm ) { server.showDocs( cm ); },
+		'Alt-.': function ( cm ) { server.jumpToDef( cm ); },
+		'Alt-,': function ( cm ) { server.jumpBack( cm ); },
+		'Ctrl-Q': function ( cm ) { server.rename( cm ); },
+		'Ctrl-.': function ( cm ) { server.selectName( cm ); }
 	} );
 
-	codemirror.on( 'cursorActivity', function( cm ) {
+	codemirror.on( 'cursorActivity', function ( cm ) {
 
 		if ( currentMode !== 'javascript' ) return;
 		server.updateArgHints( cm );
 
 	} );
 
-	codemirror.on( 'keypress', function( cm, kb ) {
+	codemirror.on( 'keypress', function ( cm, kb ) {
 
 		if ( currentMode !== 'javascript' ) return;
 		var typed = String.fromCharCode( kb.which || kb.keyCode );
@@ -337,11 +361,12 @@ var Script = function ( editor ) {
 
 		var mode, name, source;
 
-		if ( typeof( script ) === 'object' ) {
+		if ( typeof ( script ) === 'object' ) {
 
 			mode = 'javascript';
 			name = script.name;
 			source = script.source;
+			title.setValue( object.name + ' / ' + name );
 
 		} else {
 
@@ -351,7 +376,7 @@ var Script = function ( editor ) {
 
 					mode = 'glsl';
 					name = 'Vertex Shader';
-					source = object.vertexShader || "";
+					source = object.material.vertexShader || "";
 
 					break;
 
@@ -359,7 +384,7 @@ var Script = function ( editor ) {
 
 					mode = 'glsl';
 					name = 'Fragment Shader';
-					source = object.fragmentShader || "";
+					source = object.material.fragmentShader || "";
 
 					break;
 
@@ -368,13 +393,14 @@ var Script = function ( editor ) {
 					mode = 'json';
 					name = 'Program Properties';
 					var json = {
-						defines: object.defines,
-						uniforms: object.uniforms,
-						attributes: object.attributes
+						defines: object.material.defines,
+						uniforms: object.material.uniforms,
+						attributes: object.material.attributes
 					};
 					source = JSON.stringify( json, null, '\t' );
 
 			}
+			title.setValue( object.material.name + ' / ' + name );
 
 		}
 
@@ -382,11 +408,21 @@ var Script = function ( editor ) {
 		currentScript = script;
 		currentObject = object;
 
-		title.setValue( object.name + ' / ' + name );
 		container.setDisplay( '' );
 		codemirror.setValue( source );
-		if (mode === 'json' ) mode = { name: 'javascript', json: true };
+		codemirror.clearHistory();
+		if ( mode === 'json' ) mode = { name: 'javascript', json: true };
 		codemirror.setOption( 'mode', mode );
+
+	} );
+
+	signals.scriptRemoved.add( function ( script ) {
+
+		if ( currentScript === script ) {
+
+			container.setDisplay( 'none' );
+
+		}
 
 	} );
 

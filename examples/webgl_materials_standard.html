@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - standard</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based material<br/>
+			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
+			var statsEnabled = true;
+
+			var container, stats;
+
+			var camera, scene, renderer, controls;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 3;
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 1000 );
+				camera.position.z = 2;
+
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				//
+
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
+
+				//
+
+				var material = new THREE.MeshStandardMaterial();
+
+				new OBJLoader()
+					.setPath( 'models/obj/cerberus/' )
+					.load( 'Cerberus.obj', function ( group ) {
+
+						var loader = new THREE.TextureLoader()
+							.setPath( 'models/obj/cerberus/' );
+
+						material.roughness = 1; // attenuates roughnessMap
+						material.metalness = 1; // attenuates metalnessMap
+
+						material.map = loader.load( 'Cerberus_A.jpg' );
+						// roughness is in G channel, metalness is in B channel
+						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
+						material.normalMap = loader.load( 'Cerberus_N.jpg' );
+
+						material.map.wrapS = THREE.RepeatWrapping;
+						material.roughnessMap.wrapS = THREE.RepeatWrapping;
+						material.metalnessMap.wrapS = THREE.RepeatWrapping;
+						material.normalMap.wrapS = THREE.RepeatWrapping;
+
+						group.traverse( function ( child ) {
+
+							if ( child instanceof THREE.Mesh ) {
+
+								child.material = material;
+
+							}
+
+						} );
+
+						group.position.x = - 0.45;
+						group.rotation.y = - Math.PI / 2;
+						scene.add( group );
+
+					} );
+
+				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
+					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
+
+						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
+						rgbmCubeMap.format = THREE.RGBAFormat;
+
+						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
+						pmremGenerator.update( renderer );
+
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
+
+						var rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						material.envMap = rgbmCubeRenderTarget.texture;
+						material.needsUpdate = true; // is this needed?
+
+						rgbmCubeMap.magFilter = THREE.LinearFilter;
+						rgbmCubeMap.needsUpdate = true;
+						scene.background = rgbmCubeMap;
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					} );
+
+				//
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					container.appendChild( stats.dom );
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+				renderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>

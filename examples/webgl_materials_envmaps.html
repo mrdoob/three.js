@@ -1,50 +1,31 @@
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<title>three.js webgl - materials - environment maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a { color:skyblue; text-decoration:none }
-			#info {
-				position: absolute;
-				width: 100%;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
-		
-		<script src="../build/three.min.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl environment mapping example<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl environment mapping example<br/>
 			Equirectangular Map by <a href="http://gl.ict.usc.edu/Data/HighResProbes/">University of Southern California</a><br/>
 			Spherical Map by <a href="http://www.pauldebevec.com/Probes/">Paul Debevec</a>
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var controls, camera, scene, renderer;
 			var cameraCube, sceneCube;
 			var textureEquirec, textureCube, textureSphere;
 			var cubeMesh, sphereMesh;
 			var sphereMaterial;
-			var refract;
 
 			init();
 			animate();
@@ -56,10 +37,6 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.set( 0, 0, 1000 );
 				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.minDistance = 500;
-				controls.maxDistance = 2500;
 
 				// SCENE
 
@@ -78,18 +55,22 @@
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 				textureCube.mapping = THREE.CubeReflectionMapping;
+				textureCube.encoding = THREE.sRGBEncoding;
 
-				textureEquirec = THREE.ImageUtils.loadTexture( "textures/2294472375_24a3b8ef46_o.jpg" );
-				textureEquirec.format = THREE.RGBAFormat;
+				var textureLoader = new THREE.TextureLoader();
+
+				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.magFilter = THREE.LinearFilter;
 				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
+				textureEquirec.encoding = THREE.sRGBEncoding;
 
-				textureSphere = THREE.ImageUtils.loadTexture( "textures/metal.jpg" );
+				textureSphere = textureLoader.load( "textures/metal.jpg" );
 				textureSphere.mapping = THREE.SphericalReflectionMapping;
+				textureSphere.encoding = THREE.sRGBEncoding;
 
 				// Materials
 
@@ -104,6 +85,16 @@
 				} );
 
 				equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
+				// enable code injection for non-built-in material
+				Object.defineProperty( equirectMaterial, 'map', {
+
+					get: function () {
+
+						return this.uniforms.tEquirect.value;
+
+					}
+
+				} );
 
 				var cubeShader = THREE.ShaderLib[ "cube" ];
 				var cubeMaterial = new THREE.ShaderMaterial( {
@@ -115,15 +106,24 @@
 				} );
 
 				cubeMaterial.uniforms[ "tCube" ].value = textureCube;
+				Object.defineProperty( cubeMaterial, 'map', {
+
+					get: function () {
+
+						return this.uniforms.tCube.value;
+
+					}
+
+				} );
 
 				// Skybox
 
-				cubeMesh = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100 ), cubeMaterial );
+				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
 				sceneCube.add( cubeMesh );
 
 				//
 
-				var geometry = new THREE.SphereGeometry( 400.0, 24, 24 );
+				var geometry = new THREE.SphereBufferGeometry( 400.0, 48, 24 );
 				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 
@@ -135,37 +135,50 @@
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setFaceCulling( THREE.CullFaceNone );
 				document.body.appendChild( renderer.domElement );
+
+				renderer.gammaOutput = true;
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 500;
+				controls.maxDistance = 2500;
 
 				//
 
 				var params = {
 					Cube: function () {
+
 						cubeMesh.material = cubeMaterial;
 						cubeMesh.visible = true;
 						sphereMaterial.envMap = textureCube;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Equirectangular: function () {
+
 						cubeMesh.material = equirectMaterial;
 						cubeMesh.visible = true;
 						sphereMaterial.envMap = textureEquirec;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Spherical: function () {
-							cubeMesh.visible = false;
+
+						cubeMesh.visible = false;
 						sphereMaterial.envMap = textureSphere;
 						sphereMaterial.needsUpdate = true;
+
 					},
 					Refraction: false
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
 				gui.add( params, 'Spherical' );
-				gui.add( params, 'Refraction' ).onChange( function( value ) {
+				gui.add( params, 'Refraction' ).onChange( function ( value ) {
 
 					if ( value ) {
 
@@ -208,13 +221,9 @@
 
 				render();
 
-				controls.update();
-
 			}
 
 			function render() {
-
-				var timer = -0.0002 * Date.now();
 
 				camera.lookAt( scene.position );
 				cameraCube.rotation.copy( camera.rotation );

@@ -41976,18 +41976,6 @@
 					]
 				}
 				,{
-					 "key": "$clr.emissive"
-					,"semantic": 0
-					,"index": 0
-					,"type": 1
-					,"value": [
-						 0.345098
-						,0.345098
-						,0.345098
-						,1
-					]
-				}
-				,{
 					 "key": "$mat.shininess"
 					,"semantic": 0
 					,"index": 0

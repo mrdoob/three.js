@@ -5,60 +5,63 @@
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-THREE.HDRLoader = THREE.RGBELoader = function ( manager ) {
+THREE.RGBELoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.type = THREE.UnsignedByteType;
 
 };
 
-// extend THREE.BinaryTextureLoader
-THREE.RGBELoader.prototype = Object.create( THREE.BinaryTextureLoader.prototype );
+// extend THREE.DataTextureLoader
+THREE.RGBELoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
 
 // adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
-THREE.RGBELoader.prototype._parser = function( buffer ) {
+THREE.RGBELoader.prototype._parser = function ( buffer ) {
 
 	var
 		/* return codes for rgbe routines */
-		RGBE_RETURN_SUCCESS =  0,
+		//RGBE_RETURN_SUCCESS = 0,
 		RGBE_RETURN_FAILURE = - 1,
 
 		/* default error routine.  change this to change error handling */
-		rgbe_read_error     = 1,
-		rgbe_write_error    = 2,
-		rgbe_format_error   = 3,
-		rgbe_memory_error   = 4,
-		rgbe_error = function( rgbe_error_code, msg ) {
+		rgbe_read_error = 1,
+		rgbe_write_error = 2,
+		rgbe_format_error = 3,
+		rgbe_memory_error = 4,
+		rgbe_error = function ( rgbe_error_code, msg ) {
 
 			switch ( rgbe_error_code ) {
+
 				case rgbe_read_error: console.error( "THREE.RGBELoader Read Error: " + ( msg || '' ) );
 					break;
 				case rgbe_write_error: console.error( "THREE.RGBELoader Write Error: " + ( msg || '' ) );
 					break;
-				case rgbe_format_error:  console.error( "THREE.RGBELoader Bad File Format: " + ( msg || '' ) );
+				case rgbe_format_error: console.error( "THREE.RGBELoader Bad File Format: " + ( msg || '' ) );
 					break;
 				default:
-				case rgbe_memory_error:  console.error( "THREE.RGBELoader: Error: " + ( msg || '' ) );
+				case rgbe_memory_error: console.error( "THREE.RGBELoader: Error: " + ( msg || '' ) );
+
 			}
 			return RGBE_RETURN_FAILURE;
 
 		},
 
 		/* offsets to red, green, and blue components in a data (float) pixel */
-		RGBE_DATA_RED      = 0,
-		RGBE_DATA_GREEN    = 1,
-		RGBE_DATA_BLUE     = 2,
+		//RGBE_DATA_RED = 0,
+		//RGBE_DATA_GREEN = 1,
+		//RGBE_DATA_BLUE = 2,
 
 		/* number of floats per pixel, use 4 since stored in rgba image format */
-		RGBE_DATA_SIZE     = 4,
+		//RGBE_DATA_SIZE = 4,
 
 		/* flags indicating which fields in an rgbe_header_info are valid */
-		RGBE_VALID_PROGRAMTYPE      = 1,
-		RGBE_VALID_FORMAT           = 2,
-		RGBE_VALID_DIMENSIONS       = 4,
+		RGBE_VALID_PROGRAMTYPE = 1,
+		RGBE_VALID_FORMAT = 2,
+		RGBE_VALID_DIMENSIONS = 4,
 
 		NEWLINE = "\n",
 
-		fgets = function( buffer, lineLimit, consume ) {
+		fgets = function ( buffer, lineLimit, consume ) {
 
 			lineLimit = ! lineLimit ? 1024 : lineLimit;
 			var p = buffer.pos,
@@ -90,7 +93,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 		},
 
 		/* minimal header reading.  modify if you want to parse more information */
-		RGBE_ReadHeader = function( buffer ) {
+		RGBE_ReadHeader = function ( buffer ) {
 
 			var line, match,
 
@@ -104,28 +107,23 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 				// RGBE format header struct
 				header = {
 
-					valid: 0,                         /* indicate which fields are valid */
+					valid: 0, /* indicate which fields are valid */
 
-					string: '',                       /* the actual header string */
+					string: '', /* the actual header string */
 
-					comments: '',                     /* comments found in header */
+					comments: '', /* comments found in header */
 
-					programtype: 'RGBE',              /* listed at beginning of file to identify it
-													* after "#?".  defaults to "RGBE" */
-														
-					format: '',                       /* RGBE format, default 32-bit_rle_rgbe */
+					programtype: 'RGBE', /* listed at beginning of file to identify it after "#?". defaults to "RGBE" */
 
-					gamma: 1.0,                       /* image has already been gamma corrected with
-													* given gamma.  defaults to 1.0 (no correction) */
-														
-					exposure: 1.0,                    /* a value of 1.0 in an image corresponds to
-													* <exposure> watts/steradian/m^2.
-													* defaults to 1.0 */
-														
-					width: 0, height: 0               /* image dimensions, width/height */
+					format: '', /* RGBE format, default 32-bit_rle_rgbe */
 
-				}
-			;
+					gamma: 1.0, /* image has already been gamma corrected with given gamma. defaults to 1.0 (no correction) */
+
+					exposure: 1.0, /* a value of 1.0 in an image corresponds to <exposure> watts/steradian/m^2. defaults to 1.0 */
+
+					width: 0, height: 0 /* image dimensions, width/height */
+
+				};
 
 			if ( buffer.pos >= buffer.byteLength || ! ( line = fgets( buffer ) ) ) {
 
@@ -198,7 +196,7 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 		},
 
-		RGBE_ReadPixels_RLE = function( buffer, w, h ) {
+		RGBE_ReadPixels_RLE = function ( buffer, w, h ) {
 
 			var data_rgba, offset, pos, count, byteValue,
 				scanline_buffer, ptr, ptr_end, i, l, off, isEncodedRun,
@@ -315,35 +313,209 @@ THREE.RGBELoader.prototype._parser = function( buffer ) {
 
 			return data_rgba;
 
-		}
-	;
+		};
 
-	var byteArray = new Uint8Array( buffer ),
-		byteLength = byteArray.byteLength;
+	var RGBEByteToRGBFloat = function ( sourceArray, sourceOffset, destArray, destOffset ) {
+
+		var e = sourceArray[ sourceOffset + 3 ];
+		var scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
+
+		destArray[ destOffset + 0 ] = sourceArray[ sourceOffset + 0 ] * scale;
+		destArray[ destOffset + 1 ] = sourceArray[ sourceOffset + 1 ] * scale;
+		destArray[ destOffset + 2 ] = sourceArray[ sourceOffset + 2 ] * scale;
+
+	};
+
+	var RGBEByteToRGBHalf = ( function () {
+
+		// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
+
+		var floatView = new Float32Array( 1 );
+		var int32View = new Int32Array( floatView.buffer );
+
+		/* This method is faster than the OpenEXR implementation (very often
+		 * used, eg. in Ogre), with the additional benefit of rounding, inspired
+		 * by James Tursa?s half-precision code. */
+		function toHalf( val ) {
+
+			floatView[ 0 ] = val;
+			var x = int32View[ 0 ];
+
+			var bits = ( x >> 16 ) & 0x8000; /* Get the sign */
+			var m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
+			var e = ( x >> 23 ) & 0xff; /* Using int is faster here */
+
+			/* If zero, or denormal, or exponent underflows too much for a denormal
+			 * half, return signed zero. */
+			if ( e < 103 ) return bits;
+
+			/* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
+			if ( e > 142 ) {
+
+				bits |= 0x7c00;
+				/* If exponent was 0xff and one mantissa bit was set, it means NaN,
+						 * not Inf, so make sure we set one mantissa bit too. */
+				bits |= ( ( e == 255 ) ? 0 : 1 ) && ( x & 0x007fffff );
+				return bits;
+
+			}
+
+			/* If exponent underflows but not too much, return a denormal */
+			if ( e < 113 ) {
+
+				m |= 0x0800;
+				/* Extra rounding may overflow and set mantissa to 0 and exponent
+				 * to 1, which is OK. */
+				bits |= ( m >> ( 114 - e ) ) + ( ( m >> ( 113 - e ) ) & 1 );
+				return bits;
+
+			}
+
+			bits |= ( ( e - 112 ) << 10 ) | ( m >> 1 );
+			/* Extra rounding. An overflow will set mantissa to 0 and increment
+			 * the exponent, which is OK. */
+			bits += m & 1;
+			return bits;
+
+		}
+
+		return function ( sourceArray, sourceOffset, destArray, destOffset ) {
+
+			var e = sourceArray[ sourceOffset + 3 ];
+			var scale = Math.pow( 2.0, e - 128.0 ) / 255.0;
+
+			destArray[ destOffset + 0 ] = toHalf( sourceArray[ sourceOffset + 0 ] * scale );
+			destArray[ destOffset + 1 ] = toHalf( sourceArray[ sourceOffset + 1 ] * scale );
+			destArray[ destOffset + 2 ] = toHalf( sourceArray[ sourceOffset + 2 ] * scale );
+
+		};
+
+	} )();
+
+	var byteArray = new Uint8Array( buffer );
 	byteArray.pos = 0;
 	var rgbe_header_info = RGBE_ReadHeader( byteArray );
 
 	if ( RGBE_RETURN_FAILURE !== rgbe_header_info ) {
 
 		var w = rgbe_header_info.width,
-			h = rgbe_header_info.height
-			, image_rgba_data = RGBE_ReadPixels_RLE( byteArray.subarray( byteArray.pos ), w, h )
-		;
+			h = rgbe_header_info.height,
+			image_rgba_data = RGBE_ReadPixels_RLE( byteArray.subarray( byteArray.pos ), w, h );
+
 		if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
+
+			switch ( this.type ) {
+
+				case THREE.UnsignedByteType:
+
+					var data = image_rgba_data;
+					var format = THREE.RGBEFormat; // handled as THREE.RGBAFormat in shaders
+					var type = THREE.UnsignedByteType;
+					break;
+
+				case THREE.FloatType:
+
+					var numElements = ( image_rgba_data.length / 4 ) * 3;
+					var floatArray = new Float32Array( numElements );
+
+					for ( var j = 0; j < numElements; j ++ ) {
+
+						RGBEByteToRGBFloat( image_rgba_data, j * 4, floatArray, j * 3 );
+
+					}
+
+					var data = floatArray;
+					var format = THREE.RGBFormat;
+					var type = THREE.FloatType;
+					break;
+
+				case THREE.HalfFloatType:
+
+					var numElements = ( image_rgba_data.length / 4 ) * 3;
+					var halfArray = new Uint16Array( numElements );
+
+					for ( var j = 0; j < numElements; j ++ ) {
+
+						RGBEByteToRGBHalf( image_rgba_data, j * 4, halfArray, j * 3 );
+
+					}
+
+					var data = halfArray;
+					var format = THREE.RGBFormat;
+					var type = THREE.HalfFloatType;
+					break;
+
+				default:
+
+					console.error( 'THREE.RGBELoader: unsupported type: ', this.type );
+					break;
+
+			}
 
 			return {
 				width: w, height: h,
-				data: image_rgba_data,
+				data: data,
 				header: rgbe_header_info.string,
 				gamma: rgbe_header_info.gamma,
 				exposure: rgbe_header_info.exposure,
-				format: THREE.RGBEFormat, // handled as THREE.RGBAFormat in shaders
-				type: THREE.UnsignedByteType
+				format: format,
+				type: type
 			};
 
 		}
 
 	}
+
 	return null;
+
+};
+
+THREE.RGBELoader.prototype.setType = function ( value ) {
+
+	this.type = value;
+	return this;
+
+};
+
+THREE.RGBELoader.prototype.load = function ( url, onLoad, onProgress, onError ) {
+
+	function onLoadCallback( texture, texData ) {
+
+		switch ( texture.type ) {
+
+			case THREE.UnsignedByteType:
+
+				texture.encoding = THREE.RGBEEncoding;
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+			case THREE.FloatType:
+
+				texture.encoding = THREE.LinearEncoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+			case THREE.HalfFloatType:
+
+				texture.encoding = THREE.LinearEncoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = true;
+				break;
+
+		}
+
+		if ( onLoad ) onLoad( texture, texData );
+
+	}
+
+	return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
 
 };

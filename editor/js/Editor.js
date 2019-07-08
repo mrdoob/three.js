@@ -4,80 +4,87 @@
 
 var Editor = function () {
 
-	var SIGNALS = signals;
+	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+	this.DEFAULT_CAMERA.name = 'Camera';
+	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
+	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+
+	var Signal = signals.Signal;
 
 	this.signals = {
 
 		// script
 
-		editScript: new SIGNALS.Signal(),
+		editScript: new Signal(),
 
 		// player
 
-		startPlayer: new SIGNALS.Signal(),
-		stopPlayer: new SIGNALS.Signal(),
-
-		// actions
-
-		// showDialog: new SIGNALS.Signal(),
+		startPlayer: new Signal(),
+		stopPlayer: new Signal(),
 
 		// notifications
 
-		editorCleared: new SIGNALS.Signal(),
+		editorCleared: new Signal(),
 
-		savingStarted: new SIGNALS.Signal(),
-		savingFinished: new SIGNALS.Signal(),
+		savingStarted: new Signal(),
+		savingFinished: new Signal(),
 
-		themeChanged: new SIGNALS.Signal(),
+		themeChanged: new Signal(),
 
-		transformModeChanged: new SIGNALS.Signal(),
-		snapChanged: new SIGNALS.Signal(),
-		spaceChanged: new SIGNALS.Signal(),
-		rendererChanged: new SIGNALS.Signal(),
+		transformModeChanged: new Signal(),
+		snapChanged: new Signal(),
+		spaceChanged: new Signal(),
+		rendererChanged: new Signal(),
 
-		sceneGraphChanged: new SIGNALS.Signal(),
+		sceneBackgroundChanged: new Signal(),
+		sceneFogChanged: new Signal(),
+		sceneGraphChanged: new Signal(),
 
-		cameraChanged: new SIGNALS.Signal(),
+		cameraChanged: new Signal(),
 
-		geometryChanged: new SIGNALS.Signal(),
+		geometryChanged: new Signal(),
 
-		objectSelected: new SIGNALS.Signal(),
-		objectFocused: new SIGNALS.Signal(),
+		objectSelected: new Signal(),
+		objectFocused: new Signal(),
 
-		objectAdded: new SIGNALS.Signal(),
-		objectChanged: new SIGNALS.Signal(),
-		objectRemoved: new SIGNALS.Signal(),
+		objectAdded: new Signal(),
+		objectChanged: new Signal(),
+		objectRemoved: new Signal(),
 
-		helperAdded: new SIGNALS.Signal(),
-		helperRemoved: new SIGNALS.Signal(),
+		cameraAdded: new Signal(),
+		cameraRemoved: new Signal(),
 
-		materialChanged: new SIGNALS.Signal(),
+		helperAdded: new Signal(),
+		helperRemoved: new Signal(),
 
-		scriptAdded: new SIGNALS.Signal(),
-		scriptChanged: new SIGNALS.Signal(),
-		scriptRemoved: new SIGNALS.Signal(),
+		materialChanged: new Signal(),
 
-		fogTypeChanged: new SIGNALS.Signal(),
-		fogColorChanged: new SIGNALS.Signal(),
-		fogParametersChanged: new SIGNALS.Signal(),
-		windowResize: new SIGNALS.Signal(),
+		scriptAdded: new Signal(),
+		scriptChanged: new Signal(),
+		scriptRemoved: new Signal(),
 
-		showGridChanged: new SIGNALS.Signal()
+		windowResize: new Signal(),
+
+		showGridChanged: new Signal(),
+		refreshSidebarObject3D: new Signal(),
+		historyChanged: new Signal(),
+
+		viewportCameraChanged: new Signal()
 
 	};
 
 	this.config = new Config();
 	this.history = new History( this );
 	this.storage = new Storage();
+	this.strings = new Strings( this.config );
+
 	this.loader = new Loader( this );
 
-	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 100000 );
-	this.camera.position.set( 500, 250, 500 );
-	this.camera.lookAt( new THREE.Vector3() );
-	this.camera.name = 'Camera';
+	this.camera = this.DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
+	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -87,8 +94,16 @@ var Editor = function () {
 	this.textures = {};
 	this.scripts = {};
 
+	this.animations = {};
+	this.mixer = new THREE.AnimationMixer( this.scene );
+
 	this.selected = null;
 	this.helpers = {};
+
+	this.cameras = {};
+	this.viewportCamera = this.camera;
+
+	this.addCamera( this.camera );
 
 };
 
@@ -102,20 +117,16 @@ Editor.prototype = {
 
 	},
 
-	/*
-	showDialog: function ( value ) {
-
-		this.signals.showDialog.dispatch( value );
-
-	},
-	*/
-
 	//
 
 	setScene: function ( scene ) {
 
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
+
+		if ( scene.background !== null ) this.scene.background = scene.background.clone();
+		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
 		// avoid render per object
@@ -144,6 +155,7 @@ Editor.prototype = {
 			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
 			if ( child.material !== undefined ) scope.addMaterial( child.material );
 
+			scope.addCamera( child );
 			scope.addHelper( child );
 
 		} );
@@ -194,6 +206,7 @@ Editor.prototype = {
 
 		object.traverse( function ( child ) {
 
+			scope.removeCamera( child );
 			scope.removeHelper( child );
 
 		} );
@@ -237,40 +250,76 @@ Editor.prototype = {
 
 	},
 
+	addAnimation: function ( object, animations ) {
+
+		if ( animations.length > 0 ) {
+
+			this.animations[ object.uuid ] = animations;
+
+		}
+
+	},
+
+	//
+
+	addCamera: function ( camera ) {
+
+		if ( camera.isCamera ) {
+
+			this.cameras[ camera.uuid ] = camera;
+
+			this.signals.cameraAdded.dispatch( camera );
+
+		}
+
+	},
+
+	removeCamera: function ( camera ) {
+
+		if ( this.cameras[ camera.uuid ] !== undefined ) {
+
+			delete this.cameras[ camera.uuid ];
+
+			this.signals.cameraRemoved.dispatch( camera );
+
+		}
+
+	},
+
 	//
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 20, 4, 2 );
+		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
 
 			var helper;
 
-			if ( object instanceof THREE.Camera ) {
+			if ( object.isCamera ) {
 
-				helper = new THREE.CameraHelper( object, 10 );
+				helper = new THREE.CameraHelper( object, 1 );
 
-			} else if ( object instanceof THREE.PointLight ) {
+			} else if ( object.isPointLight ) {
 
-				helper = new THREE.PointLightHelper( object, 10 );
+				helper = new THREE.PointLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.DirectionalLight ) {
+			} else if ( object.isDirectionalLight ) {
 
-				helper = new THREE.DirectionalLightHelper( object, 20 );
+				helper = new THREE.DirectionalLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.SpotLight ) {
+			} else if ( object.isSpotLight ) {
 
-				helper = new THREE.SpotLightHelper( object, 10 );
+				helper = new THREE.SpotLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.HemisphereLight ) {
+			} else if ( object.isHemisphereLight ) {
 
-				helper = new THREE.HemisphereLightHelper( object, 10 );
+				helper = new THREE.HemisphereLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.SkinnedMesh ) {
+			} else if ( object.isSkinnedMesh ) {
 
-				helper = new THREE.SkeletonHelper( object );
+				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
 			} else {
 
@@ -340,6 +389,41 @@ Editor.prototype = {
 
 	},
 
+	getObjectMaterial: function ( object, slot ) {
+
+		var material = object.material;
+
+		if ( Array.isArray( material ) ) {
+
+			material = material[ slot ];
+
+		}
+
+		return material;
+
+	},
+
+	setObjectMaterial: function ( object, slot, newMaterial ) {
+
+		if ( Array.isArray( object.material ) ) {
+
+			object.material[ slot ] = newMaterial;
+
+		} else {
+
+			object.material = newMaterial;
+
+		}
+
+	},
+
+	setViewportCamera: function ( uuid ) {
+
+		this.viewportCamera = this.cameras[ uuid ];
+		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
+
+	},
+
 	//
 
 	select: function ( object ) {
@@ -398,7 +482,11 @@ Editor.prototype = {
 
 	focus: function ( object ) {
 
-		this.signals.objectFocused.dispatch( object );
+		if ( object !== undefined ) {
+
+			this.signals.objectFocused.dispatch( object );
+
+		}
 
 	},
 
@@ -411,9 +499,13 @@ Editor.prototype = {
 	clear: function () {
 
 		this.history.clear();
+		this.storage.clear();
 
-		this.camera.position.set( 500, 250, 500 );
-		this.camera.lookAt( new THREE.Vector3() );
+		this.camera.copy( this.DEFAULT_CAMERA );
+		this.scene.name = "Scene";
+		this.scene.userData = {};
+		this.scene.background.setHex( 0xaaaaaa );
+		this.scene.fog = null;
 
 		var objects = this.scene.children;
 
@@ -427,6 +519,9 @@ Editor.prototype = {
 		this.materials = {};
 		this.textures = {};
 		this.scripts = {};
+
+		this.animations = {};
+		this.mixer.stopAllAction();
 
 		this.deselect();
 
@@ -449,34 +544,78 @@ Editor.prototype = {
 
 		}
 
-		// TODO: Clean this up somehow
-
 		var camera = loader.parse( json.camera );
 
-		this.camera.position.copy( camera.position );
-		this.camera.rotation.copy( camera.rotation );
-		this.camera.aspect = camera.aspect;
-		this.camera.near = camera.near;
-		this.camera.far = camera.far;
+		this.camera.copy( camera );
+		this.camera.aspect = this.DEFAULT_CAMERA.aspect;
+		this.camera.updateProjectionMatrix();
+
+		this.history.fromJSON( json.history );
+		this.scripts = json.scripts;
 
 		this.setScene( loader.parse( json.scene ) );
-		this.scripts = json.scripts;
 
 	},
 
 	toJSON: function () {
 
+		// scripts clean up
+
+		var scene = this.scene;
+		var scripts = this.scripts;
+
+		for ( var key in scripts ) {
+
+			var script = scripts[ key ];
+
+			if ( script.length === 0 || scene.getObjectByProperty( 'uuid', key ) === undefined ) {
+
+				delete scripts[ key ];
+
+			}
+
+		}
+
+		//
+
 		return {
 
+			metadata: {},
 			project: {
+				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
-			scripts: this.scripts
+			scripts: this.scripts,
+			history: this.history.toJSON()
 
 		};
 
+	},
+
+	objectByUuid: function ( uuid ) {
+
+		return this.scene.getObjectByProperty( 'uuid', uuid, true );
+
+	},
+
+	execute: function ( cmd, optionalName ) {
+
+		this.history.execute( cmd, optionalName );
+
+	},
+
+	undo: function () {
+
+		this.history.undo();
+
+	},
+
+	redo: function () {
+
+		this.history.redo();
+
 	}
 
-}
+};

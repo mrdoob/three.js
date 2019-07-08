@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - TGA texture</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TGA texture example by <a href="https://github.com/DaoshengMu/" target="_blank" rel="noopener">Daosheng Mu</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TGALoader } from './jsm/loaders/TGALoader.js';
+
+			var camera, scene, renderer, stats;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera.position.set( 0, 50, 250 );
+
+				scene = new THREE.Scene();
+
+				//
+
+				var loader = new TGALoader();
+				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+
+				// add box 1 - grey8 texture
+
+				var texture1 = loader.load( 'textures/crate_grey8.tga' );
+				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
+
+				var mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 50;
+
+				scene.add( mesh1 );
+
+				// add box 2 - tga texture
+
+				var texture2 = loader.load( 'textures/crate_color8.tga' );
+				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
+
+				var mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 50;
+
+				scene.add( mesh2 );
+
+				//
+
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
+				scene.add( ambientLight );
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

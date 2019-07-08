@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - node material</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#waitScreen {
+				color: #fff;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-top: -50px;
+				margin-left: -50px;
+				width: 100px;
+				height: 100px;
+			}
+			.hide {
+				display:none;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material
+			<br /><span class="button" id="preload">change preload</span>
+		</div>
+
+		<div id="waitScreen">
+			Loading ...
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+
+			import {
+				NodeFrame,
+				FloatNode,
+				ColorNode,
+				ConstNode,
+				ExpressionNode,
+				MathNode,
+				OperatorNode,
+				TimerNode,
+				PhongNodeMaterial
+			} from './jsm/nodes/Nodes.js';
+
+			var container = document.getElementById( 'container' );
+
+			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+			var frame = new NodeFrame();
+			var teapot;
+			var controls;
+			var rtTexture, rtMaterial;
+			var meshes = [];
+
+			document.getElementById( "preload" ).addEventListener( 'click', function () {
+
+				var hash = document.location.hash.substr( 1 );
+
+				if ( hash.length === 0 ) {
+
+					window.location.hash = "#NoPreLoad";
+
+				} else {
+
+					window.location.hash = "";
+
+				}
+
+				location.reload( true );
+
+			}, false );
+
+			window.addEventListener( 'load', init );
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.x = 0;
+				camera.position.z = - 300;
+				camera.position.y = 200;
+				camera.target = new THREE.Vector3();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 400;
+
+				scene.add( new THREE.AmbientLight( 0x464646 ) );
+
+				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+				light.position.set( 1, 0.75, 0.5 );
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0xccccff, 1 );
+				light.position.set( - 1, 0.75, - 0.5 );
+				scene.add( light );
+
+				teapot = new TeapotBufferGeometry( 15, 18 );
+
+				var itemsonrow = 10;
+
+				for ( var i = 0; i < itemsonrow * itemsonrow; i ++ ) {
+
+					var mesh = new THREE.Mesh( teapot );
+
+					mesh.position.x = 50 * ( i % itemsonrow ) - 50 * itemsonrow / 2;
+					mesh.position.z = 50 * Math.floor( i / itemsonrow ) - 150;
+					updateMaterial( mesh );
+					scene.add( mesh );
+					meshes.push( mesh );
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				var hash = document.location.hash.substr( 1 );
+
+				if ( hash.length === 0 ) {
+
+					renderer.compile( scene, camera );
+
+				}
+
+				document.getElementById( "waitScreen" ).className = "hide";
+
+				setTimeout( function () {
+
+					onWindowResize();
+					animate();
+
+				}, 1 );
+
+			}
+
+			function updateMaterial( mesh ) {
+
+				if ( mesh.material ) mesh.material.dispose();
+
+				if ( rtTexture ) {
+
+					rtTexture.dispose();
+					rtTexture = null;
+
+				}
+
+				if ( rtMaterial ) {
+
+					rtMaterial.dispose();
+					rtMaterial = null;
+
+				}
+
+				var mtl = new PhongNodeMaterial();
+
+				var time = new TimerNode();
+				var speed = new FloatNode( Math.random() );
+
+				var color = new ColorNode( Math.random() * 0xFFFFFF );
+
+				var timeSpeed = new OperatorNode(
+					time,
+					speed,
+					OperatorNode.MUL
+				);
+
+				var sinCycleInSecs = new OperatorNode(
+					timeSpeed,
+					new ConstNode( ConstNode.PI2 ),
+					OperatorNode.MUL
+				);
+
+				var cycle = new MathNode( sinCycleInSecs, MathNode.SIN );
+
+				var cycleColor = new OperatorNode(
+					cycle,
+					color,
+					OperatorNode.MUL
+				);
+
+				var cos = new MathNode( cycleColor, MathNode.SIN );
+
+				mtl.color = new ColorNode( 0 );
+				mtl.emissive = cos;
+
+
+				var transformer = new ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ] );
+				mtl.transform = transformer;
+
+				// build shader ( ignore auto build )
+				mtl.build();
+
+				// set material
+				mesh.material = mtl;
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth, height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				if ( rtTexture ) rtTexture.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				frame.update( delta );
+
+				for ( var i = 0; i < meshes.length; i ++ ) {
+
+					var mesh = meshes[ i ];
+
+					frame.updateNode( mesh.material );
+
+				}
+
+				renderer.render( scene, camera );
+
+				requestAnimationFrame( animate );
+
+			}
+
+		</script>
+
+	</body>
+</html>

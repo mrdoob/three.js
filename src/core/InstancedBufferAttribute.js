@@ -1,24 +1,57 @@
+import { BufferAttribute } from './BufferAttribute.js';
+
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-THREE.InstancedBufferAttribute = function ( array, itemSize, meshPerAttribute ) {
+function InstancedBufferAttribute( array, itemSize, normalized, meshPerAttribute ) {
 
-	THREE.BufferAttribute.call( this, array, itemSize );
+	if ( typeof ( normalized ) === 'number' ) {
+
+		meshPerAttribute = normalized;
+
+		normalized = false;
+
+		console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
+
+	}
+
+	BufferAttribute.call( this, array, itemSize, normalized );
 
 	this.meshPerAttribute = meshPerAttribute || 1;
 
-};
+}
 
-THREE.InstancedBufferAttribute.prototype = Object.create( THREE.BufferAttribute.prototype );
-THREE.InstancedBufferAttribute.prototype.constructor = THREE.InstancedBufferAttribute;
+InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
 
-THREE.InstancedBufferAttribute.prototype.copy = function ( source ) {
+	constructor: InstancedBufferAttribute,
 
-	THREE.BufferAttribute.prototype.copy.call( this, source );
+	isInstancedBufferAttribute: true,
 
-	this.meshPerAttribute = source.meshPerAttribute;
+	copy: function ( source ) {
 
-	return this;
+		BufferAttribute.prototype.copy.call( this, source );
 
-};
+		this.meshPerAttribute = source.meshPerAttribute;
+
+		return this;
+
+	},
+
+	toJSON: function ()	{
+
+		var data = BufferAttribute.prototype.toJSON.call( this );
+
+		data.meshPerAttribute = this.meshPerAttribute;
+
+		data.isInstancedBufferAttribute = true;
+
+		return data;
+
+	}
+
+} );
+
+
+
+export { InstancedBufferAttribute };

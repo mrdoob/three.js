@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - materials - compressed textures</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+<body>
+
+<div id="info">
+	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures<br />
+	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
+</div>
+
+<script type="module">
+	import * as THREE from '../build/three.module.js';
+
+	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
+
+	/*
+	This is how compressed textures are supposed to be used:
+
+	best for desktop:
+	BC1(DXT1) - opaque textures
+	BC3(DXT5) - transparent textures with full alpha range
+
+	best for iOS:
+	PVR2, PVR4 - opaque textures or alpha
+
+	best for Android:
+	ETC1 - opaque textures
+	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
+	*/
+
+	var camera, scene, renderer;
+	var meshes = [];
+
+	init();
+	animate();
+
+	function init() {
+
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		var formats = {
+			astc: renderer.extensions.get( 'WEBGL_compressed_texture_astc' ),
+			etc1: renderer.extensions.get( 'WEBGL_compressed_texture_etc1' ),
+			s3tc: renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' ),
+			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+		};
+
+		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+		camera.position.z = 1000;
+
+		scene = new THREE.Scene();
+
+		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+		var material1, material2;
+
+		// TODO: add cubemap support
+		var loader = new KTXLoader();
+
+		if ( formats.pvrtc ) {
+
+			material1 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/disturb_PVR2bpp.ktx' )
+			} );
+			material2 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/lensflare_PVR4bpp.ktx' ),
+				depthTest: false,
+				transparent: true,
+				side: THREE.DoubleSide
+			} );
+
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material2 ) );
+
+		}
+
+		if ( formats.s3tc ) {
+
+			material1 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/disturb_BC1.ktx' )
+			} );
+			material2 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/lensflare_BC3.ktx' ),
+				depthTest: false,
+				transparent: true,
+				side: THREE.DoubleSide
+			} );
+
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material2 ) );
+
+		}
+
+		if ( formats.etc1 ) {
+
+			material1 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/disturb_ETC1.ktx' )
+			} );
+
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+
+		}
+
+		if ( formats.astc ) {
+
+			material1 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/disturb_ASTC4x4.ktx' )
+			} );
+			material2 = new THREE.MeshBasicMaterial( {
+				map: loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' ),
+				depthTest: false,
+				transparent: true,
+				side: THREE.DoubleSide
+			} );
+
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material2 ) );
+
+		}
+
+		var x = - meshes.length / 2 * 150;
+		for ( var i = 0; i < meshes.length; ++ i, x += 300 ) {
+
+			var mesh = meshes[ i ];
+			mesh.position.x = x;
+			mesh.position.y = 0;
+			scene.add( mesh );
+
+		}
+
+		window.addEventListener( 'resize', onWindowResize, false );
+
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
+
+	function animate() {
+
+		requestAnimationFrame( animate );
+
+		var time = Date.now() * 0.001;
+
+		for ( var i = 0; i < meshes.length; i ++ ) {
+
+			var mesh = meshes[ i ];
+			mesh.rotation.x = time;
+			mesh.rotation.y = time;
+
+		}
+
+		renderer.render( scene, camera );
+
+	}
+
+</script>
+
+</body>
+</html>

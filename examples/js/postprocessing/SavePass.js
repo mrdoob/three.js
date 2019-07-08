@@ -4,6 +4,8 @@
 
 THREE.SavePass = function ( renderTarget ) {
 
+	THREE.Pass.call( this );
+
 	if ( THREE.CopyShader === undefined )
 		console.error( "THREE.SavePass relies on THREE.CopyShader" );
 
@@ -25,38 +27,33 @@ THREE.SavePass = function ( renderTarget ) {
 
 	if ( this.renderTarget === undefined ) {
 
-		this.renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-		this.renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, this.renderTargetParameters );
+		this.renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false } );
+		this.renderTarget.texture.name = "SavePass.rt";
 
 	}
 
-	this.enabled = true;
 	this.needsSwap = false;
-	this.clear = false;
 
-
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene  = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.scene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
-THREE.SavePass.prototype = {
+THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	constructor: THREE.SavePass,
+
+	render: function ( renderer, writeBuffer, readBuffer ) {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].value = readBuffer;
+			this.uniforms[ this.textureID ].value = readBuffer.texture;
 
 		}
 
-		this.quad.material = this.material;
-
-		renderer.render( this.scene, this.camera, this.renderTarget, this.clear );
+		renderer.setRenderTarget( this.renderTarget );
+		if ( this.clear ) renderer.clear();
+		this.fsQuad.render( renderer );
 
 	}
 
-};
+} );
