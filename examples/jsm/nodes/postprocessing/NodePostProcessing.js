@@ -97,6 +97,8 @@ NodePostProcessing.prototype = {
 
 		this.output = source.output;
 
+		return this;
+
 	},
 
 	toJSON: function ( meta ) {

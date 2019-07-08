@@ -142,6 +142,8 @@ BlurNode.prototype.copy = function ( source ) {
 	this.blurX = source.blurX;
 	this.blurY = source.blurY;
 
+	return this;
+
 };
 
 BlurNode.prototype.toJSON = function ( meta ) {

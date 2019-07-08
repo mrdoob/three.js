@@ -226,6 +226,8 @@ FunctionNode.prototype.copy = function ( source ) {
 
 	if ( source.type !== undefined ) this.type = source.type;
 
+	return this;
+
 };
 
 FunctionNode.prototype.toJSON = function ( meta ) {

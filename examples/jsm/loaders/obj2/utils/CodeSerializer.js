@@ -12,12 +12,13 @@ const CodeSerializer = {
 	 * @returns {string}
 	 */
 	serializeObject: function ( fullName, object ) {
+
 		let objectString = fullName + ' = {\n\n';
 		let part;
 		for ( let name in object ) {
 
 			part = object[ name ];
-			if ( typeof( part ) === 'string' || part instanceof String ) {
+			if ( typeof ( part ) === 'string' || part instanceof String ) {
 
 				part = part.replace( '\n', '\\n' );
 				part = part.replace( '\r', '\\r' );
@@ -42,6 +43,7 @@ const CodeSerializer = {
 		objectString += '}\n\n';
 
 		return objectString;
+
 	},
 
 	/**
@@ -53,6 +55,7 @@ const CodeSerializer = {
 	 * @returns {string}
 	 */
 	serializeClass: function ( fullName, object, constructorName, basePrototypeName, ignoreFunctions, includeFunctions, overrideFunctions ) {
+
 		let valueString, objectPart, constructorString, i, funcOverride;
 		let prototypeFunctions = [];
 		let objectProperties = [];
@@ -90,6 +93,7 @@ const CodeSerializer = {
 						prototypeFunctions.push( '\t' + name + ': ' + valueString + ',\n\n' );
 
 					}
+
 				}
 
 			}
@@ -119,7 +123,7 @@ const CodeSerializer = {
 
 			} else {
 
-				if ( typeof( objectPart ) === 'string' || objectPart instanceof String) {
+				if ( typeof ( objectPart ) === 'string' || objectPart instanceof String ) {
 
 					valueString = '\"' + objectPart.toString() + '\"';
 
@@ -172,7 +176,8 @@ const CodeSerializer = {
 		objectString += '\n\n';
 
 		return objectString;
+
 	},
 };
 
-export { CodeSerializer }
+export { CodeSerializer };

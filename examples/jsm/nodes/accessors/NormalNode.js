@@ -84,6 +84,8 @@ NormalNode.prototype.copy = function ( source ) {
 
 	this.scope = source.scope;
 
+	return this;
+
 };
 
 NormalNode.prototype.toJSON = function ( meta ) {

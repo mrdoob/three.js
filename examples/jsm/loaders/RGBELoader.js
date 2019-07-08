@@ -484,10 +484,18 @@ RGBELoader.prototype._parser = function ( buffer ) {
 
 };
 
-RGBELoader.prototype.setType = function ( value ) {
+RGBELoader.prototype.setDataType = function ( value ) {
 
 	this.type = value;
 	return this;
+
+};
+
+RGBELoader.prototype.setType = function ( value ) {
+
+	console.warn( 'THREE.RGBELoader: .setType() has been renamed to .setDataType().' );
+
+	return this.setDataType( value );
 
 };
 

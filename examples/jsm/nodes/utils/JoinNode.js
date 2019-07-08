@@ -78,6 +78,8 @@ JoinNode.prototype.copy = function ( source ) {
 
 	}
 
+	return this;
+
 };
 
 JoinNode.prototype.toJSON = function ( meta ) {

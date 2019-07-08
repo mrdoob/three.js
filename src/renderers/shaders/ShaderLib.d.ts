@@ -12,14 +12,17 @@ export let ShaderLib: {
 	lambert: Shader;
 	phong: Shader;
 	standard: Shader;
+	matcap: Shader;
 	points: Shader;
 	dashed: Shader;
 	depth: Shader;
 	normal: Shader;
+	sprite: Shader;
+	background: Shader;
 	cube: Shader;
 	equirect: Shader;
-	depthRGBA: Shader;
 	distanceRGBA: Shader;
 	cubeEnv: Shader;
+	shadow: Shader;
 	physical: Shader;
 };
