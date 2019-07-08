@@ -33,8 +33,6 @@
 		<div id="container">
 		</div>
 
-		<script src="js/WebGL.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -43,6 +41,7 @@
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { WEBGL } from './jsm/WebGL.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
