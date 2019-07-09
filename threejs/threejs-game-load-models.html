@@ -130,11 +130,11 @@ function main() {
   };
   {
     const gltfLoader = new THREE.GLTFLoader(manager);
-    Object.values(models).forEach((model) => {
+    for (const model of Object.values(models)) {
       gltfLoader.load(model.url, (gltf) => {
         model.gltf = gltf;
       });
-    });
+    }
   }
 
   function prepModelsAndAnimations() {
