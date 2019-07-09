@@ -7,6 +7,7 @@
 
 import {
 	EventDispatcher,
+	MOUSE,
 	Quaternion,
 	Vector2,
 	Vector3
@@ -41,6 +42,8 @@ var TrackballControls = function ( object, domElement ) {
 	this.maxDistance = Infinity;
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
+
+	this.mouseButtons = { LEFT: MOUSE.LEFT, MIDDLE: MOUSE.MIDDLE, RIGHT: MOUSE.RIGHT };
 
 	// internals
 
@@ -377,7 +380,7 @@ var TrackballControls = function ( object, domElement ) {
 
 	}
 
-	function keyup( event ) {
+	function keyup() {
 
 		if ( _this.enabled === false ) return;
 
@@ -394,26 +397,46 @@ var TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( _state === STATE.NONE ) {
+		switch ( event.button ) {
 
-			_state = event.button;
+			case _this.mouseButtons.LEFT:
 
-		}
+				if ( ! _this.noRotate ) {
 
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
+					_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
+					_movePrev.copy( _moveCurr );
 
-			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
-			_movePrev.copy( _moveCurr );
+					_state = STATE.ROTATE;
 
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
+				}
 
-			_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_zoomEnd.copy( _zoomStart );
+				break;
 
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
+			case _this.mouseButtons.MIDDLE:
 
-			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_panEnd.copy( _panStart );
+				if ( ! _this.noZoom ) {
+
+					_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
+					_zoomEnd.copy( _zoomStart );
+
+					_state = STATE.ZOOM;
+
+				}
+
+				break;
+
+			case _this.mouseButtons.RIGHT:
+
+				if ( ! _this.noPan ) {
+
+					_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
+					_panEnd.copy( _panStart );
+
+					_state = STATE.PAN;
+
+				}
+
+				break;
 
 		}
 
