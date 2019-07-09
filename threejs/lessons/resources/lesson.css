@@ -305,10 +305,13 @@ iframe.threejs_example, iframe.threejs_diagram {
   display: block;
 }
 iframe.threejs_example {
-  border: 1px solid black;
+  background: black;
 }
 iframe.noborder {
   border: none !important;
+}
+.threejs_example_container>div {
+  border: 1px solid black;
 }
 
 iframe.external_diagram {
