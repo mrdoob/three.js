@@ -322,6 +322,7 @@ iframe.noborder {
 }
 .threejs_example_container>div {
   border: 1px solid black;
+  margin: 0 auto;
 }
 
 iframe.external_diagram {
@@ -489,10 +490,14 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
     .threejs_example {
         max-height: 400px;
     }
-    iframe {
+    .threejs_example_container>div {
         max-width: 95%;
+    }    
+    .threejs_diagram_container iframe {
+      max-width: 95%;
     }
-    iframe.background {
+  }    
+  iframe.background {
         max-width: 100%;
     }
 }
