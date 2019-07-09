@@ -17,6 +17,16 @@ table {
     margin-bottom: 1em;
 }
 
+.footnote {
+  font-size: smaller;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
+}
+.footnotes {
+  font-size: smaller;
+}
+
 pre {
   background: rgb(143, 140, 140);
   padding: 1em;
