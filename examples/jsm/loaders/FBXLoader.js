@@ -337,26 +337,14 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof TGALoader !== 'function' ) {
+					if( Loader.Handlers.get( '.tga' ) === null ) {
 
-						console.warn( 'FBXLoader: TGALoader is required to load TGA textures' );
-						return;
-
-					} else {
-
-						if ( Loader.Handlers.get( '.tga' ) === null ) {
-
-							var tgaLoader = new TGALoader();
-							tgaLoader.setPath( this.textureLoader.path );
-
-							Loader.Handlers.add( /\.tga$/i, tgaLoader );
-
-						}
-
-						type = 'image/tga';
-						break;
+						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
 					}
+
+					type = 'image/tga';
+					break;
 
 				default:
 
@@ -466,7 +454,7 @@ var FBXLoader = ( function () {
 
 				if ( loader === null ) {
 
-					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
+					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
 					texture = new Texture();
 
 				} else {
@@ -477,7 +465,7 @@ var FBXLoader = ( function () {
 
 			} else if ( extension === 'psd' ) {
 
-				console.warn( 'FBXLoader: PSD textures are not supported, creating empty placeholder texture for', fileName );
+				console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
 				texture = new Texture();
 
 			} else {
@@ -1607,7 +1595,7 @@ var FBXLoader = ( function () {
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
 
 			var skeletons = deformers.skeletons;
-			var morphTargets = deformers.morphTargets;
+			var morphTargets = [];
 
 			var modelNodes = relationships.parents.map( function ( parent ) {
 
@@ -1626,13 +1614,15 @@ var FBXLoader = ( function () {
 
 			}, null );
 
-			var morphTarget = relationships.children.reduce( function ( morphTarget, child ) {
+			relationships.children.forEach( function( child ) {
 
-				if ( morphTargets[ child.ID ] !== undefined ) morphTarget = morphTargets[ child.ID ];
+				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
 
-				return morphTarget;
+					morphTargets.push( deformers.morphTargets[ child.ID ] );
 
-			}, null );
+				}
+
+			} );
 
 			// Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
@@ -1649,12 +1639,12 @@ var FBXLoader = ( function () {
 
 			var transform = generateTransform( transformData );
 
-			return this.genGeometry( geoNode, skeleton, morphTarget, transform );
+			return this.genGeometry( geoNode, skeleton, morphTargets, transform );
 
 		},
 
 		// Generate a BufferGeometry from a node in FBXTree.Objects.Geometry
-		genGeometry: function ( geoNode, skeleton, morphTarget, preTransform ) {
+		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
 
 			var geo = new BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
@@ -1755,7 +1745,7 @@ var FBXLoader = ( function () {
 
 			}
 
-			this.addMorphTargets( geo, geoNode, morphTarget, preTransform );
+			this.addMorphTargets( geo, geoNode, morphTargets, preTransform );
 
 			return geo;
 
@@ -2128,23 +2118,27 @@ var FBXLoader = ( function () {
 
 		},
 
-		addMorphTargets: function ( parentGeo, parentGeoNode, morphTarget, preTransform ) {
+		addMorphTargets: function ( parentGeo, parentGeoNode, morphTargets, preTransform ) {
 
-			if ( morphTarget === null ) return;
+			if ( morphTargets.length === 0 ) return;
 
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-			var self = this;
-			morphTarget.rawTargets.forEach( function ( rawTarget ) {
+			 var self = this;
+			morphTargets.forEach( function( morphTarget ) {
 
-				var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
+				morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-				if ( morphGeoNode !== undefined ) {
+					var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
-					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					if ( morphGeoNode !== undefined ) {
 
-				}
+						self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+
+					}
+
+				} );
 
 			} );
 
@@ -2156,6 +2150,7 @@ var FBXLoader = ( function () {
 		// Normal and position attributes only have data for the vertices that are affected by the morph
 		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
+			console.log(parentGeo, parentGeoNode, morphGeoNode, preTransform, name);
 			var morphGeo = new BufferGeometry();
 			if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
 
