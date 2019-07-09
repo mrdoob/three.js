@@ -87,6 +87,7 @@ import uv2_pars_fragment from './ShaderChunk/uv2_pars_fragment.glsl.js';
 import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl.js';
 import uv2_vertex from './ShaderChunk/uv2_vertex.glsl.js';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl.js';
+import transparency_pars_fragment from './ShaderChunk/transparency_pars_fragment.glsl.js';
 
 import background_frag from './ShaderLib/background_frag.glsl.js';
 import background_vert from './ShaderLib/background_vert.glsl.js';
@@ -209,6 +210,7 @@ export var ShaderChunk = {
 	uv2_pars_vertex: uv2_pars_vertex,
 	uv2_vertex: uv2_vertex,
 	worldpos_vertex: worldpos_vertex,
+	transparency_pars_fragment: transparency_pars_fragment,
 
 	background_frag: background_frag,
 	background_vert: background_vert,
