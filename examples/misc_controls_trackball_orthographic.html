@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - trackball controls</title>
+		<title>three.js webgl - orthographic trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -18,7 +18,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - orthographic trackball controls<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - orthographic trackball controls<br />
 			MOVE mouse &amp; press LEFT: rotate, MIDDLE: zoom, RIGHT: pan
 		</div>
 
@@ -38,7 +38,6 @@
 			function init() {
 
 				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 2000 );
-				// camera = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 2000 );
 				camera.position.z = 1000;
 
 				// world
@@ -61,7 +60,6 @@
 					scene.add( mesh );
 
 				}
-
 
 				// lights
 
@@ -88,7 +86,6 @@
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
 
 				controls.noZoom = false;
 				controls.noPan = false;
