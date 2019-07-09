@@ -21,6 +21,7 @@
     'threejs-billboards.md',
     'threejs-cleanup.md',
     'threejs-voxel-geometry.md',
+    'threejs-game.md',
   ],
   'webvr': [
     'threejs-webvr.md',
