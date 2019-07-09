@@ -1607,7 +1607,7 @@ var FBXLoader = ( function () {
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
 
 			var skeletons = deformers.skeletons;
-			var morphTargets = deformers.morphTargets;
+			var morphTargets = [];
 
 			var modelNodes = relationships.parents.map( function ( parent ) {
 
@@ -1626,13 +1626,15 @@ var FBXLoader = ( function () {
 
 			}, null );
 
-			var morphTarget = relationships.children.reduce( function ( morphTarget, child ) {
+			relationships.children.forEach( function( child ) {
 
-				if ( morphTargets[ child.ID ] !== undefined ) morphTarget = morphTargets[ child.ID ];
+				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
 
-				return morphTarget;
+					morphTargets.push( deformers.morphTargets[ child.ID ] );
 
-			}, null );
+				}
+
+			} );
 
 			// Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
@@ -1649,12 +1651,12 @@ var FBXLoader = ( function () {
 
 			var transform = generateTransform( transformData );
 
-			return this.genGeometry( geoNode, skeleton, morphTarget, transform );
+			return this.genGeometry( geoNode, skeleton, morphTargets, transform );
 
 		},
 
 		// Generate a BufferGeometry from a node in FBXTree.Objects.Geometry
-		genGeometry: function ( geoNode, skeleton, morphTarget, preTransform ) {
+		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
 
 			var geo = new BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
@@ -1755,7 +1757,7 @@ var FBXLoader = ( function () {
 
 			}
 
-			this.addMorphTargets( geo, geoNode, morphTarget, preTransform );
+			this.addMorphTargets( geo, geoNode, morphTargets, preTransform );
 
 			return geo;
 
@@ -2128,23 +2130,27 @@ var FBXLoader = ( function () {
 
 		},
 
-		addMorphTargets: function ( parentGeo, parentGeoNode, morphTarget, preTransform ) {
+		addMorphTargets: function ( parentGeo, parentGeoNode, morphTargets, preTransform ) {
 
-			if ( morphTarget === null ) return;
+			if ( morphTargets.length === 0 ) return;
 
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-			var self = this;
-			morphTarget.rawTargets.forEach( function ( rawTarget ) {
+			 var self = this;
+			morphTargets.forEach( function( morphTarget ) {
 
-				var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
+				morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-				if ( morphGeoNode !== undefined ) {
+					var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
-					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					if ( morphGeoNode !== undefined ) {
 
-				}
+						self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+
+					}
+
+				} );
 
 			} );
 
