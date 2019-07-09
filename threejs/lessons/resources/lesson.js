@@ -308,6 +308,9 @@ $(document).ready(function($){
   const classRE = /^(\w+)$/;
   $('a').each(function() {
     const href = this.getAttribute('href');
+    if (!href) {
+      return;
+    }
     const m = methodPropertyRE.exec(href);
     if (m) {
       const codeKeywordLink = getKeywordLink(m[1]);
