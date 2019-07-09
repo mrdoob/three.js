@@ -468,8 +468,10 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.ambient ) this.ambient = source.ambient;
 
 	if ( source.environment ) this.environment = source.environment;
-	
+
 	if ( source.sheen ) this.sheen = source.sheen;
+
+	return this;
 
 };
 
@@ -511,7 +513,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
-		
+
 		if ( this.sheen ) data.sheen = this.sheen.toJSON( meta ).uuid;
 
 	}
