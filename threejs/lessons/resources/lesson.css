@@ -496,8 +496,7 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
     .threejs_diagram_container iframe {
       max-width: 95%;
     }
-  }    
-  iframe.background {
+    iframe.background {
         max-width: 100%;
     }
 }
