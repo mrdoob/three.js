@@ -86,6 +86,7 @@ module.exports = {
     "one-variable-per-var/one-variable-per-var": [2],
     "quotes": [2, "single"],
     "require-trailing-comma/require-trailing-comma": [2],
+    "require-yield": 0,
     "semi": [2, "always"],
     "strict": [2, "global"],
     "space-before-function-paren": [2, "never"],
