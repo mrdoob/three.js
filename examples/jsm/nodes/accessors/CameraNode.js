@@ -202,6 +202,8 @@ CameraNode.prototype.copy = function ( source ) {
 
 	}
 
+	return this;
+
 };
 
 CameraNode.prototype.toJSON = function ( meta ) {

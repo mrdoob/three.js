@@ -84,6 +84,8 @@ CubeTextureNode.prototype.copy = function ( source ) {
 
 	if ( source.bias ) this.bias = source.bias;
 
+	return this;
+
 };
 
 CubeTextureNode.prototype.toJSON = function ( meta ) {

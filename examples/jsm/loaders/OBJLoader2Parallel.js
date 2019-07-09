@@ -27,12 +27,14 @@ import {
  * @constructor
  */
 const OBJLoader2Parallel = function ( manager ) {
+
 	OBJLoader2.call( this, manager );
 	this.preferJsmWorker = false;
 
 	this.callbacks.onParseComplete = null;
 	this.executeParallel = true;
 	this.workerExecutionSupport = new WorkerExecutionSupport();
+
 };
 OBJLoader2Parallel.prototype = Object.create( OBJLoader2.prototype );
 OBJLoader2Parallel.prototype.constructor = OBJLoader2Parallel;
@@ -42,8 +44,10 @@ console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2.OBJLOADER2_PARAL
 
 
 OBJLoader2Parallel.prototype.setPreferJsmWorker = function ( preferJsmWorker ) {
+
 	this.preferJsmWorker = preferJsmWorker === true;
 	return this;
+
 };
 
 /**
@@ -53,10 +57,14 @@ OBJLoader2Parallel.prototype.setPreferJsmWorker = function ( preferJsmWorker ) {
  * @return {OBJLoader2Parallel}
  */
 OBJLoader2Parallel.prototype.setCallbackOnParseComplete = function ( onParseComplete ) {
+
 	if ( onParseComplete !== undefined && onParseComplete !== null ) {
+
 		this.callbacks.onParseComplete = onParseComplete;
+
 	}
 	return this;
+
 };
 
 /**
@@ -66,8 +74,10 @@ OBJLoader2Parallel.prototype.setCallbackOnParseComplete = function ( onParseComp
  * @return {OBJLoader2Parallel}
  */
 OBJLoader2Parallel.prototype.setExecuteParallel = function ( executeParallel ) {
+
 	this.executeParallel = executeParallel === true;
 	return this;
+
 };
 
 /**
@@ -76,7 +86,9 @@ OBJLoader2Parallel.prototype.setExecuteParallel = function ( executeParallel ) {
  * @return {WorkerExecutionSupport|WorkerExecutionSupport}
  */
 OBJLoader2Parallel.prototype.getWorkerExecutionSupport = function () {
+
 	return this.workerExecutionSupport;
+
 };
 
 /**
@@ -85,6 +97,7 @@ OBJLoader2Parallel.prototype.getWorkerExecutionSupport = function () {
  * @return {CodeBuilderInstructions}
  */
 OBJLoader2Parallel.prototype.buildWorkerCode = function () {
+
 	let codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
 	if ( codeBuilderInstructions.isSupportsJsmWorker() ) {
 
@@ -104,19 +117,23 @@ OBJLoader2Parallel.prototype.buildWorkerCode = function () {
 		codeBuilderInstructions.addCodeFragment( codeWorkerRunner );
 
 		// allows to include full libraries as importScripts
-//		codeBuilderInstructions.addLibraryImport( '../../node_modules/three/build/three.js' );
+		//		codeBuilderInstructions.addLibraryImport( '../../node_modules/three/build/three.js' );
 		codeBuilderInstructions.addStartCode( 'new WorkerRunner( new DefaultWorkerPayloadHandler( new OBJLoader2Parser() ) );' );
 
 	}
 	return codeBuilderInstructions;
+
 };
 
 /**
  * @private
  */
 OBJLoader2Parallel.prototype._configure = function () {
+
 	if ( this.callbacks.onParseComplete === null ) {
+
 		throw "No callbackOnLoad was provided! Aborting!";
+
 	}
 	// check if worker is already available and if so, then fast-fail
 	if ( this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) return;
@@ -125,10 +142,13 @@ OBJLoader2Parallel.prototype._configure = function () {
 
 	let scope = this;
 	let scopedOnAssetAvailable = function ( payload ) {
+
 		scope._onAssetAvailable( payload );
+
 	};
 
 	this.workerExecutionSupport.updateCallbacks( scopedOnAssetAvailable, this.callbacks.onParseComplete );
+
 };
 
 /**
@@ -141,10 +161,12 @@ OBJLoader2Parallel.prototype._configure = function () {
  * @param {function} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
  * @param {function} [onMeshAlter] Called after worker successfully delivered a single mesh
  */
-OBJLoader2Parallel.prototype.load = function( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
+OBJLoader2Parallel.prototype.load = function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
+
 	this.setCallbackOnParseComplete( onLoad );
 
 	OBJLoader2.prototype.load.call( this, content, function () {}, onFileLoadProgress, onError, onMeshAlter );
+
 };
 
 /**
@@ -152,7 +174,8 @@ OBJLoader2Parallel.prototype.load = function( content, onLoad, onFileLoadProgres
  *
  * @param {arraybuffer} content OBJ data as Uint8Array or String
  */
-OBJLoader2Parallel.prototype.parse = function( content ) {
+OBJLoader2Parallel.prototype.parse = function ( content ) {
+
 	if ( this.executeParallel ) {
 
 		this._configure();
@@ -183,6 +206,7 @@ OBJLoader2Parallel.prototype.parse = function( content ) {
 		this.callbacks.onParseComplete( OBJLoader2.prototype.parse.call( this, content ) );
 
 	}
+
 };
 
-export { OBJLoader2Parallel }
+export { OBJLoader2Parallel };

@@ -295,6 +295,8 @@ ColorSpaceNode.prototype.copy = function ( source ) {
 	this.input = source.input;
 	this.method = source.method;
 
+	return this;
+
 };
 
 ColorSpaceNode.prototype.toJSON = function ( meta ) {

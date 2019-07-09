@@ -47,6 +47,8 @@ AttributeNode.prototype.copy = function ( source ) {
 
 	this.type = source.type;
 
+	return this;
+
 };
 
 AttributeNode.prototype.toJSON = function ( meta ) {

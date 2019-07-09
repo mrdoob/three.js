@@ -95,6 +95,8 @@ NormalMapNode.prototype.copy = function ( source ) {
 	this.value = source.value;
 	this.scale = source.scale;
 
+	return this;
+
 };
 
 NormalMapNode.prototype.toJSON = function ( meta ) {
