@@ -69,11 +69,11 @@ manager.onLoad = init;
 const models = {
   pig:    { url: 'resources/models/animals/Pig.gltf' },
   cow:    { url: 'resources/models/animals/Cow.gltf' },
-  llama:  { url: 'resources/models/animals/llama.gltf' },
-  pug:    { url: 'resources/models/animals/pug.gltf' },
-  sheep:  { url: 'resources/models/animals/sheep.gltf' },
-  zebra:  { url: 'resources/models/animals/zebra.gltf' },
-  horse:  { url: 'resources/models/animals/horse.gltf' },
+  llama:  { url: 'resources/models/animals/Llama.gltf' },
+  pug:    { url: 'resources/models/animals/Pug.gltf' },
+  sheep:  { url: 'resources/models/animals/Sheep.gltf' },
+  zebra:  { url: 'resources/models/animals/Zebra.gltf' },
+  horse:  { url: 'resources/models/animals/Horse.gltf' },
   knight: { url: 'resources/models/knight/KnightCharacter.gltf' },
 };
 {
@@ -740,31 +740,31 @@ And running it got this list in [the JavaScript console](https://developers.goog
     WalkSlow
     Death
     Idle
- ------->:  resources/models/animals/llama.gltf
+ ------->:  resources/models/animals/Llama.gltf
     Jump
     Idle
     Walk
     Death
     WalkSlow
- ------->:  resources/models/animals/pug.gltf
+ ------->:  resources/models/animals/Pug.gltf
     Jump
     Walk
     Idle
     WalkSlow
     Death
- ------->:  resources/models/animals/sheep.gltf
+ ------->:  resources/models/animals/Sheep.gltf
     WalkSlow
     Death
     Jump
     Walk
     Idle
- ------->:  resources/models/animals/zebra.gltf
+ ------->:  resources/models/animals/Zebra.gltf
     Jump
     Walk
     Death
     WalkSlow
     Idle
- ------->:  resources/models/animals/horse.gltf
+ ------->:  resources/models/animals/Horse.gltf
     Jump
     WalkSlow
     Death
