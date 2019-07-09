@@ -127,7 +127,7 @@ function render(time) {
 You'd think that would be it but there is one more detail.
 In VR just like we don't control the field of view and direction
 the camera is looking we also don't control where the camera
-starts. At least not as of three.js r103. The camera is hardcoded
+starts. At least not as of three.js r105. The camera is hardcoded
 to default to `x = 0`, `y = 1.6`, `z = 0`
 
 Before we had the cubes along the X axis at Y and Z = 0.
@@ -304,7 +304,7 @@ there's some things to cover
 
 * Supporting both VR and Non-VR
 
-  AFAICT, at least as of r103, there is no easy way to support
+  AFAICT, at least as of r105, there is no easy way to support
 both VR and non-VR modes with three.js. With VR enabled but not in VR mode
 the camera's position is hard coded to `0, 1.6, 0`. Ideally
 if not in VR mode you'd be able to control the camera using
