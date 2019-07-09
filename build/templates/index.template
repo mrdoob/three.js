@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     right: 0;
     top: 0;
     pointer-events: none;
-}}
+}
 @media (max-width: 900px) {
     #forkongithub a{
         line-height: 1.2rem;
