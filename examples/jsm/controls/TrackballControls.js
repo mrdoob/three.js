@@ -7,6 +7,7 @@
 
 import {
 	EventDispatcher,
+	MOUSE,
 	Quaternion,
 	Vector2,
 	Vector3
@@ -41,6 +42,8 @@ var TrackballControls = function ( object, domElement ) {
 	this.maxDistance = Infinity;
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
+
+	this.mouseButtons = { ROTATE: MOUSE.LEFT, ZOOM: MOUSE.MIDDLE, PAN: MOUSE.RIGHT };
 
 	// internals
 
@@ -394,7 +397,24 @@ var TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.NONE ) {
 
-			_state = event.button;
+			switch ( event.button ) {
+
+				case _this.mouseButtons.ROTATE:
+					_state = STATE.ROTATE;
+					break;
+
+				case _this.mouseButtons.ZOOM:
+					_state = STATE.ZOOM;
+					break;
+
+				case _this.mouseButtons.PAN:
+					_state = STATE.PAN;
+					break;
+
+				default:
+					_state = STATE.NONE;
+
+			}
 
 		}
 
