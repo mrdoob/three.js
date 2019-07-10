@@ -5,6 +5,7 @@
 if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 	console.log( "Helio WebXR Polyfill (Lumin 0.97.0)" );
+
 	const isHelio96 = navigator.userAgent.includes("Chrome/73");
 
 	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
@@ -30,6 +31,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 		navigator.xr.requestSession = function ( sessionType ) {
 
 			return new Promise( function ( resolve, reject ) {
+
 				const sessionType = (isHelio96 ? {
 					mode: 'immersive-ar' // Force using immersive-ar
 				} : 'immersive-ar');
@@ -90,7 +92,9 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 										return inputPose;
 
 									} else {
+
 										return tempGetPose(targetRaySpace.gripSpace, referenceSpace);
+
 									}
 
 								};
