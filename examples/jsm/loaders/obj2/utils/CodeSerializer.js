@@ -6,10 +6,11 @@
 const CodeSerializer = {
 
 	/**
+	 * Serialize an object without specific prototype definition.
 	 *
-	 * @param fullName
-	 * @param object
-	 * @returns {string}
+	 * @param {String} fullName complete object name
+	 * @param {Object} object The object that should be serialized
+	 * @returns {String}
 	 */
 	serializeObject: function ( fullName, object ) {
 
@@ -47,23 +48,23 @@ const CodeSerializer = {
 	},
 
 	/**
+	 * Serialize an object with specific prototype definition.
 	 *
-	 * @param fullName
-	 * @param object
-	 * @param basePrototypeName
-	 * @param ignoreFunctions
-	 * @returns {string}
+	 * @param {String} fullName complete object name
+	 * @param {Object} object The object that should be serialized
+	 * @param {String} constructorName
+	 * @param {String} basePrototypeName
+	 * @param {Object} overrideFunctions Object of {@Link OverrideFunctionDescription}
+	 * @returns {String}
 	 */
-	serializeClass: function ( fullName, object, constructorName, basePrototypeName, ignoreFunctions, includeFunctions, overrideFunctions ) {
+	serializeClass: function ( fullName, object, constructorName, basePrototypeName, overrideFunctions ) {
 
-		let valueString, objectPart, constructorString, i, funcOverride;
+		let valueString, objectPart, constructorString, i, funcOverride, currentName;
 		let prototypeFunctions = [];
 		let objectProperties = [];
 		let objectFunctions = [];
 		let isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
 
-		if ( ! Array.isArray( ignoreFunctions ) ) ignoreFunctions = [];
-		if ( ! Array.isArray( includeFunctions ) ) includeFunctions = null;
 		if ( ! Array.isArray( overrideFunctions ) ) overrideFunctions = [];
 
 		for ( let name in object.prototype ) {
@@ -76,23 +77,20 @@ const CodeSerializer = {
 
 			} else if ( typeof objectPart === 'function' ) {
 
-				if ( ignoreFunctions.indexOf( name ) < 0 && ( includeFunctions === null || includeFunctions.indexOf( name ) >= 0 ) ) {
+				currentName = fullName + '.prototype.' + name;
+				funcOverride = overrideFunctions[ name ];
+				if ( funcOverride instanceof OverrideFunctionInstruction && funcOverride.getFullName() === currentName ) {
 
-					funcOverride = overrideFunctions[ name ];
-					if ( funcOverride && funcOverride.fullName === fullName + '.prototype.' + name ) {
+					valueString = funcOverride.code;
 
-						valueString = funcOverride.code;
+				}
+				if ( isExtended ) {
 
-					}
-					if ( isExtended ) {
+					prototypeFunctions.push( currentName + ' = ' + valueString + ';\n\n' );
 
-						prototypeFunctions.push( fullName + '.prototype.' + name + ' = ' + valueString + ';\n\n' );
+				} else {
 
-					} else {
-
-						prototypeFunctions.push( '\t' + name + ': ' + valueString + ',\n\n' );
-
-					}
+					prototypeFunctions.push( '\t' + name + ': ' + valueString + ',\n\n' );
 
 				}
 
@@ -102,24 +100,21 @@ const CodeSerializer = {
 		for ( let name in object ) {
 
 			objectPart = object[ name ];
+			currentName = fullName + '.' + name;
 
 			if ( typeof objectPart === 'function' ) {
 
-				if ( ignoreFunctions.indexOf( name ) < 0 && ( includeFunctions === null || includeFunctions.indexOf( name ) >= 0 ) ) {
+				funcOverride = overrideFunctions[ name ];
+				if ( funcOverride instanceof OverrideFunctionInstruction && funcOverride.getFullName() === currentName ) {
 
-					funcOverride = overrideFunctions[ name ];
-					if ( funcOverride && funcOverride.fullName === fullName + '.' + name ) {
+					valueString = funcOverride.getFunctionCode();
 
-						valueString = funcOverride.code;
+				} else {
 
-					} else {
-
-						valueString = objectPart.toString();
-
-					}
-					objectFunctions.push( fullName + '.' + name + ' = ' + valueString + ';\n\n' );
+					valueString = objectPart.toString();
 
 				}
+				objectFunctions.push( currentName + ' = ' + valueString + ';\n\n' );
 
 			} else {
 
@@ -137,7 +132,7 @@ const CodeSerializer = {
 					valueString = objectPart;
 
 				}
-				objectProperties.push( fullName + '.' + name + ' = ' + valueString + ';\n' );
+				objectProperties.push( currentName + ' = ' + valueString + ';\n' );
 
 			}
 
@@ -156,20 +151,36 @@ const CodeSerializer = {
 		objectString += fullName + '.prototype.constructor = ' + fullName + ';\n';
 		objectString += '\n\n';
 
-		for ( i = 0; i < objectProperties.length; i ++ ) objectString += objectProperties[ i ];
+		for ( i = 0; i < objectProperties.length; i ++ ) {
+
+			objectString += objectProperties[ i ];
+
+		}
 		objectString += '\n\n';
 
-		for ( i = 0; i < objectFunctions.length; i ++ ) objectString += objectFunctions[ i ];
+		for ( i = 0; i < objectFunctions.length; i ++ ) {
+
+			objectString += objectFunctions[ i ];
+
+		}
 		objectString += '\n\n';
 
 		if ( isExtended ) {
 
-			for ( i = 0; i < prototypeFunctions.length; i ++ ) objectString += prototypeFunctions[ i ];
+			for ( i = 0; i < prototypeFunctions.length; i ++ ) {
+
+				objectString += prototypeFunctions[ i ];
+
+			}
 
 		} else {
 
 			objectString += fullName + '.prototype = {\n\n';
-			for ( i = 0; i < prototypeFunctions.length; i ++ ) objectString += prototypeFunctions[ i ];
+			for ( i = 0; i < prototypeFunctions.length; i ++ ) {
+
+				objectString += prototypeFunctions[ i ];
+
+			}
 			objectString += '\n};';
 
 		}
@@ -180,4 +191,46 @@ const CodeSerializer = {
 	},
 };
 
-export { CodeSerializer };
+/**
+ *
+ * @param {String} fullName
+ * @param {String} functionCode
+ * @constructor
+ */
+const OverrideFunctionInstruction = function ( fullName, functionCode ) {
+
+	this.fullName = fullName;
+	this.functionCode = functionCode;
+
+};
+
+OverrideFunctionInstruction.prototype = {
+
+	constructor: OverrideFunctionInstruction,
+
+	/**
+	 * Returns the full name of the function
+	 * @return {String}
+	 */
+	getFullName: function () {
+
+		return this.fullName;
+
+	},
+
+	/**
+	 * Returns the serialized function code
+	 * @return {String}
+	 */
+	getFunctionCode: function() {
+
+		return this.functionCode;
+
+	}
+
+};
+
+export {
+	CodeSerializer,
+	OverrideFunctionInstruction
+};
