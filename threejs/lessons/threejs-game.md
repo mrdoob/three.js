@@ -1871,10 +1871,31 @@ function* countOTo9() {
 }
 ```
 
-If we passed this function to the `CoroutineRunner` above it would print
+If we added this function to the `CoroutineRunner` above it would print
 out each number, 0 to 9, once per frame or rather once per time we called `runner.update`.
 
-In the player let's use a coroutine to emit a note every half second to 1 second
+```js
+const runner = new CoroutineRunner();
+runner.add(count0To9);
+while(runner.isBusy()) {
+  runner.update();
+}
+```
+
+Coroutines are removed automatically when they are finished. 
+To remove a coroutine early, before it reaches the end you need to keep
+a reference to its generator like this
+
+```js
+const gen = count0To9();
+runner.add(gen);
+
+// sometime later
+
+runner.remove(gen);
+```
+
+In any case, in the player let's use a coroutine to emit a note every half second to 1 second
 
 ```js
 class Player extends Component {
@@ -1928,11 +1949,15 @@ function makeTextTexture(str) {
   ctx.font = '60px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#FFF';
   ctx.fillText(str, ctx.canvas.width / 2, ctx.canvas.height / 2);
   return new THREE.CanvasTexture(ctx.canvas);
 }
 const noteTexture = makeTextTexture('♪');
 ```
+
+The texture we create above is white each means when we use it
+we can set the material's color and get a note of any color.
 
 Now that we have a noteTexture here's the `Note` component.
 It uses `SpriteMaterial` and a `Sprite` like we covered in
@@ -1944,6 +1969,7 @@ class Note extends Component {
     super(gameObject);
     const {transform} = gameObject;
     const noteMaterial = new THREE.SpriteMaterial({
+      color: new THREE.Color().setHSL(rand(1), 1, 0.5),
       map: noteTexture,
       side: THREE.DoubleSide,
       transparent: true,
@@ -1981,8 +2007,8 @@ from the scene and the note itself from active gameobjects.
 {{{example url="../threejs-game-conga-line-w-notes.html"}}}
 
 You might be asking, why not use `setTimeout`? The problem with `setTimeout`
-is it's not related to the game clock. For example above we make the maximum
-amount of time allowed to elapse between frames is 1/20th of a second.
+is it's not related to the game clock. For example above we made the maximum
+amount of time allowed to elapse between frames to be 1/20th of a second.
 Our coroutine system will respect that limit but `setTimeout` would not.
 
 Of course we could have made a simple timer ourselves
@@ -1992,6 +2018,7 @@ class Player ... {
   update() {
     this.noteTimer -= globals.deltaTime;
     if (this.noteTimer <= 0) {
+      // reset timer
       this.noteTimer = rand(0.5, 1);
       // create a gameobject with a note component
     }
@@ -2036,6 +2063,17 @@ function* animalCoroutine() {
 
 This would have worked but of course as soon as our states were not so linear
 we'd have had to switch to a `FiniteStateMachine`.
+
+It also wasn't clear to me if coroutines should run independently of their
+components. We could have made a global `CoroutineRunner` and put all
+coroutines on it. That would make cleaning them up harder. As it is now
+if the gameobject is removed all of it's components are removed and
+therefore the coroutine runners created are no longer called and it will
+all get garbage collected. If we had global runner then it would be
+the responsibility of each component to remove any coroutines it added
+or else some other mechanism of registering coroutines with a particular
+component or gameobject would be needed so that removing one removes the
+others.
 
 There are lots more issues a
 normal game engine would deal with. As it is there is no order to how
