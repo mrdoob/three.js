@@ -70,6 +70,8 @@ FunctionCallNode.prototype.copy = function ( source ) {
 
 	this.value = source.value;
 
+	return this;
+
 };
 
 FunctionCallNode.prototype.toJSON = function ( meta ) {

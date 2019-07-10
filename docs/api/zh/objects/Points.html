@@ -50,6 +50,17 @@
 		[page:Material]的实例。定义了物体的外观。默认值是一个具有随机颜色的[page:PointsMaterial]。
 	</p>
 
+	<h3>[property:Array morphTargetInfluences]</h3>
+	<p>
+		一个包含有权重（值一般在0-1范围内）的数组，指定应用了多少变形。
+		默认情况下是未定义的，但是会被[page:Points.updateMorphTargets updateMorphTargets]重置为一个空数组。
+	</p>
+
+	<h3>[property:Object morphTargetDictionary]</h3>
+	<p>
+		基于morphTarget.name属性的morphTargets字典。
+		默认情况下是未定义的，但是会被[page:Points.updateMorphTargets updateMorphTargets]重建。
+	</p>
 
 	<h2>方法</h2>
 	<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
@@ -65,6 +76,11 @@
 		返回这个点及其子集的一个克隆对象。
 	</p>
 
+	<h3>[method:null updateMorphTargets]()</h3>
+	<p>
+		更新morphTargets，使其不对对象产生影响，重置[page:Points.morphTargetInfluences morphTargetInfluences] and
+		[page:Points.morphTargetDictionary morphTargetDictionary]属性。
+	</p>
 
 	<h2>源代码</h2>
 

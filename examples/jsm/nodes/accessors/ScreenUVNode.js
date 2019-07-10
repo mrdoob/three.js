@@ -43,6 +43,8 @@ ScreenUVNode.prototype.copy = function ( source ) {
 
 	this.resolution = source.resolution;
 
+	return this;
+
 };
 
 ScreenUVNode.prototype.toJSON = function ( meta ) {

@@ -29,6 +29,8 @@ BlinnExponentToRoughnessNode.prototype.copy = function ( source ) {
 
 	this.blinnExponent = source.blinnExponent;
 
+	return this;
+
 };
 
 BlinnExponentToRoughnessNode.prototype.toJSON = function ( meta ) {

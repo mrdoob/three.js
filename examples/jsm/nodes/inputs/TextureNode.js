@@ -89,6 +89,8 @@ TextureNode.prototype.copy = function ( source ) {
 	if ( source.bias ) this.bias = source.bias;
 	if ( source.project !== undefined ) this.project = source.project;
 
+	return this;
+
 };
 
 TextureNode.prototype.toJSON = function ( meta ) {

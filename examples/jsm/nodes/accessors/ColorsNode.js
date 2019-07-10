@@ -34,6 +34,8 @@ ColorsNode.prototype.copy = function ( source ) {
 
 	this.index = source.index;
 
+	return this;
+
 };
 
 ColorsNode.prototype.toJSON = function ( meta ) {

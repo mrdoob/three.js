@@ -7,6 +7,7 @@
 
 import {
 	EventDispatcher,
+	MOUSE,
 	Quaternion,
 	Vector2,
 	Vector3
@@ -42,6 +43,8 @@ var TrackballControls = function ( object, domElement ) {
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
+	this.mouseButtons = { ROTATE: MOUSE.LEFT, ZOOM: MOUSE.MIDDLE, PAN: MOUSE.RIGHT };
+
 	// internals
 
 	this.target = new Vector3();
@@ -51,7 +54,7 @@ var TrackballControls = function ( object, domElement ) {
 	var lastPosition = new Vector3();
 
 	var _state = STATE.NONE,
-		_prevState = STATE.NONE,
+		_keyState = STATE.NONE,
 
 		_eye = new Vector3(),
 
@@ -331,7 +334,7 @@ var TrackballControls = function ( object, domElement ) {
 	this.reset = function () {
 
 		_state = STATE.NONE;
-		_prevState = STATE.NONE;
+		_keyState = STATE.NONE;
 
 		_this.target.copy( _this.target0 );
 		_this.object.position.copy( _this.position0 );
@@ -355,33 +358,31 @@ var TrackballControls = function ( object, domElement ) {
 
 		window.removeEventListener( 'keydown', keydown );
 
-		_prevState = _state;
-
-		if ( _state !== STATE.NONE ) {
+		if ( _keyState !== STATE.NONE ) {
 
 			return;
 
 		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && ! _this.noRotate ) {
 
-			_state = STATE.ROTATE;
+			_keyState = STATE.ROTATE;
 
 		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && ! _this.noZoom ) {
 
-			_state = STATE.ZOOM;
+			_keyState = STATE.ZOOM;
 
 		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && ! _this.noPan ) {
 
-			_state = STATE.PAN;
+			_keyState = STATE.PAN;
 
 		}
 
 	}
 
-	function keyup( event ) {
+	function keyup() {
 
 		if ( _this.enabled === false ) return;
 
-		_state = _prevState;
+		_keyState = STATE.NONE;
 
 		window.addEventListener( 'keydown', keydown, false );
 
@@ -396,21 +397,40 @@ var TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.NONE ) {
 
-			_state = event.button;
+			switch ( event.button ) {
+
+				case _this.mouseButtons.ROTATE:
+					_state = STATE.ROTATE;
+					break;
+
+				case _this.mouseButtons.ZOOM:
+					_state = STATE.ZOOM;
+					break;
+
+				case _this.mouseButtons.PAN:
+					_state = STATE.PAN;
+					break;
+
+				default:
+					_state = STATE.NONE;
+
+			}
 
 		}
 
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
+		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
+
+		if ( state === STATE.ROTATE && ! _this.noRotate ) {
 
 			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 			_movePrev.copy( _moveCurr );
 
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
+		} else if ( state === STATE.ZOOM && ! _this.noZoom ) {
 
 			_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 			_zoomEnd.copy( _zoomStart );
 
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
+		} else if ( state === STATE.PAN && ! _this.noPan ) {
 
 			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 			_panEnd.copy( _panStart );
@@ -431,16 +451,18 @@ var TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( _state === STATE.ROTATE && ! _this.noRotate ) {
+		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
+
+		if ( state === STATE.ROTATE && ! _this.noRotate ) {
 
 			_movePrev.copy( _moveCurr );
 			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 
-		} else if ( _state === STATE.ZOOM && ! _this.noZoom ) {
+		} else if ( state === STATE.ZOOM && ! _this.noZoom ) {
 
 			_zoomEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
-		} else if ( _state === STATE.PAN && ! _this.noPan ) {
+		} else if ( state === STATE.PAN && ! _this.noPan ) {
 
 			_panEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 

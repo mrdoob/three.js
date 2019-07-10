@@ -28,6 +28,8 @@ FloatNode.prototype.copy = function ( source ) {
 
 	this.value = source.value;
 
+	return this;
+
 };
 
 FloatNode.prototype.toJSON = function ( meta ) {

@@ -33,6 +33,8 @@ ColorNode.prototype.copy = function ( source ) {
 
 	this.value.copy( source );
 
+	return this;
+
 };
 
 ColorNode.prototype.toJSON = function ( meta ) {

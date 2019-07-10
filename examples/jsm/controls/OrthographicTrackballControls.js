@@ -492,7 +492,25 @@ var OrthographicTrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		_zoomStart.y += event.deltaY * 0.01;
+		switch ( event.deltaMode ) {
+
+			case 2:
+				// Zoom in pages
+				_zoomStart.y -= event.deltaY * 0.025;
+				break;
+
+			case 1:
+				// Zoom in lines
+				_zoomStart.y -= event.deltaY * 0.01;
+				break;
+
+			default:
+				// undefined, 0, assume pixels
+				_zoomStart.y -= event.deltaY * 0.00025;
+				break;
+
+		}
+
 		_this.dispatchEvent( startEvent );
 		_this.dispatchEvent( endEvent );
 

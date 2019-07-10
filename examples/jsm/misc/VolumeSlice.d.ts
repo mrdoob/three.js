@@ -3,7 +3,7 @@ import {
   Mesh,
 } from '../../../src/Three';
 
-import { volume } from './Volume';
+import { Volume } from './Volume';
 
 export class VolumeSlice {
   constructor( volume: Volume, index?: number, axis?: string );

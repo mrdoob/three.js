@@ -135,10 +135,14 @@ export const MirroredRepeatWrapping: Wrapping;
 // Filters
 export enum TextureFilter {}
 export const NearestFilter: TextureFilter;
+export const NearestMipmapNearestFilter: TextureFilter;
 export const NearestMipMapNearestFilter: TextureFilter;
+export const NearestMipmapLinearFilter: TextureFilter;
 export const NearestMipMapLinearFilter: TextureFilter;
 export const LinearFilter: TextureFilter;
+export const LinearMipmapNearestFilter: TextureFilter;
 export const LinearMipMapNearestFilter: TextureFilter;
+export const LinearMipmapLinearFilter: TextureFilter;
 export const LinearMipMapLinearFilter: TextureFilter;
 
 // Data types

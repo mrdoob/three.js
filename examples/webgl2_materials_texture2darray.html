@@ -55,13 +55,13 @@
 		</div>
 
 		<script src="js/libs/jszip.min.js"></script>
-		<script src="js/WebGL.js"></script>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
+			import { WEBGL } from './jsm/WebGL.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 

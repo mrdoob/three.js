@@ -52,6 +52,8 @@ LuminanceNode.prototype.copy = function ( source ) {
 
 	this.rgb = source.rgb;
 
+	return this;
+
 };
 
 LuminanceNode.prototype.toJSON = function ( meta ) {

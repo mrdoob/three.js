@@ -3,7 +3,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-var WEBGL = {
+THREE.WEBGL = {
 
 	isWebGLAvailable: function () {
 
