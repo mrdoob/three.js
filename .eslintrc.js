@@ -10,7 +10,6 @@ module.exports = {
     },
   },
   "plugins": [
-    "eslint-plugin-react",
     "eslint-plugin-html",
     "eslint-plugin-optional-comma-spacing",
     "eslint-plugin-one-variable-per-var",
@@ -85,6 +84,7 @@ module.exports = {
     "no-unreachable": 2,
     "one-variable-per-var/one-variable-per-var": [2],
     "quotes": [2, "single"],
+    "require-atomic-updates": 0,
     "require-trailing-comma/require-trailing-comma": [2],
     "require-yield": 0,
     "semi": [2, "always"],
