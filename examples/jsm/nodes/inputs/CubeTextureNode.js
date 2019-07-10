@@ -47,8 +47,15 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	var code;
 
-	if ( bias ) code = 'texCubeBias( ' + cubetex + ', ' + uv + ', ' + bias + ' )';
-	else code = 'texCube( ' + cubetex + ', ' + uv + ' )';
+	if ( bias ) {
+
+		var renderer = builder.renderer;
+		var texLodExtension = renderer.capabilities.isWebGL2 || renderer.extensions.get( 'EXT_shader_texture_lod' ); // copied from WebGLProgram
+
+		if(texLodExtension) code = 'textureCubeLodEXT( ' + cubetex + ', ' + uv + ', ' + bias + ' )';
+		else code = 'texCubeBias( ' + cubetex + ', ' + uv + ', ' + bias + ' )';
+
+	} else code = 'texCube( ' + cubetex + ', ' + uv + ' )';
 
 	// add a custom context for fix incompatibility with the core
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
