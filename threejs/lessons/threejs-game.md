@@ -2136,6 +2136,12 @@ have to edit the render loop.
 I'll leave those kinds of issues up to you.
 I hope this article has given you some ideas for your own game engine.
 
+Maybe I should promote a game jam. If you click the *jsfiddle* or *codepen* buttons
+above the last example they'll open in those sites ready to edit. Add some features,
+Change the game to a pug leading a bunch of knights. Use the knight's rolling animation
+as a bowling ball and make an animal bowling game. Make an animal relay race.
+If you make a cool game post a link in the comments below.
+
 <div class="footnotes">
 [<a id="parented">1</a>]: technically it would still work if none of the parents have any translation, rotation, or scale <a href="#parented-backref">§</a>.
 </div>
