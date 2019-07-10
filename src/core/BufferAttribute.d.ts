@@ -6,6 +6,7 @@ export class BufferAttribute {
 	constructor( array: ArrayLike<number>, itemSize: number, normalized?: boolean ); // array parameter should be TypedArray.
 
 	uuid: string;
+	name: string;
 	array: ArrayLike<number>;
 	itemSize: number;
 	dynamic: boolean;
