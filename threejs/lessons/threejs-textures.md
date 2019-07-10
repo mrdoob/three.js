@@ -96,16 +96,22 @@ It works!
 
 {{{example url="../threejs-textured-cube-6-textures.html" }}}
 
-It should be noted though that by default the only geometry that supports multiple
-materials is the `BoxGeometry` and `BoxBufferGeometry`. For other cases you will
-need to build or load custom geometry and/or modify texture coordinates. It's far
-more common to use a [Texture Atlas](https://en.wikipedia.org/wiki/Texture_atlas)
-if you want to allow multiple images on a single
-geometry.
+It should be noted though that not all geometry types supports multiple
+materials. `BoxGeometry` and `BoxBufferGeometry` can use 6 materials one for each face.
+`ConeGeometry` and `ConeBufferGeometry` can use 2 materials, one for the bottom and one for the cone.
+`CylinderGeometry` and `CylinderBufferGeometry` can use 3 materials, bottom, top, and side.
+For other cases you will need to build or load custom geometry and/or modify texture coordinates.
+
+It's far more common in other 3D engines and far more performant to use a
+[Texture Atlas](https://en.wikipedia.org/wiki/Texture_atlas)
+if you want to allow multiple images on a single geometry. A Texture atlas
+is where you put multiple images in a single texture and then use texture coordinates
+on the vertices of your geometry to select which parts of a texture are used on
+each triangle in your geometry.
 
 What are texture coordinates? They are data added to each vertex of a piece of geometry
 that specify what part of the texture corresponds to that specific vertex.
-We'll go over them when we start building custom geometry.
+We'll go over them when we start [building custom geometry](threejs-custom-geometry.html).
 
 ## <a name="loading"></a> Loading Textures
 
