@@ -544,12 +544,10 @@
     // Override the getError function with one that returns our saved results.
     if (wrapper.getError) {
       wrapper.getError = function() {
-        for (const err in glErrorShadow) {
-          if (glErrorShadow.hasOwnProperty(err)) {
-            if (glErrorShadow[err]) {
-              glErrorShadow[err] = false;
-              return err;
-            }
+        for (const err of glErrorShadow) {
+          if (glErrorShadow[err]) {
+            glErrorShadow[err] = false;
+            return err;
           }
         }
         return ctx.NO_ERROR;
