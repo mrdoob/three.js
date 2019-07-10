@@ -343,6 +343,10 @@ function main() {
       }
 
       uiElem.addEventListener('mousedown', (e) => {
+        // this is needed because we call preventDefault();
+        // we also gave the canvas a tabindex so it can
+        // become the focus
+        canvas.focus();
         handleMouseMove(e);
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
