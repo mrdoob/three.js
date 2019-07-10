@@ -615,11 +615,14 @@ function main() {
 
   const gui = new dat.GUI();
   gui.add(globals, 'debug').onChange(showHideDebugInfo);
+  gui.close();
 
   const labelContainerElem = document.querySelector('#labels');
   function showHideDebugInfo() {
     labelContainerElem.style.display = globals.debug ? '' : 'none';
   }
+  showHideDebugInfo();
+
   class StateDisplayHelper extends Component {
     constructor(gameObject, size) {
       super(gameObject);

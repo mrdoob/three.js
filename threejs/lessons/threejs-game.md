@@ -1692,11 +1692,14 @@ we've used else where
 ```js
 +const gui = new dat.GUI();
 +gui.add(globals, 'debug').onChange(showHideDebugInfo);
++showHideDebugInfo();
 
 const labelContainerElem = document.querySelector('#labels');
 +function showHideDebugInfo() {
 +  labelContainerElem.style.display = globals.debug ? '' : 'none';
 +}
++showHideDebugInfo();
+
 class StateDisplayHelper extends Component {
 
   ...
@@ -2003,6 +2006,45 @@ the transform at that velocity for 60 frames while fading out the note
 by setting the material's [`opacity`](Material.opacity). 
 After the loop it the removes the transform
 from the scene and the note itself from active gameobjects.
+
+One last thing, let's add a few more animals
+
+```js
+function init() {
+
+   ...
+
+  const animalModelNames = [
+    'pig',
+    'cow',
+    'llama',
+    'pug',
+    'sheep',
+    'zebra',
+    'horse',
+  ];
++  const base = new THREE.Object3D();
++  const offset = new THREE.Object3D();
++  base.add(offset);
++
++  // position animals in a spiral.
++  const numAnimals = 28;
++  const arc = 10;
++  const b = 10 / (2 * Math.PI);
++  let r = 10;
++  let phi = r / b;
++  for (let i = 0; i < numAnimals; ++i) {
++    const name = animalModelNames[rand(animalModelNames.length) | 0];
+    const gameObject = gameObjectManager.createGameObject(scene, name);
+    gameObject.addComponent(Animal, models[name]);
++    base.rotation.y = phi;
++    offset.position.x = r;
++    offset.updateWorldMatrix(true, false);
++    offset.getWorldPosition(gameObject.transform.position);
++    phi += arc / r;
++    r = b * phi;
+  }
+```
 
 {{{example url="../threejs-game-conga-line-w-notes.html"}}}
 
