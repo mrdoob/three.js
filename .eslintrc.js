@@ -77,6 +77,7 @@ module.exports = {
     "no-comma-dangle": [0],
     "no-irregular-whitespace": 2,
     "no-multi-spaces": [0],
+    "no-loop-func": 0,
     "no-obj-calls": 2,
     "no-redeclare": [0],
     "no-shadow": [0],
