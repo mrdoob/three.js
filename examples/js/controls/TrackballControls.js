@@ -35,7 +35,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
-	this.mouseButtons = { LEFT: THREE.MOUSE.LEFT, MIDDLE: THREE.MOUSE.MIDDLE, RIGHT: THREE.MOUSE.RIGHT };
+	this.mouseButtons = { ROTATE: THREE.MOUSE.LEFT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.RIGHT };
 
 	// internals
 
@@ -391,15 +391,15 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			switch ( event.button ) {
 
-				case _this.mouseButtons.LEFT:
+				case _this.mouseButtons.ROTATE:
 					_state = STATE.ROTATE;
 					break;
 
-				case _this.mouseButtons.MIDDLE:
+				case _this.mouseButtons.ZOOM:
 					_state = STATE.ZOOM;
 					break;
 
-				case _this.mouseButtons.RIGHT:
+				case _this.mouseButtons.PAN:
 					_state = STATE.PAN;
 					break;
 
