@@ -123,6 +123,64 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export Material
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/material' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null ) {
+
+			alert( 'No object selected.' );
+			return;
+
+		}
+
+		var material = object.material;
+
+		if ( material === undefined ) {
+
+			alert( 'The selected object doesn\'t have material.' );
+			return;
+
+		}
+
+		if(!(material instanceof Array)){
+			material = [material];
+		}
+
+		for(var i = 0; i < material.length; i++) {
+
+			var output = material[i].toJSON();
+			
+			try {
+				
+				output = JSON.stringify( output, parseNumber, '\t' );
+				output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+				
+			} catch ( e ) {
+				
+				output = JSON.stringify( output );
+				
+			}
+			
+			if(material.length === 1) {
+
+				saveString( output, 'material.json' );
+				
+			} else {
+				
+				saveString( output, 'material.' + i + '.json' );
+				
+			}
+		}
+
+	} );
+	options.add( option );
+
 	// Export Object
 
 	var option = new UI.Row();
