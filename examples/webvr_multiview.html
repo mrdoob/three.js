@@ -23,16 +23,17 @@
 		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/geometries/BoxLineGeometry.js"></script>
-
+		<script src="js/libs/stats.min.js"></script>
 		<script>
 
 			var container;
 			var camera, scene, renderer;
 
 			var room;
+			var stats;
 
 			var count = 0;
-			var radius = 0.08;
+			var radius = 0.02;
 			var normal = new THREE.Vector3();
 			var relativeVelocity = new THREE.Vector3();
 
@@ -45,6 +46,18 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				//
+
+				var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2', { antialias: false } );
+
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
+				container.appendChild( renderer.domElement );
 
 				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
@@ -61,7 +74,7 @@
 
 				room = new THREE.LineSegments(
 					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.LineBasicMaterial( { color: 0x808080 } )
+					new THREE.LineBasicMaterial( { color: renderer.multiview.isAvailable() ? 0x99ff99 : 0xff3333 } )
 				);
 				room.geometry.translate( 0, 3, 0 );
 				scene.add( room );
@@ -72,7 +85,7 @@
 
 				var geometry = new THREE.IcosahedronBufferGeometry( radius );
 
-				for ( var i = 0; i < 2000; i ++ ) {
+				for ( var i = 0; i < 5000; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
@@ -91,21 +104,12 @@
 
 				//
 
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2', { antialias: false } );
-
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
-
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.vr.enabled = true;
-				container.appendChild( renderer.domElement );
-
-				//
-
 				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -131,6 +135,7 @@
 			function render() {
 
 				//
+				stats.update();
 
 				var delta = clock.getDelta();
 

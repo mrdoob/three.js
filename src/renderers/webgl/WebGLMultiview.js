@@ -8,7 +8,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-function WebGLMultiview( renderer, gl ) {
+function WebGLMultiview( renderer, gl, contextAttributes ) {
 
 	var DEFAULT_NUMVIEWS = 2;
 
@@ -52,7 +52,7 @@ function WebGLMultiview( renderer, gl ) {
 
 	function isAvailable() {
 
-		return capabilities.multiview;
+		return capabilities.multiview && !contextAttributes.antialias;
 
 	}
 
@@ -204,8 +204,6 @@ function WebGLMultiview( renderer, gl ) {
 
 
 	if ( isAvailable() ) {
-
-		console.log('multiivew enabled!');
 
 		renderTarget = new WebGLMultiviewRenderTarget( 0, 0, DEFAULT_NUMVIEWS );
 
