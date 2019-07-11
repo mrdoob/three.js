@@ -77,7 +77,7 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
-		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
+		if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
@@ -106,7 +106,7 @@ THREE.BloomPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY.texture;
 
-		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
+		if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 
 		renderer.setRenderTarget( readBuffer );
 		if ( this.clear ) renderer.clear();

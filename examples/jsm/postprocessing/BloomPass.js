@@ -90,7 +90,7 @@ BloomPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
-		if ( maskActive ) renderer.getContext().disable( renderer.getContext().STENCIL_TEST ); // avoid direct gl calls
+		if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
@@ -119,7 +119,7 @@ BloomPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY.texture;
 
-		if ( maskActive ) renderer.getContext().enable( renderer.getContext().STENCIL_TEST ); // avoid direct gl calls
+		if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 
 		renderer.setRenderTarget( readBuffer );
 		if ( this.clear ) renderer.clear();
