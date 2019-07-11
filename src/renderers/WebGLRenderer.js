@@ -317,7 +317,7 @@ function WebGLRenderer( parameters ) {
 
 	// Multiview
 
-	var multiview = new WebGLMultiview( _this, _gl );
+	var multiview = new WebGLMultiview( _this, _gl, _gl.getContextAttributes() );
 
 	this.multiview = multiview;
 
