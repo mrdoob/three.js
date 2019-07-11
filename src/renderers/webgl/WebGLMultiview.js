@@ -8,9 +8,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-function WebGLMultiview( renderer, requested, options ) {
-
-	options = Object.assign( {}, { debug: false }, options );
+function WebGLMultiview( renderer ) {
 
 	var DEFAULT_NUMVIEWS = 2;
 	var gl = renderer.context;
@@ -56,26 +54,6 @@ function WebGLMultiview( renderer, requested, options ) {
 	function isAvailable() {
 
 		return capabilities.multiview;
-
-	}
-
-	function isEnabled() {
-
-		return requested && isAvailable();
-
-	}
-
-	if ( options.debug ) {
-
-		if ( requested && ! isAvailable() ) {
-
-			console.warn( 'WebGLRenderer: Multiview requested but not supported by the browser' );
-
-		} else if ( requested !== false && isAvailable() ) {
-
-			console.info( 'WebGLRenderer: Multiview enabled' );
-
-		}
 
 	}
 
@@ -226,7 +204,9 @@ function WebGLMultiview( renderer, requested, options ) {
 	}
 
 
-	if ( isEnabled() ) {
+	if ( isAvailable() ) {
+
+		console.log('multiivew enabled!');
 
 		renderTarget = new WebGLMultiviewRenderTarget( 0, 0, DEFAULT_NUMVIEWS );
 
@@ -248,7 +228,6 @@ function WebGLMultiview( renderer, requested, options ) {
 	this.attachRenderTarget = attachRenderTarget;
 	this.detachRenderTarget = detachRenderTarget;
 	this.isAvailable = isAvailable;
-	this.isEnabled = isEnabled;
 	this.getNumViews = getNumViews;
 	this.updateCameraProjectionMatricesUniform = updateCameraProjectionMatricesUniform;
 	this.updateCameraViewMatricesUniform = updateCameraViewMatricesUniform;
