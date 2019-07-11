@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 /**
  * This is a template that can be used to light a material, it uses pluggable
  * RenderEquations (RE)for specific lighting scenarios.
@@ -20,6 +20,9 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
+#ifndef STANDARD
+geometry.clearCoatNormal = clearCoatNormal;
+#endif
 IncidentLight directLight;
 
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )

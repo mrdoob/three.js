@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 #define PHYSICAL
 
 uniform vec3 diffuse;
@@ -10,6 +10,7 @@ uniform float opacity;
 #ifndef STANDARD
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
+	uniform bool clearCoatGeometryNormals;
 #endif
 
 varying vec3 vViewPosition;
@@ -70,6 +71,7 @@ void main() {
 	#include <metalnessmap_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
+	#include <clearcoat_normal_fragment_begin>
 	#include <emissivemap_fragment>
 
 	// accumulation

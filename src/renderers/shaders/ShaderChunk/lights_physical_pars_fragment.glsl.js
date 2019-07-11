@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 struct PhysicalMaterial {
 
 	vec3	diffuseColor;
@@ -88,7 +88,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#ifndef STANDARD
 
-		reflectedLight.directSpecular += irradiance * material.clearCoat * BRDF_Specular_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
+		reflectedLight.directSpecular += irradiance * material.clearCoat * BRDF_ClearCoat_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
 	#endif
 
@@ -142,7 +142,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifndef STANDARD
 
-		reflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_Specular_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
+	reflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_ClearCoat_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
 	#endif
 }

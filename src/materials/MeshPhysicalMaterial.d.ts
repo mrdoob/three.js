@@ -8,6 +8,7 @@ export interface MeshPhysicalMaterialParameters
 	reflectivity?: number;
 	clearCoat?: number;
 	clearCoatRoughness?: number;
+	clearCoatGeometryNormals?: boolean;
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
@@ -18,5 +19,6 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 	reflectivity: number;
 	clearCoat: number;
 	clearCoatRoughness: number;
+	clearCoatGeometryNormals?: boolean;
 
 }

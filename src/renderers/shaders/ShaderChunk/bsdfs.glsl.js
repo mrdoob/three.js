@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.
@@ -146,6 +146,29 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 } // validated
 
+#ifndef STANDARD
+vec3 BRDF_ClearCoat_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
+
+	float alpha = pow2( roughness ); // UE4's roughness
+
+	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
+
+	float dotNL = saturate( dot( geometry.clearCoatNormal, incidentLight.direction ) );
+	float dotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
+	float dotNH = saturate( dot( geometry.clearCoatNormal, halfDir ) );
+	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
+
+	vec3 F = F_Schlick( specularColor, dotLH );
+
+	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+
+	float D = D_GGX( alpha, dotNH );
+
+	return F * ( G * D );
+
+}
+#endif
+
 // Rect Area Light
 
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
@@ -273,6 +296,17 @@ vec3 BRDF_Specular_GGX_Environment( const in GeometricContext geometry, const in
 	return specularColor * brdf.x + brdf.y;
 
 } // validated
+
+#ifndef STANDARD
+vec3 BRDF_ClearCoat_GGX_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
+
+	float dotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
+
+	vec2 brdf = integrateSpecularBRDF( dotNV, roughness );
+
+	return specularColor * brdf.x + brdf.y;
+}
+#endif
 
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
 // Approximates multiscattering in order to preserve energy.

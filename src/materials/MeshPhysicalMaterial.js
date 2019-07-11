@@ -7,6 +7,7 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
  *  reflectivity: <float>
  *  clearCoat: <float>
  *  clearCoatRoughness: <float>
+ *  clearCoatGeometryNormals: <boolean>
  * }
  */
 
@@ -22,6 +23,8 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.clearCoat = 0.0;
 	this.clearCoatRoughness = 0.0;
+
+	this.clearCoatGeometryNormals = false;
 
 	this.setValues( parameters );
 
@@ -42,6 +45,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	this.clearCoat = source.clearCoat;
 	this.clearCoatRoughness = source.clearCoatRoughness;
+	this.clearCoatGeometryNormals = source.clearCoatGeometryNormals;
 
 	return this;
 

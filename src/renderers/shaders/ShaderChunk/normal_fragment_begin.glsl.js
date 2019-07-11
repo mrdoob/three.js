@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 #ifdef FLAT_SHADED
 
 	// Workaround for Adreno/Nexus5 not able able to do dFdx( vViewPosition ) ...
@@ -31,5 +31,8 @@ export default /* glsl */`
 
 	#endif
 
+#endif
+#ifndef STANDARD
+	vec3 geometryNormal = normal;
 #endif
 `;

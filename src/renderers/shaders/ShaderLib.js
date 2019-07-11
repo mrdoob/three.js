@@ -273,7 +273,8 @@ ShaderLib.physical = {
 		ShaderLib.standard.uniforms,
 		{
 			clearCoat: { value: 0 },
-			clearCoatRoughness: { value: 0 }
+			clearCoatRoughness: { value: 0 },
+			clearCoatGeometryNormals: { value: false },
 		}
 	] ),
 
