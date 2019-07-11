@@ -339,6 +339,7 @@ var files = {
 		"webvr_cubes",
 		"webvr_dragging",
 		"webvr_lorenzattractor",
+		"webvr_multiview",
 		"webvr_panorama",
 		"webvr_paint",
 		"webvr_rollercoaster",
