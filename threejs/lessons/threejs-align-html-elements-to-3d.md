@@ -791,4 +791,5 @@ div[data-diagram] canvas {
   display: block;
 }
 </style>
+<script src="/3rdparty/dat.gui.min.js"></script>
 <script src="resources/threejs-align-html-elements-to-3d.js"></script>
