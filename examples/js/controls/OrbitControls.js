@@ -998,7 +998,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.touches.ONE ) {
 
-					case TOUCH.ROTATE:
+					case THREE.TOUCH.ROTATE:
 
 						if ( scope.enableRotate === false ) return;
 
@@ -1008,7 +1008,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 						break;
 
-					case TOUCH.PAN:
+					case THREE.TOUCH.PAN:
 
 						if ( scope.enablePan === false ) return;
 
@@ -1030,7 +1030,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				switch ( scope.touches.TWO ) {
 
-					case TOUCH.DOLLY_PAN:
+					case THREE.TOUCH.DOLLY_PAN:
 
 						if ( scope.enableZoom === false && scope.enablePan === false ) return;
 
@@ -1040,7 +1040,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 						break;
 
-					case TOUCH.DOLLY_ROTATE:
+					case THREE.TOUCH.DOLLY_ROTATE:
 
 						if ( scope.enableZoom === false && scope.enableRotate === false ) return;
 
