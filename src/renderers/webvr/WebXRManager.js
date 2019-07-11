@@ -15,7 +15,7 @@ function WebXRManager( renderer ) {
 
 	var scope = this;
 
-	var gl = renderer.context;
+	var gl = renderer.getContext();
 
 	var session = null;
 

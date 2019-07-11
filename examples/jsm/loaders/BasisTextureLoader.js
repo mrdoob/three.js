@@ -82,7 +82,7 @@ BasisTextureLoader.prototype = {
 
 	detectSupport: function ( renderer ) {
 
-		var context = renderer.context;
+		var context = renderer.getContext();
 		var config = this.workerConfig;
 
 		config.etcSupported = !! context.getExtension( 'WEBGL_compressed_texture_etc1' );

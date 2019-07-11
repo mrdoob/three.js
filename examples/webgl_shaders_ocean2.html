@@ -36,8 +36,8 @@
 
 					this.ms_Renderer = new THREE.WebGLRenderer();
 					this.ms_Renderer.setPixelRatio( window.devicePixelRatio );
-					this.ms_Renderer.context.getExtension( 'OES_texture_float' );
-					this.ms_Renderer.context.getExtension( 'OES_texture_float_linear' );
+					this.ms_Renderer.getContext().getExtension( 'OES_texture_float' );
+					this.ms_Renderer.getContext().getExtension( 'OES_texture_float_linear' );
 
 					document.body.appendChild( this.ms_Renderer.domElement );
 
