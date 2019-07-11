@@ -82,13 +82,12 @@ BasisTextureLoader.prototype = {
 
 	detectSupport: function ( renderer ) {
 
-		var context = renderer.getContext();
 		var config = this.workerConfig;
 
-		config.etcSupported = !! context.getExtension( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! context.getExtension( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! context.getExtension( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! context.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.etcSupported ) {
 
