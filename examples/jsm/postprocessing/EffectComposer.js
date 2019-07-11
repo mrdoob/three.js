@@ -147,13 +147,13 @@ Object.assign( EffectComposer.prototype, {
 
 				if ( maskActive ) {
 
-					var context = this.renderer.context;
+					var context = this.renderer.getContext();
 
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff ); // avoid direct gl calls
 
 					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
 
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+					context.stencilFunc( context.EQUAL, 1, 0xffffffff ); // avoid direct gl calls
 
 				}
 

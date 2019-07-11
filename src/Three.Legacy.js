@@ -1549,7 +1549,16 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
 		}
+	},
+	context: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .context has been removed. Use .getContext() instead.' );
+			return this.getContext();
+
+		}
 	}
+
 } );
 
 Object.defineProperties( WebGLShadowMap.prototype, {

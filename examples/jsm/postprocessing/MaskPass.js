@@ -25,7 +25,7 @@ MaskPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		var context = renderer.context;
+		var context = renderer.getContext();
 		var state = renderer.state;
 
 		// don't update color or depth
