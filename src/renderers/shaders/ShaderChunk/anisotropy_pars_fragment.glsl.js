@@ -26,7 +26,7 @@ export default /* glsl */`
   }
 
   vec3 getBentNormal(const GeometricContext geometry, const float anisotropyLocal, const float roughnessFactor) {
-    vec3  anisotropyDirection = anisotropyLocal >= 0.0 ? geometry.anisotropicS : geometry.anisotropicT;
+    vec3  anisotropyDirection = anisotropyLocal >= 0.0 ? geometry.anisotropicT : geometry.anisotropicS;
     vec3  anisotropicTangent  = cross(anisotropyDirection, geometry.viewDir);
     vec3  anisotropicNormal   = cross(anisotropicTangent, anisotropyDirection);
     float bendFactor          = abs(anisotropyLocal) * saturate(5.0 * roughnessFactor);
