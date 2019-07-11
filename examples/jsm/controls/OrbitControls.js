@@ -534,7 +534,7 @@ var OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function handleMouseUp( event ) {
+	function handleMouseUp( /*event*/ ) {
 
 		// console.log( 'handleMouseUp' );
 
@@ -608,9 +608,7 @@ var OrbitControls = function ( object, domElement ) {
 
 			rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -629,9 +627,7 @@ var OrbitControls = function ( object, domElement ) {
 
 			panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -683,9 +679,7 @@ var OrbitControls = function ( object, domElement ) {
 
 			rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -714,9 +708,7 @@ var OrbitControls = function ( object, domElement ) {
 
 			panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -772,7 +764,7 @@ var OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function handleTouchEnd( event ) {
+	function handleTouchEnd( /*event*/ ) {
 
 		//console.log( 'handleTouchEnd' );
 
@@ -1324,7 +1316,7 @@ var MapControls = function ( object, domElement ) {
 	this.touches.ONE = TOUCH.PAN;
 	this.touches.TWO = TOUCH.DOLLY_ROTATE;
 
-}
+};
 
 MapControls.prototype = Object.create( EventDispatcher.prototype );
 MapControls.prototype.constructor = MapControls;

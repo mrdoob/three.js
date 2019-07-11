@@ -524,7 +524,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function handleMouseUp( event ) {
+	function handleMouseUp( /*event*/ ) {
 
 		// console.log( 'handleMouseUp' );
 
@@ -598,9 +598,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -619,9 +617,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -673,9 +669,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -704,9 +698,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
 
-		}
-
-		else {
+		} else {
 
 			var x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
 			var y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
@@ -762,7 +754,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function handleTouchEnd( event ) {
+	function handleTouchEnd( /*event*/ ) {
 
 		//console.log( 'handleTouchEnd' );
 
@@ -1314,7 +1306,7 @@ THREE.MapControls = function ( object, domElement ) {
 	this.touches.ONE = THREE.TOUCH.PAN;
 	this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
 
-}
+};
 
 THREE.MapControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 THREE.MapControls.prototype.constructor = THREE.MapControls;
