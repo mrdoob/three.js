@@ -72,7 +72,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 								// WebXRManager - xrFrame.getPose() Polyfill - line 259
 
-								const tempGetPose = frame.getPose.bind( frame );
+								const tempGetPose = (isHelio96 ? null : frame.getPose.bind( frame ));
 
 								frame.getPose = function ( targetRaySpace, referenceSpace ) {
 
