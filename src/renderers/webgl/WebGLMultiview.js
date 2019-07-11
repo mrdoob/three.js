@@ -8,10 +8,9 @@ import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-function WebGLMultiview( renderer ) {
+function WebGLMultiview( renderer, gl ) {
 
 	var DEFAULT_NUMVIEWS = 2;
-	var gl = renderer.context;
 
 	var capabilities = renderer.capabilities;
 	var properties = renderer.properties;
