@@ -61,9 +61,6 @@ function WebGLRenderer( parameters ) {
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 		_context = parameters.context !== undefined ? parameters.context : null,
-
-		_multiviewRequested = parameters.multiview !== undefined ? parameters.multiview : false,
-
 		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 		_depth = parameters.depth !== undefined ? parameters.depth : true,
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
@@ -318,7 +315,7 @@ function WebGLRenderer( parameters ) {
 
 	this.vr = vr;
 
-	var multiview = new WebGLMultiview( _this, _multiviewRequested );
+	var multiview = new WebGLMultiview( _this );
 
 	this.multiview = multiview;
 
@@ -1185,7 +1182,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( multiview.isEnabled() ) {
+		if ( multiview.isAvailable() ) {
 
 			multiview.attachRenderTarget( camera );
 
@@ -1245,7 +1242,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( multiview.isEnabled() ) {
+		if ( multiview.isAvailable() ) {
 
 			multiview.detachRenderTarget( camera );
 
@@ -1393,7 +1390,7 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			if ( multiview.isEnabled() ) {
+			if ( multiview.isAvailable() ) {
 
 				_currentArrayCamera = camera;
 
