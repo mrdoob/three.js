@@ -28,12 +28,11 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - solid geometry with clip planes and stencil materials</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from './jsm/libs/stats.module.js';
 
 			var camera, scene, renderer, startTime, object, stats;
 			var planes, planeObjects, planeHelpers;
@@ -235,13 +234,13 @@
 				renderer.localClippingEnabled = true;
 
 				// Controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 20;
 				controls.update();
 
 				// GUI
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( params, 'animate' );
 
 				var planeX = gui.addFolder( 'planeX' );
