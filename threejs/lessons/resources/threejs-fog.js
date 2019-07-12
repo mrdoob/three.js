@@ -23,10 +23,28 @@
       metalness: 0,
     };
     loader.load('../resources/models/simple_house_scene/scene.gltf', (gltf) => {
+      const hackGeometry = new THREE.CircleBufferGeometry(0.5, 32);
+      const box = new THREE.Box3();
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
       const materials = new Set();
       gltf.scene.traverse((node) => {
         const material = node.material;
         if (material) {
+          // hack in the bottom of the trees since I don't have
+          // the model file
+          if (node.name === 'mesh_11' || node.name === 'mesh_6') {
+            node.updateWorldMatrix(true, false);
+            box.setFromObject(node);
+            box.getSize(size);
+            box.getCenter(center);
+            const hackMesh = new THREE.Mesh(hackGeometry, node.material);
+            scene.add(hackMesh);
+            hackMesh.position.copy(center);
+            hackMesh.rotation.x = Math.PI * 0.5;
+            hackMesh.position.y -= size.y / 2;
+            hackMesh.scale.set(size.x, size.z, 1);
+          }
           (Array.isArray(material) ? material : [material]).forEach((material) => {
             if (!materials.has(material)) {
               materials.add(material);
