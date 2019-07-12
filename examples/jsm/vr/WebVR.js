@@ -5,7 +5,9 @@
  * Based on @tojiro's vr-samples-utils.js
  */
 
-THREE.WEBVR = {
+
+
+var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
@@ -239,3 +241,5 @@ THREE.WEBVR = {
 	}
 
 };
+
+export { WEBVR };

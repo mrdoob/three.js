@@ -15,7 +15,6 @@
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="js/vr/WebVR.js"></script>
 
 		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/MaryOculus.webm">
@@ -25,6 +24,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var camera, scene, renderer;
 
