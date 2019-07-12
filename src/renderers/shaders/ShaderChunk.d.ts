@@ -88,7 +88,7 @@ export let ShaderChunk: {
 	points_vert: string;
 	shadow_frag: string;
 	shadow_vert: string;
-	transparentcy_pars_fragment: string;
+	transparency_pars_fragment: string;
 
 	premultiplied_alpha_fragment: string;
 	project_vertex: string;
