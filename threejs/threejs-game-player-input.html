@@ -15,6 +15,11 @@
     html, body {
         margin: 0;
         height: 100%;
+        user-select: none;
+    }
+    img, canvas {
+        /* prevent the save-image on long press on mobile */
+        pointer-events: none;
     }
     #c {
         width: 100%;
