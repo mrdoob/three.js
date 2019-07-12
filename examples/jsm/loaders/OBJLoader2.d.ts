@@ -1,6 +1,7 @@
 import {
   LoadingManager,
-  Group
+  Group,
+  Object3D
 } from '../../../src/Three';
 
 import { MaterialHandler } from './obj2/shared/MaterialHandler';
