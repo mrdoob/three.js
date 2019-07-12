@@ -24,12 +24,6 @@
 			<button id="directionalButton">toggle directional light</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-
 		<script type="x-shader/x-vertex" id="vertexShader">
 
 			varying vec3 vWorldPosition;
@@ -63,13 +57,14 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
 
 			var camera, scene, renderer, dirLight, dirLightHeper, hemiLight, hemiLightHelper;
 			var mixers = [];
@@ -167,7 +162,7 @@
 
 				// MODEL
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
 

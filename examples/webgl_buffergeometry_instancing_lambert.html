@@ -26,21 +26,13 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/curves/CurveExtras.js"></script>
+		import Stats from './jsm/libs/stats.module.js';
 
-
-	<script>
-
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { Curves } from './jsm/curves/CurveExtras.js';
 
 		THREE.ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
 
@@ -212,7 +204,7 @@
 
 			scene.add( camera );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableZoom = false;
 			controls.maxPolarAngle = Math.PI / 2;
 
@@ -236,7 +228,7 @@
 			scene.add( light );
 
 			// light shadow camera helper
-			//light.shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+			//light.shadowCameraHelper = new CameraHelper( light.shadow.camera );
 			//scene.add( light.shadowCameraHelper );
 
 
@@ -247,7 +239,7 @@
 
 			const INSTANCES = 256;
 
-			var knot = new THREE.Curves.TorusKnot( 10 );
+			var knot = new Curves.TorusKnot( 10 );
 			var positions = knot.getSpacedPoints( INSTANCES );
 
 			var offsets = new Float32Array( INSTANCES * 3 ); // xyz

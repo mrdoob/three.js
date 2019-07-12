@@ -19,12 +19,14 @@
 			by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
 		</div>
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var group;
 			var container, stats;
@@ -55,7 +57,7 @@
 
 			function initGUI() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( effectController, "showDots" ).onChange( function ( value ) {
 
@@ -88,7 +90,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
 				camera.position.z = 1750;
 
-				var controls = new THREE.OrbitControls( camera, container );
+				var controls = new OrbitControls( camera, container );
 
 				scene = new THREE.Scene();
 

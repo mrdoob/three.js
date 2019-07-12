@@ -21,12 +21,12 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl layers
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -97,7 +97,7 @@
 
 				//
 				// Init gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( layers, 'red' ).onChange( function () {
 
 					camera.layers.toggle( 0 );

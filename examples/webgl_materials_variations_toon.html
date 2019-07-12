@@ -11,25 +11,18 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Toon Material Variantions with OutlineEffect</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/effects/OutlineEffect.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
 
 			var container, stats;
 
-			var camera, scene, renderer, controls, effect;
+			var camera, scene, renderer, effect;
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
@@ -163,14 +156,14 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				//
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

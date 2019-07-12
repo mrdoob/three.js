@@ -79,18 +79,11 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var scenes = [], views, t, canvas, renderer;
 
@@ -179,7 +172,7 @@
 					camera.position.set( 0, 0, 1.2 * balls );
 					scene.userData.camera = camera;
 
-					var controls = new THREE.OrbitControls( camera, views[ n ] );
+					var controls = new OrbitControls( camera, views[ n ] );
 					scene.userData.controls = controls;
 
 					scenes.push( scene );

@@ -17,10 +17,11 @@
 
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			var camera, scene, renderer, controls;
 
@@ -50,7 +51,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 500 );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 200;
 				controls.maxDistance = 500;
 

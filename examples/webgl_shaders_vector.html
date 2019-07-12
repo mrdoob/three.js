@@ -19,10 +19,6 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
-		<script src="../build/three.js"></script>
-		<script src="./js/controls/OrbitControls.js"></script>
-
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-fragment" id="fs">
 
@@ -62,8 +58,13 @@
 
 		</script>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var stats;
 
@@ -203,7 +204,7 @@
 
 						hole = subshape.holes[ i ];
 
-						process = processShape( hole.curves, true );
+						process = processShape( hole.curves );
 
 						pts = process.pts;
 						pts2 = process.pts2;
@@ -283,7 +284,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 50, 100, 0 );
 				controls.update();
 

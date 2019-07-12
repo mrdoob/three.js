@@ -16,24 +16,15 @@
 		based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård
 	</div>
 
-	<script src="../build/three.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script src="js/controls/OrbitControls.js"></script>
+		import Stats from './jsm/libs/stats.module.js';
 
-	<script src="js/objects/MarchingCubes.js"></script>
-	<script src="js/shaders/ToonShader.js"></script>
-
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-
-
-	<script>
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
+		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
 
 		var container, stats;
 
@@ -89,7 +80,7 @@
 
 			resolution = 28;
 
-			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true, true );
+			effect = new MarchingCubes( resolution, materials[ current_material ].m, true, true );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
 
@@ -113,7 +104,7 @@
 
 			// CONTROLS
 
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new OrbitControls( camera, renderer.domElement );
 
 			// STATS
 
@@ -161,10 +152,10 @@
 
 			// toons
 
-			var toonMaterial1 = createShaderMaterial( THREE.ToonShader1, light, ambientLight );
-			var toonMaterial2 = createShaderMaterial( THREE.ToonShader2, light, ambientLight );
-			var hatchingMaterial = createShaderMaterial( THREE.ToonShaderHatching, light, ambientLight );
-			var dottedMaterial = createShaderMaterial( THREE.ToonShaderDotted, light, ambientLight );
+			var toonMaterial1 = createShaderMaterial( ToonShader1, light, ambientLight );
+			var toonMaterial2 = createShaderMaterial( ToonShader2, light, ambientLight );
+			var hatchingMaterial = createShaderMaterial( ToonShaderHatching, light, ambientLight );
+			var dottedMaterial = createShaderMaterial( ToonShaderDotted, light, ambientLight );
 
 			var texture = new THREE.TextureLoader().load( "textures/UV_Grid_Sm.jpg" );
 			texture.wrapS = THREE.RepeatWrapping;
@@ -321,7 +312,7 @@
 
 			var h, m_h, m_s, m_l;
 
-			var gui = new dat.GUI();
+			var gui = new GUI();
 
 			// material (type)
 
@@ -383,14 +374,14 @@
 
 			var i, ballx, bally, ballz, subtract, strength;
 			var rainbow = [
-					new THREE.Color(0xff0000),
-					new THREE.Color(0xff7f00),
-					new THREE.Color(0xffff00),
-					new THREE.Color(0x00ff00),
-					new THREE.Color(0x0000ff),
-					new THREE.Color(0x4b0082),
-					new THREE.Color(0x9400d3)
-				];
+				new THREE.Color( 0xff0000 ),
+				new THREE.Color( 0xff7f00 ),
+				new THREE.Color( 0xffff00 ),
+				new THREE.Color( 0x00ff00 ),
+				new THREE.Color( 0x0000ff ),
+				new THREE.Color( 0x4b0082 ),
+				new THREE.Color( 0x9400d3 )
+			];
 			subtract = 12;
 			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
 
@@ -402,7 +393,7 @@
 
 				if ( current_material === 'multiColors' ) {
 
-					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[i % 7] );
+					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[ i % 7 ] );
 
 				} else {
 

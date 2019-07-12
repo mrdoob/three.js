@@ -12,24 +12,14 @@
 			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			////////////////////////////////////////////////////////////////////////////////
-			// Utah/Newell Teapot demo
-			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, dat, window */
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			var camera, scene, renderer;
 			var cameraControls;
@@ -85,7 +75,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
@@ -181,7 +171,7 @@
 
 				var h;
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				// material (attributes)
 
@@ -315,7 +305,7 @@
 
 				}
 
-				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,

@@ -22,16 +22,16 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - catmull spline editor
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/DragControls.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/controls/TransformControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { DragControls } from './jsm/controls/DragControls.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TransformControls } from './jsm/controls/TransformControls.js';
 
 			String.prototype.format = function () {
 
@@ -109,7 +109,7 @@
 				helper.material.transparent = true;
 				scene.add( helper );
 
-				//var axes = new THREE.AxesHelper( 1000 );
+				//var axes = new AxesHelper( 1000 );
 				//axes.position.set( - 500, - 500, - 500 );
 				//scene.add( axes );
 
@@ -122,7 +122,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'uniform' );
 				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
@@ -139,7 +139,7 @@
 				gui.open();
 
 				// Controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
@@ -155,7 +155,7 @@
 
 				} );
 
-				transformControl = new THREE.TransformControls( camera, renderer.domElement );
+				transformControl = new TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
 				transformControl.addEventListener( 'dragging-changed', function ( event ) {
 
@@ -189,7 +189,7 @@
 
 				} );
 
-				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
+				var dragcontrols = new DragControls( splineHelperObjects, camera, renderer.domElement ); //
 				dragcontrols.enabled = false;
 				dragcontrols.addEventListener( 'hoveron', function ( event ) {
 

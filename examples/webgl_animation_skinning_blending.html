@@ -32,20 +32,14 @@
 			Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var scene, renderer, camera, stats;
 			var model, skeleton, mixer, clock;
@@ -90,7 +84,7 @@
 				dirLight.shadow.camera.far = 40;
 				scene.add( dirLight );
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				// ground
 
@@ -99,7 +93,7 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( 'models/gltf/Soldier.glb', function ( gltf ) {
 
 					model = gltf.scene;
@@ -157,7 +151,7 @@
 
 			function createPanel() {
 
-				var panel = new dat.GUI( { width: 310 } );
+				var panel = new GUI( { width: 310 } );
 
 				var folder1 = panel.addFolder( 'Visibility' );
 				var folder2 = panel.addFolder( 'Activation/Deactivation' );

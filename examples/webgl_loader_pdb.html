@@ -38,17 +38,17 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/loaders/PDBLoader.js"></script>
-		<script src="js/renderers/CSS2DRenderer.js"></script>
-
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules</div>
 		<div id="menu"></div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
+			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
 
 			var camera, scene, renderer, labelRenderer;
 			var controls;
@@ -75,7 +75,7 @@
 				"Graphite": "graphite.pdb"
 			};
 
-			var loader = new THREE.PDBLoader();
+			var loader = new PDBLoader();
 			var offset = new THREE.Vector3();
 
 			var menu = document.getElementById( 'menu' );
@@ -110,7 +110,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
-				labelRenderer = new THREE.CSS2DRenderer();
+				labelRenderer = new CSS2DRenderer();
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
 				labelRenderer.domElement.style.top = '0';
@@ -119,7 +119,7 @@
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 500;
 				controls.maxDistance = 2000;
 
@@ -219,7 +219,7 @@
 						text.style.color = 'rgb(' + atom[ 3 ][ 0 ] + ',' + atom[ 3 ][ 1 ] + ',' + atom[ 3 ][ 2 ] + ')';
 						text.textContent = atom[ 4 ];
 
-						var label = new THREE.CSS2DObject( text );
+						var label = new CSS2DObject( text );
 						label.position.copy( object.position );
 						root.add( label );
 

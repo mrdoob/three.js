@@ -8,22 +8,17 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/DigitalGlitch.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/GlitchPass.js"></script>
-
 		<div id="info">
-			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox" onchange="updateOptions()"/><br />
+			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox"/><br />
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { GlitchPass } from './jsm/postprocessing/GlitchPass.js';
 
 			var camera, scene, renderer, composer;
 			var object, light;
@@ -81,16 +76,19 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				glitchPass = new THREE.GlitchPass();
+				glitchPass = new GlitchPass();
 				composer.addPass( glitchPass );
 
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var wildGlitchOption = document.getElementById( 'wildGlitch' );
+				wildGlitchOption.addEventListener( 'change', updateOptions );
 
 				updateOptions();
 
@@ -115,7 +113,6 @@
 				object.rotation.y += 0.01;
 
 				composer.render();
-				//renderer.render(scene, camera);
 
 			}
 

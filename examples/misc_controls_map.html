@@ -22,19 +22,13 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - map controls
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/MapControls.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script src='js/libs/dat.gui.min.js'></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { MapControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, controls, scene, renderer;
 
@@ -58,7 +52,7 @@
 
 				// controls
 
-				controls = new THREE.MapControls( camera, renderer.domElement );
+				controls = new MapControls( camera, renderer.domElement );
 
 				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
@@ -111,8 +105,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-				var gui = new dat.GUI();
-
+				var gui = new GUI();
 				gui.add( controls, 'screenSpacePanning' );
 
 			}

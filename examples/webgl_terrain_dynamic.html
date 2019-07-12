@@ -28,18 +28,6 @@
 			animate terrain: <strong>m</strong>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-
-		<script src="js/shaders/NormalMapShader.js"></script>
-		<script src="js/shaders/TerrainShader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
 
 			//
@@ -183,13 +171,16 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { NormalMapShader } from './jsm/shaders/NormalMapShader.js';
+			import { TerrainShader } from './jsm/shaders/TerrainShader.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -257,7 +248,7 @@
 
 				// HEIGHT + NORMAL MAPS
 
-				var normalShader = THREE.NormalMapShader;
+				var normalShader = NormalMapShader;
 
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -307,7 +298,7 @@
 
 				// TERRAIN SHADER
 
-				var terrainShader = THREE.TerrainShader;
+				var terrainShader = TerrainShader;
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
@@ -366,7 +357,7 @@
 
 				var geometryTerrain = new THREE.PlaneBufferGeometry( 6000, 6000, 256, 256 );
 
-				THREE.BufferGeometryUtils.computeTangents( geometryTerrain );
+				BufferGeometryUtils.computeTangents( geometryTerrain );
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ 'terrain' ] );
 				terrain.position.set( 0, - 125, 0 );
@@ -383,7 +374,7 @@
 
 				// CONTROLS
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;

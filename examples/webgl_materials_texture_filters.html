@@ -43,23 +43,14 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container, stats;
+			var container;
 
 			var camera, scene, scene2, renderer;
 
@@ -191,9 +182,6 @@
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				//container.appendChild( stats.dom );
-
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			}
@@ -212,7 +200,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 

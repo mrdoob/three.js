@@ -9,45 +9,36 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Exported by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Exporter</a> and edited by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Studio</a>.<br/>
-			Asset by <a href="http://vhalldez.cgsociety.org/" target="_blank" rel="noopener">Valdez Araujo</a>. 
+			Asset by <a href="http://vhalldez.cgsociety.org/" target="_blank" rel="noopener">Valdez Araujo</a>.
 			Geometry Compression with <a href="https://github.com/google/draco" target="_blank" rel="noopener">Google Draco</a> and content with LZMA using <a href="http://sunag.github.io/sea3d/IO/index.html" style="color:#FFFFFF" target="_blank">SEA3D I.O.</a> Tools<br>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
-
-		<script src="js/loaders/sea3d/SEA3D.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
-
 		<script src="js/libs/draco/draco_decoder.js"></script>
-		<script src="js/loaders/sea3d/SEA3DDraco.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
+			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
 
-			}
+			import { SEA3D } from './jsm/loaders/sea3d/SEA3DLoader.js';
+			import './jsm/loaders/sea3d/SEA3DLZMA.js'; // sea3d lzma extension
+			import './jsm/loaders/sea3d/SEA3DDraco.js'; // sea3d draco extension
+
+			import Stats from './jsm/libs/stats.module.js';
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls;
+			var camera, scene, renderer, composer;
 
 			var loader;
 
@@ -59,7 +50,7 @@
 			// SEA3D Loader
 			//
 
-			loader = new THREE.SEA3D( {
+			loader = new SEA3D( {
 
 				autoPlay: true, // Auto play animations
 				container: scene, // Container to add models
@@ -101,27 +92,27 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				// post-processing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var renderPass = new RenderPass( scene, camera );
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
 
-				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
 				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
 				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
-				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				var vignettePass = new ShaderPass( VignetteShader );
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
@@ -155,7 +146,7 @@
 				requestAnimationFrame( animate );
 
 				// Update SEA3D Animations
-				THREE.SEA3D.AnimationHandler.update( delta );
+				SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
 

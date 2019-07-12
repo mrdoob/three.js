@@ -24,11 +24,6 @@
 				border: 1px solid white;
 			}
 		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-
 	</head>
 	<body>
 
@@ -40,13 +35,11 @@
 			<div></div>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer;
 			var mesh, sprite, texture;
@@ -123,7 +116,7 @@
 				//
 
 				var overlay = document.getElementById( 'overlay' );
-				var controls = new THREE.OrbitControls( camera, overlay );
+				var controls = new OrbitControls( camera, overlay );
 				controls.enablePan = false;
 
 				//

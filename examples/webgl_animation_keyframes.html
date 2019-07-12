@@ -27,15 +27,15 @@
 			<a href="https://www.artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 			var scene, camera, pointLight, stats;
 			var renderer, mixer, controls;
@@ -59,7 +59,7 @@
 			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( 5, 2, 8 );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
 			controls.enablePan = false;
 
@@ -78,10 +78,10 @@
 				path + 'posz' + format, path + 'negz' + format
 			] );
 
-			THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+			DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
-			var loader = new THREE.GLTFLoader();
-			loader.setDRACOLoader( new THREE.DRACOLoader() );
+			var loader = new GLTFLoader();
+			loader.setDRACOLoader( new DRACOLoader() );
 			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
 
 				var model = gltf.scene;

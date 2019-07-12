@@ -12,24 +12,14 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader - Nurbs
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/curves/NURBSCurve.js"></script>
-		<script src="js/curves/NURBSUtils.js"></script>
-		<script src="js/loaders/FBXLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -64,7 +54,7 @@
 				container.appendChild( stats.dom );
 
 				// model
-				var loader = new THREE.FBXLoader();
+				var loader = new FBXLoader();
 				loader.load( 'models/fbx/nurbs.fbx', function ( object ) {
 
 					scene.add( object );
@@ -76,7 +66,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 12, 0 );
 				controls.update();
 

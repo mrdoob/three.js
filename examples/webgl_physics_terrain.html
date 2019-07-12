@@ -15,19 +15,15 @@
 		<div id="container"></div>
 		<div id="info">Ammo.js physics terrain heightfield demo</div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// Heightfield parameters
 			var terrainWidthExtents = 100;
@@ -62,7 +58,7 @@
 			var timeNextSpawn = time + objectTimePeriod;
 			var maxNumObjects = 30;
 
-			Ammo().then( function( AmmoLib ) {
+			Ammo().then( function ( AmmoLib ) {
 
 				Ammo = AmmoLib;
 
@@ -106,7 +102,7 @@
 				camera.position.z = terrainDepthExtents / 2;
 				camera.lookAt( 0, 0, 0 );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );

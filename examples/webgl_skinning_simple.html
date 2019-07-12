@@ -13,12 +13,14 @@
 			<a href="https://github.com/mrdoob/three.js/blob/master/examples/models/skinned/simple/simple.blend" target="_blank" rel="noopener">Blender File</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var stats, mixer, camera, scene, renderer, clock;
 
@@ -73,7 +75,7 @@
 
 				//
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( './models/gltf/SimpleSkinning.gltf', function ( gltf ) {
 
 					scene.add( gltf.scene );
@@ -102,7 +104,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
 				controls.minDistance = 5;
 				controls.maxDistance = 50;

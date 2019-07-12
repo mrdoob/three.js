@@ -13,20 +13,13 @@
 			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var params = {
 				exposure: 2.0
@@ -54,8 +47,8 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.RGBELoader()
-					.setType( THREE.UnsignedByteType ) // alt: THREE.FloatType, THREE.HalfFloatType
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType ) // alt: FloatType, HalfFloatType
 					.load( 'textures/memorial.hdr', function ( texture, textureData ) {
 
 						//console.log( textureData );
@@ -75,7 +68,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();

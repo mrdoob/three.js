@@ -20,12 +20,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> svg - lines
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SVGRenderer.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { SVGRenderer } from './jsm/renderers/SVGRenderer.js';
 
 			var camera, scene, renderer;
 
@@ -40,7 +39,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0, 0, 0 );
 
-				renderer = new THREE.SVGRenderer();
+				renderer = new SVGRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

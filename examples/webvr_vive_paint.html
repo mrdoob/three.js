@@ -13,15 +13,14 @@
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="../build/three.js"></script>
 
-		<script src="js/vr/ViveController.js"></script>
-		<script src="js/vr/PaintViveController.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { PaintViveController } from './jsm/vr/PaintViveController.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -98,8 +97,8 @@
 				light.shadow.mapSize.set( 4096, 4096 );
 				scene.add( light );
 
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new DirectionalLightHelper( light ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				//
 
@@ -116,19 +115,19 @@
 
 				// controllers
 
-				controller1 = new THREE.PaintViveController( 0 );
+				controller1 = new PaintViveController( 0 );
 				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller1 );
 
-				controller2 = new THREE.PaintViveController( 1 );
+				controller2 = new PaintViveController( 1 );
 				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller2 );
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
 				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 
@@ -141,7 +140,7 @@
 					controller.castShadow = true;
 					controller.receiveShadow = true;
 
-					// var pivot = new THREE.Group();
+					// var pivot = new Group();
 					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
 					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
 					pivot.name = 'pivot';
@@ -192,7 +191,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				var reflectionCube = new CubeTextureLoader().load( urls );
 				*/
 
 				var material = new THREE.MeshStandardMaterial( {

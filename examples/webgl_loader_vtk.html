@@ -14,23 +14,14 @@
 		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank" rel="noopener">The GeorgiaTech Lagre Geometric Model Archive</a>
 		</div>
 
-		<script src='js/libs/inflate.min.js'></script>
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/VTKLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
 			var container, stats;
 
@@ -58,7 +49,7 @@
 
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
 
-				var loader = new THREE.VTKLoader();
+				var loader = new VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
 
 					geometry.center();
@@ -71,7 +62,7 @@
 
 				} );
 
-				var loader1 = new THREE.VTKLoader();
+				var loader1 = new VTKLoader();
 				loader1.load( 'models/vtk/cube_ascii.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -88,7 +79,7 @@
 
 				} );
 
-				var loader2 = new THREE.VTKLoader();
+				var loader2 = new VTKLoader();
 				loader2.load( 'models/vtk/cube_binary.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -105,7 +96,7 @@
 
 				} );
 
-				var loader3 = new THREE.VTKLoader();
+				var loader3 = new VTKLoader();
 				loader3.load( 'models/vtk/cube_no_compression.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -134,7 +125,7 @@
 
 				// controls
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;

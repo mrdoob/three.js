@@ -57,11 +57,6 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-		<script src="js/loaders/PDBLoader.js"></script>
-
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - molecules</div>
 		<div id="topmenu">
@@ -69,7 +64,14 @@
 		</div>
 		<div id="menu"></div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
+			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
+
 			var camera, scene, renderer;
 			var controls;
 			var root;
@@ -104,7 +106,7 @@
 				"Graphite": "graphite.pdb"
 			};
 
-			var loader = new THREE.PDBLoader();
+			var loader = new PDBLoader();
 			var colorSpriteMap = {};
 			var baseSprite = document.createElement( 'img' );
 
@@ -125,13 +127,13 @@
 
 				//
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
 				controls.addEventListener( 'change', render );
 
@@ -211,7 +213,7 @@
 
 					var object = objects[ i ];
 
-					if ( object instanceof THREE.CSS3DSprite ) {
+					if ( object instanceof CSS3DSprite ) {
 
 						object.element.style.display = "";
 						object.visible = true;
@@ -233,7 +235,7 @@
 
 					var object = objects[ i ];
 
-					if ( object instanceof THREE.CSS3DSprite ) {
+					if ( object instanceof CSS3DSprite ) {
 
 						object.element.style.display = "none";
 						object.visible = false;
@@ -259,7 +261,7 @@
 					object.element.style.display = "";
 					object.visible = true;
 
-					if ( ! ( object instanceof THREE.CSS3DSprite ) ) {
+					if ( ! ( object instanceof CSS3DSprite ) ) {
 
 						object.element.style.height = object.userData.bondLengthShort;
 
@@ -369,7 +371,7 @@
 						var atom = document.createElement( 'img' );
 						atom.src = colorSprite;
 
-						var object = new THREE.CSS3DSprite( atom );
+						var object = new CSS3DSprite( atom );
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
 
@@ -409,7 +411,7 @@
 						bond.className = "bond";
 						bond.style.height = bondLength + "px";
 
-						var object = new THREE.CSS3DObject( bond );
+						var object = new CSS3DObject( bond );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 
@@ -448,7 +450,7 @@
 						joint.matrixAutoUpdate = false;
 						joint.updateMatrix();
 
-						var object = new THREE.CSS3DObject( bond );
+						var object = new CSS3DObject( bond );
 						object.rotation.y = Math.PI / 2;
 
 						object.matrixAutoUpdate = false;

@@ -113,7 +113,7 @@ Sidebar.Geometry.ExtrudeGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
 			parameters.shapes,
 			{
 				curveSegments: curveSegments.getValue(),
@@ -131,7 +131,7 @@ Sidebar.Geometry.ExtrudeGeometry = function ( editor, object ) {
 
 	function toShape() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE.ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
 			parameters.shapes,
 			options.curveSegments
 		) ) );

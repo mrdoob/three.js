@@ -15,32 +15,19 @@
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-		<script src="js/shaders/FocusShader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
+			import { FocusShader } from './jsm/shaders/FocusShader.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var camera, scene, renderer, mesh;
 
@@ -68,7 +55,7 @@
 
 				camera.lookAt( scene.position );
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 
 				loader.load( 'models/obj/male02/male02.obj', function ( object ) {
 
@@ -110,16 +97,16 @@
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 0.75 );
-				var effectFilm = new THREE.FilmPass( 0.5, 0.5, 1448, false );
+				var renderModel = new RenderPass( scene, camera );
+				var effectBloom = new BloomPass( 0.75 );
+				var effectFilm = new FilmPass( 0.5, 0.5, 1448, false );
 
-				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
+				effectFocus = new ShaderPass( FocusShader );
 
 				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
 				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );

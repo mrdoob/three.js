@@ -13,20 +13,13 @@
 			Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/PLYLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
 			var container, stats;
 
@@ -65,7 +58,7 @@
 
 				// PLY file
 
-				var loader = new THREE.PLYLoader();
+				var loader = new PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
 					geometry.computeVertexNormals();

@@ -9,14 +9,14 @@
 	<body>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="../build/three.js"></script>
 
-		<script src="js/objects/Lensflare.js"></script>
-		<script src="js/objects/Reflector.js"></script>
+		<script type="module">
 
-		<script src="js/vr/WebVR.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
+			import { Reflector } from './jsm/objects/Reflector.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var camera, scene, renderer;
 
@@ -63,7 +63,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				var light = new THREE.DirectionalLight( 0xff0000 );
@@ -74,7 +74,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				// lensflare
@@ -82,19 +82,19 @@
 				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
-				var lensflare = new THREE.Lensflare();
+				var lensflare = new Lensflare();
 				lensflare.position.set( 0, 5, - 5 );
-				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
+				lensflare.addElement( new LensflareElement( texture0, 700, 0 ) );
+				lensflare.addElement( new LensflareElement( texture3, 60, 0.6 ) );
+				lensflare.addElement( new LensflareElement( texture3, 70, 0.7 ) );
+				lensflare.addElement( new LensflareElement( texture3, 120, 0.9 ) );
+				lensflare.addElement( new LensflareElement( texture3, 70, 1 ) );
 				scene.add( lensflare );
 
 				//
 
 				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
-				reflector = new THREE.Reflector( geometry, {
+				reflector = new Reflector( geometry, {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );

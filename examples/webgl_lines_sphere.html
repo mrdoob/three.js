@@ -12,18 +12,9 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - lines WebGL demo
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth,
 				SCREEN_HEIGHT = window.innerHeight,

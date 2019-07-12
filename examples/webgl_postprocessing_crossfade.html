@@ -15,12 +15,14 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/utils/BufferGeometryUtils.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var container, stats;
 			var renderer;
@@ -55,8 +57,8 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var sceneA = new Scene( "cube", 5000, 1200, 120, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
-				var sceneB = new Scene( "sphere", 500, 2000, 50, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
+				var sceneA = new FXScene( "cube", 5000, 1200, 120, new THREE.Vector3( 0, - 0.4, 0 ), 0xffffff );
+				var sceneB = new FXScene( "sphere", 500, 2000, 50, new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
 
 				transition = new Transition( sceneA, sceneB );
 
@@ -73,7 +75,7 @@
 
 			function initGUI() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( transitionParams, "useTexture" ).onChange( function ( value ) {
 
@@ -175,11 +177,11 @@
 
 				}
 
-				return THREE.BufferGeometryUtils.mergeBufferGeometries( geometries );
+				return BufferGeometryUtils.mergeBufferGeometries( geometries );
 
 			}
 
-			function Scene( type, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
+			function FXScene( type, numObjects, cameraZ, fov, rotationSpeed, clearColor ) {
 
 				this.clearColor = clearColor;
 

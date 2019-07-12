@@ -11,18 +11,11 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - raycasting - points </div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var renderer, scene, camera, stats;
 			var pointclouds;
@@ -90,7 +83,7 @@
 				var geometry = generatePointCloudGeometry( color, width, length );
 				var material = new THREE.PointsMaterial( { size: pointSize, vertexColors: THREE.VertexColors } );
 
-				return  new THREE.Points( geometry, material );
+				return new THREE.Points( geometry, material );
 
 			}
 

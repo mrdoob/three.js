@@ -11,10 +11,6 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<script id="vertexShader" type="x-shader/x-vertex">
 
 			varying vec2 vUv;
@@ -67,13 +63,9 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var container;
 

@@ -28,10 +28,11 @@
 			See your console for stats.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PRWMLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { PRWMLoader } from './jsm/loaders/PRWMLoader.js';
 
 			var container;
 
@@ -49,7 +50,7 @@
 
 			function init() {
 
-				document.getElementById( 'endianness' ).innerHTML = THREE.PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
+				document.getElementById( 'endianness' ).innerHTML = PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -69,7 +70,7 @@
 
 				// model
 
-				var loader = new THREE.PRWMLoader();
+				var loader = new PRWMLoader();
 				var material = new THREE.MeshPhongMaterial( {} );
 				var busy = false;
 				var mesh = null;

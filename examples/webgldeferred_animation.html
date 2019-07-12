@@ -10,23 +10,15 @@
 	<body>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
-
-		<script src="js/loaders/GLTFLoader.js"></script>
-
-		<script>
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { WebGLDeferredRenderer } from './jsm/renderers/WebGLDeferredRenderer.js';
 
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight;
@@ -52,7 +44,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLDeferredRenderer();
+				renderer = new WebGLDeferredRenderer();
 				renderer.setSize( WIDTH, HEIGHT );
 
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
@@ -80,7 +72,7 @@
 
 			function initModel() {
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function ( gltf ) {
 
@@ -208,7 +200,7 @@
 
 			function initGui() {
 
-				var gui = new dat.GUI( { width: 280 } );
+				var gui = new GUI( { width: 280 } );
 
 				var api = {
 					'mode': 0,

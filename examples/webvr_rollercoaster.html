@@ -9,12 +9,13 @@
 	<body>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="../build/three.js"></script>
 
-		<script src="js/misc/RollerCoaster.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { RollerCoasterGeometry, RollerCoasterShadowGeometry, RollerCoasterLiftersGeometry, TreesGeometry, SkyGeometry } from './jsm/misc/RollerCoaster.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -70,14 +71,14 @@
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
-			var geometry = new THREE.TreesGeometry( mesh );
+			var geometry = new TreesGeometry( mesh );
 			var material = new THREE.MeshBasicMaterial( {
 				side: THREE.DoubleSide, vertexColors: THREE.VertexColors
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
-			var geometry = new THREE.SkyGeometry();
+			var geometry = new SkyGeometry();
 			var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
@@ -120,20 +121,20 @@
 
 			} )();
 
-			var geometry = new THREE.RollerCoasterGeometry( curve, 1500 );
+			var geometry = new RollerCoasterGeometry( curve, 1500 );
 			var material = new THREE.MeshPhongMaterial( {
 				vertexColors: THREE.VertexColors
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
-			var geometry = new THREE.RollerCoasterLiftersGeometry( curve, 100 );
+			var geometry = new RollerCoasterLiftersGeometry( curve, 100 );
 			var material = new THREE.MeshPhongMaterial();
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.position.y = 0.1;
 			scene.add( mesh );
 
-			var geometry = new THREE.RollerCoasterShadowGeometry( curve, 500 );
+			var geometry = new RollerCoasterShadowGeometry( curve, 500 );
 			var material = new THREE.MeshBasicMaterial( {
 				color: 0x305000, depthWrite: false, transparent: true
 			} );

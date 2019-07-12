@@ -18,24 +18,15 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="birds"></span> webgl gpgpu birds<br/>
-			Select <span id="options"></span> birds<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds<br/>
 			Move mouse to disturb birds.
 		</div>
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/misc/GPUComputationRenderer.js"></script>
 
 		<!--
 		TODO: If you're reading this, you may wish to improve this example by
 			- Create a better shading for the birds?
 
 		-->
-
 
 		<!-- shader for bird's position -->
 		<script id="fragmentShaderPosition" type="x-shader/x-fragment">
@@ -304,25 +295,22 @@
 
 		</script>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var hash = document.location.hash.substr( 1 );
-			if ( hash ) hash = parseInt( hash, 0 );
+			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
 			/* TEXTURE WIDTH FOR SIMULATION */
-			var WIDTH = hash || 32;
+			var WIDTH = 32;
 
 			var BIRDS = WIDTH * WIDTH;
 
 			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
-			THREE.BirdGeometry = function () {
+			var BirdGeometry = function () {
 
 				var triangles = BIRDS * 3;
 				var points = triangles * 3;
@@ -407,37 +395,17 @@
 
 			};
 
-			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+			BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
 
 
 			var container, stats;
-			var camera, scene, renderer, i;
+			var camera, scene, renderer;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
 			var BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
-
-			document.getElementById( 'birds' ).innerText = BIRDS;
-
-			function change( n ) {
-
-				location.hash = n;
-				location.reload();
-				return false;
-
-			}
-
-			var options = '';
-			for ( i = 1; i < 7; i ++ ) {
-
-				var j = Math.pow( 2, i );
-				options += '<a href="#" onclick="return change(' + j + ')">' + ( j * j ) + '</a> ';
-
-			}
-
-			document.getElementById( 'options' ).innerHTML = options;
 
 			var last = performance.now();
 
@@ -481,9 +449,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-
-
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 
 				var effectController = {
@@ -504,7 +470,6 @@
 
 				valuesChanger();
 
-
 				gui.add( effectController, "separation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
 				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
@@ -516,7 +481,7 @@
 
 			function initComputeRenderer() {
 
-				gpuCompute = new THREE.GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
@@ -560,7 +525,7 @@
 
 			function initBirds() {
 
-				var geometry = new THREE.BirdGeometry();
+				var geometry = new BirdGeometry();
 
 				// For Vertex and Fragment
 				birdUniforms = {
@@ -571,7 +536,7 @@
 					"delta": { value: 0.0 }
 				};
 
-				// ShaderMaterial
+				// THREE.ShaderMaterial
 				var material = new THREE.ShaderMaterial( {
 					uniforms: birdUniforms,
 					vertexShader: document.getElementById( 'birdVS' ).textContent,

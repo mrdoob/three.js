@@ -9,20 +9,13 @@
 
 	<body>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - ascii</div>
-		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/effects/AsciiEffect.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			var camera, controls, scene, renderer, effect;
 
@@ -62,7 +55,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';
@@ -72,7 +65,7 @@
 
 				document.body.appendChild( effect.domElement );
 
-				controls = new THREE.TrackballControls( camera, effect.domElement );
+				controls = new TrackballControls( camera, effect.domElement );
 
 				//
 

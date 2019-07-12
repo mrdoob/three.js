@@ -100,10 +100,6 @@
 
 	<div id="container"></div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/controls/TrackballControls.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-
 	<script id="vertMerged" type="x-shader/x-vertex">
 		#define SHADER_NAME vertMerged
 
@@ -305,7 +301,12 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 		var container, stats;
 		var camera, controls, scene, renderer;
@@ -950,7 +951,7 @@
 
 			// controls
 
-			controls = new THREE.TrackballControls(
+			controls = new TrackballControls(
 				camera, renderer.domElement
 			);
 			controls.staticMoving = true;

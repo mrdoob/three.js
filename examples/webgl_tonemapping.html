@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - inline tone mapping</title>
+		<title>three.js webgl - inline tone mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -11,31 +11,22 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Inline Tone Mapping (within a Material's fragment shader) without<br/>using a pre-processing step or float/half buffers by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var container, stats;
 			var params = {
@@ -57,7 +48,7 @@
 				ACESFilmic: THREE.ACESFilmicToneMapping
 			};
 
-			var camera, scene, renderer, group;
+			var camera, scene, renderer, mesh;
 			var composer;
 			var standardMaterial, floorMaterial;
 
@@ -151,24 +142,24 @@
 					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
 				];
 
-				new THREE.HDRCubeTextureLoader()
-					.setType( THREE.UnsignedByteType )
+				new HDRCubeTextureLoader()
+					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function ( hdrCubeMap ) {
 
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
+						pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-					standardMaterial.needsUpdate = true;
+						standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						standardMaterial.needsUpdate = true;
 
-					hdrCubeMap.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
+						hdrCubeMap.dispose();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-				} );
+					} );
 
 				// Lights
 
@@ -190,23 +181,23 @@
 
 				renderer.gammaOutput = true;
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				var renderScene = new THREE.RenderPass( scene, camera );
+				var renderScene = new RenderPass( scene, camera );
 				composer.addPass( renderScene );
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) );
 				gui.add( params, 'exposure', 0, 10 );

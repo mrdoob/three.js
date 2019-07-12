@@ -44,9 +44,6 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/PointerLockControls.js"></script>
-
 		<div id="blocker">
 
 			<div id="instructions">
@@ -59,7 +56,11 @@
 
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { PointerLockControls } from './jsm/controls/PointerLockControls.js';
 
 			var camera, scene, renderer, controls;
 
@@ -85,6 +86,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.y = 10;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
@@ -94,7 +96,7 @@
 				light.position.set( 0.5, 1, 0.75 );
 				scene.add( light );
 
-				controls = new THREE.PointerLockControls( camera );
+				controls = new PointerLockControls( camera );
 
 				var blocker = document.getElementById( 'blocker' );
 				var instructions = document.getElementById( 'instructions' );

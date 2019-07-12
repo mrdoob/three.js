@@ -10,19 +10,9 @@
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgl gpgpu water<br/>
-			Select <span id="options"></span> water size<br/>
 			Move mouse to disturb water.<br>
 			Press mouse button to orbit around. 'W' key toggles wireframe.
 		</div>
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/math/SimplexNoise.js"></script>
-
-		<script src="js/misc/GPUComputationRenderer.js"></script>
 
 
 		<!-- This is the 'compute shader' for the water heightmap: -->
@@ -72,7 +62,7 @@
 		<!-- This is just a smoothing 'compute shader' for using manually: -->
 		<script id="smoothFragmentShader" type="x-shader/x-fragment">
 
-			uniform sampler2D texture;
+			uniform sampler2D smoothTexture;
 
 			void main()	{
 
@@ -81,11 +71,11 @@
 				vec2 uv = gl_FragCoord.xy * cellSize;
 
 				// Computes the mean of texel and 4 neighbours
-				vec4 textureValue = texture2D( texture, uv );
-				textureValue += texture2D( texture, uv + vec2( 0.0, cellSize.y ) );
-				textureValue += texture2D( texture, uv + vec2( 0.0, - cellSize.y ) );
-				textureValue += texture2D( texture, uv + vec2( cellSize.x, 0.0 ) );
-				textureValue += texture2D( texture, uv + vec2( - cellSize.x, 0.0 ) );
+				vec4 textureValue = texture2D( smoothTexture, uv );
+				textureValue += texture2D( smoothTexture, uv + vec2( 0.0, cellSize.y ) );
+				textureValue += texture2D( smoothTexture, uv + vec2( 0.0, - cellSize.y ) );
+				textureValue += texture2D( smoothTexture, uv + vec2( cellSize.x, 0.0 ) );
+				textureValue += texture2D( smoothTexture, uv + vec2( - cellSize.x, 0.0 ) );
 
 				textureValue /= 5.0;
 
@@ -101,7 +91,7 @@
 
 			uniform vec2 point1;
 
-			uniform sampler2D texture;
+			uniform sampler2D levelTexture;
 
 			// Integer to float conversion from https://stackoverflow.com/questions/17981163/webgl-read-pixels-from-floating-point-render-target
 
@@ -152,11 +142,11 @@
 
 				vec2 cellSize = 1.0 / resolution.xy;
 
-				float waterLevel = texture2D( texture, point1 ).x;
+				float waterLevel = texture2D( levelTexture, point1 ).x;
 
 				vec2 normal = vec2(
-					( texture2D( texture, point1 + vec2( - cellSize.x, 0 ) ).x - texture2D( texture, point1 + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
-					( texture2D( texture, point1 + vec2( 0, - cellSize.y ) ).x - texture2D( texture, point1 + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS );
+					( texture2D( levelTexture, point1 + vec2( - cellSize.x, 0 ) ).x - texture2D( levelTexture, point1 + vec2( cellSize.x, 0 ) ).x ) * WIDTH / BOUNDS,
+					( texture2D( levelTexture, point1 + vec2( 0, - cellSize.y ) ).x - texture2D( levelTexture, point1 + vec2( 0, cellSize.y ) ).x ) * WIDTH / BOUNDS );
 
 				if ( gl_FragCoord.x < 1.5 ) {
 
@@ -180,7 +170,7 @@
 
 		</script>
 
-		<!-- This is the water visualization shader, copied from the MeshPhongMaterial and modified: -->
+		<!-- This is the water visualization shader, copied from the THREE.MeshPhongMaterial and modified: -->
 		<script id="waterVertexShader" type="x-shader/x-vertex">
 
 			uniform sampler2D heightmap;
@@ -256,19 +246,19 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
-
-			var hash = document.location.hash.substr( 1 );
-			if ( hash ) hash = parseInt( hash, 0 );
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
+			import { SimplexNoise } from './jsm/math/SimplexNoise.js';
 
 			// Texture width for simulation
-			var WIDTH = hash || 128;
+			var WIDTH = 128;
 
 			// Water size in system units
 			var BOUNDS = 512;
@@ -295,27 +285,7 @@
 			var spheres = [];
 			var spheresEnabled = true;
 
-			var simplex = new THREE.SimplexNoise();
-
-			document.getElementById( 'waterSize' ).innerText = WIDTH + ' x ' + WIDTH;
-
-			function change( n ) {
-
-				location.hash = n;
-				location.reload();
-				return false;
-
-			}
-
-
-			var options = '';
-			for ( var i = 4; i < 10; i ++ ) {
-
-				var j = Math.pow( 2, i );
-				options += '<a href="#" onclick="return change(' + j + ')">' + j + 'x' + j + '</a> ';
-
-			}
-			document.getElementById( 'options' ).innerHTML = options;
+			var simplex = new SimplexNoise();
 
 			init();
 			animate();
@@ -343,7 +313,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -367,7 +337,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var effectController = {
 					mouseSize: 20.0,
@@ -420,7 +390,7 @@
 
 				var geometry = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
 
-				// material: make a ShaderMaterial clone of MeshPhongMaterial, with customized vertex shader
+				// material: make a THREE.ShaderMaterial clone of THREE.MeshPhongMaterial, with customized vertex shader
 				var material = new THREE.ShaderMaterial( {
 					uniforms: THREE.UniformsUtils.merge( [
 						THREE.ShaderLib[ 'phong' ].uniforms,
@@ -435,7 +405,7 @@
 
 				material.lights = true;
 
-				// Material attributes from MeshPhongMaterial
+				// Material attributes from THREE.MeshPhongMaterial
 				material.color = new THREE.Color( materialColor );
 				material.specular = new THREE.Color( 0x111111 );
 				material.shininess = 50;
@@ -459,7 +429,7 @@
 
 				scene.add( waterMesh );
 
-				// Mesh just for mouse raycasting
+				// THREE.Mesh just for mouse raycasting
 				var geometryRay = new THREE.PlaneBufferGeometry( BOUNDS, BOUNDS, 1, 1 );
 				meshRay = new THREE.Mesh( geometryRay, new THREE.MeshBasicMaterial( { color: 0xFFFFFF, visible: false } ) );
 				meshRay.rotation.x = - Math.PI / 2;
@@ -470,7 +440,7 @@
 
 				// Creates the gpu computation class and sets it up
 
-				gpuCompute = new THREE.GPUComputationRenderer( WIDTH, WIDTH, renderer );
+				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				var heightmap0 = gpuCompute.createTexture();
 
@@ -494,12 +464,12 @@
 				}
 
 				// Create compute shader to smooth the water surface and velocity
-				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { texture: { value: null } } );
+				smoothShader = gpuCompute.createShaderMaterial( document.getElementById( 'smoothFragmentShader' ).textContent, { smoothTexture: { value: null } } );
 
 				// Create compute shader to read water level
 				readWaterLevelShader = gpuCompute.createShaderMaterial( document.getElementById( 'readWaterLevelFragmentShader' ).textContent, {
 					point1: { value: new THREE.Vector2() },
-					texture: { value: null }
+					levelTexture: { value: null }
 				} );
 				readWaterLevelShader.defines.WIDTH = WIDTH.toFixed( 1 );
 				readWaterLevelShader.defines.BOUNDS = BOUNDS.toFixed( 1 );
@@ -550,7 +520,7 @@
 						var x = i * 128 / WIDTH;
 						var y = j * 128 / WIDTH;
 
-						pixels[ p + 0 ] = noise( x, y, 123.4 );
+						pixels[ p + 0 ] = noise( x, y );
 						pixels[ p + 1 ] = pixels[ p + 0 ];
 						pixels[ p + 2 ] = 0;
 						pixels[ p + 3 ] = 1;
@@ -570,10 +540,10 @@
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					smoothShader.uniforms[ "texture" ].value = currentRenderTarget.texture;
+					smoothShader.uniforms[ "smoothTexture" ].value = currentRenderTarget.texture;
 					gpuCompute.doRenderTarget( smoothShader, alternateRenderTarget );
 
-					smoothShader.uniforms[ "texture" ].value = alternateRenderTarget.texture;
+					smoothShader.uniforms[ "smoothTexture" ].value = alternateRenderTarget.texture;
 					gpuCompute.doRenderTarget( smoothShader, currentRenderTarget );
 
 				}
@@ -591,7 +561,7 @@
 
 						sphere = sphereTemplate.clone();
 
-				}
+					}
 
 					sphere.position.x = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
 					sphere.position.z = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
@@ -610,7 +580,7 @@
 
 				var currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
 
-				readWaterLevelShader.uniforms[ "texture" ].value = currentRenderTarget.texture;
+				readWaterLevelShader.uniforms[ "levelTexture" ].value = currentRenderTarget.texture;
 
 				for ( var i = 0; i < NUM_SPHERES; i ++ ) {
 

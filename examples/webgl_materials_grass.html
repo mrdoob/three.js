@@ -8,17 +8,10 @@
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
 
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 

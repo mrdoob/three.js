@@ -18,9 +18,11 @@
 	</head>
 <body>
 	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raycast sprite<br></div>
-	<script src="../build/three.js"></script>
-	<script src="./js/controls/OrbitControls.js"></script>
-	<script>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 		var renderer, scene, camera;
 		var controls, group;
@@ -48,7 +50,7 @@
 			camera.position.set( 15, 15, 15 );
 			camera.lookAt( scene.position );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableRotate = true;
 
 			// add sprites

@@ -20,21 +20,14 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/math/ImprovedNoise.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			var container, stats;
 
@@ -68,7 +61,7 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 20000 );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1000;
 				controls.maxDistance = 10000;
 				controls.maxPolarAngle = Math.PI / 2;
@@ -133,7 +126,7 @@
 			function generateHeight( width, height ) {
 
 				var size = width * height, data = new Uint8Array( size ),
-					perlin = new THREE.ImprovedNoise(), quality = 1, z = Math.random() * 100;
+					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 

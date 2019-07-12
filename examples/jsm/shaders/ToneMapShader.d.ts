@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface ToneMapShader {
+export const ToneMapShader: {
   uniforms: {
     tDiffuse: Uniform;
     averageLuminance: Uniform;
@@ -13,4 +13,4 @@ export interface ToneMapShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

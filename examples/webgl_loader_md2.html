@@ -13,24 +13,16 @@
 			Character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/MD2Loader.js"></script>
-		<script src="js/misc/MD2Character.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MD2Character } from './jsm/misc/MD2Character.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -84,7 +76,7 @@
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
 				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
@@ -96,7 +88,7 @@
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 				scene.add( light );
 
 				//  GROUND
@@ -137,13 +129,13 @@
 
 				// CONTROLS
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
 				controls.update();
 
 				// GUI
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function () {
 
@@ -180,7 +172,7 @@
 
 				};
 
-				character = new THREE.MD2Character();
+				character = new MD2Character();
 				character.scale = 3;
 
 				character.onLoadComplete = function () {

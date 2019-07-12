@@ -532,7 +532,7 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 };
 
-THREE.LightningStrike.prototype.addNewSubray = function ( rayParameters ) {
+THREE.LightningStrike.prototype.addNewSubray = function ( /*rayParameters*/ ) {
 
 	return this.subrays[ this.numSubrays ++ ];
 
@@ -784,7 +784,7 @@ THREE.LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, 
 
 };
 
-THREE.LightningStrike.prototype.createPrismFaces = function ( vertex, index ) {
+THREE.LightningStrike.prototype.createPrismFaces = function ( vertex/*, index*/ ) {
 
 	var indices = this.indices;
 	var vertex = this.currentVertex - 6;
@@ -832,7 +832,6 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 
 		var isActive = phase % period <= dutyCycle * period;
 
-		probability = lightningStrike.subrayProbability;
 		var probability = 0;
 
 		if ( isActive ) {

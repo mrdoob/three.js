@@ -10,13 +10,13 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sandbox</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/BasicShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { BasicShader } from './jsm/shaders/BasicShader.js';
 
 			var statsEnabled = true;
 
@@ -46,7 +46,7 @@
 				var light = new THREE.PointLight( 0xffffff );
 				scene.add( light );
 
-				var shader = THREE.BasicShader;
+				var shader = BasicShader;
 				var uniforms = shader.uniforms;
 				var vertexShader = shader.vertexShader;
 				var fragmentShader = shader.fragmentShader;

@@ -13,19 +13,14 @@
 	</div>
 	<div id="inset"></div>
 
-	<script src="../build/three.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script src="js/controls/OrbitControls.js"></script>
-
-	<script src="js/misc/Volume.js"></script>
-	<script src="js/loaders/NRRDLoader.js"></script>
-	<script src="js/shaders/VolumeShader.js"></script>
-
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/gunzip.min.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-
-	<script>
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
+		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
+		import { WEBGL } from './jsm/WebGL.js';
 
 		if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -33,8 +28,7 @@
 
 		}
 
-		var container,
-			renderer,
+		var renderer,
 			scene,
 			camera,
 			controls,
@@ -64,21 +58,21 @@
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
 
 			// Create controls
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.addEventListener( 'change', render );
 			controls.target.set( 64, 64, 128 );
 			controls.minZoom = 0.5;
 			controls.maxZoom = 4;
 			controls.update();
 
-			// scene.add( new THREE.AxesHelper( 128 ) );
+			// scene.add( new AxesHelper( 128 ) );
 
 			// Lighting is baked into the shader a.t.m.
-			// var dirLight = new THREE.DirectionalLight( 0xffffff );
+			// var dirLight = new DirectionalLight( 0xffffff );
 
 			// The gui for interaction
 			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis' };
-			var gui = new dat.GUI();
+			var gui = new GUI();
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
@@ -86,10 +80,10 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
-			new THREE.NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
+			new NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
-				// THREEJS will select R32F (33326) based on the RedFormat and FloatType.
+				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
 				var texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
@@ -106,7 +100,7 @@
 				};
 
 				// Material
-				var shader = THREE.VolumeRenderShader1;
+				var shader = VolumeRenderShader1;
 
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -124,7 +118,7 @@
 					side: THREE.BackSide // The volume shader uses the backface as its "reference point"
 				} );
 
-				// Mesh
+				// THREE.Mesh
 				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
 				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
 

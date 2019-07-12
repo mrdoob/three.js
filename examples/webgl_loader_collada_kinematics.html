@@ -12,21 +12,14 @@
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/tween.min.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
 			var container, stats;
 
@@ -38,7 +31,7 @@
 			var kinematicsTween;
 			var tweenParameters = {};
 
-			var loader = new THREE.ColladaLoader();
+			var loader = new ColladaLoader();
 			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
@@ -46,7 +39,7 @@
 
 				dae.traverse( function ( child ) {
 
-					if ( child instanceof THREE.Mesh ) {
+					if ( child.isMesh ) {
 
 						// model does not have normals
 						child.material.flatShading = true;
@@ -141,7 +134,7 @@
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate( function () {
+				kinematicsTween.onUpdate( function ( object ) {
 
 					for ( var prop in kinematics.joints ) {
 
@@ -149,7 +142,7 @@
 
 							if ( ! kinematics.joints[ prop ].static ) {
 
-								kinematics.setJointValue( prop, this[ prop ] );
+								kinematics.setJointValue( prop, object[ prop ] );
 
 							}
 

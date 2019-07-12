@@ -19,24 +19,16 @@
 			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, camera, scene, renderer, mesh;
 
 			function init() {
-
-				if ( WEBGL.isWebGLAvailable() === false ) {
-
-					document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-					return false;
-
-				}
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x8FBCD4 );
@@ -48,7 +40,7 @@
 				camera.position.z = 8;
 				scene.add( camera );
 
-				var controls = new THREE.OrbitControls( camera, container );
+				var controls = new OrbitControls( camera, container );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
@@ -140,7 +132,7 @@
 					Spherify: 0,
 					Twist: 0,
 				};
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var folder = gui.addFolder( 'Morph Targets' );
 
 				folder.add( params, 'Spherify', 0, 1 ).step( 0.01 ).onChange( function ( value ) {

@@ -19,23 +19,6 @@
 				color: orange
 			}
 		</style>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/FlyControls.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FilmShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 	</head>
 
 	<body>
@@ -44,13 +27,16 @@
 		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { FlyControls } from './jsm/controls/FlyControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
 
 			var radius = 6371;
 			var tilt = 0.41;
@@ -204,7 +190,7 @@
 
 				//
 
-				controls = new THREE.FlyControls( camera );
+				controls = new FlyControls( camera );
 
 				controls.movementSpeed = 1000;
 				controls.domElement = renderer.domElement;
@@ -221,10 +207,10 @@
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
+				var renderModel = new RenderPass( scene, camera );
+				var effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFilm );

@@ -13,11 +13,11 @@
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -56,18 +56,7 @@
 				var table = new THREE.Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
-				table.castShadow = true;
-				table.receiveShadow = true;
 				scene.add( table );
-
-				/*
-				var table = new THREE.Mesh( geometry, material );
-				table.position.y = 0.35;
-				table.position.z = -0.85;
-				table.castShadow = true;
-				table.receiveShadow = true;
-				scene.add( table );
-				*/
 
 				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
@@ -77,25 +66,17 @@
 				} );
 				var floor = new THREE.Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
-				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
+				var grid = new THREE.GridHelper( 10, 20, 0x111111, 0x111111 );
+				grid.material.depthTest = false; // avoid z-fighting
+				scene.add( grid );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 6, 0 );
-				light.castShadow = true;
-				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = - 2;
-				light.shadow.camera.right = 2;
-				light.shadow.camera.left = - 2;
-				light.shadow.mapSize.set( 4096, 4096 );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light.position.set( 0, 4, 0 );
 				scene.add( light );
-
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 				//
 
@@ -104,7 +85,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.shadowMap.enabled = true;
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -138,34 +118,20 @@
 				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller2 );
 
-				var loader = new THREE.OBJLoader();
-				loader.setPath( 'models/obj/vive-controller/' );
-				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+				//
 
-					var loader = new THREE.TextureLoader();
-					loader.setPath( 'models/obj/vive-controller/' );
+				var geometry = new THREE.CylinderBufferGeometry( 0.01, 0.02, 0.08, 5 );
+				geometry.rotateX( - Math.PI / 2 );
+				var material = new THREE.MeshStandardMaterial( { flatShading: true } );
+				var mesh = new THREE.Mesh( geometry, material );
 
-					var controller = object.children[ 0 ];
-					controller.material.map = loader.load( 'onepointfive_texture.png' );
-					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-					controller.castShadow = true;
-					controller.receiveShadow = true;
+				var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
+				pivot.name = 'pivot';
+				pivot.position.z = - 0.05;
+				mesh.add( pivot );
 
-					// var pivot = new THREE.Group();
-					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
-					pivot.name = 'pivot';
-					pivot.position.y = - 0.016;
-					pivot.position.z = - 0.043;
-					pivot.rotation.x = Math.PI / 5.5;
-					controller.add( pivot );
-
-					controller1.add( controller.clone() );
-
-					pivot.material = pivot.material.clone();
-					controller2.add( controller.clone() );
-
-				} );
+				controller1.add( mesh.clone() );
+				controller2.add( mesh.clone() );
 
 				//
 
@@ -191,32 +157,14 @@
 
 				geometry.drawRange.count = 0;
 
-				//
-
-				/*
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-					path + 'px' + format, path + 'nx' + format,
-					path + 'py' + format, path + 'ny' + format,
-					path + 'pz' + format, path + 'nz' + format
-				];
-
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				*/
-
 				var material = new THREE.MeshStandardMaterial( {
 					roughness: 0.9,
 					metalness: 0.0,
-					// envMap: reflectionCube,
-					vertexColors: THREE.VertexColors,
-					side: THREE.DoubleSide
+					vertexColors: THREE.VertexColors
 				} );
 
 				line = new THREE.Mesh( geometry, material );
 				line.frustumCulled = false;
-				line.castShadow = true;
-				line.receiveShadow = true;
 				scene.add( line );
 
 				// Shapes

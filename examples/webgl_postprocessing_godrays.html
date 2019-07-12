@@ -8,25 +8,18 @@
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/shaders/GodRaysShader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl god-rays example - tree by <a href="http://www.turbosquid.com/3d-models/free-tree-3d-model/592617" target="_blank" rel="noopener">stanloshka</a>
 		</div>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { GodRaysFakeSunShader, GodRaysDepthMaskShader, GodRaysCombineShader, GodRaysGenerateShader } from './jsm/shaders/GodRaysShader.js';
 
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
@@ -71,7 +64,7 @@
 
 				// tree
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					object.material = materialScene;
@@ -187,7 +180,7 @@
 
 				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
 				// investigate further for now.
-				// pars.format = THREE.LuminanceFormat;
+				// pars.format = LuminanceFormat;
 
 				// I would have this quarter size and use it as one of the ping-pong render
 				// targets but the aliasing causes some temporal flickering
@@ -204,7 +197,7 @@
 
 				// god-ray shaders
 
-				var godraysMaskShader = THREE.GodRaysDepthMaskShader;
+				var godraysMaskShader = GodRaysDepthMaskShader;
 				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
 				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
 
@@ -214,7 +207,7 @@
 
 				} );
 
-				var godraysGenShader = THREE.GodRaysGenerateShader;
+				var godraysGenShader = GodRaysGenerateShader;
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
 				postprocessing.materialGodraysGenerate = new THREE.ShaderMaterial( {
 
@@ -224,7 +217,7 @@
 
 				} );
 
-				var godraysCombineShader = THREE.GodRaysCombineShader;
+				var godraysCombineShader = GodRaysCombineShader;
 				postprocessing.godrayCombineUniforms = THREE.UniformsUtils.clone( godraysCombineShader.uniforms );
 				postprocessing.materialGodraysCombine = new THREE.ShaderMaterial( {
 
@@ -234,7 +227,7 @@
 
 				} );
 
-				var godraysFakeSunShader = THREE.GodRaysFakeSunShader;
+				var godraysFakeSunShader = GodRaysFakeSunShader;
 				postprocessing.godraysFakeSunUniforms = THREE.UniformsUtils.clone( godraysFakeSunShader.uniforms );
 				postprocessing.materialGodraysFakeSun = new THREE.ShaderMaterial( {
 

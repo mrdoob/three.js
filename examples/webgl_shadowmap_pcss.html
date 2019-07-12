@@ -19,12 +19,6 @@
 	<body>
 		<div id="info">Percent Closer Soft-Shadows (PCSS) by <a href="http://eduperiment.com">spidersharma03</a></div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<script type="x-shader/x-fragment" id="PCSS">
 
 				#define LIGHT_WORLD_SIZE 0.005
@@ -120,13 +114,13 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -167,7 +161,7 @@
 
 				scene.add( light );
 
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
+				// scene.add( new DirectionalLightHelper( light ) );
 				scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 				// group
@@ -243,7 +237,7 @@
 				renderer.shadowMap.enabled = true;
 
 				// controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.5;
 				controls.minDistance = 10;
 				controls.maxDistance = 75;

@@ -20,10 +20,13 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - BVH Loader<br/>
 			animation from <a href="http://mocap.cs.cmu.edu/">http://mocap.cs.cmu.edu/</a>
 		</div>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/BVHLoader.js"></script>
-		<script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { BVHLoader } from './jsm/loaders/BVHLoader.js';
 
 			var clock = new THREE.Clock();
 
@@ -33,11 +36,11 @@
 			init();
 			animate();
 
-			var loader = new THREE.BVHLoader();
+			var loader = new BVHLoader();
 			loader.load( "models/bvh/pirouette.bvh", function ( result ) {
 
 				skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
-				skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+				skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to THREE.SkeletonHelper directly
 
 				var boneContainer = new THREE.Group();
 				boneContainer.add( result.skeleton.bones[ 0 ] );
@@ -67,7 +70,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 300;
 				controls.maxDistance = 700;
 

@@ -8,24 +8,9 @@
 	</head>
 	<body>
 
-		<div id="container"></div>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> Click on a sphere to toggle bloom<br>By <a href="http://github.com/Temdog007" target="_blank" rel="noopener">Temdog007</a>
 		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/LuminosityHighPassShader.js"></script>
-		<script src="js/postprocessing/UnrealBloomPass.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -48,9 +33,9 @@
 
 			varying vec2 vUv;
 
-			vec4 getTexture( sampler2D texture ) {
+			vec4 getTexture( sampler2D texelToLinearTexture ) {
 
-				return mapTexelToLinear( texture2D( texture , vUv ) );
+				return mapTexelToLinear( texture2D( texelToLinearTexture , vUv ) );
 
 			}
 
@@ -62,9 +47,19 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			var scene, camera, geometry, controls;
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
+
+			var scene, camera, controls;
 			var renderer;
 
 			var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
@@ -83,8 +78,6 @@
 			var darkMaterial = new THREE.MeshBasicMaterial( { color: "black" } );
 			var materials = {};
 
-			var container = document.getElementById( 'container' );
-
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -97,7 +90,7 @@
 			camera.position.set( 0, 0, 20 );
 			camera.lookAt( 0, 0, 0 );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.maxPolarAngle = Math.PI * 0.5;
 			controls.minDistance = 1;
 			controls.maxDistance = 100;
@@ -105,19 +98,19 @@
 
 			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
-			var renderScene = new THREE.RenderPass( scene, camera );
+			var renderScene = new RenderPass( scene, camera );
 
-			var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			var bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
-			var bloomComposer = new THREE.EffectComposer( renderer );
+			var bloomComposer = new EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
-			var finalPass = new THREE.ShaderPass(
+			var finalPass = new ShaderPass(
 				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
@@ -130,7 +123,7 @@
 			);
 			finalPass.needsSwap = true;
 
-			var finalComposer = new THREE.EffectComposer( renderer );
+			var finalComposer = new EffectComposer( renderer );
 			finalComposer.addPass( renderScene );
 			finalComposer.addPass( finalPass );
 
@@ -140,7 +133,7 @@
 
 			window.addEventListener( 'click', onDocumentMouseClick, false );
 
-			var gui = new dat.GUI();
+			var gui = new GUI();
 
 			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Scene only' ] ).onChange( function ( value ) {
 
@@ -231,9 +224,6 @@
 			};
 
 			function setupScene() {
-
-				var minLightness = 0;
-				var maxLightness = 0.1;
 
 				scene.traverse( disposeMaterial );
 				scene.children.length = 0;

@@ -12,11 +12,12 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - 3DS loader
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/loaders/TDSLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { TDSLoader } from './jsm/loaders/TDSLoader.js';
 
 			var container, controls;
 			var camera, scene, renderer;
@@ -43,13 +44,13 @@
 				var loader = new THREE.TextureLoader();
 				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
 
-				var loader = new THREE.TDSLoader( );
+				var loader = new TDSLoader( );
 				loader.setResourcePath( 'models/3ds/portalgun/textures/' );
 				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
 
 					object.traverse( function ( child ) {
 
-						if ( child instanceof THREE.Mesh ) {
+						if ( child.isMesh ) {
 
 							child.material.normalMap = normal;
 
@@ -66,7 +67,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', resize, false );
 

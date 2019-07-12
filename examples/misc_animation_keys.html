@@ -12,17 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - basic use
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var stats, clock;
 			var scene, camera, renderer, mixer;
@@ -62,7 +56,7 @@
 				var scaleKF = new THREE.VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
 
 				// ROTATION
-				// Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
+				// Rotation should be performed using quaternions, using a THREE.QuaternionKeyframeTrack
 				// Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
 
 				// set up rotation about x axis
@@ -82,7 +76,7 @@
 				// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
 				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
 
-				// setup the AnimationMixer
+				// setup the THREE.AnimationMixer
 				mixer = new THREE.AnimationMixer( mesh );
 
 				// create a ClipAction and set it to play

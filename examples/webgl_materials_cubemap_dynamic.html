@@ -10,13 +10,14 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 
 			var camera, scene, renderer;
-			var cube, sphere, torus, material, backgroundMesh;
+			var cube, sphere, torus, material;
 
 			var count = 0, cubeCamera1, cubeCamera2;
 
@@ -56,7 +57,7 @@
 					magFilter: THREE.LinearFilter
 				};
 
-				scene.background = new THREE.CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+				scene.background = new CubemapGenerator( renderer ).fromEquirectangular( texture, options );
 
 				//
 

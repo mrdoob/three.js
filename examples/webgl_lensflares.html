@@ -14,14 +14,14 @@
 			fly with WASD/RF/QE + mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FlyControls.js"></script>
-		<script src="js/objects/Lensflare.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { FlyControls } from './jsm/controls/FlyControls.js';
+			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
 
 			var container, stats;
 
@@ -43,7 +43,7 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 250;
 
-				controls = new THREE.FlyControls( camera );
+				controls = new FlyControls( camera );
 
 				controls.movementSpeed = 2500;
 				controls.domElement = container;
@@ -108,12 +108,12 @@
 					light.position.set( x, y, z );
 					scene.add( light );
 
-					var lensflare = new THREE.Lensflare();
-					lensflare.addElement( new THREE.LensflareElement( textureFlare0, 700, 0, light.color ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 60, 0.6 ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 0.7 ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 120, 0.9 ) );
-					lensflare.addElement( new THREE.LensflareElement( textureFlare3, 70, 1 ) );
+					var lensflare = new Lensflare();
+					lensflare.addElement( new LensflareElement( textureFlare0, 700, 0, light.color ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 60, 0.6 ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 70, 0.7 ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 120, 0.9 ) );
+					lensflare.addElement( new LensflareElement( textureFlare3, 70, 1 ) );
 					light.add( lensflare );
 
 				}

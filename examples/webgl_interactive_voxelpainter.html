@@ -22,20 +22,12 @@
 			<strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
-			var plane, cube;
+			var plane;
 			var mouse, raycaster, isShiftDown = false;
 
 			var rollOverMesh, rollOverMaterial;

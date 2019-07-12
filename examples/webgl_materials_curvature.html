@@ -14,13 +14,6 @@
 			by <a href="http://codercat.club" target="_blank" rel="noopener">CoderCat</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<script id="vertexShaderRaw" type="x-shader/x-vertex">
 
 		attribute float curvature;
@@ -49,13 +42,13 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var camera, scene, renderer;
 
@@ -137,9 +130,9 @@
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				//load the obj
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( object ) {
 
@@ -326,7 +319,7 @@
 					}
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var topologyFolder = gui.addFolder( 'Topology' );
 				topologyFolder.add( params, 'filterConvex' );

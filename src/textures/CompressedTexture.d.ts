@@ -3,7 +3,7 @@ import {
 	Mapping,
 	Wrapping,
 	TextureFilter,
-	PixelFormat,
+	CompressedPixelFormat,
 	TextureDataType,
 	TextureEncoding,
 } from '../constants';
@@ -14,7 +14,7 @@ export class CompressedTexture extends Texture {
 		mipmaps: ImageData[],
 		width: number,
 		height: number,
-		format?: PixelFormat,
+		format?: CompressedPixelFormat,
 		type?: TextureDataType,
 		mapping?: Mapping,
 		wrapS?: Wrapping,

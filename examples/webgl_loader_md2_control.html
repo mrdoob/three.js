@@ -23,25 +23,15 @@
 			use arrows to control characters, mouse for camera
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/MD2Loader.js"></script>
-		<script src="js/misc/MorphBlendMesh.js"></script>
-		<script src="js/misc/MD2CharacterComplex.js"></script>
-		<script src="js/misc/Gyroscope.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MD2CharacterComplex } from './jsm/misc/MD2CharacterComplex.js';
+			import { Gyroscope } from './jsm/misc/Gyroscope.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -107,7 +97,7 @@
 				light.shadow.camera.bottom = - 350;
 
 				scene.add( light );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 
 				//  GROUND
@@ -154,7 +144,7 @@
 
 				// CONTROLS
 
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
 				cameraControls.update();
 
@@ -191,14 +181,14 @@
 
 				for ( var i = 0; i < nCharacters; i ++ ) {
 
-					var character = new THREE.MD2CharacterComplex();
+					var character = new MD2CharacterComplex();
 					character.scale = 3;
 					character.controls = controls;
 					characters.push( character );
 
 				}
 
-				var baseCharacter = new THREE.MD2CharacterComplex();
+				var baseCharacter = new MD2CharacterComplex();
 				baseCharacter.scale = 3;
 
 				baseCharacter.onLoadComplete = function () {
@@ -230,7 +220,7 @@
 
 					}
 
-					var gyro = new THREE.Gyroscope();
+					var gyro = new Gyroscope();
 					gyro.add( camera );
 					gyro.add( light, light.target );
 

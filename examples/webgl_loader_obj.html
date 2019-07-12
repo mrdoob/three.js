@@ -12,10 +12,11 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var container;
 
@@ -95,7 +96,7 @@
 
 				function onError() {}
 
-				var loader = new THREE.OBJLoader( manager );
+				var loader = new OBJLoader( manager );
 
 				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
 

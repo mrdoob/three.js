@@ -12,17 +12,15 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader + MTLLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/DDSLoader.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { MTLLoader } from './jsm/loaders/MTLLoader.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
-		<script>
-
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -70,15 +68,15 @@
 
 				var onError = function () { };
 
-				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
+				THREE.Loader.Handlers.add( /\.dds$/i, new DDSLoader() );
 
-				new THREE.MTLLoader()
+				new MTLLoader()
 					.setPath( 'models/obj/male02/' )
 					.load( 'male02_dds.mtl', function ( materials ) {
 
 						materials.preload();
 
-						new THREE.OBJLoader()
+						new OBJLoader()
 							.setMaterials( materials )
 							.setPath( 'models/obj/male02/' )
 							.load( 'male02.obj', function ( object ) {

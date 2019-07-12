@@ -13,20 +13,13 @@
 			PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/STLLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { STLLoader } from './jsm/loaders/STLLoader.js';
 
 			var container, stats;
 
@@ -65,7 +58,7 @@
 
 				// ASCII file
 
-				var loader = new THREE.STLLoader();
+				var loader = new STLLoader();
 				loader.load( './models/stl/ascii/slotted_disk.stl', function ( geometry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );

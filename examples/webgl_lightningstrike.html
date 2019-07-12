@@ -11,32 +11,23 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lightning strike</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/geometries/LightningStrike.js"></script>
-		<script src="js/objects/LightningStorm.js"></script>
-		<script src="js/math/SimplexNoise.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/OutlinePass.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LightningStrike } from './jsm/geometries/LightningStrike.js';
+			import { LightningStorm } from './jsm/objects/LightningStorm.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { OutlinePass } from './jsm/postprocessing/OutlinePass.js';
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, gui;
+			var scene, renderer, composer, gui;
 
 			var currentSceneIndex = 0;
 
@@ -47,8 +38,6 @@
 				createPlasmaBallScene,
 				createStormScene
 			];
-
-			var textureLoader;
 
 			var clock = new THREE.Clock();
 
@@ -71,14 +60,12 @@
 
 				container.appendChild( renderer.domElement );
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				textureLoader = new THREE.TextureLoader();
 
 				createScene();
 
@@ -108,10 +95,12 @@
 			function createGUI() {
 
 				if ( gui ) {
+
 					gui.destroy();
+
 				}
 
-				gui = new dat.GUI( { width: 350 } );
+				gui = new GUI( { width: 350 } );
 
 				var sceneFolder = gui.addFolder( "Scene" );
 
@@ -126,7 +115,7 @@
 				} );
 
 				scene.userData.timeRate = 1;
-				sceneFolder.add( scene.userData, 'timeRate', scene.userData.canGoBackwardsInTime ? -1 : 0, 1 ).name( 'Time rate' );
+				sceneFolder.add( scene.userData, 'timeRate', scene.userData.canGoBackwardsInTime ? - 1 : 0, 1 ).name( 'Time rate' );
 
 				sceneFolder.open();
 
@@ -140,7 +129,9 @@
 					scene.userData.lightningColor.b * 255
 				];
 				graphicsFolder.addColor( scene.userData, 'lightningColorRGB' ).name( 'Color' ).onChange( function ( value ) {
+
 					scene.userData.lightningMaterial.color.setRGB( value[ 0 ], value[ 1 ], value[ 2 ] ).multiplyScalar( 1 / 255 );
+
 				} );
 				scene.userData.outlineColorRGB = [
 					scene.userData.outlineColor.r * 255,
@@ -148,7 +139,9 @@
 					scene.userData.outlineColor.b * 255
 				];
 				graphicsFolder.addColor( scene.userData, 'outlineColorRGB' ).name( 'Glow color' ).onChange( function ( value ) {
+
 					scene.userData.outlineColor.setRGB( value[ 0 ], value[ 1 ], value[ 2 ] ).multiplyScalar( 1 / 255 );
+
 				} );
 
 				graphicsFolder.open();
@@ -224,7 +217,7 @@
 
 			function createOutline( scene, objectsArray, visibleColor ) {
 
-				var outlinePass = new THREE.OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, scene.userData.camera, objectsArray );
+				var outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, scene.userData.camera, objectsArray );
 				outlinePass.edgeStrength = 2.5;
 				outlinePass.edgeGlow = 0.7;
 				outlinePass.edgeThickness = 2.8;
@@ -319,10 +312,12 @@
 				scene.userData.recreateRay = function () {
 
 					if ( lightningStrikeMesh ) {
+
 						scene.remove( lightningStrikeMesh );
+
 					}
 
-					lightningStrike = new THREE.LightningStrike( scene.userData.rayParams );
+					lightningStrike = new LightningStrike( scene.userData.rayParams );
 					lightningStrikeMesh = new THREE.Mesh( lightningStrike, scene.userData.lightningMaterial );
 
 					outlineMeshArray.length = 0;
@@ -330,27 +325,27 @@
 
 					scene.add( lightningStrikeMesh );
 
-				}
+				};
 
 				scene.userData.recreateRay();
 
 				// Compose rendering
 
 				composer.passes = [];
-				composer.addPass( new THREE.RenderPass( scene, scene.userData.camera ) );
+				composer.addPass( new RenderPass( scene, scene.userData.camera ) );
 				createOutline( scene, outlineMeshArray, scene.userData.outlineColor );
 
 				// Controls
 
-				var controls = new THREE.OrbitControls( scene.userData.camera, renderer.domElement );
-				controls.target.y = ( conesDistance + coneHeight ) * 0.5
+				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
+				controls.target.y = ( conesDistance + coneHeight ) * 0.5;
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 
 				scene.userData.render = function ( time ) {
 
 					// Move cones and Update ray position
-					coneMesh1.position.set( Math.sin( 0.5 * time ) * conesDistance * 0.6,  conesDistance + coneHeight, Math.cos( 0.5 * time ) * conesDistance * 0.6 );
+					coneMesh1.position.set( Math.sin( 0.5 * time ) * conesDistance * 0.6, conesDistance + coneHeight, Math.cos( 0.5 * time ) * conesDistance * 0.6 );
 					coneMesh2.position.set( Math.sin( 0.9 * time ) * conesDistance, coneHeightHalf, 0 );
 					lightningStrike.rayParameters.sourceOffset.copy( coneMesh1.position );
 					lightningStrike.rayParameters.sourceOffset.y -= coneHeightHalf;
@@ -368,8 +363,7 @@
 
 						composer.render();
 
-					}
-					else {
+					}	else {
 
 						renderer.render( scene, scene.userData.camera );
 
@@ -406,7 +400,7 @@
 				scene.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light2.position.set( -0.5, 1, 0.2 );
+				light2.position.set( - 0.5, 1, 0.2 );
 				ballScene.add( light2 );
 				scene.add( light2 );
 
@@ -415,7 +409,7 @@
 				scene.userData.lightningColor = new THREE.Color( 0xFFB0FF );
 				scene.userData.outlineColor = new THREE.Color( 0xFF00FF );
 
-				scene.userData.lightningMaterial =  new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor, side: THREE.DoubleSide } );
+				scene.userData.lightningMaterial = new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor, side: THREE.DoubleSide } );
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -494,12 +488,14 @@
 
 						lightningStrike.subrayConePosition( segment, parentSubray, childSubray, 0.6, 0.9, 0.7 );
 
-						// Sphere projection
+						// THREE.Sphere projection
 
 						vec1.subVectors( childSubray.pos1, lightningStrike.rayParameters.sourceOffset );
 						vec2.set( 0, 0, 0 );
 						if ( lightningStrike.randomGenerator.random() < 0.7 ) {
+
 							vec2.copy( rayDirection ).multiplyScalar( rayLength * 1.0865 );
+
 						}
 						vec1.add( vec2 ).setLength( rayLength );
 						childSubray.pos1.addVectors( vec1, lightningStrike.rayParameters.sourceOffset );
@@ -515,10 +511,12 @@
 				scene.userData.recreateRay = function () {
 
 					if ( lightningStrikeMesh ) {
+
 						scene.remove( lightningStrikeMesh );
+
 					}
 
-					lightningStrike = new THREE.LightningStrike( scene.userData.rayParams );
+					lightningStrike = new LightningStrike( scene.userData.rayParams );
 					lightningStrikeMesh = new THREE.Mesh( lightningStrike, scene.userData.lightningMaterial );
 
 					outlineMeshArray.length = 0;
@@ -527,7 +525,7 @@
 
 					scene.add( lightningStrikeMesh );
 
-				}
+				};
 
 				scene.userData.recreateRay();
 
@@ -535,9 +533,9 @@
 
 				composer.passes = [];
 
-				composer.addPass( new THREE.RenderPass( ballScene, scene.userData.camera ) );
+				composer.addPass( new RenderPass( ballScene, scene.userData.camera ) );
 
-				var rayPass = new THREE.RenderPass( scene, scene.userData.camera );
+				var rayPass = new RenderPass( scene, scene.userData.camera );
 				rayPass.clear = false;
 				composer.addPass( rayPass );
 
@@ -561,12 +559,12 @@
 
 				// Controls
 
-				var controls = new THREE.OrbitControls( scene.userData.camera, renderer.domElement );
+				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
 				controls.target.copy( sphereMesh.position );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
 
-				// Sphere mouse raycasting
+				// THREE.Sphere mouse raycasting
 
 				window.addEventListener( 'mousemove', onTouchMove );
 				window.addEventListener( 'touchmove', onTouchMove );
@@ -652,9 +650,9 @@
 				scene.userData.lightningColor = new THREE.Color( 0xB0FFFF );
 				scene.userData.outlineColor = new THREE.Color( 0x00FFFF );
 
-				scene.userData.lightningMaterial =  new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor } );
+				scene.userData.lightningMaterial = new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor } );
 
-				var rayDirection = new THREE.Vector3( 0, -1, 0 );
+				var rayDirection = new THREE.Vector3( 0, - 1, 0 );
 				var rayLength = 0;
 				var vec1 = new THREE.Vector3();
 				var vec2 = new THREE.Vector3();
@@ -703,7 +701,7 @@
 				var starVertices = [];
 				var prevPoint = new THREE.Vector3( 0, 0, 1 );
 				var currPoint = new THREE.Vector3();
-				for ( var i = 1; i <= 16; i++ ) {
+				for ( var i = 1; i <= 16; i ++ ) {
 
 					currPoint.set( Math.sin( 2 * Math.PI * i / 16 ), 0, Math.cos( 2 * Math.PI * i / 16 ) );
 
@@ -728,7 +726,7 @@
 
 				//
 
-				var storm = new THREE.LightningStorm( {
+				var storm = new LightningStorm( {
 
 					size: GROUND_SIZE,
 					minHeight: 90,
@@ -758,12 +756,12 @@
 				// Compose rendering
 
 				composer.passes = [];
-				composer.addPass( new THREE.RenderPass( scene, scene.userData.camera ) );
+				composer.addPass( new RenderPass( scene, scene.userData.camera ) );
 				createOutline( scene, storm.lightningsMeshes, scene.userData.outlineColor );
 
 				// Controls
 
-				var controls = new THREE.OrbitControls( scene.userData.camera, renderer.domElement );
+				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
 				controls.target.y = GROUND_SIZE * 0.05;
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.25;
@@ -778,8 +776,7 @@
 
 						composer.render();
 
-					}
-					else {
+					}	else {
 
 						renderer.render( scene, scene.userData.camera );
 

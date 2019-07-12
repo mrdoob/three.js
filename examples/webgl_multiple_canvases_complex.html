@@ -48,17 +48,9 @@
 		</div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple canvases - complex</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var views = [];
 
@@ -91,7 +83,7 @@
 					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 					camera.lookAt( scene.position );
 
-					renderer.setViewport( 0, 0, viewWidth, viewHeight );
+					renderer.setViewport( 0, fullHeight - viewHeight, viewWidth, viewHeight );
 					renderer.render( scene, camera );
 
 					context.drawImage( renderer.domElement, 0, 0 );

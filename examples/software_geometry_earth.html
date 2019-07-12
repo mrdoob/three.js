@@ -16,14 +16,13 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth demo</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SoftwareRenderer.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { SoftwareRenderer } from './jsm/renderers/SoftwareRenderer.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -92,7 +91,7 @@
 				mesh.rotation.x = - Math.PI / 2;
 				group.add( mesh );
 
-				renderer = new THREE.SoftwareRenderer();
+				renderer = new SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

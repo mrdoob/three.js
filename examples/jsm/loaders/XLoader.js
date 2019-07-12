@@ -226,7 +226,7 @@ var XLoader = ( function () {
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
-			this.manager = manager !== undefined ? manager : new DefaultLoadingManager();
+			this.manager = manager !== undefined ? manager : DefaultLoadingManager;
 			this.texloader = new TextureLoader( this.manager );
 			this.url = "";
 			this._putMatLength = 0;

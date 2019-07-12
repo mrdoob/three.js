@@ -13,22 +13,16 @@
 		<br/>Fast subsurface scattering in Blinn-Phong shading demo<br/>
 		[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
 	</div>
-	<script src="../build/three.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
 
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-	<script src="js/loaders/FBXLoader.js"></script>
-	<script src="js/shaders/TranslucentShader.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script>
+		import Stats from './jsm/libs/stats.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { TranslucentShader } from './jsm/shaders/TranslucentShader.js';
+		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 		var container, stats;
 		var camera, scene, renderer;
@@ -82,7 +76,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			var controls = new THREE.OrbitControls( camera, container );
+			var controls = new OrbitControls( camera, container );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -97,7 +91,7 @@
 			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-			var shader = THREE.TranslucentShader;
+			var shader = TranslucentShader;
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;
@@ -123,7 +117,7 @@
 
 			// LOADER
 
-			var loader = new THREE.FBXLoader();
+			var loader = new FBXLoader();
 			loader.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
 
 				model = object.children[ 0 ];
@@ -140,7 +134,7 @@
 
 		function initGUI( uniforms ) {
 
-			var gui = new dat.GUI();
+			var gui = new GUI();
 
 			var ThicknessControls = function () {
 

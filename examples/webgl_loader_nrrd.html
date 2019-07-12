@@ -28,27 +28,16 @@
 		</div>
 		<div id="inset"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/misc/Volume.js"></script>
-		<script src="js/misc/VolumeSlice.js"></script>
-		<script src="js/loaders/NRRDLoader.js"></script>
-		<script src="js/loaders/VTKLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/gunzip.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
+			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
 			var container,
 				stats,
@@ -82,7 +71,7 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var loader = new THREE.NRRDLoader();
+				var loader = new NRRDLoader();
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
 
 					var geometry,
@@ -154,7 +143,7 @@
 
 				var vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
 
-				var vtkloader = new THREE.VTKLoader();
+				var vtkloader = new VTKLoader();
 				vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -182,7 +171,7 @@
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;
 				controls.panSpeed = 2;
@@ -194,7 +183,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				setupInset();
 

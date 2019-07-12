@@ -58,31 +58,20 @@
 			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var container;
 
@@ -201,11 +190,11 @@
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 1.3 );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+				var renderModel = new RenderPass( scene, camera );
+				var effectBloom = new BloomPass( 1.3 );
+				var effectCopy = new ShaderPass( CopyShader );
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );

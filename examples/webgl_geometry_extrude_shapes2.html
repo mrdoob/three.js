@@ -17,11 +17,14 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shapes extrusion via geodata
 		</div>
 
-		<script type="text/javascript" src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
 			// From d3-threeD.js
 			/* This Source Code Form is subject to the terms of the Mozilla Public
 			 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -426,7 +429,7 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

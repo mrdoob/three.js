@@ -13,13 +13,15 @@
 			drag to change the point of view
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/utils/GeometryUtils.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SoftwareRenderer.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { SoftwareRenderer } from './jsm/renderers/SoftwareRenderer.js';
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			var camera, controls, scene, renderer, stats;
 
@@ -85,13 +87,13 @@
 				texCube.position.set( - 300, 0, 0 );
 				scene.add( texCube );
 
-				// Sprite
+				// THREE.Sprite
 				var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: 0xff0040 } ) );
 				sprite.scale.set( 100, 100, 1 );
 				sprite.position.set( - 100, 200, 0 );
 				scene.add( sprite );
 
-				// Sprite with texture
+				// THREE.Sprite with texture
 				var texLoader = new THREE.TextureLoader();
 				map = texLoader.load( 'textures/sprite1.png' );
 				var texSprite = new THREE.Sprite( new THREE.SpriteMaterial( { map: map, transparent: true } ) );
@@ -99,8 +101,8 @@
 				texSprite.position.set( 100, 200, 0 );
 				scene.add( texSprite );
 
-				// Line
-				var hilbertPoints = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				// THREE.Line
+				var hilbertPoints = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				var lineGeometry = new THREE.BufferGeometry();
 				var subdivisions = 6;
@@ -134,11 +136,11 @@
 
 				//
 
-				renderer = new THREE.SoftwareRenderer();
+				renderer = new SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

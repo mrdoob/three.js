@@ -10,7 +10,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
 			<button id="export_scene">Export Scene1</button>
-			<button id="export_scenes">Export Scene1 and Scene 2</button>
+			<button id="export_scenes">Export Scene1 and THREE.Scene 2</button>
 			<button id="export_object">Export Sphere</button><br/>
 			<button id="export_obj">Export WaltHead</button>
 			<button id="export_objects">Export Sphere and Grid</button>
@@ -24,17 +24,16 @@
 			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/exporters/GLTFExporter.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
 
 			function exportGLTF( input ) {
 
-				var gltfExporter = new THREE.GLTFExporter();
+				var gltfExporter = new GLTFExporter();
 
 				var options = {
 					trs: document.getElementById( 'option_trs' ).checked,
@@ -126,12 +125,6 @@
 
 			}
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
 			var container;
 
 			var camera, object, scene1, scene2, renderer;
@@ -168,9 +161,9 @@
 				// DirectLight
 				// ---------------------------------------------------------------------
 				light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.target.position.set( 0, 0, -1 );
+				light.target.position.set( 0, 0, - 1 );
 				light.add( light.target );
-				light.lookAt( -1, -1, 0 );
+				light.lookAt( - 1, - 1, 0 );
 				light.name = 'DirectionalLight';
 				scene1.add( light );
 
@@ -332,7 +325,7 @@
 
 
 				// ---------------------------------------------------------------------
-				// Line Strip
+				// THREE.Line Strip
 				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
 				var numPoints = 100;
@@ -353,7 +346,7 @@
 
 
 				// ---------------------------------------------------------------------
-				// Line Loop
+				// THREE.Line Loop
 				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
 				var numPoints = 5;
@@ -414,7 +407,7 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
-				// Points
+				// THREE.Points
 				// ---------------------------------------------------------------------
 				var numPoints = 100;
 				var pointsArray = new Float32Array( numPoints * 3 );
@@ -487,7 +480,7 @@
 				// ---------------------------------------------------------------------
 				//
 				//
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
 
 					waltHead = obj;
@@ -499,7 +492,7 @@
 
 
 				// ---------------------------------------------------------------------
-				// 2nd Scene
+				// 2nd THREE.Scene
 				// ---------------------------------------------------------------------
 				scene2 = new THREE.Scene();
 				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), material );

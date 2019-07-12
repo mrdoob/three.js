@@ -10,20 +10,15 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TGA texture example by <a href="https://github.com/DaoshengMu/" target="_blank" rel="noopener">Daosheng Mu</a>
 		</div>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/TGALoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TGALoader } from './jsm/loaders/TGALoader.js';
 
 			var camera, scene, renderer, stats;
 
@@ -42,7 +37,7 @@
 
 				//
 
-				var loader = new THREE.TGALoader();
+				var loader = new TGALoader();
 				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
 
 				// add box 1 - grey8 texture
@@ -83,7 +78,7 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

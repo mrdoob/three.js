@@ -28,13 +28,14 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script src="js/interactive/SelectionBox.js"></script>
-		<script src="js/interactive/SelectionHelper.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { SelectionBox } from './jsm/interactive/SelectionBox.js';
+			import { SelectionHelper } from './jsm/interactive/SelectionHelper.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -134,14 +135,14 @@
 
 			}
 
-			var selectionBox = new THREE.SelectionBox( camera, scene );
-			var helper = new THREE.SelectionHelper( selectionBox, renderer, 'selectBox' );
+			var selectionBox = new SelectionBox( camera, scene );
+			var helper = new SelectionHelper( selectionBox, renderer, 'selectBox' );
 
 			document.addEventListener( 'mousedown', function ( event ) {
 
 				for ( var item of selectionBox.collection ) {
 
-					item.material.emissive = new THREE.Color( 0x000000 );
+					item.material.emissive.set( 0x000000 );
 
 				}
 
@@ -158,7 +159,7 @@
 
 					for ( var i = 0; i < selectionBox.collection.length; i ++ ) {
 
-						selectionBox.collection[ i ].material.emissive = new THREE.Color( 0x000000 );
+						selectionBox.collection[ i ].material.emissive.set( 0x000000 );
 
 					}
 
@@ -171,7 +172,7 @@
 
 					for ( var i = 0; i < allSelected.length; i ++ ) {
 
-						allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+						allSelected[ i ].material.emissive.set( 0xffffff );
 
 					}
 
@@ -190,7 +191,7 @@
 
 				for ( var i = 0; i < allSelected.length; i ++ ) {
 
-					allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+					allSelected[ i ].material.emissive.set( 0xffffff );
 
 				}
 

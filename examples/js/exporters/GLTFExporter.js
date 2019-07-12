@@ -2224,8 +2224,6 @@ THREE.GLTFExporter.Utils = {
 
 			}
 
-			var mergedKeyframeIndex = 0;
-			var sourceKeyframeIndex = 0;
 			var sourceInterpolant = sourceTrack.createInterpolant( new sourceTrack.ValueBufferType( 1 ) );
 
 			mergedTrack = mergedTracks[ sourceTrackNode.uuid ];

@@ -11,12 +11,6 @@
 			}
 		</style>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-
 	</head>
 	<body>
 
@@ -28,130 +22,126 @@
 			</div>
 		</div>
 
-		<script>
+		<script type="module">
 
-if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-	document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-}
+			var scene, camera, renderer, envMap, radianceMap;
+			var right = 6;
 
-var scene, camera, renderer, envMap, radianceMap, gui;
-var right = 6;
-var config = {
-	preserveEnergy: true,
-};
+			function init() {
 
-function init() {
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				var aspect = width / height;
 
-	var width = window.innerWidth;
-	var height = window.innerHeight;
-	var aspect = width / height;
+				// renderer
 
-	// renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				document.body.appendChild( renderer.domElement );
 
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( width, height );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	document.body.appendChild( renderer.domElement );
+				window.addEventListener( 'resize', onResize, false );
 
-	window.addEventListener( 'resize', onResize, false );
+				// scene
 
-	// scene
+				scene = new THREE.Scene();
 
-	scene = new THREE.Scene();
+				// camera
 
-	// camera
+				camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
+				camera.position.set( 0, 0, 9 );
 
-	camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
-	camera.position.set( 0, 0, 9 );
+			}
 
-}
+			function createObjects() {
 
-function createObjects() {
+				var geo = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+				var count = 10;
+				for ( var x = 0; x <= count; x ++ ) {
 
-	var geo = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
-	var count = 10;
-	for ( var x = 0; x <= count; x ++ ) {
+					var mesh = new THREE.Mesh( geo, new THREE.MeshPhysicalMaterial( {
+						roughness: x / count,
+						metalness: 1,
+						color: 0xffffff,
+						envMap: radianceMap,
+						envMapIntensity: 1,
+						reflectivity: 1,
+					} ) );
+					mesh.position.x = x - ( Math.floor( count / 2 ) );
+					scene.add( mesh );
 
-		var mesh = new THREE.Mesh( geo, new THREE.MeshPhysicalMaterial( {
-			roughness: x / count,
-			metalness: 1,
-			color: 0xffffff,
-			envMap: radianceMap,
-			envMapIntensity: 1,
-			reflectivity: 1,
-		} ) );
-		mesh.position.x = x - ( Math.floor( count / 2 ) );
-		scene.add( mesh );
+				}
 
-	}
+			}
 
-}
+			function createEnvironment() {
 
-function createEnvironment() {
+				var color = new THREE.Color( 0xcccccc );
+				var sky = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), new THREE.MeshBasicMaterial( {
+					color: color,
+					side: THREE.DoubleSide,
+				} ) );
+				sky.scale.setScalar( 100 );
 
-	var color = new THREE.Color( 0xcccccc );
-	var sky = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), new THREE.MeshBasicMaterial( {
-		color: color,
-		side: THREE.DoubleSide,
-	} ) );
-	sky.scale.setScalar( 100 );
+				var envScene = new THREE.Scene();
+				envScene.add( sky );
+				envScene.background = color;
+				var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
+				cubeCamera.update( renderer, envScene );
 
-	var envScene = new THREE.Scene();
-	envScene.add( sky );
-	envScene.background = color;
-	var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
-	cubeCamera.update( renderer, envScene );
+				envMap = cubeCamera.renderTarget.texture;
 
-	envMap = cubeCamera.renderTarget.texture;
+				scene.background = color;
 
-	scene.background = color;
+			}
 
-}
+			function getRadiance() {
 
-function getRadiance() {
+				return new Promise( function ( resolve ) {
 
-	return new Promise( function ( resolve, reject ) {
+					var pmremGenerator = new PMREMGenerator( envMap );
+					pmremGenerator.update( renderer );
+					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+					var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-		var pmremGenerator = new THREE.PMREMGenerator( envMap );
-		pmremGenerator.update( renderer );
-		var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-		pmremCubeUVPacker.update( renderer );
-		var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+					radianceMap = cubeRenderTarget.texture;
+					resolve();
 
-		pmremGenerator.dispose();
-		pmremCubeUVPacker.dispose();
-		radianceMap = cubeRenderTarget.texture;
-		resolve();
+				} );
 
-	} );
+			}
 
-}
+			function onResize() {
 
-function onResize() {
+				var aspect = window.innerWidth / window.innerHeight;
+				camera.top = right / aspect;
+				camera.bottom = - camera.top;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				render();
 
-	var aspect = window.innerWidth / window.innerHeight;
-	camera.top = right / aspect;
-	camera.bottom = - camera.top;
-	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	render();
+			}
 
-}
+			function render() {
 
-function render() {
+				renderer.render( scene, camera );
 
-	renderer.render( scene, camera );
+			}
 
-}
-
-Promise.resolve()
-	.then( init )
-	.then( createEnvironment )
-	.then( getRadiance )
-	.then( createObjects )
-	.then( render );
+			Promise.resolve()
+				.then( init )
+				.then( createEnvironment )
+				.then( getRadiance )
+				.then( createObjects )
+				.then( render );
 
 		</script>
 	</body>

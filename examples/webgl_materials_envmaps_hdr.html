@@ -14,26 +14,17 @@
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var params = {
 				envMap: 'HDR',
@@ -89,15 +80,15 @@
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 
-				hdrCubeMap = new THREE.HDRCubeTextureLoader()
+				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.setType( THREE.UnsignedByteType )
+					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
 						pmremGenerator.update( renderer );
 
-						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 						pmremCubeUVPacker.update( renderer );
 
 						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -117,10 +108,10 @@
 
 						ldrCubeMap.encoding = THREE.sRGBEncoding;
 
-						var pmremGenerator = new THREE.PMREMGenerator( ldrCubeMap );
+						var pmremGenerator = new PMREMGenerator( ldrCubeMap );
 						pmremGenerator.update( renderer );
 
-						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 						pmremCubeUVPacker.update( renderer );
 
 						ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -139,10 +130,10 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new THREE.PMREMGenerator( rgbmCubeMap );
+						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
 						pmremGenerator.update( renderer );
 
-						var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 						pmremCubeUVPacker.update( renderer );
 
 						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
@@ -159,19 +150,19 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//renderer.toneMapping = THREE.ReinhardToneMapping;
+				//renderer.toneMapping = ReinhardToneMapping;
 				renderer.gammaOutput = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
@@ -225,6 +216,7 @@
 						renderTarget = rgbmCubeRenderTarget;
 						cubeMap = rgbmCubeMap;
 						break;
+
 				}
 
 				var newEnvMap = renderTarget ? renderTarget.texture : null;

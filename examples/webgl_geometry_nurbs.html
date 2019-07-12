@@ -20,13 +20,14 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - NURBS curve and surface example
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/curves/NURBSCurve.js"></script>
-		<script src="js/curves/NURBSSurface.js"></script>
-		<script src="js/curves/NURBSUtils.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { NURBSCurve } from './jsm/curves/NURBSCurve.js';
+			import { NURBSSurface } from './jsm/curves/NURBSSurface.js';
 
 			var container, stats;
 
@@ -93,7 +94,7 @@
 
 				}
 
-				var nurbsCurve = new THREE.NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
+				var nurbsCurve = new NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
 
 				var nurbsGeometry = new THREE.BufferGeometry();
 				nurbsGeometry.setFromPoints( nurbsCurve.getPoints( 200 ) );
@@ -139,7 +140,7 @@
 				var degree2 = 3;
 				var knots1 = [ 0, 0, 0, 1, 1, 1 ];
 				var knots2 = [ 0, 0, 0, 0, 1, 1, 1, 1 ];
-				var nurbsSurface = new THREE.NURBSSurface( degree1, degree2, knots1, knots2, nsControlPoints );
+				var nurbsSurface = new NURBSSurface( degree1, degree2, knots1, knots2, nsControlPoints );
 
 				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;

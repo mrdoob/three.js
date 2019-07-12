@@ -17,13 +17,12 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css2d - label</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/renderers/CSS2DRenderer.js"></script>
-
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
 
 			var camera, scene, renderer, labelRenderer;
 
@@ -80,7 +79,7 @@
 				earthDiv.className = 'label';
 				earthDiv.textContent = 'Earth';
 				earthDiv.style.marginTop = '-1em';
-				var earthLabel = new THREE.CSS2DObject( earthDiv );
+				var earthLabel = new CSS2DObject( earthDiv );
 				earthLabel.position.set( 0, EARTH_RADIUS, 0 );
 				earth.add( earthLabel );
 
@@ -88,7 +87,7 @@
 				moonDiv.className = 'label';
 				moonDiv.textContent = 'Moon';
 				moonDiv.style.marginTop = '-1em';
-				var moonLabel = new THREE.CSS2DObject( moonDiv );
+				var moonLabel = new CSS2DObject( moonDiv );
 				moonLabel.position.set( 0, MOON_RADIUS, 0 );
 				moon.add( moonLabel );
 
@@ -99,13 +98,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				labelRenderer = new THREE.CSS2DRenderer();
+				labelRenderer = new CSS2DRenderer();
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
 				labelRenderer.domElement.style.top = 0;
 				document.body.appendChild( labelRenderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, labelRenderer.domElement );
+				var controls = new OrbitControls( camera, labelRenderer.domElement );
 
 			}
 

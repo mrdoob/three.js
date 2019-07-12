@@ -12,19 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl RGBM texture loader example
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var params = {
 				exposure: 2.0
@@ -74,7 +66,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();

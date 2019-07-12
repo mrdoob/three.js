@@ -10,20 +10,12 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - convex geometry</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/math/ConvexHull.js"></script>
-		<script src="js/geometries/ConvexGeometry.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
 
 			var group, camera, scene, renderer;
 
@@ -47,7 +39,7 @@
 
 				// controls
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
@@ -103,7 +95,7 @@
 					transparent: true
 				} );
 
-				var meshGeometry = new THREE.ConvexBufferGeometry( vertices );
+				var meshGeometry = new ConvexBufferGeometry( vertices );
 
 				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh.material.side = THREE.BackSide; // back faces
@@ -120,12 +112,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
-
-			// function randomPoint() {
-
-			// 	return new THREE.Vector3( THREE.Math.randFloat( - 1, 1 ), THREE.Math.randFloat( - 1, 1 ), THREE.Math.randFloat( - 1, 1 ) );
-
-			// }
 
 			function onWindowResize() {
 
