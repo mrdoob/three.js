@@ -21,7 +21,6 @@
       shininess: 0,
       roughness: 1,
       metalness: 0,
-      side: THREE.DoubleSide,
     };
     loader.load('../resources/models/simple_house_scene/scene.gltf', (gltf) => {
       const materials = new Set();
