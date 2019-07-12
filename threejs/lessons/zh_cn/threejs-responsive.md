@@ -207,8 +207,8 @@ HD-DPI代表每英寸高密度点显示器(视网膜显示器)。它指的是当
     function resizeRendererToDisplaySize(renderer) {
       const canvas = renderer.domElement;
       const pixelRatio = window.devicePixelRatio;
-      const width = canvas.clientWidth * pixelRatio;
-      const height = canvas.clientHeight * pixelRatio;
+      const width = canvas.clientWidth * pixelRatio | 0;
+      const height = canvas.clientHeight * pixelRatio | 0;
       const needResize = canvas.width !== width || canvas.height !== height;
       if (needResize) {
         renderer.setSize(width, height, false);
