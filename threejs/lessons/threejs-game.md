@@ -1,4 +1,4 @@
-Title: Three.js Game
+Title: Three.js Making a Game
 Description: Making a game with THREE.js
 Category: solutions
 TOC: Start making a Game.
