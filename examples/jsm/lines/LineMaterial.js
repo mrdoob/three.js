@@ -148,7 +148,7 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// perpendicular to dir
+				// get the offset direction as perpendicular to the view vector
 				vec3 worldDir = normalize( end.xyz - start.xyz );
 				vec3 offset;
 				if ( position.y < 0.5 ) {
@@ -164,6 +164,8 @@ ShaderLib[ 'line' ] = {
 				// sign flip
 				if ( position.x < 0.0 ) offset *= - 1.0;
 
+				// don't extend the line if we're rendering dashes because we
+				// won't be rendering the endcaps
 				#ifndef USE_DASH
 
 					// extend the line bounds to encompass  endcaps
