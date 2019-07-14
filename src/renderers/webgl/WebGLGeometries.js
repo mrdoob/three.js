@@ -159,6 +159,8 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
+		if ( wireframeAttributes[ geometry.id ] ) attributes.remove( wireframeAttributes[ geometry.id ] );
+
 		wireframeAttributes[ geometry.id ] = attribute;
 
 	}
