@@ -147,3 +147,21 @@ export var BasicDepthPacking = 3200;
 export var RGBADepthPacking = 3201;
 export var TangentSpaceNormalMap = 0;
 export var ObjectSpaceNormalMap = 1;
+
+export var ZeroStencilOp = 0;
+export var KeepStencilOp = 7680;
+export var ReplaceStencilOp = 7681;
+export var IncrementStencilOp = 7682;
+export var DecrementStencilOp = 7683;
+export var IncrementWrapStencilOp = 34055;
+export var DecrementWrapStencilOp = 34056;
+export var InvertStencilOp = 5386;
+
+export var NeverStencilFunc = 512;
+export var LessStencilFunc = 513;
+export var EqualStencilFunc = 514;
+export var LessEqualStencilFunc = 515;
+export var GreaterStencilFunc = 516;
+export var NotEqualStencilFunc = 517;
+export var GreaterEqualStencilFunc = 518;
+export var AlwaysStencilFunc = 519;
