@@ -4,40 +4,34 @@
 		<title>three.js webgl - geometry - catmull spline editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - catmull spline editor</div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - catmull spline editor
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/DragControls.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/controls/TransformControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { DragControls } from './jsm/controls/DragControls.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TransformControls } from './jsm/controls/TransformControls.js';
 
 			String.prototype.format = function () {
 
@@ -115,7 +109,7 @@
 				helper.material.transparent = true;
 				scene.add( helper );
 
-				//var axes = new THREE.AxesHelper( 1000 );
+				//var axes = new AxesHelper( 1000 );
 				//axes.position.set( - 500, - 500, - 500 );
 				//scene.add( axes );
 
@@ -128,7 +122,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'uniform' );
 				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
@@ -145,13 +139,13 @@
 				gui.open();
 
 				// Controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
 				controls.addEventListener( 'start', function () {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
@@ -161,7 +155,7 @@
 
 				} );
 
-				transformControl = new THREE.TransformControls( camera, renderer.domElement );
+				transformControl = new TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
 				transformControl.addEventListener( 'dragging-changed', function ( event ) {
 
@@ -173,13 +167,13 @@
 				// Hiding transform situation is a little in a mess :()
 				transformControl.addEventListener( 'change', function () {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
 				transformControl.addEventListener( 'mouseDown', function () {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
@@ -195,12 +189,12 @@
 
 				} );
 
-				var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
+				var dragcontrols = new DragControls( splineHelperObjects, camera, renderer.domElement ); //
 				dragcontrols.enabled = false;
 				dragcontrols.addEventListener( 'hoveron', function ( event ) {
 
 					transformControl.attach( event.object );
-					cancelHideTransorm();
+					cancelHideTransform();
 
 				} );
 
@@ -214,7 +208,7 @@
 
 				function delayHideTransform() {
 
-					cancelHideTransorm();
+					cancelHideTransform();
 					hideTransform();
 
 				}
@@ -229,7 +223,7 @@
 
 				}
 
-				function cancelHideTransorm() {
+				function cancelHideTransform() {
 
 					if ( hiding ) clearTimeout( hiding );
 

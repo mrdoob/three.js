@@ -4,17 +4,12 @@
 		<title>three.js webgl - materials - wireframe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<script src="../build/three.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl wireframe demo
+		</div>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -24,6 +19,7 @@
 			void main() {
 
 				vCenter = center;
+
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
@@ -32,105 +28,122 @@
 
 		<script type="x-shader/x-fragment" id="fragmentShader">
 
+			uniform float widthFactor;
+
 			varying vec3 vCenter;
 
 			float edgeFactorTri() {
 
 				vec3 d = fwidth( vCenter.xyz );
-				vec3 a3 = smoothstep( vec3( 0.0 ), d * 1.5, vCenter.xyz );
+
+				vec3 a3 = smoothstep( vec3( 0.0 ), d * widthFactor, vCenter.xyz );
+
 				return min( min( a3.x, a3.y ), a3.z );
 
 			}
 
 			void main() {
 
-				gl_FragColor.rgb = mix( vec3( 1.0 ), vec3( 0.2 ), edgeFactorTri() );
-				gl_FragColor.a = 1.0;
+				if ( edgeFactorTri() > 0.99 ) discard;
+
+				gl_FragColor = gl_FrontFacing ? vec4( 0.9, 0.9, 1.0, 1.0 ) : vec4( 0.4, 0.4, 0.5, 1.0 );
+
 			}
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			var camera, scene, renderer;
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			var API = {
+				widthFactor: 1
+			};
+
+			var renderer, scene, camera, mesh1, mesh2;
 
 			init();
-			animate();
 
 			function init() {
-
-				var geometry, material, mesh;
-
-				var size = 150;
-
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 800;
-
-				scene = new THREE.Scene();
-
-				//
-
-				geometry = new THREE.BoxBufferGeometry( size, size, size );
-				material = new THREE.MeshBasicMaterial( { wireframe: true } );
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = - 150;
-				scene.add( mesh );
-
-				//
-
-				geometry = new THREE.BoxBufferGeometry( size, size, size );
-				geometry = geometry.toNonIndexed();
-
-				setupAttributes( geometry );
-
-				material = new THREE.ShaderMaterial( {
-					uniforms: {},
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-				} );
-
-				material.extensions.derivatives = true;
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 150;
-				scene.add( mesh );
-
-				//
-
-				geometry = new THREE.SphereBufferGeometry( size / 2, 32, 16 );
-				geometry = geometry.toNonIndexed();
-
-				setupAttributes( geometry );
-
-				material = new THREE.ShaderMaterial( {
-					uniforms: {},
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-				} );
-
-				material.extensions.derivatives = true;
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = - 150;
-				scene.add( mesh );
-
-				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				// events
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 500 );
+				camera.position.z = 150;
+
+				new THREE.BufferGeometryLoader().load( 'models/json/WaltHeadLo_buffergeometry.json', function ( geometry ) {
+
+					// on the left
+
+					var material = new THREE.MeshBasicMaterial( {
+
+						color: 0xe0e0ff,
+						wireframe: true
+
+					} );
+
+					mesh1 = new THREE.Mesh( geometry, material );
+					mesh1.position.set( - 40, 0, 0 );
+
+					scene.add( mesh1 );
+
+					// on the right
+
+					var uniforms = { 'widthFactor': { value: API.widthFactor } };
+
+					var material = new THREE.ShaderMaterial( {
+
+						uniforms: uniforms,
+						vertexShader: document.getElementById( 'vertexShader' ).textContent,
+						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+						side: THREE.DoubleSide
+
+					} );
+
+					material.extensions.derivatives = true;
+
+					geometry.removeAttribute( 'normal' );
+					geometry.removeAttribute( 'uv' );
+
+					setupAttributes( geometry );
+
+					mesh2 = new THREE.Mesh( geometry, material );
+					mesh2.position.set( 40, 0, 0 );
+
+					scene.add( mesh2 );
+
+					//
+
+					animate();
+
+				} );
+
+				//
+
+				var gui = new GUI();
+
+				gui.add( API, 'widthFactor', 0.4, 4 ).onChange( function () {
+
+					mesh2.material.uniforms.widthFactor.value = API.widthFactor;
+
+				} );
+
+				gui.open();
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			function setupAttributes( geometry ) {
-
-				// TODO: Bring back quads
 
 				var vectors = [
 					new THREE.Vector3( 1, 0, 0 ),
@@ -164,13 +177,9 @@
 
 				requestAnimationFrame( animate );
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				mesh1.rotation.y += 0.01;
 
-					var object = scene.children[ i ];
-					object.rotation.x += 0.005;
-					object.rotation.y += 0.01;
-
-				}
+				mesh2.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 

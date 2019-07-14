@@ -4,23 +4,22 @@
 		<title>three.js svg - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
+			svg {
+				display: block;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SVGRenderer.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { SVGRenderer, SVGObject } from './jsm/renderers/SVGRenderer.js';
 
 			var camera, scene, renderer, stats;
 
@@ -84,30 +83,39 @@
 
 				// POLYFIELD
 
-				var geometry = new THREE.Geometry();
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, side: THREE.DoubleSide } );
+				var geometry = new THREE.BufferGeometry();
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, side: THREE.DoubleSide } );
+
+				var v = new THREE.Vector3();
+				var v0 = new THREE.Vector3();
+				var v1 = new THREE.Vector3();
+				var v2 = new THREE.Vector3();
+				var color = new THREE.Color();
+
+				var vertices = [];
+				var colors = [];
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var v = new THREE.Vector3(
+					v.set(
 						Math.random() * 1000 - 500,
 						Math.random() * 1000 - 500,
 						Math.random() * 1000 - 500
 					);
 
-					var v0 = new THREE.Vector3(
+					v0.set(
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50
 					);
 
-					var v1 = new THREE.Vector3(
+					v1.set(
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50
 					);
 
-					var v2 = new THREE.Vector3(
+					v2.set(
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50,
 						Math.random() * 100 - 50
@@ -117,19 +125,22 @@
 					v1.add( v );
 					v2.add( v );
 
-					var face = new THREE.Face3(
-						geometry.vertices.push( v0 ) - 1,
-						geometry.vertices.push( v1 ) - 1,
-						geometry.vertices.push( v2 ) - 1,
-						null,
-						new THREE.Color( Math.random() * 0xffffff )
-					);
+					color.setHex( Math.random() * 0xffffff );
 
-					geometry.faces.push( face );
+					// create a single triangle
+
+					vertices.push( v0.x, v0.y, v0.z );
+					vertices.push( v1.x, v1.y, v1.z );
+					vertices.push( v2.x, v2.y, v2.z );
+
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
+					colors.push( color.r, color.g, color.b );
 
 				}
 
-				geometry.computeFaceNormals();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				group = new THREE.Mesh( geometry, material );
 				group.scale.set( 2, 2, 2 );
@@ -158,13 +169,30 @@
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					var object = new THREE.SVGObject( node.cloneNode() );
+					var object = new SVGObject( node.cloneNode() );
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 1000 - 500;
 					object.position.z = Math.random() * 1000 - 500;
 					scene.add( object );
 
 				}
+
+				// CUSTOM FROM FILE
+
+				var fileLoader = new THREE.FileLoader();
+				fileLoader.load( 'models/svg/hexagon.svg', function ( svg ) {
+
+					var node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
+					var parser = new DOMParser();
+					var doc = parser.parseFromString( svg, 'image/svg+xml' );
+
+					node.appendChild( doc.documentElement );
+
+					var object = new SVGObject( node );
+					object.position.x = 500;
+					scene.add( object );
+
+				} );
 
 				// LIGHTS
 
@@ -175,7 +203,7 @@
 				directional.position.set( - 1, 0.5, 0 );
 				scene.add( directional );
 
-				renderer = new THREE.SVGRenderer();
+				renderer = new SVGRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setQuality( 'low' );
 				document.body.appendChild( renderer.domElement );

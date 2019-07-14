@@ -4,30 +4,7 @@
 		<title>three.js webgl - teapot buffer geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #fff;
-			}
-
-			a { color: blue; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -35,28 +12,14 @@
 			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-
-		<script>
-
-			////////////////////////////////////////////////////////////////////////////////
-			// Utah/Newell Teapot demo
-			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, dat, window */
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			var camera, scene, renderer;
 			var cameraControls;
@@ -112,7 +75,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
@@ -208,7 +171,7 @@
 
 				var h;
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				// material (attributes)
 
@@ -342,7 +305,7 @@
 
 				}
 
-				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,

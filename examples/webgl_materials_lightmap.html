@@ -4,26 +4,10 @@
 		<title>three.js webgl - materials - lightmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a { color:skyblue }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -58,7 +42,13 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -83,12 +73,6 @@
 
 				scene = new THREE.Scene();
 
-				// CONTROLS
-
-				var controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = 0.9 * Math.PI / 2;
-				controls.enableZoom = false;
-
 				// LIGHTS
 
 				var light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
@@ -102,10 +86,10 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				var uniforms = {
-					topColor: { type: "c", value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { type: "c", value: new THREE.Color( 0xffffff ) },
-					offset: { type: "f", value: 400 },
-					exponent: { type: "f", value: 0.6 }
+					topColor: { value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					offset: { value: 400 },
+					exponent: { value: 0.6 }
 				};
 				uniforms.topColor.value.copy( light.color );
 
@@ -129,6 +113,12 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				// CONTROLS
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = 0.9 * Math.PI / 2;
+				controls.enableZoom = false;
 
 				// STATS
 

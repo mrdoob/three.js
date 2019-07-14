@@ -4,32 +4,24 @@
 		<title>three.js webgl - postprocessing smaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - post-processing SMAA
+		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/SMAAShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SMAAPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { SMAAPass } from './jsm/postprocessing/SMAAPass.js';
 
 			var camera, scene, renderer, composer, pass, stats;
 
@@ -73,11 +65,10 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				pass = new THREE.SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
-				pass.renderToScreen = true;
+				pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
 				composer.addPass( pass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -93,11 +84,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth = Math.floor( width * pixelRatio ) || 1;
-				var newHeight = Math.floor( height * pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 

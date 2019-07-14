@@ -4,21 +4,8 @@
 		<title>three.js webgl - scene - multiple - compare</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				margin: 0px;
-				overflow: hidden;
-				text-align: center;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				z-index: 2;
-			}
-
 			.container {
 				position: absolute;
 				width: 100%;
@@ -52,13 +39,11 @@
 			<div class="slider"></div>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, camera, renderer, controls;
 			var sceneL, sceneR;
@@ -79,7 +64,7 @@
 				camera = new THREE.PerspectiveCamera( 35, container.clientWidth / container.clientHeight, 0.1, 10 );
 				camera.position.set( 2, 4, 7 );
 
-				controls = new THREE.OrbitControls( camera, container );
+				controls = new OrbitControls( camera, container );
 
 				initMeshes();
 				initLights();

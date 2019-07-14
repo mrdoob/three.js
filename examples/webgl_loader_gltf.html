@@ -4,28 +4,7 @@
 		<title>three.js webgl - glTF loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #75ddc1;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -33,26 +12,24 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=pedestrian_overpass" target="_blank" rel="noopener">Pedestrian Overpass</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var container, stats, controls;
-			var camera, scene, renderer, light;
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -65,53 +42,59 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.9, 2.7 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, - 0.2, - 0.2 );
-				controls.update();
-
-				// envmap
-				var path = 'textures/cube/Bridge2/';
-				var format = '.jpg';
-				var envMap = new THREE.CubeTextureLoader().load( [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
-				] );
-
 				scene = new THREE.Scene();
-				scene.background = envMap;
 
-				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
-				// model
-				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', function ( gltf ) {
+						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
+						cubeGenerator.update( renderer );
 
-					gltf.scene.traverse( function ( child ) {
+						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
+						pmremGenerator.update( renderer );
 
-						if ( child.isMesh ) {
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-							child.material.envMap = envMap;
+						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
-						}
+						// model
+
+						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+							gltf.scene.traverse( function ( child ) {
+
+								if ( child.isMesh ) {
+
+									child.material.envMap = envMap;
+
+								}
+
+							} );
+
+							scene.add( gltf.scene );
+
+						} );
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+						scene.background = cubeGenerator.renderTarget;
 
 					} );
-
-					scene.add( gltf.scene );
-
-				}, undefined, function ( e ) {
-
-					console.error( e );
-
-				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, - 0.2, - 0.2 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

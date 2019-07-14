@@ -4,33 +4,15 @@
 	<title>three.js webgl - instancing - lambert shader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
 		a {
-			color: #ffffff;
+			color: #08f;
 		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
-			border: 2px red solid;
+			background-color: #f00;
 			margin-top: 20px;
 			padding: 10px;
 		}
@@ -44,21 +26,13 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/CurveExtras.js"></script>
+		import Stats from './jsm/libs/stats.module.js';
 
-
-	<script>
-
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { Curves } from './jsm/curves/CurveExtras.js';
 
 		THREE.ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
 
@@ -135,11 +109,11 @@
 				#endif
 
 				varying vec3 vLightFront;
+				varying vec3 vIndirectFront;
 
 				#ifdef DOUBLE_SIDED
-
 					varying vec3 vLightBack;
-
+					varying vec3 vIndirectBack;
 				#endif
 
 				#include <common>
@@ -230,7 +204,7 @@
 
 			scene.add( camera );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableZoom = false;
 			controls.maxPolarAngle = Math.PI / 2;
 
@@ -254,7 +228,7 @@
 			scene.add( light );
 
 			// light shadow camera helper
-			//light.shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+			//light.shadowCameraHelper = new CameraHelper( light.shadow.camera );
 			//scene.add( light.shadowCameraHelper );
 
 
@@ -265,7 +239,7 @@
 
 			const INSTANCES = 256;
 
-			var knot = new THREE.Curves.TorusKnot( 10 );
+			var knot = new Curves.TorusKnot( 10 );
 			var positions = knot.getSpacedPoints( INSTANCES );
 
 			var offsets = new Float32Array( INSTANCES * 3 ); // xyz

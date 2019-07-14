@@ -17,7 +17,6 @@
 		<h2>Examples</h2>
 
 		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
-		<p>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</p>
 		<p>[example:webgl_shading_physical shading / physical ]</p>
 
 		<code>// Create cube camera
@@ -25,7 +24,7 @@
 		scene.add( cubeCamera );
 
 		// Create car
-		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 

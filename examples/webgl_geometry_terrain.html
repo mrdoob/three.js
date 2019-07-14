@@ -4,52 +4,30 @@
 		<title>three.js webgl - geometry - terrain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
 				color: #a06851;
 			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			var container, stats;
 
@@ -74,7 +52,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 				controls.movementSpeed = 1000;
 				controls.lookSpeed = 0.1;
 
@@ -103,9 +81,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

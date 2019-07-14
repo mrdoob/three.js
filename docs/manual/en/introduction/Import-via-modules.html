@@ -8,7 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1><br />
+		<h1>[name]</h1>
 
 		<p>
 			While importing three.js via script tags is a great way to get up and running fast, it has a few drawbacks for longer lived projects, for example:
@@ -27,7 +27,7 @@
 
 		<h2>Importing the module</h2>
 
-		<p>Assuming that you're bundling your files with a tool such as [link:https://webpack.github.io/ Webpack] or [link:https://github.com/substack/node-browserify Browserify], which allow you to "require('modules') in the browser by bundling up all of your dependencies."</p>
+		<p>Assuming that you're bundling your files with a tool such as [link:https://webpack.github.io/ Webpack] or [link:https://github.com/substack/node-browserify Browserify], which allow you to "require('modules')" in the browser by bundling up all of your dependencies.</p>
 
 		<p>
 			You should now be able to import the module into your source files and continue to use it as per normal.
@@ -62,11 +62,20 @@
 		...
 		</code>
 
-		<h2>Caveats</h2>
-
+		<h2>Importable Examples</h2>
 		<p>
-			Currently it's not possible to import the files within the "examples/js" directory in this way.
-			This is due to some of the files relying on global namespace pollution of THREE. For more information see <a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>.
+			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
+			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
+			for a project. You can find in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory an ES6
+			module version for almost all example files. If you install three.js via npm, you can import them like so:
+		</p>
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		</code>
+		<p>
+			Note: When using code from the examples directory, it's important that all files match the version of
+			your three.js main file. For example, it's not acceptable to use *GLTFLoader* and *OrbitControls* from R96 together
+			with three.js R103.
 		</p>
 	</body>
 </html>

@@ -22,7 +22,7 @@
 		<h2>Example</h2>
 
 		<p>
-			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
 			[example:webaudio_visualizer webaudio / visualizer ]
 		</p>
 
@@ -61,6 +61,9 @@
 
 		<h3>[property:AudioContext context]</h3>
 		<p>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</p>
+
+		<h3>[property:Number detune]</h3>
+		<p>Modify pitch, measured in cents. +/- 100 is a semitone. +/- 1200 is an octave. Default is *0*.</p>
 
 		<h3>[property:Array filters]</h3>
 		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>

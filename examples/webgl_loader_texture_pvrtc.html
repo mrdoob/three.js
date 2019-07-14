@@ -4,27 +4,7 @@
 		<title>three.js webgl - materials - compressed textures</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #050505;
-				color: #fff;
-				overflow: hidden;
-			}
-
-			a { color: #e00 }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -32,18 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - PVR compressed textures
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PVRLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { PVRLoader } from './jsm/loaders/PVRLoader.js';
 
 			var camera, scene, renderer;
 			var meshes = [];
@@ -74,7 +47,7 @@
 				var onCube2Loaded = function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
-					// texture.minFilter = THREE.LinearMipMapNearestFilter;
+					// texture.minFilter = LinearMipMapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;
@@ -83,7 +56,7 @@
 
 				//
 
-				var loader = new THREE.PVRLoader();
+				var loader = new PVRLoader();
 
 				var disturb_4bpp_rgb = loader.load( 'textures/compressed/disturb_4bpp_rgb.pvr' );
 				var disturb_4bpp_rgb_v3 = loader.load( 'textures/compressed/disturb_4bpp_rgb_v3.pvr' );

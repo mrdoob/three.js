@@ -4,39 +4,20 @@
 		<title>three.js webgl - materials - dynamic cube reflection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 
 			var camera, scene, renderer;
-			var cube, sphere, torus, material, backgroundMesh;
+			var cube, sphere, torus, material;
 
 			var count = 0, cubeCamera1, cubeCamera2;
 
@@ -58,23 +39,35 @@
 
 			function init( texture ) {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-
-				scene = new THREE.Scene();
-
-				backgroundMesh = new THREE.Mesh( new THREE.SphereBufferGeometry( 500, 32, 16 ), new THREE.MeshBasicMaterial( { map: texture } ) );
-				backgroundMesh.geometry.scale( - 1, 1, 1 );
-				scene.add( backgroundMesh );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				// background
+
+				var options = {
+					resolution: 1024,
+
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipMapLinearFilter,
+					magFilter: THREE.LinearFilter
+				};
+
+				scene.background = new CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+
+				//
+
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera1.renderTarget.texture.generateMipmaps = true;
 				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera1 );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
+				cubeCamera2.renderTarget.texture.generateMipmaps = true;
 				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
 				scene.add( cubeCamera2 );
 
@@ -196,13 +189,11 @@
 				if ( count % 2 === 0 ) {
 
 					material.envMap = cubeCamera1.renderTarget.texture;
-					backgroundMesh.position.copy( cubeCamera2.position );
 					cubeCamera2.update( renderer, scene );
 
 				} else {
 
 					material.envMap = cubeCamera2.renderTarget.texture;
-					backgroundMesh.position.copy( cubeCamera1.position );
 					cubeCamera1.update( renderer, scene );
 
 				}
@@ -211,7 +202,6 @@
 
 				sphere.visible = true;
 
-				backgroundMesh.position.copy( camera.position );
 				renderer.render( scene, camera );
 
 			}

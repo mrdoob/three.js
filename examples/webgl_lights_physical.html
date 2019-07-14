@@ -4,55 +4,25 @@
 		<title>three.js webgl - lights - physical lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate lighting example using a incandescent bulb - by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
-			Using real world scale: Brick cube is 1 meter in size.  Light is 2 meters from floor.  Globe is 25 cm in diameter.<br/>
-			Using Reinhard inline tonemapping with real-world light falloff (decay = 2).
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate incandescent bulb by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
+			Real world scale: Brick cube is 50 cm in size. Globe is 50 cm in diameter.<br/>
+			Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer,
 				bulbLight, bulbMat, hemiLight, stats;
@@ -218,9 +188,9 @@
 				floorMesh.rotation.x = - Math.PI / 2.0;
 				scene.add( floorMesh );
 
-				var ballGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
+				var ballGeometry = new THREE.SphereBufferGeometry( 0.25, 32, 32 );
 				var ballMesh = new THREE.Mesh( ballGeometry, ballMat );
-				ballMesh.position.set( 1, 0.5, 1 );
+				ballMesh.position.set( 1, 0.25, 1 );
 				ballMesh.rotation.y = Math.PI;
 				ballMesh.castShadow = true;
 				scene.add( ballMesh );
@@ -253,12 +223,12 @@
 				container.appendChild( renderer.domElement );
 
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'hemiIrradiance', Object.keys( hemiLuminousIrradiances ) );
 				gui.add( params, 'bulbPower', Object.keys( bulbLuminousPowers ) );

@@ -4,61 +4,27 @@
 		<title>three.js webgl - post processing - Outline Pass</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color:#00ff78;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/OutlinePass.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { OutlinePass } from './jsm/postprocessing/OutlinePass.js';
+			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
 			var container, stats;
 			var camera, scene, renderer, controls;
@@ -83,7 +49,7 @@
 
 			// Init gui
 
-			var gui = new dat.GUI( { width: 300 } );
+			var gui = new GUI( { width: 300 } );
 
 			gui.add( params, 'edgeStrength', 0.01, 10 ).onChange( function ( value ) {
 
@@ -160,7 +126,7 @@
 				camera = new THREE.PerspectiveCamera( 45, width / height, 0.1, 100 );
 				camera.position.set( 0, 0, 8 );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 5;
 				controls.maxDistance = 20;
 				controls.enablePan = false;
@@ -200,7 +166,7 @@
 
 				};
 
-				var loader = new THREE.OBJLoader( manager );
+				var loader = new OBJLoader( manager );
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					var scale = 1.0;
@@ -276,12 +242,12 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
-				outlinePass = new THREE.OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+				outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
 				composer.addPass( outlinePass );
 
 				var onLoad = function ( texture ) {
@@ -296,9 +262,8 @@
 
 				loader.load( 'textures/tri_pattern.jpg', onLoad );
 
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				effectFXAA = new ShaderPass( FXAAShader );
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-				effectFXAA.renderToScreen = true;
 				composer.addPass( effectFXAA );
 
 				window.addEventListener( 'resize', onWindowResize, false );

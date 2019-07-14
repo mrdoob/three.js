@@ -228,7 +228,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
-		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
+		for ( var i = 0; i < positions.length; i += 3 ) {
 
 			scope.vertices.push( new Vector3().fromArray( positions, i ) );
 
@@ -695,8 +695,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			vertices2 = geometry.vertices,
 			faces1 = this.faces,
 			faces2 = geometry.faces,
-			uvs1 = this.faceVertexUvs[ 0 ],
-			uvs2 = geometry.faceVertexUvs[ 0 ],
 			colors1 = this.colors,
 			colors2 = geometry.colors;
 
@@ -778,23 +776,25 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// uvs
 
-		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+		for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
-			var uv = uvs2[ i ], uvCopy = [];
+			var faceVertexUvs2 = geometry.faceVertexUvs[ i ];
 
-			if ( uv === undefined ) {
+			if ( this.faceVertexUvs[ i ] === undefined ) this.faceVertexUvs[ i ] = [];
 
-				continue;
+			for ( var j = 0, jl = faceVertexUvs2.length; j < jl; j ++ ) {
+
+				var uvs2 = faceVertexUvs2[ j ], uvsCopy = [];
+
+				for ( var k = 0, kl = uvs2.length; k < kl; k ++ ) {
+
+					uvsCopy.push( uvs2[ k ].clone() );
+
+				}
+
+				this.faceVertexUvs[ i ].push( uvsCopy );
 
 			}
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( uv[ j ].clone() );
-
-			}
-
-			uvs1.push( uvCopy );
 
 		}
 

@@ -4,42 +4,23 @@
 		<title>three.js - skinning - simple</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #046;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple skinning -
-		<a href="https://github.com/mrdoob/three.js/blob/master/examples/models/skinned/simple/simple.blend" target="_blank" rel="noopener">Blender File</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple skinning -
+			<a href="https://github.com/mrdoob/three.js/blob/master/examples/models/skinned/simple/simple.blend" target="_blank" rel="noopener">Blender File</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var stats, mixer, camera, scene, renderer, clock;
 
@@ -94,7 +75,7 @@
 
 				//
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( './models/gltf/SimpleSkinning.gltf', function ( gltf ) {
 
 					scene.add( gltf.scene );
@@ -123,7 +104,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.enablePan = false;
 				controls.minDistance = 5;
 				controls.maxDistance = 50;

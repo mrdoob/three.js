@@ -1,62 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - baked illumination</title>
+		<title>three.js webgl - CTM loader materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#000;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a { color:skyblue }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #fff;
-				background:rgba(0,0,0,0.65);
-				padding: 5px;
-				text-align: center;
-				z-index:100;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -
-		using <a href="https://github.com/jcmellado/js-openctm"  target="_blank" rel="noopener">js-openctm</a> -
-		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank" rel="noopener">dskfnwn</a> -
-		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -
+			using <a href="https://github.com/jcmellado/js-openctm"  target="_blank" rel="noopener">js-openctm</a><br/>
+			camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank" rel="noopener">dskfnwn</a> -
+			skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank" rel="noopener">Paul Debevec</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/ctm/lzma.js"></script>
-		<script src="js/loaders/ctm/ctm.js"></script>
-		<script src="js/loaders/ctm/CTMLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { CTMLoader } from './jsm/loaders/ctm/CTMLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -80,11 +45,6 @@
 
 				camera = new THREE.PerspectiveCamera( 30, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 185, 40, 170 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.maxPolarAngle = Math.PI / 2;
-				controls.minDistance = 150;
-				controls.maxDistance = 500;
 
 				// SCENE
 
@@ -119,14 +79,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-
-				container.appendChild( renderer.domElement );
-
-				//
-
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI / 2;
+				controls.minDistance = 150;
+				controls.maxDistance = 500;
 
 				// STATS
 
@@ -146,7 +107,9 @@
 				var position = new THREE.Vector3( - 105, - 78, - 30 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
-				var loader = new THREE.CTMLoader();
+				var loader = new CTMLoader();
+				loader.setWorkerPath( "js/loaders/ctm/CTMWorker.js" );
+
 				loader.loadParts( "models/ctm/camaro/camaro.js", function ( geometries, materials ) {
 
 					hackMaterials( materials );
@@ -231,7 +194,6 @@
 						mm.specularMap = m.map;
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
-						mm.metal = true;
 
 						materials[ i ] = mm;
 

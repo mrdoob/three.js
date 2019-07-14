@@ -8,38 +8,37 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>三维矩阵（[name]）</h1>
 
 		<p class="desc">
-			A class representing a 3x3 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].
+			一个表示3X3矩阵[link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].的类。
 		</p>
 
-		<h2>Example</h2>
+		<h2>示例（Example）</h2>
 		<code>
 var m = new Matrix3();
 		</code>
 
-		<h2>A Note on Row-Major and Column-Major Ordering</h2>
+		<h2>注意行优先列优先的顺序。</h2>
 		<p>
-			The [page:set]() method takes arguments in [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]
-			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
+			[page:set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+			而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在数组当中。<br /><br />
 
-			This means that calling
+			这意味着
 		<code>
 m.set( 11, 12, 13,
        21, 22, 23,
        31, 32, 33 );
 		</code>
-		will result in the [page:.elements elements] array containing:
+		元素数组[page:.elements elements]将存储为:
 		<code>
 m.elements = [ 11, 21, 31,
               12, 22, 32,
               13, 23, 33 ];
 		</code>
-		and internally all calculations are performed using column-major ordering. However, as the actual ordering
-		makes no difference mathematically and most people are used to thinking about matrices in row-major order,
-		the three.js documentation shows matrices in row-major order. Just bear in mind that if you are reading the source
-		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
+		在内部，所有的计算都是使用列优先顺序进行的。然而，由于实际的排序在数学上没有什么不同，
+		而且大多数人习惯于以行优先顺序考虑矩阵，所以three.js文档以行为主的顺序显示矩阵。
+		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
 		</p>
 
 		<h2>Constructor</h2>
@@ -47,87 +46,81 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[name]()</h3>
 		<p>
-		Creates and initializes the [name] to the 3x3
-		[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+		创建并初始化一个3X3的单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 		</p>
 
 
 
-		<h2>Properties</h2>
+		<h2>属性（Properties）</h2>
 
-		<h3>[property:Float32Array elements]</h3>
+		<h3>[property:Array elements]</h3>
 		<p>
-		A [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]
-		 list of matrix values.
+			矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
 		<h3>[property:Boolean isMatrix3]</h3>
 		<p>
-			Used to check whether this or derived classes are Matrix3s. Default is *true*.<br /><br />
+				用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
 
-			You should not change this, as it used internally for optimisation.
+				不应该改变该值，因为它在内部用于优化。
 		</p>
 
 
 
-		<h2>Methods</h2>
+		<h2>方法（Methods）</h2>
 
 		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
 		<p>
-		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
+		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
 
-		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
+		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
 		</p>
 
 
 		<h3>[method:Matrix3 clone]()</h3>
-		<p>Creates a new Matrix3 and with identical elements to this one.</p>
+		<p>创建一个新的矩阵，元素 [page:.elements elements] 与该矩阵相同。</p>
 
 		<h3>[method:this copy]( [param:Matrix3 m] )</h3>
-		<p>Copies the elements of matrix [page:Matrix3 m] into this matrix.</p>
+		<p>将矩阵[page:Matrix3 m]的元素复制到当前矩阵中。</p>
 
 		<h3>[method:Float determinant]()</h3>
 		<p>
-		Computes and returns the
-		[link:https://en.wikipedia.org/wiki/Determinant determinant] of this matrix.
+			计算并返回矩阵的行列式[link:https://en.wikipedia.org/wiki/Determinant determinant] 。
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
-		<p>Return true if this matrix and [page:Matrix3 m] are equal.</p>
+		<p>如果矩阵[page:Matrix3 m] 与当前矩阵所有对应元素相同则返回true。</p>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - the array to read the elements from.<br />
-		[page:Integer offset] - (optional) index of first element in the array. Default is 0.<br /><br />
+		[page:Array array] - 用来存储设置元素数据的数组<br />
+		[page:Integer offset] - (可选参数) 数组的偏移量，默认值为 0。<br /><br />
 
-		Sets the elements of this matrix based on an array in
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
+		使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 		</p>
 
 		<h3>[method:this getInverse]( [param:Matrix3 m], [param:Boolean throwOnDegenerate] )</h3>
 		<p>
-		[page:Matrix3 m] - the matrix to take the inverse of.<br />
-		[page:Boolean throwOnDegenerate] - (optional) If true, throw an error if the matrix is degenerate (not invertible).<br /><br />
+		[page:Matrix3 m] - 取逆的矩阵。<br />
+		[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
 
-		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix3 m],
-		using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
-
-		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 3x3 identity matrix.
+		使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
+		将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
+		参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
 		</p>
 
 		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>
 		<p>
 		[page:Matrix4 m] - [page:Matrix4]<br /><br />
 
-		Sets this matrix as the upper left 3x3 of the [link:https://en.wikipedia.org/wiki/Normal_matrix normal matrix]
-		of the passed [page:Matrix4 matrix4]. The normal matrix is the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] [link:https://en.wikipedia.org/wiki/Transpose transpose]
-	  of the matrix [page:Matrix4 m].
+		将这个矩阵设置为给定矩阵的正规矩阵[link:https://en.wikipedia.org/wiki/Normal_matrix normal matrix]（左上角的3x3）。
+		正规矩阵是矩阵[page:Matrix4 m]的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] 的转置[link:https://en.wikipedia.org/wiki/Transpose transpose]。
 		</p>
 
 		<h3>[method:this identity]()</h3>
 		<p>
-		Resets this matrix to the 3x3 identity matrix:
-		<code>
+			将此矩阵重置为3x3单位矩阵:
+				<code>
 1, 0, 0
 0, 1, 0
 0, 0, 1
@@ -136,22 +129,22 @@ m.elements = [ 11, 21, 31,
 		</p>
 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
-		<p>Post-multiplies this matrix by [page:Matrix3 m].</p>
+		<p>将当前矩阵乘以矩阵[page:Matrix3 m]。</p>
 
 		<h3>[method:this multiplyMatrices]( [param:Matrix3 a], [param:Matrix3 b] )</h3>
-		<p>Sets this matrix to [page:Matrix3 a] x [page:Matrix3 b].</p>
+		<p>设置当前矩阵为矩阵[page:Matrix3 a] x 矩阵[page:Matrix3 b]。</p>
 
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
-		<p>Multiplies every component of the matrix by the scalar value *s*.</p>
+		<p>当前矩阵所有的元素乘以该缩放值*s*</p>
 
 		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )</h3>
 		<p>
-		[page:Float n11] - value to put in row 1, col 1.<br />
-		[page:Float n12] - value to put in row 1, col 2.<br />
+		[page:Float n11] - 设置第一行第一列的值。<br />
+		[page:Float n12] - 设置第一行第二列的值。<br />
 		...<br />
 		...<br />
-		[page:Float n32] - value to put in row 3, col 2.<br />
-		[page:Float n33] - value to put in row 3, col 3.<br /><br />
+		[page:Float n32] - 设置第三行第二列的值。<br />
+		[page:Float n33] - 设置第三行第三列的值。<br /><br />
 
 		Sets the 3x3 matrix values to the given
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
@@ -159,45 +152,44 @@ m.elements = [ 11, 21, 31,
 		</p>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
-		<p>Pre-multiplies this matrix by [page:Matrix3 m].</p>
+		<p>将矩阵[page:Matrix3 m]乘以当前矩阵。</p>
 
 		<h3>[method:this setFromMatrix4]( [param:Matrix4 m] )</h3>
-		<p>Set this matrx to the upper 3x3 matrix of the Matrix4 [page:Matrix4 m].</p>
+		<p>将当前矩阵设置为4X4矩阵[page:Matrix4 m]左上3X3</p>
 
 		<h3>[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )</h3>
 		<p>
-		[page:Float tx] - offset x<br />
-		[page:Float ty] - offset y<br />
-		[page:Float sx] - repeat x<br />
-		[page:Float sy] - repeat y<br />
-		[page:Float rotation] - rotation (in radians)<br />
-		[page:Float cx] - center x of rotation<br />
-		[page:Float cy] - center y of rotation<br /><br />
+		[page:Float tx] - x偏移量<br />
+		[page:Float ty] - y偏移量<br />
+		[page:Float sx] - x方向的重复比例<br />
+		[page:Float sy] - y方向的重复比例<br />
+		[page:Float rotation] - 旋转（弧度）<br />
+		[page:Float cx] - 旋转中心x<br />
+		[page:Float cy] - 旋转中心y<br /><br />
 
-		Sets the UV transform matrix from offset, repeat, rotation, and center.
+		使用偏移，重复，旋转和中心点位置设置UV变换矩阵。
 		</p>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - (optional) array to store the resulting vector in. If not given a new array will be created.<br />
-		[page:Integer offset] - (optional) offset in the array at which to put the result.<br /><br />
+		[page:Array array] - (可选参数) 存储矩阵元素的数组，如果未指定会创建一个新的数组。<br />
+		[page:Integer offset] - (可选参数) 存放矩阵元素数组的偏移量。<br /><br />
 
-		Writes the elements of this matrix to an array in
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
+		使用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]格式将此矩阵的元素写入数组中。
 		</p>
 
 		<h3>[method:this transpose]()</h3>
-		<p>[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix in place.</p>
+		<p>将该矩阵转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]。</p>
 
 		<h3>[method:this transposeIntoArray]( [param:Array array] )</h3>
 		<p>
-		[page:Array array] -  array to store the resulting vector in.<br /><br />
+		[page:Array array] -  用于存储当前矩阵转置结果的数组。<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Transpose Transposes] this matrix into the supplied array,
-		and returns itself unchanged.
+		将当前矩阵的转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]存入给定的数组[param:Array array]但不改变当前矩阵，
+		并返回当前矩阵。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源码（Source）</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 	</body>

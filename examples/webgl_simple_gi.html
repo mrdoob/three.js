@@ -4,26 +4,7 @@
 		<title>three.js webgl - simple global illumination</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-
-			a { color: #0078ff; }
-
-			#info {
-				position: absolute;
-				top: 5px;
-				width: 100%;
-				color:#fff;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align: center;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -31,10 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// HACK:
 
@@ -113,7 +95,8 @@
 						camera.position.copy( position );
 						camera.lookAt( position.add( normal ) );
 
-						renderer.render( clone, camera, rt );
+						renderer.setRenderTarget( rt );
+						renderer.render( clone, camera );
 
 						renderer.readRenderTargetPixels( rt, 0, 0, SIZE, SIZE, buffer );
 
@@ -176,29 +159,10 @@
 				// sphere
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
-				// var geometry = new THREE.BoxBufferGeometry( 1, 1, 1, 10, 10, 10 )
 				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 
 				var mesh = new THREE.Mesh( geometry, material );
-				// mesh.position.y = 1;
 				scene.add( mesh );
-
-				/*
-				var geometry = new THREE.SphereBufferGeometry( 0.5, 16, 8 );
-
-				for ( var i = 0; i < 10; i ++ ) {
-
-					var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } );
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 3 - 1.5;
-					mesh.position.y = Math.random() * 3 - 1.5;
-					mesh.position.z = Math.random() * 3 - 1.5;
-					mesh.updateMatrix();
-					scene.add( mesh );
-
-				}
-				*/
 
 				// room
 
@@ -224,7 +188,7 @@
 
 				new SimpleGI( renderer, scene );
 
-				var controls = new THREE.OrbitControls( camera );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -243,6 +207,7 @@
 
 				requestAnimationFrame( animate );
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 			}

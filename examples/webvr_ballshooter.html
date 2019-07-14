@@ -4,35 +4,23 @@
 		<title>three.js webvr - ball shooter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-12-02 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-12-02" content="Ah46myef4Ax/+fcLtkeotXmIqnvun4lg4bYbHVttuJvbsWiE4oacrvroId7hbCEb4/byxFHIO6+uwq4pwr6RfQkAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Mzc1ODIyNn0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-12-02 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-12-02" content="AqI9LIanbGxr/HoTOsYCUNxG82Vy94NZbjhv83R+bF+5NX2jiZOaf7ny+mFoTUP5wrWpYlPjQ6+HeVas9f1lRwYAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQzNzU4MjI2fQ==">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #48f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter
+		</div>
 
-		<script src="js/geometries/BoxLineGeometry.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script>
+		<script type="module">
 
-			var container;
+			import * as THREE from '../build/three.module.js';
+
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
+
 			var camera, scene, renderer;
 			var controller1, controller2;
 
@@ -50,24 +38,13 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter';
-				container.appendChild( info );
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
 				room = new THREE.LineSegments(
-					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
 					new THREE.LineBasicMaterial( { color: 0x808080 } )
 				);
 				room.geometry.translate( 0, 3, 0 );
@@ -102,7 +79,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 

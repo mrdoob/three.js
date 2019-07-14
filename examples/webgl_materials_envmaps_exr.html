@@ -4,63 +4,39 @@
 		<title>threejs webgl - materials - equirectangular exr image based lighting</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
-			}
-			a { color: #00f }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Example of an IBL (Image based lighting) pipeline based around<br> equirectangular EXR lightprobe data. Created by <a href="https://github.com/richardmonette" target="_blank" rel="noopener">Richard Monette</a></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/EXRLoader.js"></script>
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var container, stats;
 			var params = {
 				envMap: 'EXR',
 				roughness: 0.0,
 				metalness: 0.0,
-				exposure: 1.0
+				exposure: 1.0,
+				debug: false,
 			};
-			var camera, scene, renderer, controls, objects = [];
-			var standardMaterial, floorMaterial;
+
+			var container, stats;
+			var camera, scene, renderer, controls;
+			var torusMesh, planeMesh;
 			var pngCubeRenderTarget, exrCubeRenderTarget;
+			var pngBackground, exrBackground;
 
 			init();
 			animate();
@@ -74,77 +50,74 @@
 				camera.position.set( 0, 0, 120 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.toneMapping = THREE.LinearToneMapping;
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					color: 0xffffff,
+				//
+
+				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				var material = new THREE.MeshStandardMaterial( {
 					metalness: params.roughness,
 					roughness: params.metalness,
 					envMapIntensity: 1.0
 				} );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				torusMesh = new THREE.Mesh( geometry, material );
+				scene.add( torusMesh );
 
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
+				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var material = new THREE.MeshBasicMaterial();
 
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
+				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh.position.y = - 50;
+				planeMesh.rotation.x = - Math.PI * 0.5;
+				scene.add( planeMesh );
 
-				floorMaterial = new THREE.MeshBasicMaterial( {
-					color: 0xffffff
-				} );
+				new EXRLoader()
+					.setDataType( THREE.FloatType )
+					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
-				var planeMesh1 = new THREE.Mesh( planeGeometry, floorMaterial );
-				planeMesh1.position.y = - 50;
-				planeMesh1.rotation.x = - Math.PI * 0.5;
-				scene.add( planeMesh1 );
+						texture.minFilter = THREE.NearestFilter;
+						// texture.magFilter = THREE.NearestFilter;
+						texture.encoding = THREE.LinearEncoding;
 
-				new THREE.EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
+						var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
+						exrBackground = cubemapGenerator.renderTarget;
+						var cubeMapTexture = cubemapGenerator.update( renderer );
 
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
-					texture.encoding = THREE.LinearEncoding;
+						var pmremGenerator = new PMREMGenerator( cubeMapTexture );
+						pmremGenerator.update( renderer );
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
-					var cubeMapTexture = cubemapGenerator.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
-					pmremGenerator.update( renderer );
+						exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						texture.dispose();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-					exrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-					texture.dispose();
-					cubemapGenerator.dispose();
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
-				} );
+					} );
 
 				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					var cubemapGenerator = new THREE.EquirectangularToCubeGenerator( texture, { resolution: 512 } );
+					var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512 } );
+					pngBackground = cubemapGenerator.renderTarget;
+
 					var cubeMapTexture = cubemapGenerator.update( renderer );
 
-					var pmremGenerator = new THREE.PMREMGenerator( cubeMapTexture );
+					var pmremGenerator = new PMREMGenerator( cubeMapTexture );
 					pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
 					pngCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					texture.dispose();
-					cubemapGenerator.dispose();
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
 
@@ -161,18 +134,19 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'envMap', [ 'EXR', 'PNG' ] );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'metalness', 0, 1 );
-				gui.add( params, 'exposure', 0, 2 );
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'debug', false );
 				gui.open();
 
 			}
@@ -201,40 +175,40 @@
 
 			function render() {
 
-				if ( standardMaterial !== undefined ) {
+				torusMesh.material.roughness = params.roughness;
+				torusMesh.material.metalness = params.metalness;
 
-					standardMaterial.roughness = params.roughness;
-					standardMaterial.metalness = params.metalness;
+				var newEnvMap = torusMesh.material.envMap;
+				var background = scene.background;
 
-					var newEnvMap = standardMaterial.envMap;
+				switch ( params.envMap ) {
 
-					switch ( params.envMap ) {
-
-						case 'EXR': newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null; break;
-						case 'PNG': newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null; break;
-
-					}
-
-					if ( newEnvMap !== standardMaterial.envMap ) {
-
-						standardMaterial.envMap = newEnvMap;
-						standardMaterial.needsUpdate = true;
-
-						floorMaterial.map = newEnvMap;
-						floorMaterial.needsUpdate = true;
-
-					}
+					case 'EXR':
+						newEnvMap = exrCubeRenderTarget ? exrCubeRenderTarget.texture : null;
+						background = exrBackground;
+						break;
+					case 'PNG':
+						newEnvMap = pngCubeRenderTarget ? pngCubeRenderTarget.texture : null;
+						background = pngBackground;
+						break;
 
 				}
 
+				if ( newEnvMap !== torusMesh.material.envMap ) {
+
+					torusMesh.material.envMap = newEnvMap;
+					torusMesh.material.needsUpdate = true;
+
+					planeMesh.material.map = newEnvMap;
+					planeMesh.material.needsUpdate = true;
+
+				}
+
+				torusMesh.rotation.y += 0.005;
+				planeMesh.visible = params.debug;
+
+				scene.background = background;
 				renderer.toneMappingExposure = params.exposure;
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-					object.rotation.y += 0.005;
-
-				}
 
 				renderer.render( scene, camera );
 

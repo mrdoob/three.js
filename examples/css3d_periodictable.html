@@ -4,32 +4,10 @@
 		<title>three.js css3d - periodic table</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
-			body {
-				background-color: #000000;
-				margin: 0;
-				font-family: Helvetica, sans-serif;;
-				overflow: hidden;
-			}
-
 			a {
-				color: #ffffff;
-			}
-
-			#info {
-				position: absolute;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				font-weight: bold;
-				text-align: center;
-				z-index: 1;
+				color: #8ff;
 			}
 
 			#menu {
@@ -44,7 +22,9 @@
 				height: 160px;
 				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
 				border: 1px solid rgba(127,255,255,0.25);
+				font-family: Helvetica, sans-serif;
 				text-align: center;
+				line-height: normal;
 				cursor: default;
 			}
 
@@ -89,9 +69,11 @@
 				padding: 5px 10px;
 				cursor: pointer;
 			}
+
 			button:hover {
 				background-color: rgba(0,255,255,0.5);
 			}
+
 			button:active {
 				color: #000000;
 				background-color: rgba(0,255,255,0.75);
@@ -99,12 +81,8 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - periodic table. <a href="https://plus.google.com/113862800338869870683/posts/QcFk5HrWran" target="_blank" rel="noopener">info</a>.</div>
 		<div id="container"></div>
 		<div id="menu">
 			<button id="table">TABLE</button>
@@ -113,7 +91,13 @@
 			<button id="grid">GRID</button>
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var table = [
 				"H", "Hydrogen", "1.00794", 1, 1,
@@ -275,7 +259,7 @@
 					details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
 					element.appendChild( details );
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new CSS3DObject( element );
 					object.position.x = Math.random() * 4000 - 2000;
 					object.position.y = Math.random() * 4000 - 2000;
 					object.position.z = Math.random() * 4000 - 2000;
@@ -353,14 +337,13 @@
 
 				//
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 0.5;
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 500;
 				controls.maxDistance = 6000;
 				controls.addEventListener( 'change', render );

@@ -2,6 +2,7 @@ import { Color } from '../math/Color.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { Matrix3 } from '../math/Matrix3.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
@@ -92,6 +93,7 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.skinning !== undefined ) material.skinning = json.skinning;
 		if ( json.morphTargets !== undefined ) material.morphTargets = json.morphTargets;
+		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
@@ -129,6 +131,9 @@ Object.assign( MaterialLoader.prototype, {
 						material.uniforms[ name ].value = new Vector4().fromArray( uniform.value );
 						break;
 
+					case 'm3':
+						material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+
 					case 'm4':
 						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
 						break;
@@ -146,6 +151,16 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
 
+		if ( json.extensions !== undefined ) {
+
+			for ( var key in json.extensions ) {
+
+				material.extensions[ key ] = json.extensions[ key ];
+
+			}
+
+		}
+
 		// Deprecated
 
 		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
@@ -158,6 +173,7 @@ Object.assign( MaterialLoader.prototype, {
 		// maps
 
 		if ( json.map !== undefined ) material.map = getTexture( json.map );
+		if ( json.matcap !== undefined ) material.matcap = getTexture( json.matcap );
 
 		if ( json.alphaMap !== undefined ) {
 
@@ -203,6 +219,7 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
 
 		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
+		if ( json.refractionRatio !== undefined ) material.refractionRatio = json.refractionRatio;
 
 		if ( json.lightMap !== undefined ) material.lightMap = getTexture( json.lightMap );
 		if ( json.lightMapIntensity !== undefined ) material.lightMapIntensity = json.lightMapIntensity;

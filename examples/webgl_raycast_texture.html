@@ -4,28 +4,21 @@
 		<title>three.js raycast - texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #808080;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #444;
 			}
 
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+			a {
+				color: #08f;
 			}
 
 			#controls {
 				position: absolute;
 				text-align:left;
-				top: 40px;
+				top: 60px;
 				left: 5px;
 				padding: 5px;
 			}
@@ -41,33 +34,35 @@
 		<fieldset id="controls">
 			<legend>Circle</legend>
 			<div class="control">
-				WrapS : <select onchange="setwrapS(this)">
-					<option value="ClampToEdgeWrapping">ClampToEdgeWrapping</option>
-					<option value="RepeatWrapping" selected>RepeatWrapping</option>
-					<option value="MirroredRepeatWrapping">MirroredRepeatWrapping</option>
+				WrapS : <select id="setwrapS">
+					<option value="1001">ClampToEdgeWrapping</option>
+					<option value="1000" selected>RepeatWrapping</option>
+					<option value="1002">MirroredRepeatWrapping</option>
 				</select>
 			</div>
 			<div class="control">
-				WrapT : <select onchange="setwrapT(this)">
-					<option value="ClampToEdgeWrapping">ClampToEdgeWrapping</option>
-					<option value="RepeatWrapping" selected>RepeatWrapping</option>
-					<option value="MirroredRepeatWrapping">MirroredRepeatWrapping</option>
+				WrapT : <select id="setwrapT">
+					<option value="1001">ClampToEdgeWrapping</option>
+					<option value="1000" selected>RepeatWrapping</option>
+					<option value="1002">MirroredRepeatWrapping</option>
 				</select>
 			</div>
 			<div class="control">
-				Offset : X <input type="number" value="0" step="0.05" onchange="setOffsetU(this)" />
-				Y <input type="number" value="0" step="0.05" onchange="setOffsetV(this)" /><br />
+				Offset : X <input id="setOffsetU" type="number" value="0" step="0.05" />
+				Y <input id="setOffsetV" type="number" value="0" step="0.05" /><br />
 			</div>
 			<div class="control">
-				Repeat : X <input type="number" value="1" step="0.1" onchange="setRepeatU(this)" />
-				Y <input type="number" value="1" step="0.1" onchange="setRepeatV(this)" />
+				Repeat : X <input id="setRepeatU" type="number" value="1" step="0.1" />
+				Y <input id="setRepeatV" type="number" value="1" step="0.1" />
 			</div>
 			<div class="control">
-				Rotation : <input type="number" value="0" step="0.1" onchange="setRotation(this)" />
+				Rotation : <input id="setRotation" type="number" value="0" step="0.1" />
 			</div>
 		</fieldset>
-		<script src="../build/three.js"></script>
-		<script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
 
 			var CanvasTexture = function ( parentTexture ) {
 
@@ -272,6 +267,14 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				container.addEventListener( 'mousemove', onMouseMove, false );
 
+				document.getElementById( 'setwrapS' ).addEventListener( 'change', setwrapS );
+				document.getElementById( 'setwrapT' ).addEventListener( 'change', setwrapT );
+				document.getElementById( 'setOffsetU' ).addEventListener( 'change', setOffsetU );
+				document.getElementById( 'setOffsetV' ).addEventListener( 'change', setOffsetV );
+				document.getElementById( 'setRepeatU' ).addEventListener( 'change', setRepeatU );
+				document.getElementById( 'setRepeatV' ).addEventListener( 'change', setRepeatV );
+				document.getElementById( 'setRotation' ).addEventListener( 'change', setRotation );
+
 			}
 
 			function onWindowResize() {
@@ -326,47 +329,47 @@
 
 			}
 
-			function setwrapS( that ) {
+			function setwrapS( event ) {
 
-				circleTexture.wrapS = THREE[ that.value ];
+				circleTexture.wrapS = parseFloat( event.target.value );
 				circleTexture.needsUpdate = true;
 
 			}
 
-			function setwrapT( that ) {
+			function setwrapT( event ) {
 
-				circleTexture.wrapT = THREE[ that.value ];
+				circleTexture.wrapT = parseFloat( event.target.value );
 				circleTexture.needsUpdate = true;
 
 			}
 
-			function setOffsetU( that ) {
+			function setOffsetU( event ) {
 
-				circleTexture.offset.x = parseFloat( that.value );
-
-			}
-
-			function setOffsetV( that ) {
-
-				circleTexture.offset.y = parseFloat( that.value );
+				circleTexture.offset.x = parseFloat( event.target.value );
 
 			}
 
-			function setRepeatU( that ) {
+			function setOffsetV( event ) {
 
-				circleTexture.repeat.x = parseFloat( that.value );
-
-			}
-
-			function setRepeatV( that ) {
-
-				circleTexture.repeat.y = parseFloat( that.value );
+				circleTexture.offset.y = parseFloat( event.target.value );
 
 			}
 
-			function setRotation( that ) {
+			function setRepeatU( event ) {
 
-				circleTexture.rotation = parseFloat( that.value );
+				circleTexture.repeat.x = parseFloat( event.target.value );
+
+			}
+
+			function setRepeatV( event ) {
+
+				circleTexture.repeat.y = parseFloat( event.target.value );
+
+			}
+
+			function setRotation( event ) {
+
+				circleTexture.rotation = parseFloat( event.target.value );
 
 			}
 

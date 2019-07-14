@@ -1,314 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - decals - Decal Splatter</title>
+		<title>three.js webgl - decal splatter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - decals - Decal Splatter (click or tap to shoot)</div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - decal splatter<br/>
+			click to shoot
+		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/geometries/DecalGeometry.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-		var container = document.getElementById( 'container' );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		var renderer, scene, camera, stats;
-		var mesh;
-		var raycaster;
-		var line;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DecalGeometry } from './jsm/geometries/DecalGeometry.js';
 
-		var intersection = {
-			intersects: false,
-			point: new THREE.Vector3(),
-			normal: new THREE.Vector3()
-		};
-		var mouse = new THREE.Vector2();
+			var container = document.getElementById( 'container' );
 
-		var textureLoader = new THREE.TextureLoader();
-		var decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
-		var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
+			var renderer, scene, camera, stats;
+			var mesh;
+			var raycaster;
+			var line;
 
-		var decalMaterial = new THREE.MeshPhongMaterial( {
-			specular: 0x444444,
-			map: decalDiffuse,
-			normalMap: decalNormal,
-			normalScale: new THREE.Vector2( 1, 1 ),
-			shininess: 30,
-			transparent: true,
-			depthTest: true,
-			depthWrite: false,
-			polygonOffset: true,
-			polygonOffsetFactor: - 4,
-			wireframe: false
-		} );
+			var intersection = {
+				intersects: false,
+				point: new THREE.Vector3(),
+				normal: new THREE.Vector3()
+			};
+			var mouse = new THREE.Vector2();
 
-		var decals = [];
-		var mouseHelper;
-		var position = new THREE.Vector3();
-		var orientation = new THREE.Euler();
-		var size = new THREE.Vector3( 10, 10, 10 );
+			var textureLoader = new THREE.TextureLoader();
+			var decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
+			var decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 
-		var params = {
-			minScale: 10,
-			maxScale: 20,
-			rotate: true,
-			clear: function () {
-
-				removeDecals();
-
-			}
-		};
-
-		window.addEventListener( 'load', init );
-
-		function init() {
-
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			container.appendChild( renderer.domElement );
-
-			stats = new Stats();
-			container.appendChild( stats.dom );
-
-			scene = new THREE.Scene();
-
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-			camera.position.z = 120;
-			camera.target = new THREE.Vector3();
-
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.minDistance = 50;
-			controls.maxDistance = 200;
-
-			scene.add( new THREE.AmbientLight( 0x443333 ) );
-
-			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
-			light.position.set( 1, 0.75, 0.5 );
-			scene.add( light );
-
-			var light = new THREE.DirectionalLight( 0xccccff, 1 );
-			light.position.set( - 1, 0.75, - 0.5 );
-			scene.add( light );
-
-			var geometry = new THREE.BufferGeometry();
-			geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
-
-			line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
-			scene.add( line );
-
-			loadLeePerrySmith();
-
-			raycaster = new THREE.Raycaster();
-
-			mouseHelper = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
-			mouseHelper.visible = false;
-			scene.add( mouseHelper );
-
-			window.addEventListener( 'resize', onWindowResize, false );
-
-			var moved = false;
-
-			controls.addEventListener( 'change', function () {
-
-				moved = true;
-
+			var decalMaterial = new THREE.MeshPhongMaterial( {
+				specular: 0x444444,
+				map: decalDiffuse,
+				normalMap: decalNormal,
+				normalScale: new THREE.Vector2( 1, 1 ),
+				shininess: 30,
+				transparent: true,
+				depthTest: true,
+				depthWrite: false,
+				polygonOffset: true,
+				polygonOffsetFactor: - 4,
+				wireframe: false
 			} );
 
-			window.addEventListener( 'mousedown', function () {
+			var decals = [];
+			var mouseHelper;
+			var position = new THREE.Vector3();
+			var orientation = new THREE.Euler();
+			var size = new THREE.Vector3( 10, 10, 10 );
 
-				moved = false;
+			var params = {
+				minScale: 10,
+				maxScale: 20,
+				rotate: true,
+				clear: function () {
 
-			}, false );
-
-			window.addEventListener( 'mouseup', function () {
-
-				checkIntersection();
-				if ( ! moved && intersection.intersects ) shoot();
-
-			} );
-
-			window.addEventListener( 'mousemove', onTouchMove );
-			window.addEventListener( 'touchmove', onTouchMove );
-
-			function onTouchMove( event ) {
-
-				var x, y;
-
-				if ( event.changedTouches ) {
-
-					x = event.changedTouches[ 0 ].pageX;
-					y = event.changedTouches[ 0 ].pageY;
-
-				} else {
-
-					x = event.clientX;
-					y = event.clientY;
+					removeDecals();
 
 				}
+			};
 
-				mouse.x = ( x / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+			window.addEventListener( 'load', init );
 
-				checkIntersection();
+			function init() {
 
-			}
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-			function checkIntersection() {
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
-				if ( ! mesh ) return;
+				scene = new THREE.Scene();
 
-				raycaster.setFromCamera( mouse, camera );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 120;
+				camera.target = new THREE.Vector3();
 
-				var intersects = raycaster.intersectObjects( [ mesh ] );
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 200;
 
-				if ( intersects.length > 0 ) {
+				scene.add( new THREE.AmbientLight( 0x443333 ) );
 
-					var p = intersects[ 0 ].point;
-					mouseHelper.position.copy( p );
-					intersection.point.copy( p );
+				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+				light.position.set( 1, 0.75, 0.5 );
+				scene.add( light );
 
-					var n = intersects[ 0 ].face.normal.clone();
-					n.transformDirection( mesh.matrixWorld );
-					n.multiplyScalar( 10 );
-					n.add( intersects[ 0 ].point );
+				var light = new THREE.DirectionalLight( 0xccccff, 1 );
+				light.position.set( - 1, 0.75, - 0.5 );
+				scene.add( light );
 
-					intersection.normal.copy( intersects[ 0 ].face.normal );
-					mouseHelper.lookAt( n );
+				var geometry = new THREE.BufferGeometry();
+				geometry.setFromPoints( [ new THREE.Vector3(), new THREE.Vector3() ] );
 
-					var positions = line.geometry.attributes.position;
-					positions.setXYZ( 0, p.x, p.y, p.z );
-					positions.setXYZ( 1, n.x, n.y, n.z );
-					positions.needsUpdate = true;
+				line = new THREE.Line( geometry, new THREE.LineBasicMaterial() );
+				scene.add( line );
 
-					intersection.intersects = true;
+				loadLeePerrySmith();
 
-				} else {
+				raycaster = new THREE.Raycaster();
 
-					intersection.intersects = false;
+				mouseHelper = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
+				mouseHelper.visible = false;
+				scene.add( mouseHelper );
 
-				}
+				window.addEventListener( 'resize', onWindowResize, false );
 
-			}
+				var moved = false;
 
-			var gui = new dat.GUI();
+				controls.addEventListener( 'change', function () {
 
-			gui.add( params, 'minScale', 1, 30 );
-			gui.add( params, 'maxScale', 1, 30 );
-			gui.add( params, 'rotate' );
-			gui.add( params, 'clear' );
-			gui.open();
+					moved = true;
 
-			onWindowResize();
-			animate();
-
-		}
-
-		function loadLeePerrySmith() {
-
-			var loader = new THREE.GLTFLoader();
-
-			loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
-
-				mesh = gltf.scene.children[ 0 ];
-				mesh.material = new THREE.MeshPhongMaterial( {
-					specular: 0x111111,
-					map: textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
-					specularMap: textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' ),
-					normalMap: textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
-					shininess: 25
 				} );
 
-				scene.add( mesh );
-				mesh.scale.set( 10, 10, 10 );
+				window.addEventListener( 'mousedown', function () {
 
-			} );
+					moved = false;
 
-		}
+				}, false );
 
-		function shoot() {
+				window.addEventListener( 'mouseup', function () {
 
-			position.copy( intersection.point );
-			orientation.copy( mouseHelper.rotation );
+					checkIntersection();
+					if ( ! moved && intersection.intersects ) shoot();
 
-			if ( params.rotate ) orientation.z = Math.random() * 2 * Math.PI;
+				} );
 
-			var scale = params.minScale + Math.random() * ( params.maxScale - params.minScale );
-			size.set( scale, scale, scale );
+				window.addEventListener( 'mousemove', onTouchMove );
+				window.addEventListener( 'touchmove', onTouchMove );
 
-			var material = decalMaterial.clone();
-			material.color.setHex( Math.random() * 0xffffff );
+				function onTouchMove( event ) {
 
-			var m = new THREE.Mesh( new THREE.DecalGeometry( mesh, position, orientation, size ), material );
+					var x, y;
 
-			decals.push( m );
-			scene.add( m );
+					if ( event.changedTouches ) {
 
-		}
+						x = event.changedTouches[ 0 ].pageX;
+						y = event.changedTouches[ 0 ].pageY;
 
-		function removeDecals() {
+					} else {
 
-			decals.forEach( function ( d ) {
+						x = event.clientX;
+						y = event.clientY;
 
-				scene.remove( d );
+					}
 
-			} );
+					mouse.x = ( x / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
 
-			decals = [];
+					checkIntersection();
 
-		}
+				}
 
-		function onWindowResize() {
+				function checkIntersection() {
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
+					if ( ! mesh ) return;
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+					raycaster.setFromCamera( mouse, camera );
 
-		}
+					var intersects = raycaster.intersectObjects( [ mesh ] );
 
-		function animate() {
+					if ( intersects.length > 0 ) {
 
-			requestAnimationFrame( animate );
+						var p = intersects[ 0 ].point;
+						mouseHelper.position.copy( p );
+						intersection.point.copy( p );
 
-			renderer.render( scene, camera );
+						var n = intersects[ 0 ].face.normal.clone();
+						n.transformDirection( mesh.matrixWorld );
+						n.multiplyScalar( 10 );
+						n.add( intersects[ 0 ].point );
 
-			stats.update();
+						intersection.normal.copy( intersects[ 0 ].face.normal );
+						mouseHelper.lookAt( n );
 
-		}
+						var positions = line.geometry.attributes.position;
+						positions.setXYZ( 0, p.x, p.y, p.z );
+						positions.setXYZ( 1, n.x, n.y, n.z );
+						positions.needsUpdate = true;
+
+						intersection.intersects = true;
+
+					} else {
+
+						intersection.intersects = false;
+
+					}
+
+				}
+
+				var gui = new GUI();
+
+				gui.add( params, 'minScale', 1, 30 );
+				gui.add( params, 'maxScale', 1, 30 );
+				gui.add( params, 'rotate' );
+				gui.add( params, 'clear' );
+				gui.open();
+
+				onWindowResize();
+				animate();
+
+			}
+
+			function loadLeePerrySmith() {
+
+				var loader = new GLTFLoader();
+
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
+
+					mesh = gltf.scene.children[ 0 ];
+					mesh.material = new THREE.MeshPhongMaterial( {
+						specular: 0x111111,
+						map: textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
+						specularMap: textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' ),
+						normalMap: textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+						shininess: 25
+					} );
+
+					scene.add( mesh );
+					mesh.scale.set( 10, 10, 10 );
+
+				} );
+
+			}
+
+			function shoot() {
+
+				position.copy( intersection.point );
+				orientation.copy( mouseHelper.rotation );
+
+				if ( params.rotate ) orientation.z = Math.random() * 2 * Math.PI;
+
+				var scale = params.minScale + Math.random() * ( params.maxScale - params.minScale );
+				size.set( scale, scale, scale );
+
+				var material = decalMaterial.clone();
+				material.color.setHex( Math.random() * 0xffffff );
+
+				var m = new THREE.Mesh( new DecalGeometry( mesh, position, orientation, size ), material );
+
+				decals.push( m );
+				scene.add( m );
+
+			}
+
+			function removeDecals() {
+
+				decals.forEach( function ( d ) {
+
+					scene.remove( d );
+
+				} );
+
+				decals = [];
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
 
 		</script>
 

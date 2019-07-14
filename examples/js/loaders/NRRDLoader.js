@@ -1,3 +1,7 @@
+/*
+ *  three.js NRRD file loader
+ */
+
 THREE.NRRDLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;

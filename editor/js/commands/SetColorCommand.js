@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param attributeName string
  * @param newValue integer representing a hex color value
  * @constructor
  */
 
-var SetColorCommand = function ( object, attributeName, newValue ) {
+var SetColorCommand = function ( editor, object, attributeName, newValue ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetColorCommand';
 	this.name = 'Set ' + attributeName;

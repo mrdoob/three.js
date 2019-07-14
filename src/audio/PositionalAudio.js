@@ -12,6 +12,7 @@ function PositionalAudio( listener ) {
 	Audio.call( this, listener );
 
 	this.panner = this.context.createPanner();
+	this.panner.panningModel = 'HRTF';
 	this.panner.connect( this.gain );
 
 }
@@ -104,10 +105,13 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 			Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			var panner = this.panner;
+			if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
+
 			this.matrixWorld.decompose( position, quaternion, scale );
 
 			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+
+			var panner = this.panner;
 
 			if ( panner.positionX ) {
 

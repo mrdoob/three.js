@@ -101,7 +101,7 @@ Sidebar.Project = function ( editor ) {
 
 	var rendererPropertiesRow = new UI.Row().setMarginLeft( '90px' );
 
-	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), 'antialias' ).onChange( function () {
+	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
 		updateRenderer();
@@ -111,7 +111,7 @@ Sidebar.Project = function ( editor ) {
 
 	// Renderer / Shadows
 
-	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), 'shadows' ).onChange( function () {
+	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();
@@ -119,45 +119,39 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
-	rendererPropertiesRow.add( new UI.Break() );
-
-	// Renderer / Gamma input
-
-	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), 'γ input' ).onChange( function () {
-
-		config.setKey( 'project/renderer/gammaInput', this.getValue() );
-		updateRenderer();
-
-	} );
-	rendererPropertiesRow.add( rendererGammaInput );
-
-	// Renderer / Gamma output
-
-	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), 'γ output' ).onChange( function () {
-
-		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
-		updateRenderer();
-
-	} );
-	rendererPropertiesRow.add( rendererGammaOutput );
-
 	container.add( rendererPropertiesRow );
 
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
+		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
+	function createRenderer( type, antialias, shadows ) {
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
-		renderer.gammaInput = gammaIn;
-		renderer.gammaOutput = gammaOut;
+		var parameters = {};
+
+		switch ( type ) {
+
+			case 'WebGLRenderer':
+				parameters.antialias = antialias;
+				break;
+
+			case 'RaytracingRenderer':
+				parameters.workers = navigator.hardwareConcurrency || 4;
+				parameters.workerPath = '../examples/js/renderers/RaytracingWorker.js';
+				parameters.randomize = true;
+				parameters.blockSize = 64;
+				break;
+
+		}
+
+		var renderer = new rendererTypes[ type ]( parameters );
+
 		if ( shadows && renderer.shadowMap ) {
 
 			renderer.shadowMap.enabled = true;
@@ -169,7 +163,7 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/gammaInput' ), config.getKey( 'project/renderer/gammaOutput' ) );
+	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
 
 	return container;
 

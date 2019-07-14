@@ -4,29 +4,19 @@
 		<title>three.js webvr - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-12-02 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-12-02" content="Ah46myef4Ax/+fcLtkeotXmIqnvun4lg4bYbHVttuJvbsWiE4oacrvroId7hbCEb4/byxFHIO6+uwq4pwr6RfQkAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0Mzc1ODIyNn0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-12-02 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-12-02" content="AqI9LIanbGxr/HoTOsYCUNxG82Vy94NZbjhv83R+bF+5NX2jiZOaf7ny+mFoTUP5wrWpYlPjQ6+HeVas9f1lRwYAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQzNzU4MjI2fQ==">
-		<style>
-			body {
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script src="js/objects/Lensflare.js"></script>
-		<script src="js/objects/Reflector.js"></script>
+		<script type="module">
 
-		<script src="js/vr/WebVR.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
+			import { Reflector } from './jsm/objects/Reflector.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var camera, scene, renderer;
 
@@ -73,7 +63,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				var light = new THREE.DirectionalLight( 0xff0000 );
@@ -84,7 +74,7 @@
 				light.target.position.set( 0, 0, - 2 );
 				scene.add( light.target );
 
-				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				// lensflare
@@ -92,19 +82,19 @@
 				var texture0 = loader.load( "textures/lensflare/lensflare0.png" );
 				var texture3 = loader.load( "textures/lensflare/lensflare3.png" );
 
-				var lensflare = new THREE.Lensflare();
+				var lensflare = new Lensflare();
 				lensflare.position.set( 0, 5, - 5 );
-				lensflare.addElement( new THREE.LensflareElement( texture0, 700, 0 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 60, 0.6 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 0.7 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 120, 0.9 ) );
-				lensflare.addElement( new THREE.LensflareElement( texture3, 70, 1 ) );
+				lensflare.addElement( new LensflareElement( texture0, 700, 0 ) );
+				lensflare.addElement( new LensflareElement( texture3, 60, 0.6 ) );
+				lensflare.addElement( new LensflareElement( texture3, 70, 0.7 ) );
+				lensflare.addElement( new LensflareElement( texture3, 120, 0.9 ) );
+				lensflare.addElement( new LensflareElement( texture3, 70, 1 ) );
 				scene.add( lensflare );
 
 				//
 
 				var geometry = new THREE.PlaneBufferGeometry( 1.4, 1.4 );
-				reflector = new THREE.Reflector( geometry, {
+				reflector = new Reflector( geometry, {
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio
 				} );

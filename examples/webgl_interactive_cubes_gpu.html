@@ -4,44 +4,33 @@
 		<title>three.js webgl - interactive cubes (gpu)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #444;
 			}
-
-			.info {
-				position: absolute;
-				background-color: black;
-				opacity: 0.8;
-				color: white;
-				text-align: center;
-				top: 0px;
-				width: 100%;
-			}
-
-			.info a {
-				color: #00ffff;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
-		<div class="info">
+		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var container, stats;
 			var camera, controls, scene, renderer;
@@ -61,21 +50,11 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
-				controls = new THREE.TrackballControls( camera );
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
 				pickingScene = new THREE.Scene();
-				pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				pickingTexture.texture.minFilter = THREE.LinearFilter;
+				pickingTexture = new THREE.WebGLRenderTarget( 1, 1 );
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 
@@ -127,7 +106,7 @@
 					scale.y = Math.random() * 200 + 100;
 					scale.z = Math.random() * 200 + 100;
 
-					quaternion.setFromEuler( rotation, false );
+					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
 					geometry.applyMatrix( matrix );
@@ -156,10 +135,10 @@
 
 				}
 
-				var objects = new THREE.Mesh( THREE.BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
+				var objects = new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
 				scene.add( objects );
 
-				pickingScene.add( new THREE.Mesh( THREE.BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
+				pickingScene.add( new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
 
 				highlightBox = new THREE.Mesh(
 					new THREE.BoxBufferGeometry(),
@@ -171,6 +150,15 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				controls = new TrackballControls( camera, renderer.domElement );
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -201,15 +189,26 @@
 
 				//render the picking scene off-screen
 
-				renderer.render( pickingScene, camera, pickingTexture );
+				// set the view offset to represent just a single pixel under the mouse
+
+				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, mouse.x * window.devicePixelRatio | 0, mouse.y * window.devicePixelRatio | 0, 1, 1 );
+
+				// render the scene
+
+				renderer.setRenderTarget( pickingTexture );
+				renderer.render( pickingScene, camera );
+
+				// clear the view offset so rendering returns to normal
+
+				camera.clearViewOffset();
 
 				//create buffer for reading single pixel
 
 				var pixelBuffer = new Uint8Array( 4 );
 
-				//read the pixel under the mouse from the texture
+				//read the pixel
 
-				renderer.readRenderTargetPixels( pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer );
+				renderer.readRenderTargetPixels( pickingTexture, 0, 0, 1, 1, pixelBuffer );
 
 				//interpret the pixel as an ID
 
@@ -243,6 +242,7 @@
 
 				pick();
 
+				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );
 
 			}

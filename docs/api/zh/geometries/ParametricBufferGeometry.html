@@ -10,9 +10,9 @@
 	<body>
 		[page:BufferGeometry] &rarr;
 
-		<h1>[name]</h1>
+		<h1>参数化缓冲几何体（[name]）</h1>
 
-		<p class="desc">Generate geometry representing a parametric surface.</p>
+		<p class="desc">生成由参数表示其表面的几何体。</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ParametricBufferGeometry"></iframe>
 
@@ -32,7 +32,7 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<code>
 		var geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 25, 25 );
@@ -42,7 +42,7 @@
 		</code>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]([param:Function func], [param:Integer slices], [param:Integer stacks])</h3>
@@ -52,15 +52,18 @@
 		stacks — The count of stacks to use for the parametric function
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
+		<p>常用属性请参见基类[page:BufferGeometry]。</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
 		</p>
 
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:BufferGeometry]。</p>
 
-		<h2>Source</h2>
+		<h2>方法</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/ParametricGeometry.js src/geometries/ParametricGeometry.js]
 	</body>

@@ -8,101 +8,96 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>数学函数（[name]）</h1>
 
-		<p class="desc">An object with several math utility functions.</p>
+		<p class="desc">具有多个数学实用函数的对象。</p>
 
-		<h2>Functions</h2>
+		<h2>函数（Functions）</h2>
 
 		<h3>[method:Float clamp]( [param:Float value], [param:Float min], [param:Float max] )</h3>
 		<p>
-		[page:Float value] — Value to be clamped.<br />
-		[page:Float min] — Minimum value.<br />
-		[page:Float max] — Maximum value.<br /><br />
+		[page:Float value] — 需要clamp处理的值。<br />
+		[page:Float min] — 最小值。<br />
+		[page:Float max] — 最大值。<br /><br />
 
-		Clamps the [page:Float value] to be between [page:Float min] and [page:Float max].
+		限制数值[page:Float value]处于最小值[page:Float min]和最大值[page:Float max]之间。
 		</p>
 
 		<h3>[method:Float degToRad]( [param:Float degrees] )</h3>
-		<p>Converts degrees to radians.</p>
+		<p>将度转化为弧度。</p>
 
 		<h3>[method:Integer euclideanModulo]( [param:Integer n], [param:Integer m] )</h3>
 		<p>
-		[page:Integer n], [page:Integer m] - Integers<br /><br />
-
-		Computes the Euclidean modulo of [page:Integer m] % [page:Integer n], that is:
+		[page:Integer n], [page:Integer m] - 整型<br /><br />
+		计算 [page:Integer m] % [page:Integer n] 的欧几里得模:
 		<code>( ( n % m ) + m ) % m</code>
 		</p>
 
 		<h3>[method:UUID generateUUID]( )</h3>
 		<p>
-		Generate a [link:https://en.wikipedia.org/wiki/Universally_unique_identifier UUID]
-		(universally unique identifier).
+			创建一个全局唯一标识符 [link:https://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
 		</p>
 
 		<h3>[method:Boolean isPowerOfTwo]( [param:Number n] )</h3>
-		<p>Return *true* if [page:Number n] is a power of 2.</p>
+		<p>如果 [page:Number n] 是2的幂，返回true。</p>
 
 		<h3>[method:Float lerp]( [param:Float x], [param:Float y], [param:Float t] )</h3>
 		<p>
-		[page:Float x] - Start point. <br />
-		[page:Float y] - End point. <br />
-		[page:Float t] - interpolation factor in the closed interval [0, 1].<br><br />
+		[page:Float x] - 起始点。 <br />
+		[page:Float y] - 终点。 <br />
+		[page:Float t] - 封闭区间[0,1]内的插值因子。<br><br />
 
-		Returns a value [link:https://en.wikipedia.org/wiki/Linear_interpolation linearly interpolated]
-		from two known points based on the given interval - [page:Float t] = 0 will return [page:Float x]
-		and [page:Float t] = 1 will return [page:Float y].
+		返回给定区间的线性插值[link:https://en.wikipedia.org/wiki/Linear_interpolation linearly interpolated]结果 - [page:Float t] = 0 将会返回 [page:Float x]
+		如果 [page:Float t] = 1 将会返回 [page:Float y].
 		</p>
 
 		<h3>[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )</h3>
 		<p>
-		[page:Float x] — Value to be mapped.<br />
-		[page:Float a1] — Minimum value for range A.<br />
-		[page:Float a2] — Maximum value for range A.<br />
-		[page:Float b1] — Minimum value for range B.<br />
-		[page:Float b2] — Maximum value for range B.<br /><br />
+		[page:Float x] — 用于映射的值。<br />
+		[page:Float a1] — A区间最小值。<br />
+		[page:Float a2] — A区间最大值。<br />
+		[page:Float b1] — B区间最小值。<br />
+		[page:Float b2] — A区间最大值。<br /><br />
 
-		Linear mapping of [page:Float x] from range [[page:Float a1], [page:Float a2]] to range [[page:Float b1], [page:Float b2]].
+		x从范围[[page:Float a1], [page:Float a2]] 到范围[[page:Float b1], [page:Float b2]]的线性映射。
 		</p>
 
 		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
-		<p>Returns the smallest power of 2 that is greater than or equal to [page:Number n].</p>
+		<p>返回大于等于 [page:Number n] 的2的最小次幂。</p>
 
 		<h3>[method:Integer floorPowerOfTwo]( [param:Number n] )</h3>
-		<p>Returns the largest power of 2 that is less than or equal to [page:Number n].</p>
+		<p>返回小于等于 [page:Number n] 的2的最大幂。</p>
 
 		<h3>[method:Float radToDeg]( [param:Float radians] )</h3>
-		<p>Converts radians to degrees.</p>
+		<p>将弧度转换为角度。</p>
 
 		<h3>[method:Float randFloat]( [param:Float low], [param:Float high] )</h3>
-		<p>Random float in the interval [page:Float low] to [page:Float high].</p>
+		<p>在区间[page:Float low] 到 [page:Float high]随机一个浮点数。</p>
 
 		<h3>[method:Float randFloatSpread]( [param:Float range] )</h3>
-		<p>Random float in the interval *- [page:Float range] / 2* to *[page:Float range] / 2*.</p>
+		<p>在区间*- [page:Float range] / 2* 到 *[page:Float range] / 2*随机一个浮点数。</p>
 
 		<h3>[method:Integer randInt]( [param:Integer low], [param:Integer high] )</h3>
-		<p>Random integer in the interval [page:Float low] to [page:Float high].</p>
+		<p>在区间[page:Float low] 到 [page:Float high]随机一个整数。</p>
 
 		<h3>[method:Float smoothstep]( [param:Float x], [param:Float min], [param:Float max] )</h3>
 		<p>
-		[page:Float x] - The value to evaluate based on its position between min and max. <br />
-		[page:Float min] - Any x value below min will be 0.<br />
-		[page:Float max] - Any x value above max will be 1.<br /><br />
+		[page:Float x] - 根据其在最小值和最大值之间的位置来计算的值。 <br />
+		[page:Float min] - 任何x比最小值还小会返回0.<br />
+		[page:Float max] - 任何x比最大值还大会返回0.<br /><br />
 
-		Returns a value between 0-1 that represents the percentage that x has moved between min and max,
-		but smoothed or slowed down the closer X is to the min and max.<br/><br/>
+		返回0-1之间的值，该值表示x在最小值和最大值之间移动的百分比，但是当x接近最小值和最大值时，变化程度会平滑或减慢。<br/><br/>
 
-		See [link:http://en.wikipedia.org/wiki/Smoothstep Smoothstep] for details.
+		查看更多详情请移步到 [link:http://en.wikipedia.org/wiki/Smoothstep Smoothstep] 。
 		</p>
 
 		<h3>[method:Float smootherstep]( [param:Float x], [param:Float min], [param:Float max] )</h3>
 		<p>
-		[page:Float x] - The value to evaluate based on its position between min and max. <br />
-		[page:Float min] - Any x value below min will be 0.<br />
-		[page:Float max] - Any x value above max will be 1.<br /><br />
+			[page:Float x] - 根据其在最小值和最大值之间的位置来计算的值。 <br />
+			[page:Float min] - 任何x比最小值还小会返回0.<br />
+			[page:Float max] - 任何x比最大值还大会返回0.<br /><br />
 
-		Returns a value between 0-1. A [link:https://en.wikipedia.org/wiki/Smoothstep#Variations variation on smoothstep]
-		that has zero 1st and 2nd order derivatives at x=0 and x=1.
+		返回一个0-1之间的值。它和smoothstep相同，但变动更平缓。[link:https://en.wikipedia.org/wiki/Smoothstep#Variations variation on smoothstep] 在x=0和x=1处有0阶和二阶导数。
 		</p>
 
 		<h2>Source</h2>
