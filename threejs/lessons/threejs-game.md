@@ -172,6 +172,7 @@ a CSS animation of diagonal stripes.
 }
 #progressbar {
   width: 0;
+  transition: width ease-out .5s;
   height: 1em;
   background-color: #888;
   background-image: linear-gradient(
