@@ -26,7 +26,6 @@ export class Scene extends Object3D {
 	autoUpdate: boolean;
 	background: null | Color | Texture;
 
-	copy( source: this, recursive?: boolean ): this;
 	toJSON( meta?: any ): any;
 	dispose(): void;
 
