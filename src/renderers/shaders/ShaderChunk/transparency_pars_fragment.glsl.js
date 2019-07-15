@@ -2,17 +2,16 @@ export default /* glsl */`
 uniform float transparency;
 
 	// makes surface transparent without hiding the specular term
-	vec4 combineLight(const in vec3 diffuseLight, const in vec3 specularLight, const in GeometricContext geometry, const in PhysicalMaterial material) {
+	vec4 combineLight( const in vec3 diffuseLight, const in vec3 specularLight, const in GeometricContext geometry, const in PhysicalMaterial material ) {
 
-	vec3 fresnel = BRDF_Specular_GGX_Environment(geometry, material.specularColor, material.specularRoughness);
+	vec4 diffuseFinal = vec4( diffuseLight * ( 1. - transparency ), 1. - transparency );
 
-	// since we can't have per-channel opacity blending, we must settle for a single float (reflectance)
-	float reflectance = (fresnel.r + fresnel.g + fresnel.b) * (1. / 3.);
+	vec3 fresnel = BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
+	float fresnelApprox = ( fresnel.r + fresnel.g + fresnel.b ) * ( 1. / 3. ); // since we can't have per-channel opacity blending, we must approximate with a single blending factor
 
-	vec4 fragColor = vec4(specularLight, reflectance); // specularLight is already premultiplied by fresnel
+	vec4 specularFinal = vec4( specularLight, fresnelApprox ); // specularLight is already premultiplied by fresnel (TODO: factor fresnel out of BSDF)
 
-	float diffuseAlpha = (1. - reflectance) * (1. - transparency);
-	fragColor += vec4(diffuseLight * diffuseAlpha, diffuseAlpha);
+	vec4 fragColor = mix( diffuseFinal, specularFinal, fresnelApprox );
 
 	// the above math is performed in premultiplied alpha
 	fragColor.rgb /= fragColor.a;
