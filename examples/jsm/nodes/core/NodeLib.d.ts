@@ -1,4 +1,5 @@
 import { Node } from './Node';
+import { NodeBuilder } from './NodeBuilder';
 
 export interface NodeLibKeyword {
   callback: () => void;
@@ -15,7 +16,7 @@ export namespace NodeLib {
   export function remove(node: Node): void;
   export function removeKeyword(name: string): void;
   export function get(name: string): Node;
-  export function getKeyword(name: string, material: object): any;
+  export function getKeyword(name: string, builder: NodeBuilder): any;
   export function getKeywordData(name: string): NodeLibKeyword;
   export function contains(name: string): boolean;
   export function containsKeyword(name: string): boolean;
