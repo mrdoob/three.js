@@ -3,48 +3,30 @@
 		<title>Ammo.js softbody volume demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #a06851;
+				color: #333;
 			}
 		</style>
 	</head>
 	<body>
-		<div id="info">Ammo.js physics soft body volume demo<br>Click to throw a ball</div>
-		<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+		<div id="info">
+			Ammo.js physics soft body volume demo<br/>
+			Click to throw a ball
+		</div>
+		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			// Detects webgl
-			if ( ! Detector.webgl ) {
-					Detector.addGetWebGLMessage();
-					document.getElementById( 'container' ).innerHTML = "";
-			}
+			import * as THREE from '../build/three.module.js';
 
-			// - Global variables -
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			// Graphics variables
 			var container, stats;
@@ -59,23 +41,22 @@
 			var quat = new THREE.Quaternion();
 
 			// Physics variables
-			var gravityConstant = -9.8;
+			var gravityConstant = - 9.8;
 			var physicsWorld;
 			var rigidBodies = [];
 			var softBodies = [];
 			var margin = 0.05;
-			var transformAux1 = new Ammo.btTransform();
-			var softBodyHelpers = new Ammo.btSoftBodyHelpers();
+			var transformAux1;
+			var softBodyHelpers;
 
-			var armMovement = 0;
+			Ammo().then( function ( AmmoLib ) {
 
-			// - Main code -
+				Ammo = AmmoLib;
 
-			init();
-			animate();
+				init();
+				animate();
 
-
-			// - Functions -
+			} );
 
 			function init() {
 
@@ -98,16 +79,17 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				camera.position.set( -7, 5, 8 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 2, 0 );
-				controls.update();
+				camera.position.set( - 7, 5, 8 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2, 0 );
+				controls.update();
 
 				textureLoader = new THREE.TextureLoader();
 
@@ -115,13 +97,13 @@
 				scene.add( ambientLight );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.position.set( -10, 10, 5 );
+				light.position.set( - 10, 10, 5 );
 				light.castShadow = true;
 				var d = 20;
-				light.shadow.camera.left = -d;
+				light.shadow.camera.left = - d;
 				light.shadow.camera.right = d;
 				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = -d;
+				light.shadow.camera.bottom = - d;
 
 				light.shadow.camera.near = 2;
 				light.shadow.camera.far = 50;
@@ -130,11 +112,6 @@
 				light.shadow.mapSize.y = 1024;
 
 				scene.add( light );
-
-
-				container.innerHTML = '';
-
-				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -155,9 +132,12 @@
 				var broadphase = new Ammo.btDbvtBroadphase();
 				var solver = new Ammo.btSequentialImpulseConstraintSolver();
 				var softBodySolver = new Ammo.btDefaultSoftBodySolver();
-				physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver);
+				physicsWorld = new Ammo.btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration, softBodySolver );
 				physicsWorld.setGravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
 				physicsWorld.getWorldInfo().set_m_gravity( new Ammo.btVector3( 0, gravityConstant, 0 ) );
+
+				transformAux1 = new Ammo.btTransform();
+				softBodyHelpers = new Ammo.btSoftBodyHelpers();
 
 			}
 
@@ -169,14 +149,15 @@
 				var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 				ground.castShadow = true;
 				ground.receiveShadow = true;
-				textureLoader.load( "textures/grid.png", function( texture ) {
+				textureLoader.load( "textures/grid.png", function ( texture ) {
+
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.repeat.set( 40, 40 );
 					ground.material.map = texture;
 					ground.material.needsUpdate = true;
-				} );
 
+				} );
 
 				// Create soft volumes
 				var volumeMass = 15;
@@ -200,57 +181,17 @@
 
 			function processGeometry( bufGeometry ) {
 
-				// Obtain a Geometry
-				var geometry = new THREE.Geometry().fromBufferGeometry( bufGeometry );
+				// Ony consider the position values when merging the vertices
+				var posOnlyBufGeometry = new THREE.BufferGeometry();
+				posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
+				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var vertsDiff = geometry.mergeVertices();
-
-				// Convert again to BufferGeometry, indexed
-				var indexedBufferGeom = createIndexedBufferGeometryFromGeometry( geometry );
+				var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
 
 				// Create index arrays mapping the indexed vertices to bufGeometry vertices
 				mapIndices( bufGeometry, indexedBufferGeom );
 
-			}
-
-			function createIndexedBufferGeometryFromGeometry( geometry ) {
-
-				var numVertices = geometry.vertices.length;
-				var numFaces = geometry.faces.length;
-
-				var bufferGeom = new THREE.BufferGeometry();
-				var vertices = new Float32Array( numVertices * 3 );
-				var indices = new ( numFaces * 3 > 65535 ? Uint32Array : Uint16Array )( numFaces * 3 );
-
-				for ( var i = 0; i < numVertices; i++ ) {
-
-					var p = geometry.vertices[ i ];
-
-					var i3 = i * 3;
-
-					vertices[ i3 ] = p.x;
-					vertices[ i3 + 1 ] = p.y;
-					vertices[ i3 + 2 ] = p.z;
-
-				}
-
-				for ( var i = 0; i < numFaces; i++ ) {
-
-					var f = geometry.faces[ i ];
-
-					var i3 = i * 3;
-
-					indices[ i3 ] = f.a;
-					indices[ i3 + 1 ] = f.b;
-					indices[ i3 + 2 ] = f.c;
-
-				}
-
-				bufferGeom.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-				bufferGeom.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-
-				return bufferGeom;
 			}
 
 			function isEqual( x1, y1, z1, x2, y2, z2 ) {
@@ -277,19 +218,21 @@
 				bufGeometry.ammoIndices = indices;
 				bufGeometry.ammoIndexAssociation = [];
 
-				for ( var i = 0; i < numIdxVertices; i++ ) {
+				for ( var i = 0; i < numIdxVertices; i ++ ) {
 
 					var association = [];
 					bufGeometry.ammoIndexAssociation.push( association );
 
 					var i3 = i * 3;
 
-					for ( var j = 0; j < numVertices; j++ ) {
+					for ( var j = 0; j < numVertices; j ++ ) {
 
 						var j3 = j * 3;
-						if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ],  idxVertices[ i3 + 2 ],
-										vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
-								association.push( j3 );
+						if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
+							vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
+
+							association.push( j3 );
+
 						}
 
 					}
@@ -308,19 +251,21 @@
 				volume.frustumCulled = false;
 				scene.add( volume );
 
-				textureLoader.load( "textures/colors.png", function( texture ) {
-						volume.material.map = texture;
-						volume.material.needsUpdate = true;
+				textureLoader.load( "textures/colors.png", function ( texture ) {
+
+					volume.material.map = texture;
+					volume.material.needsUpdate = true;
+
 				} );
 
 				// Volume physic object
 
 				var volumeSoftBody = softBodyHelpers.CreateFromTriMesh(
-						physicsWorld.getWorldInfo(),
-						bufferGeom.ammoVertices,
-						bufferGeom.ammoIndices,
-						bufferGeom.ammoIndices.length / 3,
-						true );
+					physicsWorld.getWorldInfo(),
+					bufferGeom.ammoVertices,
+					bufferGeom.ammoIndices,
+					bufferGeom.ammoIndices.length / 3,
+					true );
 
 				var sbConfig = volumeSoftBody.get_m_cfg();
 				sbConfig.set_viterations( 40 );
@@ -339,9 +284,9 @@
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kLST( 0.9 );
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kAST( 0.9 );
 
-				volumeSoftBody.setTotalMass( mass, false )
+				volumeSoftBody.setTotalMass( mass, false );
 				Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
-				physicsWorld.addSoftBody( volumeSoftBody, 1, -1 );
+				physicsWorld.addSoftBody( volumeSoftBody, 1, - 1 );
 				volume.userData.physicsBody = volumeSoftBody;
 				// Disable deactivation
 				volumeSoftBody.setActivationState( 4 );
@@ -352,7 +297,7 @@
 
 			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-				var threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
+				var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 				var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
@@ -394,12 +339,13 @@
 
 				physicsWorld.addRigidBody( body );
 
-					return body;
+				return body;
+
 			}
 
 			function initInput() {
 
-				window.addEventListener( 'mousedown', function( event ) {
+				window.addEventListener( 'mousedown', function ( event ) {
 
 					if ( ! clickRequest ) {
 
@@ -483,7 +429,8 @@
 				physicsWorld.stepSimulation( deltaTime, 10 );
 
 				// Update soft volumes
-				for ( var i = 0, il = softBodies.length; i < il; i++ ) {
+				for ( var i = 0, il = softBodies.length; i < il; i ++ ) {
+
 					var volume = softBodies[ i ];
 					var geometry = volume.geometry;
 					var softBody = volume.userData.physicsBody;
@@ -506,17 +453,20 @@
 
 						var assocVertex = association[ j ];
 
-						for ( var k = 0, kl = assocVertex.length; k < kl; k++ ) {
+						for ( var k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+
 							var indexVertex = assocVertex[ k ];
 							volumePositions[ indexVertex ] = x;
 							volumeNormals[ indexVertex ] = nx;
-							indexVertex++;
+							indexVertex ++;
 							volumePositions[ indexVertex ] = y;
 							volumeNormals[ indexVertex ] = ny;
-							indexVertex++;
+							indexVertex ++;
 							volumePositions[ indexVertex ] = z;
 							volumeNormals[ indexVertex ] = nz;
+
 						}
+
 					}
 
 					geometry.attributes.position.needsUpdate = true;
@@ -525,7 +475,8 @@
 				}
 
 				// Update rigid bodies
-				for ( var i = 0, il = rigidBodies.length; i < il; i++ ) {
+				for ( var i = 0, il = rigidBodies.length; i < il; i ++ ) {
+
 					var objThree = rigidBodies[ i ];
 					var objPhys = objThree.userData.physicsBody;
 					var ms = objPhys.getMotionState();
@@ -538,6 +489,7 @@
 						objThree.quaternion.set( q.x(), q.y(), q.z(), q.w() );
 
 					}
+
 				}
 
 			}

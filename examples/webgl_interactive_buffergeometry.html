@@ -4,44 +4,18 @@
 		<title>three.js webgl - interactive - buffergeometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: #0080ff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - buffergeometry</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -76,7 +50,7 @@
 				scene.add( light1 );
 
 				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light2.position.set( 0, -1, 0 );
+				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
 				//
@@ -91,8 +65,8 @@
 
 				var color = new THREE.Color();
 
-				var n = 800, n2 = n/2;	// triangles spread in the cube
-				var d = 120, d2 = d/2;	// individual triangle size
+				var n = 800, n2 = n / 2;	// triangles spread in the cube
+				var d = 120, d2 = d / 2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
@@ -121,7 +95,7 @@
 					var cy = y + Math.random() * d - d2;
 					var cz = z + Math.random() * d - d2;
 
-					positions[ i ]     = ax;
+					positions[ i ] = ax;
 					positions[ i + 1 ] = ay;
 					positions[ i + 2 ] = az;
 
@@ -149,7 +123,7 @@
 					var ny = cb.y;
 					var nz = cb.z;
 
-					normals[ i ]     = nx;
+					normals[ i ] = nx;
 					normals[ i + 1 ] = ny;
 					normals[ i + 2 ] = nz;
 
@@ -169,7 +143,7 @@
 
 					color.setRGB( vx, vy, vz );
 
-					colors[ i ]     = color.r;
+					colors[ i ] = color.r;
 					colors[ i + 1 ] = color.g;
 					colors[ i + 2 ] = color.b;
 
@@ -190,8 +164,8 @@
 				geometry.computeBoundingSphere();
 
 				var material = new THREE.MeshPhongMaterial( {
-						color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-						side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -206,7 +180,7 @@
 				var geometry = new THREE.BufferGeometry();
 				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2, transparent: true } );
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true } );
 
 				line = new THREE.Line( geometry, material );
 				scene.add( line );

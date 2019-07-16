@@ -4,53 +4,30 @@
 		<title>three.js webgl - geometry - terrain + fog</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #efd1b5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
 				color: #a06851;
 			}
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/ImprovedNoise.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) {
-
-				Detector.addGetWebGLMessage();
-				document.getElementById( 'container' ).innerHTML = "";
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
 
 			var container, stats;
 
@@ -58,8 +35,9 @@
 
 			var mesh, texture;
 
-			var worldWidth = 256, worldDepth = 256,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+			var worldWidth = 256, worldDepth = 256;
+			var worldHalfWidth = worldWidth / 2;
+			var worldHalfDepth = worldDepth / 2;
 
 			var clock = new THREE.Clock();
 
@@ -72,7 +50,7 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
 
@@ -105,9 +83,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -134,13 +109,13 @@
 			function generateHeight( width, height ) {
 
 				var size = width * height, data = new Uint8Array( size ),
-				perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						var x = i % width, y = ~~ ( i / width );
+						var x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 					}
@@ -155,8 +130,7 @@
 
 			function generateTexture( data, width, height ) {
 
-				var canvas, canvasScaled, context, image, imageData,
-				level, diff, vector3, sun, shade;
+				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 
@@ -206,7 +180,7 @@
 
 				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
 
-					var v = ~~ ( Math.random() * 5 );
+					var v = ~ ~ ( Math.random() * 5 );
 
 					imageData[ i ] += v;
 					imageData[ i + 1 ] += v;

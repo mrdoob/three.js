@@ -3,23 +3,14 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Three.js Bones Browser</title>
+		<link rel="shortcut icon" href="../../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../../files/main.css">
 		<style>
-			@font-face {
-				font-family: 'inconsolata';
-				src: url('../files/inconsolata.woff') format('woff');
-				font-weight: normal;
-				font-style: normal;
+			canvas {
+				display: block;
+				width: 100%;
+				height: 100%;
 			}
-
-			body {
-				margin:0;
-				font-family: 'inconsolata';
-				font-size: 15px;
-				line-height: 18px;
-				overflow: hidden;
-			}
-
-			canvas { width: 100%; height: 100% }
 
 			#newWindow {
 				display: block;
@@ -34,41 +25,57 @@
 
 		<a id='newWindow' href='./bones-browser.html' target='_blank'>Open in New Window</a>
 
-		<script src="../../build/three.min.js"></script>
-		<script src='../../examples/js/libs/dat.gui.min.js'></script>
-		<script src="../../examples/js/controls/OrbitControls.js"></script>
+		<script type="module">
+			import {
+				Bone,
+				Color,
+				CylinderBufferGeometry,
+				DoubleSide,
+				Float32BufferAttribute,
+				MeshPhongMaterial,
+				PerspectiveCamera,
+				PointLight,
+				Scene,
+				SkinnedMesh,
+				Skeleton,
+				SkeletonHelper,
+				Vector3,
+				Uint16BufferAttribute,
+				WebGLRenderer
+			} from "../../build/three.module.js";
 
-		<script>
+			import { GUI } from '../../examples/jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
 
 			var gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper;
 
 			var state = {
-
-				animateBones : false
-
+				animateBones: false
 			};
 
-			function initScene () {
+			function initScene() {
 
-				gui = new dat.GUI();
-				scene = new THREE.Scene();
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 200 );
+				gui = new GUI();
+
+				scene = new Scene();
+				scene.background = new Color( 0x444444 );
+
+				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.z = 30;
 				camera.position.y = 30;
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000, 1 );
 				document.body.appendChild( renderer.domElement );
 
-				orbit = new THREE.OrbitControls( camera, renderer.domElement );
+				orbit = new OrbitControls( camera, renderer.domElement );
 				orbit.enableZoom = false;
 
 				lights = [];
-				lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-				lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-				lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+				lights[ 0 ] = new PointLight( 0xffffff, 1, 0 );
+				lights[ 1 ] = new PointLight( 0xffffff, 1, 0 );
+				lights[ 2 ] = new PointLight( 0xffffff, 1, 0 );
 
 				lights[ 0 ].position.set( 0, 200, 0 );
 				lights[ 1 ].position.set( 100, 200, 100 );
@@ -92,45 +99,56 @@
 
 			}
 
-			function createGeometry ( sizing ) {
+			function createGeometry( sizing ) {
 
-				var geometry = new THREE.CylinderGeometry(
-					5,                       // radiusTop
-					5,                       // radiusBottom
-					sizing.height,           // height
-					8,                       // radiusSegments
+				var geometry = new CylinderBufferGeometry(
+					5, // radiusTop
+					5, // radiusBottom
+					sizing.height, // height
+					8, // radiusSegments
 					sizing.segmentCount * 3, // heightSegments
-					true                     // openEnded
+					true // openEnded
 				);
 
-				for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+				var position = geometry.attributes.position;
 
-					var vertex = geometry.vertices[ i ];
+				var vertex = new Vector3();
+
+				var skinIndices = [];
+				var skinWeights = [];
+
+				for ( var i = 0; i < position.count; i ++ ) {
+
+					vertex.fromBufferAttribute( position, i );
+
 					var y = ( vertex.y + sizing.halfHeight );
 
 					var skinIndex = Math.floor( y / sizing.segmentHeight );
 					var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
 
-					geometry.skinIndices.push( new THREE.Vector4( skinIndex, skinIndex + 1, 0, 0 ) );
-					geometry.skinWeights.push( new THREE.Vector4( 1 - skinWeight, skinWeight, 0, 0 ) );
+					skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+					skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
 
 				}
+
+				geometry.addAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
+				geometry.addAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
 
 				return geometry;
 
 			}
 
-			function createBones ( sizing ) {
+			function createBones( sizing ) {
 
 				bones = [];
 
-				var prevBone = new THREE.Bone();
+				var prevBone = new Bone();
 				bones.push( prevBone );
 				prevBone.position.y = - sizing.halfHeight;
 
 				for ( var i = 0; i < sizing.segmentCount; i ++ ) {
 
-					var bone = new THREE.Bone();
+					var bone = new Bone();
 					bone.position.y = sizing.segmentHeight;
 					bones.push( bone );
 					prevBone.add( bone );
@@ -142,24 +160,24 @@
 
 			}
 
-			function createMesh ( geometry, bones ) {
+			function createMesh( geometry, bones ) {
 
-				var material = new THREE.MeshPhongMaterial( {
-					skinning : true,
+				var material = new MeshPhongMaterial( {
+					skinning: true,
 					color: 0x156289,
 					emissive: 0x072534,
-					side: THREE.DoubleSide,
+					side: DoubleSide,
 					flatShading: true
 				} );
 
-				var mesh = new THREE.SkinnedMesh( geometry,	material );
-				var skeleton = new THREE.Skeleton( bones );
+				var mesh = new SkinnedMesh( geometry,	material );
+				var skeleton = new Skeleton( bones );
 
 				mesh.add( bones[ 0 ] );
 
 				mesh.bind( skeleton );
 
-				skeletonHelper = new THREE.SkeletonHelper( mesh );
+				skeletonHelper = new SkeletonHelper( mesh );
 				skeletonHelper.material.linewidth = 2;
 				scene.add( skeletonHelper );
 
@@ -167,7 +185,7 @@
 
 			}
 
-			function setupDatGui () {
+			function setupDatGui() {
 
 				var folder = gui.addFolder( "General Options" );
 
@@ -213,7 +231,7 @@
 
 			}
 
-			function initBones () {
+			function initBones() {
 
 				var segmentHeight = 8;
 				var segmentCount = 4;
@@ -221,10 +239,10 @@
 				var halfHeight = height * 0.5;
 
 				var sizing = {
-					segmentHeight : segmentHeight,
-					segmentCount : segmentCount,
-					height : height,
-					halfHeight : halfHeight
+					segmentHeight: segmentHeight,
+					segmentCount: segmentCount,
+					height: height,
+					halfHeight: halfHeight
 				};
 
 				var geometry = createGeometry( sizing );
@@ -236,7 +254,7 @@
 
 			}
 
-			function render () {
+			function render() {
 
 				requestAnimationFrame( render );
 

@@ -4,53 +4,31 @@
 		<title>three.js webgl - postprocessing - sobel (edge detection)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/LuminosityShader.js"></script>
-		<script src="js/shaders/SobelOperatorShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - webgl - postprocessing - sobel (edge detection)
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - webgl - postprocessing<br/>
+			sobel (edge detection)
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+
+			import { LuminosityShader } from './jsm/shaders/LuminosityShader.js';
+			import { SobelOperatorShader } from './jsm/shaders/SobelOperatorShader.js';
+
+			var camera, scene, renderer, composer;
 
 			var camera, scene, renderer, composer;
 
@@ -99,13 +77,13 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				var renderPass = new THREE.RenderPass( scene, camera );
+				composer = new EffectComposer( renderer );
+				var renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
 				// color to grayscale conversion
 
-				var effectGrayScale = new THREE.ShaderPass( THREE.LuminosityShader );
+				var effectGrayScale = new ShaderPass( LuminosityShader );
 				composer.addPass( effectGrayScale );
 
 				// you might want to use a gaussian blur filter before
@@ -113,17 +91,16 @@
 
 				// Sobel operator
 
-				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
-				effectSobel.renderToScreen = true;
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel = new ShaderPass( SobelOperatorShader );
+				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
+				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 				composer.addPass( effectSobel );
 
-				var controls = new THREE.OrbitControls( camera );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'enable' );
 				gui.open();
@@ -136,14 +113,14 @@
 
 			function onWindowResize() {
 
-				camera.aspect =  window.innerWidth / window.innerHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectSobel.uniforms.resolution.value.x = window.innerWidth;
-				effectSobel.uniforms.resolution.value.y = window.innerHeight;
+				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
+				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 
 			}
 

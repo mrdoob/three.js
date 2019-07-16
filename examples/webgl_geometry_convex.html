@@ -4,40 +4,18 @@
 		<title>three.js webgl - convex geometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				color: #fff;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				text-align:center;
-			}
-			a {
-				color: #fff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - ConvexGeometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - convex geometry</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/QuickHull.js"></script>
-		<script src="js/geometries/ConvexGeometry.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
 
 			var group, camera, scene, renderer;
 
@@ -61,7 +39,7 @@
 
 				// controls
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
@@ -87,11 +65,11 @@
 
 				// points
 
-				var pointsGeometry = new THREE.DodecahedronGeometry( 10 );
+				var vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
 
-				for ( var i = 0; i < pointsGeometry.vertices.length; i ++ ) {
+				for ( var i = 0; i < vertices.length; i ++ ) {
 
-					//pointsGeometry.vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
+					//vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
 
 				}
 
@@ -104,6 +82,8 @@
 
 				} );
 
+				var pointsGeometry = new THREE.BufferGeometry().setFromPoints( vertices );
+
 				var points = new THREE.Points( pointsGeometry, pointsMaterial );
 				group.add( points );
 
@@ -115,7 +95,7 @@
 					transparent: true
 				} );
 
-				var meshGeometry = new THREE.ConvexBufferGeometry( pointsGeometry.vertices );
+				var meshGeometry = new ConvexBufferGeometry( vertices );
 
 				var mesh = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh.material.side = THREE.BackSide; // back faces
@@ -130,12 +110,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function randomPoint() {
-
-				return new THREE.Vector3( THREE.Math.randFloat( - 1, 1 ), THREE.Math.randFloat( - 1, 1 ), THREE.Math.randFloat( - 1, 1 ) );
 
 			}
 

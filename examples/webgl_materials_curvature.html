@@ -4,44 +4,15 @@
 		<title>three.js webgl - shader - curvature [ninja]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: #ffffff;
-			}
-
-			#oldie a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - curvature estimation of a geometry by <a href="http://codercat.club" target="_blank" rel="noopener">CoderCat</a></div>
-
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - curvature estimation of a geometry<br/>
+			by <a href="http://codercat.club" target="_blank" rel="noopener">CoderCat</a>
+		</div>
 
 		<script id="vertexShaderRaw" type="x-shader/x-vertex">
 
@@ -71,11 +42,13 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
-			var container;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var camera, scene, renderer;
 
@@ -90,12 +63,12 @@
 				var sum = 0;
 				var length = 0;
 
-				Object.keys( dict ).forEach( function( key ) {
+				Object.keys( dict ).forEach( function ( key ) {
 
 					sum += dict[ key ];
 					length ++;
 
-				});
+				} );
 
 				return sum / length;
 
@@ -104,16 +77,16 @@
 			//clamp a number between min and max
 			function clamp( number, min, max ) {
 
-			  return Math.max( min, Math.min( number, max ) );
+				return Math.max( min, Math.min( number, max ) );
 
 			}
 
 			//filter the curvature array to only show concave values
 			function filterConcave( curvature ) {
 
-				for ( var i = 0; i < curvature.length; i++ ) {
+				for ( var i = 0; i < curvature.length; i ++ ) {
 
-					curvature[ i ] = Math.abs( clamp( curvature[ i ], -1, 0 ) );
+					curvature[ i ] = Math.abs( clamp( curvature[ i ], - 1, 0 ) );
 
 				}
 
@@ -122,7 +95,7 @@
 			//filter the curvature array to only show convex values
 			function filterConvex( curvature ) {
 
-				for ( var i = 0; i < curvature.length; i++ ) {
+				for ( var i = 0; i < curvature.length; i ++ ) {
 
 					curvature[ i ] = clamp( curvature[ i ], 0, 1 );
 
@@ -133,7 +106,7 @@
 			//filter the curvature array to show both the concave and convex values
 			function filterBoth( curvature ) {
 
-				for ( var i = 0; i < curvature.length; i++ ) {
+				for ( var i = 0; i < curvature.length; i ++ ) {
 
 					curvature[ i ] = Math.abs( curvature[ i ] );
 
@@ -148,40 +121,42 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-				camera.position.x = -23;
+				camera.position.x = - 23;
 				camera.position.y = 2;
 				camera.position.z = 24;
-
-				controls = new THREE.OrbitControls( camera );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
-
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.OBJLoader();
+				var controls = new OrbitControls( camera, renderer.domElement );
+
+				var loader = new OBJLoader();
 				//load the obj
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( object ) {
+
 					object.traverse( function ( child ) {
+
 						if ( child.isMesh ) {
 
 							bufferGeo = child.geometry;
 							bufferGeo.center();
-							var dict= {};
+							var dict = {};
 
-							for ( var i = 0; i < bufferGeo.attributes.position.count; i+=3 ) {
+							for ( var i = 0; i < bufferGeo.attributes.position.count; i += 3 ) {
+
 								//create a dictionary of every position, and its neighboring positions
 								var array = bufferGeo.attributes.position.array;
 								var normArray = bufferGeo.attributes.normal.array;
 
-								var posA = new THREE.Vector3(array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ]);
-								var posB = new THREE.Vector3(array[ 3 * ( i + 1 ) ], array[ 3 * ( i + 1 ) + 1 ], array[ 3 * ( i + 1 ) + 2 ]);
-								var posC = new THREE.Vector3(array[ 3 * ( i + 2 ) ], array[ 3 * ( i + 2 ) + 1 ], array[ 3 * ( i + 2 ) + 2 ]);
+								var posA = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
+								var posB = new THREE.Vector3( array[ 3 * ( i + 1 ) ], array[ 3 * ( i + 1 ) + 1 ], array[ 3 * ( i + 1 ) + 2 ] );
+								var posC = new THREE.Vector3( array[ 3 * ( i + 2 ) ], array[ 3 * ( i + 2 ) + 1 ], array[ 3 * ( i + 2 ) + 2 ] );
 
-								var normA = new THREE.Vector3(normArray[ 3 * i ], normArray[ 3 * i + 1 ], normArray[ 3 * i + 2 ]).normalize();
-								var normB = new THREE.Vector3(normArray[ 3 * ( i + 1 ) ], normArray[ 3 * ( i + 1 ) + 1 ], normArray[ 3 * ( i + 1 ) + 2 ]).normalize();
-								var normC = new THREE.Vector3(normArray[ 3 * ( i + 2 ) ], normArray[ 3 * ( i + 2 ) + 1 ], normArray[ 3 * ( i + 2 ) + 2 ]).normalize();
+								var normA = new THREE.Vector3( normArray[ 3 * i ], normArray[ 3 * i + 1 ], normArray[ 3 * i + 2 ] ).normalize();
+								var normB = new THREE.Vector3( normArray[ 3 * ( i + 1 ) ], normArray[ 3 * ( i + 1 ) + 1 ], normArray[ 3 * ( i + 1 ) + 2 ] ).normalize();
+								var normC = new THREE.Vector3( normArray[ 3 * ( i + 2 ) ], normArray[ 3 * ( i + 2 ) + 1 ], normArray[ 3 * ( i + 2 ) + 2 ] ).normalize();
 
 								var strA = posA.toArray().toString();
 								var strB = posB.toArray().toString();
@@ -191,26 +166,28 @@
 								var posB_C = new THREE.Vector3().subVectors( posB, posC );
 								var posC_A = new THREE.Vector3().subVectors( posC, posA );
 
-								var normB_A = new THREE.Vector3().subVectors( normB, normA );
-								var normB_C = new THREE.Vector3().subVectors( normB, normC );
-								var normC_A = new THREE.Vector3().subVectors( normC, normA );
-
 								var b2a = normB.dot( posB_A.normalize() );
 								var b2c = normB.dot( posB_C.normalize() );
 								var c2a = normC.dot( posC_A.normalize() );
 
-								var a2b = -normA.dot( posB_A.normalize() );
-								var c2b = -normC.dot( posB_C.normalize() );
-								var a2c = -normA.dot( posC_A.normalize() );
+								var a2b = - normA.dot( posB_A.normalize() );
+								var c2b = - normC.dot( posB_C.normalize() );
+								var a2c = - normA.dot( posC_A.normalize() );
 
-								if (dict[ strA ] === undefined ) {
+								if ( dict[ strA ] === undefined ) {
+
 									dict[ strA ] = {};
+
 								}
-								if (dict[ strB ] === undefined ) {
+								if ( dict[ strB ] === undefined ) {
+
 									dict[ strB ] = {};
+
 								}
-								if (dict[ strC ] === undefined ) {
+								if ( dict[ strC ] === undefined ) {
+
 									dict[ strC ] = {};
+
 								}
 
 								dict[ strA ][ strB ] = a2b;
@@ -225,70 +202,75 @@
 							var curvatureDict = {};
 							var min = 10, max = 0;
 
-							Object.keys( dict ).forEach( function( key ) {
+							Object.keys( dict ).forEach( function ( key ) {
 
 								curvatureDict[ key ] = average( dict[ key ] );
 
-							});
+							} );
 
 							//smoothing
-							var smoothCurvatureDict  = Object.create(curvatureDict);
+							var smoothCurvatureDict = Object.create( curvatureDict );
 
-							Object.keys( dict ).forEach( function( key ) {
+							Object.keys( dict ).forEach( function ( key ) {
 
 								var count = 0;
 								var sum = 0;
-								Object.keys( dict[ key ] ).forEach( function( key2 ) {
+								Object.keys( dict[ key ] ).forEach( function ( key2 ) {
 
 									sum += smoothCurvatureDict[ key2 ];
 									count ++;
 
-								});
-								smoothCurvatureDict[key] = sum / count;
+								} );
+								smoothCurvatureDict[ key ] = sum / count;
 
-							});
+							} );
 
 							curvatureDict = smoothCurvatureDict;
 
 							// fit values to 0 and 1
-							Object.keys( curvatureDict ).forEach( function( key ) {
+							Object.keys( curvatureDict ).forEach( function ( key ) {
 
 								var val = Math.abs( curvatureDict[ key ] );
 								if ( val < min ) min = val;
 								if ( val > max ) max = val;
 
-							});
+							} );
 
 							var range = ( max - min );
 
-							Object.keys( curvatureDict ).forEach( function( key ) {
+							Object.keys( curvatureDict ).forEach( function ( key ) {
 
 								var val = Math.abs( curvatureDict[ key ] );
 								if ( curvatureDict[ key ] < 0 ) {
-									curvatureDict[ key ] = (min - val) / range
+
+									curvatureDict[ key ] = ( min - val ) / range;
+
 								} else {
-									curvatureDict[ key ] = (val - min) / range;
+
+									curvatureDict[ key ] = ( val - min ) / range;
+
 								}
 
-							});
+							} );
 
 							curvatureAttribute = new Float32Array( bufferGeo.attributes.position.count );
 
-							for ( var i = 0; i < bufferGeo.attributes.position.count; i++ ) {
+							for ( var i = 0; i < bufferGeo.attributes.position.count; i ++ ) {
 
 								array = bufferGeo.attributes.position.array;
 								var pos = new THREE.Vector3( array[ 3 * i ], array[ 3 * i + 1 ], array[ 3 * i + 2 ] );
 								var str = pos.toArray().toString();
-								curvatureAttribute[i] = curvatureDict[ str ];
+								curvatureAttribute[ i ] = curvatureDict[ str ];
+
 							}
 
 							bufferGeo.addAttribute( 'curvature', new THREE.BufferAttribute( curvatureAttribute, 1 ) );
 
 							//starting filter is to show both concave and convex
 							var curvatureFiltered = new Float32Array( curvatureAttribute );
-							filterBoth(curvatureFiltered);
+							filterBoth( curvatureFiltered );
 
-							var materialRaw = new THREE.ShaderMaterial ({
+							var materialRaw = new THREE.ShaderMaterial( {
 
 								vertexShader: document.getElementById( 'vertexShaderRaw' ).textContent,
 								fragmentShader: document.getElementById( 'fragmentShaderRaw' ).textContent
@@ -298,6 +280,7 @@
 							ninjaMeshRaw = new THREE.Mesh( bufferGeo, materialRaw );
 
 						}
+
 					} );
 
 					scene.add( ninjaMeshRaw );
@@ -311,7 +294,7 @@
 					filterConvex: function () {
 
 						var curvatureFiltered = new Float32Array( curvatureAttribute );
-						filterConvex(curvatureFiltered);
+						filterConvex( curvatureFiltered );
 						bufferGeo.attributes.curvature.array = curvatureFiltered;
 						bufferGeo.attributes.curvature.needsUpdate = true;
 
@@ -320,7 +303,7 @@
 					filterConcave: function () {
 
 						var curvatureFiltered = new Float32Array( curvatureAttribute );
-						filterConcave(curvatureFiltered);
+						filterConcave( curvatureFiltered );
 						bufferGeo.attributes.curvature.array = curvatureFiltered;
 						bufferGeo.attributes.curvature.needsUpdate = true;
 
@@ -329,20 +312,20 @@
 					filterBoth: function () {
 
 						var curvatureFiltered = new Float32Array( curvatureAttribute );
-						filterBoth(curvatureFiltered);
+						filterBoth( curvatureFiltered );
 						bufferGeo.attributes.curvature.array = curvatureFiltered;
 						bufferGeo.attributes.curvature.needsUpdate = true;
 
 					}
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var topologyFolder = gui.addFolder( 'Topology' );
 				topologyFolder.add( params, 'filterConvex' );
 				topologyFolder.add( params, 'filterConcave' );
 				topologyFolder.add( params, 'filterBoth' );
-				topologyFolder.open()
+				topologyFolder.open();
 
 				onWindowResize();
 
@@ -350,7 +333,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -368,7 +351,7 @@
 
 			function render() {
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 

@@ -4,37 +4,15 @@
 	<title>three.js webgl - instanced particles - billboards - colors</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
 		a {
-			color: #ffffff;
+			color: #08f;
 		}
-
-		#oldie a {
-			color: #da0;
-		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
-			border: 2px red solid;
+			background-color: #f00;
 			margin-top: 20px;
 			padding: 10px;
 		}
@@ -44,12 +22,8 @@
 
 	<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instanced circle billboards - colors
-		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+		<div id="notSupported" style="display:none">Sorry, your graphics card + browser does not support hardware instancing</div>
 	</div>
-
-	<script src="../build/three.js"></script>
-	<script src="js/Detector.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vshader" type="x-shader/x-vertex">
 		precision highp float;
@@ -108,7 +82,11 @@
 		}
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
 		var container, stats;
 
 		var camera, scene, renderer;
@@ -116,18 +94,13 @@
 
 		function init() {
 
-			if ( !Detector.webgl ) {
-
-				Detector.addGetWebGLMessage();
-				return false;
-
-			}
-
 			renderer = new THREE.WebGLRenderer();
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
 				document.getElementById( 'notSupported' ).style.display = '';
 				return false;
+
 			}
 
 			container = document.createElement( 'div' );
@@ -156,12 +129,12 @@
 
 			}
 
-			geometry.addAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
+			geometry.addAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3 ) );
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					map: { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
-					time: { value: 0.0 }
+					"map": { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
+					"time": { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
@@ -186,7 +159,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
@@ -208,7 +181,7 @@
 
 			var time = performance.now() * 0.0005;
 
-			material.uniforms.time.value = time;
+			material.uniforms[ "time" ].value = time;
 
 			mesh.rotation.x = time * 0.2;
 			mesh.rotation.y = time * 0.4;

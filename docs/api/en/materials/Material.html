@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Abstract base class for materials.<br /><br />
+
+		Materials describe the appearance of [page:Object objects].
+		They are defined in a (mostly) renderer-independent way, so you don't have to
+		rewrite materials if you decide to use a different renderer.<br /><br />
+
+		The following properties and methods are inherited by all other material types
+		(although they may have different defaults).
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>This creates a generic material.</p>
+
+
+		<h2>Properties</h2>
+
+		<h3>[property:Float alphaTest]</h3>
+		<p>
+		Sets the alpha value to be used when running an alpha test.
+		The material will not be renderered if the opacity is lower than this value.
+		Default is *0*.
+		</p>
+
+		<h3>[property:Integer blendDst]</h3>
+		<p>
+		Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor].
+		See the destination factors [page:CustomBlendingEquation constants] for all possible values.<br />
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
+		</p>
+
+		<h3>[property:Integer blendDstAlpha]</h3>
+		<p>The transparency of the [page:.blendDst]. Default is *null*.</p>
+
+		<h3>[property:Integer blendEquation]</h3>
+		<p>
+		Blending equation to use when applying blending. Default is [page:CustomBlendingEquation AddEquation].
+		See the blending equation [page:CustomBlendingEquation constants] for all possible values.<br />
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
+		</p>
+
+		<h3>[property:Integer blendEquationAlpha]</h3>
+		<p>The tranparency of the [page:.blendEquation]. Default is *null*.</p>
+
+		<h3>[property:Blending blending]</h3>
+		<p>
+		Which blending to use when displaying objects with this material. <br />
+		This must be set to [page:Materials CustomBlending] to use custom [page:Constant blendSrc], [page:Constant blendDst] or [page:Constant blendEquation].<br />
+		See the blending mode [page:Materials constants] for all possible values. Default is [page:Materials NormalBlending].
+		</p>
+
+		<h3>[property:Integer blendSrc]</h3>
+		<p>
+		Blending source. Default is [page:CustomBlendingEquation SrcAlphaFactor].
+		See the source factors [page:CustomBlendingEquation constants] for all possible values.<br />
+		The material's [page:Constant blending] must be set to [page:Materials CustomBlending] for this to have any effect.
+		</p>
+
+		<h3>[property:Integer blendSrcAlpha]</h3>
+		<p>The tranparency of the [page:.blendSrc]. Default is *null*.</p>
+
+		<h3>[property:Boolean clipIntersection]</h3>
+		<p>
+		Changes the behavior of clipping planes so that only their intersection is clipped, rather than their union.
+		Default is *false*.
+		</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+		User-defined clipping planes specified as THREE.Plane objects in world space.
+		These planes apply to the objects this material is attached to.
+		Points in space whose signed distance to the plane is negative are clipped (not rendered).
+		This requires [page:WebGLRenderer.localClippingEnabled] to be *true*.
+		See the [example:webgl_clipping_intersection WebGL / clipping /intersection] example.
+		Default is *null*.
+		</p>
+
+		<h3>[property:Boolean clipShadows]</h3>
+		<p>
+		Defines whether to clip shadows according to the clipping planes specified on this material. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean colorWrite]</h3>
+		<p>
+		Whether to render the material's color.
+		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p>
+		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
+		</p>
+
+		<h3>[property:Integer depthFunc]</h3>
+		<p>
+		Which depth function to use. Default is [page:Materials LessEqualDepth]. See the depth mode [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean depthTest]</h3>
+		<p>
+		Whether to have depth test enabled when rendering this material. Default is *true*.
+		</p>
+
+		<h3>[property:Boolean depthWrite]</h3>
+		<p>
+		Whether rendering this material has any effect on the depth buffer. Default is *true*.<br /><br />
+
+		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
+		</p>
+
+		<h3>[property:Boolean stencilWrite]</h3>
+		<p>
+		Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean stencilFunc]</h3>
+		<p>
+		The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Integer stencilRef]</h3>
+		<p>
+		The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+		</p>
+
+		<h3>[property:Boolean stencilMask]</h3>
+		<p>
+		The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+		</p>
+
+		<h3>[property:Integer stencilFail]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns false. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean stencilZFail]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean stencilZPass]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+		Define whether the material is rendered with flat shading. Default is false.
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Whether the material is affected by fog. Default is *true*.</p>
+
+		<h3>[property:Integer id]</h3>
+		<p>Unique number for this material instance.</p>
+
+		<h3>[property:Boolean isMaterial]</h3>
+		<p>
+			Used to check whether this or derived classes are materials. Default is *true*.<br /><br />
+
+			You should not change this, as it used internally for optimisation.
+		</p>
+
+		<h3>[property:Boolean lights]</h3>
+		<p>Whether the material is affected by lights. Default is *true*.</p>
+
+		<h3>[property:String name]</h3>
+		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		Specifies that the material needs to be recompiled.<br />
+		This property is automatically set to *true* when instancing a new material.
+		</p>
+
+		<h3>[property:Float opacity]</h3>
+		<p>
+		Float in the range of *0.0* - *1.0* indicating how transparent the material is.
+		A value of *0.0* indicates fully transparent, *1.0* is fully opaque.<br />
+		If the material's [page:Boolean transparent] property is not set to *true*, the material will remain
+		fully opaque and this value will only affect its color. <br />
+		Default is *1.0*.
+		</p>
+
+		<h3>[property:Boolean polygonOffset]</h3>
+		<p>
+		Whether to use polygon offset. Default is *false*. This corresponds to the *GL_POLYGON_OFFSET_FILL* WebGL feature.
+		</p>
+
+		<h3>[property:Integer polygonOffsetFactor]</h3>
+		<p>Sets the polygon offset factor. Default is *0*.</p>
+
+		<h3>[property:Integer polygonOffsetUnits]</h3>
+		<p>Sets the polygon offset units. Default is *0*.</p>
+
+		<h3>[property:String precision]</h3>
+		<p>
+		Override the renderer's default precision for this material. Can be "*highp*", "*mediump*" or "*lowp*".
+		Default is *null*.
+		</p>
+
+		<h3>[property:Boolean premultipliedAlpha]</h3>
+		<p>
+		Whether to premultiply the alpha (transparency) value.
+		See [Example:webgl_materials_transparency WebGL / Materials / Transparency] for an example of the difference.
+		Default is *false*.
+		</p>
+
+		<h3>[property:Boolean dithering]</h3>
+		<p>
+		Whether to apply dithering to the color to remove the appearance of banding.
+		Default is *false*.
+		</p>
+
+		<h3>[property:Integer shadowSide]</h3>
+		<p>
+		Defines which side of faces cast shadows.
+		When set, can be [page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], or [page:Materials THREE.DoubleSide]. Default is *null*. <br />
+		If *null*, the side casting shadows is determined as follows: <br />
+
+		<table>
+			<thead>
+				<tr>
+					<th>[page:Material.side]</th>
+					<th>Side casting shadows</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<tr>
+					<td>THREE.FrontSide</td>
+					<td>back side</td>
+				</tr>
+				<tr>
+					<td>THREE.BackSide</td>
+					<td>front side</td>
+				</tr>
+				<tr>
+					<td>THREE.DoubleSide</td>
+					<td>both sides</td>
+				</tr>
+			</tbody>
+		</table>
+
+
+		</p>
+
+		<h3>[property:Integer side]</h3>
+		<p>
+		Defines which side of faces will be rendered - front, back or both.
+		Default is [page:Materials THREE.FrontSide].
+		Other options are [page:Materials THREE.BackSide] and [page:Materials THREE.DoubleSide].
+		</p>
+
+		<h3>[property:Boolean transparent]</h3>
+		<p>
+		Defines whether this material is transparent. This has an effect on rendering
+		as transparent objects need special treatment and are rendered after
+		non-transparent objects. <br />
+		When set to true, the extent to which the material is transparent is
+		controlled by setting it's [page:Float opacity] property. <br />
+		Default is *false*.
+		</p>
+
+		<h3>[property:String type]</h3>
+		<p>
+		Value is the string 'Material'. This shouldn't be changed, and can be used to
+		find all objects of this type in a scene.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this material instance.
+		This gets automatically assigned, so this shouldn't be edited.
+		</p>
+
+		<h3>[property:Integer vertexColors]</h3>
+		<p>
+		Defines whether vertex coloring is used.
+		Default is [page:Materials THREE.NoColors].
+		Other options are [page:Materials THREE.VertexColors] and [page:Materials THREE.FaceColors].
+		</p>
+
+		<h3>[property:Boolean vertexTangents]</h3>
+		<p>
+		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		</p>
+
+		<h3>[property:Boolean visible]</h3>
+		<p>
+		Defines whether this material is visible. Default is *true*.
+		</p>
+
+		<h3>[property:object userData]</h3>
+		<p>
+		An object that can be used to store custom data about the Material. It should not hold
+		references to functions as these will not be cloned.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>[method:Material clone]( )</h3>
+		<p>Return a new material with the same parameters as this material.</p>
+
+		<h3>[method:Material copy]( [param:material material] )</h3>
+		<p>Copy the parameters from the passed material into this material.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+		This disposes the material. Textures of a material don't get disposed.
+		These needs to be disposed by [page:Texture Texture].
+		</p>
+
+		<h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
+		<p>
+		An optional callback that is executed immediately before the shader program is compiled.
+		This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
+		</p>
+
+		<h3>[method:null setValues]( [param:object values] )</h3>
+		<p>
+		values -- a container with parameters.<br />
+		Sets the properties based on the *values*.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:object meta] )</h3>
+		<p>
+		meta -- object containing metadata such as textures or images for the material.<br />
+		Convert the material to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

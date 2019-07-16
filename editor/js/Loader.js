@@ -9,7 +9,40 @@ var Loader = function ( editor ) {
 
 	this.texturePath = '';
 
-	this.loadFile = function ( file ) {
+	this.loadFiles = function ( files ) {
+
+		if ( files.length > 0 ) {
+
+			var filesMap = createFileMap( files );
+
+			var manager = new THREE.LoadingManager();
+			manager.setURLModifier( function ( url ) {
+
+				var file = filesMap[ url ];
+
+				if ( file ) {
+
+					console.log( 'Loading', url );
+
+					return URL.createObjectURL( file );
+
+				}
+
+				return url;
+
+			} );
+
+			for ( var i = 0; i < files.length; i ++ ) {
+
+				scope.loadFile( files[ i ], manager );
+
+			}
+
+		}
+
+	};
+
+	this.loadFile = function ( file, manager ) {
 
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
@@ -19,6 +52,7 @@ var Loader = function ( editor ) {
 
 			var size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
 			var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
+
 			console.log( 'Loading', filename, size, progress );
 
 		} );
@@ -32,7 +66,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.TDSLoader();
 					var object = loader.parse( event.target.result );
 
-					editor.execute( new AddObjectCommand( object ) );
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -46,7 +80,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AMFLoader();
 					var amfobject = loader.parse( event.target.result );
 
-					editor.execute( new AddObjectCommand( amfobject ) );
+					editor.execute( new AddObjectCommand( editor, amfobject ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -60,7 +94,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.AWDLoader();
 					var scene = loader.parse( event.target.result );
 
-					editor.execute( new SetSceneCommand( scene ) );
+					editor.execute( new SetSceneCommand( editor, scene ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -77,7 +111,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.BabylonLoader();
 					var scene = loader.parse( json );
 
-					editor.execute( new SetSceneCommand( scene ) );
+					editor.execute( new SetSceneCommand( editor, scene ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -99,7 +133,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.execute( new AddObjectCommand( mesh ) );
+					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -116,7 +150,7 @@ var Loader = function ( editor ) {
 					stream.offset = 0;
 
 					var loader = new THREE.CTMLoader();
-					loader.createModel( new CTM.File( stream ), function( geometry ) {
+					loader.createModel( new CTM.File( stream ), function ( geometry ) {
 
 						geometry.sourceType = "ctm";
 						geometry.sourceFile = file.name;
@@ -126,7 +160,7 @@ var Loader = function ( editor ) {
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
 
-						editor.execute( new AddObjectCommand( mesh ) );
+						editor.execute( new AddObjectCommand( editor, mesh ) );
 
 					} );
 
@@ -141,12 +175,13 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var loader = new THREE.ColladaLoader();
+					var loader = new THREE.ColladaLoader( manager );
 					var collada = loader.parse( contents );
 
 					collada.scene.name = filename;
 
-					editor.execute( new AddObjectCommand( collada.scene ) );
+					editor.addAnimation( collada.scene, collada.animations );
+					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -159,10 +194,11 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var loader = new THREE.FBXLoader();
+					var loader = new THREE.FBXLoader( manager );
 					var object = loader.parse( contents );
 
-					editor.execute( new AddObjectCommand( object ) );
+					editor.addAnimation( object, object.animations );
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -170,27 +206,55 @@ var Loader = function ( editor ) {
 				break;
 
 			case 'glb':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					THREE.DRACOLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
+					var loader = new THREE.GLTFLoader();
+					loader.setDRACOLoader( new THREE.DRACOLoader() );
+					loader.parse( contents, '', function ( result ) {
+
+						var scene = result.scene;
+						scene.name = filename;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( editor, scene ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'gltf':
 
 				reader.addEventListener( 'load', function ( event ) {
 
 					var contents = event.target.result;
+
 					var loader;
 
-					if ( isGltf1( contents ) ) {
+					if ( isGLTF1( contents ) ) {
 
-						loader = new THREE.LegacyGLTFLoader();
+						loader = new THREE.LegacyGLTFLoader( manager );
 
 					} else {
 
-						loader = new THREE.GLTFLoader();
+						loader = new THREE.GLTFLoader( manager );
 
 					}
 
 					loader.parse( contents, '', function ( result ) {
 
-						result.scene.name = filename;
-						editor.execute( new AddObjectCommand( result.scene ) );
+						var scene = result.scene;
+						scene.name = filename;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
 
@@ -265,7 +329,7 @@ var Loader = function ( editor ) {
 
 					collada.scene.name = filename;
 
-					editor.execute( new AddObjectCommand( collada.scene ) );
+					editor.execute( new AddObjectCommand( editor, collada.scene ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -288,7 +352,8 @@ var Loader = function ( editor ) {
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
-					editor.execute( new AddObjectCommand( mesh ) );
+					editor.addAnimation( mesh, geometry.animations );
+					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -304,7 +369,7 @@ var Loader = function ( editor ) {
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
 
-					editor.execute( new AddObjectCommand( object ) );
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -321,7 +386,7 @@ var Loader = function ( editor ) {
 					var loader = new THREE.PlayCanvasLoader();
 					var object = loader.parse( json );
 
-					editor.execute( new AddObjectCommand( object ) );
+					editor.execute( new AddObjectCommand( editor, object ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -343,7 +408,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.execute( new AddObjectCommand( mesh ) );
+					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
@@ -365,7 +430,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.execute( new AddObjectCommand( mesh ) );
+					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
 
@@ -388,13 +453,13 @@ var Loader = function ( editor ) {
 					var contents = event.target.result;
 
 					var loader = new THREE.SVGLoader();
-					var paths = loader.parse( contents );
+					var paths = loader.parse( contents ).paths;
 
 					//
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.1 );
-					group.scale.y *= -1;
+					group.scale.y *= - 1;
 
 					for ( var i = 0; i < paths.length; i ++ ) {
 
@@ -420,7 +485,7 @@ var Loader = function ( editor ) {
 
 					}
 
-					editor.execute( new AddObjectCommand( group ) );
+					editor.execute( new AddObjectCommand( editor, group ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -442,7 +507,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.execute( new AddObjectCommand( mesh ) );
+					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -457,7 +522,7 @@ var Loader = function ( editor ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					editor.execute( new SetSceneCommand( result ) );
+					editor.execute( new SetSceneCommand( editor, result ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -468,19 +533,7 @@ var Loader = function ( editor ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					var contents = event.target.result;
-
-					var zip = new JSZip( contents );
-
-					// BLOCKS
-
-					if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
-
-						var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
-						var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
-						editor.execute( new AddObjectCommand( object ) );
-
-					}
+					handleZIP( event.target.result );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -489,7 +542,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				alert( 'Unsupported file format (' + extension +  ').' );
+				// alert( 'Unsupported file format (' + extension +  ').' );
 
 				break;
 
@@ -526,73 +579,30 @@ var Loader = function ( editor ) {
 
 				var mesh = new THREE.Mesh( result );
 
-				editor.execute( new AddObjectCommand( mesh ) );
+				editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				break;
 
 			case 'geometry':
 
-				var loader = new THREE.JSONLoader();
-				loader.setTexturePath( scope.texturePath );
-
-				var result = loader.parse( data );
-
-				var geometry = result.geometry;
-				var material;
-
-				if ( result.materials !== undefined ) {
-
-					if ( result.materials.length > 1 ) {
-
-						material = new THREE.MultiMaterial( result.materials );
-
-					} else {
-
-						material = result.materials[ 0 ];
-
-					}
-
-				} else {
-
-					material = new THREE.MeshStandardMaterial();
-
-				}
-
-				geometry.sourceType = "ascii";
-				geometry.sourceFile = file.name;
-
-				var mesh;
-
-				if ( geometry.animation && geometry.animation.hierarchy ) {
-
-					mesh = new THREE.SkinnedMesh( geometry, material );
-
-				} else {
-
-					mesh = new THREE.Mesh( geometry, material );
-
-				}
-
-				mesh.name = filename;
-
-				editor.execute( new AddObjectCommand( mesh ) );
+				console.error( 'Loader: "Geometry" is no longer supported.' );
 
 				break;
 
 			case 'object':
 
 				var loader = new THREE.ObjectLoader();
-				loader.setTexturePath( scope.texturePath );
+				loader.setResourcePath( scope.texturePath );
 
 				var result = loader.parse( data );
 
-				if ( result instanceof THREE.Scene ) {
+				if ( result.isScene ) {
 
-					editor.execute( new SetSceneCommand( result ) );
+					editor.execute( new SetSceneCommand( editor, result ) );
 
 				} else {
 
-					editor.execute( new AddObjectCommand( result ) );
+					editor.execute( new AddObjectCommand( editor, result ) );
 
 				}
 
@@ -608,7 +618,105 @@ var Loader = function ( editor ) {
 
 	}
 
-	function isGltf1( contents ) {
+	function createFileMap( files ) {
+
+		var map = {};
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			map[ file.name ] = file;
+
+		}
+
+		return map;
+
+	}
+
+	function handleZIP( contents ) {
+
+		var zip = new JSZip( contents );
+
+		// Poly
+
+		if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+
+			var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
+			var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+			editor.execute( new AddObjectCommand( editor, object ) );
+
+		}
+
+		//
+
+		zip.filter( function ( path, file ) {
+
+			var manager = new THREE.LoadingManager();
+			manager.setURLModifier( function ( url ) {
+
+				var file = zip.files[ url ];
+
+				if ( file ) {
+
+					console.log( 'Loading', url );
+
+					var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+					return URL.createObjectURL( blob );
+
+				}
+
+				return url;
+
+			} );
+
+			var extension = file.name.split( '.' ).pop().toLowerCase();
+
+			switch ( extension ) {
+
+				case 'fbx':
+
+					var loader = new THREE.FBXLoader( manager );
+					var object = loader.parse( file.asArrayBuffer() );
+
+					editor.execute( new AddObjectCommand( editor, object ) );
+
+					break;
+
+				case 'glb':
+
+					var loader = new THREE.GLTFLoader();
+					loader.parse( file.asArrayBuffer(), '', function ( result ) {
+
+						var scene = result.scene;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( editor, scene ) );
+
+					} );
+
+					break;
+
+				case 'gltf':
+
+					var loader = new THREE.GLTFLoader( manager );
+					loader.parse( file.asText(), '', function ( result ) {
+
+						var scene = result.scene;
+
+						editor.addAnimation( scene, result.animations );
+						editor.execute( new AddObjectCommand( scene ) );
+
+					} );
+
+					break;
+
+			}
+
+		} );
+
+	}
+
+	function isGLTF1( contents ) {
 
 		var resultContent;
 

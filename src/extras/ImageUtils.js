@@ -4,31 +4,30 @@
  * @author szimek / https://github.com/szimek/
  */
 
+var _canvas;
+
 var ImageUtils = {
 
 	getDataURL: function ( image ) {
 
 		var canvas;
 
-		if ( image instanceof HTMLCanvasElement ) {
+		if ( typeof HTMLCanvasElement == 'undefined' ) {
+
+			return image.src;
+
+		} else if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 
 		} else {
 
-			if ( typeof OffscreenCanvas !== 'undefined' ) {
+			if ( _canvas === undefined ) _canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 
-				canvas = new OffscreenCanvas( image.width, image.height );
+			_canvas.width = image.width;
+			_canvas.height = image.height;
 
-			} else {
-
-				canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-				canvas.width = image.width;
-				canvas.height = image.height;
-
-			}
-
-			var context = canvas.getContext( '2d' );
+			var context = _canvas.getContext( '2d' );
 
 			if ( image instanceof ImageData ) {
 
@@ -39,6 +38,8 @@ var ImageUtils = {
 				context.drawImage( image, 0, 0, image.width, image.height );
 
 			}
+
+			canvas = _canvas;
 
 		}
 

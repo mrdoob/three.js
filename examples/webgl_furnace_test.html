@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js white furnace test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #444;
+			}
+		</style>
+
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="info">
+				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a><br/><br/>
+				There are 11 fully metal spheres with full white specular color and increasing roughness values rendered here. A metal object, no matter how rough, fully reflects all energy. If uniformly lit, the spheres should be indistinguishable from the environment. If spheres are visible, then some energy has been lost or gained after reflection.<br />
+			</div>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
+			var scene, camera, renderer, envMap, radianceMap;
+			var right = 6;
+
+			function init() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				var aspect = width / height;
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onResize, false );
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				// camera
+
+				camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
+				camera.position.set( 0, 0, 9 );
+
+			}
+
+			function createObjects() {
+
+				var geo = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+				var count = 10;
+				for ( var x = 0; x <= count; x ++ ) {
+
+					var mesh = new THREE.Mesh( geo, new THREE.MeshPhysicalMaterial( {
+						roughness: x / count,
+						metalness: 1,
+						color: 0xffffff,
+						envMap: radianceMap,
+						envMapIntensity: 1,
+						reflectivity: 1,
+					} ) );
+					mesh.position.x = x - ( Math.floor( count / 2 ) );
+					scene.add( mesh );
+
+				}
+
+			}
+
+			function createEnvironment() {
+
+				var color = new THREE.Color( 0xcccccc );
+				var sky = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), new THREE.MeshBasicMaterial( {
+					color: color,
+					side: THREE.DoubleSide,
+				} ) );
+				sky.scale.setScalar( 100 );
+
+				var envScene = new THREE.Scene();
+				envScene.add( sky );
+				envScene.background = color;
+				var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
+				cubeCamera.update( renderer, envScene );
+
+				envMap = cubeCamera.renderTarget.texture;
+
+				scene.background = color;
+
+			}
+
+			function getRadiance() {
+
+				return new Promise( function ( resolve ) {
+
+					var pmremGenerator = new PMREMGenerator( envMap );
+					pmremGenerator.update( renderer );
+					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					pmremCubeUVPacker.update( renderer );
+					var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+					pmremGenerator.dispose();
+					pmremCubeUVPacker.dispose();
+					radianceMap = cubeRenderTarget.texture;
+					resolve();
+
+				} );
+
+			}
+
+			function onResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+				camera.top = right / aspect;
+				camera.bottom = - camera.top;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			Promise.resolve()
+				.then( init )
+				.then( createEnvironment )
+				.then( getRadiance )
+				.then( createObjects )
+				.then( render );
+
+		</script>
+	</body>
+</html>

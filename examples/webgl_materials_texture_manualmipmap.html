@@ -4,24 +4,8 @@
 		<title>three.js webgl - materials - manual mipmaping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #aaa;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
 
 			.lbl { color:#fff; font-size:16px; font-weight:bold; position: absolute; bottom:0px; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
 			#lbl_left { text-align:left; left:0px }
@@ -30,15 +14,13 @@
 			.g { color:#aaa }
 			.c { color:#fa0 }
 
-			a { color:red }
-
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - texture manual mipmapping example
-			- painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - texture manual mipmapping example<br/>
+			painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
 		</div>
 
 		<div id="lbl_left" class="lbl">
@@ -61,19 +43,14 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( !Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container, stats;
+			var container;
 
 			var camera, scene1, scene2, renderer;
 
@@ -127,10 +104,10 @@
 				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
 				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );
 				textureCanvas1.mipmaps[ 3 ] = mipmap( 16, '#400' );
-				textureCanvas1.mipmaps[ 4 ] = mipmap( 8,  '#040' );
-				textureCanvas1.mipmaps[ 5 ] = mipmap( 4,  '#004' );
-				textureCanvas1.mipmaps[ 6 ] = mipmap( 2,  '#044' );
-				textureCanvas1.mipmaps[ 7 ] = mipmap( 1,  '#404' );
+				textureCanvas1.mipmaps[ 4 ] = mipmap( 8, '#040' );
+				textureCanvas1.mipmaps[ 5 ] = mipmap( 4, '#004' );
+				textureCanvas1.mipmaps[ 6 ] = mipmap( 2, '#044' );
+				textureCanvas1.mipmaps[ 7 ] = mipmap( 1, '#404' );
 				textureCanvas1.repeat.set( 1000, 1000 );
 				textureCanvas1.wrapS = THREE.RepeatWrapping;
 				textureCanvas1.wrapT = THREE.RepeatWrapping;
@@ -145,11 +122,11 @@
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
 				var meshCanvas1 = new THREE.Mesh( geometry, materialCanvas1 );
-				meshCanvas1.rotation.x = -Math.PI / 2;
-				meshCanvas1.scale.set(1000, 1000, 1000);
+				meshCanvas1.rotation.x = - Math.PI / 2;
+				meshCanvas1.scale.set( 1000, 1000, 1000 );
 
 				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
-				meshCanvas2.rotation.x = -Math.PI / 2;
+				meshCanvas2.rotation.x = - Math.PI / 2;
 				meshCanvas2.scale.set( 1000, 1000, 1000 );
 
 
@@ -186,14 +163,14 @@
 						zscene.add( meshFrame );
 
 						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
-						meshShadow.position.y = -1.1 * image.height / 2;
-						meshShadow.position.z = -1.1 * image.height / 2;
-						meshShadow.rotation.x = -Math.PI / 2;
+						meshShadow.position.y = - 1.1 * image.height / 2;
+						meshShadow.position.z = - 1.1 * image.height / 2;
+						meshShadow.rotation.x = - Math.PI / 2;
 						meshShadow.scale.x = 1.1 * image.width / 100;
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshShadow );
 
-						var floorHeight = -1.117 * image.height / 2;
+						var floorHeight = - 1.117 * image.height / 2;
 						meshCanvas1.position.y = meshCanvas2.position.y = floorHeight;
 
 					}
@@ -218,9 +195,6 @@
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				//container.appendChild( stats.dom );
-
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			}
@@ -238,16 +212,14 @@
 
 				requestAnimationFrame( animate );
 
-				stats.begin();
 				render();
-				stats.end();
 
 			}
 
 			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( -( mouseY - 200 ) - camera.position.y ) * .05;
+				camera.position.y += ( - ( mouseY - 200 ) - camera.position.y ) * .05;
 
 				camera.lookAt( scene1.position );
 

@@ -1,223 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials - hdr environment mapping</title>
+		<title>three.js webgl - postprocessing - unreal bloom</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-			a {
-				color:#00ff78;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/LuminosityHighPassShader.js"></script>
-		<script src="js/postprocessing/UnrealBloomPass.js"></script>
+		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
-			This Bloom Pass is inspired by the bloom pass of the Unreal Engine. It creates a mip map chain of bloom textures and blur them <br>
-			with different radii. Because of the weigted combination of mips, and since larger blurs are done on higher mips this bloom <br>
-			is better in quality and performance.<br>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<p>
+				This Bloom Pass is inspired by the bloom pass of the Unreal Engine. It creates a mip map chain of bloom textures and blur them
+				with different radii.<br /> Because of the weigted combination of mips, and since larger blurs are done on higher mips, this bloom
+				is better in quality and performance.
+			</p>
+			Model: <a href="https://blog.sketchfab.com/art-spotlight-primary-ion-drive/" target="_blank" rel="noopener">Primary Ion Drive</a> by
+			<a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a>, CC Attribution.
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
-			var container, stats;
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
+
+			var scene, camera, controls, pointLight, stats;
+			var composer, renderer, mixer;
+
 			var params = {
-				projection: 'normal',
-				background: false,
-				exposure: 0.9,
+				exposure: 1,
 				bloomStrength: 1.5,
-				bloomThreshold: 0.85,
-				bloomRadius: 0.4
+				bloomThreshold: 0,
+				bloomRadius: 0
 			};
-			var camera, scene, renderer, controls, objects = [];
-			var effectFXAA, bloomPass, renderScene;
-			var hdrCubeMap;
-			var composer;
-			var standardMaterial;
-			var hdrCubeRenderTarget;
 
-			init();
-			animate();
+			var clock = new THREE.Clock();
+			var container = document.getElementById( 'container' );
 
-			function init() {
+			stats = new Stats();
+			container.appendChild( stats.dom );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ReinhardToneMapping;
+			container.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, 35, 35 * 3.5 );
+			scene = new THREE.Scene();
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera.position.set( - 5, 2.5, - 3.5 );
+			scene.add( camera );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.toneMapping = THREE.LinearToneMapping;
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.maxPolarAngle = Math.PI * 0.5;
+			controls.minDistance = 1;
+			controls.maxDistance = 10;
 
-				standardMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					color: 0xffffff,
-					metalness: 1.0
-				} );
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
-				var torusMesh1 = new THREE.Mesh( geometry, standardMaterial );
-				torusMesh1.position.x = 0.0;
-				torusMesh1.castShadow = true;
-				torusMesh1.receiveShadow = true;
-				scene.add( torusMesh1 );
-				objects.push( torusMesh1 );
+			pointLight = new THREE.PointLight( 0xffffff, 1 );
+			camera.add( pointLight );
 
-				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( './textures/roughness_map.jpg', function ( map ) {
+			var renderScene = new RenderPass( scene, camera );
 
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.anisotropy = 4;
-					map.repeat.set( 9, 2 );
-					standardMaterial.roughnessMap = map;
-					standardMaterial.bumpMap = map;
-					standardMaterial.needsUpdate = true;
+			var bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			bloomPass.threshold = params.bloomThreshold;
+			bloomPass.strength = params.bloomStrength;
+			bloomPass.radius = params.bloomRadius;
 
-				} );
+			composer = new EffectComposer( renderer );
+			composer.addPass( renderScene );
+			composer.addPass( bloomPass );
 
-				var genCubeUrls = function ( prefix, postfix ) {
+			new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
 
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
+				var model = gltf.scene;
 
-				};
+				scene.add( model );
 
-				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
+				// Mesh contains self-intersecting semi-transparent faces, which display
+				// z-fighting unless depthWrite is disabled.
+				var core = model.getObjectByName( 'geo1_HoloFillDark_0' );
+				core.material.depthWrite = false;
 
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update( renderer );
+				mixer = new THREE.AnimationMixer( model );
+				var clip = gltf.animations[ 0 ];
+				mixer.clipAction( clip.optimize() ).play();
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+				animate();
 
-					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+			} );
 
-				} );
+			var gui = new GUI();
 
-				// Lights
+			gui.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.1 ) );
+				renderer.toneMappingExposure = Math.pow( value, 4.0 );
 
-				var spotLight = new THREE.SpotLight( 0xffffff, 1 );
-				spotLight.position.set( 50, 100, 50 );
-				spotLight.angle = Math.PI / 7;
-				spotLight.penumbra = 0.8;
-				spotLight.castShadow = true;
-				scene.add( spotLight );
+			} );
 
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
+			gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
 
-				renderScene = new THREE.RenderPass( scene, camera );
+				bloomPass.threshold = Number( value );
 
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+			} );
 
-				bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 ); //1.0, 9, 0.5, 512);
-				bloomPass.renderToScreen = true;
+			gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.setSize( window.innerWidth, window.innerHeight );
-				composer.addPass( renderScene );
-				composer.addPass( effectFXAA );
-				composer.addPass( bloomPass );
+				bloomPass.strength = Number( value );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+			} );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+			gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 50;
-				controls.maxDistance = 200;
+				bloomPass.radius = Number( value );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+			} );
 
-				var gui = new dat.GUI();
-
-				gui.add( params, 'exposure', 0.1, 2 );
-
-				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
-
-					bloomPass.threshold = Number( value );
-
-				} );
-
-				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
-
-					bloomPass.strength = Number( value );
-
-				} );
-
-				gui.add( params, 'bloomRadius', 0.0, 1.0 ).onChange( function ( value ) {
-
-					bloomPass.radius = Number( value );
-
-				} );
-
-				gui.open();
-
-			}
-
-			function onWindowResize() {
+			window.onresize = function () {
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
@@ -227,55 +138,19 @@
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-			}
+			};
 
-			//
 
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				stats.begin();
-				render();
-				stats.end();
+				const delta = clock.getDelta();
 
-			}
+				mixer.update( delta );
 
-			function render() {
-
-				if ( standardMaterial !== undefined ) {
-
-					standardMaterial.roughness = 1.0;
-					standardMaterial.bumpScale = 0.25;
-
-					var newEnvMap = standardMaterial.envMap;
-
-					if ( hdrCubeRenderTarget ) newEnvMap = hdrCubeRenderTarget.texture;
-
-					if ( newEnvMap !== standardMaterial.envMap ) {
-
-						standardMaterial.envMap = newEnvMap;
-						standardMaterial.envMapIntensity = 1;
-						standardMaterial.needsUpdate = true;
-
-					}
-
-				}
-
-				renderer.toneMappingExposure = Math.pow( params.exposure, 4.0 );
-
-				var timer = Date.now() * 0.00025;
-
-				camera.lookAt( scene.position );
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
-					object.rotation.y += 0.005;
-
-				}
+				stats.update();
 
 				composer.render();
 
@@ -284,4 +159,5 @@
 		</script>
 
 	</body>
+
 </html>

@@ -4,54 +4,22 @@
 		<title>three.js webgl - PLY</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: skyblue }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				float: left;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			PLY loader test by <a href="https://github.com/menway">Wei Meng</a>. Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
+			PLY loader test by <a href="https://github.com/menway" target="_blank" rel="noopener">Wei Meng</a>.<br/>
+			Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/PLYLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
 			var container, stats;
 
@@ -68,7 +36,7 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.15, 3 );
 
-				cameraTarget = new THREE.Vector3( 0, -0.1, 0 );
+				cameraTarget = new THREE.Vector3( 0, - 0.1, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x72645b );
@@ -81,8 +49,8 @@
 					new THREE.PlaneBufferGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
-				plane.rotation.x = -Math.PI/2;
-				plane.position.y = -0.5;
+				plane.rotation.x = - Math.PI / 2;
+				plane.position.y = - 0.5;
 				scene.add( plane );
 
 				plane.receiveShadow = true;
@@ -90,7 +58,7 @@
 
 				// PLY file
 
-				var loader = new THREE.PLYLoader();
+				var loader = new PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -99,7 +67,7 @@
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
-					mesh.position.z =   0.3;
+					mesh.position.z = 0.3;
 					mesh.rotation.x = - Math.PI / 2;
 					mesh.scale.multiplyScalar( 0.001 );
 
@@ -134,7 +102,7 @@
 				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
+				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
 
 				// renderer
 
@@ -169,10 +137,10 @@
 				directionalLight.castShadow = true;
 
 				var d = 1;
-				directionalLight.shadow.camera.left = -d;
+				directionalLight.shadow.camera.left = - d;
 				directionalLight.shadow.camera.right = d;
 				directionalLight.shadow.camera.top = d;
-				directionalLight.shadow.camera.bottom = -d;
+				directionalLight.shadow.camera.bottom = - d;
 
 				directionalLight.shadow.camera.near = 1;
 				directionalLight.shadow.camera.far = 4;
@@ -180,7 +148,7 @@
 				directionalLight.shadow.mapSize.width = 1024;
 				directionalLight.shadow.mapSize.height = 1024;
 
-				directionalLight.shadow.bias = -0.001;
+				directionalLight.shadow.bias = - 0.001;
 
 			}
 

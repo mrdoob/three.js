@@ -87,7 +87,7 @@ THREE.LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsG
 
 	},
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 

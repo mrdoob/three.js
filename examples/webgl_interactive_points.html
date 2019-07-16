@@ -4,37 +4,12 @@
 		<title>three.js webgl - interactive particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-			}
-			a {
-				color: #fff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -60,7 +35,7 @@
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
 			uniform vec3 color;
-			uniform sampler2D texture;
+			uniform sampler2D pointTexture;
 
 			varying vec3 vColor;
 
@@ -68,7 +43,7 @@
 
 				gl_FragColor = vec4( color * vColor, 1.0 );
 
-				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
 
 				if ( gl_FragColor.a < ALPHATEST ) discard;
 
@@ -76,14 +51,15 @@
 
 		</script>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
 
 			var renderer, scene, camera, stats;
 
-			var particles, uniforms;
+			var particles;
 
 			var PARTICLE_SIZE = 20;
 
@@ -104,8 +80,7 @@
 
 				//
 
-				var geometry1 = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 );
-				var vertices = geometry1.vertices;
+				var vertices = new THREE.BoxGeometry( 200, 200, 200, 16, 16, 16 ).vertices;
 
 				var positions = new Float32Array( vertices.length * 3 );
 				var colors = new Float32Array( vertices.length * 3 );
@@ -136,8 +111,8 @@
 				var material = new THREE.ShaderMaterial( {
 
 					uniforms: {
-						color:   { value: new THREE.Color( 0xffffff ) },
-						texture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
+						color: { value: new THREE.Color( 0xffffff ) },
+						pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

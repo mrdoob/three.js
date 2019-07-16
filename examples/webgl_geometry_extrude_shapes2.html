@@ -1,46 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - extrude shapes from geodata</title>
+		<title>three.js webgl - geometry - shapes extrusion via geodata</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
-		a {
-			color: #ffffff;
-		}
+			body {
+				color: #fff;
+			}
 		</style>
 	</head>
-
 	<body>
-
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Shapes Extrusion via Geo Data
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shapes extrusion via geodata
 		</div>
 
-		<script type="text/javascript" src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
 			// From d3-threeD.js
 			/* This Source Code Form is subject to the terms of the Mozilla Public
 			 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -48,7 +32,7 @@
 
 			function d3threeD( exports ) {
 
-				var DEGS_TO_RADS = Math.PI / 180, UNIT_SIZE = 100;
+				var DEGS_TO_RADS = Math.PI / 180;
 				var DIGIT_0 = 48, DIGIT_9 = 57, COMMA = 44, SPACE = 32, PERIOD = 46, MINUS = 45;
 
 				exports.transformSVGPath = function transformSVGPath( pathStr ) {
@@ -237,8 +221,10 @@
 
 							case 'T':
 								if ( activeCmd === 'T' ) {
+
 									x1 = 2 * x - x1;
 									y1 = 2 * y - y1;
+
 								}
 								nx = eatNum();
 								ny = eatNum();
@@ -292,7 +278,7 @@
 								if ( laf === sf ) norm = - norm;
 
 								x2 = norm * rx * y1 / ry;
-								y2 = norm * -ry * x1 / rx;
+								y2 = norm * - ry * x1 / rx;
 
 								// step 3
 
@@ -338,7 +324,7 @@
 
 					return path;
 
-				}
+				};
 
 			}
 
@@ -348,7 +334,7 @@
 			/// Part from g0v/twgeojson
 			/// Graphic Engine and Geo Data Init Functions
 
-			var addGeoObject = function( group, svgObject ) {
+			var addGeoObject = function ( group, svgObject ) {
 
 				var paths = svgObject.paths;
 				var depths = svgObject.depths;
@@ -443,7 +429,7 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -490,10 +476,10 @@
 					"M363.4600,128.3904 L366.6300,130.3829 L369.3732,129.3913 L369.5603,125.6695 L374.3989,125.1677 " +
 					"L370.8412,123.6440 L371.0684,118.8252 L369.0431,117.3157 L369.6882,115.7936 L367.8578,112.8749 " +
 					"L368.1217,110.4867 L366.5152,109.2554 L361.9554,112.3435 L358.1163,117.8678 L361.7218,120.2192 " +
-					"L360.7261,126.3232 L362.8064,125.5221 Z"];
+					"L360.7261,126.3232 L362.8064,125.5221 Z" ];
 
 				obj.depths = [ 19, 20, 21 ];
-				obj.colors =  [ 0xC07000, 0xC08000, 0xC0A000 ];
+				obj.colors = [ 0xC07000, 0xC08000, 0xC0A000 ];
 				obj.center = { x: 365, y: 125 };
 
 				return obj;

@@ -4,37 +4,19 @@
 		<title>three.js webgl - loaders - Babylon loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - BabylonLoader test
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Babylon loader
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/BabylonLoader.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { BabylonLoader } from './jsm/loaders/BabylonLoader.js';
 
 			var camera, controls, scene, renderer;
 
@@ -44,8 +26,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 100;
-
-				controls = new THREE.TrackballControls( camera );
 
 				// scene
 
@@ -60,28 +40,25 @@
 
 				};
 
-				var texture = new THREE.Texture();
-
-				var material = new THREE.MeshBasicMaterial( { color: 'red' } );
-
 				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
-					}
-				};
 
-				var onError = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+
+					}
+
 				};
 
 				// model
 
-				var loader = new THREE.BabylonLoader( manager );
+				var loader = new BabylonLoader( manager );
 				loader.load( 'models/babylon/skull.babylon', function ( babylonScene ) {
 
 					babylonScene.traverse( function ( object ) {
 
-						if ( object instanceof THREE.Mesh ) {
+						if ( object.isMesh ) {
 
 							object.material = new THREE.MeshPhongMaterial( {
 								color: Math.random() * 0xffffff
@@ -95,7 +72,7 @@
 
 					animate();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				//
 
@@ -103,6 +80,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				//
+
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				//
 

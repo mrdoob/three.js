@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>矩阵变换（[name]）</h1>
+
+		<p>
+				Three.js使用*matrix*编码3D变换 —— 平移（位置），旋转和缩放。
+				[page:Object3D]的每个实例都有一个[page:Object3D.matrix matrix]，用于存储该对象的位置，旋转和比例。本页介绍如何更新对象的变换。
+		</p>
+
+		<h2>便利的属性和*matrixAutoUpdate*（Convenience properties and *matrixAutoUpdate*）</h2>
+
+		有两种方法可以更新对象的转换：
+		<ol>
+			<li>
+				修改对象的*position*，*quaternion*和*scale*属性，让three.js重新计算来自这些属性的对象矩阵：
+				<code>
+object.position.copy( start_position );
+object.quaternion.copy( quaternion );
+				</code>
+				默认情况下，*matrixAutoUpdate*属性设置为true，并且将自动重新计算矩阵。
+如果对象是静态的，或者您希望在重新计算时手动控制，则可以通过将属性设置为false来获得更好的性能：
+				<code>
+object.matrixAutoUpdate = false;
+				</code>
+				更改任何属性后，手动更新矩阵：
+				<code>
+object.updateMatrix();
+				</code>
+			</li>
+			<li>
+				直接修改对象的矩阵。 [page：Matrix4]类有各种修改矩阵的方法：
+				<code>
+object.matrix.setRotationFromQuaternion( quaternion );
+object.matrix.setPosition( start_position );
+object.matrixAutoUpdate = false;
+				</code>
+				请注意，在这种情况下，*matrixAutoUpdate* <em> 必须 </em>设置为*false*，并且您应该确保<em> 不 </em>调用*updateMatrix*。
+				调用*updateMatrix*将破坏对矩阵所做的手动更改，从*position*，*scale*重新计算矩阵，依此类推。
+			</li>
+		</ol>
+
+		<h2>对象和世界矩阵（Object and world matrices）</h2>
+		<p>
+		一个对象的[page:Object3D.matrix matrix]存储了该对象<em> 相对于 </em>其[page:Object3D.parent]（父节点）的变换。要在<em> 世界 </em>坐标系中获取对象的转换，您必须访问该对象的[page:Object3D.matrixWorld]。
+		</p>
+		<p>
+		当父对象或子对象的变换发生更改时，可以通过调用[page:Object3D.updateMatrixWorld updateMatrixWorld()]来请求更新子对象的[page:Object3D.matrixWorld matrixWorld]。
+		</p>
+
+		<h2>旋转和四元数（Rotation and Quaternion）</h2>
+		<p>
+		Three.js提供了两种表示3D旋转的方式：[page:Euler Euler angles]（欧拉角）和[page：Quaternion Quaternions]（四元数），以及两者之间的转换方法。 欧拉角有称为“万向节锁定”的问题，其中某些配置可能失去一定程度的自由度（防止物体绕一个轴旋转）。 因此，对象旋转<em> 始终 </em>存储在对象的[page:Object3D.quaternion quaternion]中。
+		</p>
+		<p>
+		该库的早期版本包含*useQuaternion*属性，当设置为false时，将导致对象的[page:Object3D.matrix matrix]从欧拉角计算。这种做法已被弃用 - 作为代替，您应该使用[page:Object3D.setRotationFromEuler setRotationFromEuler]方法，该方法将更新四元数。
+		</p>
+
+	</body>
+</html>

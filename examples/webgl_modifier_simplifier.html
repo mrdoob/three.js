@@ -4,25 +4,17 @@
 		<title>three.js webgl - modifier - Subdivisions using Loop Subdivision Scheme</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/modifiers/SimplifyModifier.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { SimplifyModifier } from './jsm/modifiers/SimplifyModifier.js';
 
 			var renderer, scene, camera;
 
@@ -48,7 +40,7 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 15;
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.enablePan = false;
 				controls.enableZoom = false;
@@ -59,25 +51,24 @@
 				camera.add( light );
 				scene.add( camera );
 
-				new THREE.JSONLoader().load( "models/json/leeperrysmith/LeePerrySmith.json", function ( geometry ) {
+				new GLTFLoader().load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xAEAED5, shininess: 1 } );
-
-					var mesh = new THREE.Mesh( geometry, material );
+					var mesh = gltf.scene.children[ 0 ];
 					mesh.position.x = - 3;
 					mesh.rotation.y = Math.PI / 2;
 					scene.add( mesh );
 
-					var modifer = new THREE.SimplifyModifier();
+					var modifier = new SimplifyModifier();
 
-					var simplified = modifer.modify( geometry, Math.floor( geometry.vertices.length * 0.9375 ) ); // number of vertices to remove
+					var simplified = mesh.clone();
+					simplified.material = simplified.material.clone();
+					simplified.material.flatShading = true;
+					var count = Math.floor( simplified.geometry.attributes.position.count * 0.875 ); // number of vertices to remove
+					simplified.geometry = modifier.modify( simplified.geometry, count );
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xAEAED5, shininess: 1, flatShading: true } );
-
-					var mesh = new THREE.Mesh( simplified, material );
-					mesh.position.x = 3;
-					mesh.rotation.y = - Math.PI / 2;
-					scene.add( mesh );
+					simplified.position.x = 3;
+					simplified.rotation.y = - Math.PI / 2;
+					scene.add( simplified );
 
 					render();
 

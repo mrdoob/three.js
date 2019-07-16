@@ -104,17 +104,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
 
-				this.morphTargetInfluences = [];
-				this.morphTargetDictionary = {};
-
-				for ( m = 0, ml = morphTargets.length; m < ml; m ++ ) {
-
-					name = morphTargets[ m ].name || String( m );
-
-					this.morphTargetInfluences.push( 0 );
-					this.morphTargetDictionary[ name ] = m;
-
-				}
+				console.error( 'THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 
@@ -136,28 +126,16 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var tempB = new Vector3();
 		var tempC = new Vector3();
 
+		var morphA = new Vector3();
+		var morphB = new Vector3();
+		var morphC = new Vector3();
+
 		var uvA = new Vector2();
 		var uvB = new Vector2();
 		var uvC = new Vector2();
 
-		var barycoord = new Vector3();
-
 		var intersectionPoint = new Vector3();
 		var intersectionPointWorld = new Vector3();
-
-		function uvIntersection( point, p1, p2, p3, uv1, uv2, uv3 ) {
-
-			Triangle.getBarycoord( point, p1, p2, p3, barycoord );
-
-			uv1.multiplyScalar( barycoord.x );
-			uv2.multiplyScalar( barycoord.y );
-			uv3.multiplyScalar( barycoord.z );
-
-			uv1.add( uv2 ).add( uv3 );
-
-			return uv1.clone();
-
-		}
 
 		function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
@@ -190,11 +168,42 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkBufferGeometryIntersection( object, material, raycaster, ray, position, uv, a, b, c ) {
+		function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, uv, a, b, c ) {
 
 			vA.fromBufferAttribute( position, a );
 			vB.fromBufferAttribute( position, b );
 			vC.fromBufferAttribute( position, c );
+
+			var morphInfluences = object.morphTargetInfluences;
+
+			if ( material.morphTargets && morphPosition && morphInfluences ) {
+
+				morphA.set( 0, 0, 0 );
+				morphB.set( 0, 0, 0 );
+				morphC.set( 0, 0, 0 );
+
+				for ( var i = 0, il = morphPosition.length; i < il; i ++ ) {
+
+					var influence = morphInfluences[ i ];
+					var morphAttribute = morphPosition[ i ];
+
+					if ( influence === 0 ) continue;
+
+					tempA.fromBufferAttribute( morphAttribute, a );
+					tempB.fromBufferAttribute( morphAttribute, b );
+					tempC.fromBufferAttribute( morphAttribute, c );
+
+					morphA.addScaledVector( tempA.sub( vA ), influence );
+					morphB.addScaledVector( tempB.sub( vB ), influence );
+					morphC.addScaledVector( tempC.sub( vC ), influence );
+
+				}
+
+				vA.add( morphA );
+				vB.add( morphB );
+				vC.add( morphC );
+
+			}
 
 			var intersection = checkIntersection( object, material, raycaster, ray, vA, vB, vC, intersectionPoint );
 
@@ -206,7 +215,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					uvB.fromBufferAttribute( uv, b );
 					uvC.fromBufferAttribute( uv, c );
 
-					intersection.uv = uvIntersection( intersectionPoint, vA, vB, vC, uvA, uvB, uvC );
+					intersection.uv = Triangle.getUV( intersectionPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() );
 
 				}
 
@@ -258,6 +267,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				var a, b, c;
 				var index = geometry.index;
 				var position = geometry.attributes.position;
+				var morphPosition = geometry.morphAttributes.position;
 				var uv = geometry.attributes.uv;
 				var groups = geometry.groups;
 				var drawRange = geometry.drawRange;
@@ -285,11 +295,12 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 								b = index.getX( j + 1 );
 								c = index.getX( j + 2 );
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, morphPosition, uv, a, b, c );
 
 								if ( intersection ) {
 
 									intersection.faceIndex = Math.floor( j / 3 ); // triangle number in indexed buffer semantics
+									intersection.face.materialIndex = group.materialIndex;
 									intersects.push( intersection );
 
 								}
@@ -309,7 +320,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = index.getX( i + 1 );
 							c = index.getX( i + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, morphPosition, uv, a, b, c );
 
 							if ( intersection ) {
 
@@ -342,11 +353,12 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 								b = j + 1;
 								c = j + 2;
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, uv, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, morphPosition, uv, a, b, c );
 
 								if ( intersection ) {
 
 									intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
+									intersection.face.materialIndex = group.materialIndex;
 									intersects.push( intersection );
 
 								}
@@ -366,7 +378,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = i + 1;
 							c = i + 2;
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, uv, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, morphPosition, uv, a, b, c );
 
 							if ( intersection ) {
 
@@ -404,39 +416,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					fvB = vertices[ face.b ];
 					fvC = vertices[ face.c ];
 
-					if ( faceMaterial.morphTargets === true ) {
-
-						var morphTargets = geometry.morphTargets;
-						var morphInfluences = this.morphTargetInfluences;
-
-						vA.set( 0, 0, 0 );
-						vB.set( 0, 0, 0 );
-						vC.set( 0, 0, 0 );
-
-						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
-
-							var influence = morphInfluences[ t ];
-
-							if ( influence === 0 ) continue;
-
-							var targets = morphTargets[ t ].vertices;
-
-							vA.addScaledVector( tempA.subVectors( targets[ face.a ], fvA ), influence );
-							vB.addScaledVector( tempB.subVectors( targets[ face.b ], fvB ), influence );
-							vC.addScaledVector( tempC.subVectors( targets[ face.c ], fvC ), influence );
-
-						}
-
-						vA.add( fvA );
-						vB.add( fvB );
-						vC.add( fvC );
-
-						fvA = vA;
-						fvB = vB;
-						fvC = vC;
-
-					}
-
 					intersection = checkIntersection( this, faceMaterial, raycaster, ray, fvA, fvB, fvC, intersectionPoint );
 
 					if ( intersection ) {
@@ -448,7 +427,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							uvB.copy( uvs_f[ 1 ] );
 							uvC.copy( uvs_f[ 2 ] );
 
-							intersection.uv = uvIntersection( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC );
+							intersection.uv = Triangle.getUV( intersectionPoint, fvA, fvB, fvC, uvA, uvB, uvC, new Vector2() );
 
 						}
 

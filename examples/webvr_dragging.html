@@ -4,31 +4,20 @@
 		<title>three.js webvr - dragging</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-08-30 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-08-30" content="Ag80lPFLAvRyqP2W5I5XBzACxrTAQTWa3cXebXzq+WzW66nlQa6lvejGg1gdAMrzYbY6jUWp8g08kEnzb6svVgcAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNTYzNjYxOX0=">
-		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-08-28" content="Ag7nJS0Q6nBKfmRY1XLKHslnz73amLhaf8RoFpYz36MpMq0oa30AETLXer74BIwa3t8uDXlR0n4W9f/o674Rqw4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUzNTQxNDQwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-08-28" content="AsflqqNG2L/Eepy8xSwCYwWH5U7w3nN7Ak137jGxMeBFz9lqQVcMBqMTcMw6ZkxThB7ZM2Cn7hgPqX++ZlgC9wMAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTM1NDE0NDAwfQ==">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - dragging
+		</div>
 
-		<script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -46,14 +35,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - dragging';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x808080 );
@@ -77,9 +58,9 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 				scene.add( light );
 
@@ -142,9 +123,9 @@
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller1 );
 
-				controller2 = renderer.vr.getController( 0 );
-				controller1.addEventListener( 'selectstart', onSelectStart );
-				controller1.addEventListener( 'selectend', onSelectEnd );
+				controller2 = renderer.vr.getController( 1 );
+				controller2.addEventListener( 'selectstart', onSelectStart );
+				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
 
 				//
@@ -223,7 +204,7 @@
 				tempMatrix.identity().extractRotation( controller.matrixWorld );
 
 				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				raycaster.ray.direction.set( 0, 0, -1 ).applyMatrix4( tempMatrix );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
 				return raycaster.intersectObjects( group.children );
 

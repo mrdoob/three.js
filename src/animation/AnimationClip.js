@@ -31,8 +31,6 @@ function AnimationClip( name, duration, tracks ) {
 
 	}
 
-	this.optimize();
-
 }
 
 function getTrackTypeForValueTypeName( typeName ) {
@@ -407,6 +405,8 @@ Object.assign( AnimationClip.prototype, {
 
 		this.duration = duration;
 
+		return this;
+
 	},
 
 	trim: function () {
@@ -421,6 +421,20 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
+	validate: function () {
+
+		var valid = true;
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			valid = valid && this.tracks[ i ].validate();
+
+		}
+
+		return valid;
+
+	},
+
 	optimize: function () {
 
 		for ( var i = 0; i < this.tracks.length; i ++ ) {
@@ -430,6 +444,21 @@ Object.assign( AnimationClip.prototype, {
 		}
 
 		return this;
+
+	},
+
+
+	clone: function () {
+
+		var tracks = [];
+
+		for ( var i = 0; i < this.tracks.length; i ++ ) {
+
+			tracks.push( this.tracks[ i ].clone() );
+
+		}
+
+		return new AnimationClip( this.name, this.duration, tracks );
 
 	}
 

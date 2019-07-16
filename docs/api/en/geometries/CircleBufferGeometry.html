@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">This is the [page:BufferGeometry] port of [page:CircleGeometry].</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CircleBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+		<code>
+		var geometry = new THREE.CircleBufferGeometry( 5, 32 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var circle = new THREE.Mesh( geometry, material );
+		scene.add( circle );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		radius — Radius of the circle, default = 1.<br />
+		segments — Number of segments (triangles), minimum = 3, default = 8.<br />
+		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
+		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/CircleGeometry.js src/geometries/CircleGeometry.js]
+	</body>
+</html>

@@ -6,16 +6,47 @@
  *	http://code.google.com/p/js-openctm/
  *
  * @author alteredq / http://alteredqualia.com/
+ *
+ * OpenCTM LICENSE:
+ *
+ * Copyright (c) 2009-2010 Marcus Geelnard
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ *     1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
+ *
+ *    2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ *
+ *    3. This notice may not be removed or altered from any source
+ *    distribution.
+ *
  */
+
+/* global CTM */
 
 THREE.CTMLoader = function () {
 
-	THREE.Loader.call( this );
+	this.workerPath = null;
 
 };
 
-THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
 THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
+
+THREE.CTMLoader.prototype.setWorkerPath = function ( workerPath ) {
+
+	this.workerPath = workerPath;
+
+};
 
 // Load multiple CTM parts defined in JSON
 
@@ -58,7 +89,7 @@ THREE.CTMLoader.prototype.loadParts = function ( url, callback, parameters ) {
 
 				for ( var i = 0; i < jsonObject.materials.length; i ++ ) {
 
-					materials[ i ] = scope.createMaterial( jsonObject.materials[ i ], basePath );
+					materials[ i ] = THREE.Loader.prototype.createMaterial( jsonObject.materials[ i ], basePath );
 
 				}
 
@@ -110,7 +141,7 @@ THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
 
 				if ( parameters.useWorker ) {
 
-					var worker = parameters.worker || new Worker( 'js/loaders/ctm/CTMWorker.js' );
+					var worker = parameters.worker || new Worker( scope.workerPath );
 
 					worker.onmessage = function ( event ) {
 
@@ -123,7 +154,7 @@ THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
 							var e1 = Date.now();
 							// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
 
-							scope.createModel( ctmFile, callback );
+							scope._createGeometry( ctmFile, callback );
 
 							var e = Date.now();
 							console.log( "model load time [worker]: " + ( e - e1 ) + " ms, total: " + ( e - s ) );
@@ -144,7 +175,7 @@ THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
 
 						var ctmFile = new CTM.File( stream );
 
-						scope.createModel( ctmFile, callback );
+						scope._createGeometry( ctmFile, callback );
 
 					}
 
@@ -189,63 +220,52 @@ THREE.CTMLoader.prototype.load = function ( url, callback, parameters ) {
 };
 
 
-THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
+THREE.CTMLoader.prototype._createGeometry = function ( file, callback ) {
 
-	var Model = function () {
+	var geometry = new THREE.BufferGeometry();
 
-		THREE.BufferGeometry.call( this );
+	var indices = file.body.indices;
+	var positions = file.body.vertices;
+	var normals = file.body.normals;
 
-		this.materials = [];
+	var uvs, colors;
 
-		var indices = file.body.indices;
-		var positions = file.body.vertices;
-		var normals = file.body.normals;
+	var uvMaps = file.body.uvMaps;
 
-		var uvs, colors;
+	if ( uvMaps !== undefined && uvMaps.length > 0 ) {
 
-		var uvMaps = file.body.uvMaps;
+		uvs = uvMaps[ 0 ].uv;
 
-		if ( uvMaps !== undefined && uvMaps.length > 0 ) {
+	}
 
-			uvs = uvMaps[ 0 ].uv;
+	var attrMaps = file.body.attrMaps;
 
-		}
+	if ( attrMaps !== undefined && attrMaps.length > 0 && attrMaps[ 0 ].name === 'Color' ) {
 
-		var attrMaps = file.body.attrMaps;
+		colors = attrMaps[ 0 ].attr;
 
-		if ( attrMaps !== undefined && attrMaps.length > 0 && attrMaps[ 0 ].name === 'Color' ) {
+	}
 
-			colors = attrMaps[ 0 ].attr;
+	geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-		}
+	if ( normals !== undefined ) {
 
-		this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-		this.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+		geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
-		if ( normals !== undefined ) {
+	}
 
-			this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	if ( uvs !== undefined ) {
 
-		}
+		geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
-		if ( uvs !== undefined ) {
+	}
 
-			this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	if ( colors !== undefined ) {
 
-		}
+		geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
 
-		if ( colors !== undefined ) {
-
-			this.addAttribute( 'color', new THREE.BufferAttribute( colors, 4 ) );
-
-		}
-
-	};
-
-	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
-	Model.prototype.constructor = Model;
-
-	var geometry = new Model();
+	}
 
 	// compute vertex normals if not present in the CTM model
 	if ( geometry.attributes.normal === undefined ) {

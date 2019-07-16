@@ -3,8 +3,6 @@
 		"type": "App"
 	},
 	"project": {
-		"gammaInput": true,
-		"gammaOutput": true,
 		"shadows": true,
 		"vr": false
 	},
@@ -39,7 +37,7 @@
 		"geometries": [
 			{
 				"uuid": "BBEE74D1-E43D-4C32-A9F3-4656E78C26F3",
-				"type": "PlaneGeometry",
+				"type": "PlaneBufferGeometry",
 				"width": 30,
 				"height": 40,
 				"widthSegments": 1,
@@ -47,7 +45,7 @@
 			},
 			{
 				"uuid": "C1722F5F-89AD-45D8-B78C-D1D34AF2A012",
-				"type": "BoxGeometry",
+				"type": "BoxBufferGeometry",
 				"width": 2,
 				"height": 1,
 				"depth": 1,
@@ -57,7 +55,7 @@
 			},
 			{
 				"uuid": "327EFFCF-649C-4EF3-86D4-B422C5A86E89",
-				"type": "CylinderGeometry",
+				"type": "CylinderBufferGeometry",
 				"radiusTop": 0.5,
 				"radiusBottom": 0.5,
 				"height": 2,
@@ -67,7 +65,7 @@
 			},
 			{
 				"uuid": "0791211B-BB02-4E57-82B5-64C05DE92B39",
-				"type": "SphereGeometry",
+				"type": "SphereBufferGeometry",
 				"radius": 0.5,
 				"widthSegments": 32,
 				"heightSegments": 16,
@@ -78,7 +76,7 @@
 			},
 			{
 				"uuid": "73F12A47-9EA7-47FD-BCF3-89B8219B2626",
-				"type": "BoxGeometry",
+				"type": "BoxBufferGeometry",
 				"width": 2,
 				"height": 1,
 				"depth": 1,
@@ -88,7 +86,7 @@
 			},
 			{
 				"uuid": "3BDEB9FB-BDD4-44AD-8A47-008BED1C8982",
-				"type": "CylinderGeometry",
+				"type": "CylinderBufferGeometry",
 				"radiusTop": 0.5,
 				"radiusBottom": 0.5,
 				"height": 2,
@@ -272,7 +270,7 @@
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
 				"name": "Game Logic",
-				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\npaddle.material.visible = false;\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.position.x = i * 2.2 - 12;\n\t\tobject.position.z = j * 1.4 - 12;\n\t\tgroup.add( object );\n\n\t\tvar cylinder = object.getObjectByName( 'Cylinder' );\n\t\tcylinder.material = material;\n\n\t}\n\t\n}\n\nbrick.visible = false;\nbrick.material.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 15 || ball.position.x > 15 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 20 || ball.position.z > 20 ) direction.z = - direction.z;\n\n\tball.position.x = Math.max( - 15, Math.min( 15, ball.position.x ) );\n\tball.position.z = Math.max( - 20, Math.min( 20, ball.position.z ) );\n\t\n\tball.position.add( speed.copy( direction ).multiplyScalar( event.delta / 40 ) );\n\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 0.5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n}"
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\npaddle.material.visible = false;\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.position.x = i * 2.2 - 12;\n\t\tobject.position.z = j * 1.4 - 12;\n\t\tgroup.add( object );\n\n\t\tvar cylinder = object.getObjectByName( 'Cylinder' );\n\t\tcylinder.material = material;\n\n\t}\n\t\n}\n\nbrick.visible = false;\nbrick.material.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 15 || ball.position.x > 15 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 20 || ball.position.z > 20 ) direction.z = - direction.z;\n\n\tball.position.x = Math.max( - 15, Math.min( 15, ball.position.x ) );\n\tball.position.z = Math.max( - 20, Math.min( 20, ball.position.z ) );\n\t\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 0.5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tball.position.add( speed.copy( direction ).multiplyScalar( event.delta / 40 ) );\n\t\n}"
 			}]
 	}
 }

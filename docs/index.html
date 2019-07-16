@@ -2,27 +2,40 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js / documentation</title>
+		<title>three.js docs</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="index.css">
+		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<!-- console sandbox -->
+		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
+		<div id="panel" class="">
 
-		<div id="panel" class="collapsed">
+			<div id="header">
+				<h1><a href="http://threejs.org">three.js</a></h1>
 
-			<h1><a href="http://threejs.org">three.js</a> / docs</h1>
+				<div id="sections">
+					<span class="selected">docs</span>
+					<a href="../examples/#webgl_animation_cloth">examples</a>
+				</div>
 
-			<a id="expandButton" href="#">
-				<span></span>
-				<span></span>
-				<span></span>
-			</a>
-
-			<div class="filterBlock" >
-				<input type="text" id="filterInput" placeholder="Type to filter" autocorrect="off" autocapitalize="off" spellcheck="false">
-				<a href="#" id="clearFilterButton">x</a>
+				<div id="expandButton"></div>
 			</div>
-			<div id="content"></div>
+
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="exitSearchButton"></div>
+					<select id="language">
+						<option value="en">en</option>
+						<option value="zh">zh</option>
+					</select>
+				</div>
+				<div id="content"></div>
+			</div>
 
 		</div>
 
@@ -32,16 +45,63 @@
 
 		<script>
 
+			var hash = window.location.hash.substring( 1 );
+
+			// Localisation
+
+			var language = 'en';
+
+			if ( /^(api|manual|examples)/.test( hash ) ) {
+
+				var hashLanguage = /^(api|manual|examples)\/(en|zh)\//.exec( hash );
+
+				if ( hashLanguage === null ) {
+
+					// Route old non-localised api links
+
+					window.location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
+
+				} else {
+
+					language = hashLanguage[ 2 ];
+
+				}
+
+			}
+
+			//
+
+			var languageSelect = document.getElementById( 'language' );
+			languageSelect.value = language;
+			languageSelect.addEventListener( 'change', function ( event ) {
+
+				setLanguage( this.value );
+
+			} );
+
+			function setLanguage( value ) {
+
+				language = value;
+
+				createNavigation();
+				updateFilter();
+				autoChangeUrlLanguage( language );
+
+			}
+
 			var panel = document.getElementById( 'panel' );
 			var content = document.getElementById( 'content' );
-			var clearFilterButton = document.getElementById( 'clearFilterButton' );
 			var expandButton = document.getElementById( 'expandButton' );
-			var filterInput = document.getElementById( 'filterInput' );
+			var exitSearchButton = document.getElementById( 'exitSearchButton' );
+			var panelScrim = document.getElementById( 'panelScrim' );
+			var filterInput = document.getElementById( 'filter' );
 			var iframe = document.querySelector( 'iframe' );
 
 			var pageProperties = {};
 			var titles = {};
 			var categoryElements = [];
+
+			var navigation;
 
 
 			// Functionality for hamburger button (on small devices)
@@ -49,27 +109,43 @@
 			expandButton.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.classList.toggle( 'collapsed' );
+				panel.classList.toggle( 'open' );
+
+			};
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
 
 			};
 
 
 			// Functionality for search/filter input field
+			filterInput.onfocus = function ( event ) {
+
+				panel.classList.add('searchFocused');
+
+			}
+
+			filterInput.onblur = function ( event ) {
+
+				if(filterInput.value === '') {
+					panel.classList.remove('searchFocused');
+				}
+
+			}
+
+			exitSearchButton.onclick = function( event ) {
+
+				filterInput.value = '';
+				updateFilter();
+				panel.classList.remove('searchFocused');
+
+			}
 
 			filterInput.oninput = function ( event ) {
 
-				updateFilter();
-
-			};
-
-
-			// Functionality for filter clear button
-
-			clearFilterButton.onclick = function ( event ) {
-
-				event.preventDefault();
-
-				filterInput.value = '';
 				updateFilter();
 
 			};
@@ -93,8 +169,19 @@
 				link.setAttribute( 'target', 'viewer' );
 				link.addEventListener( 'click', function ( event ) {
 
+					if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
 					window.location.hash = pageURL;
-					panel.classList.add( 'collapsed' );
+					panel.classList.remove( 'open' );
+
+
+					content.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+						item.classList.remove( 'selected' );
+
+					} );
+
+					link.classList.add('selected');
 
 				} );
 
@@ -104,16 +191,24 @@
 
 			function createNavigation() {
 
+				if ( navigation !== undefined ) {
+
+					content.removeChild( navigation );
+
+				}
+
 				// Create the navigation panel using data from list.js
 
-				var navigation = document.createElement( 'div' );
+				navigation = document.createElement( 'div' );
 				content.appendChild( navigation );
 
-				for ( var section in list ) {
+				var localList = list[ language ];
+
+				for ( var section in localList ) {
 
 					// Create sections
 
-					var categories = list[ section ];
+					var categories = localList[ section ];
 
 					var sectionHead = document.createElement( 'h2' );
 					sectionHead.textContent = section;
@@ -140,6 +235,8 @@
 							// Create page links
 
 							var pageURL = pages[ pageName ];
+
+							// Localisation
 
 							var listElement = document.createElement( 'li' );
 							categoryContent.appendChild( listElement );
@@ -169,6 +266,19 @@
 					}
 
 				}
+
+			}
+
+			// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+
+			function autoChangeUrlLanguage( language ) {
+
+				var hash = location.hash;
+				if ( hash === '' ) return;
+				var docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
+				var docLink = hash.substr( hash.indexOf( '/' ) + 1 );
+				docLink = docLink.substr( docLink.indexOf( '/' ) );
+				location.href = docType + language + docLink;
 
 			}
 
@@ -307,7 +417,7 @@
 				if(hash) {
 
 					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
-					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' - ';
+					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
 
 				} else {
 
@@ -318,6 +428,7 @@
 
 				document.body.replaceChild( iframe, oldIframe );
 				document.title = subtitle + 'three.js docs';
+
 
 			}
 
@@ -363,8 +474,6 @@
 
 
 		</script>
-
-		<script src="../build/three.min.js"></script> <!-- console sandbox -->
 
 	</body>
 

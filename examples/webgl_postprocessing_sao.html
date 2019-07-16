@@ -4,78 +4,29 @@
 		<title>three.js webgl - post processing - Scalable Ambient Occlusion (SAO)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color:#00ff78;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/SAOPass.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/SAOShader.js"></script>
-		<script src="js/shaders/DepthLimitedBlurShader.js"></script>
-		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Scalable Ambient Occlusion (SAO) shader by <a href="http://clara.io">Ben Houston</a> / Post-processing pass by <a href="http://ludobaka.github.io">Ludobaka</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Scalable Ambient Occlusion (SAO)<br/>
+			shader by <a href="http://clara.io">Ben Houston</a> / Post-processing pass by <a href="http://ludobaka.github.io">Ludobaka</a>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { SAOPass } from './jsm/postprocessing/SAOPass.js';
 
 			var container, stats;
 			var camera, scene, renderer;
-			var depthMaterial, saoMaterial, saoModulateMaterial, normalMaterial, vBlurMaterial, hBlurMaterial, copyMaterial;
-			var depthRenderTarget, normalRenderTarget, saoRenderTarget, beautyRenderTarget, blurIntermediateRenderTarget;
-            var composer, renderPass, saoPass, copyPass;
+			var composer, renderPass, saoPass;
 			var group;
-			var params = {
-				output: 0,
-				saoBias: 0.5,
-				saoIntensity: 0.25,
-				saoScale: 1,
-				saoKernelRadius: 100,
-				saoMinResolution: 0,
-				saoBlur: true,
-				saoBlurRadius: 12,
-				saoBlurStdDev: 6,
-				saoBlurDepthCutoff: 0.01
-			}
-			var supportsDepthTextureExtension = false;
-			var isWebGL2 = false;
 
 			init();
 			animate();
@@ -105,20 +56,20 @@
 
 				var light = new THREE.PointLight( 0xddffdd, 0.8 );
 				light.position.z = 70;
-				light.position.y = -70;
-				light.position.x = -70;
+				light.position.y = - 70;
+				light.position.x = - 70;
 				scene.add( light );
 
 				var light2 = new THREE.PointLight( 0xffdddd, 0.8 );
 				light2.position.z = 70;
-				light2.position.x = -70;
+				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
 				var light3 = new THREE.PointLight( 0xddddff, 0.8 );
 				light3.position.z = 70;
 				light3.position.x = 70;
-				light3.position.y = -70;
+				light3.position.y = - 70;
 				scene.add( light3 );
 
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
@@ -149,22 +100,25 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				composer = new THREE.EffectComposer( renderer );
-				renderPass = new THREE.RenderPass( scene, camera );
+				composer = new EffectComposer( renderer );
+				renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
-				saoPass = new THREE.SAOPass( scene, camera, false, true );
-				saoPass.renderToScreen = true;
+				saoPass = new SAOPass( scene, camera, false, true );
 				composer.addPass( saoPass );
 
 				// Init gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( saoPass.params, 'output', {
-					'Beauty': THREE.SAOPass.OUTPUT.Beauty,
-					'Beauty+SAO': THREE.SAOPass.OUTPUT.Default,
-					'SAO': THREE.SAOPass.OUTPUT.SAO,
-					'Depth': THREE.SAOPass.OUTPUT.Depth,
-					'Normal': THREE.SAOPass.OUTPUT.Normal
-				} ).onChange( function ( value ) { saoPass.params.output = parseInt( value ); } );
+					'Beauty': SAOPass.OUTPUT.Beauty,
+					'Beauty+SAO': SAOPass.OUTPUT.Default,
+					'SAO': SAOPass.OUTPUT.SAO,
+					'Depth': SAOPass.OUTPUT.Depth,
+					'Normal': SAOPass.OUTPUT.Normal
+				} ).onChange( function ( value ) {
+
+					saoPass.params.output = parseInt( value );
+
+				} );
 				gui.add( saoPass.params, 'saoBias', - 1, 1 );
 				gui.add( saoPass.params, 'saoIntensity', 0, 1 );
 				gui.add( saoPass.params, 'saoScale', 0, 10 );
@@ -183,7 +137,6 @@
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
-				var devicePixelRatio = window.devicePixelRatio || 1;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();

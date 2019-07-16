@@ -4,81 +4,110 @@
 		<title>three.js - skinning - simple</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple skinning -
+			<a href="https://github.com/mrdoob/three.js/blob/master/examples/models/skinned/simple/simple.blend" target="_blank" rel="noopener">Blender File</a>
+		</div>
 
-		<script>
+		<script type="module">
 
-			var container, stats, controls;
-			var camera, scene, renderer, loader, clock, light;
-			var skinnedMesh, animation, mixer;
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+			var stats, mixer, camera, scene, renderer, clock;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 10, 0, 10 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 24, 8, 24 );
 
 				scene = new THREE.Scene();
-				loader = new THREE.JSONLoader();
-				clock = new THREE.Clock;
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 70, 100 );
+
+				clock = new THREE.Clock();
+
+				// ground
+
+				var geometry = new THREE.PlaneBufferGeometry( 500, 500 );
+				var material = new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } );
+
+				var ground = new THREE.Mesh( geometry, material );
+				ground.position.set( 0, - 5, 0 );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
+
+				var grid = new THREE.GridHelper( 500, 100, 0x000000, 0x000000 );
+				grid.position.y = - 5;
+				grid.material.opacity = 0.2;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				// lights
+
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444, 0.6 );
+				light.position.set( 0, 200, 0 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				light.position.set( 0, 20, 10 );
+				light.castShadow = true;
+				light.shadow.camera.top = 18;
+				light.shadow.camera.bottom = - 10;
+				light.shadow.camera.left = - 12;
+				light.shadow.camera.right = 12;
+				scene.add( light );
+
+				//
+
+				var loader = new GLTFLoader();
+				loader.load( './models/gltf/SimpleSkinning.gltf', function ( gltf ) {
+
+					scene.add( gltf.scene );
+
+					gltf.scene.traverse( function ( child ) {
+
+						if ( child.isSkinnedMesh ) child.castShadow = true;
+
+					} );
+
+					mixer = new THREE.AnimationMixer( gltf.scene );
+					mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+				} );
+
+				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				//
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var geometry = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var material = new THREE.MeshBasicMaterial( { emissive: 0xbbbbbb } );
-
-				var ground = new THREE.Mesh( geometry, material );
-				ground.position.set( 0, -5, 0 );
-				ground.rotation.x = -Math.PI / 2;
-				scene.add( ground );
-
-				light = new THREE.HemisphereLight( 0xffffff, 0x003300, 1 );
-				light.position.set( - 80, 500, 50 );
-				scene.add( light );
-
-				loader.load( './models/skinned/simple/simple.js', function ( geometry, materials ) {
-
-					for ( var k in materials ) {
-
-						materials[ k ].skinning = true;
-
-					}
-
-					skinnedMesh = new THREE.SkinnedMesh( geometry, materials );
-					skinnedMesh.scale.set( 1, 1, 1 );
-
-					scene.add( skinnedMesh );
-
-					mixer = new THREE.AnimationMixer( skinnedMesh );
-					mixer.clipAction( skinnedMesh.geometry.animations[ 0 ] ).play();
-
-				} );
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
+				controls.minDistance = 5;
+				controls.maxDistance = 50;
 
 			}
 

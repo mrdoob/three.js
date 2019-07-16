@@ -4,43 +4,20 @@
 		<title>three.js webgl - exporter - stl</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			#info a {
-				color: #046;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - stl
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - stl<br/><br/>
+			<button id="exportASCII">export ASCII</button> <button id="exportBinary">export binary</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/exporters/STLExporter.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { STLExporter } from './jsm/exporters/STLExporter.js';
 
 			var scene, camera, renderer, exporter, mesh;
 
@@ -56,7 +33,7 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-				exporter = new THREE.STLExporter();
+				exporter = new STLExporter();
 
 				//
 
@@ -105,31 +82,19 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 25, 0 );
 				controls.update();
 
 				//
 
-				var params = {
-					ASCII: function() {
-						exportASCII();
-					},
-					Binary: function() {
-						exportBinary();
-					}
-				}
-
-				var gui = new dat.GUI();
-				var folder = gui.addFolder( 'Export' );
-
-				folder.add( params, 'ASCII' );
-				folder.add( params, 'Binary' );
-				folder.open();
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var buttonExportASCII = document.getElementById( 'exportASCII' );
+				buttonExportASCII.addEventListener( 'click', exportASCII );
+
+				var buttonExportBinary = document.getElementById( 'exportBinary' );
+				buttonExportBinary.addEventListener( 'click', exportBinary );
 
 			}
 

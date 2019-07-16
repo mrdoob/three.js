@@ -4,30 +4,30 @@
 		<title>three.js / editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-08-30 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-08-30" content="Ag80lPFLAvRyqP2W5I5XBzACxrTAQTWa3cXebXzq+WzW66nlQa6lvejGg1gdAMrzYbY6jUWp8g08kEnzb6svVgcAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNTYzNjYxOX0=">
-		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-08-28" content="Ag7nJS0Q6nBKfmRY1XLKHslnz73amLhaf8RoFpYz36MpMq0oa30AETLXer74BIwa3t8uDXlR0n4W9f/o674Rqw4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUzNTQxNDQwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-08-28" content="AsflqqNG2L/Eepy8xSwCYwWH5U7w3nN7Ak137jGxMeBFz9lqQVcMBqMTcMw6ZkxThB7ZM2Cn7hgPqX++ZlgC9wMAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTM1NDE0NDAwfQ==">
+		<link rel="apple-touch-icon" href="images/icon.png">
+		<link rel="manifest" href="manifest.json">
+		<link rel="shortcut icon" href="../files/favicon.ico" />
 	</head>
 	<body ontouchstart="">
-		<link href="css/main.css" rel="stylesheet" />
-		<link id="theme" href="css/light.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" id="theme" href="css/light.css">
 
 		<script src="../build/three.js"></script>
-		<script src="../examples/js/libs/system.min.js"></script>
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
 
+		<script src="../examples/js/libs/chevrotain.min.js"></script> <!-- VRML -->
 		<script src="../examples/js/libs/jszip.min.js"></script>
 		<script src="../examples/js/libs/inflate.min.js"></script> <!-- FBX -->
+		<script src="../examples/js/libs/lzma.js"></script> <!-- CTM -->
+		<script src="../examples/js/libs/ctm.js"></script> <!-- CTM -->
 
 		<script src="../examples/js/loaders/AMFLoader.js"></script>
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/DRACOLoader.js"></script>
 		<script src="../examples/js/loaders/FBXLoader.js"></script>
 		<script src="../examples/js/loaders/GLTFLoader.js"></script>
 		<script src="../examples/js/loaders/deprecated/LegacyGLTFLoader.js"></script>
@@ -43,15 +43,14 @@
 		<script src="../examples/js/loaders/TDSLoader.js"></script>
 		<script src="../examples/js/loaders/VRMLLoader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
-		<script src="../examples/js/loaders/ctm/lzma.js"></script>
-		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
-		<script src="../examples/js/exporters/OBJExporter.js"></script>
+
+		<script src="../examples/js/exporters/ColladaExporter.js"></script>
 		<script src="../examples/js/exporters/GLTFExporter.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
-		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
 		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
@@ -62,6 +61,7 @@
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 		<script src="js/libs/codemirror/mode/glsl.js"></script>
 
+		<script src="js/libs/system.min.js"></script>
 		<script src="js/libs/esprima.js"></script>
 		<script src="js/libs/jsonlint.js"></script>
 		<script src="js/libs/glslprep.min.js"></script>
@@ -87,6 +87,9 @@
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
+
+		<script src="js/libs/html2canvas.js"></script>
+		<script src="js/libs/three.html.js"></script>
 
 		<script src="js/libs/app.js"></script>
 		<script src="js/Player.js"></script>
@@ -124,11 +127,17 @@
 		<script src="js/Sidebar.Geometry.BoxGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.CircleGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.CylinderGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.ExtrudeGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.OctahedronGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.PlaneGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.RingGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.SphereGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.ShapeGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TetrahedronGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TubeGeometry.js"></script>
 		<script src="../examples/js/geometries/TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.LatheGeometry.js"></script>
@@ -136,8 +145,10 @@
 		<script src="js/Sidebar.Animation.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Sidebar.History.js"></script>
+		<script src="js/Strings.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
+		<script src="js/Viewport.Camera.js"></script>
 		<script src="js/Viewport.Info.js"></script>
 
 		<script src="js/Command.js"></script>
@@ -161,9 +172,6 @@
 		<script src="js/commands/SetMaterialColorCommand.js"></script>
 		<script src="js/commands/SetMaterialMapCommand.js"></script>
 		<script src="js/commands/SetSceneCommand.js"></script>
-
-		<script src="js/libs/html2canvas.js"></script>
-		<script src="js/libs/three.html.js"></script>
 
 		<script>
 
@@ -190,14 +198,11 @@
 			var player = new Player( editor );
 			document.body.appendChild( player.dom );
 
-			var menubar = new Menubar( editor );
-			document.body.appendChild( menubar.dom );
-
 			var sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			var modal = new UI.Modal();
-			document.body.appendChild( modal.dom );
+			var menubar = new Menubar( editor );
+			document.body.appendChild( menubar.dom );
 
 			//
 
@@ -268,12 +273,6 @@
 				signals.scriptChanged.add( saveState );
 				signals.historyChanged.add( saveState );
 
-				signals.showModal.add( function ( content ) {
-
-					modal.show( content );
-
-				} );
-
 			} );
 
 			//
@@ -289,11 +288,7 @@
 
 				event.preventDefault();
 
-				if ( event.dataTransfer.files.length > 0 ) {
-
-					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
-
-				}
+				editor.loader.loadFiles( event.dataTransfer.files );
 
 			}, false );
 
@@ -328,6 +323,20 @@
 					} );
 
 					isLoadingFromHash = true;
+
+				}
+
+			}
+
+			// ServiceWorker
+
+			if ( 'serviceWorker' in navigator ) {
+
+				try {
+
+					navigator.serviceWorker.register( 'sw.js' );
+
+				} catch ( error ) {
 
 				}
 

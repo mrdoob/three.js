@@ -12,7 +12,7 @@ THREE.FXAAShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { value: null },
+		"tDiffuse": { value: null },
 		"resolution": { value: new THREE.Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
@@ -705,8 +705,8 @@ THREE.FXAAShader = {
         "    //",
         "    // Extra constants for 360 FXAA Console only.",
         "    // Use zeros or anything else for other platforms.",
-        "    // These must be in physical constant registers and NOT immedates.",
-        "    // Immedates will result in compiler un-optimizing.",
+        "    // These must be in physical constant registers and NOT immediates.",
+        "    // Immediates will result in compiler un-optimizing.",
         "    // {xyzw} = float4(1.0, -1.0, 0.25, -0.25)",
         "    FxaaFloat4 fxaaConsole360ConstDir",
         ") {",

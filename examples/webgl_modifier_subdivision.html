@@ -4,268 +4,51 @@
 		<title>three.js webgl - modifier - Subdivisions using Loop Subdivision Scheme</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
+			}
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - subdivision modifier<br/ >
+			Original Geometry: <span id="original-vertex-count"></span> vertices and <span id="original-face-count"></span> faces<br/ >
+			Smooth Geometry: <span id="smooth-vertex-count"></span> vertices and <span id="smooth-face-count"></span> faces<br/ >
+		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/modifiers/SubdivisionModifier.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/Detector.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
 
-			var container, stats;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { SubdivisionModifier } from './jsm/modifiers/SubdivisionModifier.js';
 
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer, stats, smoothMesh, wireframe;
 
-			var cube, mesh, material;
+			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
 
-			// Create new object by parameters
+			var faceIndices = [ 'a', 'b', 'c' ];
 
-			var createSomething = function( klass, args ) {
-
-				var F = function( klass, args ) {
-
-					return klass.apply( this, args );
-
-				};
-
-				F.prototype = klass.prototype;
-
-				return new F( klass, args );
-
+			var params = {
+				subdivisions: 2
 			};
 
-			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.15, transparent: true } );
-			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
-			var smoothMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } )
-
-			// Cube
-
-			var materials = [];
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
-
-			}
-
-
-
-			var geometriesParams = [
-
-				{ type: 'BoxGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
-				{ type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI * 2 ] },
-				{ type: 'TorusKnotGeometry', args: [ 100, 30 ], scale: 0.25, meshScale: 4 },
-				{ type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale: 2 },
-				{ type: 'IcosahedronGeometry', args: [ 100, 1 ], meshScale: 2 },
-				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
-				{ type: 'OctahedronGeometry', args: [200, 0], meshScale: 2 },
-				{ type: 'LatheGeometry', args: [ [
-					new THREE.Vector2( 0, 0 ),
-					new THREE.Vector2( 50, 50 ),
-					new THREE.Vector2( 10, 100 ),
-					new THREE.Vector2( 50, 150 ),
-					new THREE.Vector2( 0, 200 ) ] ]},
-				{ type: 'TextGeometry', args: ['&', {
-						size: 200,
-						height: 50,
-						curveSegments: 1
-					}]},
-				{ type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
-
-			];
-
-			var loader = new THREE.FontLoader();
-			loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
-
-				geometriesParams[ 8 ].args[ 1 ].font = font;
-
-			} );
-
-			var loader = new THREE.JSONLoader();
-			loader.load( 'models/json/WaltHeadLo.json', function ( geometry ) {
-
-				geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
-
-				THREE.WaltHead = function() {
-					return geometry.clone();
-				};
-
-				updateInfo()
-
-			});
-
-			var loader2 = new THREE.JSONLoader();
-			loader2.load( 'models/json/suzanne_geometry.json', function ( geometry ) {
-
-				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
-
-				THREE.Suzanne = function() {
-					return geometry.clone();
-				};
-
-				updateInfo()
-
-			} );
-
-
-			var info;
-			var subdivisions = 2;
-			var geometryIndex = 0;
-
-			// start scene
-
 			init();
-			animate();
-
-			function nextSubdivision( x ) {
-
-				subdivisions = Math.max( 0, subdivisions + x );
-				addStuff();
-
-			}
-
-			function nextGeometry() {
-
-				geometryIndex ++;
-
-				if ( geometryIndex > geometriesParams.length - 1 ) {
-
-					geometryIndex = 0;
-
-				}
-
-				addStuff();
-
-			}
-
-			function switchGeometry(i) {
-
-				geometryIndex = i;
-
-				addStuff();
-			}
-
-			function updateInfo() {
-
-				var params = geometriesParams[ geometryIndex ];
-
-				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
-
-				for ( var i = 0; i < geometriesParams.length; i ++ ) {
-					dropdown += '<option value="' + i + '"';
-
-					dropdown += ( geometryIndex == i ) ? ' selected' : '';
-
-					dropdown += '>' + geometriesParams[ i ].type + '</option>';
-				}
-
-				dropdown += '</select>';
-
-				info.innerHTML = 'Drag to spin THREE.' + params.type +
-
-					'<br><br>Subdivisions: ' + subdivisions +
-					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
-					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
-
-			}
-
-			function addStuff() {
-
-				if ( cube !== undefined ) {
-
-					geometry.dispose();
-					smooth.dispose();
-
-					scene.remove( group );
-					scene.remove( cube );
-
-				}
-
-				var modifier = new THREE.SubdivisionModifier( subdivisions );
-
-				var params = geometriesParams[ geometryIndex ];
-
-				geometry = createSomething( THREE[ params.type ], params.args );
-
-				// Scale Geometry
-
-				if ( params.scale ) {
-
-					geometry.scale( params.scale, params.scale, params.scale );
-
-				}
-
-				smooth = modifier.modify( geometry );
-
-				var faceIndices = [ 'a', 'b', 'c' ];
-
-				for ( var i = 0; i < smooth.faces.length; i ++ ) {
-
-					var face  = smooth.faces[ i ];
-
-					for ( var j = 0; j < 3; j ++ ) {
-
-						var vertexIndex = face[ faceIndices[ j ] ];
-						var vertex = smooth.vertices[ vertexIndex ];
-
-						var hue = ( vertex.y / 200 ) + 0.5;
-						var color = new THREE.Color().setHSL( hue, 1, 0.5 );
-
-						face.vertexColors[ j ] = color;
-
-					}
-
-				}
-
-				updateInfo();
-
-				group = new THREE.Group();
-				scene.add( group );
-
-				mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
-
-				cube = new THREE.Mesh( smooth, smoothMaterial );
-				var wireframe = new THREE.Mesh( smooth, wireframeMaterial );
-				cube.add( wireframe );
-
-				cube.scale.setScalar( params.meshScale ? params.meshScale : 1 );
-				scene.add( cube );
-
-				group.scale.copy( cube.scale );
-
-			}
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the geometry ';
-				container.appendChild( info );
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 500;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 500 );
+				camera.position.z = 100;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -274,21 +57,102 @@
 				light.position.set( 1000, 1000, 2000 );
 				scene.add( light );
 
-				addStuff();
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/WaltHeadLo_buffergeometry.json', function ( bufferGeometry ) {
+
+					// converting to legacy THREE.Geometry because SubdivisionModifier only returns THREE.Geometry
+
+					var geometry = new THREE.Geometry().fromBufferGeometry( bufferGeometry );
+					geometry.mergeVertices();
+
+					var material = new THREE.MeshBasicMaterial( { color: 0xcccccc, wireframe: true } );
+					var mesh = new THREE.Mesh( bufferGeometry, material );
+					scene.add( mesh );
+
+					var gui = new GUI();
+
+					gui.add( params, 'subdivisions', 0, 3 ).step( 1 ).onChange( function ( subdivisions ) {
+
+						subdivide( geometry, subdivisions );
+
+					} );
+
+					//
+
+					subdivide( geometry, params.subdivisions );
+					animate();
+
+				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 400;
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				//
+
+				smoothMesh = new THREE.Mesh( undefined, smoothMaterial );
+				wireframe = new THREE.Mesh( undefined, wireframeMaterial );
+				scene.add( smoothMesh, wireframe );
+
+			}
+
+			function subdivide( geometry, subdivisions ) {
+
+				var modifier = new SubdivisionModifier( subdivisions );
+
+				var smoothGeometry = modifier.modify( geometry );
+
+				// colorify faces
+
+				for ( var i = 0; i < smoothGeometry.faces.length; i ++ ) {
+
+					var face = smoothGeometry.faces[ i ];
+
+					for ( var j = 0; j < 3; j ++ ) {
+
+						var vertexIndex = face[ faceIndices[ j ] ];
+						var vertex = smoothGeometry.vertices[ vertexIndex ];
+
+						var hue = ( vertex.y / 200 ) + 0.5;
+						var color = new THREE.Color().setHSL( hue, 1, 0.5 );
+						face.vertexColors[ j ] = color;
+
+					}
+
+				}
+
+				// convert to THREE.BufferGeometry
+
+				if ( smoothMesh.geometry ) smoothMesh.geometry.dispose();
+
+				smoothMesh.geometry = new THREE.BufferGeometry().fromGeometry( smoothGeometry );
+				wireframe.geometry = smoothMesh.geometry;
+
+				//
+
+				updateUI( geometry, smoothGeometry );
+
+			}
+
+			function updateUI( originalGeometry, smoothGeometry ) {
+
+				document.getElementById( 'original-vertex-count' ).textContent = originalGeometry.vertices.length;
+				document.getElementById( 'original-face-count' ).textContent = originalGeometry.faces.length;
+
+				document.getElementById( 'smooth-vertex-count' ).textContent = smoothGeometry.vertices.length;
+				document.getElementById( 'smooth-face-count' ).textContent = smoothGeometry.faces.length;
 
 			}
 
@@ -307,9 +171,8 @@
 
 				requestAnimationFrame( animate );
 
-				stats.begin();
 				render();
-				stats.end();
+				stats.update();
 
 			}
 

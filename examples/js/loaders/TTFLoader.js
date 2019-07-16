@@ -23,12 +23,20 @@ THREE.TTFLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
+
+	},
+
+	setPath: function ( value ) {
+
+		this.path = value;
+		return this;
 
 	},
 
@@ -60,7 +68,7 @@ THREE.TTFLoader.prototype = {
 
 					}
 
-					glyph.path.commands.forEach( function ( command, i ) {
+					glyph.path.commands.forEach( function ( command ) {
 
 						if ( command.type.toLowerCase() === 'c' ) {
 

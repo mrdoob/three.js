@@ -4,57 +4,28 @@
 		<title>threejs webgl - materials - hdr environment mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
-			}
-			a { color: #88f }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Standard Material Reflectivity (reflectance at F0) example by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Standard Material Reflectivity (reflectance at F0)<br/>
+			example by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
+		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
-		<script src="js/loaders/HDRCubeTextureLoader.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var container, stats;
 			var params = {
@@ -65,9 +36,7 @@
 				exposure: 1.0,
 				gemColor: 'Green'
 			};
-			var camera, scene, renderer, controls, objects = [];
-			var hdrCubeMap;
-			var composer;
+			var camera, scene, renderer, objects = [];
 			var gemBackMaterial, gemFrontMaterial;
 			var hdrCubeRenderTarget;
 
@@ -80,7 +49,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, -10, 20 * 3.5 );
+				camera.position.set( 0.0, - 10, 20 * 3.5 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
@@ -119,7 +88,7 @@
 
 				};
 
-				var loader = new THREE.OBJLoader( manager );
+				var loader = new OBJLoader( manager );
 				loader.load( 'models/obj/emerald.obj', function ( object ) {
 
 					object.traverse( function ( child ) {
@@ -144,29 +113,38 @@
 
 				} );
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
-				};
+
+	};
 
 				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
-				new THREE.HDRCubeTextureLoader().load( THREE.UnsignedByteType, hdrUrls, function ( hdrCubeMap ) {
 
-					var pmremGenerator = new THREE.PMREMGenerator( hdrCubeMap );
-					pmremGenerator.update( renderer );
+				new HDRCubeTextureLoader()
+					.setDataType( THREE.UnsignedByteType )
+					.load( hdrUrls, function ( hdrCubeMap ) {
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
+						pmremGenerator.update( renderer );
 
-					hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
-					gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
+						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
-				} );
+						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
+						gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
+
+						hdrCubeMap.dispose();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					} );
 
 
 				// Lights
@@ -179,11 +157,11 @@
 				scene.add( pointLight1 );
 
 				var pointLight2 = new THREE.PointLight( 0xffffff );
-				pointLight2.position.set( -150, 0, 0 );
+				pointLight2.position.set( - 150, 0, 0 );
 				scene.add( pointLight2 );
 
 				var pointLight3 = new THREE.PointLight( 0xffffff );
-				pointLight3.position.set( 0, -10, -150 );
+				pointLight3.position.set( 0, - 10, - 150 );
 				scene.add( pointLight3 );
 
 				var pointLight4 = new THREE.PointLight( 0xffffff );
@@ -195,17 +173,16 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'reflectivity', 0, 1 );
 				gui.add( params, 'exposure', 0.1, 2 );
@@ -246,13 +223,15 @@
 					gemFrontMaterial.reflectivity = gemBackMaterial.reflectivity = params.reflectivity;
 
 					var newColor = gemBackMaterial.color;
-					switch( params.gemColor ) {
+					switch ( params.gemColor ) {
+
 						case 'Blue': newColor = new THREE.Color( 0x000088 ); break;
 						case 'Red': newColor = new THREE.Color( 0x880000 ); break;
 						case 'Green': newColor = new THREE.Color( 0x008800 ); break;
-						case 'White': newColor =  new THREE.Color( 0x888888 ); break;
-						case 'Black': newColor =  new THREE.Color( 0x0f0f0f ); break;
-					}
+						case 'White': newColor = new THREE.Color( 0x888888 ); break;
+						case 'Black': newColor = new THREE.Color( 0x0f0f0f ); break;
+
+		}
 					gemBackMaterial.color = gemFrontMaterial.color = newColor;
 
 
@@ -260,18 +239,18 @@
 
 				renderer.toneMappingExposure = params.exposure;
 
-				var timer = Date.now() * 0.00025;
-
 				camera.lookAt( scene.position );
 
-				if( params.autoRotate ) {
+				if ( params.autoRotate ) {
+
 					for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 						var object = objects[ i ];
 						object.rotation.y += 0.005;
 
 					}
-				}
+
+	}
 
 				renderer.render( scene, camera );
 

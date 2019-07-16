@@ -4,46 +4,21 @@
 		<title>three.js webgl - parametric geometries</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #eee;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				padding: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - parametric geometries</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/CurveExtras.js"></script>
-		<script src="js/ParametricGeometries.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { Curves } from './jsm/curves/CurveExtras.js';
+			import { ParametricGeometries } from './jsm/geometries/ParametricGeometries.js';
 
 			var camera, scene, renderer, stats;
 
@@ -80,19 +55,19 @@
 
 				var geometry, object;
 
-				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.plane( 100, 100 ), 10, 10 );
+				geometry = new THREE.ParametricBufferGeometry( ParametricGeometries.plane( 100, 100 ), 10, 10 );
 				geometry.center();
 				object = new THREE.Mesh( geometry, material );
 				object.position.set( - 200, 0, 200 );
 				scene.add( object );
 
-				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.klein, 20, 20 );
+				geometry = new THREE.ParametricBufferGeometry( ParametricGeometries.klein, 20, 20 );
 				object = new THREE.Mesh( geometry, material );
 				object.position.set( 0, 0, 200 );
 				object.scale.multiplyScalar( 5 );
 				scene.add( object );
 
-				geometry = new THREE.ParametricBufferGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
+				geometry = new THREE.ParametricBufferGeometry( ParametricGeometries.mobius, 20, 20 );
 				object = new THREE.Mesh( geometry, material );
 				object.position.set( 200, 0, 200 );
 				object.scale.multiplyScalar( 30 );
@@ -100,11 +75,15 @@
 
 				//
 
-				var GrannyKnot =  new THREE.Curves.GrannyKnot();
+				var GrannyKnot = new Curves.GrannyKnot();
 
-				var torus = new THREE.ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
-				var sphere = new THREE.ParametricGeometries.SphereGeometry( 50, 20, 10 );
-				var tube = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true, false );
+				var torus = new ParametricGeometries.TorusKnotGeometry( 50, 10, 50, 20, 2, 3 );
+				var sphere = new ParametricGeometries.SphereGeometry( 50, 20, 10 );
+				var tube = new ParametricGeometries.TubeGeometry( GrannyKnot, 100, 3, 8, true, false );
+
+				torus = new THREE.BufferGeometry().fromGeometry( torus );
+				sphere = new THREE.BufferGeometry().fromGeometry( sphere );
+				tube = new THREE.BufferGeometry().fromGeometry( tube );
 
 				object = new THREE.Mesh( torus, material );
 				object.position.set( - 200, 0, - 200 );
@@ -160,7 +139,7 @@
 
 				camera.lookAt( scene.position );
 
-				scene.traverse( function( object ) {
+				scene.traverse( function ( object ) {
 
 					if ( object.isMesh === true ) {
 
