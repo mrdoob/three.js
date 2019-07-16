@@ -288,7 +288,7 @@ THREE.FBXLoader = ( function () {
 
 				case 'tga':
 
-					if( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
 
 						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 

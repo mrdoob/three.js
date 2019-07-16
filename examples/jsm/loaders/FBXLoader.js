@@ -64,7 +64,6 @@ import {
 	VertexColors
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
-import { TGALoader } from "../loaders/TGALoader.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
 
 
@@ -337,7 +336,7 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if( Loader.Handlers.get( '.tga' ) === null ) {
+					if ( Loader.Handlers.get( '.tga' ) === null ) {
 
 						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
