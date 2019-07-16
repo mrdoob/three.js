@@ -9,7 +9,7 @@ import {
 	DefaultLoadingManager,
 	FileLoader,
 	LinearFilter,
-	LinearMipMapLinearFilter,
+	LinearMipmapLinearFilter,
 	RGB_ETC1_Format,
 	RGB_PVRTC_4BPPV1_Format,
 	UnsignedByteType
@@ -179,7 +179,7 @@ BasisTextureLoader.prototype = {
 
 				}
 
-				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipMapLinearFilter;
+				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
