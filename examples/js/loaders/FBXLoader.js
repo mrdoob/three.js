@@ -1542,11 +1542,12 @@ THREE.FBXLoader = ( function () {
 
 		},
 
+
 		// Parse single node mesh geometry in FBXTree.Objects.Geometry
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
 
 			var skeletons = deformers.skeletons;
-			var morphTargets = [];
+			var morphTargets = deformers.morphTargets;
 
 			var modelNodes = relationships.parents.map( function ( parent ) {
 
@@ -1565,15 +1566,13 @@ THREE.FBXLoader = ( function () {
 
 			}, null );
 
-			relationships.children.forEach( function( child ) {
+			var morphTarget = relationships.children.reduce( function ( morphTarget, child ) {
 
-				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
+				if ( morphTargets[ child.ID ] !== undefined ) morphTarget = morphTargets[ child.ID ];
 
-					morphTargets.push( deformers.morphTargets[ child.ID ] );
+				return morphTarget;
 
-				}
-
-			} );
+			}, null );
 
 			// Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
@@ -1590,12 +1589,12 @@ THREE.FBXLoader = ( function () {
 
 			var transform = generateTransform( transformData );
 
-			return this.genGeometry( geoNode, skeleton, morphTargets, transform );
+			return this.genGeometry( geoNode, skeleton, morphTarget, transform );
 
 		},
 
 		// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
-		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
+		genGeometry: function ( geoNode, skeleton, morphTarget, preTransform ) {
 
 			var geo = new THREE.BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
@@ -1696,7 +1695,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			this.addMorphTargets( geo, geoNode, morphTargets, preTransform );
+			this.addMorphTargets( geo, geoNode, morphTarget, preTransform );
 
 			return geo;
 
@@ -2069,27 +2068,23 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		addMorphTargets: function ( parentGeo, parentGeoNode, morphTargets, preTransform ) {
+		addMorphTargets: function ( parentGeo, parentGeoNode, morphTarget, preTransform ) {
 
-			if ( morphTargets.length === 0 ) return;
+			if ( morphTarget === null ) return;
 
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-			 var self = this;
-			morphTargets.forEach( function( morphTarget ) {
+			var self = this;
+			morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-				morphTarget.rawTargets.forEach( function ( rawTarget ) {
+				var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
-					var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
+				if ( morphGeoNode !== undefined ) {
 
-					if ( morphGeoNode !== undefined ) {
+					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
 
-						self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
-
-					}
-
-				} );
+				}
 
 			} );
 
@@ -2101,7 +2096,6 @@ THREE.FBXLoader = ( function () {
 		// Normal and position attributes only have data for the vertices that are affected by the morph
 		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
-			console.log(parentGeo, parentGeoNode, morphGeoNode, preTransform, name);
 			var morphGeo = new THREE.BufferGeometry();
 			if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
 
