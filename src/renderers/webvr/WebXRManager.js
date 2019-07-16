@@ -11,11 +11,9 @@ import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { setProjectionFromUnion } from './WebVRUtils.js';
 
-function WebXRManager( renderer ) {
+function WebXRManager( renderer, gl ) {
 
 	var scope = this;
-
-	var gl = renderer.getContext();
 
 	var session = null;
 
