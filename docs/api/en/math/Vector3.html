@@ -258,7 +258,7 @@ var d = a.distanceTo( b );
 		<h3>[method:this lerp]( [param:Vector3 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector3 v] - [page:Vector3] to interpolate towards.<br />
-		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
+		alpha - interpolation factor (not clamped).<br /><br />
 
 		Linearly interpolate between this vector and [page:Vector3 v], where alpha is the
 		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector3 v].
@@ -268,7 +268,7 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Vector3 v1] - the starting [page:Vector3].<br />
 		[page:Vector3 v2] - [page:Vector3] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor (not clamped).<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector3 v1] and
 		[page:Vector3 v2] where alpha is the distance along the line connecting the two vectors
