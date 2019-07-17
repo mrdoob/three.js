@@ -1,4 +1,4 @@
-import { Camera } from '../../../../build/three.module';
+import { Camera } from '../../../../src/Three';
 
 import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
