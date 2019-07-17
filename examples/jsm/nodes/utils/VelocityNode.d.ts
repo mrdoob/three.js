@@ -1,7 +1,7 @@
 import { 
   Object3D,
   Vector3
-} from '../../../../build/three.module';
+} from '../../../../src/Three';
 
 import { NodeFrame } from '../core/NodeFrame';
 import { Vector3Node } from '../inputs/Vector3Node';

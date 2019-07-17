@@ -1,5 +1,5 @@
 import { NodeBuilder } from '../core/NodeBuilder';
-import { TempNode } from '../core/TempNode.js';
+import { TempNode } from '../core/TempNode';
 
 export class NormalNode extends TempNode {
   constructor(scope?: string);

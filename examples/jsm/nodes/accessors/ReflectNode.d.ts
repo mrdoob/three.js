@@ -1,7 +1,7 @@
-import { Vector2 } from '../../../../build/three.module.js';
+import { Vector2 } from '../../../../build/three.module';
 
 import { NodeBuilder } from '../core/NodeBuilder';
-import { TempNode } from '../core/TempNode.js';
+import { TempNode } from '../core/TempNode';
 
 export class ReflectNode extends TempNode {
   constructor(scope?: string);

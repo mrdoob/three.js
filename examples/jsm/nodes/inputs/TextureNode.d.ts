@@ -1,9 +1,12 @@
-import { Texture } from '../../../../build/three.module.js';
+import {
+  Matrix4,
+  Texture 
+} from '../../../../src/Three';
 
 import { InputNode } from '../core/InputNode';
 import { NodeBuilder } from '../core/NodeBuilder';
-import { Node } from '../core/Node.js';
-import { UVNode } from '../accessors/UVNode.js';
+import { Node } from '../core/Node';
+import { UVNode } from '../accessors/UVNode';
 
 export class TextureNode extends InputNode {
   constructor(value: Texture, uv?: UVNode, bias?: Node, project?: boolean);

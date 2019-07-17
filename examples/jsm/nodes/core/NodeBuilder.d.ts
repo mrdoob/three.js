@@ -3,7 +3,7 @@ import {
   Texture,
   TextureEncoding,
   WebGLRenderer
-} from "../../../../build/three.module.js";
+} from '../../../../src/Three';
 
 import { Node } from './Node';
 import { NodeUniform } from './NodeUniform';

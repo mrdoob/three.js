@@ -2,7 +2,7 @@ import { Camera } from '../../../../build/three.module';
 
 import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
-import { TempNode } from '../core/TempNode.js';
+import { TempNode } from '../core/TempNode';
 import { FunctionNode } from '../core/FunctionNode';
 import { FloatNode } from '../inputs/FloatNode';
 

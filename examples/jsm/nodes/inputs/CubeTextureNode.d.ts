@@ -1,4 +1,4 @@
-import { CubeTexture } from '../../../../build/three.module.js';
+import { CubeTexture } from '../../../../src/Three';
 
 import { InputNode } from '../core/InputNode';
 import { Node } from '../core/Node';

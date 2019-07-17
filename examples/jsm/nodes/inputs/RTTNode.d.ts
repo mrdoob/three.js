@@ -4,11 +4,11 @@ import {
   SceneUtils,
   WebGLRenderTarget,
   WebGLRenderTargetOptions
-} from '../../../../build/three.module';
+} from '../../../../src/Three';
 
 import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
-import { TextureNode } from './TextureNode.js';
+import { TextureNode } from './TextureNode';
 
 export interface RTTNodeOptions extends WebGLRenderTargetOptions {
   clear?: boolean;

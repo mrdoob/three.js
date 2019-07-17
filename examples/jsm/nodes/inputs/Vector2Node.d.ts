@@ -1,4 +1,4 @@
-import { Vector2 } from '../../../../build/three.module.js';
+import { Vector2 } from '../../../../src/Three';
 
 import { InputNode } from '../core/InputNode';
 import { NodeBuilder } from '../core/NodeBuilder';

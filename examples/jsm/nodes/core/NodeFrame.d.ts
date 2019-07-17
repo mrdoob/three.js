@@ -1,7 +1,7 @@
 import {
   Texture,
   WebGLRenderer
-} from "../../../../build/three.module.js";
+} from '../../../../src/Three';
 
 import { Node } from './Node';
 

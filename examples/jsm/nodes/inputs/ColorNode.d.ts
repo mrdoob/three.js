@@ -1,4 +1,4 @@
-import { Color } from '../../../../build/three.module.js';
+import { Color } from '../../../../src/Three';
 
 import { InputNode } from '../core/InputNode';
 import { NodeBuilder } from '../core/NodeBuilder';
