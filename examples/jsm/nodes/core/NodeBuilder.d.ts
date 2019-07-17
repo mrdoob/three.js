@@ -80,7 +80,7 @@ export class NodeBuilder {
 
   analyzing: boolean;
 
-  build(vertex: Node, fragment: node): this;
+  build(vertex: Node, fragment: Node): this;
   buildShader(shader: string, node: Node): void;
   setMaterial(material: Material, renderer: WebGLRenderer): this;
   addFlow(slot: string, cache?: string, context?: object): this;
@@ -141,6 +141,6 @@ export class NodeBuilder {
   isShader(shader: string): boolean;
   setShader(shader: string): this;
   mergeDefines(defines: object): object;
-  mergeUniform(uniforms: object): uniforms;
+  mergeUniform(uniforms: object): object;
   getTextureEncodingFromMap(map: Texture, gammaOverrideLinear?: boolean): TextureEncoding;
 }
