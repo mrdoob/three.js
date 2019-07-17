@@ -168,7 +168,7 @@ THREE.BasisTextureLoader.prototype = {
 
 				}
 
-				texture.minFilter = mipmaps.length === 1 ? THREE.LinearFilter : THREE.LinearMipMapLinearFilter;
+				texture.minFilter = mipmaps.length === 1 ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;

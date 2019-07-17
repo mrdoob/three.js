@@ -1123,10 +1123,10 @@ THREE.GLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: THREE.NearestFilter,
 		9729: THREE.LinearFilter,
-		9984: THREE.NearestMipMapNearestFilter,
-		9985: THREE.LinearMipMapNearestFilter,
-		9986: THREE.NearestMipMapLinearFilter,
-		9987: THREE.LinearMipMapLinearFilter
+		9984: THREE.NearestMipmapNearestFilter,
+		9985: THREE.LinearMipmapNearestFilter,
+		9986: THREE.NearestMipmapLinearFilter,
+		9987: THREE.LinearMipmapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -2040,7 +2040,7 @@ THREE.GLTFLoader = ( function () {
 			var sampler = samplers[ textureDef.sampler ] || {};
 
 			texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipMapLinearFilter;
+			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipmapLinearFilter;
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 
