@@ -75,9 +75,7 @@ Object.assign( THREE.EffectComposer.prototype, {
 	addPass: function ( pass ) {
 
 		this.passes.push( pass );
-
-		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
-		pass.setSize( size.width, size.height );
+		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
 	},
 
