@@ -52,7 +52,7 @@ function WebGLMultiview( renderer, gl, contextAttributes ) {
 
 	function isAvailable() {
 
-		return capabilities.multiview && !contextAttributes.antialias;
+		return capabilities.multiview && ! contextAttributes.antialias;
 
 	}
 
