@@ -2,7 +2,7 @@ export default /* glsl */ `
 #ifdef USE_NORMALMAP
 
 	//uniform sampler2D normalMap;
-	//uniform vec2 normalScale;
+	//uniform vec2 clearCoatNormalScale;
 
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
