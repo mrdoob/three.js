@@ -2275,11 +2275,19 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
 
-		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
-		uniforms.clearCoatNormalMap.value = material.clearCoatNormalMap;
-		uniforms.clearCoatNormalScale.value = material.clearCoatNormalScale;
-		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
+		if ( material.normalMap || material.clearCoatNormalMap) {
 
+			if(material.clearCoatNormalMap){
+				uniforms.clearCoatNormalMap.value = material.clearCoatNormalMap;
+			}
+
+			uniforms.clearCoatNormalScale.value.copy( material.clearCoatNormalScale );
+			if ( material.side === BackSide ) uniforms.clearCoatNormalScale.value.negate();
+
+		}
+
+		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
+		
 	}
 
 	function refreshUniformsMatcap( uniforms, material ) {

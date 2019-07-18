@@ -2,7 +2,7 @@ export default /* glsl */ `
 #ifdef USE_NORMALMAP
 
 	//uniform sampler2D normalMap;
-	//uniform vec2 clearCoatNormalScale;
+	uniform vec2 clearCoatNormalScale;
 
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
@@ -25,7 +25,7 @@ export default /* glsl */ `
 
 			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 
-			mapN.xy *= normalScale;
+			mapN.xy *= clearCoatNormalScale;
 			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
 			return normalize( tsn * mapN );

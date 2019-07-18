@@ -15468,7 +15468,7 @@ var clearcoat_normal_fragment_maps = /* glsl */ `
 
 		mat3 vTBN = mat3( tangent, bitangent, clearCoatNormal );
 		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-		mapN.xy = normalScale * mapN.xy;
+		mapN.xy = clearCoatNormalScale * mapN.xy;
 		clearCoatNormal = normalize( vTBN * mapN );
 
 	#else
@@ -15545,7 +15545,7 @@ var clearcoat_normalmap_pars_fragment = /* glsl */ `
 #ifdef USE_NORMALMAP
 
 	//uniform sampler2D normalMap;
-	//uniform vec2 normalScale;
+	uniform vec2 clearCoatNormalScale;
 
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
@@ -15568,7 +15568,7 @@ var clearcoat_normalmap_pars_fragment = /* glsl */ `
 
 			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 
-			mapN.xy *= normalScale;
+			mapN.xy *= clearCoatNormalScale;
 			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
 			return normalize( tsn * mapN );
@@ -26672,11 +26672,19 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
 
-		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
-		uniforms.clearCoatNormalMap.value = material.clearCoatNormalMap;
-		uniforms.clearCoatNormalScale.value = material.clearCoatNormalScale;
-		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
+		if ( material.normalMap || material.clearCoatNormalMap) {
 
+			if(material.clearCoatNormalMap){
+				uniforms.clearCoatNormalMap.value = material.clearCoatNormalMap;
+			}
+
+			uniforms.clearCoatNormalScale.value.copy( material.clearCoatNormalScale );
+			if ( material.side === BackSide ) uniforms.clearCoatNormalScale.value.negate();
+
+		}
+
+		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
+		
 	}
 
 	function refreshUniformsMatcap( uniforms, material ) {

@@ -73,7 +73,7 @@
 		const sphereSpacing = 1.25 * sphereSize * 2;
 
 		const variationsX = [
-			(mat, scale, map) => { },
+			(mat, scale, map) => { mat.clearCoatNormalScale.copy(	mat.normalScale); },
 			(mat, scale, map) => { mat.clearCoatNormalScale = new THREE.Vector2(scale, scale); },
 			(mat, scale, map) => {
 				mat.clearCoatNormalScale = new THREE.Vector2(scale, scale);
