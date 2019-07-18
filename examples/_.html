@@ -20,7 +20,8 @@
 
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl clearcoat geometry normal demo.<br />
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl clearcoat geometry normal
+		demo.<br />
 	</div>
 
 	<script type="module">
@@ -40,33 +41,68 @@
 
 		var camera, scene, renderer;
 
-		var color = {
-			hue: 0.0,
-		}
-
-		var params = {
-
+		var guiParams = {
 			metalness: 0.0,
-			roughness: 0.8,
+			roughness: 1.0,
 			clearCoat: 1.0,
 			clearCoatRoughness: 0.0,
 			reflectivity: 0.0,
 		};
 
+		var guiNormalMapNames = [
+			"face",
+			"tentacle"
+		]
+
+		var guiMatParams = {
+			normalMap: "face",
+			normalScale: 1.0,
+			clearCoatNormalMap: "tentacle",
+			clearCoatNormalScale: 1.0,
+		}
+
 		var particleLight;
 		var meshes = [];
 		var mats = [];
+		var normalMaps = {};
 
 		var windowHalfX = window.innerWidth / 2;
 		var windowHalfY = window.innerHeight / 2;
 
-	new THREE.FontLoader()
-		.load('fonts/gentilis_regular.typeface.json', function (font) {
+		const sphereSize = 80;
+		const sphereSpacing = 1.25 * sphereSize * 2;
 
-			init(font);
-			animate();
+		const variationsX = [
+			(mat, scale, map) => { },
+			(mat, scale, map) => { mat.clearCoatNormalScale = new THREE.Vector2(scale, scale); },
+			(mat, scale, map) => {
+				mat.clearCoatNormalScale = new THREE.Vector2(scale, scale);
+				if (mat.clearCoatNormalMap !== map) {
+					mat.clearCoatNormalMap = map;
+					mat.needsUpdate = true;
+				}
+			},
+		];
 
-		});
+		const variationsY = [
+			(mat, scale, map) => { },
+			(mat, scale, map) => {
+				mat.normalScale = new THREE.Vector2(scale, scale);
+				if (mat.normalMap !== map) {
+					mat.normalMap = map;
+					mat.needsUpdate = true;
+				}
+			},
+		];
+
+		const maxI = variationsX.length;
+		const maxJ = variationsY.length;
+
+		new THREE.FontLoader()
+			.load('fonts/gentilis_regular.typeface.json', function (font) {
+				init(font);
+				animate();
+			});
 
 
 		function init(font) {
@@ -75,9 +111,9 @@
 			document.body.appendChild(container);
 
 			camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 10000);
-			camera.position.z = 1200;
+			camera.position.z = 1500;
 
-			var genCubeUrls = function ( prefix, postfix ) {
+			var genCubeUrls = function (prefix, postfix) {
 
 				return [
 					prefix + 'px' + postfix, prefix + 'nx' + postfix,
@@ -89,7 +125,7 @@
 
 			scene = new THREE.Scene();
 
-			var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
+			var hdrUrls = genCubeUrls('./textures/cube/pisaHDR/', '.hdr');
 
 			new HDRCubeTextureLoader()
 				.setType(THREE.UnsignedByteType)
@@ -105,26 +141,39 @@
 
 					var geometry = new THREE.SphereBufferGeometry(80, 64, 32);
 
-					var normalMap = new THREE.TextureLoader()
+					var textureLoader = new THREE.TextureLoader();
+
+					normalMaps.tentacle = textureLoader
+						.load("textures/nvidia_tentacle/tentacle_tangent_space.png");
+
+					normalMaps.face = textureLoader
 						.load("models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg");
 
-					var mat = {
+					// objectNormalMap = textureLoader
+					// 	.load("textures/nvidia_tentacle/tentacle_object_space.png");
+
+					var matParams = {
 						envMap: hdrCubeRenderTarget.texture,
-						normalMap: normalMap,
-						normalScale: new THREE.Vector2(0.8, 0.8)
 					};
 
-					for(var i = 0;i<2;i++){
-						mats[i] = new THREE.MeshPhysicalMaterial(mat);
-						meshes[i] = new THREE.Mesh(geometry, mats[i]);
-						meshes[i].position.x  = -100.0+ i*200;
-						scene.add(meshes[i]);
+
+					for (var ii = 0; ii < maxI; ii++) {
+						if (!mats[ii]) {
+							mats[ii] = [];
+						}
+						for (var jj = 0; jj < maxJ; jj++) {
+
+							var mat = mats[ii][jj] = new THREE.MeshPhysicalMaterial(matParams);
+
+							variationsX[ii](mat, 1, normalMaps.tentacle);
+							variationsY[jj](mat, 1, normalMaps.face);
+							var mesh = new THREE.Mesh(geometry, mat);
+
+							mesh.position.x = (ii - (maxI - 1) / 2) * sphereSpacing;
+							mesh.position.y = (jj - (maxJ - 1) / 2) * sphereSpacing;
+							scene.add(mesh);
+						}
 					}
-
-					mats[0].clearCoat = 1.0;
-
-					mats[1].clearCoat = 1.0;
-					mats[1].clearCoatGeometryNormals = true;
 
 					hdrCubeMap.magFilter = THREE.LinearFilter;
 					hdrCubeMap.needsUpdate = true;
@@ -150,25 +199,27 @@
 
 				textGeo.computeBoundingBox();
 				var bb = textGeo.boundingBox.clone();
-				//var diag = bb.max.sub(bb.min);
-				var displace = bb.max.sub(bb.min).divide( new THREE.Vector3(2,2,2));
-
-
-
+				var displace = bb.max.sub(bb.min).divide(new THREE.Vector3(2, 2, 2));
 
 				textMesh.position.copy(location.sub(displace));
 				scene.add(textMesh);
 
 			}
 
-			addLabel("false", new THREE.Vector3(- 100, 110, 0));
-			addLabel("true", new THREE.Vector3(100, 110, 0));
-			addLabel("Use geometry normals", new THREE.Vector3(0, 180, 0),30);
+
+			addLabel("Normal Map", new THREE.Vector3(-450, 0, 0), 30);
+			addLabel("None", new THREE.Vector3(-350, -100, 0));
+			addLabel("Scaling + Map", new THREE.Vector3(-400, 100, 0));
+
+			addLabel("Clearcoat Normal Map", new THREE.Vector3(0, 260, 0), 30);
+			addLabel("None", new THREE.Vector3(- 200, 200, 0));
+			addLabel("Scaling", new THREE.Vector3(0, 200, 0));
+			addLabel("Scaling + Map", new THREE.Vector3(200, 200, 0));
 
 			// LIGHTS
 
-			particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-			scene.add( particleLight );
+			particleLight = new THREE.Mesh(new THREE.SphereBufferGeometry(4, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+			scene.add(particleLight);
 
 			{
 				var ambientLight = new THREE.AmbientLight(0x444444);
@@ -201,18 +252,23 @@
 
 			// EVENTS
 
-			var controls = new OrbitControls( camera, renderer.domElement );
+			var controls = new OrbitControls(camera, renderer.domElement);
 
 			window.addEventListener('resize', onWindowResize, false);
 
 			var gui = new GUI();
 
-			gui.add( color, 'hue', 0, 1 );
-			gui.add( params, 'metalness', 0, 1 );
-			gui.add( params, 'roughness', 0, 1 );
-			gui.add( params, 'reflectivity', 0, 1 );
-			gui.add( params, 'clearCoat', 0, 1 );
-			gui.add( params, 'clearCoatRoughness', 0, 1 );
+			gui.add(guiParams, 'metalness', 0, 1, 0.01);
+			gui.add(guiParams, 'roughness', 0, 1, 0.01);
+			gui.add(guiParams, 'reflectivity', 0, 1, 0.01);
+			gui.add(guiParams, 'clearCoat', 0, 1, 0.01);
+			gui.add(guiParams, 'clearCoatRoughness', 0, 1, 0.01);
+
+
+			gui.add(guiMatParams, 'normalMap', guiNormalMapNames);
+			gui.add(guiMatParams, 'normalScale', 0, 10, 0.01);
+			gui.add(guiMatParams, 'clearCoatNormalMap', guiNormalMapNames);
+			gui.add(guiMatParams, 'clearCoatNormalScale', 0, 10, 0.01);
 
 			gui.open();
 		}
@@ -243,24 +299,38 @@
 
 		function render() {
 
-			var matColor = new THREE.Color().setHSL( color.hue, 0.5, 0.25 );
-			for (var mat of mats) {
-				mat.color = matColor;
-				for (var param in params) {
-					mat[param] = params[param];
+			var matColor = new THREE.Color().setHSL(0.0, 0.5, 0.25);
+
+			for (var ii = 0; ii < maxI; ii++) {
+				if (mats[ii]) {
+					for (var jj = 0; jj < maxJ; jj++) {
+						var mat = mats[ii][jj];
+						mat.color = matColor;
+						for (var matParam in guiParams) {
+							mat[matParam] = guiParams[matParam];
+						}
+
+						var normalMap = normalMaps[guiMatParams.normalMap];
+						var clearCoatNormalMap = normalMaps[guiMatParams.clearCoatNormalMap];
+
+						variationsX[ii](mat, guiMatParams.clearCoatNormalScale, clearCoatNormalMap);
+						variationsY[jj](mat, guiMatParams.normalScale, normalMap);
+					}
 				}
 			}
 
 			var timer = Date.now() * 0.00025;
-			particleLight.position.x = Math.sin( timer * 7 ) * 300;
-			particleLight.position.y = Math.cos( timer * 5 ) * 400;
-			particleLight.position.z = Math.cos( timer * 3 ) * 300;
+			particleLight.position.x = Math.sin(timer * 7) * 300;
+			particleLight.position.y = Math.cos(timer * 5) * 400;
+			particleLight.position.z = Math.cos(timer * 3) * 300;
 
-			for(var mesh of meshes){
-				mesh.rotation.y += 0.005;
+
+			for (var mesh of meshes) {
+				mesh.rotation.y += 0.01;
 			}
 
-			renderer.render( scene, camera );
+
+			renderer.render(scene, camera);
 
 		}
 

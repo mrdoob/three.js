@@ -77,7 +77,9 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 	#endif
 
 	#ifndef STANDARD
-		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );
+		float ccDotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
+		float ccDotNL = ccDotNV;
+		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, ccDotNL );
 	#else
 		float clearCoatDHR = 0.0;
 	#endif
@@ -109,9 +111,9 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
 	#ifndef STANDARD
-		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
-		float dotNL = dotNV;
-		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );
+		float ccDotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
+		float ccDotNL = ccDotNV;
+		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, ccDotNL );
 	#else
 		float clearCoatDHR = 0.0;
 	#endif

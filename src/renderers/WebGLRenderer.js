@@ -155,7 +155,7 @@ function WebGLRenderer( parameters ) {
 		_currentScissor = new Vector4(),
 		_currentScissorTest = null,
 
-		//
+	//
 
 		_width = _canvas.width,
 		_height = _canvas.height,
@@ -256,47 +256,47 @@ function WebGLRenderer( parameters ) {
 
 	function initGLContext() {
 
-		extensions = new WebGLExtensions( _gl );
+			extensions = new WebGLExtensions( _gl );
 
-		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
+			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-		if ( ! capabilities.isWebGL2 ) {
+			if ( ! capabilities.isWebGL2 ) {
 
-			extensions.get( 'WEBGL_depth_texture' );
-			extensions.get( 'OES_texture_float' );
-			extensions.get( 'OES_texture_half_float' );
-			extensions.get( 'OES_texture_half_float_linear' );
-			extensions.get( 'OES_standard_derivatives' );
-			extensions.get( 'OES_element_index_uint' );
-			extensions.get( 'ANGLE_instanced_arrays' );
+				extensions.get( 'WEBGL_depth_texture' );
+				extensions.get( 'OES_texture_float' );
+				extensions.get( 'OES_texture_half_float' );
+				extensions.get( 'OES_texture_half_float_linear' );
+				extensions.get( 'OES_standard_derivatives' );
+				extensions.get( 'OES_element_index_uint' );
+				extensions.get( 'ANGLE_instanced_arrays' );
 
-		}
+			}
 
-		extensions.get( 'OES_texture_float_linear' );
+			extensions.get( 'OES_texture_float_linear' );
 
-		utils = new WebGLUtils( _gl, extensions, capabilities );
+			utils = new WebGLUtils( _gl, extensions, capabilities );
 
-		state = new WebGLState( _gl, extensions, utils, capabilities );
-		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
-		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
+			state = new WebGLState( _gl, extensions, utils, capabilities );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
-		info = new WebGLInfo( _gl );
-		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
-		attributes = new WebGLAttributes( _gl );
-		geometries = new WebGLGeometries( _gl, attributes, info );
-		objects = new WebGLObjects( geometries, info );
-		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, extensions, capabilities );
-		renderLists = new WebGLRenderLists();
-		renderStates = new WebGLRenderStates();
+			info = new WebGLInfo( _gl );
+			properties = new WebGLProperties();
+			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
+			attributes = new WebGLAttributes( _gl );
+			geometries = new WebGLGeometries( _gl, attributes, info );
+			objects = new WebGLObjects( geometries, info );
+			morphtargets = new WebGLMorphtargets( _gl );
+			programCache = new WebGLPrograms( _this, extensions, capabilities );
+			renderLists = new WebGLRenderLists();
+			renderStates = new WebGLRenderStates();
 
-		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
+			background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
-		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
-		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
+			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
+			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
 
-		info.programs = programCache.programs;
+			info.programs = programCache.programs;
 
 		_this.capabilities = capabilities;
 		_this.extensions = extensions;
@@ -305,124 +305,124 @@ function WebGLRenderer( parameters ) {
 		_this.state = state;
 		_this.info = info;
 
-	}
+		}
 
-	initGLContext();
+		initGLContext();
 
-	// vr
+		// vr
 
 	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
-	this.vr = vr;
+		this.vr = vr;
 
-	// shadow map
+		// shadow map
 
-	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
+		var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
 
-	this.shadowMap = shadowMap;
+		this.shadowMap = shadowMap;
 
-	// API
+		// API
 
-	this.getContext = function () {
+		this.getContext = function () {
 
-		return _gl;
+			return _gl;
 
-	};
+		};
 
-	this.getContextAttributes = function () {
+		this.getContextAttributes = function () {
 
-		return _gl.getContextAttributes();
+			return _gl.getContextAttributes();
 
-	};
+		};
 
-	this.forceContextLoss = function () {
+		this.forceContextLoss = function () {
 
-		var extension = extensions.get( 'WEBGL_lose_context' );
-		if ( extension ) extension.loseContext();
+			var extension = extensions.get( 'WEBGL_lose_context' );
+			if ( extension ) extension.loseContext();
 
-	};
+		};
 
-	this.forceContextRestore = function () {
+		this.forceContextRestore = function () {
 
-		var extension = extensions.get( 'WEBGL_lose_context' );
-		if ( extension ) extension.restoreContext();
+			var extension = extensions.get( 'WEBGL_lose_context' );
+			if ( extension ) extension.restoreContext();
 
-	};
+		};
 
-	this.getPixelRatio = function () {
+		this.getPixelRatio = function () {
 
-		return _pixelRatio;
+			return _pixelRatio;
 
-	};
+		};
 
-	this.setPixelRatio = function ( value ) {
+		this.setPixelRatio = function ( value ) {
 
-		if ( value === undefined ) return;
+			if ( value === undefined ) return;
 
-		_pixelRatio = value;
+			_pixelRatio = value;
 
-		this.setSize( _width, _height, false );
+			this.setSize( _width, _height, false );
 
-	};
+		};
 
-	this.getSize = function ( target ) {
+		this.getSize = function ( target ) {
 
-		if ( target === undefined ) {
+			if ( target === undefined ) {
 
-			console.warn( 'WebGLRenderer: .getsize() now requires a Vector2 as an argument' );
+				console.warn( 'WebGLRenderer: .getsize() now requires a Vector2 as an argument' );
 
-			target = new Vector2();
+				target = new Vector2();
 
-		}
+			}
 
-		return target.set( _width, _height );
+			return target.set( _width, _height );
 
-	};
+		};
 
-	this.setSize = function ( width, height, updateStyle ) {
+		this.setSize = function ( width, height, updateStyle ) {
 
-		if ( vr.isPresenting() ) {
+			if ( vr.isPresenting() ) {
 
-			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
-			return;
+				console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
+				return;
 
-		}
+			}
 
-		_width = width;
-		_height = height;
+			_width = width;
+			_height = height;
 
-		_canvas.width = Math.floor( width * _pixelRatio );
-		_canvas.height = Math.floor( height * _pixelRatio );
+			_canvas.width = Math.floor( width * _pixelRatio );
+			_canvas.height = Math.floor( height * _pixelRatio );
 
-		if ( updateStyle !== false ) {
+			if ( updateStyle !== false ) {
 
-			_canvas.style.width = width + 'px';
-			_canvas.style.height = height + 'px';
+				_canvas.style.width = width + 'px';
+				_canvas.style.height = height + 'px';
 
-		}
+			}
 
-		this.setViewport( 0, 0, width, height );
+			this.setViewport( 0, 0, width, height );
 
-	};
+		};
 
-	this.getDrawingBufferSize = function ( target ) {
+		this.getDrawingBufferSize = function ( target ) {
 
-		if ( target === undefined ) {
+			if ( target === undefined ) {
 
-			console.warn( 'WebGLRenderer: .getdrawingBufferSize() now requires a Vector2 as an argument' );
+				console.warn( 'WebGLRenderer: .getdrawingBufferSize() now requires a Vector2 as an argument' );
 
-			target = new Vector2();
+				target = new Vector2();
 
-		}
+			}
 
-		return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
+			return target.set( _width * _pixelRatio, _height * _pixelRatio ).floor();
 
-	};
+		};
 
-	this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
+		this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
 
-		_width = width;
-		_height = height;
+			_width = width;
+			_height = height;
 
 		_pixelRatio = pixelRatio;
 
@@ -2274,6 +2274,10 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
+
+		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
+		uniforms.clearCoatNormalMap.value = material.clearCoatNormalMap;
+		uniforms.clearCoatNormalScale.value = material.clearCoatNormalScale;
 		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
 
 	}
