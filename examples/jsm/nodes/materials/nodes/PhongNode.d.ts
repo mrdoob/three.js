@@ -4,7 +4,7 @@ import { ColorNode } from '../../inputs/ColorNode';
 import { FloatNode } from '../../inputs/FloatNode';
 
 export class PhongNode extends Node {
-  constructor(value: Node);
+  constructor();
 
   color: ColorNode;
   specular: ColorNode;

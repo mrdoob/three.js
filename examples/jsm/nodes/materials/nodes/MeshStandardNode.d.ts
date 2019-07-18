@@ -8,7 +8,7 @@ import { StandardNode } from './StandardNode';
 import { PropertyNode } from "../../inputs/PropertyNode";
 
 export class MeshStandardNode extends StandardNode {
-  constructor(value: Node);
+  constructor();
 
   properties: {
     color: Color;
