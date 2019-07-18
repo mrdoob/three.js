@@ -7,7 +7,7 @@ uniform float transparency;
 	vec4 diffuseFinal = vec4( diffuseLight * ( 1. - transparency ), 1. - transparency );
 
 	vec3 fresnel = BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );
-	float fresnelApprox = ( fresnel.r + fresnel.g + fresnel.b ) * ( 1. / 3. ); // since we can't have per-channel opacity blending, we must approximate with a single blending factor
+	float fresnelApprox = linearToRelativeLuminance( fresnel ); // since we can't have per-channel opacity blending, we must approximate with a single blending factor
 
 	vec4 specularFinal = vec4( specularLight, fresnelApprox ); // specularLight is already premultiplied by fresnel (TODO: factor fresnel out of BSDF)
 
