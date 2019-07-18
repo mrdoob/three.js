@@ -3,7 +3,7 @@ import { Node } from '../../core/Node';
 import { ColorNode } from '../../inputs/ColorNode';
 
 export class SpriteNode extends Node {
-  constructor(value: Node);
+  constructor();
 
   color: ColorNode;
   spherical: true;
