@@ -4,31 +4,7 @@
 	<title>three.js webgl - loaders - Draco loader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			font-family: Monospace;
-			background-color: #000;
-			color: #fff;
-			margin: 0px;
-			overflow: hidden;
-		}
-		#info {
-			color: #fff;
-			position: absolute;
-			top: 10px;
-			width: 100%;
-			text-align: center;
-			z-index: 100;
-			display: block;
-		}
-		#info a,
-		.button {
-			color: #f00;
-			font-weight: bold;
-			text-decoration: underline;
-			cursor: pointer
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
 <body>
@@ -37,16 +13,20 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
-	<script src="../build/three.js"></script>
-	<script src="js/loaders/DRACOLoader.js"></script>
-	<script>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
 		var camera, scene, renderer;
 
+		var container = document.querySelector( '#container' );
+
 		// Configure and create Draco decoder.
-		THREE.DRACOLoader.setDecoderPath('js/libs/draco/');
-		THREE.DRACOLoader.setDecoderConfig({type: 'js'});
-		var dracoLoader = new THREE.DRACOLoader();
+		DRACOLoader.setDecoderPath( 'js/libs/draco/' );
+		DRACOLoader.setDecoderConfig( { type: 'js' } );
+		var dracoLoader = new DRACOLoader();
 		init();
 		animate();
 
@@ -67,7 +47,7 @@
 			plane.rotation.x = - Math.PI / 2;
 			plane.position.y = 0.03;
 			plane.receiveShadow = true;
-			scene.add(plane);
+			scene.add( plane );
 
 			// Lights
 			var light = new THREE.HemisphereLight( 0x443333, 0x111122 );
@@ -84,14 +64,14 @@
 
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshStandardMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				// Release decoder resources.
-				THREE.DRACOLoader.releaseDecoderModule();
+				DRACOLoader.releaseDecoderModule();
 
 			} );
 
@@ -130,7 +110,7 @@
 
 			camera.position.x = Math.sin( timer ) * 0.5;
 			camera.position.z = Math.cos( timer ) * 0.5;
-			camera.lookAt( new THREE.Vector3( 0, 0.1, 0 ) );
+			camera.lookAt( 0, 0.1, 0 );
 
 			renderer.render( scene, camera );
 

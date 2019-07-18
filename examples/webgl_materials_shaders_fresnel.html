@@ -4,54 +4,26 @@
 		<title>three.js webgl - materials - shaders [Fresnel]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {	color: #ffffff;	}
-
-			#oldie a { color:#0b0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube Fresnel shader demo. texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a> </div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl cube Fresnel shader demo.<br/>texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/FresnelShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { FresnelShader } from './jsm/shaders/FresnelShader.js';
 
 			var container;
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
-
-			var directionalLight, pointLight;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -76,10 +48,10 @@
 				var path = "textures/cube/Park2/";
 				var format = '.jpg';
 				var urls = [
-						path + 'posx' + format, path + 'negx' + format,
-						path + 'posy' + format, path + 'negy' + format,
-						path + 'posz' + format, path + 'negz' + format
-					];
+					path + 'posx' + format, path + 'negx' + format,
+					path + 'posy' + format, path + 'negy' + format,
+					path + 'posz' + format, path + 'negz' + format
+				];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
@@ -91,7 +63,7 @@
 
 				var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
 
-				var shader = THREE.FresnelShader;
+				var shader = FresnelShader;
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tCube" ].value = textureCube;
@@ -117,8 +89,6 @@
 					spheres.push( mesh );
 
 				}
-
-				scene.matrixAutoUpdate = false;
 
 				//
 

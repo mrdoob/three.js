@@ -24,12 +24,12 @@ THREE.FilmShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { value: null },
-		"time":       { value: 0.0 },
+		"tDiffuse": { value: null },
+		"time": { value: 0.0 },
 		"nIntensity": { value: 0.5 },
 		"sIntensity": { value: 0.05 },
-		"sCount":     { value: 4096 },
-		"grayscale":  { value: 1 }
+		"sCount": { value: 4096 },
+		"grayscale": { value: 1 }
 
 	},
 
@@ -49,7 +49,7 @@ THREE.FilmShader = {
 	fragmentShader: [
 
 		"#include <common>",
-		
+
 		// control parameter
 		"uniform float time;",
 

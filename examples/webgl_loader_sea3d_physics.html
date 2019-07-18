@@ -4,129 +4,112 @@
 		<title>three.js webgl - sea3d / physics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: white }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Ammo Physics Example - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a> edited by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Studio</a>
-			<br/>
-			<br/><div id="description">Right click to clone</div>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Ammo Physics Example<br/>
+			Exported by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Exporter</a> edited by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Studio</a><br/>
+			<div id="description">Right click to clone</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
-
-		<script src="js/loaders/sea3d/SEA3D.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
-
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/loaders/sea3d/physics/SEA3DRigidBody.js"></script>
-		<script src="js/loaders/sea3d/physics/SEA3DAmmo.js"></script>
-		<script src="js/loaders/sea3d/physics/SEA3DAmmoLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			console.log("Visit https://github.com/sunag/sea3d to all codes and builds under development.");
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
+			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
+
+			import { SEA3D } from './jsm/loaders/sea3d/SEA3DLoader.js';
+			import { AMMO } from './jsm/loaders/sea3d/physics/SEA3DAmmoLoader.js'; // sea3d ammo.js extension
+			import './jsm/loaders/sea3d/SEA3DLZMA.js'; // sea3d lzma extension
+			import './jsm/loaders/sea3d/physics/SEA3DSDKRigidBody.js'; // sea3d physics extension
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
 			var container, stats;
 
-			var camera, scene, renderer, composer, controls, demoAt = -1;
+			var camera, scene, renderer, composer;
 
 			var loader;
 
-			// Initialize Three.JS
+			Ammo().then( function ( AmmoLib ) {
 
-			init();
-			
-			// Initialize Physics Engine
-			
-			SEA3D.AMMO.init(); 
+				// Initialize Three.JS
 
-			//
-			// SEA3D Loader
-			//
+				init();
 
-			loader = new THREE.SEA3D( {
+				// Initialize Physics Engine
 
-				container : scene // Container to add models
+				Ammo = AmmoLib;
+				AMMO.init();
 
-			} );
+				//
+				// SEA3D Loader
+				//
 
-			loader.onComplete = function( e ) {
+				loader = new SEA3D( {
 
-				controls = new THREE.OrbitControls( camera );
-
-				// events
-
-				window.addEventListener( 'contextmenu', function(e) { 
-
-					e.preventDefault(); 
-
-					cloneAsset(); 
+					container: scene // Container to add models
 
 				} );
 
-				animate();
+				loader.onComplete = function () {
 
-			};
+					new OrbitControls( camera, renderer.domElement );
 
-			loader.load( './models/sea3d/car.tjs.sea' );
+					// events
 
-			var cloneAsset = function() {
+					window.addEventListener( 'contextmenu', function ( e ) {
 
-				var offset = 0;
+						e.preventDefault();
 
-				return function() {
+						cloneAsset();
 
-					var domain = this.loader.clone( { lights : false, runScripts : false, autoPlay: false, enabledPhysics : false } );
+					} );
 
-					offset -= 180;
+					// prevent material compilation in render loop
 
-					domain.container.position.x += offset;
-					domain.applyContainerTransform();
-					domain.enabledPhysics( true );
-					domain.runScripts();
+					renderer.compile( scene, camera );
 
-					this.scene.add( domain.container );
+					animate();
 
-				}
+				};
 
-			}();
+				loader.load( './models/sea3d/car.tjs.sea' );
+
+				var cloneAsset = function () {
+
+					var offset = 0;
+
+					return function () {
+
+						var domain = loader.clone( { lights: false, runScripts: false, autoPlay: false, enabledPhysics: false } );
+
+						offset -= 180;
+
+						domain.container.position.x += offset;
+						domain.applyContainerTransform();
+						domain.enabledPhysics( true );
+						domain.runScripts();
+
+						scene.add( domain.container );
+
+					};
+
+				}();
+
+			} );
 
 			//
 
@@ -139,7 +122,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
-				camera.position.set( 300, 200, -300 );
+				camera.position.set( 300, 200, - 300 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -151,25 +134,24 @@
 
 				// post-processing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var renderPass = new RenderPass( scene, camera );
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
 
-				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
 				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
 				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
-				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				var vignettePass = new ShaderPass( VignetteShader );
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
 				composer.addPass( copyPass );
-				copyPass.renderToScreen = true;
 
 				// events
 
@@ -197,13 +179,13 @@
 
 				requestAnimationFrame( animate );
 
-				// Update Physics Engine
+				// Update Physics Engine ( fix delta-time in 60fps for more stability )
 
-				SEA3D.AMMO.update( delta );
+				AMMO.update( 1 / 60 );
 
 				// Update SEA3D Animations
 
-				THREE.SEA3D.AnimationHandler.update( delta );
+				SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
 

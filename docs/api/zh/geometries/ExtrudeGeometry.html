@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>挤压几何体（[name]）</h1>
+
+		<p class="desc">从一条形状路径中，挤压出一个Geometry。</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#ExtrudeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>示例</h2>
+
+
+		<code>
+		var length = 12, width = 8;
+
+		var shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		var extrudeSettings = {
+			steps: 2,
+			depth: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelSegments: 1
+		};
+
+		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var mesh = new THREE.Mesh( geometry, material ) ;
+		scene.add( mesh );
+		</code>
+
+
+		<h2>构造器</h2>
+
+
+		<h3>[name]([param:Array shapes], [param:Object options])</h3>
+		<p>shapes — 形状或者一个包含形状的数组。<br />
+			options — 一个包含有下列参数的对象：
+
+			<ul>
+				<li>curveSegments — int，曲线上点的数量，默认值是12。</li>
+				<li>steps — int，用于沿着挤出样条的深度细分的点的数量，默认值为1。
+				</li>
+				<li>depth — float，挤出的形状的深度，默认值为100。</li>
+				<li>bevelEnabled — bool，对挤出的形状应用是否斜角，默认值为true。</li>
+				<li>bevelThickness — float，设置原始形状上斜角的厚度。默认值为6。</li>
+				<li>bevelSize — float。斜角与原始形状轮廓之间的延伸距离，默认值为bevelThickness-2。</li>
+				<li>bevelSegments — int。斜角的分段层数，默认值为3。</li>
+				<li>extrudePath — THREE.Curve对象。一条沿着被挤出形状的三维样条线。</li>
+				<li>UVGenerator —  Object。提供了UV生成器函数的对象。</li>
+			</ul>
+
+		</p>
+		<p>
+				该对象将一个二维形状挤出为一个三维几何体。
+			</p>
+
+		<p>
+				当使用这个几何体创建Mesh的时候，如果你希望分别对它的表面和它挤出的侧面使用单独的材质，你可以使用一个材质数组。
+				第一个材质将用于其表面；第二个材质则将用于其挤压出的侧面。
+		</p>
+
+		<h2>属性</h2>
+		<p>常用属性请参见基类[page:Geometry]。</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+			一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>常用方法请参见基类[page:Geometry]。</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

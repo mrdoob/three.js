@@ -14,15 +14,12 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script type="module">
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
-			var mesh, mapBg;
+			var mapBg;
 
 			var textureLoader = new THREE.TextureLoader();
 
@@ -69,12 +66,18 @@
 				var materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
 
 				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
-				meshBg.position.set( 0, 0, -1 );
+				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
 				// OBJECTS
 
-				var blendings = [ 'NoBlending', 'NormalBlending', 'AdditiveBlending', 'SubtractiveBlending', 'MultiplyBlending' ];
+				var blendings = [
+					{ name: 'No', constant: THREE.NoBlending },
+					{ name: 'Normal', constant: THREE.NormalBlending },
+					{ name: 'Additive', constant: THREE.AdditiveBlending },
+					{ name: 'Subtractive', constant: THREE.SubtractiveBlending },
+					{ name: 'Multiply', constant: THREE.MultiplyBlending }
+				];
 
 				var map0 = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 				var map1 = textureLoader.load( 'textures/sprite0.jpg' );
@@ -88,8 +91,8 @@
 				addImageRow( map0, 300 );
 				addImageRow( map1, 150 );
 				addImageRow( map2, 0 );
-				addImageRow( map3, -150 );
-				addImageRow( map4, -300 );
+				addImageRow( map3, - 150 );
+				addImageRow( map4, - 300 );
 
 				function addImageRow( map, y ) {
 
@@ -99,7 +102,7 @@
 
 						var material = new THREE.MeshBasicMaterial( { map: map } );
 						material.transparent = true;
-						material.blending = THREE[ blending ];
+						material.blending = blending.constant;
 
 						var x = ( i - blendings.length / 2 ) * 110;
 						var z = 0;
@@ -109,7 +112,7 @@
 						scene.add( mesh );
 
 
-						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( 'Blending', '' ) ) );
+						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.name ) );
 						mesh.position.set( x, y - 75, z );
 						scene.add( mesh );
 
@@ -132,7 +135,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				var SCREEN_WIDTH = window.innerWidth;
 				var SCREEN_HEIGHT = window.innerHeight;
@@ -172,8 +175,8 @@
 				requestAnimationFrame( animate );
 
 				var time = Date.now() * 0.00025;
-				var ox = ( time * -0.01 * mapBg.repeat.x ) % 1;
-				var oy = ( time * -0.01 * mapBg.repeat.y ) % 1;
+				var ox = ( time * - 0.01 * mapBg.repeat.x ) % 1;
+				var oy = ( time * - 0.01 * mapBg.repeat.y ) % 1;
 
 				mapBg.offset.set( ox, oy );
 

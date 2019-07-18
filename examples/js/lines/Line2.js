@@ -20,7 +20,7 @@ THREE.Line2.prototype = Object.assign( Object.create( THREE.LineSegments2.protot
 
 	isLine2: true,
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 

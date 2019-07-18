@@ -4,28 +4,8 @@
 		<title>three.js webgl - materials - displacement map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #ffffff;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
 		</style>
@@ -40,19 +20,15 @@
 			<div id="vt">displacement mapping requires vertex textures</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			var stats;
 
 			var camera, scene, renderer, controls;
@@ -70,12 +46,6 @@
 
 			var pointLight, ambientLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			var height = 500; // of camera frustum
 
 			var r = 0.0;
@@ -87,45 +57,45 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				//var gui = gui.addFolder( "Material" );
-				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.metalness = value;
 
 				} );
 
-				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.roughness = value;
 
 				} );
 
-				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.aoMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					ambientLight.intensity = value;
 
 				} );
 
-				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function( value ) {
+				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function ( value ) {
 
 					material.envMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function( value ) {
+				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function ( value ) {
 
 					material.displacementScale = value;
 
 				} );
 
-				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function( value ) {
+				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function ( value ) {
 
 					material.normalScale.set( 1, - 1 ).multiplyScalar( value );
 
@@ -155,7 +125,7 @@
 				camera.position.z = 1500;
 				scene.add( camera );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 				controls.enableDamping = true;
 
@@ -181,10 +151,10 @@
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
@@ -222,7 +192,7 @@
 
 				//
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
 					var geometry = group.children[ 0 ].geometry;

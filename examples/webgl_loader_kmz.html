@@ -4,56 +4,22 @@
 		<title>three.js webgl - KMZ</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: skyblue }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				float: left;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ File format</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZ</a> loader
 		</div>
-
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/KMZLoader.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { KMZLoader } from './jsm/loaders/KMZLoader.js';
 
 			var camera, scene, renderer;
 
@@ -84,7 +50,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.KMZLoader();
+				var loader = new KMZLoader();
 				loader.load( './models/kmz/Box.kmz', function ( kmz ) {
 
 					kmz.scene.position.y = 0.5;
@@ -93,7 +59,7 @@
 
 				} );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.update();
 

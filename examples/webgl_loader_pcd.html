@@ -4,37 +4,7 @@
 		<title>three.js webgl - PCD</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: #d14826 }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				float: left;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -42,19 +12,17 @@
 			<a href="http://pointclouds.org/documentation/tutorials/pcd_file_format.php#pcd-file-format" target="_blank" rel="noopener">PCD File format</a>
 			<div>PCD loader test by <a href="http://filipecaixeta.com.br" target="_blank" rel="noopener">Filipe Caixeta</a></div>
 			<div>+/-: Increase/Decrease point size</div>
-			<div>c: Toggle color</div>
+			<div>c: Change color</div>
 		</div>
 
+		<script type="module">
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PCDLoader.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { PCDLoader } from './jsm/loaders/PCDLoader.js';
 
 			var container, stats;
 			var camera, controls, scene, renderer;
@@ -68,10 +36,31 @@
 
 				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
 				camera.position.x = 0.4;
-				camera.position.z = -2;
-				camera.up.set(0,0,1);
+				camera.position.z = - 2;
+				camera.up.set( 0, 0, 1 );
 
-				controls = new THREE.TrackballControls( camera );
+				scene.add( camera );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var loader = new PCDLoader();
+				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
+
+					scene.add( points );
+					var center = points.geometry.boundingSphere.center;
+					controls.target.set( center.x, center.y, center.z );
+					controls.update();
+
+				} );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				controls.rotateSpeed = 2.0;
 				controls.zoomSpeed = 0.3;
@@ -86,33 +75,12 @@
 				controls.minDistance = 0.3;
 				controls.maxDistance = 0.3 * 100;
 
-				scene.add( camera );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				var loader = new THREE.PCDLoader();
-				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( mesh ) {
-
-					scene.add( mesh );
-					var center = mesh.geometry.boundingSphere.center;
-					controls.target.set( center.x, center.y, center.z);
-					controls.update();
-
-				} );
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener('keypress', keyboard);
+				window.addEventListener( 'keypress', keyboard );
 
 			}
 
@@ -125,25 +93,25 @@
 
 			}
 
-			function keyboard ( ev ) {
+			function keyboard( ev ) {
 
-				var ZaghettoMesh = scene.getObjectByName( 'Zaghetto.pcd' );
+				var points = scene.getObjectByName( 'Zaghetto.pcd' );
 
 				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
 
 					case '+':
-						ZaghettoMesh.material.size*=1.2;
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.size *= 1.2;
+						points.material.needsUpdate = true;
 						break;
 
 					case '-':
-						ZaghettoMesh.material.size/=1.2;
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.size /= 1.2;
+						points.material.needsUpdate = true;
 						break;
 
 					case 'c':
-						ZaghettoMesh.material.color.setHex(Math.random()*0xffffff);
-						ZaghettoMesh.material.needsUpdate = true;
+						points.material.color.setHex( Math.random() * 0xffffff );
+						points.material.needsUpdate = true;
 						break;
 
 				}

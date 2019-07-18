@@ -54,6 +54,13 @@ THREE.VRMLoader = ( function () {
 
 		},
 
+		setResourcePath: function ( value ) {
+
+			this.glTFLoader.setResourcePath( value );
+			return this;
+
+		},
+
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.glTFLoader.setDRACOLoader( dracoLoader );
@@ -63,9 +70,9 @@ THREE.VRMLoader = ( function () {
 
 		parse: function ( gltf, onLoad ) {
 
-			var gltfParser = gltf.parser;
-			var gltfExtensions = gltf.userData.gltfExtensions || {};
-			var vrmExtension = gltfExtensions.VRM || {};
+			// var gltfParser = gltf.parser;
+			// var gltfExtensions = gltf.userData.gltfExtensions || {};
+			// var vrmExtension = gltfExtensions.VRM || {};
 
 			// handle VRM Extension here
 

@@ -4,28 +4,7 @@
 		<title>three.js webgl - FBX loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #046;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -34,26 +13,21 @@
 			Character and animation from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/inflate.min.js"></script>
-		<script src="js/loaders/FBXLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
 
 			var clock = new THREE.Clock();
 
-			var mixers = [];
+			var mixer;
 
 			init();
 			animate();
@@ -65,10 +39,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 100, 200, 300 );
-
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 100, 0 );
-				controls.update();
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -82,12 +52,12 @@
 				light.position.set( 0, 200, 100 );
 				light.castShadow = true;
 				light.shadow.camera.top = 180;
-				light.shadow.camera.bottom = -100;
-				light.shadow.camera.left = -120;
+				light.shadow.camera.bottom = - 100;
+				light.shadow.camera.left = - 120;
 				light.shadow.camera.right = 120;
 				scene.add( light );
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				// ground
 				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
@@ -101,13 +71,12 @@
 				scene.add( grid );
 
 				// model
-				var loader = new THREE.FBXLoader();
+				var loader = new FBXLoader();
 				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
 
-					object.mixer = new THREE.AnimationMixer( object );
-					mixers.push( object.mixer );
+					mixer = new THREE.AnimationMixer( object );
 
-					var action = object.mixer.clipAction( object.animations[ 0 ] );
+					var action = mixer.clipAction( object.animations[ 0 ] );
 					action.play();
 
 					object.traverse( function ( child ) {
@@ -130,6 +99,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 100, 0 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -154,15 +127,9 @@
 
 				requestAnimationFrame( animate );
 
-				if ( mixers.length > 0 ) {
+				var delta = clock.getDelta();
 
-					for ( var i = 0; i < mixers.length; i ++ ) {
-
-						mixers[ i ].update( clock.getDelta() );
-
-					}
-
-				}
+				if ( mixer ) mixer.update( delta );
 
 				renderer.render( scene, camera );
 

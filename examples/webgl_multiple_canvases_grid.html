@@ -4,24 +4,19 @@
 		<title>three.js webgl - multiple canvases - grid</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			html, body {
-				color: #808080;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-				width: 100%;
 				height: 100%;
 			}
 
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+			body {
+				background-color: #fff;
+				color: #444;
+			}
+
+			a {
+				color: #08f;
 			}
 
 			#centerer {
@@ -51,11 +46,6 @@
 				border: 1px solid red;
 				float: left;
 			}
-
-			a {
-				color: #0080ff;
-			}
-
 		</style>
 	</head>
 	<body>
@@ -75,13 +65,9 @@
 		</div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -  multiple canvases - grid</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var views = [];
 
@@ -263,7 +249,7 @@
 
 			function animate() {
 
-				for ( var i = 0; i < views.length; ++i ) {
+				for ( var i = 0; i < views.length; ++ i ) {
 
 					views[ i ].render();
 

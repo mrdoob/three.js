@@ -4,310 +4,190 @@
 		<title>three.js webgl - lookup table</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
 				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				color:#000;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
 			a {
 				color: red;
 			}
 		</style>
 	</head>
-
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookuptable - vertex color values from a range of data values.<br />
-		press A: change color map, press S: change numberOfColors, press D: toggle Legend on/off, press F: change Legend layout<br />
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookup table<br/>
+			vertex color values from a range of data values
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/math/Lut.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) { Detector.addGetWebGLMessage(); }
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var container, stats;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Lut } from './jsm/math/Lut.js';
 
-			var camera, scene, renderer, lut, legendLayout;
+			var container;
 
-			var mesh, material;
+			var perpCamera, orthoCamera, renderer, lut;
 
-			var colorMap;
-			var numberOfColors;
+			var mesh, sprite;
+			var scene, uiScene;
 
-			var loader = new THREE.BufferGeometryLoader();
+			var params;
 
 			init();
-			animate();
 
 			function init() {
 
 				container = document.getElementById( 'container' );
 
-				// SCENE
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				// CAMERA
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100 );
-				camera.position.set( 0, 0, 10 );
+				uiScene = new THREE.Scene();
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				lut = new Lut();
 
-				// LIGHT
-				var ambientLight = new THREE.AmbientLight( 0x444444 );
-				scene.add( ambientLight );
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 
-				colorMap = 'rainbow';
-				numberOfColors = 512;
+				perpCamera = new THREE.PerspectiveCamera( 60, width / height, 1, 100 );
+				perpCamera.position.set( 0, 0, 10 );
+				scene.add( perpCamera );
 
-				legendLayout = 'vertical';
+				orthoCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 1, 2 );
+				orthoCamera.position.set( 0.5, 0, 1 );
 
-				material = new THREE.MeshLambertMaterial( {
+				sprite = new THREE.Sprite( new THREE.SpriteMaterial( {
+					map: new THREE.CanvasTexture( lut.createCanvas() )
+				} ) );
+				sprite.scale.x = 0.125;
+				uiScene.add( sprite );
+
+				mesh = new THREE.Mesh( undefined, new THREE.MeshLambertMaterial( {
 					side: THREE.DoubleSide,
 					color: 0xF5F5F5,
 					vertexColors: THREE.VertexColors
-				} );
+				} ) );
+				scene.add( mesh );
 
-				loadModel( colorMap, numberOfColors, legendLayout );
+				params	= {
+					colorMap: 'rainbow',
+				};
+				loadModel( );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
-				directionalLight.position.set( 17, 9, 30 );
-				scene.add( directionalLight );
+				var pointLight = new THREE.PointLight( 0xffffff, 1 );
+				perpCamera.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize(  window.innerWidth,  window.innerHeight );
+				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'keydown', onKeyDown, true);
+
+				var controls = new OrbitControls( perpCamera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+
+				var gui = new GUI();
+
+				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
+
+					updateColors();
+					render();
+
+				} );
 
 			}
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				perpCamera.aspect = width / height;
+				perpCamera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
 				render();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
 
 			}
 
 			function render() {
 
-				if ( mesh !== undefined ) mesh.rotation.y += 0.01;
-
-				renderer.render( scene, camera );
+				renderer.clear();
+				renderer.render( scene, perpCamera );
+				renderer.render( uiScene, orthoCamera );
 
 			}
 
-			function loadModel ( colorMap, numberOfColors, legendLayout ) {
+			function loadModel( ) {
 
-				loader.load( 'models/json/pressure.json', function( geometry ) {
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/pressure.json', function ( geometry ) {
 
 					geometry.center();
 					geometry.computeVertexNormals();
 
-					var lutColors = [];
+					// default color attribute
+					var colors = [];
+					for ( var i = 0, n = geometry.attributes.position.count; i < n; ++ i ) {
 
-					lut = new THREE.Lut( colorMap, numberOfColors );
-
-					lut.setMax( 2000 );
-					lut.setMin( 0 );
-
-					for ( var i = 0; i < geometry.attributes.pressure.array.length; i ++ ) {
-
-						var colorValue = geometry.attributes.pressure.array[ i ];
-
-						var color = lut.getColor( colorValue );
-
-						if ( color === undefined ) {
-
-							console.log( 'Unable to determine color for value:', colorValue );
-
-						} else {
-
-							lutColors[ 3 * i ] = color.r;
-							lutColors[ 3 * i + 1 ] = color.g;
-							lutColors[ 3 * i + 2 ] = color.b;
-
-						}
+						colors.push( 1, 1, 1 );
 
 					}
+					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( lutColors, 3 ) );
-					geometry.removeAttribute( 'pressure' );
+					mesh.geometry = geometry;
+					updateColors();
 
-					mesh = new THREE.Mesh( geometry, material );
-
-					scene.add( mesh );
-
-					if ( legendLayout ) {
-
-						var legend;
-
-						if ( legendLayout === 'horizontal' ) {
-
-							legend = lut.setLegendOn( { 'layout':'horizontal', 'position': { 'x': 4, 'y': 0, 'z': 0 } } );
-
-						} else {
-
-							legend = lut.setLegendOn();
-
-						}
-
-						scene.add ( legend );
-
-						var labels = lut.setLegendLabels( { 'title': 'Pressure', 'um': 'Pa', 'ticks': 5 } );
-
-						scene.add ( labels['title'] );
-
-						for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i ++ ) {
-
-							scene.add ( labels[ 'ticks' ][ i ] );
-							scene.add ( labels[ 'lines' ][ i ] );
-
-						}
-
-					}
+					render();
 
 				} );
 
 			}
 
-			function cleanScene() {
+			function updateColors() {
 
-				var elementsInTheScene = scene.children.length;
+				lut.setColorMap( params.colorMap );
 
-				for ( var i = elementsInTheScene - 1; i > 0; i -- ) {
+				lut.setMax( 2000 );
+				lut.setMin( 0 );
 
-					var child = scene.children[ i ];
+				var geometry = mesh.geometry;
+				var pressures = geometry.attributes.pressure;
+				var colors = geometry.attributes.color;
+				for ( var i = 0; i < pressures.array.length; i ++ ) {
 
-					if ( ! child.isLight ) {
+					var colorValue = pressures.array[ i ];
 
-						scene.remove( child );
+					var color = lut.getColor( colorValue );
 
-						if ( child.isMesh || child.isLine ) {
+					if ( color === undefined ) {
 
-							child.geometry.dispose();
-							child.material.dispose();
-							if ( child.material.map ) child.material.map.dispose();
+						console.log( 'Unable to determine color for value:', colorValue );
 
+					} else {
 
-						} else if ( child.isSprite ) {
-
-							child.material.dispose();
-							if ( child.material.map ) child.material.map.dispose();
-
-						}
+						colors.setXYZ( i, color.r, color.g, color.b );
 
 					}
 
 				}
 
-			}
+				colors.needsUpdate = true;
 
-			function onKeyDown( e ) {
-
-				var maps = [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ];
-
-				var colorNumbers = [ '16', '128', '256', '512' ];
-
-				if ( e.keyCode === 65 ) {
-
-					cleanScene();
-
-					var index = maps.indexOf( colorMap ) >= maps.length - 1 ? 0 : maps.indexOf( colorMap ) + 1;
-
-					colorMap = maps [ index ];
-
-					loadModel( colorMap, numberOfColors, legendLayout );
-
-				} else if ( e.keyCode === 83 ) {
-
-					cleanScene();
-
-					var index = colorNumbers.indexOf( numberOfColors ) >= colorNumbers.length - 1 ? 0 : colorNumbers.indexOf( numberOfColors ) + 1;
-
-					numberOfColors = colorNumbers [ index ];
-
-					loadModel( colorMap ,  numberOfColors, legendLayout );
-
-				} else if ( e.keyCode === 68 ) {
-
-					if ( ! legendLayout ) {
-
-						cleanScene();
-
-						legendLayout = 'vertical';
-
-						loadModel( colorMap ,  numberOfColors, legendLayout );
-
-					} else {
-
-						cleanScene();
-
-						legendLayout = lut.setLegendOff();
-
-						loadModel( colorMap ,  numberOfColors, legendLayout );
-
-					}
-
-				} else if ( e.keyCode === 70 ) {
-
-					cleanScene();
-
-					if ( ! legendLayout ) return false;
-
-					lut.setLegendOff();
-
-					if ( legendLayout === 'horizontal') {
-
-						legendLayout = 'vertical';
-
-					} else {
-
-						legendLayout = 'horizontal';
-
-					}
-
-					loadModel( colorMap ,  numberOfColors, legendLayout );
-
-				}
+				var map = sprite.material.map;
+				lut.updateCanvas( map.image );
+				map.needsUpdate = true;
 
 			}
 

@@ -4,58 +4,29 @@
 		<title>three.js webgl - materials - cube refraction [Lucy]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a {	color: #ff0080;	text-decoration: none; }
-			a:hover { color: #0080ff; }
-
-			canvas { pointer-events:none; z-index:10; }
-
-			#d { text-align:center; margin:1em auto -9.5em; z-index:200; position:relative; display:block;
-				background:rgba(0,0,0,0.5); padding:0.5em; width:400px; border-radius:15px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
-
-			#oldie { margin-top:15em !important }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<div id="d">
-			<p><a href="http://threejs.org">Three.js</a> cube map refraction demo
-
-			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>
-			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
+		<div id="info">
+			<a href="http://threejs.org">Three.js</a> cube map refraction demo<br/>
+			Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository<br/>
+			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/PLYLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var FLOOR = -250;
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, geometry;
-
-			var loader;
-
-			var directionalLight, pointLight;
+			var pointLight;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -67,11 +38,11 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z =  - 4000;
+				camera.position.z = - 4000;
 
 				//
 
@@ -121,10 +92,14 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				loader = new THREE.PLYLoader();
-				loader.load( 'models/ply/binary/Lucy100k.ply', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
+				var loader = new PLYLoader();
+				loader.load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
+					createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 );
+
+				} );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				//
 
@@ -166,7 +141,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 4;
 				mouseY = ( event.clientY - windowHalfY ) * 4;
@@ -186,7 +161,7 @@
 
 			function render() {
 
-				var timer = -0.0002 * Date.now();
+				var timer = - 0.0002 * Date.now();
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

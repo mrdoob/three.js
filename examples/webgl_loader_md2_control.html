@@ -4,28 +4,15 @@
 		<title>three.js webgl - morphtargets - MD2 controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
 				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #000;
+			a {
+				color: #08f;
 			}
-
-			a { color: skyblue; }
 		</style>
 	</head>
 
@@ -36,21 +23,15 @@
 			use arrows to control characters, mouse for camera
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src='js/loaders/MD2Loader.js'></script>
-		<script src='js/MorphBlendMesh.js'></script>
-		<script src='js/MD2CharacterComplex.js'></script>
-		<script src='js/Gyroscope.js'></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src='js/Detector.js'></script>
-		<script src='js/libs/stats.min.js'></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MD2CharacterComplex } from './jsm/misc/MD2CharacterComplex.js';
+			import { Gyroscope } from './jsm/misc/Gyroscope.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -110,13 +91,13 @@
 				light.shadow.camera.near = 100;
 				light.shadow.camera.far = 1200;
 
-				light.shadow.camera.left = -1000;
+				light.shadow.camera.left = - 1000;
 				light.shadow.camera.right = 1000;
 				light.shadow.camera.top = 350;
-				light.shadow.camera.bottom = -350;
+				light.shadow.camera.bottom = - 350;
 
 				scene.add( light );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 
 				//  GROUND
@@ -163,7 +144,7 @@
 
 				// CONTROLS
 
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
 				cameraControls.update();
 
@@ -177,7 +158,7 @@
 					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
 							 "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
 							 "sharokh.png" ],
-					weapons:  [ [ "weapon.md2", "weapon.jpg" ] ],
+					weapons: [[ "weapon.md2", "weapon.jpg" ]],
 					animations: {
 						move: "run",
 						idle: "stand",
@@ -200,14 +181,14 @@
 
 				for ( var i = 0; i < nCharacters; i ++ ) {
 
-					var character = new THREE.MD2CharacterComplex();
+					var character = new MD2CharacterComplex();
 					character.scale = 3;
 					character.controls = controls;
 					characters.push( character );
 
 				}
 
-				var baseCharacter = new THREE.MD2CharacterComplex();
+				var baseCharacter = new MD2CharacterComplex();
 				baseCharacter.scale = 3;
 
 				baseCharacter.onLoadComplete = function () {
@@ -228,7 +209,7 @@
 							cloneCharacter.setWeapon( 0 );
 							cloneCharacter.setSkin( i );
 
-							cloneCharacter.root.position.x = ( i - nSkins/2 ) * 150;
+							cloneCharacter.root.position.x = ( i - nSkins / 2 ) * 150;
 							cloneCharacter.root.position.z = j * 250;
 
 							scene.add( cloneCharacter.root );
@@ -239,7 +220,7 @@
 
 					}
 
-					var gyro = new THREE.Gyroscope();
+					var gyro = new Gyroscope();
 					gyro.add( camera );
 					gyro.add( light, light.target );
 
@@ -253,23 +234,23 @@
 
 			// EVENT HANDLERS
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				event.stopPropagation();
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: /*up*/
 					case 87: /*W*/ 	controls.moveForward = true; break;
@@ -278,10 +259,10 @@
 					case 83: /*S*/ 	 controls.moveBackward = true; break;
 
 					case 37: /*left*/
-					case 65: /*A*/   controls.moveLeft = true; break;
+					case 65: /*A*/ controls.moveLeft = true; break;
 
 					case 39: /*right*/
-					case 68: /*D*/    controls.moveRight = true; break;
+					case 68: /*D*/ controls.moveRight = true; break;
 
 					//case 67: /*C*/     controls.crouch = true; break;
 					//case 32: /*space*/ controls.jump = true; break;
@@ -291,11 +272,11 @@
 
 			}
 
-			function onKeyUp ( event ) {
+			function onKeyUp( event ) {
 
 				event.stopPropagation();
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: /*up*/
 					case 87: /*W*/ controls.moveForward = false; break;
@@ -307,7 +288,7 @@
 					case 65: /*A*/ 	 controls.moveLeft = false; break;
 
 					case 39: /*right*/
-					case 68: /*D*/ 	  controls.moveRight = false; break;
+					case 68: /*D*/ controls.moveRight = false; break;
 
 					//case 67: /*C*/     controls.crouch = false; break;
 					//case 32: /*space*/ controls.jump = false; break;

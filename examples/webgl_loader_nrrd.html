@@ -1,31 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - vtk loader</title>
+		<title>three.js webgl - loaders - NRRD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 5;
-				display:block;
-			}
-			.dg {
-				z-index: 10 !important;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-			#inset  {
+			#inset {
 				width: 150px;
 				height: 150px;
 				background-color: transparent; /* or transparent; will show through only if renderer alpha: true */
@@ -43,27 +24,20 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			nrrd format loader test
+			NRRD format loader test
 		</div>
 		<div id="inset"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Volume.js"></script>
-		<script src="js/VolumeSlice.js"></script>
-		<script src="js/loaders/NRRDLoader.js"></script>
-		<script src="js/loaders/VTKLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/gunzip.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
+			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
 			var container,
 				stats,
@@ -71,7 +45,6 @@
 				controls,
 				scene,
 				renderer,
-				gui,
 				container2,
 				renderer2,
 				camera2,
@@ -86,8 +59,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 300;
 
-
-
 				scene = new THREE.Scene();
 
 				scene.add( camera );
@@ -100,13 +71,11 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var loader = new THREE.NRRDLoader();
+				var loader = new NRRDLoader();
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
+
 					var geometry,
-						canvas,
-						canvasMap,
 						material,
-						plane,
 						sliceZ,
 						sliceY,
 						sliceX;
@@ -118,47 +87,63 @@
 					cube.visible = false;
 					var box = new THREE.BoxHelper( cube );
 					scene.add( box );
-					box.applyMatrix(volume.matrix);
+					box.applyMatrix( volume.matrix );
 					scene.add( cube );
 
 					//z plane
-
-					var indexZ = 0;
-					sliceZ = volume.extractSlice('z',Math.floor(volume.RASDimensions[2]/4));
+					sliceZ = volume.extractSlice( 'z', Math.floor( volume.RASDimensions[ 2 ] / 4 ) );
 					scene.add( sliceZ.mesh );
 
 					//y plane
-					var indexY = 0;
-					sliceY = volume.extractSlice('y',Math.floor(volume.RASDimensions[1]/2));
+					sliceY = volume.extractSlice( 'y', Math.floor( volume.RASDimensions[ 1 ] / 2 ) );
 					scene.add( sliceY.mesh );
 
 					//x plane
-					var indexX = 0;
-					sliceX = volume.extractSlice('x',Math.floor(volume.RASDimensions[0]/2));
+					sliceX = volume.extractSlice( 'x', Math.floor( volume.RASDimensions[ 0 ] / 2 ) );
 					scene.add( sliceX.mesh );
 
-					gui.add( sliceX, "index", 0, volume.RASDimensions[0], 1 ).name( "indexX" ).onChange( function () {sliceX.repaint.call(sliceX);} );
-					gui.add( sliceY, "index", 0, volume.RASDimensions[1], 1 ).name( "indexY" ).onChange( function () {sliceY.repaint.call(sliceY);} );
-					gui.add( sliceZ, "index", 0, volume.RASDimensions[2], 1 ).name( "indexZ" ).onChange( function () {sliceZ.repaint.call(sliceZ);} );
+					gui.add( sliceX, "index", 0, volume.RASDimensions[ 0 ], 1 ).name( "indexX" ).onChange( function () {
 
-					gui.add( volume, "lowerThreshold", volume.min, volume.max, 1).name( "Lower Threshold").onChange( function () {
+						sliceX.repaint.call( sliceX );
+
+					} );
+					gui.add( sliceY, "index", 0, volume.RASDimensions[ 1 ], 1 ).name( "indexY" ).onChange( function () {
+
+						sliceY.repaint.call( sliceY );
+
+					} );
+					gui.add( sliceZ, "index", 0, volume.RASDimensions[ 2 ], 1 ).name( "indexZ" ).onChange( function () {
+
+						sliceZ.repaint.call( sliceZ );
+
+					} );
+
+					gui.add( volume, "lowerThreshold", volume.min, volume.max, 1 ).name( "Lower Threshold" ).onChange( function () {
+
 						volume.repaintAllSlices();
-					});
-					gui.add( volume, "upperThreshold", volume.min, volume.max, 1).name( "Upper Threshold").onChange( function () {
+
+					} );
+					gui.add( volume, "upperThreshold", volume.min, volume.max, 1 ).name( "Upper Threshold" ).onChange( function () {
+
 						volume.repaintAllSlices();
-					});
-					gui.add( volume, "windowLow", volume.min, volume.max, 1).name( "Window Low").onChange( function () {
+
+					} );
+					gui.add( volume, "windowLow", volume.min, volume.max, 1 ).name( "Window Low" ).onChange( function () {
+
 						volume.repaintAllSlices();
-					});
-					gui.add( volume, "windowHigh", volume.min, volume.max, 1).name( "Window High").onChange( function () {
+
+					} );
+					gui.add( volume, "windowHigh", volume.min, volume.max, 1 ).name( "Window High" ).onChange( function () {
+
 						volume.repaintAllSlices();
-					});
+
+					} );
 
 				} );
 
-				var vtkmaterial = new THREE.MeshLambertMaterial( {wireframe : false, morphTargets : false, side : THREE.DoubleSide, color : 0xff0000} );
+				var vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
 
-				var vtkloader = new THREE.VTKLoader();
+				var vtkloader = new VTKLoader();
 				vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -166,12 +151,14 @@
 					var mesh = new THREE.Mesh( geometry, vtkmaterial );
 					scene.add( mesh );
 					var visibilityControl = {
-						visible : true
+						visible: true
 					};
-					gui.add(visibilityControl, "visible").name( "Model Visible").onChange( function () {
+					gui.add( visibilityControl, "visible" ).name( "Model Visible" ).onChange( function () {
+
 						mesh.visible = visibilityControl.visible;
 						renderer.render( scene, camera );
-					});
+
+					} );
 
 				} );
 				// renderer
@@ -184,7 +171,7 @@
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;
 				controls.panSpeed = 2;
@@ -196,7 +183,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				setupInset();
 
@@ -228,29 +215,22 @@
 				camera2.lookAt( scene2.position );
 
 				renderer.render( scene, camera );
-				renderer2.render( scene2, camera2);
+				renderer2.render( scene2, camera2 );
 
 				stats.update();
 
 			}
 
-			function rotateAroundWorldAxis(object, axis, radians) {
-				var rotWorldMatrix = new THREE.Matrix4();
-				rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
+			function setupInset() {
 
-				object.applyMatrix(rotWorldMatrix);
-
-			}
-
-			function setupInset () {
 				var insetWidth = 150,
 					insetHeight = 150;
-				container2 = document.getElementById('inset');
+				container2 = document.getElementById( 'inset' );
 				container2.width = insetWidth;
 				container2.height = insetHeight;
 
 				// renderer
-				renderer2 = new THREE.WebGLRenderer({alpha : true});
+				renderer2 = new THREE.WebGLRenderer( { alpha: true } );
 				renderer2.setClearColor( 0x000000, 0 );
 				renderer2.setSize( insetWidth, insetHeight );
 				container2.appendChild( renderer2.domElement );
@@ -265,8 +245,8 @@
 				// axes
 				axes2 = new THREE.AxesHelper( 100 );
 				scene2.add( axes2 );
-			}
 
+			}
 
 		</script>
 

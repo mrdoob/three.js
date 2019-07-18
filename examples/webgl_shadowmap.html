@@ -4,24 +4,7 @@
 		<title>three.js webgl - shadow map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -32,23 +15,17 @@
 		t: toggle HUD
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
-		<script src="js/utils/ShadowMapViewer.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
-
-			var HUD_MARGIN = 0.05;
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -77,29 +54,25 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE CAMERA
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
-
-				controls = new THREE.FirstPersonControls( camera );
-
-				controls.lookSpeed = 0.0125;
-				controls.movementSpeed = 500;
-				controls.noFly = false;
-				controls.lookVertical = true;
-				controls.constrainVertical = true;
-				controls.verticalMin = 1.5;
-				controls.verticalMax = 2.0;
-
-				controls.lon = 250;
-				controls.lat = 30;
 
 				// SCENE
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x59472b );
 				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
+
+				controls = new FirstPersonControls( camera );
+
+				controls.lookSpeed = 0.0125;
+				controls.movementSpeed = 500;
+				controls.noFly = false;
+				controls.lookVertical = true;
+
+				controls.lookAt( scene.position );
 
 				// LIGHTS
 
@@ -130,6 +103,8 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
 				renderer.autoClear = false;
 
 				//
@@ -163,7 +138,7 @@
 
 			}
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
 				switch ( event.keyCode ) {
 
@@ -177,7 +152,7 @@
 
 			function createHUD() {
 
-				lightShadowMapViewer = new THREE.ShadowMapViewer( light );
+				lightShadowMapViewer = new ShadowMapViewer( light );
 				lightShadowMapViewer.position.x = 10;
 				lightShadowMapViewer.position.y = SCREEN_HEIGHT - ( SHADOW_MAP_HEIGHT / 4 ) - 10;
 				lightShadowMapViewer.size.width = SHADOW_MAP_WIDTH / 4;
@@ -191,7 +166,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -265,26 +240,24 @@
 
 				mixer = new THREE.AnimationMixer( scene );
 
-				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
+				function addMorph( mesh, clip, speed, duration, x, y, z, fudgeColor ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
+					mesh = mesh.clone();
+					mesh.material = mesh.material.clone();
 
 					if ( fudgeColor ) {
 
-						material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
+						mesh.material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
 
 					}
 
-					var mesh = new THREE.Mesh( geometry, material );
 					mesh.speed = speed;
 
-					var clip = geometry.animations[ 0 ];
-
 					mixer.clipAction( clip, mesh ).
-							setDuration( duration ).
-							// to shift the playback out of phase:
-							startAt( - duration * Math.random() ).
-							play();
+						setDuration( duration ).
+					// to shift the playback out of phase:
+						startAt( - duration * Math.random() ).
+						play();
 
 					mesh.position.set( x, y, z );
 					mesh.rotation.y = Math.PI / 2;
@@ -298,35 +271,48 @@
 
 				}
 
-				var loader = new THREE.JSONLoader();
+				var loader = new GLTFLoader();
 
-				loader.load( "models/animated/horse.js", function( geometry ) {
+				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 300, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 450, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, 600, true );
+					var mesh = gltf.scene.children[ 0 ];
 
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, - 300, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, - 450, true );
-					addMorph( geometry, 550, 1, 100 - Math.random() * 1000, FLOOR, - 600, true );
+					var clip = gltf.animations[ 0 ];
 
-				} );
+					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, 300, true );
+					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, 450, true );
+					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, 600, true );
 
-				loader.load( "models/animated/flamingo.js", function( geometry ) {
-
-					addMorph( geometry, 500, 1, 500 - Math.random() * 500, FLOOR + 350, 40 );
+					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, - 300, true );
+					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, - 450, true );
+					addMorph( mesh, clip, 550, 1, 100 - Math.random() * 1000, FLOOR, - 600, true );
 
 				} );
 
-				loader.load( "models/animated/stork.js", function( geometry ) {
+				loader.load( "models/gltf/Flamingo.glb", function ( gltf ) {
 
-					addMorph( geometry, 350, 1, 500 - Math.random() * 500, FLOOR + 350, 340 );
+					var mesh = gltf.scene.children[ 0 ];
+					var clip = gltf.animations[ 0 ];
+
+					addMorph( mesh, clip, 500, 1, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
 				} );
 
-				loader.load( "models/animated/parrot.js", function( geometry ) {
+				loader.load( "models/gltf/Stork.glb", function ( gltf ) {
 
-					addMorph( geometry, 450, 0.5, 500 - Math.random() * 500, FLOOR + 300, 700 );
+					var mesh = gltf.scene.children[ 0 ];
+					var clip = gltf.animations[ 0 ];
+
+					addMorph( mesh, clip, 350, 1, 500 - Math.random() * 500, FLOOR + 350, 340 );
+
+				} );
+
+				loader.load( "models/gltf/Parrot.glb", function ( gltf ) {
+
+					var mesh = gltf.scene.children[ 0 ];
+					var clip = gltf.animations[ 0 ];
+
+					addMorph( mesh, clip, 450, 0.5, 500 - Math.random() * 500, FLOOR + 300, 700 );
 
 				} );
 
@@ -353,7 +339,7 @@
 
 					morph.position.x += morph.speed * delta;
 
-					if ( morph.position.x  > 2000 )  {
+					if ( morph.position.x > 2000 ) {
 
 						morph.position.x = - 1000 - Math.random() * 500;
 

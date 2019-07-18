@@ -4,47 +4,31 @@
 		<title>three.js webgl - map controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
+				background-color: #ccc;
 				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#000;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
 			}
 
 			a {
-				color: red;
+				color: #f00;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - map controls example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - map controls
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/MapControls.js"></script>
-		<script src="js/Detector.js"></script>
+		<script type="module">
 
-		<script src='js/libs/dat.gui.min.js'></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { MapControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, controls, scene, renderer;
 
@@ -68,7 +52,7 @@
 
 				// controls
 
-				controls = new THREE.MapControls( camera, renderer.domElement );
+				controls = new MapControls( camera, renderer.domElement );
 
 				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
@@ -121,9 +105,9 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 
-                var gui = new dat.GUI();
+				var gui = new GUI();
+				gui.add( controls, 'screenSpacePanning' );
 
-				gui.add(controls, 'screenSpacePanning');
 			}
 
 			function onWindowResize() {

@@ -4,46 +4,20 @@
 		<title>three.js webgl - materials - texture - rotation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #050505;
-				color: #fff;
-				overflow: hidden;
-			}
-
-			a { color: #e00 }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - texture rotation
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - texture rotation
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/Detector.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var mesh, renderer, scene, camera;
 
@@ -60,8 +34,6 @@
 			};
 
 			init();
-			render();
-
 
 			function init() {
 
@@ -76,7 +48,7 @@
 				camera.position.set( 10, 15, 25 );
 				scene.add( camera );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
@@ -84,20 +56,25 @@
 
 				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 
-				var loader = new THREE.TextureLoader();
-				var texture = loader.load( 'textures/UV_Grid_Sm.jpg', render );
-				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg', function ( texture ) {
 
-				texture.matrixAutoUpdate = false; // set this to false to update texture.matrix manually
+					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+					texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+					//texture.matrixAutoUpdate = false; // default true; set to false to update texture.matrix manually
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+					var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				updateUvTransform();
+					mesh = new THREE.Mesh( geometry, material );
+					scene.add( mesh );
 
-				initGui();
+					updateUvTransform();
+
+					initGui();
+
+					render();
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -154,9 +131,7 @@
 
 			function initGui() {
 
-				var drop;
-
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( API, 'offsetX', 0.0, 1.0 ).name( 'offset.x' ).onChange( updateUvTransform );
 				gui.add( API, 'offsetY', 0.0, 1.0 ).name( 'offset.y' ).onChange( updateUvTransform );

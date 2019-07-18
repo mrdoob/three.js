@@ -4,48 +4,29 @@
 		<title>three.js webgl - multiple renderers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-				color: #0080ff;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 	<body>
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple renderers</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer1, renderer2;
 
 			var mesh1, mesh2, mesh3;
 			var color = new THREE.Color();
-			var vec = new THREE.Vector3();
 
 			init();
 			animate();

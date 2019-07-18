@@ -4,46 +4,22 @@
 		<title>three.js webgl - loader - ttf</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/loaders/TTFLoader.js"></script>
 		<script src="js/libs/opentype.min.js"></script>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TTFLoader using opentype by gero3
 			<br/>type to enter new text, drag to spin the text
 		</div>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { TTFLoader } from './jsm/loaders/TTFLoader.js';
 
-			var container, color;
+			var container;
 			var camera, cameraTarget, scene, renderer;
 			var group, textMesh1, textMesh2, textGeo, material;
 			var firstLetter = true;
@@ -54,8 +30,7 @@
 				hover = 30,
 				curveSegments = 4,
 				bevelThickness = 2,
-				bevelSize = 1.5,
-				bevelSegments = 3;
+				bevelSize = 1.5;
 
 			var font = null;
 			var mirror = true;
@@ -67,7 +42,6 @@
 			var mouseXOnMouseDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -108,11 +82,13 @@
 
 				scene.add( group );
 
-				var loader = new THREE.TTFLoader();
+				var loader = new TTFLoader();
 
 				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
+
 					font = new THREE.Font( json );
 					createText();
+
 				} );
 
 				var plane = new THREE.Mesh(
@@ -145,7 +121,6 @@
 			function onWindowResize() {
 
 				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -215,7 +190,7 @@
 					bevelSize: bevelSize,
 					bevelEnabled: true
 
-				});
+				} );
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
@@ -238,7 +213,7 @@
 					textMesh2 = new THREE.Mesh( textGeo, material );
 
 					textMesh2.position.x = centerOffset;
-					textMesh2.position.y = -hover;
+					textMesh2.position.y = - hover;
 					textMesh2.position.z = height;
 
 					textMesh2.rotation.x = Math.PI;
@@ -255,7 +230,7 @@
 				group.remove( textMesh1 );
 				if ( mirror ) group.remove( textMesh2 );
 
-				if ( !text ) return;
+				if ( ! text ) return;
 
 				createText();
 
@@ -282,7 +257,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -290,7 +265,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

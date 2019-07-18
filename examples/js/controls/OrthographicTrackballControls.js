@@ -43,21 +43,21 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	var _changed = true;
 
 	var _state = STATE.NONE,
-	_prevState = STATE.NONE,
+		_prevState = STATE.NONE,
 
-	_eye = new THREE.Vector3(),
+		_eye = new THREE.Vector3(),
 
-	_rotateStart = new THREE.Vector3(),
-	_rotateEnd = new THREE.Vector3(),
+		_rotateStart = new THREE.Vector3(),
+		_rotateEnd = new THREE.Vector3(),
 
-	_zoomStart = new THREE.Vector2(),
-	_zoomEnd = new THREE.Vector2(),
+		_zoomStart = new THREE.Vector2(),
+		_zoomEnd = new THREE.Vector2(),
 
-	_touchZoomDistanceStart = 0,
-	_touchZoomDistanceEnd = 0,
+		_touchZoomDistanceStart = 0,
+		_touchZoomDistanceEnd = 0,
 
-	_panStart = new THREE.Vector2(),
-	_panEnd = new THREE.Vector2();
+		_panStart = new THREE.Vector2(),
+		_panEnd = new THREE.Vector2();
 
 	// for reset
 
@@ -176,7 +176,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}() );
 
-	this.rotateCamera = ( function() {
+	this.rotateCamera = ( function () {
 
 		var axis = new THREE.Vector3(),
 			quaternion = new THREE.Quaternion();
@@ -214,7 +214,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			}
 
-		}
+		};
 
 	}() );
 
@@ -255,7 +255,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.panCamera = ( function() {
+	this.panCamera = ( function () {
 
 		var mouseChange = new THREE.Vector2(),
 			objectUp = new THREE.Vector3(),
@@ -293,7 +293,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 			}
 
-		}
+		};
 
 	}() );
 
@@ -393,7 +393,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}
 
-	function keyup( event ) {
+	function keyup() {
 
 		if ( _this.enabled === false ) return;
 
@@ -429,7 +429,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		} else if ( _state === STATE.PAN && ! _this.noPan ) {
 
 			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
-			_panEnd.copy( _panStart )
+			_panEnd.copy( _panStart );
 
 		}
 
@@ -485,7 +485,25 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		_zoomStart.y += event.deltaY * 0.01;
+		switch ( event.deltaMode ) {
+
+			case 2:
+				// Zoom in pages
+				_zoomStart.y -= event.deltaY * 0.025;
+				break;
+
+			case 1:
+				// Zoom in lines
+				_zoomStart.y -= event.deltaY * 0.01;
+				break;
+
+			default:
+				// undefined, 0, assume pixels
+				_zoomStart.y -= event.deltaY * 0.00025;
+				break;
+
+		}
+
 		_this.dispatchEvent( startEvent );
 		_this.dispatchEvent( endEvent );
 
@@ -586,7 +604,7 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	}
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
 		this.domElement.removeEventListener( 'mousedown', mousedown, false );

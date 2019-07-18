@@ -4,34 +4,30 @@
 		<title>three.js webgl - geometry - NURBS</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				text-align:center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
-		<canvas id="debug" style="position:absolute; left:100px"></canvas>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - NURBS curve and surface example
+		</div>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - NURBS curve and surface example</div>
+		<script type="module">
 
-		<script src="../build/three.js"></script>
-		<script src="js/curves/NURBSCurve.js"></script>
-		<script src="js/curves/NURBSSurface.js"></script>
-		<script src="js/curves/NURBSUtils.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { NURBSCurve } from './jsm/curves/NURBSCurve.js';
+			import { NURBSSurface } from './jsm/curves/NURBSSurface.js';
 
 			var container, stats;
 
@@ -45,7 +41,6 @@
 			var mouseXOnMouseDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -54,14 +49,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '30px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin';
-				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 150, 750 );
@@ -107,12 +94,12 @@
 
 				}
 
-				var nurbsCurve = new THREE.NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
+				var nurbsCurve = new NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
 
 				var nurbsGeometry = new THREE.BufferGeometry();
 				nurbsGeometry.setFromPoints( nurbsCurve.getPoints( 200 ) );
 
-				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333 } );
+				var nurbsMaterial = new THREE.LineBasicMaterial( { color: 0x333333 } );
 
 				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
 				nurbsLine.position.set( 200, - 100, 0 );
@@ -121,7 +108,7 @@
 				var nurbsControlPointsGeometry = new THREE.BufferGeometry();
 				nurbsControlPointsGeometry.setFromPoints( nurbsCurve.controlPoints );
 
-				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, opacity: 0.25, transparent: true } );
+				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { color: 0x333333, opacity: 0.25, transparent: true } );
 
 				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
 				nurbsControlPointsLine.position.copy( nurbsLine.position );
@@ -131,29 +118,29 @@
 
 				var nsControlPoints = [
 					[
-						new THREE.Vector4 ( -200, -200, 100, 1 ),
-						new THREE.Vector4 ( -200, -100, -200, 1 ),
-						new THREE.Vector4 ( -200, 100, 250, 1 ),
-						new THREE.Vector4 ( -200, 200, -100, 1 )
+						new THREE.Vector4( - 200, - 200, 100, 1 ),
+						new THREE.Vector4( - 200, - 100, - 200, 1 ),
+						new THREE.Vector4( - 200, 100, 250, 1 ),
+						new THREE.Vector4( - 200, 200, - 100, 1 )
 					],
 					[
-						new THREE.Vector4 ( 0, -200, 0, 1 ),
-						new THREE.Vector4 ( 0, -100, -100, 5 ),
-						new THREE.Vector4 ( 0, 100, 150, 5 ),
-						new THREE.Vector4 ( 0, 200, 0, 1 )
+						new THREE.Vector4( 0, - 200, 0, 1 ),
+						new THREE.Vector4( 0, - 100, - 100, 5 ),
+						new THREE.Vector4( 0, 100, 150, 5 ),
+						new THREE.Vector4( 0, 200, 0, 1 )
 					],
 					[
-						new THREE.Vector4 ( 200, -200, -100, 1 ),
-						new THREE.Vector4 ( 200, -100, 200, 1 ),
-						new THREE.Vector4 ( 200, 100, -250, 1 ),
-						new THREE.Vector4 ( 200, 200, 100, 1 )
+						new THREE.Vector4( 200, - 200, - 100, 1 ),
+						new THREE.Vector4( 200, - 100, 200, 1 ),
+						new THREE.Vector4( 200, 100, - 250, 1 ),
+						new THREE.Vector4( 200, 200, 100, 1 )
 					]
 				];
 				var degree1 = 2;
 				var degree2 = 3;
-				var knots1 = [0, 0, 0, 1, 1, 1];
-				var knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
-				var nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
+				var knots1 = [ 0, 0, 0, 1, 1, 1 ];
+				var knots2 = [ 0, 0, 0, 0, 1, 1, 1, 1 ];
+				var nurbsSurface = new NURBSSurface( degree1, degree2, knots1, knots2, nsControlPoints );
 
 				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
@@ -195,7 +182,6 @@
 			function onWindowResize() {
 
 				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -227,7 +213,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -235,7 +221,7 @@
 
 			}
 
-			function onDocumentMouseOut( event ) {
+			function onDocumentMouseOut() {
 
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );

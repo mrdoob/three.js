@@ -4,42 +4,30 @@
 		<title>three.js webvr - htc vive - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-08-30 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-08-30" content="Ag80lPFLAvRyqP2W5I5XBzACxrTAQTWa3cXebXzq+WzW66nlQa6lvejGg1gdAMrzYbY6jUWp8g08kEnzb6svVgcAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNTYzNjYxOX0=">
-		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-08-28" content="Ag7nJS0Q6nBKfmRY1XLKHslnz73amLhaf8RoFpYz36MpMq0oa30AETLXer74BIwa3t8uDXlR0n4W9f/o674Rqw4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUzNTQxNDQwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-08-28" content="AsflqqNG2L/Eepy8xSwCYwWH5U7w3nN7Ak137jGxMeBFz9lqQVcMBqMTcMw6ZkxThB7ZM2Cn7hgPqX++ZlgC9wMAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTM1NDE0NDAwfQ==">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - htc vive - sculpt
+		</div>
 
-		<script src="js/vr/ViveController.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/MarchingCubes.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
+			import { ViveController } from './jsm/vr/ViveController.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
 
-			var blob, vector;
+			var blob;
 
 			var points = [];
 
@@ -51,14 +39,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - htc vive - sculpt';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
@@ -97,15 +77,15 @@
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = -2;
+				light.shadow.camera.bottom = - 2;
 				light.shadow.camera.right = 2;
-				light.shadow.camera.left = -2;
+				light.shadow.camera.left = - 2;
 				light.shadow.mapSize.set( 4096, 4096 );
 
 				scene.add( light );
 
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new DirectionalLightHelper( light ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				//
 
@@ -122,15 +102,15 @@
 
 				// controllers
 
-				controller1 = new THREE.ViveController( 0 );
+				controller1 = new ViveController( 0 );
 				controller1.standingMatrix = renderer.vr.getStandingMatrix();
 				scene.add( controller1 );
 
-				controller2 = new THREE.ViveController( 1 );
+				controller2 = new ViveController( 1 );
 				controller2.standingMatrix = renderer.vr.getStandingMatrix();
 				scene.add( controller2 );
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.setPath( 'models/obj/vive-controller/' );
 				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
 
@@ -146,8 +126,8 @@
 					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
 					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
 					pivot.name = 'pivot';
-					pivot.position.y = -0.016;
-					pivot.position.z = -0.043;
+					pivot.position.y = - 0.016;
+					pivot.position.z = - 0.043;
 					pivot.rotation.x = Math.PI / 5.5;
 					controller.add( pivot );
 
@@ -176,7 +156,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				var reflectionCube = new CubeTextureLoader().load( urls );
 				*/
 
 				var material = new THREE.MeshStandardMaterial( {
@@ -186,7 +166,7 @@
 					metalness: 0.0
 				} );
 
-				blob = new THREE.MarchingCubes( 64, material, true );
+				blob = new MarchingCubes( 64, material );
 				blob.position.y = 1;
 				scene.add( blob );
 
@@ -198,7 +178,7 @@
 
 				points = [
 					{ position: new THREE.Vector3(), strength: - 0.08, subtract: 10 },
-					{ position: new THREE.Vector3(), strength:   0.04, subtract: 10 }
+					{ position: new THREE.Vector3(), strength: 0.04, subtract: 10 }
 				];
 
 			}

@@ -4,141 +4,127 @@
 		<title>three.js webvr - panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-08-30 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-08-30" content="Ag80lPFLAvRyqP2W5I5XBzACxrTAQTWa3cXebXzq+WzW66nlQa6lvejGg1gdAMrzYbY6jUWp8g08kEnzb6svVgcAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNTYzNjYxOX0=">
-		<!-- Origin Trial Token, feature = WebXR Device API, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API" data-expires="2018-08-28" content="Ag7nJS0Q6nBKfmRY1XLKHslnz73amLhaf8RoFpYz36MpMq0oa30AETLXer74BIwa3t8uDXlR0n4W9f/o674Rqw4AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZSIsImV4cGlyeSI6MTUzNTQxNDQwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-08-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-08-28" content="AsflqqNG2L/Eepy8xSwCYwWH5U7w3nN7Ak137jGxMeBFz9lqQVcMBqMTcMw6ZkxThB7ZM2Cn7hgPqX++ZlgC9wMAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTM1NDE0NDAwfQ==">
-		<style>
-			html, body {
-				background-color: #000;
-				margin: 0px;
-				padding: 0px;
-				overflow: hidden;
-			}
-		</style>
-
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script src="js/vr/WebVR.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
-		var camera;
-		var renderer;
-		var scene;
+			var camera;
+			var renderer;
+			var scene;
 
-		init();
-		animate();
+			init();
+			animate();
 
-		function init() {
+			function init() {
 
-			renderer = new THREE.WebGLRenderer();
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.vr.enabled = true;
-			renderer.vr.userHeight = 0; // TOFIX
-			document.body.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
+				document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );
+				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
-			//
+				//
 
-			scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
-			camera.layers.enable( 1 );
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.layers.enable( 1 );
 
-			var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-			geometry.scale( 1, 1, - 1 );
-			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
+				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				geometry.scale( 1, 1, - 1 );
+				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
 
-			var materials = [];
+				var materials = [];
 
-			for ( var i = 0; i < 6; i ++ ) {
+				for ( var i = 0; i < 6; i ++ ) {
 
-				materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
-
-			}
-
-			var skyBox = new THREE.Mesh( geometry, materials );
-			skyBox.layers.set( 1 );
-			scene.add( skyBox );
-
-
-			var materialsR = [];
-
-			for ( var i = 6; i < 12; i ++ ) {
-
-				materialsR.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
-
-			}
-
-			var skyBoxR = new THREE.Mesh( geometry, materialsR );
-			skyBoxR.layers.set( 2 );
-			scene.add( skyBoxR );
-
-			window.addEventListener( 'resize', onWindowResize, false );
-
-		}
-
-		function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
-
-			var textures = [];
-
-			for ( var i = 0; i < tilesNum; i ++ ) {
-
-				textures[ i ] = new THREE.Texture();
-
-			}
-
-			var loader = new THREE.ImageLoader();
-			loader.load( atlasImgUrl, function ( imageObj ) {
-
-				var canvas, context;
-				var tileWidth = imageObj.height;
-
-				for ( var i = 0; i < textures.length; i ++ ) {
-
-					canvas = document.createElement( 'canvas' );
-					context = canvas.getContext( '2d' );
-					canvas.height = tileWidth;
-					canvas.width = tileWidth;
-					context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-					textures[ i ].image = canvas
-					textures[ i ].needsUpdate = true;
+					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
 
 				}
 
-			} );
+				var skyBox = new THREE.Mesh( geometry, materials );
+				skyBox.layers.set( 1 );
+				scene.add( skyBox );
 
-			return textures;
 
-		}
+				var materialsR = [];
 
-		function onWindowResize() {
+				for ( var i = 6; i < 12; i ++ ) {
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
+					materialsR.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+				}
 
-		}
+				var skyBoxR = new THREE.Mesh( geometry, materialsR );
+				skyBoxR.layers.set( 2 );
+				scene.add( skyBoxR );
 
-		function animate() {
+				window.addEventListener( 'resize', onWindowResize, false );
 
-			renderer.setAnimationLoop( render );
+			}
 
-		}
+			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
-		function render() {
+				var textures = [];
 
-			renderer.render( scene, camera );
+				for ( var i = 0; i < tilesNum; i ++ ) {
 
-		}
+					textures[ i ] = new THREE.Texture();
+
+				}
+
+				var loader = new THREE.ImageLoader();
+				loader.load( atlasImgUrl, function ( imageObj ) {
+
+					var canvas, context;
+					var tileWidth = imageObj.height;
+
+					for ( var i = 0; i < textures.length; i ++ ) {
+
+						canvas = document.createElement( 'canvas' );
+						context = canvas.getContext( '2d' );
+						canvas.height = tileWidth;
+						canvas.width = tileWidth;
+						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+						textures[ i ].image = canvas;
+						textures[ i ].needsUpdate = true;
+
+					}
+
+				} );
+
+				return textures;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
 
 		</script>
 	</body>

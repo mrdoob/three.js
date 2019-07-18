@@ -4,39 +4,7 @@
 		<title>three.js - water flow map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/objects/Reflector.js"></script>
-		<script src="js/objects/Refractor.js"></script>
-		<script src="js/objects/Water2.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -45,117 +13,123 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - water flow map
 		</div>
 
-		<script>
+		<script type="module">
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
-		var scene, camera, renderer, water;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Water } from './jsm/objects/Water2.js';
 
-		init();
-		animate();
+			var scene, camera, renderer, water;
 
-		function init() {
+			init();
+			animate();
 
-			// scene
+			function init() {
 
-			scene = new THREE.Scene();
+				// scene
 
-			// camera
+				scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			camera.position.set( 0, 25, 0 );
-			camera.lookAt( scene.position );
+				// camera
 
-			// ground
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 0, 25, 0 );
+				camera.lookAt( scene.position );
 
-			var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20, 10, 10 );
-			var groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
-			var ground = new THREE.Mesh( groundGeometry, groundMaterial );
-			ground.rotation.x = Math.PI * - 0.5;
-			scene.add( ground );
+				// ground
 
-			var textureLoader = new THREE.TextureLoader();
-			textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function( map ) {
-				map.wrapS = THREE.RepeatWrapping;
-				map.wrapT = THREE.RepeatWrapping;
-				map.anisotropy = 16;
-				map.repeat.set( 4, 4 );
-				groundMaterial.map = map;
-				groundMaterial.needsUpdate = true;
-			} );
+				var groundGeometry = new THREE.PlaneBufferGeometry( 20, 20, 10, 10 );
+				var groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
+				var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+				ground.rotation.x = Math.PI * - 0.5;
+				scene.add( ground );
 
-			// water
+				var textureLoader = new THREE.TextureLoader();
+				textureLoader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', function ( map ) {
 
-			var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-			var flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
+					map.wrapS = THREE.RepeatWrapping;
+					map.wrapT = THREE.RepeatWrapping;
+					map.anisotropy = 16;
+					map.repeat.set( 4, 4 );
+					groundMaterial.map = map;
+					groundMaterial.needsUpdate = true;
 
-			water = new THREE.Water( waterGeometry, {
-				scale: 2,
-				textureWidth: 1024,
-				textureHeight: 1024,
-				flowMap: flowMap
-			} );
+				} );
 
-			water.position.y = 1;
-			water.rotation.x = Math.PI * - 0.5;
-			scene.add( water );
+				// water
 
-			// flow map helper
+				var waterGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				var flowMap = textureLoader.load( 'textures/water/Water_1_M_Flow.jpg' );
 
-			var helperGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-			var helperMaterial = new THREE.MeshBasicMaterial( { map: flowMap } );
-			var helper = new THREE.Mesh( helperGeometry, helperMaterial );
-			helper.position.y = 1.01;
-			helper.rotation.x = Math.PI * - 0.5;
-			helper.visible = false;
-			scene.add( helper );
+				water = new Water( waterGeometry, {
+					scale: 2,
+					textureWidth: 1024,
+					textureHeight: 1024,
+					flowMap: flowMap
+				} );
 
-			// renderer
+				water.position.y = 1;
+				water.rotation.x = Math.PI * - 0.5;
+				scene.add( water );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			document.body.appendChild( renderer.domElement );
+				// flow map helper
 
-			//
+				var helperGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+				var helperMaterial = new THREE.MeshBasicMaterial( { map: flowMap } );
+				var helper = new THREE.Mesh( helperGeometry, helperMaterial );
+				helper.position.y = 1.01;
+				helper.rotation.x = Math.PI * - 0.5;
+				helper.visible = false;
+				scene.add( helper );
 
-			var gui = new dat.GUI();
-			gui.add( helper, 'visible' ).name( 'Show Flow Map');
-			gui.open();
+				// renderer
 
-			//
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				document.body.appendChild( renderer.domElement );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+				//
 
-			//
+				var gui = new GUI();
+				gui.add( helper, 'visible' ).name( 'Show Flow Map' );
+				gui.open();
 
-			window.addEventListener( 'resize', onResize, false );
+				//
 
-		}
+				var controls = new OrbitControls( camera, renderer.domElement );
 
-		function onResize() {
+				//
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-			renderer.setSize( window.innerWidth, window.innerHeight );
+				window.addEventListener( 'resize', onResize, false );
 
-		}
+			}
 
-		function animate() {
+			function onResize() {
 
-			requestAnimationFrame( animate );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			render();
+			}
 
-		}
+			function animate() {
 
-		function render() {
+				requestAnimationFrame( animate );
 
-			renderer.render( scene, camera );
+				render();
 
-		}
+			}
 
-	</script>
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
 
 </body>
 </html>

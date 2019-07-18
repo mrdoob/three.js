@@ -4,36 +4,11 @@
 		<title>three.js webgl - 3MF</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #333;
 			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: skyblue }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				float: left;
-				text-align: center;
-			}
-
 		</style>
 	</head>
 	<body>
@@ -44,17 +19,14 @@
 			<div>Cube gears file from <a href="https://github.com/3MFConsortium/3mf-samples" target="_blank" rel="noopener">3mf-samples</a></div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/3MFLoader.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
 
 			var camera, scene, renderer;
 
@@ -80,7 +52,7 @@
 				camera.position.set( - 80, - 90, 150 );
 				scene.add( camera );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 50;
 				controls.maxDistance = 300;
@@ -90,7 +62,7 @@
 
 				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
-				var loader = new THREE.ThreeMFLoader();
+				var loader = new ThreeMFLoader();
 				loader.load( './models/3mf/cube_gears.3mf', function ( object ) {
 
 					scene.add( object );

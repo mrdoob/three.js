@@ -4,25 +4,7 @@
 		<title>three.js webgl - loaders - OBJ loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -30,10 +12,11 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var container;
 
@@ -44,6 +27,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var object;
 
 			init();
 			animate();
@@ -68,45 +52,55 @@
 				camera.add( pointLight );
 				scene.add( camera );
 
-				// texture
+				// manager
 
-				var manager = new THREE.LoadingManager();
+				function loadModel() {
+
+					object.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.map = texture;
+
+					} );
+
+					object.position.y = - 95;
+					scene.add( object );
+
+				}
+
+				var manager = new THREE.LoadingManager( loadModel );
+
 				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
 				};
 
+				// texture
+
 				var textureLoader = new THREE.TextureLoader( manager );
+
 				var texture = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
 
 				// model
 
-				var onProgress = function ( xhr ) {
+				function onProgress( xhr ) {
+
 					if ( xhr.lengthComputable ) {
+
 						var percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+						console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
+
 					}
-				};
 
-				var onError = function ( xhr ) {
-				};
+				}
 
-				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'models/obj/male02/male02.obj', function ( object ) {
+				function onError() {}
 
-					object.traverse( function ( child ) {
+				var loader = new OBJLoader( manager );
 
-						if ( child instanceof THREE.Mesh ) {
+				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
 
-							child.material.map = texture;
-
-						}
-
-					} );
-
-					object.position.y = - 95;
-					scene.add( object );
+					object = obj;
 
 				}, onProgress, onError );
 

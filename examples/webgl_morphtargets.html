@@ -4,56 +4,26 @@
 		<title>three.js webgl - animation - morph targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				color: #ffffff;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			var container;
 
-			var container, stats;
+			var camera, scene, renderer, raycaster;
 
-			var camera, scene, renderer;
-
-			var geometry, objects;
-
-			var mesh;
+			var mesh, mouse = new THREE.Vector2();
 
 			init();
 			animate();
@@ -69,7 +39,8 @@
 				scene.background = new THREE.Color( 0x222222 );
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
-				var light = new THREE.PointLight( 0xff2200 );
+				var light = new THREE.PointLight( 0xffffff );
+				light.position.z = 500;
 				camera.add( light );
 				scene.add( camera );
 
@@ -77,7 +48,7 @@
 				scene.add( light );
 
 				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xff0000, morphTargets: true } );
 
 				// construct 8 blend shapes
 
@@ -122,20 +93,54 @@
 					influence8: 0
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				var folder = gui.addFolder( 'Morph Targets' );
-				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 0 ] = value; } );
-				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 1 ] = value; } );
-				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 2 ] = value; } );
-				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 3 ] = value; } );
-				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 4 ] = value; } );
-				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 5 ] = value; } );
-				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 6 ] = value; } );
-				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function( value ) { mesh.morphTargetInfluences[ 7 ] = value; } );
+				folder.add( params, 'influence1', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 0 ] = value;
+
+				} );
+				folder.add( params, 'influence2', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 1 ] = value;
+
+				} );
+				folder.add( params, 'influence3', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 2 ] = value;
+
+				} );
+				folder.add( params, 'influence4', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 3 ] = value;
+
+				} );
+				folder.add( params, 'influence5', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 4 ] = value;
+
+				} );
+				folder.add( params, 'influence6', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 5 ] = value;
+
+				} );
+				folder.add( params, 'influence7', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 6 ] = value;
+
+				} );
+				folder.add( params, 'influence8', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+					mesh.morphTargetInfluences[ 7 ] = value;
+
+				} );
 				folder.open();
 
 				//
+
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -144,13 +149,34 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 400;
 				controls.maxDistance = 1000;
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				document.addEventListener( 'click', onClick, false );
+
+			}
+
+			function onClick( event ) {
+
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( mouse, camera );
+
+				var intersects = raycaster.intersectObject( mesh );
+
+				if ( intersects.length > 0 ) {
+
+					mesh.material.color.set( Math.random() * 0xffffff );
+
+				}
 
 			}
 

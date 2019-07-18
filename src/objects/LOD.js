@@ -20,11 +20,15 @@ function LOD() {
 		}
 	} );
 
+	this.autoUpdate = true;
+
 }
 
 LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: LOD,
+
+	isLOD: true,
 
 	copy: function ( source ) {
 
@@ -65,6 +69,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		levels.splice( l, 0, { distance: distance, object: object } );
 
 		this.add( object );
+
+		return this;
 
 	},
 

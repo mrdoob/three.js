@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">This is the [page:BufferGeometry] port of [page:TorusGeometry].</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TorusBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.TorusBufferGeometry( 10, 3, 16, 100 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var torus = new THREE.Mesh( geometry, material );
+		scene.add( torus );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([param:Float radius], [param:Float tube], [param:Integer radialSegments], [param:Integer tubularSegments], [param:Float arc])</h3>
+		<p>
+		radius - Radius of the torus, from the center of the torus to the center of the tube. Default is 1. <br />
+		tube — Radius of the tube.  Default is 0.4. <br />
+		radialSegments — Default is 8 <br />
+		tubularSegments — Default is 6. <br />
+		arc — Central angle.  Default is Math.PI * 2.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
+
+		<h3>.parameters</h3>
+		<p>
+		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/TorusGeometry.js src/geometries/TorusGeometry.js]
+	</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>三维线段曲线（[name]）</h1>
+
+		<p class="desc">一个表示三维线段的曲线。</p>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Vector3 v1], [param:Vector3 v2] )</h3>
+		<p>
+			[page:Vector3 v1] – 起点<br/>
+			[page:Vector3 v2] - 终点
+		</p>
+
+
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Curve]来了解共有属性。</p>
+
+		<h3>[property:Boolean isLineCurve3]</h3>
+		<p>
+			用于检查该类或者其派生类是否为LineCurves。默认值为*true*。
+			<br /><br />
+	
+			你不应当更改这个属性，它在内部使用，以用于优化。
+		</p>
+
+		<h3>[property:Vector3 v1]</h3>
+		<p>起点</p>
+
+		<h3>[property:Vector3 v2]</h3>
+		<p>终点</p>
+
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Curve]来了解共有方法。</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -4,29 +4,11 @@
 		<title>three.js software - geometry - earth</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #ffffff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
-				color: #0080ff;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -34,14 +16,13 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth demo</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/renderers/Projector.js"></script>
-		<script src="js/renderers/SoftwareRenderer.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { SoftwareRenderer } from './jsm/renderers/SoftwareRenderer.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -73,7 +54,7 @@
 
 					var geometry = new THREE.SphereBufferGeometry( 200, 20, 20 );
 
-					var material = new THREE.MeshLambertMaterial( { map: texture, overdraw: 0.5 } );
+					var material = new THREE.MeshLambertMaterial( { map: texture } );
 					var mesh = new THREE.Mesh( geometry, material );
 					group.add( mesh );
 
@@ -103,14 +84,14 @@
 				var texture = new THREE.CanvasTexture( canvas );
 
 				var geometry = new THREE.PlaneBufferGeometry( 300, 300, 3, 3 );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - Math.PI / 2;
 				group.add( mesh );
 
-				renderer = new THREE.SoftwareRenderer();
+				renderer = new SoftwareRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
