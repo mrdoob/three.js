@@ -1,7 +1,7 @@
-import { 
+import {
   Mesh,
   OrthographicCamera,
-  SceneUtils,
+  Scene,
   WebGLRenderTarget,
   WebGLRenderTargetOptions
 } from '../../../../src/Three';
