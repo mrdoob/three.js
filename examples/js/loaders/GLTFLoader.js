@@ -223,7 +223,48 @@ THREE.GLTFLoader = ( function () {
 				}
 
 			}
+			if ( json.materials&&json.materials.length>0 ) {
+			    for ( var i = 0; i < json.materials.length; ++ i ) {
+				var mExtensions = json.materials[ i ].extensions;
+				for(var extensionName in mExtensions){
+				    switch ( extensionName ) {
 
+					case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
+					    extensions[ extensionName ] = new GLTFLightsExtension( json );
+					    break;
+
+					case EXTENSIONS.KHR_MATERIALS_UNLIT:
+					    extensions[ extensionName ] = new GLTFMaterialsUnlitExtension( json );
+					    break;
+
+					case EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS:
+					    extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension( json );
+					    break;
+
+					case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
+					    extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
+					    break;
+
+					case EXTENSIONS.MSFT_TEXTURE_DDS:
+					    extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension( json );
+					    break;
+
+					case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
+					    extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension( json );
+					    break;
+
+					default:
+
+					    if ( extensionsRequired.indexOf( extensionName ) >= 0 ) {
+
+						console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
+
+					    }
+
+				    }
+				}
+			    }
+			}
 			var parser = new GLTFParser( json, extensions, {
 
 				path: path || this.resourcePath || '',
