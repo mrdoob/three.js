@@ -15234,8 +15234,8 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
-#ifndef STANDARD
-geometry.clearCoatNormal = clearCoatNormal;
+#if defined( PHYSICAL ) && !defined( STANDARD )
+	geometry.clearCoatNormal = clearCoatNormal;
 #endif
 IncidentLight directLight;
 
@@ -15441,7 +15441,7 @@ var normal_fragment_begin = /* glsl */ `
 	#endif
 
 #endif
-#ifndef STANDARD
+#if defined( PHYSICAL ) && !defined( STANDARD )
 	vec3 geometryNormal = normal;
 #endif
 `;
@@ -15461,7 +15461,7 @@ var normalmap_pars_fragment = /* glsl */ `
 	#endif
 #endif
 
-#if defined ( USE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP )
+#if ( defined ( USE_NORMALMAP ) && !defined ( OBJECTSPACE_NORMALMAP )) || ( defined ( USE_CLEARCOAT_NORMALMAP ) && !defined ( OBJECTSPACE_CLEARCOAT_NORMALMAP ) )
 
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
@@ -15493,19 +15493,7 @@ var normalmap_pars_fragment = /* glsl */ `
 #endif
 `;
 
-var clearcoat_normal_fragment_begin = /* glsl */ `
-#ifndef STANDARD
-  vec3 clearCoatNormal = geometryNormal;
-#endif
-`;
-
-/*
-
-vec3 clearCoatNormal = clearCoatGeometryNormals ?
-  geometryNormal: // use the unperturbed normal of the geometry
-  normal; // Use the (maybe) perturbed normal
-
-*/
+var clearcoat_normal_fragment_begin = "#ifndef STANDARD\n  vec3 clearCoatNormal = geometryNormal;\n#endif";
 
 var clearcoat_normal_fragment_maps = /* glsl */ `
 #ifndef STANDARD
@@ -19046,7 +19034,7 @@ function generateExtensions( extensions, parameters, rendererExtensions ) {
 	extensions = extensions || {};
 
 	var chunks = [
-		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || ( parameters.normalMap && ! parameters.objectSpaceNormalMap ) || ( parameters.clearCoatNormalMap && ! parameters.objectSpaceclearCoatNormalMap ) || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || ( parameters.normalMap && ! parameters.objectSpaceNormalMap ) || ( parameters.clearCoatNormalMap && ! parameters.objectSpaceClearCoatNormalMap ) || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 		( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 		( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 		( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''

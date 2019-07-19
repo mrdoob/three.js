@@ -11,7 +11,7 @@ export default /* glsl */ `
 	#endif
 #endif
 
-#if defined ( USE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP )
+#if ( defined ( USE_NORMALMAP ) && !defined ( OBJECTSPACE_NORMALMAP )) || ( defined ( USE_CLEARCOAT_NORMALMAP ) && !defined ( OBJECTSPACE_CLEARCOAT_NORMALMAP ) )
 
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
