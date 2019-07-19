@@ -1,6 +1,7 @@
 /**
  * @author gero3 / https://github.com/gero3
  * @author tentone / https://github.com/tentone
+ * @author troy351 / https://github.com/troy351
  *
  * Requires opentype.js to be included in the project.
  * Loads TTF files and converts them into typeface JSON that can be used directly
@@ -115,7 +116,7 @@ TTFLoader.prototype = {
 
 			return {
 				glyphs: glyphs,
-				familyName: font.familyName,
+				familyName: font.getEnglishName( 'fullName' ),
 				ascender: round( font.ascender * scale ),
 				descender: round( font.descender * scale ),
 				underlinePosition: font.tables.post.underlinePosition,
