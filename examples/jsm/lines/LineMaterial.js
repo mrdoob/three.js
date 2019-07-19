@@ -164,6 +164,8 @@ ShaderLib[ 'line' ] = {
 				// sign flip
 				if ( position.x < 0.0 ) offset *= - 1.0;
 
+				float forwardOffset = dot( worldDir, vec3( 0.0, 0.0, 1.0 ) );
+
 				// don't extend the line if we're rendering dashes because we
 				// won't be rendering the endcaps
 				#ifndef USE_DASH
@@ -173,18 +175,14 @@ ShaderLib[ 'line' ] = {
 					end.xyz += worldDir * linewidth * 0.5;
 
 					// shift the position of the quad so it hugs the forward edge of the line
-					offset.xy -= dir * dot( worldDir, vec3( 0.0, 0.0, 1.0 ) );
+					offset.xy -= dir * forwardOffset;
 
 				#endif
 
 				// endcaps
-				if ( position.y > 1.0 ) {
+				if ( position.y > 1.0 || position.y < 0.0 ) {
 
-					offset.xy += dir * 2.0;
-
-				} else if ( position.y < 0.0 ) {
-
-					offset.xy -= dir * 2.0;
+					offset.xy += dir * 2.0 * forwardOffset;
 
 				}
 
