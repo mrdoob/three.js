@@ -73,7 +73,7 @@
 		const sphereSpacing = 1.25 * sphereSize * 2;
 
 		const variationsX = [
-			(mat, scale, map) => { mat.clearCoatNormalScale.copy(	mat.normalScale); },
+			(mat, scale, map) => { mat.clearCoatNormalScale.copy(mat.normalScale); },
 			(mat, scale, map) => { mat.clearCoatNormalScale = new THREE.Vector2(scale, scale); },
 			(mat, scale, map) => {
 				mat.clearCoatNormalScale = new THREE.Vector2(scale, scale);
@@ -168,7 +168,7 @@
 							variationsX[ii](mat, 1, normalMaps.tentacle);
 							variationsY[jj](mat, 1, normalMaps.face);
 							var mesh = new THREE.Mesh(geometry, mat);
-
+							meshes.push(mesh);
 							mesh.position.x = (ii - (maxI - 1) / 2) * sphereSpacing;
 							mesh.position.y = (jj - (maxJ - 1) / 2) * sphereSpacing;
 							scene.add(mesh);
@@ -266,9 +266,9 @@
 
 
 			gui.add(guiMatParams, 'normalMap', guiNormalMapNames);
-			gui.add(guiMatParams, 'normalScale', 0, 10, 0.01);
+			gui.add(guiMatParams, 'normalScale', 0, 1, 0.01);
 			gui.add(guiMatParams, 'clearCoatNormalMap', guiNormalMapNames);
-			gui.add(guiMatParams, 'clearCoatNormalScale', 0, 10, 0.01);
+			gui.add(guiMatParams, 'clearCoatNormalScale', 0, 1, 0.01);
 
 			gui.open();
 		}

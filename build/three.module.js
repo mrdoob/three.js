@@ -15109,18 +15109,23 @@ float clearCoatDHRApprox( const in float roughness, const in float dotNL ) {
 void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
 	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
-
 	vec3 irradiance = dotNL * directLight.color;
-
-	#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-		irradiance *= PI; // punctual light
-
-	#endif
 
 	#ifndef STANDARD
 		float ccDotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
 		float ccDotNL = ccDotNV;
+		vec3 ccIrradiance= ccDotNL * directLight.color;
+	#endif
+
+	#ifndef PHYSICALLY_CORRECT_LIGHTS
+
+		irradiance *= PI; // punctual light
+		#ifndef STANDARD
+			ccIrradiance *= PI; // punctual light
+		#endif
+	#endif
+
+	#ifndef STANDARD
 		float clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, ccDotNL );
 	#else
 		float clearCoatDHR = 0.0;
@@ -15132,7 +15137,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#ifndef STANDARD
 
-		reflectedLight.directSpecular += irradiance * material.clearCoat * BRDF_ClearCoat_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
+		reflectedLight.directSpecular += ccIrradiance * material.clearCoat * BRDF_ClearCoat_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
 	#endif
 
@@ -15462,7 +15467,7 @@ vec3 clearCoatNormal = clearCoatGeometryNormals ?
 */
 
 var clearcoat_normal_fragment_maps = /* glsl */ `
-#if defined( USE_NORMALMAP )
+#if defined( USE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP )
 
 	#ifdef USE_TANGENT
 
@@ -15542,9 +15547,13 @@ var clearcoat_normal_fragment_maps = /* glsl */ `
 */
 
 var clearcoat_normalmap_pars_fragment = /* glsl */ `
-#ifdef USE_NORMALMAP
+#if defined( USE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP )
 
-	//uniform sampler2D normalMap;
+	#ifdef USE_CLEARCOAT_NORMALMAP
+		uniform sampler2D clearCoatNormalMap;
+	#else
+		#define clearCoatNormalMap normalMap
+	#endif
 	uniform vec2 clearCoatNormalScale;
 
 		// Per-Pixel Tangent Space Normal Mapping
@@ -15566,7 +15575,7 @@ var clearcoat_normalmap_pars_fragment = /* glsl */ `
 			vec3 N = normalize( surf_norm );
 			mat3 tsn = mat3( S, T, N );
 
-			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+			vec3 mapN = texture2D( clearCoatNormalMap, vUv ).xyz * 2.0 - 1.0;
 
 			mapN.xy *= clearCoatNormalScale;
 			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );

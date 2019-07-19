@@ -1,7 +1,11 @@
 export default /* glsl */ `
-#ifdef USE_NORMALMAP
+#if defined( USE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP )
 
-	//uniform sampler2D normalMap;
+	#ifdef USE_CLEARCOAT_NORMALMAP
+		uniform sampler2D clearCoatNormalMap;
+	#else
+		#define clearCoatNormalMap normalMap
+	#endif
 	uniform vec2 clearCoatNormalScale;
 
 		// Per-Pixel Tangent Space Normal Mapping
@@ -23,7 +27,7 @@ export default /* glsl */ `
 			vec3 N = normalize( surf_norm );
 			mat3 tsn = mat3( S, T, N );
 
-			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+			vec3 mapN = texture2D( clearCoatNormalMap, vUv ).xyz * 2.0 - 1.0;
 
 			mapN.xy *= clearCoatNormalScale;
 			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );

@@ -1,5 +1,5 @@
 export default /* glsl */ `
-#if defined( USE_NORMALMAP )
+#if defined( USE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP )
 
 	#ifdef USE_TANGENT
 
