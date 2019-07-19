@@ -48,12 +48,16 @@ THREE.TTFLoader.prototype = {
 
 			var glyphs = {};
 			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
+			
+			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
+			var unicodes = Object.keys( glyphIndexMap );
 
-			for ( var i = 0; i < font.glyphs.length; i ++ ) {
+			for ( var i = 0; i < unicodes.length; i ++ ) {
 
-				var glyph = font.glyphs.glyphs[ i ];
+				var unicode = unicodes[ i ];
+				var glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
 
-				if ( glyph.unicode !== undefined ) {
+				if ( unicode !== undefined ) {
 
 					var token = {
 						ha: round( glyph.advanceWidth * scale ),
@@ -98,7 +102,7 @@ THREE.TTFLoader.prototype = {
 
 					} );
 
-					glyphs[ String.fromCharCode( glyph.unicode ) ] = token;
+					glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
 
 				}
 

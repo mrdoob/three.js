@@ -54,11 +54,15 @@ TTFLoader.prototype = {
 			var glyphs = {};
 			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
 
-			for ( var i = 0; i < font.glyphs.length; i ++ ) {
+			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
+			var unicodes = Object.keys( glyphIndexMap );
 
-				var glyph = font.glyphs.glyphs[ i ];
+			for ( var i = 0; i < unicodes.length; i ++ ) {
 
-				if ( glyph.unicode !== undefined ) {
+				var unicode = unicodes[ i ];
+				var glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
+
+				if ( unicode !== undefined ) {
 
 					var token = {
 						ha: round( glyph.advanceWidth * scale ),
@@ -103,7 +107,7 @@ TTFLoader.prototype = {
 
 					} );
 
-					glyphs[ String.fromCharCode( glyph.unicode ) ] = token;
+					glyphs[ String.fromCodePoint( unicode ) ] = token;
 
 				}
 
