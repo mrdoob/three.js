@@ -256,7 +256,7 @@ function WebVRManager( renderer ) {
 
 		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
 
-		if ( isPresenting() === false ) {
+		if ( device === null ) {
 
 			camera.position.set( 0, userHeight, 0 );
 			camera.rotation.set( 0, 0, 0 );
@@ -313,6 +313,8 @@ function WebVRManager( renderer ) {
 		}
 
 		poseObject.updateMatrixWorld();
+
+		if ( device.isPresenting === false ) return camera;
 
 		//
 
