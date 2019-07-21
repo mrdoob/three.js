@@ -129,6 +129,12 @@ function WebGLAttributes( gl ) {
 
 		if ( data === undefined ) {
 
+			if ( attribute.isBufferAttribute ) {
+
+				attribute.addEventListener( 'dispose', onAttributeDispose );
+
+			}
+
 			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 		} else if ( data.version < attribute.version ) {
@@ -138,6 +144,16 @@ function WebGLAttributes( gl ) {
 			data.version = attribute.version;
 
 		}
+
+	}
+
+	function onAttributeDispose( event ) {
+
+		var attribute = event.target;
+
+		remove( attribute );
+
+		attribute.removeEventListener( 'dispose', onAttributeDispose );
 
 	}
 

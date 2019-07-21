@@ -117,6 +117,8 @@
 
 		<h2>Methods</h2>
 
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>Return a copy of this bufferAttribute.</p>
 
@@ -145,6 +147,9 @@
 
 		<h3>[method:BufferAttribute copyVector4sArray]( [param:Array vectors] ) </h3>
 		<p>Copy an array representing [page:Vector4]s into [page:BufferAttribute.array array].</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>Disposes the buffer attribute from memory. Use this method if you need to remove or replace a single buffer attribute. Notice that this method is not supported for [page:InterleavedBufferAttribute]s.</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
 		<p>Returns the x component of the vector at the given index.</p>

@@ -1,7 +1,9 @@
+import { EventDispatcher } from './EventDispatcher';
+
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js">src/core/BufferAttribute.js</a>
  */
-export class BufferAttribute {
+export class BufferAttribute extends EventDispatcher {
 
 	constructor( array: ArrayLike<number>, itemSize: number, normalized?: boolean ); // array parameter should be TypedArray.
 
@@ -36,6 +38,7 @@ export class BufferAttribute {
 	copyVector4sArray(
 		vectors: { x: number; y: number; z: number; w: number }[]
 	): BufferAttribute;
+	dispose(): void;
 	set(
 		value: ArrayLike<number> | ArrayBufferView,
 		offset?: number

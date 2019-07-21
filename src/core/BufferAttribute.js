@@ -1,3 +1,4 @@
+import { EventDispatcher } from './EventDispatcher.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
@@ -29,17 +30,9 @@ function BufferAttribute( array, itemSize, normalized ) {
 
 }
 
-Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
+BufferAttribute.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
-
-Object.assign( BufferAttribute.prototype, {
+	constructor: BufferAttribute,
 
 	isBufferAttribute: true,
 
@@ -205,6 +198,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	},
+
 	set: function ( value, offset ) {
 
 		if ( offset === undefined ) offset = 0;
@@ -329,6 +328,16 @@ Object.assign( BufferAttribute.prototype, {
 			array: Array.prototype.slice.call( this.array ),
 			normalized: this.normalized
 		};
+
+	}
+
+} );
+
+Object.defineProperty( BufferAttribute.prototype, 'needsUpdate', {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 
