@@ -18,13 +18,12 @@
 		</style>
 	</head>
 	<body>
+		<script type="module">
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
-
-		<script src="js/geometries/BoxLineGeometry.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script>
+			import * as THREE from '../build/three.module.js';
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -73,7 +72,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
 				room = new THREE.LineSegments(
-					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
 					new THREE.LineBasicMaterial( { color: renderer.multiview.isAvailable() ? 0x99ff99 : 0xff3333 } )
 				);
 				room.geometry.translate( 0, 3, 0 );
@@ -85,7 +84,7 @@
 
 				var geometry = new THREE.IcosahedronBufferGeometry( radius );
 
-				for ( var i = 0; i < 20000; i ++ ) {
+				for ( var i = 0; i < 2000; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
