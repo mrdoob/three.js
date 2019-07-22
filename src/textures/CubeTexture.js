@@ -5,14 +5,16 @@
 import { Texture } from './Texture.js';
 import { CubeReflectionMapping, RGBFormat } from '../constants.js';
 
-function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding, mipmaps ) {
 
 	images = images !== undefined ? images : [];
 	mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
 	format = format !== undefined ? format : RGBFormat;
+	mipmaps = mipmaps !== undefined ? mipmaps : [];
 
 	Texture.call( this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
+	this.mipmaps = mipmaps;
 	this.flipY = false;
 
 }

@@ -397,6 +397,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
 
+				var mipmaps = texture.mipmaps;
+
 				for ( var i = 0; i < 6; i ++ ) {
 
 					if ( ! isCompressed ) {
@@ -408,6 +410,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						} else {
 
 							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+
+							var mipmap;
+
+							for ( var j = 1; j < mipmaps.length; ++ j ) {
+
+								mipmap = mipmaps[ j ];
+
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+							}
 
 						}
 
@@ -443,15 +455,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				if ( ! isCompressed ) {
-
-					textureProperties.__maxMipLevel = 0;
-
-				} else {
-
-					textureProperties.__maxMipLevel = mipmaps.length - 1;
-
-				}
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 				if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 

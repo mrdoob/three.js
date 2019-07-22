@@ -20,7 +20,8 @@ export class CubeTexture extends Texture {
 		format?: PixelFormat,
 		type?: TextureDataType,
 		anisotropy?: number,
-		encoding?: TextureEncoding
+		encoding?: TextureEncoding,
+		mipmaps?: CubeTexture[]
 	);
 
 	images: any; // returns and sets the value of Texture.image in the codde ?
