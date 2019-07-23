@@ -27,7 +27,7 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearCoat = 0.0;
 	this.clearCoatRoughness = 0.0;
 
-	this.clearCoatNormalScale = new Vector2(1, 1);
+	this.clearCoatNormalScale = new Vector2( 1, 1 );
 	this.clearCoatNormalMap = null;
 
 	this.setValues( parameters );
@@ -51,7 +51,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearCoatRoughness = source.clearCoatRoughness;
 
 	this.clearCoatNormalMap = source.clearCoatNormalMap;
-	this.clearCoatNormalScale.copy(source.clearCoatNormalScale);
+	this.clearCoatNormalScale.copy( source.clearCoatNormalScale );
 
 	return this;
 

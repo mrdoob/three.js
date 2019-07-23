@@ -1,6 +1,5 @@
 import { Texture } from './../textures/Texture';
 import { Vector2 } from './../math/Vector2';
-import { NormalMapTypes } from '../constants';
 import {
 	MeshStandardMaterialParameters,
 	MeshStandardMaterial,
