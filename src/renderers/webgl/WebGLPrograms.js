@@ -190,6 +190,10 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
+			numDirLightShadows: lights.directionalShadowMap.length,
+			numPointLightShadows: lights.pointShadowMap.length,
+			numSpotLightShadows: lights.spotShadowMap.length,
+
 			numClippingPlanes: nClipPlanes,
 			numClipIntersection: nClipIntersection,
 
