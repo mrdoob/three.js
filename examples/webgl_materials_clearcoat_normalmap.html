@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>three.js webgl - materials - normal map [Lee Perry-Smith]</title>
+	<title>three.js webgl - materials - clearcoat normal</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -20,7 +20,7 @@
 
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl clearcoat geometry normal
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - materials - clearcoat normal
 		demo.<br />
 	</div>
 
@@ -52,14 +52,14 @@
 		var guiNormalMapNames = [
 			"face",
 			"tentacle"
-		]
+		];
 
 		var guiMatParams = {
 			normalMap: "face",
 			normalScale: 1.0,
 			clearCoatNormalMap: "tentacle",
 			clearCoatNormalScale: 1.0,
-		}
+		};
 
 		var particleLight;
 		var meshes = [];
@@ -256,17 +256,31 @@
 
 			var gui = new GUI();
 
-			gui.add(guiParams, 'metalness', 0, 1, 0.01);
-			gui.add(guiParams, 'roughness', 0, 1, 0.01);
-			gui.add(guiParams, 'reflectivity', 0, 1, 0.01);
-			gui.add(guiParams, 'clearCoat', 0, 1, 0.01);
-			gui.add(guiParams, 'clearCoatRoughness', 0, 1, 0.01);
+			{
+				var materialGui = gui.addFolder( 'Physical Material' );
+				materialGui.add(guiParams, 'metalness', 0, 1, 0.01);
+				materialGui.add(guiParams, 'roughness', 0, 1, 0.01);
+				materialGui.add(guiParams, 'reflectivity', 0, 1, 0.01);
+				materialGui.open();
+			}
+			{
+				var clearCoatGui = gui.addFolder( 'ClearCoat' );
+				clearCoatGui.add(guiParams, 'clearCoat', 0, 1, 0.01);
+				clearCoatGui.add(guiParams, 'clearCoatRoughness', 0, 1, 0.01);
+				clearCoatGui.open();
+			}
+			{
+				var normalGui = gui.addFolder( 'Normal Maps' );
+				normalGui.add(guiMatParams, 'normalMap', guiNormalMapNames);
+				normalGui.add(guiMatParams, 'normalScale', 0, 1, 0.01);
+				normalGui.add(guiMatParams, 'clearCoatNormalMap', guiNormalMapNames);
+				normalGui.add(guiMatParams, 'clearCoatNormalScale', 0, 1, 0.01);
+				normalGui.open();
+			}
 
 
-			gui.add(guiMatParams, 'normalMap', guiNormalMapNames);
-			gui.add(guiMatParams, 'normalScale', 0, 1, 0.01);
-			gui.add(guiMatParams, 'clearCoatNormalMap', guiNormalMapNames);
-			gui.add(guiMatParams, 'clearCoatNormalScale', 0, 1, 0.01);
+
+
 
 			gui.open();
 		}
