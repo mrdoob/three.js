@@ -49,6 +49,16 @@
 				//
 
 				var canvas = document.createElement( 'canvas' );
+
+
+				// Currently OVR_multiview2 is supported just on WebGL2 non-multisampled contexts
+				// so we must create the context manually ensuring `antialias` is set to false
+				//
+				// There is an ongoing discussion on how to add multisampled multiview support
+				// on the Khronos Group's WebGL repo: https://github.com/KhronosGroup/WebGL/issues/2912
+				// as soon as that will get solved we will update the code so it will be
+				// transparent for the user and you could use this extension with or without multisampled
+				// contexts
 				var context = canvas.getContext( 'webgl2', { antialias: false } );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
@@ -63,7 +73,10 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - multiview<br/>';
+				info.innerHTML += renderer.multiview.isAvailable() ? `<span style="color: #33ff33"><b>OVR_multiview2</b> is supported in your browser</span>` :
+					`<span style="color: #ff3333"><b>OVR_multiview2</b> is not supported or enabled in your browser</span>`;
+
 				container.appendChild( info );
 
 				scene = new THREE.Scene();
