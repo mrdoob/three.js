@@ -102,7 +102,7 @@ function UniformsCache() {
 
 var nextVersion = 0;
 
-var shadowCastingLightsFirst = function( lightA, lightB ) {
+var shadowCastingLightsFirst = function ( lightA, lightB ) {
 
 	return ( lightB.castShadow ? 1 : 0 ) - ( lightA.castShadow ? 1 : 0 );
 
@@ -123,9 +123,9 @@ function WebGLLights() {
 			rectAreaLength: - 1,
 			hemiLength: - 1,
 
-			numDirectionalShadows: -1,
-			numPointShadows: -1,
-			numSpotShadows: -1,
+			numDirectionalShadows: - 1,
+			numPointShadows: - 1,
+			numSpotShadows: - 1,
 		},
 
 		ambient: [ 0, 0, 0 ],
@@ -142,9 +142,9 @@ function WebGLLights() {
 		pointShadowMatrix: [],
 		hemi: [],
 
-		numDirectionalShadows: -1,
-		numPointShadows: -1,
-		numSpotShadows: -1
+		numDirectionalShadows: - 1,
+		numPointShadows: - 1,
+		numSpotShadows: - 1
 
 	};
 
@@ -365,8 +365,8 @@ function WebGLLights() {
 			hash.spotLength !== spotLength ||
 			hash.rectAreaLength !== rectAreaLength ||
 			hash.hemiLength !== hemiLength ||
-			hash.numDirectionalShadows !== numDirectionalShadows || 
-			hash.numPointShadows !== numPointShadows || 
+			hash.numDirectionalShadows !== numDirectionalShadows ||
+			hash.numPointShadows !== numPointShadows ||
 			hash.numSpotShadows !== numSpotShadows ) {
 
 			state.directional.length = directionalLength;
