@@ -9,12 +9,13 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Color } from '../math/Color.js';
 
-function GridHelper( size, divisions, color1, color2 ) {
+function GridHelper( size, divisions, color1, color2, color3 ) {
 
 	size = size || 10;
 	divisions = divisions || 10;
 	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
 	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
+	color3 = new Color( color3 !== undefined ? color3 : 0x444444 );
 
 	var center = divisions / 2;
 	var step = size / divisions;
@@ -29,10 +30,18 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 		var color = i === center ? color1 : color2;
 
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
+		if(i === center){
+			color1.toArray( colors, j ); j += 3;
+			color1.toArray( colors, j ); j += 3;
+			color3.toArray( colors, j ); j += 3;
+			color3.toArray( colors, j ); j += 3;
+		}
+		else{
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+		}
 
 	}
 
