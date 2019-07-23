@@ -71,6 +71,8 @@ RoughnessToBlinnExponentNode.prototype.copy = function ( source ) {
 
 	this.texture = source.texture;
 
+	return this;
+
 };
 
 RoughnessToBlinnExponentNode.prototype.toJSON = function ( meta ) {

@@ -80,6 +80,8 @@ SwitchNode.prototype.copy = function ( source ) {
 	this.node = source.node;
 	this.components = source.components;
 
+	return this;
+
 };
 
 SwitchNode.prototype.toJSON = function ( meta ) {

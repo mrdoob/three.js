@@ -340,7 +340,7 @@
 				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
 				controls.target.y = ( conesDistance + coneHeight ) * 0.5;
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
+				controls.dampingFactor = 0.05;
 
 				scene.userData.render = function ( time ) {
 
@@ -562,7 +562,7 @@
 				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
 				controls.target.copy( sphereMesh.position );
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
+				controls.dampingFactor = 0.05;
 
 				// THREE.Sphere mouse raycasting
 
@@ -764,7 +764,7 @@
 				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
 				controls.target.y = GROUND_SIZE * 0.05;
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
+				controls.dampingFactor = 0.05;
 
 				scene.userData.render = function ( time ) {
 

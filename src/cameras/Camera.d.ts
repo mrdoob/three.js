@@ -31,8 +31,6 @@ export class Camera extends Object3D {
 
 	isCamera: true;
 
-	copy( source: Camera, recursive?: boolean ): this;
-
 	getWorldDirection( target: Vector3 ): Vector3;
 
 	updateMatrixWorld( force?: boolean ): void;
