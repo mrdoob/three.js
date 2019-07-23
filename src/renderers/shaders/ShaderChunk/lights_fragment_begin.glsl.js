@@ -20,8 +20,14 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
-#if defined( PHYSICAL ) && !defined( STANDARD )
-	geometry.clearCoatNormal = clearCoatNormal;
+#ifdef PHYSICAL
+	#ifndef STANDARD
+		#ifdef USE_CLEARCOAT_NORMALMAP
+		
+			geometry.clearCoatNormal = clearCoatNormal;
+
+		#endif
+	#endif
 #endif
 IncidentLight directLight;
 
@@ -125,6 +131,6 @@ IncidentLight directLight;
 
 	vec3 radiance = vec3( 0.0 );
 	vec3 clearCoatRadiance = vec3( 0.0 );
-
+	
 #endif
 `;

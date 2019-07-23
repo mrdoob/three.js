@@ -1,4 +1,3 @@
-import { TangentSpaceNormalMap } from '../constants.js';
 import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 
@@ -9,11 +8,9 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
  *  reflectivity: <float>
  *  clearCoat: <float>
  *  clearCoatRoughness: <float>
-
- *  clearCoatGeometryNormals: <boolean>
- *  clearCoatNormalMap: new THREE.Texture( <Image> ),
- *  clearCoatNormalMapType: THREE.TangentSpaceNormalMap,
+ *
  *  clearCoatNormalScale: <Vector2>,
+ *  clearCoatNormalMap: new THREE.Texture( <Image> ),
  * }
  */
 
@@ -30,10 +27,8 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearCoat = 0.0;
 	this.clearCoatRoughness = 0.0;
 
-	this.clearCoatGeometryNormals = false;
-	this.clearCoatNormalMap = null;
-	this.clearCoatNormalMapType = TangentSpaceNormalMap;
 	this.clearCoatNormalScale = new Vector2(1, 1);
+	this.clearCoatNormalMap = null;
 
 	this.setValues( parameters );
 
@@ -55,9 +50,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearCoat = source.clearCoat;
 	this.clearCoatRoughness = source.clearCoatRoughness;
 
-	this.clearCoatGeometryNormals = source.clearCoatGeometryNormals;
 	this.clearCoatNormalMap = source.clearCoatNormalMap;
-	this.clearCoatNormalMapType = source.clearCoatNormalMapType;
 	this.clearCoatNormalScale.copy(source.clearCoatNormalScale);
 
 	return this;

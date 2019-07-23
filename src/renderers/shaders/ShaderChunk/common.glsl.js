@@ -40,8 +40,12 @@ struct GeometricContext {
 	vec3 normal;
 	vec3 viewDir;
 
-  #ifndef STANDARD
-	vec3 clearCoatNormal;
+	#ifndef STANDARD
+		#ifdef USE_CLEARCOAT_NORMALMAP
+
+			vec3 clearCoatNormal;
+			
+		#endif
   #endif
 };
 

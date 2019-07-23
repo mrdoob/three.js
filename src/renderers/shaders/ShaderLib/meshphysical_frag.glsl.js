@@ -10,7 +10,6 @@ uniform float opacity;
 #ifndef STANDARD
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
-	uniform bool clearCoatGeometryNormals;
 #endif
 
 varying vec3 vViewPosition;

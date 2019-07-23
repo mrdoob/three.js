@@ -275,9 +275,8 @@ ShaderLib.physical = {
 		{
 			clearCoat: { value: 0 },
 			clearCoatRoughness: { value: 0 },
-			clearCoatGeometryNormals: { value: false },
+			clearCoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearCoatNormalMap: { value: null },
-			clearCoatNormalScale: { value: new Vector2( 1, 1 ) }
 		}
 	] ),
 

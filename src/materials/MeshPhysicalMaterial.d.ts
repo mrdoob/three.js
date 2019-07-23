@@ -11,11 +11,9 @@ export interface MeshPhysicalMaterialParameters
 	reflectivity?: number;
 	clearCoat?: number;
 	clearCoatRoughness?: number;
-	
-	clearCoatGeometryNormals?: boolean;
-	clearCoatNormalMap?: Texture;
-	clearCoatNormalMapType?: NormalMapTypes;
+
 	clearCoatNormalScale?: Vector2;
+	clearCoatNormalMap?: Texture;
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
@@ -27,9 +25,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 	clearCoat: number;
 	clearCoatRoughness: number;
 
-	clearCoatGeometryNormals?: boolean;
-	clearCoatNormalMap: Texture | null;
-	clearCoatNormalMapType: NormalMapTypes;
 	clearCoatNormalScale: Vector2;
+	clearCoatNormalMap: Texture | null;
 
 }

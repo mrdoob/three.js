@@ -74,7 +74,6 @@
 
 		const variationsX = [
 			(mat, scale, map) => { mat.clearCoatNormalScale.copy(mat.normalScale); },
-			(mat, scale, map) => { mat.clearCoatNormalScale = new THREE.Vector2(scale, scale); },
 			(mat, scale, map) => {
 				mat.clearCoatNormalScale = new THREE.Vector2(scale, scale);
 				if (mat.clearCoatNormalMap !== map) {
@@ -207,14 +206,13 @@
 			}
 
 
-			addLabel("Normal Map", new THREE.Vector3(-450, 0, 0), 30);
-			addLabel("None", new THREE.Vector3(-350, -100, 0));
-			addLabel("Scaling + Map", new THREE.Vector3(-400, 100, 0));
+			addLabel("Normal Map", new THREE.Vector3(-350, 0, 0), 30);
+			addLabel("None", new THREE.Vector3(-250, -100, 0));
+			addLabel("Map", new THREE.Vector3(-300, 100, 0));
 
 			addLabel("Clearcoat Normal Map", new THREE.Vector3(0, 260, 0), 30);
-			addLabel("None", new THREE.Vector3(- 200, 200, 0));
-			addLabel("Scaling", new THREE.Vector3(0, 200, 0));
-			addLabel("Scaling + Map", new THREE.Vector3(200, 200, 0));
+			addLabel("None", new THREE.Vector3(-100, 200, 0));
+			addLabel("Map", new THREE.Vector3(100, 200, 0));
 
 			// LIGHTS
 

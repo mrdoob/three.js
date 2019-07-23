@@ -2282,12 +2282,11 @@ function WebGLRenderer( parameters ) {
 			}
 
 			uniforms.clearCoatNormalScale.value.copy( material.clearCoatNormalScale );
-			if ( material.side === BackSide ) uniforms.clearCoatNormalScale.value.negate();
+			if ( material.side === BackSide ){
+				uniforms.clearCoatNormalScale.value.negate();
+			}
 
 		}
-
-		uniforms.clearCoatGeometryNormals.value = material.clearCoatGeometryNormals;
-		
 	}
 
 	function refreshUniformsMatcap( uniforms, material ) {

@@ -28,8 +28,11 @@ export default /* glsl */ `
   radiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.normal, Material_BlinnShininessExponent( material ), maxMipLevel );
 
 	#ifndef STANDARD
-	  clearCoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.clearCoatNormal,Material_ClearCoat_BlinnShininessExponent( material ), maxMipLevel );
+		#ifdef USE_CLEARCOAT_NORMALMAP
+			clearCoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.clearCoatNormal, Material_ClearCoat_BlinnShininessExponent( material ), maxMipLevel );
+		#else
+			clearCoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.normal, Material_ClearCoat_BlinnShininessExponent( material ), maxMipLevel );
+		#endif
 	#endif
-
 #endif
 `;
