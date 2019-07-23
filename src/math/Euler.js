@@ -23,7 +23,9 @@ Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 Euler.DefaultOrder = 'XYZ';
 
 Object.defineProperties( Euler.prototype, {
+
 	x: {
+
 		get: function () {
 
 			return this._x;
@@ -35,10 +37,12 @@ Object.defineProperties( Euler.prototype, {
 			this._x = value;
 			this._onChangeCallback();
 
-		},
+		}
+
 	},
 
 	y: {
+
 		get: function () {
 
 			return this._y;
@@ -50,10 +54,12 @@ Object.defineProperties( Euler.prototype, {
 			this._y = value;
 			this._onChangeCallback();
 
-		},
+		}
+
 	},
 
 	z: {
+
 		get: function () {
 
 			return this._z;
@@ -65,10 +71,12 @@ Object.defineProperties( Euler.prototype, {
 			this._z = value;
 			this._onChangeCallback();
 
-		},
+		}
+
 	},
 
 	order: {
+
 		get: function () {
 
 			return this._order;
@@ -80,11 +88,14 @@ Object.defineProperties( Euler.prototype, {
 			this._order = value;
 			this._onChangeCallback();
 
-		},
-	},
+		}
+
+	}
+
 } );
 
 Object.assign( Euler.prototype, {
+
 	isEuler: true,
 
 	set: function ( x, y, z, order ) {
@@ -126,15 +137,9 @@ Object.assign( Euler.prototype, {
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		var te = m.elements;
-		var m11 = te[ 0 ],
-			m12 = te[ 4 ],
-			m13 = te[ 8 ];
-		var m21 = te[ 1 ],
-			m22 = te[ 5 ],
-			m23 = te[ 9 ];
-		var m31 = te[ 2 ],
-			m32 = te[ 6 ],
-			m33 = te[ 10 ];
+		var m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
+		var m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
+		var m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
 		order = order || this._order;
 
@@ -236,10 +241,7 @@ Object.assign( Euler.prototype, {
 
 		} else {
 
-			console.warn(
-				'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' +
-					order
-			);
+			console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order );
 
 		}
 
@@ -251,7 +253,7 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	setFromQuaternion: ( function () {
+	setFromQuaternion: function () {
 
 		var matrix = new Matrix4();
 
@@ -263,7 +265,7 @@ Object.assign( Euler.prototype, {
 
 		};
 
-	} )(),
+	}(),
 
 	setFromVector3: function ( v, order ) {
 
@@ -271,7 +273,7 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	reorder: ( function () {
+	reorder: function () {
 
 		// WARNING: this discards revolution information -bhouston
 
@@ -285,16 +287,11 @@ Object.assign( Euler.prototype, {
 
 		};
 
-	} )(),
+	}(),
 
 	equals: function ( euler ) {
 
-		return (
-			euler._x === this._x &&
-			euler._y === this._y &&
-			euler._z === this._z &&
-			euler._order === this._order
-		);
+		return ( euler._x === this._x ) && ( euler._y === this._y ) && ( euler._z === this._z ) && ( euler._order === this._order );
 
 	},
 
@@ -347,7 +344,9 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	_onChangeCallback: function () {},
+	_onChangeCallback: function () {}
+
 } );
+
 
 export { Euler };
