@@ -6,7 +6,7 @@ export default /* glsl */`
 
 #ifdef USE_ENVMAP
 
-	#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )
+	#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( PHONG ) )
 		varying vec3 vWorldPosition;
 	#endif
 
@@ -18,7 +18,7 @@ export default /* glsl */`
 	uniform float flipEnvMap;
 	uniform int maxMipLevel;
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
 		uniform float refractionRatio;
 	#else
 		varying vec3 vReflect;

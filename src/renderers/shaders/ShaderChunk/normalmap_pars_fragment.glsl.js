@@ -8,12 +8,15 @@ export default /* glsl */`
 
 		uniform mat3 normalMatrix;
 
-	#else
+	#endif
+#endif
+
+#if ( defined ( USE_NORMALMAP ) && !defined ( OBJECTSPACE_NORMALMAP )) || defined ( USE_CLEARCOAT_NORMALMAP )
 
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 
-		vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {
+		vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec2 normalScale, in sampler2D normalMap ) {
 
 			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -37,8 +40,5 @@ export default /* glsl */`
 			return normalize( tsn * mapN );
 
 		}
-
-	#endif
-
 #endif
 `;

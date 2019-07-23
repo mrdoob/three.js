@@ -39,6 +39,14 @@ struct GeometricContext {
 	vec3 position;
 	vec3 normal;
 	vec3 viewDir;
+
+	#ifndef STANDARD
+		#ifdef USE_CLEARCOAT_NORMALMAP
+
+			vec3 clearCoatNormal;
+
+		#endif
+  #endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {

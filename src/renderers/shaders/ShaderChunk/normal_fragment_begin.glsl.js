@@ -32,4 +32,7 @@ export default /* glsl */`
 	#endif
 
 #endif
+#if defined( PHYSICAL ) && !defined( STANDARD )
+	vec3 geometryNormal = normal;
+#endif
 `;

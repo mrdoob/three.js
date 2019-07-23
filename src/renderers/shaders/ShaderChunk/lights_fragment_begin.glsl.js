@@ -20,6 +20,15 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
+#ifdef PHYSICAL
+	#ifndef STANDARD
+		#ifdef USE_CLEARCOAT_NORMALMAP
+
+			geometry.clearCoatNormal = clearCoatNormal;
+
+		#endif
+	#endif
+#endif
 IncidentLight directLight;
 
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
