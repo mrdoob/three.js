@@ -38,12 +38,8 @@
 		var customDepthVertexShader = 
 			`
 			// instanced
-			#ifdef INSTANCED
-
-				attribute vec3 instanceOffset;
-				attribute float instanceScale;
-
-			#endif
+			attribute vec3 instanceOffset;
+			attribute float instanceScale;
 
 			#include <common>
 			#include <uv_pars_vertex>
@@ -70,12 +66,8 @@
 				#include <begin_vertex>
 
 				// instanced
-				#ifdef INSTANCED
-
-					transformed *= instanceScale;
-					transformed = transformed + instanceOffset;
-
-				#endif
+				transformed *= instanceScale;
+				transformed = transformed + instanceOffset;
 
 				#include <morphtarget_vertex>
 				#include <skinning_vertex>
@@ -92,11 +84,9 @@
 			`
 			#define LAMBERT
 
-			#ifdef INSTANCED
-				attribute vec3 instanceOffset;
-				attribute vec3 instanceColor;
-				attribute float instanceScale;
-			#endif
+			attribute vec3 instanceOffset;
+			attribute vec3 instanceColor;
+			attribute float instanceScale;
 
 			varying vec3 vLightFront;
 			varying vec3 vIndirectFront;
@@ -127,10 +117,8 @@
 				#include <color_vertex>
 
 				// vertex colors instanced
-				#ifdef INSTANCED
-					#ifdef USE_COLOR
-						vColor.xyz = instanceColor.xyz;
-					#endif
+				#ifdef USE_COLOR
+					vColor.xyz = instanceColor.xyz;
 				#endif
 
 				#include <beginnormal_vertex>
@@ -142,10 +130,8 @@
 				#include <begin_vertex>
 				// position instanced
 
-				#ifdef INSTANCED
-					transformed *= instanceScale;
-					transformed = transformed + instanceOffset;
-				#endif
+				transformed *= instanceScale;
+				transformed = transformed + instanceOffset;
 
 				#include <morphtarget_vertex>
 				#include <skinning_vertex>
@@ -284,9 +270,6 @@
 
 			};
 
-			material.defines = material.defines || {};
-			material.defines[ 'INSTANCED' ] = "";
-
 
 			// custom depth material - required for instanced shadows
 
@@ -299,8 +282,6 @@
 			};
 
 			customDepthMaterial.depthPacking = THREE.RGBADepthPacking;
-			customDepthMaterial.defines = material.defines || {};
-			customDepthMaterial.defines[ 'INSTANCED' ] = "";
 
 			//
 
