@@ -84,6 +84,7 @@
 			`
 			#define LAMBERT
 
+			// instanced
 			attribute vec3 instanceOffset;
 			attribute vec3 instanceColor;
 			attribute float instanceScale;
@@ -128,8 +129,8 @@
 				#include <defaultnormal_vertex>
 
 				#include <begin_vertex>
-				// position instanced
 
+				// position instanced
 				transformed *= instanceScale;
 				transformed = transformed + instanceOffset;
 
