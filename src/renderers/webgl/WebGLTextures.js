@@ -1062,11 +1062,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				state.bindTexture( _gl.TEXTURE_2D, attachmentProperties.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, attachment, supportsMips );
-				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, textures[ i ], _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D );
+				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, attachment, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D );
 
 				if ( textureNeedsGenerateMipmaps( renderTarget.texture, supportsMips ) ) {
 
-					generateMipmap( _gl.TEXTURE_2D, textures[ i ], renderTarget.width, renderTarget.height );
+					generateMipmap( _gl.TEXTURE_2D, attachment, renderTarget.width, renderTarget.height );
 
 				}
 
