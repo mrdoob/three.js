@@ -141,14 +141,20 @@
 
 				// Create a multi render target with Float buffers
 
-				renderTarget = new THREE.WebGLMultiRenderTarget( window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, 2 );
-				renderTarget.texture.format = THREE.RGBAFormat;
-				renderTarget.texture.minFilter = THREE.NearestFilter;
-				renderTarget.texture.magFilter = THREE.NearestFilter;
-				renderTarget.texture.type = THREE.FloatType;
-				renderTarget.texture.generateMipmaps = false;
-				renderTarget.stencilBuffer = false;
-				renderTarget.depthBuffer = true;
+				renderTarget = new THREE.WebGLMultiRenderTarget(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio,
+					2,
+					{
+						format: THREE.RGBAFormat,
+						minFilter: THREE.NearestFilter,
+						magFilter: THREE.NearestFilter,
+						type: THREE.FloatType,
+						generateMipmaps: false,
+						stencilBuffer: false,
+						depthBuffer: true
+					}
+				);
 
 				// Name our G-Buffer attachments for debugging
 
