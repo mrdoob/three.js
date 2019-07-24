@@ -30,20 +30,20 @@ function GridHelper( size, divisions, color1, color2, color3 ) {
 
 		var color = i === center ? color1 : color2;
 
-		if( i === center ) {
-			
+		if ( i === center ) {
+
 			color1.toArray( colors, j ); j += 3;
 			color1.toArray( colors, j ); j += 3;
 			color3.toArray( colors, j ); j += 3;
 			color3.toArray( colors, j ); j += 3;
-			
+
 		} else {
-			
+
 			color.toArray( colors, j ); j += 3;
 			color.toArray( colors, j ); j += 3;
 			color.toArray( colors, j ); j += 3;
 			color.toArray( colors, j ); j += 3;
-			
+
 		}
 
 	}
