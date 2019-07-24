@@ -67,7 +67,7 @@
 
 				exposure: 1,
 
-				hdr: true
+				hdr: false
 
 				//autoRotate: true,
 
@@ -123,7 +123,6 @@
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
-				renderer.gammaOutput = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
