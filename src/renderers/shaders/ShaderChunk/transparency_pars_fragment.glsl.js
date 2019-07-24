@@ -1,8 +1,6 @@
 export default /* glsl */`
-uniform float transparency;
-
-	// makes surface transparent without hiding the specular term
-	vec4 combineLight( const in vec3 diffuseLight, const in vec3 specularLight, const in GeometricContext geometry, const in PhysicalMaterial material ) {
+// makes surface transparent without hiding the specular term
+vec4 combineLight(const in vec3 diffuseLight, const in vec3 specularLight, const in GeometricContext geometry, const in PhysicalMaterial material, float transparency) {
 
 	float diffuseAlpha = 1. - transparency;
 
