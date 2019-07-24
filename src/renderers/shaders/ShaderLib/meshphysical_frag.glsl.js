@@ -50,7 +50,6 @@ varying vec3 vViewPosition;
 #include <normalmap_pars_fragment>
 #include <roughnessmap_pars_fragment>
 #include <metalnessmap_pars_fragment>
-#include <transparency_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
@@ -82,14 +81,9 @@ void main() {
 	// modulation
 	#include <aomap_fragment>
 
-	gl_FragColor = combineLight(
-		reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance,
-		reflectedLight.directSpecular + reflectedLight.indirectSpecular,
-		geometry,
-		material
-	);
+	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 
-	gl_FragColor.a *= diffuseColor.a;
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
