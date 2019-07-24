@@ -34,65 +34,58 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { Curves } from './jsm/curves/CurveExtras.js';
 
-		var customDepthToRGBAShader = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
+		// this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
+		var customDepthVertexShader = 
+			`
+			// instanced
+			#ifdef INSTANCED
 
-			uniforms: THREE.ShaderLib.depth.uniforms,
+				attribute vec3 instanceOffset;
+				attribute float instanceScale;
 
-			vertexShader:
-				`
-				// instanced
-				#ifdef INSTANCED
+			#endif
 
-					attribute vec3 instanceOffset;
-					attribute float instanceScale;
+			#include <common>
+			#include <uv_pars_vertex>
+			#include <displacementmap_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
+			#include <logdepthbuf_pars_vertex>
+			#include <clipping_planes_pars_vertex>
+
+			void main() {
+
+				#include <uv_vertex>
+
+				#include <skinbase_vertex>
+
+				#ifdef USE_DISPLACEMENTMAP
+
+					#include <beginnormal_vertex>
+					#include <morphnormal_vertex>
+					#include <skinnormal_vertex>
 
 				#endif
 
-				#include <common>
-				#include <uv_pars_vertex>
-				#include <displacementmap_pars_vertex>
-				#include <morphtarget_pars_vertex>
-				#include <skinning_pars_vertex>
-				#include <logdepthbuf_pars_vertex>
-				#include <clipping_planes_pars_vertex>
+				#include <begin_vertex>
 
-				void main() {
+				// instanced
+				#ifdef INSTANCED
 
-					#include <uv_vertex>
+					transformed *= instanceScale;
+					transformed = transformed + instanceOffset;
 
-					#include <skinbase_vertex>
+				#endif
 
-					#ifdef USE_DISPLACEMENTMAP
+				#include <morphtarget_vertex>
+				#include <skinning_vertex>
+				#include <displacementmap_vertex>
+				#include <project_vertex>
+				#include <logdepthbuf_vertex>
+				#include <clipping_planes_vertex>
 
-						#include <beginnormal_vertex>
-						#include <morphnormal_vertex>
-						#include <skinnormal_vertex>
-
-					#endif
-
-					#include <begin_vertex>
-
-					// instanced
-					#ifdef INSTANCED
-
-						transformed *= instanceScale;
-						transformed = transformed + instanceOffset;
-
-					#endif
-
-					#include <morphtarget_vertex>
-					#include <skinning_vertex>
-					#include <displacementmap_vertex>
-					#include <project_vertex>
-					#include <logdepthbuf_vertex>
-					#include <clipping_planes_vertex>
-
-				}
-			`,
-
-			fragmentShader: THREE.ShaderChunk.depth_frag
-
-		};
+			}
+			`;
 
 		// this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
 		var customLambertVertexShader =
@@ -286,27 +279,28 @@
 			} );
 
 			material.onBeforeCompile = function( shader ) {
+
 				shader.vertexShader = customLambertVertexShader;
+
 			};
+
 			material.defines = material.defines || {};
 			material.defines[ 'INSTANCED' ] = "";
 
 
 			// custom depth material - required for instanced shadows
 
-			var uniforms = THREE.UniformsUtils.clone( customDepthToRGBAShader.uniforms );
+			var customDepthMaterial = new THREE.MeshDepthMaterial();
 
-			var customDepthMaterial = new THREE.ShaderMaterial( {
+			customDepthMaterial.onBeforeCompile = function( shader ) {
 
-				defines: {
-					'INSTANCED': "",
-					'DEPTH_PACKING': THREE.RGBADepthPacking
-				},
-				uniforms: uniforms,
-				vertexShader: customDepthToRGBAShader.vertexShader,
-				fragmentShader: customDepthToRGBAShader.fragmentShader
+				shader.vertexShader = customDepthVertexShader;
 
-			} );
+			};
+
+			customDepthMaterial.depthPacking = THREE.RGBADepthPacking;
+			customDepthMaterial.defines = material.defines || {};
+			customDepthMaterial.defines[ 'INSTANCED' ] = "";
 
 			//
 
