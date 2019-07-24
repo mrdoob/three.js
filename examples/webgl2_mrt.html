@@ -110,10 +110,11 @@
 			Created by <a href="http://twitter.com/mattdesl" target="_blank">@mattdesl</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container;
 			var camera, scene, renderer, controls;
@@ -216,7 +217,7 @@
 
 				// Controls
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.enableZoom = false;
 				controls.screenSpacePanning = true;
