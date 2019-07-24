@@ -22,6 +22,7 @@ StandardNodeMaterial.prototype.constructor = StandardNodeMaterial;
 NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'color',
 	'alpha',
+	'transparency',
 	'roughness',
 	'metalness',
 	'reflectivity',

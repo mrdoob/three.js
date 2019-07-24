@@ -24,6 +24,8 @@
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
+			import * as Nodes from './jsm/nodes/Nodes.js';
+
 			var params = {
 				opacity: 1,
 				transparency: 0,
@@ -37,10 +39,12 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var material, material1, material2;
+			var material, material1, material2, material1n, material2n;
 			var hdrCubeRenderTarget;
 			var hdrCubeMap;
 			var spotLight;
+
+			var alpha, transparency, metalness, roughness, color;
 
 			var fontLoader = new THREE.FontLoader();
 			fontLoader.load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
@@ -82,16 +86,43 @@
 
 				//
 
+				material1n = new Nodes.StandardNodeMaterial();
+				material2n = new Nodes.StandardNodeMaterial();
+				material2n.premultipliedAlpha = true;
+
+				alpha = new Nodes.FloatNode( params.opacity );
+				transparency = new Nodes.FloatNode( params.transparency );
+				metalness = new Nodes.FloatNode( params.metalness );
+				roughness = new Nodes.FloatNode( params.roughness );
+				color = new Nodes.ColorNode( 0xffffff );
+
+				material1n.alpha = material2n.alpha = alpha;
+				material1n.transparency = material2n.transparency = transparency;
+				material1n.metalness = material2n.metalness = metalness;
+				material1n.roughness = material2n.roughness = roughness;
+				material1n.color = material2n.color = color;
+
 				var textureLoader = new THREE.TextureLoader();
 				textureLoader.load( "textures/hardwood2_roughness.jpg", function ( map ) {
 
 					map.anisotropy = 8;
+
+					material1n.roughness = material2n.roughness = new Nodes.OperatorNode(
+						roughness,
+						new Nodes.SwitchNode(
+							new Nodes.TextureNode( map ),
+							'g'
+						),
+						Nodes.OperatorNode.MUL
+					);
 
 					material1.roughnessMap = map;
 					material2.roughnessMap = map;
 
 					material1.needsUpdate = true;
 					material2.needsUpdate = true;
+					material1n.needsUpdate = true;
+					material2n.needsUpdate = true;
 
 				} );
 
@@ -99,15 +130,27 @@
 
 				mesh = new THREE.Mesh( geometry, material1 );
 				mesh.position.x = - 25.0;
+				mesh.position.y = 25.0;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( geometry, material2 );
 				mesh.position.x = 25.0;
+				mesh.position.y = 25.0;
+				scene.add( mesh );
+
+				mesh = new THREE.Mesh( geometry, material1n );
+				mesh.position.x = - 25.0;
+				mesh.position.y = - 25.0;
+				scene.add( mesh );
+
+				mesh = new THREE.Mesh( geometry, material2n );
+				mesh.position.x = 25.0;
+				mesh.position.y = - 25.0;
 				scene.add( mesh );
 
 				//
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 100, 100 );
+				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				material = new THREE.MeshStandardMaterial( { color: 0x333333, side: THREE.BackSide } );
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -176,14 +219,19 @@
 					spotLight.intensity = params.spotLight;
 					mesh.visible = params.showbox;
 
-					var color = new THREE.Color().setHSL(0, params.colorSaturation, params.colorBrightness);
+					alpha.value = params.opacity;
+					transparency.value = params.transparency;
+					metalness.value = params.metalness;
+					roughness.value = params.roughness;
+
+					color.value.setHSL(0, params.colorSaturation, params.colorBrightness * .5);
 
 					material1.opacity = material2.opacity = params.opacity;
 					material1.transparency = material2.transparency = params.transparency;
 					material1.metalness = material2.metalness = params.metalness;
 					material1.roughness = material2.roughness = params.roughness;
 					material1.roughness = material2.roughness = params.roughness;
-					material1.color = material2.color = color;
+					material1.color = material2.color = color.value;
 
 				}
 
@@ -223,9 +271,13 @@
 
 				}
 
-				addLabel( "premultiplied alpha", new THREE.Vector3( 7, 20, 0 ) );
+				addLabel( "premultiplied alpha", new THREE.Vector3( 7, 45, 0 ) );
 
-				addLabel( "regular alpha", new THREE.Vector3( -37, 20, 0 ) );
+				addLabel( "regular alpha", new THREE.Vector3( -37, 45, 0 ) );
+
+				addLabel( "MeshPhysicalMaterial", new THREE.Vector3( 45, 25, 0 ) );
+
+				addLabel( "StandardNodeMaterial", new THREE.Vector3( 45, - 25, 0 ) );
 
 			}
 
@@ -259,6 +311,7 @@
 					material1.envMap = hdrCubeRenderTarget.texture;
 					material2.envMap = hdrCubeRenderTarget.texture;
 					material.envMap = hdrCubeRenderTarget.texture;
+					material1n.environment = material2n.environment = new Nodes.TextureCubeNode(new Nodes.TextureNode(hdrCubeRenderTarget.texture));
 					scene.background = hdrCubeMap;
 				}
 

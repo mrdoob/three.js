@@ -139,6 +139,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.alpha ) this.alpha.analyze( builder );
 
+		if ( this.transparency ) this.transparency.analyze( builder );
+
 		if ( this.normal ) this.normal.analyze( builder );
 
 		if ( this.clearCoat ) this.clearCoat.analyze( builder );
@@ -164,6 +166,7 @@ StandardNode.prototype.build = function ( builder ) {
 		var metalness = this.metalness.flow( builder, 'f' );
 
 		var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
+		var transparency = this.transparency ? this.transparency.flow( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
 
@@ -183,7 +186,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
-		builder.requires.transparent = alpha !== undefined;
+		builder.requires.transparent = alpha !== undefined || transparency !== undefined;
 
 		builder.addParsCode( [
 
@@ -201,6 +204,7 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <lights_pars_begin>",
 			"#include <lights_physical_pars_fragment>",
 			"#include <shadowmap_pars_fragment>",
+			"#include <transparency_pars_fragment>",
 			"#include <logdepthbuf_pars_fragment>"
 		].join( "\n" ) );
 
@@ -396,17 +400,20 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <lights_fragment_end>"
 		);
 
-		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
+		output.push(
+			'float alpha = ' + ( alpha ? alpha.result : '1.') + ';',
+			'float transparency = ' + ( transparency ? transparency.result : '0.') + ';',
 
-		if ( alpha ) {
+			'gl_FragColor = combineLight(',
+			'  reflectedLight.directDiffuse + reflectedLight.indirectDiffuse,',
+			'  reflectedLight.directSpecular + reflectedLight.indirectSpecular,',
+			'  geometry,',
+			'  material,',
+			'  transparency',
+			');',
 
-			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
-
-		} else {
-
-			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
-
-		}
+			'gl_FragColor.a *= alpha;'
+		);
 
 		output.push(
 			"#include <tonemapping_fragment>",
@@ -441,6 +448,8 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.mask ) this.mask = source.mask;
 
 	if ( source.alpha ) this.alpha = source.alpha;
+
+	if ( source.transparency ) this.transparency = source.transparency;
 
 	if ( source.normal ) this.normal = source.normal;
 
@@ -484,6 +493,8 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.mask ) data.mask = this.mask.toJSON( meta ).uuid;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
+
+		if ( this.transparency ) data.transparency = this.transparency.toJSON( meta ).uuid;
 
 		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
 
