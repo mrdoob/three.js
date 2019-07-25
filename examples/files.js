@@ -189,6 +189,7 @@ var files = {
 		"webgl_materials_video",
 		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
+		"webgl_materials_sheen",
 		"webgl_math_orientation_transform",
 		"webgl_mirror",
 		"webgl_mirror_nodes",
