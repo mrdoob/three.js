@@ -86,6 +86,9 @@ var GLTFLoader = ( function () {
 		constructor: GLTFLoader,
 
 		crossOrigin: 'anonymous',
+		
+		onBeforeGLTFParser: function (json) {},  // Hook function. You can modify "json" before "new GLTFParser()"
+
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -234,6 +237,8 @@ var GLTFLoader = ( function () {
 			}
 
 			var json = JSON.parse( content );
+			
+			this.onBeforeGLTFParser(json);
 
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
