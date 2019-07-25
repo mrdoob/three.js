@@ -7,12 +7,14 @@ import {
 
 export interface MeshPhysicalMaterialParameters
 	extends MeshStandardMaterialParameters {
+
 	reflectivity?: number;
 	clearCoat?: number;
 	clearCoatRoughness?: number;
 
 	clearCoatNormalScale?: Vector2;
 	clearCoatNormalMap?: Texture;
+
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
