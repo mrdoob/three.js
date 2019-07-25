@@ -9,7 +9,7 @@ import { _Math } from './Math.js';
  * @author bhouston / http://clara.io
  */
 
-var _matrix, _quaterion;
+var _matrix, _quaternion;
 
 function Euler( x, y, z, order ) {
 
@@ -275,11 +275,11 @@ Object.assign( Euler.prototype, {
 
 		// WARNING: this discards revolution information -bhouston
 
-		if ( _quaterion === undefined ) _quaterion = new Quaternion();
+		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-		_quaterion.setFromEuler( this );
+		_quaternion.setFromEuler( this );
 
-		return this.setFromQuaternion( _quaterion, newOrder );
+		return this.setFromQuaternion( _quaternion, newOrder );
 
 	},
 
