@@ -20,11 +20,11 @@ NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
 NormalNode.prototype.nodeType = "Normal";
 
-NormalNode.prototype.getUnique = function () {
+NormalNode.prototype.getShared = function () {
 
-	// if unique is true, TempNode will not create temp variable (for optimization)
+	// if shared is false, TempNode will not create temp variable (for optimization)
 
-	return this.scope === NormalNode.LOCAL;
+	return this.scope === NormalNode.WORLD;
 
 };
 
