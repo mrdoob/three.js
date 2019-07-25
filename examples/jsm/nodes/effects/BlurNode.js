@@ -16,7 +16,7 @@ function BlurNode( value, uv, radius, size ) {
 
 	this.value = value;
 	this.uv = uv || new UVNode();
-	this.radius = new Vector2Node( 1, 1 );
+	this.radius = radius || new Vector2Node( 1, 1 );
 
 	this.size = size;
 
@@ -141,6 +141,8 @@ BlurNode.prototype.copy = function ( source ) {
 
 	this.blurX = source.blurX;
 	this.blurY = source.blurY;
+
+	return this;
 
 };
 

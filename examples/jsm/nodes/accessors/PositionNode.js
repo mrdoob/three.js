@@ -114,6 +114,8 @@ PositionNode.prototype.copy = function ( source ) {
 
 	this.scope = source.scope;
 
+	return this;
+
 };
 
 PositionNode.prototype.toJSON = function ( meta ) {

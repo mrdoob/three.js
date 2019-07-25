@@ -44,6 +44,8 @@ UVTransformNode.prototype.copy = function ( source ) {
 	this.uv = source.uv;
 	this.position = source.position;
 
+	return this;
+
 };
 
 UVTransformNode.prototype.toJSON = function ( meta ) {

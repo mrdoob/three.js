@@ -132,7 +132,7 @@
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.setType( THREE.UnsignedByteType )
+					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
 						generate( params.textureSize );

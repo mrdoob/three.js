@@ -29,8 +29,8 @@ import {
 	LineLoop,
 	LineSegments,
 	LinearFilter,
-	LinearMipMapLinearFilter,
-	LinearMipMapNearestFilter,
+	LinearMipmapLinearFilter,
+	LinearMipmapNearestFilter,
 	Loader,
 	LoaderUtils,
 	Material,
@@ -41,8 +41,8 @@ import {
 	MeshStandardMaterial,
 	MirroredRepeatWrapping,
 	NearestFilter,
-	NearestMipMapLinearFilter,
-	NearestMipMapNearestFilter,
+	NearestMipmapLinearFilter,
+	NearestMipmapNearestFilter,
 	NumberKeyframeTrack,
 	Object3D,
 	OrthographicCamera,
@@ -1188,10 +1188,10 @@ var GLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: NearestFilter,
 		9729: LinearFilter,
-		9984: NearestMipMapNearestFilter,
-		9985: LinearMipMapNearestFilter,
-		9986: NearestMipMapLinearFilter,
-		9987: LinearMipMapLinearFilter
+		9984: NearestMipmapNearestFilter,
+		9985: LinearMipmapNearestFilter,
+		9986: NearestMipmapLinearFilter,
+		9987: LinearMipmapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -2105,7 +2105,7 @@ var GLTFLoader = ( function () {
 			var sampler = samplers[ textureDef.sampler ] || {};
 
 			texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || LinearFilter;
-			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || LinearMipMapLinearFilter;
+			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || LinearMipmapLinearFilter;
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 

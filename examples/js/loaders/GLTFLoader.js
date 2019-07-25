@@ -1123,10 +1123,10 @@ THREE.GLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: THREE.NearestFilter,
 		9729: THREE.LinearFilter,
-		9984: THREE.NearestMipMapNearestFilter,
-		9985: THREE.LinearMipMapNearestFilter,
-		9986: THREE.NearestMipMapLinearFilter,
-		9987: THREE.LinearMipMapLinearFilter
+		9984: THREE.NearestMipmapNearestFilter,
+		9985: THREE.LinearMipmapNearestFilter,
+		9986: THREE.NearestMipmapLinearFilter,
+		9987: THREE.LinearMipmapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -1875,13 +1875,15 @@ THREE.GLTFLoader = ( function () {
 			// The buffer is not interleaved if the stride is the item size in bytes.
 			if ( byteStride && byteStride !== itemBytes ) {
 
-				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType;
+				// Each "slice" of the buffer, as defined by 'count' elements of 'byteStride' bytes, gets its own InterleavedBuffer
+				// This makes sure that IBA.count reflects accessor.count properly
+				var ibSlice = Math.floor( byteOffset / byteStride );
+				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType + ':' + ibSlice + ':' + accessorDef.count;
 				var ib = parser.cache.get( ibCacheKey );
 
 				if ( ! ib ) {
 
-					// Use the full buffer if it's interleaved.
-					array = new TypedArray( bufferView );
+					array = new TypedArray( bufferView, ibSlice * byteStride, accessorDef.count * byteStride / elementBytes );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
@@ -1890,7 +1892,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, byteOffset / elementBytes, normalized );
+				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, (byteOffset % byteStride) / elementBytes, normalized );
 
 			} else {
 
@@ -2040,7 +2042,7 @@ THREE.GLTFLoader = ( function () {
 			var sampler = samplers[ textureDef.sampler ] || {};
 
 			texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipMapLinearFilter;
+			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.LinearMipmapLinearFilter;
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 

@@ -75,6 +75,8 @@ TimerNode.prototype.copy = function ( source ) {
 
 	this.timeScale = source.timeScale;
 
+	return this;
+
 };
 
 TimerNode.prototype.toJSON = function ( meta ) {

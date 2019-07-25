@@ -40,6 +40,8 @@ LightNode.prototype.copy = function ( source ) {
 
 	this.scope = source.scope;
 
+	return this;
+
 };
 
 LightNode.prototype.toJSON = function ( meta ) {

@@ -247,7 +247,7 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
-				texture.minFilter = THREE.LinearMipMapLinearFilter;
+				texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				var mesh = new THREE.Mesh(
 					geometry,
