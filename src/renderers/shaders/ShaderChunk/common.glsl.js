@@ -44,7 +44,7 @@ struct GeometricContext {
 
 		vec3 clearCoatNormal;
 
-  #endif
+	#endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
