@@ -25,7 +25,7 @@ export class GLTFLoader {
   crossOrigin: string;
   resourcePath: string;
 	
-	onBeforeGLTFParser(json: object) : void;
+  onBeforeGLTFParser(json: object) : void;
   load(url: string, onLoad: (gltf: GLTF) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
   setPath(path: string) : GLTFLoader;
   setResourcePath(path: string) : GLTFLoader;
