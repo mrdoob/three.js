@@ -28,6 +28,7 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'clearCoat',
 	'clearCoatRoughness',
 	'normal',
+	'clearCoatNormal',
 	'emissive',
 	'ambient',
 	'light',
