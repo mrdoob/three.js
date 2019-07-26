@@ -42,7 +42,7 @@ function getEncodingComponents( encoding ) {
 		case GammaEncoding:
 			return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
 		case LogLuvEncoding:
-			return [ 'LogLuv', '( value )'];
+			return [ 'LogLuv', '( value )' ];
 		default:
 			throw new Error( 'unsupported encoding: ' + encoding );
 
