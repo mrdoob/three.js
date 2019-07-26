@@ -3565,27 +3565,16 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: function ( minVal, maxVal ) {
 
-		var min, max;
+		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
+		this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
+		this.w = Math.max( minVal, Math.min( maxVal, this.w ) );
 
-		return function clampScalar( minVal, maxVal ) {
+		return this;
 
-			if ( min === undefined ) {
-
-				min = new Vector4();
-				max = new Vector4();
-
-			}
-
-			min.set( minVal, minVal, minVal, minVal );
-			max.set( maxVal, maxVal, maxVal, maxVal );
-
-			return this.clamp( min, max );
-
-		};
-
-	}(),
+	},
 
 	clampLength: function ( min, max ) {
 
@@ -11195,7 +11184,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, uv, a, b, c ) {
+		function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, uv, uv2, a, b, c ) {
 
 			vA.fromBufferAttribute( position, a );
 			vB.fromBufferAttribute( position, b );
@@ -11243,6 +11232,16 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					uvC.fromBufferAttribute( uv, c );
 
 					intersection.uv = Triangle.getUV( intersectionPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() );
+
+				}
+
+				if ( uv2 ) {
+
+					uvA.fromBufferAttribute( uv2, a );
+					uvB.fromBufferAttribute( uv2, b );
+					uvC.fromBufferAttribute( uv2, c );
+
+					intersection.uv2 = Triangle.getUV( intersectionPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() );
 
 				}
 
@@ -11296,6 +11295,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				var position = geometry.attributes.position;
 				var morphPosition = geometry.morphAttributes.position;
 				var uv = geometry.attributes.uv;
+				var uv2 = geometry.attributes.uv2;
 				var groups = geometry.groups;
 				var drawRange = geometry.drawRange;
 				var i, j, il, jl;
@@ -11322,7 +11322,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 								b = index.getX( j + 1 );
 								c = index.getX( j + 2 );
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, morphPosition, uv, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, morphPosition, uv, uv2, a, b, c );
 
 								if ( intersection ) {
 
@@ -11347,7 +11347,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = index.getX( i + 1 );
 							c = index.getX( i + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, morphPosition, uv, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, morphPosition, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 
@@ -11380,7 +11380,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 								b = j + 1;
 								c = j + 2;
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, morphPosition, uv, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, ray, position, morphPosition, uv, uv2, a, b, c );
 
 								if ( intersection ) {
 
@@ -11405,7 +11405,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = i + 1;
 							c = i + 2;
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, morphPosition, uv, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, ray, position, morphPosition, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 

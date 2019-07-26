@@ -12,5 +12,4 @@ export class NormalNode extends TempNode {
 
   static LOCAL: string;
   static WORLD: string;
-  static VIEW: string;
 }
