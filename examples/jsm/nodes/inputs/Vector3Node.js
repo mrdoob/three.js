@@ -6,6 +6,7 @@ import { Vector3 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 function Vector3Node( x, y, z ) {
 
@@ -56,5 +57,7 @@ Vector3Node.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addFunctionNodeClass( 'vec3', Vector3Node );
 
 export { Vector3Node };

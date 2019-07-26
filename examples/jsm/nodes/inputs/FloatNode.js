@@ -3,6 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 function FloatNode( value ) {
 
@@ -49,5 +50,7 @@ FloatNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addFunctionNodeClass( 'float', FloatNode );
 
 export { FloatNode };

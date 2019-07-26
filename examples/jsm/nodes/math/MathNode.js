@@ -3,6 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 function MathNode( a, bOrMethod, cOrMethod, method ) {
 
@@ -266,5 +267,17 @@ MathNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addFunctions( MathNode, function() { 
+
+	var node = new MathNode();
+	node.method = arguments[0];
+	node.a = arguments[1];
+	node.b = arguments[2];
+	node.c = arguments[3];
+
+	return node;
+
+} );
 
 export { MathNode };

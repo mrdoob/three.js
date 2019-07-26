@@ -3,6 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 function OperatorNode( a, b, op ) {
 
@@ -84,5 +85,17 @@ OperatorNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addFunction('add', function ( a, b ) {
+
+	return new OperatorNode( a, b, OperatorNode.ADD );
+
+} );
+
+NodeLib.addFunction('mul', function ( a, b ) {
+
+	return new OperatorNode( a, b, OperatorNode.MUL );
+
+} );
 
 export { OperatorNode };

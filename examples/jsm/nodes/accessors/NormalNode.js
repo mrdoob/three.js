@@ -86,6 +86,9 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
+NodeLib.addFunctionNode( 'normal', new NormalNode( NormalNode.LOCAL ) );
+NodeLib.addFunctionNode( 'worldNormal', new NormalNode( NormalNode.WORLD ) );
+
 NodeLib.addKeyword( 'normal', function () {
 
 	return new NormalNode();

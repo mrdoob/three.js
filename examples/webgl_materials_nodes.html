@@ -25,6 +25,10 @@
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
+			// node material syntax 2.0
+			const { float, color, vec3, add, mul, dot, pow, normal } = Nodes.NodeLib.functions;
+			const colorNode = color, normalLocal = normal;
+
 			var container = document.getElementById( 'container' );
 
 			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
@@ -153,6 +157,7 @@
 					'basic / bump': 'bump',
 					'basic / blur': 'blur',
 					'basic / spherical-reflection': 'spherical-reflection',
+					'basic / syntax-2-rim': 'syntax-2-rim',
 					'adv / fresnel': 'fresnel',
 					'adv / saturation': 'saturation',
 					'adv / top-bottom': 'top-bottom',
@@ -778,6 +783,74 @@
 						);
 
 						mtl.color = new Nodes.ColorNode( 0x111111 );
+						mtl.emissive = rimColor;
+
+						// GUI
+
+						addGui( 'color', color.value.getHex(), function ( val ) {
+
+							color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'intensity', intensity, function ( val ) {
+
+							intensity = val;
+
+							viewZ.b.z = - intensity;
+							rim.b.value = intensity;
+
+
+						}, false, 0, 3 );
+
+						addGui( 'power', power.value, function ( val ) {
+
+							power.value = val;
+
+						}, false, 0, 6 );
+
+						addGui( 'xray', false, function ( val ) {
+
+							if ( val ) {
+
+								mtl.emissive = color;
+								mtl.alpha = rimPower;
+								mtl.blending = THREE.AdditiveBlending;
+								mtl.depthWrite = false;
+
+							} else {
+
+								mtl.emissive = rimColor;
+								mtl.alpha = null;
+								mtl.blending = THREE.NormalBlending;
+								mtl.depthWrite = true;
+
+							}
+
+							mtl.needsUpdate = true;
+
+						} );
+
+						break;
+
+					case 'syntax-2-rim':
+
+						// MATERIAL
+
+						mtl = new Nodes.PhongNodeMaterial();
+
+						defaultSide = THREE.FrontSide;
+
+						var intensity = 1.3;
+						var power = float( 3 );
+						var color = colorNode( 0xFFFFFF );
+
+						var viewZ = dot( normalLocal, vec3( 0, 0, - intensity ) );
+						var rim = add( viewZ, float( intensity ) );
+						var rimPower = pow( rim, power );
+						var rimColor = mul( rimPower, color	);
+
+						mtl.color = colorNode( 0x111111 );
 						mtl.emissive = rimColor;
 
 						// GUI

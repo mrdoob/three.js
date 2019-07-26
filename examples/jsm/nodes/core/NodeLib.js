@@ -2,10 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+//import { NodeBuilder } from './NodeBuilder.js';
+//console.log( NodeBuilder );
+
 var NodeLib = {
 
 	nodes: {},
 	keywords: {},
+	functions: {},
 
 	add: function ( node ) {
 
@@ -21,6 +25,67 @@ var NodeLib = {
 
 	},
 
+	addFunction: function ( name, callback ) {
+
+		this.functions[ name ] = callback;
+
+	},
+
+	addFunctionNode: function ( name, node ) {
+
+		this.functions[ name ] = node;
+
+	},
+
+	addFunctionNodeClass: function ( name, nodeClass ) {
+
+		function callback() {
+			
+			return Reflect.construct(nodeClass, arguments)
+			
+		}
+
+		this.functions[ name ] = callback;
+
+	},
+
+	addFunctions: ( function () {
+
+		//var builder = new NodeBuilder();
+
+		function ResolverCallbackFunction( method, callback ) {
+			
+			return function() {
+			
+				var params = Array.prototype.slice.call(arguments);
+				params.unshift( method );
+				
+				return callback.apply( undefined, params );
+
+			}
+			
+		}
+		
+		return function( nodeClass, callback ) {
+
+			for( var property in nodeClass ) {
+				
+				// detect if the property is static
+				
+				if ( property === property.toUpperCase() ) {
+					
+					var method = nodeClass[property];
+					
+					this.addFunction( nodeClass[property], ResolverCallbackFunction( method, callback ) );
+					
+				}
+				
+			}
+			
+		}
+
+	} )(),
+
 	remove: function ( node ) {
 
 		delete this.nodes[ node.name ];
@@ -30,6 +95,12 @@ var NodeLib = {
 	removeKeyword: function ( name ) {
 
 		delete this.keywords[ name ];
+
+	},
+
+	removeFunction: function ( name ) {
+
+		delete this.functions[ name ];
 
 	},
 
@@ -51,6 +122,12 @@ var NodeLib = {
 
 	},
 
+	getFunction: function ( name ) {
+
+		return this.functions[ name ];
+
+	},
+
 	contains: function ( name ) {
 
 		return this.nodes[ name ] !== undefined;
@@ -60,6 +137,12 @@ var NodeLib = {
 	containsKeyword: function ( name ) {
 
 		return this.keywords[ name ] !== undefined;
+
+	},
+
+	containsFunction: function ( name ) {
+
+		return this.functions[ name ] !== undefined;
 
 	}
 

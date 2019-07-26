@@ -6,6 +6,7 @@ import { Color } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 function ColorNode( color, g, b ) {
 
@@ -56,5 +57,7 @@ ColorNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addFunctionNodeClass( 'color', ColorNode );
 
 export { ColorNode };
