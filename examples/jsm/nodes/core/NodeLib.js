@@ -8,26 +8,23 @@
 //var builder = new NodeBuilder();
 
 function ResolverNodeClass( nodeClass ) {
-	
+
 	this.callback = function() {
-	
+
 		return Reflect.construct(nodeClass, arguments);
 
 	}
-	
+
 }
 
 function ResolverCallbackFunction( method, callback ) {
-	
+
 	this.callback = function() {
-	
-		var params = Array.prototype.slice.call(arguments);
-		params.unshift( method );
-		
-		return callback( ...params );
+
+		return callback( method, arguments );
 
 	}
-	
+
 }
 
 var NodeLib = {
