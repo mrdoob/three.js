@@ -407,7 +407,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
 
-							var mipmap
+							var mipmap;
 
 							for ( var j = 0; j < mipmaps.length; ++ j ) {
 
