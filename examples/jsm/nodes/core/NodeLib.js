@@ -54,7 +54,7 @@ var NodeLib = {
 
 		if ( this.containsNode( name ) ) {
 			
-			throw new Error( `Node ${name} already exist.` );
+			console.warn( `Node ${name} already exist.` );
 			
 		}
 
