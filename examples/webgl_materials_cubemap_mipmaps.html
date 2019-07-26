@@ -15,71 +15,6 @@
 			Bottom: customized mimaps
 		</div>
 
-		<script id="fragmentShader" type="x-shader/x-fragment">
-
-			varying vec3 vNormal;
-			varying vec3 vVertex;
-
-			uniform float roughness;
-			uniform vec2 lodRange;
-			uniform samplerCube specularCubeMap;
-
-			vec3 cubemapSeamlessFixDirection(const in vec3 direction, const in float scale)
-			{
-				vec3 dir = direction;
-				// http://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
-				float M = max( max( abs( dir.x ), abs( dir.y ) ), abs( dir.z ) );
-
-				if ( abs( dir.x ) != M )
-					dir.x *= scale;
-				if ( abs( dir.y ) != M )
-					dir.y *= scale;
-				if ( abs( dir.z ) != M )
-					dir.z *= scale;
-
-				return dir;
-			}
-
-			vec3 sample_cube_texture_lod( vec3 direction )
-			{
-
-				float lod = min( roughness * roughness * lodRange.y, lodRange.x );
-
-				direction = cubemapSeamlessFixDirection( direction, 1.0 - exp2( lod ) / exp2( lodRange.y ) );
-
-				vec4 rgba = textureCubeLodEXT( specularCubeMap, direction, lod );
-#ifdef LUV
-				return LogLuvToLinear(rgba).xyz;
-#endif
-				return rgba.xyz;
-			}
-
-			void main()
-			{
-				vec3 reflectColor = vec3( 0.972, 0.960, 0.915 ); // sliver
-				vec3 reflect = sample_cube_texture_lod( reflect( normalize( vVertex ), vNormal ) );
-				gl_FragColor = vec4( 0.1 + reflect * reflectColor, 1.0 );
-			}
-
-		</script>
-
-		<script id="vertexShader" type="x-shader/x-vertex">
-
-			varying vec3 vNormal;
-			varying vec3 vVertex;
-
-			void main()
-			{
-
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-				vVertex = mvPosition.xyz;
-				vNormal = normalMatrix * normal;
-				gl_Position = projectionMatrix * mvPosition;
-
-			}
-
-		</script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -130,10 +65,11 @@
 					cubeTextures.push( levelCubeTexture );
 				}
 
-				var customizedCubeTexture = cubeTextures.shift();
+				var customizedCubeTexture = cubeTextures[0];
 				customizedCubeTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				customizedCubeTexture.magFilter = THREE.LinearFilter;
 				customizedCubeTexture.format = THREE.RGBAFormat;
+				customizedCubeTexture.encoding = THREE.LogLuvEncoding;
 
 				if ( cubeTextures.length > 0 ) {
 
@@ -153,15 +89,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 4000;
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1500;
 
 				//load cubemap
 
 				scene = new THREE.Scene();
 
 				//lights
-				var ambient = new THREE.AmbientLight( 0xffffff, 0.6 );
+				var ambient = new THREE.AmbientLight( 0xffffff, 1.0 );
 				scene.add( ambient );
 
 				var pendings = [];
@@ -170,30 +106,12 @@
 					//rewrite mipmaps
 					var originalCubeTexture = reflectCubeTexture.clone();
 					originalCubeTexture.generateMipmaps = true;
+					originalCubeTexture.needsUpdate = true;
 
 					//models
 					var sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
 
-					//materials
-					var uniforms = {
-						lodRange: { value: new Float32Array( [ 5, 8 ] ) }, // min & max lod
-						roughness: { value: 0 },
-						specularCubeMap: { value: reflectCubeTexture }
-					};
-
-					var defines = {
-						LUV: 1
-					};
-
-					var material = new THREE.ShaderMaterial( {
-
-						uniforms: Object.assign( {}, uniforms ),
-						vertexShader: document.getElementById( 'vertexShader' ).textContent,
-						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-						defines: defines
-
-					} );
-					material.extensions.shaderTextureLOD = true;
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: reflectCubeTexture } );
 
 					var offset = 250;
 					var originX = -1150;
@@ -202,9 +120,7 @@
 						//customize mipmaps sphere
 						var roughness = 0.6 * i / 10 + 0.4;
 						var cm = material.clone();
-						cm.uniforms.specularCubeMap.value = originalCubeTexture;
-						cm.uniforms.specularCubeMap.value.needsUpdate = true;
-						cm.uniforms.roughness.value = roughness;
+						cm.envMap = originalCubeTexture;
 
 						var c = new THREE.Mesh( sphere, cm );
 						c.position.set( originX + i * offset, 150, 0 );
@@ -212,22 +128,12 @@
 
 						//webgl mipmaps sphere
 						var om = material.clone();
-						om.uniforms.specularCubeMap.value.needsUpdate = true;
-						om.uniforms.roughness.value = roughness;
 
 						var o = new THREE.Mesh( sphere, om );
 						o.position.set( originX + i * offset, -150, 0 );
 						scene.add( o );
 					}
 
-					var backgroundMaterial = material.clone();
-					backgroundMaterial.uniforms.specularCubeMap.value.needsUpdate = true;
-					backgroundMaterial.uniforms.roughness.value = 0.6;
-					backgroundMaterial.side = THREE.DoubleSide;
-
-					backgound = new THREE.Mesh( sphere, backgroundMaterial );
-					backgound.scale.set( 600, 600, 600 );
-					scene.add( backgound );
 				} );
 
 				//renderer
@@ -239,10 +145,9 @@
 
 				//controls
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 				controls.minPolarAngle = Math.PI / 4;
 				controls.maxPolarAngle = Math.PI / 1.5;
-				controls.minDistance = 1000;
-				controls.maxDistance = 6000;
 
 				//stats
 				stats = new Stats();

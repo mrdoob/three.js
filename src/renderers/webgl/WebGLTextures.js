@@ -409,11 +409,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							var mipmap;
 
-							for ( var j = 0; j < mipmaps.length; ++ j ) {
+							for ( var j = 1; j < mipmaps.length; ++ j ) {
 
 								mipmap = mipmaps[ j ];
 
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmap.image[ i ].image.width, mipmap.image[ i ].image.height, 0, glFormat, glType, mipmap.images[ i ].image.data );
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.image[ i ].image.width, mipmap.image[ i ].image.height, 0, glFormat, glType, mipmap.images[ i ].image.data );
 
 							}
 
@@ -423,11 +423,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							var mipmap;
 
-							for ( var j = 0; j < mipmaps.length; ++ j ) {
+							for ( var j = 1; j < mipmaps.length; ++ j ) {
 
 								mipmap = mipmaps[ j ];
 
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
 
 							}
 
@@ -465,7 +465,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				textureProperties.__maxMipLevel = mipmaps.length;
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 				if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
