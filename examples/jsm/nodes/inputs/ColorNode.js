@@ -58,6 +58,6 @@ ColorNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addFunctionNodeClass( 'color', ColorNode );
+NodeLib.addNodeClass( 'color', ColorNode );
 
 export { ColorNode };

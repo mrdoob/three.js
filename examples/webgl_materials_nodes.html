@@ -26,7 +26,7 @@
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
 			// node material syntax 2.0
-			const { float, color, vec3, add, mul, dot, pow, normal } = Nodes.NodeLib.functions;
+			const { float, color, vec3, add, mul, dot, pow, normal } = Nodes.NodeLib.nodes;
 			const colorNode = color, normalLocal = normal;
 
 			var container = document.getElementById( 'container' );
@@ -2302,7 +2302,7 @@
 						} );
 
 						// add global const or function
-						//Nodes.NodeLib.add( new Nodes.ConstNode("float MY_CONST .05") )
+						//Nodes.NodeLib.addInclude( new Nodes.ConstNode("float MY_CONST .05") )
 
 						// reserved keywords
 

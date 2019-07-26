@@ -125,9 +125,9 @@ FunctionNode.prototype.generate = function ( builder, output ) {
 
 		}
 
-		if ( this.getIncludeByName( reference ) === undefined && NodeLib.contains( reference ) ) {
+		if ( this.getIncludeByName( reference ) === undefined && NodeLib.containsInclude( reference ) ) {
 
-			builder.include( NodeLib.get( reference ) );
+			builder.include( NodeLib.getInclude( reference ) );
 
 		}
 

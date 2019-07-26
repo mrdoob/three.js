@@ -268,7 +268,7 @@ MathNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addFunctions( MathNode, function() { 
+NodeLib.addNodes( MathNode, function() { 
 
 	var node = new MathNode();
 	node.method = arguments[0];

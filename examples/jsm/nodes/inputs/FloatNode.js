@@ -51,6 +51,6 @@ FloatNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addFunctionNodeClass( 'float', FloatNode );
+NodeLib.addNodeClass( 'float', FloatNode );
 
 export { FloatNode };

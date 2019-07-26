@@ -86,16 +86,7 @@ OperatorNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addFunction('add', function ( a, b ) {
-
-	return new OperatorNode( a, b, OperatorNode.ADD );
-
-} );
-
-NodeLib.addFunction('mul', function ( a, b ) {
-
-	return new OperatorNode( a, b, OperatorNode.MUL );
-
-} );
+NodeLib.addNode('add', ( a, b ) => { return new OperatorNode( a, b, OperatorNode.ADD ); } );
+NodeLib.addNode('mul', ( a, b ) => { return new OperatorNode( a, b, OperatorNode.MUL ); } );
 
 export { OperatorNode };

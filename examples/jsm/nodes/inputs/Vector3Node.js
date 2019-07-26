@@ -58,6 +58,6 @@ Vector3Node.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addFunctionNodeClass( 'vec3', Vector3Node );
+NodeLib.addNodeClass( 'vec3', Vector3Node );
 
 export { Vector3Node };

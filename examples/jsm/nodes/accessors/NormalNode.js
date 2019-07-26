@@ -86,19 +86,10 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addFunctionNode( 'normal', new NormalNode( NormalNode.LOCAL ) );
-NodeLib.addFunctionNode( 'worldNormal', new NormalNode( NormalNode.WORLD ) );
+NodeLib.addNode( 'normal', new NormalNode( NormalNode.LOCAL ) );
+NodeLib.addNode( 'worldNormal', new NormalNode( NormalNode.WORLD ) );
 
-NodeLib.addKeyword( 'normal', function () {
-
-	return new NormalNode();
-
-} );
-
-NodeLib.addKeyword( 'worldNormal', function () {
-
-	return new NormalNode( NormalNode.WORLD );
-
-} );
+NodeLib.addKeyword( 'normal', () => { return new NormalNode( NormalNode.LOCAL ); } );
+NodeLib.addKeyword( 'worldNormal', () => { return new NormalNode( NormalNode.WORLD ); } );
 
 export { NormalNode };

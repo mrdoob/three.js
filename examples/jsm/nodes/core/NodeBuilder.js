@@ -600,7 +600,7 @@ NodeBuilder.prototype = {
 
 		var includesStruct;
 
-		node = typeof node === 'string' ? NodeLib.get( node ) : node;
+		node = typeof node === 'string' ? NodeLib.getInclude( node ) : node;
 
 		if ( this.context.include === false ) {
 

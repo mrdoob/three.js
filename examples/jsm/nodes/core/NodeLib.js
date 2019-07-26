@@ -5,15 +5,40 @@
 //import { NodeBuilder } from './NodeBuilder.js';
 //console.log( NodeBuilder );
 
+//var builder = new NodeBuilder();
+
+function ResolverNodeClass( nodeClass ) {
+	
+	this.callback = function() {
+	
+		return Reflect.construct(nodeClass, arguments);
+
+	}
+	
+}
+
+function ResolverCallbackFunction( method, callback ) {
+	
+	this.callback = function() {
+	
+		var params = Array.prototype.slice.call(arguments);
+		params.unshift( method );
+		
+		return callback( ...params );
+
+	}
+	
+}
+
 var NodeLib = {
 
 	nodes: {},
 	keywords: {},
-	functions: {},
+	includes: {},
 
-	add: function ( node ) {
+	addInclude: function ( node ) {
 
-		this.nodes[ node.name ] = node;
+		this.includes[ node.name ] = node;
 
 	},
 
@@ -25,68 +50,43 @@ var NodeLib = {
 
 	},
 
-	addFunction: function ( name, callback ) {
+	addNode: function ( name, callbackNode ) {
 
-		this.functions[ name ] = callback;
-
-	},
-
-	addFunctionNode: function ( name, node ) {
-
-		this.functions[ name ] = node;
-
-	},
-
-	addFunctionNodeClass: function ( name, nodeClass ) {
-
-		function callback() {
+		if ( this.containsNode( name ) ) {
 			
-			return Reflect.construct(nodeClass, arguments)
+			throw new Error( `Node ${name} already exist.` );
 			
 		}
 
-		this.functions[ name ] = callback;
+		this.nodes[ name ] = callbackNode;
 
 	},
 
-	addFunctions: ( function () {
+	addNodeClass: function ( name, nodeClass ) {
 
-		//var builder = new NodeBuilder();
+		this.addNode( name, new ResolverNodeClass( nodeClass ).callback );
 
-		function ResolverCallbackFunction( method, callback ) {
+	},
+
+	addNodes: function ( nodeClass, callback ) {
+
+		for( var property in nodeClass ) {
 			
-			return function() {
+			// detect if the property is static
 			
-				var params = Array.prototype.slice.call(arguments);
-				params.unshift( method );
+			if ( property === property.toUpperCase() ) {
 				
-				return callback.apply( undefined, params );
-
+				var method = nodeClass[property];
+				
+				this.addNode( method, new ResolverCallbackFunction( method, callback ).callback );
+				
 			}
 			
 		}
 		
-		return function( nodeClass, callback ) {
+	},
 
-			for( var property in nodeClass ) {
-				
-				// detect if the property is static
-				
-				if ( property === property.toUpperCase() ) {
-					
-					var method = nodeClass[property];
-					
-					this.addFunction( nodeClass[property], ResolverCallbackFunction( method, callback ) );
-					
-				}
-				
-			}
-			
-		}
-
-	} )(),
-
-	remove: function ( node ) {
+	removeInclude: function ( node ) {
 
 		delete this.nodes[ node.name ];
 
@@ -98,15 +98,15 @@ var NodeLib = {
 
 	},
 
-	removeFunction: function ( name ) {
+	removeNode: function ( name ) {
 
-		delete this.functions[ name ];
+		delete this.nodes[ name ];
 
 	},
 
-	get: function ( name ) {
+	getInclude: function ( name ) {
 
-		return this.nodes[ name ];
+		return this.includes[ name ];
 
 	},
 
@@ -122,15 +122,15 @@ var NodeLib = {
 
 	},
 
-	getFunction: function ( name ) {
+	getNode: function ( name ) {
 
-		return this.functions[ name ];
+		return this.nodes[ name ];
 
 	},
 
-	contains: function ( name ) {
+	containsInclude: function ( name ) {
 
-		return this.nodes[ name ] !== undefined;
+		return this.includes[ name ] !== undefined;
 
 	},
 
@@ -140,9 +140,9 @@ var NodeLib = {
 
 	},
 
-	containsFunction: function ( name ) {
+	containsNode: function ( name ) {
 
-		return this.functions[ name ] !== undefined;
+		return this.includes[ name ] !== undefined;
 
 	}
 
