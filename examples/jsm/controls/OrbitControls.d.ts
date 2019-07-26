@@ -142,7 +142,9 @@ export class MapControls {
 
 	dollyOut(dollyScale: number): void;
 
-	update(): void;
+	update(): boolean;
+
+	saveState(): void;
 
 	reset(): void;
 
