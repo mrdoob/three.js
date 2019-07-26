@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - cubemap mipmaps</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cubemap customized mipmaps demo. Author <a href="https://github.com/AngusLang">Angus</a><br/>
+			Top: webgl generated mipmaps<br/>
+			Bottom: customized mimaps
+		</div>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			varying vec3 vNormal;
+			varying vec3 vVertex;
+
+			uniform float roughness;
+			uniform vec2 lodRange;
+			uniform samplerCube specularCubeMap;
+
+			vec3 cubemapSeamlessFixDirection(const in vec3 direction, const in float scale)
+			{
+				vec3 dir = direction;
+				// http://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
+				float M = max( max( abs( dir.x ), abs( dir.y ) ), abs( dir.z ) );
+
+				if ( abs( dir.x ) != M )
+					dir.x *= scale;
+				if ( abs( dir.y ) != M )
+					dir.y *= scale;
+				if ( abs( dir.z ) != M )
+					dir.z *= scale;
+
+				return dir;
+			}
+
+			vec3 sample_cube_texture_lod( vec3 direction )
+			{
+
+				float lod = min( roughness * roughness * lodRange.y, lodRange.x );
+
+				direction = cubemapSeamlessFixDirection( direction, 1.0 - exp2( lod ) / exp2( lodRange.y ) );
+
+				vec4 rgba = textureCubeLodEXT( specularCubeMap, direction, lod );
+#ifdef LUV
+				return LogLuvToLinear(rgba).xyz;
+#endif
+				return rgba.xyz;
+			}
+
+			void main()
+			{
+				vec3 reflectColor = vec3( 0.972, 0.960, 0.915 ); // sliver
+				vec3 reflect = sample_cube_texture_lod( reflect( normalize( vVertex ), vNormal ) );
+				gl_FragColor = vec4( 0.1 + reflect * reflectColor, 1.0 );
+			}
+
+		</script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec3 vNormal;
+			varying vec3 vVertex;
+
+			void main()
+			{
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				vVertex = mvPosition.xyz;
+				vNormal = normalMatrix * normal;
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			var container, stats;
+
+			var camera, scene, renderer, backgound;
+
+			init();
+			animate();
+
+			// load custmized cube texture
+			async function loadCubeTexture( path, imageWidth ) {
+
+				//fetch data
+				var response = await fetch( path );
+				var arrayBuffer = await response.arrayBuffer();
+
+				var cubeTextures = [];
+				var byteOffset = 0;
+				const maxLevel = Math.log( imageWidth ) / Math.LN2;
+
+				for ( var level = 0; level <= maxLevel; ++ level ) {
+
+					var size = Math.pow( 2, maxLevel - level );
+					var imageByteLength = size * size * 4;
+					var textures = [];
+					
+					if ( byteOffset >= arrayBuffer.byteLength ) {
+
+						break;
+
+					}
+
+					for ( var face = 0; face < 6; ++ face ) {
+
+						var imageData = new Uint8Array( arrayBuffer, byteOffset, imageByteLength );
+						var texture = new THREE.DataTexture( imageData, size, size, THREE.RGBAFormat, THREE.UnsignedByteType );
+						textures.push( texture );
+						byteOffset += imageByteLength;
+					}
+
+					var levelCubeTexture = new THREE.CubeTexture( textures );
+					cubeTextures.push( levelCubeTexture );
+				}
+
+				var customizedCubeTexture = cubeTextures.shift();
+				customizedCubeTexture.minFilter = THREE.LinearMipMapLinearFilter;
+				customizedCubeTexture.magFilter = THREE.LinearFilter;
+				customizedCubeTexture.format = THREE.RGBAFormat;
+
+				if ( cubeTextures.length > 0 ) {
+
+					customizedCubeTexture.mipmaps = cubeTextures;
+					customizedCubeTexture.generateMipmaps = false;
+
+				}
+
+				customizedCubeTexture.needsUpdate = true;
+
+				return customizedCubeTexture;
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.z = 4000;
+
+				//load cubemap
+
+				scene = new THREE.Scene();
+
+				//lights
+				var ambient = new THREE.AmbientLight( 0xffffff, 0.6 );
+				scene.add( ambient );
+
+				var pendings = [];
+				loadCubeTexture( 'textures/cube/angus/specular_cubemap_256_luv.bin', 256 ).then( function ( reflectCubeTexture ) {
+
+					//rewrite mipmaps
+					var originalCubeTexture = reflectCubeTexture.clone();
+					originalCubeTexture.generateMipmaps = true;
+
+					//models
+					var sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
+
+					//materials
+					var uniforms = {
+						lodRange: { value: new Float32Array( [ 5, 8 ] ) }, // min & max lod
+						roughness: { value: 0 },
+						specularCubeMap: { value: reflectCubeTexture }
+					};
+
+					var defines = {
+						LUV: 1
+					};
+
+					var material = new THREE.ShaderMaterial( {
+
+						uniforms: Object.assign( {}, uniforms ),
+						vertexShader: document.getElementById( 'vertexShader' ).textContent,
+						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+						defines: defines
+
+					} );
+					material.extensions.shaderTextureLOD = true;
+
+					var offset = 250;
+					var originX = -1150;
+					for ( var i = 0; i < 10; ++ i ) {
+
+						//customize mipmaps sphere
+						var roughness = 0.6 * i / 10 + 0.4;
+						var cm = material.clone();
+						cm.uniforms.specularCubeMap.value = originalCubeTexture;
+						cm.uniforms.specularCubeMap.value.needsUpdate = true;
+						cm.uniforms.roughness.value = roughness;
+
+						var c = new THREE.Mesh( sphere, cm );
+						c.position.set( originX + i * offset, 150, 0 );
+						scene.add( c );
+
+						//webgl mipmaps sphere
+						var om = material.clone();
+						om.uniforms.specularCubeMap.value.needsUpdate = true;
+						om.uniforms.roughness.value = roughness;
+
+						var o = new THREE.Mesh( sphere, om );
+						o.position.set( originX + i * offset, -150, 0 );
+						scene.add( o );
+					}
+
+					var backgroundMaterial = material.clone();
+					backgroundMaterial.uniforms.specularCubeMap.value.needsUpdate = true;
+					backgroundMaterial.uniforms.roughness.value = 0.6;
+					backgroundMaterial.side = THREE.DoubleSide;
+
+					backgound = new THREE.Mesh( sphere, backgroundMaterial );
+					backgound.scale.set( 600, 600, 600 );
+					scene.add( backgound );
+				} );
+
+				//renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setClearColor( 0xf1f3f5 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//controls
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minPolarAngle = Math.PI / 4;
+				controls.maxPolarAngle = Math.PI / 1.5;
+				controls.minDistance = 1000;
+				controls.maxDistance = 6000;
+
+				//stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>
