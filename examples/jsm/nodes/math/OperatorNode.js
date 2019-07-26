@@ -5,6 +5,13 @@
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
+const operatorsDict = {
+	'add': '+',
+	'sub': '-',
+	'mul': '*',
+	'div': '/'
+};
+
 function OperatorNode( a, b, op ) {
 
 	TempNode.call( this );
@@ -15,10 +22,10 @@ function OperatorNode( a, b, op ) {
 
 }
 
-OperatorNode.ADD = '+';
-OperatorNode.SUB = '-';
-OperatorNode.MUL = '*';
-OperatorNode.DIV = '/';
+OperatorNode.ADD = 'add';
+OperatorNode.SUB = 'sub';
+OperatorNode.MUL = 'mul';
+OperatorNode.DIV = 'div';
 
 OperatorNode.prototype = Object.create( TempNode.prototype );
 OperatorNode.prototype.constructor = OperatorNode;
@@ -50,9 +57,10 @@ OperatorNode.prototype.generate = function ( builder, output ) {
 	var type = this.getType( builder );
 
 	var a = this.a.build( builder, type ),
-		b = this.b.build( builder, type );
+		b = this.b.build( builder, type ),
+		op = operatorsDict[ this.op ] || this.op;
 
-	return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
+	return builder.format( '( ' + a + ' ' + op + ' ' + b + ' )', type, output );
 
 };
 
@@ -86,7 +94,10 @@ OperatorNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addNode('add', ( a, b ) => { return new OperatorNode( a, b, OperatorNode.ADD ); } );
-NodeLib.addNode('mul', ( a, b ) => { return new OperatorNode( a, b, OperatorNode.MUL ); } );
+NodeLib.addNodes( OperatorNode, ( method, params ) => { 
+
+	return new OperatorNode( ...params, method );
+
+} );
 
 export { OperatorNode };
