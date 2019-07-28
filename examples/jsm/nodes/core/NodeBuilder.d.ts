@@ -130,8 +130,8 @@ export class NodeBuilder {
   isTypeMatrix(format: string): boolean;
   getTypeLength(type: string): number;
   getTypeFromLength(len: number): string;
-  findNode(): Node;
-  resolve(): void;
+  findNode(...args: any[]): Node;
+  resolve(...args: any[]): void;
   format(code: string, from: string, to: string): string;
   getTypeByFormat(format: string): string;
   getFormatByType(type: string): string;
