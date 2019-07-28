@@ -2,11 +2,6 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-//import { NodeBuilder } from './NodeBuilder.js';
-//console.log( NodeBuilder );
-
-//var builder = new NodeBuilder();
-
 function ResolverNodeClass( nodeClass ) {
 
 	this.callback = function() {
