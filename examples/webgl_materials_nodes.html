@@ -25,9 +25,9 @@
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
-			// node material syntax 2.0
-			const { float, color, vec3, add, mul, dot, pow, normal } = Nodes.NodeLib.nodes;
-			const colorNode = color, normalLocal = normal;
+			// node material simplified syntax
+			const nodes = Nodes.NodeLib.nodes;
+			const { float, color, vec3, add, mul, dot, pow, normal, uv, texture } = nodes;
 
 			var container = document.getElementById( 'container' );
 
@@ -157,7 +157,6 @@
 					'basic / bump': 'bump',
 					'basic / blur': 'blur',
 					'basic / spherical-reflection': 'spherical-reflection',
-					'basic / syntax-2-rim': 'syntax-2-rim',
 					'adv / fresnel': 'fresnel',
 					'adv / saturation': 'saturation',
 					'adv / top-bottom': 'top-bottom',
@@ -186,6 +185,7 @@
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
 					'misc / reserved-keywords': 'reserved-keywords',
+					'misc / simplified-syntax': 'simplified-syntax',
 					'misc / varying': 'varying',
 					'misc / void-function': 'void-function',
 					'misc / readonly': 'readonly',
@@ -783,74 +783,6 @@
 						);
 
 						mtl.color = new Nodes.ColorNode( 0x111111 );
-						mtl.emissive = rimColor;
-
-						// GUI
-
-						addGui( 'color', color.value.getHex(), function ( val ) {
-
-							color.value.setHex( val );
-
-						}, true );
-
-						addGui( 'intensity', intensity, function ( val ) {
-
-							intensity = val;
-
-							viewZ.b.z = - intensity;
-							rim.b.value = intensity;
-
-
-						}, false, 0, 3 );
-
-						addGui( 'power', power.value, function ( val ) {
-
-							power.value = val;
-
-						}, false, 0, 6 );
-
-						addGui( 'xray', false, function ( val ) {
-
-							if ( val ) {
-
-								mtl.emissive = color;
-								mtl.alpha = rimPower;
-								mtl.blending = THREE.AdditiveBlending;
-								mtl.depthWrite = false;
-
-							} else {
-
-								mtl.emissive = rimColor;
-								mtl.alpha = null;
-								mtl.blending = THREE.NormalBlending;
-								mtl.depthWrite = true;
-
-							}
-
-							mtl.needsUpdate = true;
-
-						} );
-
-						break;
-
-					case 'syntax-2-rim':
-
-						// MATERIAL
-
-						mtl = new Nodes.PhongNodeMaterial();
-
-						defaultSide = THREE.FrontSide;
-
-						var intensity = 1.3;
-						var power = float( 3 );
-						var color = colorNode( 0xFFFFFF );
-
-						var viewZ = dot( normalLocal, vec3( 0, 0, - intensity ) );
-						var rim = add( viewZ, float( intensity ) );
-						var rimPower = pow( rim, power );
-						var rimColor = mul( rimPower, color	);
-
-						mtl.color = colorNode( 0x111111 );
 						mtl.emissive = rimColor;
 
 						// GUI
@@ -2971,6 +2903,28 @@
 						}, false, 0, 1 );
 
 						break;
+
+				case 'simplified-syntax':
+
+					// MATERIAL
+
+					mtl = new Nodes.PhongNodeMaterial();
+
+					var intensity = 1.3;
+					var power = float( 3 );
+					var color = nodes.color( 0xFFFFFF );
+
+					var viewZ = dot( nodes.normal, vec3( 0, 0, - intensity ) );
+					var rim = add( viewZ, float( intensity ) );
+					var rimPower = pow( rim, power );
+					var rimColor = mul( rimPower, color	);
+
+					var rimResult = mul( rimColor, nodes.texture( getTexture( 'cloud' ) ) );
+
+					mtl.color = nodes.color( 0x111111 );
+					mtl.emissive = rimResult;
+
+					break;
 
 				}
 

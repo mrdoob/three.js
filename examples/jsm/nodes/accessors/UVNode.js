@@ -56,6 +56,12 @@ UVNode.prototype.toJSON = function ( meta ) {
 
 };
 
+NodeLib.addNode( 'uv', function () { 
+
+	return new UVNode( ...arguments );
+
+} );
+
 NodeLib.addKeyword( 'uv', function () {
 
 	return new UVNode();

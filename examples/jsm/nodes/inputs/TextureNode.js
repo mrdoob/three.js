@@ -6,6 +6,7 @@ import { InputNode } from '../core/InputNode.js';
 import { UVNode } from '../accessors/UVNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 function TextureNode( value, uv, bias, project ) {
 
@@ -113,5 +114,11 @@ TextureNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+NodeLib.addNode( 'texture', function () { 
+
+	return new TextureNode( ...arguments );
+
+} );
 
 export { TextureNode };
