@@ -23,6 +23,8 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearCoat = 0.0;
 	this.clearCoatRoughness = 0.0;
 
+	this.transparency = 0.0;
+
 	this.setValues( parameters );
 
 }
@@ -43,9 +45,10 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearCoat = source.clearCoat;
 	this.clearCoatRoughness = source.clearCoatRoughness;
 
+	this.transparency = source.transparency;
+
 	return this;
 
 };
-
 
 export { MeshPhysicalMaterial };

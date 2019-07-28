@@ -10,6 +10,7 @@ uniform float opacity;
 #ifndef STANDARD
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
+	uniform float transparency;
 #endif
 
 varying vec3 vViewPosition;
@@ -82,6 +83,9 @@ void main() {
 	#include <aomap_fragment>
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+
+	// this is a stub for the transparency model
+	diffuseColor.a *= saturate( 1. - transparency + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) );
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 

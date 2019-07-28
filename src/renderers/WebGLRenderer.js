@@ -2275,6 +2275,8 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
 
+		uniforms.transparency.value = material.transparency;
+
 	}
 
 	function refreshUniformsMatcap( uniforms, material ) {
