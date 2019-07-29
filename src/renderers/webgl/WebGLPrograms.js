@@ -247,7 +247,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-		array.push( material.onBeforeCompile.toString() );
+		if ( material.onBeforeCompile ) {
+
+			array.push( material.onBeforeCompile.toString() );
+
+		}
 
 		array.push( renderer.gammaOutput );
 
