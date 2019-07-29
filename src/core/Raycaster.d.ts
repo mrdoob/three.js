@@ -55,6 +55,12 @@ export class Raycaster {
 	 */
 	far: number;
 
+	/**
+	 * The camera to use when raycasting against view-dependent objects such as billboarded objects like Sprites. This field
+	 * can be set manually or is set when calling "setFromCamera".
+	 */
+	camera: Camera;
+
 	params: RaycasterParameters;
 
 	/**
