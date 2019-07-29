@@ -14,6 +14,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -307,7 +308,7 @@
 				// cube camera for environment map
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
 
 				cubeCamera.position.set( 0, - 100, 0 );

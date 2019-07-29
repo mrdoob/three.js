@@ -9,7 +9,7 @@
 
 import {
 	LinearFilter,
-	LinearMipMapLinearFilter,
+	LinearMipmapLinearFilter,
 	MeshBasicMaterial,
 	NoBlending,
 	RGBAFormat,
@@ -228,7 +228,7 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
-		pars.minFilter = LinearMipMapLinearFilter;
+		pars.minFilter = LinearMipmapLinearFilter;
 		pars.generateMipmaps = true;
 		this.currentLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.currentLuminanceRT.texture.name = "AdaptiveToneMappingPass.cl";

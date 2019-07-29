@@ -159,7 +159,7 @@ var WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new WebGLRenderer();
 		_this.domElement = _this.renderer.domElement;
 
-		_context = _this.renderer.context;
+		_context = _this.renderer.getContext();
 		_state = _this.renderer.state;
 
 		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize( new Vector2() ).width;

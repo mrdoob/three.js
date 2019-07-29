@@ -12,11 +12,13 @@ const ObjectManipulator = {
 	 * @param {Object} params The parameter object
 	 */
 	applyProperties: function ( objToAlter, params, forceCreation ) {
+
 		// fast-fail
 		if ( objToAlter === undefined || objToAlter === null || params === undefined || params === null ) return;
 
-		var property, funcName, values;
+		let property, funcName, values;
 		for ( property in params ) {
+
 			funcName = 'set' + property.substring( 0, 1 ).toLocaleUpperCase() + property.substring( 1 );
 			values = params[ property ];
 
@@ -29,8 +31,10 @@ const ObjectManipulator = {
 				objToAlter[ property ] = values;
 
 			}
+
 		}
+
 	}
 };
 
-export { ObjectManipulator }
+export { ObjectManipulator };

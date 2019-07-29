@@ -79,13 +79,10 @@
 		// commonjs
 		var THREE = window.THREE = require('three');
 		require('three/examples/js/loaders/GLTFLoader');
-	</code>
 
-	<p>
-		目前three.js示例不能作为ES modules （import &hellip; from '&hellip;'）来使用。
-		这里讨论了一些解决方法：
-		<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank" rel="noopener">#9562</a>.
-	</p>
+		// ES modules
+		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+	</code>
 
 	<p>
 		一旦你引入了一个加载器，你就已经准备好为场景添加模型了。不同加载器之间可能具有不同的语法 ——

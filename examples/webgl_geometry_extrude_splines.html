@@ -24,6 +24,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -326,7 +327,7 @@
 
 				if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
 				splineCamera.matrix.lookAt( splineCamera.position, lookAt, normal );
-				splineCamera.rotation.setFromRotationMatrix( splineCamera.matrix, splineCamera.rotation.order );
+				splineCamera.quaternion.setFromRotationMatrix( splineCamera.matrix );
 
 				cameraHelper.update();
 
