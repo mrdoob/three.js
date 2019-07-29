@@ -12,7 +12,7 @@ function CubeTextureNode( value, uv, bias ) {
 	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.uv = uv || new ReflectNode();
+	this.uv = uv;
 	this.bias = bias;
 
 }
@@ -36,7 +36,11 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	}
 
 	var cubetex = this.getTexture( builder, output );
-	var uv = this.uv.build( builder, 'v3' );
+	
+	var uv = this.uv || builder.context.uv || new ReflectNode();
+	
+	uv = uv.build( builder, 'v3' ) ;
+
 	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
 	if ( bias === undefined && builder.context.bias ) {

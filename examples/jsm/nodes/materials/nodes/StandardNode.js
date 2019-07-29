@@ -11,6 +11,8 @@ import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
+import { ReflectNode } from '../../accessors/ReflectNode.js';
+import { NormalNode } from '../../accessors/NormalNode.js';
 
 function StandardNode() {
 
@@ -129,6 +131,17 @@ StandardNode.prototype.build = function ( builder ) {
 			gamma: true
 		};
 
+		var contextClearCoatNormalEnvironment = 
+		{
+
+			bias: RoughnessToBlinnExponentNode,
+			gamma: true,
+			uv: new ReflectNode( undefined, new NormalNode( NormalNode.CLEARCOAT ) )
+
+		}
+
+		var contextClearCoatEnvironment = this.clearCoatNormal ? contextClearCoatNormalEnvironment : contextEnvironment;
+
 		var contextGammaOnly = {
 			gamma: true
 		};
@@ -175,6 +188,21 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		if ( this.environment && this.clearCoatNormal ) {
+
+			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+			// environment.analyze will detect if there is a need of calculate irradiance
+
+			this.environment.analyze( builder, { cache: 'clearCoatRadiance', context: contextClearCoatEnvironment, slot: 'radiance' } ); 
+
+			if ( builder.requires.irradiance ) {
+
+				this.environment.analyze( builder, { cache: 'clearCoatIrradiance', context: contextClearCoatEnvironment, slot: 'irradiance' } ); 
+
+			}
+
+		}
+
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
@@ -216,7 +244,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
+		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'environment' } ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
