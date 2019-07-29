@@ -9,13 +9,13 @@ import { UVNode } from '../accessors/UVNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 
-function NormalMapNode( value, scale ) {
+function NormalMapNode( value, scale, normal ) {
 
 	TempNode.call( this, 'v3' );
 
 	this.value = value;
 	this.scale = scale || new Vector2Node( 1, 1 );
-
+	this.normal = normal || new NormalNode();
 }
 
 NormalMapNode.Nodes = ( function () {
@@ -68,7 +68,6 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 
 		var perturbNormal2Arb = builder.include( NormalMapNode.Nodes.perturbNormal2Arb );
 
-		this.normal = this.normal || new NormalNode();
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 

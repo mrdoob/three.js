@@ -14,6 +14,7 @@ function NormalNode( scope ) {
 }
 
 NormalNode.LOCAL = 'local';
+NormalNode.CLEARCOAT = 'clearcoat';
 NormalNode.WORLD = 'world';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
@@ -37,6 +38,12 @@ NormalNode.prototype.generate = function ( builder, output ) {
 		case NormalNode.LOCAL:
 
 			result = 'normal';
+
+			break;
+
+		case NormalNode.CLEARCOAT:
+
+			result = 'clearCoatNormal';
 
 			break;
 
@@ -89,6 +96,12 @@ NormalNode.prototype.toJSON = function ( meta ) {
 NodeLib.addKeyword( 'normal', function () {
 
 	return new NormalNode();
+
+} );
+
+NodeLib.addKeyword( 'clearCoatNormal' , function () {
+
+	return new NormalNode(NormalNode.CLEARCOAT);
 
 } );
 
