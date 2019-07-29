@@ -12,7 +12,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cubemap customized mipmaps demo. Author <a href="https://github.com/AngusLang">Angus</a><br/>
 			Top: webgl generated mipmaps<br/>
-			Bottom: customized mimaps
+			Bottom: customized mimaps<br/>
 		</div>
 
 		<script type="module">
@@ -25,7 +25,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, backgound;
+			var camera, scene, renderer;
 
 			init();
 			animate();
@@ -79,7 +79,6 @@
 				}
 
 				customizedCubeTexture.needsUpdate = true;
-
 				return customizedCubeTexture;
 
 			}
@@ -90,7 +89,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1500;
+				camera.position.set( -1750, 0, 500 );
 
 				//load cubemap
 
@@ -118,7 +117,6 @@
 					for ( var i = 0; i < 10; ++ i ) {
 
 						//customize mipmaps sphere
-						var roughness = 0.6 * i / 10 + 0.4;
 						var cm = material.clone();
 						cm.envMap = originalCubeTexture;
 
@@ -128,7 +126,6 @@
 
 						//webgl mipmaps sphere
 						var om = material.clone();
-
 						var o = new THREE.Mesh( sphere, om );
 						o.position.set( originX + i * offset, -150, 0 );
 						scene.add( o );
@@ -139,7 +136,6 @@
 				//renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setClearColor( 0xf1f3f5 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
