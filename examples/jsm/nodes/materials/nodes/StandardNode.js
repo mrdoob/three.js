@@ -146,6 +146,10 @@ StandardNode.prototype.build = function ( builder ) {
 			gamma: true
 		};
 
+		var contextClearCoatNormal = {
+			normal: new NormalNode( NormalNode.CLEARCOAT )
+		}
+
 		var useClearCoat = ! builder.isDefined( 'STANDARD' );
 
 		// analyze all nodes to reuse generate codes
@@ -162,7 +166,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.clearCoat ) this.clearCoat.analyze( builder );
 		if ( this.clearCoatRoughness ) this.clearCoatRoughness.analyze( builder );
-		if ( this.clearCoatNormal ) this.clearCoatNormal.analyze( builder );
+		if ( this.clearCoatNormal ) this.clearCoatNormal.analyze( builder, { context: contextClearCoatNormal } );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
@@ -217,7 +221,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoat = this.clearCoat ? this.clearCoat.flow( builder, 'f' ) : undefined;
 		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.flow( builder, 'f' ) : undefined;
-		var clearCoatNormal = this.clearCoatNormal ? this.clearCoatNormal.flow( builder, 'v3' ) : undefined;
+		var clearCoatNormal = this.clearCoatNormal ? this.clearCoatNormal.flow( builder, 'v3', { context: contextClearCoatNormal } ) : undefined;
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 

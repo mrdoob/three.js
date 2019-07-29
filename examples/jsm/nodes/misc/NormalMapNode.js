@@ -15,7 +15,7 @@ function NormalMapNode( value, scale, normal ) {
 
 	this.value = value;
 	this.scale = scale || new Vector2Node( 1, 1 );
-	this.normal = normal || new NormalNode();
+	this.normal = normal;
 }
 
 NormalMapNode.Nodes = ( function () {
@@ -71,8 +71,14 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 
+		var normal = this.normal || builder.context.normal || new NormalNode();
+
+		if(this.normal){
+			console.log(this.normal);
+		}
+
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
-			this.normal.build( builder, 'v3' ) + ', ' +
+			normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
 			this.uv.build( builder, 'v2' ) + ', ' +
 			this.scale.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
