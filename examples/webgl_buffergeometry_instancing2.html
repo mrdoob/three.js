@@ -4,33 +4,15 @@
 	<title>three.js webgl - instancing test (meshes)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
 		a {
-			color: #ffffff;
+			color: #08f;
 		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
-			border: 2px red solid;
+			background-color: #f00;
 			margin-top: 20px;
 			padding: 10px;
 		}
@@ -43,12 +25,6 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing test (meshes)
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
-
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-
-	<script src="js/controls/TrackballControls.js"></script>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
 		precision highp float;
@@ -92,13 +68,12 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
+		import Stats from './jsm/libs/stats.module.js';
 
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 		var container, stats;
 
@@ -202,7 +177,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			controls = new THREE.TrackballControls( camera, renderer.domElement );
+			controls = new TrackballControls( camera, renderer.domElement );
 
 			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 

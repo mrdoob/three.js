@@ -4,30 +4,7 @@
 		<title>three.js webgl - materials - HDR texture loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
-			a { color: red; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -36,20 +13,13 @@
 			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/RGBELoader.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var params = {
 				exposure: 2.0
@@ -77,33 +47,9 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				var type = THREE.UnsignedByteType;
-				//var type = THREE.FloatType;
-
-				new THREE.RGBELoader()
-					.setType( type )
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType ) // alt: FloatType, HalfFloatType
 					.load( 'textures/memorial.hdr', function ( texture, textureData ) {
-
-						switch ( type ) {
-
-							case THREE.UnsignedByteType:
-
-								texture.encoding = THREE.RGBEEncoding;
-								texture.minFilter = THREE.NearestFilter;
-								texture.magFilter = THREE.NearestFilter;
-								break;
-
-							case THREE.FloatType:
-
-								texture.encoding = THREE.LinearEncoding;
-								texture.minFilter = THREE.LinearFilter;
-								texture.magFilter = THREE.LinearFilter;
-								break;
-
-						}
-
-						texture.generateMipmaps = false;
-						texture.flipY = true;
 
 						//console.log( textureData );
 						//console.log( texture );
@@ -122,7 +68,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();

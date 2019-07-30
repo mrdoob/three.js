@@ -3,40 +3,25 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #ffffff;
-				margin: 0;
-				overflow: hidden;
+				color: #000;
 			}
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #000000;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index: 1;
-			}
-
 			a {
-				color: #000000;
+				color: #080;
 			}
-
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - css3d sandbox</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - sandbox</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-
-		<script>
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
 
@@ -69,7 +54,7 @@
 					element.style.opacity = ( i < 5 ) ? 0.5 : 1;
 					element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new CSS3DObject( element );
 					object.position.x = Math.random() * 200 - 100;
 					object.position.y = Math.random() * 200 - 100;
 					object.position.z = Math.random() * 200 - 100;
@@ -96,13 +81,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer2 = new THREE.CSS3DRenderer();
+				renderer2 = new CSS3DRenderer();
 				renderer2.setSize( window.innerWidth, window.innerHeight );
 				renderer2.domElement.style.position = 'absolute';
 				renderer2.domElement.style.top = 0;
 				document.body.appendChild( renderer2.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer2.domElement );
+				controls = new TrackballControls( camera, renderer2.domElement );
 
 			}
 

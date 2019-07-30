@@ -9,6 +9,8 @@ import { _Math } from './Math.js';
  * @author bhouston / http://clara.io
  */
 
+var _matrix, _quaternion;
+
 function Euler( x, y, z, order ) {
 
 	this._x = x || 0;
@@ -35,7 +37,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._x = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -52,7 +54,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._y = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -69,7 +71,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._z = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -86,7 +88,7 @@ Object.defineProperties( Euler.prototype, {
 		set: function ( value ) {
 
 			this._order = value;
-			this.onChangeCallback();
+			this._onChangeCallback();
 
 		}
 
@@ -105,7 +107,7 @@ Object.assign( Euler.prototype, {
 		this._z = z;
 		this._order = order || this._order;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -124,7 +126,7 @@ Object.assign( Euler.prototype, {
 		this._z = euler._z;
 		this._order = euler._order;
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -247,25 +249,21 @@ Object.assign( Euler.prototype, {
 
 		this._order = order;
 
-		if ( update !== false ) this.onChangeCallback();
+		if ( update !== false ) this._onChangeCallback();
 
 		return this;
 
 	},
 
-	setFromQuaternion: function () {
+	setFromQuaternion: function ( q, order, update ) {
 
-		var matrix = new Matrix4();
+		if ( _matrix === undefined ) _matrix = new Matrix4();
 
-		return function setFromQuaternion( q, order, update ) {
+		_matrix.makeRotationFromQuaternion( q );
 
-			matrix.makeRotationFromQuaternion( q );
+		return this.setFromRotationMatrix( _matrix, order, update );
 
-			return this.setFromRotationMatrix( matrix, order, update );
-
-		};
-
-	}(),
+	},
 
 	setFromVector3: function ( v, order ) {
 
@@ -273,21 +271,17 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	reorder: function () {
+	reorder: function ( newOrder ) {
 
 		// WARNING: this discards revolution information -bhouston
 
-		var q = new Quaternion();
+		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-		return function reorder( newOrder ) {
+		_quaternion.setFromEuler( this );
 
-			q.setFromEuler( this );
+		return this.setFromQuaternion( _quaternion, newOrder );
 
-			return this.setFromQuaternion( q, newOrder );
-
-		};
-
-	}(),
+	},
 
 	equals: function ( euler ) {
 
@@ -302,7 +296,7 @@ Object.assign( Euler.prototype, {
 		this._z = array[ 2 ];
 		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
 
-		this.onChangeCallback();
+		this._onChangeCallback();
 
 		return this;
 
@@ -336,15 +330,15 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	onChange: function ( callback ) {
+	_onChange: function ( callback ) {
 
-		this.onChangeCallback = callback;
+		this._onChangeCallback = callback;
 
 		return this;
 
 	},
 
-	onChangeCallback: function () {}
+	_onChangeCallback: function () {}
 
 } );
 

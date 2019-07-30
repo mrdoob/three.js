@@ -9,9 +9,9 @@ import {
 	Group
 } from "../../../build/three.module.js";
 
-import { Parser } from "./worker/independent/OBJLoader2Parser.js";
-import { MeshReceiver } from "./shared/MeshReceiver.js";
-import { MaterialHandler } from "./shared/MaterialHandler.js";
+import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
+import { MeshReceiver } from "./obj2/shared/MeshReceiver.js";
+import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
 
 /**
  * Use this class to load OBJ data from files or to parse OBJ data from an arraybuffer
@@ -20,6 +20,7 @@ import { MaterialHandler } from "./shared/MaterialHandler.js";
  * @param {DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link DefaultLoadingManager}
  */
 const OBJLoader2 = function ( manager ) {
+
 	this.manager = ( manager !== undefined && manager !== null ) ? manager : DefaultLoadingManager;
 	this.logging = {
 		enabled: true,
@@ -43,10 +44,10 @@ const OBJLoader2 = function ( manager ) {
 
 	this.materialHandler = new MaterialHandler();
 	this.meshReceiver = new MeshReceiver( this.materialHandler );
-};
-OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta';
-console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
+};
+OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta2';
+console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
 OBJLoader2.prototype = {
 
@@ -59,9 +60,11 @@ OBJLoader2.prototype = {
 	 * @param {boolean} debug True or false.
 	 */
 	setLogging: function ( enabled, debug ) {
+
 		this.logging.enabled = enabled === true;
 		this.logging.debug = debug === true;
 		return this;
+
 	},
 
 	/**
@@ -70,8 +73,10 @@ OBJLoader2.prototype = {
 	 * @param {string} modelName
 	 */
 	setModelName: function ( modelName ) {
+
 		this.modelName = modelName ? modelName : this.modelName;
 		return this;
+
 	},
 
 	/**
@@ -80,8 +85,10 @@ OBJLoader2.prototype = {
 	 * @param {string} path URL
 	 */
 	setPath: function ( path ) {
+
 		this.path = path ? path : this.path;
 		return this;
+
 	},
 
 
@@ -90,7 +97,9 @@ OBJLoader2.prototype = {
 	 * @param {string} resourcePath
 	 */
 	setResourcePath: function ( resourcePath ) {
+
 		this.resourcePath = resourcePath ? resourcePath : this.resourcePath;
+
 	},
 
 	/**
@@ -99,8 +108,10 @@ OBJLoader2.prototype = {
 	 * @param {Object3D} baseObject3d Object already attached to scenegraph where new meshes will be attached to
 	 */
 	setBaseObject3d: function ( baseObject3d ) {
+
 		this.baseObject3d = ( baseObject3d === undefined || baseObject3d === null ) ? this.baseObject3d : baseObject3d;
 		return this;
+
 	},
 
 	/**
@@ -109,7 +120,9 @@ OBJLoader2.prototype = {
 	 * @param materials Object with named {@link Material}
 	 */
 	addMaterials: function ( materials ) {
+
 		this.materialHandler.addMaterials( materials );
+
 	},
 
 	/**
@@ -118,8 +131,10 @@ OBJLoader2.prototype = {
 	 * @param {boolean} useIndices=false
 	 */
 	setUseIndices: function ( useIndices ) {
+
 		this.useIndices = useIndices === true;
 		return this;
+
 	},
 
 	/**
@@ -128,8 +143,10 @@ OBJLoader2.prototype = {
 	 * @param {boolean} disregardNormals=false
 	 */
 	setDisregardNormals: function ( disregardNormals ) {
+
 		this.disregardNormals = disregardNormals === true;
 		return this;
+
 	},
 
 	/**
@@ -138,8 +155,10 @@ OBJLoader2.prototype = {
 	 * @param {boolean} materialPerSmoothingGroup=false
 	 */
 	setMaterialPerSmoothingGroup: function ( materialPerSmoothingGroup ) {
+
 		this.materialPerSmoothingGroup = materialPerSmoothingGroup === true;
 		return this;
+
 	},
 
 	/**
@@ -148,8 +167,10 @@ OBJLoader2.prototype = {
 	 * @param {boolean} useOAsMesh=false
 	 */
 	setUseOAsMesh: function ( useOAsMesh ) {
+
 		this.useOAsMesh = useOAsMesh === true;
 		return this;
+
 	},
 
 	/**
@@ -157,11 +178,13 @@ OBJLoader2.prototype = {
 	 * @param {Function} genericErrorHandler
 	 */
 	setGenericErrorHandler: function ( genericErrorHandler ) {
+
 		if ( genericErrorHandler !== undefined && genericErrorHandler !== null ) {
 
 			this.callbacks.genericErrorHandler = genericErrorHandler;
 
 		}
+
 	},
 
 	/**
@@ -174,6 +197,7 @@ OBJLoader2.prototype = {
 	 * @private
 	 */
 	_setCallbacks: function ( onParseProgress, onMeshAlter, onLoadMaterials ) {
+
 		if ( onParseProgress !== undefined && onParseProgress !== null ) {
 
 			this.callbacks.onParseProgress = onParseProgress;
@@ -181,6 +205,7 @@ OBJLoader2.prototype = {
 		}
 		this.meshReceiver._setCallbacks( onParseProgress, onMeshAlter );
 		this.materialHandler._setCallbacks( onLoadMaterials );
+
 	},
 
 	/**
@@ -192,6 +217,7 @@ OBJLoader2.prototype = {
 	 * @param {number} numericalValue Numerical value describing the progress
 	 */
 	_onProgress: function ( type, text, numericalValue ) {
+
 		let message = text ? text : '';
 		let event = {
 			detail: {
@@ -212,6 +238,7 @@ OBJLoader2.prototype = {
 			console.log( message );
 
 		}
+
 	},
 
 	/**
@@ -221,6 +248,7 @@ OBJLoader2.prototype = {
 	 * @param {String} errorMessage The event containing the error
 	 */
 	_onError: function ( errorMessage ) {
+
 		if ( this.callbacks.genericErrorHandler ) {
 
 			this.callbacks.genericErrorHandler( errorMessage );
@@ -241,9 +269,10 @@ OBJLoader2.prototype = {
 	 * @param {function} onLoad A function to be called after loading is successfully completed. The function receives loaded Object3D as an argument.
 	 * @param {function} [onFileLoadProgress] A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains total and Integer bytes.
 	 * @param {function} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
-	 * @param {function} [onMeshAlter] Called after worker successfully delivered a single mesh
+	 * @param {function} [onMeshAlter] Called after every single mesh is made available by the parser
 	 */
 	load: function ( url, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
+
 		let scope = this;
 		if ( onError === null || onError === undefined ) {
 
@@ -280,27 +309,32 @@ OBJLoader2.prototype = {
 			let numericalValueRef = 0;
 			let numericalValue = 0;
 			onFileLoadProgress = function ( event ) {
+
 				if ( ! event.lengthComputable ) return;
 
 				numericalValue = event.loaded / event.total;
 				if ( numericalValue > numericalValueRef ) {
 
 					numericalValueRef = numericalValue;
-					let output = 'Download of "' + url + '": ' + (numericalValue * 100).toFixed( 2 ) + '%';
+					let output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
 					scope._onProgress( 'progressLoad', output, numericalValue );
 
 				}
+
 			};
 
 		}
 		this._setCallbacks( null, onMeshAlter, null );
 		let fileLoaderOnLoad = function ( content ) {
+
 			onLoad( scope.parse( content ) );
+
 		};
 		let fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path || this.resourcePath );
 		fileLoader.setResponseType( 'arraybuffer' );
 		fileLoader.load( filename, fileLoaderOnLoad, onFileLoadProgress, onError );
+
 	},
 
 	/**
@@ -309,6 +343,7 @@ OBJLoader2.prototype = {
 	 * @param {arraybuffer|string} content OBJ data as Uint8Array or String
 	 */
 	parse: function ( content ) {
+
 		// fast-fail in case of illegal data
 		if ( content === null || content === undefined ) {
 
@@ -320,7 +355,7 @@ OBJLoader2.prototype = {
 			console.time( 'OBJLoader parse: ' + this.modelName );
 
 		}
-		let parser = new Parser();
+		let parser = new OBJLoader2Parser();
 		parser.setLogging( this.logging.enabled, this.logging.debug );
 		parser.setMaterialPerSmoothingGroup( this.materialPerSmoothingGroup );
 		parser.setUseOAsMesh( this.useOAsMesh );
@@ -330,30 +365,22 @@ OBJLoader2.prototype = {
 		parser.setMaterials( this.materialHandler.getMaterials() );
 
 		let scope = this;
-		let onMeshLoaded = function ( payload ) {
+		let scopedOnAssetAvailable = function ( payload ) {
 
-			if ( payload.cmd !== 'data' ) return;
+			scope._onAssetAvailable( payload );
 
-			if ( payload.type === 'mesh' ) {
-
-				let meshes = scope.meshReceiver.buildMeshes( payload );
-				for ( let mesh of meshes ) {
-					scope.baseObject3d.add( mesh );
-				}
-
-			} else if ( payload.type === 'material' ) {
-
-				scope.materialHandler.addPayloadMaterials( payload );
-
-			}
 		};
 		let onProgressScoped = function ( text, numericalValue ) {
+
 			scope._onProgress( 'progressParse', text, numericalValue );
+
 		};
 		let onErrorScoped = function ( message ) {
+
 			scope._onError( message );
+
 		};
-		parser.setCallbackOnAssetAvailable( onMeshLoaded );
+		parser.setCallbackOnAssetAvailable( scopedOnAssetAvailable );
 		parser.setCallbackOnProgress( onProgressScoped );
 		parser.setCallbackOnError( onErrorScoped );
 		if ( content instanceof ArrayBuffer || content instanceof Uint8Array ) {
@@ -361,7 +388,7 @@ OBJLoader2.prototype = {
 			if ( this.logging.enabled ) console.info( 'Parsing arrayBuffer...' );
 			parser.parse( content );
 
-		} else if ( typeof( content ) === 'string' || content instanceof String ) {
+		} else if ( typeof ( content ) === 'string' || content instanceof String ) {
 
 			if ( this.logging.enabled ) console.info( 'Parsing text...' );
 			parser.parseText( content );
@@ -377,6 +404,28 @@ OBJLoader2.prototype = {
 
 		}
 		return this.baseObject3d;
+
+	},
+
+	_onAssetAvailable: function ( payload ) {
+
+		if ( payload.cmd !== 'assetAvailable' ) return;
+
+		if ( payload.type === 'mesh' ) {
+
+			let meshes = this.meshReceiver.buildMeshes( payload );
+			for ( let mesh of meshes ) {
+
+				this.baseObject3d.add( mesh );
+
+			}
+
+		} else if ( payload.type === 'material' ) {
+
+			this.materialHandler.addPayloadMaterials( payload );
+
+		}
+
 	}
 };
 

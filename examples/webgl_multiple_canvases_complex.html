@@ -4,22 +4,15 @@
 		<title>three.js webgl - multiple canvases - complex</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #808080;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-
 				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
 
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
+			a {
+				color: #08f;
 			}
 
 			#canvas1, #canvas2, #canvas3 {
@@ -44,12 +37,6 @@
 				height: 300px;
 				left: 75px;
 			}
-
-			a {
-
-				color: #0080ff;
-			}
-
 		</style>
 	</head>
 	<body>
@@ -61,17 +48,9 @@
 		</div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple canvases - complex</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var views = [];
 
@@ -104,7 +83,7 @@
 					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 					camera.lookAt( scene.position );
 
-					renderer.setViewport( 0, 0, viewWidth, viewHeight );
+					renderer.setViewport( 0, fullHeight - viewHeight, viewWidth, viewHeight );
 					renderer.render( scene, camera );
 
 					context.drawImage( renderer.domElement, 0, 0 );

@@ -4,30 +4,19 @@
 		<title>three.js webgl - postprocessing - afterimage</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/AfterimageShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/AfterimagePass.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/libs/dat.gui.min.js" type="text/javascript" charset="utf-8"></script>
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { AfterimagePass } from './jsm/postprocessing/AfterimagePass.js';
 
 			var camera, scene, renderer, composer;
 			var mesh;
@@ -64,10 +53,10 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				afterimagePass = new THREE.AfterimagePass();
+				afterimagePass = new AfterimagePass();
 				composer.addPass( afterimagePass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -76,7 +65,7 @@
 
 			function createGUI() {
 
-				var gui = new dat.GUI( { name: 'Damp setting' } );
+				var gui = new GUI( { name: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
 				gui.add( params, 'enable' );
 

@@ -4,49 +4,21 @@
 		<title>three.js webgl - collada</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: skyblue }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			simple AWD loader
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - AWD loader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/AWDLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { AWDLoader } from './jsm/loaders/AWDLoader.js';
 
 			var container, stats;
 
@@ -54,7 +26,7 @@
 			var pointLight;
 			var trunk;
 
-			var loader = new THREE.AWDLoader();
+			var loader = new AWDLoader();
 
 			loader.materialFactory = createMaterial;
 			loader.load( './models/awd/simple/simple.awd', function ( _trunk ) {
@@ -69,7 +41,7 @@
 			function createMaterial() {
 
 				// console.log( name );
-				// var mat = new THREE.MeshPhongMaterial({
+				// var mat = new MeshPhongMaterial({
 				// 	color: 0xaaaaaa,
 				// 	shininess: 20
 
@@ -110,7 +82,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

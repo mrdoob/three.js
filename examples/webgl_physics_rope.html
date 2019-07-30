@@ -3,48 +3,25 @@
 		<title>Amjs softbody rope demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-				body {
-					color: #61443e;
-					font-family:Monospace;
-					font-size:13px;
-					text-align:center;
-
-					background-color: #bfd1e5;
-					margin: 0px;
-					overflow: hidden;
-				}
-
-				#info {
-					position: absolute;
-					top: 0px; width: 100%;
-					padding: 5px;
-				}
-
-				a { color: #a06851; }
-
+			body {
+				color: #333;
+			}
 		</style>
 	</head>
 	<body>
 	<div id="info">Ammo.js physics soft body rope demo<br>Press Q or A to move the arm.</div>
-	<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+	<div id="container"></div>
 
-	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-		// Detects webgl
+		import Stats from './jsm/libs/stats.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-			document.getElementById( 'container' ).innerHTML = "";
-
-		}
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 		// Graphics variables
 		var container, stats;
@@ -68,7 +45,7 @@
 
 		var armMovement = 0;
 
-		Ammo().then( function( AmmoLib ) {
+		Ammo().then( function ( AmmoLib ) {
 
 			Ammo = AmmoLib;
 
@@ -92,7 +69,6 @@
 		function initGraphics() {
 
 			container = document.getElementById( 'container' );
-			container.innerHTML = '';
 
 			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
@@ -107,7 +83,7 @@
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 2, 0 );
 			controls.update();
 

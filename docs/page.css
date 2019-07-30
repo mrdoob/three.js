@@ -1,33 +1,52 @@
 :root {
 	--color-blue: #049EF4;
 	--text-color: #444;
-	--border-style: 1px solid #EEE;
-	--header-height: 56px;
+
+	--font-size: 16px;
+	--line-height: 26px;
+
+	--border-style: 1px solid #E8E8E8;
+	--panel-width: 300px;
+	--page-padding: 24px;
+	--max-width: 760px;
+	--icon-size: 20px;
 }
 
 @font-face {
 	font-family: 'Roboto Mono';
-	src: local('Roboto Mono'), url('../files/RobotoMono-Regular.woff2') format('woff2');
-	font-weight: normal;
+	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../files/RobotoMono-Regular.woff2') format('woff2');
 	font-style: normal;
+	font-weight: 400;
+}
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Inter-Regular'), url("../files/Inter-Regular.woff2?v=3.6") format("woff2");
+}
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 600;
+	src: local('Inter-SemiBold'), url("../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
 }
 
-@font-face {
-	font-family: 'SF-Pro-Text';
-	src: local('SF-Pro-Text'), url('../files/SF-Pro-Text-Regular.otf');
-	font-weight: normal;
-	font-style: normal;
+html {
+	font-family: 'Inter', sans-serif;
+	font-size: var(--font-size);
+	line-height: var(--line-height);
 }
 
 body {
-	padding: 20px 24px 40px 24px;
-	margin: 0;
 	color: var(--text-color);
-	font-family: 'SF-Pro-Text', sans-serif;
-	font-size: 16px;
-	line-height: 24px;
 	tab-size: 4;
 	overflow: auto;
+	max-width: var(--max-width);
+	margin: 0 auto;
+	padding-top: var(--page-padding);
+	padding-bottom: var(--page-padding);
+	padding-right: var(--page-padding);
+	padding-left: calc(var(--page-padding) + var(--panel-width));
 }
 
 a {
@@ -37,41 +56,47 @@ a {
 }
 
 h1 {
-	color: var(--color-blue);
-	font-size: 2.4em;
+	font-size: 40px;
+	line-height: 48px;
 	font-weight: normal;
-	line-height: 1.36em;
+	margin-left: -2px;
 	margin-top: 16px;
-	margin-bottom: -16px;
-	text-indent: -2px;
+	margin-bottom: -8px;
 }
 
 h2 {
-	color: var(--color-blue);
-	font-size: 1.8em;
-	line-height: 1.32em;
+	font-size: 28px;
+	line-height: 36px;
 	font-weight: normal;
-	margin-top: 40px;
-	margin-bottom: 12px;
-	text-indent: -1px;
+	margin-left: -1px;
+	margin-top: 28px;
+	margin-bottom: -8px;
 }
 
 h3 {
-	font-size: 1.32em;
-	line-height: 1.48em;
+	font-size: 20px;
+	line-height: 28px;
 	font-weight: normal;
-	text-indent: -1px;
 	margin-top: 24px;
-	margin-bottom: 12px;
+	margin-bottom: -8px;
+}
+
+p,
+div,
+table,
+ol,
+ul {
+	margin-top: 16px;
+	margin-bottom: 16px;
 }
 
 p {
-	margin-top: 24px;
-	margin-bottom: 24px;
+	padding-right: 16px;
 }
+
 ul, ol {
 	box-sizing: border-box;
-	padding-left: 20px;
+	padding-left: 24px;
 }
 ul li,
 ol li {
@@ -84,60 +109,57 @@ li ol {
 	margin-top: 4px;
 }
 
-body {
-	max-width: 760px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-table,
-pre,
-code:not(.inline) {
-	margin-left: -24px;
-	margin-right: -24px;
-	margin-top: 20px;
-	margin-bottom: 20px;
-}
-
-div {
-	margin-bottom: 20px;
-}
-
-.desc {
-	padding-left: 0px;
-}
-
-br {
-	display: none;
-}
-
-table {
-	border-spacing: 24px 4px;
-}
-table,
-table tr,
-table td {
-	text-align: left;
-}
-
-table th {
-	text-decoration: none;
-	padding: 2px 0;
-}
-
 code {
-	display: block;
-	padding: 20px 24px;
-	white-space: pre-wrap;
-	overflow: auto;
-	box-sizing: border-box;
+	font-size: calc(var(--font-size) - 1px);
+	line-height: calc(var(--line-height) - 1px);
+	margin: 16px calc(-1 * var(--page-padding));
+}
+
+ol code,
+ul code {
+	margin: 16px 0;
 }
 
 code.inline {
 	display: inline-block;
 	vertical-align: middle;
 	border-radius: 4px;
-	padding: 2px 5px;
+	padding: 0px 5px;
+	background: #F5F5F5;
+	margin: 0;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.desc {
+	padding-left: 0px;
+}
+
+table th,
+table td {
+	text-align: left;
+	vertical-align: top;
+	padding: 8px 6px;
+	border-bottom: var(--border-style);
+}
+
+table th {
+	text-decoration: none;
+}
+table th:first-child,
+table td:first-child {
+	padding-left: 0;
+}
+
+code:not(.inline) {
+	display: block;
+	padding: calc(var(--page-padding) - 6px) var(--page-padding);
+	white-space: pre-wrap;
+	overflow: auto;
+	box-sizing: border-box;
 }
 
 iframe {
@@ -146,52 +168,46 @@ iframe {
 	border:0;
 }
 
-th {
-	padding: 10px;
-	text-decoration: underline;
-}
-
-td {
-	text-align: center;
-}
-
 table code {
-	padding: 2px;
+	padding: 0px;
 	margin: 0px;
 	width: auto;
 }
 
 strong {
-	color: #000;
-	font-weight: normal;
+	font-weight: 600;
 }
 
+
+/* TODO: Duplicate styles in main.css. Needed here cause button is inside the iframe */
 #button {
 	position: fixed;
-	bottom: 12px;
-	right: 12px;
+	bottom: 16px;
+	right: 16px;
 
-	padding: 8px;
+	padding: 12px;
 	border-radius: 50%;
 	margin-bottom: 0px;
 
-	background-color: #E5E5E5;
+	background-color: #FFF;
 	opacity: .9;
-}
+	z-index: 999;
 
+	box-shadow: 0 0 4px rgba(0,0,0,.15);
+}
 	#button:hover {
 		cursor: pointer;
 		opacity: 1;
 	}
-
 	#button img {
 		display: block;
-		width: 20px;
+		width: var(--icon-size);
 	}
 
 a.permalink {
 	float: right;
 	margin-left: 5px;
+	display: none;
 }
 
 a.param,
@@ -200,35 +216,60 @@ span.param {
 }
 
 a.param:hover {
-	color: #777;
+	color: var(--text-color);
 }
 
-sup, sub {
-	/* prevent superscript and subscript elements from affecting line-height */
-	vertical-align: baseline;
-	position: relative;
-	top: -0.4em;
-}
 
-sub {
-	top: 0.4em;
+@media all and ( min-width: 1700px ) {
+	:root {
+		--panel-width: 360px;
+		--font-size: 18px;
+		--line-height: 28px;
+		--max-width: 880px;
+		--page-padding: 28px;
+		--icon-size: 24px;
+	}
+	h1 {
+		font-size: 42px;
+		line-height: 50px;
+	}
+	h2 {
+		font-size: 32px;
+		line-height: 40px;
+	}
+
+	h3 {
+		font-size: 24px;
+		line-height: 32px;
+	}
 }
 
 /* mobile */
 
 @media all and ( max-width: 640px ) {
+	:root {
+		--page-padding: 16px;
+		--icon-size: 24px;
+	}
 	body {
-		padding: 16px 20px;
+		padding: var(--page-padding);
 	}
 
 	h1 {
+		font-size: 28px;
+		line-height: 36px;
+		padding-right: 20px;
 		margin-top: 0;
-		font-size: 26px;
 	}
 
 	h2 {
-		margin-top: 20px;
-		font-size: 18px;
-		line-height: 25px;
+		font-size: 24px;
+		line-height: 32px;
+		margin-top: 24px;
+	}
+
+	h3 {
+		font-size: 20px;
+		line-height: 28px;
 	}
 }

@@ -16,6 +16,8 @@ export interface EXR {
 
 export class EXRLoader extends DataTextureLoader {
   constructor(manager?: LoadingManager);
+  type: TextureDataType;
 
   _parser(buffer: ArrayBuffer) : EXR;
+  setDataType(type: TextureDataType): this;
 }

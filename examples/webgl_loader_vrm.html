@@ -4,28 +4,7 @@
 		<title>three.js webgl - vrm loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #75ddc1;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -36,22 +15,14 @@
 			<a href="http://3d.nicovideo.jp/alicia/rule.html">License</a><br />
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/loaders/VRMLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VRMLoader } from './jsm/loaders/VRMLoader.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -74,11 +45,11 @@
 				scene.add( light );
 
 				// model
-				var loader = new THREE.VRMLoader();
+				var loader = new VRMLoader();
 				loader.load( 'models/vrm/Alicia/AliciaSolid.vrm', function ( vrm ) {
 
 					// VRMLoader doesn't support VRM Unlit extension yet so
-					// converting all materials to MeshBasicMaterial here as workaround so far.
+					// converting all materials to THREE.MeshBasicMaterial here as workaround so far.
 					vrm.scene.traverse( function ( object ) {
 
 						if ( object.material ) {
@@ -127,7 +98,7 @@
 				renderer.gammaOutput = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0.9, 0 );
 				controls.update();
 

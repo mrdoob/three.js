@@ -4,32 +4,7 @@
 		<title>three.js webgl - shaders - sky sun shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-
-			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#ccc;
-				text-shadow: 1px 1px rgba(0,0,0,0.25);
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
-			a { color: #fff; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -39,21 +14,13 @@
 
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/objects/Sky.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Sky } from './jsm/objects/Sky.js';
 
 			var camera, controls, scene, renderer;
 
@@ -65,7 +32,7 @@
 			function initSky() {
 
 				// Add Sky
-				sky = new THREE.Sky();
+				sky = new Sky();
 				sky.scale.setScalar( 450000 );
 				scene.add( sky );
 
@@ -117,7 +84,7 @@
 
 				}
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( effectController, "turbidity", 1.0, 20.0, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
@@ -149,7 +116,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				//controls.maxPolarAngle = Math.PI / 2;
 				controls.enableZoom = false;

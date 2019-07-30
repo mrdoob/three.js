@@ -1,4 +1,5 @@
 import {
+	Clock,
   WebGLRenderer,
   WebGLRenderTarget,
 } from '../../../src/Three';
@@ -15,12 +16,13 @@ export class EffectComposer {
   readBuffer: WebGLRenderTarget;
   passes: Pass[];
   copyPass: ShaderPass;
+  clock: Clock;
 
   swapBuffers(): void;
   addPass(pass: Pass): void;
   insertPass(pass: Pass, index: number): void;
-  isLastEnabledPass(): boolean;
-  render(deltaTime: number): void;
+  isLastEnabledPass(passIndex: number): boolean;
+  render(deltaTime?: number): void;
   reset(renderTarget?: WebGLRenderTarget): void;
   setSize(width: number, height: number): void;
   setPixelRatio(pixelRatio: number): void;

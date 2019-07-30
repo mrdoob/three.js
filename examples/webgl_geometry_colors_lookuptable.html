@@ -4,52 +4,34 @@
 		<title>three.js webgl - lookup table</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
 				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-
-			#info {
-				color:#000;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
 			a {
 				color: red;
 			}
 		</style>
 	</head>
-
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookuptable - vertex color values from a range of data values.<br />
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lookup table<br/>
+			vertex color values from a range of data values
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/math/Lut.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script>
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Lut } from './jsm/math/Lut.js';
 
 			var container;
 
@@ -71,7 +53,7 @@
 
 				uiScene = new THREE.Scene();
 
-				lut = new THREE.Lut();
+				lut = new Lut();
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
@@ -112,10 +94,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var controls = new THREE.OrbitControls( perpCamera, renderer.domElement );
+				var controls = new OrbitControls( perpCamera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
 

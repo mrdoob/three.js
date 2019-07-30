@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js / documentation</title>
+		<title>three.js docs</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
@@ -17,23 +17,23 @@
 
 				<div id="sections">
 					<span class="selected">docs</span>
-					<a href="../examples/">examples</a>
+					<a href="../examples/#webgl_animation_cloth">examples</a>
 				</div>
 
-				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
+				<div id="expandButton"></div>
 			</div>
 
 			<div id="panelScrim"></div>
 
 			<div id="contentWrapper">
-				<input placeholder="Search" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
-				<div id="exitSearchButton"></div>
-
-				<select id="language">
-					<option value="en">en</option>
-					<option value="zh">zh</option>
-				</select>
-
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="exitSearchButton"></div>
+					<select id="language">
+						<option value="en">en</option>
+						<option value="zh">zh</option>
+					</select>
+				</div>
 				<div id="content"></div>
 			</div>
 
@@ -51,15 +51,15 @@
 
 			var language = 'en';
 
-			if ( /^(api|manual)/.test( hash ) ) {
+			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				var hashLanguage = /^(api|manual)\/(en|zh)\//.exec( hash );
+				var hashLanguage = /^(api|manual|examples)\/(en|zh)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
 					// Route old non-localised api links
 
-					window.location.hash = hash.replace( /^(api|manual)/, '$1/en' );
+					window.location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
 
 				} else {
 
@@ -417,7 +417,7 @@
 				if(hash) {
 
 					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
-					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' - ';
+					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
 
 				} else {
 
@@ -428,6 +428,7 @@
 
 				document.body.replaceChild( iframe, oldIframe );
 				document.title = subtitle + 'three.js docs';
+
 
 			}
 

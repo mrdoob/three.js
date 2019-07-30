@@ -4,31 +4,9 @@
 		<title>three.js webgl - materials - environment maps</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a { color:skyblue; text-decoration:none }
-			#info {
-				position: absolute;
-				width: 100%;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/libs/dat.gui.min.js"></script>
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl environment mapping example<br/>
@@ -36,7 +14,12 @@
 			Spherical Map by <a href="http://www.pauldebevec.com/Probes/">Paul Debevec</a>
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var controls, camera, scene, renderer;
 			var cameraCube, sceneCube;
@@ -82,7 +65,7 @@
 				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.magFilter = THREE.LinearFilter;
-				textureEquirec.minFilter = THREE.LinearMipMapLinearFilter;
+				textureEquirec.minFilter = THREE.LinearMipmapLinearFilter;
 				textureEquirec.encoding = THREE.sRGBEncoding;
 
 				textureSphere = textureLoader.load( "textures/metal.jpg" );
@@ -158,7 +141,7 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 500;
 				controls.maxDistance = 2500;
 
@@ -191,7 +174,7 @@
 					Refraction: false
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
 				gui.add( params, 'Spherical' );

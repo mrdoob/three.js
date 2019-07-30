@@ -63,6 +63,7 @@ import {
 	VectorKeyframeTrack,
 	VertexColors
 } from "../../../build/three.module.js";
+import { Zlib } from "../libs/inflate.module.min.js";
 import { TGALoader } from "../loaders/TGALoader.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
 

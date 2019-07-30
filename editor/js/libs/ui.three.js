@@ -365,7 +365,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 		if ( newParentIsChild ) return;
 
-		editor.execute( new MoveObjectCommand( object, newParent, nextObject ) );
+		editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
 		var changeEvent = document.createEvent( 'HTMLEvents' );
 		changeEvent.initEvent( 'change', true, true );

@@ -4,27 +4,7 @@
 		<title>three.js webgl - node material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-
-			a { color: white }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -34,21 +14,21 @@
 			<a id="serialize" href="javascript:void(0);">Serialize and apply</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<script type="module">
 
-			import './js/nodes/THREE.Nodes.js';
-			import './js/loaders/NodeMaterialLoader.js';
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+
+			import * as Nodes from './jsm/nodes/Nodes.js';
 
 			var container = document.getElementById( 'container' );
 
 			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new THREE.NodeFrame();
+			var frame = new Nodes.NodeFrame();
 			var teapot, mesh;
 			var controls;
 			var move = false;
@@ -123,7 +103,7 @@
 				camera.target = new THREE.Vector3();
 
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
@@ -137,7 +117,7 @@
 				light.position.set( - 1, 0.75, - 0.5 );
 				scene.add( light );
 
-				teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+				teapot = new TeapotBufferGeometry( 15, 18 );
 
 				mesh = new THREE.Mesh( teapot );
 				scene.add( mesh );
@@ -159,7 +139,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( param, 'example', {
 					'basic / mesh-standard': 'mesh-standard',
@@ -197,6 +177,7 @@
 					'adv / translucent': 'translucent',
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
+					'node / reflect': 'node-reflect',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
 					'misc / reserved-keywords': 'reserved-keywords',
@@ -229,7 +210,7 @@
 
 					} );
 
-				} else if ( typeof value == 'object' ) {
+				} else if ( typeof value === 'object' ) {
 
 					param[ name ] = value[ Object.keys( value )[ 0 ] ];
 
@@ -287,7 +268,7 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
 						//mtl.color = // albedo (vec3)
 						//mtl.alpha = // opacity (float)
@@ -304,15 +285,15 @@
 						//mtl.environmentAlpha = // environment alpha (float)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
-						mtl.color = new THREE.TextureNode( getTexture( "grass" ) );
-						mtl.specular = new THREE.FloatNode( .5 );
-						mtl.shininess = new THREE.FloatNode( 15 );
-						mtl.environment = new THREE.CubeTextureNode( cubemap );
+						mtl.color = new Nodes.TextureNode( getTexture( "grass" ) );
+						mtl.specular = new Nodes.FloatNode( .5 );
+						mtl.shininess = new Nodes.FloatNode( 15 );
+						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.environmentAlpha = mask;
-						mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
-						mtl.normal.scale = new THREE.Math1Node( mask, THREE.Math1Node.INVERT );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal.scale = new Nodes.MathNode( mask, Nodes.MathNode.INVERT );
 
 						break;
 
@@ -320,7 +301,7 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
 						//mtl.color = // albedo (vec3)
 						//mtl.alpha = // opacity (float)
@@ -335,41 +316,41 @@
 						//mtl.environment = // reflection/refraction (vec3)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
-						var normalScale = new THREE.FloatNode( .3 );
+						var normalScale = new Nodes.FloatNode( .3 );
 
-						var roughnessA = new THREE.FloatNode( .5 );
-						var metalnessA = new THREE.FloatNode( .5 );
+						var roughnessA = new Nodes.FloatNode( .5 );
+						var metalnessA = new Nodes.FloatNode( .5 );
 
-						var roughnessB = new THREE.FloatNode( 0 );
-						var metalnessB = new THREE.FloatNode( 1 );
+						var roughnessB = new Nodes.FloatNode( 0 );
+						var metalnessB = new Nodes.FloatNode( 1 );
 
-						var roughness = new THREE.Math3Node(
+						var roughness = new Nodes.MathNode(
 							roughnessA,
 							roughnessB,
 							mask,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var metalness = new THREE.Math3Node(
+						var metalness = new Nodes.MathNode(
 							metalnessA,
 							metalnessB,
 							mask,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var normalMask = new THREE.OperatorNode(
-							new THREE.Math1Node( mask, THREE.Math1Node.INVERT ),
+						var normalMask = new Nodes.OperatorNode(
+							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
 							normalScale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						mtl.color = new THREE.ColorNode( 0xEEEEEE );
+						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
-						mtl.environment = new THREE.CubeTextureNode( cubemap );
-						mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.environment = new Nodes.CubeTextureNode( cubemap );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
 
 						// GUI
@@ -416,7 +397,7 @@
 
 						// MATERIAL
 
-						var sataturation = new THREE.FloatNode( 1 ),
+						var sataturation = new Nodes.FloatNode( 1 ),
 							useNodeMaterial = true,
 							useMap = true,
 							useNormals = true;
@@ -427,7 +408,7 @@
 
 							if ( oldMaterial ) oldMaterial.dispose();
 
-							mtl = useNodeMaterial ? new THREE.MeshStandardNodeMaterial() : new THREE.MeshStandardMaterial();
+							mtl = useNodeMaterial ? new Nodes.MeshStandardNodeMaterial() : new THREE.MeshStandardMaterial();
 
 							// default syntax ( backward-compatible )
 
@@ -445,10 +426,10 @@
 
 							if ( useNodeMaterial && useMap ) {
 
-								mtl.map = new THREE.ColorAdjustmentNode(
-									new THREE.TextureNode( mtl.map ),
+								mtl.map = new Nodes.ColorAdjustmentNode(
+									new Nodes.TextureNode( mtl.map ),
 									sataturation,
-									THREE.ColorAdjustmentNode.SATURATION
+									Nodes.ColorAdjustmentNode.SATURATION
 								);
 
 							}
@@ -526,7 +507,7 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
 						//mtl.color = // albedo (vec3)
 						//mtl.alpha = // opacity (float)
@@ -544,48 +525,48 @@
 						//mtl.environment = // reflection/refraction (vec3)
 						//mtl.position = // vertex local position (vec3)
 
-						var mask = new THREE.SwitchNode( new THREE.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
-						var normalScale = new THREE.FloatNode( .3 );
+						var normalScale = new Nodes.FloatNode( .3 );
 
-						var roughnessA = new THREE.FloatNode( .5 );
-						var metalnessA = new THREE.FloatNode( .5 );
+						var roughnessA = new Nodes.FloatNode( .5 );
+						var metalnessA = new Nodes.FloatNode( .5 );
 
-						var roughnessB = new THREE.FloatNode( 0 );
-						var metalnessB = new THREE.FloatNode( 1 );
+						var roughnessB = new Nodes.FloatNode( 0 );
+						var metalnessB = new Nodes.FloatNode( 1 );
 
-						var reflectivity = new THREE.FloatNode( 0 );
-						var clearCoat = new THREE.FloatNode( 1 );
-						var clearCoatRoughness = new THREE.FloatNode( 1 );
+						var reflectivity = new Nodes.FloatNode( 0 );
+						var clearCoat = new Nodes.FloatNode( 1 );
+						var clearCoatRoughness = new Nodes.FloatNode( 1 );
 
-						var roughness = new THREE.Math3Node(
+						var roughness = new Nodes.MathNode(
 							roughnessA,
 							roughnessB,
 							mask,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var metalness = new THREE.Math3Node(
+						var metalness = new Nodes.MathNode(
 							metalnessA,
 							metalnessB,
 							mask,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var normalMask = new THREE.OperatorNode(
-							new THREE.Math1Node( mask, THREE.Math1Node.INVERT ),
+						var normalMask = new Nodes.OperatorNode(
+							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
 							normalScale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						mtl.color = new THREE.ColorNode( 0xEEEEEE );
+						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
 						mtl.clearCoat = clearCoat;
 						mtl.clearCoatRoughness = clearCoatRoughness;
-						mtl.environment = new THREE.CubeTextureNode( cubemap );
-						mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.environment = new Nodes.CubeTextureNode( cubemap );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
 
 						// GUI
@@ -650,69 +631,69 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var time = new THREE.TimerNode();
-						var speed = new THREE.FloatNode( 5 );
-						var scale = new THREE.FloatNode( 1 );
-						var worldScale = new THREE.FloatNode( .4 );
-						var colorA = new THREE.ColorNode( 0xFFFFFF );
-						var colorB = new THREE.ColorNode( 0x0054df );
+						var time = new Nodes.TimerNode();
+						var speed = new Nodes.FloatNode( 5 );
+						var scale = new Nodes.FloatNode( 1 );
+						var worldScale = new Nodes.FloatNode( .4 );
+						var colorA = new Nodes.ColorNode( 0xFFFFFF );
+						var colorB = new Nodes.ColorNode( 0x0054df );
 
 						// used for serialization only
 						time.name = "time";
 						speed.name = "speed";
 
-						var timeScale = new THREE.OperatorNode(
+						var timeScale = new Nodes.OperatorNode(
 							time,
 							speed,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var worldScl = new THREE.OperatorNode(
-							new THREE.PositionNode(),
+						var worldScl = new Nodes.OperatorNode(
+							new Nodes.PositionNode(),
 							worldScale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var posContinuous = new THREE.OperatorNode(
+						var posContinuous = new Nodes.OperatorNode(
 							worldScl,
 							timeScale,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var wave = new THREE.Math1Node( posContinuous, THREE.Math1Node.SIN );
-						wave = new THREE.SwitchNode( wave, 'x' );
+						var wave = new Nodes.MathNode( posContinuous, Nodes.MathNode.SIN );
+						wave = new Nodes.SwitchNode( wave, 'x' );
 
-						var waveScale = new THREE.OperatorNode(
+						var waveScale = new Nodes.OperatorNode(
 							wave,
 							scale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var displaceY = new THREE.JoinNode(
-							new THREE.FloatNode(),
+						var displaceY = new Nodes.JoinNode(
+							new Nodes.FloatNode(),
 							waveScale,
-							new THREE.FloatNode()
+							new Nodes.FloatNode()
 						);
 
-						var displace = new THREE.OperatorNode(
-							new THREE.NormalNode(),
+						var displace = new Nodes.OperatorNode(
+							new Nodes.NormalNode(),
 							displaceY,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var blend = new THREE.OperatorNode(
-							new THREE.PositionNode(),
+						var blend = new Nodes.OperatorNode(
+							new Nodes.PositionNode(),
 							displaceY,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var color = new THREE.Math3Node(
+						var color = new Nodes.MathNode(
 							colorB,
 							colorA,
 							wave,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						mtl.color = color;
@@ -764,39 +745,39 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
 						defaultSide = THREE.FrontSide;
 
 						var intensity = 1.3;
-						var power = new THREE.FloatNode( 3 );
-						var color = new THREE.ColorNode( 0xFFFFFF );
+						var power = new Nodes.FloatNode( 3 );
+						var color = new Nodes.ColorNode( 0xFFFFFF );
 
-						var viewZ = new THREE.Math2Node(
-							new THREE.NormalNode(),
-							new THREE.Vector3Node( 0, 0, - intensity ),
-							THREE.Math2Node.DOT
+						var viewZ = new Nodes.MathNode(
+							new Nodes.NormalNode(),
+							new Nodes.Vector3Node( 0, 0, - intensity ),
+							Nodes.MathNode.DOT
 						);
 
-						var rim = new THREE.OperatorNode(
+						var rim = new Nodes.OperatorNode(
 							viewZ,
-							new THREE.FloatNode( intensity ),
-							THREE.OperatorNode.ADD
+							new Nodes.FloatNode( intensity ),
+							Nodes.OperatorNode.ADD
 						);
 
-						var rimPower = new THREE.Math2Node(
+						var rimPower = new Nodes.MathNode(
 							rim,
 							power,
-							THREE.Math2Node.POW
+							Nodes.MathNode.POW
 						);
 
-						var rimColor = new THREE.OperatorNode(
+						var rimColor = new Nodes.OperatorNode(
 							rimPower,
 							color,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						mtl.color = new THREE.ColorNode( 0x111111 );
+						mtl.color = new Nodes.ColorNode( 0x111111 );
 						mtl.emissive = rimColor;
 
 						// GUI
@@ -832,7 +813,7 @@
 								mtl.blending = THREE.AdditiveBlending;
 								mtl.depthWrite = false;
 
-							}				else {
+							} else {
 
 								mtl.emissive = rimColor;
 								mtl.alpha = null;
@@ -851,21 +832,21 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var texture = new THREE.TextureNode( getTexture( "brick" ) );
+						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var hue = new THREE.FloatNode();
-						var sataturation = new THREE.FloatNode( 1 );
-						var vibrance = new THREE.FloatNode();
-						var brightness = new THREE.FloatNode( 0 );
-						var contrast = new THREE.FloatNode( 1 );
+						var hue = new Nodes.FloatNode();
+						var sataturation = new Nodes.FloatNode( 1 );
+						var vibrance = new Nodes.FloatNode();
+						var brightness = new Nodes.FloatNode( 0 );
+						var contrast = new Nodes.FloatNode( 1 );
 
-						var hueNode = new THREE.ColorAdjustmentNode( texture, hue, THREE.ColorAdjustmentNode.HUE );
-						var satNode = new THREE.ColorAdjustmentNode( hueNode, sataturation, THREE.ColorAdjustmentNode.SATURATION );
-						var vibranceNode = new THREE.ColorAdjustmentNode( satNode, vibrance, THREE.ColorAdjustmentNode.VIBRANCE );
-						var brightnessNode = new THREE.ColorAdjustmentNode( vibranceNode, brightness, THREE.ColorAdjustmentNode.BRIGHTNESS );
-						var contrastNode = new THREE.ColorAdjustmentNode( brightnessNode, contrast, THREE.ColorAdjustmentNode.CONTRAST );
+						var hueNode = new Nodes.ColorAdjustmentNode( texture, hue, Nodes.ColorAdjustmentNode.HUE );
+						var satNode = new Nodes.ColorAdjustmentNode( hueNode, sataturation, Nodes.ColorAdjustmentNode.SATURATION );
+						var vibranceNode = new Nodes.ColorAdjustmentNode( satNode, vibrance, Nodes.ColorAdjustmentNode.VIBRANCE );
+						var brightnessNode = new Nodes.ColorAdjustmentNode( vibranceNode, brightness, Nodes.ColorAdjustmentNode.BRIGHTNESS );
+						var contrastNode = new Nodes.ColorAdjustmentNode( brightnessNode, contrast, Nodes.ColorAdjustmentNode.CONTRAST );
 
 						mtl.color = contrastNode;
 
@@ -907,15 +888,15 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
 						var translate = new THREE.Vector2();
 						var rotate = 0;
 						var scale = new THREE.Vector2( 1, 1 );
 
-						var texture = new THREE.TextureNode( getTexture( "brick" ) );
-						texture.uv = new THREE.UVTransformNode();
-						//texture.uv.uv = new THREE.UVNode( 1 ); // uv2 for example
+						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
+						texture.uv = new Nodes.UVTransformNode();
+						//texture.uv.uv = new Nodes.UVNode( 1 ); // uv2 for example
 
 						mtl.color = texture;
 
@@ -973,19 +954,19 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
+						var diffuse = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var bumpMap = new THREE.BumpMapNode( new THREE.TextureNode( getTexture( "brick" ) ) );
-						bumpMap.scale = new THREE.FloatNode( .5 );
+						var bumpMap = new Nodes.BumpMapNode( new Nodes.TextureNode( getTexture( "brick" ) ) );
+						bumpMap.scale = new Nodes.FloatNode( .5 );
 
 						mtl.color = diffuse;
 						mtl.normal = bumpMap;
 
 						// convert BumpMap to NormalMap
 						//bumpMap.toNormalMap = true;
-						//mtl.normal = new THREE.NormalMapNode( bumpMap );
+						//mtl.normal = new Nodes.NormalMapNode( bumpMap );
 
 						// GUI
 
@@ -997,7 +978,7 @@
 
 						addGui( 'color', true, function ( val ) {
 
-							mtl.color = val ? diffuse : new THREE.ColorNode( 0xEEEEEE );
+							mtl.color = val ? diffuse : new Nodes.ColorNode( 0xEEEEEE );
 
 							mtl.needsUpdate = true;
 
@@ -1009,11 +990,11 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var diffuse = new THREE.TextureNode( getTexture( "brick" ) );
+						var diffuse = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var blur = new THREE.BlurNode( new THREE.TextureNode( getTexture( "brick" ) ) );
+						var blur = new Nodes.BlurNode( new Nodes.TextureNode( getTexture( "brick" ) ) );
 
 						mtl.color = blur;
 
@@ -1037,9 +1018,9 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						mtl.environment = new THREE.TextureNode( getTexture( "spherical" ), new THREE.ReflectNode( THREE.ReflectNode.SPHERE ) );
+						mtl.environment = new Nodes.TextureNode( getTexture( "spherical" ), new Nodes.ReflectNode( Nodes.ReflectNode.SPHERE ) );
 
 						break;
 
@@ -1047,39 +1028,39 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var reflectance = new THREE.FloatNode( 1.3 );
-						var power = new THREE.FloatNode( 1 );
-						var color = new THREE.CubeTextureNode( cubemap );
+						var reflectance = new Nodes.FloatNode( 1.3 );
+						var power = new Nodes.FloatNode( 1 );
+						var color = new Nodes.CubeTextureNode( cubemap );
 
-						var viewZ = new THREE.Math2Node(
-							new THREE.NormalNode(),
-							new THREE.Vector3Node( 0, 0, - 1 ),
-							THREE.Math2Node.DOT
+						var viewZ = new Nodes.MathNode(
+							new Nodes.NormalNode(),
+							new Nodes.Vector3Node( 0, 0, - 1 ),
+							Nodes.MathNode.DOT
 						);
 
-						var theta = new THREE.OperatorNode(
+						var theta = new Nodes.OperatorNode(
 							viewZ,
-							new THREE.FloatNode( 1 ),
-							THREE.OperatorNode.ADD
+							new Nodes.FloatNode( 1 ),
+							Nodes.OperatorNode.ADD
 						);
 
-						var thetaPower = new THREE.Math2Node(
+						var thetaPower = new Nodes.MathNode(
 							theta,
 							power,
-							THREE.Math2Node.POW
+							Nodes.MathNode.POW
 						);
 
-						var fresnel = new THREE.OperatorNode(
+						var fresnel = new Nodes.OperatorNode(
 							reflectance,
 							thetaPower,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						mtl.color = new THREE.ColorNode( 0x3399FF );
+						mtl.color = new Nodes.ColorNode( 0x3399FF );
 						mtl.environment = color;
-						mtl.environmentAlpha = new THREE.Math1Node( fresnel, THREE.Math1Node.SATURATE );
+						mtl.environmentAlpha = new Nodes.MathNode( fresnel, Nodes.MathNode.SATURATE );
 
 						// GUI
 
@@ -1101,35 +1082,35 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var tex1 = new THREE.TextureNode( getTexture( "grass" ) );
-						var tex2 = new THREE.TextureNode( getTexture( "brick" ) );
+						var tex1 = new Nodes.TextureNode( getTexture( "grass" ) );
+						var tex2 = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var offset = new THREE.FloatNode( 0 );
-						var scale = new THREE.FloatNode( 1 );
-						var uv = new THREE.UVNode();
+						var offset = new Nodes.FloatNode( 0 );
+						var scale = new Nodes.FloatNode( 1 );
+						var uv = new Nodes.UVNode();
 
-						var uvOffset = new THREE.OperatorNode(
+						var uvOffset = new Nodes.OperatorNode(
 							offset,
 							uv,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var uvScale = new THREE.OperatorNode(
+						var uvScale = new Nodes.OperatorNode(
 							uvOffset,
 							scale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var mask = new THREE.TextureNode( getTexture( "decalDiffuse" ), uvScale );
-						var maskAlphaChannel = new THREE.SwitchNode( mask, 'w' );
+						var mask = new Nodes.TextureNode( getTexture( "decalDiffuse" ), uvScale );
+						var maskAlphaChannel = new Nodes.SwitchNode( mask, 'w' );
 
-						var blend = new THREE.Math3Node(
+						var blend = new Nodes.MathNode(
 							tex1,
 							tex2,
 							maskAlphaChannel,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						mtl.color = blend;
@@ -1154,20 +1135,20 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var tex = new THREE.TextureNode( getTexture( "brick" ) );
-						var sat = new THREE.FloatNode( 0 );
+						var tex = new Nodes.TextureNode( getTexture( "brick" ) );
+						var sat = new Nodes.FloatNode( 0 );
 
-						var satrgb = new THREE.FunctionNode( [
+						var satrgb = new Nodes.FunctionNode( [
 							"vec3 satrgb( vec3 rgb, float adjustment ) {",
 							// include luminance function from LuminanceNode
 							"	vec3 intensity = vec3( luminance( rgb ) );",
 							"	return mix( intensity, rgb, adjustment );",
 							"}"
-						].join( "\n" ), [ THREE.LuminanceNode.Nodes.luminance ] );
+						].join( "\n" ), [ Nodes.LuminanceNode.Nodes.luminance ] );
 
-						var saturation = new THREE.FunctionCallNode( satrgb );
+						var saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = tex;
 						saturation.inputs.adjustment = sat;
 
@@ -1192,32 +1173,32 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var top = new THREE.TextureNode( getTexture( "grass" ) );
-						var bottom = new THREE.TextureNode( getTexture( "brick" ) );
+						var top = new Nodes.TextureNode( getTexture( "grass" ) );
+						var bottom = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var normal = new THREE.NormalNode( THREE.NormalNode.WORLD );
-						var normalY = new THREE.SwitchNode( normal, 'y' );
+						var normal = new Nodes.NormalNode( Nodes.NormalNode.WORLD );
+						var normalY = new Nodes.SwitchNode( normal, 'y' );
 
-						var hard = new THREE.FloatNode( 9 );
-						var offset = new THREE.FloatNode( - 2.5 );
+						var hard = new Nodes.FloatNode( 9 );
+						var offset = new Nodes.FloatNode( - 2.5 );
 
-						var hardClamp = new THREE.OperatorNode(
+						var hardClamp = new Nodes.OperatorNode(
 							normalY,
 							hard,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var offsetClamp = new THREE.OperatorNode(
+						var offsetClamp = new Nodes.OperatorNode(
 							hardClamp,
 							offset,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var clamp0at1 = new THREE.Math1Node( offsetClamp, THREE.Math1Node.SATURATE );
+						var clamp0at1 = new Nodes.MathNode( offsetClamp, Nodes.MathNode.SATURATE );
 
-						var blend = new THREE.Math3Node( top, bottom, clamp0at1, THREE.Math3Node.MIX );
+						var blend = new Nodes.MathNode( top, bottom, clamp0at1, Nodes.MathNode.MIX );
 
 						mtl.color = blend;
 
@@ -1241,61 +1222,61 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var time = new THREE.TimerNode();
-						var scale = new THREE.FloatNode( 2 );
-						var speed = new THREE.FloatNode( .2 );
-						var colorA = new THREE.ColorNode( 0xFFFFFF );
-						var colorB = new THREE.ColorNode( 0x0054df );
+						var time = new Nodes.TimerNode();
+						var scale = new Nodes.FloatNode( 2 );
+						var speed = new Nodes.FloatNode( .2 );
+						var colorA = new Nodes.ColorNode( 0xFFFFFF );
+						var colorB = new Nodes.ColorNode( 0x0054df );
 
 						// used for serialization only
 						time.name = "time";
 						speed.name = "speed";
 
-						var uv = new THREE.UVNode();
+						var uv = new Nodes.UVNode();
 
-						var timeScl = new THREE.OperatorNode(
+						var timeScl = new Nodes.OperatorNode(
 							time,
 							speed,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var displaceOffset = new THREE.OperatorNode(
+						var displaceOffset = new Nodes.OperatorNode(
 							timeScl,
 							uv,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var tex = new THREE.TextureNode( getTexture( "cloud" ), displaceOffset );
-						var texArea = new THREE.SwitchNode( tex, 'w' );
+						var tex = new Nodes.TextureNode( getTexture( "cloud" ), displaceOffset );
+						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
-						var displace = new THREE.OperatorNode(
-							new THREE.NormalNode(),
+						var displace = new Nodes.OperatorNode(
+							new Nodes.NormalNode(),
 							texArea,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var displaceScale = new THREE.OperatorNode(
+						var displaceScale = new Nodes.OperatorNode(
 							displace,
 							scale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var blend = new THREE.OperatorNode(
-							new THREE.PositionNode(),
+						var blend = new Nodes.OperatorNode(
+							new Nodes.PositionNode(),
 							displaceScale,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var color = new THREE.Math3Node(
+						var color = new Nodes.MathNode(
 							colorB,
 							colorA,
 							texArea,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						mtl.color = mtl.specular = new THREE.ColorNode( 0 );
+						mtl.color = mtl.specular = new Nodes.ColorNode( 0 );
 						mtl.emissive = color;
 						mtl.position = blend;
 
@@ -1332,37 +1313,37 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var color = new THREE.ColorNode( 0xEEEEEE );
-						var borderColor = new THREE.ColorNode( 0x0054df );
-						var threshold = new THREE.FloatNode( .1 );
-						var borderSize = new THREE.FloatNode( .2 );
+						var color = new Nodes.ColorNode( 0xEEEEEE );
+						var borderColor = new Nodes.ColorNode( 0x0054df );
+						var threshold = new Nodes.FloatNode( .1 );
+						var borderSize = new Nodes.FloatNode( .2 );
 
-						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
-						var texArea = new THREE.SwitchNode( tex, 'w' );
+						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
+						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
-						var thresholdBorder = new THREE.Math3Node(
-							new THREE.OperatorNode( threshold, borderSize, THREE.OperatorNode.ADD ),
+						var thresholdBorder = new Nodes.MathNode(
+							new Nodes.OperatorNode( threshold, borderSize, Nodes.OperatorNode.ADD ),
 							threshold,
 							texArea,
-							THREE.Math3Node.SMOOTHSTEP
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var thresholdEmissive = new THREE.OperatorNode(
+						var thresholdEmissive = new Nodes.OperatorNode(
 							borderColor,
 							thresholdBorder,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
 						// APPLY
 
 						mtl.color = color;
 						mtl.emissive = thresholdEmissive;
-						mtl.mask = new THREE.CondNode(
+						mtl.mask = new Nodes.CondNode(
 							texArea, // a: value
 							threshold, // b: value
-							THREE.CondNode.GREATER // condition
+							Nodes.CondNode.GREATER // condition
 						);
 
 						// GUI
@@ -1397,89 +1378,89 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var color = new THREE.ColorNode( 0xEEEEEE );
-						var fireStartColor = new THREE.ColorNode( 0xF7CA78 );
-						var fireEndColor = new THREE.ColorNode( 0xFF0000 );
-						var burnedColor = new THREE.ColorNode( 0x000000 );
-						var threshold = new THREE.FloatNode( .1 );
-						var fireSize = new THREE.FloatNode( .16 );
-						var burnedSize = new THREE.FloatNode( .5 );
-						var timer = new THREE.TimerNode( 0.8 );
+						var color = new Nodes.ColorNode( 0xEEEEEE );
+						var fireStartColor = new Nodes.ColorNode( 0xF7CA78 );
+						var fireEndColor = new Nodes.ColorNode( 0xFF0000 );
+						var burnedColor = new Nodes.ColorNode( 0x000000 );
+						var threshold = new Nodes.FloatNode( .1 );
+						var fireSize = new Nodes.FloatNode( .16 );
+						var burnedSize = new Nodes.FloatNode( .5 );
+						var timer = new Nodes.TimerNode( 0.8 );
 
-						var sinCycleInSecs = new THREE.OperatorNode(
+						var sinCycleInSecs = new Nodes.OperatorNode(
 							timer,
-							new THREE.ConstNode( THREE.ConstNode.PI2 ),
-							THREE.OperatorNode.MUL
+							new Nodes.ConstNode( Nodes.ConstNode.PI2 ),
+							Nodes.OperatorNode.MUL
 						);
 
-						var cycle = new THREE.Math1Node( sinCycleInSecs, THREE.Math1Node.SIN );
+						var cycle = new Nodes.MathNode( sinCycleInSecs, Nodes.MathNode.SIN );
 
 						// round sin to 0 at 1
-						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( 1 ), THREE.OperatorNode.ADD );
-						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( 2 ), THREE.OperatorNode.DIV );
+						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( 1 ), Nodes.OperatorNode.ADD );
+						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( 2 ), Nodes.OperatorNode.DIV );
 
 						// offset to +.9
-						cycle = new THREE.OperatorNode( cycle, new THREE.FloatNode( .9 ), THREE.OperatorNode.ADD );
+						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( .9 ), Nodes.OperatorNode.ADD );
 
-						var tex = new THREE.TextureNode( getTexture( "cloud" ) );
-						var texArea = new THREE.SwitchNode( tex, 'w' );
+						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
+						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
-						var thresholdBorder = new THREE.Math3Node(
-							new THREE.OperatorNode( threshold, fireSize, THREE.OperatorNode.ADD ),
+						var thresholdBorder = new Nodes.MathNode(
+							new Nodes.OperatorNode( threshold, fireSize, Nodes.OperatorNode.ADD ),
 							threshold,
 							texArea,
-							THREE.Math3Node.SMOOTHSTEP
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var fireStartAnimatedColor = new THREE.ColorAdjustmentNode(
+						var fireStartAnimatedColor = new Nodes.ColorAdjustmentNode(
 							fireStartColor,
 							cycle,
-							THREE.ColorAdjustmentNode.SATURATION
+							Nodes.ColorAdjustmentNode.SATURATION
 						);
 
-						var fireEndAnimatedColor = new THREE.ColorAdjustmentNode(
+						var fireEndAnimatedColor = new Nodes.ColorAdjustmentNode(
 							fireEndColor,
 							cycle,
-							THREE.ColorAdjustmentNode.SATURATION
+							Nodes.ColorAdjustmentNode.SATURATION
 						);
 
-						var fireColor = new THREE.Math3Node(
+						var fireColor = new Nodes.MathNode(
 							fireEndAnimatedColor,
 							fireStartAnimatedColor,
 							thresholdBorder,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var thresholdBurnedBorder = new THREE.Math3Node(
-							new THREE.OperatorNode( threshold, burnedSize, THREE.OperatorNode.ADD ),
+						var thresholdBurnedBorder = new Nodes.MathNode(
+							new Nodes.OperatorNode( threshold, burnedSize, Nodes.OperatorNode.ADD ),
 							threshold,
 							texArea,
-							THREE.Math3Node.SMOOTHSTEP
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var fireEmissive = new THREE.OperatorNode(
+						var fireEmissive = new Nodes.OperatorNode(
 							fireColor,
 							thresholdBorder,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var burnedResultColor = new THREE.Math3Node(
+						var burnedResultColor = new Nodes.MathNode(
 							color,
 							burnedColor,
 							thresholdBurnedBorder,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						// APPLY
 
 						mtl.color = burnedResultColor;
 						mtl.emissive = fireEmissive;
-						mtl.mask = new THREE.CondNode(
+						mtl.mask = new Nodes.CondNode(
 							texArea, // a: value
 							threshold, // b: value
-							THREE.CondNode.GREATER // condition
+							Nodes.CondNode.GREATER // condition
 						);
 
 						// GUI
@@ -1538,47 +1519,47 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
 						defaultSide = THREE.FrontSide;
 
-						var time = new THREE.TimerNode();
-						var uv = new THREE.UVNode();
+						var time = new Nodes.TimerNode();
+						var uv = new Nodes.UVNode();
 
-						var timeSpeedA = new THREE.OperatorNode(
+						var timeSpeedA = new Nodes.OperatorNode(
 							time,
-							new THREE.Vector2Node( 0.3, 0.1 ),
-							THREE.OperatorNode.MUL
+							new Nodes.Vector2Node( 0.3, 0.1 ),
+							Nodes.OperatorNode.MUL
 						);
 
-						var timeSpeedB = new THREE.OperatorNode(
+						var timeSpeedB = new Nodes.OperatorNode(
 							time,
-							new THREE.Vector2Node( 0.15, 0.4 ),
-							THREE.OperatorNode.MUL
+							new Nodes.Vector2Node( 0.15, 0.4 ),
+							Nodes.OperatorNode.MUL
 						);
 
-						var uvOffsetA = new THREE.OperatorNode(
+						var uvOffsetA = new Nodes.OperatorNode(
 							timeSpeedA,
 							uv,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var uvOffsetB = new THREE.OperatorNode(
+						var uvOffsetB = new Nodes.OperatorNode(
 							timeSpeedB,
 							uv,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var cloudA = new THREE.TextureNode( getTexture( "cloud" ), uvOffsetA );
-						var cloudB = new THREE.TextureNode( getTexture( "cloud" ), uvOffsetB );
+						var cloudA = new Nodes.TextureNode( getTexture( "cloud" ), uvOffsetA );
+						var cloudB = new Nodes.TextureNode( getTexture( "cloud" ), uvOffsetB );
 
-						var clouds = new THREE.OperatorNode(
+						var clouds = new Nodes.OperatorNode(
 							cloudA,
 							cloudB,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						mtl.environment = new THREE.ColorNode( 0xFFFFFF );
+						mtl.environment = new Nodes.ColorNode( 0xFFFFFF );
 						mtl.alpha = clouds;
 
 						// GUI
@@ -1595,21 +1576,21 @@
 
 						// MATERIAL
 
-						var colorA = new THREE.ColorNode( 0xFFFFFF );
-						var colorB = new THREE.ColorNode( 0x0054df );
+						var colorA = new Nodes.ColorNode( 0xFFFFFF );
+						var colorB = new Nodes.ColorNode( 0x0054df );
 
-						var depth = new THREE.CameraNode( THREE.CameraNode.DEPTH );
+						var depth = new Nodes.CameraNode( Nodes.CameraNode.DEPTH );
 						depth.near.value = 1;
 						depth.far.value = 200;
 
-						var colors = new THREE.Math3Node(
+						var colors = new Nodes.MathNode(
 							colorB,
 							colorA,
 							depth,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color = colors;
 
 						// GUI
@@ -1644,15 +1625,15 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var hash2 = new THREE.FunctionNode( [
+						var hash2 = new Nodes.FunctionNode( [
 							"vec2 hash2(vec2 p) {",
 							"	return fract(sin(vec2(dot(p, vec2(123.4, 748.6)), dot(p, vec2(547.3, 659.3))))*5232.85324);",
 							"}"
 						].join( "\n" ) );
 
-						var voronoi = new THREE.FunctionNode( [
+						var voronoi = new Nodes.FunctionNode( [
 							// Based off of iq's described here: http://www.iquilezles.org/www/articles/voronoili
 							"float voronoi(vec2 p, in float time) {",
 							"	vec2 n = floor(p);",
@@ -1676,7 +1657,7 @@
 							"}"
 						].join( "\n" ), [ hash2 ] ); // define hash2 as dependencies
 
-						var voronoiLayers = new THREE.FunctionNode( [
+						var voronoiLayers = new Nodes.FunctionNode( [
 							// based on https://www.shadertoy.com/view/4tXSDf
 							"float voronoiLayers(vec2 p, in float time) {",
 							"	float v = 0.0;",
@@ -1690,77 +1671,77 @@
 							"}"
 						].join( "\n" ), [ voronoi ] ); // define voronoi as dependencies
 
-						var time = new THREE.TimerNode();
-						var timeScale = new THREE.FloatNode( 2 );
+						var time = new Nodes.TimerNode();
+						var timeScale = new Nodes.FloatNode( 2 );
 
 						// used for serialization only
 						time.name = "time";
 						timeScale.name = "speed";
 
-						var alpha = new THREE.FloatNode( 1 );
-						var scale = new THREE.FloatNode( .1 );
-						var intensity = new THREE.FloatNode( 1.5 );
+						var alpha = new Nodes.FloatNode( 1 );
+						var scale = new Nodes.FloatNode( .1 );
+						var intensity = new Nodes.FloatNode( 1.5 );
 
-						var color = new THREE.ColorNode( 0xFFFFFF );
-						var colorA = new THREE.ColorNode( 0xFFFFFF );
-						var colorB = new THREE.ColorNode( 0x0054df );
+						var color = new Nodes.ColorNode( 0xFFFFFF );
+						var colorA = new Nodes.ColorNode( 0xFFFFFF );
+						var colorB = new Nodes.ColorNode( 0x0054df );
 
-						var worldPos = new THREE.PositionNode( THREE.PositionNode.WORLD );
-						var worldPosTop = new THREE.SwitchNode( worldPos, 'xz' );
+						var worldPos = new Nodes.PositionNode( Nodes.PositionNode.WORLD );
+						var worldPosTop = new Nodes.SwitchNode( worldPos, 'xz' );
 
-						var worldNormal = new THREE.NormalNode( THREE.NormalNode.WORLD );
+						var worldNormal = new Nodes.NormalNode( Nodes.NormalNode.WORLD );
 
-						var mask = new THREE.SwitchNode( worldNormal, 'y' );
+						var mask = new Nodes.SwitchNode( worldNormal, 'y' );
 
 						// clamp0at1
-						mask = new THREE.Math1Node( mask, THREE.Math1Node.SATURATE );
+						mask = new Nodes.MathNode( mask, Nodes.MathNode.SATURATE );
 
-						var timeOffset = new THREE.OperatorNode(
+						var timeOffset = new Nodes.OperatorNode(
 							time,
 							timeScale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var uvPos = new THREE.OperatorNode(
+						var uvPos = new Nodes.OperatorNode(
 							worldPosTop,
 							scale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var voronoi = new THREE.FunctionCallNode( voronoiLayers );
+						var voronoi = new Nodes.FunctionCallNode( voronoiLayers );
 						voronoi.inputs.p = uvPos;
 						voronoi.inputs.time = timeOffset;
 
-						var maskCaustic = new THREE.OperatorNode(
+						var maskCaustic = new Nodes.OperatorNode(
 							alpha,
 							mask,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var voronoiIntensity = new THREE.OperatorNode(
+						var voronoiIntensity = new Nodes.OperatorNode(
 							voronoi,
 							intensity,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var voronoiColors = new THREE.Math3Node(
+						var voronoiColors = new Nodes.MathNode(
 							colorB,
 							colorA,
-							new THREE.Math1Node( voronoiIntensity, THREE.Math1Node.SATURATE ), // mix needs clamp
-							THREE.Math3Node.MIX
+							new Nodes.MathNode( voronoiIntensity, Nodes.MathNode.SATURATE ), // mix needs clamp
+							Nodes.MathNode.MIX
 						);
 
-						var caustic = new THREE.Math3Node(
+						var caustic = new Nodes.MathNode(
 							color,
 							voronoiColors,
 							maskCaustic,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
-						var causticLights = new THREE.OperatorNode(
+						var causticLights = new Nodes.OperatorNode(
 							voronoiIntensity,
 							maskCaustic,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
 						mtl.color = caustic;
@@ -1818,46 +1799,46 @@
 
 						move = true;
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var scale = new THREE.FloatNode( 2 );
-						var colorA = new THREE.ColorNode( 0xFF6633 );
-						var colorB = new THREE.ColorNode( 0x3366FF );
+						var scale = new Nodes.FloatNode( 2 );
+						var colorA = new Nodes.ColorNode( 0xFF6633 );
+						var colorB = new Nodes.ColorNode( 0x3366FF );
 
-						var pos = new THREE.PositionNode();
-						var posNorm = new THREE.Math1Node( pos, THREE.Math1Node.NORMALIZE );
+						var pos = new Nodes.PositionNode();
+						var posNorm = new Nodes.MathNode( pos, Nodes.MathNode.NORMALIZE );
 
-						var mask = new THREE.SwitchNode( posNorm, 'y' );
+						var mask = new Nodes.SwitchNode( posNorm, 'y' );
 
-						var velocity = new THREE.VelocityNode( mesh, {
+						var velocity = new Nodes.VelocityNode( mesh, {
 							type: 'elastic',
 							spring: .95,
 							damping: .95
 						} );
 
-						var velocityArea = new THREE.OperatorNode(
+						var velocityArea = new Nodes.OperatorNode(
 							mask,
 							scale,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var softVelocity = new THREE.OperatorNode(
+						var softVelocity = new Nodes.OperatorNode(
 							velocity,
 							velocityArea,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var softPosition = new THREE.OperatorNode(
-							new THREE.PositionNode(),
+						var softPosition = new Nodes.OperatorNode(
+							new Nodes.PositionNode(),
 							softVelocity,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
-						var colors = new THREE.Math3Node(
+						var colors = new Nodes.MathNode(
 							colorB,
 							colorA,
 							mask,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						mtl.color = colors;
@@ -1901,40 +1882,40 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var color = new THREE.ColorNode( 0x8D8677 );
-						var mildness = new THREE.FloatNode( 1.6 );
-						var fur = new THREE.FloatNode( .5 );
+						var color = new Nodes.ColorNode( 0x8D8677 );
+						var mildness = new Nodes.FloatNode( 1.6 );
+						var fur = new Nodes.FloatNode( .5 );
 
-						var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
-						var norDirection = new THREE.Math1Node( new THREE.NormalNode(), THREE.Math1Node.NORMALIZE );
+						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode(), Nodes.MathNode.NORMALIZE );
 
-						var viewZ = new THREE.Math2Node(
+						var viewZ = new Nodes.MathNode(
 							posDirection,
 							norDirection,
-							THREE.Math2Node.DOT
+							Nodes.MathNode.DOT
 						);
 
 						// without luma correction for now
-						var mildnessColor = new THREE.OperatorNode(
+						var mildnessColor = new Nodes.OperatorNode(
 							color,
 							mildness,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var furScale = new THREE.OperatorNode(
+						var furScale = new Nodes.OperatorNode(
 							viewZ,
 							fur,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
 						mtl.color = color;
-						mtl.normal = new THREE.NormalMapNode( new THREE.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = furScale;
 						mtl.environment = mildnessColor;
-						mtl.environmentAlpha = new THREE.Math1Node( viewZ, THREE.Math1Node.INVERT );
-						mtl.shininess = new THREE.FloatNode( 0 );
+						mtl.environmentAlpha = new Nodes.MathNode( viewZ, Nodes.MathNode.INVERT );
+						mtl.shininess = new Nodes.FloatNode( 0 );
 
 						// GUI
 
@@ -1963,44 +1944,44 @@
 
 						// MATERIAL
 
-						mtl = name == 'skin' ? new THREE.StandardNodeMaterial() : new THREE.PhongNodeMaterial();
+						mtl = name == 'skin' ? new Nodes.StandardNodeMaterial() : new Nodes.PhongNodeMaterial();
 
-						var skinColor = new THREE.ColorNode( 0xFFC495 );
-						var bloodColor = new THREE.ColorNode( 0x6b0602 );
-						var wrapLight = new THREE.FloatNode( 1.5 );
-						var wrapShadow = new THREE.FloatNode( 0 );
+						var skinColor = new Nodes.ColorNode( 0xFFC495 );
+						var bloodColor = new Nodes.ColorNode( 0x6b0602 );
+						var wrapLight = new Nodes.FloatNode( 1.5 );
+						var wrapShadow = new Nodes.FloatNode( 0 );
 
-						var directLight = new THREE.LightNode();
+						var directLight = new Nodes.LightNode();
 
-						var lightLuminance = new THREE.LuminanceNode( directLight );
+						var lightLuminance = new Nodes.LuminanceNode( directLight );
 
-						var lightWrap = new THREE.Math3Node(
+						var lightWrap = new Nodes.MathNode(
 							wrapShadow,
 							wrapLight,
 							lightLuminance,
-							THREE.Math3Node.SMOOTHSTEP
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var lightTransition = new THREE.OperatorNode(
+						var lightTransition = new Nodes.OperatorNode(
 							lightWrap,
-							new THREE.ConstNode( THREE.ConstNode.PI2 ),
-							THREE.OperatorNode.MUL
+							new Nodes.ConstNode( Nodes.ConstNode.PI2 ),
+							Nodes.OperatorNode.MUL
 						);
 
-						var wrappedLight = new THREE.Math1Node( lightTransition, THREE.Math1Node.SIN );
+						var wrappedLight = new Nodes.MathNode( lightTransition, Nodes.MathNode.SIN );
 
-						var wrappedLightColor = new THREE.OperatorNode(
+						var wrappedLightColor = new Nodes.OperatorNode(
 							wrappedLight,
 							bloodColor,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var bloodArea = new THREE.Math1Node( wrappedLightColor, THREE.Math1Node.SATURATE );
+						var bloodArea = new Nodes.MathNode( wrappedLightColor, Nodes.MathNode.SATURATE );
 
-						var totalLight = new THREE.OperatorNode(
+						var totalLight = new Nodes.OperatorNode(
 							directLight,
 							bloodArea,
-							THREE.OperatorNode.ADD
+							Nodes.OperatorNode.ADD
 						);
 
 						mtl.color = skinColor;
@@ -2010,19 +1991,19 @@
 
 							// StandardNodeMaterial
 
-							mtl.metalness = new THREE.FloatNode( 0 );
-							mtl.roughness = new THREE.FloatNode( 1 );
-							mtl.reflectivity = new THREE.FloatNode( 0 );
-							mtl.clearCoat = new THREE.FloatNode( .2 );
-							mtl.clearCoatRoughness = new THREE.FloatNode( .3 );
-							mtl.environment = new THREE.CubeTextureNode( cubemap );
+							mtl.metalness = new Nodes.FloatNode( 0 );
+							mtl.roughness = new Nodes.FloatNode( 1 );
+							mtl.reflectivity = new Nodes.FloatNode( 0 );
+							mtl.clearCoat = new Nodes.FloatNode( .2 );
+							mtl.clearCoatRoughness = new Nodes.FloatNode( .3 );
+							mtl.environment = new Nodes.CubeTextureNode( cubemap );
 
 						} else {
 
 							// PhongNodeMaterial
 
-							mtl.specular = new THREE.ColorNode( 0x2f2e2d );
-							mtl.shininess = new THREE.FloatNode( 15 );
+							mtl.specular = new Nodes.ColorNode( 0x2f2e2d );
+							mtl.shininess = new Nodes.FloatNode( 15 );
 
 						}
 
@@ -2058,73 +2039,73 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var count = new THREE.FloatNode( 3.43 );
-						var sceneDirectLight = new THREE.LightNode();
-						var color = new THREE.ColorNode( 0xAABBFF );
+						var count = new Nodes.FloatNode( 3.43 );
+						var sceneDirectLight = new Nodes.LightNode();
+						var color = new Nodes.ColorNode( 0xAABBFF );
 
-						var lineColor = new THREE.ColorNode( 0xFF0000 );
-						var lineSize = new THREE.FloatNode( 0.23 );
-						var lineInner = new THREE.FloatNode( 0 );
+						var lineColor = new Nodes.ColorNode( 0xFF0000 );
+						var lineSize = new Nodes.FloatNode( 0.23 );
+						var lineInner = new Nodes.FloatNode( 0 );
 
 						// CEL
 
-						var lightLuminance = new THREE.LuminanceNode( sceneDirectLight );
+						var lightLuminance = new Nodes.LuminanceNode( sceneDirectLight );
 
-						var preCelLight = new THREE.OperatorNode(
+						var preCelLight = new Nodes.OperatorNode(
 							lightLuminance,
 							count,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var celLight = new THREE.Math1Node(
+						var celLight = new Nodes.MathNode(
 							preCelLight,
-							THREE.Math1Node.CEIL
+							Nodes.MathNode.CEIL
 						);
 
-						var posCelLight = new THREE.OperatorNode(
+						var posCelLight = new Nodes.OperatorNode(
 							celLight,
 							count,
-							THREE.OperatorNode.DIV
+							Nodes.OperatorNode.DIV
 						);
 
 						// LINE
 
-						var posDirection = new THREE.Math1Node( new THREE.PositionNode( THREE.PositionNode.VIEW ), THREE.Math1Node.NORMALIZE );
-						var norDirection = new THREE.Math1Node( new THREE.NormalNode(), THREE.Math1Node.NORMALIZE );
+						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode(), Nodes.MathNode.NORMALIZE );
 
-						var viewZ = new THREE.Math2Node(
+						var viewZ = new Nodes.MathNode(
 							posDirection,
 							norDirection,
-							THREE.Math2Node.DOT
+							Nodes.MathNode.DOT
 						);
 
-						var lineOutside = new THREE.Math1Node(
+						var lineOutside = new Nodes.MathNode(
 							viewZ,
-							THREE.Math1Node.ABS
+							Nodes.MathNode.ABS
 						);
 
-						var line = new THREE.OperatorNode(
+						var line = new Nodes.OperatorNode(
 							lineOutside,
-							new THREE.FloatNode( 1 ),
-							THREE.OperatorNode.DIV
+							new Nodes.FloatNode( 1 ),
+							Nodes.OperatorNode.DIV
 						);
 
-						var lineScaled = new THREE.Math3Node(
+						var lineScaled = new Nodes.MathNode(
 							line,
 							lineSize,
 							lineInner,
-							THREE.Math3Node.SMOOTHSTEP
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var innerContour = new THREE.Math1Node( new THREE.Math1Node( lineScaled, THREE.Math1Node.SATURATE ), THREE.Math1Node.INVERT );
+						var innerContour = new Nodes.MathNode( new Nodes.MathNode( lineScaled, Nodes.MathNode.SATURATE ), Nodes.MathNode.INVERT );
 
 						// APPLY
 
 						mtl.color = color;
 						mtl.light = posCelLight;
-						mtl.shininess = new THREE.FloatNode( 0 );
+						mtl.shininess = new Nodes.FloatNode( 0 );
 
 						mtl.environment = lineColor;
 						mtl.environmentAlpha = innerContour;
@@ -2163,7 +2144,7 @@
 
 						addGui( 'ignoreIndirectLight', false, function ( val ) {
 
-							mtl.ao = val ? new THREE.FloatNode() : undefined;
+							mtl.ao = val ? new Nodes.FloatNode() : undefined;
 
 							mtl.needsUpdate = true;
 
@@ -2180,13 +2161,13 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						mtl.color = new THREE.AttributeNode( "custom", 3 );
+						mtl.color = new Nodes.AttributeNode( "custom", 3 );
 
 						// or
 
-						//mtl.color = new THREE.AttributeNode( "custom", "vec3" );
+						//mtl.color = new Nodes.AttributeNode( "custom", "vec3" );
 
 						break;
 
@@ -2194,20 +2175,23 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var speed = new THREE.FloatNode( .5 );
+						var speed = new Nodes.FloatNode( .5 );
 
-						mtl.color = new THREE.ExpressionNode( "myCustomUv + (sin(time*speed)*.5) + (position * .05)", "vec3" );
-						mtl.color.keywords[ "speed" ] = speed;
+						var myspeed = new Nodes.ExpressionNode( "speed * time", "float" );
+						myspeed.keywords[ "speed" ] = speed;
 
-						mtl.position = new THREE.ExpressionNode( "mod(time*speed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(time*speed*1.0))*3.0) : position + sin( position.x * sin(time*speed*2.0))", "vec3" );
-						mtl.position.keywords[ "speed" ] = speed;
+						mtl.color = new Nodes.ExpressionNode( "myCustomUv + (sin(myspeed)*.5) + (position * .05)", "vec3" );
+						mtl.color.keywords[ "myspeed" ] = myspeed;
+
+						mtl.position = new Nodes.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
+						mtl.position.keywords[ "myspeed" ] = myspeed;
 
 						// add global keyword ( variable or const )
-						THREE.NodeLib.addKeyword( 'myCustomUv', function () {
+						Nodes.NodeLib.addKeyword( 'myCustomUv', function () {
 
-							return new THREE.ReflectNode();
+							return new Nodes.ReflectNode();
 
 						} );
 
@@ -2225,9 +2209,9 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var keywordsexample = new THREE.FunctionNode( [
+						var keywordsexample = new Nodes.FunctionNode( [
 							// use "uv" reserved keyword
 							"vec4 keywordsexample( sampler2D texture ) {",
 							"	return texture2D( texture, myUV ) + vec4( position * myAlpha, 0.0 );",
@@ -2235,26 +2219,26 @@
 						].join( "\n" ) );
 
 						// add local keyword ( const only )
-						keywordsexample.keywords[ "myAlpha" ] = new THREE.ConstNode( "float myAlpha .05" );
+						keywordsexample.keywords[ "myAlpha" ] = new Nodes.ConstNode( "float myAlpha .05" );
 
 						// add global keyword ( const only )
-						THREE.NodeLib.addKeyword( 'myUV', function () {
+						Nodes.NodeLib.addKeyword( 'myUV', function () {
 
-							return new THREE.UVNode();
+							return new Nodes.UVNode();
 
 						} );
 
 						// add global const or function
-						//THREE.NodeLib.add( new THREE.ConstNode("float MY_CONST .05") )
+						//Nodes.NodeLib.add( new Nodes.ConstNode("float MY_CONST .05") )
 
 						// reserved keywords
 
-						console.log( THREE.NodeLib.keywords );
+						console.log( Nodes.NodeLib.keywords );
 
 						// keywords conflit? use this to disable:
 						//blurtexture.useKeywords = false; // ( true is default )
 
-						mtl.color = new THREE.FunctionCallNode( keywordsexample, [ new THREE.TextureNode( getTexture( "brick" ) ) ] );
+						mtl.color = new Nodes.FunctionCallNode( keywordsexample, [ new Nodes.TextureNode( getTexture( "brick" ) ) ] );
 
 						break;
 
@@ -2262,17 +2246,17 @@
 
 						// MATERIAL
 
-						var node = new THREE.PositionNode();
+						var node = new Nodes.PositionNode();
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color = node;
 
 						// GUI
 
 						addGui( 'scope', {
-							local: THREE.PositionNode.LOCAL,
-							world: THREE.PositionNode.WORLD,
-							view: THREE.PositionNode.VIEW
+							local: Nodes.PositionNode.LOCAL,
+							world: Nodes.PositionNode.WORLD,
+							view: Nodes.PositionNode.VIEW
 						}, function ( val ) {
 
 							node.scope = val;
@@ -2287,17 +2271,16 @@
 
 						// MATERIAL
 
-						var node = new THREE.NormalNode();
+						var node = new Nodes.NormalNode();
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color = node;
 
 						// GUI
 
 						addGui( 'scope', {
-							local: THREE.NormalNode.LOCAL,
-							world: THREE.NormalNode.WORLD,
-							view: THREE.NormalNode.VIEW
+							local: Nodes.NormalNode.LOCAL,
+							world: Nodes.NormalNode.WORLD
 						}, function ( val ) {
 
 							node.scope = val;
@@ -2308,25 +2291,51 @@
 
 						break;
 
+					case 'node-reflect':
+
+						// MATERIAL
+
+						var node = new Nodes.ReflectNode();
+
+						mtl = new Nodes.PhongNodeMaterial();
+						mtl.environment = new Nodes.CubeTextureNode( cubemap, node );
+
+						// GUI
+
+						addGui( 'scope', {
+							vector: Nodes.ReflectNode.VECTOR,
+							cube: Nodes.ReflectNode.CUBE,
+							sphere: Nodes.ReflectNode.SPHERE
+						}, function ( val ) {
+
+							node.scope = val;
+
+							mtl.needsUpdate = true;
+
+						} );
+
+						break;
+
+
 					case 'varying':
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var varying = new THREE.VarNode( "vec3" );
-						varying.value = new THREE.NormalNode( THREE.NormalNode.VIEW );
+						var varying = new Nodes.VarNode( "vec3" );
+						varying.value = new Nodes.NormalNode( Nodes.NormalNode.VIEW );
 
 						// using BypassNode the NormalNode not apply the value in .position slot
 						// but set the NormalNode value in VarNode
 						// it can be useful to send values between vertex to fragment shader
 						// without affect vertex shader
-						mtl.position = new THREE.BypassNode( varying );
+						mtl.position = new Nodes.BypassNode( varying );
 						mtl.color = varying;
 
 						// you can also set a independent value in .position slot using BypassNode
 						// such this expression using ExpressionNode
-						mtl.position.value = new THREE.ExpressionNode( "position * ( .1 + abs( sin( time ) ) )", "vec3" );
+						mtl.position.value = new Nodes.ExpressionNode( "position * ( .1 + abs( sin( time ) ) )", "vec3" );
 
 						break;
 
@@ -2334,13 +2343,13 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var varying = new THREE.VarNode( "vec3" );
+						var varying = new Nodes.VarNode( "vec3" );
 
 						// VERTEX
 
-						var setMyVar = new THREE.FunctionNode( [
+						var setMyVar = new Nodes.FunctionNode( [
 							"void setMyVar( vec3 pos ) {",
 							// set "myVar" in vertex shader in this example,
 							// can be used in fragment shader too or in rest of the current shader
@@ -2352,16 +2361,16 @@
 						// add keyword
 						setMyVar.keywords[ "myVar" ] = varying;
 
-						var position = new THREE.ExpressionNode( "setMyVar( position * .1 )", "vec3" );
+						var position = new Nodes.ExpressionNode( "setMyVar( position * .1 )", "vec3" );
 						position.includes = [ setMyVar ];
-						position.keywords[ "tex" ] = new THREE.TextureNode( getTexture( "brick" ) );
+						position.keywords[ "tex" ] = new Nodes.TextureNode( getTexture( "brick" ) );
 
 						// use BypassNode to "void" functions
-						mtl.position = new THREE.BypassNode( position );
+						mtl.position = new Nodes.BypassNode( position );
 
 						// FRAGMENT
 
-						var clipFromPos = new THREE.FunctionNode( [
+						var clipFromPos = new Nodes.FunctionNode( [
 							"void clipFromPos( vec3 pos ) {",
 
 							"	if ( pos.y < .0 ) discard;",
@@ -2369,11 +2378,11 @@
 							"}"
 						].join( "\n" ) );
 
-						var clipFromPosCall = new THREE.FunctionCallNode( clipFromPos, {
+						var clipFromPosCall = new Nodes.FunctionCallNode( clipFromPos, {
 							pos: varying
 						} );
 
-						mtl.color = new THREE.BypassNode( clipFromPosCall, varying );
+						mtl.color = new Nodes.BypassNode( clipFromPosCall, varying );
 
 						break;
 
@@ -2381,14 +2390,14 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var a = new THREE.FloatNode( 0 ),
-							b = new THREE.FloatNode( 0 ),
-							ifNode = new THREE.ColorNode( 0x0000FF ),
-							elseNode = new THREE.ColorNode( 0xFF0000 );
+						var a = new Nodes.FloatNode( 0 ),
+							b = new Nodes.FloatNode( 0 ),
+							ifNode = new Nodes.ColorNode( 0x0000FF ),
+							elseNode = new Nodes.ColorNode( 0xFF0000 );
 
-						var cond = new THREE.CondNode( a, b, THREE.CondNode.EQUAL, ifNode, elseNode );
+						var cond = new Nodes.CondNode( a, b, Nodes.CondNode.EQUAL, ifNode, elseNode );
 
 						mtl.color = cond;
 
@@ -2407,12 +2416,12 @@
 						}, false, 0, 1 );
 
 						addGui( 'a condition b', {
-							EQUAL: THREE.CondNode.EQUAL,
-							NOT_EQUAL: THREE.CondNode.NOT_EQUAL,
-							GREATER: THREE.CondNode.GREATER,
-							GREATER_EQUAL: THREE.CondNode.GREATER_EQUAL,
-							LESS: THREE.CondNode.LESS,
-							LESS_EQUAL: THREE.CondNode.LESS_EQUAL
+							EQUAL: Nodes.CondNode.EQUAL,
+							NOT_EQUAL: Nodes.CondNode.NOT_EQUAL,
+							GREATER: Nodes.CondNode.GREATER,
+							GREATER_EQUAL: Nodes.CondNode.GREATER_EQUAL,
+							LESS: Nodes.CondNode.LESS,
+							LESS_EQUAL: Nodes.CondNode.LESS_EQUAL
 						}, function ( val ) {
 
 							cond.op = val;
@@ -2439,15 +2448,15 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var uvTransform = new THREE.UVTransformNode(),
-							checker = new THREE.CheckerNode( uvTransform );
+						var uvTransform = new Nodes.UVTransformNode(),
+							checker = new Nodes.CheckerNode( uvTransform );
 
 						uvTransform.setUvTransform( 0, 0, 2, 2, 0 );
 
-						var rtt = new THREE.RTTNode( 512, 512, checker ),
-							bumpMap = new THREE.BumpMapNode( rtt );
+						var rtt = new Nodes.RTTNode( 512, 512, checker ),
+							bumpMap = new Nodes.BumpMapNode( rtt );
 
 						bumpMap.scale.value = .1;
 
@@ -2470,7 +2479,7 @@
 
 						addGui( 'ignoreColor', false, function ( val ) {
 
-							mtl.color = val ? new THREE.ColorNode( 0xFFFFFF ) : checker;
+							mtl.color = val ? new Nodes.ColorNode( 0xFFFFFF ) : checker;
 
 							mtl.needsUpdate = true;
 
@@ -2482,25 +2491,25 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var texture = new THREE.TextureNode( getTexture( "brick" ) );
+						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var rttStore = new THREE.RTTNode( 512, 512, texture );
-						var blur = new THREE.BlurNode( rttStore );
+						var rttStore = new Nodes.RTTNode( 512, 512, texture );
+						var blur = new Nodes.BlurNode( rttStore );
 
-						var timer = new THREE.TimerNode( .01, THREE.TimerNode.LOCAL );
+						var timer = new Nodes.TimerNode( .01, Nodes.TimerNode.LOCAL );
 
-						var color = new THREE.Math3Node(
+						var color = new Nodes.MathNode(
 							rttStore,
 							blur,
-							new THREE.FloatNode( .6 ),
-							THREE.Math3Node.MIX
+							new Nodes.FloatNode( .6 ),
+							Nodes.MathNode.MIX
 						);
 
 						blur.horizontal = blur.vertical = timer;
 
-						var rttSave = new THREE.RTTNode( 512, 512, color );
+						var rttSave = new Nodes.RTTNode( 512, 512, color );
 						rttSave.saveTo = rttStore;
 
 						mtl.color = rttSave;
@@ -2525,16 +2534,16 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
 						// not use "uniform" input ( for optimization )
 						// instead use explicit declaration, for example:
 						// vec3( 1.0, 1.0, 1.0 ) instead "uniform vec3"
 						// if readonly is true not allow change the value after build the shader material
 
-						mtl.color = new THREE.ColorNode( 0xFFFFFF ).setReadonly( true );
-						mtl.specular = new THREE.FloatNode( .5 ).setReadonly( true );
-						mtl.shininess = new THREE.FloatNode( 15 ).setReadonly( true );
+						mtl.color = new Nodes.ColorNode( 0xFFFFFF ).setReadonly( true );
+						mtl.specular = new Nodes.FloatNode( .5 ).setReadonly( true );
+						mtl.shininess = new Nodes.FloatNode( 15 ).setReadonly( true );
 
 						break;
 
@@ -2542,20 +2551,20 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
 						// label can be useful for finding the nodes as variables in debug level
 						// but this always force the creation of a variable
 						// same as the code can be writed in the same line (inline)
 						// for optimization this is not recommended
 
-						var colorInput = new THREE.ColorNode( 0xFFFFFF ).setLabel( "colorInput" );
-						var specularInput = new THREE.FloatNode( .5 ).setLabel( "specularInput" );
+						var colorInput = new Nodes.ColorNode( 0xFFFFFF ).setLabel( "colorInput" );
+						var specularInput = new Nodes.FloatNode( .5 ).setLabel( "specularInput" );
 
-						var colorMix = new THREE.OperatorNode(
+						var colorMix = new Nodes.OperatorNode(
 							colorInput,
-							new THREE.ColorNode( 0x6495ED ).setReadonly( true ),
-							THREE.OperatorNode.MUL
+							new Nodes.ColorNode( 0x6495ED ).setReadonly( true ),
+							Nodes.OperatorNode.MUL
 						).setLabel( "colorMix" );
 
 						mtl.color = colorMix;
@@ -2564,10 +2573,10 @@
 						// default: without use label
 						// this is optimized writed the code in a single line (inline)
 						// for the reason that this node is used only once in this shader program
-						mtl.shininess = new THREE.OperatorNode(
-							new THREE.FloatNode( 10 ).setReadonly( true ),
-							new THREE.FloatNode( 5 ).setReadonly( true ),
-							THREE.OperatorNode.ADD
+						mtl.shininess = new Nodes.OperatorNode(
+							new Nodes.FloatNode( 10 ).setReadonly( true ),
+							new Nodes.FloatNode( 5 ).setReadonly( true ),
+							Nodes.OperatorNode.ADD
 						);
 
 						mtl.build();
@@ -2583,12 +2592,12 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var delta = new THREE.Vector2Node( .5, .25 );
-						var alpha = new THREE.FloatNode( 1 );
+						var delta = new Nodes.Vector2Node( .5, .25 );
+						var alpha = new Nodes.FloatNode( 1 );
 
-						var blurtexture = new THREE.FunctionNode( [
+						var blurtexture = new Nodes.FunctionNode( [
 							// Reference: TriangleBlurShader.js
 							"vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta) {",
 							"	vec4 color = vec4( 0.0 );",
@@ -2603,19 +2612,19 @@
 							"	}",
 							"	return color / total;",
 							"}"
-						].join( "\n" ), [ new THREE.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
+						].join( "\n" ), [ new Nodes.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
 
-						var blurredTexture = new THREE.FunctionCallNode( blurtexture, {
-							texture: new THREE.TextureNode( getTexture( "brick" ) ),
+						var blurredTexture = new Nodes.FunctionCallNode( blurtexture, {
+							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
 							delta: delta,
-							uv: new THREE.UVNode()
+							uv: new Nodes.UVNode()
 						} );
 
-						var color = new THREE.Math3Node(
-							new THREE.TextureNode( getTexture( "brick" ) ),
+						var color = new Nodes.MathNode(
+							new Nodes.TextureNode( getTexture( "brick" ) ),
 							blurredTexture,
 							alpha,
-							THREE.Math3Node.MIX
+							Nodes.MathNode.MIX
 						);
 
 						mtl.color = color;
@@ -2646,11 +2655,11 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var scale = new THREE.FloatNode( .02 );
+						var scale = new Nodes.FloatNode( .02 );
 
-						var triplanarMapping = new THREE.FunctionNode( [
+						var triplanarMapping = new Nodes.FunctionNode( [
 							// Reference: https://github.com/keijiro/StandardTriplanar
 							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
 
@@ -2673,10 +2682,10 @@
 							"}"
 						].join( "\n" ) );
 
-						var triplanarMappingTexture = new THREE.FunctionCallNode( triplanarMapping, {
-							texture: new THREE.TextureNode( getTexture( "brick" ) ),
-							normal: new THREE.NormalNode( THREE.NormalNode.WORLD ),
-							position: new THREE.PositionNode( THREE.PositionNode.WORLD ),
+						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
+							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
+							normal: new Nodes.NormalNode( Nodes.NormalNode.WORLD ),
+							position: new Nodes.PositionNode( Nodes.PositionNode.WORLD ),
 							scale: scale,
 						} );
 
@@ -2696,36 +2705,36 @@
 
 						// MATERIAL
 
-						mtl = new THREE.PhongNodeMaterial();
+						mtl = new Nodes.PhongNodeMaterial();
 
-						var time = new THREE.TimerNode();
-						var speed = new THREE.FloatNode( .5 );
+						var time = new Nodes.TimerNode();
+						var speed = new Nodes.FloatNode( .5 );
 
-						var color = new THREE.ColorNode( 0x98ff00 );
+						var color = new Nodes.ColorNode( 0x98ff00 );
 
-						var timeSpeed = new THREE.OperatorNode(
+						var timeSpeed = new Nodes.OperatorNode(
 							time,
 							speed,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var sinCycleInSecs = new THREE.OperatorNode(
+						var sinCycleInSecs = new Nodes.OperatorNode(
 							timeSpeed,
-							new THREE.ConstNode( THREE.ConstNode.PI2 ),
-							THREE.OperatorNode.MUL
+							new Nodes.ConstNode( Nodes.ConstNode.PI2 ),
+							Nodes.OperatorNode.MUL
 						);
 
-						var cycle = new THREE.Math1Node( sinCycleInSecs, THREE.Math1Node.SIN );
+						var cycle = new Nodes.MathNode( sinCycleInSecs, Nodes.MathNode.SIN );
 
-						var cycleColor = new THREE.OperatorNode(
+						var cycleColor = new Nodes.OperatorNode(
 							cycle,
 							color,
-							THREE.OperatorNode.MUL
+							Nodes.OperatorNode.MUL
 						);
 
-						var cos = new THREE.Math1Node( cycleColor, THREE.Math1Node.SIN );
+						var cos = new Nodes.MathNode( cycleColor, Nodes.MathNode.SIN );
 
-						mtl.color = new THREE.ColorNode( 0 );
+						mtl.color = new Nodes.ColorNode( 0 );
 						mtl.emissive = cos;
 
 						// GUI
@@ -2743,36 +2752,36 @@
 
 						// DISTANCE FORMULA
 
-						var modelPos = new THREE.Vector3Node();
+						var modelPos = new Nodes.Vector3Node();
 
-						var viewPos = new THREE.PositionNode( THREE.PositionNode.VIEW );
-						var cameraPosition = new THREE.CameraNode( THREE.CameraNode.POSITION );
+						var viewPos = new Nodes.PositionNode( Nodes.PositionNode.VIEW );
+						var cameraPosition = new Nodes.CameraNode( Nodes.CameraNode.POSITION );
 
-						var cameraDistance = new THREE.Math2Node(
+						var cameraDistance = new Nodes.MathNode(
 							modelPos,
 							cameraPosition,
-							THREE.Math2Node.DISTANCE
+							Nodes.MathNode.DISTANCE
 						);
 
-						var viewPosZ = new THREE.SwitchNode( viewPos, 'z' );
+						var viewPosZ = new Nodes.SwitchNode( viewPos, 'z' );
 
-						var distance = new THREE.OperatorNode(
+						var distance = new Nodes.OperatorNode(
 							cameraDistance,
 							viewPosZ,
-							THREE.OperatorNode.SUB
+							Nodes.OperatorNode.SUB
 						);
 
-						var distanceRadius = new THREE.OperatorNode(
+						var distanceRadius = new Nodes.OperatorNode(
 							distance,
-							new THREE.FloatNode( 70 ),
-							THREE.OperatorNode.ADD
+							new Nodes.FloatNode( 70 ),
+							Nodes.OperatorNode.ADD
 						);
 
-						var objectDepth = new THREE.Math3Node(
+						var objectDepth = new Nodes.MathNode(
 							distanceRadius,
-							new THREE.FloatNode( 0 ),
-							new THREE.FloatNode( 50 ),
-							THREE.Math3Node.SMOOTHSTEP
+							new Nodes.FloatNode( 0 ),
+							new Nodes.FloatNode( 50 ),
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
 						// RTT ( get back distance )
@@ -2781,7 +2790,7 @@
 
 						library[ rtTexture.texture.uuid ] = rtTexture.texture;
 
-						var distanceMtl = new THREE.PhongNodeMaterial();
+						var distanceMtl = new Nodes.PhongNodeMaterial();
 						distanceMtl.environment = objectDepth;
 						distanceMtl.side = THREE.BackSide;
 
@@ -2789,79 +2798,79 @@
 
 						// MATERIAL
 
-						mtl = new THREE.StandardNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var backSideDepth = new THREE.TextureNode( rtTexture.texture, new THREE.ScreenUVNode() );
+						var backSideDepth = new Nodes.TextureNode( rtTexture.texture, new Nodes.ScreenUVNode() );
 
-						var difference = new THREE.OperatorNode(
+						var difference = new Nodes.OperatorNode(
 							objectDepth,
 							backSideDepth,
-							THREE.OperatorNode.SUB
+							Nodes.OperatorNode.SUB
 						);
 
-						var sss = new THREE.Math3Node(
-							new THREE.FloatNode( - .1 ),
-							new THREE.FloatNode( .5 ),
+						var sss = new Nodes.MathNode(
+							new Nodes.FloatNode( - .1 ),
+							new Nodes.FloatNode( .5 ),
 							difference,
-							THREE.Math3Node.SMOOTHSTEP
+							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var sssAlpha = new THREE.Math1Node( sss, THREE.Math1Node.SATURATE );
+						var sssAlpha = new Nodes.MathNode( sss, Nodes.MathNode.SATURATE );
 
 						var frontColor, backColor;
 
 						if ( name == 'sss' ) {
 
-							var sssOut = new THREE.Math2Node(
+							var sssOut = new Nodes.MathNode(
 								objectDepth,
 								sssAlpha,
-								THREE.Math2Node.MIN
+								Nodes.MathNode.MIN
 							);
 
-							frontColor = new THREE.ColorNode( 0xd4cfbb );
-							backColor = new THREE.ColorNode( 0xd04327 );
+							frontColor = new Nodes.ColorNode( 0xd4cfbb );
+							backColor = new Nodes.ColorNode( 0xd04327 );
 
-							var color = new THREE.Math3Node(
+							var color = new Nodes.MathNode(
 								backColor,
 								frontColor,
 								sssOut,
-								THREE.Math3Node.MIX
+								Nodes.MathNode.MIX
 							);
 
-							var light = new THREE.OperatorNode(
-								new THREE.LightNode(),
+							var light = new Nodes.OperatorNode(
+								new Nodes.LightNode(),
 								color,
-								THREE.OperatorNode.ADD
+								Nodes.OperatorNode.ADD
 							);
 
 							mtl.color = frontColor;
-							mtl.roughness = new THREE.FloatNode( .1 );
-							mtl.metalness = new THREE.FloatNode( .5 );
+							mtl.roughness = new Nodes.FloatNode( .1 );
+							mtl.metalness = new Nodes.FloatNode( .5 );
 
 							mtl.light = light;
 							mtl.environment = color;
 
 						} else {
 
-							frontColor = new THREE.ColorNode( 0xd04327 );
-							backColor = new THREE.ColorNode( 0x1a0e14 );
+							frontColor = new Nodes.ColorNode( 0xd04327 );
+							backColor = new Nodes.ColorNode( 0x1a0e14 );
 
-							var color = new THREE.Math3Node(
+							var color = new Nodes.MathNode(
 								frontColor,
 								backColor,
 								sssAlpha,
-								THREE.Math3Node.MIX
+								Nodes.MathNode.MIX
 							);
 
-							var light = new THREE.OperatorNode(
-								new THREE.LightNode(),
+							var light = new Nodes.OperatorNode(
+								new Nodes.LightNode(),
 								color,
-								THREE.OperatorNode.ADD
+								Nodes.OperatorNode.ADD
 							);
 
-							mtl.color = new THREE.ColorNode( 0xffffff );
-							mtl.roughness = new THREE.FloatNode( .1 );
-							mtl.metalness = new THREE.FloatNode( .5 );
+							mtl.color = new Nodes.ColorNode( 0xffffff );
+							mtl.roughness = new Nodes.FloatNode( .1 );
+							mtl.metalness = new Nodes.FloatNode( .5 );
 
 							mtl.light = light;
 							mtl.environment = color;
@@ -2941,7 +2950,7 @@
 
 				var cloud = getTexture( "cloud" );
 
-				THREE.NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
+				NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
 
 				library[ "cloud" ] = cloud;
 
@@ -2951,7 +2960,7 @@
 
 				console.log( jsonStr );
 
-				var loader = new THREE.NodeMaterialLoader( null, library ),
+				var loader = new NodeMaterialLoader( null, library ),
 					material = loader.parse( json );
 
 				mesh.material.dispose();
@@ -2990,9 +2999,9 @@
 
 				// update material animation and/or gpu calcs (pre-renderer)
 
-				frame.update( delta ).setRenderer( renderer );
+				frame.setRenderer( renderer ).update( delta );
 
-				if ( mesh.material instanceof THREE.NodeMaterial ) {
+				if ( mesh.material instanceof Nodes.NodeMaterial ) {
 
 					frame.updateNode( mesh.material );
 

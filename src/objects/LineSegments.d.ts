@@ -13,12 +13,14 @@ export const LineStrip: number;
 export const LinePieces: number;
 
 export class LineSegments extends Line {
-  constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[],
-    mode?: number
-  );
 
-  type: 'LineSegments';
-  isLineSegments: true;
+	constructor(
+		geometry?: Geometry | BufferGeometry,
+		material?: Material | Material[],
+		mode?: number
+	);
+
+	type: 'LineSegments';
+	isLineSegments: true;
+
 }

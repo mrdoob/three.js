@@ -4,61 +4,28 @@
 		<title>three.js webgl - exporter - collada</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #fff;
-			}
-
-			a { color: blue; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
-			<button onclick="exportCollada()">Export COLLADA</button>
+			<button id="export">Export COLLADA</button>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-
-		<script src="js/exporters/ColladaExporter.js"></script>
-
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
 			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, dat, window */
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			/*global window */
 
 			var camera, scene, renderer;
 			var cameraControls;
@@ -114,11 +81,11 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
 
@@ -210,7 +177,7 @@
 
 				var h;
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				// material (attributes)
 
@@ -257,6 +224,9 @@
 				// shading
 
 				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
+
+				var exportButton = document.getElementById( 'export' );
+				exportButton.addEventListener( 'click', exportCollada );
 
 			}
 
@@ -344,7 +314,7 @@
 
 				}
 
-				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
@@ -364,23 +334,30 @@
 
 			}
 
-			var exporter = new THREE.ColladaExporter();
+			var exporter = new ColladaExporter();
 
 			function exportCollada() {
 
 				var result = exporter.parse( teapot );
 				var material_type = "Phong";
 				if ( shading === "wireframe" ) {
-					material_type = "Constant"
+
+					material_type = "Constant";
+
 				}
 				if ( shading === "smooth" ) {
-					material_type = "Lambert"
+
+					material_type = "Lambert";
+
 				}
 
 				saveString( result.data, 'teapot_' + shading + "_" + material_type + '.dae' );
+
 				result.textures.forEach( tex => {
+
 					saveArrayBuffer( tex.data, `${ tex.name }.${ tex.ext }` );
-				});
+
+				} );
 
 			}
 

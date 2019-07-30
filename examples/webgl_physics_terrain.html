@@ -4,46 +4,26 @@
 		<title>Ammo.js terrain heightfield demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #333;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a { color: #a06851; }
-
 		</style>
 	</head>
 	<body>
-		<div id="container"><br /><br /><br /><br /><br />Loading...</div>
+		<div id="container"></div>
 		<div id="info">Ammo.js physics terrain heightfield demo</div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// Heightfield parameters
 			var terrainWidthExtents = 100;
@@ -78,7 +58,7 @@
 			var timeNextSpawn = time + objectTimePeriod;
 			var maxNumObjects = 30;
 
-			Ammo().then( function( AmmoLib ) {
+			Ammo().then( function ( AmmoLib ) {
 
 				Ammo = AmmoLib;
 
@@ -100,7 +80,6 @@
 			function initGraphics() {
 
 				container = document.getElementById( 'container' );
-				container.innerHTML = '';
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -123,7 +102,7 @@
 				camera.position.z = terrainDepthExtents / 2;
 				camera.lookAt( 0, 0, 0 );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );

@@ -113,6 +113,7 @@
 		- [page:Boolean floatVertexTextures]: *true* if [page:Boolean floatFragmentTextures] and [page:Boolean vertexTextures] are both true.<br />
 		- [page:Method getMaxAnisotropy](): Returns the maximum available anisotropy.<br />
 		- [page:Method getMaxPrecision](): Returns the maximum available precision for vertex and fragment shaders. <br />
+		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
 		- [page:Boolean logarithmicDepthBuffer]: *true* if the [page:parameter logarithmicDepthBuffer] was set to true in the constructor and
 		the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.
 			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 around 66% of WebGL enabled devices support this.<br />
@@ -140,16 +141,6 @@
 		User-defined clipping planes specified as THREE.Plane objects in world space.
 			These planes apply globally. Points in space whose dot product with the plane is negative are cut away.
 		 Default is [].
-		</p>
-
-		<h3>[property:WebGLRenderingContext context]</h3>
-		<p>
-		The renderer obtains a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext] context
-		  from its [page:WebGLRenderer.domElement domElement] by default, using
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext HTMLCanvasElement.getContext]().<br /><br />
-
-		You can create this manually, however it must correspond to the
-		[page:WebGLRenderer.domElement domElement] in order to render to the screen.
 		</p>
 
 		<h3>[property:DOMElement domElement]</h3>
@@ -257,7 +248,7 @@
 
 		<h3>[property:Integer shadowMap.type]</h3>
 		<p>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</p>
-		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap. See [page:Renderer Renderer constants] for details.</p>
+		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default) and THREE.PCFSoftShadowMap. See [page:Renderer Renderer constants] for details.</p>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>
@@ -350,6 +341,12 @@
 		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
 		<p>Returns an object that describes the attributes set on the WebGL context when it was created.</p>
 
+		<h3>[method:Integer getActiveCubeFace]()</h3>
+		<p>Returns the current active cube face.</p>
+
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
+		<p>Returns the current active mipmap level.</p>
+
 		<h3>[method:RenderTarget getRenderTarget]()</h3>
 		<p>Returns the current [page:RenderTarget RenderTarget] if there are; returns *null* otherwise.</p>
 
@@ -439,11 +436,11 @@
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
 
-		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipMapLevel] )</h3>
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
 		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
 		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
-		activeMipMapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
 		This method sets the active rendertarget.
 		</p>
 

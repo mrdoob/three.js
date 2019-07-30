@@ -1,56 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lights - light probe</title>
+		<title>three.js webgl - light probe</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			a {
-				color: #ffa;
-				font-weight: bold;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 0; /* to not conflict with dat.gui */
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl lights - light probe
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/lights/LightProbeGenerator.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
 
 			var mesh, renderer, scene, camera;
 
@@ -77,7 +46,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				// tone mapping
-				//renderer.toneMapping = THREE.LinearToneMapping;
+				//renderer.toneMapping = LinearToneMapping;
 			 	//renderer.toneMappingExposure = API.exposure;
 
 				// gamma
@@ -92,7 +61,7 @@
 				camera.position.set( 0, 0, 30 );
 
 				// controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;
@@ -126,10 +95,10 @@
 
 					scene.background = cubeTexture;
 
-					lightProbe.copy( THREE.LightProbeGenerator.fromCubeTexture( cubeTexture ) );
-					console.log(lightProbe );
+					lightProbe.copy( LightProbeGenerator.fromCubeTexture( cubeTexture ) );
+
 					var geometry = new THREE.SphereBufferGeometry( 5, 64, 32 );
-					//var geometry = new THREE.TorusKnotBufferGeometry( 4, 1.5, 256, 32, 2, 3 );
+					//var geometry = new TorusKnotBufferGeometry( 4, 1.5, 256, 32, 2, 3 );
 
 					var material = new THREE.MeshStandardMaterial( {
 						color: 0xffffff,
@@ -149,7 +118,7 @@
 
 
 				// gui
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.width = 300;
 
@@ -158,16 +127,28 @@
 				var fl = gui.addFolder( 'Intensity' );
 
 				fl.add( API, 'lightProbeIntensity', 0, 1, 0.02 )
-					.name( 'light probe')
-					.onChange( function() { lightProbe.intensity = API.lightProbeIntensity; render(); } );
+					.name( 'light probe' )
+					.onChange( function () {
+
+						lightProbe.intensity = API.lightProbeIntensity; render();
+
+					} );
 
 				fl.add( API, 'directionalLightIntensity', 0, 1, 0.02 )
-					.name( 'directional light')
-					.onChange( function() { directionalLight.intensity = API.directionalLightIntensity; render(); } );
+					.name( 'directional light' )
+					.onChange( function () {
+
+						directionalLight.intensity = API.directionalLightIntensity; render();
+
+					} );
 
 				fl.add( API, 'envMapIntensity', 0, 1, 0.02 )
-					.name( 'envMap')
-					.onChange( function() { mesh.material.envMapIntensity = API.envMapIntensity; render(); } );
+					.name( 'envMap' )
+					.onChange( function () {
+
+						mesh.material.envMapIntensity = API.envMapIntensity; render();
+
+					} );
 
 				fl.open();
 
