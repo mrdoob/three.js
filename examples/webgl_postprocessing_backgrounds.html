@@ -110,6 +110,7 @@
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
+				renderer.gammaOutput = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -188,6 +189,7 @@
 					console.log( "loaded ldr envmap" );
 
 				} );
+				ldrCubeMap.encoding = THREE.sRGBEncoding;
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
