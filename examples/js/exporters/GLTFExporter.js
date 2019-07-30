@@ -895,7 +895,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isShaderMaterial ) {
+			if ( material.isShaderMaterial && !material.isGLTFSpecularGlossinessMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
@@ -964,6 +964,36 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			if ( material.isGLTFSpecularGlossinessMaterial ) {
+
+				var specularExtensionName = "KHR_materials_pbrSpecularGlossiness";
+				var specularMapDef = material.specularMap ? { index: processTexture( material.specularMap ) } : undefined;
+				var diffuseMapDef = material.map ? { index: processTexture( material.map ) } : undefined;
+				if ( material.specularMap ) {
+					
+					applyTextureTransform( specularMapDef, material.specularMap );
+			
+				}
+			
+				// alpha default is 1, rgb will be overridden
+				var diffuseFactor = [ 1, 1, 1, 1 ];
+				material.color.toArray( diffuseFactor, 0 );
+				// same story for specularFactor
+				var specularFactor = [ 1, 1, 1 ];
+				material.specular.toArray( specularFactor, 0 );
+			
+				gltfMaterial.extensions = {};
+				gltfMaterial.extensions[ specularExtensionName ] = {
+					"diffuseFactor": diffuseFactor,
+					"diffuseTexture": diffuseMapDef,
+					"specularFactor": specularFactor,
+					"glossinessFactor": material.glossiness,
+					"specularGlossinessTexture": specularMapDef
+				};
+				extensionsUsed[ specularExtensionName ] = true;
+			
+			}
+
 			// pbrMetallicRoughness.baseColorTexture
 			if ( material.map ) {
 
@@ -1004,7 +1034,7 @@ THREE.GLTFExporter.prototype = {
 
 				var normalMapDef = { index: processTexture( material.normalMap ) };
 
-				if ( material.normalScale.x !== - 1 ) {
+				if ( material.normalScale && material.normalScale.x !== - 1 ) {
 
 					if ( material.normalScale.x !== material.normalScale.y ) {
 
