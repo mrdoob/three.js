@@ -31,54 +31,46 @@
 			animate();
 
 			// load custmized cube texture
-			async function loadCubeTexture( path, imageWidth ) {
+			async function loadCubeTextureWithMipmaps() {
 
-				//fetch data
-				var response = await fetch( path );
-				var arrayBuffer = await response.arrayBuffer();
+				var path = 'textures/cube/angus/';
+				var format = '.jpg';
+				var mipmaps = [];
 
-				var cubeTextures = [];
-				var byteOffset = 0;
-				const maxLevel = Math.log( imageWidth ) / Math.LN2;
-
-				for ( var level = 0; level <= maxLevel; ++ level ) {
-
-					var size = Math.pow( 2, maxLevel - level );
-					var imageByteLength = size * size * 4;
-					var textures = [];
-					
-					if ( byteOffset >= arrayBuffer.byteLength ) {
-
-						break;
-
-					}
-
-					for ( var face = 0; face < 6; ++ face ) {
-
-						var imageData = new Uint8Array( arrayBuffer, byteOffset, imageByteLength );
-						var texture = new THREE.DataTexture( imageData, size, size, THREE.RGBAFormat, THREE.UnsignedByteType );
-						textures.push( texture );
-						byteOffset += imageByteLength;
-					}
-
-					var levelCubeTexture = new THREE.CubeTexture( textures );
-					cubeTextures.push( levelCubeTexture );
+				async function loadCubeTexture( urls ) {
+					return new Promise( function( resolve, reject) {
+						new THREE.CubeTextureLoader().load( urls, function( cubeTexture ) {
+							resolve( cubeTexture );
+						} );
+					} );
 				}
 
-				var customizedCubeTexture = cubeTextures[0];
+				//load mipmaps
+				var pendings = [];
+				for ( var level = 0; level < 9; ++ level ) {
+
+					var urls = [];
+					for ( var face = 0; face < 6; ++ face ) {
+						urls.push( path + 'cube_m0' + level + '_c0' + face + format );
+					}
+
+					pendings.push( loadCubeTexture( urls ).then( function( cubeTexture ) {
+
+						mipmaps.push( cubeTexture );
+
+					} ) );
+
+				}
+
+				await Promise.all( pendings );
+
+				var customizedCubeTexture = mipmaps.shift();
+				customizedCubeTexture.mipmaps = mipmaps;
 				customizedCubeTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				customizedCubeTexture.magFilter = THREE.LinearFilter;
-				customizedCubeTexture.format = THREE.RGBAFormat;
-				customizedCubeTexture.encoding = THREE.LogLuvEncoding;
-
-				if ( cubeTextures.length > 0 ) {
-
-					customizedCubeTexture.mipmaps = cubeTextures;
-					customizedCubeTexture.generateMipmaps = false;
-
-				}
-
+				customizedCubeTexture.generateMipmaps = false;
 				customizedCubeTexture.needsUpdate = true;
+	
 				return customizedCubeTexture;
 
 			}
@@ -100,7 +92,7 @@
 				scene.add( ambient );
 
 				var pendings = [];
-				loadCubeTexture( 'textures/cube/angus/specular_cubemap_256_luv.bin', 256 ).then( function ( reflectCubeTexture ) {
+				var reflectCubeTexture = loadCubeTextureWithMipmaps().then( function( reflectCubeTexture ) {
 
 					//rewrite mipmaps
 					var originalCubeTexture = reflectCubeTexture.clone();
@@ -141,7 +133,6 @@
 
 				//controls
 				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableZoom = false;
 				controls.minPolarAngle = Math.PI / 4;
 				controls.maxPolarAngle = Math.PI / 1.5;
 
