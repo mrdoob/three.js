@@ -15,6 +15,42 @@ function Vector4( x, y, z, w ) {
 
 }
 
+Object.defineProperties( Vector4.prototype, {
+
+	"width": {
+
+		get: function () {
+
+			return this.z;
+
+		},
+
+		set: function ( value ) {
+
+			this.z = value;
+
+		}
+
+	},
+
+	"height": {
+
+		get: function () {
+
+			return this.w;
+
+		},
+
+		set: function ( value ) {
+
+			this.w = value;
+
+		}
+
+	}
+
+} );
+
 Object.assign( Vector4.prototype, {
 
 	isVector4: true,
@@ -435,27 +471,16 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: function ( minVal, maxVal ) {
 
-		var min, max;
+		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
+		this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
+		this.w = Math.max( minVal, Math.min( maxVal, this.w ) );
 
-		return function clampScalar( minVal, maxVal ) {
+		return this;
 
-			if ( min === undefined ) {
-
-				min = new Vector4();
-				max = new Vector4();
-
-			}
-
-			min.set( minVal, minVal, minVal, minVal );
-			max.set( maxVal, maxVal, maxVal, maxVal );
-
-			return this.clamp( min, max );
-
-		};
-
-	}(),
+	},
 
 	clampLength: function ( min, max ) {
 

@@ -8,7 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:ExtrudeBufferGeometry] &rarr;
+		[page:BufferGeometry] &rarr; [page:ExtrudeBufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
@@ -55,6 +55,7 @@
 				bevelEnabled: true,
 				bevelThickness: 10,
 				bevelSize: 8,
+				bevelOffset: 0,
 				bevelSegments: 5
 			} );
 		} );
@@ -74,6 +75,7 @@
 			<li>bevelEnabled — Boolean. Turn on bevel. Default is False.</li>
 			<li>bevelThickness — Float. How deep into text bevel goes. Default is 10.</li>
 			<li>bevelSize — Float. How far from text outline is bevel. Default is 8.</li>
+			<li>bevelOffset — Float. How far from text outline bevel starts. Default is 0.</li>
 			<li>bevelSegments — Integer. Number of bevel segments. Default is 3.</li>
 		</ul>
 		</p>
@@ -154,11 +156,15 @@
 		</table>
 
 		<h2>Properties</h2>
+		<p>See the base [page:ExtrudeBufferGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:ExtrudeBufferGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

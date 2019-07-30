@@ -4,51 +4,27 @@
 		<title>three.js webgl - geometry - text</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq
-		<br/>type to enter new text, drag to spin the text
-		<br/><span class="button" id="color">change color</span>,
-			<span class="button" id="font">change font</span>,
-			<span class="button" id="weight">change weight</span>,
-			<span class="button" id="bevel">change bevel</span>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
+			type to enter new text, drag to spin the text<br/>
+			<button id="color">change color</button>
+			<button id="font">change font</button>
+			<button id="weight">change weight</button>
+			<button id="bevel">change bevel</button><br/>
 			<a id="permalink" href="#">permalink</a>
 		</div>
 
+		<script type="module">
 
-		<script src="../build/three.js"></script>
-		<script src="js/utils/GeometryUtils.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			THREE.Cache.enabled = true;
 
@@ -405,7 +381,7 @@
 							var vb = textGeo.vertices[ face.b ];
 							var vc = textGeo.vertices[ face.c ];
 
-							var s = THREE.GeometryUtils.triangleArea( va, vb, vc );
+							var s = GeometryUtils.triangleArea( va, vb, vc );
 
 							if ( s > triangleAreaHeuristics ) {
 

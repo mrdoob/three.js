@@ -1,16 +1,20 @@
-// r103
+// r106
 
 const staticAssets = [
 	'./',
 
+	'../files/favicon.ico',
+
 	'../build/three.js',
-	'../examples/js/libs/system.min.js',
 
 	'../examples/js/controls/EditorControls.js',
 	'../examples/js/controls/TransformControls.js',
 
+	'../examples/js/libs/chevrotain.min.js',
 	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/inflate.min.js',
+	'../examples/js/libs/lzma.js',
+	'../examples/js/libs/ctm.js',
 
 	'../examples/js/loaders/AMFLoader.js',
 	'../examples/js/loaders/AWDLoader.js',
@@ -32,8 +36,6 @@ const staticAssets = [
 	'../examples/js/loaders/TDSLoader.js',
 	'../examples/js/loaders/VRMLLoader.js',
 	'../examples/js/loaders/VTKLoader.js',
-	'../examples/js/loaders/ctm/lzma.js',
-	'../examples/js/loaders/ctm/ctm.js',
 	'../examples/js/loaders/ctm/CTMLoader.js',
 
 	'../examples/js/exporters/ColladaExporter.js',
@@ -53,6 +55,7 @@ const staticAssets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
+	'./js/libs/system.min.js',
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
 	'./js/libs/glslprep.min.js',
@@ -125,9 +128,14 @@ const staticAssets = [
 	'./js/Sidebar.Geometry.BoxGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
+	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
+	'./js/Sidebar.Geometry.OctahedronGeometry.js',
 	'./js/Sidebar.Geometry.PlaneGeometry.js',
+	'./js/Sidebar.Geometry.RingGeometry.js',
 	'./js/Sidebar.Geometry.SphereGeometry.js',
+	'./js/Sidebar.Geometry.ShapeGeometry.js',
+	'./js/Sidebar.Geometry.TetrahedronGeometry.js',
 	'./js/Sidebar.Geometry.TorusGeometry.js',
 	'./js/Sidebar.Geometry.TorusKnotGeometry.js',
 	'./js/Sidebar.Geometry.TubeGeometry.js',
@@ -141,6 +149,7 @@ const staticAssets = [
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
+	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
 
 	'./js/Command.js',

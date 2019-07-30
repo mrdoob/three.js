@@ -4,28 +4,20 @@
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/DotScreenShader.js"></script>
-		<script src="js/shaders/RGBShiftShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 
-
-		<script>
+			import { RGBShiftShader } from './jsm/shaders/RGBShiftShader.js';
+			import { DotScreenShader } from './jsm/shaders/DotScreenShader.js';
 
 			var camera, scene, renderer, composer;
 			var object, light;
@@ -73,14 +65,14 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				var effect = new THREE.ShaderPass( THREE.DotScreenShader );
+				var effect = new ShaderPass( DotScreenShader );
 				effect.uniforms[ 'scale' ].value = 4;
 				composer.addPass( effect );
 
-				var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
+				var effect = new ShaderPass( RGBShiftShader );
 				effect.uniforms[ 'amount' ].value = 0.0015;
 				composer.addPass( effect );
 

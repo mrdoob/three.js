@@ -1,11 +1,285 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author yomboprime / https://github.com/yomboprime/
+ * @author gkjohnson / https://github.com/gkjohnson/
  *
  *
  */
 
 THREE.LDrawLoader = ( function () {
+
+	var conditionalLineVertShader = /* glsl */`
+	attribute vec3 control0;
+	attribute vec3 control1;
+	attribute vec3 direction;
+	varying float discardFlag;
+
+	#include <common>
+	#include <color_pars_vertex>
+	#include <fog_pars_vertex>
+	#include <logdepthbuf_pars_vertex>
+	#include <clipping_planes_pars_vertex>
+	void main() {
+		#include <color_vertex>
+
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+
+		// Transform the line segment ends and control points into camera clip space
+		vec4 c0 = projectionMatrix * modelViewMatrix * vec4( control0, 1.0 );
+		vec4 c1 = projectionMatrix * modelViewMatrix * vec4( control1, 1.0 );
+		vec4 p0 = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		vec4 p1 = projectionMatrix * modelViewMatrix * vec4( position + direction, 1.0 );
+
+		c0.xy /= c0.w;
+		c1.xy /= c1.w;
+		p0.xy /= p0.w;
+		p1.xy /= p1.w;
+
+		// Get the direction of the segment and an orthogonal vector
+		vec2 dir = p1.xy - p0.xy;
+		vec2 norm = vec2( -dir.y, dir.x );
+
+		// Get control point directions from the line
+		vec2 c0dir = c0.xy - p1.xy;
+		vec2 c1dir = c1.xy - p1.xy;
+
+		// If the vectors to the controls points are pointed in different directions away
+		// from the line segment then the line should not be drawn.
+		float d0 = dot( normalize( norm ), normalize( c0dir ) );
+		float d1 = dot( normalize( norm ), normalize( c1dir ) );
+		discardFlag = float( sign( d0 ) != sign( d1 ) );
+
+		#include <logdepthbuf_vertex>
+		#include <clipping_planes_vertex>
+		#include <fog_vertex>
+	}
+	`;
+
+	var conditionalLineFragShader = /* glsl */`
+	uniform vec3 diffuse;
+	uniform float opacity;
+	varying float discardFlag;
+
+	#include <common>
+	#include <color_pars_fragment>
+	#include <fog_pars_fragment>
+	#include <logdepthbuf_pars_fragment>
+	#include <clipping_planes_pars_fragment>
+	void main() {
+
+		if ( discardFlag > 0.5 ) discard;
+
+		#include <clipping_planes_fragment>
+		vec3 outgoingLight = vec3( 0.0 );
+		vec4 diffuseColor = vec4( diffuse, opacity );
+		#include <logdepthbuf_fragment>
+		#include <color_fragment>
+		outgoingLight = diffuseColor.rgb; // simple shader
+		gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+		#include <premultiplied_alpha_fragment>
+		#include <tonemapping_fragment>
+		#include <encodings_fragment>
+		#include <fog_fragment>
+	}
+	`;
+
+
+
+	var tempVec0 = new THREE.Vector3();
+	var tempVec1 = new THREE.Vector3();
+	function smoothNormals( triangles, lineSegments ) {
+
+		function hashVertex( v ) {
+
+			// NOTE: 1e2 is pretty coarse but was chosen because it allows edges
+			// to be smoothed as expected (see minifig arms). The errors between edges
+			// could be due to matrix multiplication.
+			var x = ~ ~ ( v.x * 1e2 );
+			var y = ~ ~ ( v.y * 1e2 );
+			var z = ~ ~ ( v.z * 1e2 );
+			return `${ x },${ y },${ z }`;
+
+		}
+
+		function hashEdge( v0, v1 ) {
+
+			return `${ hashVertex( v0 ) }_${ hashVertex( v1 ) }`;
+
+		}
+
+		var hardEdges = new Set();
+		var halfEdgeList = {};
+		var fullHalfEdgeList = {};
+		var normals = [];
+
+		// Save the list of hard edges by hash
+		for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+			var ls = lineSegments[ i ];
+			var v0 = ls.v0;
+			var v1 = ls.v1;
+			hardEdges.add( hashEdge( v0, v1 ) );
+			hardEdges.add( hashEdge( v1, v0 ) );
+
+		}
+
+		// track the half edges associated with each triangle
+		for ( var i = 0, l = triangles.length; i < l; i ++ ) {
+
+			var tri = triangles[ i ];
+			for ( var i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+
+				var index = i2;
+				var next = ( i2 + 1 ) % 3;
+				var v0 = tri[ `v${ index }` ];
+				var v1 = tri[ `v${ next }` ];
+				var hash = hashEdge( v0, v1 );
+
+				// don't add the triangle if the edge is supposed to be hard
+				if ( hardEdges.has( hash ) ) continue;
+				halfEdgeList[ hash ] = tri;
+				fullHalfEdgeList[ hash ] = tri;
+
+			}
+
+		}
+
+		// NOTE: Some of the normals wind up being skewed in an unexpected way because
+		// quads provide more "influence" to some vertex normals than a triangle due to
+		// the fact that a quad is made up of two triangles and all triangles are weighted
+		// equally. To fix this quads could be tracked separately so their vertex normals
+		// are weighted appropriately or we could try only adding a normal direction
+		// once per normal.
+
+		// Iterate until we've tried to connect all triangles to share normals
+		while ( true ) {
+
+			// Stop if there are no more triangles left
+			var halfEdges = Object.keys( halfEdgeList );
+			if ( halfEdges.length === 0 ) break;
+
+			// Exhaustively find all connected triangles
+			var i = 0;
+			var queue = [ fullHalfEdgeList[ halfEdges[ 0 ] ] ];
+			while ( i < queue.length ) {
+
+				// initialize all vertex normals in this triangle
+				var tri = queue[ i ];
+				i ++;
+
+				var faceNormal = tri.faceNormal;
+				if ( tri.n0 === null ) {
+
+					tri.n0 = faceNormal.clone();
+					normals.push( tri.n0 );
+
+				}
+
+				if ( tri.n1 === null ) {
+
+					tri.n1 = faceNormal.clone();
+					normals.push( tri.n1 );
+
+				}
+
+				if ( tri.n2 === null ) {
+
+					tri.n2 = faceNormal.clone();
+					normals.push( tri.n2 );
+
+				}
+
+				// Check if any edge is connected to another triangle edge
+				for ( var i2 = 0, l2 = 3; i2 < l2; i2 ++ ) {
+
+					var index = i2;
+					var next = ( i2 + 1 ) % 3;
+					var v0 = tri[ `v${ index }` ];
+					var v1 = tri[ `v${ next }` ];
+
+					// delete this triangle from the list so it won't be found again
+					var hash = hashEdge( v0, v1 );
+					delete halfEdgeList[ hash ];
+
+					var reverseHash = hashEdge( v1, v0 );
+					var otherTri = fullHalfEdgeList[ reverseHash ];
+					if ( otherTri ) {
+
+						// NOTE: If the angle between triangles is > 67.5 degrees then assume it's
+						// hard edge. There are some cases where the line segments do not line up exactly
+						// with or span multiple triangle edges (see Lunar Vehicle wheels).
+						if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
+
+							continue;
+
+						}
+
+						// if this triangle has already been traversed then it won't be in
+						// the halfEdgeList. If it has not then add it to the queue and delete
+						// it so it won't be found again.
+						if ( reverseHash in halfEdgeList ) {
+
+							queue.push( otherTri );
+							delete halfEdgeList[ reverseHash ];
+
+						}
+
+						// Find the matching edge in this triangle and copy the normal vector over
+						for ( var i3 = 0, l3 = 3; i3 < l3; i3 ++ ) {
+
+							var otherIndex = i3;
+							var otherNext = ( i3 + 1 ) % 3;
+							var otherV0 = otherTri[ `v${ otherIndex }` ];
+							var otherV1 = otherTri[ `v${ otherNext }` ];
+
+							var otherHash = hashEdge( otherV0, otherV1 );
+							if ( otherHash === reverseHash ) {
+
+								if ( otherTri[ `n${ otherIndex }` ] === null ) {
+
+									var norm = tri[ `n${ next }` ];
+									otherTri[ `n${ otherIndex }` ] = norm;
+									norm.add( otherTri.faceNormal );
+
+								}
+
+								if ( otherTri[ `n${ otherNext }` ] === null ) {
+
+									var norm = tri[ `n${ index }` ];
+									otherTri[ `n${ otherNext }` ] = norm;
+									norm.add( otherTri.faceNormal );
+
+								}
+
+								break;
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		// The normals of each face have been added up so now we average them by normalizing the vector.
+		for ( var i = 0, l = normals.length; i < l; i ++ ) {
+
+			normals[ i ].normalize();
+
+		}
+
+	}
+
+	function isPrimitiveType( type ) {
+
+		return /primitive/i.test( type ) || type === 'Subpart';
+
+	}
 
 	function LineParser( line, lineNumber ) {
 
@@ -111,7 +385,7 @@ THREE.LDrawLoader = ( function () {
 
 	}
 
-	function createObject( elements, elementSize ) {
+	function createObject( elements, elementSize, isConditionalSegments ) {
 
 		// Creates a THREE.LineSegments (elementSize = 2) or a THREE.Mesh (elementSize = 3 )
 		// With per face / segment material, implemented with mesh groups and materials array
@@ -119,11 +393,11 @@ THREE.LDrawLoader = ( function () {
 		// Sort the triangles or line segments by colour code to make later the mesh groups
 		elements.sort( sortByMaterial );
 
-		var vertices = [];
+		var positions = [];
+		var normals = [];
 		var materials = [];
 
 		var bufferGeometry = new THREE.BufferGeometry();
-		bufferGeometry.clearGroups();
 		var prevMaterial = null;
 		var index0 = 0;
 		var numGroupVerts = 0;
@@ -134,10 +408,17 @@ THREE.LDrawLoader = ( function () {
 			var v0 = elem.v0;
 			var v1 = elem.v1;
 			// Note that LDraw coordinate system is rotated 180 deg. in the X axis w.r.t. Three.js's one
-			vertices.push( v0.x, v0.y, v0.z, v1.x, v1.y, v1.z );
+			positions.push( v0.x, v0.y, v0.z, v1.x, v1.y, v1.z );
 			if ( elementSize === 3 ) {
 
-				vertices.push( elem.v2.x, elem.v2.y, elem.v2.z );
+				positions.push( elem.v2.x, elem.v2.y, elem.v2.z );
+
+				var n0 = elem.n0 || elem.faceNormal;
+				var n1 = elem.n1 || elem.faceNormal;
+				var n2 = elem.n2 || elem.faceNormal;
+				normals.push( n0.x, n0.y, n0.z );
+				normals.push( n1.x, n1.y, n1.z );
+				normals.push( n2.x, n2.y, n2.z );
 
 			}
 
@@ -169,7 +450,13 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
-		bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+		bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+
+		if ( elementSize === 3 ) {
+
+			bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+
+		}
 
 		var object3d = null;
 
@@ -179,9 +466,51 @@ THREE.LDrawLoader = ( function () {
 
 		} else if ( elementSize === 3 ) {
 
-			bufferGeometry.computeVertexNormals();
-
 			object3d = new THREE.Mesh( bufferGeometry, materials );
+
+		}
+
+		if ( isConditionalSegments ) {
+
+			object3d.isConditionalLine = true;
+
+			var controlArray0 = new Float32Array( elements.length * 3 * 2 );
+			var controlArray1 = new Float32Array( elements.length * 3 * 2 );
+			var directionArray = new Float32Array( elements.length * 3 * 2 );
+			for ( var i = 0, l = elements.length; i < l; i ++ ) {
+
+				var os = elements[ i ];
+				var c0 = os.c0;
+				var c1 = os.c1;
+				var v0 = os.v0;
+				var v1 = os.v1;
+				var index = i * 3 * 2;
+				controlArray0[ index + 0 ] = c0.x;
+				controlArray0[ index + 1 ] = c0.y;
+				controlArray0[ index + 2 ] = c0.z;
+				controlArray0[ index + 3 ] = c0.x;
+				controlArray0[ index + 4 ] = c0.y;
+				controlArray0[ index + 5 ] = c0.z;
+
+				controlArray1[ index + 0 ] = c1.x;
+				controlArray1[ index + 1 ] = c1.y;
+				controlArray1[ index + 2 ] = c1.z;
+				controlArray1[ index + 3 ] = c1.x;
+				controlArray1[ index + 4 ] = c1.y;
+				controlArray1[ index + 5 ] = c1.z;
+
+				directionArray[ index + 0 ] = v1.x - v0.x;
+				directionArray[ index + 1 ] = v1.y - v0.y;
+				directionArray[ index + 2 ] = v1.z - v0.z;
+				directionArray[ index + 3 ] = v1.x - v0.x;
+				directionArray[ index + 4 ] = v1.y - v0.y;
+				directionArray[ index + 5 ] = v1.z - v0.z;
+
+			}
+
+			bufferGeometry.addAttribute( 'control0', new THREE.BufferAttribute( controlArray0, 3, false ) );
+			bufferGeometry.addAttribute( 'control1', new THREE.BufferAttribute( controlArray1, 3, false ) );
+			bufferGeometry.addAttribute( 'direction', new THREE.BufferAttribute( directionArray, 3, false ) );
 
 		}
 
@@ -223,10 +552,8 @@ THREE.LDrawLoader = ( function () {
 		// If not (the default), only one object which contains all the merged primitives will be created.
 		this.separateObjects = false;
 
-		// Current merged object and primitives
-		this.currentGroupObject = null;
-		this.currentTriangles = null;
-		this.currentLineSegments = null;
+		// If this flag is set to true the vertex normals will be smoothed.
+		this.smoothNormals = true;
 
 	}
 
@@ -267,259 +594,17 @@ THREE.LDrawLoader = ( function () {
 			fileLoader.setPath( this.path );
 			fileLoader.load( url, function ( text ) {
 
-				processObject( text, onLoad );
+				scope.processObject( text, onLoad, null, url );
 
 			}, onProgress, onError );
 
-			function processObject( text, onProcessed ) {
+		},
 
-				var parseScope = scope.newParseScopeLevel();
-				parseScope.url = url;
+		parse: function ( text, path, onLoad ) {
 
-				var parentParseScope = scope.getParentParseScope();
+			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
-				// Add to cache
-				var currentFileName = parentParseScope.currentFileName;
-				if ( scope.subobjectCache[ currentFileName ] === undefined ) {
-
-					scope.subobjectCache[ currentFileName ] = text;
-
-
-				}
-
-				// Parse the object (returns a THREE.Group)
-				var objGroup = scope.parse( text );
-
-				// Load subobjects
-				parseScope.subobjects = objGroup.userData.subobjects;
-				parseScope.numSubobjects = parseScope.subobjects.length;
-				parseScope.subobjectIndex = 0;
-
-				if ( parseScope.numSubobjects > 0 ) {
-
-					// Load the first subobject
-					var subobjectGroup = loadSubobject( parseScope.subobjects[ 0 ], true );
-
-					// Optimization for loading pack: If subobjects are obtained from cache, keep loading them iteratively rather than recursively
-					if ( subobjectGroup ) {
-
-						while ( subobjectGroup && parseScope.subobjectIndex < parseScope.numSubobjects - 1 ) {
-
-							subobjectGroup = loadSubobject( parseScope.subobjects[ ++ parseScope.subobjectIndex ], true );
-
-						}
-
-						if ( subobjectGroup ) {
-
-							finalizeObject();
-
-						}
-
-					}
-
-				} else {
-
-					// No subobjects, finish object
-					finalizeObject();
-
-				}
-
-				return objGroup;
-
-				function finalizeObject() {
-
-					if ( ! scope.separateObjects && ! parentParseScope.isFromParse ) {
-
-						// We are finalizing the root object and merging primitives is activated, so create the entire Mesh and LineSegments objects now
-						if ( scope.currentLineSegments.length > 0 ) {
-
-							objGroup.add( createObject( scope.currentLineSegments, 2 ) );
-
-						}
-
-						if ( scope.currentTriangles.length > 0 ) {
-
-							objGroup.add( createObject( scope.currentTriangles, 3 ) );
-
-						}
-
-					}
-
-					scope.removeScopeLevel();
-
-					if ( onProcessed ) {
-
-						onProcessed( objGroup );
-
-					}
-
-				}
-
-				function loadSubobject( subobject, sync ) {
-
-					parseScope.mainColourCode = subobject.material.userData.code;
-					parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
-					parseScope.currentFileName = subobject.originalFileName;
-
-					if ( ! scope.separateObjects ) {
-
-						// Set current matrix
-						parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
-
-					}
-
-					// If subobject was cached previously, use the cached one
-					var cached = scope.subobjectCache[ subobject.originalFileName ];
-					if ( cached ) {
-
-						var subobjectGroup = processObject( cached, sync ? undefined : onSubobjectLoaded );
-						if ( sync ) {
-
-							addSubobject( subobject, subobjectGroup );
-							return subobjectGroup;
-
-						}
-
-						return;
-
-					}
-
-					// Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
-					// Update also subobject.locationState for the next try if this load fails.
-					var subobjectURL = subobject.fileName;
-					var newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
-
-					switch ( subobject.locationState ) {
-
-						case LDrawLoader.FILE_LOCATION_AS_IS:
-							newLocationState = subobject.locationState + 1;
-							break;
-
-						case LDrawLoader.FILE_LOCATION_TRY_PARTS:
-							subobjectURL = 'parts/' + subobjectURL;
-							newLocationState = subobject.locationState + 1;
-							break;
-
-						case LDrawLoader.FILE_LOCATION_TRY_P:
-							subobjectURL = 'p/' + subobjectURL;
-							newLocationState = subobject.locationState + 1;
-							break;
-
-						case LDrawLoader.FILE_LOCATION_TRY_MODELS:
-							subobjectURL = 'models/' + subobjectURL;
-							newLocationState = subobject.locationState + 1;
-							break;
-
-						case LDrawLoader.FILE_LOCATION_TRY_RELATIVE:
-							subobjectURL = url.substring( 0, url.lastIndexOf( "/" ) + 1 ) + subobjectURL;
-							newLocationState = subobject.locationState + 1;
-							break;
-
-						case LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE:
-
-							if ( subobject.triedLowerCase ) {
-
-								// Try absolute path
-								newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
-
-							} else {
-
-								// Next attempt is lower case
-								subobject.fileName = subobject.fileName.toLowerCase();
-								subobjectURL = subobject.fileName;
-								subobject.triedLowerCase = true;
-								newLocationState = LDrawLoader.FILE_LOCATION_AS_IS;
-
-							}
-							break;
-
-						case LDrawLoader.FILE_LOCATION_NOT_FOUND:
-
-							// All location possibilities have been tried, give up loading this object
-							console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
-
-							// Try to read the next subobject
-							parseScope.subobjectIndex ++;
-
-							if ( parseScope.subobjectIndex >= parseScope.numSubobjects ) {
-
-								// All subojects have been loaded. Finish parent object
-								scope.removeScopeLevel();
-								onProcessed( objGroup );
-
-							} else {
-
-								// Load next subobject
-								loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-							}
-
-							return;
-
-					}
-
-					subobject.locationState = newLocationState;
-					subobject.url = subobjectURL;
-
-					// Load the subobject
-					scope.load( subobjectURL, onSubobjectLoaded, undefined, onSubobjectError );
-
-				}
-
-				function onSubobjectLoaded( subobjectGroup ) {
-
-					var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
-
-					if ( subobjectGroup === null ) {
-
-						// Try to reload
-						loadSubobject( subobject );
-						return;
-
-					}
-
-					// Add the subobject just loaded
-					addSubobject( subobject, subobjectGroup );
-
-					// Proceed to load the next subobject, or finish the parent object
-
-					parseScope.subobjectIndex ++;
-
-					if ( parseScope.subobjectIndex < parseScope.numSubobjects ) {
-
-						loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-					} else {
-
-						finalizeObject();
-
-					}
-
-				}
-
-				function addSubobject( subobject, subobjectGroup ) {
-
-					if ( scope.separateObjects ) {
-
-						subobjectGroup.name = subobject.fileName;
-						objGroup.add( subobjectGroup );
-						subobjectGroup.matrix.copy( subobject.matrix );
-						subobjectGroup.matrixAutoUpdate = false;
-
-					}
-
-					scope.fileMap[ subobject.originalFileName ] = subobject.url;
-
-				}
-
-				function onSubobjectError( err ) {
-
-					// Retry download from a different default possible location
-					loadSubobject( parseScope.subobjects[ parseScope.subobjectIndex ] );
-
-				}
-
-			}
+			this.processObject( text, onLoad, null, path );
 
 		},
 
@@ -542,8 +627,6 @@ THREE.LDrawLoader = ( function () {
 			this.getCurrentParseScope().isFromParse = false;
 
 			this.materials = materials;
-
-			this.currentGroupObject = null;
 
 			return this;
 
@@ -575,9 +658,6 @@ THREE.LDrawLoader = ( function () {
 			}
 
 			var topParseScope = this.getCurrentParseScope();
-
-			var parentParseScope = this.getParentParseScope();
-
 			var newParseScope = {
 
 				lib: matLib,
@@ -587,15 +667,26 @@ THREE.LDrawLoader = ( function () {
 				subobjects: null,
 				numSubobjects: 0,
 				subobjectIndex: 0,
+				inverted: false,
+				category: null,
+				keywords: null,
 
 				// Current subobject
 				currentFileName: null,
 				mainColourCode: topParseScope ? topParseScope.mainColourCode : '16',
 				mainEdgeColourCode: topParseScope ? topParseScope.mainEdgeColourCode : '24',
 				currentMatrix: new THREE.Matrix4(),
+				matrix: new THREE.Matrix4(),
 
 				// If false, it is a root material scope previous to parse
-				isFromParse: true
+				isFromParse: true,
+
+				triangles: null,
+				lineSegments: null,
+				conditionalSegments: null,
+
+				// If true, this object is the start of a construction step
+				startingConstructionStep: false
 			};
 
 			this.parseScopesStack.push( newParseScope );
@@ -841,29 +932,20 @@ THREE.LDrawLoader = ( function () {
 			switch ( finishType ) {
 
 				case LDrawLoader.FINISH_TYPE_DEFAULT:
+
+					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.3, envMapIntensity: 0.3, metalness: 0 } );
+					break;
+
 				case LDrawLoader.FINISH_TYPE_PEARLESCENT:
 
+					// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
 					var specular = new THREE.Color( colour );
-					var shininess = 35;
 					var hsl = specular.getHSL( { h: 0, s: 0, l: 0 } );
-
-					if ( finishType === LDrawLoader.FINISH_TYPE_DEFAULT ) {
-
-						// Default plastic material with shiny specular
-						hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.12 );
-
-					} else {
-
-						// Try to imitate pearlescency by setting the specular to the complementary of the color, and low shininess
-						hsl.h = ( hsl.h + 0.5 ) % 1;
-						hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
-						shininess = 10;
-
-					}
-
+					hsl.h = ( hsl.h + 0.5 ) % 1;
+					hsl.l = Math.min( 1, hsl.l + ( 1 - hsl.l ) * 0.7 );
 					specular.setHSL( hsl.h, hsl.s, hsl.l );
 
-					material = new THREE.MeshPhongMaterial( { color: colour, specular: specular, shininess: shininess, reflectivity: 0.3 } );
+					material = new THREE.MeshPhongMaterial( { color: colour, specular: specular, shininess: 10, reflectivity: 0.3 } );
 					break;
 
 				case LDrawLoader.FINISH_TYPE_CHROME:
@@ -874,8 +956,8 @@ THREE.LDrawLoader = ( function () {
 
 				case LDrawLoader.FINISH_TYPE_RUBBER:
 
-					// Rubber is best simulated with Lambert
-					material = new THREE.MeshLambertMaterial( { color: colour } );
+					// Rubber finish
+					material = new THREE.MeshStandardMaterial( { color: colour, roughness: 0.9, metalness: 0 } );
 					canHaveEnvMap = false;
 					break;
 
@@ -897,11 +979,13 @@ THREE.LDrawLoader = ( function () {
 
 			}
 
-			// BFC (Back Face Culling) LDraw language meta extension is not implemented, so set all materials double-sided:
-			material.side = THREE.DoubleSide;
-
 			material.transparent = isTransparent;
+			material.premultipliedAlpha = true;
 			material.opacity = alpha;
+			material.depthWrite = ! isTransparent;
+
+			material.polygonOffset = true;
+			material.polygonOffsetFactor = 1;
 
 			material.userData.canHaveEnvMap = canHaveEnvMap;
 
@@ -914,10 +998,32 @@ THREE.LDrawLoader = ( function () {
 			if ( ! edgeMaterial ) {
 
 				// This is the material used for edges
-				edgeMaterial = new THREE.LineBasicMaterial( { color: edgeColour } );
+				edgeMaterial = new THREE.LineBasicMaterial( {
+					color: edgeColour,
+					transparent: isTransparent,
+					opacity: alpha,
+					depthWrite: ! isTransparent
+				} );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + " - Edge";
 				edgeMaterial.userData.canHaveEnvMap = false;
+
+				// This is the material used for conditional edges
+				edgeMaterial.userData.conditionalEdgeMaterial = new THREE.ShaderMaterial( {
+					vertexShader: conditionalLineVertShader,
+					fragmentShader: conditionalLineFragShader,
+					uniforms: {
+						diffuse: {
+							value: new THREE.Color( edgeColour )
+						},
+						opacity: {
+							value: alpha
+						}
+					},
+					transparent: isTransparent,
+					depthWrite: ! isTransparent
+				} );
+				edgeMaterial.userData.conditionalEdgeMaterial.userData.canHaveEnvMap = false;
 
 			}
 
@@ -932,7 +1038,7 @@ THREE.LDrawLoader = ( function () {
 
 		//
 
-		parse: function ( text ) {
+		objectParse: function ( text ) {
 
 			//console.time( 'LDrawLoader' );
 
@@ -943,33 +1049,12 @@ THREE.LDrawLoader = ( function () {
 			var mainColourCode = parentParseScope.mainColourCode;
 			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
 
-			var url = parentParseScope.url;
-
 			var currentParseScope = this.getCurrentParseScope();
 
 			// Parse result variables
 			var triangles;
 			var lineSegments;
-
-			if ( this.separateObjects ) {
-
-				triangles = [];
-				lineSegments = [];
-
-			} else {
-
-				if ( this.currentGroupObject === null ) {
-
-					this.currentGroupObject = new THREE.Group();
-					this.currentTriangles = [];
-					this.currentLineSegments = [];
-
-				}
-
-				triangles = this.currentTriangles;
-				lineSegments = this.currentLineSegments;
-
-			}
+			var conditionalSegments;
 
 			var subobjects = [];
 
@@ -990,6 +1075,14 @@ THREE.LDrawLoader = ( function () {
 			var parsingEmbeddedFiles = false;
 			var currentEmbeddedFileName = null;
 			var currentEmbeddedText = null;
+
+			var bfcCertified = false;
+			var bfcCCW = true;
+			var bfcInverted = false;
+			var bfcCull = true;
+			var type = '';
+
+			var startingConstructionStep = false;
 
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
@@ -1027,7 +1120,7 @@ THREE.LDrawLoader = ( function () {
 
 				if ( ! scope.separateObjects ) {
 
-					v.applyMatrix4( parentParseScope.currentMatrix );
+					v.applyMatrix4( currentParseScope.currentMatrix );
 
 				}
 
@@ -1047,7 +1140,7 @@ THREE.LDrawLoader = ( function () {
 					if ( line.startsWith( '0 FILE ' ) ) {
 
 						// Save previous embedded file in the cache
-						this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
+						this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 						// New embedded text file
 						currentEmbeddedFileName = line.substring( 7 );
@@ -1088,6 +1181,47 @@ THREE.LDrawLoader = ( function () {
 						if ( meta ) {
 
 							switch ( meta ) {
+
+								case '!LDRAW_ORG':
+
+									type = lp.getToken();
+
+									if ( ! parsingEmbeddedFiles ) {
+
+										currentParseScope.triangles = [];
+										currentParseScope.lineSegments = [];
+										currentParseScope.conditionalSegments = [];
+										currentParseScope.type = type;
+
+										var isRoot = ! parentParseScope.isFromParse;
+										if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
+
+											currentParseScope.groupObject = new THREE.Group();
+
+											currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
+
+										}
+
+										// If the scale of the object is negated then the triangle winding order
+										// needs to be flipped.
+										var matrix = currentParseScope.matrix;
+										if (
+											matrix.determinant() < 0 && (
+												scope.separateObjects && isPrimitiveType( type ) ||
+												! scope.separateObjects
+											) ) {
+
+											currentParseScope.inverted = ! currentParseScope.inverted;
+
+										}
+
+										triangles = currentParseScope.triangles;
+										lineSegments = currentParseScope.lineSegments;
+										conditionalSegments = currentParseScope.conditionalSegments;
+
+									}
+
+									break;
 
 								case '!COLOUR':
 
@@ -1137,7 +1271,65 @@ THREE.LDrawLoader = ( function () {
 										currentEmbeddedFileName = lp.getRemainingString();
 										currentEmbeddedText = '';
 
+										bfcCertified = false;
+										bfcCCW = true;
+
 									}
+
+									break;
+
+								case 'BFC':
+
+									// Changes to the backface culling state
+									while ( ! lp.isAtTheEnd() ) {
+
+										var token = lp.getToken();
+
+										switch ( token ) {
+
+											case 'CERTIFY':
+											case 'NOCERTIFY':
+
+												bfcCertified = token === 'CERTIFY';
+												bfcCCW = true;
+
+												break;
+
+											case 'CW':
+											case 'CCW':
+
+												bfcCCW = token === 'CCW';
+
+												break;
+
+											case 'INVERTNEXT':
+
+												bfcInverted = true;
+
+												break;
+
+											case 'CLIP':
+											case 'NOCLIP':
+
+											  bfcCull = token === 'CLIP';
+
+												break;
+
+											default:
+
+												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
+
+												break;
+
+										}
+
+									}
+
+									break;
+
+								case 'STEP':
+
+									startingConstructionStep = true;
 
 									break;
 
@@ -1176,7 +1368,7 @@ THREE.LDrawLoader = ( function () {
 							0, 0, 0, 1
 						);
 
-						var fileName = lp.getRemainingString().trim().replace( "\\", "/" );
+						var fileName = lp.getRemainingString().trim().replace( /\\/g, "/" );
 
 						if ( scope.fileMap[ fileName ] ) {
 
@@ -1205,8 +1397,12 @@ THREE.LDrawLoader = ( function () {
 							originalFileName: fileName,
 							locationState: LDrawLoader.FILE_LOCATION_AS_IS,
 							url: null,
-							triedLowerCase: false
+							triedLowerCase: false,
+							inverted: bfcInverted !== currentParseScope.inverted,
+							startingConstructionStep: startingConstructionStep
 						} );
+
+						bfcInverted = false;
 
 						break;
 
@@ -1215,12 +1411,32 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp, true );
 
-						lineSegments.push( {
+						var segment = {
 							material: material.userData.edgeMaterial,
 							colourCode: material.userData.code,
 							v0: parseVector( lp ),
 							v1: parseVector( lp )
-						} );
+						};
+
+						lineSegments.push( segment );
+
+						break;
+
+					// Line type 5: Conditional Line segment
+					case '5':
+
+						var material = parseColourCode( lp, true );
+
+						var segment = {
+							material: material.userData.edgeMaterial.userData.conditionalEdgeMaterial,
+							colourCode: material.userData.code,
+							v0: parseVector( lp ),
+							v1: parseVector( lp ),
+							c0: parseVector( lp ),
+							c1: parseVector( lp )
+						};
+
+						conditionalSegments.push( segment );
 
 						break;
 
@@ -1229,13 +1445,58 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
+						var inverted = currentParseScope.inverted;
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
+						var v0, v1, v2, faceNormal;
+
+						if ( ccw === true ) {
+
+							v0 = parseVector( lp );
+							v1 = parseVector( lp );
+							v2 = parseVector( lp );
+
+						} else {
+
+							v2 = parseVector( lp );
+							v1 = parseVector( lp );
+							v0 = parseVector( lp );
+
+						}
+
+						tempVec0.subVectors( v1, v0 );
+						tempVec1.subVectors( v2, v1 );
+						faceNormal = new THREE.Vector3()
+							.crossVectors( tempVec0, tempVec1 )
+							.normalize();
+
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
-							v0: parseVector( lp ),
-							v1: parseVector( lp ),
-							v2: parseVector( lp )
+							v0: v0,
+							v1: v1,
+							v2: v2,
+							faceNormal: faceNormal,
+							n0: null,
+							n1: null,
+							n2: null
 						} );
+
+						if ( doubleSided === true ) {
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1,
+								faceNormal: faceNormal,
+								n0: null,
+								n1: null,
+								n2: null
+							} );
+
+						}
 
 						break;
 
@@ -1244,17 +1505,43 @@ THREE.LDrawLoader = ( function () {
 
 						var material = parseColourCode( lp );
 
-						var v0 = parseVector( lp );
-						var v1 = parseVector( lp );
-						var v2 = parseVector( lp );
-						var v3 = parseVector( lp );
+						var inverted = currentParseScope.inverted;
+						var ccw = bfcCCW !== inverted;
+						var doubleSided = ! bfcCertified || ! bfcCull;
+						var v0, v1, v2, v3, faceNormal;
+
+						if ( ccw === true ) {
+
+							v0 = parseVector( lp );
+							v1 = parseVector( lp );
+							v2 = parseVector( lp );
+							v3 = parseVector( lp );
+
+						} else {
+
+							v3 = parseVector( lp );
+							v2 = parseVector( lp );
+							v1 = parseVector( lp );
+							v0 = parseVector( lp );
+
+						}
+
+						tempVec0.subVectors( v1, v0 );
+						tempVec1.subVectors( v2, v1 );
+						faceNormal = new THREE.Vector3()
+							.crossVectors( tempVec0, tempVec1 )
+							.normalize();
 
 						triangles.push( {
 							material: material,
 							colourCode: material.userData.code,
 							v0: v0,
 							v1: v1,
-							v2: v2
+							v2: v2,
+							faceNormal: faceNormal,
+							n0: null,
+							n1: null,
+							n2: null
 						} );
 
 						triangles.push( {
@@ -1262,14 +1549,41 @@ THREE.LDrawLoader = ( function () {
 							colourCode: material.userData.code,
 							v0: v0,
 							v1: v2,
-							v2: v3
+							v2: v3,
+							faceNormal: faceNormal,
+							n0: null,
+							n1: null,
+							n2: null
 						} );
 
-						break;
+						if ( doubleSided === true ) {
 
-					// Line type 5: Optional line
-					case '5':
-						// Line type 5 is not implemented
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v2,
+								v2: v1,
+								faceNormal: faceNormal,
+								n0: null,
+								n1: null,
+								n2: null
+							} );
+
+							triangles.push( {
+								material: material,
+								colourCode: material.userData.code,
+								v0: v0,
+								v1: v3,
+								v2: v2,
+								faceNormal: faceNormal,
+								n0: null,
+								n1: null,
+								n2: null
+							} );
+
+						}
+
 						break;
 
 					default:
@@ -1282,44 +1596,354 @@ THREE.LDrawLoader = ( function () {
 
 			if ( parsingEmbeddedFiles ) {
 
-				this.subobjectCache[ currentEmbeddedFileName ] = currentEmbeddedText;
+				this.subobjectCache[ currentEmbeddedFileName.toLowerCase() ] = currentEmbeddedText;
 
 			}
 
-			//
+			currentParseScope.category = category;
+			currentParseScope.keywords = keywords;
+			currentParseScope.subobjects = subobjects;
+			currentParseScope.numSubobjects = subobjects.length;
+			currentParseScope.subobjectIndex = 0;
 
-			var groupObject = null;
+		},
 
-			if ( this.separateObjects ) {
+		computeConstructionSteps: function ( model ) {
 
-				groupObject = new THREE.Group();
+			// Sets userdata.constructionStep number in Group objects and userData.numConstructionSteps number in the root Group object.
 
-				if ( lineSegments.length > 0 ) {
+			var stepNumber = 0;
 
-					groupObject.add( createObject( lineSegments, 2 ) );
+			model.traverse( c => {
 
+				if ( c.isGroup ) {
+
+					if ( c.userData.startingConstructionStep ) {
+
+						stepNumber ++;
+
+					}
+
+					c.userData.constructionStep = stepNumber;
 
 				}
 
-				if ( triangles.length > 0 ) {
+			} );
 
-					groupObject.add( createObject( triangles, 3 ) );
+			model.userData.numConstructionSteps = stepNumber + 1;
 
-				}
+		},
 
-			} else {
+		processObject: function ( text, onProcessed, subobject, url ) {
 
-				groupObject = this.currentGroupObject;
+			var scope = this;
+
+			var parseScope = scope.newParseScopeLevel();
+			parseScope.url = url;
+
+			var parentParseScope = scope.getParentParseScope();
+
+			// Set current matrix
+			if ( subobject ) {
+
+				parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
+				parseScope.matrix.copy( subobject.matrix );
+				parseScope.inverted = subobject.inverted;
+				parseScope.startingConstructionStep = subobject.startingConstructionStep;
 
 			}
 
-			groupObject.userData.category = category;
-			groupObject.userData.keywords = keywords;
-			groupObject.userData.subobjects = subobjects;
+			// Add to cache
+			var currentFileName = parentParseScope.currentFileName;
+			if ( currentFileName !== null ) {
 
-			//console.timeEnd( 'LDrawLoader' );
+				currentFileName = parentParseScope.currentFileName.toLowerCase();
 
-			return groupObject;
+			}
+
+			if ( scope.subobjectCache[ currentFileName ] === undefined ) {
+
+				scope.subobjectCache[ currentFileName ] = text;
+
+			}
+
+
+			// Parse the object (returns a THREE.Group)
+			scope.objectParse( text );
+			var finishedCount = 0;
+			onSubobjectFinish();
+
+			function onSubobjectFinish() {
+
+				finishedCount ++;
+
+				if ( finishedCount === parseScope.subobjects.length + 1 ) {
+
+					finalizeObject();
+
+				} else {
+
+					// Once the previous subobject has finished we can start processing the next one in the list.
+					// The subobject processing shares scope in processing so it's important that they be loaded serially
+					// to avoid race conditions.
+					// Promise.resolve is used as an approach to asynchronously schedule a task _before_ this frame ends to
+					// avoid stack overflow exceptions when loading many subobjects from the cache. RequestAnimationFrame
+					// will work but causes the load to happen after the next frame which causes the load to take significantly longer.
+					var subobject = parseScope.subobjects[ parseScope.subobjectIndex ];
+					Promise.resolve().then( function () {
+
+						loadSubobject( subobject );
+
+					} );
+					parseScope.subobjectIndex ++;
+
+				}
+
+			}
+
+			function finalizeObject() {
+
+				if ( scope.smoothNormals && parseScope.type === 'Part' ) {
+
+					smoothNormals( parseScope.triangles, parseScope.lineSegments );
+
+				}
+
+				var isRoot = ! parentParseScope.isFromParse;
+				if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
+
+
+					const objGroup = parseScope.groupObject;
+					if ( parseScope.triangles.length > 0 ) {
+
+						objGroup.add( createObject( parseScope.triangles, 3 ) );
+
+					}
+
+					if ( parseScope.lineSegments.length > 0 ) {
+
+						objGroup.add( createObject( parseScope.lineSegments, 2 ) );
+
+					}
+
+					if ( parseScope.conditionalSegments.length > 0 ) {
+
+						objGroup.add( createObject( parseScope.conditionalSegments, 2, true ) );
+
+					}
+
+					if ( parentParseScope.groupObject ) {
+
+						objGroup.name = parseScope.fileName;
+						objGroup.userData.category = parseScope.category;
+						objGroup.userData.keywords = parseScope.keywords;
+						parseScope.matrix.decompose( objGroup.position, objGroup.quaternion, objGroup.scale );
+
+						parentParseScope.groupObject.add( objGroup );
+
+					}
+
+				} else {
+
+					var separateObjects = scope.separateObjects;
+					var parentLineSegments = parentParseScope.lineSegments;
+					var parentConditionalSegments = parentParseScope.conditionalSegments;
+					var parentTriangles = parentParseScope.triangles;
+
+					var lineSegments = parseScope.lineSegments;
+					var conditionalSegments = parseScope.conditionalSegments;
+					var triangles = parseScope.triangles;
+
+					for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
+
+						var ls = lineSegments[ i ];
+						if ( separateObjects ) {
+
+							ls.v0.applyMatrix4( parseScope.matrix );
+							ls.v1.applyMatrix4( parseScope.matrix );
+
+						}
+						parentLineSegments.push( ls );
+
+					}
+
+					for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
+
+						var os = conditionalSegments[ i ];
+						if ( separateObjects ) {
+
+							os.v0.applyMatrix4( parseScope.matrix );
+							os.v1.applyMatrix4( parseScope.matrix );
+							os.c0.applyMatrix4( parseScope.matrix );
+							os.c1.applyMatrix4( parseScope.matrix );
+
+						}
+						parentConditionalSegments.push( os );
+
+					}
+
+					for ( var i = 0, l = triangles.length; i < l; i ++ ) {
+
+						var tri = triangles[ i ];
+						if ( separateObjects ) {
+
+							tri.v0 = tri.v0.clone().applyMatrix4( parseScope.matrix );
+							tri.v1 = tri.v1.clone().applyMatrix4( parseScope.matrix );
+							tri.v2 = tri.v2.clone().applyMatrix4( parseScope.matrix );
+
+							tempVec0.subVectors( tri.v1, tri.v0 );
+							tempVec1.subVectors( tri.v2, tri.v1 );
+							tri.faceNormal.crossVectors( tempVec0, tempVec1 ).normalize();
+
+						}
+						parentTriangles.push( tri );
+
+					}
+
+				}
+
+				scope.removeScopeLevel();
+
+				// If it is root object, compute construction steps
+				if ( ! parentParseScope.isFromParse ) {
+
+					scope.computeConstructionSteps( parseScope.groupObject );
+
+				}
+
+				if ( onProcessed ) {
+
+					onProcessed( parseScope.groupObject );
+
+				}
+
+			}
+
+			function loadSubobject( subobject ) {
+
+				parseScope.mainColourCode = subobject.material.userData.code;
+				parseScope.mainEdgeColourCode = subobject.material.userData.edgeMaterial.userData.code;
+				parseScope.currentFileName = subobject.originalFileName;
+
+
+				// If subobject was cached previously, use the cached one
+				var cached = scope.subobjectCache[ subobject.originalFileName.toLowerCase() ];
+				if ( cached ) {
+
+					scope.processObject( cached, function ( subobjectGroup ) {
+
+						onSubobjectLoaded( subobjectGroup, subobject );
+						onSubobjectFinish();
+
+					}, subobject, url );
+
+					return;
+
+				}
+
+				// Adjust file name to locate the subobject file path in standard locations (always under directory scope.path)
+				// Update also subobject.locationState for the next try if this load fails.
+				var subobjectURL = subobject.fileName;
+				var newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
+
+				switch ( subobject.locationState ) {
+
+					case LDrawLoader.FILE_LOCATION_AS_IS:
+						newLocationState = subobject.locationState + 1;
+						break;
+
+					case LDrawLoader.FILE_LOCATION_TRY_PARTS:
+						subobjectURL = 'parts/' + subobjectURL;
+						newLocationState = subobject.locationState + 1;
+						break;
+
+					case LDrawLoader.FILE_LOCATION_TRY_P:
+						subobjectURL = 'p/' + subobjectURL;
+						newLocationState = subobject.locationState + 1;
+						break;
+
+					case LDrawLoader.FILE_LOCATION_TRY_MODELS:
+						subobjectURL = 'models/' + subobjectURL;
+						newLocationState = subobject.locationState + 1;
+						break;
+
+					case LDrawLoader.FILE_LOCATION_TRY_RELATIVE:
+						subobjectURL = url.substring( 0, url.lastIndexOf( "/" ) + 1 ) + subobjectURL;
+						newLocationState = subobject.locationState + 1;
+						break;
+
+					case LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE:
+
+						if ( subobject.triedLowerCase ) {
+
+							// Try absolute path
+							newLocationState = LDrawLoader.FILE_LOCATION_NOT_FOUND;
+
+						} else {
+
+							// Next attempt is lower case
+							subobject.fileName = subobject.fileName.toLowerCase();
+							subobjectURL = subobject.fileName;
+							subobject.triedLowerCase = true;
+							newLocationState = LDrawLoader.FILE_LOCATION_AS_IS;
+
+						}
+						break;
+
+					case LDrawLoader.FILE_LOCATION_NOT_FOUND:
+
+						// All location possibilities have been tried, give up loading this object
+						console.warn( 'LDrawLoader: Subobject "' + subobject.originalFileName + '" could not be found.' );
+
+						return;
+
+				}
+
+				subobject.locationState = newLocationState;
+				subobject.url = subobjectURL;
+
+				// Load the subobject
+				// Use another file loader here so we can keep track of the subobject information
+				// and use it when processing the next model.
+				var fileLoader = new THREE.FileLoader( scope.manager );
+				fileLoader.setPath( scope.path );
+				fileLoader.load( subobjectURL, function ( text ) {
+
+					scope.processObject( text, function ( subobjectGroup ) {
+
+						onSubobjectLoaded( subobjectGroup, subobject );
+						onSubobjectFinish();
+
+					}, subobject, url );
+
+				}, undefined, function ( err ) {
+
+					onSubobjectError( err, subobject );
+
+				}, subobject );
+
+			}
+
+			function onSubobjectLoaded( subobjectGroup, subobject ) {
+
+				if ( subobjectGroup === null ) {
+
+					// Try to reload
+					loadSubobject( subobject );
+					return;
+
+				}
+
+				scope.fileMap[ subobject.originalFileName ] = subobject.url;
+
+			}
+
+			function onSubobjectError( err, subobject ) {
+
+				// Retry download from a different default possible location
+				loadSubobject( subobject );
+
+			}
 
 		}
 

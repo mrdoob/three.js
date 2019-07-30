@@ -10,8 +10,8 @@
 	<body>
 		<h1>[name]</h1>
 		<p class="desc">
-			该对象用于跟踪时间。如果<a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now">performance.now()</a>可用，则
-			Clock 对象通过该方法实现，否则通过歉精准的<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now">Date.now()</a>实现。
+			该对象用于跟踪时间。如果[link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now]可用，则
+			Clock 对象通过该方法实现，否则通过歉精准的[link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now Date.now]实现。
 		</p>
 
 
@@ -67,7 +67,7 @@
 
 		<h3>[method:Float getElapsedTime]()</h3>
 		<p>
-			获取自时钟启动后的秒数，摒弃将 [page:Clock.oldTime oldTime] 设置为当前时间。<br />
+			获取自时钟启动后的秒数，同时将 [page:Clock.oldTime oldTime] 设置为当前时间。<br />
 			如果 [page:Clock.autoStart autoStart] 设置为 *true* 且时钟并未运行，则该方法同时启动时钟。
 		</p>
 

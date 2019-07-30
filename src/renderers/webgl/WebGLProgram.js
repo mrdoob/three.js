@@ -9,6 +9,20 @@ import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, Equirecta
 
 var programIdCount = 0;
 
+function addLineNumbers( string ) {
+
+	var lines = string.split( '\n' );
+
+	for ( var i = 0; i < lines.length; i ++ ) {
+
+		lines[ i ] = ( i + 1 ) + ': ' + lines[ i ];
+
+	}
+
+	return lines.join( '\n' );
+
+}
+
 function getEncodingComponents( encoding ) {
 
 	switch ( encoding ) {
@@ -31,6 +45,22 @@ function getEncodingComponents( encoding ) {
 			throw new Error( 'unsupported encoding: ' + encoding );
 
 	}
+
+}
+
+function getShaderErrors( gl, shader, type ) {
+
+	var status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
+	var log = gl.getShaderInfoLog( shader ).trim();
+
+	if ( status && log === '' ) return '';
+
+	// --enable-privileged-webgl-extension
+	// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
+
+	var source = gl.getShaderSource( shader );
+
+	return 'THREE.WebGLShader: gl.getShaderInfoLog() ' + type + '\n' + log + addLineNumbers( source );
 
 }
 
@@ -206,9 +236,9 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities, textures ) {
+function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
 
-	var gl = renderer.context;
+	var gl = renderer.getContext();
 
 	var defines = material.defines;
 
@@ -604,56 +634,61 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	gl.linkProgram( program );
 
-	var programLog = gl.getProgramInfoLog( program ).trim();
-	var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-	var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+	// check for link errors
+	if ( renderer.debug.checkShaderErrors ) {
 
-	var runnable = true;
-	var haveDiagnostics = true;
+		var programLog = gl.getProgramInfoLog( program ).trim();
+		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
-	// console.log( '**VERTEX**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glVertexShader ) );
-	// console.log( '**FRAGMENT**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( glFragmentShader ) );
+		var runnable = true;
+		var haveDiagnostics = true;
 
-	if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-		runnable = false;
+			runnable = false;
 
-		console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexLog, fragmentLog );
+			var vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
+			var fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
-	} else if ( programLog !== '' ) {
+			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
 
-		console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
+		} else if ( programLog !== '' ) {
 
-	} else if ( vertexLog === '' || fragmentLog === '' ) {
+			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
 
-		haveDiagnostics = false;
+		} else if ( vertexLog === '' || fragmentLog === '' ) {
 
-	}
+			haveDiagnostics = false;
 
-	if ( haveDiagnostics ) {
+		}
 
-		this.diagnostics = {
+		if ( haveDiagnostics ) {
 
-			runnable: runnable,
-			material: material,
+			this.diagnostics = {
 
-			programLog: programLog,
+				runnable: runnable,
+				material: material,
 
-			vertexShader: {
+				programLog: programLog,
 
-				log: vertexLog,
-				prefix: prefixVertex
+				vertexShader: {
 
-			},
+					log: vertexLog,
+					prefix: prefixVertex
 
-			fragmentShader: {
+				},
 
-				log: fragmentLog,
-				prefix: prefixFragment
+				fragmentShader: {
 
-			}
+					log: fragmentLog,
+					prefix: prefixFragment
 
-		};
+				}
+
+			};
+
+		}
 
 	}
 
@@ -670,7 +705,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 		if ( cachedUniforms === undefined ) {
 
-			cachedUniforms = new WebGLUniforms( gl, program, textures );
+			cachedUniforms = new WebGLUniforms( gl, program );
 
 		}
 
@@ -702,31 +737,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 		this.program = undefined;
 
 	};
-
-	// DEPRECATED
-
-	Object.defineProperties( this, {
-
-		uniforms: {
-			get: function () {
-
-				console.warn( 'THREE.WebGLProgram: .uniforms is now .getUniforms().' );
-				return this.getUniforms();
-
-			}
-		},
-
-		attributes: {
-			get: function () {
-
-				console.warn( 'THREE.WebGLProgram: .attributes is now .getAttributes().' );
-				return this.getAttributes();
-
-			}
-		}
-
-	} );
-
 
 	//
 

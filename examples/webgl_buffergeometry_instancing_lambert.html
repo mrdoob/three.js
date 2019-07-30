@@ -4,33 +4,15 @@
 	<title>three.js webgl - instancing - lambert shader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
 		a {
-			color: #ffffff;
+			color: #08f;
 		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
-			border: 2px red solid;
+			background-color: #f00;
 			margin-top: 20px;
 			padding: 10px;
 		}
@@ -44,163 +26,128 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/CurveExtras.js"></script>
+		import Stats from './jsm/libs/stats.module.js';
 
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { Curves } from './jsm/curves/CurveExtras.js';
 
-	<script>
+		// this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
+		var customDepthVertexShader = 
+			`
+			// instanced
+			attribute vec3 instanceOffset;
+			attribute float instanceScale;
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
+			#include <common>
+			#include <uv_pars_vertex>
+			#include <displacementmap_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
+			#include <logdepthbuf_pars_vertex>
+			#include <clipping_planes_pars_vertex>
 
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			void main() {
 
-		}
+				#include <uv_vertex>
 
-		THREE.ShaderLib.customDepthRGBA = { // this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
+				#include <skinbase_vertex>
 
-			uniforms: THREE.ShaderLib.depth.uniforms,
-
-			vertexShader:
-				`
-				// instanced
-				#ifdef INSTANCED
-
-					attribute vec3 instanceOffset;
-					attribute float instanceScale;
-
-				#endif
-
-				#include <common>
-				#include <uv_pars_vertex>
-				#include <displacementmap_pars_vertex>
-				#include <morphtarget_pars_vertex>
-				#include <skinning_pars_vertex>
-				#include <logdepthbuf_pars_vertex>
-				#include <clipping_planes_pars_vertex>
-
-				void main() {
-
-					#include <uv_vertex>
-
-					#include <skinbase_vertex>
-
-					#ifdef USE_DISPLACEMENTMAP
-
-						#include <beginnormal_vertex>
-						#include <morphnormal_vertex>
-						#include <skinnormal_vertex>
-
-					#endif
-
-					#include <begin_vertex>
-
-					// instanced
-					#ifdef INSTANCED
-
-						transformed *= instanceScale;
-						transformed = transformed + instanceOffset;
-
-					#endif
-
-					#include <morphtarget_vertex>
-					#include <skinning_vertex>
-					#include <displacementmap_vertex>
-					#include <project_vertex>
-					#include <logdepthbuf_vertex>
-					#include <clipping_planes_vertex>
-
-				}
-			`,
-
-			fragmentShader: THREE.ShaderChunk.depth_frag
-
-		};
-
-		THREE.ShaderLib.lambert = { // this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
-
-			uniforms: THREE.ShaderLib.lambert.uniforms,
-
-			vertexShader:
-				`
-				#define LAMBERT
-
-				#ifdef INSTANCED
-					attribute vec3 instanceOffset;
-					attribute vec3 instanceColor;
-					attribute float instanceScale;
-				#endif
-
-				varying vec3 vLightFront;
-				varying vec3 vIndirectFront;
-
-				#ifdef DOUBLE_SIDED
-					varying vec3 vLightBack;
-					varying vec3 vIndirectBack;
-				#endif
-
-				#include <common>
-				#include <uv_pars_vertex>
-				#include <uv2_pars_vertex>
-				#include <envmap_pars_vertex>
-				#include <bsdfs>
-				#include <lights_pars_begin>
-				#include <color_pars_vertex>
-				#include <fog_pars_vertex>
-				#include <morphtarget_pars_vertex>
-				#include <skinning_pars_vertex>
-				#include <shadowmap_pars_vertex>
-				#include <logdepthbuf_pars_vertex>
-				#include <clipping_planes_pars_vertex>
-
-				void main() {
-
-					#include <uv_vertex>
-					#include <uv2_vertex>
-					#include <color_vertex>
-
-					// vertex colors instanced
-					#ifdef INSTANCED
-						#ifdef USE_COLOR
-							vColor.xyz = instanceColor.xyz;
-						#endif
-					#endif
+				#ifdef USE_DISPLACEMENTMAP
 
 					#include <beginnormal_vertex>
 					#include <morphnormal_vertex>
-					#include <skinbase_vertex>
 					#include <skinnormal_vertex>
-					#include <defaultnormal_vertex>
 
-					#include <begin_vertex>
+				#endif
 
-					// position instanced
-					#ifdef INSTANCED
-						transformed *= instanceScale;
-						transformed = transformed + instanceOffset;
-					#endif
+				#include <begin_vertex>
 
-					#include <morphtarget_vertex>
-					#include <skinning_vertex>
-					#include <project_vertex>
-					#include <logdepthbuf_vertex>
-					#include <clipping_planes_vertex>
+				// instanced
+				transformed *= instanceScale;
+				transformed = transformed + instanceOffset;
 
-					#include <worldpos_vertex>
-					#include <envmap_vertex>
-					#include <lights_lambert_vertex>
-					#include <shadowmap_vertex>
-					#include <fog_vertex>
+				#include <morphtarget_vertex>
+				#include <skinning_vertex>
+				#include <displacementmap_vertex>
+				#include <project_vertex>
+				#include <logdepthbuf_vertex>
+				#include <clipping_planes_vertex>
 
-				}
-				`,
+			}
+			`;
 
-			fragmentShader: THREE.ShaderLib.lambert.fragmentShader
+		// this is a cut-and-paste of the lambert shader -- modified to accommodate instancing for this app
+		var customLambertVertexShader =
+			`
+			#define LAMBERT
 
-		};
+			// instanced
+			attribute vec3 instanceOffset;
+			attribute vec3 instanceColor;
+			attribute float instanceScale;
+
+			varying vec3 vLightFront;
+			varying vec3 vIndirectFront;
+
+			#ifdef DOUBLE_SIDED
+				varying vec3 vLightBack;
+				varying vec3 vIndirectBack;
+			#endif
+
+			#include <common>
+			#include <uv_pars_vertex>
+			#include <uv2_pars_vertex>
+			#include <envmap_pars_vertex>
+			#include <bsdfs>
+			#include <lights_pars_begin>
+			#include <color_pars_vertex>
+			#include <fog_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
+			#include <shadowmap_pars_vertex>
+			#include <logdepthbuf_pars_vertex>
+			#include <clipping_planes_pars_vertex>
+
+			void main() {
+
+				#include <uv_vertex>
+				#include <uv2_vertex>
+				#include <color_vertex>
+
+				// vertex colors instanced
+				#ifdef USE_COLOR
+					vColor.xyz = instanceColor.xyz;
+				#endif
+
+				#include <beginnormal_vertex>
+				#include <morphnormal_vertex>
+				#include <skinbase_vertex>
+				#include <skinnormal_vertex>
+				#include <defaultnormal_vertex>
+
+				#include <begin_vertex>
+
+				// position instanced
+				transformed *= instanceScale;
+				transformed = transformed + instanceOffset;
+
+				#include <morphtarget_vertex>
+				#include <skinning_vertex>
+				#include <project_vertex>
+				#include <logdepthbuf_vertex>
+				#include <clipping_planes_vertex>
+
+				#include <worldpos_vertex>
+				#include <envmap_vertex>
+				#include <lights_lambert_vertex>
+				#include <shadowmap_vertex>
+				#include <fog_vertex>
+
+			}
+			`;
 
 
 		//
@@ -230,7 +177,7 @@
 
 			scene.add( camera );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableZoom = false;
 			controls.maxPolarAngle = Math.PI / 2;
 
@@ -254,7 +201,7 @@
 			scene.add( light );
 
 			// light shadow camera helper
-			//light.shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+			//light.shadowCameraHelper = new CameraHelper( light.shadow.camera );
 			//scene.add( light.shadowCameraHelper );
 
 
@@ -265,7 +212,7 @@
 
 			const INSTANCES = 256;
 
-			var knot = new THREE.Curves.TorusKnot( 10 );
+			var knot = new Curves.TorusKnot( 10 );
 			var positions = knot.getSpacedPoints( INSTANCES );
 
 			var offsets = new Float32Array( INSTANCES * 3 ); // xyz
@@ -318,27 +265,24 @@
 
 			} );
 
-			material.defines = material.defines || {};
-			material.defines[ 'INSTANCED' ] = "";
+			material.onBeforeCompile = function( shader ) {
+
+				shader.vertexShader = customLambertVertexShader;
+
+			};
 
 
 			// custom depth material - required for instanced shadows
 
-			var shader = THREE.ShaderLib[ 'customDepthRGBA' ];
+			var customDepthMaterial = new THREE.MeshDepthMaterial();
 
-			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+			customDepthMaterial.onBeforeCompile = function( shader ) {
 
-			var customDepthMaterial = new THREE.ShaderMaterial( {
+				shader.vertexShader = customDepthVertexShader;
 
-				defines: {
-					'INSTANCED': "",
-					'DEPTH_PACKING': THREE.RGBADepthPacking
-				},
-				uniforms: uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
+			};
 
-			} );
+			customDepthMaterial.depthPacking = THREE.RGBADepthPacking;
 
 			//
 

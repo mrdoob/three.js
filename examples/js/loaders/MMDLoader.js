@@ -1026,7 +1026,7 @@ THREE.MMDLoader = ( function () {
 		 * @param {function} onError
 		 * @return {Array<THREE.MeshToonMaterial>}
 		 */
-		build: function ( data, geometry, onProgress, onError ) {
+		build: function ( data, geometry /*, onProgress, onError */ ) {
 
 			var materials = [];
 

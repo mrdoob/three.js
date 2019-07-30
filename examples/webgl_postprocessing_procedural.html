@@ -4,27 +4,7 @@
 		<title>three.js webgl - postprocessing procedural effects</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -74,12 +54,12 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var postCamera, postScene, renderer;
 			var postMaterial, noiseRandom1DMaterial, noiseRandom2DMaterial, noiseRandom3DMaterial, postQuad;
@@ -94,7 +74,7 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( params, 'procedure', [ 'noiseRandom1D', 'noiseRandom2D', 'noiseRandom3D' ] );
 
 			}

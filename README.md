@@ -24,13 +24,13 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 ### Usage ###
 
 Download the [minified library](http://threejs.org/build/three.min.js) and include it in your HTML, or install and import it as a [module](http://threejs.org/docs/#manual/introduction/Import-via-modules),
-Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/Build-instructions).
+Alternatively, see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/Build-instructions).
 
 ```html
 <script src="js/three.min.js"></script>
 ```
 
-This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the document.body element. Finally, it animates the cube within the scene for the camera.
+This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
 
 ```javascript
 var camera, scene, renderer;

@@ -4,26 +4,9 @@
 		<title>three.js webgl - exporter - obj</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display: block;
-			}
-
-			div.floating {
-				color : #ffffff;
+			.floating {
 				background : #000000;
 				opacity : 0.8;
 				width : 80%;
@@ -37,33 +20,24 @@
 				overflow : auto;
 				z-index: 100;
 			}
-
-			span.link {
-				color: skyblue;
-				cursor: pointer;
-				text-decoration : underline;
-			}
-
-			a {
-				color: skyblue
-			}
 		</style>
 	</head>
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj<br /><br />
-			<span class="link" id="triangle">triangle</span>,
-			<span class="link" id="cube">cube</span>,
-			<span class="link" id="cylinder">cylinder</span>,
-			<span class="link" id="multiple">multiple</span>,
-			<span class="link" id="transformed">transformed</span><br /><br />
-			<span class="link" id="export">export to obj</span>
+			<button id="triangle">triangle</button>
+			<button id="cube">cube</button>
+			<button id="cylinder">cylinder</button>
+			<button id="multiple">multiple</button>
+			<button id="transformed">transformed</button><br /><br />
+			<button id="export">export to obj</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/exporters/OBJExporter.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OBJExporter } from './jsm/exporters/OBJExporter.js';
 
 			var camera, scene, light, renderer;
 			var exportButton, floatingDiv;
@@ -71,7 +45,7 @@
 
 			function exportToObj() {
 
-				var exporter = new THREE.OBJExporter();
+				var exporter = new OBJExporter();
 				var result = exporter.parse( scene );
 				floatingDiv.style.display = 'block';
 				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );

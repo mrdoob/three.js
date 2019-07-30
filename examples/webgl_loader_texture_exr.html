@@ -4,54 +4,25 @@
 		<title>three.js webgl - materials - EXR texture loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
-			a { color: red; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
+			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/EXRLoader.js"></script>
+		<script type="module">
 
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
 			var params = {
-				exposure: 1.0
+				exposure: 2.0
 			};
 
 			var renderer, scene, camera;
@@ -76,37 +47,39 @@
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.EXRLoader().load( 'textures/piz_compressed.exr', function ( texture, textureData ) {
+				new EXRLoader()
+					.setDataType( THREE.FloatType )
+					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
-					//console.log( textureData );
-					//console.log( texture );
+						//console.log( textureData );
+						//console.log( texture );
 
-					texture.minFilter = THREE.NearestFilter;
-					texture.magFilter = THREE.NearestFilter;
+						texture.minFilter = THREE.NearestFilter;
+						texture.magFilter = THREE.NearestFilter;
 
-					// these setting are currently set correctly by default
-					//texture.encoding = THREE.LinearEncoding;
-					//texture.minFilter = THREE.LinearMipMapLinearFilter;
-					//texture.magFilter = THREE.LinearFilter;
-					//texture.flipY = true;
+						// these setting are currently set correctly by default
+						//texture.encoding = LinearEncoding;
+						//texture.minFilter = LinearMipmapLinearFilter;
+						//texture.magFilter = LinearFilter;
+						//texture.flipY = true;
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+						var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					var quad = new THREE.PlaneBufferGeometry( textureData.width / textureData.height, 1 );
+						var quad = new THREE.PlaneBufferGeometry( 1.5 * textureData.width / textureData.height, 1.5 );
 
-					var mesh = new THREE.Mesh( quad, material );
+						var mesh = new THREE.Mesh( quad, material );
 
-					scene.add( mesh );
+						scene.add( mesh );
 
-					render();
+						render();
 
-				} );
+					} );
 
 				//
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
-				gui.add( params, 'exposure', 0, 2 ).onChange( render );
+				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();
 
 				//

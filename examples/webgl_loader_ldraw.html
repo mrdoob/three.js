@@ -4,26 +4,13 @@
 		<title>three.js webgl - LDrawLoader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #888;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			#info a {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -33,14 +20,14 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/LDrawLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
 			var container, progressBarDiv;
 
@@ -97,35 +84,25 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
 				guiData = {
 					modelFileName: modelFileList[ 'Car' ],
-					envMapActivated: false
+					envMapActivated: false,
+					separateObjects: false,
+					displayLines: true,
+					conditionalLines: true,
+					smoothNormals: true,
+					constructionStep: 0,
+					noConstructionSteps: "No steps."
 				};
-
-				gui = new dat.GUI();
-
-				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
-
-					reloadObject( true );
-
-				} );
-
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
-
-					envMapActivated = value;
-
-					reloadObject( false );
-
-				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -146,6 +123,34 @@
 
 			}
 
+			function updateObjectsVisibility() {
+
+				model.traverse( c => {
+
+					if ( c.isLineSegments ) {
+
+						if ( c.isConditionalLine ) {
+
+							c.visible = guiData.conditionalLines;
+
+						} else {
+
+							c.visible = guiData.displayLines;
+
+						}
+
+					}
+					else if ( c.isGroup ) {
+
+						// Hide objects with construction step > gui setting
+						c.visible = c.userData.constructionStep <= guiData.constructionStep;
+
+					}
+
+				} );
+
+			}
+
 			function reloadObject( resetCamera ) {
 
 				if ( model ) {
@@ -159,7 +164,9 @@
 				updateProgressBar( 0 );
 				showProgressBar();
 
-				var lDrawLoader = new THREE.LDrawLoader();
+				var lDrawLoader = new LDrawLoader();
+				lDrawLoader.separateObjects = guiData.separateObjects;
+				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
 					.setPath( ldrawPath )
 					.load( guiData.modelFileName, function ( group2 ) {
@@ -210,6 +217,10 @@
 
 						}
 
+						guiData.constructionStep = model.userData.numConstructionSteps - 1;
+
+						updateObjectsVisibility();
+
 						// Adjust camera and light
 
 						var bbox = new THREE.Box3().setFromObject( model );
@@ -224,6 +235,8 @@
 
 						}
 
+						createGUI();
+
 						hideProgressBar();
 
 					}, onProgress, onError );
@@ -236,6 +249,59 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function createGUI() {
+
+				if ( gui ) {
+
+					gui.destroy();
+				}
+
+				gui = new GUI();
+
+				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+
+					reloadObject( true );
+
+				} );
+
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				if ( guiData.separateObjects ) {
+
+					if ( model.userData.numConstructionSteps > 1  ) {
+
+						gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+					else {
+
+						gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+				}
+
+				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function changeEnvMap ( value ) {
+
+					envMapActivated = value;
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( updateObjectsVisibility );
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
 
 			}
 
@@ -297,7 +363,7 @@
 		<!-- LDraw.org CC BY 2.0 Parts Library attribution -->
 		<div style="display: block; position: absolute; bottom: 8px; left: 8px; width: 160px; padding: 10px; background-color: #F3F7F8;">
 			<center>
-				<a href="http://www.ldraw.org"><img style="width: 145px" src="files/ldraw_org_logo/Stamp145.png"></a>
+				<a href="http://www.ldraw.org"><img style="width: 145px" src="models/ldraw/ldraw_org_logo/Stamp145.png"></a>
 				<br />
 				<a href="http://www.ldraw.org/">This software uses the LDraw Parts Library</a>
 			</center>

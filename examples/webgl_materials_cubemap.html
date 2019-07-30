@@ -4,52 +4,24 @@
 		<title>three.js webgl - materials - cube reflection / refraction [Walt]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #ff0080;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cube mapping demo.<br />
-			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a> Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
+			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>, Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var container, stats;
 
@@ -68,15 +40,8 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
-				//controls
-				var controls = new THREE.OrbitControls( camera );
-				controls.enableZoom = false;
-				controls.enablePan = false;
-				controls.minPolarAngle = Math.PI / 4;
-				controls.maxPolarAngle = Math.PI / 1.5;
-
 				//cubemap
-				var path = "textures/cube/SwedishRoyalCastle/";
+				var path = 'textures/cube/SwedishRoyalCastle/';
 				var format = '.jpg';
 				var urls = [
 					path + 'px' + format, path + 'nx' + format,
@@ -107,7 +72,7 @@
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
 
 				//models
-				var objLoader = new THREE.OBJLoader();
+				var objLoader = new OBJLoader();
 
 				objLoader.setPath( 'models/obj/walt/' );
 				objLoader.load( 'WaltHead.obj', function ( object ) {
@@ -135,6 +100,13 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//controls
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.minPolarAngle = Math.PI / 4;
+				controls.maxPolarAngle = Math.PI / 1.5;
 
 				//stats
 				stats = new Stats();

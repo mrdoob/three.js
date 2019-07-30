@@ -1,45 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - box projected cubemap environment mapping</title>
+		<title>js webgl - box projected cubemap environment mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #888888;
-				font-family:Monospace;
-				font-size:13px;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 500px;
-				left: calc(50% - 250px);
-				text-align: center;
-			}
-
-			a {
-				color: #00f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - box projected cubemap environment mapping. <br> created by <a href="https://codercat.tk" target="_blank" rel="noopener">codercat</a>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - box projected cubemap environment mapping. <br> created by <a href="https://codercat.tk" target="_blank" rel="noopener">codercat</a>
 		</div>
-		<script src="../build/three.js"></script>
-		<script src="js/objects/Reflector.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/lights/RectAreaLightUniformsLib.js"></script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			// shader injection for box projected cube environment mapping
 			var worldposReplace = `
@@ -79,8 +59,8 @@
 					vec3 parallaxCorrectNormal( vec3 v, vec3 cubeSize, vec3 cubePos ) {
 
 						vec3 nDir = normalize( v );
-						vec3 rbmax = (   .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
-						vec3 rbmin = ( - .5 * ( cubeSize - cubePos ) - vWorldPosition ) / nDir;
+						vec3 rbmax = ( .5 * cubeSize + cubePos - vWorldPosition ) / nDir;
+						vec3 rbmin = ( -.5 * cubeSize + cubePos - vWorldPosition ) / nDir;
 
 						vec3 rbminmax;
 						rbminmax.x = ( nDir.x > 0. ) ? rbmax.x : rbmin.x;
@@ -289,7 +269,7 @@
 				container.appendChild( renderer.domElement );
 
 				// gui controls
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var params = {
 					'box projected': true
 				};
@@ -318,7 +298,7 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 280, 106, - 5 );
 
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, - 10, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
@@ -328,7 +308,7 @@
 				// cube camera for environment map
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
 
 				cubeCamera.position.set( 0, - 100, 0 );
@@ -356,7 +336,8 @@
 
 				boxProjectedMat.onBeforeCompile = function ( shader ) {
 
-					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 100, 100 ) };
+					//these parameters are for the cubeCamera texture
+					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
 					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
 					shader.uniforms.flipEnvMap.value = true;
 
@@ -441,6 +422,8 @@
 				var width = 50;
 				var height = 50;
 				var intensity = 10;
+
+				RectAreaLightUniformsLib.init();
 
 				var blueRectLight = new THREE.RectAreaLight( 0xf3aaaa, intensity, width, height );
 				blueRectLight.position.set( 99, 5, 0 );

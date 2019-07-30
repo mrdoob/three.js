@@ -4,58 +4,32 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				width: 100%;
-				height: 100%;
-				overflow: hidden;
-			}
-			
 			body {
+				background-color: #ccc;
 				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
 			}
-
-			#info {
-				color:#000;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				box-sizing: border-box;
-			}
-
 			a {
-				color: red;
+				color: #f00;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls example<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls<br />
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
 
 			var camera, controls, scene, renderer, stats;
 
@@ -66,22 +40,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 500;
-
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
-				controls.keys = [ 65, 83, 68 ];
-
-				controls.addEventListener( 'change', render );
 
 				// world
 
@@ -126,6 +84,22 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [ 65, 83, 68 ];
+
+				controls.addEventListener( 'change', render );
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
@@ -154,9 +128,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				
+
 				controls.update();
-				
+
 				stats.update();
 
 			}

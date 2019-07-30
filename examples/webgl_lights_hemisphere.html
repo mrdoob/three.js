@@ -4,52 +4,25 @@
 		<title>three.js webgl - lights - hemisphere light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #fff;
-				color: #111;
-				margin: 0px;
-				overflow: hidden;
-				font-family: Monospace;
-				font-size: 13px;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				text-align: center;
-			}
-
 			a {
-				color: #0080ff;
-				text-decoration: none;
+				color: #08f;
 			}
-
-			a:hover {
-				color: #f00;
-			}
-
-			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
-			strong { color: red }
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl hemisphere light example -
-			flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl hemisphere light example<br/>
+			flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/><br/>
+			<button id="hemisphereButton">toggle hemisphere light</button>
+			<button id="directionalButton">toggle directional light</button>
 		</div>
-		<div id="footer">
-			press <strong>h</strong> to toggle hemisphere light, <strong>d</strong> to toggle directional light
-		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -84,13 +57,14 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
 
 			var camera, scene, renderer, dirLight, dirLightHeper, hemiLight, hemiLightHelper;
 			var mixers = [];
@@ -188,7 +162,7 @@
 
 				// MODEL
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
 
@@ -230,7 +204,22 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', onKeyDown, false );
+
+				var hemisphereButton = document.getElementById( 'hemisphereButton' );
+				hemisphereButton.addEventListener( 'click', function () {
+
+					hemiLight.visible = ! hemiLight.visible;
+					hemiLightHelper.visible = ! hemiLightHelper.visible;
+
+				} );
+
+				var directionalButton = document.getElementById( 'directionalButton' );
+				directionalButton.addEventListener( 'click', function () {
+
+					dirLight.visible = ! dirLight.visible;
+					dirLightHeper.visible = ! dirLightHeper.visible;
+
+				} );
 
 			}
 
@@ -240,26 +229,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onKeyDown( event ) {
-
-				switch ( event.keyCode ) {
-
-					case 72: // h
-
-						hemiLight.visible = ! hemiLight.visible;
-						hemiLightHelper.visible = ! hemiLightHelper.visible;
-						break;
-
-					case 68: // d
-
-						dirLight.visible = ! dirLight.visible;
-						dirLightHeper.visible = ! dirLightHeper.visible;
-						break;
-
-				}
 
 			}
 
