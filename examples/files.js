@@ -12,7 +12,6 @@ var files = {
 		"webgl_clipping",
 		"webgl_clipping_advanced",
 		"webgl_clipping_intersection",
-		"webgl_clipping_stencil",
 		"webgl_decals",
 		"webgl_depth_texture",
 		"webgl_effects_anaglyph",
