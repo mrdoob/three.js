@@ -185,7 +185,7 @@
 
 	} );
 
-	var REVISION = '107dev';
+	var REVISION = '107';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	var CullFaceNone = 0;
@@ -2349,6 +2349,8 @@
 	 * @author tschw
 	 */
 
+	var _vector;
+
 	function Matrix3() {
 
 		this.elements = [
@@ -2432,29 +2434,25 @@
 
 		},
 
-		applyToBufferAttribute: function () {
+		applyToBufferAttribute: function ( attribute ) {
 
-			var v1 = new Vector3();
+			if ( _vector === undefined ) _vector = new Vector3();
 
-			return function applyToBufferAttribute( attribute ) {
+			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+				_vector.x = attribute.getX( i );
+				_vector.y = attribute.getY( i );
+				_vector.z = attribute.getZ( i );
 
-					v1.x = attribute.getX( i );
-					v1.y = attribute.getY( i );
-					v1.z = attribute.getZ( i );
+				_vector.applyMatrix3( this );
 
-					v1.applyMatrix3( this );
+				attribute.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
-					attribute.setXYZ( i, v1.x, v1.y, v1.z );
+			}
 
-				}
+			return attribute;
 
-				return attribute;
-
-			};
-
-		}(),
+		},
 
 		multiply: function ( m ) {
 
@@ -4825,6 +4823,8 @@
 	 * @author bhouston / http://clara.io
 	 */
 
+	var _matrix, _quaternion;
+
 	function Euler( x, y, z, order ) {
 
 		this._x = x || 0;
@@ -5069,19 +5069,15 @@
 
 		},
 
-		setFromQuaternion: function () {
+		setFromQuaternion: function ( q, order, update ) {
 
-			var matrix = new Matrix4();
+			if ( _matrix === undefined ) _matrix = new Matrix4();
 
-			return function setFromQuaternion( q, order, update ) {
+			_matrix.makeRotationFromQuaternion( q );
 
-				matrix.makeRotationFromQuaternion( q );
+			return this.setFromRotationMatrix( _matrix, order, update );
 
-				return this.setFromRotationMatrix( matrix, order, update );
-
-			};
-
-		}(),
+		},
 
 		setFromVector3: function ( v, order ) {
 
@@ -5089,21 +5085,17 @@
 
 		},
 
-		reorder: function () {
+		reorder: function ( newOrder ) {
 
 			// WARNING: this discards revolution information -bhouston
 
-			var q = new Quaternion();
+			if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-			return function reorder( newOrder ) {
+			_quaternion.setFromEuler( this );
 
-				q.setFromEuler( this );
+			return this.setFromQuaternion( _quaternion, newOrder );
 
-				return this.setFromQuaternion( q, newOrder );
-
-			};
-
-		}(),
+		},
 
 		equals: function ( euler ) {
 
@@ -6807,6 +6799,8 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	var _box;
+
 	function Sphere( center, radius ) {
 
 		this.center = ( center !== undefined ) ? center : new Vector3();
@@ -6825,39 +6819,35 @@
 
 		},
 
-		setFromPoints: function () {
+		setFromPoints: function ( points, optionalCenter ) {
 
-			var box = new Box3();
+			if ( _box === undefined ) _box = new Box3();
 
-			return function setFromPoints( points, optionalCenter ) {
+			var center = this.center;
 
-				var center = this.center;
+			if ( optionalCenter !== undefined ) {
 
-				if ( optionalCenter !== undefined ) {
+				center.copy( optionalCenter );
 
-					center.copy( optionalCenter );
+			} else {
 
-				} else {
+				_box.setFromPoints( points ).getCenter( center );
 
-					box.setFromPoints( points ).getCenter( center );
+			}
 
-				}
+			var maxRadiusSq = 0;
 
-				var maxRadiusSq = 0;
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-				for ( var i = 0, il = points.length; i < il; i ++ ) {
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+			}
 
-				}
+			this.radius = Math.sqrt( maxRadiusSq );
 
-				this.radius = Math.sqrt( maxRadiusSq );
+			return this;
 
-				return this;
-
-			};
-
-		}(),
+		},
 
 		clone: function () {
 
@@ -27847,7 +27837,7 @@
 
 		// all vertices should lie on a conceptual sphere with a given radius
 
-		appplyRadius( radius );
+		applyRadius( radius );
 
 		// finally, create the uv data
 
@@ -27960,7 +27950,7 @@
 
 		}
 
-		function appplyRadius( radius ) {
+		function applyRadius( radius ) {
 
 			var vertex = new Vector3();
 
@@ -40138,7 +40128,13 @@
 
 		var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
 
-		if ( ! glyph ) return;
+		if ( ! glyph ) {
+
+			console.error( 'THREE.Font: character "' + char + '" does not exists in font family ' + data.familyName + '.' );
+
+			return;
+
+		}
 
 		var path = new ShapePath();
 
@@ -45158,6 +45154,8 @@
 	 * @author bhouston / http://clara.io
 	 */
 
+	var _startP, _startEnd;
+
 	function Line3( start, end ) {
 
 		this.start = ( start !== undefined ) ? start : new Vector3();
@@ -45242,32 +45240,32 @@
 
 		},
 
-		closestPointToPointParameter: function () {
+		closestPointToPointParameter: function ( point, clampToLine ) {
 
-			var startP = new Vector3();
-			var startEnd = new Vector3();
+			if ( _startP === undefined ) {
 
-			return function closestPointToPointParameter( point, clampToLine ) {
+				_startP = new Vector3();
+				_startEnd = new Vector3();
 
-				startP.subVectors( point, this.start );
-				startEnd.subVectors( this.end, this.start );
+			}
 
-				var startEnd2 = startEnd.dot( startEnd );
-				var startEnd_startP = startEnd.dot( startP );
+			_startP.subVectors( point, this.start );
+			_startEnd.subVectors( this.end, this.start );
 
-				var t = startEnd_startP / startEnd2;
+			var startEnd2 = _startEnd.dot( _startEnd );
+			var startEnd_startP = _startEnd.dot( _startP );
 
-				if ( clampToLine ) {
+			var t = startEnd_startP / startEnd2;
 
-					t = _Math.clamp( t, 0, 1 );
+			if ( clampToLine ) {
 
-				}
+				t = _Math.clamp( t, 0, 1 );
 
-				return t;
+			}
 
-			};
+			return t;
 
-		}(),
+		},
 
 		closestPointToPoint: function ( point, clampToLine, target ) {
 
