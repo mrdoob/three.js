@@ -55,6 +55,7 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		state.buffers.stencil.setOp( context.REPLACE, context.REPLACE, context.REPLACE );
 		state.buffers.stencil.setFunc( context.ALWAYS, writeValue, 0xffffffff );
 		state.buffers.stencil.setClear( clearValue );
+		state.buffers.stencil.setLocked( true );
 
 		// draw into the stencil buffer
 
@@ -73,8 +74,10 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		// only render where stencil is set to 1
 
+		state.buffers.stencil.setLocked( false );
 		state.buffers.stencil.setFunc( context.EQUAL, 1, 0xffffffff ); // draw if == 1
 		state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.KEEP );
+		state.buffers.stencil.setLocked( true );
 
 	}
 
@@ -95,6 +98,7 @@ Object.assign( THREE.ClearMaskPass.prototype, {
 
 	render: function ( renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
 
+		state.buffers.stencil.setLocked( false );
 		renderer.state.buffers.stencil.setTest( false );
 
 	}
