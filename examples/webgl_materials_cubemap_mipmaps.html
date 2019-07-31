@@ -30,7 +30,7 @@
 			init();
 			animate();
 
-			// load custmized cube texture
+			//load custmized cube texture
 			async function loadCubeTextureWithMipmaps() {
 
 				var path = 'textures/cube/angus/';
@@ -88,10 +88,10 @@
 				var pendings = [];
 				loadCubeTextureWithMipmaps().then( function( cubeTexture ) {
 
-					// model
+					//model
 					var sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
 
-					// manual mipmaps
+					//manual mipmaps
 					var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
 					material.name = 'manual mipmaps';
 
@@ -111,7 +111,7 @@
 					material.name = 'auto mipmaps';
 
 					var autoCubeTexture = cubeTexture.clone();
-					// autoCubeTexture.mipmaps = [];
+					autoCubeTexture.mipmaps = [];
 					autoCubeTexture.generateMipmaps = true;
 					autoCubeTexture.needsUpdate = true;
 
