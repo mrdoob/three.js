@@ -61,7 +61,8 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	VertexColors
+	VertexColors,
+	sRGBEncoding
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
@@ -645,6 +646,7 @@ var FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map.encoding = sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
@@ -653,6 +655,7 @@ var FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap.encoding = sRGBEncoding;
 						break;
 
 					case 'NormalMap':
@@ -663,10 +666,12 @@ var FBXLoader = ( function () {
 					case 'ReflectionColor':
 						parameters.envMap = self.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap.encoding = sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
@@ -4171,5 +4176,4 @@ var FBXLoader = ( function () {
 	return FBXLoader;
 
 } )();
-
 export { FBXLoader };

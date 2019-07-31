@@ -597,6 +597,7 @@ THREE.FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
@@ -605,6 +606,7 @@ THREE.FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'NormalMap':
@@ -615,10 +617,12 @@ THREE.FBXLoader = ( function () {
 					case 'ReflectionColor':
 						parameters.envMap = self.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
+						parameters.envMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
