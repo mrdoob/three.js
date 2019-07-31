@@ -206,6 +206,10 @@
 	<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
 	<p>对当前物体应用由四元数所表示的变换。</p>
 
+	
+	<h3>[method:this attach]( [param:Object3D object] )</h3>
+	<p>将*object*作为子级来添加到该对象中，同时保持该object的世界变换。</p>
+
 	<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 	<p>
 		recursive —— 如果值为true，则该物体的后代也会被克隆。默认值为true。<br /><br />
@@ -216,7 +220,10 @@
 	<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
 	<p>
 		recursive —— 如果值为true，则该物体的后代也会被复制。默认值为true。<br /><br />
+
 		复制给定的对象到这个对象中。
+
+		请注意，事件监听器和用户定义的回调函数（[page:.onAfterRender] 和 [page:.onBeforeRender]）不会被复制。
 	</p>
 
 	<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
@@ -356,12 +363,13 @@
 	<p>
 		q -- 标准化的四元数。<br /><br />
 
-将所给的四元数复制到[page:.quaternion]中。
+		将所给的四元数复制到[page:.quaternion]中。
 	</p>
 
 	<h3>[method:null toJSON]( [param:Quaternion q] )</h3>
 	<p>
-		将这个对象转换为JSON格式。
+		meta -- 包含有元数据的对象，例如该对象的材质、纹理或图片。
+		将对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 	</p>
 
 	<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
