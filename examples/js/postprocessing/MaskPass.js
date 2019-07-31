@@ -98,7 +98,7 @@ Object.assign( THREE.ClearMaskPass.prototype, {
 
 	render: function ( renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
 
-		state.buffers.stencil.setLocked( false );
+		renderer.state.buffers.stencil.setLocked( false );
 		renderer.state.buffers.stencil.setTest( false );
 
 	}
