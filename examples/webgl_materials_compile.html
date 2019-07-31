@@ -33,205 +33,214 @@
 			Loading ...
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<script type="module">
 
-		import './js/nodes/THREE.Nodes.js';
+			import * as THREE from '../build/three.module.js';
 
-		var container = document.getElementById( 'container' );
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
-		var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-		var frame = new THREE.NodeFrame();
-		var teapot;
-		var controls;
-		var rtTexture, rtMaterial;
-		var meshes = [];
+			import {
+				NodeFrame,
+				FloatNode,
+				ColorNode,
+				ConstNode,
+				ExpressionNode,
+				MathNode,
+				OperatorNode,
+				TimerNode,
+				PhongNodeMaterial
+			} from './jsm/nodes/Nodes.js';
 
-		document.getElementById( "preload" ).addEventListener( 'click', function () {
+			var container = document.getElementById( 'container' );
 
-			var hash = document.location.hash.substr( 1 );
+			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+			var frame = new NodeFrame();
+			var teapot;
+			var controls;
+			var rtTexture, rtMaterial;
+			var meshes = [];
 
-			if ( hash.length === 0 ) {
+			document.getElementById( "preload" ).addEventListener( 'click', function () {
 
-				window.location.hash = "#NoPreLoad";
+				var hash = document.location.hash.substr( 1 );
 
-			} else {
+				if ( hash.length === 0 ) {
 
-				window.location.hash = "";
+					window.location.hash = "#NoPreLoad";
 
-			}
+				} else {
 
-			location.reload( true );
+					window.location.hash = "";
 
-		}, false );
+				}
 
-		window.addEventListener( 'load', init );
+				location.reload( true );
 
-		function init() {
+			}, false );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			container.appendChild( renderer.domElement );
+			window.addEventListener( 'load', init );
 
-			scene = new THREE.Scene();
+			function init() {
 
-			camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
-			camera.position.x = 0;
-			camera.position.z = - 300;
-			camera.position.y = 200;
-			camera.target = new THREE.Vector3();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.minDistance = 50;
-			controls.maxDistance = 400;
+				scene = new THREE.Scene();
 
-			scene.add( new THREE.AmbientLight( 0x464646 ) );
+				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.x = 0;
+				camera.position.z = - 300;
+				camera.position.y = 200;
+				camera.target = new THREE.Vector3();
 
-			var light = new THREE.DirectionalLight( 0xffddcc, 1 );
-			light.position.set( 1, 0.75, 0.5 );
-			scene.add( light );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 400;
 
-			var light = new THREE.DirectionalLight( 0xccccff, 1 );
-			light.position.set( - 1, 0.75, - 0.5 );
-			scene.add( light );
+				scene.add( new THREE.AmbientLight( 0x464646 ) );
 
-			teapot = new THREE.TeapotBufferGeometry( 15, 18 );
+				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+				light.position.set( 1, 0.75, 0.5 );
+				scene.add( light );
 
-			var itemsonrow = 10;
+				var light = new THREE.DirectionalLight( 0xccccff, 1 );
+				light.position.set( - 1, 0.75, - 0.5 );
+				scene.add( light );
 
-			for ( var i = 0; i < itemsonrow * itemsonrow; i ++ ) {
+				teapot = new TeapotBufferGeometry( 15, 18 );
 
-				var mesh = new THREE.Mesh( teapot );
+				var itemsonrow = 10;
 
-				mesh.position.x = 50 * ( i % itemsonrow ) - 50 * itemsonrow / 2;
-				mesh.position.z = 50 * Math.floor( i / itemsonrow ) - 150;
-				updateMaterial( mesh );
-				scene.add( mesh );
-				meshes.push( mesh );
+				for ( var i = 0; i < itemsonrow * itemsonrow; i ++ ) {
 
-			}
+					var mesh = new THREE.Mesh( teapot );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+					mesh.position.x = 50 * ( i % itemsonrow ) - 50 * itemsonrow / 2;
+					mesh.position.z = 50 * Math.floor( i / itemsonrow ) - 150;
+					updateMaterial( mesh );
+					scene.add( mesh );
+					meshes.push( mesh );
 
-			var hash = document.location.hash.substr( 1 );
+				}
 
-			if ( hash.length === 0 ) {
+				window.addEventListener( 'resize', onWindowResize, false );
 
-				renderer.compile( scene, camera );
+				var hash = document.location.hash.substr( 1 );
 
-			}
+				if ( hash.length === 0 ) {
 
-			document.getElementById( "waitScreen" ).className = "hide";
+					renderer.compile( scene, camera );
 
-			setTimeout( function () {
+				}
 
-				onWindowResize();
-				animate();
+				document.getElementById( "waitScreen" ).className = "hide";
 
-			}, 1 );
+				setTimeout( function () {
 
-		}
+					onWindowResize();
+					animate();
 
-		function updateMaterial( mesh ) {
-
-			if ( mesh.material ) mesh.material.dispose();
-
-			if ( rtTexture ) {
-
-				rtTexture.dispose();
-				rtTexture = null;
-
-			}
-
-			if ( rtMaterial ) {
-
-				rtMaterial.dispose();
-				rtMaterial = null;
+				}, 1 );
 
 			}
 
-			var mtl = new THREE.PhongNodeMaterial();
+			function updateMaterial( mesh ) {
 
-			var time = new THREE.TimerNode();
-			var speed = new THREE.FloatNode( Math.random() );
+				if ( mesh.material ) mesh.material.dispose();
 
-			var color = new THREE.ColorNode( Math.random() * 0xFFFFFF );
+				if ( rtTexture ) {
 
-			var timeSpeed = new THREE.OperatorNode(
-				time,
-				speed,
-				THREE.OperatorNode.MUL
-			);
+					rtTexture.dispose();
+					rtTexture = null;
 
-			var sinCycleInSecs = new THREE.OperatorNode(
-				timeSpeed,
-				new THREE.ConstNode( THREE.ConstNode.PI2 ),
-				THREE.OperatorNode.MUL
-			);
+				}
 
-			var cycle = new THREE.MathNode( sinCycleInSecs, THREE.MathNode.SIN );
+				if ( rtMaterial ) {
 
-			var cycleColor = new THREE.OperatorNode(
-				cycle,
-				color,
-				THREE.OperatorNode.MUL
-			);
+					rtMaterial.dispose();
+					rtMaterial = null;
 
-			var cos = new THREE.MathNode( cycleColor, THREE.MathNode.SIN );
+				}
 
-			mtl.color = new THREE.ColorNode( 0 );
-			mtl.emissive = cos;
+				var mtl = new PhongNodeMaterial();
+
+				var time = new TimerNode();
+				var speed = new FloatNode( Math.random() );
+
+				var color = new ColorNode( Math.random() * 0xFFFFFF );
+
+				var timeSpeed = new OperatorNode(
+					time,
+					speed,
+					OperatorNode.MUL
+				);
+
+				var sinCycleInSecs = new OperatorNode(
+					timeSpeed,
+					new ConstNode( ConstNode.PI2 ),
+					OperatorNode.MUL
+				);
+
+				var cycle = new MathNode( sinCycleInSecs, MathNode.SIN );
+
+				var cycleColor = new OperatorNode(
+					cycle,
+					color,
+					OperatorNode.MUL
+				);
+
+				var cos = new MathNode( cycleColor, MathNode.SIN );
+
+				mtl.color = new ColorNode( 0 );
+				mtl.emissive = cos;
 
 
-			var transformer = new THREE.ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ] );
-			mtl.transform = transformer;
+				var transformer = new ExpressionNode( "position + 0.0 * " + Math.random(), "vec3", [ ] );
+				mtl.transform = transformer;
 
-			// build shader ( ignore auto build )
-			mtl.build();
+				// build shader ( ignore auto build )
+				mtl.build();
 
-			// set material
-			mesh.material = mtl;
-
-		}
-
-		function onWindowResize() {
-
-			var width = window.innerWidth, height = window.innerHeight;
-
-			camera.aspect = width / height;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize( width, height );
-
-			if ( rtTexture ) rtTexture.setSize( width, height );
-
-		}
-
-		function animate() {
-
-			var delta = clock.getDelta();
-
-			frame.update( delta );
-
-			for ( var i = 0; i < meshes.length; i ++ ) {
-
-				var mesh = meshes[ i ];
-
-				frame.updateNode( mesh.material );
+				// set material
+				mesh.material = mtl;
 
 			}
 
-			renderer.render( scene, camera );
+			function onWindowResize() {
 
-			requestAnimationFrame( animate );
+				var width = window.innerWidth, height = window.innerHeight;
 
-		}
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				if ( rtTexture ) rtTexture.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				frame.update( delta );
+
+				for ( var i = 0; i < meshes.length; i ++ ) {
+
+					var mesh = meshes[ i ];
+
+					frame.updateNode( mesh.material );
+
+				}
+
+				renderer.render( scene, camera );
+
+				requestAnimationFrame( animate );
+
+			}
 
 		</script>
 
