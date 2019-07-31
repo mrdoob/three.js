@@ -64,7 +64,6 @@ import {
 	VertexColors
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
-import { TGALoader } from "../loaders/TGALoader.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
 
 
@@ -337,26 +336,14 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof TGALoader !== 'function' ) {
+					if ( Loader.Handlers.get( '.tga' ) === null ) {
 
-						console.warn( 'FBXLoader: TGALoader is required to load TGA textures' );
-						return;
-
-					} else {
-
-						if ( Loader.Handlers.get( '.tga' ) === null ) {
-
-							var tgaLoader = new TGALoader();
-							tgaLoader.setPath( this.textureLoader.path );
-
-							Loader.Handlers.add( /\.tga$/i, tgaLoader );
-
-						}
-
-						type = 'image/tga';
-						break;
+						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
 					}
+
+					type = 'image/tga';
+					break;
 
 				default:
 
@@ -466,7 +453,7 @@ var FBXLoader = ( function () {
 
 				if ( loader === null ) {
 
-					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
+					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
 					texture = new Texture();
 
 				} else {
@@ -477,7 +464,7 @@ var FBXLoader = ( function () {
 
 			} else if ( extension === 'psd' ) {
 
-				console.warn( 'FBXLoader: PSD textures are not supported, creating empty placeholder texture for', fileName );
+				console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
 				texture = new Texture();
 
 			} else {
@@ -1602,6 +1589,7 @@ var FBXLoader = ( function () {
 			}
 
 		},
+
 
 		// Parse single node mesh geometry in FBXTree.Objects.Geometry
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
