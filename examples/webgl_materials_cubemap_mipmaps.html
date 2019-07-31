@@ -12,7 +12,7 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cubemap customized mipmaps demo. Author <a href="https://github.com/AngusLang">Angus</a><br/>
 			Top: webgl generated mipmaps<br/>
-			Bottom: customized mimaps<br/>
+			Bottom: manual mimaps<br/>
 		</div>
 
 		<script type="module">
@@ -81,46 +81,48 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( -1750, 0, 500 );
-
-				//load cubemap
+				camera.position.set( - 1750, 0, 500 );
 
 				scene = new THREE.Scene();
 
-				//lights
-				var ambient = new THREE.AmbientLight( 0xffffff, 1.0 );
-				scene.add( ambient );
-
 				var pendings = [];
-				var reflectCubeTexture = loadCubeTextureWithMipmaps().then( function( reflectCubeTexture ) {
+				loadCubeTextureWithMipmaps().then( function( cubeTexture ) {
 
-					//rewrite mipmaps
-					var originalCubeTexture = reflectCubeTexture.clone();
-					originalCubeTexture.generateMipmaps = true;
-					originalCubeTexture.needsUpdate = true;
-
-					//models
+					// model
 					var sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: reflectCubeTexture } );
+					// manual mipmaps
+					var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
+					material.name = 'manual mipmaps';
 
 					var offset = 250;
-					var originX = -1150;
+					var originX = - 1150;
+
 					for ( var i = 0; i < 10; ++ i ) {
 
-						//customize mipmaps sphere
-						var cm = material.clone();
-						cm.envMap = originalCubeTexture;
+						var mesh = new THREE.Mesh( sphere, material );
+						mesh.position.set( originX + i * offset, - 150, 0 );
+						scene.add( mesh );
 
-						var c = new THREE.Mesh( sphere, cm );
-						c.position.set( originX + i * offset, 150, 0 );
-						scene.add( c );
+					}
 
-						//webgl mipmaps sphere
-						var om = material.clone();
-						var o = new THREE.Mesh( sphere, om );
-						o.position.set( originX + i * offset, -150, 0 );
-						scene.add( o );
+					//webgl mipmaps
+					material = material.clone();
+					material.name = 'auto mipmaps';
+
+					var autoCubeTexture = cubeTexture.clone();
+					// autoCubeTexture.mipmaps = [];
+					autoCubeTexture.generateMipmaps = true;
+					autoCubeTexture.needsUpdate = true;
+
+					material.envMap = autoCubeTexture;
+
+					for ( var i = 0; i < 10; ++ i ) {
+
+						var mesh = new THREE.Mesh( sphere, material );
+						mesh.position.set( originX + i * offset, 150, 0 );
+						scene.add( mesh );
+
 					}
 
 				} );
