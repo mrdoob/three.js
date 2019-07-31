@@ -80,7 +80,7 @@ MaskPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		state.buffers.stencil.setLocked( false );
 		state.buffers.stencil.setFunc( context.EQUAL, 1, 0xffffffff ); // draw if == 1
 		state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.KEEP );
-		state.buffers.depth.setLocked( true );
+		state.buffers.stencil.setLocked( true );
 
 	}
 
