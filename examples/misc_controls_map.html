@@ -26,8 +26,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-
 			import { MapControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, controls, scene, renderer;
@@ -64,8 +62,6 @@
 				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
 				controls.dampingFactor = 0.05;
 
-				controls.screenSpacePanning = false;
-
 				controls.minDistance = 100;
 				controls.maxDistance = 700;
 
@@ -93,9 +89,6 @@
 				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				var gui = new GUI();
-				gui.add( controls, 'screenSpacePanning' );
 
 			}
 
