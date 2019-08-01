@@ -64,6 +64,9 @@ var OrbitControls = function ( object, domElement ) {
 	this.enableZoom = true;
 	this.zoomSpeed = 1.0;
 
+	// Set to true to zoom to cursor // panning may have to be enabled... // does it make sense for orbit controls?
+	this.zoomToCursor = false;
+
 	// Set to false to disable rotating
 	this.enableRotate = true;
 	this.rotateSpeed = 1.0;
@@ -185,7 +188,7 @@ var OrbitControls = function ( object, domElement ) {
 
 			spherical.makeSafe();
 
-
+			var prevRadius = spherical.radius;
 			spherical.radius *= scale;
 
 			// restrict radius to be between desired limits
@@ -200,6 +203,22 @@ var OrbitControls = function ( object, domElement ) {
 			} else {
 
 				scope.target.add( panOffset );
+
+			}
+
+			// suport zoomToCursor (mouse only)
+
+			if ( scope.zoomToCursor ) {
+
+				if ( scope.object.isPerspectiveCamera ) {
+
+					scope.target.lerp( mouse3D, 1 - spherical.radius / prevRadius );
+
+				} else if ( scope.object.isOrthographicCamera ) {
+
+					scope.target.lerp( mouse3D, 1 - zoomFactor );
+
+				}
 
 			}
 
@@ -242,6 +261,7 @@ var OrbitControls = function ( object, domElement ) {
 				lastPosition.copy( scope.object.position );
 				lastQuaternion.copy( scope.object.quaternion );
 				zoomChanged = false;
+				zoomFactor = 1;
 
 				return true;
 
@@ -304,6 +324,7 @@ var OrbitControls = function ( object, domElement ) {
 	var scale = 1;
 	var panOffset = new Vector3();
 	var zoomChanged = false;
+	var zoomFactor = 1;
 
 	var rotateStart = new Vector2();
 	var rotateEnd = new Vector2();
@@ -316,6 +337,8 @@ var OrbitControls = function ( object, domElement ) {
 	var dollyStart = new Vector2();
 	var dollyEnd = new Vector2();
 	var dollyDelta = new Vector2();
+
+	var mouse3D = new Vector3();
 
 	function getAutoRotationAngle() {
 
@@ -430,7 +453,9 @@ var OrbitControls = function ( object, domElement ) {
 
 		} else if ( scope.object.isOrthographicCamera ) {
 
+			zoomFactor = scope.object.zoom;
 			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
+			zoomFactor /= scope.object.zoom
 			scope.object.updateProjectionMatrix();
 			zoomChanged = true;
 
@@ -451,7 +476,9 @@ var OrbitControls = function ( object, domElement ) {
 
 		} else if ( scope.object.isOrthographicCamera ) {
 
+			zoomFactor = scope.object.zoom;
 			scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / dollyScale ) );
+			zoomFactor /= scope.object.zoom
 			scope.object.updateProjectionMatrix();
 			zoomChanged = true;
 
@@ -522,7 +549,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( dollyDelta.y > 0 ) {
 
-			dollyIn( getZoomScale() );
+			dollyIn( getZoomScale() ); // fix - set mouse3D - dragging with middle mouse button
 
 		} else if ( dollyDelta.y < 0 ) {
 
@@ -558,9 +585,64 @@ var OrbitControls = function ( object, domElement ) {
 
 	}
 
+	var updateMouse3D = function () {
+
+		var v = new Vector3();
+		var dir = new Vector3();
+
+		return function updateMouse3D( event ) {
+
+			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+
+			if ( scope.object.isPerspectiveCamera ) {
+
+				v.set(
+				    ( event.clientX / element.clientWidth ) * 2 - 1,
+				    - ( event.clientY / element.clientHeight ) * 2 + 1,
+				    0.5 );
+
+				v.unproject( scope.object );
+
+				v.sub( scope.object.position ).normalize();
+
+				var distance = ( scope.target.y - scope.object.position.y ) / v.y; // y-up case only - fix; .y can be zero
+
+				mouse3D.copy( scope.object.position ).add( v.multiplyScalar( distance ) );
+
+			} else if ( scope.object.isOrthographicCamera ) {
+
+				// ref: https://stackoverflow.com/questions/38902223/three-js-orthographic-camera-find-x-and-z-where-y-0/38904730#38904730
+				v.set(
+				    ( event.clientX / element.clientWidth ) * 2 - 1,
+				    - ( event.clientY / element.clientHeight ) * 2 + 1,
+				    ( scope.object.near + scope.object.far ) / ( scope.object.near - scope.object.far ) );
+
+				v.unproject( scope.object ); // set v in plane of camera
+
+				dir.set( 0, 0, - 1 ).transformDirection( scope.object.matrixWorld ); // could use quaternion...
+
+				var distance = - v.y / dir.y; // y-up case only - fix; .y can be zero
+
+				mouse3D.copy( v ).add( dir.multiplyScalar( distance ) );
+
+			} else {
+
+				// camera neither orthographic nor perspective
+				console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type.' );
+
+			}
+
+			//console.log( mouse3D );
+
+		};
+
+	}();
+
 	function handleMouseWheel( event ) {
 
 		// console.log( 'handleMouseWheel' );
+
+		updateMouse3D( event );
 
 		if ( event.deltaY < 0 ) {
 
@@ -756,7 +838,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
 
-		dollyIn( dollyDelta.y );
+		dollyIn( dollyDelta.y ); // fix - set mouse3D for zoom to cursor
 
 		dollyStart.copy( dollyEnd );
 
@@ -952,7 +1034,7 @@ var OrbitControls = function ( object, domElement ) {
 
 				if ( scope.enableZoom === false ) return;
 
-				handleMouseMoveDolly( event );
+				handleMouseMoveDolly( event ); // fix zoom to cursor - dragging with middle mouse button - could be from alt key???
 
 				break;
 
@@ -1333,6 +1415,8 @@ var MapControls = function ( object, domElement ) {
 
 	this.touches.ONE = TOUCH.PAN;
 	this.touches.TWO = TOUCH.DOLLY_ROTATE;
+
+	this.zoomToCursor = true;
 
 };
 

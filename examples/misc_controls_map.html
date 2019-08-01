@@ -40,14 +40,19 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xcccccc );
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.0012 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				renderer.gammaOutput = true;
+
+				//var h = 100, aspect = window.innerWidth / window.innerHeight;
+				//camera = new THREE.OrthographicCamera( - h * aspect, h * aspect, h, - h, 10, 10000 );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 10, 10000 );
 				camera.position.set( 400, 200, 0 );
 
 				// controls
@@ -62,48 +67,32 @@
 				controls.screenSpacePanning = false;
 
 				controls.minDistance = 100;
-				controls.maxDistance = 500;
+				controls.maxDistance = 700;
 
-				controls.maxPolarAngle = Math.PI / 2;
+				controls.maxPolarAngle = Math.PI / 3;
 
-				// world
+				//scene.add( new THREE.AxesHelper( 500 ) );
 
-				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-				geometry.translate( 0, 0.5, 0 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				new THREE.TextureLoader().load( 'textures/terrain/agrarian_economy.jpg', function ( texture ) {
 
-				for ( var i = 0; i < 500; i ++ ) {
+					texture.encoding = THREE.sRGBEncoding;
+
+					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+					texture.repeat.set( 6, 6 );
+
+					var geometry = new THREE.PlaneBufferGeometry( 6000, 6000 );
+					geometry.rotateX( - Math.PI / 2 );
+
+					var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 1600 - 800;
-					mesh.position.y = 0;
-					mesh.position.z = Math.random() * 1600 - 800;
-					mesh.scale.x = 20;
-					mesh.scale.y = Math.random() * 80 + 10;
-					mesh.scale.z = 20;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
+					scene.add( mesh )
 
-				}
+					//render(); // if there is no animation loop
 
-				// lights
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
-
-				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( - 1, - 1, - 1 );
-				scene.add( light );
-
-				var light = new THREE.AmbientLight( 0x222222 );
-				scene.add( light );
-
-				//
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
 
 				var gui = new GUI();
 				gui.add( controls, 'screenSpacePanning' );
@@ -124,6 +113,32 @@
 				requestAnimationFrame( animate );
 
 				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+				// poor man's infinity map
+
+				if ( camera.position.x > 1000 ) {
+
+					camera.position.x -= 1000;
+					controls.target.x -= 1000;
+
+				} else if ( camera.position.x < - 1000 ) {
+
+					camera.position.x += 1000;
+					controls.target.x += 1000;
+
+				}
+
+				if ( camera.position.z > 1000 ) {
+
+					camera.position.z -= 1000;
+					controls.target.z -= 1000;
+
+				} else if ( camera.position.z < - 1000 ) {
+
+					camera.position.z += 1000;
+					controls.target.z += 1000;
+
+				}
 
 				render();
 
