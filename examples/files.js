@@ -282,7 +282,7 @@ var files = {
 		"webgl_buffergeometry",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
-		"webgl_buffergeometry_drawcalls",
+		"webgl_buffergeometry_drawrange",
 		"webgl_buffergeometry_indexed",
 		"webgl_buffergeometry_instancing",
 		"webgl_buffergeometry_instancing2",

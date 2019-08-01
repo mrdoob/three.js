@@ -61,10 +61,10 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	VertexColors
+	VertexColors,
+	sRGBEncoding
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
-import { TGALoader } from "../loaders/TGALoader.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
 
 
@@ -337,26 +337,14 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof TGALoader !== 'function' ) {
+					if ( Loader.Handlers.get( '.tga' ) === null ) {
 
-						console.warn( 'FBXLoader: TGALoader is required to load TGA textures' );
-						return;
-
-					} else {
-
-						if ( Loader.Handlers.get( '.tga' ) === null ) {
-
-							var tgaLoader = new TGALoader();
-							tgaLoader.setPath( this.textureLoader.path );
-
-							Loader.Handlers.add( /\.tga$/i, tgaLoader );
-
-						}
-
-						type = 'image/tga';
-						break;
+						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
 					}
+
+					type = 'image/tga';
+					break;
 
 				default:
 
@@ -466,7 +454,7 @@ var FBXLoader = ( function () {
 
 				if ( loader === null ) {
 
-					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
+					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
 					texture = new Texture();
 
 				} else {
@@ -477,7 +465,7 @@ var FBXLoader = ( function () {
 
 			} else if ( extension === 'psd' ) {
 
-				console.warn( 'FBXLoader: PSD textures are not supported, creating empty placeholder texture for', fileName );
+				console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
 				texture = new Texture();
 
 			} else {
@@ -658,6 +646,7 @@ var FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map.encoding = sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
@@ -666,6 +655,7 @@ var FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap.encoding = sRGBEncoding;
 						break;
 
 					case 'NormalMap':
@@ -676,10 +666,12 @@ var FBXLoader = ( function () {
 					case 'ReflectionColor':
 						parameters.envMap = self.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap.encoding = sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
@@ -1602,6 +1594,7 @@ var FBXLoader = ( function () {
 			}
 
 		},
+
 
 		// Parse single node mesh geometry in FBXTree.Objects.Geometry
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
@@ -4183,5 +4176,4 @@ var FBXLoader = ( function () {
 	return FBXLoader;
 
 } )();
-
 export { FBXLoader };

@@ -148,7 +148,7 @@ NodeLib.addKeyword( 'worldPosition', function () {
 
 NodeLib.addKeyword( 'viewPosition', function () {
 
-	return new PositionNode( NormalNode.VIEW );
+	return new PositionNode( PositionNode.VIEW );
 
 } );
 

@@ -61,7 +61,7 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	builder.addContext( context );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
-	this.colorSpace.fromEncoding( builder.getTextureEncodingFromMap( this.value ) );
+	this.colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );
 	this.colorSpace.input.parse( code );
 
 	code = this.colorSpace.build( builder, outputType );
