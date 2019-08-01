@@ -76,7 +76,6 @@ function WebGLRenderer( parameters ) {
 	// public properties
 
 	this.domElement = _canvas;
-	this.context = null;
 
 	// Debug configuration container
 	this.debug = {
@@ -299,7 +298,6 @@ function WebGLRenderer( parameters ) {
 
 		info.programs = programCache.programs;
 
-		_this.context = _gl;
 		_this.capabilities = capabilities;
 		_this.extensions = extensions;
 		_this.properties = properties;
@@ -313,7 +311,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
 	this.vr = vr;
 

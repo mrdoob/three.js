@@ -1,5 +1,6 @@
-export var REVISION = '106';
-export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2 };
+export var REVISION = '107dev';
+export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
+export var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export var CullFaceNone = 0;
 export var CullFaceBack = 1;
 export var CullFaceFront = 2;
@@ -146,3 +147,21 @@ export var BasicDepthPacking = 3200;
 export var RGBADepthPacking = 3201;
 export var TangentSpaceNormalMap = 0;
 export var ObjectSpaceNormalMap = 1;
+
+export var ZeroStencilOp = 0;
+export var KeepStencilOp = 7680;
+export var ReplaceStencilOp = 7681;
+export var IncrementStencilOp = 7682;
+export var DecrementStencilOp = 7683;
+export var IncrementWrapStencilOp = 34055;
+export var DecrementWrapStencilOp = 34056;
+export var InvertStencilOp = 5386;
+
+export var NeverStencilFunc = 512;
+export var LessStencilFunc = 513;
+export var EqualStencilFunc = 514;
+export var LessEqualStencilFunc = 515;
+export var GreaterStencilFunc = 516;
+export var NotEqualStencilFunc = 517;
+export var GreaterEqualStencilFunc = 518;
+export var AlwaysStencilFunc = 519;
