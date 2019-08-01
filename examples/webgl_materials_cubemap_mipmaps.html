@@ -11,8 +11,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cubemap customized mipmaps demo. Author <a href="https://github.com/AngusLang">Angus</a><br/>
-			Top: webgl generated mipmaps<br/>
-			Bottom: manual mimaps<br/>
+			Left: webgl generated mipmaps<br/>
+			Right: manual mimaps<br/>
 		</div>
 
 		<script type="module">
@@ -81,7 +81,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( - 1750, 0, 500 );
+				camera.position.z = 500;
 
 				scene = new THREE.Scene();
 
@@ -95,16 +95,10 @@
 					var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
 					material.name = 'manual mipmaps';
 
-					var offset = 250;
-					var originX = - 1150;
+					var mesh = new THREE.Mesh( sphere, material );
+					mesh.position.set( 150, 0, 0 );
+					scene.add( mesh );
 
-					for ( var i = 0; i < 10; ++ i ) {
-
-						var mesh = new THREE.Mesh( sphere, material );
-						mesh.position.set( originX + i * offset, - 150, 0 );
-						scene.add( mesh );
-
-					}
 
 					//webgl mipmaps
 					material = material.clone();
@@ -117,13 +111,9 @@
 
 					material.envMap = autoCubeTexture;
 
-					for ( var i = 0; i < 10; ++ i ) {
-
-						var mesh = new THREE.Mesh( sphere, material );
-						mesh.position.set( originX + i * offset, 150, 0 );
-						scene.add( mesh );
-
-					}
+					mesh = new THREE.Mesh( sphere, material );
+					mesh.position.set( -150, 0, 0 );
+					scene.add( mesh );
 
 				} );
 
