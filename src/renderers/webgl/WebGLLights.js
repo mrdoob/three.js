@@ -221,7 +221,7 @@ function WebGLLights() {
 					state.directionalShadowMap[ directionalLength ] = shadowMap;
 					state.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 
-					++ numDirectionalShadows;
+					numDirectionalShadows ++;
 
 				}
 
@@ -261,7 +261,7 @@ function WebGLLights() {
 					state.spotShadowMap[ spotLength ] = shadowMap;
 					state.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 
-					++ numSpotShadows;
+					numSpotShadows ++;
 
 				}
 
@@ -327,7 +327,7 @@ function WebGLLights() {
 					state.pointShadowMap[ pointLength ] = shadowMap;
 					state.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 
-					++ numPointShadows;
+					numPointShadows ++;
 
 				}
 
