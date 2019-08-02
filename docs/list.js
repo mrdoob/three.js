@@ -384,6 +384,10 @@ var list = {
 				"Lensflare": "examples/en/objects/Lensflare",
 			},
 
+			"Post-Processing": {
+				"EffectComposer": "examples/en/postprocessing/EffectComposer"
+			},
+
 			"Exporters": {
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
@@ -813,6 +817,10 @@ var list = {
 
 			"物体": {
 				"Lensflare": "examples/zh/objects/Lensflare",
+			},
+
+			"Post-Processing": {
+				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
 			},
 
 			"导出器": {

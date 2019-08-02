@@ -1187,6 +1187,13 @@ THREE.GLTFLoader = ( function () {
 
 		// Invalid URL
 		if ( typeof url !== 'string' || url === '' ) return '';
+		
+		// Host Relative URL
+		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
+
+			path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
+
+		}
 
 		// Absolute URL http://,https://,//
 		if ( /^(https?:)?\/\//i.test( url ) ) return url;
