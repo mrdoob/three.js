@@ -22,6 +22,8 @@
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;
 
+			var extraPointLights;
+
 			init();
 			animate();
 
@@ -85,6 +87,34 @@
 
 				pointLight2 = createLight( 0xff8888 );
 				scene.add( pointLight2 );
+
+				// The extra point lights demonstrate that it's possible to have lots of non-shadow-casting lights in
+				// the same scene as the shadow casting lights.
+				var createExtraLight = function () {
+
+					var pointLight = new THREE.PointLight( 0xffffff, 0.1, 20 );
+					pointLight.position.x = ( Math.random() - 0.5 ) * 29;
+					pointLight.position.y = ( Math.random() - 0.5 ) * 29;
+					pointLight.position.z = ( Math.random() - 0.5 ) * 29;
+
+					var geometry = new THREE.SphereBufferGeometry( 0.1, 10, 6 );
+					var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+					var sphere = new THREE.Mesh( geometry, material );
+					pointLight.add( sphere );
+
+					return pointLight;
+
+				};
+
+				var extraPointLights = new THREE.Object3D();
+				scene.add( extraPointLights );
+				extraPointLights.position.set( 0, 10, 0 );
+
+				for ( var i = 0; i < 20; i ++ ) {
+
+					extraPointLights.add( createExtraLight() );
+
+				}
 
 				//
 

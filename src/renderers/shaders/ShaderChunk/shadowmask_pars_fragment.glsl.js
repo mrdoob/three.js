@@ -5,12 +5,12 @@ float getShadowMask() {
 
 	#ifdef USE_SHADOWMAP
 
-	#if NUM_DIR_LIGHTS > 0
+	#if NUM_DIR_LIGHT_SHADOWS > 0
 
 	DirectionalLight directionalLight;
 
 	#pragma unroll_loop
-	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
 		shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
@@ -19,12 +19,12 @@ float getShadowMask() {
 
 	#endif
 
-	#if NUM_SPOT_LIGHTS > 0
+	#if NUM_SPOT_LIGHT_SHADOWS > 0
 
 	SpotLight spotLight;
 
 	#pragma unroll_loop
-	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {
 
 		spotLight = spotLights[ i ];
 		shadow *= bool( spotLight.shadow ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
@@ -33,12 +33,12 @@ float getShadowMask() {
 
 	#endif
 
-	#if NUM_POINT_LIGHTS > 0
+	#if NUM_POINT_LIGHT_SHADOWS > 0
 
 	PointLight pointLight;
 
 	#pragma unroll_loop
-	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
+	for ( int i = 0; i < NUM_POINT_LIGHT_SHADOWS; i ++ ) {
 
 		pointLight = pointLights[ i ];
 		shadow *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
