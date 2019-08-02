@@ -13,7 +13,7 @@ export class WebXRManager {
 	setSession( value: any ): void;
 	getCamera( camera: Camera ): Camera;
 	isPresenting: () => boolean;
-	setAnimationLoop( callback?: Function ): void;
+	setAnimationLoop( callback: Function ): void;
 	dispose(): void;
 
 }
