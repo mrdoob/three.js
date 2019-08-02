@@ -30,13 +30,30 @@ export default /* glsl */`
 		vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );
 		vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
 		vec3 N = normalize( surf_norm );
-		mat3 tsn = mat3( S, T, N );
 
 		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 
 		mapN.xy *= normalScale;
-		mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
+		#ifdef DOUBLE_SIDED
+
+			// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
+			// http://hacksoflife.blogspot.com/2009/11/per-pixel-tangent-space-normal-mapping.html?showComment=1522254677437#c5087545147696715943
+			vec3 NfromST = cross( S, T );
+			if( dot( NfromST, N ) > 0.0 ) {
+
+				S *= -1.0;
+				T *= -1.0;
+
+			}
+
+		#else
+
+			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+		#endif
+
+		mat3 tsn = mat3( S, T, N );
 		return normalize( tsn * mapN );
 
 	}
