@@ -15,31 +15,22 @@
  * Much of the code below from excellent work by WestLangley / http://github.com/WestLangley
  */
 
-import {
-	ShaderLib,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils,
-	Vector2
-} from "../../../build/three.module.js";
-
-UniformsLib.perspectiveline = {
-
+THREE.UniformsLib.perspectiveline = {
 	worldlinewidth: { value: 0.3 },
 	maxlinewidth: { value: 20 },
 	minlinewidth: { value: 0 },
-	resolution: { value: new Vector2( 1, 1 ) },
+	resolution: { value: new THREE.Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
-	gapSize: { value: 1 } 
+	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
 };
 
-ShaderLib[ 'perspectiveline' ] = {
+THREE.ShaderLib[ 'perspectiveline' ] = {
 
-	uniforms: UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.fog,
-		UniformsLib.perspectiveline
+	uniforms: THREE.UniformsUtils.merge( [
+		THREE.UniformsLib.common,
+		THREE.UniformsLib.fog,
+		THREE.UniformsLib.perspectiveline
 	] ),
 
 	vertexShader:
@@ -94,7 +85,6 @@ ShaderLib[ 'perspectiveline' ] = {
 				vColor.xyz = ( position.y < 0.5 ) ? instanceColorStart : instanceColorEnd;
 
 			#endif
-
 
 			#ifdef USE_DASH
 
@@ -258,21 +248,20 @@ ShaderLib[ 'perspectiveline' ] = {
 		`
 };
 
-var PerspectiveLineMaterial = function ( parameters ) {
+THREE.PerspectiveLineMaterial = function ( parameters ) {
 
-	ShaderMaterial.call( this, {
+	THREE.ShaderMaterial.call( this, {
 
 		type: 'PerspectiveLineMaterial',
 
-		uniforms: UniformsUtils.clone( ShaderLib[ 'perspectiveline' ].uniforms ),
+		uniforms: THREE.UniformsUtils.clone( THREE.ShaderLib[ 'perspectiveline' ].uniforms ),
 
-		vertexShader: ShaderLib[ 'perspectiveline' ].vertexShader,
-		fragmentShader: ShaderLib[ 'perspectiveline' ].fragmentShader
+		vertexShader: THREE.ShaderLib[ 'perspectiveline' ].vertexShader,
+		fragmentShader: THREE.ShaderLib[ 'perspectiveline' ].fragmentShader
 
 	} );
 
 	this.dashed = false;
-
 
 	Object.defineProperties( this, {
 
@@ -425,24 +414,21 @@ var PerspectiveLineMaterial = function ( parameters ) {
 
 	this.setValues( parameters );
 
-
 };
 
-PerspectiveLineMaterial.prototype = Object.create( ShaderMaterial.prototype );
-PerspectiveLineMaterial.prototype.constructor = PerspectiveLineMaterial;
+THREE.PerspectiveLineMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
+THREE.PerspectiveLineMaterial.prototype.constructor = THREE.PerspectiveLineMaterial;
 
-PerspectiveLineMaterial.prototype.isPerspectiveLineMaterial = true;
+THREE.PerspectiveLineMaterial.prototype.isPerspectiveLineMaterial = true;
 
-PerspectiveLineMaterial.prototype.copy = function ( source ) {
+THREE.PerspectiveLineMaterial.prototype.copy = function ( source ) {
 
-	ShaderMaterial.prototype.copy.call( this, source );
+	THREE.ShaderMaterial.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
 
 	this.worldlinewidth = source.worldlinewidth;
-
 	this.minlinewidth   = source.minlinewidth;
-
 	this.maxlinewidth   = source.maxlinewidth;
 
 	this.resolution = source.resolution;
@@ -453,5 +439,3 @@ PerspectiveLineMaterial.prototype.copy = function ( source ) {
 
 };
 
-
-export { PerspectiveLineMaterial };

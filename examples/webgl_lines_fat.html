@@ -104,13 +104,13 @@
 				line = new Line2( geometry, matLine );
 				line.computeLineDistances();
 				line.scale.set( 1, 1, 3 );
+				line.visible = false;
 				scene.add( line );
 
+				// perspective line, which gets narrower as it receeds into the distance
 
-
-				// perspective line
 				perspectiveMatLine = new PerspectiveLineMaterial( {
-					color: 0x00ff00,
+					color: 0xffffff,
 					vertexColors: THREE.VertexColors,
 					worldlinewidth : 0.2,
 					maxlinewidth: 100,
@@ -121,7 +121,7 @@
 				perline.computeLineDistances();
 				perline.scale.set( 1, 1, 3 );
 
-				perline.visible = false;
+				perline.visible = true;
 				scene.add( perline );
 
 				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE_STRIP
@@ -260,7 +260,7 @@
 				gui = new GUI();
 
 				var param = {
-					'line type': 0,
+					'line type': 2,
 					'width (px)': 5,
 					'dashed': false,
 					'dash scale': 1,
