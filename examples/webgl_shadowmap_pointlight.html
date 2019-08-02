@@ -22,8 +22,6 @@
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;
 
-			var extraPointLights;
-
 			init();
 			animate();
 
@@ -57,7 +55,7 @@
 					texture.magFilter = THREE.NearestFilter;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.wrapS = THREE.RepeatWrapping;
-					texture.repeat.set( 1, 3.5 );
+					texture.repeat.set( 1, 4.5 );
 
 					var geometry = new THREE.SphereBufferGeometry( 2, 32, 8 );
 					var material = new THREE.MeshPhongMaterial( {
@@ -87,35 +85,6 @@
 
 				pointLight2 = createLight( 0xff8888 );
 				scene.add( pointLight2 );
-
-				// The extra point lights demonstrate that it's possible to have lots of non-shadow-casting lights in
-				// the same scene as the shadow casting lights.
-				var createExtraLight = function () {
-
-					var pointLight = new THREE.PointLight( 0xffffff, 0.1, 20 );
-					pointLight.position.x = ( Math.random() - 0.5 ) * 29;
-					pointLight.position.y = ( Math.random() - 0.5 ) * 29;
-					pointLight.position.z = ( Math.random() - 0.5 ) * 29;
-
-					var geometry = new THREE.SphereBufferGeometry( 0.1, 10, 6 );
-					var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-					var sphere = new THREE.Mesh( geometry, material );
-					pointLight.add( sphere );
-
-					return pointLight;
-
-				};
-
-				var extraPointLights = new THREE.Object3D();
-				scene.add( extraPointLights );
-				extraPointLights.position.set( 0, 10, 0 );
-
-				for ( var i = 0; i < 20; i ++ ) {
-
-					extraPointLights.add( createExtraLight() );
-
-				}
-
 				//
 
 				var geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
@@ -189,7 +158,7 @@
 				var time = performance.now() * 0.001;
 
 				pointLight.position.x = Math.sin( time * 0.6 ) * 9;
-				pointLight.position.y = Math.sin( time * 0.7 ) * 9 + 5;
+				pointLight.position.y = Math.sin( time * 0.7 ) * 9 + 6;
 				pointLight.position.z = Math.sin( time * 0.8 ) * 9;
 
 				pointLight.rotation.x = time;
@@ -198,7 +167,7 @@
 				time += 10000;
 
 				pointLight2.position.x = Math.sin( time * 0.6 ) * 9;
-				pointLight2.position.y = Math.sin( time * 0.7 ) * 9 + 5;
+				pointLight2.position.y = Math.sin( time * 0.7 ) * 9 + 6;
 				pointLight2.position.z = Math.sin( time * 0.8 ) * 9;
 
 				pointLight2.rotation.x = time;

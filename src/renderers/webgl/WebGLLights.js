@@ -102,11 +102,11 @@ function UniformsCache() {
 
 var nextVersion = 0;
 
-var shadowCastingLightsFirst = function ( lightA, lightB ) {
+function shadowCastingLightsFirst( lightA, lightB ) {
 
 	return ( lightB.castShadow ? 1 : 0 ) - ( lightA.castShadow ? 1 : 0 );
 
-};
+}
 
 function WebGLLights() {
 
