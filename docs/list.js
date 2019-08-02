@@ -24,6 +24,7 @@ var list = {
 				"How to update things": "manual/en/introduction/How-to-update-things",
 				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
 				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
+				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system"
 			},
@@ -461,6 +462,7 @@ var list = {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
 				"如何废置对象": "manual/zh/introduction/How-to-dispose-of-objects",
 				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
+				"How to use post-processing": "manual/zh/introduction/How-to-use-post-processing",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
 			},
