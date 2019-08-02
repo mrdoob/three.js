@@ -23,12 +23,15 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Line2 } from './jsm/lines/Line2.js';
 			import { LineMaterial } from './jsm/lines/LineMaterial.js';
+			import { PerspectiveLineMaterial } from './jsm/lines/PerspectiveLineMaterial.js';
 			import { LineGeometry } from './jsm/lines/LineGeometry.js';
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			var line, renderer, scene, camera, camera2, controls;
 			var line1;
 			var matLine, matLineBasic, matLineDashed;
+			var perline, perspectiveMatLine;
+			var marker, markergeo, markermat;
 			var stats;
 			var gui;
 
@@ -100,9 +103,26 @@
 
 				line = new Line2( geometry, matLine );
 				line.computeLineDistances();
-				line.scale.set( 1, 1, 1 );
+				line.scale.set( 1, 1, 3 );
 				scene.add( line );
 
+
+
+				// perspective line
+				perspectiveMatLine = new PerspectiveLineMaterial( {
+					color: 0x00ff00,
+					vertexColors: THREE.VertexColors,
+					worldlinewidth : 0.2,
+					maxlinewidth: 100,
+					minlinewidth:0.1,
+					dashed: false
+				} );
+				perline = new Line2( geometry, perspectiveMatLine );
+				perline.computeLineDistances();
+				perline.scale.set( 1, 1, 3 );
+
+				perline.visible = false;
+				scene.add( perline );
 
 				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE_STRIP
 
@@ -116,15 +136,25 @@
 				line1 = new THREE.Line( geo, matLineBasic );
 				line1.computeLineDistances();
 				line1.visible = false;
+				line1.scale.set( 1, 1, 3 );
 				scene.add( line1 );
 
 				//
+				// A marker to show mouse intersect
+				markergeo = new THREE.SphereBufferGeometry(0.3);
+				markermat = new THREE.MeshBasicMaterial( {color: 0xff0000});
+				marker = new THREE.Mesh(markergeo,markermat);
+				scene.add(marker);
+				// marker.visible=false;
+
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				onWindowResize();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+				renderer.domElement.addEventListener( 'mousemove', onMouseMove, false );
 
 				initGui();
 
@@ -140,10 +170,45 @@
 				insetWidth = window.innerHeight / 4; // square
 				insetHeight = window.innerHeight / 4;
 
+
 				camera2.aspect = insetWidth / insetHeight;
 				camera2.updateProjectionMatrix();
 
 			}
+
+			var point = new THREE.Vector2();
+
+			var mouse = new THREE.Vector2();
+			
+			var raycaster = new THREE.Raycaster();
+
+			function onMouseMove(evt) {
+			
+				var array = getMousePosition( renderer.domElement, evt.clientX, evt.clientY );
+				point.fromArray( array );
+
+				mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+				raycaster.setFromCamera( mouse, camera );
+
+				var intersects = raycaster.intersectObjects( [line,line1,perline] );
+
+				if ( intersects.length > 0  ) {
+					console.log(intersects[0].point);
+					marker.visible = true;
+					marker.position.copy(intersects[0].point);
+				} else {
+					// console.log("no intersects");
+					marker.visible = false;
+				}
+			}
+
+			var getMousePosition = function ( dom, x, y ) {
+
+				var rect = dom.getBoundingClientRect();
+				return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+
+			};
 
 			function animate() {
 
@@ -159,6 +224,7 @@
 
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
+				perspectiveMatLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
 
 				renderer.render( scene, camera );
 
@@ -179,6 +245,7 @@
 
 				// renderer will set this eventually
 				matLine.resolution.set( insetWidth, insetHeight ); // resolution of the inset viewport
+				perspectiveMatLine.resolution.set( insetWidth, insetHeight ); // resolution of the inset viewport
 
 				renderer.render( scene, camera2 );
 
@@ -197,47 +264,64 @@
 					'width (px)': 5,
 					'dashed': false,
 					'dash scale': 1,
-					'dash / gap': 1
+					'dash / gap': 1,
+					'world width':0.2,
+					'min width (px)':0.1,
+					'max width (px)':10
 				};
 
 
-				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
+
+				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1, 'PerspectiveLineGeometry': 2 } ).onChange( function ( val ) {
 
 					switch ( val ) {
 
 						case '0':
 							line.visible = true;
-
 							line1.visible = false;
-
+							perline.visible = false;
+							subgui_linegeometry.open();
+							// subgui_glines.close();
+							subgui_perspective.close();
 							break;
 
 						case '1':
 							line.visible = false;
-
 							line1.visible = true;
-
+							perline.visible = false;
+							subgui_linegeometry.close();
+							// subgui_glines.open();
+							subgui_perspective.close();
 							break;
 
-					}
+						case '2':
+							line.visible = false;
+							line1.visible = false;
+							perline.visible = true;
+							subgui_linegeometry.close();
+							// subgui_glines.close();
+							subgui_perspective.open();
+							break;
+
+
+						}
 
 				} );
 
-				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
-
-					matLine.linewidth = val;
-
-				} );
 
 				gui.add( param, 'dashed' ).onChange( function ( val ) {
 
 					matLine.dashed = val;
+					perspectiveMatLine.minlinewidth = val;
+
 
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
-					// ... or THREE.LineDashedMaterial could be implemented as a separate material
+					// ... or LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
 					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
+					if ( val ) perspectiveMatLine.defines.USE_DASH = ""; else delete perspectiveMatLine.defines.USE_DASH;
 					matLine.needsUpdate = true;
+					perspectiveMatLine.needsUpdate = true;
 
 					line1.material = val ? matLineDashed : matLineBasic;
 
@@ -247,6 +331,7 @@
 
 					matLine.dashScale = val;
 					matLineDashed.scale = val;
+					perspectiveMatLine.dashScale = val;
 
 				} );
 
@@ -261,6 +346,7 @@
 							matLineDashed.dashSize = 2;
 							matLineDashed.gapSize = 1;
 
+
 							break;
 
 						case '1':
@@ -269,6 +355,7 @@
 
 							matLineDashed.dashSize = 1;
 							matLineDashed.gapSize = 1;
+
 
 							break;
 
@@ -279,11 +366,39 @@
 							matLineDashed.dashSize = 1;
 							matLineDashed.gapSize = 2;
 
+
 							break;
 
 					}
 
 				} );
+
+				var subgui_linegeometry = gui.addFolder("LineGeometry");
+				subgui_linegeometry.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
+					matLine.linewidth = val;
+				} );
+				subgui_linegeometry.open();
+
+
+				// Options valid for gl lines:
+				// var subgui_glines       = gui.addFolder("gl.lines");
+
+
+				// Options valid for PerspectiveGeometry:
+				var subgui_perspective = gui.addFolder("PerspectiveGeometry");
+
+				subgui_perspective.add( param, 'world width', 0.01, 1 ).onChange( function ( val ) {
+					perspectiveMatLine.worldlinewidth = val;
+				} );
+
+				subgui_perspective.add( param, 'min width (px)', 0, 10 ).onChange( function ( val ) {
+					perspectiveMatLine.minlinewidth = val;
+				} );
+ 				subgui_perspective.add( param, 'max width (px)', 0, 10 ).onChange( function ( val ) {
+					perspectiveMatLine.maxlinewidth = val;
+				} );
+
+
 
 			}
 

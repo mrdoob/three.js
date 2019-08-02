@@ -7,7 +7,10 @@ import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Mesh,
-	Vector3
+	Vector3,
+	Matrix4,
+	Ray,
+	Sphere
 } from "../../../build/three.module.js";
 import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "../lines/LineMaterial.js";
@@ -69,7 +72,75 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		return this;
 
-	}
+	},
+
+	
+	raycast: ( function () {
+
+		var inverseMatrix = new Matrix4();
+		var ray = new Ray();
+		var sphere = new Sphere();
+
+		return function raycast( raycaster, intersects ) {
+
+			var precision = raycaster.linePrecision;
+
+			var geometry = this.geometry;
+			var matrixWorld = this.matrixWorld;
+
+			// Checking boundingSphere distance to ray
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( matrixWorld );
+			sphere.radius += precision;
+
+			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+
+			inverseMatrix.getInverse( matrixWorld );
+			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			var localPrecisionSq = localPrecision * localPrecision;
+
+			var vStart = new Vector3();
+			var vEnd = new Vector3();
+			var interSegment = new Vector3();
+			var interRay = new Vector3();
+
+	     	// Currently, the geometry is always a LineSegments2 geometry, which uses the instanceStart/instanceEnd to store segment locations
+	     	var starts = geometry.attributes.instanceStart;
+	     	var ends   = geometry.attributes.instanceEnd;
+	      
+      		for(var i=0;i<starts.count;i++) {
+		        vStart.fromArray( starts.data.array, i * starts.data.stride + starts.offset );
+		        vEnd  .fromArray( ends  .data.array, i * ends  .data.stride + ends  .offset );
+		        var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+        
+		        if ( distSq > localPrecisionSq ) continue;
+        
+		        interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+        
+		        var distance = raycaster.ray.origin.distanceTo( interRay );
+        
+		        if ( distance < raycaster.near || distance > raycaster.far ) continue;
+        
+		        intersects.push( {
+        
+		          distance: distance,
+		          // What do we want? intersection point on the ray or on the segment??
+		          // point: raycaster.ray.at( distance ),
+		          point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+		          index: i,
+		          face: null,
+		          faceIndex: null,
+		          object: this
+		        } );
+          
+      		}
+		};
+  }() )
+  
 
 } );
 
