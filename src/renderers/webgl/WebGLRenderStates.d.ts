@@ -4,18 +4,22 @@ import { Light } from '../../lights/Light';
 import { WebGLLights } from './WebGLLights';
 
 interface WebGLRenderState {
-  init(): void;
-  state: {
-    lightsArray: Light[];
+
+	init(): void;
+	state: {
+		lightsArray: Light[];
 		shadowsArray: Light[];
 		lights: WebGLLights;
-  };
-  setupLights( camera: Camera ): void;
-  pushLight( light: Light ): void;
-  pushShadow( shadowLight: Light ): void;
+	};
+	setupLights( camera: Camera ): void;
+	pushLight( light: Light ): void;
+	pushShadow( shadowLight: Light ): void;
+
 }
 
 export class WebGLRenderStates {
-  get( scene: Scene, camera: Camera ): WebGLRenderState;
-  dispose(): void;
+
+	get( scene: Scene, camera: Camera ): WebGLRenderState;
+	dispose(): void;
+
 }

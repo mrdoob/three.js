@@ -5,5 +5,5 @@ export namespace UniformsUtils {
 	export {
 		mergeUniforms as merge,
 		cloneUniforms as clone,
-	}
+	};
 }
