@@ -274,14 +274,15 @@
 
 					case 'perspective':
 						camera = cameraPerspective;
-						controlsPerspective.update();
 						break;
 					case 'ortho':
 						camera = cameraOrtho;
-						controlsOrtho.update();
 						break;
 
 				}
+
+				controlsPerspective.update();
+				controlsOrtho.update(); // must update both controls for damping to complete
 
 				renderer.render( scene, camera );
 
