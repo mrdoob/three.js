@@ -13,7 +13,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			TODO
+			[name] is defined by a MatCap (or Lit Sphere) texture, which encodes the material color and shading.<br/><br/>
+			[name] does not respond to lights since the matcap image file encodes baked lighting.
+			It will cast a shadow onto an object that receives shadows (and shadow clipping works), but it will not self-shadow or receive shadows.
 		</p>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshMatcapMaterial"></iframe>

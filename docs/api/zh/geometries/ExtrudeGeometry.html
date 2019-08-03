@@ -51,6 +51,7 @@
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
+			bevelOffset: 0,
 			bevelSegments: 1
 		};
 
@@ -70,12 +71,12 @@
 
 			<ul>
 				<li>curveSegments — int，曲线上点的数量，默认值是12。</li>
-				<li>steps — int，用于沿着挤出样条的深度细分的点的数量，默认值为1。
-				</li>
+				<li>steps — int，用于沿着挤出样条的深度细分的点的数量，默认值为1。</li>
 				<li>depth — float，挤出的形状的深度，默认值为100。</li>
 				<li>bevelEnabled — bool，对挤出的形状应用是否斜角，默认值为true。</li>
 				<li>bevelThickness — float，设置原始形状上斜角的厚度。默认值为6。</li>
 				<li>bevelSize — float。斜角与原始形状轮廓之间的延伸距离，默认值为bevelThickness-2。</li>
+				<li>bevelOffset — float. Distance from the shape outline that the bevel starts. Default is 0.</li>
 				<li>bevelSegments — int。斜角的分段层数，默认值为3。</li>
 				<li>extrudePath — THREE.Curve对象。一条沿着被挤出形状的三维样条线。</li>
 				<li>UVGenerator —  Object。提供了UV生成器函数的对象。</li>

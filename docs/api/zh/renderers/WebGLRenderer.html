@@ -44,7 +44,11 @@
 		[page:Boolean preserveDrawingBuffer] -是否保留缓直到手动清除或被覆盖。 默认*false*.<br />
 
 		[page:String powerPreference] - 提示用户代理怎样的配置更适用于当前WebGL环境。 可能是*"high-performance"*, *"low-power"* 或 *"default"*。默认是*"default"*.
-		详见[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec]<br />
+		详见[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec]<br />
+
+		
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
 
 		[page:Boolean depth] - 绘图缓存是否有一个至少6位的深度缓存([link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] )。
 		默认是*true*.<br />
@@ -97,6 +101,7 @@
 		- [page:Boolean floatVertexTextures]: 如果[page:Boolean floatFragmentTextures]和[page:Boolean vertexTextures]都是true， 则此值为*true* <br />
 		- [page:Method getMaxAnisotropy](): 返回最大可用各向异性。<br />
 		- [page:Method getMaxPrecision](): 返回顶点着色器和片元着色器的最大可用精度。 <br />
+		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
 		- [page:Boolean logarithmicDepthBuffer]: 如果[page:parameter logarithmicDepthBuffer]在构造器中被设为true且
 		环境支持[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth]扩展，则此值为*true*
 			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月， 约66%的支持WebGL的设备支持此功能<br />
@@ -222,7 +227,7 @@
 
 		<h3>[property:Integer shadowMap.type]</h3>
 		<p>定义阴影贴图类型 (未过滤, 关闭部分过滤, 关闭部分双线性过滤)</p>
-		<p>可选值有THREE.BasicShadowMap, THREE.PCFShadowMap (默认), THREE.PCFSoftShadowMap。 详见[page:Renderer Renderer constants]</p>
+		<p>可选值有THREE.BasicShadowMap, THREE.PCFShadowMap (默认)和 THREE.PCFSoftShadowMap。 详见[page:Renderer Renderer constants]</p>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>
@@ -323,8 +328,14 @@
 		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
 		<p>返回一个对象，这个对象中存有在WebGL环境在创建的时候所设置的属性</p>
 
+		<h3>[method:Integer getActiveCubeFace]()</h3>
+		<p>Returns the current active cube face.</p>
+
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
+		<p>Returns the current active mipmap level.</p>
+
 		<h3>[method:RenderTarget getRenderTarget]()</h3>
-		<p>如果当前存在RenderTarget，返回当前它</p>
+		<p>如果当前存在[page:RenderTarget RenderTarget]，则返回该值；否则返回*null*。</p>
 
 		<h3>[method:RenderTarget getCurrentViewport]()</h3>
 		<p>返回当前视口</p>
@@ -341,10 +352,11 @@
 		<h3>[method:null resetGLState]( )</h3>
 		<p>将GL状态重置为默认值。WebGL环境丢失时会内部调用</p>
 
-		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], buffer )</h3>
+		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
+		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
 		<p>将enderTarget中的像素数据读取到传入的缓冲区中。这是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]()的包装器<br />
-		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]
-		</p>
+		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]</p>
+		<p>For reading out a [page:WebGLRenderTargetCube WebGLRenderTargetCube] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
 		<h3>[method:null render]( [param:Scene scene], [param:Camera camera], [param:WebGLRenderTarget renderTarget], [param:Boolean forceClear] )</h3>
 		<p>
@@ -381,12 +393,12 @@
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>设置设备像素比。通常用于避免HiDPI设备上绘图模糊</p>
 
-		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipMapLevel] )</h3>
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
-		renderTarget -- 需要被激活的[page:WebGLRenderTarget renderTarget](可选).<br />
+		renderTarget -- 需要被激活的[page:WebGLRenderTarget renderTarget](可选)。When *null* is given, the canvas is set as the active render target instead.<br />
 		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
-		activeMipMapLevel -- Specifies the active mipmap level (optional).<br /><br />
-		该方法设置活跃rendertarget. 参数缺省则将canvas设置成活跃rendertarget
+		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		该方法设置活跃rendertarget。
 		</p>
 
 		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
