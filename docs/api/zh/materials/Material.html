@@ -102,6 +102,42 @@
     在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
 </p>
 
+
+<h3>[property:Boolean stencilWrite]</h3>
+<p>
+Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+</p>
+
+<h3>[property:Boolean stencilFunc]</h3>
+<p>
+The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
+</p>
+
+<h3>[property:Integer stencilRef]</h3>
+<p>
+The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+</p>
+
+<h3>[property:Boolean stencilMask]</h3>
+<p>
+The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+</p>
+
+<h3>[property:Integer stencilFail]</h3>
+<p>
+Which stencil operation to perform when the comparison function returns false. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+</p>
+
+<h3>[property:Boolean stencilZFail]</h3>
+<p>
+Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+</p>
+
+<h3>[property:Boolean stencilZPass]</h3>
+<p>
+Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+</p>
+
 <h3>[property:Boolean flatShading]</h3>
 <p> 定义材质是否使用平面着色进行渲染。默认值为false。
 </p>
@@ -218,7 +254,9 @@
 </p>
 
 <h3>[property:Boolean vertexTangents]</h3>
-<p> TODO.
+<p>	Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+    are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+    more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
 </p>
 
 <h3>[property:Boolean visible]</h3>
@@ -252,9 +290,10 @@
     根据*values*设置属性。<br/>
 </p>
 
-<h3>[method:null toJSON]( [param:object meta] )</h3>
-<p> meta -- 包含元素，例如材质的纹理或图像。
-    将材质转换为three.js JSON格式。<br/>
+<h3>[method:Object toJSON]( [param:object meta] )</h3>
+<p>
+    meta -- 包含有元数据的对象，例如该对象的纹理或图片。
+    将material对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 </p>
 
 <h2>源码(Source)</h2>
