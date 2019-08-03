@@ -98,7 +98,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 
 	// Defer to the IndirectSpecular function to compute
 	// the indirectDiffuse if energy preservation is enabled.
-	#ifndef ENVMAP_TYPE_CUBE_UV
+	#ifndef ENERGY_PRESERVATION
 
 		reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
@@ -120,7 +120,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	// Both indirect specular and diffuse light accumulate here
 	// if energy preservation enabled, and PMREM provided.
-	#if defined( ENVMAP_TYPE_CUBE_UV )
+	#if defined( ENERGY_PRESERVATION )
 
 		vec3 singleScattering = vec3( 0.0 );
 		vec3 multiScattering = vec3( 0.0 );
