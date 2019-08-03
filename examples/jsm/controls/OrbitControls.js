@@ -588,7 +588,7 @@ var OrbitControls = function ( object, domElement ) {
 	var updateMouse3D = function () {
 
 		var v = new Vector3();
-		var dir = new Vector3();
+		var v1 = new Vector3();
 
 		return function updateMouse3D( event ) {
 
@@ -605,25 +605,24 @@ var OrbitControls = function ( object, domElement ) {
 
 				v.sub( scope.object.position ).normalize();
 
-				var distance = ( scope.target.y - scope.object.position.y ) / v.y; // y-up case only - fix; .y can be zero
+				var distance = v1.copy( scope.target ).sub( scope.object.position ).dot( scope.object.up ) / v.dot( scope.object.up );
 
 				mouse3D.copy( scope.object.position ).add( v.multiplyScalar( distance ) );
 
 			} else if ( scope.object.isOrthographicCamera ) {
 
-				// ref: https://stackoverflow.com/questions/38902223/three-js-orthographic-camera-find-x-and-z-where-y-0/38904730#38904730
 				v.set(
 				    ( event.clientX / element.clientWidth ) * 2 - 1,
 				    - ( event.clientY / element.clientHeight ) * 2 + 1,
 				    ( scope.object.near + scope.object.far ) / ( scope.object.near - scope.object.far ) );
 
-				v.unproject( scope.object ); // set v in plane of camera
+				v.unproject( scope.object );
 
-				dir.set( 0, 0, - 1 ).transformDirection( scope.object.matrixWorld ); // could use quaternion...
+				v1.set( 0, 0, - 1 ).applyQuaternion( scope.object.quaternion );
 
-				var distance = - v.y / dir.y; // y-up case only - fix; .y can be zero
+				var distance = - v.dot( scope.object.up ) / v1.dot( scope.object.up )
 
-				mouse3D.copy( v ).add( dir.multiplyScalar( distance ) );
+				mouse3D.copy( v ).add( v1.multiplyScalar( distance ) );
 
 			} else {
 
@@ -1417,6 +1416,7 @@ var MapControls = function ( object, domElement ) {
 	this.touches.TWO = TOUCH.DOLLY_ROTATE;
 
 	this.zoomToCursor = true;
+	this.maxPolarAngle = Math.PI / 3; // must be less than pi/2 when zoomToCursor is true
 
 };
 
