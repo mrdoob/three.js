@@ -13,7 +13,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Frustum } from '../../math/Frustum.js';
 
-function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
+function WebGLShadowMap( _renderer, maxTextureSize ) {
 
 	var _frustum = new Frustum(),
 		_projScreenMatrix = new Matrix4(),
@@ -386,7 +386,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				object.modelViewMatrix.multiplyMatrices( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
-				var geometry = _objects.update( object );
+				var geometry = _renderer.objects.update( object );
 				var material = object.material;
 
 				if ( Array.isArray( material ) ) {

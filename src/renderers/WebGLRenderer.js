@@ -304,6 +304,7 @@ function WebGLRenderer( parameters ) {
 		_this.renderLists = renderLists;
 		_this.state = state;
 		_this.info = info;
+		_this.objects = objects;
 
 	}
 
@@ -317,7 +318,7 @@ function WebGLRenderer( parameters ) {
 
 	// shadow map
 
-	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
+	var shadowMap = new WebGLShadowMap( _this, capabilities.maxTextureSize );
 
 	this.shadowMap = shadowMap;
 

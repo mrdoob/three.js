@@ -7,9 +7,7 @@ export class WebGLShadowMap {
 
 	constructor(
 		_renderer: WebGLRenderer,
-		_lights: any[],
-		_objects: any[],
-		capabilities: any
+		maxTextureSize: number
 	);
 
 	enabled: boolean;
