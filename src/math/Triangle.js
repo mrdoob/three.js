@@ -5,8 +5,8 @@ import { Vector3 } from './Vector3.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var v0, v1, v2, v3;
-var vab, vac, vbc, vap, vbp, vcp;
+var _v0, _v1, _v2, _v3;
+var _vab, _vac, _vbc, _vap, _vbp, _vcp;
 
 function Triangle( a, b, c ) {
 
@@ -20,7 +20,7 @@ Object.assign( Triangle, {
 
 	getNormal: function ( a, b, c, target ) {
 
-		if ( v0 === undefined ) v0 = new Vector3();
+		if ( _v0 === undefined ) _v0 = new Vector3();
 
 		if ( target === undefined ) {
 
@@ -30,8 +30,8 @@ Object.assign( Triangle, {
 		}
 
 		target.subVectors( c, b );
-		v0.subVectors( a, b );
-		target.cross( v0 );
+		_v0.subVectors( a, b );
+		target.cross( _v0 );
 
 		var targetLengthSq = target.lengthSq();
 		if ( targetLengthSq > 0 ) {
@@ -48,23 +48,23 @@ Object.assign( Triangle, {
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 	getBarycoord: function ( point, a, b, c, target ) {
 
-		if ( v1 === undefined ) {
+		if ( _v1 === undefined ) {
 
-			 v0 = new Vector3();
-			 v1 = new Vector3();
-			 v2 = new Vector3();
+			_v0 = new Vector3();
+			_v1 = new Vector3();
+			_v2 = new Vector3();
 
 		}
 
-		v0.subVectors( c, a );
-		v1.subVectors( b, a );
-		v2.subVectors( point, a );
+		_v0.subVectors( c, a );
+		_v1.subVectors( b, a );
+		_v2.subVectors( point, a );
 
-		var dot00 = v0.dot( v0 );
-		var dot01 = v0.dot( v1 );
-		var dot02 = v0.dot( v2 );
-		var dot11 = v1.dot( v1 );
-		var dot12 = v1.dot( v2 );
+		var dot00 = _v0.dot( _v0 );
+		var dot01 = _v0.dot( _v1 );
+		var dot02 = _v0.dot( _v2 );
+		var dot11 = _v1.dot( _v1 );
+		var dot12 = _v1.dot( _v2 );
 
 		var denom = ( dot00 * dot11 - dot01 * dot01 );
 
@@ -95,24 +95,24 @@ Object.assign( Triangle, {
 
 	containsPoint: function ( point, a, b, c ) {
 
-		if ( v3 === undefined ) v3 = new Vector3();
+		if ( _v3 === undefined ) _v3 = new Vector3();
 
-		Triangle.getBarycoord( point, a, b, c, v3 );
+		Triangle.getBarycoord( point, a, b, c, _v3 );
 
-		return ( v3.x >= 0 ) && ( v3.y >= 0 ) && ( ( v3.x + v3.y ) <= 1 );
+		return ( _v3.x >= 0 ) && ( _v3.y >= 0 ) && ( ( _v3.x + _v3.y ) <= 1 );
 
 	},
 
 	getUV: function ( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
-		if ( v3 === undefined ) v3 = new Vector3();
+		if ( _v3 === undefined ) _v3 = new Vector3();
 
-		this.getBarycoord( point, p1, p2, p3, v3 );
+		this.getBarycoord( point, p1, p2, p3, _v3 );
 
 		target.set( 0, 0 );
-		target.addScaledVector( uv1, v3.x );
-		target.addScaledVector( uv2, v3.y );
-		target.addScaledVector( uv3, v3.z );
+		target.addScaledVector( uv1, _v3.x );
+		target.addScaledVector( uv2, _v3.y );
+		target.addScaledVector( uv3, _v3.z );
 
 		return target;
 
@@ -120,18 +120,18 @@ Object.assign( Triangle, {
 
 	isFrontFacing: function ( a, b, c, direction ) {
 
-		if ( v1 === undefined ) {
+		if ( _v1 === undefined ) {
 
-			v0 = new Vector3();
-			v1 = new Vector3();
+			_v0 = new Vector3();
+			_v1 = new Vector3();
 
 		}
 
-		v0.subVectors( c, b );
-		v1.subVectors( a, b );
+		_v0.subVectors( c, b );
+		_v1.subVectors( a, b );
 
 		// strictly front facing
-		return ( v0.cross( v1 ).dot( direction ) < 0 ) ? true : false;
+		return ( _v0.cross( _v1 ).dot( direction ) < 0 ) ? true : false;
 
 	}
 
@@ -177,17 +177,17 @@ Object.assign( Triangle.prototype, {
 
 	getArea: function () {
 
-		if ( v1 === undefined ) {
+		if ( _v1 === undefined ) {
 
-			v0 = new Vector3();
-			v1 = new Vector3();
+			_v0 = new Vector3();
+			_v1 = new Vector3();
 
 		}
 
-		v0.subVectors( this.c, this.b );
-		v1.subVectors( this.a, this.b );
+		_v0.subVectors( this.c, this.b );
+		_v1.subVectors( this.a, this.b );
 
-		return v0.cross( v1 ).length() * 0.5;
+		return _v0.cross( _v1 ).length() * 0.5;
 
 	},
 
@@ -255,14 +255,14 @@ Object.assign( Triangle.prototype, {
 
 	closestPointToPoint: function ( p, target ) {
 
-		if ( vab === undefined ) {
+		if ( _vab === undefined ) {
 
-			vab = new Vector3();
-			vac = new Vector3();
-			vbc = new Vector3();
-			vap = new Vector3();
-			vbp = new Vector3();
-			vcp = new Vector3();
+			_vab = new Vector3();
+			_vac = new Vector3();
+			_vbc = new Vector3();
+			_vap = new Vector3();
+			_vbp = new Vector3();
+			_vcp = new Vector3();
 
 		}
 
@@ -282,11 +282,11 @@ Object.assign( Triangle.prototype, {
 		// basically, we're distinguishing which of the voronoi regions of the triangle
 		// the point lies in with the minimum amount of redundant computation.
 
-		vab.subVectors( b, a );
-		vac.subVectors( c, a );
-		vap.subVectors( p, a );
-		var d1 = vab.dot( vap );
-		var d2 = vac.dot( vap );
+		_vab.subVectors( b, a );
+		_vac.subVectors( c, a );
+		_vap.subVectors( p, a );
+		var d1 = _vab.dot( _vap );
+		var d2 = _vac.dot( _vap );
 		if ( d1 <= 0 && d2 <= 0 ) {
 
 			// vertex region of A; barycentric coords (1, 0, 0)
@@ -294,9 +294,9 @@ Object.assign( Triangle.prototype, {
 
 		}
 
-		vbp.subVectors( p, b );
-		var d3 = vab.dot( vbp );
-		var d4 = vac.dot( vbp );
+		_vbp.subVectors( p, b );
+		var d3 = _vab.dot( _vbp );
+		var d4 = _vac.dot( _vbp );
 		if ( d3 >= 0 && d4 <= d3 ) {
 
 			// vertex region of B; barycentric coords (0, 1, 0)
@@ -309,13 +309,13 @@ Object.assign( Triangle.prototype, {
 
 			v = d1 / ( d1 - d3 );
 			// edge region of AB; barycentric coords (1-v, v, 0)
-			return target.copy( a ).addScaledVector( vab, v );
+			return target.copy( a ).addScaledVector( _vab, v );
 
 		}
 
-		vcp.subVectors( p, c );
-		var d5 = vab.dot( vcp );
-		var d6 = vac.dot( vcp );
+		_vcp.subVectors( p, c );
+		var d5 = _vab.dot( _vcp );
+		var d6 = _vac.dot( _vcp );
 		if ( d6 >= 0 && d5 <= d6 ) {
 
 			// vertex region of C; barycentric coords (0, 0, 1)
@@ -328,17 +328,17 @@ Object.assign( Triangle.prototype, {
 
 			w = d2 / ( d2 - d6 );
 			// edge region of AC; barycentric coords (1-w, 0, w)
-			return target.copy( a ).addScaledVector( vac, w );
+			return target.copy( a ).addScaledVector( _vac, w );
 
 		}
 
 		var va = d3 * d6 - d5 * d4;
 		if ( va <= 0 && ( d4 - d3 ) >= 0 && ( d5 - d6 ) >= 0 ) {
 
-			vbc.subVectors( c, b );
+			_vbc.subVectors( c, b );
 			w = ( d4 - d3 ) / ( ( d4 - d3 ) + ( d5 - d6 ) );
 			// edge region of BC; barycentric coords (0, 1-w, w)
-			return target.copy( b ).addScaledVector( vbc, w ); // edge region of BC
+			return target.copy( b ).addScaledVector( _vbc, w ); // edge region of BC
 
 		}
 
@@ -348,7 +348,7 @@ Object.assign( Triangle.prototype, {
 		v = vb * denom;
 		w = vc * denom;
 
-		return target.copy( a ).addScaledVector( vab, v ).addScaledVector( vac, w );
+		return target.copy( a ).addScaledVector( _vab, v ).addScaledVector( _vac, w );
 
 	},
 

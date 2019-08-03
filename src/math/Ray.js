@@ -4,9 +4,9 @@ import { Vector3 } from './Vector3.js';
  * @author bhouston / http://clara.io
  */
 
-var vector;
-var segCenter, segDir, diff;
-var diff, edge1, edge2, normal;
+var _vector;
+var _segCenter, _segDir, _diff;
+var _diff, _edge1, _edge2, _normal;
 
 function Ray( origin, direction ) {
 
@@ -64,9 +64,9 @@ Object.assign( Ray.prototype, {
 
 	recast: function ( t ) {
 
-		if ( vector === undefined ) vector = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		this.origin.copy( this.at( t, vector ) );
+		this.origin.copy( this.at( t, _vector ) );
 
 		return this;
 
@@ -103,9 +103,9 @@ Object.assign( Ray.prototype, {
 
 	distanceSqToPoint: function ( point ) {
 
-		if ( vector === undefined ) vector = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		var directionDistance = vector.subVectors( point, this.origin ).dot( this.direction );
+		var directionDistance = _vector.subVectors( point, this.origin ).dot( this.direction );
 
 		// point behind the ray
 
@@ -115,19 +115,19 @@ Object.assign( Ray.prototype, {
 
 		}
 
-		vector.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		_vector.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-		return vector.distanceToSquared( point );
+		return _vector.distanceToSquared( point );
 
 	},
 
 	distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-		if ( segCenter === undefined ) {
+		if ( _segCenter === undefined ) {
 
-			segCenter = new Vector3();
-			segDir = new Vector3();
-			diff = new Vector3();
+			_segCenter = new Vector3();
+			_segDir = new Vector3();
+			_diff = new Vector3();
 
 		}
 
@@ -138,15 +138,15 @@ Object.assign( Ray.prototype, {
 		// - The closest point on the ray
 		// - The closest point on the segment
 
-		segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
-		segDir.copy( v1 ).sub( v0 ).normalize();
-		diff.copy( this.origin ).sub( segCenter );
+		_segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
+		_segDir.copy( v1 ).sub( v0 ).normalize();
+		_diff.copy( this.origin ).sub( _segCenter );
 
 		var segExtent = v0.distanceTo( v1 ) * 0.5;
-		var a01 = - this.direction.dot( segDir );
-		var b0 = diff.dot( this.direction );
-		var b1 = - diff.dot( segDir );
-		var c = diff.lengthSq();
+		var a01 = - this.direction.dot( _segDir );
+		var b0 = _diff.dot( this.direction );
+		var b1 = - _diff.dot( _segDir );
+		var c = _diff.lengthSq();
 		var det = Math.abs( 1 - a01 * a01 );
 		var s0, s1, sqrDist, extDet;
 
@@ -240,7 +240,7 @@ Object.assign( Ray.prototype, {
 
 		if ( optionalPointOnSegment ) {
 
-			optionalPointOnSegment.copy( segDir ).multiplyScalar( s1 ).add( segCenter );
+			optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
 
 		}
 
@@ -250,11 +250,11 @@ Object.assign( Ray.prototype, {
 
 	intersectSphere: function ( sphere, target ) {
 
-		if ( vector === undefined ) vector = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		vector.subVectors( sphere.center, this.origin );
-		var tca = vector.dot( this.direction );
-		var d2 = vector.dot( vector ) - tca * tca;
+		_vector.subVectors( sphere.center, this.origin );
+		var tca = _vector.dot( this.direction );
+		var d2 = _vector.dot( _vector ) - tca * tca;
 		var radius2 = sphere.radius * sphere.radius;
 
 		if ( d2 > radius2 ) return null;
@@ -424,9 +424,9 @@ Object.assign( Ray.prototype, {
 
 	intersectsBox: function ( box ) {
 
-		if ( vector === undefined ) vector = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		return this.intersectBox( box, vector ) !== null;
+		return this.intersectBox( box, _vector ) !== null;
 
 	},
 
@@ -434,27 +434,27 @@ Object.assign( Ray.prototype, {
 
 		// Compute the offset origin, edges, and normal.
 
-		if ( diff === undefined ) {
+		if ( _diff === undefined ) {
 
-			diff = new Vector3();
-			edge1 = new Vector3();
-			edge2 = new Vector3();
-			normal = new Vector3();
+			_diff = new Vector3();
+			_edge1 = new Vector3();
+			_edge2 = new Vector3();
+			_normal = new Vector3();
 
 		}
 
 		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
-		edge1.subVectors( b, a );
-		edge2.subVectors( c, a );
-		normal.crossVectors( edge1, edge2 );
+		_edge1.subVectors( b, a );
+		_edge2.subVectors( c, a );
+		_normal.crossVectors( _edge1, _edge2 );
 
 		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
 		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
 		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-		var DdN = this.direction.dot( normal );
+		var DdN = this.direction.dot( _normal );
 		var sign;
 
 		if ( DdN > 0 ) {
@@ -473,8 +473,8 @@ Object.assign( Ray.prototype, {
 
 		}
 
-		diff.subVectors( this.origin, a );
-		var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
+		_diff.subVectors( this.origin, a );
+		var DdQxE2 = sign * this.direction.dot( _edge2.crossVectors( _diff, _edge2 ) );
 
 		// b1 < 0, no intersection
 		if ( DdQxE2 < 0 ) {
@@ -483,7 +483,7 @@ Object.assign( Ray.prototype, {
 
 		}
 
-		var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+		var DdE1xQ = sign * this.direction.dot( _edge1.cross( _diff ) );
 
 		// b2 < 0, no intersection
 		if ( DdE1xQ < 0 ) {
@@ -500,7 +500,7 @@ Object.assign( Ray.prototype, {
 		}
 
 		// Line intersects triangle, check if ray does.
-		var QdN = - sign * diff.dot( normal );
+		var QdN = - sign * _diff.dot( _normal );
 
 		// t < 0, no intersection
 		if ( QdN < 0 ) {

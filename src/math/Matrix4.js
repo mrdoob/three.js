@@ -13,9 +13,9 @@ import { Vector3 } from './Vector3.js';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-var v1, m1;
-var zero, one;
-var x, y, z;
+var _v1, _m1;
+var _zero, _one;
+var _x, _y, _z;
 
 function Matrix4() {
 
@@ -125,16 +125,16 @@ Object.assign( Matrix4.prototype, {
 
 	extractRotation: function ( m ) {
 
-		if ( v1 === undefined ) v1 = new Vector3();
+		if ( _v1 === undefined ) _v1 = new Vector3();
 
 		// this method does not support reflection matrices
 
 		var te = this.elements;
 		var me = m.elements;
 
-		var scaleX = 1 / v1.setFromMatrixColumn( m, 0 ).length();
-		var scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
-		var scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
+		var scaleX = 1 / _v1.setFromMatrixColumn( m, 0 ).length();
+		var scaleY = 1 / _v1.setFromMatrixColumn( m, 1 ).length();
+		var scaleZ = 1 / _v1.setFromMatrixColumn( m, 2 ).length();
 
 		te[ 0 ] = me[ 0 ] * scaleX;
 		te[ 1 ] = me[ 1 ] * scaleX;
@@ -290,67 +290,67 @@ Object.assign( Matrix4.prototype, {
 
 	makeRotationFromQuaternion: function ( q ) {
 
-		if ( zero === undefined ) {
+		if ( _zero === undefined ) {
 
-			zero = new Vector3( 0, 0, 0 );
-			one = new Vector3( 1, 1, 1 );
+			_zero = new Vector3( 0, 0, 0 );
+			_one = new Vector3( 1, 1, 1 );
 
 		}
 
-		return this.compose( zero, q, one );
+		return this.compose( _zero, q, _one );
 
 	},
 
 	lookAt: function ( eye, target, up ) {
 
-		if ( x === undefined ) {
+		if ( _x === undefined ) {
 
-			x = new Vector3();
-			y = new Vector3();
-			z = new Vector3();
+			_x = new Vector3();
+			_y = new Vector3();
+			_z = new Vector3();
 
 		}
 
 		var te = this.elements;
 
-		z.subVectors( eye, target );
+		_z.subVectors( eye, target );
 
-		if ( z.lengthSq() === 0 ) {
+		if ( _z.lengthSq() === 0 ) {
 
 			// eye and target are in the same position
 
-			z.z = 1;
+			_z.z = 1;
 
 		}
 
-		z.normalize();
-		x.crossVectors( up, z );
+		_z.normalize();
+		_x.crossVectors( up, _z );
 
-		if ( x.lengthSq() === 0 ) {
+		if ( _x.lengthSq() === 0 ) {
 
 			// up and z are parallel
 
 			if ( Math.abs( up.z ) === 1 ) {
 
-				z.x += 0.0001;
+				_z.x += 0.0001;
 
 			} else {
 
-				z.z += 0.0001;
+				_z.z += 0.0001;
 
 			}
 
-			z.normalize();
-			x.crossVectors( up, z );
+			_z.normalize();
+			_x.crossVectors( up, _z );
 
 		}
 
-		x.normalize();
-		y.crossVectors( z, x );
+		_x.normalize();
+		_y.crossVectors( _z, _x );
 
-		te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
-		te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
-		te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
+		te[ 0 ] = _x.x; te[ 4 ] = _y.x; te[ 8 ] = _z.x;
+		te[ 1 ] = _x.y; te[ 5 ] = _y.y; te[ 9 ] = _z.y;
+		te[ 2 ] = _x.z; te[ 6 ] = _y.z; te[ 10 ] = _z.z;
 
 		return this;
 
@@ -430,17 +430,17 @@ Object.assign( Matrix4.prototype, {
 
 	applyToBufferAttribute: function ( attribute ) {
 
-		if ( v1 === undefined ) v1 = new Vector3();
+		if ( _v1 === undefined ) _v1 = new Vector3();
 
 		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-			v1.x = attribute.getX( i );
-			v1.y = attribute.getY( i );
-			v1.z = attribute.getZ( i );
+			_v1.x = attribute.getX( i );
+			_v1.y = attribute.getY( i );
+			_v1.z = attribute.getZ( i );
 
-			v1.applyMatrix4( this );
+			_v1.applyMatrix4( this );
 
-			attribute.setXYZ( i, v1.x, v1.y, v1.z );
+			attribute.setXYZ( i, _v1.x, _v1.y, _v1.z );
 
 		}
 
@@ -782,18 +782,18 @@ Object.assign( Matrix4.prototype, {
 
 	decompose: function ( position, quaternion, scale ) {
 
-		if ( m1 === undefined ) {
+		if ( _m1 === undefined ) {
 
-			m1 = new Matrix4();
-			v1 = new Vector3();
+			_m1 = new Matrix4();
+			_v1 = new Vector3();
 
 		}
 
 		var te = this.elements;
 
-		var sx = v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-		var sy = v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-		var sz = v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		var sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
+		var sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+		var sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
 		// if determine is negative, we need to invert one scale
 		var det = this.determinant();
@@ -804,25 +804,25 @@ Object.assign( Matrix4.prototype, {
 		position.z = te[ 14 ];
 
 		// scale the rotation part
-		m1.copy( this );
+		_m1.copy( this );
 
 		var invSX = 1 / sx;
 		var invSY = 1 / sy;
 		var invSZ = 1 / sz;
 
-		m1.elements[ 0 ] *= invSX;
-		m1.elements[ 1 ] *= invSX;
-		m1.elements[ 2 ] *= invSX;
+		_m1.elements[ 0 ] *= invSX;
+		_m1.elements[ 1 ] *= invSX;
+		_m1.elements[ 2 ] *= invSX;
 
-		m1.elements[ 4 ] *= invSY;
-		m1.elements[ 5 ] *= invSY;
-		m1.elements[ 6 ] *= invSY;
+		_m1.elements[ 4 ] *= invSY;
+		_m1.elements[ 5 ] *= invSY;
+		_m1.elements[ 6 ] *= invSY;
 
-		m1.elements[ 8 ] *= invSZ;
-		m1.elements[ 9 ] *= invSZ;
-		m1.elements[ 10 ] *= invSZ;
+		_m1.elements[ 8 ] *= invSZ;
+		_m1.elements[ 9 ] *= invSZ;
+		_m1.elements[ 10 ] *= invSZ;
 
-		quaternion.setFromRotationMatrix( m1 );
+		quaternion.setFromRotationMatrix( _m1 );
 
 		scale.x = sx;
 		scale.y = sy;
