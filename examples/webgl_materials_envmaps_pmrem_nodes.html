@@ -46,6 +46,7 @@
 			import {
 				StandardNodeMaterial,
 				FloatNode,
+				OperatorNode,
 				TextureNode,
 				TextureCubeNode
 			} from './jsm/nodes/Nodes.js';
@@ -55,13 +56,14 @@
 				roughness: 0.0,
 				metalness: 0.0,
 				exposure: 1.0,
+				intensity: 1.0,
 				animate: true,
 				debug: false
 			};
 
 			var container, stats;
 			var camera, scene, renderer, controls;
-			var nodeMaterial, nodeTexture, nodeTextureSize, torusMesh, planeMesh;
+			var nodeMaterial, nodeTexture, nodeTextureSize, nodeTextureIntensity, torusMesh, planeMesh;
 			var hdrCubeRenderTarget;
 			var hdrCubeMap;
 
@@ -118,8 +120,9 @@
 
 				nodeTexture = new TextureNode();
 				nodeTextureSize = new FloatNode( 1024 );
+				nodeTextureIntensity = new FloatNode( 1 );
 
-				nodeMaterial.environment = new TextureCubeNode( nodeTexture, nodeTextureSize );
+				nodeMaterial.environment = new OperatorNode( new TextureCubeNode( nodeTexture, nodeTextureSize ), nodeTextureIntensity, OperatorNode.MUL );
 
 				torusMesh = new THREE.Mesh( geometry, nodeMaterial );
 				scene.add( torusMesh );
@@ -164,6 +167,7 @@
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'intensity', 0, 2, 0.01 );
 				gui.add( params, 'animate', true );
 				gui.add( params, 'debug', false );
 				gui.open();
@@ -196,6 +200,8 @@
 
 				torusMesh.material.roughness.value = params.roughness;
 				torusMesh.material.metalness.value = params.metalness;
+
+				nodeTextureIntensity.value = params.intensity;
 
 				if ( nodeTextureSize.value !== params.textureSize ) {
 

@@ -153,7 +153,14 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.shadow ) this.shadow.analyze( builder );
 		if ( this.emissive ) this.emissive.analyze( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.analyze( builder, { cache: 'env', context: contextEnvironment, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) {
+
+			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+
+			this.environment.analyze( builder, { cache: 'radianceCache', context: contextEnvironment, slot: 'radiance' } ); 
+			this.environment.analyze( builder, { cache: 'irradianceCache', context: contextEnvironment, slot: 'irradiance' } ); 
+
+		}
 
 		// build code
 
@@ -179,7 +186,16 @@ StandardNode.prototype.build = function ( builder ) {
 		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.flow( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.flow( builder, 'c', { cache: 'env', context: contextEnvironment, slot: 'environment' } ) : undefined;
+		var environment;
+
+		if ( this.environment ) {
+
+			environment = {
+				radiance: this.environment.flow( builder, 'c', { cache: 'radianceCache', context: contextEnvironment, slot: 'radiance' } ),
+				irradiance: this.environment.flow( builder, 'c', { cache: 'irradianceCache', context: contextEnvironment, slot: 'irradiance' } ),
+			};
+
+		}
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
@@ -371,7 +387,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( environment ) {
 
-			output.push( environment.code );
+			output.push( environment.radiance.code );
+			output.push( environment.irradiance.code );
 
 			if ( clearCoatEnv ) {
 
@@ -382,13 +399,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 			}
 
-			output.push( "radiance += " + environment.result + ";" );
-
-			if ( environment.extra.irradiance ) {
-
-				output.push( "irradiance += PI * " + environment.extra.irradiance + ";" );
-
-			}
+			output.push( "radiance += " + environment.radiance.result + ";" );
+			output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
 
 		}
 
