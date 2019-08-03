@@ -1635,8 +1635,6 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	var _vector, _quaternion;
-
 	function Vector3( x, y, z ) {
 
 		this.x = x || 0;
@@ -1858,27 +1856,35 @@
 
 		},
 
-		applyEuler: function ( euler ) {
+		applyEuler: function () {
 
-			if ( _quaternion === undefined ) _quaternion = new Quaternion();
+			var quaternion = new Quaternion();
 
-			if ( ! ( euler && euler.isEuler ) ) {
+			return function applyEuler( euler ) {
 
-				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
+				if ( ! ( euler && euler.isEuler ) ) {
 
-			}
+					console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
-			return this.applyQuaternion( _quaternion.setFromEuler( euler ) );
+				}
 
-		},
+				return this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
-		applyAxisAngle: function ( axis, angle ) {
+			};
 
-			if ( _quaternion === undefined ) _quaternion = new Quaternion();
+		}(),
 
-			return this.applyQuaternion( _quaternion.setFromAxisAngle( axis, angle ) );
+		applyAxisAngle: function () {
 
-		},
+			var quaternion = new Quaternion();
+
+			return function applyAxisAngle( axis, angle ) {
+
+				return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
+
+			};
+
+		}(),
 
 		applyMatrix3: function ( m ) {
 
@@ -2162,26 +2168,34 @@
 
 		},
 
-		projectOnPlane: function ( planeNormal ) {
+		projectOnPlane: function () {
 
-			if ( _vector === undefined ) _vector = new Vector3();
+			var v1 = new Vector3();
 
-			_vector.copy( this ).projectOnVector( planeNormal );
+			return function projectOnPlane( planeNormal ) {
 
-			return this.sub( _vector );
+				v1.copy( this ).projectOnVector( planeNormal );
 
-		},
+				return this.sub( v1 );
 
-		reflect: function ( normal ) {
+			};
 
-			if ( _vector === undefined ) _vector = new Vector3();
+		}(),
+
+		reflect: function () {
 
 			// reflect incident vector off plane orthogonal to normal
 			// normal is assumed to have unit length
 
-			return this.sub( _vector.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
+			var v1 = new Vector3();
 
-		},
+			return function reflect( normal ) {
+
+				return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
+
+			};
+
+		}(),
 
 		angleTo: function ( v ) {
 
@@ -2335,7 +2349,7 @@
 	 * @author tschw
 	 */
 
-	var _vector$1;
+	var _vector;
 
 	function Matrix3() {
 
@@ -2422,17 +2436,17 @@
 
 		applyToBufferAttribute: function ( attribute ) {
 
-			if ( _vector$1 === undefined ) _vector$1 = new Vector3();
+			if ( _vector === undefined ) _vector = new Vector3();
 
 			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-				_vector$1.x = attribute.getX( i );
-				_vector$1.y = attribute.getY( i );
-				_vector$1.z = attribute.getZ( i );
+				_vector.x = attribute.getX( i );
+				_vector.y = attribute.getY( i );
+				_vector.z = attribute.getZ( i );
 
-				_vector$1.applyMatrix3( this );
+				_vector.applyMatrix3( this );
 
-				attribute.setXYZ( i, _vector$1.x, _vector$1.y, _vector$1.z );
+				attribute.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
 			}
 
@@ -4809,7 +4823,7 @@
 	 * @author bhouston / http://clara.io
 	 */
 
-	var _matrix, _quaternion$1;
+	var _matrix, _quaternion;
 
 	function Euler( x, y, z, order ) {
 
@@ -5075,11 +5089,11 @@
 
 			// WARNING: this discards revolution information -bhouston
 
-			if ( _quaternion$1 === undefined ) _quaternion$1 = new Quaternion();
+			if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-			_quaternion$1.setFromEuler( this );
+			_quaternion.setFromEuler( this );
 
-			return this.setFromQuaternion( _quaternion$1, newOrder );
+			return this.setFromQuaternion( _quaternion, newOrder );
 
 		},
 
@@ -7867,7 +7881,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	var _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+	var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 		'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
 		'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
 		'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
@@ -7891,9 +7905,6 @@
 		'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
 		'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 		'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
-
-	var _hslA = { h: 0, s: 0, l: 0 };
-	var _hslB = { h: 0, s: 0, l: 0 };
 
 	function Color( r, g, b ) {
 
@@ -8125,7 +8136,7 @@
 			if ( style && style.length > 0 ) {
 
 				// color keywords
-				var hex = _colorKeywords[ style ];
+				var hex = ColorKeywords[ style ];
 
 				if ( hex !== undefined ) {
 
@@ -8307,17 +8318,23 @@
 
 		},
 
-		offsetHSL: function ( h, s, l ) {
+		offsetHSL: function () {
 
-			this.getHSL( _hslA );
+			var hsl = {};
 
-			_hslA.h += h; _hslA.s += s; _hslA.l += l;
+			return function ( h, s, l ) {
 
-			this.setHSL( _hslA.h, _hslA.s, _hslA.l );
+				this.getHSL( hsl );
 
-			return this;
+				hsl.h += h; hsl.s += s; hsl.l += l;
 
-		},
+				this.setHSL( hsl.h, hsl.s, hsl.l );
+
+				return this;
+
+			};
+
+		}(),
 
 		add: function ( color ) {
 
@@ -8389,20 +8406,27 @@
 
 		},
 
-		lerpHSL: function ( color, alpha ) {
+		lerpHSL: function () {
 
-			this.getHSL( _hslA );
-			color.getHSL( _hslB );
+			var hslA = { h: 0, s: 0, l: 0 };
+			var hslB = { h: 0, s: 0, l: 0 };
 
-			var h = _Math.lerp( _hslA.h, _hslB.h, alpha );
-			var s = _Math.lerp( _hslA.s, _hslB.s, alpha );
-			var l = _Math.lerp( _hslA.l, _hslB.l, alpha );
+			return function lerpHSL( color, alpha ) {
 
-			this.setHSL( h, s, l );
+				this.getHSL( hslA );
+				color.getHSL( hslB );
 
-			return this;
+				var h = _Math.lerp( hslA.h, hslB.h, alpha );
+				var s = _Math.lerp( hslA.s, hslB.s, alpha );
+				var l = _Math.lerp( hslA.l, hslB.l, alpha );
 
-		},
+				this.setHSL( h, s, l );
+
+				return this;
+
+			};
+
+		}(),
 
 		equals: function ( c ) {
 
@@ -13894,8 +13918,6 @@
 	 * @author bhouston / http://clara.io
 	 */
 
-	var _vector1, _vector2, _normalMatrix;
-
 	function Plane( normal, constant ) {
 
 		// normal is assumed to be normalized
@@ -13936,24 +13958,24 @@
 
 		},
 
-		setFromCoplanarPoints: function ( a, b, c ) {
+		setFromCoplanarPoints: function () {
 
-			if ( _vector1 === undefined ) {
+			var v1 = new Vector3();
+			var v2 = new Vector3();
 
-				_vector1 = new Vector3();
-				_vector2 = new Vector3();
+			return function setFromCoplanarPoints( a, b, c ) {
 
-			}
+				var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
 
-			var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
+				// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
-			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+				this.setFromNormalAndCoplanarPoint( normal, a );
 
-			this.setFromNormalAndCoplanarPoint( normal, a );
+				return this;
 
-			return this;
+			};
 
-		},
+		}(),
 
 		clone: function () {
 
@@ -14016,46 +14038,50 @@
 
 		},
 
-		intersectLine: function ( line, target ) {
+		intersectLine: function () {
 
-			if ( _vector1 === undefined ) _vector1 = new Vector3();
+			var v1 = new Vector3();
 
-			if ( target === undefined ) {
+			return function intersectLine( line, target ) {
 
-				console.warn( 'THREE.Plane: .intersectLine() target is now required' );
-				target = new Vector3();
+				if ( target === undefined ) {
 
-			}
-
-			var direction = line.delta( _vector1 );
-
-			var denominator = this.normal.dot( direction );
-
-			if ( denominator === 0 ) {
-
-				// line is coplanar, return origin
-				if ( this.distanceToPoint( line.start ) === 0 ) {
-
-					return target.copy( line.start );
+					console.warn( 'THREE.Plane: .intersectLine() target is now required' );
+					target = new Vector3();
 
 				}
 
-				// Unsure if this is the correct method to handle this case.
-				return undefined;
+				var direction = line.delta( v1 );
 
-			}
+				var denominator = this.normal.dot( direction );
 
-			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+				if ( denominator === 0 ) {
 
-			if ( t < 0 || t > 1 ) {
+					// line is coplanar, return origin
+					if ( this.distanceToPoint( line.start ) === 0 ) {
 
-				return undefined;
+						return target.copy( line.start );
 
-			}
+					}
 
-			return target.copy( direction ).multiplyScalar( t ).add( line.start );
+					// Unsure if this is the correct method to handle this case.
+					return undefined;
 
-		},
+				}
+
+				var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+
+				if ( t < 0 || t > 1 ) {
+
+					return undefined;
+
+				}
+
+				return target.copy( direction ).multiplyScalar( t ).add( line.start );
+
+			};
+
+		}(),
 
 		intersectsLine: function ( line ) {
 
@@ -14093,26 +14119,26 @@
 
 		},
 
-		applyMatrix4: function ( matrix, optionalNormalMatrix ) {
+		applyMatrix4: function () {
 
-			if ( _normalMatrix === undefined ) {
+			var v1 = new Vector3();
+			var m1 = new Matrix3();
 
-				_normalMatrix = new Matrix3();
-				_vector1 = new Vector3();
+			return function applyMatrix4( matrix, optionalNormalMatrix ) {
 
-			}
+				var normalMatrix = optionalNormalMatrix || m1.getNormalMatrix( matrix );
 
-			var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
+				var referencePoint = this.coplanarPoint( v1 ).applyMatrix4( matrix );
 
-			var referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
+				var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
 
-			var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
+				this.constant = - referencePoint.dot( normal );
 
-			this.constant = - referencePoint.dot( normal );
+				return this;
 
-			return this;
+			};
 
-		},
+		}(),
 
 		translate: function ( offset ) {
 
@@ -14135,9 +14161,6 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author bhouston / http://clara.io
 	 */
-
-	var _sphere;
-	var _vector$2;
 
 	function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
@@ -14211,29 +14234,41 @@
 
 		},
 
-		intersectsObject: function ( object ) {
+		intersectsObject: function () {
 
-			if ( _sphere === undefined ) _sphere = new Sphere();
+			var sphere = new Sphere();
 
-			var geometry = object.geometry;
+			return function intersectsObject( object ) {
 
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+				var geometry = object.geometry;
 
-			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+				if ( geometry.boundingSphere === null )
+					geometry.computeBoundingSphere();
 
-			return this.intersectsSphere( _sphere );
+				sphere.copy( geometry.boundingSphere )
+					.applyMatrix4( object.matrixWorld );
 
-		},
+				return this.intersectsSphere( sphere );
 
-		intersectsSprite: function ( sprite ) {
+			};
 
-			_sphere.center.set( 0, 0, 0 );
-			_sphere.radius = 0.7071067811865476;
-			_sphere.applyMatrix4( sprite.matrixWorld );
+		}(),
 
-			return this.intersectsSphere( _sphere );
+		intersectsSprite: function () {
 
-		},
+			var sphere = new Sphere();
+
+			return function intersectsSprite( sprite ) {
+
+				sphere.center.set( 0, 0, 0 );
+				sphere.radius = 0.7071067811865476;
+				sphere.applyMatrix4( sprite.matrixWorld );
+
+				return this.intersectsSphere( sphere );
+
+			};
+
+		}(),
 
 		intersectsSphere: function ( sphere ) {
 
@@ -14257,33 +14292,37 @@
 
 		},
 
-		intersectsBox: function ( box ) {
+		intersectsBox: function () {
 
-			if ( _vector$2 === undefined ) _vector$2 = new Vector3();
+			var p = new Vector3();
 
-			var planes = this.planes;
+			return function intersectsBox( box ) {
 
-			for ( var i = 0; i < 6; i ++ ) {
+				var planes = this.planes;
 
-				var plane = planes[ i ];
+				for ( var i = 0; i < 6; i ++ ) {
 
-				// corner at max distance
+					var plane = planes[ i ];
 
-				_vector$2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				_vector$2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				_vector$2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+					// corner at max distance
 
-				if ( plane.distanceToPoint( _vector$2 ) < 0 ) {
+					p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+					p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+					p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-					return false;
+					if ( plane.distanceToPoint( p ) < 0 ) {
+
+						return false;
+
+					}
 
 				}
 
-			}
+				return true;
 
-			return true;
+			};
 
-		},
+		}(),
 
 		containsPoint: function ( point ) {
 
@@ -44928,8 +44967,6 @@
 	 * @author bhouston / http://clara.io
 	 */
 
-	var _vector$3;
-
 	function Box2( min, max ) {
 
 		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
@@ -44962,17 +44999,21 @@
 
 		},
 
-		setFromCenterAndSize: function ( center, size ) {
+		setFromCenterAndSize: function () {
 
-			if ( _vector$3 === undefined ) _vector$3 = new Vector2();
+			var v1 = new Vector2();
 
-			var halfSize = _vector$3.copy( size ).multiplyScalar( 0.5 );
-			this.min.copy( center ).sub( halfSize );
-			this.max.copy( center ).add( halfSize );
+			return function setFromCenterAndSize( center, size ) {
 
-			return this;
+				var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+				this.min.copy( center ).sub( halfSize );
+				this.max.copy( center ).add( halfSize );
 
-		},
+				return this;
+
+			};
+
+		}(),
 
 		clone: function () {
 
@@ -45114,14 +45155,18 @@
 
 		},
 
-		distanceToPoint: function ( point ) {
+		distanceToPoint: function () {
 
-			if ( _vector$3 === undefined ) _vector$3 = new Vector2();
+			var v1 = new Vector2();
 
-			var clampedPoint = _vector$3.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
+			return function distanceToPoint( point ) {
 
-		},
+				var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+				return clampedPoint.sub( point ).length();
+
+			};
+
+		}(),
 
 		intersect: function ( box ) {
 
