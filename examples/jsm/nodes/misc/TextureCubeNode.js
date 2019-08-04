@@ -79,10 +79,12 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		var cache = builder.slot === 'irradiance' ? this.irradianceCache : this.radianceCache;
-		var code = this.generateTextureCubeUV( builder, cache );
+		builder.require( 'irradiance' );
 
-		return builder.format( 'vec4( ' + code + ', 1.0 )', this.getType( builder ), output );
+		var cache = builder.slot === 'irradiance' ? this.irradianceCache : this.radianceCache;
+		var result = this.generateTextureCubeUV( builder, cache );
+
+		return builder.format( 'vec4( ' + result + ', 1.0 )', this.getType( builder ), output );
 
 	} else {
 

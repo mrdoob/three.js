@@ -449,6 +449,12 @@ NodeBuilder.prototype = {
 
 	},
 
+	require: function ( name ) {
+
+		this.requires[ name ] = true;
+
+	},
+
 	isDefined: function ( name ) {
 
 		return this.defines[ name ] !== undefined;

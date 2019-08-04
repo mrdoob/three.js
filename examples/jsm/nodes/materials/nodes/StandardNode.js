@@ -157,8 +157,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 
-			this.environment.analyze( builder, { cache: 'radianceCache', context: contextEnvironment, slot: 'radiance' } ); 
-			this.environment.analyze( builder, { cache: 'irradianceCache', context: contextEnvironment, slot: 'irradiance' } ); 
+			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
+			this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
 
 		}
 
@@ -191,9 +191,14 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.environment ) {
 
 			environment = {
-				radiance: this.environment.flow( builder, 'c', { cache: 'radianceCache', context: contextEnvironment, slot: 'radiance' } ),
-				irradiance: this.environment.flow( builder, 'c', { cache: 'irradianceCache', context: contextEnvironment, slot: 'irradiance' } ),
+				radiance: this.environment.flow( builder, 'c', { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } )
 			};
+
+			if ( builder.requires.irradiance ) {
+
+				environment.irradiance = this.environment.flow( builder, 'c', { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
+
+			}
 
 		}
 
@@ -388,7 +393,12 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( environment ) {
 
 			output.push( environment.radiance.code );
-			output.push( environment.irradiance.code );
+
+			if ( builder.requires.irradiance ) {
+
+				output.push( environment.irradiance.code );
+
+			}
 
 			if ( clearCoatEnv ) {
 
@@ -400,7 +410,12 @@ StandardNode.prototype.build = function ( builder ) {
 			}
 
 			output.push( "radiance += " + environment.radiance.result + ";" );
-			output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
+
+			if ( builder.requires.irradiance ) {
+
+				output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
+
+			}
 
 		}
 
