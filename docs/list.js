@@ -14,8 +14,6 @@ var list = {
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
-				"Migration guide": "manual/en/introduction/Migration-guide",
-				"Code style guide": "manual/en/introduction/Code-style-guide",
 				"FAQ": "manual/en/introduction/FAQ",
 				"Useful links": "manual/en/introduction/Useful-links"
 			},
@@ -452,8 +450,6 @@ var list = {
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
-				"迁移指南": "manual/zh/introduction/Migration-guide",
-				"代码风格指南": "manual/zh/introduction/Code-style-guide",
 				"常见问题": "manual/zh/introduction/FAQ",
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},
