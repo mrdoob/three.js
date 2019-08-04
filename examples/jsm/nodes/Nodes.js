@@ -82,6 +82,7 @@ export { VelocityNode } from './utils/VelocityNode.js';
 export { UVTransformNode } from './utils/UVTransformNode.js';
 export { MaxMIPLevelNode } from './utils/MaxMIPLevelNode.js';
 export { ColorSpaceNode } from './utils/ColorSpaceNode.js';
+export { SubSlotNode } from './utils/SubSlotNode.js';
 
 // effects
 
