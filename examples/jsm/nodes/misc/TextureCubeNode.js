@@ -96,6 +96,16 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 };
 
+TextureCubeNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.value = source.value;
+
+	return this;
+
+};
+
 TextureCubeNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
