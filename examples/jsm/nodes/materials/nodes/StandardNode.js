@@ -156,9 +156,15 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.environment ) {
 
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+			// environment.analyze will detect if there is a need of calculate irradiance
 
 			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
-			this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+
+			if ( builder.requires.irradiance ) {
+
+				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+
+			}
 
 		}
 
