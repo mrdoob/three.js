@@ -5,6 +5,7 @@ import { WebGLInfo } from './webgl/WebGLInfo';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { WebGLProperties } from './webgl/WebGLProperties';
+import { WebGLObjects } from './webgl/WebGLObjects';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLState } from './webgl/WebGLState';
 import { Vector2 } from './../math/Vector2';
@@ -194,6 +195,7 @@ export class WebGLRenderer implements Renderer {
 	properties: WebGLProperties;
 	renderLists: WebGLRenderLists;
 	state: WebGLState;
+	objects: WebGLObjects;
 
 	vr: WebVRManager;
 
