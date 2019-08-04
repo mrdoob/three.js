@@ -3,6 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
+import { NodeContext } from '../core/NodeContext.js';
 import { UVNode } from '../accessors/UVNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
@@ -36,13 +37,16 @@ TextureNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	var tex = this.getTexture( builder, output ),
-		uv = this.uv.build( builder, this.project ? 'v4' : 'v2' ),
-		bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
+	// automatic bias is used normally in physically-based material
+	const BiasClass = builder.getContextClass( 'Bias' );
 
-	if ( bias === undefined && builder.context.bias ) {
+	var tex = this.getTexture( builder, output );
+	var uv = this.uv.build( builder, this.project ? 'v4' : 'v2' );
+	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
-		bias = new builder.context.bias( this ).build( builder, 'f' );
+	if ( bias === undefined && BiasClass !== undefined ) {
+
+		bias = new BiasClass( this ).build( builder, 'f' );
 
 	}
 
@@ -57,12 +61,13 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	// add a custom context for fix incompatibility with the core
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
-	// context.include is used to include or not functions if used FunctionNode
-	// context.ignoreCache =: not create temp variables nodeT0..9 to optimize the code
-	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
+	// include => is used to include or not functions if used FunctionNode
+	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
+
+	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setIgnoreCache( true );
 	var outputType = this.getType( builder );
 
-	builder.addContext( context );
+	builder.addContext( colorSpaceContext );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	this.colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );

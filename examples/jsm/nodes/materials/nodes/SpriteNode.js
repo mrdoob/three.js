@@ -8,6 +8,8 @@ import {
 } from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
+import { NodeContext } from '../../core/NodeContext.js';
+import { NodeFlowSettings } from '../../core/NodeFlowSettings.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 
 function SpriteNode() {
@@ -34,7 +36,7 @@ SpriteNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', { cache: 'position' } ) : undefined;
+		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeFlowSettings().setCache( 'position' ) ) : undefined;
 
 		builder.mergeUniform( UniformsUtils.merge( [
 			UniformsLib.fog
@@ -126,19 +128,23 @@ SpriteNode.prototype.build = function ( builder ) {
 			"#include <logdepthbuf_fragment>"
 		].join( "\n" ) );
 
+		// flow settings
+
+		var colorFlowSettings = new NodeFlowSettings().setSlot( 'color' );
+
 		// analyze all nodes to reuse generate codes
 
 		if ( this.mask ) this.mask.analyze( builder );
 
 		if ( this.alpha ) this.alpha.analyze( builder );
 
-		this.color.analyze( builder, { slot: 'color' } );
+		this.color.analyze( builder, colorFlowSettings );
 
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined,
 			alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined,
-			color = this.color.flow( builder, 'c', { slot: 'color' } ),
+			color = this.color.flow( builder, 'c', colorFlowSettings ),
 			output = [];
 
 		if ( mask ) {

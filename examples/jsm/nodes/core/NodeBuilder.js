@@ -17,6 +17,8 @@ import { NodeLib } from './NodeLib.js';
 import { FunctionNode } from './FunctionNode.js';
 import { ConstNode } from './ConstNode.js';
 import { StructNode } from './StructNode.js';
+import { NodeContext } from './NodeContext.js';
+import { NodeFlowSettings } from './NodeFlowSettings.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { Vector3Node } from '../inputs/Vector3Node.js';
 import { Vector4Node } from '../inputs/Vector4Node.js';
@@ -255,9 +257,11 @@ NodeBuilder.prototype = {
 
 	},
 
-	addFlow: function ( slot, cache, context ) {
+	addFlow: function ( settings ) {
 
-		return this.addSlot( slot ).addCache( cache ).addContext( context );
+		settings = settings || new NodeFlowSettings();
+
+		return this.addSlot( settings.slot ).addCache( settings.cache ).addContext( settings.context );
 
 	},
 
@@ -287,9 +291,7 @@ NodeBuilder.prototype = {
 
 	addContext: function ( context ) {
 
-		this.context = Object.assign( {}, this.context, context );
-		this.context.extra = this.context.extra || {};
-
+		this.context = Object.assign( {}, this.context, context ? context.data : {} );
 		this.contexts.push( this.context );
 
 		return this;
@@ -608,7 +610,7 @@ NodeBuilder.prototype = {
 
 		node = typeof node === 'string' ? NodeLib.get( node ) : node;
 
-		if ( this.context.include === false ) {
+		if ( this.getContextProperty( NodeContext.INCLUDE ) === false ) {
 
 			return node.name;
 
@@ -728,6 +730,18 @@ NodeBuilder.prototype = {
 		};
 
 	}(),
+
+	getContextProperty: function ( name ) {
+
+		return this.context[ name ];
+
+	},
+
+	getContextClass: function ( name ) {
+
+		return this.getContextProperty( name + 'Class' );
+
+	},
 
 	getConstructorFromLength: function ( len ) {
 
@@ -951,7 +965,7 @@ NodeBuilder.prototype = {
 
 	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
 
-		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.context.gamma && ( this.renderer ? this.renderer.gammaInput : false );
+		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.getContextProperty( NodeContext.GAMMA ) && ( this.renderer ? this.renderer.gammaInput : false );
 
 		var encoding;
 

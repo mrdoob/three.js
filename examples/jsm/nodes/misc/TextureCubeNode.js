@@ -2,10 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { TempNode } from '../core/TempNode.js';
-import { FloatNode } from '../inputs/FloatNode.js';
-import { ExpressionNode } from '../core/ExpressionNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
+import { TempNode } from '../core/TempNode.js';
+import { NodeContext } from '../core/NodeContext.js';
+import { ExpressionNode } from '../core/ExpressionNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
@@ -48,12 +49,13 @@ TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache ) {
 	// add a custom context for fix incompatibility with the core
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
-	// context.include =: is used to include or not functions if used FunctionNode
-	// context.ignoreCache =: not create temp variables nodeT0..9 to optimize the code
-	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
+	// include => is used to include or not functions if used FunctionNode
+	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
+
+	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setIgnoreCache( true );
 	var outputType = this.getType( builder );
 
-	builder.addContext( context );
+	builder.addContext( colorSpaceContext );
 
 	cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	cache.colorSpace10.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );

@@ -3,6 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
+import { NodeContext } from '../core/NodeContext.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
@@ -35,13 +36,16 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	}
 
+	// automatic bias is used normally in physically-based material
+	const BiasClass = builder.getContextClass( 'Bias' );
+
 	var cubetex = this.getTexture( builder, output );
 	var uv = this.uv.build( builder, 'v3' );
 	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
-	if ( bias === undefined && builder.context.bias ) {
+	if ( bias === undefined && BiasClass !== undefined ) {
 
-		bias = new builder.context.bias( this ).build( builder, 'f' );
+		bias = new BiasClass( this ).build( builder, 'f' );
 
 	}
 
@@ -53,12 +57,13 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	// add a custom context for fix incompatibility with the core
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
-	// context.include =: is used to include or not functions if used FunctionNode
-	// context.ignoreCache =: not create variables temp nodeT0..9 to optimize the code
-	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
+	// include => is used to include or not functions if used FunctionNode
+	// ignoreCache => not create variables temp nodeT0..9 to optimize the code
+
+	var contextSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setIgnoreCache( true );
 	var outputType = this.getType( builder );
 
-	builder.addContext( context );
+	builder.addContext( contextSpaceContext );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	this.colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );

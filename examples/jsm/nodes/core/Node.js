@@ -24,11 +24,9 @@ Node.prototype = {
 
 	analyze: function ( builder, settings ) {
 
-		settings = settings || {};
-
 		builder.analyzing = true;
 
-		this.build( builder.addFlow( settings.slot, settings.cache, settings.context ), 'v4' );
+		this.build( builder.addFlow( settings ), 'v4' );
 
 		builder.clearVertexNodeCode();
 		builder.clearFragmentNodeCode();
@@ -41,8 +39,6 @@ Node.prototype = {
 
 	analyzeAndFlow: function ( builder, output, settings ) {
 
-		settings = settings || {};
-
 		this.analyze( builder, settings );
 
 		return this.flow( builder, output, settings );
@@ -51,14 +47,11 @@ Node.prototype = {
 
 	flow: function ( builder, output, settings ) {
 
-		settings = settings || {};
-
-		builder.addFlow( settings.slot, settings.cache, settings.context );
+		builder.addFlow( settings );
 
 		var flow = {};
 		flow.result = this.build( builder, output );
 		flow.code = builder.clearNodeCode();
-		flow.extra = builder.context.extra;
 
 		builder.removeFlow();
 
