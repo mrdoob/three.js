@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - buffergeometry - indexed</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			color: #cccccc;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+
+			background-color: #050505;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		#info {
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			padding: 5px;
+		}
+
+		a {
+			color: #0080ff;
+		}
+
+	</style>
+</head>
+<body>
+
+<div id="container"></div>
+<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - indexed
+</div>
+
+<script src="../build/three.js"></script>
+
+<script src="js/WebGL.js"></script>
+<script src="js/libs/stats.min.js"></script>
+<script src="./js/libs/dat.gui.min.js"></script>
+
+<script type="module">
+
+	import {TrackballControls} from './jsm/controls/TrackballControls.js';
+
+	if (WEBGL.isWebGLAvailable() === false) {
+
+		document.body.appendChild(WEBGL.getWebGLErrorMessage());
+
+	}
+
+	var camera, scene, renderer, stats, pickingScene, gui;
+
+	var mesh;
+	var mesh1;
+
+	var controls;
+	let raycaster;
+
+	var GPUPickingPoint = new THREE.Vector3();
+	var CPUPickingPoint = new THREE.Vector3();
+
+	init();
+	animate();
+
+	function init() {
+
+		//
+		raycaster = new THREE.Raycaster();
+		camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+		camera.up.set(0, 0, 1);
+		camera.position.x = 64;
+
+		scene = new THREE.Scene();
+		pickingScene = new THREE.Scene();
+		// scene.background = new THREE.Color(0x050505);
+
+		//
+		let axesHelper = new THREE.AxesHelper(100);
+		scene.add(axesHelper);
+
+		// var ambientLight = new THREE.AmbientLight(0x222222);
+		// scene.add(ambientLight);
+		//
+		// var light1 = new THREE.DirectionalLight(0xffffff, 0.5);
+		// light1.position.set(1, 1, 1);
+		// scene.add(light1);
+		//
+		// var light2 = new THREE.DirectionalLight(0xffffff, 1);
+		// light2.position.set(0, -1, 0);
+		// scene.add(light2);
+
+		//
+
+		// let geometry = new THREE.SphereBufferGeometry(100, 20, 20);
+		let geometry = new THREE.BoxBufferGeometry(100, 100, 100);
+
+		var depthMaterial = new THREE.MeshDepthMaterial();
+		depthMaterial.depthPacking = THREE.RGBADepthPacking;
+
+		mesh = new THREE.Mesh(geometry, depthMaterial);
+		mesh1 = new THREE.Mesh(geometry, depthMaterial);
+		scene.add(mesh);
+		pickingScene.add(mesh1);
+
+		//
+
+		renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		// renderer.capabilities.logarithmicDepthBuffer = true;
+		document.body.appendChild(renderer.domElement);
+
+		//
+
+		stats = new Stats();
+		document.body.appendChild(stats.dom);
+
+		//
+
+		gui = new dat.GUI();
+		gui.add(renderer.capabilities, 'logarithmicDepthBuffer');
+		let GPUPFolder = gui.addFolder('GPUPickingPoint');
+		GPUPFolder.open();
+		GPUPFolder.add(GPUPickingPoint, 'x');
+		GPUPFolder.add(GPUPickingPoint, 'y');
+		GPUPFolder.add(GPUPickingPoint, 'z');
+		let CPUPFolder = gui.addFolder('CPUPickingPoint');
+		CPUPFolder.open();
+		CPUPFolder.add(CPUPickingPoint, 'x');
+		CPUPFolder.add(CPUPickingPoint, 'y');
+		CPUPFolder.add(CPUPickingPoint, 'z');
+		//
+
+		controls = new TrackballControls(camera, renderer.domElement);
+		controls.rotateSpeed = 5.0;
+		controls.zoomSpeed = 5;
+		controls.panSpeed = 2;
+
+		controls.noZoom = false;
+		controls.noPan = false;
+
+		controls.staticMoving = true;
+		controls.dynamicDampingFactor = 0.3;
+
+		//
+
+		window.addEventListener('resize', onWindowResize, false);
+		renderer.domElement.addEventListener('click', pick);
+
+	}
+
+	function pick(e) {
+
+		var x = e.clientX;
+		var y = renderer.domElement.height - e.clientY;
+
+		var pX = 2 * x / renderer.domElement.width - 1; //归一化为标准化设备坐标系
+		var pY = 2 * y / renderer.domElement.height - 1;
+
+		let mouseVector = new THREE.Vector3();
+		mouseVector.set(pX, pY, 0.5); // set raycaster target
+		raycaster.setFromCamera(mouseVector, camera);
+
+		var pickingTexture = new THREE.WebGLRenderTarget(renderer.domElement.width, renderer.domElement.height);
+		//render the picking scene off-screen
+		// set the view offset to represent just a single pixel under the mouse
+		camera.setViewOffset(renderer.domElement.width, renderer.domElement.height, e.clientX * window.devicePixelRatio | 0, e.clientY * window.devicePixelRatio | 0, 1, 1);
+		// render the scene
+		renderer.setRenderTarget(pickingTexture);
+		renderer.render(pickingScene, camera);
+		// clear the view offset so rendering returns to normal
+
+		//create buffer for reading single pixel
+		var pixelBuffer = new Uint8Array(4);
+		//read the pixel
+		renderer.readRenderTargetPixels(pickingTexture, 0, 0, 1, 1, pixelBuffer);
+		//interpret the pixel as an ID
+		var temp = 256;
+		var depth = 0;
+		for (var i = 3; i >= 0; --i) {
+			depth += pixelBuffer[i] / temp;
+			temp *= 256;
+		}
+		// var depth = (pixelBuffer[0] << 24 | pixelBuffer[1] << 16 | pixelBuffer[2] << 8 | pixelBuffer[3]) / (256 * 256 * 256 * 256);
+
+		// var d = camera.far * depth;
+		depth = camera.near * camera.far / (camera.near * depth + camera.far * (1 - depth));
+
+		if (depth > 500) {
+
+			var savedNear = camera.near;
+			camera.near = depth * 0.95;
+			camera.updateProjectionMatrix();
+			var pickingTexture = new THREE.WebGLRenderTarget(renderer.domElement.width, renderer.domElement.height);
+
+			renderer.setRenderTarget(pickingTexture);
+			renderer.render(pickingScene, camera);
+
+			renderer.readRenderTargetPixels(pickingTexture, 0, 0, 1, 1, pixelBuffer);
+
+			//
+
+			temp = 256;
+			depth = 0;
+			for (var i = 3; i >= 0; --i) {
+				depth += pixelBuffer[i] / temp;
+				temp *= 256;
+			}
+			depth = camera.near * camera.far / (camera.near * depth + camera.far * (1 - depth));
+
+			camera.near = savedNear;
+			camera.updateProjectionMatrix();
+		}
+
+		let direction = raycaster.ray.direction.normalize();
+		var target = new THREE.Vector3();
+		camera.getWorldDirection(target);
+		var dist = depth / target.dot(raycaster.ray.direction);
+
+		GPUPickingPoint.addVectors(camera.position, new THREE.Vector3().copy(direction).multiplyScalar(dist));
+
+		let intersectObject = raycaster.intersectObject(mesh);
+
+		if (intersectObject.length) {
+			console.log("far from camera:" + dist);
+			console.log("cpu point from camera:" + new THREE.Vector3().subVectors(camera.position,CPUPickingPoint).length());
+			console.log("gpu point from camera:" + new THREE.Vector3().subVectors(camera.position,GPUPickingPoint).length());
+
+			console.log("GPU picking point");
+			console.log(GPUPickingPoint);
+
+			console.log("CPU picking point");
+			CPUPickingPoint.copy(intersectObject[0].point);
+			console.log(CPUPickingPoint);
+			console.log(camera.position);
+			console.log("points distance:" + new THREE.Vector3().subVectors(CPUPickingPoint, GPUPickingPoint).length());
+
+			gui.updateDisplay();
+		}
+
+		camera.clearViewOffset();
+		renderer.setRenderTarget(null);
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+	}
+
+
+	//
+
+	function animate() {
+
+		requestAnimationFrame(animate);
+
+		render();
+		stats.update();
+
+	}
+
+	function render() {
+
+		controls.update();
+
+		renderer.render(scene, camera);
+
+	}
+
+</script>
+
+</body>
+</html>
