@@ -62,20 +62,19 @@
 		...
 		</code>
 
-		<h2>Importable Examples</h2>
+		<h2>可引入的示例</h2>
 		<p>
-			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
-			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
-			for a project. You can find in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory an ES6
-			module version for almost all example files. If you install three.js via npm, you can import them like so:
+			three.js的核心专注于实现3D引擎中最为重要的组件。其他诸如加载器和控制器等组件，是示例文件夹中的一部分。
+			three.js确保这些文件能够与核心保持同步，但如果在一个项目中这些组件是必要的，用户将必须分别地引入它们。
+			你可以在[link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm]文件夹中找到所有示例文件的ES6版本。
+			如果你是通过npm来安装three.js的，那么你可以使用类似下面的代码来引入它们：
 		</p>
 		<code>
 		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 		</code>
 		<p>
-			Note: When using code from the examples directory, it's important that all files match the version of
-			your three.js main file. For example, it's not acceptable to use *GLTFLoader* and *OrbitControls* from R96 together
-			with three.js R103.
+			请注意：当你在使用来自示例（examples）文件夹中的代码时，其中的所有文件和你的three.js主文件版本相匹配是很重要的。
+			比如说，three.js的R103版本不能够接受和来自R96版本的*GLTFLoader*和*OrbitControls*一起使用。
 		</p>
 	</body>
 </html>
