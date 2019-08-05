@@ -20,6 +20,8 @@ function StandardNode() {
 	this.roughness = new FloatNode( 0.5 );
 	this.metalness = new FloatNode( 0.5 );
 
+	this.energyPreservation = true;
+
 }
 
 StandardNode.prototype = Object.create( Node.prototype );
@@ -31,6 +33,8 @@ StandardNode.prototype.build = function ( builder ) {
 	var code;
 
 	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
+
+	if ( this.energyPreservation ) builder.define( 'ENERGY_PRESERVATION' );
 
 	builder.requires.lights = true;
 
