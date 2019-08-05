@@ -35,18 +35,19 @@
 <div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu - picking - point
 </div>
 
-<script src="../build/three.js"></script>
+<script type="module">
 
-<script src="js/WebGL.js"></script>
-<script src="js/libs/stats.min.js"></script>
-<script src="./js/libs/dat.gui.min.js"></script>
-<script src="./jsm/controls/TrackballControls.js"></script>
-<script>
-	//if (WEBGL.isWebGLAvailable() === false) {
+	import * as THREE from '../build/three.module.js';
+	// import {WEBGL} from './js/WebGL.js';
+	import Stats from './jsm/libs/stats.module.js';
+	import {GUI} from './jsm/libs/dat.gui.module.js';
+	import {TrackballControls} from './jsm/controls/TrackballControls.js';
 
-	//	document.body.appendChild(WEBGL.getWebGLErrorMessage());
-
-	//}
+	// if (WEBGL.isWebGLAvailable() === false) {
+	//
+	// 	document.body.appendChild(WEBGL.getWebGLErrorMessage());
+	//
+	// }
 
 	var camera, scene, renderer, stats, pickingScene, gui;
 
@@ -117,7 +118,7 @@
 
 		//
 
-		gui = new dat.GUI();
+		gui = new GUI();
 		gui.add(renderer.capabilities, 'logarithmicDepthBuffer');
 		let GPUPFolder = gui.addFolder('GPUPickingPoint');
 		GPUPFolder.open();
@@ -223,8 +224,8 @@
 
 		if (intersectObject.length) {
 			console.log("far from camera:" + dist);
-			console.log("cpu point from camera:" + new THREE.Vector3().subVectors(camera.position,CPUPickingPoint).length());
-			console.log("gpu point from camera:" + new THREE.Vector3().subVectors(camera.position,GPUPickingPoint).length());
+			console.log("cpu point from camera:" + new THREE.Vector3().subVectors(camera.position, CPUPickingPoint).length());
+			console.log("gpu point from camera:" + new THREE.Vector3().subVectors(camera.position, GPUPickingPoint).length());
 
 			console.log("GPU picking point");
 			console.log(GPUPickingPoint);
