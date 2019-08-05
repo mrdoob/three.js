@@ -41,7 +41,7 @@
 	// import {WEBGL} from './js/WebGL.js';
 	import Stats from './jsm/libs/stats.module.js';
 	import {GUI} from './jsm/libs/dat.gui.module.js';
-	import {TrackballControls} from './jsm/controls/TrackballControls.js';
+	import {OrbitControls} from './jsm/controls/OrbitControls.js';
 
 	// if (WEBGL.isWebGLAvailable() === false) {
 	//
@@ -132,7 +132,7 @@
 		CPUPFolder.add(CPUPickingPoint, 'z');
 		//
 
-		controls = new TrackballControls(camera, renderer.domElement);
+		controls = new OrbitControls(camera, renderer.domElement);
 		controls.rotateSpeed = 5.0;
 		controls.zoomSpeed = 5;
 		controls.panSpeed = 2;
