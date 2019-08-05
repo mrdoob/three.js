@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - buffergeometry - indexed</title>
+	<title>three.js webgl - gpu - picking - point</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
@@ -32,7 +32,7 @@
 <body>
 
 <div id="container"></div>
-<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - indexed
+<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu - picking - point
 </div>
 
 <script src="../build/three.js"></script>
@@ -40,11 +40,8 @@
 <script src="js/WebGL.js"></script>
 <script src="js/libs/stats.min.js"></script>
 <script src="./js/libs/dat.gui.min.js"></script>
-
-<script type="module">
-
-	import {TrackballControls} from './jsm/controls/TrackballControls.js';
-
+<script src="./jsm/controls/TrackballControls.js"></script>
+<script>
 	if (WEBGL.isWebGLAvailable() === false) {
 
 		document.body.appendChild(WEBGL.getWebGLErrorMessage());
