@@ -2,7 +2,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { _Math } from '../math/Math.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-var eyeRight, eyeLeft;
+var _eyeRight, _eyeLeft;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -40,10 +40,10 @@ Object.assign( StereoCamera.prototype, {
 
 	update: function ( camera ) {
 
-		if ( eyeRight === undefined ) {
+		if ( _eyeRight === undefined ) {
 
-			eyeRight = new Matrix4();
-			eyeLeft = new Matrix4();
+			_eyeRight = new Matrix4();
+			_eyeLeft = new Matrix4();
 
 		}
 
@@ -74,8 +74,8 @@ Object.assign( StereoCamera.prototype, {
 
 			// translate xOffset
 
-			eyeLeft.elements[ 12 ] = - eyeSepHalf;
-			eyeRight.elements[ 12 ] = eyeSepHalf;
+			_eyeLeft.elements[ 12 ] = - eyeSepHalf;
+			_eyeRight.elements[ 12 ] = eyeSepHalf;
 
 			// for left eye
 
@@ -99,8 +99,8 @@ Object.assign( StereoCamera.prototype, {
 
 		}
 
-		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
-		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
+		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeLeft );
+		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeRight );
 
 	}
 
