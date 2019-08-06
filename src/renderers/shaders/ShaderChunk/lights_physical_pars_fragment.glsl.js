@@ -116,13 +116,6 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
-	// Defer to the IndirectSpecular function to compute
-	// the indirectDiffuse if energy preservation is enabled.
-	#ifndef ENERGY_PRESERVATION
-
-		reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-
-	#endif
 
 }
 
@@ -157,23 +150,22 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	// Both indirect specular and diffuse light accumulate here
 	// if energy preservation enabled, and PMREM provided.
-	#if defined( ENERGY_PRESERVATION )
 
-		vec3 singleScattering = vec3( 0.0 );
-		vec3 multiScattering = vec3( 0.0 );
-		vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
+	vec3 singleScattering = vec3( 0.0 );
+	vec3 multiScattering = vec3( 0.0 );
+	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
-		BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
+	BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
 
-		vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
 
-		reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
-		reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
-		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
+	reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
+	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
 
-	#else
+	#ifndef STANDARD
 
-		reflectedLight.indirectSpecular += clearCoatInv * radiance * BRDF_Specular_GGX_Environment( geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness );
+		reflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_Specular_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );
 
 	#endif
 

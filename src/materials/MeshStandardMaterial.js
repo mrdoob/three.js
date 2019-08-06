@@ -44,8 +44,6 @@ import { Color } from '../math/Color.js';
  *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
  *  envMapIntensity: <float>
  *
- *  energyPreservation: <bool>,
- *
  *  refractionRatio: <float>,
  *
  *  wireframe: <boolean>,
@@ -100,8 +98,6 @@ function MeshStandardMaterial( parameters ) {
 
 	this.envMap = null;
 	this.envMapIntensity = 1.0;
-
-	this.energyPreservation = true;
 
 	this.refractionRatio = 0.98;
 
@@ -164,8 +160,6 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	this.envMap = source.envMap;
 	this.envMapIntensity = source.envMapIntensity;
-
-	this.energyPreservation = source.energyPreservation;
 
 	this.refractionRatio = source.refractionRatio;
 
