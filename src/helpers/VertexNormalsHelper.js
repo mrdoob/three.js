@@ -10,6 +10,8 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
+var _v1, _v2, _normalMatrix, _keys;
+
 function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	this.object = object;
@@ -57,85 +59,56 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
 VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
 
-VertexNormalsHelper.prototype.update = ( function () {
+VertexNormalsHelper.prototype.update = function () {
 
-	var v1 = new Vector3();
-	var v2 = new Vector3();
-	var normalMatrix = new Matrix3();
+	if ( _normalMatrix === undefined ) {
 
-	return function update() {
+		_v1 = new Vector3();
+		_v2 = new Vector3();
+		_normalMatrix = new Matrix3();
+		_keys = [ 'a', 'b', 'c' ];
 
-		var keys = [ 'a', 'b', 'c' ];
+	}
 
-		this.object.updateMatrixWorld( true );
+	this.object.updateMatrixWorld( true );
 
-		normalMatrix.getNormalMatrix( this.object.matrixWorld );
+	_normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
-		var matrixWorld = this.object.matrixWorld;
+	var matrixWorld = this.object.matrixWorld;
 
-		var position = this.geometry.attributes.position;
+	var position = this.geometry.attributes.position;
 
-		//
+	//
 
-		var objGeometry = this.object.geometry;
+	var objGeometry = this.object.geometry;
 
-		if ( objGeometry && objGeometry.isGeometry ) {
+	if ( objGeometry && objGeometry.isGeometry ) {
 
-			var vertices = objGeometry.vertices;
+		var vertices = objGeometry.vertices;
 
-			var faces = objGeometry.faces;
+		var faces = objGeometry.faces;
 
-			var idx = 0;
+		var idx = 0;
 
-			for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-				var face = faces[ i ];
+			var face = faces[ i ];
 
-				for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-					var vertex = vertices[ face[ keys[ j ] ] ];
+				var vertex = vertices[ face[ _keys[ j ] ] ];
 
-					var normal = face.vertexNormals[ j ];
+				var normal = face.vertexNormals[ j ];
 
-					v1.copy( vertex ).applyMatrix4( matrixWorld );
+				_v1.copy( vertex ).applyMatrix4( matrixWorld );
 
-					v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+				_v2.copy( normal ).applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
 
-					position.setXYZ( idx, v1.x, v1.y, v1.z );
-
-					idx = idx + 1;
-
-					position.setXYZ( idx, v2.x, v2.y, v2.z );
-
-					idx = idx + 1;
-
-				}
-
-			}
-
-		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
-
-			var objPos = objGeometry.attributes.position;
-
-			var objNorm = objGeometry.attributes.normal;
-
-			var idx = 0;
-
-			// for simplicity, ignore index and drawcalls, and render every normal
-
-			for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
-
-				v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
-
-				v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
-
-				v2.applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
-
-				position.setXYZ( idx, v1.x, v1.y, v1.z );
+				position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
 
 				idx = idx + 1;
 
-				position.setXYZ( idx, v2.x, v2.y, v2.z );
+				position.setXYZ( idx, _v2.x, _v2.y, _v2.z );
 
 				idx = idx + 1;
 
@@ -143,11 +116,39 @@ VertexNormalsHelper.prototype.update = ( function () {
 
 		}
 
-		position.needsUpdate = true;
+	} else if ( objGeometry && objGeometry.isBufferGeometry ) {
 
-	};
+		var objPos = objGeometry.attributes.position;
 
-}() );
+		var objNorm = objGeometry.attributes.normal;
+
+		var idx = 0;
+
+		// for simplicity, ignore index and drawcalls, and render every normal
+
+		for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
+
+			_v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
+
+			_v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
+
+			_v2.applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
+
+			position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
+
+			idx = idx + 1;
+
+			position.setXYZ( idx, _v2.x, _v2.y, _v2.z );
+
+			idx = idx + 1;
+
+		}
+
+	}
+
+	position.needsUpdate = true;
+
+};
 
 
 export { VertexNormalsHelper };

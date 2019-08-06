@@ -140,16 +140,12 @@ LightProbeHelper.prototype.dispose = function () {
 
 LightProbeHelper.prototype.onBeforeRender = function () {
 
-	return function update() {
+	this.position.copy( this.lightProbe.position );
 
-		this.position.copy( this.lightProbe.position );
+	this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
 
-		this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
+	this.material.uniforms.intensity.value = this.lightProbe.intensity;
 
-		this.material.uniforms.intensity.value = this.lightProbe.intensity;
-
-	};
-
-}();
+};
 
 export { LightProbeHelper };
