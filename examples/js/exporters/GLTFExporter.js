@@ -915,7 +915,13 @@ THREE.GLTFExporter.prototype = {
 
 				extensionsUsed[ 'KHR_materials_unlit' ] = true;
 
-			} else if ( ! material.isMeshStandardMaterial ) {
+			} else if ( material.isGLTFSpecularGlossinessMaterial ) {
+
+				gltfMaterial.extensions = { KHR_materials_pbrSpecularGlossiness: {} };
+
+				extensionsUsed[ 'KHR_materials_pbrSpecularGlossiness' ] = true;
+			} 
+			else if ( ! material.isMeshStandardMaterial ) {
 
 				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
 
@@ -947,6 +953,21 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
+			// pbrSpecularGlossiness diffuse, specular and glossiness factor
+			if ( material.isGLTFSpecularGlossinessMaterial ) {
+				
+				var diffuseFactor = [ 1, 1, 1, 1 ];
+				material.color.toArray( diffuseFactor, 0 );
+				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor = diffuseFactor;
+
+				var specularFactor = [ 1, 1, 1 ];
+				material.specular.toArray( specularFactor, 0 );
+				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor = specularFactor;
+
+				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor = material.glossiness;
+			
+			}
+
 			// pbrMetallicRoughness.metallicRoughnessTexture
 			if ( material.metalnessMap || material.roughnessMap ) {
 
@@ -964,42 +985,30 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isGLTFSpecularGlossinessMaterial ) {
-
-				var specularExtensionName = "KHR_materials_pbrSpecularGlossiness";
-				var specularMapDef = material.specularMap ? { index: processTexture( material.specularMap ) } : undefined;
-				var diffuseMapDef = material.map ? { index: processTexture( material.map ) } : undefined;
-				if ( material.specularMap ) {
-					
-					applyTextureTransform( specularMapDef, material.specularMap );
-			
-				}
-			
-				// alpha default is 1, rgb will be overridden
-				var diffuseFactor = [ 1, 1, 1, 1 ];
-				material.color.toArray( diffuseFactor, 0 );
-				// same story for specularFactor
-				var specularFactor = [ 1, 1, 1 ];
-				material.specular.toArray( specularFactor, 0 );
-			
-				gltfMaterial.extensions = {};
-				gltfMaterial.extensions[ specularExtensionName ] = {
-					"diffuseFactor": diffuseFactor,
-					"diffuseTexture": diffuseMapDef,
-					"specularFactor": specularFactor,
-					"glossinessFactor": material.glossiness,
-					"specularGlossinessTexture": specularMapDef
-				};
-				extensionsUsed[ specularExtensionName ] = true;
-			
-			}
-
-			// pbrMetallicRoughness.baseColorTexture
+			// pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
 			if ( material.map ) {
 
 				var baseColorMapDef = { index: processTexture( material.map ) };
 				applyTextureTransform( baseColorMapDef, material.map );
-				gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
+
+				if ( material.isGLTFSpecularGlossinessMaterial ) {
+
+					gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture = baseColorMapDef;
+
+				} else {
+
+					gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
+
+				}
+				
+			}
+
+			// pbrSpecularGlossiness specular map
+			if ( material.specularMap ) {
+
+				var specularMapDef = { index: processTexture( material.specularMap ) };
+				applyTextureTransform( specularMapDef, material.specularMap );
+				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture = specularMapDef;
 
 			}
 
