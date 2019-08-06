@@ -56,6 +56,8 @@ function WebGLRenderer( parameters ) {
 
 	parameters = parameters || {};
 
+	if ( ! parameters.silent ) console.log( 'Made with three.js', REVISION );
+
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
