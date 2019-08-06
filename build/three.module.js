@@ -179,7 +179,7 @@ Object.assign( EventDispatcher.prototype, {
 
 } );
 
-var REVISION = '107';
+var REVISION = '108dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -352,40 +352,36 @@ var AlwaysStencilFunc = 519;
  * @author mrdoob / http://mrdoob.com/
  */
 
+var _lut = [];
+
+for ( var i = 0; i < 256; i ++ ) {
+
+	_lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
+
+}
+
 var _Math = {
 
 	DEG2RAD: Math.PI / 180,
 	RAD2DEG: 180 / Math.PI,
 
-	generateUUID: ( function () {
+	generateUUID: function () {
 
 		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-		var lut = [];
+		var d0 = Math.random() * 0xffffffff | 0;
+		var d1 = Math.random() * 0xffffffff | 0;
+		var d2 = Math.random() * 0xffffffff | 0;
+		var d3 = Math.random() * 0xffffffff | 0;
+		var uuid = _lut[ d0 & 0xff ] + _lut[ d0 >> 8 & 0xff ] + _lut[ d0 >> 16 & 0xff ] + _lut[ d0 >> 24 & 0xff ] + '-' +
+			_lut[ d1 & 0xff ] + _lut[ d1 >> 8 & 0xff ] + '-' + _lut[ d1 >> 16 & 0x0f | 0x40 ] + _lut[ d1 >> 24 & 0xff ] + '-' +
+			_lut[ d2 & 0x3f | 0x80 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
+			_lut[ d3 & 0xff ] + _lut[ d3 >> 8 & 0xff ] + _lut[ d3 >> 16 & 0xff ] + _lut[ d3 >> 24 & 0xff ];
 
-		for ( var i = 0; i < 256; i ++ ) {
+		// .toUpperCase() here flattens concatenated strings to save heap memory space.
+		return uuid.toUpperCase();
 
-			lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
-
-		}
-
-		return function generateUUID() {
-
-			var d0 = Math.random() * 0xffffffff | 0;
-			var d1 = Math.random() * 0xffffffff | 0;
-			var d2 = Math.random() * 0xffffffff | 0;
-			var d3 = Math.random() * 0xffffffff | 0;
-			var uuid = lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + '-' +
-				lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + '-' + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + '-' +
-				lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
-				lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
-
-			// .toUpperCase() here flattens concatenated strings to save heap memory space.
-			return uuid.toUpperCase();
-
-		};
-
-	} )(),
+	},
 
 	clamp: function ( value, min, max ) {
 
@@ -1629,6 +1625,8 @@ Object.assign( Quaternion.prototype, {
  * @author WestLangley / http://github.com/WestLangley
  */
 
+var _vector, _quaternion;
+
 function Vector3( x, y, z ) {
 
 	this.x = x || 0;
@@ -1850,35 +1848,27 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
+	applyEuler: function ( euler ) {
 
-		var quaternion = new Quaternion();
+		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-		return function applyEuler( euler ) {
+		if ( ! ( euler && euler.isEuler ) ) {
 
-			if ( ! ( euler && euler.isEuler ) ) {
+			console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
-				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
+		}
 
-			}
+		return this.applyQuaternion( _quaternion.setFromEuler( euler ) );
 
-			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
+	},
 
-		};
+	applyAxisAngle: function ( axis, angle ) {
 
-	}(),
+		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-	applyAxisAngle: function () {
+		return this.applyQuaternion( _quaternion.setFromAxisAngle( axis, angle ) );
 
-		var quaternion = new Quaternion();
-
-		return function applyAxisAngle( axis, angle ) {
-
-			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-		};
-
-	}(),
+	},
 
 	applyMatrix3: function ( m ) {
 
@@ -2162,34 +2152,26 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	projectOnPlane: function () {
+	projectOnPlane: function ( planeNormal ) {
 
-		var v1 = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		return function projectOnPlane( planeNormal ) {
+		_vector.copy( this ).projectOnVector( planeNormal );
 
-			v1.copy( this ).projectOnVector( planeNormal );
+		return this.sub( _vector );
 
-			return this.sub( v1 );
+	},
 
-		};
+	reflect: function ( normal ) {
 
-	}(),
-
-	reflect: function () {
+		if ( _vector === undefined ) _vector = new Vector3();
 
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		var v1 = new Vector3();
+		return this.sub( _vector.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-		return function reflect( normal ) {
-
-			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
-
-		};
-
-	}(),
+	},
 
 	angleTo: function ( v ) {
 
@@ -2343,7 +2325,7 @@ Object.assign( Vector3.prototype, {
  * @author tschw
  */
 
-var _vector;
+var _vector$1;
 
 function Matrix3() {
 
@@ -2430,17 +2412,17 @@ Object.assign( Matrix3.prototype, {
 
 	applyToBufferAttribute: function ( attribute ) {
 
-		if ( _vector === undefined ) _vector = new Vector3();
+		if ( _vector$1 === undefined ) _vector$1 = new Vector3();
 
 		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-			_vector.x = attribute.getX( i );
-			_vector.y = attribute.getY( i );
-			_vector.z = attribute.getZ( i );
+			_vector$1.x = attribute.getX( i );
+			_vector$1.y = attribute.getY( i );
+			_vector$1.z = attribute.getZ( i );
 
-			_vector.applyMatrix3( this );
+			_vector$1.applyMatrix3( this );
 
-			attribute.setXYZ( i, _vector.x, _vector.y, _vector.z );
+			attribute.setXYZ( i, _vector$1.x, _vector$1.y, _vector$1.z );
 
 		}
 
@@ -3880,6 +3862,10 @@ WebGLMultisampleRenderTarget.prototype = Object.assign( Object.create( WebGLRend
  * @author WestLangley / http://github.com/WestLangley
  */
 
+var _v1, _m1;
+var _zero, _one;
+var _x, _y, _z;
+
 function Matrix4() {
 
 	this.elements = [
@@ -3986,46 +3972,42 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	extractRotation: function () {
+	extractRotation: function ( m ) {
 
-		var v1 = new Vector3();
+		if ( _v1 === undefined ) _v1 = new Vector3();
 
-		return function extractRotation( m ) {
+		// this method does not support reflection matrices
 
-			// this method does not support reflection matrices
+		var te = this.elements;
+		var me = m.elements;
 
-			var te = this.elements;
-			var me = m.elements;
+		var scaleX = 1 / _v1.setFromMatrixColumn( m, 0 ).length();
+		var scaleY = 1 / _v1.setFromMatrixColumn( m, 1 ).length();
+		var scaleZ = 1 / _v1.setFromMatrixColumn( m, 2 ).length();
 
-			var scaleX = 1 / v1.setFromMatrixColumn( m, 0 ).length();
-			var scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
-			var scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
+		te[ 0 ] = me[ 0 ] * scaleX;
+		te[ 1 ] = me[ 1 ] * scaleX;
+		te[ 2 ] = me[ 2 ] * scaleX;
+		te[ 3 ] = 0;
 
-			te[ 0 ] = me[ 0 ] * scaleX;
-			te[ 1 ] = me[ 1 ] * scaleX;
-			te[ 2 ] = me[ 2 ] * scaleX;
-			te[ 3 ] = 0;
+		te[ 4 ] = me[ 4 ] * scaleY;
+		te[ 5 ] = me[ 5 ] * scaleY;
+		te[ 6 ] = me[ 6 ] * scaleY;
+		te[ 7 ] = 0;
 
-			te[ 4 ] = me[ 4 ] * scaleY;
-			te[ 5 ] = me[ 5 ] * scaleY;
-			te[ 6 ] = me[ 6 ] * scaleY;
-			te[ 7 ] = 0;
+		te[ 8 ] = me[ 8 ] * scaleZ;
+		te[ 9 ] = me[ 9 ] * scaleZ;
+		te[ 10 ] = me[ 10 ] * scaleZ;
+		te[ 11 ] = 0;
 
-			te[ 8 ] = me[ 8 ] * scaleZ;
-			te[ 9 ] = me[ 9 ] * scaleZ;
-			te[ 10 ] = me[ 10 ] * scaleZ;
-			te[ 11 ] = 0;
+		te[ 12 ] = 0;
+		te[ 13 ] = 0;
+		te[ 14 ] = 0;
+		te[ 15 ] = 1;
 
-			te[ 12 ] = 0;
-			te[ 13 ] = 0;
-			te[ 14 ] = 0;
-			te[ 15 ] = 1;
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	makeRotationFromEuler: function ( euler ) {
 
@@ -4155,73 +4137,73 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	makeRotationFromQuaternion: function () {
+	makeRotationFromQuaternion: function ( q ) {
 
-		var zero = new Vector3( 0, 0, 0 );
-		var one = new Vector3( 1, 1, 1 );
+		if ( _zero === undefined ) {
 
-		return function makeRotationFromQuaternion( q ) {
+			_zero = new Vector3( 0, 0, 0 );
+			_one = new Vector3( 1, 1, 1 );
 
-			return this.compose( zero, q, one );
+		}
 
-		};
+		return this.compose( _zero, q, _one );
 
-	}(),
+	},
 
-	lookAt: function () {
+	lookAt: function ( eye, target, up ) {
 
-		var x = new Vector3();
-		var y = new Vector3();
-		var z = new Vector3();
+		if ( _x === undefined ) {
 
-		return function lookAt( eye, target, up ) {
+			_x = new Vector3();
+			_y = new Vector3();
+			_z = new Vector3();
 
-			var te = this.elements;
+		}
 
-			z.subVectors( eye, target );
+		var te = this.elements;
 
-			if ( z.lengthSq() === 0 ) {
+		_z.subVectors( eye, target );
 
-				// eye and target are in the same position
+		if ( _z.lengthSq() === 0 ) {
 
-				z.z = 1;
+			// eye and target are in the same position
 
-			}
+			_z.z = 1;
 
-			z.normalize();
-			x.crossVectors( up, z );
+		}
 
-			if ( x.lengthSq() === 0 ) {
+		_z.normalize();
+		_x.crossVectors( up, _z );
 
-				// up and z are parallel
+		if ( _x.lengthSq() === 0 ) {
 
-				if ( Math.abs( up.z ) === 1 ) {
+			// up and z are parallel
 
-					z.x += 0.0001;
+			if ( Math.abs( up.z ) === 1 ) {
 
-				} else {
+				_z.x += 0.0001;
 
-					z.z += 0.0001;
+			} else {
 
-				}
-
-				z.normalize();
-				x.crossVectors( up, z );
+				_z.z += 0.0001;
 
 			}
 
-			x.normalize();
-			y.crossVectors( z, x );
+			_z.normalize();
+			_x.crossVectors( up, _z );
 
-			te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
-			te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
-			te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
+		}
 
-			return this;
+		_x.normalize();
+		_y.crossVectors( _z, _x );
 
-		};
+		te[ 0 ] = _x.x; te[ 4 ] = _y.x; te[ 8 ] = _z.x;
+		te[ 1 ] = _x.y; te[ 5 ] = _y.y; te[ 9 ] = _z.y;
+		te[ 2 ] = _x.z; te[ 6 ] = _y.z; te[ 10 ] = _z.z;
 
-	}(),
+		return this;
+
+	},
 
 	multiply: function ( m, n ) {
 
@@ -4295,29 +4277,25 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	applyToBufferAttribute: function () {
+	applyToBufferAttribute: function ( attribute ) {
 
-		var v1 = new Vector3();
+		if ( _v1 === undefined ) _v1 = new Vector3();
 
-		return function applyToBufferAttribute( attribute ) {
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+			_v1.x = attribute.getX( i );
+			_v1.y = attribute.getY( i );
+			_v1.z = attribute.getZ( i );
 
-				v1.x = attribute.getX( i );
-				v1.y = attribute.getY( i );
-				v1.z = attribute.getZ( i );
+			_v1.applyMatrix4( this );
 
-				v1.applyMatrix4( this );
+			attribute.setXYZ( i, _v1.x, _v1.y, _v1.z );
 
-				attribute.setXYZ( i, v1.x, v1.y, v1.z );
+		}
 
-			}
+		return attribute;
 
-			return attribute;
-
-		};
-
-	}(),
+	},
 
 	determinant: function () {
 
@@ -4651,57 +4629,57 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	decompose: function () {
+	decompose: function ( position, quaternion, scale ) {
 
-		var vector = new Vector3();
-		var matrix = new Matrix4();
+		if ( _m1 === undefined ) {
 
-		return function decompose( position, quaternion, scale ) {
+			_m1 = new Matrix4();
+			_v1 = new Vector3();
 
-			var te = this.elements;
+		}
 
-			var sx = vector.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-			var sy = vector.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-			var sz = vector.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		var te = this.elements;
 
-			// if determine is negative, we need to invert one scale
-			var det = this.determinant();
-			if ( det < 0 ) sx = - sx;
+		var sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
+		var sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+		var sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
-			position.x = te[ 12 ];
-			position.y = te[ 13 ];
-			position.z = te[ 14 ];
+		// if determine is negative, we need to invert one scale
+		var det = this.determinant();
+		if ( det < 0 ) sx = - sx;
 
-			// scale the rotation part
-			matrix.copy( this );
+		position.x = te[ 12 ];
+		position.y = te[ 13 ];
+		position.z = te[ 14 ];
 
-			var invSX = 1 / sx;
-			var invSY = 1 / sy;
-			var invSZ = 1 / sz;
+		// scale the rotation part
+		_m1.copy( this );
 
-			matrix.elements[ 0 ] *= invSX;
-			matrix.elements[ 1 ] *= invSX;
-			matrix.elements[ 2 ] *= invSX;
+		var invSX = 1 / sx;
+		var invSY = 1 / sy;
+		var invSZ = 1 / sz;
 
-			matrix.elements[ 4 ] *= invSY;
-			matrix.elements[ 5 ] *= invSY;
-			matrix.elements[ 6 ] *= invSY;
+		_m1.elements[ 0 ] *= invSX;
+		_m1.elements[ 1 ] *= invSX;
+		_m1.elements[ 2 ] *= invSX;
 
-			matrix.elements[ 8 ] *= invSZ;
-			matrix.elements[ 9 ] *= invSZ;
-			matrix.elements[ 10 ] *= invSZ;
+		_m1.elements[ 4 ] *= invSY;
+		_m1.elements[ 5 ] *= invSY;
+		_m1.elements[ 6 ] *= invSY;
 
-			quaternion.setFromRotationMatrix( matrix );
+		_m1.elements[ 8 ] *= invSZ;
+		_m1.elements[ 9 ] *= invSZ;
+		_m1.elements[ 10 ] *= invSZ;
 
-			scale.x = sx;
-			scale.y = sy;
-			scale.z = sz;
+		quaternion.setFromRotationMatrix( _m1 );
 
-			return this;
+		scale.x = sx;
+		scale.y = sy;
+		scale.z = sz;
 
-		};
+		return this;
 
-	}(),
+	},
 
 	makePerspective: function ( left, right, top, bottom, near, far ) {
 
@@ -4817,7 +4795,7 @@ Object.assign( Matrix4.prototype, {
  * @author bhouston / http://clara.io
  */
 
-var _matrix, _quaternion;
+var _matrix, _quaternion$1;
 
 function Euler( x, y, z, order ) {
 
@@ -4957,7 +4935,7 @@ Object.assign( Euler.prototype, {
 
 			this._y = Math.asin( clamp( m13, - 1, 1 ) );
 
-			if ( Math.abs( m13 ) < 0.99999 ) {
+			if ( Math.abs( m13 ) < 0.9999999 ) {
 
 				this._x = Math.atan2( - m23, m33 );
 				this._z = Math.atan2( - m12, m11 );
@@ -4973,7 +4951,7 @@ Object.assign( Euler.prototype, {
 
 			this._x = Math.asin( - clamp( m23, - 1, 1 ) );
 
-			if ( Math.abs( m23 ) < 0.99999 ) {
+			if ( Math.abs( m23 ) < 0.9999999 ) {
 
 				this._y = Math.atan2( m13, m33 );
 				this._z = Math.atan2( m21, m22 );
@@ -4989,7 +4967,7 @@ Object.assign( Euler.prototype, {
 
 			this._x = Math.asin( clamp( m32, - 1, 1 ) );
 
-			if ( Math.abs( m32 ) < 0.99999 ) {
+			if ( Math.abs( m32 ) < 0.9999999 ) {
 
 				this._y = Math.atan2( - m31, m33 );
 				this._z = Math.atan2( - m12, m22 );
@@ -5005,7 +4983,7 @@ Object.assign( Euler.prototype, {
 
 			this._y = Math.asin( - clamp( m31, - 1, 1 ) );
 
-			if ( Math.abs( m31 ) < 0.99999 ) {
+			if ( Math.abs( m31 ) < 0.9999999 ) {
 
 				this._x = Math.atan2( m32, m33 );
 				this._z = Math.atan2( m21, m11 );
@@ -5021,7 +4999,7 @@ Object.assign( Euler.prototype, {
 
 			this._z = Math.asin( clamp( m21, - 1, 1 ) );
 
-			if ( Math.abs( m21 ) < 0.99999 ) {
+			if ( Math.abs( m21 ) < 0.9999999 ) {
 
 				this._x = Math.atan2( - m23, m22 );
 				this._y = Math.atan2( - m31, m11 );
@@ -5037,7 +5015,7 @@ Object.assign( Euler.prototype, {
 
 			this._z = Math.asin( - clamp( m12, - 1, 1 ) );
 
-			if ( Math.abs( m12 ) < 0.99999 ) {
+			if ( Math.abs( m12 ) < 0.9999999 ) {
 
 				this._x = Math.atan2( m32, m22 );
 				this._y = Math.atan2( m13, m11 );
@@ -5083,11 +5061,11 @@ Object.assign( Euler.prototype, {
 
 		// WARNING: this discards revolution information -bhouston
 
-		if ( _quaternion === undefined ) _quaternion = new Quaternion();
+		if ( _quaternion$1 === undefined ) _quaternion$1 = new Quaternion();
 
-		_quaternion.setFromEuler( this );
+		_quaternion$1.setFromEuler( this );
 
-		return this.setFromQuaternion( _quaternion, newOrder );
+		return this.setFromQuaternion( _quaternion$1, newOrder );
 
 	},
 
@@ -6182,6 +6160,15 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
  * @author WestLangley / http://github.com/WestLangley
  */
 
+var _points;
+var _vector$2;
+
+var _v0, _v1$1, _v2;
+var _f0, _f1, _f2;
+var _center;
+var _extents;
+var _triangleNormal;
+
 function Box3( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
@@ -6282,22 +6269,18 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: function ( center, size ) {
 
-		var v1 = new Vector3();
+		if ( _vector$2 === undefined ) _vector$2 = new Vector3();
 
-		return function setFromCenterAndSize( center, size ) {
+		var halfSize = _vector$2.copy( size ).multiplyScalar( 0.5 );
 
-			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
-			this.min.copy( center ).sub( halfSize );
-			this.max.copy( center ).add( halfSize );
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setFromObject: function ( object ) {
 
@@ -6392,47 +6375,45 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	expandByObject: function () {
+	expandByObject: function ( object ) {
+
+		if ( _vector$2 === undefined ) _vector$2 = new Vector3();
+
+		var i, l;
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var scope, i, l;
+		object.updateWorldMatrix( false, false );
 
-		var v1 = new Vector3();
+		var geometry = object.geometry;
 
-		function traverse( node ) {
+		if ( geometry !== undefined ) {
 
-			var geometry = node.geometry;
+			if ( geometry.isGeometry ) {
 
-			if ( geometry !== undefined ) {
+				var vertices = geometry.vertices;
 
-				if ( geometry.isGeometry ) {
+				for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
-					var vertices = geometry.vertices;
+					_vector$2.copy( vertices[ i ] );
+					_vector$2.applyMatrix4( object.matrixWorld );
 
-					for ( i = 0, l = vertices.length; i < l; i ++ ) {
+					this.expandByPoint( _vector$2 );
 
-						v1.copy( vertices[ i ] );
-						v1.applyMatrix4( node.matrixWorld );
+				}
 
-						scope.expandByPoint( v1 );
+			} else if ( geometry.isBufferGeometry ) {
 
-					}
+				var attribute = geometry.attributes.position;
 
-				} else if ( geometry.isBufferGeometry ) {
+				if ( attribute !== undefined ) {
 
-					var attribute = geometry.attributes.position;
+					for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-					if ( attribute !== undefined ) {
+						_vector$2.fromBufferAttribute( attribute, i ).applyMatrix4( object.matrixWorld );
 
-						for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
+						this.expandByPoint( _vector$2 );
 
 					}
 
@@ -6442,19 +6423,19 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		return function expandByObject( object ) {
+		//
 
-			scope = this;
+		var children = object.children;
 
-			object.updateMatrixWorld( true );
+		for ( i = 0, l = children.length; i < l; i ++ ) {
 
-			object.traverse( traverse );
+			this.expandByObject( children[ i ] );
 
-			return this;
+		}
 
-		};
+		return this;
 
-	}(),
+	},
 
 	containsPoint: function ( point ) {
 
@@ -6501,21 +6482,17 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	intersectsSphere: ( function () {
+	intersectsSphere: function ( sphere ) {
 
-		var closestPoint = new Vector3();
+		if ( _vector$2 === undefined ) _vector$2 = new Vector3();
 
-		return function intersectsSphere( sphere ) {
+		// Find the point on the AABB closest to the sphere center.
+		this.clampPoint( sphere.center, _vector$2 );
 
-			// Find the point on the AABB closest to the sphere center.
-			this.clampPoint( sphere.center, closestPoint );
+		// If that point is inside the sphere, the AABB and sphere intersect.
+		return _vector$2.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
-			// If that point is inside the sphere, the AABB and sphere intersect.
-			return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
-
-		};
-
-	} )(),
+	},
 
 	intersectsPlane: function ( plane ) {
 
@@ -6564,106 +6541,78 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	intersectsTriangle: ( function () {
+	intersectsTriangle: function ( triangle ) {
 
-		// triangle centered vertices
-		var v0 = new Vector3();
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+		if ( _v0 === undefined ) {
 
-		// triangle edge vectors
-		var f0 = new Vector3();
-		var f1 = new Vector3();
-		var f2 = new Vector3();
+			// triangle centered vertices
 
-		var testAxis = new Vector3();
+			_v0 = new Vector3();
+			_v1$1 = new Vector3();
+			_v2 = new Vector3();
 
-		var center = new Vector3();
-		var extents = new Vector3();
+			// triangle edge vectors
 
-		var triangleNormal = new Vector3();
+			_f0 = new Vector3();
+			_f1 = new Vector3();
+			_f2 = new Vector3();
 
-		function satForAxes( axes ) {
-
-			var i, j;
-
-			for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
-
-				testAxis.fromArray( axes, i );
-				// project the aabb onto the seperating axis
-				var r = extents.x * Math.abs( testAxis.x ) + extents.y * Math.abs( testAxis.y ) + extents.z * Math.abs( testAxis.z );
-				// project all 3 vertices of the triangle onto the seperating axis
-				var p0 = v0.dot( testAxis );
-				var p1 = v1.dot( testAxis );
-				var p2 = v2.dot( testAxis );
-				// actual test, basically see if either of the most extreme of the triangle points intersects r
-				if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
-
-					// points of the projected triangle are outside the projected half-length of the aabb
-					// the axis is seperating and we can exit
-					return false;
-
-				}
-
-			}
-
-			return true;
+			_center = new Vector3();
+			_extents = new Vector3();
+			_triangleNormal = new Vector3();
 
 		}
 
-		return function intersectsTriangle( triangle ) {
+		if ( this.isEmpty() ) {
 
-			if ( this.isEmpty() ) {
+			return false;
 
-				return false;
+		}
 
-			}
+		// compute box center and extents
+		this.getCenter( _center );
+		_extents.subVectors( this.max, _center );
 
-			// compute box center and extents
-			this.getCenter( center );
-			extents.subVectors( this.max, center );
+		// translate triangle to aabb origin
+		_v0.subVectors( triangle.a, _center );
+		_v1$1.subVectors( triangle.b, _center );
+		_v2.subVectors( triangle.c, _center );
 
-			// translate triangle to aabb origin
-			v0.subVectors( triangle.a, center );
-			v1.subVectors( triangle.b, center );
-			v2.subVectors( triangle.c, center );
+		// compute edge vectors for triangle
+		_f0.subVectors( _v1$1, _v0 );
+		_f1.subVectors( _v2, _v1$1 );
+		_f2.subVectors( _v0, _v2 );
 
-			// compute edge vectors for triangle
-			f0.subVectors( v1, v0 );
-			f1.subVectors( v2, v1 );
-			f2.subVectors( v0, v2 );
+		// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
+		// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
+		// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
+		var axes = [
+			0, - _f0.z, _f0.y, 0, - _f1.z, _f1.y, 0, - _f2.z, _f2.y,
+			_f0.z, 0, - _f0.x, _f1.z, 0, - _f1.x, _f2.z, 0, - _f2.x,
+			- _f0.y, _f0.x, 0, - _f1.y, _f1.x, 0, - _f2.y, _f2.x, 0
+		];
+		if ( ! satForAxes( axes, _v0, _v1$1, _v2, _extents ) ) {
 
-			// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
-			// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
-			// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
-			var axes = [
-				0, - f0.z, f0.y, 0, - f1.z, f1.y, 0, - f2.z, f2.y,
-				f0.z, 0, - f0.x, f1.z, 0, - f1.x, f2.z, 0, - f2.x,
-				- f0.y, f0.x, 0, - f1.y, f1.x, 0, - f2.y, f2.x, 0
-			];
-			if ( ! satForAxes( axes ) ) {
+			return false;
 
-				return false;
+		}
 
-			}
+		// test 3 face normals from the aabb
+		axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
+		if ( ! satForAxes( axes, _v0, _v1$1, _v2, _extents ) ) {
 
-			// test 3 face normals from the aabb
-			axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
-			if ( ! satForAxes( axes ) ) {
+			return false;
 
-				return false;
+		}
 
-			}
+		// finally testing the face normal of the triangle
+		// use already existing triangle edge vectors here
+		_triangleNormal.crossVectors( _f0, _f1 );
+		axes = [ _triangleNormal.x, _triangleNormal.y, _triangleNormal.z ];
 
-			// finally testing the face normal of the triangle
-			// use already existing triangle edge vectors here
-			triangleNormal.crossVectors( f0, f1 );
-			axes = [ triangleNormal.x, triangleNormal.y, triangleNormal.z ];
-			return satForAxes( axes );
+		return satForAxes( axes, _v0, _v1$1, _v2, _extents );
 
-		};
-
-	} )(),
+	},
 
 	clampPoint: function ( point, target ) {
 
@@ -6678,41 +6627,34 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
 
-		var v1 = new Vector3();
+		if ( _vector$2 === undefined ) _vector$2 = new Vector3();
 
-		return function distanceToPoint( point ) {
+		var clampedPoint = _vector$2.copy( point ).clamp( this.min, this.max );
 
-			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
+		return clampedPoint.sub( point ).length();
 
-		};
+	},
 
-	}(),
+	getBoundingSphere: function ( target ) {
 
-	getBoundingSphere: function () {
+		if ( _vector$2 === undefined ) _vector$2 = new Vector3();
 
-		var v1 = new Vector3();
+		if ( target === undefined ) {
 
-		return function getBoundingSphere( target ) {
+			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
+			//target = new Sphere(); // removed to avoid cyclic dependency
 
-			if ( target === undefined ) {
+		}
 
-				console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
-				//target = new Sphere(); // removed to avoid cyclic dependency
+		this.getCenter( target.center );
 
-			}
+		target.radius = this.getSize( _vector$2 ).length() * 0.5;
 
-			this.getCenter( target.center );
+		return target;
 
-			target.radius = this.getSize( v1 ).length() * 0.5;
-
-			return target;
-
-		};
-
-	}(),
+	},
 
 	intersect: function ( box ) {
 
@@ -6735,41 +6677,41 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: function ( matrix ) {
 
-		var points = [
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3()
-		];
+		if ( _points === undefined ) {
 
-		return function applyMatrix4( matrix ) {
+			_points = [
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3()
+			];
 
-			// transform of empty box is an empty box.
-			if ( this.isEmpty() ) return this;
+		}
 
-			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
+		// transform of empty box is an empty box.
+		if ( this.isEmpty() ) return this;
 
-			this.setFromPoints( points );
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		_points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+		_points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+		_points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+		_points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+		_points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+		_points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+		_points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+		_points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
 
-			return this;
+		this.setFromPoints( _points );
 
-		};
+		return this;
 
-	}(),
+	},
 
 	translate: function ( offset ) {
 
@@ -6787,6 +6729,38 @@ Object.assign( Box3.prototype, {
 	}
 
 } );
+
+var _testAxis;
+
+function satForAxes( axes, v0, v1, v2, extents ) {
+
+	if ( _testAxis === undefined ) _testAxis = new Vector3();
+
+	var i, j;
+
+	for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+
+		_testAxis.fromArray( axes, i );
+		// project the aabb onto the seperating axis
+		var r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
+		// project all 3 vertices of the triangle onto the seperating axis
+		var p0 = v0.dot( _testAxis );
+		var p1 = v1.dot( _testAxis );
+		var p2 = v2.dot( _testAxis );
+		// actual test, basically see if either of the most extreme of the triangle points intersects r
+		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
+
+			// points of the projected triangle are outside the projected half-length of the aabb
+			// the axis is seperating and we can exit
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+}
 
 /**
  * @author bhouston / http://clara.io
@@ -6965,6 +6939,10 @@ Object.assign( Sphere.prototype, {
  * @author bhouston / http://clara.io
  */
 
+var _vector$3;
+var _segCenter, _segDir, _diff;
+var _diff, _edge1, _edge2, _normal;
+
 function Ray( origin, direction ) {
 
 	this.origin = ( origin !== undefined ) ? origin : new Vector3();
@@ -7019,19 +6997,15 @@ Object.assign( Ray.prototype, {
 
 	},
 
-	recast: function () {
+	recast: function ( t ) {
 
-		var v1 = new Vector3();
+		if ( _vector$3 === undefined ) _vector$3 = new Vector3();
 
-		return function recast( t ) {
+		this.origin.copy( this.at( t, _vector$3 ) );
 
-			this.origin.copy( this.at( t, v1 ) );
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	closestPointToPoint: function ( point, target ) {
 
@@ -7062,94 +7036,82 @@ Object.assign( Ray.prototype, {
 
 	},
 
-	distanceSqToPoint: function () {
+	distanceSqToPoint: function ( point ) {
 
-		var v1 = new Vector3();
+		if ( _vector$3 === undefined ) _vector$3 = new Vector3();
 
-		return function distanceSqToPoint( point ) {
+		var directionDistance = _vector$3.subVectors( point, this.origin ).dot( this.direction );
 
-			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
+		// point behind the ray
 
-			// point behind the ray
+		if ( directionDistance < 0 ) {
 
-			if ( directionDistance < 0 ) {
+			return this.origin.distanceToSquared( point );
 
-				return this.origin.distanceToSquared( point );
+		}
 
-			}
+		_vector$3.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		return _vector$3.distanceToSquared( point );
 
-			return v1.distanceToSquared( point );
+	},
 
-		};
+	distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-	}(),
+		if ( _segCenter === undefined ) {
 
-	distanceSqToSegment: function () {
+			_segCenter = new Vector3();
+			_segDir = new Vector3();
+			_diff = new Vector3();
 
-		var segCenter = new Vector3();
-		var segDir = new Vector3();
-		var diff = new Vector3();
+		}
 
-		return function distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+		// It returns the min distance between the ray and the segment
+		// defined by v0 and v1
+		// It can also set two optional targets :
+		// - The closest point on the ray
+		// - The closest point on the segment
 
-			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
-			// It returns the min distance between the ray and the segment
-			// defined by v0 and v1
-			// It can also set two optional targets :
-			// - The closest point on the ray
-			// - The closest point on the segment
+		_segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
+		_segDir.copy( v1 ).sub( v0 ).normalize();
+		_diff.copy( this.origin ).sub( _segCenter );
 
-			segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
-			segDir.copy( v1 ).sub( v0 ).normalize();
-			diff.copy( this.origin ).sub( segCenter );
+		var segExtent = v0.distanceTo( v1 ) * 0.5;
+		var a01 = - this.direction.dot( _segDir );
+		var b0 = _diff.dot( this.direction );
+		var b1 = - _diff.dot( _segDir );
+		var c = _diff.lengthSq();
+		var det = Math.abs( 1 - a01 * a01 );
+		var s0, s1, sqrDist, extDet;
 
-			var segExtent = v0.distanceTo( v1 ) * 0.5;
-			var a01 = - this.direction.dot( segDir );
-			var b0 = diff.dot( this.direction );
-			var b1 = - diff.dot( segDir );
-			var c = diff.lengthSq();
-			var det = Math.abs( 1 - a01 * a01 );
-			var s0, s1, sqrDist, extDet;
+		if ( det > 0 ) {
 
-			if ( det > 0 ) {
+			// The ray and segment are not parallel.
 
-				// The ray and segment are not parallel.
+			s0 = a01 * b1 - b0;
+			s1 = a01 * b0 - b1;
+			extDet = segExtent * det;
 
-				s0 = a01 * b1 - b0;
-				s1 = a01 * b0 - b1;
-				extDet = segExtent * det;
+			if ( s0 >= 0 ) {
 
-				if ( s0 >= 0 ) {
+				if ( s1 >= - extDet ) {
 
-					if ( s1 >= - extDet ) {
+					if ( s1 <= extDet ) {
 
-						if ( s1 <= extDet ) {
+						// region 0
+						// Minimum at interior points of ray and segment.
 
-							// region 0
-							// Minimum at interior points of ray and segment.
-
-							var invDet = 1 / det;
-							s0 *= invDet;
-							s1 *= invDet;
-							sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
-
-						} else {
-
-							// region 1
-
-							s1 = segExtent;
-							s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-							sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-						}
+						var invDet = 1 / det;
+						s0 *= invDet;
+						s1 *= invDet;
+						sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
 
 					} else {
 
-						// region 5
+						// region 1
 
-						s1 = - segExtent;
+						s1 = segExtent;
 						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
 						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
@@ -7157,97 +7119,101 @@ Object.assign( Ray.prototype, {
 
 				} else {
 
-					if ( s1 <= - extDet ) {
+					// region 5
 
-						// region 4
-
-						s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
-						s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-					} else if ( s1 <= extDet ) {
-
-						// region 3
-
-						s0 = 0;
-						s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = s1 * ( s1 + 2 * b1 ) + c;
-
-					} else {
-
-						// region 2
-
-						s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
-						s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-					}
+					s1 = - segExtent;
+					s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 				}
 
 			} else {
 
-				// Ray and segment are parallel.
+				if ( s1 <= - extDet ) {
 
-				s1 = ( a01 > 0 ) ? - segExtent : segExtent;
-				s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+					// region 4
+
+					s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				} else if ( s1 <= extDet ) {
+
+					// region 3
+
+					s0 = 0;
+					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
+
+				} else {
+
+					// region 2
+
+					s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				}
 
 			}
 
-			if ( optionalPointOnRay ) {
+		} else {
 
-				optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+			// Ray and segment are parallel.
 
-			}
+			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
+			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
-			if ( optionalPointOnSegment ) {
+		}
 
-				optionalPointOnSegment.copy( segDir ).multiplyScalar( s1 ).add( segCenter );
+		if ( optionalPointOnRay ) {
 
-			}
+			optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
 
-			return sqrDist;
+		}
 
-		};
+		if ( optionalPointOnSegment ) {
 
-	}(),
+			optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
 
-	intersectSphere: function () {
+		}
 
-		var v1 = new Vector3();
+		return sqrDist;
 
-		return function intersectSphere( sphere, target ) {
+	},
 
-			v1.subVectors( sphere.center, this.origin );
-			var tca = v1.dot( this.direction );
-			var d2 = v1.dot( v1 ) - tca * tca;
-			var radius2 = sphere.radius * sphere.radius;
+	intersectSphere: function ( sphere, target ) {
 
-			if ( d2 > radius2 ) return null;
+		if ( _vector$3 === undefined ) _vector$3 = new Vector3();
 
-			var thc = Math.sqrt( radius2 - d2 );
+		_vector$3.subVectors( sphere.center, this.origin );
+		var tca = _vector$3.dot( this.direction );
+		var d2 = _vector$3.dot( _vector$3 ) - tca * tca;
+		var radius2 = sphere.radius * sphere.radius;
 
-			// t0 = first intersect point - entrance on front of sphere
-			var t0 = tca - thc;
+		if ( d2 > radius2 ) return null;
 
-			// t1 = second intersect point - exit point on back of sphere
-			var t1 = tca + thc;
+		var thc = Math.sqrt( radius2 - d2 );
 
-			// test to see if both t0 and t1 are behind the ray - if so, return null
-			if ( t0 < 0 && t1 < 0 ) return null;
+		// t0 = first intersect point - entrance on front of sphere
+		var t0 = tca - thc;
 
-			// test to see if t0 is behind the ray:
-			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
-			// in order to always return an intersect point that is in front of the ray.
-			if ( t0 < 0 ) return this.at( t1, target );
+		// t1 = second intersect point - exit point on back of sphere
+		var t1 = tca + thc;
 
-			// else t0 is in front of the ray, so return the first collision point scaled by t0
-			return this.at( t0, target );
+		// test to see if both t0 and t1 are behind the ray - if so, return null
+		if ( t0 < 0 && t1 < 0 ) return null;
 
-		};
+		// test to see if t0 is behind the ray:
+		// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
+		// in order to always return an intersect point that is in front of the ray.
+		if ( t0 < 0 ) return this.at( t1, target );
 
-	}(),
+		// else t0 is in front of the ray, so return the first collision point scaled by t0
+		return this.at( t0, target );
+
+	},
 
 	intersectsSphere: function ( sphere ) {
 
@@ -7391,100 +7357,97 @@ Object.assign( Ray.prototype, {
 
 	},
 
-	intersectsBox: ( function () {
+	intersectsBox: function ( box ) {
 
-		var v = new Vector3();
+		if ( _vector$3 === undefined ) _vector$3 = new Vector3();
 
-		return function intersectsBox( box ) {
+		return this.intersectBox( box, _vector$3 ) !== null;
 
-			return this.intersectBox( box, v ) !== null;
+	},
 
-		};
-
-	} )(),
-
-	intersectTriangle: function () {
+	intersectTriangle: function ( a, b, c, backfaceCulling, target ) {
 
 		// Compute the offset origin, edges, and normal.
-		var diff = new Vector3();
-		var edge1 = new Vector3();
-		var edge2 = new Vector3();
-		var normal = new Vector3();
 
-		return function intersectTriangle( a, b, c, backfaceCulling, target ) {
+		if ( _diff === undefined ) {
 
-			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+			_diff = new Vector3();
+			_edge1 = new Vector3();
+			_edge2 = new Vector3();
+			_normal = new Vector3();
 
-			edge1.subVectors( b, a );
-			edge2.subVectors( c, a );
-			normal.crossVectors( edge1, edge2 );
+		}
 
-			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
-			// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
-			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = this.direction.dot( normal );
-			var sign;
+		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
-			if ( DdN > 0 ) {
+		_edge1.subVectors( b, a );
+		_edge2.subVectors( c, a );
+		_normal.crossVectors( _edge1, _edge2 );
 
-				if ( backfaceCulling ) return null;
-				sign = 1;
+		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+		var DdN = this.direction.dot( _normal );
+		var sign;
 
-			} else if ( DdN < 0 ) {
+		if ( DdN > 0 ) {
 
-				sign = - 1;
-				DdN = - DdN;
+			if ( backfaceCulling ) return null;
+			sign = 1;
 
-			} else {
+		} else if ( DdN < 0 ) {
 
-				return null;
+			sign = - 1;
+			DdN = - DdN;
 
-			}
+		} else {
 
-			diff.subVectors( this.origin, a );
-			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
+			return null;
 
-			// b1 < 0, no intersection
-			if ( DdQxE2 < 0 ) {
+		}
 
-				return null;
+		_diff.subVectors( this.origin, a );
+		var DdQxE2 = sign * this.direction.dot( _edge2.crossVectors( _diff, _edge2 ) );
 
-			}
+		// b1 < 0, no intersection
+		if ( DdQxE2 < 0 ) {
 
-			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+			return null;
 
-			// b2 < 0, no intersection
-			if ( DdE1xQ < 0 ) {
+		}
 
-				return null;
+		var DdE1xQ = sign * this.direction.dot( _edge1.cross( _diff ) );
 
-			}
+		// b2 < 0, no intersection
+		if ( DdE1xQ < 0 ) {
 
-			// b1+b2 > 1, no intersection
-			if ( DdQxE2 + DdE1xQ > DdN ) {
+			return null;
 
-				return null;
+		}
 
-			}
+		// b1+b2 > 1, no intersection
+		if ( DdQxE2 + DdE1xQ > DdN ) {
 
-			// Line intersects triangle, check if ray does.
-			var QdN = - sign * diff.dot( normal );
+			return null;
 
-			// t < 0, no intersection
-			if ( QdN < 0 ) {
+		}
 
-				return null;
+		// Line intersects triangle, check if ray does.
+		var QdN = - sign * _diff.dot( _normal );
 
-			}
+		// t < 0, no intersection
+		if ( QdN < 0 ) {
 
-			// Ray intersects triangle.
-			return this.at( QdN / DdN, target );
+			return null;
 
-		};
+		}
 
-	}(),
+		// Ray intersects triangle.
+		return this.at( QdN / DdN, target );
+
+	},
 
 	applyMatrix4: function ( matrix4 ) {
 
@@ -7508,6 +7471,9 @@ Object.assign( Ray.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
+var _v0$1, _v1$2, _v2$1, _v3;
+var _vab, _vac, _vbc, _vap, _vbp, _vcp;
+
 function Triangle( a, b, c ) {
 
 	this.a = ( a !== undefined ) ? a : new Vector3();
@@ -7518,134 +7484,122 @@ function Triangle( a, b, c ) {
 
 Object.assign( Triangle, {
 
-	getNormal: function () {
+	getNormal: function ( a, b, c, target ) {
 
-		var v0 = new Vector3();
+		if ( _v0$1 === undefined ) _v0$1 = new Vector3();
 
-		return function getNormal( a, b, c, target ) {
+		if ( target === undefined ) {
 
-			if ( target === undefined ) {
+			console.warn( 'THREE.Triangle: .getNormal() target is now required' );
+			target = new Vector3();
 
-				console.warn( 'THREE.Triangle: .getNormal() target is now required' );
-				target = new Vector3();
+		}
 
-			}
+		target.subVectors( c, b );
+		_v0$1.subVectors( a, b );
+		target.cross( _v0$1 );
 
-			target.subVectors( c, b );
-			v0.subVectors( a, b );
-			target.cross( v0 );
+		var targetLengthSq = target.lengthSq();
+		if ( targetLengthSq > 0 ) {
 
-			var targetLengthSq = target.lengthSq();
-			if ( targetLengthSq > 0 ) {
+			return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
 
-				return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
+		}
 
-			}
+		return target.set( 0, 0, 0 );
 
-			return target.set( 0, 0, 0 );
-
-		};
-
-	}(),
+	},
 
 	// static/instance method to calculate barycentric coordinates
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-	getBarycoord: function () {
+	getBarycoord: function ( point, a, b, c, target ) {
 
-		var v0 = new Vector3();
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+		if ( _v1$2 === undefined ) {
 
-		return function getBarycoord( point, a, b, c, target ) {
+			_v0$1 = new Vector3();
+			_v1$2 = new Vector3();
+			_v2$1 = new Vector3();
 
-			v0.subVectors( c, a );
-			v1.subVectors( b, a );
-			v2.subVectors( point, a );
+		}
 
-			var dot00 = v0.dot( v0 );
-			var dot01 = v0.dot( v1 );
-			var dot02 = v0.dot( v2 );
-			var dot11 = v1.dot( v1 );
-			var dot12 = v1.dot( v2 );
+		_v0$1.subVectors( c, a );
+		_v1$2.subVectors( b, a );
+		_v2$1.subVectors( point, a );
 
-			var denom = ( dot00 * dot11 - dot01 * dot01 );
+		var dot00 = _v0$1.dot( _v0$1 );
+		var dot01 = _v0$1.dot( _v1$2 );
+		var dot02 = _v0$1.dot( _v2$1 );
+		var dot11 = _v1$2.dot( _v1$2 );
+		var dot12 = _v1$2.dot( _v2$1 );
 
-			if ( target === undefined ) {
+		var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-				console.warn( 'THREE.Triangle: .getBarycoord() target is now required' );
-				target = new Vector3();
+		if ( target === undefined ) {
 
-			}
+			console.warn( 'THREE.Triangle: .getBarycoord() target is now required' );
+			target = new Vector3();
 
-			// collinear or singular triangle
-			if ( denom === 0 ) {
+		}
 
-				// arbitrary location outside of triangle?
-				// not sure if this is the best idea, maybe should be returning undefined
-				return target.set( - 2, - 1, - 1 );
+		// collinear or singular triangle
+		if ( denom === 0 ) {
 
-			}
+			// arbitrary location outside of triangle?
+			// not sure if this is the best idea, maybe should be returning undefined
+			return target.set( - 2, - 1, - 1 );
 
-			var invDenom = 1 / denom;
-			var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-			var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+		}
 
-			// barycentric coordinates must always sum to 1
-			return target.set( 1 - u - v, v, u );
+		var invDenom = 1 / denom;
+		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-		};
+		// barycentric coordinates must always sum to 1
+		return target.set( 1 - u - v, v, u );
 
-	}(),
+	},
 
-	containsPoint: function () {
+	containsPoint: function ( point, a, b, c ) {
 
-		var v1 = new Vector3();
+		if ( _v3 === undefined ) _v3 = new Vector3();
 
-		return function containsPoint( point, a, b, c ) {
+		Triangle.getBarycoord( point, a, b, c, _v3 );
 
-			Triangle.getBarycoord( point, a, b, c, v1 );
+		return ( _v3.x >= 0 ) && ( _v3.y >= 0 ) && ( ( _v3.x + _v3.y ) <= 1 );
 
-			return ( v1.x >= 0 ) && ( v1.y >= 0 ) && ( ( v1.x + v1.y ) <= 1 );
+	},
 
-		};
+	getUV: function ( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
-	}(),
+		if ( _v3 === undefined ) _v3 = new Vector3();
 
-	getUV: function () {
+		this.getBarycoord( point, p1, p2, p3, _v3 );
 
-		var barycoord = new Vector3();
+		target.set( 0, 0 );
+		target.addScaledVector( uv1, _v3.x );
+		target.addScaledVector( uv2, _v3.y );
+		target.addScaledVector( uv3, _v3.z );
 
-		return function getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+		return target;
 
-			this.getBarycoord( point, p1, p2, p3, barycoord );
+	},
 
-			target.set( 0, 0 );
-			target.addScaledVector( uv1, barycoord.x );
-			target.addScaledVector( uv2, barycoord.y );
-			target.addScaledVector( uv3, barycoord.z );
+	isFrontFacing: function ( a, b, c, direction ) {
 
-			return target;
+		if ( _v1$2 === undefined ) {
 
-		};
+			_v0$1 = new Vector3();
+			_v1$2 = new Vector3();
 
-	}(),
+		}
 
-	isFrontFacing: function () {
+		_v0$1.subVectors( c, b );
+		_v1$2.subVectors( a, b );
 
-		var v0 = new Vector3();
-		var v1 = new Vector3();
+		// strictly front facing
+		return ( _v0$1.cross( _v1$2 ).dot( direction ) < 0 ) ? true : false;
 
-		return function isFrontFacing( a, b, c, direction ) {
-
-			v0.subVectors( c, b );
-			v1.subVectors( a, b );
-
-			// strictly front facing
-			return ( v0.cross( v1 ).dot( direction ) < 0 ) ? true : false;
-
-		};
-
-	}()
+	}
 
 } );
 
@@ -7689,19 +7643,19 @@ Object.assign( Triangle.prototype, {
 
 	getArea: function () {
 
-		var v0 = new Vector3();
-		var v1 = new Vector3();
+		if ( _v1$2 === undefined ) {
 
-		return function getArea() {
+			_v0$1 = new Vector3();
+			_v1$2 = new Vector3();
 
-			v0.subVectors( this.c, this.b );
-			v1.subVectors( this.a, this.b );
+		}
 
-			return v0.cross( v1 ).length() * 0.5;
+		_v0$1.subVectors( this.c, this.b );
+		_v1$2.subVectors( this.a, this.b );
 
-		};
+		return _v0$1.cross( _v1$2 ).length() * 0.5;
 
-	}(),
+	},
 
 	getMidpoint: function ( target ) {
 
@@ -7765,103 +7719,104 @@ Object.assign( Triangle.prototype, {
 
 	},
 
-	closestPointToPoint: function () {
+	closestPointToPoint: function ( p, target ) {
 
-		var vab = new Vector3();
-		var vac = new Vector3();
-		var vbc = new Vector3();
-		var vap = new Vector3();
-		var vbp = new Vector3();
-		var vcp = new Vector3();
+		if ( _vab === undefined ) {
 
-		return function closestPointToPoint( p, target ) {
+			_vab = new Vector3();
+			_vac = new Vector3();
+			_vbc = new Vector3();
+			_vap = new Vector3();
+			_vbp = new Vector3();
+			_vcp = new Vector3();
 
-			if ( target === undefined ) {
+		}
 
-				console.warn( 'THREE.Triangle: .closestPointToPoint() target is now required' );
-				target = new Vector3();
+		if ( target === undefined ) {
 
-			}
+			console.warn( 'THREE.Triangle: .closestPointToPoint() target is now required' );
+			target = new Vector3();
 
-			var a = this.a, b = this.b, c = this.c;
-			var v, w;
+		}
 
-			// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
-			// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
-			// under the accompanying license; see chapter 5.1.5 for detailed explanation.
-			// basically, we're distinguishing which of the voronoi regions of the triangle
-			// the point lies in with the minimum amount of redundant computation.
+		var a = this.a, b = this.b, c = this.c;
+		var v, w;
 
-			vab.subVectors( b, a );
-			vac.subVectors( c, a );
-			vap.subVectors( p, a );
-			var d1 = vab.dot( vap );
-			var d2 = vac.dot( vap );
-			if ( d1 <= 0 && d2 <= 0 ) {
+		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
+		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
+		// under the accompanying license; see chapter 5.1.5 for detailed explanation.
+		// basically, we're distinguishing which of the voronoi regions of the triangle
+		// the point lies in with the minimum amount of redundant computation.
 
-				// vertex region of A; barycentric coords (1, 0, 0)
-				return target.copy( a );
+		_vab.subVectors( b, a );
+		_vac.subVectors( c, a );
+		_vap.subVectors( p, a );
+		var d1 = _vab.dot( _vap );
+		var d2 = _vac.dot( _vap );
+		if ( d1 <= 0 && d2 <= 0 ) {
 
-			}
+			// vertex region of A; barycentric coords (1, 0, 0)
+			return target.copy( a );
 
-			vbp.subVectors( p, b );
-			var d3 = vab.dot( vbp );
-			var d4 = vac.dot( vbp );
-			if ( d3 >= 0 && d4 <= d3 ) {
+		}
 
-				// vertex region of B; barycentric coords (0, 1, 0)
-				return target.copy( b );
+		_vbp.subVectors( p, b );
+		var d3 = _vab.dot( _vbp );
+		var d4 = _vac.dot( _vbp );
+		if ( d3 >= 0 && d4 <= d3 ) {
 
-			}
+			// vertex region of B; barycentric coords (0, 1, 0)
+			return target.copy( b );
 
-			var vc = d1 * d4 - d3 * d2;
-			if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
+		}
 
-				v = d1 / ( d1 - d3 );
-				// edge region of AB; barycentric coords (1-v, v, 0)
-				return target.copy( a ).addScaledVector( vab, v );
+		var vc = d1 * d4 - d3 * d2;
+		if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
 
-			}
+			v = d1 / ( d1 - d3 );
+			// edge region of AB; barycentric coords (1-v, v, 0)
+			return target.copy( a ).addScaledVector( _vab, v );
 
-			vcp.subVectors( p, c );
-			var d5 = vab.dot( vcp );
-			var d6 = vac.dot( vcp );
-			if ( d6 >= 0 && d5 <= d6 ) {
+		}
 
-				// vertex region of C; barycentric coords (0, 0, 1)
-				return target.copy( c );
+		_vcp.subVectors( p, c );
+		var d5 = _vab.dot( _vcp );
+		var d6 = _vac.dot( _vcp );
+		if ( d6 >= 0 && d5 <= d6 ) {
 
-			}
+			// vertex region of C; barycentric coords (0, 0, 1)
+			return target.copy( c );
 
-			var vb = d5 * d2 - d1 * d6;
-			if ( vb <= 0 && d2 >= 0 && d6 <= 0 ) {
+		}
 
-				w = d2 / ( d2 - d6 );
-				// edge region of AC; barycentric coords (1-w, 0, w)
-				return target.copy( a ).addScaledVector( vac, w );
+		var vb = d5 * d2 - d1 * d6;
+		if ( vb <= 0 && d2 >= 0 && d6 <= 0 ) {
 
-			}
+			w = d2 / ( d2 - d6 );
+			// edge region of AC; barycentric coords (1-w, 0, w)
+			return target.copy( a ).addScaledVector( _vac, w );
 
-			var va = d3 * d6 - d5 * d4;
-			if ( va <= 0 && ( d4 - d3 ) >= 0 && ( d5 - d6 ) >= 0 ) {
+		}
 
-				vbc.subVectors( c, b );
-				w = ( d4 - d3 ) / ( ( d4 - d3 ) + ( d5 - d6 ) );
-				// edge region of BC; barycentric coords (0, 1-w, w)
-				return target.copy( b ).addScaledVector( vbc, w ); // edge region of BC
+		var va = d3 * d6 - d5 * d4;
+		if ( va <= 0 && ( d4 - d3 ) >= 0 && ( d5 - d6 ) >= 0 ) {
 
-			}
+			_vbc.subVectors( c, b );
+			w = ( d4 - d3 ) / ( ( d4 - d3 ) + ( d5 - d6 ) );
+			// edge region of BC; barycentric coords (0, 1-w, w)
+			return target.copy( b ).addScaledVector( _vbc, w ); // edge region of BC
 
-			// face region
-			var denom = 1 / ( va + vb + vc );
-			// u = va * denom
-			v = vb * denom;
-			w = vc * denom;
-			return target.copy( a ).addScaledVector( vab, v ).addScaledVector( vac, w );
+		}
 
-		};
+		// face region
+		var denom = 1 / ( va + vb + vc );
+		// u = va * denom
+		v = vb * denom;
+		w = vc * denom;
 
-	}(),
+		return target.copy( a ).addScaledVector( _vab, v ).addScaledVector( _vac, w );
+
+	},
 
 	equals: function ( triangle ) {
 
@@ -7875,7 +7830,7 @@ Object.assign( Triangle.prototype, {
  * @author mrdoob / http://mrdoob.com/
  */
 
-var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+var _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
 	'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
 	'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
@@ -7899,6 +7854,9 @@ var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0
 	'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
 	'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 	'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
+
+var _hslA = { h: 0, s: 0, l: 0 };
+var _hslB = { h: 0, s: 0, l: 0 };
 
 function Color( r, g, b ) {
 
@@ -8130,7 +8088,7 @@ Object.assign( Color.prototype, {
 		if ( style && style.length > 0 ) {
 
 			// color keywords
-			var hex = ColorKeywords[ style ];
+			var hex = _colorKeywords[ style ];
 
 			if ( hex !== undefined ) {
 
@@ -8312,23 +8270,17 @@ Object.assign( Color.prototype, {
 
 	},
 
-	offsetHSL: function () {
+	offsetHSL: function ( h, s, l ) {
 
-		var hsl = {};
+		this.getHSL( _hslA );
 
-		return function ( h, s, l ) {
+		_hslA.h += h; _hslA.s += s; _hslA.l += l;
 
-			this.getHSL( hsl );
+		this.setHSL( _hslA.h, _hslA.s, _hslA.l );
 
-			hsl.h += h; hsl.s += s; hsl.l += l;
+		return this;
 
-			this.setHSL( hsl.h, hsl.s, hsl.l );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	add: function ( color ) {
 
@@ -8400,27 +8352,20 @@ Object.assign( Color.prototype, {
 
 	},
 
-	lerpHSL: function () {
+	lerpHSL: function ( color, alpha ) {
 
-		var hslA = { h: 0, s: 0, l: 0 };
-		var hslB = { h: 0, s: 0, l: 0 };
+		this.getHSL( _hslA );
+		color.getHSL( _hslB );
 
-		return function lerpHSL( color, alpha ) {
+		var h = _Math.lerp( _hslA.h, _hslB.h, alpha );
+		var s = _Math.lerp( _hslA.s, _hslB.s, alpha );
+		var l = _Math.lerp( _hslA.l, _hslB.l, alpha );
 
-			this.getHSL( hslA );
-			color.getHSL( hslB );
+		this.setHSL( h, s, l );
 
-			var h = _Math.lerp( hslA.h, hslB.h, alpha );
-			var s = _Math.lerp( hslA.s, hslB.s, alpha );
-			var l = _Math.lerp( hslA.l, hslB.l, alpha );
+		return this;
 
-			this.setHSL( h, s, l );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	equals: function ( c ) {
 
@@ -13912,6 +13857,8 @@ DataTexture.prototype.isDataTexture = true;
  * @author bhouston / http://clara.io
  */
 
+var _vector1, _vector2, _normalMatrix;
+
 function Plane( normal, constant ) {
 
 	// normal is assumed to be normalized
@@ -13952,24 +13899,24 @@ Object.assign( Plane.prototype, {
 
 	},
 
-	setFromCoplanarPoints: function () {
+	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+		if ( _vector1 === undefined ) {
 
-		return function setFromCoplanarPoints( a, b, c ) {
+			_vector1 = new Vector3();
+			_vector2 = new Vector3();
 
-			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
+		}
 
-			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+		var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
 
-			this.setFromNormalAndCoplanarPoint( normal, a );
+		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
-			return this;
+		this.setFromNormalAndCoplanarPoint( normal, a );
 
-		};
+		return this;
 
-	}(),
+	},
 
 	clone: function () {
 
@@ -14032,50 +13979,46 @@ Object.assign( Plane.prototype, {
 
 	},
 
-	intersectLine: function () {
+	intersectLine: function ( line, target ) {
 
-		var v1 = new Vector3();
+		if ( _vector1 === undefined ) _vector1 = new Vector3();
 
-		return function intersectLine( line, target ) {
+		if ( target === undefined ) {
 
-			if ( target === undefined ) {
+			console.warn( 'THREE.Plane: .intersectLine() target is now required' );
+			target = new Vector3();
 
-				console.warn( 'THREE.Plane: .intersectLine() target is now required' );
-				target = new Vector3();
+		}
 
-			}
+		var direction = line.delta( _vector1 );
 
-			var direction = line.delta( v1 );
+		var denominator = this.normal.dot( direction );
 
-			var denominator = this.normal.dot( direction );
+		if ( denominator === 0 ) {
 
-			if ( denominator === 0 ) {
+			// line is coplanar, return origin
+			if ( this.distanceToPoint( line.start ) === 0 ) {
 
-				// line is coplanar, return origin
-				if ( this.distanceToPoint( line.start ) === 0 ) {
-
-					return target.copy( line.start );
-
-				}
-
-				// Unsure if this is the correct method to handle this case.
-				return undefined;
+				return target.copy( line.start );
 
 			}
 
-			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+			// Unsure if this is the correct method to handle this case.
+			return undefined;
 
-			if ( t < 0 || t > 1 ) {
+		}
 
-				return undefined;
+		var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
-			}
+		if ( t < 0 || t > 1 ) {
 
-			return target.copy( direction ).multiplyScalar( t ).add( line.start );
+			return undefined;
 
-		};
+		}
 
-	}(),
+		return target.copy( direction ).multiplyScalar( t ).add( line.start );
+
+	},
 
 	intersectsLine: function ( line ) {
 
@@ -14113,26 +14056,26 @@ Object.assign( Plane.prototype, {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: function ( matrix, optionalNormalMatrix ) {
 
-		var v1 = new Vector3();
-		var m1 = new Matrix3();
+		if ( _normalMatrix === undefined ) {
 
-		return function applyMatrix4( matrix, optionalNormalMatrix ) {
+			_normalMatrix = new Matrix3();
+			_vector1 = new Vector3();
 
-			var normalMatrix = optionalNormalMatrix || m1.getNormalMatrix( matrix );
+		}
 
-			var referencePoint = this.coplanarPoint( v1 ).applyMatrix4( matrix );
+		var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
 
-			var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
+		var referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
 
-			this.constant = - referencePoint.dot( normal );
+		var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
 
-			return this;
+		this.constant = - referencePoint.dot( normal );
 
-		};
+		return this;
 
-	}(),
+	},
 
 	translate: function ( offset ) {
 
@@ -14155,6 +14098,9 @@ Object.assign( Plane.prototype, {
  * @author alteredq / http://alteredqualia.com/
  * @author bhouston / http://clara.io
  */
+
+var _sphere;
+var _vector$4;
 
 function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
@@ -14228,41 +14174,29 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	intersectsObject: function () {
+	intersectsObject: function ( object ) {
 
-		var sphere = new Sphere();
+		if ( _sphere === undefined ) _sphere = new Sphere();
 
-		return function intersectsObject( object ) {
+		var geometry = object.geometry;
 
-			var geometry = object.geometry;
+		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			if ( geometry.boundingSphere === null )
-				geometry.computeBoundingSphere();
+		_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
-			sphere.copy( geometry.boundingSphere )
-				.applyMatrix4( object.matrixWorld );
+		return this.intersectsSphere( _sphere );
 
-			return this.intersectsSphere( sphere );
+	},
 
-		};
+	intersectsSprite: function ( sprite ) {
 
-	}(),
+		_sphere.center.set( 0, 0, 0 );
+		_sphere.radius = 0.7071067811865476;
+		_sphere.applyMatrix4( sprite.matrixWorld );
 
-	intersectsSprite: function () {
+		return this.intersectsSphere( _sphere );
 
-		var sphere = new Sphere();
-
-		return function intersectsSprite( sprite ) {
-
-			sphere.center.set( 0, 0, 0 );
-			sphere.radius = 0.7071067811865476;
-			sphere.applyMatrix4( sprite.matrixWorld );
-
-			return this.intersectsSphere( sphere );
-
-		};
-
-	}(),
+	},
 
 	intersectsSphere: function ( sphere ) {
 
@@ -14286,37 +14220,33 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	intersectsBox: function () {
+	intersectsBox: function ( box ) {
 
-		var p = new Vector3();
+		if ( _vector$4 === undefined ) _vector$4 = new Vector3();
 
-		return function intersectsBox( box ) {
+		var planes = this.planes;
 
-			var planes = this.planes;
+		for ( var i = 0; i < 6; i ++ ) {
 
-			for ( var i = 0; i < 6; i ++ ) {
+			var plane = planes[ i ];
 
-				var plane = planes[ i ];
+			// corner at max distance
 
-				// corner at max distance
+			_vector$4.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+			_vector$4.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+			_vector$4.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+			if ( plane.distanceToPoint( _vector$4 ) < 0 ) {
 
-				if ( plane.distanceToPoint( p ) < 0 ) {
-
-					return false;
-
-				}
+				return false;
 
 			}
 
-			return true;
+		}
 
-		};
+		return true;
 
-	}(),
+	},
 
 	containsPoint: function ( point ) {
 
@@ -14426,7 +14356,7 @@ var lights_physical_fragment = "PhysicalMaterial material;\nmaterial.diffuseColo
 
 var lights_physical_pars_fragment = "struct PhysicalMaterial {\n\tvec3\tdiffuseColor;\n\tfloat\tspecularRoughness;\n\tvec3\tspecularColor;\n\t#ifndef STANDARD\n\t\tfloat clearCoat;\n\t\tfloat clearCoatRoughness;\n\t#endif\n};\n#define MAXIMUM_SPECULAR_COEFFICIENT 0.16\n#define DEFAULT_SPECULAR_COEFFICIENT 0.04\nfloat clearCoatDHRApprox( const in float roughness, const in float dotNL ) {\n\treturn DEFAULT_SPECULAR_COEFFICIENT + ( 1.0 - DEFAULT_SPECULAR_COEFFICIENT ) * ( pow( 1.0 - dotNL, 5.0 ) * pow( 1.0 - roughness, 2.0 ) );\n}\n#if NUM_RECT_AREA_LIGHTS > 0\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\t\tvec3 normal = geometry.normal;\n\t\tvec3 viewDir = geometry.viewDir;\n\t\tvec3 position = geometry.position;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.specularRoughness;\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight;\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\t\tvec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\t}\n#endif\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tfloat dotNL = saturate( dot( geometry.normal, directLight.direction ) );\n\tvec3 irradiance = dotNL * directLight.color;\n\t#ifndef PHYSICALLY_CORRECT_LIGHTS\n\t\tirradiance *= PI;\n\t#endif\n\t#ifndef STANDARD\n\t\tfloat clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );\n\t#else\n\t\tfloat clearCoatDHR = 0.0;\n\t#endif\n\treflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry, material.specularColor, material.specularRoughness );\n\treflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n\t#ifndef STANDARD\n\t\treflectedLight.directSpecular += irradiance * material.clearCoat * BRDF_Specular_GGX( directLight, geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );\n\t#endif\n}\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\t#ifndef ENVMAP_TYPE_CUBE_UV\n\t\treflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\n\t#endif\n}\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\t#ifndef STANDARD\n\t\tfloat dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );\n\t\tfloat dotNL = dotNV;\n\t\tfloat clearCoatDHR = material.clearCoat * clearCoatDHRApprox( material.clearCoatRoughness, dotNL );\n\t#else\n\t\tfloat clearCoatDHR = 0.0;\n\t#endif\n\tfloat clearCoatInv = 1.0 - clearCoatDHR;\n\t#if defined( ENVMAP_TYPE_CUBE_UV )\n\t\tvec3 singleScattering = vec3( 0.0 );\n\t\tvec3 multiScattering = vec3( 0.0 );\n\t\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\t\tBRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );\n\t\tvec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );\n\t\treflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;\n\t\treflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;\n\t\treflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;\n\t#else\n\t\treflectedLight.indirectSpecular += clearCoatInv * radiance * BRDF_Specular_GGX_Environment( geometry, material.specularColor, material.specularRoughness );\n\t#endif\n\t#ifndef STANDARD\n\t\treflectedLight.indirectSpecular += clearCoatRadiance * material.clearCoat * BRDF_Specular_GGX_Environment( geometry, vec3( DEFAULT_SPECULAR_COEFFICIENT ), material.clearCoatRoughness );\n\t#endif\n}\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\n#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )\n#define Material_ClearCoat_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.clearCoatRoughness )\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n}";
 
-var lights_fragment_begin = "\nGeometricContext geometry;\ngeometry.position = - vViewPosition;\ngeometry.normal = normal;\ngeometry.viewDir = normalize( vViewPosition );\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n\tPointLight pointLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tgetPointDirectLightIrradiance( pointLight, geometry, directLight );\n\t\t#ifdef USE_SHADOWMAP\n\t\tdirectLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n\tSpotLight spotLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tgetSpotDirectLightIrradiance( spotLight, geometry, directLight );\n\t\t#ifdef USE_SHADOWMAP\n\t\tdirectLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n\tDirectionalLight directionalLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tgetDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );\n\t\t#ifdef USE_SHADOWMAP\n\t\tdirectLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )\n\tRectAreaLight rectAreaLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {\n\t\trectAreaLight = rectAreaLights[ i ];\n\t\tRE_Direct_RectArea( rectAreaLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if defined( RE_IndirectDiffuse )\n\tvec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n\tirradiance += getLightProbeIrradiance( lightProbe, geometry );\n\t#if ( NUM_HEMI_LIGHTS > 0 )\n\t\t#pragma unroll_loop\n\t\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\t\tirradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n\t\t}\n\t#endif\n#endif\n#if defined( RE_IndirectSpecular )\n\tvec3 radiance = vec3( 0.0 );\n\tvec3 clearCoatRadiance = vec3( 0.0 );\n#endif";
+var lights_fragment_begin = "\nGeometricContext geometry;\ngeometry.position = - vViewPosition;\ngeometry.normal = normal;\ngeometry.viewDir = normalize( vViewPosition );\nIncidentLight directLight;\n#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )\n\tPointLight pointLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tgetPointDirectLightIrradiance( pointLight, geometry, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_POINT_LIGHT_SHADOWS )\n\t\tdirectLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )\n\tSpotLight spotLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tgetSpotDirectLightIrradiance( spotLight, geometry, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )\n\t\tdirectLight.color *= all( bvec2( spotLight.shadow, directLight.visible ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )\n\tDirectionalLight directionalLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tgetDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );\n\t\t#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )\n\t\tdirectLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t\t#endif\n\t\tRE_Direct( directLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )\n\tRectAreaLight rectAreaLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {\n\t\trectAreaLight = rectAreaLights[ i ];\n\t\tRE_Direct_RectArea( rectAreaLight, geometry, material, reflectedLight );\n\t}\n#endif\n#if defined( RE_IndirectDiffuse )\n\tvec3 irradiance = getAmbientLightIrradiance( ambientLightColor );\n\tirradiance += getLightProbeIrradiance( lightProbe, geometry );\n\t#if ( NUM_HEMI_LIGHTS > 0 )\n\t\t#pragma unroll_loop\n\t\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\t\tirradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n\t\t}\n\t#endif\n#endif\n#if defined( RE_IndirectSpecular )\n\tvec3 radiance = vec3( 0.0 );\n\tvec3 clearCoatRadiance = vec3( 0.0 );\n#endif";
 
 var lights_fragment_maps = "#if defined( RE_IndirectDiffuse )\n\t#ifdef USE_LIGHTMAP\n\t\tvec3 lightMapIrradiance = texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n\t\t#ifndef PHYSICALLY_CORRECT_LIGHTS\n\t\t\tlightMapIrradiance *= PI;\n\t\t#endif\n\t\tirradiance += lightMapIrradiance;\n\t#endif\n\t#if defined( USE_ENVMAP ) && defined( PHYSICAL ) && defined( ENVMAP_TYPE_CUBE_UV )\n\t\tirradiance += getLightProbeIndirectIrradiance( geometry, maxMipLevel );\n\t#endif\n#endif\n#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )\n\tradiance += getLightProbeIndirectRadiance( geometry, Material_BlinnShininessExponent( material ), maxMipLevel );\n\t#ifndef STANDARD\n\t\tclearCoatRadiance += getLightProbeIndirectRadiance( geometry, Material_ClearCoat_BlinnShininessExponent( material ), maxMipLevel );\n\t#endif\n#endif";
 
@@ -14478,13 +14408,13 @@ var roughnessmap_fragment = "float roughnessFactor = roughness;\n#ifdef USE_ROUG
 
 var roughnessmap_pars_fragment = "#ifdef USE_ROUGHNESSMAP\n\tuniform sampler2D roughnessMap;\n#endif";
 
-var shadowmap_pars_fragment = "#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHTS > 0\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\n\t#endif\n\t#if NUM_SPOT_LIGHTS > 0\n\t\tuniform sampler2D spotShadowMap[ NUM_SPOT_LIGHTS ];\n\t\tvarying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];\n\t#endif\n\t#if NUM_POINT_LIGHTS > 0\n\t\tuniform sampler2D pointShadowMap[ NUM_POINT_LIGHTS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];\n\t#endif\n\tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\n\t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\n\t}\n\tfloat texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {\n\t\tconst vec2 offset = vec2( 0.0, 1.0 );\n\t\tvec2 texelSize = vec2( 1.0 ) / size;\n\t\tvec2 centroidUV = floor( uv * size + 0.5 ) / size;\n\t\tfloat lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );\n\t\tfloat lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );\n\t\tfloat rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );\n\t\tfloat rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );\n\t\tvec2 f = fract( uv * size + 0.5 );\n\t\tfloat a = mix( lb, lt, f.y );\n\t\tfloat b = mix( rb, rt, f.y );\n\t\tfloat c = mix( a, b, f.x );\n\t\treturn c;\n\t}\n\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\tfloat shadow = 1.0;\n\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\tshadowCoord.z += shadowBias;\n\t\tbvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n\t\tbool inFrustum = all( inFrustumVec );\n\t\tbvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n\t\tbool frustumTest = all( frustumTestVec );\n\t\tif ( frustumTest ) {\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx0 = - texelSize.x * shadowRadius;\n\t\t\tfloat dy0 = - texelSize.y * shadowRadius;\n\t\t\tfloat dx1 = + texelSize.x * shadowRadius;\n\t\t\tfloat dy1 = + texelSize.y * shadowRadius;\n\t\t\tfloat dx2 = dx0 / 2.0;\n\t\t\tfloat dy2 = dy0 / 2.0;\n\t\t\tfloat dx3 = dx1 / 2.0;\n\t\t\tfloat dy3 = dy1 / 2.0;\n\t\t\tshadow = (\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\n\t\t\t) * ( 1.0 / 17.0 );\n\t\t#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx0 = - texelSize.x * shadowRadius;\n\t\t\tfloat dy0 = - texelSize.y * shadowRadius;\n\t\t\tfloat dx1 = + texelSize.x * shadowRadius;\n\t\t\tfloat dy1 = + texelSize.y * shadowRadius;\n\t\t\tshadow = (\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\n\t\t\t) * ( 1.0 / 9.0 );\n\t\t#else\n\t\t\tshadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\n\t\t#endif\n\t\t}\n\t\treturn shadow;\n\t}\n\tvec2 cubeToUV( vec3 v, float texelSizeY ) {\n\t\tvec3 absV = abs( v );\n\t\tfloat scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\n\t\tabsV *= scaleToCube;\n\t\tv *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\n\t\tvec2 planar = v.xy;\n\t\tfloat almostATexel = 1.5 * texelSizeY;\n\t\tfloat almostOne = 1.0 - almostATexel;\n\t\tif ( absV.z >= almostOne ) {\n\t\t\tif ( v.z > 0.0 )\n\t\t\t\tplanar.x = 4.0 - v.x;\n\t\t} else if ( absV.x >= almostOne ) {\n\t\t\tfloat signX = sign( v.x );\n\t\t\tplanar.x = v.z * signX + 2.0 * signX;\n\t\t} else if ( absV.y >= almostOne ) {\n\t\t\tfloat signY = sign( v.y );\n\t\t\tplanar.x = v.x + 2.0 * signY + 2.0;\n\t\t\tplanar.y = v.z * signY - 2.0;\n\t\t}\n\t\treturn vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );\n\t}\n\tfloat getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tvec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\tfloat dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );\t\tdp += shadowBias;\n\t\tvec3 bd3D = normalize( lightToPosition );\n\t\t#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )\n\t\t\tvec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\n\t\t\treturn (\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\n\t\t\t) * ( 1.0 / 9.0 );\n\t\t#else\n\t\t\treturn texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\n\t\t#endif\n\t}\n#endif";
+var shadowmap_pars_fragment = "#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\tuniform sampler2D pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n\tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\n\t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\n\t}\n\tfloat texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {\n\t\tconst vec2 offset = vec2( 0.0, 1.0 );\n\t\tvec2 texelSize = vec2( 1.0 ) / size;\n\t\tvec2 centroidUV = floor( uv * size + 0.5 ) / size;\n\t\tfloat lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );\n\t\tfloat lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );\n\t\tfloat rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );\n\t\tfloat rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );\n\t\tvec2 f = fract( uv * size + 0.5 );\n\t\tfloat a = mix( lb, lt, f.y );\n\t\tfloat b = mix( rb, rt, f.y );\n\t\tfloat c = mix( a, b, f.x );\n\t\treturn c;\n\t}\n\tfloat getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {\n\t\tfloat shadow = 1.0;\n\t\tshadowCoord.xyz /= shadowCoord.w;\n\t\tshadowCoord.z += shadowBias;\n\t\tbvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n\t\tbool inFrustum = all( inFrustumVec );\n\t\tbvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n\t\tbool frustumTest = all( frustumTestVec );\n\t\tif ( frustumTest ) {\n\t\t#if defined( SHADOWMAP_TYPE_PCF )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx0 = - texelSize.x * shadowRadius;\n\t\t\tfloat dy0 = - texelSize.y * shadowRadius;\n\t\t\tfloat dx1 = + texelSize.x * shadowRadius;\n\t\t\tfloat dy1 = + texelSize.y * shadowRadius;\n\t\t\tfloat dx2 = dx0 / 2.0;\n\t\t\tfloat dy2 = dy0 / 2.0;\n\t\t\tfloat dx3 = dx1 / 2.0;\n\t\t\tfloat dy3 = dy1 / 2.0;\n\t\t\tshadow = (\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy2 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx2, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx3, dy3 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\n\t\t\t) * ( 1.0 / 17.0 );\n\t\t#elif defined( SHADOWMAP_TYPE_PCF_SOFT )\n\t\t\tvec2 texelSize = vec2( 1.0 ) / shadowMapSize;\n\t\t\tfloat dx0 = - texelSize.x * shadowRadius;\n\t\t\tfloat dy0 = - texelSize.y * shadowRadius;\n\t\t\tfloat dx1 = + texelSize.x * shadowRadius;\n\t\t\tfloat dy1 = + texelSize.y * shadowRadius;\n\t\t\tshadow = (\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\n\t\t\t\ttexture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\n\t\t\t) * ( 1.0 / 9.0 );\n\t\t#else\n\t\t\tshadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\n\t\t#endif\n\t\t}\n\t\treturn shadow;\n\t}\n\tvec2 cubeToUV( vec3 v, float texelSizeY ) {\n\t\tvec3 absV = abs( v );\n\t\tfloat scaleToCube = 1.0 / max( absV.x, max( absV.y, absV.z ) );\n\t\tabsV *= scaleToCube;\n\t\tv *= scaleToCube * ( 1.0 - 2.0 * texelSizeY );\n\t\tvec2 planar = v.xy;\n\t\tfloat almostATexel = 1.5 * texelSizeY;\n\t\tfloat almostOne = 1.0 - almostATexel;\n\t\tif ( absV.z >= almostOne ) {\n\t\t\tif ( v.z > 0.0 )\n\t\t\t\tplanar.x = 4.0 - v.x;\n\t\t} else if ( absV.x >= almostOne ) {\n\t\t\tfloat signX = sign( v.x );\n\t\t\tplanar.x = v.z * signX + 2.0 * signX;\n\t\t} else if ( absV.y >= almostOne ) {\n\t\t\tfloat signY = sign( v.y );\n\t\t\tplanar.x = v.x + 2.0 * signY + 2.0;\n\t\t\tplanar.y = v.z * signY - 2.0;\n\t\t}\n\t\treturn vec2( 0.125, 0.25 ) * planar + vec2( 0.375, 0.75 );\n\t}\n\tfloat getPointShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, float shadowCameraNear, float shadowCameraFar ) {\n\t\tvec2 texelSize = vec2( 1.0 ) / ( shadowMapSize * vec2( 4.0, 2.0 ) );\n\t\tvec3 lightToPosition = shadowCoord.xyz;\n\t\tfloat dp = ( length( lightToPosition ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );\t\tdp += shadowBias;\n\t\tvec3 bd3D = normalize( lightToPosition );\n\t\t#if defined( SHADOWMAP_TYPE_PCF ) || defined( SHADOWMAP_TYPE_PCF_SOFT )\n\t\t\tvec2 offset = vec2( - 1, 1 ) * shadowRadius * texelSize.y;\n\t\t\treturn (\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xyx, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yyx, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxy, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.xxx, texelSize.y ), dp ) +\n\t\t\t\ttexture2DCompare( shadowMap, cubeToUV( bd3D + offset.yxx, texelSize.y ), dp )\n\t\t\t) * ( 1.0 / 9.0 );\n\t\t#else\n\t\t\treturn texture2DCompare( shadowMap, cubeToUV( bd3D, texelSize.y ), dp );\n\t\t#endif\n\t}\n#endif";
 
-var shadowmap_pars_vertex = "#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHTS > 0\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\n\t#endif\n\t#if NUM_SPOT_LIGHTS > 0\n\t\tuniform mat4 spotShadowMatrix[ NUM_SPOT_LIGHTS ];\n\t\tvarying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];\n\t#endif\n\t#if NUM_POINT_LIGHTS > 0\n\t\tuniform mat4 pointShadowMatrix[ NUM_POINT_LIGHTS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];\n\t#endif\n#endif";
+var shadowmap_pars_vertex = "#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ];\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tuniform mat4 spotShadowMatrix[ NUM_SPOT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t\tuniform mat4 pointShadowMatrix[ NUM_POINT_LIGHT_SHADOWS ];\n\t\tvarying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n#endif";
 
-var shadowmap_vertex = "#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHTS > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tvDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;\n\t}\n\t#endif\n\t#if NUM_SPOT_LIGHTS > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tvSpotShadowCoord[ i ] = spotShadowMatrix[ i ] * worldPosition;\n\t}\n\t#endif\n\t#if NUM_POINT_LIGHTS > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tvPointShadowCoord[ i ] = pointShadowMatrix[ i ] * worldPosition;\n\t}\n\t#endif\n#endif";
+var shadowmap_vertex = "#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {\n\t\tvDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;\n\t}\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {\n\t\tvSpotShadowCoord[ i ] = spotShadowMatrix[ i ] * worldPosition;\n\t}\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_POINT_LIGHT_SHADOWS; i ++ ) {\n\t\tvPointShadowCoord[ i ] = pointShadowMatrix[ i ] * worldPosition;\n\t}\n\t#endif\n#endif";
 
-var shadowmask_pars_fragment = "float getShadowMask() {\n\tfloat shadow = 1.0;\n\t#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHTS > 0\n\tDirectionalLight directionalLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tshadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t}\n\t#endif\n\t#if NUM_SPOT_LIGHTS > 0\n\tSpotLight spotLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tshadow *= bool( spotLight.shadow ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;\n\t}\n\t#endif\n\t#if NUM_POINT_LIGHTS > 0\n\tPointLight pointLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tshadow *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;\n\t}\n\t#endif\n\t#endif\n\treturn shadow;\n}";
+var shadowmask_pars_fragment = "float getShadowMask() {\n\tfloat shadow = 1.0;\n\t#ifdef USE_SHADOWMAP\n\t#if NUM_DIR_LIGHT_SHADOWS > 0\n\tDirectionalLight directionalLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {\n\t\tdirectionalLight = directionalLights[ i ];\n\t\tshadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;\n\t}\n\t#endif\n\t#if NUM_SPOT_LIGHT_SHADOWS > 0\n\tSpotLight spotLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {\n\t\tspotLight = spotLights[ i ];\n\t\tshadow *= bool( spotLight.shadow ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;\n\t}\n\t#endif\n\t#if NUM_POINT_LIGHT_SHADOWS > 0\n\tPointLight pointLight;\n\t#pragma unroll_loop\n\tfor ( int i = 0; i < NUM_POINT_LIGHT_SHADOWS; i ++ ) {\n\t\tpointLight = pointLights[ i ];\n\t\tshadow *= bool( pointLight.shadow ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;\n\t}\n\t#endif\n\t#endif\n\treturn shadow;\n}";
 
 var skinbase_vertex = "#ifdef USE_SKINNING\n\tmat4 boneMatX = getBoneMatrix( skinIndex.x );\n\tmat4 boneMatY = getBoneMatrix( skinIndex.y );\n\tmat4 boneMatZ = getBoneMatrix( skinIndex.z );\n\tmat4 boneMatW = getBoneMatrix( skinIndex.w );\n#endif";
 
@@ -17750,7 +17680,10 @@ function replaceLightNums( string, parameters ) {
 		.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
 		.replace( /NUM_RECT_AREA_LIGHTS/g, parameters.numRectAreaLights )
 		.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
-		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights );
+		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights )
+		.replace( /NUM_DIR_LIGHT_SHADOWS/g, parameters.numDirLightShadows )
+		.replace( /NUM_SPOT_LIGHT_SHADOWS/g, parameters.numSpotLightShadows )
+		.replace( /NUM_POINT_LIGHT_SHADOWS/g, parameters.numPointLightShadows );
 
 }
 
@@ -17794,7 +17727,9 @@ function unrollLoops( string ) {
 
 		for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
 
-			unroll += snippet.replace( /\[ i \]/g, '[ ' + i + ' ]' );
+			unroll += snippet
+				.replace( /\[ i \]/g, '[ ' + i + ' ]' )
+				.replace( /UNROLLED_LOOP_INDEX/g, i );
 
 		}
 
@@ -18511,6 +18446,10 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
+			numDirLightShadows: lights.directionalShadowMap.length,
+			numPointLightShadows: lights.pointShadowMap.length,
+			numSpotLightShadows: lights.spotShadowMap.length,
+
 			numClippingPlanes: nClipPlanes,
 			numClipIntersection: nClipIntersection,
 
@@ -18986,6 +18925,12 @@ function UniformsCache() {
 
 var nextVersion = 0;
 
+function shadowCastingLightsFirst( lightA, lightB ) {
+
+	return ( lightB.castShadow ? 1 : 0 ) - ( lightA.castShadow ? 1 : 0 );
+
+}
+
 function WebGLLights() {
 
 	var cache = new UniformsCache();
@@ -19000,7 +18945,10 @@ function WebGLLights() {
 			spotLength: - 1,
 			rectAreaLength: - 1,
 			hemiLength: - 1,
-			shadowsLength: - 1,
+
+			numDirectionalShadows: - 1,
+			numPointShadows: - 1,
+			numSpotShadows: - 1,
 		},
 
 		ambient: [ 0, 0, 0 ],
@@ -19015,7 +18963,11 @@ function WebGLLights() {
 		point: [],
 		pointShadowMap: [],
 		pointShadowMatrix: [],
-		hemi: []
+		hemi: [],
+
+		numDirectionalShadows: - 1,
+		numPointShadows: - 1,
+		numSpotShadows: - 1
 
 	};
 
@@ -19037,7 +18989,13 @@ function WebGLLights() {
 		var rectAreaLength = 0;
 		var hemiLength = 0;
 
+		var numDirectionalShadows = 0;
+		var numPointShadows = 0;
+		var numSpotShadows = 0;
+
 		var viewMatrix = camera.matrixWorldInverse;
+
+		lights.sort( shadowCastingLightsFirst );
 
 		for ( var i = 0, l = lights.length; i < l; i ++ ) {
 
@@ -19083,10 +19041,13 @@ function WebGLLights() {
 					uniforms.shadowRadius = shadow.radius;
 					uniforms.shadowMapSize = shadow.mapSize;
 
+					state.directionalShadowMap[ directionalLength ] = shadowMap;
+					state.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
+
+					numDirectionalShadows ++;
+
 				}
 
-				state.directionalShadowMap[ directionalLength ] = shadowMap;
-				state.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 				state.directional[ directionalLength ] = uniforms;
 
 				directionalLength ++;
@@ -19120,10 +19081,13 @@ function WebGLLights() {
 					uniforms.shadowRadius = shadow.radius;
 					uniforms.shadowMapSize = shadow.mapSize;
 
+					state.spotShadowMap[ spotLength ] = shadowMap;
+					state.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
+
+					numSpotShadows ++;
+
 				}
 
-				state.spotShadowMap[ spotLength ] = shadowMap;
-				state.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 				state.spot[ spotLength ] = uniforms;
 
 				spotLength ++;
@@ -19183,10 +19147,13 @@ function WebGLLights() {
 					uniforms.shadowCameraNear = shadow.camera.near;
 					uniforms.shadowCameraFar = shadow.camera.far;
 
+					state.pointShadowMap[ pointLength ] = shadowMap;
+					state.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
+
+					numPointShadows ++;
+
 				}
 
-				state.pointShadowMap[ pointLength ] = shadowMap;
-				state.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 				state.point[ pointLength ] = uniforms;
 
 				pointLength ++;
@@ -19221,7 +19188,9 @@ function WebGLLights() {
 			hash.spotLength !== spotLength ||
 			hash.rectAreaLength !== rectAreaLength ||
 			hash.hemiLength !== hemiLength ||
-			hash.shadowsLength !== shadows.length ) {
+			hash.numDirectionalShadows !== numDirectionalShadows ||
+			hash.numPointShadows !== numPointShadows ||
+			hash.numSpotShadows !== numSpotShadows ) {
 
 			state.directional.length = directionalLength;
 			state.spot.length = spotLength;
@@ -19229,12 +19198,22 @@ function WebGLLights() {
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
+			state.directionalShadowMap.length = numDirectionalShadows;
+			state.pointShadowMap.length = numPointShadows;
+			state.spotShadowMap.length = numSpotShadows;
+			state.directionalShadowMatrix.length = numDirectionalShadows;
+			state.pointShadowMatrix.length = numPointShadows;
+			state.spotShadowMatrix.length = numSpotShadows;
+
 			hash.directionalLength = directionalLength;
 			hash.pointLength = pointLength;
 			hash.spotLength = spotLength;
 			hash.rectAreaLength = rectAreaLength;
 			hash.hemiLength = hemiLength;
-			hash.shadowsLength = shadows.length;
+
+			hash.numDirectionalShadows = numDirectionalShadows;
+			hash.numPointShadows = numPointShadows;
+			hash.numSpotShadows = numSpotShadows;
 
 			state.version = nextVersion ++;
 
@@ -20157,13 +20136,17 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			setTest: function ( stencilTest ) {
 
-				if ( stencilTest ) {
+				if ( ! locked ) {
 
-					enable( 2960 );
+					if ( stencilTest ) {
 
-				} else {
+						enable( 2960 );
 
-					disable( 2960 );
+					} else {
+
+						disable( 2960 );
+
+					}
 
 				}
 
@@ -41058,20 +41041,21 @@ Object.assign( StereoCamera.prototype, {
 				near = camera.near;
 				far = camera.far;
 				zoom = camera.zoom;
+				eyeSep = this.eyeSep;
 
 				// Off-axis stereoscopic effect based on
 				// http://paulbourke.net/stereographics/stereorender/
 
 				var projectionMatrix = camera.projectionMatrix.clone();
-				eyeSep = this.eyeSep / 2;
-				var eyeSepOnProjection = eyeSep * near / focus;
+				var eyeSepHalf = eyeSep / 2;
+				var eyeSepOnProjection = eyeSepHalf * near / focus;
 				var ymax = ( near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) ) / zoom;
 				var xmin, xmax;
 
 				// translate xOffset
 
-				eyeLeft.elements[ 12 ] = - eyeSep;
-				eyeRight.elements[ 12 ] = eyeSep;
+				eyeLeft.elements[ 12 ] = - eyeSepHalf;
+				eyeRight.elements[ 12 ] = eyeSepHalf;
 
 				// for left eye
 
@@ -44908,6 +44892,8 @@ Object.assign( Cylindrical.prototype, {
  * @author bhouston / http://clara.io
  */
 
+var _vector$5;
+
 function Box2( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
@@ -44940,21 +44926,17 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: function ( center, size ) {
 
-		var v1 = new Vector2();
+		if ( _vector$5 === undefined ) _vector$5 = new Vector2();
 
-		return function setFromCenterAndSize( center, size ) {
+		var halfSize = _vector$5.copy( size ).multiplyScalar( 0.5 );
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
-			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
-			this.min.copy( center ).sub( halfSize );
-			this.max.copy( center ).add( halfSize );
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	clone: function () {
 
@@ -45096,18 +45078,14 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
 
-		var v1 = new Vector2();
+		if ( _vector$5 === undefined ) _vector$5 = new Vector2();
 
-		return function distanceToPoint( point ) {
+		var clampedPoint = _vector$5.copy( point ).clamp( this.min, this.max );
+		return clampedPoint.sub( point ).length();
 
-			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
-
-		};
-
-	}(),
+	},
 
 	intersect: function ( box ) {
 

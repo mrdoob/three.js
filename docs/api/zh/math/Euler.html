@@ -53,29 +53,21 @@
 			Three.js 使用<em>intrinsic</em> Tait-Bryan angles（Yaw、Pitch、Roll）。
 			这意味着旋转是在<em>本地</em>坐标系下进行的。也就是说，对于“XYZ”顺序，首先是围绕local-X轴旋转(与world- x轴相同)，
 			然后是local-Y(现在可能与world y轴不同)，然后是local-Z(可能与world z轴不同)。<br /><br />
-
-			如果order值被改变，[page:.onChangeCallback onChangeCallback] 会被调用。
 		</p>
 
 		<h3>[property:Float x]</h3>
 		<p>
 			当前x分量的值。<br /><br />
-
-			如果这个值发生变化，[page:.onChangeCallback onChangeCallback] 会被调用。
 		</p>
 
 		<h3>[property:Float y]</h3>
 		<p>
 			当前y分量的值。<br /><br />
-
-			如果这个值发生变化，[page:.onChangeCallback onChangeCallback] 会被调用。
 		</p>
 
 		<h3>[property:Float z]</h3>
 		<p>
 			当前z分量的值。<br /><br />
-
-			如果这个值发生变化，[page:.onChangeCallback onChangeCallback] 会被调用。
 		</p>
 
 		<h2>方法（Methods）</h2>
@@ -99,18 +91,6 @@
 		将array[3]设置给欧拉角的 [page:.order order] 。可选。
 		</p>
 
-		<h3>[method:Euler onChange]( [param:Function onChangeCallback] )</h3>
-		<p>
-			[page:Function onChangeCallback] - 为 onChangeCallback() 函数赋值。
-		</p>
-
-		<h3>[method:Euler onChangeCallback](  )</h3>
-		<p>
-			默认情况下，这个函数为空，但是它可以通过[page:.onChange onChange]()来设置。<br />
-			在更改 [page:.x x], [page:.y y], [page:.z z] 或 [page:.order order] 属性之后调用它，
-			在调用大多数setter函数之后也会调用它(详细信息请参阅那些函数)。
-		</p>
-
 		<h3>[method:Euler reorder]( [param:String newOrder] )</h3>
 		<p>
 		通过这个欧拉角创建一个四元数，然后用这个四元数和新顺序设置这个欧拉角。 <br /><br />
@@ -125,24 +105,22 @@
 			[page:.z z] - 用弧度表示z轴旋转量。<br />
 			[page:.order order] - (optional) 表示旋转顺序的字符串。<br /><br />
 
-			设置该欧拉变换的角度和旋转顺序 [page:.order order] ，然后调用  [page:.onChangeCallback onChangeCallback]()。
+			设置该欧拉变换的角度和旋转顺序 [page:.order order]。
 		</p>
 
-		<h3>[method:Euler setFromRotationMatrix]( [param:Matrix4 m], [param:String order], [param:Boolean update] )</h3>
+		<h3>[method:Euler setFromRotationMatrix]( [param:Matrix4 m], [param:String order])</h3>
 		<p>
 		[page:Matrix4 m] - [page:Matrix4] 矩阵上面的3x3部分是一个纯旋转矩阵[link:https://en.wikipedia.org/wiki/Rotation_matrix rotation matrix]
 		（也就是不发生缩放）<br />
 		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br />
-		[page:Boolean update] - (可选参数) 表示设置完变换矩阵后是否调用 [page:.onChangeCallback onChangeCallback]。<br /><br />
 
 		使用基于 [page:.order order] 顺序的纯旋转矩阵来设置当前欧拉角。
 		</p>
 
-		<h3>[method:Euler setFromQuaternion]( [param:Quaternion q], [param:String order], [param:Boolean update] )</h3>
+		<h3>[method:Euler setFromQuaternion]( [param:Quaternion q], [param:String order] )</h3>
 		<p>
 		[page:Quaternion q] - 归一化的四元数。<br />
 		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br />
-		[page:Boolean update] - (可选参数) 表示设置完变换矩阵后是否调用 [page:.onChangeCallback onChangeCallback]。<br /><br />
 
 		根据 [page:.order order] 指定的方向，使用归一化四元数设置这个欧拉变换的角度。
 		</p>
@@ -154,7 +132,6 @@
 		[page:.order order] - (可选参数) 表示旋转顺序的字符串。<br /><br />
 
 		设置 [page:.x x], [page:.y y] and [page:.z z] 并且选择性更新 [page:.order order]。
-		更改完成之后调用 [page:.onChangeCallback onChangeCallback]()。
 		</p>
 
 
