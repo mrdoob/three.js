@@ -4,5 +4,5 @@ import {
 
 export namespace MtlObjBridge {
   export function link(processResult: object, assetLoader: object): void;
-  export function addMaterialsFromMtlLoader(materialCreator: MaterialCreator): void;
+  export function addMaterialsFromMtlLoader(materialCreator: MaterialCreator): object;
 }
