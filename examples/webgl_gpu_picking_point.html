@@ -49,13 +49,15 @@
 	//
 	// }
 
-	var camera, scene, renderer, stats, pickingScene, gui;
+	var renderCamera, scene, renderer, stats, pickingScene, gui;
 
 	var mesh;
 	var mesh1;
 
 	var controls;
 	let raycaster;
+
+	var pickingCamera
 
 	var GPUPickingPoint = new THREE.Vector3();
 	var CPUPickingPoint = new THREE.Vector3();
@@ -67,9 +69,11 @@
 
 		//
 		raycaster = new THREE.Raycaster();
-		camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-		camera.up.set(0, 0, 1);
-		camera.position.x = 64;
+		renderCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+		pickingCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+		renderCamera.up.set(0, 0, 1);
+		pickingCamera.up.set(0, 0, 1);
+		renderCamera.position.x = 64;
 
 		scene = new THREE.Scene();
 		pickingScene = new THREE.Scene();
@@ -132,16 +136,16 @@
 		CPUPFolder.add(CPUPickingPoint, 'z');
 		//
 
-		controls = new OrbitControls(camera, renderer.domElement);
+		controls = new OrbitControls(renderCamera, renderer.domElement);
 		controls.rotateSpeed = 5.0;
 		controls.zoomSpeed = 5;
 		controls.panSpeed = 2;
 
-		controls.noZoom = false;
-		controls.noPan = false;
+		controls.enableZoom = true;
+		controls.enablePan = true;
 
-		controls.staticMoving = true;
-		controls.dynamicDampingFactor = 0.3;
+		controls.enableDamping = false;
+		controls.dampingFactor = 0.3;
 
 		//
 
@@ -152,10 +156,12 @@
 
 	function pick(e) {
 
+		var camera = renderCamera;
+
 		var x = e.clientX;
 		var y = renderer.domElement.height - e.clientY;
 
-		var pX = 2 * x / renderer.domElement.width - 1; //归一化为标准化设备坐标系
+		var pX = 2 * x / renderer.domElement.width - 1;
 		var pY = 2 * y / renderer.domElement.height - 1;
 
 		let mouseVector = new THREE.Vector3();
@@ -175,7 +181,9 @@
 		var pixelBuffer = new Uint8Array(4);
 		//read the pixel
 		renderer.readRenderTargetPixels(pickingTexture, 0, 0, 1, 1, pixelBuffer);
-		//interpret the pixel as an ID
+		camera.clearViewOffset();
+
+		//convert color to depth which between [0,1]
 		var temp = 256;
 		var depth = 0;
 		for (var i = 3; i >= 0; --i) {
@@ -184,20 +192,39 @@
 		}
 		// var depth = (pixelBuffer[0] << 24 | pixelBuffer[1] << 16 | pixelBuffer[2] << 8 | pixelBuffer[3]) / (256 * 256 * 256 * 256);
 
-		// var d = camera.far * depth;
+		// compute the depth from the camera which between [0,far];
 		depth = camera.near * camera.far / (camera.near * depth + camera.far * (1 - depth));
 
-		if (depth > 500) {
+		let direction = raycaster.ray.direction.normalize();
+		var target = new THREE.Vector3();
+		camera.getWorldDirection(target);
+		var dist = depth / target.dot(raycaster.ray.direction);
 
-			var savedNear = camera.near;
-			camera.near = depth * 0.95;
+		GPUPickingPoint.addVectors(camera.position, new THREE.Vector3().copy(direction).multiplyScalar(dist));
+
+
+		if (depth > 100) {
+			camera = pickingCamera;
+			// var savedNear = camera.near;
+			// camera.near = depth - 0.5;
+
+			let pickingCameraPosition = new THREE.Vector3();
+			let pickingCameraLookAt = new THREE.Vector3();
+			//why is 0.999 ,when depth is 10000 the point error is 1~10,if big than that value,the result could be wrong
+			pickingCameraPosition.addVectors(renderCamera.position, new THREE.Vector3().copy(direction).multiplyScalar((dist - camera.near) * 0.999));
+			pickingCameraLookAt.addVectors(renderCamera.position, new THREE.Vector3().copy(direction).multiplyScalar(dist));
+			camera.position.set(pickingCameraPosition.x, pickingCameraPosition.y, pickingCameraPosition.z);
+			camera.lookAt(pickingCameraLookAt);
+			// renderCamera.position.set(pickingCameraPosition.x, pickingCameraPosition.y, pickingCameraPosition.z);
+			// renderCamera.lookAt(pickingCameraLookAt);
 			camera.updateProjectionMatrix();
+
 			var pickingTexture = new THREE.WebGLRenderTarget(renderer.domElement.width, renderer.domElement.height);
 
 			renderer.setRenderTarget(pickingTexture);
 			renderer.render(pickingScene, camera);
 
-			renderer.readRenderTargetPixels(pickingTexture, 0, 0, 1, 1, pixelBuffer);
+			renderer.readRenderTargetPixels(pickingTexture, renderer.domElement.width / 2, renderer.domElement.height / 2, 1, 1, pixelBuffer);
 
 			//
 
@@ -208,17 +235,11 @@
 				temp *= 256;
 			}
 			depth = camera.near * camera.far / (camera.near * depth + camera.far * (1 - depth));
-
-			camera.near = savedNear;
-			camera.updateProjectionMatrix();
+			GPUPickingPoint.addVectors(camera.position, new THREE.Vector3().copy(direction).multiplyScalar(depth));
+			// camera.near = savedNear;
+			// camera.updateProjectionMatrix();
 		}
 
-		let direction = raycaster.ray.direction.normalize();
-		var target = new THREE.Vector3();
-		camera.getWorldDirection(target);
-		var dist = depth / target.dot(raycaster.ray.direction);
-
-		GPUPickingPoint.addVectors(camera.position, new THREE.Vector3().copy(direction).multiplyScalar(dist));
 
 		let intersectObject = raycaster.intersectObject(mesh);
 
@@ -239,7 +260,6 @@
 			gui.updateDisplay();
 		}
 
-		camera.clearViewOffset();
 		renderer.setRenderTarget(null);
 	}
 
@@ -268,7 +288,7 @@
 
 		controls.update();
 
-		renderer.render(scene, camera);
+		renderer.render(scene, renderCamera);
 
 	}
 
