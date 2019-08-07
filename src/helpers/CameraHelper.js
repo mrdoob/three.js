@@ -17,6 +17,8 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
+var _vector, _camera;
+
 function CameraHelper( camera ) {
 
 	var geometry = new BufferGeometry();
@@ -126,85 +128,79 @@ CameraHelper.prototype.constructor = CameraHelper;
 
 CameraHelper.prototype.update = function () {
 
-	var geometry, pointMap;
+	if ( _camera === undefined ) _camera = new Camera();
 
-	var vector = new Vector3();
-	var camera = new Camera();
+	var geometry = this.geometry;
+	var pointMap = this.pointMap;
 
-	function setPoint( point, x, y, z ) {
+	var w = 1, h = 1;
 
-		vector.set( x, y, z ).unproject( camera );
+	// we need just camera projection matrix inverse
+	// world matrix must be identity
 
-		var points = pointMap[ point ];
+	_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
-		if ( points !== undefined ) {
+	// center / target
 
-			var position = geometry.getAttribute( 'position' );
+	setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
+	setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
 
-			for ( var i = 0, l = points.length; i < l; i ++ ) {
+	// near
 
-				position.setXYZ( points[ i ], vector.x, vector.y, vector.z );
+	setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
+	setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
+	setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
+	setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
 
-			}
+	// far
+
+	setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
+	setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
+	setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
+	setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
+
+	// up
+
+	setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
+	setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
+	setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
+
+	// cross
+
+	setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
+	setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
+	setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
+	setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
+
+	setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
+	setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
+	setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
+	setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
+
+	geometry.getAttribute( 'position' ).needsUpdate = true;
+
+};
+
+function setPoint( point, pointMap, geometry, camera, x, y, z ) {
+
+	if ( _vector === undefined ) _vector = new Vector3();
+
+	_vector.set( x, y, z ).unproject( camera );
+
+	var points = pointMap[ point ];
+
+	if ( points !== undefined ) {
+
+		var position = geometry.getAttribute( 'position' );
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			position.setXYZ( points[ i ], _vector.x, _vector.y, _vector.z );
 
 		}
 
 	}
 
-	return function update() {
-
-		geometry = this.geometry;
-		pointMap = this.pointMap;
-
-		var w = 1, h = 1;
-
-		// we need just camera projection matrix inverse
-		// world matrix must be identity
-
-		camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
-
-		// center / target
-
-		setPoint( 'c', 0, 0, - 1 );
-		setPoint( 't', 0, 0, 1 );
-
-		// near
-
-		setPoint( 'n1', - w, - h, - 1 );
-		setPoint( 'n2', w, - h, - 1 );
-		setPoint( 'n3', - w, h, - 1 );
-		setPoint( 'n4', w, h, - 1 );
-
-		// far
-
-		setPoint( 'f1', - w, - h, 1 );
-		setPoint( 'f2', w, - h, 1 );
-		setPoint( 'f3', - w, h, 1 );
-		setPoint( 'f4', w, h, 1 );
-
-		// up
-
-		setPoint( 'u1', w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u2', - w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u3', 0, h * 2, - 1 );
-
-		// cross
-
-		setPoint( 'cf1', - w, 0, 1 );
-		setPoint( 'cf2', w, 0, 1 );
-		setPoint( 'cf3', 0, - h, 1 );
-		setPoint( 'cf4', 0, h, 1 );
-
-		setPoint( 'cn1', - w, 0, - 1 );
-		setPoint( 'cn2', w, 0, - 1 );
-		setPoint( 'cn3', 0, - h, - 1 );
-		setPoint( 'cn4', 0, h, - 1 );
-
-		geometry.getAttribute( 'position' ).needsUpdate = true;
-
-	};
-
-}();
-
+}
 
 export { CameraHelper };
