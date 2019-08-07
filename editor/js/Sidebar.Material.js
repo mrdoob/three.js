@@ -351,6 +351,22 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialNormalMapRow );
 
+	// clearcoat normal map
+
+	var materialClearCoatNormalMapRow = new UI.Row();
+	var materialClearCoatNormalMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialClearCoatNormalMap = new UI.Texture().onChange( update );
+	var materialClearCoatNormalScaleX = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
+	var materialClearCoatNormalScaleY = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
+
+	materialClearCoatNormalMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoatnormalmap' ) ).setWidth( '90px' ) );
+	materialClearCoatNormalMapRow.add( materialClearCoatNormalMapEnabled );
+	materialClearCoatNormalMapRow.add( materialClearCoatNormalMap );
+	materialClearCoatNormalMapRow.add( materialClearCoatNormalScaleX );
+	materialClearCoatNormalMapRow.add( materialClearCoatNormalScaleY );
+
+	container.add( materialClearCoatNormalMapRow );
+
 	// displacement map
 
 	var materialDisplacementMapRow = new UI.Row();
@@ -796,6 +812,39 @@ Sidebar.Material = function ( editor ) {
 				} else {
 
 					if ( normalMapEnabled ) textureWarning = true;
+
+				}
+
+			}
+
+			if ( material.clearCoatNormalMap !== undefined ) {
+
+				var clearCoatNormalMapEnabled = materialClearCoatNormalMapEnabled.getValue() === true;
+
+				if ( objectHasUvs ) {
+
+					var clearCoatNormalMap = clearCoatNormalMapEnabled ? materialClearCoatNormalMap.getValue() : null;
+
+					if ( material.clearCoatNormalMap !== clearCoatNormalMap ) {
+
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'clearCoatNormalMap', clearCoatNormalMap, currentMaterialSlot ) );
+
+					}
+
+					if ( material.clearCoatNormalScale.x !== materialClearCoatNormalScaleX.getValue() ||
+						material.clearCoatNormalScale.y !== materialClearCoatNormalScaleY.getValue() ) {
+
+						var value = [
+							materialClearCoatNormalScaleX.getValue(),
+							materialClearCoatNormalScaleY.getValue()
+						];
+						editor.execute( new SetMaterialVectorCommand( editor, currentObject, 'clearCoatNormalScale', value, currentMaterialSlot ) );
+
+					}
+
+				} else {
+
+					if ( clearCoatNormalMapEnabled ) textureWarning = true;
 
 				}
 
@@ -1330,6 +1379,21 @@ Sidebar.Material = function ( editor ) {
 
 			materialNormalScaleX.setValue( material.normalScale.x );
 			materialNormalScaleY.setValue( material.normalScale.y );
+
+		}
+
+		if ( material.clearCoatNormalMap !== undefined ) {
+
+			materialClearCoatNormalMapEnabled.setValue( material.clearCoatNormalMap !== null );
+
+			if ( material.clearCoatNormalMap !== null || resetTextureSelectors ) {
+
+				materialClearCoatNormalMap.setValue( material.clearCoatNormalMap );
+
+			}
+
+			materialClearCoatNormalScaleX.setValue( material.clearCoatNormalScale.x );
+			materialClearCoatNormalScaleY.setValue( material.clearCoatNormalScale.y );
 
 		}
 
