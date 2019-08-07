@@ -39,12 +39,12 @@ THREE.CubeTexturePass.prototype = Object.assign( Object.create( THREE.Pass.proto
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		this.cubeCamera.projectionMatrix.copy( camera.projectionMatrix );
+		this.cubeCamera.copy( camera );
 		this.cubeCamera.near = 0.01;
 		this.cubeCamera.far = 20;
-		this.cubeCamera.aspect = camera.aspect;
-		this.cubeCamera.updateProjectionMatrix();
+		this.cubeCamera.position.set(0, 0, 0);
 		this.cubeCamera.quaternion.setFromRotationMatrix( camera.matrixWorld );
+		this.cubeCamera.updateProjectionMatrix();
 		if( this.cubeMaterial.envMap != this.envMap ) {
 			this.cubeMaterial.envMap = this.envMap;
 			this.cubeMaterial.needsUpdate = true;
