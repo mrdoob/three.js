@@ -52,26 +52,15 @@
 			camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.z = 1000;
 
-			var genCubeUrls = function ( prefix, postfix ) {
-
-				return [
-					prefix + 'px' + postfix, prefix + 'nx' + postfix,
-					prefix + 'py' + postfix, prefix + 'ny' + postfix,
-					prefix + 'pz' + postfix, prefix + 'nz' + postfix
-				];
-
-			};
-
 			scene = new THREE.Scene();
 
 			group = new THREE.Group();
 			scene.add( group );
 
-			var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
-
 			new HDRCubeTextureLoader()
 				.setType( THREE.UnsignedByteType )
-				.load( hdrUrls,
+				.setPath( './textures/cube/pisaHDR/' )
+				.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
 					function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
@@ -172,14 +161,13 @@
 
 			// LIGHTS
 
-			particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+			particleLight = new THREE.Mesh(
+				new THREE.SphereBufferGeometry( 4, 8, 8 ),
+				new THREE.MeshBasicMaterial( { color: 0xffffff } )
+			);
 			scene.add( particleLight );
 
-			var ambientLight = new THREE.AmbientLight( 0x444444 );
-			scene.add( ambientLight );
-
-			var pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
-			particleLight.add( pointLight );
+			particleLight.add( new THREE.PointLight( 0xffffff, 1.25 ) );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
