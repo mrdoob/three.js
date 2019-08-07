@@ -24,6 +24,10 @@ geometry.viewDir = normalize( vViewPosition );
 
 	geometry.clearCoatNormal = clearCoatNormal;
 
+#else
+
+	geometry.clearCoatNormal = geometryNormal;
+
 #endif
 
 IncidentLight directLight;
