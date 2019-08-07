@@ -41,12 +41,6 @@ UI.Texture = function ( mapping ) {
 	}, false );
 	dom.appendChild( canvas );
 
-	var name = document.createElement( 'input' );
-	name.disabled = true;
-	name.style.width = '64px';
-	name.style.border = '1px solid #ccc';
-	dom.appendChild( name );
-
 	function loadFile( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
@@ -122,7 +116,6 @@ UI.Texture.prototype.getValue = function () {
 UI.Texture.prototype.setValue = function ( texture ) {
 
 	var canvas = this.dom.children[ 0 ];
-	var name = this.dom.children[ 1 ];
 	var context = canvas.getContext( '2d' );
 
 	if ( texture !== null ) {
@@ -131,21 +124,21 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 		if ( image !== undefined && image.width > 0 ) {
 
-			name.value = texture.sourceFile;
+			canvas.title = texture.sourceFile;
 
 			var scale = canvas.width / image.width;
 			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
 
 		} else {
 
-			name.value = texture.sourceFile + ' (error)';
+			canvas.title = texture.sourceFile + ' (error)';
 			context.clearRect( 0, 0, canvas.width, canvas.height );
 
 		}
 
 	} else {
 
-		name.value = '';
+		canvas.title = 'empty';
 
 		if ( context !== null ) {
 
