@@ -40,7 +40,7 @@ THREE.Sky.SkyShader = {
 		"mieCoefficient": { value: 0.005 },
 		"mieDirectionalG": { value: 0.8 },
 		"sunPosition": { value: new THREE.Vector3() },
-		"up": { value: new THREE.Vector3(0, 1, 0) }
+		"up": { value: new THREE.Vector3( 0, 1, 0 ) }
 	},
 
 	vertexShader: [
