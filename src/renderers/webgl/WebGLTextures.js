@@ -407,13 +407,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
 
-							var mipmap;
-
 							for ( var j = 0; j < mipmaps.length; ++ j ) {
 
-								mipmap = mipmaps[ j ];
+								var mipmap = mipmaps[ j ];
+								var image = mipmap.image[ i ].image;
 
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmap.image[ i ].image.width, mipmap.image[ i ].image.height, 0, glFormat, glType, mipmap.images[ i ].image.data );
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
 
 							}
 
@@ -421,11 +420,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
 
-							var mipmap;
-
 							for ( var j = 0; j < mipmaps.length; ++ j ) {
 
-								mipmap = mipmaps[ j ];
+								var mipmap = mipmaps[ j ];
 
 								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
 
@@ -435,11 +432,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					} else {
 
-						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
+						var mipmaps = cubeImage[ i ].mipmaps;
 
 						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
-							mipmap = mipmaps[ j ];
+							var mipmap = mipmaps[ j ];
 
 							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
