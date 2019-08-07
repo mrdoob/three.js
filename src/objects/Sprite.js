@@ -13,7 +13,12 @@ import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { SpriteMaterial } from '../materials/SpriteMaterial.js';
 
-var geometry;
+var _geometry;
+
+var _intersectPoint, _worldScale, _mvPosition;
+var _alignedPosition, _rotatedPosition, _viewWorldMatrix;
+var _vA, _vB, _vC;
+var _uvA, _uvB, _uvC;
 
 function Sprite( material ) {
 
@@ -21,9 +26,9 @@ function Sprite( material ) {
 
 	this.type = 'Sprite';
 
-	if ( geometry === undefined ) {
+	if ( _geometry === undefined ) {
 
-		geometry = new BufferGeometry();
+		_geometry = new BufferGeometry();
 
 		var float32Array = new Float32Array( [
 			- 0.5, - 0.5, 0, 0, 0,
@@ -34,13 +39,13 @@ function Sprite( material ) {
 
 		var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
-		geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-		geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-		geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+		_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+		_geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+		_geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	}
 
-	this.geometry = geometry;
+	this.geometry = _geometry;
 	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
 
 	this.center = new Vector2( 0.5, 0.5 );
@@ -53,120 +58,93 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isSprite: true,
 
-	raycast: ( function () {
+	raycast: function ( raycaster, intersects ) {
 
-		var intersectPoint = new Vector3();
-		var worldScale = new Vector3();
-		var mvPosition = new Vector3();
+		if ( _uvC === undefined ) {
 
-		var alignedPosition = new Vector2();
-		var rotatedPosition = new Vector2();
-		var viewWorldMatrix = new Matrix4();
+			_intersectPoint = new Vector3();
+			_worldScale = new Vector3();
+			_mvPosition = new Vector3();
 
-		var vA = new Vector3();
-		var vB = new Vector3();
-		var vC = new Vector3();
+			_alignedPosition = new Vector2();
+			_rotatedPosition = new Vector2();
+			_viewWorldMatrix = new Matrix4();
 
-		var uvA = new Vector2();
-		var uvB = new Vector2();
-		var uvC = new Vector2();
+			_vA = new Vector3();
+			_vB = new Vector3();
+			_vC = new Vector3();
 
-		function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
-
-			// compute position in camera space
-			alignedPosition.subVectors( vertexPosition, center ).addScalar( 0.5 ).multiply( scale );
-
-			// to check if rotation is not zero
-			if ( sin !== undefined ) {
-
-				rotatedPosition.x = ( cos * alignedPosition.x ) - ( sin * alignedPosition.y );
-				rotatedPosition.y = ( sin * alignedPosition.x ) + ( cos * alignedPosition.y );
-
-			} else {
-
-				rotatedPosition.copy( alignedPosition );
-
-			}
-
-
-			vertexPosition.copy( mvPosition );
-			vertexPosition.x += rotatedPosition.x;
-			vertexPosition.y += rotatedPosition.y;
-
-			// transform to world space
-			vertexPosition.applyMatrix4( viewWorldMatrix );
+			_uvA = new Vector2();
+			_uvB = new Vector2();
+			_uvC = new Vector2();
 
 		}
 
-		return function raycast( raycaster, intersects ) {
+		_worldScale.setFromMatrixScale( this.matrixWorld );
 
-			worldScale.setFromMatrixScale( this.matrixWorld );
+		_viewWorldMatrix.copy( raycaster._camera.matrixWorld );
+		this.modelViewMatrix.multiplyMatrices( raycaster._camera.matrixWorldInverse, this.matrixWorld );
 
-			viewWorldMatrix.copy( raycaster._camera.matrixWorld );
-			this.modelViewMatrix.multiplyMatrices( raycaster._camera.matrixWorldInverse, this.matrixWorld );
+		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
 
-			mvPosition.setFromMatrixPosition( this.modelViewMatrix );
+		if ( raycaster._camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
 
-			if ( raycaster._camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
+			_worldScale.multiplyScalar( - _mvPosition.z );
 
-				worldScale.multiplyScalar( - mvPosition.z );
+		}
 
-			}
+		var rotation = this.material.rotation;
+		var sin, cos;
+		if ( rotation !== 0 ) {
 
-			var rotation = this.material.rotation;
-			var sin, cos;
-			if ( rotation !== 0 ) {
+			cos = Math.cos( rotation );
+			sin = Math.sin( rotation );
 
-				cos = Math.cos( rotation );
-				sin = Math.sin( rotation );
+		}
 
-			}
+		var center = this.center;
 
-			var center = this.center;
+		transformVertex( _vA.set( - 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( _vB.set( 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( _vC.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
 
-			transformVertex( vA.set( - 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
-			transformVertex( vB.set( 0.5, - 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
-			transformVertex( vC.set( 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
+		_uvA.set( 0, 0 );
+		_uvB.set( 1, 0 );
+		_uvC.set( 1, 1 );
 
-			uvA.set( 0, 0 );
-			uvB.set( 1, 0 );
-			uvC.set( 1, 1 );
+		// check first triangle
+		var intersect = raycaster.ray.intersectTriangle( _vA, _vB, _vC, false, _intersectPoint );
 
-			// check first triangle
-			var intersect = raycaster.ray.intersectTriangle( vA, vB, vC, false, intersectPoint );
+		if ( intersect === null ) {
 
+			// check second triangle
+			transformVertex( _vB.set( - 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+			_uvB.set( 0, 1 );
+
+			intersect = raycaster.ray.intersectTriangle( _vA, _vC, _vB, false, _intersectPoint );
 			if ( intersect === null ) {
 
-				// check second triangle
-				transformVertex( vB.set( - 0.5, 0.5, 0 ), mvPosition, center, worldScale, sin, cos );
-				uvB.set( 0, 1 );
-
-				intersect = raycaster.ray.intersectTriangle( vA, vC, vB, false, intersectPoint );
-				if ( intersect === null ) {
-
-					return;
-
-				}
+				return;
 
 			}
 
-			var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+		}
 
-			if ( distance < raycaster.near || distance > raycaster.far ) return;
+		var distance = raycaster.ray.origin.distanceTo( _intersectPoint );
 
-			intersects.push( {
+		if ( distance < raycaster.near || distance > raycaster.far ) return;
 
-				distance: distance,
-				point: intersectPoint.clone(),
-				uv: Triangle.getUV( intersectPoint, vA, vB, vC, uvA, uvB, uvC, new Vector2() ),
-				face: null,
-				object: this
+		intersects.push( {
 
-			} );
+			distance: distance,
+			point: _intersectPoint.clone(),
+			uv: Triangle.getUV( _intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() ),
+			face: null,
+			object: this
 
-		};
+		} );
 
-	}() ),
+	},
 
 	clone: function () {
 
@@ -186,5 +164,32 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 
 } );
+
+function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
+
+	// compute position in camera space
+	_alignedPosition.subVectors( vertexPosition, center ).addScalar( 0.5 ).multiply( scale );
+
+	// to check if rotation is not zero
+	if ( sin !== undefined ) {
+
+		_rotatedPosition.x = ( cos * _alignedPosition.x ) - ( sin * _alignedPosition.y );
+		_rotatedPosition.y = ( sin * _alignedPosition.x ) + ( cos * _alignedPosition.y );
+
+	} else {
+
+		_rotatedPosition.copy( _alignedPosition );
+
+	}
+
+
+	vertexPosition.copy( mvPosition );
+	vertexPosition.x += _rotatedPosition.x;
+	vertexPosition.y += _rotatedPosition.y;
+
+	// transform to world space
+	vertexPosition.applyMatrix4( _viewWorldMatrix );
+
+}
 
 export { Sprite };

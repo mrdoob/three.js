@@ -10,6 +10,8 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
+var _inverseMatrix, _ray, _sphere;
+
 function Points( geometry, material ) {
 
 	Object3D.call( this );
@@ -29,114 +31,114 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isPoints: true,
 
-	raycast: ( function () {
+	raycast: function ( raycaster, intersects ) {
 
-		var inverseMatrix = new Matrix4();
-		var ray = new Ray();
-		var sphere = new Sphere();
+		if ( _sphere === undefined ) {
 
-		return function raycast( raycaster, intersects ) {
+			_inverseMatrix = new Matrix4();
+			_ray = new Ray();
+			_sphere = new Sphere();
 
-			var object = this;
-			var geometry = this.geometry;
-			var matrixWorld = this.matrixWorld;
-			var threshold = raycaster.params.Points.threshold;
+		}
 
-			// Checking boundingSphere distance to ray
+		var object = this;
+		var geometry = this.geometry;
+		var matrixWorld = this.matrixWorld;
+		var threshold = raycaster.params.Points.threshold;
 
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+		// Checking boundingSphere distance to ray
 
-			sphere.copy( geometry.boundingSphere );
-			sphere.applyMatrix4( matrixWorld );
-			sphere.radius += threshold;
+		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			if ( raycaster.ray.intersectsSphere( sphere ) === false ) return;
+		_sphere.copy( geometry.boundingSphere );
+		_sphere.applyMatrix4( matrixWorld );
+		_sphere.radius += threshold;
 
-			//
+		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
-			inverseMatrix.getInverse( matrixWorld );
-			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+		//
 
-			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-			var localThresholdSq = localThreshold * localThreshold;
-			var position = new Vector3();
-			var intersectPoint = new Vector3();
+		_inverseMatrix.getInverse( matrixWorld );
+		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-			function testPoint( point, index ) {
+		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		var localThresholdSq = localThreshold * localThreshold;
+		var position = new Vector3();
+		var intersectPoint = new Vector3();
 
-				var rayPointDistanceSq = ray.distanceSqToPoint( point );
+		function testPoint( point, index ) {
 
-				if ( rayPointDistanceSq < localThresholdSq ) {
+			var rayPointDistanceSq = _ray.distanceSqToPoint( point );
 
-					ray.closestPointToPoint( point, intersectPoint );
-					intersectPoint.applyMatrix4( matrixWorld );
+			if ( rayPointDistanceSq < localThresholdSq ) {
 
-					var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+				_ray.closestPointToPoint( point, intersectPoint );
+				intersectPoint.applyMatrix4( matrixWorld );
 
-					if ( distance < raycaster.near || distance > raycaster.far ) return;
+				var distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
-					intersects.push( {
+				if ( distance < raycaster.near || distance > raycaster.far ) return;
 
-						distance: distance,
-						distanceToRay: Math.sqrt( rayPointDistanceSq ),
-						point: intersectPoint.clone(),
-						index: index,
-						face: null,
-						object: object
+				intersects.push( {
 
-					} );
+					distance: distance,
+					distanceToRay: Math.sqrt( rayPointDistanceSq ),
+					point: intersectPoint.clone(),
+					index: index,
+					face: null,
+					object: object
 
-				}
+				} );
 
 			}
 
-			if ( geometry.isBufferGeometry ) {
+		}
 
-				var index = geometry.index;
-				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
+		if ( geometry.isBufferGeometry ) {
 
-				if ( index !== null ) {
+			var index = geometry.index;
+			var attributes = geometry.attributes;
+			var positions = attributes.position.array;
 
-					var indices = index.array;
+			if ( index !== null ) {
 
-					for ( var i = 0, il = indices.length; i < il; i ++ ) {
+				var indices = index.array;
 
-						var a = indices[ i ];
+				for ( var i = 0, il = indices.length; i < il; i ++ ) {
 
-						position.fromArray( positions, a * 3 );
+					var a = indices[ i ];
 
-						testPoint( position, a );
+					position.fromArray( positions, a * 3 );
 
-					}
-
-				} else {
-
-					for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
-
-						position.fromArray( positions, i * 3 );
-
-						testPoint( position, i );
-
-					}
+					testPoint( position, a );
 
 				}
 
 			} else {
 
-				var vertices = geometry.vertices;
+				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+					position.fromArray( positions, i * 3 );
 
-					testPoint( vertices[ i ], i );
+					testPoint( position, i );
 
 				}
 
 			}
 
-		};
+		} else {
 
-	}() ),
+			var vertices = geometry.vertices;
+
+			for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+
+				testPoint( vertices[ i ], i );
+
+			}
+
+		}
+
+	},
 
 	updateMorphTargets: function () {
 
