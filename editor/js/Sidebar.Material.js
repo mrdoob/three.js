@@ -340,10 +340,14 @@ Sidebar.Material = function ( editor ) {
 	var materialNormalMapRow = new UI.Row();
 	var materialNormalMapEnabled = new UI.Checkbox( false ).onChange( update );
 	var materialNormalMap = new UI.Texture().onChange( update );
+	var materialNormalScaleX = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
+	var materialNormalScaleY = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialNormalMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/normalmap' ) ).setWidth( '90px' ) );
 	materialNormalMapRow.add( materialNormalMapEnabled );
 	materialNormalMapRow.add( materialNormalMap );
+	materialNormalMapRow.add( materialNormalScaleX );
+	materialNormalMapRow.add( materialNormalScaleY );
 
 	container.add( materialNormalMapRow );
 
@@ -775,6 +779,17 @@ Sidebar.Material = function ( editor ) {
 					if ( material.normalMap !== normalMap ) {
 
 						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'normalMap', normalMap, currentMaterialSlot ) );
+
+					}
+
+					if ( material.normalScale.x !== materialNormalScaleX.getValue() ||
+						material.normalScale.y !== materialNormalScaleY.getValue() ) {
+
+						var value = [
+							materialNormalScaleX.getValue(),
+							materialNormalScaleY.getValue()
+						];
+						editor.execute( new SetMaterialVectorCommand( editor, currentObject, 'normalScale', value, currentMaterialSlot ) );
 
 					}
 
@@ -1312,6 +1327,9 @@ Sidebar.Material = function ( editor ) {
 				materialNormalMap.setValue( material.normalMap );
 
 			}
+
+			materialNormalScaleX.setValue( material.normalScale.x );
+			materialNormalScaleY.setValue( material.normalScale.y );
 
 		}
 
