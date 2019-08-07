@@ -39,7 +39,8 @@ THREE.Sky.SkyShader = {
 		"rayleigh": { value: 1 },
 		"mieCoefficient": { value: 0.005 },
 		"mieDirectionalG": { value: 0.8 },
-		"sunPosition": { value: new THREE.Vector3() }
+		"sunPosition": { value: new THREE.Vector3() },
+		"up": { value: new THREE.Vector3(0, 1, 0) }
 	},
 
 	vertexShader: [
@@ -47,6 +48,7 @@ THREE.Sky.SkyShader = {
 		'uniform float rayleigh;',
 		'uniform float turbidity;',
 		'uniform float mieCoefficient;',
+		'uniform vec3 up;',
 
 		'varying vec3 vWorldPosition;',
 		'varying vec3 vSunDirection;',
@@ -54,8 +56,6 @@ THREE.Sky.SkyShader = {
 		'varying vec3 vBetaR;',
 		'varying vec3 vBetaM;',
 		'varying float vSunE;',
-
-		'const vec3 up = vec3( 0.0, 1.0, 0.0 );',
 
 		// constants for atmospheric scattering
 		'const float e = 2.71828182845904523536028747135266249775724709369995957;',
@@ -126,6 +126,7 @@ THREE.Sky.SkyShader = {
 
 		'uniform float luminance;',
 		'uniform float mieDirectionalG;',
+		'uniform vec3 up;',
 
 		'const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );',
 
@@ -138,7 +139,6 @@ THREE.Sky.SkyShader = {
 		// optical length at zenith for molecules
 		'const float rayleighZenithLength = 8.4E3;',
 		'const float mieZenithLength = 1.25E3;',
-		'const vec3 up = vec3( 0.0, 1.0, 0.0 );',
 		// 66 arc seconds -> degrees, and the cosine of that
 		'const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;',
 
