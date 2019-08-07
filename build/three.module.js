@@ -17554,6 +17554,8 @@ function getEncodingComponents( encoding ) {
 			return [ 'RGBD', '( value, 256.0 )' ];
 		case GammaEncoding:
 			return [ 'Gamma', '( value, float( GAMMA_FACTOR ) )' ];
+		case LogLuvEncoding:
+			return [ 'LogLuv', '( value )' ];
 		default:
 			throw new Error( 'unsupported encoding: ' + encoding );
 
@@ -21320,6 +21322,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				setTextureParameters( 34067, texture, supportsMips );
 
+				var mipmaps = texture.mipmaps;
+
 				for ( var i = 0; i < 6; i ++ ) {
 
 					if ( ! isCompressed ) {
@@ -21328,19 +21332,36 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							state.texImage2D( 34069 + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
 
+							for ( var j = 0; j < mipmaps.length; ++ j ) {
+
+								var mipmap = mipmaps[ j ];
+								var image = mipmap.image[ i ].image;
+
+								state.texImage2D( 34069 + i, j + 1, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+
+							}
+
 						} else {
 
 							state.texImage2D( 34069 + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+
+							for ( var j = 0; j < mipmaps.length; ++ j ) {
+
+								var mipmap = mipmaps[ j ];
+
+								state.texImage2D( 34069 + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+							}
 
 						}
 
 					} else {
 
-						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
+						var mipmaps = cubeImage[ i ].mipmaps;
 
 						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
-							mipmap = mipmaps[ j ];
+							var mipmap = mipmaps[ j ];
 
 							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
@@ -21366,15 +21387,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				if ( ! isCompressed ) {
-
-					textureProperties.__maxMipLevel = 0;
-
-				} else {
-
-					textureProperties.__maxMipLevel = mipmaps.length - 1;
-
-				}
+				textureProperties.__maxMipLevel = isCompressed ? mipmaps.length - 1 : mipmaps.length;
 
 				if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
