@@ -14196,6 +14196,8 @@
 
 		intersectsSprite: function ( sprite ) {
 
+			if ( _sphere === undefined ) _sphere = new Sphere();
+
 			_sphere.center.set( 0, 0, 0 );
 			_sphere.radius = 0.7071067811865476;
 			_sphere.applyMatrix4( sprite.matrixWorld );
