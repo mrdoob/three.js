@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cubemap customized mipmaps demo. Author <a href="https://github.com/AngusLang">Angus</a><br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cubemap customized mipmaps demo. Author <a href="https://github.com/AngusLang" target="_blank">Angus</a><br/>
 			Left: webgl generated mipmaps<br/>
 			Right: manual mipmaps<br/>
 		</div>
@@ -19,11 +19,9 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
-
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -38,23 +36,34 @@
 				var mipmaps = [];
 
 				async function loadCubeTexture( urls ) {
-					return new Promise( function( resolve, reject) {
-						new THREE.CubeTextureLoader().load( urls, function( cubeTexture ) {
+
+					return new Promise( function ( resolve, reject) {
+
+						new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
+
 							resolve( cubeTexture );
+
 						} );
+
+
 					} );
+
 				}
 
-				//load mipmaps
+				// load mipmaps
 				var pendings = [];
+
 				for ( var level = 0; level < 9; ++ level ) {
 
 					var urls = [];
+
 					for ( var face = 0; face < 6; ++ face ) {
+
 						urls.push( path + 'cube_m0' + level + '_c0' + face + format );
+
 					}
 
-					pendings.push( loadCubeTexture( urls ).then( function( cubeTexture ) {
+					pendings.push( loadCubeTexture( urls ).then( function ( cubeTexture ) {
 
 						mipmaps.push( cubeTexture );
 
@@ -70,7 +79,7 @@
 				customizedCubeTexture.magFilter = THREE.LinearFilter;
 				customizedCubeTexture.generateMipmaps = false;
 				customizedCubeTexture.needsUpdate = true;
-	
+
 				return customizedCubeTexture;
 
 			}
@@ -85,8 +94,7 @@
 
 				scene = new THREE.Scene();
 
-				var pendings = [];
-				loadCubeTextureWithMipmaps().then( function( cubeTexture ) {
+				loadCubeTextureWithMipmaps().then( function ( cubeTexture ) {
 
 					//model
 					var sphere = new THREE.SphereBufferGeometry( 100, 128, 128 );
@@ -96,7 +104,7 @@
 					material.name = 'manual mipmaps';
 
 					var mesh = new THREE.Mesh( sphere, material );
-					mesh.position.set( 150, 0, 0 );
+					mesh.position.set( 100, 0, 0 );
 					scene.add( mesh );
 
 
@@ -112,7 +120,7 @@
 					material.envMap = autoCubeTexture;
 
 					mesh = new THREE.Mesh( sphere, material );
-					mesh.position.set( -150, 0, 0 );
+					mesh.position.set( - 100, 0, 0 );
 					scene.add( mesh );
 
 				} );
@@ -127,10 +135,6 @@
 				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minPolarAngle = Math.PI / 4;
 				controls.maxPolarAngle = Math.PI / 1.5;
-
-				//stats
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -148,14 +152,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				render();
-
-			}
-
-			function render() {
-
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 
