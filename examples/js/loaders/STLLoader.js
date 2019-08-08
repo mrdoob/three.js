@@ -200,20 +200,21 @@ THREE.STLLoader.prototype = {
 				for ( var i = 1; i <= 3; i ++ ) {
 
 					var vertexstart = start + i * 12;
+					var componentIdx = (face * 3 * 3) + ((i - 1) * 3);
+					
+					vertices[componentIdx] = reader.getFloat32( vertexstart, true );
+					vertices[componentIdx + 1] = reader.getFloat32( vertexstart + 4, true );
+					vertices[componentIdx + 2] = reader.getFloat32( vertexstart + 8, true );
 
-					vertices[face * 3 * 3] = reader.getFloat32( vertexstart, true );
-					vertices[(face * 3 * 3) + 1] = reader.getFloat32( vertexstart + 4, true );
-					vertices[(face * 3 * 3) + 2] = reader.getFloat32( vertexstart + 8, true );
-
-					normals[face * 3 * 3] = normalX;
-					normals[(face * 3 * 3) + 1] = normalY;
-					normals[(face * 3 * 3) + 2] = normalZ;
+					normals[componentIdx] = normalX;
+					normals[componentIdx + 1] = normalY;
+					normals[componentIdx + 2] = normalZ;
 
 					if ( hasColors ) {
 
-						colors[face * 3 * 3] = r;
-						colors[(face * 3 * 3) + 1] = g;
-						colors[(face * 3 * 3) + 2] = b;
+						colors[componentIdx] = r;
+						colors[componentIdx + 1] = g;
+						colors[componentIdx + 2] = b;
 
 					}
 
