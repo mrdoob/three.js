@@ -108,8 +108,7 @@
 							clearCoat: 1.0,
 							envMap: hdrCubeRenderTarget.texture,
 							map: diffuse,
-							normalMap: normalMap,
-							normalScale: new THREE.Vector2( 0.5, 0.5 )
+							normalMap: normalMap
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = 100;
@@ -122,8 +121,7 @@
 							clearCoat: 1.0,
 							envMap: hdrCubeRenderTarget.texture,
 							map: diffuse,
-							clearCoatNormalMap: clearCoatNormaMap,
-							clearCoatNormalScale: new THREE.Vector2( 0.5, 0.5 )
+							clearCoatNormalMap: clearCoatNormaMap
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = - 100;
@@ -137,9 +135,7 @@
 							envMap: hdrCubeRenderTarget.texture,
 							map: diffuse,
 							normalMap: normalMap,
-							normalScale: new THREE.Vector2( 0.5, 0.5 ),
-							clearCoatNormalMap: clearCoatNormaMap,
-							clearCoatNormalScale: new THREE.Vector2( 0.5, 0.5 )
+							clearCoatNormalMap: clearCoatNormaMap
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = 100;
