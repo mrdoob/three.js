@@ -85,8 +85,6 @@ var files = {
 		"webgl_loader_collada",
 		"webgl_loader_collada_kinematics",
 		"webgl_loader_collada_skinning",
-		"webgl_loader_ctm",
-		"webgl_loader_ctm_materials",
 		"webgl_loader_draco",
 		"webgl_loader_fbx",
 		"webgl_loader_fbx_nurbs",
