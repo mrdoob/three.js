@@ -333,9 +333,4 @@ export class Material extends EventDispatcher {
 	 */
 	toJSON( meta?: any ): any;
 
-	/**
-	 * Call .dispatchEvent ( { type: 'update' }) on the material.
-	 */
-	update(): void;
-
 }
