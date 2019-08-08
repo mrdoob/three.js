@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - background</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Scene Background<br/>
+		</div>
+
+		<div id="container"></div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			var renderer, scene, camera;
+
+			var gui, FIT;
+
+			var API = {
+				fit: 'cover',
+				toneMapping: true,
+				exposure: 1.0
+			};
+
+			init();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0x302005, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = API.exposure;
+
+				renderer.gammaOutput = true;
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 15, 20, 30 );
+
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.load( 'textures/memorial.hdr', function ( texture ) {
+
+						scene.background = texture;
+
+						initGui();
+
+						window.addEventListener( 'resize', onWindowResize, false );
+
+						onWindowResize();
+
+					} );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				var aspect = ( window.innerWidth ) / ( window.innerHeight );
+
+				camera.aspect = aspect;
+
+				camera.updateProjectionMatrix();
+
+				var bg = scene.background;
+
+				if ( bg && bg.isTexture ) {
+
+					var bgAspect = bg.image.width / bg.image.height;
+
+					switch ( API.fit ) {
+
+						case 'cover': // clip to fit
+
+							bg.cover( aspect );
+							break;
+
+						case 'contain': // shrink to fit
+
+							bg.contain( aspect );
+							break;
+
+						case 'fill': // strech to fit
+
+							bg.fill();
+							break;
+
+					}
+
+				}
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			function initGui() {
+
+				gui = new GUI();
+
+				var fl = gui.addFolder( 'BACKGROUND' );
+
+				fl.add( API, 'fit', [ 'cover', 'contain', 'fill' ] )
+					.name( 'texture fit')
+					.onChange( onWindowResize );
+
+				fl.open();
+
+				var fl = gui.addFolder( 'TONEMAPPING' );
+
+				fl.add( API, 'toneMapping' )
+					.onChange( function( value ) {
+						renderer.toneMapping = value ? DefaultToneMapping : THREE.NoToneMapping;
+						textureViewer.update();
+						render();
+					} );
+
+				fl.add( API, 'exposure', 0, 2, 0.1 )
+					.onChange( function() { renderer.toneMappingExposure = API.exposure; render(); } );
+
+				fl.open();
+
+			}
+
+		</script>
+	</body>
+</html>
