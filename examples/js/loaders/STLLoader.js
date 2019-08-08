@@ -149,7 +149,7 @@ THREE.STLLoader.prototype = {
 					( reader.getUint8( index + 5 ) == 0x3D /*'='*/ ) ) {
 
 					hasColors = true;
-					colors = new Float32Array(faces * 3 * 3);
+					colors = new Float32Array( faces * 3 * 3 );
 
 					defaultR = reader.getUint8( index + 6 ) / 255;
 					defaultG = reader.getUint8( index + 7 ) / 255;
@@ -165,8 +165,8 @@ THREE.STLLoader.prototype = {
 
 			var geometry = new THREE.BufferGeometry();
 
-			var vertices = new Float32Array(faces * 3 * 3);
-			var normals = new Float32Array(faces * 3 * 3);
+			var vertices = new Float32Array( faces * 3 * 3 );
+			var normals = new Float32Array( faces * 3 * 3 );
 
 			for ( var face = 0; face < faces; face ++ ) {
 
@@ -200,21 +200,21 @@ THREE.STLLoader.prototype = {
 				for ( var i = 1; i <= 3; i ++ ) {
 
 					var vertexstart = start + i * 12;
-					var componentIdx = (face * 3 * 3) + ((i - 1) * 3);
+					var componentIdx = ( face * 3 * 3 ) + ( ( i - 1 ) * 3 );
 					
-					vertices[componentIdx] = reader.getFloat32( vertexstart, true );
-					vertices[componentIdx + 1] = reader.getFloat32( vertexstart + 4, true );
-					vertices[componentIdx + 2] = reader.getFloat32( vertexstart + 8, true );
+					vertices[ componentIdx ] = reader.getFloat32( vertexstart, true );
+					vertices[ componentIdx + 1 ] = reader.getFloat32( vertexstart + 4, true );
+					vertices[ componentIdx + 2 ] = reader.getFloat32( vertexstart + 8, true );
 
-					normals[componentIdx] = normalX;
-					normals[componentIdx + 1] = normalY;
-					normals[componentIdx + 2] = normalZ;
+					normals[ componentIdx ] = normalX;
+					normals[ componentIdx + 1 ] = normalY;
+					normals[ componentIdx + 2 ] = normalZ;
 
 					if ( hasColors ) {
 
-						colors[componentIdx] = r;
-						colors[componentIdx + 1] = g;
-						colors[componentIdx + 2] = b;
+						colors[ componentIdx ] = r;
+						colors[ componentIdx + 1 ] = g;
+						colors[ componentIdx + 2 ] = b;
 
 					}
 
