@@ -49,6 +49,8 @@ export class Geometry extends EventDispatcher {
 	id: number;
 
 	uuid: string;
+	
+	isGeometry: boolean;
 
 	/**
 	 * Name for this geometry. Default is an empty string.
