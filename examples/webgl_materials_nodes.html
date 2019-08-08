@@ -2495,11 +2495,7 @@
 
 								case 'lod':
 
-									var textureCubeFunction = new Nodes.FunctionNode( [
-										"vec4 textureCubeFunction( samplerCube texture, vec3 uv, float bias ) {",
-										"	return textureCubeLodEXT( texture, uv, bias );",
-										"}"
-									].join( "\n" ), undefined, { shaderTextureLOD: true } );
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );', undefined, { shaderTextureLOD: true } 								);
 
 									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
 
@@ -2507,11 +2503,7 @@
 
 								case 'basic':
 
-									var textureCubeFunction = new Nodes.FunctionNode( [
-										"vec4 textureCubeFunction( samplerCube texture, vec3 uv, float bias ) {",
-										"	return textureCube( texture, uv, bias );",
-										"}"
-									].join( "\n" ) );
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCube( samplerCube texture, vec3 uv, float bias );' );
 
 									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
 
