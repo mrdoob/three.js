@@ -2,11 +2,11 @@
  * @author Nathaniel Tagg / http://github.com/nathanieltagg
  *
  * parameters = {
- *  color: <hex>,     
- *  worldlinewidth: <float>,  // how fat is the line in 3d coordinates? 
+ *  color: <hex>,
+ *  worldlinewidth: <float>,  // how fat is the line in 3d coordinates?
  *  minlinewidth: <float>,    // What is the miminum line width in pixels? (0 by default, set nonzero to keep line from vanishing no matter how far away)
  *  maxlinewidth: <float>,    // What is the maximum line width in pixels? (20 by default, keep the line from filling the screen)
- *  dashed: <boolean>,		 
+ *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
  *  gapSize: <float>,
@@ -163,7 +163,7 @@ THREE.ShaderLib[ 'perspectiveline' ] = {
       		float linewidth = abs(2.0*resolution.y*worldlinewidth*( (position.y<0.5)? (start.z/clipStart.w/clipStart.w) : (end.z/clipEnd.w/clipEnd.w) ));
 
     	 	linewidth = clamp(linewidth,minlinewidth,maxlinewidth);
-      
+
 			offset *= linewidth;
 
 			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
@@ -428,8 +428,8 @@ THREE.PerspectiveLineMaterial.prototype.copy = function ( source ) {
 	this.color.copy( source.color );
 
 	this.worldlinewidth = source.worldlinewidth;
-	this.minlinewidth   = source.minlinewidth;
-	this.maxlinewidth   = source.maxlinewidth;
+	this.minlinewidth = source.minlinewidth;
+	this.maxlinewidth = source.maxlinewidth;
 
 	this.resolution = source.resolution;
 

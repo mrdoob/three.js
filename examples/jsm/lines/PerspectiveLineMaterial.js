@@ -2,11 +2,11 @@
  * @author Nathaniel Tagg / http://github.com/nathanieltagg
  *
  * parameters = {
- *  color: <hex>,     
- *  worldlinewidth: <float>,  // how fat is the line in 3d coordinates? 
+ *  color: <hex>,
+ *  worldlinewidth: <float>,  // how fat is the line in 3d coordinates?
  *  minlinewidth: <float>,    // What is the miminum line width in pixels? (0 by default, set nonzero to keep line from vanishing no matter how far away)
  *  maxlinewidth: <float>,    // What is the maximum line width in pixels? (20 by default, keep the line from filling the screen)
- *  dashed: <boolean>,		 
+ *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
  *  gapSize: <float>,
@@ -31,7 +31,7 @@ UniformsLib.perspectiveline = {
 	resolution: { value: new Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
-	gapSize: { value: 1 } 
+	gapSize: { value: 1 }
 };
 
 ShaderLib[ 'perspectiveline' ] = {
@@ -173,7 +173,7 @@ ShaderLib[ 'perspectiveline' ] = {
       		float linewidth = abs(2.0*resolution.y*worldlinewidth*( (position.y<0.5)? (start.z/clipStart.w/clipStart.w) : (end.z/clipEnd.w/clipEnd.w) ));
 
     	 	linewidth = clamp(linewidth,minlinewidth,maxlinewidth);
-      
+
 			offset *= linewidth;
 
 			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
@@ -441,9 +441,9 @@ PerspectiveLineMaterial.prototype.copy = function ( source ) {
 
 	this.worldlinewidth = source.worldlinewidth;
 
-	this.minlinewidth   = source.minlinewidth;
+	this.minlinewidth = source.minlinewidth;
 
-	this.maxlinewidth   = source.maxlinewidth;
+	this.maxlinewidth = source.maxlinewidth;
 
 	this.resolution = source.resolution;
 
