@@ -26642,7 +26642,7 @@ Object.assign( Skeleton.prototype, {
 
 	update: function () {
 
-		if ( _identityMatrix ) {
+		if ( _identityMatrix === undefined ) {
 
 			_offsetMatrix = new Matrix4();
 			_identityMatrix = new Matrix4();
