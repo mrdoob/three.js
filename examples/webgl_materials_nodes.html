@@ -2470,15 +2470,11 @@
 
 					case 'bias':
 
-						// PREREQUISITES
-
-						var image = cubemap.image[ 0 ];
-						var maxMIPLevel = image !== undefined ? Math.log( Math.max( image.width, image.height ) ) * Math.LOG2E : 0;
-
 						// MATERIAL
 
 						var bias = new Nodes.FloatNode( .5 );
-						var mipsBias = new Nodes.OperatorNode( bias, new Nodes.FloatNode( maxMIPLevel ), Nodes.OperatorNode.MUL );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap ) );
+						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
 
 						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color.value.setHex( 0xFFFFFF );
