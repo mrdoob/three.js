@@ -2534,28 +2534,52 @@
 
 					case 'node-reflect':
 
-						// MATERIAL
+							// MATERIAL
 
-						var node = new Nodes.ReflectNode();
+							var node = new Nodes.ReflectNode();
 
-						mtl = new Nodes.PhongNodeMaterial();
-						mtl.environment = new Nodes.CubeTextureNode( cubemap, node );
+							var nodeMaterial = new Nodes.StandardNodeMaterial();
+							nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+							nodeMaterial.roughness = new Nodes.FloatNode(0);
+							nodeMaterial.metalness = new Nodes.FloatNode(1);
 
-						// GUI
+							var standardMaterial = new THREE.MeshStandardMaterial( {
+								envMap: cubemap,
+								roughness: 0,
+								metalness: 1
+							} );
 
-						addGui( 'scope', {
-							vector: Nodes.ReflectNode.VECTOR,
-							cube: Nodes.ReflectNode.CUBE,
-							sphere: Nodes.ReflectNode.SPHERE
-						}, function ( val ) {
+							mtl = nodeMaterial;
 
-							node.scope = val;
+							// GUI
 
-							mtl.needsUpdate = true;
+							addGui( 'scope', {
+								vector: Nodes.ReflectNode.VECTOR,
+								cube: Nodes.ReflectNode.CUBE,
+								sphere: Nodes.ReflectNode.SPHERE
+							}, function ( val ) {
 
-						} );
+								node.scope = val;
 
-						break;
+								nodeMaterial.needsUpdate = true;
+
+							} );
+
+							addGui( 'node', true, function ( val ) {
+
+								mtl = val ? nodeMaterial : standardMaterial;
+								mesh.material = mtl;
+
+							} );
+
+							addGui( 'roughness', 0, function ( val ) {
+
+								nodeMaterial.roughness.value = val;
+								standardMaterial.roughness = val;
+
+							}, false, 0, 1 );
+
+							break;
 
 
 					case 'varying':
