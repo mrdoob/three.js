@@ -20,14 +20,20 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
+
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
+
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
+			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
 			var container = document.getElementById( 'container' );
 
-			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
+			var renderer, scene, lightGroup, camera, clock = new THREE.Clock(), fov = 50;
 			var frame = new Nodes.NodeFrame();
 			var teapot, mesh;
 			var controls;
@@ -84,6 +90,45 @@
 
 			}();
 
+			function generatePREM( cubeMap, textureSize ) {
+
+				textureSize = textureSize || 1024;
+
+				var pmremGenerator = new PMREMGenerator( cubeMap, undefined, textureSize / 4 );
+				pmremGenerator.update( renderer );
+
+				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+				pmremCubeUVPacker.update( renderer );
+
+				pmremGenerator.dispose();
+				pmremCubeUVPacker.dispose();
+
+				return pmremCubeUVPacker.CubeUVRenderTarget.texture;
+
+			}
+
+			var premTexture;
+
+			function getPREM( callback, textureSize ) {
+
+				if ( premTexture ) return callback( premTexture );
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				var hdrCubeMap = new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.setDataType( THREE.UnsignedByteType )
+					.load( hdrUrls, function () {
+
+						premTexture = generatePREM( hdrCubeMap, textureSize );
+
+						library[ premTexture.uuid ] = premTexture;
+
+						callback( premTexture );
+
+					} );
+
+			}
+
 			window.addEventListener( 'load', init );
 
 			function init() {
@@ -107,15 +152,20 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
-				scene.add( new THREE.AmbientLight( 0x464646 ) );
+				lightGroup = new THREE.Group();
+				scene.add( lightGroup );
 
-				var light = new THREE.DirectionalLight( 0xffddcc, 1 );
+				var light;
+
+				lightGroup.add( new THREE.AmbientLight( 0x464646 ) );
+
+				light = new THREE.DirectionalLight( 0xffddcc, 1 );
 				light.position.set( 1, 0.75, 0.5 );
-				scene.add( light );
+				lightGroup.add( light );
 
-				var light = new THREE.DirectionalLight( 0xccccff, 1 );
+				light = new THREE.DirectionalLight( 0xccccff, 1 );
 				light.position.set( - 1, 0.75, - 0.5 );
-				scene.add( light );
+				lightGroup.add( light );
 
 				teapot = new TeapotBufferGeometry( 15, 18 );
 
@@ -145,6 +195,7 @@
 					'basic / mesh-standard': 'mesh-standard',
 					'basic / standard': 'standard',
 					'basic / physical': 'physical',
+					'basic / prem': 'prem',
 					'basic / phong': 'phong',
 					'basic / layers': 'layers',
 					'basic / rim': 'rim',
@@ -178,6 +229,7 @@
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
 					'node / reflect': 'node-reflect',
+					'misc / sub-slot': 'sub-slot',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
 					'misc / reserved-keywords': 'reserved-keywords',
@@ -237,6 +289,8 @@
 			function updateMaterial() {
 
 				move = false;
+
+				lightGroup.visible = true;
 
 				if ( mesh.material ) mesh.material.dispose();
 
@@ -382,6 +436,193 @@
 						addGui( 'metalnessB', metalnessB.value, function ( val ) {
 
 							metalnessB.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'normalScale', normalScale.value, function ( val ) {
+
+							normalScale.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'prem':
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						//mtl.color = // albedo (vec3)
+						//mtl.alpha = // opacity (float)
+						//mtl.roughness = // roughness (float)
+						//mtl.metalness = // metalness (float)
+						//mtl.normal = // normal (vec3)
+						//mtl.emissive = // emissive color (vec3)
+						//mtl.ambient = // ambient color (vec3)
+						//mtl.shadow = // shadowmap (vec3)
+						//mtl.light = // custom-light (vec3)
+						//mtl.ao = // ambient occlusion (float)
+						//mtl.environment = // reflection/refraction (vec3)
+						//mtl.position = // vertex local position (vec3)
+
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+						var intensity = new Nodes.FloatNode( 1 );
+
+						var normalScale = new Nodes.FloatNode( .3 );
+
+						var roughnessA = new Nodes.FloatNode( .5 );
+						var metalnessA = new Nodes.FloatNode( .5 );
+
+						var roughnessB = new Nodes.FloatNode( 0 );
+						var metalnessB = new Nodes.FloatNode( 1 );
+
+						var roughness = new Nodes.MathNode(
+							roughnessA,
+							roughnessB,
+							mask,
+							Nodes.MathNode.MIX
+						);
+
+						var metalness = new Nodes.MathNode(
+							metalnessA,
+							metalnessB,
+							mask,
+							Nodes.MathNode.MIX
+						);
+
+						var normalMask = new Nodes.OperatorNode(
+							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
+							normalScale,
+							Nodes.OperatorNode.MUL
+						);
+
+						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
+						mtl.roughness = roughness;
+						mtl.metalness = metalness;
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal.scale = normalMask;
+
+						getPREM(function(texture) {
+
+							var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( texture ) );
+
+							mtl.environment = new Nodes.OperatorNode( envNode, intensity, Nodes.OperatorNode.MUL );
+							mtl.needsUpdate = true;
+
+						});
+
+						// GUI
+
+						addGui( 'color', mtl.color.value.getHex(), function ( val ) {
+
+							mtl.color.value.setHex( val );
+
+						}, true );
+
+						addGui( 'intensity', intensity.value, function ( val ) {
+
+							intensity.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'roughnessA', roughnessA.value, function ( val ) {
+
+							roughnessA.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessA', metalnessA.value, function ( val ) {
+
+							metalnessA.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughnessB', roughnessB.value, function ( val ) {
+
+							roughnessB.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalnessB', metalnessB.value, function ( val ) {
+
+							metalnessB.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'normalScale', normalScale.value, function ( val ) {
+
+							normalScale.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'sub-slot':
+
+						// disable dynamic light
+
+						lightGroup.visible = false;
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						// NODES
+
+						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
+
+						var normalScale = new Nodes.FloatNode( .3 );
+
+						var radiance = new Nodes.FloatNode( 1 );
+						var irradiance = new Nodes.FloatNode( 1 );
+
+						var roughness = new Nodes.FloatNode( .5 );
+						var metalness = new Nodes.FloatNode( .5 );
+
+						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
+						mtl.roughness = roughness;
+						mtl.metalness = metalness;
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal.scale = normalScale;
+
+						getPREM(function(texture) {
+
+							var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( texture ) );
+
+							var subSlotNode = new Nodes.SubSlotNode();
+							subSlotNode.slots['radiance'] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
+							subSlotNode.slots['irradiance'] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
+
+							mtl.environment = subSlotNode;
+							mtl.needsUpdate = true;
+
+						});
+
+						// GUI
+
+						addGui( 'radiance', radiance.value, function ( val ) {
+
+							radiance.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'irradiance', irradiance.value, function ( val ) {
+
+							irradiance.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'roughness', roughness.value, function ( val ) {
+
+							roughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalness', metalness.value, function ( val ) {
+
+							metalness.value = val;
 
 						}, false, 0, 1 );
 
@@ -2290,8 +2531,7 @@
 
 						addGui( 'scope', {
 							local: Nodes.NormalNode.LOCAL,
-							world: Nodes.NormalNode.WORLD,
-							view: Nodes.NormalNode.VIEW
+							world: Nodes.NormalNode.WORLD
 						}, function ( val ) {
 
 							node.scope = val;

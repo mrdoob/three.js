@@ -1,3 +1,5 @@
+import { Texture } from './../textures/Texture';
+import { Vector2 } from './../math/Vector2';
 import {
 	MeshStandardMaterialParameters,
 	MeshStandardMaterial,
@@ -9,11 +11,13 @@ export interface MeshPhysicalMaterialParameters
 	clearCoat?: number;
 	clearCoatRoughness?: number;
 	sheen?: number;
+
+	clearCoatNormalScale?: Vector2;
+	clearCoatNormalMap?: Texture;
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
-
-	constructor( parameters: MeshPhysicalMaterialParameters );
+	constructor(parameters: MeshPhysicalMaterialParameters);
 
 	defines: any;
 	reflectivity: number;
@@ -21,4 +25,6 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 	clearCoatRoughness: number;
 	sheen: number;
 
+	clearCoatNormalScale: Vector2;
+	clearCoatNormalMap: Texture | null;
 }
