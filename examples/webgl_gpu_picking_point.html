@@ -43,12 +43,11 @@
 	3.I can release the geometry data under the mesh, free more memory, and not affect the rendering.
 */
 import * as THREE from '../build/three.module.js';
-import Stats from './jsm/libs/stats.module.js';
 import { GUI } from './jsm/libs/dat.gui.module.js';
 import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 
-var renderCamera, scene, renderer, stats, pickingScene, gui;
+var renderCamera, scene, renderer, pickingScene, gui;
 
 var mesh;
 var mesh1;
@@ -108,14 +107,8 @@ function init() {
 	pickingTexture = new THREE.WebGLRenderTarget(renderer.domElement.width, renderer.domElement.height);
 
 	//
-	
-	stats = new Stats();
-	document.body.appendChild( stats.dom );
-
-	//
 
 	gui = new GUI();
-	gui.add( renderer.capabilities, 'logarithmicDepthBuffer' );
 	var GPUPFolder = gui.addFolder( 'GPUPickingPoint' );
 	GPUPFolder.open();
 	GPUPFolder.add( GPUPickingPoint, 'x' );
@@ -240,8 +233,6 @@ function pick( e ) {
 		console.log( camera.position );
 		console.log( "points distance:" + new THREE.Vector3().subVectors( CPUPickingPoint, GPUPickingPoint ).length() );
 
-		gui.updateDisplay();
-
 	}
 
 	renderer.setRenderTarget( null );
@@ -264,14 +255,13 @@ function animate() {
 
 	requestAnimationFrame( animate );
 
+	gui.updateDisplay();
+	
 	render();
-	stats.update();
 
 }
 
 function render() {
-
-	controls.update();
 
 	renderer.render( scene, renderCamera );
 
