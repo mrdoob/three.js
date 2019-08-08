@@ -49,7 +49,7 @@ export class Geometry extends EventDispatcher {
 	id: number;
 
 	uuid: string;
-	
+
 	isGeometry: boolean;
 
 	/**
