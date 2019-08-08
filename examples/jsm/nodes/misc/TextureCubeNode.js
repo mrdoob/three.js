@@ -79,12 +79,12 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		var radiance = this.generateTextureCubeUV( builder, this.radianceCache );
-		var irradiance = this.generateTextureCubeUV( builder, this.irradianceCache );
+		builder.require( 'irradiance' );
 
-		builder.context.extra.irradiance = irradiance;
+		var cache = builder.slot === 'irradiance' ? this.irradianceCache : this.radianceCache;
+		var result = this.generateTextureCubeUV( builder, cache );
 
-		return builder.format( 'vec4( ' + radiance + ', 1.0 )', this.getType( builder ), output );
+		return builder.format( 'vec4( ' + result + ', 1.0 )', this.getType( builder ), output );
 
 	} else {
 
@@ -93,6 +93,16 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 		return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 
 	}
+
+};
+
+TextureCubeNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.value = source.value;
+
+	return this;
 
 };
 

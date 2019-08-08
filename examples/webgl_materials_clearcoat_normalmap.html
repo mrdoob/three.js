@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - materials - clearcoat normal</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		#vt {
+			display: none
+		}
+
+		#vt,
+		#vt a {
+			color: orange;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - materials - clearcoat normal map<br />
+	</div>
+
+	<script type="module">
+
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+		import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+		import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
+		var container, stats;
+
+		var camera, scene, renderer;
+
+		var particleLight;
+		var group;
+
+		init();
+		animate();
+
+		function init() {
+
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+			camera.position.z = 1000;
+
+			scene = new THREE.Scene();
+
+			group = new THREE.Group();
+			scene.add( group );
+
+			new HDRCubeTextureLoader()
+				.setDataType( THREE.UnsignedByteType )
+				.setPath( './textures/cube/pisaHDR/' )
+				.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
+					function ( hdrCubeMap ) {
+
+						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
+						pmremGenerator.update( renderer );
+
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
+
+						var hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+						var geometry = new THREE.SphereBufferGeometry( 80, 64, 32 );
+
+						var textureLoader = new THREE.TextureLoader();
+
+						var diffuse = textureLoader.load( "textures/carbon/Carbon.png" );
+						diffuse.wrapS = THREE.RepeatWrapping;
+						diffuse.wrapT = THREE.RepeatWrapping;
+						diffuse.repeat.x = 10;
+						diffuse.repeat.y = 10;
+
+						var normalMap = textureLoader.load( "textures/carbon/Carbon_Normal.png" );
+						normalMap.wrapS = THREE.RepeatWrapping;
+						normalMap.wrapT = THREE.RepeatWrapping;
+
+						var clearCoatNormaMap = textureLoader.load( "textures/waternormals.jpg" );
+						clearCoatNormaMap.wrapS = THREE.RepeatWrapping;
+						clearCoatNormaMap.wrapT = THREE.RepeatWrapping;
+
+						//
+
+						var material = new THREE.MeshPhysicalMaterial( {
+							clearCoat: 1.0,
+							envMap: hdrCubeRenderTarget.texture,
+							map: diffuse
+						} );
+
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = - 100;
+						mesh.position.y = 100;
+						group.add( mesh );
+
+						// normalmap
+
+						var material = new THREE.MeshPhysicalMaterial( {
+							clearCoat: 1.0,
+							envMap: hdrCubeRenderTarget.texture,
+							map: diffuse,
+							normalMap: normalMap
+						} );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = 100;
+						mesh.position.y = 100;
+						group.add( mesh );
+
+						// clearcoat
+
+						var material = new THREE.MeshPhysicalMaterial( {
+							clearCoat: 1.0,
+							envMap: hdrCubeRenderTarget.texture,
+							map: diffuse,
+							clearCoatNormalMap: clearCoatNormaMap
+						} );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = - 100;
+						mesh.position.y = - 100;
+						group.add( mesh );
+
+						// clearcoat + normalmap
+
+						var material = new THREE.MeshPhysicalMaterial( {
+							clearCoat: 1.0,
+							envMap: hdrCubeRenderTarget.texture,
+							map: diffuse,
+							normalMap: normalMap,
+							clearCoatNormalMap: clearCoatNormaMap
+						} );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = 100;
+						mesh.position.y = - 100;
+						group.add( mesh );
+
+						//
+
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+						scene.background = hdrCubeMap;
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					}
+
+				);
+
+			// LIGHTS
+
+			particleLight = new THREE.Mesh(
+				new THREE.SphereBufferGeometry( 4, 8, 8 ),
+				new THREE.MeshBasicMaterial( { color: 0xffffff } )
+			);
+			scene.add( particleLight );
+
+			particleLight.add( new THREE.PointLight( 0xffffff, 1.25 ) );
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+
+			//
+
+			renderer.gammaInput = true;
+			renderer.gammaOutput = true;
+
+			//
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			// EVENTS
+
+			var controls = new OrbitControls( camera, renderer.domElement );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		//
+
+		function onWindowResize() {
+
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( width, height );
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+
+			stats.update();
+
+		}
+
+		function render() {
+
+			var timer = Date.now() * 0.00025;
+
+			particleLight.position.x = Math.sin( timer * 7 ) * 300;
+			particleLight.position.y = Math.cos( timer * 5 ) * 400;
+			particleLight.position.z = Math.cos( timer * 3 ) * 300;
+
+			for ( var i = 0; i < group.children.length; i ++ ) {
+
+				var child = group.children[ i ];
+				child.rotation.y += 0.005;
+
+			}
+
+			renderer.render( scene, camera );
+
+		}
+
+
+	</script>
+</body>
+</html>
