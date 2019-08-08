@@ -34,8 +34,6 @@ StandardNode.prototype.build = function ( builder ) {
 
 	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
 
-	if ( this.energyPreservation ) builder.define( 'ENERGY_PRESERVATION' );
-
 	builder.requires.lights = true;
 
 	builder.extensions.shaderTextureLOD = true;
