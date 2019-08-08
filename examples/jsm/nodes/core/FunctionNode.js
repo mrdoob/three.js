@@ -186,7 +186,7 @@ FunctionNode.prototype.parse = function ( src, includes, extensions, keywords ) 
 					var qualifier = inputs[ i ++ ];
 					var type, name;
 
-					if ( qualifier == 'in' || qualifier == 'out' || qualifier == 'inout' ) {
+					if ( qualifier === 'in' || qualifier === 'out' || qualifier === 'inout' ) {
 
 						type = inputs[ i ++ ];
 
