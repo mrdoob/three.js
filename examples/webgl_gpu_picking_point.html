@@ -57,6 +57,7 @@ var controls;
 var raycaster;
 
 var pickingCamera;
+var pickingTexture;	
 
 var GPUPickingPoint = new THREE.Vector3();
 var CPUPickingPoint = new THREE.Vector3();
@@ -71,8 +72,6 @@ function init() {
 	raycaster = new THREE.Raycaster();
 	renderCamera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 	pickingCamera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-	renderCamera.up.set( 0, 0, 1 );
-	pickingCamera.up.set( 0, 0, 1 );
 	renderCamera.position.x = 200;
 
 	scene = new THREE.Scene();
@@ -80,15 +79,15 @@ function init() {
 
 	//
 
-	let axesHelper = new THREE.AxesHelper( 100 );
+	var axesHelper = new THREE.AxesHelper( 100 );
 	scene.add( axesHelper );
 
 	//
 
 	// let geometry = new THREE.SphereBufferGeometry(100, 20, 20);
-	let geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+	var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
-	var material = new THREE.MeshBasicMaterial({color: new THREE.Color(0.5, 0.5, 0.5)});
+	var material = new THREE.MeshNormalMaterial();
 	var depthMaterial = new THREE.MeshDepthMaterial();
 	depthMaterial.depthPacking = THREE.RGBADepthPacking;
 
@@ -105,7 +104,11 @@ function init() {
 	document.body.appendChild( renderer.domElement );
 
 	//
+	
+	pickingTexture = new THREE.WebGLRenderTarget(renderer.domElement.width, renderer.domElement.height);
 
+	//
+	
 	stats = new Stats();
 	document.body.appendChild( stats.dom );
 
@@ -113,12 +116,12 @@ function init() {
 
 	gui = new GUI();
 	gui.add( renderer.capabilities, 'logarithmicDepthBuffer' );
-	let GPUPFolder = gui.addFolder( 'GPUPickingPoint' );
+	var GPUPFolder = gui.addFolder( 'GPUPickingPoint' );
 	GPUPFolder.open();
 	GPUPFolder.add( GPUPickingPoint, 'x' );
 	GPUPFolder.add( GPUPickingPoint, 'y' );
 	GPUPFolder.add( GPUPickingPoint, 'z' );
-	let CPUPFolder = gui.addFolder( 'CPUPickingPoint' );
+	var CPUPFolder = gui.addFolder( 'CPUPickingPoint' );
 	CPUPFolder.open();
 	CPUPFolder.add( CPUPickingPoint, 'x' );
 	CPUPFolder.add( CPUPickingPoint, 'y' );
@@ -126,15 +129,6 @@ function init() {
 	//
 
 	controls = new OrbitControls( renderCamera, renderer.domElement );
-	controls.rotateSpeed = 5.0;
-	controls.zoomSpeed = 5;
-	controls.panSpeed = 2;
-
-	controls.enableZoom = true;
-	controls.enablePan = true;
-
-	controls.enableDamping = false;
-	controls.dampingFactor = 0.3;
 
 	//
 
@@ -153,11 +147,10 @@ function pick( e ) {
 	var pX = 2 * x / renderer.domElement.width - 1;
 	var pY = 2 * y / renderer.domElement.height - 1;
 
-	let mouseVector = new THREE.Vector3();
+	var mouseVector = new THREE.Vector3();
 	mouseVector.set( pX, pY, 0.5 ); // set raycaster target
 	raycaster.setFromCamera( mouseVector, camera );
 
-	var pickingTexture = new THREE.WebGLRenderTarget( renderer.domElement.width, renderer.domElement.height );
 	//render the picking scene off-screen
 	// set the view offset to represent just a single pixel under the mouse
 	camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, e.clientX * window.devicePixelRatio | 0, e.clientY * window.devicePixelRatio | 0, 1, 1 );
@@ -185,7 +178,7 @@ function pick( e ) {
 	// compute the depth far from the camera which between [0,far];
 	depth = camera.near * camera.far / ( camera.near * depth + camera.far * ( 1 - depth ) );
 
-	let direction = raycaster.ray.direction.normalize();
+	var direction = raycaster.ray.direction.normalize();
 	var target = new THREE.Vector3();
 	camera.getWorldDirection( target );
 	var dist = depth / target.dot( raycaster.ray.direction );
@@ -197,8 +190,8 @@ function pick( e ) {
 
 		camera = pickingCamera;
 
-		let pickingCameraPosition = new THREE.Vector3();
-		let pickingCameraLookAt = new THREE.Vector3();
+		var pickingCameraPosition = new THREE.Vector3();
+		var pickingCameraLookAt = new THREE.Vector3();
 		//why is 0.999 ,when depth is 10000 the point error is 1~10,if big than that value,the result could be wrong
 		pickingCameraPosition.addVectors( renderCamera.position, new THREE.Vector3().copy( direction ).multiplyScalar( ( dist - camera.near ) * 0.999 ) );
 		pickingCameraLookAt.addVectors( renderCamera.position, new THREE.Vector3().copy( direction ).multiplyScalar( dist ) );
@@ -207,7 +200,6 @@ function pick( e ) {
 		camera.lookAt( pickingCameraLookAt );
 		camera.updateProjectionMatrix();
 
-		var pickingTexture = new THREE.WebGLRenderTarget( renderer.domElement.width, renderer.domElement.height );
 
 		renderer.setRenderTarget( pickingTexture );
 		renderer.render( pickingScene, camera );
@@ -231,7 +223,7 @@ function pick( e ) {
 	}
 
 
-	let intersectObject = raycaster.intersectObject( mesh );
+	var intersectObject = raycaster.intersectObject( mesh );
 
 	if ( intersectObject.length ) {
 
