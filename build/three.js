@@ -2844,49 +2844,50 @@
 
 		contain: function ( aspect ) { // requires pixels to be discarded if uv is outside [ 0, 1 ]
 
-	        // Sets the matrix uv transform so the texture image is contained in a region having the specified aspect ratio,
-	        // and does so without distortion. Akin to CSS object-fit: contain.
+			// Sets the matrix uv transform so the texture image is contained in a region having the specified aspect ratio,
+			// and does so without distortion. Akin to CSS object-fit: contain.
 
-	        var imageAspect = ( this.image && this.image.width ) ? this.image.width / this.image.height : 1;
+			var imageAspect = ( this.image && this.image.width ) ? this.image.width / this.image.height : 1;
 
-	        if ( aspect > imageAspect ) {
+			if ( aspect > imageAspect ) {
 
-	                this.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
+				this.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
 
-	        } else {
+			} else {
 
-	                this.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
+				this.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
 
-	        }
+			}
 
-	        this.matrixAutoUpdate = false;
+			this.matrixAutoUpdate = false;
 
 		},
 
 		cover: function ( aspect ) {
 
-	        // Sets the matrix uv transform so the texture image covers a region having the specified aspect ratio,
-	        // and does so without distortion. Image may be cropped. Akin to CSS object-fit: cover.
+			// Sets the matrix uv transform so the texture image covers a region having the specified aspect ratio,
+			// and does so without distortion. Image may be cropped. Akin to CSS object-fit: cover.
 
-	        var imageAspect = ( this.image && this.image.width ) ? this.image.width / this.image.height : 1;
+			var imageAspect = ( this.image && this.image.width ) ? this.image.width / this.image.height : 1;
 
-	        if ( aspect < imageAspect ) {
+			if ( aspect < imageAspect ) {
 
-	                this.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
+				this.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
 
-	        } else {
+			} else {
 
-	                this.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
+				this.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
 
-	        }
+			}
 
-	        this.matrixAutoUpdate = false;
+			this.matrixAutoUpdate = false;
 
 		},
 
 		fill: function () {
 
 			this.matrix.identity();
+
 		},
 
 		copy: function ( source ) {
@@ -3066,6 +3067,7 @@
 							uv.x = uv.x - Math.floor( uv.x );
 
 						}
+
 						break;
 
 				}
@@ -3097,6 +3099,7 @@
 							uv.y = uv.y - Math.floor( uv.y );
 
 						}
+
 						break;
 
 				}
