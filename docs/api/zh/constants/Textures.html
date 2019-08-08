@@ -84,12 +84,12 @@
 		Minification Filters</h2>
 	<code>
 		THREE.NearestFilter
-		THREE.NearestMipMapNearestFilter
-		THREE.NearestMipMapLinearFilter
+		THREE.NearestMipmapNearestFilter
+		THREE.NearestMipmapLinearFilter
 		THREE.LinearFilter
-		THREE.LinearMipMapNearestFilter
-		THREE.LinearMipMapLinearFilter
-		</code>
+		THREE.LinearMipmapNearestFilter
+		THREE.LinearMipmapLinearFilter
+	</code>
 
 	<p>
 		这些常量用于纹理的[page:Texture.minFilter minFilter]属性，它们定义了当被纹理化的像素映射到大于1纹理元素（texel）的区域时，将要使用的纹理缩小函数。<br /><br />
@@ -97,19 +97,19 @@
 		除了[page:constant NearestFilter] 和 [page:constant LinearFilter]，
 		下面的四个函数也可以用于缩小：<br /><br />
 
-		[page:constant NearestMipMapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，并以[page:constant
+		[page:constant NearestMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，并以[page:constant
 		NearestFilter]（最靠近像素中心的纹理元素）为标准来生成纹理值。
 		<br /><br />
 
-		[page:constant NearestMipMapLinearFilter]选择与被纹理化像素的尺寸最接近的两个mipmap，并以[page:constant
+		[page:constant NearestMipmapLinearFilter]选择与被纹理化像素的尺寸最接近的两个mipmap，并以[page:constant
 		NearestFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。
 		<br /><br />
 
-		[page:constant LinearMipMapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，并以[page:constant
+		[page:constant LinearMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，并以[page:constant
 		LinearFilter]（最靠近像素中心的四个纹理元素的加权平均值）为标准来生成纹理值。
 		<br /><br />
 
-		[page:constant LinearMipMapLinearFilter]是默认值，它选择与被纹理化像素的尺寸最接近的两个mipmap，并以[page:constant
+		[page:constant LinearMipmapLinearFilter]是默认值，它选择与被纹理化像素的尺寸最接近的两个mipmap，并以[page:constant
 		LinearFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。<br /><br />
 
 		请查看示例：[example:webgl_materials_texture_filters materials / texture / filters]。

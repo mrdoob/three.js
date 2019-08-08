@@ -169,9 +169,10 @@ const staticAssets = [
 	'./js/commands/RemoveScriptCommand.js',
 	'./js/commands/SetScriptValueCommand.js',
 	'./js/commands/SetMaterialCommand.js',
-	'./js/commands/SetMaterialValueCommand.js',
 	'./js/commands/SetMaterialColorCommand.js',
 	'./js/commands/SetMaterialMapCommand.js',
+	'./js/commands/SetMaterialValueCommand.js',
+	'./js/commands/SetMaterialVectorCommand.js',
 	'./js/commands/SetSceneCommand.js',
 
 	//
