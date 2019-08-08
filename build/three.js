@@ -2842,6 +2842,53 @@
 
 		},
 
+		contain: function ( aspect ) { // requires pixels to be discarded if uv is outside [ 0, 1 ]
+
+	        // Sets the matrix uv transform so the texture image is contained in a region having the specified aspect ratio,
+	        // and does so without distortion. Akin to CSS object-fit: contain.
+
+	        var imageAspect = ( this.image && this.image.width ) ? this.image.width / this.image.height : 1;
+
+	        if ( aspect > imageAspect ) {
+
+	                this.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
+
+	        } else {
+
+	                this.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
+
+	        }
+
+	        this.matrixAutoUpdate = false;
+
+		},
+
+		cover: function ( aspect ) {
+
+	        // Sets the matrix uv transform so the texture image covers a region having the specified aspect ratio,
+	        // and does so without distortion. Image may be cropped. Akin to CSS object-fit: cover.
+
+	        var imageAspect = ( this.image && this.image.width ) ? this.image.width / this.image.height : 1;
+
+	        if ( aspect < imageAspect ) {
+
+	                this.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
+
+	        } else {
+
+	                this.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
+
+	        }
+
+	        this.matrixAutoUpdate = false;
+
+		},
+
+		fill: function () {
+
+			this.matrix.identity();
+		},
+
 		copy: function ( source ) {
 
 			this.name = source.name;
@@ -14460,7 +14507,7 @@
 
 	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )\n\tvec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );\n#endif";
 
-	var background_frag = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\tgl_FragColor = mapTexelToLinear( texColor );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
+	var background_frag = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\n\tif ( vUv.x < 0.0 || vUv.x > 1.0 ) discard;\tif ( vUv.y < 0.0 || vUv.y > 1.0 ) discard;\n\tvec4 texColor = texture2D( t2D, vUv );\n\tgl_FragColor = mapTexelToLinear( texColor );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
 	var background_vert = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
 
