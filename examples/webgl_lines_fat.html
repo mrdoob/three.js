@@ -13,9 +13,7 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
-		<script> 
-			var perline;
-		</script>
+
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -33,8 +31,7 @@
 			var line, renderer, scene, camera, camera2, controls;
 			var line1;
 			var matLine, matLineBasic, matLineDashed;
-			var  perspectiveMatLine;
-			var marker, markergeo, markermat;
+			var perline, perspectiveMatLine;
 			var stats;
 			var gui;
 
@@ -142,22 +139,12 @@
 				line1.scale.set( 1, 1, 3 );
 				scene.add( line1 );
 
-				//
-				// A marker to show mouse intersect
-				markergeo = new THREE.SphereBufferGeometry( 0.3 );
-				markermat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-				marker = new THREE.Mesh( markergeo, markermat );
-				scene.add( marker );
-				// marker.visible=false;
-
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				onWindowResize();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
-
-				renderer.domElement.addEventListener( 'mousemove', onMouseMove, false );
 
 				initGui();
 
@@ -182,41 +169,6 @@
 			var point = new THREE.Vector2();
 
 			var mouse = new THREE.Vector2();
-
-			var raycaster = new THREE.Raycaster();
-
-			function onMouseMove( evt ) {
-
-				var array = getMousePosition( renderer.domElement, evt.clientX, evt.clientY );
-				point.fromArray( array );
-
-				mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
-
-				raycaster.setFromCamera( mouse, camera );
-
-				var intersects = raycaster.intersectObjects( [ line, line1, perline ] );
-
-				if ( intersects.length > 0 ) {
-
-					console.log( 'Found intersect at', intersects[ 0 ].point );
-					marker.visible = true;
-					marker.position.copy( intersects[ 0 ].point );
-
-				} else {
-
-					// console.log("no intersects");
-					marker.visible = false;
-
-				}
-
-			}
-
-			var getMousePosition = function ( dom, x, y ) {
-
-				var rect = dom.getBoundingClientRect();
-				return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
-
-			};
 
 			function animate() {
 
