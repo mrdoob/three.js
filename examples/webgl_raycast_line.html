@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lines - fat</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - raycasting lines</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Line2 } from './jsm/lines/Line2.js';
+			import { LineMaterial } from './jsm/lines/LineMaterial.js';
+			import { PerspectiveLineMaterial } from './jsm/lines/PerspectiveLineMaterial.js';
+			import { LineGeometry } from './jsm/lines/LineGeometry.js';
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
+
+			var line_a, line_b;
+			var renderer, scene, camera, camera2, controls;
+			var line_materials = [];
+			var marker, markergeo, markermat;
+			var stats;
+
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setClearColor( 0x000000, 0.0 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( - 40, 0, 60 );
+
+				camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
+				camera2.position.copy( camera.position );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 500;
+
+
+				// Position and THREE.Color Data
+
+				var positions = [];
+
+				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 10.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var spline = new THREE.CatmullRomCurve3( points );
+				var divisions = Math.round( 12 * points.length );
+
+
+				for ( var i = 0, l = divisions; i < l; i ++ ) {
+
+					var point = spline.getPoint( i / l );
+					positions.push( point.x, point.y, point.z );
+
+				}
+
+				var geometry = new LineGeometry();
+				geometry.setPositions( positions );
+
+				var mat_a = new LineMaterial( {
+					color: 0x00ff00,
+					linewidth: 5, // in pixels
+				} );
+				line_materials.push(mat_a);
+				line_a = new Line2( geometry, mat_a );
+				line_a.computeLineDistances();
+				line_a.visible = true;
+				line_a.position.x = -15;
+				scene.add( line_a );
+
+
+				var mat_b = new PerspectiveLineMaterial( {
+					color: 0x00ff00,
+					worldlinewidth: 0.15,
+					maxlinewidth: 100,
+					minlinewidth: 0.1,
+				} );
+				line_materials.push(mat_b);
+				line_b = new Line2( geometry, mat_b );
+				line_b.computeLineDistances();
+				line_b.visible = true;
+				line_b.position.x = 15;
+				scene.add( line_b );
+
+				//
+				// A marker to show mouse intersect
+				markergeo = new THREE.SphereBufferGeometry( 0.3 );
+				markermat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+				marker = new THREE.Mesh( markergeo, markermat );
+				marker.visible=false;
+				scene.add( marker );
+
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				onWindowResize();
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				renderer.domElement.addEventListener( 'mousemove', onMouseMove, false );
+
+				renderer.setClearColor( 0x000000, 0 );
+
+				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+
+				for(var material of line_materials) material.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				for(var material of line_materials) material.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
+
+			}
+
+			var point = new THREE.Vector2();
+
+			var mouse = new THREE.Vector2();
+
+			var raycaster = new THREE.Raycaster();
+
+			function onMouseMove( evt ) {
+
+				var array = getMousePosition( renderer.domElement, evt.clientX, evt.clientY );
+				point.fromArray( array );
+
+				mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+				// reset colors
+				for(var m of line_materials) { m.color.set(0x00ff00); }
+
+				raycaster.setFromCamera( mouse, camera );
+
+				// Note that we could normally just raycast the entire scene, but in this case that would mean that the first intersection would
+				// often be our marker object.  So we will restrict our raycast just to the objects we want to match.
+
+				var intersects = raycaster.intersectObjects( [ line_a, line_b ] );
+
+				if ( intersects.length > 0 ) {
+
+					console.log( 'Found intersect at', intersects[ 0 ].point );
+					marker.visible = true;
+					marker.position.copy( intersects[ 0 ].point );
+					intersects[0].object.material.color.set(  0x0000ff );
+
+				} else {
+
+					// console.log("no intersects");
+					marker.visible = false;
+
+				}
+
+			}
+
+			var getMousePosition = function ( dom, x, y ) {
+
+				var rect = dom.getBoundingClientRect();
+				return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
+
+			};
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.update();
+
+				// main scene
+
+				renderer.render( scene, camera );
+
+			}
+
+			//
+
+	
+		</script>
+
+	</body>
+
+</html>

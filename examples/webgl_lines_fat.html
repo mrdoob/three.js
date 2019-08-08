@@ -13,6 +13,9 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
+		<script> 
+			var perline;
+		</script>
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -30,7 +33,7 @@
 			var line, renderer, scene, camera, camera2, controls;
 			var line1;
 			var matLine, matLineBasic, matLineDashed;
-			var perline, perspectiveMatLine;
+			var  perspectiveMatLine;
 			var marker, markergeo, markermat;
 			var stats;
 			var gui;
@@ -112,9 +115,9 @@
 				perspectiveMatLine = new PerspectiveLineMaterial( {
 					color: 0xffffff,
 					vertexColors: THREE.VertexColors,
-					worldlinewidth : 0.2,
+					worldlinewidth: 0.2,
 					maxlinewidth: 100,
-					minlinewidth:0.1,
+					minlinewidth: 0.1,
 					dashed: false
 				} );
 				perline = new Line2( geometry, perspectiveMatLine );
@@ -141,10 +144,10 @@
 
 				//
 				// A marker to show mouse intersect
-				markergeo = new THREE.SphereBufferGeometry(0.3);
-				markermat = new THREE.MeshBasicMaterial( {color: 0xff0000});
-				marker = new THREE.Mesh(markergeo,markermat);
-				scene.add(marker);
+				markergeo = new THREE.SphereBufferGeometry( 0.3 );
+				markermat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+				marker = new THREE.Mesh( markergeo, markermat );
+				scene.add( marker );
 				// marker.visible=false;
 
 
@@ -179,11 +182,11 @@
 			var point = new THREE.Vector2();
 
 			var mouse = new THREE.Vector2();
-			
+
 			var raycaster = new THREE.Raycaster();
 
-			function onMouseMove(evt) {
-			
+			function onMouseMove( evt ) {
+
 				var array = getMousePosition( renderer.domElement, evt.clientX, evt.clientY );
 				point.fromArray( array );
 
@@ -191,16 +194,21 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( [line,line1,perline] );
+				var intersects = raycaster.intersectObjects( [ line, line1, perline ] );
 
-				if ( intersects.length > 0  ) {
-					console.log(intersects[0].point);
+				if ( intersects.length > 0 ) {
+
+					console.log( 'Found intersect at', intersects[ 0 ].point );
 					marker.visible = true;
-					marker.position.copy(intersects[0].point);
+					marker.position.copy( intersects[ 0 ].point );
+
 				} else {
+
 					// console.log("no intersects");
 					marker.visible = false;
+
 				}
+
 			}
 
 			var getMousePosition = function ( dom, x, y ) {
@@ -265,9 +273,9 @@
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1,
-					'world width':0.2,
-					'min width (px)':0.1,
-					'max width (px)':10
+					'world width': 0.2,
+					'min width (px)': 0.1,
+					'max width (px)': 100
 				};
 
 
@@ -304,7 +312,7 @@
 							break;
 
 
-						}
+					}
 
 				} );
 
@@ -373,11 +381,13 @@
 
 				} );
 
-				var subgui_linegeometry = gui.addFolder("LineGeometry");
+				var subgui_linegeometry = gui.addFolder( "LineGeometry" );
 				subgui_linegeometry.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
+
 					matLine.linewidth = val;
+
 				} );
-				subgui_linegeometry.open();
+				// subgui_linegeometry.open();
 
 
 				// Options valid for gl lines:
@@ -385,20 +395,26 @@
 
 
 				// Options valid for PerspectiveGeometry:
-				var subgui_perspective = gui.addFolder("PerspectiveGeometry");
+				var subgui_perspective = gui.addFolder( "PerspectiveGeometry" );
 
-				subgui_perspective.add( param, 'world width', 0.01, 1 ).onChange( function ( val ) {
+				subgui_perspective.add( param, 'world width', 0.01, 2 ).onChange( function ( val ) {
+
 					perspectiveMatLine.worldlinewidth = val;
+
 				} );
 
-				subgui_perspective.add( param, 'min width (px)', 0, 10 ).onChange( function ( val ) {
+				subgui_perspective.add( param, 'min width (px)', 0.1, 10 ).onChange( function ( val ) {
+
 					perspectiveMatLine.minlinewidth = val;
+
 				} );
- 				subgui_perspective.add( param, 'max width (px)', 0, 10 ).onChange( function ( val ) {
+				subgui_perspective.add( param, 'max width (px)', 0.5, 100 ).onChange( function ( val ) {
+
 					perspectiveMatLine.maxlinewidth = val;
+
 				} );
 
-
+				subgui_perspective.open();
 
 			}
 

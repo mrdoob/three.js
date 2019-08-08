@@ -74,7 +74,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	
+
 	raycast: ( function () {
 
 		var inverseMatrix = new Matrix4();
@@ -84,6 +84,10 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		return function raycast( raycaster, intersects ) {
 
 			var precision = raycaster.linePrecision;
+
+			// If using a persepective-line material, there is a known precision:
+			// This doesn't work correctly though; the collision distance turns out too large.
+			// if(this.material && this.material.worldlinewidth) precision = this.material.worldlinewidth;
 
 			var geometry = this.geometry;
 			var matrixWorld = this.matrixWorld;
@@ -110,23 +114,24 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	     	// Currently, the geometry is always a LineSegments2 geometry, which uses the instanceStart/instanceEnd to store segment locations
 	     	var starts = geometry.attributes.instanceStart;
-	     	var ends   = geometry.attributes.instanceEnd;
-	      
-      		for(var i=0;i<starts.count;i++) {
+	     	var ends = geometry.attributes.instanceEnd;
+
+      		for ( var i = 0; i < starts.count; i ++ ) {
+
 		        vStart.fromArray( starts.data.array, i * starts.data.stride + starts.offset );
-		        vEnd  .fromArray( ends  .data.array, i * ends  .data.stride + ends  .offset );
+		        vEnd.fromArray( ends.data.array, i * ends.data.stride + ends.offset );
 		        var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
-        
+
 		        if ( distSq > localPrecisionSq ) continue;
-        
+
 		        interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
-        
+
 		        var distance = raycaster.ray.origin.distanceTo( interRay );
-        
+
 		        if ( distance < raycaster.near || distance > raycaster.far ) continue;
-        
+
 		        intersects.push( {
-        
+
 		          distance: distance,
 		          // What do we want? intersection point on the ray or on the segment??
 		          // point: raycaster.ray.at( distance ),
@@ -136,11 +141,13 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		          faceIndex: null,
 		          object: this
 		        } );
-          
+
       		}
+
 		};
-  }() )
-  
+
+	}() )
+
 
 } );
 
