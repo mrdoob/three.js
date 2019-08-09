@@ -17,6 +17,8 @@ import { TrianglesDrawMode } from '../constants.js';
  */
 
 var object3DId = 0;
+var addedEvent = { type: 'added' };
+var removedEvent = { type: 'removed' };
 
 function Object3D() {
 
@@ -391,7 +393,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			object.parent = this;
 			this.children.push( object );
 
-			object.dispatchEvent( { type: 'added' } );
+			object.dispatchEvent( addedEvent );
 
 		} else {
 
@@ -424,7 +426,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			object.parent = null;
 			this.children.splice( index, 1 );
 
-			object.dispatchEvent( { type: 'removed' } );
+			object.dispatchEvent( removedEvent );
 
 		}
 
