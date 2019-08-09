@@ -15,11 +15,14 @@ import { arrayMax } from '../utils.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+var _m1, _obj, _offset;
+var _box, _boxMorphTargets;
+var _vector;
 
 function BufferGeometry() {
 
-	Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
+	Object.defineProperty( this, 'id', { value: _bufferGeometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -182,129 +185,103 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	rotateX: function () {
+	rotateX: function ( angle ) {
 
 		// rotate geometry around world x-axis
 
-		var m1 = new Matrix4();
+		if ( _m1 === undefined ) _m1 = new Matrix4();
 
-		return function rotateX( angle ) {
+		_m1.makeRotationX( angle );
 
-			m1.makeRotationX( angle );
+		this.applyMatrix( _m1 );
 
-			this.applyMatrix( m1 );
+		return this;
 
-			return this;
+	},
 
-		};
-
-	}(),
-
-	rotateY: function () {
+	rotateY: function ( angle ) {
 
 		// rotate geometry around world y-axis
 
-		var m1 = new Matrix4();
+		if ( _m1 === undefined ) _m1 = new Matrix4();
 
-		return function rotateY( angle ) {
+		_m1.makeRotationY( angle );
 
-			m1.makeRotationY( angle );
+		this.applyMatrix( _m1 );
 
-			this.applyMatrix( m1 );
+		return this;
 
-			return this;
+	},
 
-		};
-
-	}(),
-
-	rotateZ: function () {
+	rotateZ: function ( angle ) {
 
 		// rotate geometry around world z-axis
 
-		var m1 = new Matrix4();
+		if ( _m1 === undefined ) _m1 = new Matrix4();
 
-		return function rotateZ( angle ) {
+		_m1.makeRotationZ( angle );
 
-			m1.makeRotationZ( angle );
+		this.applyMatrix( _m1 );
 
-			this.applyMatrix( m1 );
+		return this;
 
-			return this;
+	},
 
-		};
-
-	}(),
-
-	translate: function () {
+	translate: function ( x, y, z ) {
 
 		// translate geometry
 
-		var m1 = new Matrix4();
+		if ( _m1 === undefined ) _m1 = new Matrix4();
 
-		return function translate( x, y, z ) {
+		_m1.makeTranslation( x, y, z );
 
-			m1.makeTranslation( x, y, z );
+		this.applyMatrix( _m1 );
 
-			this.applyMatrix( m1 );
+		return this;
 
-			return this;
+	},
 
-		};
-
-	}(),
-
-	scale: function () {
+	scale: function ( x, y, z ) {
 
 		// scale geometry
 
-		var m1 = new Matrix4();
+		if ( _m1 === undefined ) _m1 = new Matrix4();
 
-		return function scale( x, y, z ) {
+		_m1.makeScale( x, y, z );
 
-			m1.makeScale( x, y, z );
+		this.applyMatrix( _m1 );
 
-			this.applyMatrix( m1 );
+		return this;
 
-			return this;
+	},
 
-		};
+	lookAt: function ( vector ) {
 
-	}(),
+		if ( _obj === undefined ) _obj = new Object3D();
 
-	lookAt: function () {
+		_obj.lookAt( vector );
 
-		var obj = new Object3D();
+		_obj.updateMatrix();
 
-		return function lookAt( vector ) {
+		this.applyMatrix( _obj.matrix );
 
-			obj.lookAt( vector );
+		return this;
 
-			obj.updateMatrix();
-
-			this.applyMatrix( obj.matrix );
-
-		};
-
-	}(),
+	},
 
 	center: function () {
 
-		var offset = new Vector3();
+		if ( _offset === undefined ) _offset = new Vector3();
 
-		return function center() {
+		this.computeBoundingBox();
 
-			this.computeBoundingBox();
+		this.boundingBox.getCenter( _offset ).negate();
 
-			this.boundingBox.getCenter( offset ).negate();
+		this.translate( _offset.x, _offset.y, _offset.z );
 
-			this.translate( offset.x, offset.y, offset.z );
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setFromObject: function ( object ) {
 
@@ -601,144 +578,144 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	computeBoundingBox: function () {
 
-		var box = new Box3();
+		if ( _box === undefined ) {
 
-		return function computeBoundingBox() {
+			_box = new Box3();
 
-			if ( this.boundingBox === null ) {
+		}
 
-				this.boundingBox = new Box3();
+		if ( this.boundingBox === null ) {
 
-			}
+			this.boundingBox = new Box3();
 
-			var position = this.attributes.position;
-			var morphAttributesPosition = this.morphAttributes.position;
+		}
 
-			if ( position !== undefined ) {
+		var position = this.attributes.position;
+		var morphAttributesPosition = this.morphAttributes.position;
 
-				this.boundingBox.setFromBufferAttribute( position );
+		if ( position !== undefined ) {
 
-				// process morph attributes if present
+			this.boundingBox.setFromBufferAttribute( position );
 
-				if ( morphAttributesPosition ) {
+			// process morph attributes if present
 
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+			if ( morphAttributesPosition ) {
 
-						var morphAttribute = morphAttributesPosition[ i ];
-						box.setFromBufferAttribute( morphAttribute );
+				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
-						this.boundingBox.expandByPoint( box.min );
-						this.boundingBox.expandByPoint( box.max );
+					var morphAttribute = morphAttributesPosition[ i ];
+					_box.setFromBufferAttribute( morphAttribute );
 
-					}
+					this.boundingBox.expandByPoint( _box.min );
+					this.boundingBox.expandByPoint( _box.max );
 
 				}
 
-			} else {
-
-				this.boundingBox.makeEmpty();
-
 			}
 
-			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+		} else {
 
-				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+			this.boundingBox.makeEmpty();
 
-			}
+		}
 
-		};
+		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-	}(),
+			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+
+		}
+
+	},
 
 	computeBoundingSphere: function () {
 
-		var box = new Box3();
-		var boxMorphTargets = new Box3();
-		var vector = new Vector3();
+		if ( _boxMorphTargets === undefined ) {
 
-		return function computeBoundingSphere() {
+			_box = new Box3();
+			_vector = new Vector3();
+			_boxMorphTargets = new Box3();
 
-			if ( this.boundingSphere === null ) {
+		}
 
-				this.boundingSphere = new Sphere();
+		if ( this.boundingSphere === null ) {
 
-			}
+			this.boundingSphere = new Sphere();
 
-			var position = this.attributes.position;
-			var morphAttributesPosition = this.morphAttributes.position;
+		}
 
-			if ( position ) {
+		var position = this.attributes.position;
+		var morphAttributesPosition = this.morphAttributes.position;
 
-				// first, find the center of the bounding sphere
+		if ( position ) {
 
-				var center = this.boundingSphere.center;
+			// first, find the center of the bounding sphere
 
-				box.setFromBufferAttribute( position );
+			var center = this.boundingSphere.center;
 
-				// process morph attributes if present
+			_box.setFromBufferAttribute( position );
 
-				if ( morphAttributesPosition ) {
+			// process morph attributes if present
 
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+			if ( morphAttributesPosition ) {
 
-						var morphAttribute = morphAttributesPosition[ i ];
-						boxMorphTargets.setFromBufferAttribute( morphAttribute );
+				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
-						box.expandByPoint( boxMorphTargets.min );
-						box.expandByPoint( boxMorphTargets.max );
+					var morphAttribute = morphAttributesPosition[ i ];
+					_boxMorphTargets.setFromBufferAttribute( morphAttribute );
 
-					}
-
-				}
-
-				box.getCenter( center );
-
-				// second, try to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
-
-				var maxRadiusSq = 0;
-
-				for ( var i = 0, il = position.count; i < il; i ++ ) {
-
-					vector.fromBufferAttribute( position, i );
-
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-				}
-
-				// process morph attributes if present
-
-				if ( morphAttributesPosition ) {
-
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-						var morphAttribute = morphAttributesPosition[ i ];
-
-						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
-
-							vector.fromBufferAttribute( morphAttribute, j );
-
-							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-						}
-
-					}
-
-				}
-
-				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-				if ( isNaN( this.boundingSphere.radius ) ) {
-
-					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+					_box.expandByPoint( _boxMorphTargets.min );
+					_box.expandByPoint( _boxMorphTargets.max );
 
 				}
 
 			}
 
-		};
+			_box.getCenter( center );
 
-	}(),
+			// second, try to find a boundingSphere with a radius smaller than the
+			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
+
+			var maxRadiusSq = 0;
+
+			for ( var i = 0, il = position.count; i < il; i ++ ) {
+
+				_vector.fromBufferAttribute( position, i );
+
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+			}
+
+			// process morph attributes if present
+
+			if ( morphAttributesPosition ) {
+
+				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+					var morphAttribute = morphAttributesPosition[ i ];
+
+					for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
+
+						_vector.fromBufferAttribute( morphAttribute, j );
+
+						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+					}
+
+				}
+
+			}
+
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			if ( isNaN( this.boundingSphere.radius ) ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+
+			}
+
+		}
+
+	},
 
 	computeFaceNormals: function () {
 
@@ -900,27 +877,23 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	normalizeNormals: function () {
 
-		var vector = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		return function normalizeNormals() {
+		var normals = this.attributes.normal;
 
-			var normals = this.attributes.normal;
+		for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-			for ( var i = 0, il = normals.count; i < il; i ++ ) {
+			_vector.x = normals.getX( i );
+			_vector.y = normals.getY( i );
+			_vector.z = normals.getZ( i );
 
-				vector.x = normals.getX( i );
-				vector.y = normals.getY( i );
-				vector.z = normals.getZ( i );
+			_vector.normalize();
 
-				vector.normalize();
+			normals.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
-				normals.setXYZ( i, vector.x, vector.y, vector.z );
+		}
 
-			}
-
-		};
-
-	}(),
+	},
 
 	toNonIndexed: function () {
 

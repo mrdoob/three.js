@@ -11,17 +11,19 @@ import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { BlinnExponentToRoughnessNode } from '../bsdfs/BlinnExponentToRoughnessNode.js';
 
-function TextureCubeNode( value, textureSize ) {
+function TextureCubeNode( value, textureSize, uv, bias ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
 	this.textureSize = textureSize || new FloatNode( 1024 );
+	this.uv = uv || new ReflectNode( ReflectNode.VECTOR );
+	this.bias = bias || new BlinnExponentToRoughnessNode();
 
 	this.radianceCache = { uv: new TextureCubeUVNode(
-		new ReflectNode( ReflectNode.VECTOR ),
+		this.uv,
 		this.textureSize,
-		new BlinnExponentToRoughnessNode()
+		this.bias
 	) };
 
 	this.irradianceCache = { uv: new TextureCubeUVNode(

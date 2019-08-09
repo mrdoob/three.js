@@ -48,7 +48,7 @@ Object.assign( Triangle, {
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 	getBarycoord: function ( point, a, b, c, target ) {
 
-		if ( _v1 === undefined ) {
+		if ( _v2 === undefined ) {
 
 			_v0 = new Vector3();
 			_v1 = new Vector3();

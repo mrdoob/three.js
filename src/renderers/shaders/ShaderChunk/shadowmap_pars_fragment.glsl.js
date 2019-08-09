@@ -41,7 +41,7 @@ export default /* glsl */`
 		const vec2 offset = vec2( 0.0, 1.0 );
 
 		vec2 texelSize = vec2( 1.0 ) / size;
-		vec2 centroidUV = floor( uv * size + 0.5 ) / size;
+		vec2 centroidUV = ( floor( uv * size - 0.5 ) + 0.5 ) * texelSize;
 
 		float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );
 		float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );

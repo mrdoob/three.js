@@ -166,6 +166,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			vertexTangents: ( material.normalMap && material.vertexTangents ),
 			vertexColors: material.vertexColors,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearCoatNormalMap,
 
 			fog: !! fog,
 			useFog: material.fog,
@@ -205,8 +206,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			toneMapping: renderer.toneMapping,
 			physicallyCorrectLights: renderer.physicallyCorrectLights,
-
-			energyPreservation: material.energyPreservation,
 
 			premultipliedAlpha: material.premultipliedAlpha,
 
