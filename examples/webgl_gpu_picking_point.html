@@ -62,7 +62,6 @@ var GPUPickingPoint = new THREE.Vector3();
 var CPUPickingPoint = new THREE.Vector3();
 
 init();
-animate();
 
 function init() {
 
@@ -112,7 +111,8 @@ function init() {
 	
 	// check this state,this is work for know.
 	//but if logarithmicDepthBuffer option work for MeshDepthMaterial,enable logarithmicDepthBuffer will make this example broken.
-	var depthBufferState = renderer.capabilities.logarithmicDepthBuffer;
+	var depthBufferState= {};
+	depthBufferState.logarithmicDepthBuffer = renderer.capabilities.logarithmicDepthBuffer;
 	gui.add(depthBufferState, 'logarithmicDepthBuffer');
 	var GPUPFolder = gui.addFolder( 'GPUPickingPoint' );
 	GPUPFolder.open();
@@ -132,6 +132,8 @@ function init() {
 
 	window.addEventListener( 'resize', onWindowResize, false );
 	renderer.domElement.addEventListener( 'click', pick );
+	controls.addEventListener( 'change', render );
+	render();
 
 }
 
@@ -240,6 +242,7 @@ function pick( e ) {
 	}
 
 	renderer.setRenderTarget( null );
+	gui.updateDisplay();
 
 }
 
@@ -255,15 +258,6 @@ function onWindowResize() {
 
 //
 
-function animate() {
-
-	requestAnimationFrame( animate );
-
-	gui.updateDisplay();
-	
-	render();
-
-}
 
 function render() {
 
