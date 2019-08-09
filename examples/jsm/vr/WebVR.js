@@ -14,7 +14,6 @@ var WEBVR = {
 		if ( options && options.referenceSpaceType ) {
 
 			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
-
 		}
 
 		function showEnterVR( device ) {
@@ -101,7 +100,15 @@ var WEBVR = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-vr' ).then( onSessionStarted );
+					// WebXR's requestReferenceSpace only works if the corresponding feature
+					// was requested at session creation time. For simplicity, just ask for
+					// the interesting ones as optional features, but be aware that the
+					// requestReferenceSpace call will fail if it turns out to be unavailable.
+					// ('local' is always available for immersive sessions and doesn't need to
+					// be requested separately.)
+
+					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
 				} else {
 
