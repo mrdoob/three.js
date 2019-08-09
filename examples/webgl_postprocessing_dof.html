@@ -4,62 +4,25 @@
 		<title>three.js webgl - postprocessing - depth-of-field</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-				text-align: center;
-			}
-
-			a { color: #0078ff; }
-
-			#info {
-				color: #fff;
-				position: relative;
-				top: 0px;
-				width: 50em;
-				margin: 0 auto -2.1em;
-				padding: 5px;
-				z-index: 100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/BokehShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/BokehPass.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl depth-of-field with bokeh example -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl depth-of-field with bokeh example<br/>
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { BokehPass } from './jsm/postprocessing/BokehPass.js';
 
 			var container, stats;
 			var camera, scene, renderer,
@@ -157,8 +120,6 @@
 
 						}
 
-				scene.matrixAutoUpdate = false;
-
 				initPostprocessing();
 
 				renderer.autoClear = false;
@@ -188,7 +149,7 @@
 
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
 				gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
@@ -249,9 +210,9 @@
 
 			function initPostprocessing() {
 
-				var renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new RenderPass( scene, camera );
 
-				var bokehPass = new THREE.BokehPass( scene, camera, {
+				var bokehPass = new BokehPass( scene, camera, {
 					focus: 1.0,
 					aperture:	0.025,
 					maxblur:	1.0,
@@ -260,9 +221,7 @@
 					height: height
 				} );
 
-				bokehPass.renderToScreen = true;
-
-				var composer = new THREE.EffectComposer( renderer );
+				var composer = new EffectComposer( renderer );
 
 				composer.addPass( renderPass );
 				composer.addPass( bokehPass );

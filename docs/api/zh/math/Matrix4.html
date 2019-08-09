@@ -83,7 +83,7 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h2>属性（Properties）</h2>
 
-		<h3>[property:Float32Array elements]</h3>
+		<h3>[property:Array elements]</h3>
 		<p>
 		矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
@@ -91,7 +91,7 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[property:Boolean isMatrix4]</h3>
 		<p>
 			用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
-		
+
 			不应该改变该值，因为它在内部用于优化。
 		</p>
 
@@ -168,7 +168,7 @@ zAxis = (c, g, k)
 		<p>
 			[page:Array array] - 用来存储设置元素数据的数组<br />
 			[page:Integer offset] - (可选参数) 数组的偏移量，默认值为 0。<br /><br />
-	
+
 			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 			</p>
 
@@ -176,7 +176,7 @@ zAxis = (c, g, k)
 		<p>
 			[page:Matrix3 m] - 取逆的矩阵。<br />
 			[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
-			
+
 			使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
 			将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
 			参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
@@ -251,7 +251,7 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
-		
+
 		把该矩阵设置为绕x轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
 		结果如下：
 		<code>
@@ -356,6 +356,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
 			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
 <code>

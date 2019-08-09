@@ -41,12 +41,6 @@ for( var i = 0; i < 3; i++ ) {
 scene.add( lod );
 		</code>
 
-		<p>
-			请注意，要使得LOD在各不同细节层次之间进行切换，你将需要在你的渲染循环中调用[page:.update update]( camera )。
-			详情请查看这个示例中的源代码：
-		[example:webgl_lod WebGL / LOD]
-		</div>
-
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
 		<p>
@@ -55,7 +49,14 @@ scene.add( lod );
 
 
 		<h2>属性</h2>
-		<p>请参阅其基类[page:Object3D]来查看公共属性。</p>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
+
+		<h3>[property:boolean autoUpdate]</h3>
+		<p>
+		Whether the LOD object is updated automatically by the renderer per frame or not.
+		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
+		Default is true.
+		</p>
 
 		<h3>[property:array levels]</h3>
 		<p>
@@ -67,9 +68,9 @@ scene.add( lod );
 		</p>
 
 		<h2>方法</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
+		<p>共有方法请参见其基类[page:Object3D]。</p>
 
-		<h3>[method:null addLevel]( [param:Object3D object], [param:Float distance] )</h3>
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance] )</h3>
 		<p>
 		[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
 		[page:Float distance] —— 将显示这一细节层次的距离。<br /><br />
@@ -96,7 +97,7 @@ scene.add( lod );
 
 
 
-		<h3>[method:null toJSON]( meta )</h3>
+		<h3>[method:Object toJSON]( meta )</h3>
 		<p>
 			使用这个方法，为LOD对象中的每个细节层次创建一个JSON结构。
 		</p>
@@ -104,7 +105,6 @@ scene.add( lod );
 		<h3>[method:null update]( [param:Camera camera] )</h3>
 		<p>
 			基于每个[page:levels level]中的[page:Object3D object]和[page:Camera camera]（摄像机）之间的距离，来设置其可见性。
-			为了使得多细节层次能够被自动地更新，这个方法需要在渲染循环中被调用。
 		</p>
 
 		<h2>源代码</h2>

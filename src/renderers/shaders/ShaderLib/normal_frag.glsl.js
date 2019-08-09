@@ -3,7 +3,7 @@ export default /* glsl */`
 
 uniform float opacity;
 
-#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || ( defined( USE_NORMALMAP ) && ! defined( OBJECTSPACE_NORMALMAP ) )
+#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || ( defined( USE_NORMALMAP ) && ! defined( OBJECTSPACE_NORMALMAP ) ) || defined( USE_CLEARCOAT_NORMALMAP )
 
 	varying vec3 vViewPosition;
 
@@ -27,9 +27,11 @@ uniform float opacity;
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
+#include <clipping_planes_pars_fragment>
 
 void main() {
 
+	#include <clipping_planes_fragment>
 	#include <logdepthbuf_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>

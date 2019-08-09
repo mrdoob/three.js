@@ -16,6 +16,13 @@
 			Unlike [page:FileLoader], [name] does not avoid multiple concurrent requests to the same URL.
 		</p>
 
+		<p>
+			Note that [page:Texture.flipY] and [page:Texture.premultiplyAlpha] with [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] are ignored.
+			[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] needs these configuration on bitmap creation
+			unlike regular images need them on uploading to GPU. You need to set the equivalent options via [page:ImageBitmapLoader.setOptions]
+			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
+		</p>
+
 		<h2>Example</h2>
 
 		<p>
@@ -25,6 +32,9 @@
 		<code>
 		// instantiate a loader
 		var loader = new THREE.ImageBitmapLoader();
+
+		// set options if needed
+		loader.setOptions( { imageOrientation: 'flipY' } );
 
 		// load a image resource
 		loader.load(

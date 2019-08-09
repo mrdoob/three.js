@@ -30,7 +30,7 @@ export default /* glsl */`
 
 		#else
 
-			normal = perturbNormal2Arb( -vViewPosition, normal );
+			normal = perturbNormal2Arb( -vViewPosition, normal, normalScale, normalMap );
 
 		#endif
 

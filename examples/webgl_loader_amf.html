@@ -4,35 +4,11 @@
 		<title>three.js webgl - AMF</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #999;
 			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: skyblue }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				text-align: center;
-			}
-
 		</style>
 	</head>
 	<body>
@@ -43,21 +19,14 @@
 			<div>Rook manufacturing file from <a href="http://amf.wikispaces.com/AMF+test+files" target="_blank" rel="noopener">AMF test files</a></div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/AMFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { AMFLoader } from './jsm/loaders/AMFLoader.js';
 
 			var camera, scene, renderer;
 
@@ -90,7 +59,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new THREE.AMFLoader();
+				var loader = new AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
 					scene.add( amfobject );
@@ -98,7 +67,7 @@
 
 				} );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.target.set( 0, 1.2, 2 );
 				controls.update();

@@ -21,251 +21,253 @@ import { Vector } from './Vector2';
  * ( class Vector3 implements Vector<Vector3> )
  */
 export class Vector3 implements Vector {
-  constructor(x?: number, y?: number, z?: number);
 
-  x: number;
-  y: number;
-  z: number;
-  isVector3: true;
+	constructor( x?: number, y?: number, z?: number );
 
-  /**
-   * Sets value of this vector.
-   */
-  set(x: number, y: number, z: number): this;
+	x: number;
+	y: number;
+	z: number;
+	isVector3: true;
 
-  /**
-   * Sets all values of this vector.
-   */
-  setScalar(scalar: number): this;
+	/**
+	 * Sets value of this vector.
+	 */
+	set( x: number, y: number, z: number ): this;
 
-  /**
-   * Sets x value of this vector.
-   */
-  setX(x: number): Vector3;
+	/**
+	 * Sets all values of this vector.
+	 */
+	setScalar( scalar: number ): this;
 
-  /**
-   * Sets y value of this vector.
-   */
-  setY(y: number): Vector3;
+	/**
+	 * Sets x value of this vector.
+	 */
+	setX( x: number ): Vector3;
 
-  /**
-   * Sets z value of this vector.
-   */
-  setZ(z: number): Vector3;
+	/**
+	 * Sets y value of this vector.
+	 */
+	setY( y: number ): Vector3;
 
-  setComponent(index: number, value: number): this;
+	/**
+	 * Sets z value of this vector.
+	 */
+	setZ( z: number ): Vector3;
 
-  getComponent(index: number): number;
+	setComponent( index: number, value: number ): this;
 
-  /**
-   * Clones this vector.
-   */
-  clone(): this;
+	getComponent( index: number ): number;
 
-  /**
-   * Copies value of v to this vector.
-   */
-  copy(v: Vector3): this;
+	/**
+	 * Clones this vector.
+	 */
+	clone(): this;
 
-  /**
-   * Adds v to this vector.
-   */
-  add(a: Vector3, b?: Vector3): this;
+	/**
+	 * Copies value of v to this vector.
+	 */
+	copy( v: Vector3 ): this;
 
-  addScalar(s: number): this;
+	/**
+	 * Adds v to this vector.
+	 */
+	add( a: Vector3, b?: Vector3 ): this;
 
-  addScaledVector(v: Vector3, s: number): this;
+	addScalar( s: number ): this;
 
-  /**
-   * Sets this vector to a + b.
-   */
-  addVectors(a: Vector3, b: Vector3): this;
+	addScaledVector( v: Vector3, s: number ): this;
 
-  /**
-   * Subtracts v from this vector.
-   */
-  sub(a: Vector3): this;
+	/**
+	 * Sets this vector to a + b.
+	 */
+	addVectors( a: Vector3, b: Vector3 ): this;
 
-  subScalar(s: number): this;
+	/**
+	 * Subtracts v from this vector.
+	 */
+	sub( a: Vector3 ): this;
 
-  /**
-   * Sets this vector to a - b.
-   */
-  subVectors(a: Vector3, b: Vector3): this;
+	subScalar( s: number ): this;
 
-  multiply(v: Vector3): this;
+	/**
+	 * Sets this vector to a - b.
+	 */
+	subVectors( a: Vector3, b: Vector3 ): this;
 
-  /**
-   * Multiplies this vector by scalar s.
-   */
-  multiplyScalar(s: number): this;
+	multiply( v: Vector3 ): this;
 
-  multiplyVectors(a: Vector3, b: Vector3): this;
+	/**
+	 * Multiplies this vector by scalar s.
+	 */
+	multiplyScalar( s: number ): this;
 
-  applyEuler(euler: Euler): this;
+	multiplyVectors( a: Vector3, b: Vector3 ): this;
 
-  applyAxisAngle(axis: Vector3, angle: number): this;
+	applyEuler( euler: Euler ): this;
 
-  applyMatrix3(m: Matrix3): this;
+	applyAxisAngle( axis: Vector3, angle: number ): this;
 
-  applyMatrix4(m: Matrix4): this;
+	applyMatrix3( m: Matrix3 ): this;
 
-  applyQuaternion(q: Quaternion): this;
+	applyMatrix4( m: Matrix4 ): this;
 
-  project(camera: Camera): this;
+	applyQuaternion( q: Quaternion ): this;
 
-  unproject(camera: Camera): this;
+	project( camera: Camera ): this;
 
-  transformDirection(m: Matrix4): this;
+	unproject( camera: Camera ): this;
 
-  divide(v: Vector3): this;
+	transformDirection( m: Matrix4 ): this;
 
-  /**
-   * Divides this vector by scalar s.
-   * Set vector to ( 0, 0, 0 ) if s == 0.
-   */
-  divideScalar(s: number): this;
+	divide( v: Vector3 ): this;
 
-  min(v: Vector3): this;
+	/**
+	 * Divides this vector by scalar s.
+	 * Set vector to ( 0, 0, 0 ) if s == 0.
+	 */
+	divideScalar( s: number ): this;
 
-  max(v: Vector3): this;
+	min( v: Vector3 ): this;
 
-  clamp(min: Vector3, max: Vector3): this;
+	max( v: Vector3 ): this;
 
-  clampScalar(min: number, max: number): this;
+	clamp( min: Vector3, max: Vector3 ): this;
 
-  clampLength(min: number, max: number): this;
+	clampScalar( min: number, max: number ): this;
 
-  floor(): this;
+	clampLength( min: number, max: number ): this;
 
-  ceil(): this;
+	floor(): this;
 
-  round(): this;
+	ceil(): this;
 
-  roundToZero(): this;
+	round(): this;
 
-  /**
-   * Inverts this vector.
-   */
-  negate(): this;
+	roundToZero(): this;
 
-  /**
-   * Computes dot product of this vector and v.
-   */
-  dot(v: Vector3): number;
+	/**
+	 * Inverts this vector.
+	 */
+	negate(): this;
 
-  /**
-   * Computes squared length of this vector.
-   */
-  lengthSq(): number;
+	/**
+	 * Computes dot product of this vector and v.
+	 */
+	dot( v: Vector3 ): number;
 
-  /**
-   * Computes length of this vector.
-   */
-  length(): number;
+	/**
+	 * Computes squared length of this vector.
+	 */
+	lengthSq(): number;
 
-  /**
-   * Computes Manhattan length of this vector.
-   * http://en.wikipedia.org/wiki/Taxicab_geometry
-   *
-   * @deprecated Use {@link Vector3#manhattanLength .manhattanLength()} instead.
-   */
-  lengthManhattan(): number;
+	/**
+	 * Computes length of this vector.
+	 */
+	length(): number;
 
-  /**
-   * Computes the Manhattan length of this vector.
-   *
-   * @return {number}
-   *
-   * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
-   */
-  manhattanLength(): number;
+	/**
+	 * Computes Manhattan length of this vector.
+	 * http://en.wikipedia.org/wiki/Taxicab_geometry
+	 *
+	 * @deprecated Use {@link Vector3#manhattanLength .manhattanLength()} instead.
+	 */
+	lengthManhattan(): number;
 
-  /**
-   * Computes the Manhattan length (distance) from this vector to the given vector v
-   *
-   * @param {Vector3} v
-   *
-   * @return {number}
-   *
-   * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
-   */
-  manhattanDistanceTo(v: Vector3): number;
+	/**
+	 * Computes the Manhattan length of this vector.
+	 *
+	 * @return {number}
+	 *
+	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 */
+	manhattanLength(): number;
 
-  /**
-   * Normalizes this vector.
-   */
-  normalize(): this;
+	/**
+	 * Computes the Manhattan length (distance) from this vector to the given vector v
+	 *
+	 * @param {Vector3} v
+	 *
+	 * @return {number}
+	 *
+	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
+	 */
+	manhattanDistanceTo( v: Vector3 ): number;
 
-  /**
-   * Normalizes this vector and multiplies it by l.
-   */
-  setLength(l: number): this;
-  lerp(v: Vector3, alpha: number): this;
+	/**
+	 * Normalizes this vector.
+	 */
+	normalize(): this;
 
-  lerpVectors(v1: Vector3, v2: Vector3, alpha: number): this;
+	/**
+	 * Normalizes this vector and multiplies it by l.
+	 */
+	setLength( l: number ): this;
+	lerp( v: Vector3, alpha: number ): this;
 
-  /**
-   * Sets this vector to cross product of itself and v.
-   */
-  cross(a: Vector3, w?: Vector3): this;
+	lerpVectors( v1: Vector3, v2: Vector3, alpha: number ): this;
 
-  /**
-   * Sets this vector to cross product of a and b.
-   */
-  crossVectors(a: Vector3, b: Vector3): this;
-  projectOnVector(v: Vector3): this;
-  projectOnPlane(planeNormal: Vector3): this;
-  reflect(vector: Vector3): this;
-  angleTo(v: Vector3): number;
+	/**
+	 * Sets this vector to cross product of itself and v.
+	 */
+	cross( a: Vector3, w?: Vector3 ): this;
 
-  /**
-   * Computes distance of this vector to v.
-   */
-  distanceTo(v: Vector3): number;
+	/**
+	 * Sets this vector to cross product of a and b.
+	 */
+	crossVectors( a: Vector3, b: Vector3 ): this;
+	projectOnVector( v: Vector3 ): this;
+	projectOnPlane( planeNormal: Vector3 ): this;
+	reflect( vector: Vector3 ): this;
+	angleTo( v: Vector3 ): number;
 
-  /**
-   * Computes squared distance of this vector to v.
-   */
-  distanceToSquared(v: Vector3): number;
+	/**
+	 * Computes distance of this vector to v.
+	 */
+	distanceTo( v: Vector3 ): number;
 
-  /**
-   * @deprecated Use {@link Vector3#manhattanDistanceTo .manhattanDistanceTo()} instead.
-   */
-  distanceToManhattan(v: Vector3): number;
+	/**
+	 * Computes squared distance of this vector to v.
+	 */
+	distanceToSquared( v: Vector3 ): number;
 
-  setFromSpherical(s: Spherical): this;
-  setFromCylindrical(s: Cylindrical): this;
-  setFromMatrixPosition(m: Matrix4): this;
-  setFromMatrixScale(m: Matrix4): this;
-  setFromMatrixColumn(matrix: Matrix4, index: number): this;
+	/**
+	 * @deprecated Use {@link Vector3#manhattanDistanceTo .manhattanDistanceTo()} instead.
+	 */
+	distanceToManhattan( v: Vector3 ): number;
 
-  /**
-   * Checks for strict equality of this vector and v.
-   */
-  equals(v: Vector3): boolean;
+	setFromSpherical( s: Spherical ): this;
+	setFromCylindrical( s: Cylindrical ): this;
+	setFromMatrixPosition( m: Matrix4 ): this;
+	setFromMatrixScale( m: Matrix4 ): this;
+	setFromMatrixColumn( matrix: Matrix4, index: number ): this;
 
-  fromArray(xyz: number[], offset?: number): Vector3;
+	/**
+	 * Checks for strict equality of this vector and v.
+	 */
+	equals( v: Vector3 ): boolean;
 
-  /**
-   * Returns an array [x, y, z], or copies x, y and z into the provided array.
-   * @param array (optional) array to store the vector to. If this is not provided, a new array will be created.
-   * @param offset (optional) optional offset into the array.
-   * @return The created or provided array.
-   */
-  toArray(xyz?: number[], offset?: number): number[];
+	fromArray( xyz: number[], offset?: number ): Vector3;
 
-  /**
-   * Copies x, y and z into the provided array-like.
-   * @param array array-like to store the vector to.
-   * @param offset (optional) optional offset into the array.
-   * @return The provided array-like.
-   */
-  toArray(xyz: ArrayLike<number>, offset?: number): ArrayLike<number>;
+	/**
+	 * Returns an array [x, y, z], or copies x, y and z into the provided array.
+	 * @param array (optional) array to store the vector to. If this is not provided, a new array will be created.
+	 * @param offset (optional) optional offset into the array.
+	 * @return The created or provided array.
+	 */
+	toArray( xyz?: number[], offset?: number ): number[];
 
-  fromBufferAttribute(
-    attribute: BufferAttribute,
-    index: number,
-    offset?: number
-  ): this;
+	/**
+	 * Copies x, y and z into the provided array-like.
+	 * @param array array-like to store the vector to.
+	 * @param offset (optional) optional offset into the array.
+	 * @return The provided array-like.
+	 */
+	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
+	fromBufferAttribute(
+		attribute: BufferAttribute,
+		index: number,
+		offset?: number
+	): this;
+
 }

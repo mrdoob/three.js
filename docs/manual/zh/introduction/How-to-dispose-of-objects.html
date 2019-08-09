@@ -11,7 +11,6 @@
 
 <body>
 	<h1>如何废置对象（[name]）</h1>
-	<br />
 
 	<p>
 		为了提高性能，并避免应用程序中的内存泄露，一个重要的方面是废置未使用的类库实体。
@@ -54,11 +53,18 @@
 		这些对象仅能通过执行[page:WebGLRenderTarget.dispose]()来解除分配。
 	</p>
 
+	<h2>Scenes</h2>
+
+	<p>
+		The renderer maintains for scenes special data structures for sorting and rendering. If for some reasons a scene object becomes obsolete in an application,
+		call [page:Scene.dispose]() in order to free these resources.
+	</p>
+
 	<h2>杂项</h2>
 
 	<p>
 		有一些来自examples目录的类，例如控制器或者后期处理过程，提供了*dispose()*方法以用于移除内部事件监听器或渲染目标。
-		通常来讲，非常建议查阅类的API或者文档，并注意*dispose()*。如果存在的话，你应当在清理时使用它。
+		通常来讲，非常建议查阅类的API或者文档，并注意*dispose()*函数。如果该函数存在的话，你应当在清理时使用它。
 	</p>
 
 	<h2>常见问题</h2>
@@ -75,7 +81,7 @@
 
 	<p>
 		并不会，你必须通过*dispose()*来明确地废置geometry（几何体）或material（材质）。
-		请记住，eometry（几何体）或material（材质）可以在3D物体之间（例如mesh（网格））被共享。
+		请记住，geometry（几何体）或material（材质）可以在3D物体之间（例如mesh（网格））被共享。
 	</p>
 
 	<h3>*three.js*是否会提供被缓存对象数量的相关信息？</h3>

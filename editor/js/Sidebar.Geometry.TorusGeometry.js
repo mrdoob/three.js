@@ -68,7 +68,7 @@ Sidebar.Geometry.TorusGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),

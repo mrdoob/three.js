@@ -4,29 +4,7 @@
 		<title>three.js webgl - shadow map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			a {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -37,24 +15,15 @@
 		t: toggle HUD
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
-		<script src="js/utils/ShadowMapViewer.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
 			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
@@ -96,7 +65,7 @@
 				scene.background = new THREE.Color( 0x59472b );
 				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 
 				controls.lookSpeed = 0.0125;
 				controls.movementSpeed = 500;
@@ -134,6 +103,8 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
 				renderer.autoClear = false;
 
 				//
@@ -181,7 +152,7 @@
 
 			function createHUD() {
 
-				lightShadowMapViewer = new THREE.ShadowMapViewer( light );
+				lightShadowMapViewer = new ShadowMapViewer( light );
 				lightShadowMapViewer.position.x = 10;
 				lightShadowMapViewer.position.y = SCREEN_HEIGHT - ( SHADOW_MAP_HEIGHT / 4 ) - 10;
 				lightShadowMapViewer.size.width = SHADOW_MAP_WIDTH / 4;
@@ -195,7 +166,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -300,7 +271,7 @@
 
 				}
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 
 				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 

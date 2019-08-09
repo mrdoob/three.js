@@ -5,31 +5,24 @@
 		<title>three.js webgl - raycast - sprite</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-
-				margin: 0px;
 				background-color: #fff;
-				overflow: hidden;
+				color: #333;
 			}
-
-			#info{
-				position: absolute;
-				z-index: 1;
-				width: 100%;
-				padding: 5px;
-				text-align: center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 <body>
 	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raycast sprite<br></div>
-	<script src="../build/three.js"></script>
-	<script src="./js/controls/OrbitControls.js"></script>
-	<script>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 		var renderer, scene, camera;
 		var controls, group;
@@ -57,7 +50,7 @@
 			camera.position.set( 15, 15, 15 );
 			camera.lookAt( scene.position );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.enableRotate = true;
 
 			// add sprites
@@ -67,11 +60,11 @@
 			sprite.scale.set( 2, 5, 1 );
 			group.add( sprite );
 
-			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );
+			var sprite = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f', sizeAttenuation: false } ) );
 			sprite.material.rotation = Math.PI / 3 * 4;
 			sprite.position.set( 8, - 2, 2 );
 			sprite.center.set( 0.5, 0 );
-			sprite.scale.set( 1, - 5, 1 );
+			sprite.scale.set( .1, .5, .1 );
 			group.add( sprite );
 
 			var group2 = new THREE.Object3D();

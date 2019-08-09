@@ -7,11 +7,15 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
+var _position, _quaternion, _scale;
+var _orientation;
+
 function PositionalAudio( listener ) {
 
 	Audio.call( this, listener );
 
 	this.panner = this.context.createPanner();
+	this.panner.panningModel = 'HRTF';
 	this.panner.connect( this.gain );
 
 }
@@ -92,50 +96,48 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	},
 
-	updateMatrixWorld: ( function () {
+	updateMatrixWorld: function ( force ) {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		var orientation = new Vector3();
+		if ( _position === undefined ) {
 
-		return function updateMatrixWorld( force ) {
+			_position = new Vector3();
+			_quaternion = new Quaternion();
+			_scale = new Vector3();
+			_orientation = new Vector3();
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+		}
 
-			if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
+		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
-			this.matrixWorld.decompose( position, quaternion, scale );
+		this.matrixWorld.decompose( _position, _quaternion, _scale );
 
-			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+		_orientation.set( 0, 0, 1 ).applyQuaternion( _quaternion );
 
-			var panner = this.panner;
+		var panner = this.panner;
 
-			if ( panner.positionX ) {
+		if ( panner.positionX ) {
 
-				// code path for Chrome and Firefox (see #14393)
+			// code path for Chrome and Firefox (see #14393)
 
-				var endTime = this.context.currentTime + this.listener.timeDelta;
+			var endTime = this.context.currentTime + this.listener.timeDelta;
 
-				panner.positionX.linearRampToValueAtTime( position.x, endTime );
-				panner.positionY.linearRampToValueAtTime( position.y, endTime );
-				panner.positionZ.linearRampToValueAtTime( position.z, endTime );
-				panner.orientationX.linearRampToValueAtTime( orientation.x, endTime );
-				panner.orientationY.linearRampToValueAtTime( orientation.y, endTime );
-				panner.orientationZ.linearRampToValueAtTime( orientation.z, endTime );
+			panner.positionX.linearRampToValueAtTime( _position.x, endTime );
+			panner.positionY.linearRampToValueAtTime( _position.y, endTime );
+			panner.positionZ.linearRampToValueAtTime( _position.z, endTime );
+			panner.orientationX.linearRampToValueAtTime( _orientation.x, endTime );
+			panner.orientationY.linearRampToValueAtTime( _orientation.y, endTime );
+			panner.orientationZ.linearRampToValueAtTime( _orientation.z, endTime );
 
-			} else {
+		} else {
 
-				panner.setPosition( position.x, position.y, position.z );
-				panner.setOrientation( orientation.x, orientation.y, orientation.z );
+			panner.setPosition( _position.x, _position.y, _position.z );
+			panner.setOrientation( _orientation.x, _orientation.y, _orientation.z );
 
-			}
+		}
 
-		};
-
-	} )()
-
+	}
 
 } );
 

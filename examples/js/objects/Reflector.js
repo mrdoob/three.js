@@ -28,12 +28,10 @@ THREE.Reflector = function ( geometry, options ) {
 	var rotationMatrix = new THREE.Matrix4();
 	var lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	var clipPlane = new THREE.Vector4();
-	var viewport = new THREE.Vector4();
 
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
 	var q = new THREE.Vector4();
-	var size = new THREE.Vector2();
 
 	var textureMatrix = new THREE.Matrix4();
 	var virtualCamera = new THREE.PerspectiveCamera();
@@ -172,17 +170,9 @@ THREE.Reflector = function ( geometry, options ) {
 
 		// Restore viewport
 
-		var bounds = camera.bounds;
+		var viewport = camera.viewport;
 
-		if ( bounds !== undefined ) {
-
-			renderer.getSize( size );
-			var pixelRatio = renderer.getPixelRatio();
-
-			viewport.x = bounds.x * size.width * pixelRatio;
-			viewport.y = bounds.y * size.height * pixelRatio;
-			viewport.z = bounds.z * size.width * pixelRatio;
-			viewport.w = bounds.w * size.height * pixelRatio;
+		if ( viewport !== undefined ) {
 
 			renderer.state.viewport( viewport );
 
@@ -208,17 +198,14 @@ THREE.Reflector.ReflectorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 

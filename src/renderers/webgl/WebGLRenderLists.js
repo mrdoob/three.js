@@ -12,7 +12,7 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.program && b.program && a.program !== b.program ) {
+	} else if ( a.program !== b.program ) {
 
 		return a.program.id - b.program.id;
 
@@ -63,6 +63,8 @@ function WebGLRenderList() {
 	var opaque = [];
 	var transparent = [];
 
+	var defaultProgram = { id: - 1 };
+
 	function init() {
 
 		renderItemsIndex = 0;
@@ -83,7 +85,7 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
-				program: material.program,
+				program: material.program || defaultProgram,
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
@@ -98,7 +100,7 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
-			renderItem.program = material.program;
+			renderItem.program = material.program || defaultProgram;
 			renderItem.groupOrder = groupOrder;
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;

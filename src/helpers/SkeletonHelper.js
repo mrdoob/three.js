@@ -16,6 +16,8 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Object3D } from '../core/Object3D.js';
 
+var _vector, _boneMatrix, _matrixWorldInv;
+
 function getBoneList( object ) {
 
 	var boneList = [];
@@ -81,48 +83,47 @@ function SkeletonHelper( object ) {
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
 
-SkeletonHelper.prototype.updateMatrixWorld = function () {
+SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
 
-	var vector = new Vector3();
+	if ( _matrixWorldInv === undefined ) {
 
-	var boneMatrix = new Matrix4();
-	var matrixWorldInv = new Matrix4();
+		_vector = new Vector3();
+		_boneMatrix = new Matrix4();
+		_matrixWorldInv = new Matrix4();
 
-	return function updateMatrixWorld( force ) {
+	}
 
-		var bones = this.bones;
+	var bones = this.bones;
 
-		var geometry = this.geometry;
-		var position = geometry.getAttribute( 'position' );
+	var geometry = this.geometry;
+	var position = geometry.getAttribute( 'position' );
 
-		matrixWorldInv.getInverse( this.root.matrixWorld );
+	_matrixWorldInv.getInverse( this.root.matrixWorld );
 
-		for ( var i = 0, j = 0; i < bones.length; i ++ ) {
+	for ( var i = 0, j = 0; i < bones.length; i ++ ) {
 
-			var bone = bones[ i ];
+		var bone = bones[ i ];
 
-			if ( bone.parent && bone.parent.isBone ) {
+		if ( bone.parent && bone.parent.isBone ) {
 
-				boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
-				vector.setFromMatrixPosition( boneMatrix );
-				position.setXYZ( j, vector.x, vector.y, vector.z );
+			_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
+			_vector.setFromMatrixPosition( _boneMatrix );
+			position.setXYZ( j, _vector.x, _vector.y, _vector.z );
 
-				boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
-				vector.setFromMatrixPosition( boneMatrix );
-				position.setXYZ( j + 1, vector.x, vector.y, vector.z );
+			_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
+			_vector.setFromMatrixPosition( _boneMatrix );
+			position.setXYZ( j + 1, _vector.x, _vector.y, _vector.z );
 
-				j += 2;
-
-			}
+			j += 2;
 
 		}
 
-		geometry.getAttribute( 'position' ).needsUpdate = true;
+	}
 
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+	geometry.getAttribute( 'position' ).needsUpdate = true;
 
-	};
+	Object3D.prototype.updateMatrixWorld.call( this, force );
 
-}();
+};
 
 export { SkeletonHelper };

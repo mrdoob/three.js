@@ -14,77 +14,85 @@ import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
 import { Fog } from './../scenes/Fog';
-import { Texture } from './../textures/Texture';
 import { ToneMapping, ShadowMapType, CullFace } from '../constants';
 import { WebVRManager } from '../renderers/webvr/WebVRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
+import { Geometry } from './../core/Geometry';
+import { BufferGeometry } from './../core/BufferGeometry';
 
 export interface Renderer {
-  domElement: HTMLCanvasElement;
+	domElement: HTMLCanvasElement;
 
-  render(scene: Scene, camera: Camera): void;
-  setSize(width: number, height: number, updateStyle?: boolean): void;
+	render( scene: Scene, camera: Camera ): void;
+	setSize( width: number, height: number, updateStyle?: boolean ): void;
 }
 
 export interface WebGLRendererParameters {
-  /**
-   * A Canvas where the renderer draws its output.
-   */
-  canvas?: HTMLCanvasElement;
+	/**
+	 * A Canvas where the renderer draws its output.
+	 */
+	canvas?: HTMLCanvasElement;
 
-  /**
-   * A WebGL Rendering Context.
-   * (https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext)
-   *  Default is null
-   */
-  context?: WebGLRenderingContext;
+	/**
+	 * A WebGL Rendering Context.
+	 * (https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext)
+	 *	Default is null
+	 */
+	context?: WebGLRenderingContext;
 
-  /**
-   *  shader precision. Can be "highp", "mediump" or "lowp".
-   */
-  precision?: string;
+	/**
+	 *	shader precision. Can be "highp", "mediump" or "lowp".
+	 */
+	precision?: string;
 
-  /**
-   * default is true.
-   */
-  alpha?: boolean;
+	/**
+	 * default is true.
+	 */
+	alpha?: boolean;
 
-  /**
-   * default is true.
-   */
-  premultipliedAlpha?: boolean;
+	/**
+	 * default is true.
+	 */
+	premultipliedAlpha?: boolean;
 
-  /**
-   * default is false.
-   */
-  antialias?: boolean;
+	/**
+	 * default is false.
+	 */
+	antialias?: boolean;
 
-  /**
-   * default is true.
-   */
-  stencil?: boolean;
+	/**
+	 * default is true.
+	 */
+	stencil?: boolean;
 
-  /**
-   * default is false.
-   */
-  preserveDrawingBuffer?: boolean;
+	/**
+	 * default is false.
+	 */
+	preserveDrawingBuffer?: boolean;
 
-  /**
-   * default is 0x000000.
-   */
-  clearColor?: number;
+	/**
+	 *	Can be "high-performance", "low-power" or "default"
+	 */
+	powerPreference?: string;
 
-  /**
-   * default is 0.
-   */
-  clearAlpha?: number;
+	/**
+	 * default is true.
+	 */
+	depth?: boolean;
 
-  devicePixelRatio?: number;
+	/**
+	 * default is false.
+	 */
+	logarithmicDepthBuffer?: boolean;
+}
 
-  /**
-   * default is false.
-   */
-  logarithmicDepthBuffer?: boolean;
+export interface WebGLDebug {
+
+	/**
+	 * Enables error checking and reporting when shader programs are being compiled.
+	 */
+	checkShaderErrors: boolean;
+
 }
 
 /**
@@ -94,330 +102,363 @@ export interface WebGLRendererParameters {
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js">src/renderers/WebGLRenderer.js</a>
  */
 export class WebGLRenderer implements Renderer {
-  /**
-   * parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.
-   */
-  constructor(parameters?: WebGLRendererParameters);
 
-  /**
-   * A Canvas where the renderer draws its output.
-   * This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.
-   */
-  domElement: HTMLCanvasElement;
+	/**
+	 * parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.
+	 */
+	constructor( parameters?: WebGLRendererParameters );
 
-  /**
-   * The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.
-   */
-  context: WebGLRenderingContext;
+	/**
+	 * A Canvas where the renderer draws its output.
+	 * This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.
+	 */
+	domElement: HTMLCanvasElement;
 
-  /**
-   * Defines whether the renderer should automatically clear its output before rendering.
-   */
-  autoClear: boolean;
+	/**
+	 * The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.
+	 */
+	context: WebGLRenderingContext;
 
-  /**
-   * If autoClear is true, defines whether the renderer should clear the color buffer. Default is true.
-   */
-  autoClearColor: boolean;
+	/**
+	 * Defines whether the renderer should automatically clear its output before rendering.
+	 */
+	autoClear: boolean;
 
-  /**
-   * If autoClear is true, defines whether the renderer should clear the depth buffer. Default is true.
-   */
-  autoClearDepth: boolean;
+	/**
+	 * If autoClear is true, defines whether the renderer should clear the color buffer. Default is true.
+	 */
+	autoClearColor: boolean;
 
-  /**
-   * If autoClear is true, defines whether the renderer should clear the stencil buffer. Default is true.
-   */
-  autoClearStencil: boolean;
+	/**
+	 * If autoClear is true, defines whether the renderer should clear the depth buffer. Default is true.
+	 */
+	autoClearDepth: boolean;
 
-  /**
-   * Defines whether the renderer should sort objects. Default is true.
-   */
-  sortObjects: boolean;
+	/**
+	 * If autoClear is true, defines whether the renderer should clear the stencil buffer. Default is true.
+	 */
+	autoClearStencil: boolean;
 
-  clippingPlanes: any[];
-  localClippingEnabled: boolean;
+	/**
+	 * Debug configurations.
+	 */
+	debug: WebGLDebug;
 
-  extensions: WebGLExtensions;
+	/**
+	 * Defines whether the renderer should sort objects. Default is true.
+	 */
+	sortObjects: boolean;
 
-  /**
-   * Default is false.
-   */
-  gammaInput: boolean;
+	clippingPlanes: any[];
+	localClippingEnabled: boolean;
 
-  /**
-   * Default is false.
-   */
-  gammaOutput: boolean;
+	extensions: WebGLExtensions;
 
-  physicallyCorrectLights: boolean;
-  toneMapping: ToneMapping;
-  toneMappingExposure: number;
-  toneMappingWhitePoint: number;
+	/**
+	 * Default is false.
+	 */
+	gammaInput: boolean;
 
-  /**
-   * Default is false.
-   */
-  shadowMapDebug: boolean;
+	/**
+	 * Default is false.
+	 */
+	gammaOutput: boolean;
 
-  /**
-   * Default is 8.
-   */
-  maxMorphTargets: number;
+	physicallyCorrectLights: boolean;
+	toneMapping: ToneMapping;
+	toneMappingExposure: number;
+	toneMappingWhitePoint: number;
 
-  /**
-   * Default is 4.
-   */
-  maxMorphNormals: number;
+	/**
+	 * Default is false.
+	 */
+	shadowMapDebug: boolean;
 
-  info: WebGLInfo;
+	/**
+	 * Default is 8.
+	 */
+	maxMorphTargets: number;
 
-  shadowMap: WebGLShadowMap;
+	/**
+	 * Default is 4.
+	 */
+	maxMorphNormals: number;
 
-  pixelRation: number;
+	info: WebGLInfo;
 
-  capabilities: WebGLCapabilities;
-  properties: WebGLProperties;
-  renderLists: WebGLRenderLists;
-  state: WebGLState;
-  allocTextureUnit: any;
+	shadowMap: WebGLShadowMap;
 
-  vr: WebVRManager;
+	pixelRation: number;
 
-  /**
-   * Return the WebGL context.
-   */
-  getContext(): WebGLRenderingContext;
-  getContextAttributes(): any;
-  forceContextLoss(): void;
+	capabilities: WebGLCapabilities;
+	properties: WebGLProperties;
+	renderLists: WebGLRenderLists;
+	state: WebGLState;
 
-  /**
-   * @deprecated Use {@link WebGLCapabilities#getMaxAnisotropy .capabilities.getMaxAnisotropy()} instead.
-   */
-  getMaxAnisotropy(): number;
+	vr: WebVRManager;
 
-  /**
-   * @deprecated Use {@link WebGLCapabilities#precision .capabilities.precision} instead.
-   */
-  getPrecision(): string;
+	/**
+	 * Return the WebGL context.
+	 */
+	getContext(): WebGLRenderingContext;
+	getContextAttributes(): any;
+	forceContextLoss(): void;
 
-  getPixelRatio(): number;
-  setPixelRatio(value: number): void;
+	/**
+	 * @deprecated Use {@link WebGLCapabilities#getMaxAnisotropy .capabilities.getMaxAnisotropy()} instead.
+	 */
+	getMaxAnisotropy(): number;
 
-  getDrawingBufferSize(): { width: number; height: number };
-  setDrawingBufferSize(width: number, height: number, pixelRatio: number): void;
+	/**
+	 * @deprecated Use {@link WebGLCapabilities#precision .capabilities.precision} instead.
+	 */
+	getPrecision(): string;
 
-  getSize(target: Vector2): Vector2;
+	getPixelRatio(): number;
+	setPixelRatio( value: number ): void;
 
-  /**
-   * Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).
-   */
-  setSize(width: number, height: number, updateStyle?: boolean): void;
+	getDrawingBufferSize( target: Vector2 ): Vector2;
+	setDrawingBufferSize( width: number, height: number, pixelRatio: number ): void;
 
-  getCurrentViewport(target: Vector4): Vector4;
+	getSize( target: Vector2 ): Vector2;
 
-  /**
-   * Copies the viewport into target.
-   */
-  getViewport(target: Vector4): Vector4;
+	/**
+	 * Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).
+	 */
+	setSize( width: number, height: number, updateStyle?: boolean ): void;
 
-  /**
-   * Sets the viewport to render from (x, y) to (x + width, y + height).
-   * (x, y) is the lower-left corner of the region.
-   */
-  setViewport(x: Vector4 | number, y?: number, width?: number, height?: number): void;
+	getCurrentViewport( target: Vector4 ): Vector4;
 
-  /**
-   * Copies the scissor area into target.
-   */
-  getScissor(target: Vector4): Vector4;
+	/**
+	 * Copies the viewport into target.
+	 */
+	getViewport( target: Vector4 ): Vector4;
 
-  /**
-   * Sets the scissor area from (x, y) to (x + width, y + height).
-   */
-  setScissor(x: Vector4 | number, y?: number, width?: number, height?: number): void;
+	/**
+	 * Sets the viewport to render from (x, y) to (x + width, y + height).
+	 * (x, y) is the lower-left corner of the region.
+	 */
+	setViewport( x: Vector4 | number, y?: number, width?: number, height?: number ): void;
 
-  /**
-   * Returns true if scissor test is enabled; returns false otherwise.
-   */
-  getScissorTest(): boolean;
+	/**
+	 * Copies the scissor area into target.
+	 */
+	getScissor( target: Vector4 ): Vector4;
 
-  /**
-   * Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.
-   */
-  setScissorTest(enable: boolean): void;
+	/**
+	 * Sets the scissor area from (x, y) to (x + width, y + height).
+	 */
+	setScissor( x: Vector4 | number, y?: number, width?: number, height?: number ): void;
 
-  /**
-   * Returns a THREE.Color instance with the current clear color.
-   */
-  getClearColor(): Color;
+	/**
+	 * Returns true if scissor test is enabled; returns false otherwise.
+	 */
+	getScissorTest(): boolean;
 
-  /**
-   * Sets the clear color, using color for the color and alpha for the opacity.
-   */
-  setClearColor(color: Color, alpha?: number): void;
-  setClearColor(color: string, alpha?: number): void;
-  setClearColor(color: number, alpha?: number): void;
+	/**
+	 * Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.
+	 */
+	setScissorTest( enable: boolean ): void;
 
-  /**
-   * Returns a float with the current clear alpha. Ranges from 0 to 1.
-   */
-  getClearAlpha(): number;
+	/**
+	 * Returns a THREE.Color instance with the current clear color.
+	 */
+	getClearColor(): Color;
 
-  setClearAlpha(alpha: number): void;
+	/**
+	 * Sets the clear color, using color for the color and alpha for the opacity.
+	 */
+	setClearColor( color: Color, alpha?: number ): void;
+	setClearColor( color: string, alpha?: number ): void;
+	setClearColor( color: number, alpha?: number ): void;
 
-  /**
-   * Tells the renderer to clear its color, depth or stencil drawing buffer(s).
-   * Arguments default to true
-   */
-  clear(color?: boolean, depth?: boolean, stencil?: boolean): void;
+	/**
+	 * Returns a float with the current clear alpha. Ranges from 0 to 1.
+	 */
+	getClearAlpha(): number;
 
-  clearColor(): void;
-  clearDepth(): void;
-  clearStencil(): void;
-  clearTarget(
-    renderTarget: WebGLRenderTarget,
-    color: boolean,
-    depth: boolean,
-    stencil: boolean
-  ): void;
+	setClearAlpha( alpha: number ): void;
 
-  /**
-   * @deprecated Use {@link WebGLState#reset .state.reset()} instead.
-   */
-  resetGLState(): void;
-  dispose(): void;
+	/**
+	 * Tells the renderer to clear its color, depth or stencil drawing buffer(s).
+	 * Arguments default to true
+	 */
+	clear( color?: boolean, depth?: boolean, stencil?: boolean ): void;
 
-  /**
-   * Tells the shadow map plugin to update using the passed scene and camera parameters.
-   *
-   * @param scene an instance of Scene
-   * @param camera — an instance of Camera
-   */
-  renderBufferImmediate(
-    object: Object3D,
-    program: Object,
-    material: Material
-  ): void;
+	clearColor(): void;
+	clearDepth(): void;
+	clearStencil(): void;
+	clearTarget(
+		renderTarget: WebGLRenderTarget,
+		color: boolean,
+		depth: boolean,
+		stencil: boolean
+	): void;
 
-  renderBufferDirect(
-    camera: Camera,
-    fog: Fog,
-    material: Material,
-    geometryGroup: any,
-    object: Object3D
-  ): void;
+	/**
+	 * @deprecated Use {@link WebGLState#reset .state.reset()} instead.
+	 */
+	resetGLState(): void;
+	dispose(): void;
 
-  /**
-   * A build in function that can be used instead of requestAnimationFrame. For WebVR projects this function must be used.
-   * @param callback The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.
-   */
-  setAnimationLoop(callback: Function): void;
+	/**
+	 * Tells the shadow map plugin to update using the passed scene and camera parameters.
+	 *
+	 * @param scene an instance of Scene
+	 * @param camera — an instance of Camera
+	 */
+	renderBufferImmediate(
+		object: Object3D,
+		program: Object,
+		material: Material
+	): void;
 
-  /**
-   * @deprecated Use {@link WebGLRenderer#setAnimationLoop .setAnimationLoop()} instead.
-   */
-  animate(callback: Function): void;
+	renderBufferDirect(
+		camera: Camera,
+		fog: Fog,
+		geometry: Geometry | BufferGeometry,
+		material: Material,
+		object: Object3D,
+		geometryGroup: any
+	): void;
 
-  /**
-   * Render a scene using a camera.
-   * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling 
-   * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
-   * 
-   * By default render buffers are cleared before rendering but you can prevent this by setting the property 
-   * {@link WebGLRenderer#autoClear autoClear} to false. If you want to prevent only certain buffers being cleared 
-   * you can set either the {@link WebGLRenderer#autoClearColor autoClearColor}, 
-   * {@link WebGLRenderer#autoClearStencil autoClearStencil} or {@link WebGLRenderer#autoClearDepth autoClearDepth} 
-   * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
-   */
-  render(
-    scene: Scene,
-    camera: Camera
-  ): void;
+	/**
+	 * A build in function that can be used instead of requestAnimationFrame. For WebVR projects this function must be used.
+	 * @param callback The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.
+	 */
+	setAnimationLoop( callback: Function ): void;
 
-  /**
-   * @deprecated
-   */
-  setTexture(texture: Texture, slot: number): void;
-  setTexture2D(texture: Texture, slot: number): void;
-  setTextureCube(texture: Texture, slot: number): void;
-  getRenderTarget(): RenderTarget;
-  /**
-   * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
-   */
-  getCurrentRenderTarget(): RenderTarget;
-  setRenderTarget(renderTarget?: RenderTarget): void;
-  readRenderTargetPixels(
-    renderTarget: RenderTarget,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    buffer: any
-  ): void;
+	/**
+	 * @deprecated Use {@link WebGLRenderer#setAnimationLoop .setAnimationLoop()} instead.
+	 */
+	animate( callback: Function ): void;
 
-  /**
-   * @deprecated
-   */
-  gammaFactor: number;
+	/**
+	 * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
+	 */
+	compile(
+		scene: Scene,
+		camera: Camera
+	): void;
 
-  /**
-   * @deprecated Use {@link WebGLShadowMap#enabled .shadowMap.enabled} instead.
-   */
-  shadowMapEnabled: boolean;
+	/**
+	 * Render a scene using a camera.
+	 * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
+	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
+	 *
+	 * By default render buffers are cleared before rendering but you can prevent this by setting the property
+	 * {@link WebGLRenderer#autoClear autoClear} to false. If you want to prevent only certain buffers being cleared
+	 * you can set either the {@link WebGLRenderer#autoClearColor autoClearColor},
+	 * {@link WebGLRenderer#autoClearStencil autoClearStencil} or {@link WebGLRenderer#autoClearDepth autoClearDepth}
+	 * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
+	 */
+	render(
+		scene: Scene,
+		camera: Camera
+	): void;
 
-  /**
-   * @deprecated Use {@link WebGLShadowMap#type .shadowMap.type} instead.
-   */
-  shadowMapType: ShadowMapType;
+	/**
+	 * Returns the current active cube face.
+	 */
+	getActiveCubeFace(): number;
 
-  /**
-   * @deprecated Use {@link WebGLShadowMap#cullFace .shadowMap.cullFace} instead.
-   */
-  shadowMapCullFace: CullFace;
+	/**
+	 * Returns the current active mipmap level.
+	 */
+	getActiveMipmapLevel(): number;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'OES_texture_float' )} instead.
-   */
-  supportsFloatTextures(): any;
+	/**
+	 * Returns the current render target. If no render target is set, null is returned.
+	 */
+	getRenderTarget(): RenderTarget | null;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'OES_texture_half_float' )} instead.
-   */
-  supportsHalfFloatTextures(): any;
+	/**
+	 * @deprecated Use {@link WebGLRenderer#getRenderTarget .getRenderTarget()} instead.
+	 */
+	getCurrentRenderTarget(): RenderTarget | null;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'OES_standard_derivatives' )} instead.
-   */
-  supportsStandardDerivatives(): any;
+	/**
+	 * Sets the active render target.
+	 *
+	 * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
+	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
+	 * @param activeMipmapLevel Specifies the active mipmap level.
+	 */
+	setRenderTarget( renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipmapLevel?: number ): void;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'WEBGL_compressed_texture_s3tc' )} instead.
-   */
-  supportsCompressedTextureS3TC(): any;
+	readRenderTargetPixels(
+		renderTarget: RenderTarget,
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		buffer: any,
+		activeCubeFaceIndex?: number
+	): void;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'WEBGL_compressed_texture_pvrtc' )} instead.
-   */
-  supportsCompressedTexturePVRTC(): any;
+	/**
+	 * @deprecated
+	 */
+	gammaFactor: number;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'EXT_blend_minmax' )} instead.
-   */
-  supportsBlendMinMax(): any;
+	/**
+	 * @deprecated Use {@link WebGLShadowMap#enabled .shadowMap.enabled} instead.
+	 */
+	shadowMapEnabled: boolean;
 
-  /**
-   * @deprecated Use {@link WebGLCapabilities#vertexTextures .capabilities.vertexTextures} instead.
-   */
-  supportsVertexTextures(): any;
+	/**
+	 * @deprecated Use {@link WebGLShadowMap#type .shadowMap.type} instead.
+	 */
+	shadowMapType: ShadowMapType;
 
-  /**
-   * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'ANGLE_instanced_arrays' )} instead.
-   */
-  supportsInstancedArrays(): any;
+	/**
+	 * @deprecated Use {@link WebGLShadowMap#cullFace .shadowMap.cullFace} instead.
+	 */
+	shadowMapCullFace: CullFace;
 
-  /**
-   * @deprecated Use {@link WebGLRenderer#setScissorTest .setScissorTest()} instead.
-   */
-  enableScissorTest(boolean: any): any;
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'OES_texture_float' )} instead.
+	 */
+	supportsFloatTextures(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'OES_texture_half_float' )} instead.
+	 */
+	supportsHalfFloatTextures(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'OES_standard_derivatives' )} instead.
+	 */
+	supportsStandardDerivatives(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'WEBGL_compressed_texture_s3tc' )} instead.
+	 */
+	supportsCompressedTextureS3TC(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'WEBGL_compressed_texture_pvrtc' )} instead.
+	 */
+	supportsCompressedTexturePVRTC(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'EXT_blend_minmax' )} instead.
+	 */
+	supportsBlendMinMax(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLCapabilities#vertexTextures .capabilities.vertexTextures} instead.
+	 */
+	supportsVertexTextures(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLExtensions#get .extensions.get( 'ANGLE_instanced_arrays' )} instead.
+	 */
+	supportsInstancedArrays(): any;
+
+	/**
+	 * @deprecated Use {@link WebGLRenderer#setScissorTest .setScissorTest()} instead.
+	 */
+	enableScissorTest( boolean: any ): any;
+
 }

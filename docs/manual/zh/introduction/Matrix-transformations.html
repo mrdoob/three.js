@@ -22,25 +22,25 @@
 			<li>
 				修改对象的*position*，*quaternion*和*scale*属性，让three.js重新计算来自这些属性的对象矩阵：
 				<code>
-				object.position.copy(start_position);
-				object.quaternion.copy(quaternion);
+object.position.copy( start_position );
+object.quaternion.copy( quaternion );
 				</code>
 				默认情况下，*matrixAutoUpdate*属性设置为true，并且将自动重新计算矩阵。
 如果对象是静态的，或者您希望在重新计算时手动控制，则可以通过将属性设置为false来获得更好的性能：
 				<code>
-				object.matrixAutoUpdate = false;
+object.matrixAutoUpdate = false;
 				</code>
 				更改任何属性后，手动更新矩阵：
 				<code>
-				object.updateMatrix();
+object.updateMatrix();
 				</code>
 			</li>
 			<li>
 				直接修改对象的矩阵。 [page：Matrix4]类有各种修改矩阵的方法：
 				<code>
-				object.matrix.setRotationFromQuaternion(quaternion);
-				object.matrix.setPosition(start_position);
-				object.matrixAutoUpdate = false;
+object.matrix.setRotationFromQuaternion( quaternion );
+object.matrix.setPosition( start_position );
+object.matrixAutoUpdate = false;
 				</code>
 				请注意，在这种情况下，*matrixAutoUpdate* <em> 必须 </em>设置为*false*，并且您应该确保<em> 不 </em>调用*updateMatrix*。
 				调用*updateMatrix*将破坏对矩阵所做的手动更改，从*position*，*scale*重新计算矩阵，依此类推。

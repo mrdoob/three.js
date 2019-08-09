@@ -4,39 +4,15 @@
 		<title>three.js webgl - read float pixels</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example<br/>
+			<span id="values"></span>
+		</div>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
 
@@ -82,14 +58,11 @@
 
 		</script>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -183,17 +156,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var valueDiv = document.createElement( 'div' );
-				valueDiv.style.position = 'absolute';
-				valueDiv.style.top = '0px';
-				valueDiv.style.right = '0px';
-				valueDiv.style.width = '500px';
-				valueDiv.style.height = '300px';
-				valueDiv.style.fontSize = '60px';
-				container.appendChild( valueDiv );
-				valueNode = document.createTextNode( '' );
-				valueDiv.appendChild( valueNode );
-
+				valueNode = document.getElementById( 'values' );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -252,7 +215,7 @@
 				var read = new Float32Array( 4 );
 				renderer.readRenderTargetPixels( rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read );
 
-				valueNode.nodeValue = 'r:' + read[ 0 ] + ' g:' + read[ 1 ] + ' b:' + read[ 2 ];
+				valueNode.innerHTML = 'r:' + read[ 0 ] + '<br/>g:' + read[ 1 ] + '<br/>b:' + read[ 2 ];
 
 			}
 

@@ -1,49 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - PointLight ShadowMap</title>
+		<title>three.js webgl - THREE.PointLight ShadowMap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			a {
-				color: #f88;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - PointLight ShadowMap by <a href="https://github.com/mkkellogg">mkkellogg</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - THREE.PointLight ShadowMap by <a href="https://github.com/mkkellogg">mkkellogg</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer, stats;
 			var pointLight, pointLight2;
@@ -81,7 +55,7 @@
 					texture.magFilter = THREE.NearestFilter;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.wrapS = THREE.RepeatWrapping;
-					texture.repeat.set( 1, 3.5 );
+					texture.repeat.set( 1, 4.5 );
 
 					var geometry = new THREE.SphereBufferGeometry( 2, 32, 8 );
 					var material = new THREE.MeshPhongMaterial( {
@@ -111,7 +85,6 @@
 
 				pointLight2 = createLight( 0xff8888 );
 				scene.add( pointLight2 );
-
 				//
 
 				var geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
@@ -137,7 +110,7 @@
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 10, 0 );
 				controls.update();
 
@@ -185,7 +158,7 @@
 				var time = performance.now() * 0.001;
 
 				pointLight.position.x = Math.sin( time * 0.6 ) * 9;
-				pointLight.position.y = Math.sin( time * 0.7 ) * 9 + 5;
+				pointLight.position.y = Math.sin( time * 0.7 ) * 9 + 6;
 				pointLight.position.z = Math.sin( time * 0.8 ) * 9;
 
 				pointLight.rotation.x = time;
@@ -194,7 +167,7 @@
 				time += 10000;
 
 				pointLight2.position.x = Math.sin( time * 0.6 ) * 9;
-				pointLight2.position.y = Math.sin( time * 0.7 ) * 9 + 5;
+				pointLight2.position.y = Math.sin( time * 0.7 ) * 9 + 6;
 				pointLight2.position.z = Math.sin( time * 0.8 ) * 9;
 
 				pointLight2.rotation.x = time;

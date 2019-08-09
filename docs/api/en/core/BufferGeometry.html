@@ -51,43 +51,6 @@
 			[example:webgl_buffergeometry_rawshader Raw Shaders]
 		</p>
 
-
-		<h2>Accessing Attributes</h2>
-		<p>
-		WebGL stores data associated with individual vertices of a geometry in <em>attributes</em>.
-		Examples include the position of the vertex, the normal vector for the vertex, the vertex color,
-		and so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping
-		up this information into typed array buffers and sending this data to the shader. With
-		BufferGeometry, all of this data is stored in buffers associated with individual attributes.
-		This means that to get the position data associated with a vertex (for instance), you must call
-		[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual
-		x, y, and z coordinates of the position.
-		</p>
-		<p>
-		The following attributes are set by various members of this class:
-		</p>
-		<h3>[page:BufferAttribute position] (itemSize: 3)</h3>
-		<p>
-		Stores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().
-		</p>
-
-		<h3>[page:BufferAttribute normal] (itemSize: 3)</h3>
-		<p>
-		Stores the x, y, and z components of the vertex normal vector of each vertex in this geometry.
-		Set by [page:.fromGeometry]().
-		</p>
-
-		<h3>[page:BufferAttribute color] (itemSize: 3)</h3>
-		<p>
-		Stores the red, green, and blue channels of vertex color of each vertex in this geometry.
-		Set by [page:.fromGeometry]().
-		</p>
-
-		<p>
-		In addition to the the built-in attributes, you can set your own custom attributes using the addAttribute method. With [page:Geometry], these attributes are set and stored on the [page:Material]. In BufferGeometry, the attributes are stored with the geometry itself. Note that you still need to set the attributes information on the material as well, but the value of each attribute is stored in the BufferGeometry.
-		</p>
-
-
 		<h2>Constructor</h2>
 
 
@@ -327,7 +290,7 @@
 		<p>Sets the attributes for this BufferGeometry from an array of points.</p>
 
 		<h3>[method:Object toJSON]()</h3>
-		<p>Returns a JSON object representation of the BufferGeometry.</p>
+		<p>Convert the buffer geometry to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].</p>
 
 		<h3>[method:BufferGeometry toNonIndexed]()</h3>
 		<p>Return a non-index version of an indexed BufferGeometry.</p>

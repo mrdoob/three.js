@@ -1,3 +1,7 @@
+/**
+ * TODO
+ */
+
 THREE.SAOShader = {
 	defines: {
 		'NUM_SAMPLES': 7,
@@ -9,23 +13,23 @@ THREE.SAOShader = {
 	},
 	uniforms: {
 
-		'tDepth': { type: 't', value: null },
-		'tDiffuse': { type: 't', value: null },
-		'tNormal': { type: 't', value: null },
-		'size': { type: 'v2', value: new THREE.Vector2( 512, 512 ) },
+		'tDepth': { value: null },
+		'tDiffuse': { value: null },
+		'tNormal': { value: null },
+		'size': { value: new THREE.Vector2( 512, 512 ) },
 
-		'cameraNear': { type: 'f', value: 1 },
-		'cameraFar': { type: 'f', value: 100 },
-		'cameraProjectionMatrix': { type: 'm4', value: new THREE.Matrix4() },
-		'cameraInverseProjectionMatrix': { type: 'm4', value: new THREE.Matrix4() },
+		'cameraNear': { value: 1 },
+		'cameraFar': { value: 100 },
+		'cameraProjectionMatrix': { value: new THREE.Matrix4() },
+		'cameraInverseProjectionMatrix': { value: new THREE.Matrix4() },
 
-		'scale': { type: 'f', value: 1.0 },
-		'intensity': { type: 'f', value: 0.1 },
-		'bias': { type: 'f', value: 0.5 },
+		'scale': { value: 1.0 },
+		'intensity': { value: 0.1 },
+		'bias': { value: 0.5 },
 
-		'minResolution': { type: 'f', value: 0.0 },
-		'kernelRadius': { type: 'f', value: 100.0 },
-		'randomSeed': { type: 'f', value: 0.0 }
+		'minResolution': { value: 0.0 },
+		'kernelRadius': { value: 100.0 },
+		'randomSeed': { value: 0.0 }
 	},
 	vertexShader: [
 		"varying vec2 vUv;",

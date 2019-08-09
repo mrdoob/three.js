@@ -4,30 +4,24 @@
 		<title>three.js webvr - sculpt</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebXR Device API (For Chrome M76+), expires 09/09/2019 -->
+		<meta http-equiv="origin-trial" content="Ai1/G787sugfmWtk1xQExa8N6OqwDsJyNn+OwpA1J4PozR1lixRYIQ4Tmp00vrGWS8FQQ2iDyqjwaewrOfYvPAUAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU2ODAyMzQ3OH0=">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - sculpt
+		</div>
 
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/MarchingCubes.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -46,18 +40,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - sculpt';
-				container.appendChild( info );
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.02, 50 );
 
 				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
@@ -68,8 +54,6 @@
 				var table = new THREE.Mesh( geometry, material );
 				table.position.y = 0.35;
 				table.position.z = 0.85;
-				table.castShadow = true;
-				table.receiveShadow = true;
 				scene.add( table );
 
 				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
@@ -80,26 +64,17 @@
 				} );
 				var floor = new THREE.Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
-				floor.receiveShadow = true;
 				scene.add( floor );
 
-				scene.add( new THREE.GridHelper( 20, 40, 0x111111, 0x111111 ) );
+				var grid = new THREE.GridHelper( 10, 20, 0x111111, 0x111111 );
+				grid.material.depthTest = false; // avoid z-fighting
+				scene.add( grid );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
-				light.castShadow = true;
-				light.shadow.camera.top = 2;
-				light.shadow.camera.bottom = - 2;
-				light.shadow.camera.right = 2;
-				light.shadow.camera.left = - 2;
-				light.shadow.mapSize.set( 4096, 4096 );
-
 				scene.add( light );
-
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 				//
 
@@ -108,7 +83,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.shadowMap.enabled = true;
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -140,35 +114,20 @@
 				controller2.userData.id = 1;
 				scene.add( controller2 );
 
-				var loader = new THREE.OBJLoader();
-				loader.setPath( 'models/obj/vive-controller/' );
-				loader.load( 'vr_controller_vive_1_5.obj', function ( object ) {
+				//
 
-					var loader = new THREE.TextureLoader();
-					loader.setPath( 'models/obj/vive-controller/' );
+				var geometry = new THREE.CylinderBufferGeometry( 0.01, 0.02, 0.08, 5 );
+				geometry.rotateX( - Math.PI / 2 );
+				var material = new THREE.MeshStandardMaterial( { flatShading: true } );
+				var mesh = new THREE.Mesh( geometry, material );
 
-					var controller = object.children[ 0 ];
-					controller.material.map = loader.load( 'onepointfive_texture.png' );
-					controller.material.specularMap = loader.load( 'onepointfive_spec.png' );
-					controller.castShadow = true;
-					controller.receiveShadow = true;
+				var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
+				pivot.name = 'pivot';
+				pivot.position.z = - 0.05;
+				mesh.add( pivot );
 
-					// var pivot = new THREE.Mesh( new THREE.BoxBufferGeometry( 0.01, 0.01, 0.01 ) );
-					var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.002, 2 ), blob.material );
-					pivot.name = 'pivot';
-					pivot.position.y = - 0.016;
-					pivot.position.z = - 0.043;
-					pivot.rotation.x = Math.PI / 5.5;
-					controller.add( pivot );
-
-					var range = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.03, 3 ), new THREE.MeshBasicMaterial( { opacity: 0.25, transparent: true } ) );
-					pivot.add( range );
-
-					controller1.add( controller.clone() );
-					controller2.add( controller.clone() );
-
-				} );
-
+				controller1.add( mesh.clone() );
+				controller2.add( mesh.clone() );
 
 				//
 
@@ -187,17 +146,18 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				var reflectionCube = new CubeTextureLoader().load( urls );
 				*/
 
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					// envMap: reflectionCube,
 					roughness: 0.9,
-					metalness: 0.0
+					metalness: 0.0,
+					transparent: true
 				} );
 
-				blob = new THREE.MarchingCubes( 64, material, true );
+				blob = new MarchingCubes( 64, material );
 				blob.position.y = 1;
 				scene.add( blob );
 

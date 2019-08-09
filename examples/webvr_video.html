@@ -4,42 +4,31 @@
 		<title>three.js webvr - 360 stereo video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2019-03-06 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2019-03-06" content="AvDjbxYpoTgOL1PS0JEra7KFCehfTlKnXpU/ORSwNdCQ35cX70cTUkXOnQ26A5XJi3eXHSKpBPchdt5lbcxDuAIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU1MTgzMDM5OX0=">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				color: #fff;
-				text-align: center;
-			}
-			a {
-				color: #ff0
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebXR Device API (For Chrome M76+), expires 09/09/2019 -->
+		<meta http-equiv="origin-trial" content="Ai1/G787sugfmWtk1xQExa8N6OqwDsJyNn+OwpA1J4PozR1lixRYIQ4Tmp00vrGWS8FQQ2iDyqjwaewrOfYvPAUAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU2ODAyMzQ3OH0=">
 	</head>
 	<body>
 		<div id="container"></div>
+
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - 360 stereo video<br />
 			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script src="js/vr/WebVR.js"></script>
+		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
+			<source src="textures/MaryOculus.webm">
+			<source src="textures/MaryOculus.mp4">
+		</video>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var camera, scene, renderer;
-			var video, texture;
 
 			init();
 			animate();
@@ -58,18 +47,13 @@
 
 				// video
 
-				video = document.createElement( 'video' );
-				video.crossOrigin = 'anonymous';
-				video.loop = true;
-				video.muted = true;
-				video.src = 'textures/MaryOculus.webm';
-				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
+				var video = document.getElementById( 'video' );
 				video.play();
 
-				texture = new THREE.Texture( video );
+				var texture = new THREE.Texture( video );
 				texture.generateMipmaps = false;
 				texture.minFilter = THREE.NearestFilter;
-				texture.maxFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
 				texture.format = THREE.RGBFormat;
 
 				setInterval( function () {
@@ -135,7 +119,7 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer, { frameOfReferenceType: 'head-model' } ) );
+				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 				//
 

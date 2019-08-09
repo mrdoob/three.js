@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newPosition THREE.Vector3
  * @param optionalOldPosition THREE.Vector3
  * @constructor
  */
 
-var SetPositionCommand = function ( object, newPosition, optionalOldPosition ) {
+var SetPositionCommand = function ( editor, object, newPosition, optionalOldPosition ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetPositionCommand';
 	this.name = 'Set Position';

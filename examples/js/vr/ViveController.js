@@ -72,7 +72,7 @@ THREE.ViveController = function ( id ) {
 			if ( pose.position !== null ) scope.position.fromArray( pose.position );
 			if ( pose.orientation !== null ) scope.quaternion.fromArray( pose.orientation );
 			scope.matrix.compose( scope.position, scope.quaternion, scope.scale );
-			scope.matrix.premultiply( scope.standingMatrix );	
+			scope.matrix.premultiply( scope.standingMatrix );
 			scope.matrixWorldNeedsUpdate = true;
 			scope.visible = true;
 

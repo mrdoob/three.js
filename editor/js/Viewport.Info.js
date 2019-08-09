@@ -46,16 +46,16 @@ Viewport.Info = function ( editor ) {
 
 				objects ++;
 
-				if ( object instanceof THREE.Mesh ) {
+				if ( object.isMesh ) {
 
 					var geometry = object.geometry;
 
-					if ( geometry instanceof THREE.Geometry ) {
+					if ( geometry.isGeometry ) {
 
 						vertices += geometry.vertices.length;
 						triangles += geometry.faces.length;
 
-					} else if ( geometry instanceof THREE.BufferGeometry ) {
+					} else if ( geometry.isBufferGeometry ) {
 
 						vertices += geometry.attributes.position.count;
 

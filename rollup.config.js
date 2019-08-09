@@ -39,6 +39,7 @@ function glconstants() {
 		SCISSOR_TEST: 3089,
 		UNPACK_ALIGNMENT: 3317,
 		MAX_TEXTURE_SIZE: 3379,
+		DEPTH24_STENCIL8: 35056,
 		TEXTURE_2D: 3553,
 		BYTE: 5120,
 		UNSIGNED_BYTE: 5121,
@@ -117,6 +118,7 @@ function glconstants() {
 		ACTIVE_ATTRIBUTES: 35721,
 		IMPLEMENTATION_COLOR_READ_TYPE: 35738,
 		IMPLEMENTATION_COLOR_READ_FORMAT: 35739,
+		TEXTURE_2D_ARRAY: 35866,
 		DEPTH_COMPONENT32F: 36012,
 		COLOR_ATTACHMENT0: 36064,
 		FRAMEBUFFER_COMPLETE: 36053,
@@ -205,7 +207,7 @@ export default {
 			indent: '\t'
 		},
 		{
-			format: 'es',
+			format: 'esm',
 			file: 'build/three.module.js',
 			indent: '\t'
 		}

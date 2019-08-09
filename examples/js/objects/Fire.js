@@ -431,7 +431,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	};
 
-	this.onBeforeRender = function ( renderer, scene, camera ) {
+	this.onBeforeRender = function ( renderer ) {
 
 		var delta = this.clock.getDelta();
 		if ( delta > 0.1 ) {
@@ -498,11 +498,9 @@ THREE.Fire.SourceShader = {
 
 	uniforms: {
 		'sourceMap': {
-			type: 't',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -557,39 +555,30 @@ THREE.Fire.DiffuseShader = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'diffuse': {
-			type: 'f',
 			value: null
 		},
 		'viscosity': {
-			type: 'f',
 			value: null
 		},
 		'expansion': {
-			type: 'f',
 			value: null
 		},
 		'swirl': {
-			type: 'f',
 			value: null
 		},
 		'drag': {
-			type: 'f',
 			value: null
 		},
 		'burnRate': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -674,23 +663,18 @@ THREE.Fire.DriftShader = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'windVector': {
-			type: 'v2',
 			value: new THREE.Vector2( 0.0, 0.0 )
 		},
 		'airSpeed': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -759,15 +743,12 @@ THREE.Fire.ProjectionShader1 = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -819,15 +800,12 @@ THREE.Fire.ProjectionShader2 = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -880,19 +858,15 @@ THREE.Fire.ProjectionShader3 = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		},
 		'projMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -950,23 +924,18 @@ THREE.Fire.ColorShader = {
 
 	uniforms: {
 		'color1': {
-			type: 'c',
 			value: null
 		},
 		'color2': {
-			type: 'c',
 			value: null
 		},
 		'color3': {
-			type: 'c',
 			value: null
 		},
 		'colorBias': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -1014,23 +983,18 @@ THREE.Fire.DebugShader = {
 
 	uniforms: {
 		'color1': {
-			type: 'c',
 			value: null
 		},
 		'color2': {
-			type: 'c',
 			value: null
 		},
 		'color3': {
-			type: 'c',
 			value: null
 		},
 		'colorBias': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},

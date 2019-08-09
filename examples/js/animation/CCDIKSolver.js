@@ -65,7 +65,7 @@ THREE.CCDIKSolver = ( function () {
 				// for reference overhead reduction in loop
 				var math = Math;
 
-				for ( var i = 0, il = iks.length; i < il; i++ ) {
+				for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
 					var ik = iks[ i ];
 					var effector = bones[ ik.effector ];
@@ -78,11 +78,11 @@ THREE.CCDIKSolver = ( function () {
 					var links = ik.links;
 					var iteration = ik.iteration !== undefined ? ik.iteration : 1;
 
-					for ( var j = 0; j < iteration; j++ ) {
+					for ( var j = 0; j < iteration; j ++ ) {
 
 						var rotated = false;
 
-						for ( var k = 0, kl = links.length; k < kl; k++ ) {
+						for ( var k = 0, kl = links.length; k < kl; k ++ ) {
 
 							var link = bones[ links[ k ].index ];
 
@@ -115,9 +115,9 @@ THREE.CCDIKSolver = ( function () {
 
 								angle = 1.0;
 
-							} else if ( angle < -1.0 ) {
+							} else if ( angle < - 1.0 ) {
 
-								angle = -1.0;
+								angle = - 1.0;
 
 							}
 

@@ -57,6 +57,8 @@ THREE.SVGRenderer = function () {
 	this.sortObjects = true;
 	this.sortElements = true;
 
+	this.overdraw = 0.5;
+
 	this.info = {
 
 		render: {
@@ -226,6 +228,14 @@ THREE.SVGRenderer = function () {
 				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
 				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
+
+				if ( this.overdraw > 0 ) {
+
+					expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
+					expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
+					expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
+
+				}
 
 				_elemBox.setFromPoints( [
 					_v1.positionScreen,
@@ -448,6 +458,24 @@ THREE.SVGRenderer = function () {
 		}
 
 		addPath( style, path );
+
+	}
+
+	// Hide anti-alias gaps
+
+	function expand( v1, v2, pixels ) {
+
+		var x = v2.x - v1.x, y = v2.y - v1.y,
+			det = x * x + y * y, idet;
+
+		if ( det === 0 ) return;
+
+		idet = pixels / Math.sqrt( det );
+
+		x *= idet; y *= idet;
+
+		v2.x += x; v2.y += y;
+		v1.x -= x; v1.y -= y;
 
 	}
 

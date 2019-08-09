@@ -44,17 +44,20 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean isQuaternion]</h3>
+		<p>
+			Used to check whether this or derived classes are Quaternions. Default is *true*.<br /><br />
+
+			You should not change this, as it is used internally for optimisation.
+		</p>
+
 		<h3>[property:Float x]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float y]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float z]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float w]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 
 		<h2>Methods</h2>
@@ -108,8 +111,7 @@
 
 		<h3>[method:Quaternion inverse]()</h3>
 		<p>
-			Inverts this quaternion - calculate the [page:.conjugate conjugate] and then
-			[page:.normalize normalizes] the result.
+			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The quaternion is assumed to have unit length.
 		</p>
 
 		<h3>[method:Float length]()</h3>
@@ -139,32 +141,6 @@
 		Sets this quaternion to [page:Quaternion a] x [page:Quaternion b].<br />
 		Adapted from the method outlined [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here].
 		</p>
-
-		<h3>[method:Quaternion onChange]( [param:Function onChangeCallback] )</h3>
-		<p>Sets the [page:.onChangeCallback onChangeCallback]() method.</p>
-
-		<h3>[method:Quaternion onChangeCallback]( )</h3>
-		<p>
-			This function is called whenever any of the following occurs:
-			<ul>
-				<li>
-					The [page:.x x], [page:.y y], [page:.z z] or
-				  [page:.w w] properties are changed.
-				</li>
-				<li>
-					The [page:.set set](), [page:.copy copy](), [page:.clone clone](),
-					[page:.setFromAxisAngle setFromAxisAngle](),  [page:.setFromRotationMatrix setFromRotationMatrix](),
-					[page:.conjugate conjugate](), [page:.normalize normalize](),
-					[page:.multiplyQuaternions multiplyQuaternions](), [page:.slerp slerp]() or [page:.fromArray fromArray]()
-					functions are called.
-				</li>
-				<li>
-					[page:.setFromEuler setFromEuler]() function is called with its *update* argument set to true.
-				</li>
-			</ul>
-			By default it is the empty function, however you can change it if needed using [page:.onChange onChange]( [page:Function onChangeCallback] ).
-		</p>
-
 
 		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
 		<p>Pre-multiplies this quaternion by [page:Quaternion q].</p>

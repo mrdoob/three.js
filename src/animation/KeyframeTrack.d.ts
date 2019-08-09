@@ -4,38 +4,40 @@ import { CubicInterpolant } from './../math/interpolants/CubicInterpolant';
 import { InterpolationModes } from '../constants';
 
 export class KeyframeTrack {
-  constructor(
-    name: string,
-    times: any[],
-    values: any[],
-    interpolation?: InterpolationModes
-  );
 
-  name: string;
-  times: any[];
-  values: any[];
+	constructor(
+		name: string,
+		times: any[],
+		values: any[],
+		interpolation?: InterpolationModes
+	);
 
-  ValueTypeName: string;
-  TimeBufferType: Float32Array;
-  ValueBufferType: Float32Array;
+	name: string;
+	times: any[];
+	values: any[];
 
-  DefaultInterpolation: InterpolationModes;
+	ValueTypeName: string;
+	TimeBufferType: Float32Array;
+	ValueBufferType: Float32Array;
 
-  InterpolantFactoryMethodDiscrete(result: any): DiscreteInterpolant;
-  InterpolantFactoryMethodLinear(result: any): LinearInterpolant;
-  InterpolantFactoryMethodSmooth(result: any): CubicInterpolant;
+	DefaultInterpolation: InterpolationModes;
 
-  setInterpolation(interpolation: InterpolationModes): void;
-  getInterpolation(): InterpolationModes;
+	InterpolantFactoryMethodDiscrete( result: any ): DiscreteInterpolant;
+	InterpolantFactoryMethodLinear( result: any ): LinearInterpolant;
+	InterpolantFactoryMethodSmooth( result: any ): CubicInterpolant;
 
-  getValuesize(): number;
+	setInterpolation( interpolation: InterpolationModes ): void;
+	getInterpolation(): InterpolationModes;
 
-  shift(timeOffset: number): KeyframeTrack;
-  scale(timeScale: number): KeyframeTrack;
-  trim(startTime: number, endTime: number): KeyframeTrack;
-  validate(): boolean;
-  optimize(): KeyframeTrack;
+	getValuesize(): number;
 
-  static parse(json: any): KeyframeTrack;
-  static toJSON(track: KeyframeTrack): any;
+	shift( timeOffset: number ): KeyframeTrack;
+	scale( timeScale: number ): KeyframeTrack;
+	trim( startTime: number, endTime: number ): KeyframeTrack;
+	validate(): boolean;
+	optimize(): KeyframeTrack;
+
+	static parse( json: any ): KeyframeTrack;
+	static toJSON( track: KeyframeTrack ): any;
+
 }

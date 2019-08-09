@@ -11,7 +11,6 @@
 
 <body>
 	<h1>如何使用WebGL 2（[name]）</h1>
-	<br />
 
 	<p>
 		从R95版本起，three.js便开始支持使用WebGL 2环境来进行渲染。默认情况下，当创建一个*WebGLRenderer*实例时，
@@ -22,11 +21,11 @@
 
 	<p>
 		由于WebGL 2并不被所有支持WebGL 1的设备所支持，因此检查各种设备上WebGL 2的可用性是非常重要的。
-		要对其可用性进行检查，请将[link:https://github.com/mrdoob/three.js/blob/master/examples/js/WebGL.js WebGL.js]包含到你的项目中。
+		要对其可用性进行检查，请将[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/WebGL.js WebGL.js]包含到你的项目中。
 	</p>
 
 	<code>
-&lt;script src="/path/to/WebGL.js"&gt;&lt;/script&gt;
+import { WEBGL } from 'three/examples/jsm/WebGL.js';
 	</code>
 
 	<p>
@@ -98,7 +97,7 @@ var material = new THREE.ShaderMaterial( {
 		请参阅官方示例，来看一看WebGL 2各种特性的运行。<br /><br />
 
 		[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]<br />
-		[example:webgl2_materials_texture3d_volume WebGL2 / materials / texture3d / volume]<br />
+		[example:webgl2_materials_texture2darray WebGL2 / materials / texture2darray]<br />
 		[example:webgl2_multisampled_renderbuffers WebGL2 / multisampled renderbuffers]
 	</p>
 
@@ -109,7 +108,9 @@ var material = new THREE.ShaderMaterial( {
 		下列列表展现了在最新版本three.js中，已可用的特性的概览。
 		<ul>
 			<li>3D Textures</li>
+			<li>2D Texture Arrays</li>
 			<li>Multisampled Renderbuffers</li>
+			<li>Non-power of two (POT) textures work just the same as POT textures now. No resizing is required for best quality.</li>
 		</ul>
 
 	</p>

@@ -55,7 +55,10 @@
 
 		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
 		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
-		See the [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] for more information.<br />
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
 
 		[page:Boolean depth] - whether the drawing buffer has a
 		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
@@ -92,6 +95,15 @@
 			Default is *true*.
 		</p>
 
+		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<p>
+			If [page:.checkShaderErrors checkShaderErrors] is true, defines whether material shader programs are checked
+			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
+			It is strongly recommended to keep these checks enabled during development.
+			If the shader does not compile and link - it will not work and associated material will not render.
+			Default is *true*.
+		</p>
+
 		<h3>[property:Object capabilities]</h3>
 		<p>
 		An object containing details about the capabilities of the current [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext].<br />
@@ -101,6 +113,7 @@
 		- [page:Boolean floatVertexTextures]: *true* if [page:Boolean floatFragmentTextures] and [page:Boolean vertexTextures] are both true.<br />
 		- [page:Method getMaxAnisotropy](): Returns the maximum available anisotropy.<br />
 		- [page:Method getMaxPrecision](): Returns the maximum available precision for vertex and fragment shaders. <br />
+		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
 		- [page:Boolean logarithmicDepthBuffer]: *true* if the [page:parameter logarithmicDepthBuffer] was set to true in the constructor and
 		the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.
 			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 around 66% of WebGL enabled devices support this.<br />
@@ -128,16 +141,6 @@
 		User-defined clipping planes specified as THREE.Plane objects in world space.
 			These planes apply globally. Points in space whose dot product with the plane is negative are cut away.
 		 Default is [].
-		</p>
-
-		<h3>[property:WebGLRenderingContext context]</h3>
-		<p>
-		The renderer obtains a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext] context
-		  from its [page:WebGLRenderer.domElement domElement] by default, using
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext HTMLCanvasElement.getContext]().<br /><br />
-
-		You can create this manually, however it must correspond to the
-		[page:WebGLRenderer.domElement domElement] in order to render to the screen.
 		</p>
 
 		<h3>[property:DOMElement domElement]</h3>
@@ -245,7 +248,7 @@
 
 		<h3>[property:Integer shadowMap.type]</h3>
 		<p>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</p>
-		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap. See [page:Renderer Renderer constants] for details.</p>
+		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default) and THREE.PCFSoftShadowMap. See [page:Renderer Renderer constants] for details.</p>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>
@@ -278,13 +281,6 @@
 		</p>
 
 		<h2>Methods</h2>
-
-		<h3>[method:Integer allocTextureUnit]</h3>
-		<p>
-		Attempt to allocate a texture unit for use by a shader. Will warn if trying to allocate
-		more texture units than the GPU supports. This is mainly used internally.
-		See [page:WebGLRenderer.capabilities capabilities.maxTextures].
-		</p>
 
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
 		<p>
@@ -345,8 +341,14 @@
 		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
 		<p>Returns an object that describes the attributes set on the WebGL context when it was created.</p>
 
+		<h3>[method:Integer getActiveCubeFace]()</h3>
+		<p>Returns the current active cube face.</p>
+
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
+		<p>Returns the current active mipmap level.</p>
+
 		<h3>[method:RenderTarget getRenderTarget]()</h3>
-		<p>Returns the current RenderTarget, if any.</p>
+		<p>Returns the current [page:RenderTarget RenderTarget] if there are; returns *null* otherwise.</p>
 
 		<h3>[method:Vector4 getCurrentViewport]( [param:Vector4 target] )</h3>
 		<p>
@@ -392,11 +394,11 @@
 		<h3>[method:null resetGLState]( )</h3>
 		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
 
-		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer] )</h3>
+		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
 		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
 		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
-		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
-		</p>
+		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.</p>
+		<p>For reading out a [page:WebGLRenderTargetCube WebGLRenderTargetCube] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
 
 		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
@@ -423,7 +425,7 @@
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A build in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
+		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>
@@ -434,10 +436,12 @@
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
 
-		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget] )</h3>
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
-		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated (optional).<br /><br />
-		This method sets the active rendertarget. If the parameter is omitted the canvas is set as the active rendertarget.
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
+		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		This method sets the active rendertarget.
 		</p>
 
 		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
@@ -462,26 +466,6 @@
 		Resizes the output canvas to (width, height) with device pixel ratio taken into account,
 			and also sets the viewport to fit that size, starting in (0, 0).
 			Setting [page:Boolean updateStyle] to false prevents any style changes to the output canvas.
-		</p>
-
-		<h3>[method:null setTexture2D]( [param:Texture texture], [param:number slot] )</h3>
-		<p>
-		texture -- The [page:Texture texture] that needs to be set.<br />
-		slot -- The number indicating which slot should be used by the texture.<br /><br />
-
-		This method sets the correct texture to the correct slot for the WebGL shader.
-		The slot number can be found as a value of the uniform of the sampler.<br /><br />
-
-		Note: This method replaces the older [method:null setTexture] method.
-		</p>
-
-		<h3>[method:null setTextureCube]( [param:CubeTexture cubeTexture], [param:Number slot] )</h3>
-		<p>
-		texture -- The [page:CubeTexture cubeTexture] that needs to be set.<br />
-		slot -- The number indicating which slot should be used by the texture.<br /><br />
-
-		This method sets the correct texture to the correct slot for the WebGL shader.
-		The slot number can be found as a value of the uniform of the sampler.
 		</p>
 
 		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
