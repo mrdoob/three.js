@@ -99,7 +99,9 @@ THREE.WEBVR = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-vr' ).then( onSessionStarted );
+					var mode = options.mode || 'immersive-vr';
+					var sessionInit = options.sessionInit || {};
+					navigator.xr.requestSession( mode, sessionInit ).then( onSessionStarted );
 
 				} else {
 
@@ -168,7 +170,8 @@ THREE.WEBVR = {
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR ).catch( showXRNotFound );
+			var mode = options.mode || 'immersive-vr';
+			navigator.xr.supportsSession( mode ).then( showEnterXR ).catch( showXRNotFound );
 
 			return button;
 

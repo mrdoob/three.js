@@ -63,6 +63,24 @@ renderer.setAnimationLoop( function () {
 	<h2>Next Steps</h2>
 
 	<p>
+		By default, the WebXR button creates an "immersive-vr" session
+		with no required or optional features. If you need to override
+		this, you can pass an extra options argument to createButton:
+	</p>
+	<code>
+let options = {
+	mode: 'immersive-ar', // Default is "immersive-vr"
+	sessionInit: {
+		// These options are passed as-is to WebXR's "createSession" call,
+		// use them to request non-default reference space types or potential future features.
+		requiredFeatures: ['local-floor'],
+		optionalFeatures: ['bounded-floor', 'unbounded']
+	}
+};
+document.body.appendChild( WEBVR.createButton( renderer, options ) );
+	</code>
+
+	<p>
 		Have a look at one of the official WebVR examples to see this workflow in action.<br /><br />
 
 		[example:webvr_ballshooter WebVR / ballshoter]<br />
