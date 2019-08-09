@@ -109,6 +109,11 @@ function init() {
 	//
 
 	gui = new GUI();
+	
+	// check this state,this is work for know.
+	//but if logarithmicDepthBuffer option work for MeshDepthMaterial,enable logarithmicDepthBuffer will make this example broken.
+	var depthBufferState = renderer.capabilities.logarithmicDepthBuffer;
+	gui.add(depthBufferState, 'logarithmicDepthBuffer');
 	var GPUPFolder = gui.addFolder( 'GPUPickingPoint' );
 	GPUPFolder.open();
 	GPUPFolder.add( GPUPickingPoint, 'x' );
@@ -140,8 +145,8 @@ function pick( e ) {
 	var pX = 2 * x / renderer.domElement.width - 1;
 	var pY = 2 * y / renderer.domElement.height - 1;
 
-	var mouseVector = new THREE.Vector3();
-	mouseVector.set( pX, pY, 0.5 ); // set raycaster target
+	var mouseVector = new THREE.Vector2();
+	mouseVector.set(pX, pY); // set raycaster target
 	raycaster.setFromCamera( mouseVector, camera );
 
 	//render the picking scene off-screen
@@ -189,9 +194,8 @@ function pick( e ) {
 		pickingCameraPosition.addVectors( renderCamera.position, new THREE.Vector3().copy( direction ).multiplyScalar( ( dist - camera.near ) * 0.999 ) );
 		pickingCameraLookAt.addVectors( renderCamera.position, new THREE.Vector3().copy( direction ).multiplyScalar( dist ) );
 
-		camera.position.set( pickingCameraPosition.x, pickingCameraPosition.y, pickingCameraPosition.z );
+		camera.position.copy( pickingCameraPosition );
 		camera.lookAt( pickingCameraLookAt );
-		camera.updateProjectionMatrix();
 
 
 		renderer.setRenderTarget( pickingTexture );
