@@ -5,7 +5,7 @@ import { _Math } from '../math/Math.js';
  */
 
 
-function GLBufferAttribute( gl, buffer, type, itemSize, count ) {
+function GLBufferAttribute( gl, buffer, type, itemSize, count, normalized ) {
 
 	this.sizes = [
 		[ gl.FLOAT, 4 ],
@@ -35,6 +35,7 @@ function GLBufferAttribute( gl, buffer, type, itemSize, count ) {
 	this.itemSize = itemSize;
 	this.elementSize = this.sizes[ type ];
 	this.count = count;
+	this.normalized = normalized === true;
 
 	this.version = 0;
 
