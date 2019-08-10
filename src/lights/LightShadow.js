@@ -53,7 +53,7 @@ Object.assign( LightShadow.prototype, {
 
 	},
 
-	updateMatrices: function ( light, viewCamera, viewportIndex ) {
+	updateMatrices: function () {
 
 		var shadowCamera = this.camera,
 			shadowMatrix = this.matrix,
