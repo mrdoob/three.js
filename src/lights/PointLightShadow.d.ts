@@ -1,8 +1,8 @@
-import { OrthographicCamera } from './../cameras/OrthographicCamera';
+import { PerspectiveCamera } from './../cameras/PerspectiveCamera';
 import { LightShadow } from './LightShadow';
 
 export class PointLightShadow extends LightShadow {
 
-	camera: OrthographicCamera;
+	camera: PerspectiveCamera;
 
 }
