@@ -17,22 +17,22 @@ DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.pro
 
 	isDirectionalLightShadow: true,
 
-  updateMatrices: function ( light, viewCamera, viewportIndex ) { 
+	updateMatrices: function ( light, viewCamera, viewportIndex ) {
 
-    var camera = this.camera,
-      lightPositionWorld = this._lightPositionWorld,
-      lookTarget = this._lookTarget;
+		var camera = this.camera,
+			lightPositionWorld = this._lightPositionWorld,
+			lookTarget = this._lookTarget;
 
-    lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+		lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
 		camera.position.copy( lightPositionWorld );
 
-    lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+		lookTarget.setFromMatrixPosition( light.target.matrixWorld );
 		camera.lookAt( lookTarget );
 		camera.updateMatrixWorld();
 
-    LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+		LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
 
-  }
+	}
 
 } );
 

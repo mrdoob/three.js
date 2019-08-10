@@ -1,5 +1,4 @@
 import { Light } from './Light.js';
-import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { PointLightShadow } from './PointLightShadow.js';
 
 /**

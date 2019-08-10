@@ -8,7 +8,6 @@ import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
 import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { Vector3 } from '../../math/Vector3.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Frustum } from '../../math/Frustum.js';
@@ -16,12 +15,11 @@ import { Frustum } from '../../math/Frustum.js';
 function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	var _frustum = new Frustum(),
-		_projScreenMatrix = new Matrix4(),
 
 		_shadowMapSize = new Vector2(),
 		_viewportSize = new Vector2(),
 
-    _viewport = new Vector4(),
+		_viewport = new Vector4(),
 
 		_MorphingFlag = 1,
 		_SkinningFlag = 2,
@@ -108,33 +106,33 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			_shadowMapSize.copy( shadow.mapSize );
 
-      var shadowFrameExtents = shadow.getFrameExtents(); 
+			var shadowFrameExtents = shadow.getFrameExtents();
 
-      _shadowMapSize.multiply( shadowFrameExtents );
+			_shadowMapSize.multiply( shadowFrameExtents );
 
 			_viewportSize.copy( shadow.mapSize );
 
-      if( _shadowMapSize.x > maxTextureSize || _shadowMapSize.y > maxTextureSize ){
-        
-        console.warn( 'THREE.WebGLShadowMap:', light, 'has shadow exceeding max texture size, reducing' );
-				
-        if ( _shadowMapSize.x > maxTextureSize ) {
+			if ( _shadowMapSize.x > maxTextureSize || _shadowMapSize.y > maxTextureSize ) {
 
-          _viewportSize.x = Math.floor( maxTextureSize / shadowFrameExtents.x );
-          _shadowMapSize.x = _viewportSize.x * shadowFrameExtents.x;
-          shadow.mapSize.x = _viewportSize.x;
+				console.warn( 'THREE.WebGLShadowMap:', light, 'has shadow exceeding max texture size, reducing' );
 
-        }
+				if ( _shadowMapSize.x > maxTextureSize ) {
 
-        if ( _shadowMapSize.y > maxTextureSize ) {
+					_viewportSize.x = Math.floor( maxTextureSize / shadowFrameExtents.x );
+					_shadowMapSize.x = _viewportSize.x * shadowFrameExtents.x;
+					shadow.mapSize.x = _viewportSize.x;
 
-          _viewportSize.y = Math.floor( maxTextureSize / shadowFrameExtents.y );
-          _shadowMapSize.y = _viewportSize.y * shadowFrameExtents.y;
-          shadow.mapSize.y = _viewportSize.y;
+				}
 
-        }
+				if ( _shadowMapSize.y > maxTextureSize ) {
 
-      }
+					_viewportSize.y = Math.floor( maxTextureSize / shadowFrameExtents.y );
+					_shadowMapSize.y = _viewportSize.y * shadowFrameExtents.y;
+					shadow.mapSize.y = _viewportSize.y;
+
+				}
+
+			}
 
 			if ( shadow.map === null ) {
 
@@ -154,18 +152,18 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				var viewport = shadow.getViewport( vp );
 
-        _viewport.set( 
-        	_viewportSize.x * viewport.x, 
-        	_viewportSize.y * viewport.y, 
-        	_viewportSize.x * viewport.z, 
-        	_viewportSize.y * viewport.w 
-        );
+				_viewport.set(
+					_viewportSize.x * viewport.x,
+					_viewportSize.y * viewport.y,
+					_viewportSize.x * viewport.z,
+					_viewportSize.y * viewport.w
+				);
 
-        _state.viewport( _viewport );
+				_state.viewport( _viewport );
 
 				shadow.updateMatrices( light, camera, vp );
 
-        _frustum = shadow.getFrustum();
+				_frustum = shadow.getFrustum();
 
 				renderObject( scene, camera, shadow.camera, light );
 

@@ -20,49 +20,49 @@ function LightShadow( camera ) {
 	this.map = null;
 	this.matrix = new Matrix4();
 
-  this._frustum = new Frustum();
-  this._frameExtents = new Vector2( 1, 1 );
+	this._frustum = new Frustum();
+	this._frameExtents = new Vector2( 1, 1 );
 
-  this._viewportCount = 1;
+	this._viewportCount = 1;
 
-  this._viewports = [
+	this._viewports = [
 
-    new Vector4( 0, 0, 1, 1)
+		new Vector4( 0, 0, 1, 1 )
 
-  ];
+	];
 
 }
 
 Object.assign( LightShadow.prototype, {
 
-  _projScreenMatrix: new Matrix4(),
+	_projScreenMatrix: new Matrix4(),
 
-  _lightPositionWorld: new Vector3(),
+	_lightPositionWorld: new Vector3(),
 
-  _lookTarget: new Vector3(),
+	_lookTarget: new Vector3(),
 
-  getViewportCount: function () {
+	getViewportCount: function () {
 
-    return this._viewportCount;
+		return this._viewportCount;
 
-  },
+	},
 
-  getFrustum: function() {
+	getFrustum: function () {
 
-    return this._frustum;
+		return this._frustum;
 
-  },
+	},
 
-  updateMatrices: function ( light, viewCamera, viewportIndex ) {
+	updateMatrices: function ( light, viewCamera, viewportIndex ) {
 
-    var shadowCamera = this.camera,
-      shadowMatrix = this.matrix,
-      projScreenMatrix = this._projScreenMatrix;
+		var shadowCamera = this.camera,
+			shadowMatrix = this.matrix,
+			projScreenMatrix = this._projScreenMatrix;
 
-    projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+		projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromMatrix( projScreenMatrix );
 
-    shadowMatrix.set(
+		shadowMatrix.set(
 			0.5, 0.0, 0.0, 0.5,
 			0.0, 0.5, 0.0, 0.5,
 			0.0, 0.0, 0.5, 0.5,
@@ -72,19 +72,19 @@ Object.assign( LightShadow.prototype, {
 		shadowMatrix.multiply( shadowCamera.projectionMatrix );
 		shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
 
-  },
+	},
 
-  getViewport: function ( viewportIndex ) {
+	getViewport: function ( viewportIndex ) {
 
-    return this._viewports[ viewportIndex ];
+		return this._viewports[ viewportIndex ];
 
-  },
+	},
 
-  getFrameExtents: function () {
+	getFrameExtents: function () {
 
-    return this._frameExtents;
+		return this._frameExtents;
 
-  },
+	},
 
 	copy: function ( source ) {
 
