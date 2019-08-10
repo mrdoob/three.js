@@ -18,9 +18,11 @@ SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype 
 
 	isSpotLightShadow: true,
 
-	update: function ( light ) {
+  updateMatrices: function ( light, viewCamera, viewportIndex ) { 
 
-		var camera = this.camera;
+		var camera = this.camera,
+      lookTarget = this._lookTarget,
+      lightPositionWorld = this._lightPositionWorld;
 
 		var fov = _Math.RAD2DEG * 2 * light.angle;
 		var aspect = this.mapSize.width / this.mapSize.height;
@@ -35,7 +37,16 @@ SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype 
 
 		}
 
-	}
+    lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+		camera.position.copy( lightPositionWorld );
+
+    lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+		camera.lookAt( lookTarget );
+		camera.updateMatrixWorld();
+
+    LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+
+  }
 
 } );
 
