@@ -4,16 +4,18 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
+import { Vector4Node } from '../inputs/Vector4Node.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 
-function BumpMapNode( value, scale ) {
+function BumpMapNode( value, scale, channel ) {
 
 	TempNode.call( this, 'v3' );
 
 	this.value = value;
 	this.scale = scale || new FloatNode( 1 );
+	this.channel = channel || 'r';
 
 	this.toNormalMap = false;
 
@@ -28,16 +30,16 @@ BumpMapNode.Nodes = ( function () {
 
 		// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
-		"vec2 dHdxy_fwd( sampler2D bumpMap, vec2 vUv, float bumpScale ) {",
+		"vec2 dHdxy_fwd( sampler2D bumpMap, vec2 vUv, float bumpScale, vec4 channel ) {",
 
 		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
 		"	vec2 dSTdx = dFdx( vUv );",
 		"	vec2 dSTdy = dFdy( vUv );",
 
-		"	float Hll = bumpScale * texture2D( bumpMap, vUv ).x;",
-		"	float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;",
-		"	float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;",
+		"	float Hll = bumpScale * dot( texture2D( bumpMap, vUv ), channel );",
+		"	float dBx = bumpScale * dot( texture2D( bumpMap, vUv + dSTdx ), channel ) - Hll;",
+		"	float dBy = bumpScale * dot( texture2D( bumpMap, vUv + dSTdy ), channel ) - Hll;",
 
 		"	return vec2( dBx, dBy );",
 
@@ -71,14 +73,14 @@ BumpMapNode.Nodes = ( function () {
 	].join( "\n" ), [ dHdxy_fwd ], { derivatives: true } );
 
 	var bumpToNormal = new FunctionNode( [
-		"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
+		"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale, vec4 channel ) {",
 
 		"	vec2 dSTdx = dFdx( uv );",
 		"	vec2 dSTdy = dFdy( uv );",
 
-		"	float Hll = texture2D( bumpMap, uv ).x;",
-		"	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;",
-		"	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;",
+		"	float Hll = dot( texture2D( bumpMap, uv ), channel );",
+		"	float dBx = dot( texture2D( bumpMap, uv + dSTdx ), channel ) - Hll;",
+		"	float dBy = dot( texture2D( bumpMap, uv + dSTdy ), channel ) - Hll;",
 
 		"	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );",
 
@@ -100,14 +102,25 @@ BumpMapNode.prototype.nodeType = "BumpMap";
 BumpMapNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
+		
+		var channelMap = {
+			r: 'x',
+			g: 'y',
+			b: 'z',
+			a: 'w'
+		};
 
+		var channelVec4 = new Vector4Node( 0, 0, 0, 0 );
+		channelVec4.value[ channelMap[ this.channel ] ] = 1;
+		
 		if ( this.toNormalMap ) {
 
 			var bumpToNormal = builder.include( BumpMapNode.Nodes.bumpToNormal );
 
 			return builder.format( bumpToNormal + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
 				this.value.uv.build( builder, 'v2' ) + ', ' +
-				this.scale.build( builder, 'f' ) + ' )', this.getType( builder ), output );
+				this.scale.build( builder, 'f' ) + ', ' +
+				channelVec4.build( builder, 'v4' ) + ' )', this.getType( builder ), output );
 
 		} else {
 
@@ -119,7 +132,8 @@ BumpMapNode.prototype.generate = function ( builder, output ) {
 
 			var derivativeHeightCode = derivativeHeight + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
 				this.value.uv.build( builder, 'v2' ) + ', ' +
-				this.scale.build( builder, 'f' ) + ' )';
+				this.scale.build( builder, 'f' ) + ', ' +
+				channelVec4.build( builder, 'v4' ) + ' )';
 
 			return builder.format( perturbNormalArb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
 				this.normal.build( builder, 'v3' ) + ', ' +
@@ -143,6 +157,7 @@ BumpMapNode.prototype.copy = function ( source ) {
 
 	this.value = source.value;
 	this.scale = source.scale;
+	this.channel = source.channel;
 
 	return this;
 
@@ -158,6 +173,7 @@ BumpMapNode.prototype.toJSON = function ( meta ) {
 
 		data.value = this.value.toJSON( meta ).uuid;
 		data.scale = this.scale.toJSON( meta ).uuid;
+		data.channel = this.channel;
 
 	}
 
