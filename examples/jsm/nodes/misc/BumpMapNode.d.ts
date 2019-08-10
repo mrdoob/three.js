@@ -5,10 +5,11 @@ import { FunctionNode } from '../core/FunctionNode';
 import { TextureNode } from '../inputs/TextureNode';
 
 export class BumpMapNode extends TempNode {
-  constructor(value: TextureNode, scale?: FloatNode);
+  constructor(value: TextureNode, scale?: FloatNode, channel?: string);
 
   value: TextureNode;
   scale: FloatNode;
+  channel: string;
   toNormalMap: boolean;
   nodeType: string;
 
