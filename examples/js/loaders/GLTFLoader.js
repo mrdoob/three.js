@@ -148,7 +148,8 @@ THREE.GLTFLoader = ( function () {
 				if ( magic === "b3dm" ) {
 
 					try {
-						var b3dm = new b3dmExtension( data )
+
+						var b3dm = new B3dmExtension( data );
 						extensions[ EXTENSIONS.KHR_BINARY_GLTF ] = new GLTFBinaryExtension( b3dm.bodyGlb );
 
 					} catch ( error ) {
@@ -442,33 +443,35 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	var B3DM_HEADER_LENGTH = 28
+	var B3DM_HEADER_LENGTH = 28;
 
-	function b3dmExtension( data ) {
-		this.name = "b3dm"
-		this.content = null
-		this.body = null
-		var headerView = new DataView( data, 0, B3DM_HEADER_LENGTH )
+	function B3dmExtension( data ) {
+
+		this.name = "b3dm";
+		this.content = null;
+		this.body = null;
+		var headerView = new DataView( data, 0, B3DM_HEADER_LENGTH );
 		this.header = {
-			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice(0,4) ) ),
+
+			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true ),
 			featureTableJSONByteLength: headerView.getUint32( 12, true ),
 			featureTableBinaryByteLength: headerView.getUint32( 16, true ),
 			batchTableJSONByteLength: headerView.getUint32( 20, true ),
 			batchTableBinaryByteLength: headerView.getUint32( 24, true )
-		}
 
-		this.body = data.slice( B3DM_HEADER_LENGTH, this.header.length )
+		};
 
-		var glbStartOffset = B3DM_HEADER_LENGTH + this.header.featureTableJSONByteLength + this.header.featureTableBinaryByteLength + this.header.batchTableJSONByteLength + this.header.batchTableBinaryByteLength
+		this.body = data.slice( B3DM_HEADER_LENGTH, this.header.length );
 
-		this.bodyGlb = data.slice( glbStartOffset, this.header.length )
+		var glbStartOffset = B3DM_HEADER_LENGTH + this.header.featureTableJSONByteLength + this.header.featureTableBinaryByteLength + this.header.batchTableJSONByteLength + this.header.batchTableBinaryByteLength;
+
+		this.bodyGlb = data.slice( glbStartOffset, this.header.length );
+
 	}
 
 	/* BINARY EXTENSION */
-
-	var BINARY_EXTENSION_BUFFER_NAME = 'binary_glTF';
 	var BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
 	var BINARY_EXTENSION_HEADER_LENGTH = 12;
 	var BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4E4F534A, BIN: 0x004E4942 };
