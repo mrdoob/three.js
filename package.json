@@ -52,7 +52,7 @@
     "start": "npm run dev",
     "lint": "npm run lint-source && npm run lint-examples",
     "lint-source": "eslint src --ext js --ext ts && tsc src/Three.d.ts --noEmit",
-    "lint-examples": "eslint examples/js --ext js --ext ts --ignore-pattern libs && tsc examples/js",
+    "lint-examples": "eslint examples/js --ext js --ext ts --ignore-pattern libs && tsc examples/js --noEmit",
     "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
     "travis": "npm run lint && npm test"
   },
