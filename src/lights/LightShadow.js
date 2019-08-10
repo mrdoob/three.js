@@ -1,5 +1,8 @@
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Frustum } from '../math/Frustum.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -17,9 +20,71 @@ function LightShadow( camera ) {
 	this.map = null;
 	this.matrix = new Matrix4();
 
+  this._frustum = new Frustum();
+  this._frameExtents = new Vector2( 1, 1 );
+
+  this._viewportCount = 1;
+
+  this._viewports = [
+
+    new Vector4( 0, 0, 1, 1)
+
+  ];
+
 }
 
 Object.assign( LightShadow.prototype, {
+
+  _projScreenMatrix: new Matrix4(),
+
+  _lightPositionWorld: new Vector3(),
+
+  _lookTarget: new Vector3(),
+
+  getViewportCount: function () {
+
+    return this._viewportCount;
+
+  },
+
+  getFrustum: function() {
+
+    return this._frustum;
+
+  },
+
+  updateMatrices: function ( light, viewCamera, viewportIndex ) {
+
+    var shadowCamera = this.camera,
+      shadowMatrix = this.matrix,
+      projScreenMatrix = this._projScreenMatrix;
+
+    projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+		this._frustum.setFromMatrix( projScreenMatrix );
+
+    shadowMatrix.set(
+			0.5, 0.0, 0.0, 0.5,
+			0.0, 0.5, 0.0, 0.5,
+			0.0, 0.0, 0.5, 0.5,
+			0.0, 0.0, 0.0, 1.0
+		);
+
+		shadowMatrix.multiply( shadowCamera.projectionMatrix );
+		shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+
+  },
+
+  getViewport: function ( viewportIndex ) {
+
+    return this._viewports[ viewportIndex ];
+
+  },
+
+  getFrameExtents: function () {
+
+    return this._frameExtents;
+
+  },
 
 	copy: function ( source ) {
 
