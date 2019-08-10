@@ -20,6 +20,8 @@ var _object3DId = 0;
 var _m1, _q1, _v1;
 var _xAxis, _yAxis, _zAxis;
 var _target, _position, _scale, _quaternion;
+var _addedEvent = { type: 'added' };
+var _removedEvent = { type: 'removed' };
 
 function Object3D() {
 
@@ -354,7 +356,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			object.parent = this;
 			this.children.push( object );
 
-			object.dispatchEvent( { type: 'added' } );
+			object.dispatchEvent( _addedEvent );
 
 		} else {
 
@@ -387,7 +389,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			object.parent = null;
 			this.children.splice( index, 1 );
 
-			object.dispatchEvent( { type: 'removed' } );
+			object.dispatchEvent( _removedEvent );
 
 		}
 
