@@ -51,7 +51,7 @@
  *
  *  }
  *
- *	materials.push(material);
+ *  materials.push(material);
  *  var mesh = new THREE.Mesh(geometry, materials);
  */
 
