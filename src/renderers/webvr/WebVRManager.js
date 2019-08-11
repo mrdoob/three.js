@@ -139,9 +139,9 @@ function WebVRManager( renderer ) {
 
 			if ( gamepad !== undefined && gamepad.pose !== undefined ) {
 
-				if ( gamepad !== undefined && gamepad.id === "Cardboard Button") {
+				if ( gamepad !== undefined && gamepad.id === "Cardboard Button" ) {
 
-					// Cardboard Trigger 
+					// Cardboard Trigger
 
 					var buttonId = gamepad.index;
 
@@ -161,10 +161,10 @@ function WebVRManager( renderer ) {
 
 						}
 
-					} else if(triggers[ i ] === true) {
+					} else if ( triggers[ i ] === true ) {
 
 						controller.dispatchEvent( { type: 'select' } );
-						
+
 					}
 
 					controller.matrix.compose( camera.position, camera.quaternion, camera.scale );
