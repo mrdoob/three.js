@@ -55,33 +55,29 @@ if ( Object.assign === undefined ) {
 	// Missing in IE
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 
-	( function () {
+	Object.assign = function ( target ) {
 
-		Object.assign = function ( target ) {
+		'use strict';
 
-			'use strict';
+		if ( target === undefined || target === null ) {
 
-			if ( target === undefined || target === null ) {
+			throw new TypeError( 'Cannot convert undefined or null to object' );
 
-				throw new TypeError( 'Cannot convert undefined or null to object' );
+		}
 
-			}
+		var output = Object( target );
 
-			var output = Object( target );
+		for ( var index = 1; index < arguments.length; index ++ ) {
 
-			for ( var index = 1; index < arguments.length; index ++ ) {
+			var source = arguments[ index ];
 
-				var source = arguments[ index ];
+			if ( source !== undefined && source !== null ) {
 
-				if ( source !== undefined && source !== null ) {
+				for ( var nextKey in source ) {
 
-					for ( var nextKey in source ) {
+					if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
 
-						if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
-
-							output[ nextKey ] = source[ nextKey ];
-
-						}
+						output[ nextKey ] = source[ nextKey ];
 
 					}
 
@@ -89,10 +85,10 @@ if ( Object.assign === undefined ) {
 
 			}
 
-			return output;
+		}
 
-		};
+		return output;
 
-	} )();
+	};
 
 }
