@@ -113,7 +113,7 @@ function WebVRManager( renderer ) {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad.id === 'Cardboard Button' || gamepad && ( gamepad.id === 'Daydream Controller' ||
+			if ( gamepad && ( gamepad.id === 'Cardboard Button' || gamepad.id === 'Daydream Controller' ||
 				gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ||
 				gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) ||
 				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
