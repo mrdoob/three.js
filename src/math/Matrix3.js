@@ -7,6 +7,8 @@ import { Vector3 } from './Vector3.js';
  * @author tschw
  */
 
+var _vector;
+
 function Matrix3() {
 
 	this.elements = [
@@ -90,29 +92,25 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
-	applyToBufferAttribute: function () {
+	applyToBufferAttribute: function ( attribute ) {
 
-		var v1 = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		return function applyToBufferAttribute( attribute ) {
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+			_vector.x = attribute.getX( i );
+			_vector.y = attribute.getY( i );
+			_vector.z = attribute.getZ( i );
 
-				v1.x = attribute.getX( i );
-				v1.y = attribute.getY( i );
-				v1.z = attribute.getZ( i );
+			_vector.applyMatrix3( this );
 
-				v1.applyMatrix3( this );
+			attribute.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
-				attribute.setXYZ( i, v1.x, v1.y, v1.z );
+		}
 
-			}
+		return attribute;
 
-			return attribute;
-
-		};
-
-	}(),
+	},
 
 	multiply: function ( m ) {
 

@@ -169,7 +169,7 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		var textData = THREE.LoaderUtils.decodeText( data );
+		var textData = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
 
 		// parse header (always ascii format)
 

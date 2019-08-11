@@ -4,29 +4,8 @@
 		<title>three.js webgl - framebuffer - texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
 			#overlay {
 				position: fixed;
 				display: flex;
@@ -45,31 +24,22 @@
 				border: 1px solid white;
 			}
 		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture <br/>
-			The area of the white square is copied from the framebuffer to a texture (shown in the top-left corner).
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
 		</div>
 
 		<div id="overlay">
-			<div>
-			</div>
+			<div></div>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer;
 			var mesh, sprite, texture;
@@ -146,7 +116,7 @@
 				//
 
 				var overlay = document.getElementById( 'overlay' );
-				var controls = new THREE.OrbitControls( camera, overlay );
+				var controls = new OrbitControls( camera, overlay );
 				controls.enablePan = false;
 
 				//

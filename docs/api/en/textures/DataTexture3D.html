@@ -32,10 +32,18 @@
 		<div>[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]</div>
 		<div>[example:webgl2_materials_texture3d_volume WebGL2 / materials / texture3d / volume]</div>
 
-		<h2>Properties</h2>
+    <h2>Properties</h2>
 
 		<p>
-		See the base [page:Texture Texture] class for common properties.
+    See the base [page:Texture Texture] class for common properties.
+    </p>
+
+    <h3>[property:number wrapR]</h3>
+		<p>
+		This defines how the texture is wrapped in the depth direction.<br />
+		The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge is clamped to the outer edge texels.
+		The other two choices are [page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping].
+		See the [page:Textures texture constants] page for details.
 		</p>
 
 		<h2>Methods</h2>

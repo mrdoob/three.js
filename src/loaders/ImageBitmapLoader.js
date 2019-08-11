@@ -71,7 +71,16 @@ ImageBitmapLoader.prototype = {
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, scope.options );
+			if ( scope.options === undefined ) {
+
+				// Workaround for FireFox. It causes an error if you pass options.
+				return createImageBitmap( blob );
+
+			} else {
+
+				return createImageBitmap( blob, scope.options );
+
+			}
 
 		} ).then( function ( imageBitmap ) {
 
@@ -89,6 +98,8 @@ ImageBitmapLoader.prototype = {
 			scope.manager.itemEnd( url );
 
 		} );
+
+		scope.manager.itemStart( url );
 
 	},
 

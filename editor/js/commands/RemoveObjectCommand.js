@@ -4,13 +4,14 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
 
-var RemoveObjectCommand = function ( object ) {
+var RemoveObjectCommand = function ( editor, object ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'RemoveObjectCommand';
 	this.name = 'Remove Object';

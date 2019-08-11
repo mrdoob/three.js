@@ -215,13 +215,17 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 			setTest: function ( stencilTest ) {
 
-				if ( stencilTest ) {
+				if ( ! locked ) {
 
-					enable( gl.STENCIL_TEST );
+					if ( stencilTest ) {
 
-				} else {
+						enable( gl.STENCIL_TEST );
 
-					disable( gl.STENCIL_TEST );
+					} else {
+
+						disable( gl.STENCIL_TEST );
+
+					}
 
 				}
 
@@ -676,6 +680,15 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		depthBuffer.setTest( material.depthTest );
 		depthBuffer.setMask( material.depthWrite );
 		colorBuffer.setMask( material.colorWrite );
+
+		var stencilWrite = material.stencilWrite;
+		stencilBuffer.setTest( stencilWrite );
+		if ( stencilWrite ) {
+
+			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilMask );
+			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+
+		}
 
 		setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 

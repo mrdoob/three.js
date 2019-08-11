@@ -463,10 +463,10 @@ THREE.LegacyGLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: THREE.NearestFilter,
 		9729: THREE.LinearFilter,
-		9984: THREE.NearestMipMapNearestFilter,
-		9985: THREE.LinearMipMapNearestFilter,
-		9986: THREE.NearestMipMapLinearFilter,
-		9987: THREE.LinearMipMapLinearFilter
+		9984: THREE.NearestMipmapNearestFilter,
+		9985: THREE.LinearMipmapNearestFilter,
+		9986: THREE.NearestMipmapLinearFilter,
+		9987: THREE.LinearMipmapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -491,8 +491,8 @@ THREE.LegacyGLTFLoader = ( function () {
 	};
 
 	var WEBGL_SIDES = {
-		1028: THREE.BackSide,  // Culling front
-		1029: THREE.FrontSide  // Culling back
+		1028: THREE.BackSide, // Culling front
+		1029: THREE.FrontSide // Culling back
 		//1032: THREE.NoSide   // Culling front and back, what to do?
 	};
 
@@ -566,8 +566,10 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	function _each( object, callback, thisObj ) {
 
-		if ( !object ) {
+		if ( ! object ) {
+
 			return Promise.resolve();
+
 		}
 
 		var results;
@@ -589,11 +591,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					if ( value instanceof Promise ) {
 
-						value.then( function( key, value ) {
+						value.then( function ( key, value ) {
 
 							results[ key ] = value;
 
-						}.bind( this, idx ));
+						}.bind( this, idx ) );
 
 					} else {
 
@@ -621,11 +623,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						if ( value instanceof Promise ) {
 
-							value.then( function( key, value ) {
+							value.then( function ( key, value ) {
 
 								results[ key ] = value;
 
-							}.bind( this, key ));
+							}.bind( this, key ) );
 
 						} else {
 
@@ -641,11 +643,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		}
 
-		return Promise.all( fns ).then( function() {
+		return Promise.all( fns ).then( function () {
 
 			return results;
 
-		});
+		} );
 
 	}
 
@@ -1071,7 +1073,6 @@ THREE.LegacyGLTFLoader = ( function () {
 	GLTFParser.prototype.loadTextures = function () {
 
 		var json = this.json;
-		var extensions = this.extensions;
 		var options = this.options;
 
 		return this._withDependencies( [
@@ -1134,7 +1135,7 @@ THREE.LegacyGLTFLoader = ( function () {
 								var sampler = json.samplers[ texture.sampler ];
 
 								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipMapLinearFilter;
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipmapLinearFilter;
 								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 
@@ -1210,7 +1211,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					}
 
-					keys.forEach( function( v ) {
+					keys.forEach( function ( v ) {
 
 						if ( khr_material.values[ v ] !== undefined ) materialValues[ v ] = khr_material.values[ v ];
 
@@ -1515,7 +1516,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					materialParams.color = new THREE.Color().fromArray( materialValues.diffuse );
 
-				} else if ( typeof( materialValues.diffuse ) === 'string' ) {
+				} else if ( typeof ( materialValues.diffuse ) === 'string' ) {
 
 					materialParams.map = dependencies.textures[ materialValues.diffuse ];
 
@@ -1523,13 +1524,13 @@ THREE.LegacyGLTFLoader = ( function () {
 
 				delete materialParams.diffuse;
 
-				if ( typeof( materialValues.reflective ) === 'string' ) {
+				if ( typeof ( materialValues.reflective ) === 'string' ) {
 
 					materialParams.envMap = dependencies.textures[ materialValues.reflective ];
 
 				}
 
-				if ( typeof( materialValues.bump ) === 'string' ) {
+				if ( typeof ( materialValues.bump ) === 'string' ) {
 
 					materialParams.bumpMap = dependencies.textures[ materialValues.bump ];
 
@@ -1547,7 +1548,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					}
 
-				} else if ( typeof( materialValues.emission ) === 'string' ) {
+				} else if ( typeof ( materialValues.emission ) === 'string' ) {
 
 					if ( materialType === THREE.MeshBasicMaterial ) {
 
@@ -1565,7 +1566,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 					materialParams.specular = new THREE.Color().fromArray( materialValues.specular );
 
-				} else if ( typeof( materialValues.specular ) === 'string' ) {
+				} else if ( typeof ( materialValues.specular ) === 'string' ) {
 
 					materialParams.specularMap = dependencies.textures[ materialValues.specular ];
 
@@ -1670,9 +1671,9 @@ THREE.LegacyGLTFLoader = ( function () {
 
 									var parameters = json.techniques[ material.technique ].parameters || {};
 
-									for( var attributeName in parameters ) {
+									for ( var attributeName in parameters ) {
 
-										if ( parameters [ attributeName ][ 'semantic' ] === attributeId ) {
+										if ( parameters[ attributeName ][ 'semantic' ] === attributeId ) {
 
 											geometry.addAttribute( attributeName, bufferAttribute );
 
@@ -2217,8 +2218,10 @@ THREE.LegacyGLTFLoader = ( function () {
 					if ( child.material && child.material.isRawShaderMaterial ) {
 
 						child.gltfShader = new GLTFShader( child, dependencies.nodes );
-						child.onBeforeRender = function(renderer, scene, camera){
-							this.gltfShader.update(scene, camera);
+						child.onBeforeRender = function ( renderer, scene, camera ) {
+
+							this.gltfShader.update( scene, camera );
+
 						};
 
 					}

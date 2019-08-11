@@ -22,10 +22,6 @@ var Editor = function () {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
-		// actions
-
-		showModal: new Signal(),
-
 		// notifications
 
 		editorCleared: new Signal(),
@@ -55,6 +51,9 @@ var Editor = function () {
 		objectChanged: new Signal(),
 		objectRemoved: new Signal(),
 
+		cameraAdded: new Signal(),
+		cameraRemoved: new Signal(),
+
 		helperAdded: new Signal(),
 		helperRemoved: new Signal(),
 
@@ -68,7 +67,9 @@ var Editor = function () {
 
 		showGridChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
-		historyChanged: new Signal()
+		historyChanged: new Signal(),
+
+		viewportCameraChanged: new Signal()
 
 	};
 
@@ -93,8 +94,16 @@ var Editor = function () {
 	this.textures = {};
 	this.scripts = {};
 
+	this.animations = {};
+	this.mixer = new THREE.AnimationMixer( this.scene );
+
 	this.selected = null;
 	this.helpers = {};
+
+	this.cameras = {};
+	this.viewportCamera = this.camera;
+
+	this.addCamera( this.camera );
 
 };
 
@@ -146,6 +155,7 @@ Editor.prototype = {
 			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
 			if ( child.material !== undefined ) scope.addMaterial( child.material );
 
+			scope.addCamera( child );
 			scope.addHelper( child );
 
 		} );
@@ -196,6 +206,7 @@ Editor.prototype = {
 
 		object.traverse( function ( child ) {
 
+			scope.removeCamera( child );
 			scope.removeHelper( child );
 
 		} );
@@ -239,6 +250,42 @@ Editor.prototype = {
 
 	},
 
+	addAnimation: function ( object, animations ) {
+
+		if ( animations.length > 0 ) {
+
+			this.animations[ object.uuid ] = animations;
+
+		}
+
+	},
+
+	//
+
+	addCamera: function ( camera ) {
+
+		if ( camera.isCamera ) {
+
+			this.cameras[ camera.uuid ] = camera;
+
+			this.signals.cameraAdded.dispatch( camera );
+
+		}
+
+	},
+
+	removeCamera: function ( camera ) {
+
+		if ( this.cameras[ camera.uuid ] !== undefined ) {
+
+			delete this.cameras[ camera.uuid ];
+
+			this.signals.cameraRemoved.dispatch( camera );
+
+		}
+
+	},
+
 	//
 
 	addHelper: function () {
@@ -250,29 +297,29 @@ Editor.prototype = {
 
 			var helper;
 
-			if ( object instanceof THREE.Camera ) {
+			if ( object.isCamera ) {
 
 				helper = new THREE.CameraHelper( object, 1 );
 
-			} else if ( object instanceof THREE.PointLight ) {
+			} else if ( object.isPointLight ) {
 
 				helper = new THREE.PointLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.DirectionalLight ) {
+			} else if ( object.isDirectionalLight ) {
 
 				helper = new THREE.DirectionalLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.SpotLight ) {
+			} else if ( object.isSpotLight ) {
 
 				helper = new THREE.SpotLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.HemisphereLight ) {
+			} else if ( object.isHemisphereLight ) {
 
 				helper = new THREE.HemisphereLightHelper( object, 1 );
 
-			} else if ( object instanceof THREE.SkinnedMesh ) {
+			} else if ( object.isSkinnedMesh ) {
 
-				helper = new THREE.SkeletonHelper( object );
+				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
 			} else {
 
@@ -370,6 +417,13 @@ Editor.prototype = {
 
 	},
 
+	setViewportCamera: function ( uuid ) {
+
+		this.viewportCamera = this.cameras[ uuid ];
+		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
+
+	},
+
 	//
 
 	select: function ( object ) {
@@ -428,7 +482,11 @@ Editor.prototype = {
 
 	focus: function ( object ) {
 
-		this.signals.objectFocused.dispatch( object );
+		if ( object !== undefined ) {
+
+			this.signals.objectFocused.dispatch( object );
+
+		}
 
 	},
 
@@ -444,6 +502,8 @@ Editor.prototype = {
 		this.storage.clear();
 
 		this.camera.copy( this.DEFAULT_CAMERA );
+		this.scene.name = "Scene";
+		this.scene.userData = {};
 		this.scene.background.setHex( 0xaaaaaa );
 		this.scene.fog = null;
 
@@ -459,6 +519,9 @@ Editor.prototype = {
 		this.materials = {};
 		this.textures = {};
 		this.scripts = {};
+
+		this.animations = {};
+		this.mixer.stopAllAction();
 
 		this.deselect();
 
@@ -519,8 +582,6 @@ Editor.prototype = {
 
 			metadata: {},
 			project: {
-				gammaInput: this.config.getKey( 'project/renderer/gammaInput' ),
-				gammaOutput: this.config.getKey( 'project/renderer/gammaOutput' ),
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' )
 			},

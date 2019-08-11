@@ -4,32 +4,8 @@
 		<title>three.js webaudio - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family: Monospace;
-			}
-
-			#info {
-				position: absolute;
-				z-index: 2;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
 			#overlay {
 				position: absolute;
 				z-index: 1;
@@ -45,54 +21,48 @@
 				color: #ffffff;
 			}
 
-			#overlay > div {
-				text-align: center;
-			}
+				#overlay > div {
+					text-align: center;
+				}
 
-			#overlay > div > button {
-				height: 20px;
-				width: 100px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
+				#overlay > div > button {
+					height: 20px;
+					width: 100px;
+					background: transparent;
+					color: #ffffff;
+					outline: 1px solid #ffffff;
+					border: 0px;
+					cursor: pointer;
+				}
 
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
+				#overlay > div > p {
+					color: #777777;
+					font-size: 12px;
+				}
 		</style>
 	</head>
 	<body>
 		<div id="overlay">
 			<div>
 				<button id="startButton">Click to Play</button>
-				<p>Automatic audio playback requires a user interaction.</p>
+				<p>Audio playback requires user interaction.</p>
 			</div>
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox |
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox<br/>
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener">larrylarrybb</a>,
 			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a> and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
 			var camera, controls, scene, renderer, light;
 
@@ -222,7 +192,7 @@
 
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var soundControls = new SoundControls();
 				var generatorControls = new GeneratorControls();
 				var volumeFolder = gui.addFolder( 'sound volume' );
@@ -277,7 +247,7 @@
 
 				//
 
-				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+				controls = new FirstPersonControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 70;
 				controls.lookSpeed = 0.05;

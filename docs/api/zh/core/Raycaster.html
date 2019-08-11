@@ -149,7 +149,7 @@
 		[page:Array optionalTarget] — （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
-			检测所有在射线与物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个）。<br>
+			检测所有在射线与物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个。<br>
 			该方法返回一个包含有交叉部分的数组:
 		</p>
 		<code>
@@ -161,7 +161,8 @@
 			[page:Face3 face] —— 相交的面<br />
 			[page:Integer faceIndex] —— 相交的面的索引<br />
 			[page:Object3D object] —— 相交的物体<br />
-			[page:Vector2 uv] —— 相交部分的点的UV坐标。
+			[page:Vector2 uv] —— 相交部分的点的UV坐标。<br />
+			[page:Vector2 uv2] —— Second set of U,V coordinates at point of intersection
 		</p>
 		<p>
 			当计算这条射线是否和物体相交的时候，*Raycaster*将传入的对象委托给[page:Object3D.raycast raycast]方法。
@@ -177,7 +178,7 @@
 		<p>
 		[page:Array objects] —— 检测和射线相交的一组物体。<br />
 		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为false。<br />
-		[page:Array optionalTarget] —— （可选）（可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
+		[page:Array optionalTarget] —— （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
 			检测所有在射线与这些物体之间，包括或不包括后代的相交部分。返回结果时，相交部分将按距离进行排序，最近的位于第一个），相交部分和[page:.intersectObject]所返回的格式是相同的。

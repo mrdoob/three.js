@@ -17,5 +17,24 @@ export default /* glsl */`
 
 	#endif
 
+	#ifdef USE_TANGENT
+
+		vec3 tangent = normalize( vTangent );
+		vec3 bitangent = normalize( vBitangent );
+
+		#ifdef DOUBLE_SIDED
+
+			tangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+			bitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
+		#endif
+
+	#endif
+
 #endif
+
+// non perturbed normal for clearcoat
+
+vec3 geometryNormal = normal;
+
 `;

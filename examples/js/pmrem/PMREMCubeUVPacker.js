@@ -137,7 +137,8 @@ THREE.PMREMCubeUVPacker = ( function () {
 			renderer.gammaOutput = false;
 			renderer.toneMapping = THREE.LinearToneMapping;
 			renderer.toneMappingExposure = 1.0;
-			renderer.render( scene, camera, this.CubeUVRenderTarget, false );
+			renderer.setRenderTarget( this.CubeUVRenderTarget );
+			renderer.render( scene, camera );
 
 			renderer.setRenderTarget( currentRenderTarget );
 			renderer.toneMapping = toneMapping;

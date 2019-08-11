@@ -8,23 +8,23 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>通过模块来引入（[name]）</h1><br />
+		<h1>通过模块来引入（[name]）</h1>
 
 		<p>
-			虽然通过script标签来引入three.js是一个能够快速起步、快速运行的方式，但这种方式对于一些具有较长生命周期的项目来说是有一些缺点的。比如说：
+			虽然通过script标签来引入three.js是一个能够快速起步、快速运行的方式，但这种方式对于一些具有较长生命周期的项目来说是有一些缺点。比如：
 
 			<ul>
-				<li>你必须手动获得并在你的源代码中包含这个库的一个拷贝</li>
-				<li>更新这个库的版本是一个手动操作的过程</li>
-				<li>在检查新版本的库时，你的版本差异对比将会被许多行给弄乱。</li>
+				<li>你必须手动获得并在你的项目源代码中包含这个库的一个拷贝</li>
+				<li>更新库的版本是一个手动操作的过程</li>
+				<li>在检查新版本的库时，你的版本差异对比将会被许多行的构建文件给弄乱。</li>
 			</ul>
 		</p>
 
-		<p>使用像npm这样的依赖包管理器可以很好地避免这些需要注意的问题，只需在你的电脑上下载并导入你所需要的库的版本即可。</p>
+		<p>使用像npm这样的依赖包管理器，你只需在你的机器上下载并导入你所需要的版本的库就很好地避免这些需要注意的问题。</p>
 
 		<h2>通过npm来安装</h2>
 
-		<p>Three.js目前已经作为一个npm包来进行了发布，详情请参阅：[link:https://www.npmjs.com/package/three npm]。这意味着，在所有你需要包含three.js库的项目中，只需运行"npm install three"即可。</p>
+		<p>Three.js目前已经作为一个npm模块来进行了发布，详情请参阅：[link:https://www.npmjs.com/package/three npm]。这意味着你只需运行"npm install three"就可以使你的项目包含three.js库。</p>
 
 		<h2>导入这个模块</h2>
 
@@ -62,11 +62,20 @@
 		...
 		</code>
 
-		<h2>注意事项</h2>
-
+		<h2>Importable Examples</h2>
 		<p>
-			目前，无法用这种方式导入"examples/js"目录中的文件。
-			这是因为一些文件依赖于THREE的全局命名空间污染。了解更多详情，请参阅<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>。
+			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
+			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
+			for a project. You can find in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory an ES6
+			module version for almost all example files. If you install three.js via npm, you can import them like so:
+		</p>
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		</code>
+		<p>
+			Note: When using code from the examples directory, it's important that all files match the version of
+			your three.js main file. For example, it's not acceptable to use *GLTFLoader* and *OrbitControls* from R96 together
+			with three.js R103.
 		</p>
 	</body>
 </html>

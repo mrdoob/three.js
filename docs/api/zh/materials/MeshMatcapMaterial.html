@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] is defined by a MatCap (or Lit Sphere) texture, which encodes the material color and shading.<br/><br/>
+			[name] does not respond to lights since the matcap image file encodes baked lighting.
+			It will cast a shadow onto an object that receives shadows (and shadow clipping works), but it will not self-shadow or receive shadows.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshMatcapMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>[page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
+		</p>
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>Talpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。<br /><br />
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。Luminance-only以及luminance/alpha纹理也仍然有效。
+		</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p> 用于创建凹凸贴图的纹理。黑色和白色值映射到与光照相关的感知深度。凹凸实际上不会影响对象的几何形状，只影响光照。如果定义了法线贴图，则将忽略该贴图。
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p> 凹凸贴图会对材质产生多大影响。典型范围是0-1。默认值为1。</p>
+
+		<h3>[property:Color color]</h3>
+		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p> 位移贴图会影响网格顶点的位置，与仅影响材质的光照和阴影的其他贴图不同，移位的顶点可以投射阴影，阻挡其他对象，
+			以及充当真实的几何体。位移纹理是指：网格的所有顶点被映射为图像中每个像素的值（白色是最高的），并且被重定位。
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p> 位移贴图对网格的影响程度（黑色是无位移，白色是最大位移）。如果没有设置位移贴图，则不会应用此值。默认值为1。
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			位移贴图在网格顶点上的偏移量。如果没有设置位移贴图，则不会应用此值。默认值为0。
+		</p>
+
+		<h3>[property:Boolean isMeshMatcapMaterial]</h3>
+		<p>TODO<br /><br />
+
+			因为其通常用在内部优化，所以不应该更改该属性值。
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>颜色贴图。默认为null。纹理贴图颜色由漫反射颜色[page:.color]调节。</p>
+
+		<h3>[property:Texture matcap]</h3>
+		<p>TODO</p>
+
+		<h3>[property:boolean morphNormals]</h3>
+		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从[page:Geometry]传递到shader。默认值为*false*。
+		</p>
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>定义材质是否使用morphTargets。默认值为false。</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p> 法线贴图的类型。<br /><br />
+			选项为[page:constant THREE.TangentSpaceNormalMap]（默认）和[page:constant THREE.ObjectSpaceNormalMap]。
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
+		</p>
+
+		<h3>[property:Boolean skinning]</h3>
+		<p>材质是否使用蒙皮。默认值为false。</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material]。</p>
+
+		<h2>源码(Source)</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

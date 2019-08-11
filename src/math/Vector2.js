@@ -278,21 +278,14 @@ Object.assign( Vector2.prototype, {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: function ( minVal, maxVal ) {
 
-		var min = new Vector2();
-		var max = new Vector2();
+		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
 
-		return function clampScalar( minVal, maxVal ) {
+		return this;
 
-			min.set( minVal, minVal );
-			max.set( maxVal, maxVal );
-
-			return this.clamp( min, max );
-
-		};
-
-	}(),
+	},
 
 	clampLength: function ( min, max ) {
 

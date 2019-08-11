@@ -15,14 +15,14 @@ THREE.BokehShader = {
 
 	uniforms: {
 
-		"tColor":   { value: null },
-		"tDepth":   { value: null },
-		"focus":    { value: 1.0 },
-		"aspect":   { value: 1.0 },
+		"tColor": { value: null },
+		"tDepth": { value: null },
+		"focus": { value: 1.0 },
+		"aspect": { value: 1.0 },
 		"aperture": { value: 0.025 },
-		"maxblur":  { value: 1.0 },
-		"nearClip":  { value: 1.0 },
-		"farClip":  { value: 1000.0 },
+		"maxblur": { value: 1.0 },
+		"nearClip": { value: 1.0 },
+		"farClip": { value: 1000.0 },
 
 	},
 
@@ -47,7 +47,7 @@ THREE.BokehShader = {
 		"uniform sampler2D tColor;",
 		"uniform sampler2D tDepth;",
 
-		"uniform float maxblur;",  // max blur amount
+		"uniform float maxblur;", // max blur amount
 		"uniform float aperture;", // aperture - bigger values for shallower depth of field
 
 		"uniform float nearClip;",
@@ -73,15 +73,15 @@ THREE.BokehShader = {
 		"	return orthographicDepthToViewZ( depth, nearClip, farClip );",
 		"	#endif",
 		"}",
-		
+
 
 		"void main() {",
 
 			"vec2 aspectcorrect = vec2( 1.0, aspect );",
-	
+
 			"float viewZ = getViewZ( getDepth( vUv ) );",
 
-			"float factor = ( focus + viewZ );",  // viewZ is <= 0, so this is a difference equation
+			"float factor = ( focus + viewZ );", // viewZ is <= 0, so this is a difference equation
 
 			"vec2 dofblur = vec2 ( clamp( factor * aperture, -maxblur, maxblur ) );",
 

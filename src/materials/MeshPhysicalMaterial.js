@@ -1,3 +1,4 @@
+import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 
 /**
@@ -5,6 +6,11 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
  *
  * parameters = {
  *  reflectivity: <float>
+ *  clearCoat: <float>
+ *  clearCoatRoughness: <float>
+ *
+ *  clearCoatNormalScale: <Vector2>,
+ *  clearCoatNormalMap: new THREE.Texture( <Image> ),
  * }
  */
 
@@ -20,6 +26,9 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.clearCoat = 0.0;
 	this.clearCoatRoughness = 0.0;
+
+	this.clearCoatNormalScale = new Vector2( 1, 1 );
+	this.clearCoatNormalMap = null;
 
 	this.setValues( parameters );
 
@@ -40,6 +49,9 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	this.clearCoat = source.clearCoat;
 	this.clearCoatRoughness = source.clearCoatRoughness;
+
+	this.clearCoatNormalMap = source.clearCoatNormalMap;
+	this.clearCoatNormalScale.copy( source.clearCoatNormalScale );
 
 	return this;
 

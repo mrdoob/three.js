@@ -169,12 +169,13 @@ THREE.AssimpJSONLoader.prototype = {
 
 						// prop.semantic gives the type of the texture
 						// 1: diffuse
-						// 2: specular mao
+						// 2: specular map
+						// 4: emissive map
 						// 5: height map (bumps)
 						// 6: normal map
-						// more values (i.e. emissive, environment) are known by assimp and may be relevant
+						// more values (i.e. environment, etc) are known by assimp and may be relevant
 
-						if ( semantic === 1 || semantic === 2 || semantic === 5 || semantic === 6 ) {
+						if ( semantic === 1 || semantic === 2 || semantic === 4 || semantic === 5 || semantic === 6 ) {
 
 							var keyname;
 
@@ -185,6 +186,9 @@ THREE.AssimpJSONLoader.prototype = {
 									break;
 								case 2:
 									keyname = 'specularMap';
+									break;
+								case 4:
+									keyname = 'emissiveMap';
 									break;
 								case 5:
 									keyname = 'bumpMap';

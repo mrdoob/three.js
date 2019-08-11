@@ -4,6 +4,7 @@
 		<title>three.js webgl - multiple elements with text</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			* {
 				box-sizing: border-box;
@@ -11,15 +12,20 @@
 			}
 
 			body {
-				color: #000;
-				font-family: Monospace;
-				font-size: 13px;
-
 				background-color: #fff;
+				color: #444;
 				margin: auto;
 				padding: .5in;
 				max-width: 7in;
 				text-align: justify;
+			}
+
+			a {
+				color: #08f;
+			}
+
+			#info {
+				left: 0px;
 			}
 
 			.view {
@@ -37,56 +43,34 @@
 				z-index: -1;
 			}
 
-			#info {
-				position: absolute;
-				top: 0px; width: 6.5in;
-				padding: 0px;
-				text-align: center;
-			}
-
-			a { color: #0080ff; }
-
 			.math {
-
 				text-align: center;
-
 			}
 
 			.math-frac {
-
 				display: inline-block;
 				vertical-align: middle;
-
 			}
 
 			.math-num {
-
 				display: block;
-
 			}
 
 			.math-denom {
-
 				display: block;
 				border-top: 1px solid;
-
 			}
 
 			.math-sqrt {
-
 				display: inline-block;
 				transform: scale(1, 1.3);
-
 			}
 
 			.math-sqrt-stem {
-
 				display: inline-block;
 				border-top: 1px solid;
 				margin-top: 5px;
-
 			}
-
 		</style>
 	</head>
 	<body>
@@ -95,18 +79,11 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var scenes = [], views, t, canvas, renderer;
 
@@ -195,7 +172,7 @@
 					camera.position.set( 0, 0, 1.2 * balls );
 					scene.userData.camera = camera;
 
-					var controls = new THREE.OrbitControls( camera, views[ n ] );
+					var controls = new OrbitControls( camera, views[ n ] );
 					scene.userData.controls = controls;
 
 					scenes.push( scene );
@@ -252,10 +229,10 @@
 					var width = rect.right - rect.left;
 					var height = rect.bottom - rect.top;
 					var left = rect.left;
-					var top = rect.top;
+					var bottom = renderer.domElement.clientHeight - rect.bottom;
 
-					renderer.setViewport( left, top, width, height );
-					renderer.setScissor( left, top, width, height );
+					renderer.setViewport( left, bottom, width, height );
+					renderer.setScissor( left, bottom, width, height );
 
 					renderer.render( scene, scene.userData.camera );
 

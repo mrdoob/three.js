@@ -809,6 +809,7 @@ export default QUnit.module( 'Core', () => {
 
 			var index = new BufferAttribute( new Uint16Array( [ 0, 1, 2, 3 ] ), 1 );
 			var attribute1 = new BufferAttribute( new Uint16Array( [ 1, 3, 5, 7 ] ), 1 );
+			attribute1.name = "attribute1";
 			var a = new BufferGeometry();
 			a.name = "JSONQUnit.test";
 			// a.parameters = { "placeholder": 0 };
@@ -817,7 +818,6 @@ export default QUnit.module( 'Core', () => {
 			a.addGroup( 0, 1, 2 );
 			a.boundingSphere = new Sphere( new Vector3( x, y, z ), 0.5 );
 			var j = a.toJSON();
-
 			var gold = {
 				"metadata": {
 					"version": 4.5,
@@ -833,7 +833,8 @@ export default QUnit.module( 'Core', () => {
 							"itemSize": 1,
 							"type": "Uint16Array",
 							"array": [ 1, 3, 5, 7 ],
-							"normalized": false
+							"normalized": false,
+							"name": "attribute1"
 						}
 					},
 					"index": {
@@ -855,6 +856,22 @@ export default QUnit.module( 'Core', () => {
 			};
 
 			assert.deepEqual( j, gold, "Generated JSON is as expected" );
+
+			// add morphAttributes
+			a.morphAttributes.attribute1 = [];
+			a.morphAttributes.attribute1.push( attribute1.clone() );
+			j = a.toJSON();
+			gold.data.morphAttributes = {
+				"attribute1": [ {
+					"itemSize": 1,
+					"type": "Uint16Array",
+					"array": [ 1, 3, 5, 7 ],
+					"normalized": false,
+					"name": "attribute1"
+				} ]
+			};
+
+			assert.deepEqual( j, gold, "Generated JSON with morphAttributes is as expected" );
 
 		} );
 

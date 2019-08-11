@@ -12,7 +12,7 @@ import {
 	LinearEncoding,
 	UnsignedByteType,
 	RGBAFormat,
-	LinearMipMapLinearFilter,
+	LinearMipmapLinearFilter,
 	LinearFilter,
 	UVMapping
 } from '../constants.js';
@@ -40,7 +40,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
 
 	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : LinearMipMapLinearFilter;
+	this.minFilter = minFilter !== undefined ? minFilter : LinearMipmapLinearFilter;
 
 	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
 
@@ -63,7 +63,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
-	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
+	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
 	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
 
 	this.version = 0;

@@ -4,26 +4,19 @@
 		<title>three.js webgl - worker - offscreen canvas</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
 			body {
-				background: #ffffff;
-				padding: 0;
-				margin: 0;
-				font-family: Monospace;
-				font-size: 13px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #444;
 			}
 
-			#info {
-				top: 0px;
-				width: 100%;
-				color: #000000;
-				margin: 6px 0px;
-				text-align: center;
+			a {
+				color: #08f;
+			}
+
+			canvas {
+				display: inline-block;
 			}
 
 			#message {
@@ -36,15 +29,19 @@
 			}
 
 			#container {
+				position: absolute;
+				top: 50px;
+				bottom: 70px;
 				width: 100%;
-				height: calc(100% - 80px);
 			}
 
 			#ui {
-				margin-top: 8px;
-				height: 80px;
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
 				text-align: center;
 			}
+			
 			#button {
 				border: 0;
 				padding: 4px 6px;

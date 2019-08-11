@@ -61,7 +61,7 @@ vec4 LinearToRGBD( in vec4 value, in float maxRange ) {
 // M matrix, for encoding
 const mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );
 vec4 LinearToLogLuv( in vec4 value )  {
-	vec3 Xp_Y_XYZp = value.rgb * cLogLuvM;
+	vec3 Xp_Y_XYZp = cLogLuvM * value.rgb;
 	Xp_Y_XYZp = max( Xp_Y_XYZp, vec3( 1e-6, 1e-6, 1e-6 ) );
 	vec4 vResult;
 	vResult.xy = Xp_Y_XYZp.xy / Xp_Y_XYZp.z;
@@ -79,7 +79,7 @@ vec4 LogLuvToLinear( in vec4 value ) {
 	Xp_Y_XYZp.y = exp2( ( Le - 127.0 ) / 2.0 );
 	Xp_Y_XYZp.z = Xp_Y_XYZp.y / value.y;
 	Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;
-	vec3 vRGB = Xp_Y_XYZp.rgb * cLogLuvInverseM;
+	vec3 vRGB = cLogLuvInverseM * Xp_Y_XYZp.rgb;
 	return vec4( max( vRGB, 0.0 ), 1.0 );
 }
 `;

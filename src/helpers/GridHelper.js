@@ -46,7 +46,27 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 }
 
-GridHelper.prototype = Object.create( LineSegments.prototype );
-GridHelper.prototype.constructor = GridHelper;
+GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
+
+	constructor: GridHelper,
+
+	copy: function ( source ) {
+
+		LineSegments.prototype.copy.call( this, source );
+
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	}
+
+} );
 
 export { GridHelper };

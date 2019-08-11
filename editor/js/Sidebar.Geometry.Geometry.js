@@ -39,7 +39,7 @@ Sidebar.Geometry.Geometry = function ( editor ) {
 
 		var geometry = object.geometry;
 
-		if ( geometry instanceof THREE.Geometry ) {
+		if ( geometry && geometry.isGeometry ) {
 
 			container.setDisplay( 'block' );
 

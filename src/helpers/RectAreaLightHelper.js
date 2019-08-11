@@ -12,6 +12,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
+import { BackSide } from '../constants.js';
 
 function RectAreaLightHelper( light, color ) {
 
@@ -39,7 +40,7 @@ function RectAreaLightHelper( light, color ) {
 	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 	geometry2.computeBoundingSphere();
 
-	this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: THREE.BackSide, fog: false } ) ) );
+	this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );
 
 	this.update();
 

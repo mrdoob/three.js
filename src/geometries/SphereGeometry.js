@@ -64,7 +64,7 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var thetaEnd = thetaStart + thetaLength;
+	var thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
 	var ix, iy;
 
@@ -89,6 +89,20 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 		var v = iy / heightSegments;
 
+		// special case for the poles
+
+		var uOffset = 0;
+
+		if ( iy == 0 && thetaStart == 0 ) {
+
+			uOffset = 0.5 / widthSegments;
+
+		} else if ( iy == heightSegments && thetaEnd == Math.PI ) {
+
+			uOffset = - 0.5 / widthSegments;
+
+		}
+
 		for ( ix = 0; ix <= widthSegments; ix ++ ) {
 
 			var u = ix / widthSegments;
@@ -103,12 +117,12 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 			// normal
 
-			normal.set( vertex.x, vertex.y, vertex.z ).normalize();
+			normal.copy( vertex ).normalize();
 			normals.push( normal.x, normal.y, normal.z );
 
 			// uv
 
-			uvs.push( u, 1 - v );
+			uvs.push( u + uOffset, 1 - v );
 
 			verticesRow.push( index ++ );
 

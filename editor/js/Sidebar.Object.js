@@ -37,15 +37,15 @@ Sidebar.Object = function ( editor ) {
 		switch ( this.getValue() ) {
 
 			case 'Reset Position':
-				editor.execute( new SetPositionCommand( object, new THREE.Vector3( 0, 0, 0 ) ) );
+				editor.execute( new SetPositionCommand( editor, object, new THREE.Vector3( 0, 0, 0 ) ) );
 				break;
 
 			case 'Reset Rotation':
-				editor.execute( new SetRotationCommand( object, new THREE.Euler( 0, 0, 0 ) ) );
+				editor.execute( new SetRotationCommand( editor, object, new THREE.Euler( 0, 0, 0 ) ) );
 				break;
 
 			case 'Reset Scale':
-				editor.execute( new SetScaleCommand( object, new THREE.Vector3( 1, 1, 1 ) ) );
+				editor.execute( new SetScaleCommand( editor, object, new THREE.Vector3( 1, 1, 1 ) ) );
 				break;
 
 		}
@@ -74,7 +74,7 @@ Sidebar.Object = function ( editor ) {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
 
-		editor.execute( new SetUuidCommand( editor.selected, objectUUID.getValue() ) );
+		editor.execute( new SetUuidCommand( editor, editor.selected, objectUUID.getValue() ) );
 
 	} );
 
@@ -89,7 +89,7 @@ Sidebar.Object = function ( editor ) {
 	var objectNameRow = new UI.Row();
 	var objectName = new UI.Input().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
-		editor.execute( new SetValueCommand( editor.selected, 'name', objectName.getValue() ) );
+		editor.execute( new SetValueCommand( editor, editor.selected, 'name', objectName.getValue() ) );
 
 	} );
 
@@ -145,6 +145,46 @@ Sidebar.Object = function ( editor ) {
 	objectFovRow.add( objectFov );
 
 	container.add( objectFovRow );
+
+	// left
+
+	var objectLeftRow = new UI.Row();
+	var objectLeft = new UI.Number().onChange( update );
+
+	objectLeftRow.add( new UI.Text( strings.getKey( 'sidebar/object/left' ) ).setWidth( '90px' ) );
+	objectLeftRow.add( objectLeft );
+
+	container.add( objectLeftRow );
+
+	// right
+
+	var objectRightRow = new UI.Row();
+	var objectRight = new UI.Number().onChange( update );
+
+	objectRightRow.add( new UI.Text( strings.getKey( 'sidebar/object/right' ) ).setWidth( '90px' ) );
+	objectRightRow.add( objectRight );
+
+	container.add( objectRightRow );
+
+	// top
+
+	var objectTopRow = new UI.Row();
+	var objectTop = new UI.Number().onChange( update );
+
+	objectTopRow.add( new UI.Text( strings.getKey( 'sidebar/object/top' ) ).setWidth( '90px' ) );
+	objectTopRow.add( objectTop );
+
+	container.add( objectTopRow );
+
+	// bottom
+
+	var objectBottomRow = new UI.Row();
+	var objectBottom = new UI.Number().onChange( update );
+
+	objectBottomRow.add( new UI.Text( strings.getKey( 'sidebar/object/bottom' ) ).setWidth( '90px' ) );
+	objectBottomRow.add( objectBottom );
+
+	container.add( objectBottomRow );
 
 	// near
 
@@ -375,113 +415,151 @@ Sidebar.Object = function ( editor ) {
 			var newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
 			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
 
-				editor.execute( new SetPositionCommand( object, newPosition ) );
+				editor.execute( new SetPositionCommand( editor, object, newPosition ) );
 
 			}
 
 			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
-				editor.execute( new SetRotationCommand( object, newRotation ) );
+				editor.execute( new SetRotationCommand( editor, object, newRotation ) );
 
 			}
 
 			var newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
 			if ( object.scale.distanceTo( newScale ) >= 0.01 ) {
 
-				editor.execute( new SetScaleCommand( object, newScale ) );
+				editor.execute( new SetScaleCommand( editor, object, newScale ) );
 
 			}
 
 			if ( object.fov !== undefined && Math.abs( object.fov - objectFov.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'fov', objectFov.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'fov', objectFov.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.left !== undefined && Math.abs( object.left - objectLeft.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'left', objectLeft.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.right !== undefined && Math.abs( object.right - objectRight.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'right', objectRight.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.top !== undefined && Math.abs( object.top - objectTop.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'top', objectTop.getValue() ) );
+				object.updateProjectionMatrix();
+
+			}
+
+			if ( object.bottom !== undefined && Math.abs( object.bottom - objectBottom.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'bottom', objectBottom.getValue() ) );
 				object.updateProjectionMatrix();
 
 			}
 
 			if ( object.near !== undefined && Math.abs( object.near - objectNear.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'near', objectNear.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'near', objectNear.getValue() ) );
+				if ( object.isOrthographicCamera ) {
+
+					object.updateProjectionMatrix();
+
+				}
 
 			}
 
 			if ( object.far !== undefined && Math.abs( object.far - objectFar.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'far', objectFar.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'far', objectFar.getValue() ) );
+				if ( object.isOrthographicCamera ) {
+
+					object.updateProjectionMatrix();
+
+				}
 
 			}
 
 			if ( object.intensity !== undefined && Math.abs( object.intensity - objectIntensity.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'intensity', objectIntensity.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'intensity', objectIntensity.getValue() ) );
 
 			}
 
 			if ( object.color !== undefined && object.color.getHex() !== objectColor.getHexValue() ) {
 
-				editor.execute( new SetColorCommand( object, 'color', objectColor.getHexValue() ) );
+				editor.execute( new SetColorCommand( editor, object, 'color', objectColor.getHexValue() ) );
 
 			}
 
 			if ( object.groundColor !== undefined && object.groundColor.getHex() !== objectGroundColor.getHexValue() ) {
 
-				editor.execute( new SetColorCommand( object, 'groundColor', objectGroundColor.getHexValue() ) );
+				editor.execute( new SetColorCommand( editor, object, 'groundColor', objectGroundColor.getHexValue() ) );
 
 			}
 
 			if ( object.distance !== undefined && Math.abs( object.distance - objectDistance.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'distance', objectDistance.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'distance', objectDistance.getValue() ) );
 
 			}
 
 			if ( object.angle !== undefined && Math.abs( object.angle - objectAngle.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'angle', objectAngle.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'angle', objectAngle.getValue() ) );
 
 			}
 
 			if ( object.penumbra !== undefined && Math.abs( object.penumbra - objectPenumbra.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'penumbra', objectPenumbra.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'penumbra', objectPenumbra.getValue() ) );
 
 			}
 
 			if ( object.decay !== undefined && Math.abs( object.decay - objectDecay.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetValueCommand( object, 'decay', objectDecay.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'decay', objectDecay.getValue() ) );
 
 			}
 
 			if ( object.visible !== objectVisible.getValue() ) {
 
-				editor.execute( new SetValueCommand( object, 'visible', objectVisible.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'visible', objectVisible.getValue() ) );
 
 			}
 
 			if ( object.frustumCulled !== objectFrustumCulled.getValue() ) {
 
-				editor.execute( new SetValueCommand( object, 'frustumCulled', objectFrustumCulled.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'frustumCulled', objectFrustumCulled.getValue() ) );
 
 			}
 
 			if ( object.renderOrder !== objectRenderOrder.getValue() ) {
 
-				editor.execute( new SetValueCommand( object, 'renderOrder', objectRenderOrder.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'renderOrder', objectRenderOrder.getValue() ) );
 
 			}
 
 			if ( object.castShadow !== undefined && object.castShadow !== objectCastShadow.getValue() ) {
 
-				editor.execute( new SetValueCommand( object, 'castShadow', objectCastShadow.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'castShadow', objectCastShadow.getValue() ) );
 
 			}
 
 			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
 				object.material.needsUpdate = true;
-				editor.execute( new SetValueCommand( object, 'receiveShadow', objectReceiveShadow.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'receiveShadow', objectReceiveShadow.getValue() ) );
 
 			}
 
@@ -489,7 +567,7 @@ Sidebar.Object = function ( editor ) {
 
 				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
 
-					editor.execute( new SetValueCommand( object.shadow, 'radius', objectShadowRadius.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
 
 				}
 
@@ -500,7 +578,7 @@ Sidebar.Object = function ( editor ) {
 				var userData = JSON.parse( objectUserData.getValue() );
 				if ( JSON.stringify( object.userData ) != JSON.stringify( userData ) ) {
 
-					editor.execute( new SetValueCommand( object, 'userData', userData ) );
+					editor.execute( new SetValueCommand( editor, object, 'userData', userData ) );
 
 				}
 
@@ -518,17 +596,21 @@ Sidebar.Object = function ( editor ) {
 
 		var properties = {
 			'fov': objectFovRow,
+			'left': objectLeftRow,
+			'right': objectRightRow,
+			'top': objectTopRow,
+			'bottom': objectBottomRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
 			'groundColor': objectGroundColorRow,
-			'distance' : objectDistanceRow,
-			'angle' : objectAngleRow,
-			'penumbra' : objectPenumbraRow,
-			'decay' : objectDecayRow,
-			'castShadow' : objectShadowRow,
-			'receiveShadow' : objectReceiveShadow,
+			'distance': objectDistanceRow,
+			'angle': objectAngleRow,
+			'penumbra': objectPenumbraRow,
+			'decay': objectDecayRow,
+			'castShadow': objectShadowRow,
+			'receiveShadow': objectReceiveShadow,
 			'shadow': objectShadowRadius
 		};
 
@@ -542,8 +624,8 @@ Sidebar.Object = function ( editor ) {
 
 	function updateTransformRows( object ) {
 
-		if ( object instanceof THREE.Light ||
-		   ( object instanceof THREE.Object3D && object.userData.targetInverse ) ) {
+		if ( object.isLight ||
+		   ( object.isObject3D && object.userData.targetInverse ) ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );
@@ -614,6 +696,30 @@ Sidebar.Object = function ( editor ) {
 		if ( object.fov !== undefined ) {
 
 			objectFov.setValue( object.fov );
+
+		}
+
+		if ( object.left !== undefined ) {
+
+			objectLeft.setValue( object.left );
+
+		}
+
+		if ( object.right !== undefined ) {
+
+			objectRight.setValue( object.right );
+
+		}
+
+		if ( object.top !== undefined ) {
+
+			objectTop.setValue( object.top );
+
+		}
+
+		if ( object.bottom !== undefined ) {
+
+			objectBottom.setValue( object.bottom );
 
 		}
 

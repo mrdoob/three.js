@@ -16,8 +16,8 @@ Sidebar.Settings = function ( editor ) {
 	// language
 
 	var options = {
-		'en': 'English',
-		'zh': '中文'
+		en: 'English',
+		zh: '中文'
 	};
 
 	var languageRow = new UI.Row();

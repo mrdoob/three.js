@@ -61,7 +61,31 @@
 		基于参数数组m,来创建 [page:Material] 数组. 参数索引与材质的索引一致。
 		</p>
 
+		<h2>Handlers</h2>
 
+		<p>
+		*[name].Handlers* is a special object normally used by other loaders like [page:GLTFLoader] or [page:MTLLoader]. It provides an
+		API that allows the definition of special mappings: What loaders should be used in order to load specific files. A typical use case
+		is to overwrite the default loader for textures.<br /><br />
+	
+		Note: It's only possible to use *[name].Handlers* if the respective loader support the usage.
+		</p>
+	
+		<h3>[method:null add]( [param:Object regex], [param:Loader loader] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.<br />
+		[page:Loader loader] — The loader.
+		<p>
+		Registers a loader with the given regular expression.
+		</p>
+	
+		<h3>[method:null get]( [param:String file] )</h3>
+		<p>
+		[page:String file] — The file path.
+		<p>
+		Can be used to retrieve the registered loader for the given file path.
+		</p>
+		
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

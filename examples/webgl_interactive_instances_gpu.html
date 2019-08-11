@@ -4,28 +4,11 @@
 	<title>three.js webgl - interactive instances (gpu)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 	<style>
-		body {
-			font-family: Monospace;
-			background-color: #f0f0f0;
-			margin: 0px;
-			overflow: hidden;
+		#info {
+			background-color: rgba(0,0,0,0.75);
 		}
-
-		.info {
-			position: absolute;
-			background-color: black;
-			opacity: 0.8;
-			color: white;
-			text-align: center;
-			top: 0px;
-			width: 100%;
-		}
-
-		.info a {
-			color: #00ffff;
-		}
-
 		#notSupported {
 			width: 50%;
 			margin: auto;
@@ -37,7 +20,7 @@
 </head>
 <body>
 
-	<div class="info">
+	<div id="info">
 
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking of geometry instances
 
@@ -45,15 +28,10 @@
 
 		<br/><br/>
 
-		<div>This demo compares different methods of constructing and rendering many instances of a single geometry.</div>
-
-		<br/>
-
 		<div>
 
-			<div style="display:inline-block;">
-				<span>number of<br/>geometry instances</span>
-				<br/>
+			<div>
+				number of instances:
 				<select id="instanceCount">
 					<option>100</option>
 					<option>500</option>
@@ -69,11 +47,8 @@
 				</select>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>method of<br/>construction/rendering</span>
-				<br/>
+			<div>
+				method:
 				<select id="method">
 					<option>instanced</option>
 					<option>merged</option>
@@ -82,27 +57,18 @@
 				</select>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>render continuously<br/>(to get fps reading)</span>
-				<br/>
+			<div>
+				render continuously:
 				<input id="animate" type="checkbox" />
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>use override material<br/>(only effects singleMaterial method)</span>
-				<br/>
+			<div>
+				override material (only affects singleMaterial):
 				<input id="override" type="checkbox" checked/>
 			</div>
 
-			&nbsp;&nbsp;&nbsp;
-
-			<div style="display:inline-block;">
-				<span>construct anew<br/>(to get additional timings)</span>
-				<br/>
+			<div>
+				construct anew(to get additional timings):
 				<button id="construct" type="button">do it</button>
 			</div>
 
@@ -133,10 +99,6 @@
 	</div>
 
 	<div id="container"></div>
-
-	<script src="../build/three.js"></script>
-	<script src="js/controls/TrackballControls.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 
 	<script id="vertMerged" type="x-shader/x-vertex">
 		#define SHADER_NAME vertMerged
@@ -339,7 +301,12 @@
 
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 		var container, stats;
 		var camera, controls, scene, renderer;
@@ -485,7 +452,7 @@
 				rotation.y = Math.random() * 2 * Math.PI;
 				rotation.z = Math.random() * 2 * Math.PI;
 
-				quaternion.setFromEuler( rotation, false );
+				quaternion.setFromEuler( rotation );
 
 				scale.x = scale.y = scale.z = Math.random() * 1;
 
@@ -583,11 +550,11 @@
 				objectCount ++;
 
 				object.material = material.clone();
-				object.material.uniforms.color.value.setHex( Math.random() * 0xffffff );
+				object.material.uniforms[ "color" ].value.setHex( Math.random() * 0xffffff );
 				materialList.push( object.material );
 
 				pickingObject.material = pickingMaterial.clone();
-				pickingObject.material.uniforms.pickingColor.value.setHex( i + 1 );
+				pickingObject.material.uniforms[ "pickingColor" ].value.setHex( i + 1 );
 				materialList.push( pickingObject.material );
 
 				pickingData[ i + 1 ] = object;
@@ -613,7 +580,7 @@
 				vertexShader: vert,
 				fragmentShader: frag,
 				uniforms: {
-					color: {
+					"color": {
 						value: new THREE.Color()
 					}
 				}
@@ -624,7 +591,7 @@
 				vertexShader: "#define PICKING\n" + vert,
 				fragmentShader: "#define PICKING\n" + frag,
 				uniforms: {
-					pickingColor: {
+					"pickingColor": {
 						value: new THREE.Color()
 					}
 				}
@@ -984,7 +951,7 @@
 
 			// controls
 
-			controls = new THREE.TrackballControls(
+			controls = new TrackballControls(
 				camera, renderer.domElement
 			);
 			controls.staticMoving = true;
@@ -1045,15 +1012,17 @@
 
 			highlightBox.visible = false;
 
+			renderer.setRenderTarget( pickingRenderTarget );
+
 			if ( singlePickingMaterial ) {
 
 				scene.overrideMaterial = singlePickingMaterial;
-				renderer.render( scene, camera, pickingRenderTarget );
+				renderer.render( scene, camera );
 				scene.overrideMaterial = null;
 
 			} else {
 
-				renderer.render( pickingScene, camera, pickingRenderTarget );
+				renderer.render( pickingScene, camera );
 
 			}
 
@@ -1105,6 +1074,7 @@
 		function render() {
 
 			pick();
+			renderer.setRenderTarget( null );
 			renderer.render( scene, camera );
 
 		}

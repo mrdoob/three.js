@@ -22,25 +22,25 @@
 				Modify the object's *position*, *quaternion*, and *scale* properties, and let three.js recompute
 				the object's matrix from these properties:
 				<code>
-				object.position.copy(start_position);
-				object.quaternion.copy(quaternion);
+object.position.copy( start_position );
+object.quaternion.copy( quaternion );
 				</code>
 				By default, the *matrixAutoUpdate* property is set true, and the matrix will be automatically recalculated.
 				If the object is static, or you wish to manually control when recalculation occurs, better performance can be obtained by setting the property false:
 				<code>
-				object.matrixAutoUpdate = false;
+object.matrixAutoUpdate = false;
 				</code>
 				And after changing any properties, manually update the matrix:
 				<code>
-				object.updateMatrix();
+object.updateMatrix();
 				</code>
 			</li>
 			<li>
 				Modify the object's matrix directly. The [page:Matrix4] class has various methods for modifying the matrix:
 				<code>
-				object.matrix.setRotationFromQuaternion(quaternion);
-				object.matrix.setPosition(start_position);
-				object.matrixAutoUpdate = false;
+object.matrix.setRotationFromQuaternion( quaternion );
+object.matrix.setPosition( start_position );
+object.matrixAutoUpdate = false;
 				</code>
 				Note that *matrixAutoUpdate* <em>must</em> be set to *false* in this case, and you should make sure <em>not</em> to call *updateMatrix*. Calling *updateMatrix* will clobber the manual changes made to the matrix, recalculating the matrix from *position*, *scale*, and so on.
 			</li>

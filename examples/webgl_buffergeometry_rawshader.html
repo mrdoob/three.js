@@ -4,41 +4,12 @@
 		<title>three.js webgl - raw shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raw shader demo</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -86,13 +57,11 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -112,20 +81,22 @@
 				scene.background = new THREE.Color( 0x101010 );
 
 				// geometry
-
-				var triangles = 500;
+				// nr of triangles with 3 vertices per triangle
+				var vertexCount = 200 * 3;
 
 				var geometry = new THREE.BufferGeometry();
 
 				var positions = [];
 				var colors = [];
 
-				for ( var i = 0; i < triangles; i ++ ) {
+				for ( var i = 0; i < vertexCount; i ++ ) {
 
+					// adding x,y,z
 					positions.push( Math.random() - 0.5 );
 					positions.push( Math.random() - 0.5 );
 					positions.push( Math.random() - 0.5 );
 
+					// adding r,g,b,a
 					colors.push( Math.random() * 255 );
 					colors.push( Math.random() * 255 );
 					colors.push( Math.random() * 255 );

@@ -3,62 +3,27 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style type="text/css">
-			body {
-				margin: 0px;
-				overflow: hidden;
-				font-family: Monospace;
-				text-align: center;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-			}
-
-			a { color: #09f; }
-
-			#type-status { font-weight: bold; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean simulation<br/>
-			current simulation framebuffers type is <span id="type-status"></span><br/>
-			change type to <span id="change-type"></span>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean simulation
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/shaders/OceanShaders.js"></script>
-		<script src="js/Ocean.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Ocean } from './jsm/misc/Ocean.js';
+
 			var stats = new Stats();
 			document.body.appendChild( stats.dom );
 
 			var lastTime = ( new Date() ).getTime();
-
-			var types = { 'float': 'half-float', 'half-float': 'float' };
-			var hash = document.location.hash.substr( 1 );
-			if ( ! ( hash in types ) ) hash = 'half-float';
-
-			document.getElementById( 'type-status' ).innerHTML = hash;
-			document.getElementById( 'change-type' ).innerHTML = '<a href="#" onclick="return change(\'' + types[ hash ] + '\')">' + types[ hash ] + '</a>';
-
-			var lastTime = ( new Date() ).getTime();
-
-			function change( n ) {
-
-				location.hash = n;
-				location.reload();
-				return false;
-
-			}
 
 			var DEMO = {
 				ms_Renderer: null,
@@ -71,9 +36,6 @@
 
 					this.ms_Renderer = new THREE.WebGLRenderer();
 					this.ms_Renderer.setPixelRatio( window.devicePixelRatio );
-					this.ms_Renderer.context.getExtension( 'OES_texture_float' );
-					this.ms_Renderer.context.getExtension( 'OES_texture_float_linear' );
-
 					document.body.appendChild( this.ms_Renderer.domElement );
 
 					this.ms_Scene = new THREE.Scene();
@@ -83,7 +45,7 @@
 					this.ms_Camera.lookAt( 0, 0, 0 );
 
 					// Initialize Orbit control
-					this.ms_Controls = new THREE.OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
+					this.ms_Controls = new OrbitControls( this.ms_Camera, this.ms_Renderer.domElement );
 					this.ms_Controls.userPan = false;
 					this.ms_Controls.userPanSpeed = 0.0;
 					this.ms_Controls.minDistance = 0;
@@ -96,9 +58,9 @@
 					var gres = res / 2;
 					var origx = - gsize / 2;
 					var origz = - gsize / 2;
-					this.ms_Ocean = new THREE.Ocean( this.ms_Renderer, this.ms_Camera, this.ms_Scene,
+					this.ms_Ocean = new Ocean( this.ms_Renderer, this.ms_Camera, this.ms_Scene,
 						{
-							USE_HALF_FLOAT: hash === 'half-float',
+							USE_HALF_FLOAT: false,
 							INITIAL_SIZE: 256.0,
 							INITIAL_WIND: [ 10.0, 10.0 ],
 							INITIAL_CHOPPINESS: 1.5,
@@ -113,12 +75,12 @@
 							RESOLUTION: res
 						} );
 
-					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix = { value: this.ms_Camera.projectionMatrix };
-					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix = { value: this.ms_Camera.matrixWorldInverse };
-					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition = { value: this.ms_Camera.position };
+					this.ms_Ocean.materialOcean.uniforms[ "u_projectionMatrix" ] = { value: this.ms_Camera.projectionMatrix };
+					this.ms_Ocean.materialOcean.uniforms[ "u_viewMatrix" ] = { value: this.ms_Camera.matrixWorldInverse };
+					this.ms_Ocean.materialOcean.uniforms[ "u_cameraPosition" ] = { value: this.ms_Camera.position };
 					this.ms_Scene.add( this.ms_Ocean.oceanMesh );
 
-					var gui = new dat.GUI();
+					var gui = new GUI();
 					gui.add( this.ms_Ocean, "size", 100, 5000 ).onChange( function ( v ) {
 
 						this.object.size = v;
@@ -193,20 +155,19 @@
 
 					if ( this.ms_Ocean.changed ) {
 
-						this.ms_Ocean.materialOcean.uniforms.u_size.value = this.ms_Ocean.size;
-						this.ms_Ocean.materialOcean.uniforms.u_sunDirection.value.set( this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ );
-						this.ms_Ocean.materialOcean.uniforms.u_exposure.value = this.ms_Ocean.exposure;
+						this.ms_Ocean.materialOcean.uniforms[ "u_size" ].value = this.ms_Ocean.size;
+						this.ms_Ocean.materialOcean.uniforms[ "u_sunDirection" ].value.set( this.ms_Ocean.sunDirectionX, this.ms_Ocean.sunDirectionY, this.ms_Ocean.sunDirectionZ );
+						this.ms_Ocean.materialOcean.uniforms[ "u_exposure" ].value = this.ms_Ocean.exposure;
 						this.ms_Ocean.changed = false;
 
 					}
 
-					this.ms_Ocean.materialOcean.uniforms.u_normalMap.value = this.ms_Ocean.normalMapFramebuffer.texture;
-					this.ms_Ocean.materialOcean.uniforms.u_displacementMap.value = this.ms_Ocean.displacementMapFramebuffer.texture;
-					this.ms_Ocean.materialOcean.uniforms.u_projectionMatrix.value = this.ms_Camera.projectionMatrix;
-					this.ms_Ocean.materialOcean.uniforms.u_viewMatrix.value = this.ms_Camera.matrixWorldInverse;
-					this.ms_Ocean.materialOcean.uniforms.u_cameraPosition.value = this.ms_Camera.position;
+					this.ms_Ocean.materialOcean.uniforms[ "u_normalMap" ].value = this.ms_Ocean.normalMapFramebuffer.texture;
+					this.ms_Ocean.materialOcean.uniforms[ "u_displacementMap" ].value = this.ms_Ocean.displacementMapFramebuffer.texture;
+					this.ms_Ocean.materialOcean.uniforms[ "u_projectionMatrix" ].value = this.ms_Camera.projectionMatrix;
+					this.ms_Ocean.materialOcean.uniforms[ "u_viewMatrix" ].value = this.ms_Camera.matrixWorldInverse;
+					this.ms_Ocean.materialOcean.uniforms[ "u_cameraPosition" ].value = this.ms_Camera.position;
 					this.ms_Ocean.materialOcean.depthTest = true;
-					//this.ms_Scene.__lights[1].position.x = this.ms_Scene.__lights[1].position.x + 0.01;
 					this.Display();
 
 				},

@@ -95,16 +95,17 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		var source = this.context.createBufferSource();
 
 		source.buffer = this.buffer;
-		source.detune.value = this.detune;
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
-		source.playbackRate.setValueAtTime( this.playbackRate, this.startTime );
 		this.startTime = this.context.currentTime;
 		source.start( this.startTime, this.offset );
 
 		this.isPlaying = true;
 
 		this.source = source;
+
+		this.setDetune( this.detune );
+		this.setPlaybackRate( this.playbackRate );
 
 		return this.connect();
 
@@ -227,6 +228,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	setDetune: function ( value ) {
 
 		this.detune = value;
+
+		if ( this.source.detune === undefined ) return; // only set detune when available
 
 		if ( this.isPlaying === true ) {
 

@@ -11,7 +11,8 @@
  *
  *  bevelEnabled: <bool>, // turn on bevel
  *  bevelThickness: <float>, // how deep into the original shape bevel goes
- *  bevelSize: <float>, // how far from shape outline is bevel
+ *  bevelSize: <float>, // how far from shape outline (including bevelOffset) is bevel
+ *  bevelOffset: <float>, // how far from shape outline does bevel start
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.Curve> // curve to extrude shape along
@@ -109,6 +110,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
 		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+		var bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
 		var extrudePath = options.extrudePath;
@@ -157,6 +159,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			bevelSegments = 0;
 			bevelThickness = 0;
 			bevelSize = 0;
+			bevelOffset = 0;
 
 		}
 
@@ -393,7 +396,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+			bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
 
 			// contract shape
 
@@ -424,7 +427,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		bs = bevelSize;
+		bs = bevelSize + bevelOffset;
 
 		// Back facing vertices
 
@@ -491,7 +494,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			t = b / bevelSegments;
 			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			bs = bevelSize * Math.sin( t * Math.PI / 2 );
+			bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
 
 			// contract shape
 

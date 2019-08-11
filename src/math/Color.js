@@ -4,7 +4,7 @@ import { _Math } from './Math.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+var _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
 	'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
 	'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
@@ -29,6 +29,9 @@ var ColorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0
 	'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 	'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
 
+var _hslA = { h: 0, s: 0, l: 0 };
+var _hslB = { h: 0, s: 0, l: 0 };
+
 function Color( r, g, b ) {
 
 	if ( g === undefined && b === undefined ) {
@@ -39,6 +42,29 @@ function Color( r, g, b ) {
 	}
 
 	return this.setRGB( r, g, b );
+
+}
+
+function hue2rgb( p, q, t ) {
+
+	if ( t < 0 ) t += 1;
+	if ( t > 1 ) t -= 1;
+	if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+	if ( t < 1 / 2 ) return q;
+	if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+	return p;
+
+}
+
+function SRGBToLinear( c ) {
+
+	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+}
+
+function LinearToSRGB( c ) {
+
+	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
 
 }
 
@@ -100,46 +126,31 @@ Object.assign( Color.prototype, {
 
 	},
 
-	setHSL: function () {
+	setHSL: function ( h, s, l ) {
 
-		function hue2rgb( p, q, t ) {
+		// h,s,l ranges are in 0.0 - 1.0
+		h = _Math.euclideanModulo( h, 1 );
+		s = _Math.clamp( s, 0, 1 );
+		l = _Math.clamp( l, 0, 1 );
 
-			if ( t < 0 ) t += 1;
-			if ( t > 1 ) t -= 1;
-			if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-			if ( t < 1 / 2 ) return q;
-			if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-			return p;
+		if ( s === 0 ) {
+
+			this.r = this.g = this.b = l;
+
+		} else {
+
+			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+			var q = ( 2 * l ) - p;
+
+			this.r = hue2rgb( q, p, h + 1 / 3 );
+			this.g = hue2rgb( q, p, h );
+			this.b = hue2rgb( q, p, h - 1 / 3 );
 
 		}
 
-		return function setHSL( h, s, l ) {
+		return this;
 
-			// h,s,l ranges are in 0.0 - 1.0
-			h = _Math.euclideanModulo( h, 1 );
-			s = _Math.clamp( s, 0, 1 );
-			l = _Math.clamp( l, 0, 1 );
-
-			if ( s === 0 ) {
-
-				this.r = this.g = this.b = l;
-
-			} else {
-
-				var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
-				var q = ( 2 * l ) - p;
-
-				this.r = hue2rgb( q, p, h + 1 / 3 );
-				this.g = hue2rgb( q, p, h );
-				this.b = hue2rgb( q, p, h - 1 / 3 );
-
-			}
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setStyle: function ( style ) {
 
@@ -251,7 +262,7 @@ Object.assign( Color.prototype, {
 		if ( style && style.length > 0 ) {
 
 			// color keywords
-			var hex = ColorKeywords[ style ];
+			var hex = _colorKeywords[ style ];
 
 			if ( hex !== undefined ) {
 
@@ -329,45 +340,25 @@ Object.assign( Color.prototype, {
 
 	},
 
-	copySRGBToLinear: function () {
+	copySRGBToLinear: function ( color ) {
 
-		function SRGBToLinear( c ) {
+		this.r = SRGBToLinear( color.r );
+		this.g = SRGBToLinear( color.g );
+		this.b = SRGBToLinear( color.b );
 
-			return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+		return this;
 
-		}
+	},
 
-		return function copySRGBToLinear( color ) {
+	copyLinearToSRGB: function ( color ) {
 
-			this.r = SRGBToLinear( color.r );
-			this.g = SRGBToLinear( color.g );
-			this.b = SRGBToLinear( color.b );
+		this.r = LinearToSRGB( color.r );
+		this.g = LinearToSRGB( color.g );
+		this.b = LinearToSRGB( color.b );
 
-			return this;
+		return this;
 
-		};
-
-	}(),
-
-	copyLinearToSRGB: function () {
-
-		function LinearToSRGB( c ) {
-
-			return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
-
-		}
-
-		return function copyLinearToSRGB( color ) {
-
-			this.r = LinearToSRGB( color.r );
-			this.g = LinearToSRGB( color.g );
-			this.b = LinearToSRGB( color.b );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	convertSRGBToLinear: function () {
 
@@ -453,23 +444,17 @@ Object.assign( Color.prototype, {
 
 	},
 
-	offsetHSL: function () {
+	offsetHSL: function ( h, s, l ) {
 
-		var hsl = {};
+		this.getHSL( _hslA );
 
-		return function ( h, s, l ) {
+		_hslA.h += h; _hslA.s += s; _hslA.l += l;
 
-			this.getHSL( hsl );
+		this.setHSL( _hslA.h, _hslA.s, _hslA.l );
 
-			hsl.h += h; hsl.s += s; hsl.l += l;
+		return this;
 
-			this.setHSL( hsl.h, hsl.s, hsl.l );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	add: function ( color ) {
 
@@ -541,27 +526,20 @@ Object.assign( Color.prototype, {
 
 	},
 
-	lerpHSL: function () {
+	lerpHSL: function ( color, alpha ) {
 
-		var hslA = { h: 0, s: 0, l: 0 };
-		var hslB = { h: 0, s: 0, l: 0 };
+		this.getHSL( _hslA );
+		color.getHSL( _hslB );
 
-		return function lerpHSL( color, alpha ) {
+		var h = _Math.lerp( _hslA.h, _hslB.h, alpha );
+		var s = _Math.lerp( _hslA.s, _hslB.s, alpha );
+		var l = _Math.lerp( _hslA.l, _hslB.l, alpha );
 
-			this.getHSL( hslA );
-			color.getHSL( hslB );
+		this.setHSL( h, s, l );
 
-			var h = _Math.lerp( hslA.h, hslB.h, alpha );
-			var s = _Math.lerp( hslA.s, hslB.s, alpha );
-			var l = _Math.lerp( hslA.l, hslB.l, alpha );
+		return this;
 
-			this.setHSL( h, s, l );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	equals: function ( c ) {
 
