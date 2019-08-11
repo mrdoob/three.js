@@ -113,7 +113,7 @@ function WebVRManager( renderer ) {
 
 			var gamepad = gamepads[ i ];
 
-			if ( gamepad && ( gamepad.id === 'Daydream Controller' ||
+			if ( gamepad.id === 'Cardboard Button' || gamepad && ( gamepad.id === 'Daydream Controller' ||
 				gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ||
 				gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) ||
 				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
@@ -129,7 +129,7 @@ function WebVRManager( renderer ) {
 
 	}
 
-	function updateControllers() {
+	function updateControllers( camera ) {
 
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
@@ -138,6 +138,41 @@ function WebVRManager( renderer ) {
 			var gamepad = findGamepad( i );
 
 			if ( gamepad !== undefined && gamepad.pose !== undefined ) {
+
+				if ( gamepad !== undefined && gamepad.id === "Cardboard Button") {
+
+					// Cardboard Trigger 
+
+					var buttonId = gamepad.index;
+
+					if ( triggers[ i ] === undefined ) triggers[ i ] = false;
+
+					if ( triggers[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+						triggers[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+						if ( triggers[ i ] === true ) {
+
+							controller.dispatchEvent( { type: 'selectstart' } );
+
+						} else {
+
+							controller.dispatchEvent( { type: 'selectend' } );
+
+						}
+
+					} else if(triggers[ i ] === true) {
+
+						controller.dispatchEvent( { type: 'select' } );
+						
+					}
+
+					controller.matrix.compose( camera.position, camera.quaternion, camera.scale );
+					controller.matrix.decompose( controller.position, controller.quaternion, controller.scale );
+					controller.matrixWorldNeedsUpdate = true;
+					controller.visible = true;
+
+				}
 
 				if ( gamepad.pose === null ) return;
 
@@ -370,7 +405,7 @@ function WebVRManager( renderer ) {
 
 		}
 
-		updateControllers();
+		updateControllers( camera );
 
 		return cameraVR;
 
