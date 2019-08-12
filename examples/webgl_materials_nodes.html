@@ -44,6 +44,7 @@
 			var serialized = false;
 			var textures = {
 				brick: { url: 'textures/brick_diffuse.jpg' },
+				carbon: { url: 'textures/carbon/Carbon_Normal.png' },
 				grass: { url: 'textures/terrain/grasslight-big.jpg' },
 				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
 				decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
@@ -52,7 +53,7 @@
 				spherical: { url: 'textures/envmap.png' }
 			};
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
+			var param = { example: 'physical' };
 
 			function getTexture( name ) {
 
@@ -754,6 +755,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
+						var clearCoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -785,6 +787,12 @@
 							Nodes.OperatorNode.MUL
 						);
 
+						var clearCoatNormalMask = new Nodes.OperatorNode(
+							mask,
+							clearCoatNormalScale,
+							Nodes.OperatorNode.MUL
+						);
+
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
@@ -794,6 +802,8 @@
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
+						mtl.clearCoatNormal =  new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "carbon" ) ) ),
+						mtl.clearCoatNormal.scale = clearCoatNormalMask;
 
 						// GUI
 
@@ -848,6 +858,12 @@
 						addGui( 'normalScale', normalScale.value, function ( val ) {
 
 							normalScale.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoatNormalScale', clearCoatNormalScale.value, function ( val ) {
+
+							clearCoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 

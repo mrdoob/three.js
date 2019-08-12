@@ -131,7 +131,7 @@ StandardNode.prototype.build = function ( builder ) {
 			gamma: true
 		};
 
-		var contextClearCoatNormalEnvironment = 
+		var contextClearCoatEnvironment = 
 		{
 
 			bias: RoughnessToBlinnExponentNode,
@@ -139,8 +139,6 @@ StandardNode.prototype.build = function ( builder ) {
 			uv: new ReflectNode( undefined, new NormalNode( NormalNode.CLEARCOAT ) )
 
 		}
-
-		var contextClearCoatEnvironment = this.clearCoatNormal ? contextClearCoatNormalEnvironment : contextEnvironment;
 
 		var contextGammaOnly = {
 			gamma: true
@@ -192,18 +190,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		if ( this.environment && this.clearCoatNormal ) {
+		if( useClearCoat && this.environment ){
 
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
-			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, { cache: 'clearCoatRadiance', context: contextClearCoatEnvironment, slot: 'radiance' } ); 
-
-			if ( builder.requires.irradiance ) {
-
-				this.environment.analyze( builder, { cache: 'clearCoatIrradiance', context: contextClearCoatEnvironment, slot: 'irradiance' } ); 
-
-			}
+			this.environment.analyze( builder, { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'radiance' } ); 
 
 		}
 
@@ -248,7 +239,13 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'environment' } ) : undefined;
+		var clearCoatEnv;
+		if( useClearCoat && this.environment ){
+
+			clearCoatEnv =  this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'radiance' } );
+			
+		}
+		 
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -468,21 +465,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( clearCoatEnv ) {
 
-			output.push( clearCoatEnv.radiance.code );
+			output.push( clearCoatEnv.code );
 
-			if ( builder.requires.irradiance ) {
-
-				output.push( clearCoatEnv.irradiance.code );
-
-			}
-
-			output.push( "clearCoatRadiance += " + clearCoatEnv.radiance.result + ";" );
-
-			if ( builder.requires.irradiance ) {
-
-				output.push( "clearCoatRadiance += PI * " + clearCoatEnv.irradiance.result + ";" );
-
-			}
+			output.push( "clearCoatRadiance += " + clearCoatEnv.result + ";" );
 
 		}
 
