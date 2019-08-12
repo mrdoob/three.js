@@ -11,7 +11,6 @@ import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
-import { ReflectNode } from '../../accessors/ReflectNode.js';
 import { NormalNode } from '../../accessors/NormalNode.js';
 
 function StandardNode() {
@@ -35,8 +34,6 @@ StandardNode.prototype.build = function ( builder ) {
 	var code;
 
 	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
-
-	if ( this.energyPreservation ) builder.define( 'ENERGY_PRESERVATION' );
 
 	if( this.clearCoatNormal ){ builder.define('USE_CLEARCOAT_NORMALMAP'); }
 
