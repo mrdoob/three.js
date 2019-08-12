@@ -920,8 +920,8 @@ THREE.GLTFExporter.prototype = {
 				gltfMaterial.extensions = { KHR_materials_pbrSpecularGlossiness: {} };
 
 				extensionsUsed[ 'KHR_materials_pbrSpecularGlossiness' ] = true;
-			} 
-			else if ( ! material.isMeshStandardMaterial ) {
+
+			} else if ( ! material.isMeshStandardMaterial ) {
 
 				console.warn( 'GLTFExporter: Use MeshStandardMaterial or MeshBasicMaterial for best results.' );
 
@@ -956,9 +956,11 @@ THREE.GLTFExporter.prototype = {
 			// pbrSpecularGlossiness diffuse, specular and glossiness factor
 			if ( material.isGLTFSpecularGlossinessMaterial ) {
 				
-				var diffuseFactor = [ 1, 1, 1, 1 ];
-				material.color.toArray( diffuseFactor, 0 );
-				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor = diffuseFactor;
+				if ( gltfMaterial.pbrMetallicRoughness.baseColorFactor ) {
+
+					gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor = gltfMaterial.pbrMetallicRoughness.baseColorFactor;
+				  
+				}
 
 				var specularFactor = [ 1, 1, 1 ];
 				material.specular.toArray( specularFactor, 0 );
@@ -995,16 +997,14 @@ THREE.GLTFExporter.prototype = {
 
 					gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture = baseColorMapDef;
 
-				} else {
-
-					gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
-
 				}
+
+				gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
 				
 			}
 
 			// pbrSpecularGlossiness specular map
-			if ( material.specularMap ) {
+			if ( material.isGLTFSpecularGlossinessMaterial && material.specularMap ) {
 
 				var specularMapDef = { index: processTexture( material.specularMap ) };
 				applyTextureTransform( specularMapDef, material.specularMap );
