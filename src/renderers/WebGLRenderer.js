@@ -246,7 +246,7 @@ function WebGLRenderer( parameters ) {
 
 	var extensions, capabilities, state, info;
 	var properties, textures, attributes, geometries, objects;
-	var programCache, renderLists, renderStates;
+	var programCache, renderLists, renderStates, shadowMap;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
@@ -294,6 +294,25 @@ function WebGLRenderer( parameters ) {
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
 
+		shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
+
+		// restore properties if necessary
+
+		if ( _this.shadowMap ) {
+
+			shadowMap.enabled = _this.shadowMap.enabled;
+			shadowMap.autoUpdate = _this.shadowMap.autoUpdate;
+			shadowMap.needsUpdate = _this.shadowMap.needsUpdate;
+			shadowMap.type = _this.shadowMap.type;
+
+		}
+
+		if ( _this.info ) {
+
+			info.autoReset = _this.info.autoReset;
+
+		}
+
 		info.programs = programCache.programs;
 
 		_this.capabilities = capabilities;
@@ -302,6 +321,7 @@ function WebGLRenderer( parameters ) {
 		_this.renderLists = renderLists;
 		_this.state = state;
 		_this.info = info;
+		_this.shadowMap = shadowMap;
 
 	}
 
@@ -312,12 +332,6 @@ function WebGLRenderer( parameters ) {
 	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
 	this.vr = vr;
-
-	// shadow map
-
-	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
-
-	this.shadowMap = shadowMap;
 
 	// API
 
