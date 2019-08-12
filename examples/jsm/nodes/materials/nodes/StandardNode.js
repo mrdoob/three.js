@@ -136,7 +136,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			bias: RoughnessToBlinnExponentNode,
 			gamma: true,
-			uv: new ReflectNode( undefined, new NormalNode( NormalNode.CLEARCOAT ) )
+			cubeNormal: new NormalNode( NormalNode.CLEARCOAT )
 
 		}
 

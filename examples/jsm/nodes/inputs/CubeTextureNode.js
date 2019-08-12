@@ -36,9 +36,17 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	}
 
 	var cubetex = this.getTexture( builder, output );
+
 	
-	var uv = this.uv || builder.context.uv || new ReflectNode();
-	
+	var uv = this.uv || builder.context.cubeUv || new ReflectNode();
+
+	if ( !uv ){
+
+		var normal =  builder.context.cubeNormal || new NormalNode();
+		uv = new ReflectNode( ReflectNode.CUBE, normal);
+
+	}
+
 	uv = uv.build( builder, 'v3' ) ;
 
 	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
