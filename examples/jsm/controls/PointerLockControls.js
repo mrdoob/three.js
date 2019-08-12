@@ -6,6 +6,7 @@
 import {
 	Euler,
 	EventDispatcher,
+	Object3D,
 	Vector3
 } from "../../../build/three.module.js";
 
@@ -24,7 +25,14 @@ var PointerLockControls = function ( camera, domElement ) {
 	var lockEvent = { type: 'lock' };
 	var unlockEvent = { type: 'unlock' };
 
-	var euler = new Euler( 0, 0, 0, 'YXZ' );
+	camera.rotation.set( 0, 0, 0 );
+
+	var pitchObject = new Object3D();
+	pitchObject.add( camera );
+
+	var yawObject = new Object3D();
+	yawObject.position.y = 10;
+	yawObject.add( pitchObject );
 
 	var PI_2 = Math.PI / 2;
 
@@ -35,14 +43,10 @@ var PointerLockControls = function ( camera, domElement ) {
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		euler.setFromQuaternion( camera.quaternion );
+		yawObject.rotation.y -= movementX * 0.002;
+		pitchObject.rotation.x -= movementY * 0.002;
 
-		euler.y -= movementX * 0.002;
-		euler.x -= movementY * 0.002;
-
-		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
-
-		camera.quaternion.setFromEuler( euler );
+		pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitchObject.rotation.x ) );
 
 		scope.dispatchEvent( changeEvent );
 
@@ -94,19 +98,24 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	};
 
-	this.getObject = function () { // retaining this method for backward compatibility
+	this.getObject = function () {
 
-		return camera;
+		return yawObject;
 
 	};
 
 	this.getDirection = function () {
 
+		// assumes the camera itself is not rotated
+
 		var direction = new Vector3( 0, 0, - 1 );
+		var rotation = new Euler( 0, 0, 0, 'YXZ' );
 
 		return function ( v ) {
 
-			return v.copy( direction ).applyQuaternion( camera.quaternion );
+			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
+
+			return v.copy( direction ).applyEuler( rotation );
 
 		};
 

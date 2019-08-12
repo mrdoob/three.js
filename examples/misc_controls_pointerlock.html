@@ -86,7 +86,6 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.y = 10;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
@@ -318,7 +317,7 @@
 
 					}
 					controls.getObject().translateX( velocity.x * delta );
-					controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+					controls.getObject().translateY( velocity.y * delta );
 					controls.getObject().translateZ( velocity.z * delta );
 
 					if ( controls.getObject().position.y < 10 ) {
