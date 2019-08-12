@@ -73,10 +73,6 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 
 		var normal = this.normal || builder.context.normal || new NormalNode();
 
-		if(this.normal){
-			console.log(this.normal);
-		}
-
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
 			normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
