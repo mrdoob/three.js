@@ -11,7 +11,6 @@ import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
-import { ReflectNode } from '../../accessors/ReflectNode.js';
 import { NormalNode } from '../../accessors/NormalNode.js';
 
 function StandardNode() {
