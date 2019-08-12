@@ -62,6 +62,7 @@ THREE.TranslucentShader = {
 
 	fragmentShader: [
 		"#define USE_UV",
+		"#define USE_MAP",
 		"#define PHONG",
 		"#define TRANSLUCENT",
 		"#include <common>",
