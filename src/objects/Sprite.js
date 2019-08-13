@@ -60,6 +60,12 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: function ( raycaster, intersects ) {
 
+		if ( raycaster.camera === null ) {
+
+			console.error( 'THREE.Sprite: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
+
+		}
+
 		if ( _uvC === undefined ) {
 
 			_intersectPoint = new Vector3();
