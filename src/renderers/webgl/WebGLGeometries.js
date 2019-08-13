@@ -71,7 +71,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		}
 
-		geometries.set( geometry , buffergeometry );
+		geometries.set( geometry, buffergeometry );
 
 		info.memory.geometries ++;
 
@@ -167,7 +167,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		//
 
-		wireframeAttributes.set( geometry , attribute );
+		wireframeAttributes.set( geometry, attribute );
 
 	}
 

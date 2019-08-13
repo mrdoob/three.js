@@ -65,26 +65,27 @@ function WebGLRenderStates() {
 		scene.removeEventListener( 'dispose', onSceneDispose );
 
 		renderStates.delete( scene );
+
 	}
 
 	function get( scene, camera ) {
 
 		var renderState;
 
-		if ( !renderStates.has( scene ) ) {
+		if ( ! renderStates.has( scene ) ) {
 
 			renderState = new WebGLRenderState();
-			renderStates.set( scene , new WeakMap());
-			renderStates.get( scene ).set( camera , renderState);
+			renderStates.set( scene, new WeakMap() );
+			renderStates.get( scene ).set( camera, renderState );
 
 			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 
-			if ( !renderStates.get( scene ).has( camera ) ) {
+			if ( ! renderStates.get( scene ).has( camera ) ) {
 
 				renderState = new WebGLRenderState();
-				renderStates.get( scene ).set( camera , renderState);
+				renderStates.get( scene ).set( camera, renderState );
 
 			} else {
 

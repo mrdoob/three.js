@@ -171,7 +171,7 @@ function WebGLRenderLists() {
 		if ( cameras === undefined ) {
 
 			list = new WebGLRenderList();
-			lists.set( scene , new WeakMap() );
+			lists.set( scene, new WeakMap() );
 			lists.get( scene ).set( camera, list );
 
 			scene.addEventListener( 'dispose', onSceneDispose );
