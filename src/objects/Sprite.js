@@ -82,12 +82,12 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		_worldScale.setFromMatrixScale( this.matrixWorld );
 
-		_viewWorldMatrix.copy( raycaster._camera.matrixWorld );
-		this.modelViewMatrix.multiplyMatrices( raycaster._camera.matrixWorldInverse, this.matrixWorld );
+		_viewWorldMatrix.copy( raycaster.camera.matrixWorld );
+		this.modelViewMatrix.multiplyMatrices( raycaster.camera.matrixWorldInverse, this.matrixWorld );
 
 		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
 
-		if ( raycaster._camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
+		if ( raycaster.camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
 
 			_worldScale.multiplyScalar( - _mvPosition.z );
 
