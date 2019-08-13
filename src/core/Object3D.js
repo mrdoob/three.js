@@ -277,7 +277,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// This method does not support objects having non-uniformly-scaled parent(s)
 
-		if ( _position === undefined ) {
+		if ( _target === undefined ) {
 
 			_q1 = new Quaternion();
 			_m1 = new Matrix4();

@@ -416,6 +416,35 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "localTransformVariableInstantiation", ( assert ) => {
+
+			var a = new Object3D();
+			var b = new Object3D();
+			var c = new Object3D();
+			var d = new Object3D();
+
+			a.getWorldDirection( new Vector3() );
+			a.lookAt( new Vector3( 0, - 1, 1 ) );
+
+			assert.ok( true, "Calling lookAt after getWorldDirection does not create errors" );
+
+			b.getWorldPosition( new Vector3() );
+			b.lookAt( new Vector3( 0, - 1, 1 ) );
+
+			assert.ok( true, "Calling lookAt after getWorldPosition does not create errors" );
+
+			c.getWorldQuaternion( new Quaternion() );
+			c.lookAt( new Vector3( 0, - 1, 1 ) );
+
+			assert.ok( true, "Calling lookAt after getWorldQuaternion does not create errors" );
+
+			d.getWorldScale( new Vector3() );
+			d.lookAt( new Vector3( 0, - 1, 1 ) );
+
+			assert.ok( true, "Calling lookAt after getWorldScale does not create errors" );
+
+		} );
+
 		QUnit.todo( "raycast", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
