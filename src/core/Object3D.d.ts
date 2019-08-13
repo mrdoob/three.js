@@ -346,6 +346,6 @@ export class Object3D extends EventDispatcher {
 	 * @param object
 	 * @param recursive
 	 */
-	copy( source: Object3D, recursive?: boolean ): this;
+	copy( source: this, recursive?: boolean ): this;
 
 }

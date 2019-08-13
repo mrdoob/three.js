@@ -8,6 +8,9 @@ import { Plane } from './Plane.js';
  * @author bhouston / http://clara.io
  */
 
+var _sphere;
+var _vector;
+
 function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
 	this.planes = [
@@ -80,41 +83,31 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	intersectsObject: function () {
+	intersectsObject: function ( object ) {
 
-		var sphere = new Sphere();
+		if ( _sphere === undefined ) _sphere = new Sphere();
 
-		return function intersectsObject( object ) {
+		var geometry = object.geometry;
 
-			var geometry = object.geometry;
+		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			if ( geometry.boundingSphere === null )
-				geometry.computeBoundingSphere();
+		_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
-			sphere.copy( geometry.boundingSphere )
-				.applyMatrix4( object.matrixWorld );
+		return this.intersectsSphere( _sphere );
 
-			return this.intersectsSphere( sphere );
+	},
 
-		};
+	intersectsSprite: function ( sprite ) {
 
-	}(),
+		if ( _sphere === undefined ) _sphere = new Sphere();
 
-	intersectsSprite: function () {
+		_sphere.center.set( 0, 0, 0 );
+		_sphere.radius = 0.7071067811865476;
+		_sphere.applyMatrix4( sprite.matrixWorld );
 
-		var sphere = new Sphere();
+		return this.intersectsSphere( _sphere );
 
-		return function intersectsSprite( sprite ) {
-
-			sphere.center.set( 0, 0, 0 );
-			sphere.radius = 0.7071067811865476;
-			sphere.applyMatrix4( sprite.matrixWorld );
-
-			return this.intersectsSphere( sphere );
-
-		};
-
-	}(),
+	},
 
 	intersectsSphere: function ( sphere ) {
 
@@ -138,37 +131,33 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	intersectsBox: function () {
+	intersectsBox: function ( box ) {
 
-		var p = new Vector3();
+		if ( _vector === undefined ) _vector = new Vector3();
 
-		return function intersectsBox( box ) {
+		var planes = this.planes;
 
-			var planes = this.planes;
+		for ( var i = 0; i < 6; i ++ ) {
 
-			for ( var i = 0; i < 6; i ++ ) {
+			var plane = planes[ i ];
 
-				var plane = planes[ i ];
+			// corner at max distance
 
-				// corner at max distance
+			_vector.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+			_vector.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+			_vector.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				p.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				p.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				p.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+			if ( plane.distanceToPoint( _vector ) < 0 ) {
 
-				if ( plane.distanceToPoint( p ) < 0 ) {
-
-					return false;
-
-				}
+				return false;
 
 			}
 
-			return true;
+		}
 
-		};
+		return true;
 
-	}(),
+	},
 
 	containsPoint: function ( point ) {
 

@@ -365,7 +365,7 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Returns the current active mipmap level.
 	 */
-	getActiveMipMapLevel(): number;
+	getActiveMipmapLevel(): number;
 
 	/**
 	 * Returns the current render target. If no render target is set, null is returned.
@@ -382,9 +382,9 @@ export class WebGLRenderer implements Renderer {
 	 *
 	 * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
 	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
-	 * @param activeMipMapLevel Specifies the active mipmap level.
+	 * @param activeMipmapLevel Specifies the active mipmap level.
 	 */
-	setRenderTarget( renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipMapLevel?: number ): void;
+	setRenderTarget( renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipmapLevel?: number ): void;
 
 	readRenderTargetPixels(
 		renderTarget: RenderTarget,

@@ -11,6 +11,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
@@ -52,7 +53,7 @@
 					resolution: 1024,
 
 					generateMipmaps: true,
-					minFilter: THREE.LinearMipMapLinearFilter,
+					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter
 				};
 
@@ -62,12 +63,12 @@
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
 				cubeCamera1.renderTarget.texture.generateMipmaps = true;
-				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				scene.add( cubeCamera1 );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
 				cubeCamera2.renderTarget.texture.generateMipmaps = true;
-				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				scene.add( cubeCamera2 );
 
 				document.body.appendChild( renderer.domElement );

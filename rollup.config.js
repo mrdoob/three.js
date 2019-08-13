@@ -207,7 +207,7 @@ export default {
 			indent: '\t'
 		},
 		{
-			format: 'es',
+			format: 'esm',
 			file: 'build/three.module.js',
 			indent: '\t'
 		}

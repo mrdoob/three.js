@@ -16,6 +16,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -44,7 +45,7 @@
 				scene = new THREE.Scene();
 
 				new RGBELoader()
-					.setType( THREE.UnsignedByteType )
+					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 

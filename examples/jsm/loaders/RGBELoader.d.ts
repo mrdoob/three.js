@@ -21,5 +21,5 @@ export class RGBELoader extends DataTextureLoader {
   type: TextureDataType;
 
   _parser(buffer: ArrayBuffer): RGBE;
-  setType(type: TextureDataType): this;
+  setDataType(type: TextureDataType): this;
 }

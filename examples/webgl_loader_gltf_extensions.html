@@ -17,6 +17,7 @@
 		<div id="container"></div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -154,7 +155,7 @@
 				// Load background and generate envMap
 
 				new RGBELoader()
-					.setType( THREE.UnsignedByteType )
+					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_2k.hdr', function ( texture ) {
 

@@ -72,6 +72,7 @@ var VolumeSlice = function ( volume, index, axis ) {
 	 * @member {Mesh} mesh The mesh ready to get used in the scene
 	 */
 	this.mesh = new Mesh( this.geometry, material );
+	this.mesh.matrixAutoUpdate = false;
 	/**
 	 * @member {Boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
 	 */

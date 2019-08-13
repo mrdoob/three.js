@@ -11,9 +11,27 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			在3D空间中表示一个盒子或立方体。这个的主要目的是表示对象的最小边界框[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes]。
+			在3D空间中表示一个盒子或立方体。其主要用于表示物体在世界坐标中的边界框。
 		</p>
 
+		<h2>示例</h2>
+
+		<code>
+		// Creating the object whose bounding box we want to compute
+		var sphereObject = new THREE.Mesh( 
+			new THREE.SphereGeometry(), 
+			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		);
+		// Creating the actual bounding box with Box3
+		sphereObject.geometry.computeBoundingBox();
+		var box = sphereObject.geometry.boundingBox.clone();
+
+		// ...
+		
+		// In the animation loop, to keep the bounding box updated after move/rotate/scale operations
+		sphereObject.updateMatrixWorld( true );
+		box.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+		</code>
 
 		<h2>构造器（Constructor）</h2>
 
