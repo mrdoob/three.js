@@ -277,14 +277,13 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// This method does not support objects having non-uniformly-scaled parent(s)
 
-		if ( _position === undefined ) {
+		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
-			_q1 = new Quaternion();
-			_m1 = new Matrix4();
-			_target = new Vector3();
-			_position = new Vector3();
+		if ( _m1 === undefined ) _m1 = new Matrix4();
 
-		}
+		if ( _target === undefined ) _target = new Vector3();
+
+		if ( _position === undefined ) _position = new Vector3();
 
 		if ( x.isVector3 ) {
 
@@ -475,12 +474,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	getWorldQuaternion: function ( target ) {
 
-		if ( _scale === undefined ) {
+		if ( _position === undefined ) _position = new Vector3();
 
-			_position = new Vector3();
-			_scale = new Vector3();
-
-		}
+		if ( _scale === undefined ) _scale = new Vector3();
 
 		if ( target === undefined ) {
 
@@ -499,12 +495,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	getWorldScale: function ( target ) {
 
-		if ( _quaternion === undefined ) {
+		if ( _position === undefined ) _position = new Vector3();
 
-			_position = new Vector3();
-			_quaternion = new Quaternion();
-
-		}
+		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
 		if ( target === undefined ) {
 
