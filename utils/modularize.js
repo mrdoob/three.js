@@ -71,7 +71,6 @@ var files = [
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
-	{ path: 'loaders/ctm/CTMLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/deprecated/LegacyGLTFLoader.js', dependencies: [], ignoreList: [ 'AnimationMixer' ] },
 	{ path: 'loaders/deprecated/LegacyJSONLoader.js', dependencies: [], ignoreList: [ 'ObjectLoader' ] },
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
@@ -87,7 +86,7 @@ var files = [
 	{ path: 'loaders/DRACOLoader.js', dependencies: [], ignoreList: [ 'LoadingManager' ] },
 	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/EquirectangularToCubeGenerator.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' }, { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
+	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ] },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },

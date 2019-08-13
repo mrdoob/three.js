@@ -54,7 +54,7 @@ TTFLoader.prototype = {
 
 			var glyphs = {};
 			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
-
+			
 			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
 			var unicodes = Object.keys( glyphIndexMap );
 
@@ -108,7 +108,7 @@ TTFLoader.prototype = {
 
 					} );
 
-					glyphs[ String.fromCodePoint( unicode ) ] = token;
+					glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
 
 				}
 

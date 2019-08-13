@@ -20,6 +20,8 @@ function StandardNode() {
 	this.roughness = new FloatNode( 0.5 );
 	this.metalness = new FloatNode( 0.5 );
 
+	this.energyPreservation = true;
+
 }
 
 StandardNode.prototype = Object.create( Node.prototype );
@@ -153,7 +155,20 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.shadow ) this.shadow.analyze( builder );
 		if ( this.emissive ) this.emissive.analyze( builder, { slot: 'emissive' } );
 
-		if ( this.environment ) this.environment.analyze( builder, { cache: 'env', context: contextEnvironment, slot: 'environment' } ); // isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+		if ( this.environment ) {
+
+			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
+			// environment.analyze will detect if there is a need of calculate irradiance
+
+			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
+
+			if ( builder.requires.irradiance ) {
+
+				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+
+			}
+
+		}
 
 		// build code
 
@@ -179,7 +194,21 @@ StandardNode.prototype.build = function ( builder ) {
 		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
 		var emissive = this.emissive ? this.emissive.flow( builder, 'c', { slot: 'emissive' } ) : undefined;
 
-		var environment = this.environment ? this.environment.flow( builder, 'c', { cache: 'env', context: contextEnvironment, slot: 'environment' } ) : undefined;
+		var environment;
+
+		if ( this.environment ) {
+
+			environment = {
+				radiance: this.environment.flow( builder, 'c', { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } )
+			};
+
+			if ( builder.requires.irradiance ) {
+
+				environment.irradiance = this.environment.flow( builder, 'c', { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
+
+			}
+
+		}
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
@@ -371,7 +400,13 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( environment ) {
 
-			output.push( environment.code );
+			output.push( environment.radiance.code );
+
+			if ( builder.requires.irradiance ) {
+
+				output.push( environment.irradiance.code );
+
+			}
 
 			if ( clearCoatEnv ) {
 
@@ -382,11 +417,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 			}
 
-			output.push( "radiance += " + environment.result + ";" );
+			output.push( "radiance += " + environment.radiance.result + ";" );
 
-			if ( environment.extra.irradiance ) {
+			if ( builder.requires.irradiance ) {
 
-				output.push( "irradiance += PI * " + environment.extra.irradiance + ";" );
+				output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
 
 			}
 

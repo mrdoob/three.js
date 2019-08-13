@@ -229,6 +229,9 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
+		if ( json.clearCoatNormalMap !== undefined ) material.clearCoatNormalMap = getTexture( json.clearCoatNormalMap );
+		if ( json.clearCoatNormalScale !== undefined ) material.clearCoatNormalScale = new Vector2().fromArray( json.clearCoatNormalScale );
+
 		return material;
 
 	},

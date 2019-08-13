@@ -1,4 +1,4 @@
-/*
+/**
  * @author tamarintech / https://tamarintech.com
  *
  * Description: Early release of an AMF Loader following the pattern of the
