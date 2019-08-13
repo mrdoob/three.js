@@ -5186,6 +5186,8 @@
 	var _m1$1, _q1, _v1$1;
 	var _xAxis, _yAxis, _zAxis;
 	var _target, _position, _scale, _quaternion$2;
+	var _addedEvent = { type: 'added' };
+	var _removedEvent = { type: 'removed' };
 
 	function Object3D() {
 
@@ -5441,7 +5443,7 @@
 
 			// This method does not support objects having non-uniformly-scaled parent(s)
 
-			if ( _position === undefined ) {
+			if ( _target === undefined ) {
 
 				_q1 = new Quaternion();
 				_m1$1 = new Matrix4();
@@ -5520,7 +5522,7 @@
 				object.parent = this;
 				this.children.push( object );
 
-				object.dispatchEvent( { type: 'added' } );
+				object.dispatchEvent( _addedEvent );
 
 			} else {
 
@@ -5553,7 +5555,7 @@
 				object.parent = null;
 				this.children.splice( index, 1 );
 
-				object.dispatchEvent( { type: 'removed' } );
+				object.dispatchEvent( _removedEvent );
 
 			}
 
@@ -27105,7 +27107,7 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	var _inverseMatrix$2, _ray$2, _sphere$3;
+	var _inverseMatrix$2, _ray$2, _sphere$3, _position$1;
 
 	function Points( geometry, material ) {
 
@@ -27133,10 +27135,10 @@
 				_inverseMatrix$2 = new Matrix4();
 				_ray$2 = new Ray();
 				_sphere$3 = new Sphere();
+				_position$1 = new Vector3();
 
 			}
 
-			var object = this;
 			var geometry = this.geometry;
 			var matrixWorld = this.matrixWorld;
 			var threshold = raycaster.params.Points.threshold;
@@ -27158,36 +27160,6 @@
 
 			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localThresholdSq = localThreshold * localThreshold;
-			var position = new Vector3();
-			var intersectPoint = new Vector3();
-
-			function testPoint( point, index ) {
-
-				var rayPointDistanceSq = _ray$2.distanceSqToPoint( point );
-
-				if ( rayPointDistanceSq < localThresholdSq ) {
-
-					_ray$2.closestPointToPoint( point, intersectPoint );
-					intersectPoint.applyMatrix4( matrixWorld );
-
-					var distance = raycaster.ray.origin.distanceTo( intersectPoint );
-
-					if ( distance < raycaster.near || distance > raycaster.far ) return;
-
-					intersects.push( {
-
-						distance: distance,
-						distanceToRay: Math.sqrt( rayPointDistanceSq ),
-						point: intersectPoint.clone(),
-						index: index,
-						face: null,
-						object: object
-
-					} );
-
-				}
-
-			}
 
 			if ( geometry.isBufferGeometry ) {
 
@@ -27203,9 +27175,9 @@
 
 						var a = indices[ i ];
 
-						position.fromArray( positions, a * 3 );
+						_position$1.fromArray( positions, a * 3 );
 
-						testPoint( position, a );
+						testPoint( _position$1, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 					}
 
@@ -27213,9 +27185,9 @@
 
 					for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
 
-						position.fromArray( positions, i * 3 );
+						_position$1.fromArray( positions, i * 3 );
 
-						testPoint( position, i );
+						testPoint( _position$1, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 					}
 
@@ -27227,7 +27199,7 @@
 
 				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
 
-					testPoint( vertices[ i ], i );
+					testPoint( vertices[ i ], i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 				}
 
@@ -27288,6 +27260,36 @@
 		}
 
 	} );
+
+	function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
+
+		var rayPointDistanceSq = _ray$2.distanceSqToPoint( point );
+
+		if ( rayPointDistanceSq < localThresholdSq ) {
+
+			var intersectPoint = new Vector3();
+
+			_ray$2.closestPointToPoint( point, intersectPoint );
+			intersectPoint.applyMatrix4( matrixWorld );
+
+			var distance = raycaster.ray.origin.distanceTo( intersectPoint );
+
+			if ( distance < raycaster.near || distance > raycaster.far ) return;
+
+			intersects.push( {
+
+				distance: distance,
+				distanceToRay: Math.sqrt( rayPointDistanceSq ),
+				point: intersectPoint,
+				index: index,
+				face: null,
+				object: object
+
+			} );
+
+		}
+
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -41166,7 +41168,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	var _position$1, _quaternion$3, _scale$1;
+	var _position$2, _quaternion$3, _scale$1;
 	var _orientation;
 
 	function AudioListener() {
@@ -41260,9 +41262,9 @@
 
 			Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			if ( _position$1 === undefined ) {
+			if ( _position$2 === undefined ) {
 
-				_position$1 = new Vector3();
+				_position$2 = new Vector3();
 				_quaternion$3 = new Quaternion();
 				_scale$1 = new Vector3();
 				_orientation = new Vector3();
@@ -41274,7 +41276,7 @@
 
 			this.timeDelta = this._clock.getDelta();
 
-			this.matrixWorld.decompose( _position$1, _quaternion$3, _scale$1 );
+			this.matrixWorld.decompose( _position$2, _quaternion$3, _scale$1 );
 
 			_orientation.set( 0, 0, - 1 ).applyQuaternion( _quaternion$3 );
 
@@ -41284,9 +41286,9 @@
 
 				var endTime = this.context.currentTime + this.timeDelta;
 
-				listener.positionX.linearRampToValueAtTime( _position$1.x, endTime );
-				listener.positionY.linearRampToValueAtTime( _position$1.y, endTime );
-				listener.positionZ.linearRampToValueAtTime( _position$1.z, endTime );
+				listener.positionX.linearRampToValueAtTime( _position$2.x, endTime );
+				listener.positionY.linearRampToValueAtTime( _position$2.y, endTime );
+				listener.positionZ.linearRampToValueAtTime( _position$2.z, endTime );
 				listener.forwardX.linearRampToValueAtTime( _orientation.x, endTime );
 				listener.forwardY.linearRampToValueAtTime( _orientation.y, endTime );
 				listener.forwardZ.linearRampToValueAtTime( _orientation.z, endTime );
@@ -41296,7 +41298,7 @@
 
 			} else {
 
-				listener.setPosition( _position$1.x, _position$1.y, _position$1.z );
+				listener.setPosition( _position$2.x, _position$2.y, _position$2.z );
 				listener.setOrientation( _orientation.x, _orientation.y, _orientation.z, up.x, up.y, up.z );
 
 			}
@@ -41651,7 +41653,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	var _position$2, _quaternion$4, _scale$2;
+	var _position$3, _quaternion$4, _scale$2;
 	var _orientation$1;
 
 	function PositionalAudio( listener ) {
@@ -41744,9 +41746,9 @@
 
 			Object3D.prototype.updateMatrixWorld.call( this, force );
 
-			if ( _position$2 === undefined ) {
+			if ( _position$3 === undefined ) {
 
-				_position$2 = new Vector3();
+				_position$3 = new Vector3();
 				_quaternion$4 = new Quaternion();
 				_scale$2 = new Vector3();
 				_orientation$1 = new Vector3();
@@ -41755,7 +41757,7 @@
 
 			if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
-			this.matrixWorld.decompose( _position$2, _quaternion$4, _scale$2 );
+			this.matrixWorld.decompose( _position$3, _quaternion$4, _scale$2 );
 
 			_orientation$1.set( 0, 0, 1 ).applyQuaternion( _quaternion$4 );
 
@@ -41767,16 +41769,16 @@
 
 				var endTime = this.context.currentTime + this.listener.timeDelta;
 
-				panner.positionX.linearRampToValueAtTime( _position$2.x, endTime );
-				panner.positionY.linearRampToValueAtTime( _position$2.y, endTime );
-				panner.positionZ.linearRampToValueAtTime( _position$2.z, endTime );
+				panner.positionX.linearRampToValueAtTime( _position$3.x, endTime );
+				panner.positionY.linearRampToValueAtTime( _position$3.y, endTime );
+				panner.positionZ.linearRampToValueAtTime( _position$3.z, endTime );
 				panner.orientationX.linearRampToValueAtTime( _orientation$1.x, endTime );
 				panner.orientationY.linearRampToValueAtTime( _orientation$1.y, endTime );
 				panner.orientationZ.linearRampToValueAtTime( _orientation$1.z, endTime );
 
 			} else {
 
-				panner.setPosition( _position$2.x, _position$2.y, _position$2.z );
+				panner.setPosition( _position$3.x, _position$3.y, _position$3.z );
 				panner.setOrientation( _orientation$1.x, _orientation$1.y, _orientation$1.z );
 
 			}
