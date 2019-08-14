@@ -36,7 +36,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.LOCAL:
 
-			result = 'normal';
+			result = 'geometryNormal';
 
 			break;
 

@@ -49,6 +49,7 @@
 				decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
 				decalNormal: { url: 'textures/decal/decal-normal.jpg' },
 				cloud: { url: 'textures/lava/cloud.png' },
+				carbonNormal: { url: 'textures/carbon/Carbon_Normal.png' },
 				spherical: { url: 'textures/envmap.png' }
 			};
 
@@ -742,6 +743,7 @@
 						//mtl.reflectivity = // reflectivity (float)
 						//mtl.clearCoat = // clearCoat (float)
 						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.clearCoatNormal = // clearCoatNormal (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -754,6 +756,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
+						var clearCoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -785,12 +788,20 @@
 							Nodes.OperatorNode.MUL
 						);
 
+						var clearCoatNormalMask = new Nodes.OperatorNode(
+							mask,
+							clearCoatNormalScale,
+							Nodes.OperatorNode.MUL
+						);
+
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
 						mtl.clearCoat = clearCoat;
 						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.clearCoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearCoatNormal.scale = clearCoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
@@ -818,6 +829,12 @@
 						addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
 
 							clearCoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoatNormalScale', clearCoatNormalScale.value, function ( val ) {
+
+							clearCoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 

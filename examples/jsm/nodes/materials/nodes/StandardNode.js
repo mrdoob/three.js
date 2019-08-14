@@ -32,7 +32,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
+	builder.define( this.clearCoat || this.clearCoatRoughness || this.clearCoatNormal ? 'PHYSICAL' : 'STANDARD' );
 
 	builder.requires.lights = true;
 
@@ -145,6 +145,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.clearCoat ) this.clearCoat.analyze( builder );
 		if ( this.clearCoatRoughness ) this.clearCoatRoughness.analyze( builder );
+		if ( this.clearCoatNormal ) this.clearCoatNormal.analyze( builder );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
@@ -184,6 +185,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoat = this.clearCoat ? this.clearCoat.flow( builder, 'f' ) : undefined;
 		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.flow( builder, 'f' ) : undefined;
+		var clearCoatNormal = this.clearCoatNormal ? this.clearCoatNormal.flow( builder, 'v3' ) : undefined;
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
@@ -238,6 +240,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			// add before: prevent undeclared normal
 			"	#include <normal_fragment_begin>",
+			"	#include <clearcoat_normal_fragment_begin>",
 
 			// add before: prevent undeclared material
 			"	PhysicalMaterial material;",
@@ -285,6 +288,15 @@ StandardNode.prototype.build = function ( builder ) {
 			output.push(
 				normal.code,
 				'normal = ' + normal.result + ';'
+			);
+
+		}
+
+		if ( clearCoatNormal ) {
+
+			output.push(
+				clearCoatNormal.code,
+				'clearCoatNormal = ' + clearCoatNormal.result + ';'
 			);
 
 		}
