@@ -2603,30 +2603,20 @@
 
 							var nodeMaterial = new Nodes.StandardNodeMaterial();
 							nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
-							nodeMaterial.roughness = new Nodes.FloatNode(0);
-							nodeMaterial.metalness = new Nodes.FloatNode(1);
+							nodeMaterial.roughness.value = .5;
+							nodeMaterial.metalness.value = 1;
 
 							var standardMaterial = new THREE.MeshStandardMaterial( {
+								color: nodeMaterial.color.value,
+								side: defaultSide,
 								envMap: cubemap,
-								roughness: 0,
+								roughness: nodeMaterial.roughness.value,
 								metalness: 1
 							} );
 
 							mtl = nodeMaterial;
 
 							// GUI
-
-							addGui( 'scope', {
-								vector: Nodes.ReflectNode.VECTOR,
-								cube: Nodes.ReflectNode.CUBE,
-								sphere: Nodes.ReflectNode.SPHERE
-							}, function ( val ) {
-
-								node.scope = val;
-
-								nodeMaterial.needsUpdate = true;
-
-							} );
 
 							addGui( 'node', true, function ( val ) {
 
@@ -2635,7 +2625,7 @@
 
 							} );
 
-							addGui( 'roughness', 0, function ( val ) {
+							addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
 
 								nodeMaterial.roughness.value = val;
 								standardMaterial.roughness = val;
