@@ -7,7 +7,8 @@ import { Object3D } from '../core/Object3D.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _v1, _v2;
+var _v1 = new Vector3();
+var _v2 = new Vector3();
 
 function LOD() {
 
@@ -96,8 +97,6 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: function ( raycaster, intersects ) {
 
-		if ( _v1 === undefined ) _v1 = new Vector3();
-
 		_v1.setFromMatrixPosition( this.matrixWorld );
 
 		var distance = raycaster.ray.origin.distanceTo( _v1 );
@@ -107,13 +106,6 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	},
 
 	update: function ( camera ) {
-
-		if ( _v2 === undefined ) {
-
-			_v1 = new Vector3();
-			_v2 = new Vector3();
-
-		}
 
 		var levels = this.levels;
 

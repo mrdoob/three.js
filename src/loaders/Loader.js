@@ -24,7 +24,18 @@ import { Color } from '../math/Color.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-var _BlendingMode, _color, _textureLoader, _materialLoader;
+var _BlendingMode = {
+	NoBlending: NoBlending,
+	NormalBlending: NormalBlending,
+	AdditiveBlending: AdditiveBlending,
+	SubtractiveBlending: SubtractiveBlending,
+	MultiplyBlending: MultiplyBlending,
+	CustomBlending: CustomBlending
+};
+
+var _color = new Color();
+var _textureLoader = new TextureLoader();
+var _materialLoader = new MaterialLoader();
 
 function Loader() {}
 
@@ -86,23 +97,6 @@ Object.assign( Loader.prototype, {
 	},
 
 	createMaterial: function ( m, texturePath, crossOrigin ) {
-
-		if ( _materialLoader === undefined ) {
-
-			_BlendingMode = {
-				NoBlending: NoBlending,
-				NormalBlending: NormalBlending,
-				AdditiveBlending: AdditiveBlending,
-				SubtractiveBlending: SubtractiveBlending,
-				MultiplyBlending: MultiplyBlending,
-				CustomBlending: CustomBlending
-			};
-
-			_color = new Color();
-			_textureLoader = new TextureLoader();
-			_materialLoader = new MaterialLoader();
-
-		}
 
 		// convert from old material format
 

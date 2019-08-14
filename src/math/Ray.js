@@ -1,12 +1,17 @@
 import { Vector3 } from './Vector3.js';
 
+var _vector = new Vector3();
+var _segCenter = new Vector3();
+var _segDir = new Vector3();
+var _diff = new Vector3();
+
+var _edge1 = new Vector3();
+var _edge2 = new Vector3();
+var _normal = new Vector3();
+
 /**
  * @author bhouston / http://clara.io
  */
-
-var _vector;
-var _segCenter, _segDir, _diff;
-var _diff, _edge1, _edge2, _normal;
 
 function Ray( origin, direction ) {
 
@@ -64,8 +69,6 @@ Object.assign( Ray.prototype, {
 
 	recast: function ( t ) {
 
-		if ( _vector === undefined ) _vector = new Vector3();
-
 		this.origin.copy( this.at( t, _vector ) );
 
 		return this;
@@ -103,8 +106,6 @@ Object.assign( Ray.prototype, {
 
 	distanceSqToPoint: function ( point ) {
 
-		if ( _vector === undefined ) _vector = new Vector3();
-
 		var directionDistance = _vector.subVectors( point, this.origin ).dot( this.direction );
 
 		// point behind the ray
@@ -122,14 +123,6 @@ Object.assign( Ray.prototype, {
 	},
 
 	distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
-
-		if ( _segCenter === undefined ) {
-
-			_segCenter = new Vector3();
-			_segDir = new Vector3();
-			_diff = new Vector3();
-
-		}
 
 		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
 		// It returns the min distance between the ray and the segment
@@ -249,8 +242,6 @@ Object.assign( Ray.prototype, {
 	},
 
 	intersectSphere: function ( sphere, target ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		_vector.subVectors( sphere.center, this.origin );
 		var tca = _vector.dot( this.direction );
@@ -424,8 +415,6 @@ Object.assign( Ray.prototype, {
 
 	intersectsBox: function ( box ) {
 
-		if ( _vector === undefined ) _vector = new Vector3();
-
 		return this.intersectBox( box, _vector ) !== null;
 
 	},
@@ -433,15 +422,6 @@ Object.assign( Ray.prototype, {
 	intersectTriangle: function ( a, b, c, backfaceCulling, target ) {
 
 		// Compute the offset origin, edges, and normal.
-
-		if ( _diff === undefined ) {
-
-			_diff = new Vector3();
-			_edge1 = new Vector3();
-			_edge2 = new Vector3();
-			_normal = new Vector3();
-
-		}
 
 		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 

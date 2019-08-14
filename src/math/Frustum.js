@@ -8,8 +8,8 @@ import { Plane } from './Plane.js';
  * @author bhouston / http://clara.io
  */
 
-var _sphere;
-var _vector;
+var _sphere = new Sphere();
+var _vector = new Vector3();
 
 function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
@@ -85,8 +85,6 @@ Object.assign( Frustum.prototype, {
 
 	intersectsObject: function ( object ) {
 
-		if ( _sphere === undefined ) _sphere = new Sphere();
-
 		var geometry = object.geometry;
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
@@ -98,8 +96,6 @@ Object.assign( Frustum.prototype, {
 	},
 
 	intersectsSprite: function ( sprite ) {
-
-		if ( _sphere === undefined ) _sphere = new Sphere();
 
 		_sphere.center.set( 0, 0, 0 );
 		_sphere.radius = 0.7071067811865476;
@@ -132,8 +128,6 @@ Object.assign( Frustum.prototype, {
 	},
 
 	intersectsBox: function ( box ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		var planes = this.planes;
 

@@ -24,8 +24,13 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var _axis;
-var _lineGeometry, _coneGeometry;
+var _axis = new Vector3();
+
+var _lineGeometry = new BufferGeometry();
+_lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+
+var _coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+_coneGeometry.translate( 0, - 0.5, 0 );
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
@@ -39,16 +44,6 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 	if ( color === undefined ) color = 0xffff00;
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
-
-	if ( _lineGeometry === undefined ) {
-
-		_lineGeometry = new BufferGeometry();
-		_lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
-
-		_coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-		_coneGeometry.translate( 0, - 0.5, 0 );
-
-	}
 
 	this.position.copy( origin );
 
@@ -69,8 +64,6 @@ ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
 
 ArrowHelper.prototype.setDirection = function ( dir ) {
-
-	if ( _axis === undefined ) _axis = new Vector3();
 
 	// dir is assumed to be normalized
 

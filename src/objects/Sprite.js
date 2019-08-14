@@ -15,10 +15,21 @@ import { SpriteMaterial } from '../materials/SpriteMaterial.js';
 
 var _geometry;
 
-var _intersectPoint, _worldScale, _mvPosition;
-var _alignedPosition, _rotatedPosition, _viewWorldMatrix;
-var _vA, _vB, _vC;
-var _uvA, _uvB, _uvC;
+var _intersectPoint = new Vector3();
+var _worldScale = new Vector3();
+var _mvPosition = new Vector3();
+
+var _alignedPosition = new Vector2();
+var _rotatedPosition = new Vector2();
+var _viewWorldMatrix = new Matrix4();
+
+var _vA = new Vector3();
+var _vB = new Vector3();
+var _vC = new Vector3();
+
+var _uvA = new Vector2();
+var _uvB = new Vector2();
+var _uvC = new Vector2();
 
 function Sprite( material ) {
 
@@ -59,26 +70,6 @@ Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	isSprite: true,
 
 	raycast: function ( raycaster, intersects ) {
-
-		if ( _uvC === undefined ) {
-
-			_intersectPoint = new Vector3();
-			_worldScale = new Vector3();
-			_mvPosition = new Vector3();
-
-			_alignedPosition = new Vector2();
-			_rotatedPosition = new Vector2();
-			_viewWorldMatrix = new Matrix4();
-
-			_vA = new Vector3();
-			_vB = new Vector3();
-			_vC = new Vector3();
-
-			_uvA = new Vector2();
-			_uvB = new Vector2();
-			_uvC = new Vector2();
-
-		}
 
 		_worldScale.setFromMatrixScale( this.matrixWorld );
 
