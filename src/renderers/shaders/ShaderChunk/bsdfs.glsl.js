@@ -352,18 +352,20 @@ float V_Neubelt(float NoV, float NoL) {
 	return saturate(1.0 / (4.0 * (NoL + NoV - NoL * NoV)));
 }
 
-float BDRF_Diffuse_Sheen( const in float sheen, const in IncidentLight incidentLight, const in GeometricContext geometry ) {
+vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
 
 	vec3 N = geometry.normal;
 	vec3 V = geometry.viewDir;
-	vec3 L = incidentLight.direction;
 
 	vec3 H = normalize( V + L );
 	float dotNH = saturate( dot( N, H ) );
 
-	float thetaH = acos( dotNH );
+	return specularColor * D_Charlie( roughness, dotNH ) * V_Neubelt( dot(N, V), dot(N, L) );
 
-	return D_Charlie( sheen, dot(N, H) ) * V_Neubelt( dot(N, V), dot(N, L) );
+}
 
+vec3 BRDF_Specular_Sheen_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
+	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
+	return specularColor * texture2D(dfgLut, vec2(dotNV, roughness)).b;
 }
 `;

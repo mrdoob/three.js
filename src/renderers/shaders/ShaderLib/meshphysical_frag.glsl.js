@@ -7,6 +7,7 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 uniform float sheen;
+uniform sampler2D dfgLut;
 
 #ifndef STANDARD
 	uniform float clearCoat;

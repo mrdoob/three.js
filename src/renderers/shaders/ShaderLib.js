@@ -276,6 +276,7 @@ ShaderLib.physical = {
 			clearCoat: { value: 0 },
 			clearCoatRoughness: { value: 0 },
 			sheen: { value: 0 },
+			dfgLut: { value: null },
 			clearCoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearCoatNormalMap: { value: null },
 		}

@@ -27,13 +27,23 @@
 
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
 			// Graphics variables
 			var camera, controls, scene, renderer, mesh, stats;
+			var envMap, directionalLight, ambientLight;
 
 			var params = {
-				sheen: .5,
+				sheen: .8,
 				hue: 265,
-				roughness: .9
+				roughness: .9,
+				exposure: 2,
+				envMap: true,
+				directionalLight: false,
+				ambientLight: false
 			};
 
 			// model
@@ -53,8 +63,16 @@
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				mesh.material = new THREE.MeshPhysicalMaterial();
+				mesh.material.side = THREE.DoubleSide;
+				mesh.material.metalness = 0;
 				mesh.scale.multiplyScalar( .5 );
 				scene.add( mesh );
+
+				var sphere = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 1, 100, 100 ),
+					mesh.material
+				);
+				scene.add(sphere);
 
 				camera.position.set( - 12, 7, 4 );
 
@@ -65,31 +83,51 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
+				renderer.dfgLut = new THREE.TextureLoader().load( 'textures/dfg.png' );
+				renderer.dfgLut.generateMipmaps = false;
+				renderer.dfgLut.magFilter = THREE.LinearFilter;
+				renderer.dfgLut.minFilter = THREE.LinearFilter;
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+
+				new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ], function ( ldrCubeMap ) {
+
+						envMap = ldrCubeMap;
+
+						var pmremGenerator = new PMREMGenerator( envMap, 128 );
+						pmremGenerator.update( renderer );
+
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
+
+						mesh.material.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						mesh.material.needsUpdate = true;
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+
+					} );
+
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				var ambientLight = new THREE.AmbientLight( 0x404040 );
+				ambientLight = new THREE.AmbientLight( 0x404040 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position.set( - 7, 30, 15 );
-				light.castShadow = true;
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				directionalLight.position.set( 0, 10, 0 );
+				directionalLight.castShadow = true;
+				directionalLight.add(
+					new THREE.Mesh(
+						new THREE.SphereBufferGeometry( .5 ),
+						new THREE.MeshBasicMaterial( { color: 0xffffff } )
+					)
+				);
 
-				var d = 10;
-				light.shadow.camera.left = - d;
-				light.shadow.camera.right = d;
-				light.shadow.camera.top = d;
-				light.shadow.camera.bottom = - d;
-
-				light.shadow.camera.near = 2;
-				light.shadow.camera.far = 50;
-
-				light.shadow.mapSize.x = 1024;
-				light.shadow.mapSize.y = 1024;
-
-				light.shadow.bias = - 0.003;
-				scene.add( light );
+				scene.add( directionalLight );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -103,6 +141,10 @@
 				gui.add( params, 'sheen', 0, 1 );
 				gui.add( params, 'hue', 0, 360 );
 				gui.add( params, 'roughness', 0, 1 );
+				gui.add( params, 'exposure', 0, 3 );
+				gui.add( params, 'envMap' );
+				gui.add( params, 'directionalLight' );
+				gui.add( params, 'ambientLight' );
 				gui.open();
 
 				animate();
@@ -132,6 +174,12 @@
 				mesh.material.sheen = params.sheen;
 				mesh.material.color = new THREE.Color().setHSL(params.hue / 360, 1, .5);
 				mesh.material.roughness = params.roughness;
+				renderer.toneMappingExposure = params.exposure;
+				scene.background = params.envMap && envMap || null;
+				mesh.material.envMapIntensity = params.envMap ? 1 : 0;
+				directionalLight.visible = params.directionalLight;
+				ambientLight.visible = params.ambientLight;
+
 				renderer.render( scene, camera );
 
 			}
