@@ -8,14 +8,6 @@ import { Matrix3 } from '../math/Matrix3.js';
 import { _Math } from '../math/Math.js';
 import { TrianglesDrawMode } from '../constants.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author elephantatwork / www.elephantatwork.ch
- */
-
 var _object3DId = 0;
 
 var _v1 = new Vector3();
@@ -33,6 +25,14 @@ var _zAxis = new Vector3( 0, 0, 1 );
 
 var _addedEvent = { type: 'added' };
 var _removedEvent = { type: 'removed' };
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / http://github.com/WestLangley
+ * @author elephantatwork / www.elephantatwork.ch
+ */
 
 function Object3D() {
 
@@ -471,7 +471,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	getWorldScale: function ( target ) {
-
 
 		if ( target === undefined ) {
 
