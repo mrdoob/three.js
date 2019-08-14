@@ -61,6 +61,7 @@ THREE.TranslucentShader = {
 	].join( "\n" ),
 
 	fragmentShader: [
+		"#define USE_UV",
 		"#define USE_MAP",
 		"#define PHONG",
 		"#define TRANSLUCENT",
@@ -137,7 +138,7 @@ THREE.TranslucentShader = {
 
 		"			RE_Direct( directLight, geometry, material, reflectedLight );",
 
-		"			#if defined( TRANSLUCENT ) && defined( USE_MAP )",
+		"			#if defined( TRANSLUCENT ) && defined( USE_UV )",
 		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
 		"			#endif",
 		"		}",
@@ -159,7 +160,7 @@ THREE.TranslucentShader = {
 
 		"			RE_Direct( directLight, geometry, material, reflectedLight );",
 
-		"			#if defined( TRANSLUCENT ) && defined( USE_MAP )",
+		"			#if defined( TRANSLUCENT ) && defined( USE_UV )",
 		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
 		"			#endif",
 		"		}",
