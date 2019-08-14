@@ -7,7 +7,7 @@ import { _Math } from '../../math/Math.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
-	var _videoTextures = {};
+	var _videoTextures = new WeakMap();
 	var _canvas;
 
 	//
@@ -189,7 +189,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) {
 
-			delete _videoTextures[ texture.id ];
+			_videoTextures.delete( texture );
 
 		}
 
@@ -1098,14 +1098,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function updateVideoTexture( texture ) {
 
-		var id = texture.id;
 		var frame = info.render.frame;
 
 		// Check the last frame we updated the VideoTexture
 
-		if ( _videoTextures[ id ] !== frame ) {
+		if ( _videoTextures.get( texture ) !== frame ) {
 
-			_videoTextures[ id ] = frame;
+			_videoTextures.set( texture, frame );
 			texture.update();
 
 		}
