@@ -236,7 +236,9 @@ export class Vector3 implements Vector {
 	distanceToManhattan( v: Vector3 ): number;
 
 	setFromSpherical( s: Spherical ): this;
+	setFromSphericalCoords( r: number, phi: number, theta:number ): this;
 	setFromCylindrical( s: Cylindrical ): this;
+	setFromCylindricalCoords( radius: number, theta: number, y: number ): this;
 	setFromMatrixPosition( m: Matrix4 ): this;
 	setFromMatrixScale( m: Matrix4 ): this;
 	setFromMatrixColumn( matrix: Matrix4, index: number ): this;
