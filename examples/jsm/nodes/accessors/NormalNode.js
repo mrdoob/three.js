@@ -36,7 +36,8 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.LOCAL:
 
-			result = 'geometryNormal';
+			if ( builder.isShader( 'vertex' ) ) result = 'objectNormal';
+			else result = 'geometryNormal';
 
 			break;
 
