@@ -410,9 +410,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 							for ( var j = 0; j < mipmaps.length; ++ j ) {
 
 								var mipmap = mipmaps[ j ];
-								image = mipmap.image[ i ].image;
+								var mipmapImage = mipmap.image[ i ].image;
 
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
 
 							}
 
