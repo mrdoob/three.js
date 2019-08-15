@@ -5,7 +5,9 @@ import { Vector3 } from './Vector3.js';
  * @author bhouston / http://clara.io
  */
 
-var _vector1, _vector2, _normalMatrix;
+var _vector1 = new Vector3();
+var _vector2 = new Vector3();
+var _normalMatrix = new Matrix3();
 
 function Plane( normal, constant ) {
 
@@ -48,13 +50,6 @@ Object.assign( Plane.prototype, {
 	},
 
 	setFromCoplanarPoints: function ( a, b, c ) {
-
-		if ( _vector1 === undefined ) {
-
-			_vector1 = new Vector3();
-			_vector2 = new Vector3();
-
-		}
 
 		var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
 
@@ -128,8 +123,6 @@ Object.assign( Plane.prototype, {
 	},
 
 	intersectLine: function ( line, target ) {
-
-		if ( _vector1 === undefined ) _vector1 = new Vector3();
 
 		if ( target === undefined ) {
 
@@ -205,13 +198,6 @@ Object.assign( Plane.prototype, {
 	},
 
 	applyMatrix4: function ( matrix, optionalNormalMatrix ) {
-
-		if ( _normalMatrix === undefined ) {
-
-			_normalMatrix = new Matrix3();
-			_vector1 = new Vector3();
-
-		}
 
 		var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
 

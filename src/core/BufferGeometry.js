@@ -16,9 +16,13 @@ import { arrayMax } from '../utils.js';
  */
 
 var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
-var _m1, _obj, _offset;
-var _box, _boxMorphTargets;
-var _vector;
+
+var _m1 = new Matrix4();
+var _obj = new Object3D();
+var _offset = new Vector3();
+var _box = new Box3();
+var _boxMorphTargets = new Box3();
+var _vector = new Vector3();
 
 function BufferGeometry() {
 
@@ -189,8 +193,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// rotate geometry around world x-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationX( angle );
 
 		this.applyMatrix( _m1 );
@@ -202,8 +204,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	rotateY: function ( angle ) {
 
 		// rotate geometry around world y-axis
-
-		if ( _m1 === undefined ) _m1 = new Matrix4();
 
 		_m1.makeRotationY( angle );
 
@@ -217,8 +217,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// rotate geometry around world z-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationZ( angle );
 
 		this.applyMatrix( _m1 );
@@ -230,8 +228,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	translate: function ( x, y, z ) {
 
 		// translate geometry
-
-		if ( _m1 === undefined ) _m1 = new Matrix4();
 
 		_m1.makeTranslation( x, y, z );
 
@@ -245,8 +241,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// scale geometry
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeScale( x, y, z );
 
 		this.applyMatrix( _m1 );
@@ -256,8 +250,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	},
 
 	lookAt: function ( vector ) {
-
-		if ( _obj === undefined ) _obj = new Object3D();
 
 		_obj.lookAt( vector );
 
@@ -270,8 +262,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	},
 
 	center: function () {
-
-		if ( _offset === undefined ) _offset = new Vector3();
 
 		this.computeBoundingBox();
 
@@ -578,12 +568,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	computeBoundingBox: function () {
 
-		if ( _box === undefined ) {
-
-			_box = new Box3();
-
-		}
-
 		if ( this.boundingBox === null ) {
 
 			this.boundingBox = new Box3();
@@ -628,14 +612,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	},
 
 	computeBoundingSphere: function () {
-
-		if ( _boxMorphTargets === undefined ) {
-
-			_box = new Box3();
-			_vector = new Vector3();
-			_boxMorphTargets = new Box3();
-
-		}
 
 		if ( this.boundingSphere === null ) {
 
@@ -876,8 +852,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	},
 
 	normalizeNormals: function () {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		var normals = this.attributes.normal;
 
