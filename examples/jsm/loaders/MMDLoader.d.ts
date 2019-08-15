@@ -28,7 +28,7 @@ export class MMDLoader {
   loadPMX(url: string, onLoad: (object: object) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   loadVMD(url: string, onLoad: (object: object) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   loadVPD(url: string, onLoad: (object: object) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  loadWithAnimation(url: string, onLoad: (object: MMDLoaderAnimationObject) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
+  loadWithAnimation(url: string, vmdUrl: string | string[], onLoad: (object: MMDLoaderAnimationObject) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   setAnimationPath(animationPath: string): this;
   setCrossOrigin(crossOrigin: string): this;
   setPath(path: string): this;

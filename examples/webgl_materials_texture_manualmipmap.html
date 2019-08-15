@@ -26,7 +26,7 @@
 		<div id="lbl_left" class="lbl">
 		Floor <span class="g">(128x128)</span><br/>
 		mag: <span class="c">Linear</span><br/>
-		min: <span class="c">LinearMipMapLinear</span><br/>
+		min: <span class="c">LinearMipmapLinear</span><br/>
 		<br/>
 		Painting <span class="g">(748x600)</span><br/>
 		mag: <span class="c">Linear</span><br/>
@@ -36,7 +36,7 @@
 		<div id="lbl_right" class="lbl">
 		Floor <br/>
 		mag: <span class="c">Nearest</span><br/>
-		min: <span class="c">NearestMipMapNearestFilter</span><br/>
+		min: <span class="c">NearestMipmapNearestFilter</span><br/>
 		<br/>
 		Painting <br/>
 		mag: <span class="c">Nearest</span><br/>
@@ -114,7 +114,7 @@
 
 				var textureCanvas2 = textureCanvas1.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
-				textureCanvas2.minFilter = THREE.NearestMipMapNearestFilter;
+				textureCanvas2.minFilter = THREE.NearestMipmapNearestFilter;
 
 				var materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
 				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );

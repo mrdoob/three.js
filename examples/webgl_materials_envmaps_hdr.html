@@ -82,7 +82,7 @@
 
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.setType( THREE.UnsignedByteType )
+					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
 						var pmremGenerator = new PMREMGenerator( hdrCubeMap );

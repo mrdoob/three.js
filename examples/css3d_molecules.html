@@ -425,7 +425,7 @@
 
 						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 						object.matrix = objMatrix;
-						object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
+						object.quaternion.setFromRotationMatrix( object.matrix );
 
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
@@ -445,7 +445,7 @@
 						joint.position.lerp( end, 0.5 );
 
 						joint.matrix.copy( objMatrix );
-						joint.rotation.setFromRotationMatrix( joint.matrix, joint.rotation.order );
+						joint.quaternion.setFromRotationMatrix( joint.matrix );
 
 						joint.matrixAutoUpdate = false;
 						joint.updateMatrix();

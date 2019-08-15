@@ -12,14 +12,13 @@
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
-		<script src="js/libs/tween.min.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
 			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
 			var container, stats;
@@ -135,7 +134,7 @@
 
 				kinematicsTween = new TWEEN.Tween( tweenParameters ).to( target, duration ).easing( TWEEN.Easing.Quadratic.Out );
 
-				kinematicsTween.onUpdate( function () {
+				kinematicsTween.onUpdate( function ( object ) {
 
 					for ( var prop in kinematics.joints ) {
 
@@ -143,7 +142,7 @@
 
 							if ( ! kinematics.joints[ prop ].static ) {
 
-								kinematics.setJointValue( prop, this[ prop ] );
+								kinematics.setJointValue( prop, object[ prop ] );
 
 							}
 

@@ -32,9 +32,17 @@ canvas {
 	padding: 10px;
 	box-sizing: border-box;
 	text-align: center;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 	z-index: 1; /* TODO Solve this in HTML */
 }
 
 .dg.ac {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 	z-index: 2 !important; /* TODO Solve this in HTML */
 }

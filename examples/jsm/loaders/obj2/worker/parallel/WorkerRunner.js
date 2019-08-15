@@ -1,15 +1,18 @@
 /**
- * @author Kai Salmen / www.kaisalmen.de
+ * @author Kai Salmen / https://kaisalmen.de
+ * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
 import { ObjectManipulator } from "../../utils/ObjectManipulator.js";
 
 const DefaultWorkerPayloadHandler = function ( parser ) {
+
 	this.parser = parser;
 	this.logging = {
 		enabled: false,
 		debug: false
 	};
+
 };
 
 DefaultWorkerPayloadHandler.prototype = {
@@ -17,19 +20,26 @@ DefaultWorkerPayloadHandler.prototype = {
 	constructor: DefaultWorkerPayloadHandler,
 
 	handlePayload: function ( payload ) {
+
 		if ( payload.logging ) {
+
 			this.logging.enabled = payload.logging.enabled === true;
 			this.logging.debug = payload.logging.debug === true;
+
 		}
 		if ( payload.cmd === 'parse' ) {
 
 			let scope = this;
 			let callbacks = {
 				callbackOnAssetAvailable: function ( payload ) {
+
 					self.postMessage( payload );
+
 				},
 				callbackOnProgress: function ( text ) {
+
 					if ( scope.logging.enabled && scope.logging.debug ) console.debug( 'WorkerRunner: progress: ' + text );
+
 				}
 			};
 
@@ -44,7 +54,7 @@ DefaultWorkerPayloadHandler.prototype = {
 			ObjectManipulator.applyProperties( parser, callbacks );
 
 			let arraybuffer;
-			if ( payload.params && payload.params.index !== undefined && payload.params.index !== null) {
+			if ( payload.params && payload.params.index !== undefined && payload.params.index !== null ) {
 
 				arraybuffer = this.resourceDescriptors[ payload.params.index ].content;
 
@@ -62,7 +72,7 @@ DefaultWorkerPayloadHandler.prototype = {
 
 			} else {
 
-				parser[ parseFunctionName ] ( arraybuffer, payload.data.options );
+				parser[ parseFunctionName ]( arraybuffer, payload.data.options );
 
 			}
 			if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
@@ -87,14 +97,18 @@ DefaultWorkerPayloadHandler.prototype = {
  * @constructor
  */
 const WorkerRunner = function ( payloadHandler ) {
+
 	this.resourceDescriptors = [];
 	this.payloadHandler = payloadHandler;
 
 	let scope = this;
-	let scopedRunner = function( event ) {
+	let scopedRunner = function ( event ) {
+
 		scope.processMessage( event.data );
+
 	};
 	self.addEventListener( 'message', scopedRunner, false );
+
 };
 
 WorkerRunner.prototype = {
@@ -107,6 +121,7 @@ WorkerRunner.prototype = {
 	 * @param {Object} payload Raw mesh description (buffers, params, materials) used to build one to many meshes.
 	 */
 	processMessage: function ( payload ) {
+
 		if ( payload.data.resourceDescriptors && this.resourceDescriptors.length === 0 ) {
 
 			for ( let name in payload.data.resourceDescriptors ) {
@@ -118,6 +133,7 @@ WorkerRunner.prototype = {
 		}
 
 		this.payloadHandler.handlePayload( payload );
+
 	}
 
 };
@@ -125,4 +141,4 @@ WorkerRunner.prototype = {
 export {
 	WorkerRunner,
 	DefaultWorkerPayloadHandler
-}
+};

@@ -17,7 +17,8 @@ import {
  * @param {MaterialHandler} materialHandler
  * @constructor
  */
-const MeshReceiver = function( materialHandler ) {
+const MeshReceiver = function ( materialHandler ) {
+
 	this.logging = {
 		enabled: true,
 		debug: false
@@ -28,6 +29,7 @@ const MeshReceiver = function( materialHandler ) {
 		onMeshAlter: null
 	};
 	this.materialHandler = materialHandler;
+
 };
 
 MeshReceiver.prototype = {
@@ -41,8 +43,10 @@ MeshReceiver.prototype = {
 	 * @param {boolean} debug True or false.
 	 */
 	setLogging:	function ( enabled, debug ) {
+
 		this.logging.enabled = enabled === true;
 		this.logging.debug = debug === true;
+
 	},
 
 	/**
@@ -52,6 +56,7 @@ MeshReceiver.prototype = {
 	 * @private
 	 */
 	_setCallbacks: function ( onParseProgress, onMeshAlter ) {
+
 		if ( onParseProgress !== undefined && onParseProgress !== null ) {
 
 			this.callbacks.onParseProgress = onParseProgress;
@@ -62,6 +67,7 @@ MeshReceiver.prototype = {
 			this.callbacks.onMeshAlter = onMeshAlter;
 
 		}
+
 	},
 
 	/**
@@ -71,6 +77,7 @@ MeshReceiver.prototype = {
 	 * @returns {Mesh[]} mesh Array of {@link Mesh}
 	 */
 	buildMeshes: function ( meshPayload ) {
+
 		let meshName = meshPayload.params.meshName;
 
 		let bufferGeometry = new BufferGeometry();
@@ -80,7 +87,7 @@ MeshReceiver.prototype = {
 			bufferGeometry.setIndex( new BufferAttribute( new Uint32Array( meshPayload.buffers.indices ), 1 ) );
 
 		}
-		let haveVertexColors = meshPayload.buffers.colors  !== null;
+		let haveVertexColors = meshPayload.buffers.colors !== null;
 		if ( haveVertexColors ) {
 
 			bufferGeometry.addAttribute( 'color', new BufferAttribute( new Float32Array( meshPayload.buffers.colors ), 3 ) );
@@ -95,7 +102,7 @@ MeshReceiver.prototype = {
 			bufferGeometry.computeVertexNormals();
 
 		}
-		if ( meshPayload.buffers.uvs  !== null ) {
+		if ( meshPayload.buffers.uvs !== null ) {
 
 			bufferGeometry.addAttribute( 'uv', new BufferAttribute( new Float32Array( meshPayload.buffers.uvs ), 2 ) );
 
@@ -155,6 +162,7 @@ MeshReceiver.prototype = {
 					}
 				}
 			);
+
 		}
 
 		// here LoadedMeshUserOverride is required to be provided by the callback used to alter the results
@@ -208,12 +216,12 @@ MeshReceiver.prototype = {
 
 			}
 			progressMessage += ': Adding mesh(es) (' + meshNames.length + ': ' + meshNames + ') from input mesh: ' + meshName;
-			progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100).toFixed( 2 ) + '%)';
+			progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100 ).toFixed( 2 ) + '%)';
 
 		} else {
 
 			progressMessage += ': Not adding mesh: ' + meshName;
-			progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100).toFixed( 2 ) + '%)';
+			progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100 ).toFixed( 2 ) + '%)';
 
 		}
 		let callbackOnParseProgress = this.callbacks.onParseProgress;
@@ -224,6 +232,7 @@ MeshReceiver.prototype = {
 		}
 
 		return meshes;
+
 	}
 
 };
@@ -235,10 +244,12 @@ MeshReceiver.prototype = {
  * @param {boolean} disregardMesh=false Tell implementation to completely disregard this mesh
  * @param {boolean} disregardMesh=false Tell implementation that mesh(es) have been altered or added
  */
-const LoadedMeshUserOverride = function( disregardMesh, alteredMesh ) {
+const LoadedMeshUserOverride = function ( disregardMesh, alteredMesh ) {
+
 	this.disregardMesh = disregardMesh === true;
 	this.alteredMesh = alteredMesh === true;
 	this.meshes = [];
+
 };
 
 
@@ -252,8 +263,10 @@ LoadedMeshUserOverride.prototype = {
 	 * @param {Mesh} mesh
 	 */
 	addMesh: function ( mesh ) {
+
 		this.meshes.push( mesh );
 		this.alteredMesh = true;
+
 	},
 
 	/**
@@ -262,7 +275,9 @@ LoadedMeshUserOverride.prototype = {
 	 * @returns {boolean}
 	 */
 	isDisregardMesh: function () {
+
 		return this.disregardMesh;
+
 	},
 
 	/**
@@ -271,7 +286,9 @@ LoadedMeshUserOverride.prototype = {
 	 * @returns {boolean}
 	 */
 	providesAlteredMeshes: function () {
+
 		return this.alteredMesh;
+
 	}
 };
 

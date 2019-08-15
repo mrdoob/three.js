@@ -143,16 +143,6 @@
 		 Default is [].
 		</p>
 
-		<h3>[property:WebGLRenderingContext context]</h3>
-		<p>
-		The renderer obtains a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext] context
-		  from its [page:WebGLRenderer.domElement domElement] by default, using
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext HTMLCanvasElement.getContext]().<br /><br />
-
-		You can create this manually, however it must correspond to the
-		[page:WebGLRenderer.domElement domElement] in order to render to the screen.
-		</p>
-
 		<h3>[property:DOMElement domElement]</h3>
 		<p>
 		A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas] where the renderer draws its output.<br />
@@ -354,7 +344,7 @@
 		<h3>[method:Integer getActiveCubeFace]()</h3>
 		<p>Returns the current active cube face.</p>
 
-		<h3>[method:Integer getActiveMipMapLevel]()</h3>
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
 		<p>Returns the current active mipmap level.</p>
 
 		<h3>[method:RenderTarget getRenderTarget]()</h3>
@@ -446,11 +436,11 @@
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
 
-		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipMapLevel] )</h3>
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
 		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
 		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
-		activeMipMapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
 		This method sets the active rendertarget.
 		</p>
 

@@ -13,12 +13,14 @@ const MtlObjBridge = {
 	 * @param processResult
 	 * @param assetLoader
 	 */
-	link: function( processResult, assetLoader ) {
+	link: function ( processResult, assetLoader ) {
+
 		if ( typeof assetLoader.addMaterials === 'function' ) {
 
 			assetLoader.addMaterials( this.addMaterialsFromMtlLoader( processResult ) );
 
 		}
+
 	},
 
 	/**
@@ -27,6 +29,7 @@ const MtlObjBridge = {
 	 * @param Instance of {@link MTLLoader.MaterialCreator}
 	 */
 	addMaterialsFromMtlLoader: function ( materialCreator ) {
+
 		let newMaterials = {};
 		if ( materialCreator instanceof MTLLoader.MaterialCreator ) {
 
@@ -35,7 +38,8 @@ const MtlObjBridge = {
 
 		}
 		return newMaterials;
+
 	}
 };
 
-export { MtlObjBridge }
+export { MtlObjBridge };
