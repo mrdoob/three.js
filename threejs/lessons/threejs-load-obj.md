@@ -43,10 +43,10 @@ the hemispherical lighting example so I ended up with one
 related to adjusting the lights. I also removed the cube and sphere
 that were being added to the scene.
 
-From that the first thing we need to do is include the `OBJLoader2` loader in our scene. The `OBJLoader2` also needs the `LoadingSupport.js` file so let's add both.
+From that the first thing we need to do is include the `OBJLoader2` loader in our scene. The `OBJLoader2` also needs the `LoaderSupport.js` file so let's add both.
 
 ```html
-<script src="resources/threejs/r105/js/loaders/LoadingSupport.js"></script>
+<script src="resources/threejs/r105/js/loaders/LoaderSupport.js"></script>
 <script src="resources/threejs/r105/js/loaders/OBJLoader2.js"></script>
 ```
 
