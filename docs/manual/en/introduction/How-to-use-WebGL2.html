@@ -55,7 +55,7 @@ if ( WEBGL.isWebGL2Available() === false ) {
 
 	<code>
 var canvas = document.createElement( 'canvas' );
-var context = canvas.getContext( 'webgl2', { antialias: false } );
+var context = canvas.getContext( 'webgl2', { alpha: false } );
 var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 	</code>
 
