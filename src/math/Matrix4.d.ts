@@ -227,8 +227,7 @@ export class Matrix4 implements Matrix {
 	): Matrix4;
 	equals( matrix: Matrix4 ): boolean;
 	fromArray( array: number[], offset?: number ): Matrix4;
-
-	toArray( array?: number[], offset?: number ): number[];
+	toArray(): number[];
 
 	/**
 	 * @deprecated Use {@link Matrix4#copyPosition .copyPosition()} instead.

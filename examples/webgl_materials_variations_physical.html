@@ -62,7 +62,7 @@
 				var hdrCubeRenderTarget = null;
 
 				new HDRCubeTextureLoader()
-					.setDataType( THREE.UnsignedByteType )
+					.setType( THREE.UnsignedByteType )
 					.load( hdrUrls, function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( hdrCubeMap );

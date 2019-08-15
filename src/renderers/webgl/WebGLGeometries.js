@@ -114,18 +114,22 @@ function WebGLGeometries( gl, attributes, info ) {
 
 	}
 
-	function updateWireframeAttribute( geometry ) {
+	function getWireframeAttribute( geometry ) {
+
+		var attribute = wireframeAttributes[ geometry.id ];
+
+		if ( attribute ) return attribute;
 
 		var indices = [];
 
 		var geometryIndex = geometry.index;
-		var geometryPosition = geometry.attributes.position;
-		var version = 0;
+		var geometryAttributes = geometry.attributes;
+
+		// console.time( 'wireframe' );
 
 		if ( geometryIndex !== null ) {
 
 			var array = geometryIndex.array;
-			version = geometryIndex.version;
 
 			for ( var i = 0, l = array.length; i < l; i += 3 ) {
 
@@ -139,8 +143,7 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		} else {
 
-			var array = geometryPosition.array;
-			version = geometryPosition.version;
+			var array = geometryAttributes.position.array;
 
 			for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
 
@@ -154,50 +157,15 @@ function WebGLGeometries( gl, attributes, info ) {
 
 		}
 
-		var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
-		attribute.version = version;
+		// console.timeEnd( 'wireframe' );
+
+		attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 
 		attributes.update( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
-		//
-
-		var previousAttribute = wireframeAttributes[ geometry.id ];
-
-		if ( previousAttribute ) attributes.remove( previousAttribute );
-
-		//
-
 		wireframeAttributes[ geometry.id ] = attribute;
 
-	}
-
-	function getWireframeAttribute( geometry ) {
-
-		var currentAttribute = wireframeAttributes[ geometry.id ];
-
-		if ( currentAttribute ) {
-
-			var geometryIndex = geometry.index;
-
-			if ( geometryIndex !== null ) {
-
-				// if the attribute is obsolete, create a new one
-
-				if ( currentAttribute.version < geometryIndex.version ) {
-
-					updateWireframeAttribute( geometry );
-
-				}
-
-			}
-
-		} else {
-
-			updateWireframeAttribute( geometry );
-
-		}
-
-		return wireframeAttributes[ geometry.id ];
+		return attribute;
 
 	}
 

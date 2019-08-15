@@ -63,7 +63,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// all vertices should lie on a conceptual sphere with a given radius
 
-	applyRadius( radius );
+	appplyRadius( radius );
 
 	// finally, create the uv data
 
@@ -176,7 +176,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	}
 
-	function applyRadius( radius ) {
+	function appplyRadius( radius ) {
 
 		var vertex = new Vector3();
 

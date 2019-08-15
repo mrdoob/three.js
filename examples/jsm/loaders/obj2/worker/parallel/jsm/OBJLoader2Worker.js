@@ -1,6 +1,5 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
- * Development repository: https://github.com/kaisalmen/WWOBJLoader
+ * @author Kai Salmen / www.kaisalmen.de
  */
 
 import { OBJLoader2Parser } from "../OBJLoader2Parser.js";

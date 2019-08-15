@@ -75,7 +75,7 @@
 				scene.add( planeMesh );
 
 				new EXRLoader()
-					.setDataType( THREE.FloatType )
+					.setType( THREE.FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
 						texture.minFilter = THREE.NearestFilter;

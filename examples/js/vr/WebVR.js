@@ -5,7 +5,7 @@
  * Based on @tojiro's vr-samples-utils.js
  */
 
-THREE.WEBVR = {
+var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
@@ -25,17 +25,8 @@ THREE.WEBVR = {
 
 			button.textContent = 'ENTER VR';
 
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
 
 			button.onclick = function () {
 
@@ -47,7 +38,7 @@ THREE.WEBVR = {
 
 		}
 
-		function showEnterXR( /*device*/ ) {
+		function showEnterXR( device ) {
 
 			var currentSession = null;
 
@@ -62,7 +53,7 @@ THREE.WEBVR = {
 
 			}
 
-			function onSessionEnded( /*event*/ ) {
+			function onSessionEnded( event ) {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
@@ -83,17 +74,8 @@ THREE.WEBVR = {
 
 			button.textContent = 'ENTER XR';
 
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
+			button.onmouseenter = function () { button.style.opacity = '1.0'; };
+			button.onmouseleave = function () { button.style.opacity = '0.5'; };
 
 			button.onclick = function () {
 
@@ -185,7 +167,7 @@ THREE.WEBVR = {
 
 			}, false );
 
-			window.addEventListener( 'vrdisplaydisconnect', function ( /*event*/ ) {
+			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
 
 				showVRNotFound();
 
@@ -236,6 +218,27 @@ THREE.WEBVR = {
 
 		}
 
+	},
+
+	// DEPRECATED
+
+	checkAvailability: function () {
+		console.warn( 'WEBVR.checkAvailability has been deprecated.' );
+		return new Promise( function () {} );
+	},
+
+	getMessageContainer: function () {
+		console.warn( 'WEBVR.getMessageContainer has been deprecated.' );
+		return document.createElement( 'div' );
+	},
+
+	getButton: function () {
+		console.warn( 'WEBVR.getButton has been deprecated.' );
+		return document.createElement( 'div' );
+	},
+
+	getVRDisplay: function () {
+		console.warn( 'WEBVR.getVRDisplay has been deprecated.' );
 	}
 
 };

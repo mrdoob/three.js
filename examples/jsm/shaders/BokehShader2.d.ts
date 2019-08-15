@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const BokehShader: {
+export interface BokehShader {
   uniforms: {
     textureWidth: Uniform;
     textureHeight: Uniform;
@@ -30,13 +30,13 @@ export const BokehShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}
 
-export const BokehDepthShader: {
+export interface BokehDepthShader {
   uniforms: {
     mNear: Uniform;
     mFar: Uniform;
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

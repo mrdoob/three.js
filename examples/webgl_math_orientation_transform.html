@@ -21,7 +21,7 @@
 
 			var spherical = new THREE.Spherical();
 			var rotationMatrix = new THREE.Matrix4();
-			var targetQuaternion = new THREE.Quaternion();
+			var targetRotation = new THREE.Quaternion();
 			var clock = new THREE.Clock();
 			var speed = 2;
 
@@ -88,10 +88,10 @@
 
 				var delta = clock.getDelta();
 
-				if ( ! mesh.quaternion.equals( targetQuaternion ) ) {
+				if ( ! mesh.quaternion.equals( targetRotation ) ) {
 
 					var step = speed * delta;
-					mesh.quaternion.rotateTowards( targetQuaternion, step );
+					mesh.quaternion.rotateTowards( targetRotation, step );
 
 				}
 
@@ -112,7 +112,7 @@
 				// compute target rotation
 
 				rotationMatrix.lookAt( target.position, mesh.position, mesh.up );
-				targetQuaternion.setFromRotationMatrix( rotationMatrix );
+				targetRotation.setFromRotationMatrix( rotationMatrix );
 
 				setTimeout( generateTarget, 2000 );
 

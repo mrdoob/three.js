@@ -1,6 +1,9 @@
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from '../core/BufferGeometry';
 
+/**
+ * @deprecated Use {@link BoxGeometry} instead.
+ */
 export class CircleBufferGeometry extends BufferGeometry {
 
 	constructor(

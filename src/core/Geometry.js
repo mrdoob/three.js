@@ -695,6 +695,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			vertices2 = geometry.vertices,
 			faces1 = this.faces,
 			faces2 = geometry.faces,
+			uvs1 = this.faceVertexUvs[ 0 ],
+			uvs2 = geometry.faceVertexUvs[ 0 ],
 			colors1 = this.colors,
 			colors2 = geometry.colors;
 
@@ -776,25 +778,23 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// uvs
 
-		for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
 
-			var faceVertexUvs2 = geometry.faceVertexUvs[ i ];
+			var uv = uvs2[ i ], uvCopy = [];
 
-			if ( this.faceVertexUvs[ i ] === undefined ) this.faceVertexUvs[ i ] = [];
+			if ( uv === undefined ) {
 
-			for ( var j = 0, jl = faceVertexUvs2.length; j < jl; j ++ ) {
-
-				var uvs2 = faceVertexUvs2[ j ], uvsCopy = [];
-
-				for ( var k = 0, kl = uvs2.length; k < kl; k ++ ) {
-
-					uvsCopy.push( uvs2[ k ].clone() );
-
-				}
-
-				this.faceVertexUvs[ i ].push( uvsCopy );
+				continue;
 
 			}
+
+			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+
+				uvCopy.push( uv[ j ].clone() );
+
+			}
+
+			uvs1.push( uvCopy );
 
 		}
 

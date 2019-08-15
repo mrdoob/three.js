@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const BlendShader: {
+export interface BlendShader {
   uniforms: {
     tDiffuse1: Uniform;
     tDiffuse2: Uniform;
@@ -11,4 +11,4 @@ export const BlendShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

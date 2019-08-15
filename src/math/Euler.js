@@ -9,8 +9,6 @@ import { _Math } from './Math.js';
  * @author bhouston / http://clara.io
  */
 
-var _matrix, _quaternion;
-
 function Euler( x, y, z, order ) {
 
 	this._x = x || 0;
@@ -255,15 +253,19 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	setFromQuaternion: function ( q, order, update ) {
+	setFromQuaternion: function () {
 
-		if ( _matrix === undefined ) _matrix = new Matrix4();
+		var matrix = new Matrix4();
 
-		_matrix.makeRotationFromQuaternion( q );
+		return function setFromQuaternion( q, order, update ) {
 
-		return this.setFromRotationMatrix( _matrix, order, update );
+			matrix.makeRotationFromQuaternion( q );
 
-	},
+			return this.setFromRotationMatrix( matrix, order, update );
+
+		};
+
+	}(),
 
 	setFromVector3: function ( v, order ) {
 
@@ -271,17 +273,21 @@ Object.assign( Euler.prototype, {
 
 	},
 
-	reorder: function ( newOrder ) {
+	reorder: function () {
 
 		// WARNING: this discards revolution information -bhouston
 
-		if ( _quaternion === undefined ) _quaternion = new Quaternion();
+		var q = new Quaternion();
 
-		_quaternion.setFromEuler( this );
+		return function reorder( newOrder ) {
 
-		return this.setFromQuaternion( _quaternion, newOrder );
+			q.setFromEuler( this );
 
-	},
+			return this.setFromQuaternion( q, newOrder );
+
+		};
+
+	}(),
 
 	equals: function ( euler ) {
 

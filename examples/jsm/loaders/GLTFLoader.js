@@ -29,8 +29,8 @@ import {
 	LineLoop,
 	LineSegments,
 	LinearFilter,
-	LinearMipmapLinearFilter,
-	LinearMipmapNearestFilter,
+	LinearMipMapLinearFilter,
+	LinearMipMapNearestFilter,
 	Loader,
 	LoaderUtils,
 	Material,
@@ -41,8 +41,8 @@ import {
 	MeshStandardMaterial,
 	MirroredRepeatWrapping,
 	NearestFilter,
-	NearestMipmapLinearFilter,
-	NearestMipmapNearestFilter,
+	NearestMipMapLinearFilter,
+	NearestMipMapNearestFilter,
 	NumberKeyframeTrack,
 	Object3D,
 	OrthographicCamera,
@@ -1188,10 +1188,10 @@ var GLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: NearestFilter,
 		9729: LinearFilter,
-		9984: NearestMipmapNearestFilter,
-		9985: LinearMipmapNearestFilter,
-		9986: NearestMipmapLinearFilter,
-		9987: LinearMipmapLinearFilter
+		9984: NearestMipMapNearestFilter,
+		9985: LinearMipMapNearestFilter,
+		9986: NearestMipMapLinearFilter,
+		9987: LinearMipMapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -1252,13 +1252,6 @@ var GLTFLoader = ( function () {
 
 		// Invalid URL
 		if ( typeof url !== 'string' || url === '' ) return '';
-		
-		// Host Relative URL
-		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
-
-			path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
-
-		}
 
 		// Absolute URL http://,https://,//
 		if ( /^(https?:)?\/\//i.test( url ) ) return url;
@@ -1947,15 +1940,13 @@ var GLTFLoader = ( function () {
 			// The buffer is not interleaved if the stride is the item size in bytes.
 			if ( byteStride && byteStride !== itemBytes ) {
 
-				// Each "slice" of the buffer, as defined by 'count' elements of 'byteStride' bytes, gets its own InterleavedBuffer
-				// This makes sure that IBA.count reflects accessor.count properly
-				var ibSlice = Math.floor( byteOffset / byteStride );
-				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType + ':' + ibSlice + ':' + accessorDef.count;
+				var ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType;
 				var ib = parser.cache.get( ibCacheKey );
 
 				if ( ! ib ) {
 
-					array = new TypedArray( bufferView, ibSlice * byteStride, accessorDef.count * byteStride / elementBytes );
+					// Use the full buffer if it's interleaved.
+					array = new TypedArray( bufferView );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					ib = new InterleavedBuffer( array, byteStride / elementBytes );
@@ -1964,7 +1955,7 @@ var GLTFLoader = ( function () {
 
 				}
 
-				bufferAttribute = new InterleavedBufferAttribute( ib, itemSize, (byteOffset % byteStride) / elementBytes, normalized );
+				bufferAttribute = new InterleavedBufferAttribute( ib, itemSize, byteOffset / elementBytes, normalized );
 
 			} else {
 
@@ -2114,7 +2105,7 @@ var GLTFLoader = ( function () {
 			var sampler = samplers[ textureDef.sampler ] || {};
 
 			texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || LinearFilter;
-			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || LinearMipmapLinearFilter;
+			texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || LinearMipMapLinearFilter;
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
@@ -2986,11 +2977,14 @@ var GLTFLoader = ( function () {
 
 		return ( function () {
 
-			var pending = [];
+			// .isBone isn't in glTF spec. See .markDefs
+			if ( nodeDef.isBone === true ) {
 
-			if ( nodeDef.mesh !== undefined ) {
+				return Promise.resolve( new Bone() );
 
-				pending.push( parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+			} else if ( nodeDef.mesh !== undefined ) {
+
+				return parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
 
 					var node;
 
@@ -3036,58 +3030,25 @@ var GLTFLoader = ( function () {
 
 					return node;
 
-				} ) );
+				} );
 
-			}
+			} else if ( nodeDef.camera !== undefined ) {
 
-			if ( nodeDef.camera !== undefined ) {
+				return parser.getDependency( 'camera', nodeDef.camera );
 
-				pending.push( parser.getDependency( 'camera', nodeDef.camera ) );
-
-			}
-
-			if ( nodeDef.extensions
+			} else if ( nodeDef.extensions
 				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
 				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
 
-				pending.push( parser.getDependency( 'light', nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light ) );
-
-			}
-
-			return Promise.all( pending );
-
-		}() ).then( function ( objects ) {
-
-			var node;
-
-			// .isBone isn't in glTF spec. See .markDefs
-			if ( nodeDef.isBone === true ) {
-
-				node = new Bone();
-
-			} else if ( objects.length > 1 ) {
-
-				node = new Group();
-
-			} else if ( objects.length === 1 ) {
-
-				node = objects[ 0 ];
+				return parser.getDependency( 'light', nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light );
 
 			} else {
 
-				node = new Object3D();
+				return Promise.resolve( new Object3D() );
 
 			}
 
-			if ( node !== objects[ 0 ] ) {
-
-				for ( var i = 0, il = objects.length; i < il; i ++ ) {
-
-					node.add( objects[ i ] );
-
-				}
-
-			}
+		}() ).then( function ( node ) {
 
 			if ( nodeDef.name !== undefined ) {
 
@@ -3171,9 +3132,11 @@ var GLTFLoader = ( function () {
 
 				} ).then( function ( jointNodes ) {
 
-					node.traverse( function ( mesh ) {
+					var meshes = node.isGroup === true ? node.children : [ node ];
 
-						if ( ! mesh.isMesh ) return;
+					for ( var i = 0, il = meshes.length; i < il; i ++ ) {
+
+						var mesh = meshes[ i ];
 
 						var bones = [];
 						var boneInverses = [];
@@ -3206,7 +3169,7 @@ var GLTFLoader = ( function () {
 
 						mesh.bind( new Skeleton( bones, boneInverses ), mesh.matrixWorld );
 
-					} );
+					}
 
 					return node;
 

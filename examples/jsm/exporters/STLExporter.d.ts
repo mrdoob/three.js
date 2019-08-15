@@ -1,11 +1,7 @@
-import { Object3D } from '../../../src/Three';
-
-export interface STLExporterOptions {
-  binary?: boolean;
-}
+import {Object3D} from "../../..";
 
 export class STLExporter {
-  constructor();
+	constructor();
 
-  parse(scene: Object3D, options?: STLExporterOptions): string;
+	parse(scene: Object3D, options: {});
 }

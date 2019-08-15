@@ -7,7 +7,7 @@
  * Usage
  *
  * var myRay = new LightningStrike( paramsObject );
- * var myRayMesh = new THREE.Mesh( myRay, myMaterial );
+ * var myRayMesh = new Mesh( myRay, myMaterial );
  * scene.add( myRayMesh );
  * ...
  * myRay.update( currentTime );
@@ -105,6 +105,7 @@ import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	Math as _Math,
+	Mesh,
 	Uint32BufferAttribute,
 	Vector3
 } from "../../../build/three.module.js";
@@ -541,7 +542,7 @@ LightningStrike.prototype.fillMesh = function ( time ) {
 
 };
 
-LightningStrike.prototype.addNewSubray = function ( /*rayParameters*/ ) {
+LightningStrike.prototype.addNewSubray = function ( rayParameters ) {
 
 	return this.subrays[ this.numSubrays ++ ];
 
@@ -793,7 +794,7 @@ LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, up, fo
 
 };
 
-LightningStrike.prototype.createPrismFaces = function ( vertex/*, index*/ ) {
+LightningStrike.prototype.createPrismFaces = function ( vertex, index ) {
 
 	var indices = this.indices;
 	var vertex = this.currentVertex - 6;
@@ -840,7 +841,7 @@ LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function () {
 		var childSubraySeed = random1() * ( currentCycle + 1 );
 
 		var isActive = phase % period <= dutyCycle * period;
-
+		
 		var probability = 0;
 
 		if ( isActive ) {

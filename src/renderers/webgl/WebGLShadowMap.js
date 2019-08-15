@@ -102,7 +102,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		var currentRenderTarget = _renderer.getRenderTarget();
 		var activeCubeFace = _renderer.getActiveCubeFace();
-		var activeMipmapLevel = _renderer.getActiveMipmapLevel();
+		var activeMipMapLevel = _renderer.getActiveMipMapLevel();
 
 		var _state = _renderer.state;
 
@@ -260,7 +260,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		scope.needsUpdate = false;
 
-		_renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );
+		_renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipMapLevel );
 
 	};
 

@@ -2,11 +2,11 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const ColorifyShader: {
+export interface ColorifyShader {
   uniforms: {
     tDiffuse: Uniform;
     color: Uniform;
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

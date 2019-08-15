@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const ColorCorrectionShader: {
+export interface ColorCorrectionShader {
   uniforms: {
     tDiffuse: Uniform;
     powRGB: Uniform;
@@ -11,4 +11,4 @@ export const ColorCorrectionShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

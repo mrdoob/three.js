@@ -13,11 +13,11 @@ import {
 	MirroredRepeatWrapping,
 
 	NearestFilter,
-	NearestMipmapNearestFilter,
-	NearestMipmapLinearFilter,
+	NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter,
 	LinearFilter,
-	LinearMipmapNearestFilter,
-	LinearMipmapLinearFilter
+	LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
@@ -1013,11 +1013,11 @@ var TEXTURE_WRAPPING = {
 
 var TEXTURE_FILTER = {
 	NearestFilter: NearestFilter,
-	NearestMipmapNearestFilter: NearestMipmapNearestFilter,
-	NearestMipmapLinearFilter: NearestMipmapLinearFilter,
+	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
+	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
 	LinearFilter: LinearFilter,
-	LinearMipmapNearestFilter: LinearMipmapNearestFilter,
-	LinearMipmapLinearFilter: LinearMipmapLinearFilter
+	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
+	LinearMipMapLinearFilter: LinearMipMapLinearFilter
 };
 
 

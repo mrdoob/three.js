@@ -75,7 +75,9 @@ Object.assign( THREE.EffectComposer.prototype, {
 	addPass: function ( pass ) {
 
 		this.passes.push( pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+
+		var size = this.renderer.getDrawingBufferSize( new THREE.Vector2() );
+		pass.setSize( size.width, size.height );
 
 	},
 
@@ -130,16 +132,13 @@ Object.assign( THREE.EffectComposer.prototype, {
 
 				if ( maskActive ) {
 
-					var context = this.renderer.getContext();
-					var stencil = this.renderer.state.buffers.stencil;
+					var context = this.renderer.context;
 
-					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
+					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 
 					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
 
-					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
+					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
 
 				}
 

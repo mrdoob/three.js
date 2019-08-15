@@ -6,20 +6,18 @@
 const CodeSerializer = {
 
 	/**
-	 * Serialize an object without specific prototype definition.
 	 *
-	 * @param {String} fullObjectName complete object name
-	 * @param {Object} serializationTarget The object that should be serialized
-	 * @returns {String}
+	 * @param fullName
+	 * @param object
+	 * @returns {string}
 	 */
-	serializeObject: function ( fullObjectName, serializationTarget ) {
-
-		let objectString = fullObjectName + ' = {\n\n';
+	serializeObject: function ( fullName, object ) {
+		let objectString = fullName + ' = {\n\n';
 		let part;
-		for ( let name in serializationTarget ) {
+		for ( let name in object ) {
 
-			part = serializationTarget[ name ];
-			if ( typeof ( part ) === 'string' || part instanceof String ) {
+			part = object[ name ];
+			if ( typeof( part ) === 'string' || part instanceof String ) {
 
 				part = part.replace( '\n', '\\n' );
 				part = part.replace( '\r', '\\r' );
@@ -31,7 +29,7 @@ const CodeSerializer = {
 
 			} else if ( typeof part === 'object' ) {
 
-				console.log( 'Omitting object "' + name + '" and replace it with empty object.');
+				// TODO: Short-cut for now. Recursion required?
 				objectString += '\t' + name + ': {},\n';
 
 			} else {
@@ -44,250 +42,137 @@ const CodeSerializer = {
 		objectString += '}\n\n';
 
 		return objectString;
-
 	},
 
 	/**
-	 * Serialize an object with specific prototype definition.
 	 *
-	 * @param {String} fullObjectName Specifies the complete object name
-	 * @param {Object} serializationTarget The object that should be serialized
-	 * @param {String} [basePrototypeName] Name of the prototype
-	 * @param {Object} [overrideFunctions} Array of {@Link CodeSerializationInstruction} allows to replace or remove function with provided content
-	 *
-	 * @returns {String}
+	 * @param fullName
+	 * @param object
+	 * @param basePrototypeName
+	 * @param ignoreFunctions
+	 * @returns {string}
 	 */
-	serializeClass: function ( fullObjectName, serializationTarget, basePrototypeName, overrideFunctions ) {
-
-		let objectPart, constructorString, i, funcInstructions, funcTemp;
+	serializeClass: function ( fullName, object, constructorName, basePrototypeName, ignoreFunctions, includeFunctions, overrideFunctions ) {
+		let valueString, objectPart, constructorString, i, funcOverride;
 		let prototypeFunctions = [];
 		let objectProperties = [];
 		let objectFunctions = [];
 		let isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
 
+		if ( ! Array.isArray( ignoreFunctions ) ) ignoreFunctions = [];
+		if ( ! Array.isArray( includeFunctions ) ) includeFunctions = null;
 		if ( ! Array.isArray( overrideFunctions ) ) overrideFunctions = [];
 
-		for ( let name in serializationTarget.prototype ) {
+		for ( let name in object.prototype ) {
 
-			objectPart = serializationTarget.prototype[ name ];
-			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.prototype.' + name );
-			funcInstructions.setCode( objectPart.toString() );
-
+			objectPart = object.prototype[ name ];
+			valueString = objectPart.toString();
 			if ( name === 'constructor' ) {
 
-				if ( !funcInstructions.isRemoveCode() ) {
-
-					constructorString = fullObjectName + ' = ' + funcInstructions.getCode() + ';\n\n';
-
-				}
+				constructorString = fullName + ' = ' + valueString + ';\n\n';
 
 			} else if ( typeof objectPart === 'function' ) {
 
-				funcTemp = overrideFunctions[ name ];
-				if ( funcTemp instanceof CodeSerializationInstruction && funcTemp.getName() === funcInstructions.getName() ) {
+				if ( ignoreFunctions.indexOf( name ) < 0 && ( includeFunctions === null || includeFunctions.indexOf( name ) >= 0 ) ) {
 
-					funcInstructions = funcTemp;
+					funcOverride = overrideFunctions[ name ];
+					if ( funcOverride && funcOverride.fullName === fullName + '.prototype.' + name ) {
 
-				}
-				if ( !funcInstructions.isRemoveCode() ) {
+						valueString = funcOverride.code;
 
+					}
 					if ( isExtended ) {
 
-						prototypeFunctions.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n\n' );
+						prototypeFunctions.push( fullName + '.prototype.' + name + ' = ' + valueString + ';\n\n' );
 
 					} else {
 
-						prototypeFunctions.push( '\t' + funcInstructions.getName() + ': ' + funcInstructions.getCode() + ',\n\n' );
+						prototypeFunctions.push( '\t' + name + ': ' + valueString + ',\n\n' );
 
 					}
-
 				}
 
 			}
 
 		}
-		for ( let name in serializationTarget ) {
+		for ( let name in object ) {
 
-			objectPart = serializationTarget[ name ];
-			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.' + name );
+			objectPart = object[ name ];
+
 			if ( typeof objectPart === 'function' ) {
 
-				funcTemp = overrideFunctions[ name ];
-				if ( funcTemp instanceof CodeSerializationInstruction && funcTemp.getName() === funcInstructions.getName() ) {
+				if ( ignoreFunctions.indexOf( name ) < 0 && ( includeFunctions === null || includeFunctions.indexOf( name ) >= 0 ) ) {
 
-					funcInstructions = funcTemp;
+					funcOverride = overrideFunctions[ name ];
+					if ( funcOverride && funcOverride.fullName === fullName + '.' + name ) {
 
-				} else {
+						valueString = funcOverride.code;
 
-					funcInstructions.setCode( objectPart.toString() );
+					} else {
 
-				}
-				if ( ! funcInstructions.isRemoveCode() ) {
+						valueString = objectPart.toString();
 
-					objectFunctions.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n\n' );
+					}
+					objectFunctions.push( fullName + '.' + name + ' = ' + valueString + ';\n\n' );
 
 				}
 
 			} else {
 
-				if ( typeof ( objectPart ) === 'string' || objectPart instanceof String ) {
+				if ( typeof( objectPart ) === 'string' || objectPart instanceof String) {
 
-					funcInstructions.setCode( '\"' + objectPart.toString() + '\"' );
+					valueString = '\"' + objectPart.toString() + '\"';
 
 				} else if ( typeof objectPart === 'object' ) {
 
-					console.log( 'Omitting object "' + funcInstructions.getName() + '" and replace it with empty object.');
-					funcInstructions.setCode( "{}" );
+					// TODO: Short-cut for now. Recursion required?
+					valueString = "{}";
 
 				} else {
 
-					funcInstructions.setCode( objectPart );
+					valueString = objectPart;
 
 				}
-				if ( ! funcInstructions.isRemoveCode() ) {
-
-					objectProperties.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n' );
-
-				}
+				objectProperties.push( fullName + '.' + name + ' = ' + valueString + ';\n' );
 
 			}
+
+		}
+		if ( ( constructorString === undefined || constructorString === null ) && typeof object.prototype.constructor === 'function' ) {
+
+			constructorString = fullName + ' = ' + object.prototype.constructor.toString().replace( constructorName, '' );
 
 		}
 		let objectString = constructorString + '\n\n';
 		if ( isExtended ) {
 
-			objectString += fullObjectName + '.prototype = Object.create( ' + basePrototypeName + '.prototype );\n';
+			objectString += fullName + '.prototype = Object.create( ' + basePrototypeName + '.prototype );\n';
 
 		}
-		objectString += fullObjectName + '.prototype.constructor = ' + fullObjectName + ';\n';
+		objectString += fullName + '.prototype.constructor = ' + fullName + ';\n';
 		objectString += '\n\n';
 
-		for ( i = 0; i < objectProperties.length; i ++ ) {
-
-			objectString += objectProperties[ i ];
-
-		}
+		for ( i = 0; i < objectProperties.length; i ++ ) objectString += objectProperties[ i ];
 		objectString += '\n\n';
 
-		for ( i = 0; i < objectFunctions.length; i ++ ) {
-
-			objectString += objectFunctions[ i ];
-
-		}
+		for ( i = 0; i < objectFunctions.length; i ++ ) objectString += objectFunctions[ i ];
 		objectString += '\n\n';
 
 		if ( isExtended ) {
 
-			for ( i = 0; i < prototypeFunctions.length; i ++ ) {
-
-				objectString += prototypeFunctions[ i ];
-
-			}
+			for ( i = 0; i < prototypeFunctions.length; i ++ ) objectString += prototypeFunctions[ i ];
 
 		} else {
 
-			objectString += fullObjectName + '.prototype = {\n\n';
-			for ( i = 0; i < prototypeFunctions.length; i ++ ) {
-
-				objectString += prototypeFunctions[ i ];
-
-			}
+			objectString += fullName + '.prototype = {\n\n';
+			for ( i = 0; i < prototypeFunctions.length; i ++ ) objectString += prototypeFunctions[ i ];
 			objectString += '\n};';
 
 		}
 		objectString += '\n\n';
 
 		return objectString;
-
 	},
 };
 
-/**
- * Allows to define instructions to override or remove
- * @param {String} name Usually the name of a function
- * @param {String} fullName The name plus full object description
- * @constructor
- */
-const CodeSerializationInstruction = function ( name, fullName ) {
-
-	this.name = name;
-	this.fullName = fullName;
-	this.code = null;
-	this.removeCode = false;
-
-};
-
-CodeSerializationInstruction.prototype = {
-
-	constructor: CodeSerializationInstruction,
-
-	/**
-	 * Returns the name of the function
-	 * @return {String}
-	 */
-	getName: function () {
-
-		return this.name;
-
-	},
-
-	/**
-	 * Returns the full name of the function
-	 * @return {String}
-	 */
-	getFullName: function () {
-
-		return this.fullName;
-
-	},
-
-	/**
-	 * Set the string containing the serialized function
-	 * @param {String} code
-	 * @return {CodeSerializationInstruction}
-	 */
-	setCode: function ( code ) {
-
-		this.code = code;
-		return this;
-
-	},
-
-	/**
-	 * Returns the serialized function code
-	 * @return {String}
-	 */
-	getCode: function() {
-
-		return this.code;
-
-	},
-
-	/**
-	 * Set if function should be removed
-	 * @param {boolean} removeCode
-	 * @return {CodeSerializationInstruction}
-	 */
-	setRemoveCode: function ( removeCode ) {
-
-		this.removeCode = removeCode;
-		return this;
-
-	},
-
-	/**
-	 * If function should be completely removed
-	 * @return {boolean}
-	 */
-	isRemoveCode: function () {
-
-		return this.removeCode;
-
-	}
-
-};
-
-export {
-	CodeSerializer,
-	CodeSerializationInstruction
-};
+export { CodeSerializer }

@@ -1,12 +1,7 @@
-import { Object3D } from '../../../src/Three';
-
-export interface PLYExporterOptions {
-  binary?: boolean;
-  excludeAttributes?: string[];
-}
+import {Object3D} from "../../..";
 
 export class PLYExporter {
-  constructor();
+	constructor();
 
-  parse(object: Object3D, onDone: (res: string) => void, options: PLYExporterOptions): string | null;
+	parse(object: Object3D, onDone: (res: any) => void, options: object): null;
 }

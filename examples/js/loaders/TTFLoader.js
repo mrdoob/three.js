@@ -1,7 +1,6 @@
 /**
  * @author gero3 / https://github.com/gero3
  * @author tentone / https://github.com/tentone
- * @author troy351 / https://github.com/troy351
  *
  * Requires opentype.js to be included in the project.
  * Loads TTF files and converts them into typeface JSON that can be used directly
@@ -49,16 +48,12 @@ THREE.TTFLoader.prototype = {
 
 			var glyphs = {};
 			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
-			
-			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
-			var unicodes = Object.keys( glyphIndexMap );
 
-			for ( var i = 0; i < unicodes.length; i ++ ) {
+			for ( var i = 0; i < font.glyphs.length; i ++ ) {
 
-				var unicode = unicodes[ i ];
-				var glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
+				var glyph = font.glyphs.glyphs[ i ];
 
-				if ( unicode !== undefined ) {
+				if ( glyph.unicode !== undefined ) {
 
 					var token = {
 						ha: round( glyph.advanceWidth * scale ),
@@ -103,7 +98,7 @@ THREE.TTFLoader.prototype = {
 
 					} );
 
-					glyphs[ String.fromCodePoint( glyph.unicode ) ] = token;
+					glyphs[ String.fromCharCode( glyph.unicode ) ] = token;
 
 				}
 
@@ -111,7 +106,7 @@ THREE.TTFLoader.prototype = {
 
 			return {
 				glyphs: glyphs,
-				familyName: font.getEnglishName( 'fullName' ),
+				familyName: font.familyName,
 				ascender: round( font.ascender * scale ),
 				descender: round( font.descender * scale ),
 				underlinePosition: font.tables.post.underlinePosition,

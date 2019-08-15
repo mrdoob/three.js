@@ -4,7 +4,7 @@ import {
 	Material
 } from '../../../src/Three';
 
-export const DepthLimitedBlurShader: {
+export interface DepthLimitedBlurShader {
   defines: {
     KERNEL_RADIUS: number;
     DEPTH_PACKING: number;
@@ -22,7 +22,7 @@ export const DepthLimitedBlurShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}
 
 export interface BlurShaderUtils {
   createSampleWeights(kernelRadius: number, stdDev: number): number[];

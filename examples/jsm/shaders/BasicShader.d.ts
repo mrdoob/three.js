@@ -2,8 +2,8 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const BasicShader: {
+export interface BasicShader {
   uniforms: {};
   vertexShader: string;
   fragmentShader: string;
-};
+}

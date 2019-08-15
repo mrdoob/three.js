@@ -238,7 +238,7 @@ function unrollLoops( string ) {
 
 function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
 
-	var gl = renderer.getContext();
+	var gl = renderer.context;
 
 	var defines = material.defines;
 

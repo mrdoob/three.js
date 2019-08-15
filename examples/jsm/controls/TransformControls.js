@@ -167,8 +167,6 @@ var TransformControls = function ( camera, domElement ) {
 		this.object = object;
 		this.visible = true;
 
-		return this;
-
 	};
 
 	// Detatch from object
@@ -177,8 +175,6 @@ var TransformControls = function ( camera, domElement ) {
 		this.object = undefined;
 		this.visible = false;
 		this.axis = null;
-
-		return this;
 
 	};
 
@@ -623,7 +619,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	}
 
-	// TODO: deprecate
+	// TODO: depricate
 
 	this.getMode = function () {
 
@@ -663,7 +659,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	this.update = function () {
 
-		console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
+		console.warn( 'THREE.TransformControls: update function has been depricated.' );
 
 	};
 

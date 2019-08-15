@@ -1045,6 +1045,8 @@ THREE.LDrawLoader = ( function () {
 			// Retrieve data from the parent parse scope
 			var parentParseScope = this.getParentParseScope();
 
+			var isRoot = ! parentParseScope.isFromParse;
+
 			// Main colour codes passed to this subobject (or default codes 16 and 24 if it is the root object)
 			var mainColourCode = parentParseScope.mainColourCode;
 			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;

@@ -22,8 +22,6 @@ export class Points extends Object3D {
 	);
 
 	type: 'Points';
-	morphTargetInfluences?: number[];
-	morphTargetDictionary?: { [key: string]: number };
 	isPoints: true;
 
 	/**
@@ -37,6 +35,5 @@ export class Points extends Object3D {
 	material: Material | Material[];
 
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
-	updateMorphTargets(): void;
 
 }

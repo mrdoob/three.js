@@ -2,8 +2,7 @@ import {
   Object3D,
   Camera,
   Vector3,
-  Euler,
-  MOUSE
+  Euler
 } from '../../../src/Three';
 
 export class TransformControls extends Object3D {
@@ -28,14 +27,9 @@ export class TransformControls extends Object3D {
   showZ: boolean;
   isTransformControls: boolean;
   visible: boolean;
-  mouseButtons: {
-    LEFT: MOUSE; 
-    MIDDLE: MOUSE;
-    RIGHT: MOUSE;
-  };
 
   attach(object: Object3D): this;
-  detach(): this;
+  detach(): void;
   pointerHover(pointer: Object): void;
   pointerDown(pointer: Object): void;
   pointerMove(pointer: Object): void;

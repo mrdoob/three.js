@@ -10,7 +10,6 @@ import {
 	Quaternion,
 	Vector3
 } from "../../../build/three.module.js";
-import { MMDParser } from "../libs/mmdparser.module.js";
 
 var MMDExporter = function () {
 

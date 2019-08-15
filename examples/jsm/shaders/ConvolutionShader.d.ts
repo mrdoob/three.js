@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const ConvolutionShader: {
+export interface ConvolutionShader {
   defines: {
     KERNEL_SIZE_FLOAT: string;
     KERNEL_SIZE_INT: string;
@@ -16,4 +16,4 @@ export const ConvolutionShader: {
   fragmentShader: string;
 
   buildKernel(sigma: number): number[];
-};
+}

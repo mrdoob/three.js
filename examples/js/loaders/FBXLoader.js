@@ -288,14 +288,26 @@ THREE.FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+					if ( typeof THREE.TGALoader !== 'function' ) {
 
-						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
+						console.warn( 'FBXLoader: THREE.TGALoader is required to load TGA textures' );
+						return;
+
+					} else {
+
+						if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+
+							var tgaLoader = new THREE.TGALoader();
+							tgaLoader.setPath( this.textureLoader.path );
+
+							THREE.Loader.Handlers.add( /\.tga$/i, tgaLoader );
+
+						}
+
+						type = 'image/tga';
+						break;
 
 					}
-
-					type = 'image/tga';
-					break;
 
 				default:
 
@@ -405,7 +417,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( loader === null ) {
 
-					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
+					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
 					texture = new THREE.Texture();
 
 				} else {
@@ -416,7 +428,7 @@ THREE.FBXLoader = ( function () {
 
 			} else if ( extension === 'psd' ) {
 
-				console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
+				console.warn( 'FBXLoader: PSD textures are not supported, creating empty placeholder texture for', fileName );
 				texture = new THREE.Texture();
 
 			} else {
@@ -597,7 +609,6 @@ THREE.FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
-						parameters.map.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
@@ -606,7 +617,6 @@ THREE.FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
-						parameters.emissiveMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'NormalMap':
@@ -617,12 +627,10 @@ THREE.FBXLoader = ( function () {
 					case 'ReflectionColor':
 						parameters.envMap = self.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
-						parameters.envMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = self.getTexture( textureMap, child.ID );
-						parameters.specularMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
@@ -1545,7 +1553,6 @@ THREE.FBXLoader = ( function () {
 			}
 
 		},
-
 
 		// Parse single node mesh geometry in FBXTree.Objects.Geometry
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {

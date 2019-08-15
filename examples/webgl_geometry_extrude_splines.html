@@ -323,7 +323,7 @@
 
 				if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
 				splineCamera.matrix.lookAt( splineCamera.position, lookAt, normal );
-				splineCamera.quaternion.setFromRotationMatrix( splineCamera.matrix );
+				splineCamera.rotation.setFromRotationMatrix( splineCamera.matrix, splineCamera.rotation.order );
 
 				cameraHelper.update();
 

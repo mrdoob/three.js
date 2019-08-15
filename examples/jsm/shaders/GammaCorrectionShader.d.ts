@@ -2,10 +2,10 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const GammaCorrectionShader: {
+export interface GammaCorrectionShader {
   uniforms: {
     tDiffuse: Uniform;
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

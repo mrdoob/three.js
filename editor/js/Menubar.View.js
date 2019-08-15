@@ -23,7 +23,15 @@ Menubar.View = function ( editor ) {
 	option.setTextContent( 'VR mode' );
 	option.onClick( function () {
 
-		editor.signals.enterVR.dispatch();
+		if ( WEBVR.isAvailable() === true ) {
+
+			editor.signals.enterVR.dispatch();
+
+		} else {
+
+			alert( 'WebVR not available' );
+
+		}
 
 	} );
 	options.add( option );

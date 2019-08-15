@@ -1499,12 +1499,6 @@ Object.assign( WebGLRenderer.prototype, {
 
 		console.warn( 'THREE.WebGLRenderer: .setTextureCube() has been removed.' );
 
-	},
-	getActiveMipMapLevel: function () {
-
-		console.warn( 'THREE.WebGLRenderer: .getActiveMipMapLevel() is now .getActiveMipmapLevel().' );
-		return this.getActiveMipmapLevel();
-
 	}
 
 } );
@@ -1549,16 +1543,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			console.warn( 'THREE.WebGLRenderer: .shadowMapCullFace has been removed. Set Material.shadowSide instead.' );
 
 		}
-	},
-	context: {
-		get: function () {
-
-			console.warn( 'THREE.WebGLRenderer: .context has been removed. Use .getContext() instead.' );
-			return this.getContext();
-
-		}
 	}
-
 } );
 
 Object.defineProperties( WebGLShadowMap.prototype, {

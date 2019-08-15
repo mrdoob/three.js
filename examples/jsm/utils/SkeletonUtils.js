@@ -15,6 +15,8 @@ import {
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
 
+'use strict';
+
 var SkeletonUtils = {
 
 	retarget: function () {

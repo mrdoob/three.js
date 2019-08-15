@@ -13,7 +13,6 @@ import {
 
 
 const MaterialHandler = function () {
-
 	this.logging = {
 		enabled: true,
 		debug: false
@@ -24,7 +23,6 @@ const MaterialHandler = function () {
 	};
 	this.materials = {};
 	this._createDefaultMaterials();
-
 };
 
 MaterialHandler.prototype = {
@@ -38,24 +36,19 @@ MaterialHandler.prototype = {
 	 * @param {boolean} debug True or false.
 	 */
 	setLogging:	function ( enabled, debug ) {
-
 		this.logging.enabled = enabled === true;
 		this.logging.debug = debug === true;
-
 	},
 
 	_setCallbacks: function ( onLoadMaterials ) {
-
 		if ( onLoadMaterials !== undefined && onLoadMaterials !== null ) {
 
 			this.callbacks.onLoadMaterials = onLoadMaterials;
 
 		}
-
 	},
 
 	_createDefaultMaterials: function () {
-
 		let defaultMaterial = new MeshStandardMaterial( { color: 0xDCF1FF } );
 		defaultMaterial.name = 'defaultMaterial';
 
@@ -76,7 +69,6 @@ MaterialHandler.prototype = {
 		runtimeMaterials[ defaultPointMaterial.name ] = defaultPointMaterial;
 
 		this.addMaterials( runtimeMaterials );
-
 	},
 
 	/**
@@ -86,7 +78,6 @@ MaterialHandler.prototype = {
 	 * @returns {Object} Map of {@link Material}
 	 */
 	addPayloadMaterials: function ( materialPayload ) {
-
 		let material, materialName;
 		let materialCloneInstructions = materialPayload.materials.materialCloneInstructions;
 		let newMaterials = {};
@@ -94,10 +85,9 @@ MaterialHandler.prototype = {
 		if ( materialCloneInstructions !== undefined && materialCloneInstructions !== null ) {
 
 			let materialNameOrg = materialCloneInstructions.materialNameOrg;
-			materialNameOrg = ( materialNameOrg !== undefined && materialNameOrg !== null ) ? materialNameOrg : "";
+			materialNameOrg = (materialNameOrg !== undefined && materialNameOrg !== null) ? materialNameOrg : "";
 			let materialOrg = this.materials[ materialNameOrg ];
 			if ( materialOrg ) {
-
 				material = materialOrg.clone();
 
 				materialName = materialCloneInstructions.materialName;
@@ -121,7 +111,6 @@ MaterialHandler.prototype = {
 				console.info( 'Requested material "' + materialNameOrg + '" is not available!' );
 
 			}
-
 		}
 
 		let materials = materialPayload.materials.serializedMaterials;
@@ -148,7 +137,6 @@ MaterialHandler.prototype = {
 		newMaterials = this.addMaterials( materials, newMaterials );
 
 		return newMaterials;
-
 	},
 
 	/**
@@ -158,7 +146,6 @@ MaterialHandler.prototype = {
 	 * @param newMaterials [Object] with named {@link Material}
 	 */
 	addMaterials: function ( materials, newMaterials ) {
-
 		if ( newMaterials === undefined || newMaterials === null ) {
 
 			newMaterials = {};
@@ -178,7 +165,6 @@ MaterialHandler.prototype = {
 
 		}
 		return newMaterials;
-
 	},
 
 	/**
@@ -187,9 +173,7 @@ MaterialHandler.prototype = {
 	 * @returns {Object} Map of {@link Material}
 	 */
 	getMaterials: function () {
-
 		return this.materials;
-
 	},
 
 	/**
@@ -198,9 +182,7 @@ MaterialHandler.prototype = {
 	 * @returns {Material}
 	 */
 	getMaterial: function ( materialName ) {
-
 		return this.materials[ materialName ];
-
 	},
 
 	/**
@@ -209,20 +191,17 @@ MaterialHandler.prototype = {
 	 * @returns {Object} Map of Materials in JSON representation
 	 */
 	getMaterialsJSON: function () {
-
 		let materialsJSON = {};
 		let material;
 		for ( let materialName in this.materials ) {
 
 			material = this.materials[ materialName ];
 			materialsJSON[ materialName ] = material.toJSON();
-
 		}
 
 		return materialsJSON;
-
 	}
 
 };
 
-export { MaterialHandler };
+export { MaterialHandler }

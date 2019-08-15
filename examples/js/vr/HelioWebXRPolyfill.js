@@ -4,9 +4,7 @@
 
 if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
-	console.log( "Helio WebXR Polyfill (Lumin 0.97.0)" );
-
-	const isHelio96 = navigator.userAgent.includes("Chrome/73");
+	console.log( "Helio WebXR Polyfill (Lumin 0.96.0)" );
 
 	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
 
@@ -32,11 +30,9 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 			return new Promise( function ( resolve, reject ) {
 
-				const sessionType = (isHelio96 ? {
+				tempRequestSession( {
 					mode: 'immersive-ar' // Force using immersive-ar
-				} : 'immersive-ar');
-
-				tempRequestSession( sessionType )
+				} )
 					.then( function ( session ) {
 
 						// WebXRManager - xrFrame.getPose() Polyfill - line 279
@@ -74,28 +70,18 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 								// WebXRManager - xrFrame.getPose() Polyfill - line 259
 
-								const tempGetPose = (isHelio96 ? null : frame.getPose.bind( frame ));
-
 								frame.getPose = function ( targetRaySpace, referenceSpace ) {
 
-									if (isHelio96) {
+									const inputPose = frame.getInputPose(
+										targetRaySpace,
+										referenceSpace
+									);
 
-										const inputPose = frame.getInputPose(
-											targetRaySpace,
-											referenceSpace
-										);
+									inputPose.transform = {
+										matrix: inputPose.targetRay.transformMatrix
+									};
 
-										inputPose.transform = {
-											matrix: inputPose.targetRay.transformMatrix
-										};
-
-										return inputPose;
-
-									} else {
-
-										return tempGetPose(targetRaySpace.gripSpace, referenceSpace);
-
-									}
+									return inputPose;
 
 								};
 
@@ -141,21 +127,17 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 						// WebXRManager - xrSession.updateRenderState() Polyfill Line 129
 
-						if (isHelio96) {
+						session.updateRenderState = function ( { baseLayer } ) {
 
-							session.updateRenderState = function ( { baseLayer } ) {
+							session.baseLayer = baseLayer;
 
-								session.baseLayer = baseLayer;
+							// WebXRManager - xrSession.renderState.baseLayer Polyfill Line 219
 
-								// WebXRManager - xrSession.renderState.baseLayer Polyfill Line 219
-
-								session.renderState = {
-									baseLayer: baseLayer
-								};
-
+							session.renderState = {
+								baseLayer: baseLayer
 							};
 
-						}
+						};
 
 						// WebXRManager - xrSession.requestReferenceSpace() Polyfill Line 130
 

@@ -156,9 +156,13 @@
 
 								var mixer = startAnimation( clonedMesh, model.animations, u.animationName );
 
-								// Save the animation mixer in the list, will need it in the animation loop
-								mixers.push( mixer );
-								numSuccess ++;
+								if ( mixer ) {
+
+									// Save the animation mixer in the list, will need it in the animation loop
+									mixers.push( mixer );
+									numSuccess ++;
+
+								}
 
 							}
 
@@ -277,7 +281,7 @@
 
 					console.log( "Done loading model", model.name );
 
-					onLoaded();
+					onLoaded( model );
 
 				} );
 

@@ -24,5 +24,6 @@ export class Mesh extends Object3D {
 	setDrawMode( drawMode: TrianglesDrawModes ): void;
 	updateMorphTargets(): void;
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	copy( source: this, recursive?: boolean ): this;
 
 }

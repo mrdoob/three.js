@@ -1,4 +1,4 @@
-import { Object3D } from '../../../src/Three';
+import {Object3D} from "../../..";
 
 export class TypedGeometryExporterD {
 	constructor();

@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const BrightnessContrastShader: {
+export interface BrightnessContrastShader {
   uniforms: {
     tDiffuse: Uniform;
     brightness: Uniform;
@@ -10,4 +10,4 @@ export const BrightnessContrastShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

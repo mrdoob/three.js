@@ -881,14 +881,18 @@ THREE.SVGLoader.prototype = {
 
 			var transform = parseNodeTransform( node );
 
-			if ( transformStack.length > 0 ) {
+			if ( transform ) {
 
-				transform.premultiply( transformStack[ transformStack.length - 1 ] );
+				if ( transformStack.length > 0 ) {
+
+					transform.premultiply( transformStack[ transformStack.length - 1 ] );
+
+				}
+
+				currentTransform.copy( transform );
+				transformStack.push( transform );
 
 			}
-
-			currentTransform.copy( transform );
-			transformStack.push( transform );
 
 			return transform;
 
@@ -1174,10 +1178,11 @@ THREE.SVGLoader.prototype = {
 
 };
 
-THREE.SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
+THREE.SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap, miterLimit ) {
 
 	// Param width: Stroke width
 	// Param color: As returned by THREE.Color.getStyle()
+	// Param opacity: 0 (transparent) to 1 (opaque)
 	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
 	// Param lineCap: One of "round", "square" or "butt"
 	// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
@@ -1185,6 +1190,7 @@ THREE.SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, mit
 
 	width = width !== undefined ? width : 1;
 	color = color !== undefined ? color : '#000';
+	opacity = opacity !== undefined ? opacity : 1;
 	lineJoin = lineJoin !== undefined ? lineJoin : 'miter';
 	lineCap = lineCap !== undefined ? lineCap : 'butt';
 	miterLimit = miterLimit !== undefined ? miterLimit : 4;

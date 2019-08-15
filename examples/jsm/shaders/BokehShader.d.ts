@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export const BokehShader: {
+export interface BokehShader {
   defines: {
     DEPTH_PACKING: number;
     PERSPECTIVE_CAMERA: number;
@@ -19,4 +19,4 @@ export const BokehShader: {
   };
   vertexShader: string;
   fragmentShader: string;
-};
+}

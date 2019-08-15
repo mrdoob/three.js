@@ -6,8 +6,6 @@ import { Vector3 } from './Vector3.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _box;
-
 function Sphere( center, radius ) {
 
 	this.center = ( center !== undefined ) ? center : new Vector3();
@@ -26,35 +24,39 @@ Object.assign( Sphere.prototype, {
 
 	},
 
-	setFromPoints: function ( points, optionalCenter ) {
+	setFromPoints: function () {
 
-		if ( _box === undefined ) _box = new Box3();
+		var box = new Box3();
 
-		var center = this.center;
+		return function setFromPoints( points, optionalCenter ) {
 
-		if ( optionalCenter !== undefined ) {
+			var center = this.center;
 
-			center.copy( optionalCenter );
+			if ( optionalCenter !== undefined ) {
 
-		} else {
+				center.copy( optionalCenter );
 
-			_box.setFromPoints( points ).getCenter( center );
+			} else {
 
-		}
+				box.setFromPoints( points ).getCenter( center );
 
-		var maxRadiusSq = 0;
+			}
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+			var maxRadiusSq = 0;
 
-			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-		}
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
-		this.radius = Math.sqrt( maxRadiusSq );
+			}
 
-		return this;
+			this.radius = Math.sqrt( maxRadiusSq );
 
-	},
+			return this;
+
+		};
+
+	}(),
 
 	clone: function () {
 

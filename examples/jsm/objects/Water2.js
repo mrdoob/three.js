@@ -253,7 +253,6 @@ Water.WaterShader = {
 	vertexShader: [
 
 		'#include <fog_pars_vertex>',
-		'#include <logdepthbuf_pars_vertex>',
 
 		'uniform mat4 textureMatrix;',
 
@@ -272,7 +271,6 @@ Water.WaterShader = {
 		'	vec4 mvPosition =  viewMatrix * worldPosition;', // used in fog_vertex
 		'	gl_Position = projectionMatrix * mvPosition;',
 
-		'	#include <logdepthbuf_vertex>',
 		'	#include <fog_vertex>',
 
 		'}'
@@ -283,7 +281,6 @@ Water.WaterShader = {
 
 		'#include <common>',
 		'#include <fog_pars_fragment>',
-		'#include <logdepthbuf_pars_fragment>',
 
 		'uniform sampler2D tReflectionMap;',
 		'uniform sampler2D tRefractionMap;',
@@ -305,8 +302,6 @@ Water.WaterShader = {
 		'varying vec3 vToEye;',
 
 		'void main() {',
-
-		'	#include <logdepthbuf_fragment>',
 
 		'	float flowMapOffset0 = config.x;',
 		'	float flowMapOffset1 = config.y;',
