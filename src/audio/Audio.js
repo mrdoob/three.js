@@ -93,12 +93,17 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		if ( this.startTime < this.context.currentTime ) {
+
+			this.startTime = this.context.currentTime;
+
+		}
+
 		var source = this.context.createBufferSource();
 
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.onended = this.onEnded.bind( this );
-		this.startTime = this.context.currentTime;
 		source.start( this.startTime, this.offset, this.duration );
 
 		this.isPlaying = true;
