@@ -956,9 +956,14 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
+						var saturation = new Nodes.FloatNode( 1 );
+
 						var diffuse = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var bumpMap = new Nodes.BumpMapNode( new Nodes.TextureNode( getTexture( "brick" ) ) );
+						var bumpMapContrast = new Nodes.ColorAdjustmentNode( diffuse, saturation, Nodes.ColorAdjustmentNode.SATURATION );
+						var bumpMapChannel = new Nodes.SwitchNode( bumpMapContrast, 'r' );
+
+						var bumpMap = new Nodes.BumpMapNode( bumpMapChannel );
 						bumpMap.scale = new Nodes.FloatNode( .5 );
 
 						mtl.color = diffuse;
@@ -969,6 +974,20 @@
 						//mtl.normal = new Nodes.NormalMapNode( bumpMap );
 
 						// GUI
+
+						addGui( 'saturation', saturation.value, function ( val ) {
+
+							saturation.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'channel', [ 'r', 'g', 'b' ], function ( val ) {
+
+							bumpMapChannel.components = val;
+
+							mtl.needsUpdate = true;
+
+						} );
 
 						addGui( 'scale', bumpMap.scale.value, function ( val ) {
 
