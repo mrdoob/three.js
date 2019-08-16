@@ -72,7 +72,7 @@ function WebGLRenderStates() {
 
 		var renderState;
 
-		if ( ! renderStates.has( scene ) ) {
+		if ( renderStates.has( scene ) === false ) {
 
 			renderState = new WebGLRenderState();
 			renderStates.set( scene, new WeakMap() );
@@ -82,7 +82,7 @@ function WebGLRenderStates() {
 
 		} else {
 
-			if ( ! renderStates.get( scene ).has( camera ) ) {
+			if ( renderStates.get( scene ).has( camera ) === false ) {
 
 				renderState = new WebGLRenderState();
 				renderStates.get( scene ).set( camera, renderState );
