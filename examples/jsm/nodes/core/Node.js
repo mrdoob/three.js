@@ -22,16 +22,16 @@ Node.prototype = {
 
 	isNode: true,
 
-	analyze: function ( builder, settings ) {
+	analyze: function ( builder, context ) {
 
 		builder.analyzing = true;
 
-		this.build( builder.addFlow( settings ), 'v4' );
+		this.build( builder.addContext( context ), 'v4' );
 
 		builder.clearVertexNodeCode();
 		builder.clearFragmentNodeCode();
 
-		builder.removeFlow();
+		builder.removeContext();
 
 		builder.analyzing = false;
 
@@ -45,15 +45,15 @@ Node.prototype = {
 
 	},
 
-	flow: function ( builder, output, settings ) {
+	flow: function ( builder, output, context ) {
 
-		builder.addFlow( settings );
+		builder.addContext( context );
 
 		var flow = {};
 		flow.result = this.build( builder, output );
 		flow.code = builder.clearNodeCode();
 
-		builder.removeFlow();
+		builder.removeContext();
 
 		return flow;
 
@@ -61,11 +61,11 @@ Node.prototype = {
 
 	buildContext: function ( context, builder, output, uuid ) {
 
-		builder.addFlow( context );
+		builder.addContext( context );
 
 		var result = this.build( builder, output, uuid );
 
-		builder.removeFlow();
+		builder.removeContext();
 
 		return result;
 

@@ -55,7 +55,7 @@ function NodeBuilder() {
 
 	this.slots = [];
 	this.caches = [];
-	this.contexts = [];
+	this.contextsData = [];
 
 	this.keywords = {};
 
@@ -256,17 +256,17 @@ NodeBuilder.prototype = {
 
 	},
 
-	addFlow: function ( settings ) {
+	addContext: function ( context ) {
 
-		settings = settings || new NodeContext();
+		context = context || new NodeContext();
 
-		return this.addSlot( settings.slot ).addCache( settings.cache ).addContext( settings.context );
+		return this.addSlot( context.slot ).addCache( context.cache ).addContextData( context.data );
 
 	},
 
-	removeFlow: function () {
+	removeContext: function () {
 
-		return this.removeSlot().removeCache().removeContext();
+		return this.removeSlot().removeCache().removeContextData();
 
 	},
 
@@ -288,19 +288,19 @@ NodeBuilder.prototype = {
 
 	},
 
-	addContext: function ( context ) {
+	addContextData: function ( context ) {
 
-		this.context = Object.assign( {}, this.context, context || {} );
-		this.contexts.push( this.context );
+		this.contextData = Object.assign( {}, this.contextData, context || {} );
+		this.contextsData.push( this.contextData );
 
 		return this;
 
 	},
 
-	removeContext: function () {
+	removeContextData: function () {
 
-		this.contexts.pop();
-		this.context = this.contexts[ this.contexts.length - 1 ] || {};
+		this.contextsData.pop();
+		this.contextData = this.contextsData[ this.contextsData.length - 1 ] || {};
 
 		return this;
 
@@ -732,7 +732,7 @@ NodeBuilder.prototype = {
 
 	getContextProperty: function ( name ) {
 
-		return this.context[ name ];
+		return this.contextData[ name ];
 
 	},
 

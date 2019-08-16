@@ -84,12 +84,12 @@ export class NodeBuilder {
   build(vertex: Node, fragment: Node): this;
   buildShader(shader: string, node: Node): void;
   setMaterial(material: Material, renderer: WebGLRenderer): this;
-  addFlow(settings?: NodeContext): this;
-  removeFlow(): this;
+  addContext(context?: NodeContext): this;
+  removeContext(): this;
   addCache(name: string): this;
   removeCache(): this;
-  addContext(context: object): this;
-  removeContext(): this;
+  addContextData(context: object): this;
+  removeContextData(): this;
   addSlot(name: string): this;
   removeSlot(): this;
   addVertexCode(code: string): void;

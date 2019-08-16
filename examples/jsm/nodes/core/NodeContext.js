@@ -6,7 +6,7 @@ function NodeContext() {
 
 	this.slot = '';
 	this.cache = '';
-	this.context = {};
+	this.data = {};
 
 }
 
@@ -37,7 +37,7 @@ NodeContext.prototype = {
 
 	setProperty: function ( name, value ) {
 
-		this.context[ name ] = value;
+		this.data[ name ] = value;
 
 		return this;
 
