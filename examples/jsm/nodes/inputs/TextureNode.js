@@ -81,7 +81,7 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	// include => is used to include or not functions if used FunctionNode
 	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
 
-	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( true );
+	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( false );
 	var outputType = this.getType( builder );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
