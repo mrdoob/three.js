@@ -9,7 +9,6 @@ import {
 
 import { Node } from '../../core/Node.js';
 import { NodeContext } from '../../core/NodeContext.js';
-import { NodeFlowSettings } from '../../core/NodeFlowSettings.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
@@ -40,7 +39,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeFlowSettings().setCache( 'position' ) ) : undefined;
+		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
 
 		builder.mergeUniform( UniformsUtils.merge( [
 
@@ -122,23 +121,20 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var useClearCoat = ! builder.isDefined( 'STANDARD' );
 
-		// flow settings
+		// flow context
 
-		var environmentContext = new NodeContext().setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
-		var gammaContext = new NodeContext().setGamma( true );
-
-		var colorFlowSettings = new NodeFlowSettings().setSlot( 'color' ).setContext( gammaContext );
-		var lightFlowSettings = new NodeFlowSettings().setCache( 'light' );
-		var emissiveFlowSettings = new NodeFlowSettings().setSlot( 'emissive' );
-		var radianceFlowSettings = new NodeFlowSettings().setSlot( 'radiance' ).setCache( 'radiance' ).setContext( environmentContext );
-		var irradianceFlowSettings = new NodeFlowSettings().setSlot( 'irradiance' ).setCache( 'irradiance' ).setContext( environmentContext );
-		var clearCoatRadianceFlowSettings = new NodeFlowSettings().setSlot( 'clearCoatRadiance' ).setCache( 'radiance' ).setContext( environmentContext );
+		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
+		var lightFlowContext = new NodeContext().setCache( 'light' );
+		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
+		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+		var clearCoatRadianceFlowContext = new NodeContext().setSlot( 'clearCoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
 
 		// analyze all nodes to reuse generate codes
 
 		if ( this.mask ) this.mask.analyze( builder );
 
-		this.color.analyze( builder, colorFlowSettings );
+		this.color.analyze( builder, colorFlowContext );
 		this.roughness.analyze( builder );
 		this.metalness.analyze( builder );
 
@@ -151,23 +147,23 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
-		if ( this.light ) this.light.analyze( builder, lightFlowSettings );
+		if ( this.light ) this.light.analyze( builder, lightFlowContext );
 
 		if ( this.ao ) this.ao.analyze( builder );
 		if ( this.ambient ) this.ambient.analyze( builder );
 		if ( this.shadow ) this.shadow.analyze( builder );
-		if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowSettings );
+		if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowContext );
 
 		if ( this.environment ) {
 
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, radianceFlowSettings ); 
+			this.environment.analyze( builder, radianceFlowContext ); 
 
 			if ( builder.requires.irradiance ) {
 
-				this.environment.analyze( builder, irradianceFlowSettings ); 
+				this.environment.analyze( builder, irradianceFlowContext ); 
 
 			}
 
@@ -177,7 +173,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
 
-		var color = this.color.flow( builder, 'c', colorFlowSettings );
+		var color = this.color.flow( builder, 'c', colorFlowContext );
 		var roughness = this.roughness.flow( builder, 'f' );
 		var metalness = this.metalness.flow( builder, 'f' );
 
@@ -190,12 +186,12 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
-		var light = this.light ? this.light.flow( builder, 'v3', lightFlowSettings ) : undefined;
+		var light = this.light ? this.light.flow( builder, 'v3', lightFlowContext ) : undefined;
 
 		var ao = this.ao ? this.ao.flow( builder, 'f' ) : undefined;
 		var ambient = this.ambient ? this.ambient.flow( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowSettings ) : undefined;
+		var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowContext ) : undefined;
 
 		var environment;
 
@@ -203,17 +199,17 @@ StandardNode.prototype.build = function ( builder ) {
 
 			environment = {};
 
-			environment.radiance = this.environment.flow( builder, 'c', radianceFlowSettings )
+			environment.radiance = this.environment.flow( builder, 'c', radianceFlowContext )
 
 			if ( builder.requires.irradiance ) {
 
-				environment.irradiance = this.environment.flow( builder, 'c', irradianceFlowSettings );
+				environment.irradiance = this.environment.flow( builder, 'c', irradianceFlowContext );
 
 			}
 
 		}
 
-		var clearCoatRadiance = useClearCoat && environment ? this.environment.flow( builder, 'c', clearCoatRadianceFlowSettings ) : undefined;
+		var clearCoatRadiance = useClearCoat && environment ? this.environment.flow( builder, 'c', clearCoatRadianceFlowContext ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 

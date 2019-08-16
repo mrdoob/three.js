@@ -59,6 +59,18 @@ Node.prototype = {
 
 	},
 
+	buildContext: function ( context, builder, output, uuid ) {
+
+		builder.addFlow( context );
+
+		var result = this.build( builder, output, uuid );
+
+		builder.removeFlow();
+
+		return result;
+
+	},
+
 	build: function ( builder, output, uuid ) {
 
 		output = output || this.getType( builder, output );

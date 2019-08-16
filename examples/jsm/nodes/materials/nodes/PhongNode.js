@@ -9,7 +9,6 @@ import {
 
 import { Node } from '../../core/Node.js';
 import { NodeContext } from '../../core/NodeContext.js';
-import { NodeFlowSettings } from '../../core/NodeFlowSettings.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 
@@ -37,7 +36,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeFlowSettings().setCache( 'position' ) ) : undefined;
+		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
 
 		builder.mergeUniform( UniformsUtils.merge( [
 
@@ -108,21 +107,18 @@ PhongNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		// flow settings
+		// flow context
 
-		var environmentContext = new NodeContext().setGamma( true );
-		var gammaContext = new NodeContext().setGamma( true );
-
-		var colorFlowSettings = new NodeFlowSettings().setSlot( 'color' ).setContext( gammaContext );
-		var lightFlowSettings = new NodeFlowSettings().setCache( 'light' );
-		var emissiveFlowSettings = new NodeFlowSettings().setSlot( 'emissive' );
-		var environmentFlowSettings = new NodeFlowSettings().setSlot( 'environment' ).setContext( environmentContext );
+		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
+		var lightFlowContext = new NodeContext().setCache( 'light' );
+		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
+		var environmentFlowContext = new NodeContext().setSlot( 'environment' ).setGamma( true );
 
 		// analyze all nodes to reuse generate codes
 
 		if ( this.mask ) this.mask.analyze( builder );
 
-		this.color.analyze( builder, colorFlowSettings );
+		this.color.analyze( builder, colorFlowContext );
 		this.specular.analyze( builder );
 		this.shininess.analyze( builder );
 
@@ -130,21 +126,21 @@ PhongNode.prototype.build = function ( builder ) {
 
 		if ( this.normal ) this.normal.analyze( builder );
 
-		if ( this.light ) this.light.analyze( builder, lightFlowSettings );
+		if ( this.light ) this.light.analyze( builder, lightFlowContext );
 
 		if ( this.ao ) this.ao.analyze( builder );
 		if ( this.ambient ) this.ambient.analyze( builder );
 		if ( this.shadow ) this.shadow.analyze( builder );
-		if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowSettings );
+		if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowContext );
 
-		if ( this.environment ) this.environment.analyze( builder, environmentFlowSettings );
+		if ( this.environment ) this.environment.analyze( builder, environmentFlowContext );
 		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.analyze( builder );
 
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
 
-		var color = this.color.flow( builder, 'c', colorFlowSettings );
+		var color = this.color.flow( builder, 'c', colorFlowContext );
 		var specular = this.specular.flow( builder, 'c' );
 		var shininess = this.shininess.flow( builder, 'f' );
 
@@ -152,14 +148,14 @@ PhongNode.prototype.build = function ( builder ) {
 
 		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
 
-		var light = this.light ? this.light.flow( builder, 'v3', lightFlowSettings ) : undefined;
+		var light = this.light ? this.light.flow( builder, 'v3', lightFlowContext ) : undefined;
 
 		var ao = this.ao ? this.ao.flow( builder, 'f' ) : undefined;
 		var ambient = this.ambient ? this.ambient.flow( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowSettings ) : undefined;
+		var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowContext ) : undefined;
 
-		var environment = this.environment ? this.environment.flow( builder, 'c', environmentFlowSettings ) : undefined;
+		var environment = this.environment ? this.environment.flow( builder, 'c', environmentFlowContext ) : undefined;
 		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.flow( builder, 'f' ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;

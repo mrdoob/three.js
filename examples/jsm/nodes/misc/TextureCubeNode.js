@@ -52,26 +52,20 @@ TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache ) {
 	// include => is used to include or not functions if used FunctionNode
 	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
 
-	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setIgnoreCache( true );
+	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( true );
 	var outputType = this.getType( builder );
-
-	builder.addContext( colorSpaceContext );
 
 	cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	cache.colorSpace10.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 	cache.colorSpace10.input.parse( color10 );
 
-	color10 = cache.colorSpace10.build( builder, outputType );
+	color10 = cache.colorSpace10.buildContext( colorSpaceContext, builder, outputType );
 
 	cache.colorSpace20 = cache.colorSpace20 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	cache.colorSpace20.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 	cache.colorSpace20.input.parse( color20 );
 
-	color20 = cache.colorSpace20.build( builder, outputType );
-
-	// end custom context
-
-	builder.removeContext();
+	color20 = cache.colorSpace20.buildContext( colorSpaceContext,builder, outputType );
 
 	return 'mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb';
 

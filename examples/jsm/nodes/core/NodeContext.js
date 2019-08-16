@@ -4,21 +4,40 @@
 
 function NodeContext() {
 
-	this.data = {};
+	this.slot = '';
+	this.cache = '';
+	this.context = {};
 
 }
 
 NodeContext.GAMMA = 'gamma';
 NodeContext.INCLUDE = 'include';
-NodeContext.IGNORE_CACHE = 'ignoreCache';
+NodeContext.CACHING = 'caching';
+NodeContext.UV = 'uv';
 
 NodeContext.prototype = {
 
 	constructor: NodeContext,
 
+	setSlot: function ( slot ) {
+
+		this.slot = slot;
+
+		return this;
+
+	},
+
+	setCache: function ( cache ) {
+
+		this.cache = cache;
+
+		return this;
+
+	},
+
 	setProperty: function ( name, value ) {
 
-		this.data[ name ] = value;
+		this.context[ name ] = value;
 
 		return this;
 
@@ -42,9 +61,17 @@ NodeContext.prototype = {
 
 	},
 
-	setIgnoreCache: function ( value ) {
+	setSampler: function ( uv ) {
 
-		return this.setProperty( NodeContext.IGNORE_CACHE, value );
+		var cacheId = `sampler-uv-${uv.uuid}`;
+
+		return this.setCache( cacheId ).setProperty( NodeContext.UV, uv );
+
+	},
+
+	setCaching: function ( value ) {
+
+		return this.setProperty( NodeContext.CACHING, value );
 
 	}
 

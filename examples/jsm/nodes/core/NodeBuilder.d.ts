@@ -6,7 +6,7 @@ import {
 } from '../../../../src/Three';
 
 import { Node } from './Node';
-import { NodeFlowSettings } from './NodeFlowSettings';
+import { NodeContext } from './NodeContext';
 import { NodeUniform } from './NodeUniform';
 
 export class NodeBuilder {
@@ -84,7 +84,7 @@ export class NodeBuilder {
   build(vertex: Node, fragment: Node): this;
   buildShader(shader: string, node: Node): void;
   setMaterial(material: Material, renderer: WebGLRenderer): this;
-  addFlow(settings?: NodeFlowSettings): this;
+  addFlow(settings?: NodeContext): this;
   removeFlow(): this;
   addCache(name: string): this;
   removeCache(): this;

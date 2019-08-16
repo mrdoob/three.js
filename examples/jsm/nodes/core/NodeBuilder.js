@@ -18,7 +18,6 @@ import { FunctionNode } from './FunctionNode.js';
 import { ConstNode } from './ConstNode.js';
 import { StructNode } from './StructNode.js';
 import { NodeContext } from './NodeContext.js';
-import { NodeFlowSettings } from './NodeFlowSettings.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { Vector3Node } from '../inputs/Vector3Node.js';
 import { Vector4Node } from '../inputs/Vector4Node.js';
@@ -259,7 +258,7 @@ NodeBuilder.prototype = {
 
 	addFlow: function ( settings ) {
 
-		settings = settings || new NodeFlowSettings();
+		settings = settings || new NodeContext();
 
 		return this.addSlot( settings.slot ).addCache( settings.cache ).addContext( settings.context );
 
@@ -291,7 +290,7 @@ NodeBuilder.prototype = {
 
 	addContext: function ( context ) {
 
-		this.context = Object.assign( {}, this.context, context ? context.data : {} );
+		this.context = Object.assign( {}, this.context, context || {} );
 		this.contexts.push( this.context );
 
 		return this;

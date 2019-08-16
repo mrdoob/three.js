@@ -58,7 +58,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			return data.name;
 
-		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( builder.getContextProperty( NodeContext.IGNORE_CACHE ) || data.deps === 1 ) ) ) {
+		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( builder.getContextProperty( NodeContext.CACHING ) || data.deps === 1 ) ) ) {
 
 			return Node.prototype.build.call( this, builder, output, uuid );
 

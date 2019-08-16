@@ -13,7 +13,7 @@ function TextureNode( value, uv, bias, project ) {
 	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.uv = uv || new UVNode();
+	this.uv = uv;
 	this.bias = bias;
 	this.project = project !== undefined ? project : false;
 
@@ -29,6 +29,23 @@ TextureNode.prototype.getTexture = function ( builder, output ) {
 
 };
 
+TextureNode.prototype.getUVNode = function ( builder ) {
+	
+	this.uv = this.uv || new UVNode();
+
+	return builder.getContextProperty( 'uv' ) || this.uv;
+
+};
+
+TextureNode.prototype.getBiasNode = function ( builder ) {
+	
+	// automatic bias is used normally in physically-based material
+	const BiasClass = builder.getContextClass( 'Bias' );
+
+	return BiasClass ? new BiasClass( this ) : this.bias;
+
+};
+
 TextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( output === 'sampler2D' ) {
@@ -37,18 +54,18 @@ TextureNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	// automatic bias is used normally in physically-based material
-	const BiasClass = builder.getContextClass( 'Bias' );
+	var uvNode = this.getUVNode( builder );
+	var biasNode = this.getBiasNode( builder );
 
-	var tex = this.getTexture( builder, output );
-	var uv = this.uv.build( builder, this.project ? 'v4' : 'v2' );
-	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
+	if ( uvNode.isFunctionNode ) {
 
-	if ( bias === undefined && BiasClass !== undefined ) {
-
-		bias = new BiasClass( this ).build( builder, 'f' );
+		uvNode.keywords['texture.uv'] = this.uv;
 
 	}
+
+	var tex = this.getTexture( builder, output );
+	var uv = uvNode.build( builder, this.project ? 'v4' : 'v2' );
+	var bias = biasNode ? biasNode.build( builder, 'f' ) : undefined;
 
 	var method, code;
 
@@ -64,20 +81,14 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	// include => is used to include or not functions if used FunctionNode
 	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
 
-	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setIgnoreCache( true );
+	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( true );
 	var outputType = this.getType( builder );
-
-	builder.addContext( colorSpaceContext );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	this.colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );
 	this.colorSpace.input.parse( code );
 
-	code = this.colorSpace.build( builder, outputType );
-
-	// end custom context
-
-	builder.removeContext();
+	code = this.colorSpace.buildContext( colorSpaceContext, builder, outputType );
 
 	return builder.format( code, outputType, output );
 
