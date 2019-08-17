@@ -305,13 +305,7 @@ First we need some code to parse the query string
   *    }
   */
 function getQuery() {
-  const params = {};
-  const q = (window.location.search || '').substring(1);
-  q.split('&').forEach((pair) => {
-    const keyValue = pair.split('=').map(decodeURIComponent);
-    params[keyValue[0]] = keyValue[1];
-  });
-  return params;
+  return Object.fromEntries(new URLSearchParams(window.location.search).entries());
 }
 ```
 
@@ -538,7 +532,13 @@ your MCVE but once you actually get to posting your question on Stack Overflow
 you're required to put the code to reproduce your issue **in the question itself**. 
 By making a snippet you satisfy that requirement.
 
-Follow these suggestions and your far more likely to get help
+Also note all the live examples on this site should run as snippets.
+Just copy the HTML, CSS, and JavaScript parts to their respective
+parts of the [snippet editor](https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/).
+Just remember to try to remove the parts that are not relevant to
+your issue and try to make your code the minimal amount needed.
+
+Follow these suggestions and you're far more likely to get help
 with your issue.
 
 ## Use a `MeshBasicMaterial`
