@@ -168,7 +168,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			fog: !! fog,
 			useFog: material.fog,
-			fogExp: ( fog && fog.isFogExp2 ),
+			fogExp2: ( fog && fog.isFogExp2 ),
 
 			flatShading: material.flatShading,
 
