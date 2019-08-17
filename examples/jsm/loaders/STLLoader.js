@@ -28,6 +28,31 @@
  *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
  *  } else { .... }
  *  var mesh = new THREE.Mesh( geometry, material );
+ * 
+ * For ASCII STLs containing multiple solids, each solid is assigned to a different group. 
+ * Groups can be used to assign a different color by defining an array of materials with the same length of 
+ * geometry.groups and passing it to the Mesh constructor:
+ * 
+ * var mesh = new THREE.Mesh( geometry, material );
+ * 
+ * For example:
+ * 
+ *  var materials = [];
+ *  var nGeometryGroups = geometry.groups.length;
+ *
+ *  var colorMap = ...; // Some logic to index colors.
+ *
+ *  for (var i = 0; i < nGeometryGroups; i++) {
+ *
+ *		var material = new THREE.MeshStandardMaterial({
+ *			color: colorMap[i],
+ *			wireframe: false
+ *		});
+ *
+ *  }
+ *
+ *  materials.push(material);
+ *  var mesh = new THREE.Mesh(geometry, materials);
  */
 
 import {
@@ -250,6 +275,7 @@ STLLoader.prototype = {
 		function parseASCII( data ) {
 
 			var geometry = new BufferGeometry();
+			var patternSolid = /solid([\s\S]*?)endsolid/g;
 			var patternFace = /facet([\s\S]*?)endfacet/g;
 			var faceCounter = 0;
 
@@ -264,53 +290,78 @@ STLLoader.prototype = {
 
 			var result;
 
-			while ( ( result = patternFace.exec( data ) ) !== null ) {
+			var groupVertexes = [];
+			var groupCount = 0;
+			var startVertex = 0;
+			var endVertex = 0;
 
-				var vertexCountPerFace = 0;
-				var normalCountPerFace = 0;
+			while ((result = patternSolid.exec(data)) !== null) {
 
-				var text = result[ 0 ];
+				startVertex = endVertex;
 
-				while ( ( result = patternNormal.exec( text ) ) !== null ) {
+				solid = result[0];
 
-					normal.x = parseFloat( result[ 1 ] );
-					normal.y = parseFloat( result[ 2 ] );
-					normal.z = parseFloat( result[ 3 ] );
-					normalCountPerFace ++;
+				while ( ( result = patternFace.exec( solid ) ) !== null ) {
 
+					var vertexCountPerFace = 0;
+					var normalCountPerFace = 0;
+		
+					var text = result[ 0 ];
+		
+					while ( ( result = patternNormal.exec( text ) ) !== null ) {
+		
+						normal.x = parseFloat( result[ 1 ] );
+						normal.y = parseFloat( result[ 2 ] );
+						normal.z = parseFloat( result[ 3 ] );
+						normalCountPerFace ++;
+		
+					}
+		
+					while ( ( result = patternVertex.exec( text ) ) !== null ) {
+		
+						vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+						normals.push( normal.x, normal.y, normal.z );
+						vertexCountPerFace ++;
+						endVertex++;
+		
+					}
+		
+					// every face have to own ONE valid normal
+		
+					if ( normalCountPerFace !== 1 ) {
+		
+						console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
+		
+					}
+		
+					// each face have to own THREE valid vertices
+		
+					if ( vertexCountPerFace !== 3 ) {
+		
+						console.error( 'THREE.STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
+		
+					}
+		
+					faceCounter ++;
+		
 				}
 
-				while ( ( result = patternVertex.exec( text ) ) !== null ) {
-
-					vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
-					normals.push( normal.x, normal.y, normal.z );
-					vertexCountPerFace ++;
-
-				}
-
-				// every face have to own ONE valid normal
-
-				if ( normalCountPerFace !== 1 ) {
-
-					console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
-
-				}
-
-				// each face have to own THREE valid vertices
-
-				if ( vertexCountPerFace !== 3 ) {
-
-					console.error( 'THREE.STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
-
-				}
-
-				faceCounter ++;
+				groupVertexes.push({ startVertex: startVertex, endVertex: endVertex });
+				groupCount++;
 
 			}
-
+				
 			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
+			if (groupCount > 0) {
+
+				for (var i = 0; i < groupVertexes.length; i++) {
+
+					geometry.addGroup(groupVertexes[i].startVertex, groupVertexes[i].endVertex, i);
+				}
+			}
+				
 			return geometry;
 
 		}
