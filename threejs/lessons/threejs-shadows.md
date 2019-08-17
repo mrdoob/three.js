@@ -29,7 +29,7 @@ using data from the first 5 renders.
 It gets worse, if you have a point light casting shadows the scene
 has to be drawn 6 times just for that light!
 
-For these reasons it's common find other solutions than to have
+For these reasons it's common to find other solutions than to have
 a bunch of lights all generating shadows. One common solution
 is to have multiple lights but only one directional light generating
 shadows.
