@@ -295,11 +295,11 @@ STLLoader.prototype = {
 			var startVertex = 0;
 			var endVertex = 0;
 
-			while ((result = patternSolid.exec(data)) !== null) {
+			while ( ( result = patternSolid.exec( data ) ) !== null) {
 
 				startVertex = endVertex;
 
-				solid = result[0];
+				var solid = result[0];
 
 				while ( ( result = patternFace.exec( solid ) ) !== null ) {
 
@@ -346,7 +346,7 @@ STLLoader.prototype = {
 		
 				}
 
-				groupVertexes.push({ startVertex: startVertex, endVertex: endVertex });
+				groupVertexes.push( { startVertex: startVertex, endVertex: endVertex } );
 				groupCount++;
 
 			}
@@ -354,11 +354,12 @@ STLLoader.prototype = {
 			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
-			if (groupCount > 0) {
+			if ( groupCount > 0 ) {
 
-				for (var i = 0; i < groupVertexes.length; i++) {
+				for ( var i = 0; i < groupVertexes.length; i++ ) {
 
-					geometry.addGroup(groupVertexes[i].startVertex, groupVertexes[i].endVertex, i);
+					geometry.addGroup( groupVertexes[i].startVertex, groupVertexes[i].endVertex, i );
+					
 				}
 			}
 				
