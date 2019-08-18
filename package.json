@@ -78,6 +78,7 @@
     "http-server": "^0.11.1",
     "qunit": "^2.9.2",
     "rollup": "^1.19.4",
+    "rollup-plugin-buble": "^0.19.8",
     "typescript": "^3.5.2"
   },
   "jspm": {
