@@ -62,9 +62,9 @@ THREE.LightProbeGenerator = {
 
 				switch ( faceIndex ) {
 
-					case 0: coord.set( - 1, row, - col ); break;
+					case 0: coord.set( 1, row, col ); break;
 
-					case 1: coord.set( 1, row, col ); break;
+					case 1: coord.set( - 1, row, - col ); break;
 
 					case 2: coord.set( - col, 1, - row ); break;
 
