@@ -99,7 +99,7 @@ var Viewport = function ( editor ) {
 
 					if ( ! objectPositionOnDown.equals( object.position ) ) {
 
-						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
+						editor.execute( new SetPositionCommand( editor, object, object.position, objectPositionOnDown ) );
 
 					}
 
@@ -109,7 +109,7 @@ var Viewport = function ( editor ) {
 
 					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
 
-						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
+						editor.execute( new SetRotationCommand( editor, object, object.rotation, objectRotationOnDown ) );
 
 					}
 
@@ -119,7 +119,7 @@ var Viewport = function ( editor ) {
 
 					if ( ! objectScaleOnDown.equals( object.scale ) ) {
 
-						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
+						editor.execute( new SetScaleCommand( editor, object, object.scale, objectScaleOnDown ) );
 
 					}
 
@@ -503,10 +503,18 @@ var Viewport = function ( editor ) {
 
 	signals.viewportCameraChanged.add( function ( viewportCamera ) {
 
-		camera = viewportCamera;
+		if ( viewportCamera.isPerspectiveCamera ) {
 
-		camera.aspect = editor.camera.aspect;
-		camera.projectionMatrix.copy( editor.camera.projectionMatrix );
+			viewportCamera.aspect = editor.camera.aspect;
+			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
+
+		} else if ( ! viewportCamera.isOrthographicCamera ) {
+
+			throw "Invalid camera set as viewport";
+
+		}
+
+		camera = viewportCamera;
 
 		render();
 

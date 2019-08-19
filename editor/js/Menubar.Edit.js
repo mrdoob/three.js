@@ -97,7 +97,7 @@ Menubar.Edit = function ( editor ) {
 
 		object = object.clone();
 
-		editor.execute( new AddObjectCommand( object ) );
+		editor.execute( new AddObjectCommand( editor, object ) );
 
 	} );
 	options.add( option );
@@ -114,7 +114,7 @@ Menubar.Edit = function ( editor ) {
 		var parent = object.parent;
 		if ( parent === undefined ) return; // avoid deleting the camera or scene
 
-		editor.execute( new RemoveObjectCommand( object ) );
+		editor.execute( new RemoveObjectCommand( editor, object ) );
 
 	} );
 	options.add( option );
@@ -158,8 +158,8 @@ Menubar.Edit = function ( editor ) {
 					var shader = glslprep.minifyGlsl( [
 							material.vertexShader, material.fragmentShader ] );
 
-					cmds.push( new SetMaterialValueCommand( object, 'vertexShader', shader[ 0 ] ) );
-					cmds.push( new SetMaterialValueCommand( object, 'fragmentShader', shader[ 1 ] ) );
+					cmds.push( new SetMaterialValueCommand( editor, object, 'vertexShader', shader[ 0 ] ) );
+					cmds.push( new SetMaterialValueCommand( editor, object, 'fragmentShader', shader[ 1 ] ) );
 
 					++nMaterialsChanged;
 
@@ -189,7 +189,7 @@ Menubar.Edit = function ( editor ) {
 
 		if ( nMaterialsChanged > 0 ) {
 
-			editor.execute( new MultiCmdsCommand( cmds ), 'Minify Shaders' );
+			editor.execute( new MultiCmdsCommand( editor, cmds ), 'Minify Shaders' );
 
 		}
 
@@ -199,6 +199,68 @@ Menubar.Edit = function ( editor ) {
 	} );
 	options.add( option );
 
+	options.add( new UI.HorizontalRule() );
+
+	// Set textures to sRGB. See #15903
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
+	option.onClick( function () {
+
+		editor.scene.traverse( fixColorMap );
+
+	} );
+	options.add( option );
+
+	var colorMaps = [ 'map', 'envMap', 'emissiveMap' ];
+
+	function fixColorMap( obj ) {
+
+		var material = obj.material;
+
+		if ( material !== undefined ) {
+
+			if ( Array.isArray( material ) === true ) {
+
+				for ( var i = 0; i < material.length; i ++ ) {
+
+					fixMaterial( material[ i ] );
+
+				}
+
+			} else {
+
+				fixMaterial( material );
+
+			}
+
+			editor.signals.sceneGraphChanged.dispatch();
+
+		}
+
+	}
+
+	function fixMaterial( material ) {
+
+		var needsUpdate = material.needsUpdate;
+
+		for ( var i = 0; i < colorMaps.length; i ++ ) {
+
+			var map = material[ colorMaps[ i ] ];
+
+			if ( map ) {
+
+				map.encoding = THREE.sRGBEncoding;
+				needsUpdate = true;
+
+			}
+
+		}
+
+		material.needsUpdate = needsUpdate;
+
+	}
 
 	return container;
 

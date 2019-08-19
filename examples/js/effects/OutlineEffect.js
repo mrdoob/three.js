@@ -3,6 +3,41 @@
  *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
+ * API
+ *
+ * 1. Traditional
+ *
+ * var effect = new THREE.OutlineEffect( renderer );
+ *
+ * function render() {
+ *
+ * 	effect.render( scene, camera );
+ *
+ * }
+ *
+ * 2. VR compatible
+ *
+ * var effect = new THREE.OutlineEffect( renderer );
+ * var renderingOutline = false;
+ *
+ * scene.onAfterRender = function () {
+ *
+ * 	if ( renderingOutline ) return;
+ *
+ * 	renderingOutline = true;
+ *
+ * 	effect.renderOutline( scene, camera );
+ *
+ * 	renderingOutline = false;
+ *
+ * };
+ *
+ * function render() {
+ *
+ * 	renderer.render( scene, camera );
+ *
+ * }
+ *
  * // How to set default outline parameters
  * new THREE.OutlineEffect( renderer, {
  * 	defaultThickness: 0.01,
@@ -73,8 +108,6 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	var vertexShaderChunk = [
 
-		"#include <fog_pars_vertex>",
-
 		"uniform float outlineThickness;",
 
 		"vec4 calculateOutline( vec4 pos, vec3 objectNormal, vec4 skinned ) {",
@@ -140,7 +173,6 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		var shaderID = shaderIDs[ originalMaterial.type ];
 		var originalUniforms, originalVertexShader;
-		var outlineParameters = originalMaterial.userData.outlineParameters;
 
 		if ( shaderID !== undefined ) {
 
@@ -177,15 +209,15 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		var uniforms = Object.assign( {}, originalUniforms, uniformsChunk );
 
 		var vertexShader = originalVertexShader
-					// put vertexShaderChunk right before "void main() {...}"
-					.replace( /void\s+main\s*\(\s*\)/, vertexShaderChunk + '\nvoid main()' )
-					// put vertexShaderChunk2 the end of "void main() {...}"
-					// Note: here assums originalVertexShader ends with "}" of "void main() {...}"
-					.replace( /\}\s*$/, vertexShaderChunk2 + '\n}' )
-					// remove any light related lines
-					// Note: here is very sensitive to originalVertexShader
-					// TODO: consider safer way
-					.replace( /#include\s+<[\w_]*light[\w_]*>/g, '' );
+			// put vertexShaderChunk right before "void main() {...}"
+			.replace( /void\s+main\s*\(\s*\)/, vertexShaderChunk + '\nvoid main()' )
+			// put vertexShaderChunk2 the end of "void main() {...}"
+			// Note: here assums originalVertexShader ends with "}" of "void main() {...}"
+			.replace( /\}\s*$/, vertexShaderChunk2 + '\n}' )
+			// remove any light related lines
+			// Note: here is very sensitive to originalVertexShader
+			// TODO: consider safer way
+			.replace( /#include\s+<[\w_]*light[\w_]*>/g, '' );
 
 		var defines = {};
 
@@ -287,7 +319,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	}
 
-	function onBeforeRender( renderer, scene, camera, geometry, material, group ) {
+	function onBeforeRender( renderer, scene, camera, geometry, material ) {
 
 		var originalMaterial = originalMaterials[ material.uuid ];
 
@@ -383,7 +415,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 			if ( cache[ key ].used === false ) {
 
-				cache[ key ].count++;
+				cache[ key ].count ++;
 
 				if ( cache[ key ].keepAlive === false && cache[ key ].count > removeThresholdCount ) {
 
@@ -404,7 +436,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	this.render = function ( scene, camera ) {
 
-		var renderTarget = null;
+		var renderTarget;
 		var forceClear = false;
 
 		if ( arguments[ 2 ] !== undefined ) {
@@ -421,7 +453,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		}
 
-		renderer.setRenderTarget( renderTarget );
+		if ( renderTarget !== undefined ) renderer.setRenderTarget( renderTarget );
 
 		if ( forceClear ) renderer.clear();
 
@@ -435,10 +467,17 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		var currentAutoClear = renderer.autoClear;
 		renderer.autoClear = this.autoClear;
 
-		// 1. render normally
 		renderer.render( scene, camera );
 
-		// 2. render outline
+		renderer.autoClear = currentAutoClear;
+
+		this.renderOutline( scene, camera );
+
+	};
+
+	this.renderOutline = function ( scene, camera ) {
+
+		var currentAutoClear = renderer.autoClear;
 		var currentSceneAutoUpdate = scene.autoUpdate;
 		var currentSceneBackground = scene.background;
 		var currentShadowMapEnabled = renderer.shadowMap.enabled;

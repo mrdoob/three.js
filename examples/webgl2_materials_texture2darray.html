@@ -4,29 +4,7 @@
 		<title>three.js webgl - 2D texture array</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			#info a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<script id="vs" type="x-shader/x-vertex">
 	#version 300 es
@@ -76,14 +54,14 @@
 			<a href="https://www.codeproject.com/info/cpol10.aspx" target="_blank" rel="noopener">CPOL</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<!--<script src="js/controls/OrbitControls.js"></script>-->
-
 		<script src="js/libs/jszip.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { WEBGL } from './jsm/WebGL.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -144,8 +122,6 @@
 						scene.add( mesh );
 
 					} );
-
-				// var controls = new THREE.OrbitControls( camera );
 
 				// 2D Texture array is available on WebGL 2.0
 

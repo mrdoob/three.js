@@ -1,4 +1,4 @@
-/*
+/**
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *
  *	Simplification Geometry Modifier

@@ -4,37 +4,8 @@
 		<title>three.js webgl - Depth Texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #B2E9FF;
-				font-weight: bold;
-				pointer-events: auto;
-			}
-
-			canvas {
-				position: absolute;
-				top: 0;
-				left: 0;
-			}
-
-			#info {
-				pointer-events: none;
-				position: absolute;
-				left: 0;
-				top: 0px; width: 100%;
-				padding: 5px;
-				display: inline-block;
-			}
-
 			#error {
 				margin: auto;
 				margin-top: 40px;
@@ -82,7 +53,7 @@
 	<body>
 		<canvas></canvas>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - WebGL - Depth Texture<br/>
+			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> webgl - depth texture<br/>
 			Stores render target depth in a texture attachment.<br/>
 			Created by <a href="http://twitter.com/mattdesl" target="_blank" rel="noopener">@mattdesl</a>.
 
@@ -92,13 +63,15 @@
 			</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer, stats;
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			var camera, scene, renderer, controls, stats;
 			var target;
 			var postScene, postCamera;
 			var supportsExtension = true;
@@ -129,10 +102,9 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 				camera.position.z = 4;
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
-				controls.rotateSpeed = 0.35;
+				controls.dampingFactor = 0.05;
 
 				// Create a multi render target with Float buffers
 				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
@@ -180,8 +152,8 @@
 
 			function setupScene() {
 
-				//var diffuse = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				//diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
+				//var diffuse = new TextureLoader().load( 'textures/brick_diffuse.jpg' );
+				//diffuse.wrapS = diffuse.wrapT = RepeatWrapping;
 
 				// Setup some geometries
 				var geometry = new THREE.TorusKnotBufferGeometry( 1, 0.3, 128, 64 );
@@ -234,6 +206,8 @@
 				// render post FX
 				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
+
+				controls.update(); // required because damping is enabled
 
 				stats.update();
 

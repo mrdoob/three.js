@@ -2,12 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants.js';
+import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipmapLinearFilter, NearestMipmapNearestFilter } from '../../constants.js';
 import { _Math } from '../../math/Math.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
-	var _videoTextures = {};
+	var _videoTextures = new WeakMap();
 	var _canvas;
 
 	//
@@ -167,7 +167,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function filterFallback( f ) {
 
-		if ( f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter ) {
+		if ( f === NearestFilter || f === NearestMipmapNearestFilter || f === NearestMipmapLinearFilter ) {
 
 			return _gl.NEAREST;
 
@@ -189,7 +189,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isVideoTexture ) {
 
-			delete _videoTextures[ texture.id ];
+			_videoTextures.delete( texture );
 
 		}
 
@@ -397,6 +397,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
 
+				var mipmaps = texture.mipmaps;
+
 				for ( var i = 0; i < 6; i ++ ) {
 
 					if ( ! isCompressed ) {
@@ -405,19 +407,36 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
 
+							for ( var j = 0; j < mipmaps.length; ++ j ) {
+
+								var mipmap = mipmaps[ j ];
+								var image = mipmap.image[ i ].image;
+
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+
+							}
+
 						} else {
 
 							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+
+							for ( var j = 0; j < mipmaps.length; ++ j ) {
+
+								var mipmap = mipmaps[ j ];
+
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+							}
 
 						}
 
 					} else {
 
-						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
+						var mipmaps = cubeImage[ i ].mipmaps;
 
 						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
-							mipmap = mipmaps[ j ];
+							var mipmap = mipmaps[ j ];
 
 							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
@@ -443,15 +462,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				if ( ! isCompressed ) {
-
-					textureProperties.__maxMipLevel = 0;
-
-				} else {
-
-					textureProperties.__maxMipLevel = mipmaps.length - 1;
-
-				}
+				textureProperties.__maxMipLevel = isCompressed ? mipmaps.length - 1 : mipmaps.length;
 
 				if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
@@ -792,7 +803,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				var samples = getRenderTargetSamples( renderTarget );
 
-				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
 
 			} else {
 
@@ -1087,14 +1098,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function updateVideoTexture( texture ) {
 
-		var id = texture.id;
 		var frame = info.render.frame;
 
 		// Check the last frame we updated the VideoTexture
 
-		if ( _videoTextures[ id ] !== frame ) {
+		if ( _videoTextures.get( texture ) !== frame ) {
 
-			_videoTextures[ id ] = frame;
+			_videoTextures.set( texture, frame );
 			texture.update();
 
 		}

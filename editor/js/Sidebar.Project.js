@@ -133,7 +133,24 @@ Sidebar.Project = function ( editor ) {
 
 		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias } );
+		var parameters = {};
+
+		switch ( type ) {
+
+			case 'WebGLRenderer':
+				parameters.antialias = antialias;
+				break;
+
+			case 'RaytracingRenderer':
+				parameters.workers = navigator.hardwareConcurrency || 4;
+				parameters.workerPath = '../examples/js/renderers/RaytracingWorker.js';
+				parameters.randomize = true;
+				parameters.blockSize = 64;
+				break;
+
+		}
+
+		var renderer = new rendererTypes[ type ]( parameters );
 
 		if ( shadows && renderer.shadowMap ) {
 

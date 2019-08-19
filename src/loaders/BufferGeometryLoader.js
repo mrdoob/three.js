@@ -4,6 +4,8 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { FileLoader } from './FileLoader.js';
 import { DefaultLoadingManager } from './LoadingManager.js';
+import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
+import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -33,7 +35,7 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 	parse: function ( json ) {
 
-		var geometry = new BufferGeometry();
+		var geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
 		var index = json.data.index;
 
@@ -50,8 +52,8 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-
-			var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
+			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			geometry.addAttribute( key, bufferAttribute );
 

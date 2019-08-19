@@ -8,27 +8,22 @@ THREE.WaterRefractionShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'time': {
-			type: 'f',
 			value: 0
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'tDudv': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 

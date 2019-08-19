@@ -4,64 +4,35 @@
 		<title>three.js webgl - sea3d / bvh</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: white }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">Three.JS</a> - Exported by <a href="https://github.com/sunag/sea3d" style="color:#FFFFFF" target="_blank" rel="noopener">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" style="color:#FFFFFF" target="_blank" rel="noopener">Trivision</a>
-			<br/>
-			<br/>Runtime convertion of BVH Animation to SEA3D Skeleton Animation
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Exported by <a href="https://github.com/sunag/sea3d" target="_blank" rel="noopener">SEA3D Exporter</a>. Asset by <a href="http://www.turbosquid.com/3d-models/soccer-player-max-free/307330" target="_blank" rel="noopener">Trivision</a><br/>
+			Runtime convertion of BVH Animation to SEA3D Skeleton Animation
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		<script src="js/loaders/sea3d/SEA3D.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
+			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
 
-		<script src="js/loaders/BVHLoader.js"></script>
-		<script src="js/utils/SkeletonUtils.js"></script>
-		
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import { BVHLoader } from './jsm/loaders/BVHLoader.js';
 
-		<script>
+			import { SEA3D } from './jsm/loaders/sea3d/SEA3DLoader.js';
+			import './jsm/loaders/sea3d/SEA3DLZMA.js'; // sea3d lzma extension
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { SkeletonUtils } from './jsm/utils/SkeletonUtils.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
@@ -81,7 +52,7 @@
 			// SEA3D Loader
 			//
 
-			loader = new THREE.SEA3D( {
+			loader = new SEA3D( {
 
 				autoPlay: true, // Auto play animations
 				container: scene, // Container to add models
@@ -98,7 +69,7 @@
 				camera.position.copy( cam.position );
 				camera.rotation.copy( cam.rotation );
 
-				new THREE.OrbitControls( camera );
+				new OrbitControls( camera, renderer.domElement );
 
 				// get meshes
 				player = loader.getMesh( "Player" );
@@ -149,49 +120,49 @@
 				};
 
 				// Automatic offset: get offsets when it is in T-Pose
-				options.offsets = THREE.SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
+				options.offsets = SkeletonUtils.getSkeletonOffsets( player, bvhSkeletonHelper, options );
 
 				/*
 				// Manual offsets: compensates the difference in skeletons ( T-Pose )
 				options.offsets = {
-					"lShldr": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
+					"lShldr": new Matrix4().makeRotationFromEuler(
+						new Euler(
 							0,
-							THREE.Math.degToRad( - 45 ),
-							THREE.Math.degToRad( - 80 )
+							Math.degToRad( - 45 ),
+							Math.degToRad( - 80 )
 						)
 					),
-					"rShldr": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
+					"rShldr": new Matrix4().makeRotationFromEuler(
+						new Euler(
 							0,
-							THREE.Math.degToRad( 45 ),
-							THREE.Math.degToRad( 80 )
+							Math.degToRad( 45 ),
+							Math.degToRad( 80 )
 						)
 					),
-					"lFoot": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
+					"lFoot": new Matrix4().makeRotationFromEuler(
+						new Euler(
 							0,
-							THREE.Math.degToRad( 15 ),
+							Math.degToRad( 15 ),
 							0
 						)
 					),
-					"rFoot": new THREE.Matrix4().makeRotationFromEuler(
-						new THREE.Euler(
+					"rFoot": new Matrix4().makeRotationFromEuler(
+						new Euler(
 							0,
-							THREE.Math.degToRad( 15 ),
+							Math.degToRad( 15 ),
 							0
 						)
 					)
 				};
 				*/
 
-				var clip = THREE.SkeletonUtils.retargetClip( player, result.skeleton, result.clip, options );
+				var clip = SkeletonUtils.retargetClip( player, result.skeleton, result.clip, options );
 
 				clip.name = "dance";
 
-				clip = THREE.SEA3D.AnimationClip.fromClip( clip );
+				clip = SEA3D.AnimationClip.fromClip( clip );
 
-				player.addAnimation( new THREE.SEA3D.Animation( clip ) );
+				player.addAnimation( new SEA3D.Animation( clip ) );
 
 				player.play( "dance" );
 
@@ -200,11 +171,11 @@
 
 			function loadBVH() {
 
-				var loader = new THREE.BVHLoader();
+				var loader = new BVHLoader();
 				loader.load( "models/bvh/pirouette.bvh", function ( result ) {
 
 					bvhSkeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
-					bvhSkeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to SkeletonHelper directly
+					bvhSkeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to THREE.SkeletonHelper directly
 
 					var boneContainer = new THREE.Group();
 					boneContainer.add( result.skeleton.bones[ 0 ] );
@@ -244,20 +215,20 @@
 
 				// post-processing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var renderPass = new RenderPass( scene, camera );
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
 
-				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
 				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
 				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
-				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				var vignettePass = new ShaderPass( VignetteShader );
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
@@ -290,7 +261,7 @@
 				requestAnimationFrame( animate );
 
 				// Update SEA3D Animations
-				THREE.SEA3D.AnimationHandler.update( delta );
+				SEA3D.AnimationHandler.update( delta );
 
 				if ( bvhMixer ) bvhMixer.update( delta );
 

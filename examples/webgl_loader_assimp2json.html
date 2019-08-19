@@ -4,27 +4,7 @@
 		<title>three.js webgl - Open Asset Import Library (assimp) / assimp2json</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: red }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -34,20 +14,13 @@
 			<a href="http://www.assimp.org/" target="_blank" rel="noopener">Assimp</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/AssimpJSONLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AssimpJSONLoader } from './jsm/loaders/AssimpJSONLoader.js';
 
 			/*
 
@@ -91,8 +64,9 @@
 
 				// load jeep model
 
-				var loader1 = new THREE.AssimpJSONLoader();
-				loader1.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
+				var loader = new AssimpJSONLoader();
+
+				loader.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
 
 					object.scale.multiplyScalar( 0.2 );
 					scene.add( object );
@@ -101,8 +75,7 @@
 
 				// load interior model
 
-				var loader2 = new THREE.AssimpJSONLoader();
-				loader2.load( 'models/assimp/interior/interior.assimp.json', function ( object ) {
+				loader.load( 'models/assimp/interior/interior.assimp.json', function ( object ) {
 
 					scene.add( object );
 

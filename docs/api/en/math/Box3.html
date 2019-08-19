@@ -12,11 +12,31 @@
 
 		<p class="desc">
 			Represents a box or cube in 3D space. The main purpose of this is to represent
-			the [link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Boxes]
-			for objects.
+			the world-axis-aligned bounding boxes for objects. 
 		</p>
 
+		
+		<h2>Example</h2>
 
+		<code>
+		// Creating the object whose bounding box we want to compute
+		var sphereObject = new THREE.Mesh( 
+			new THREE.SphereGeometry(), 
+			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		);
+		// Creating the actual bounding box with Box3
+		sphereObject.geometry.computeBoundingBox();
+		var box = sphereObject.geometry.boundingBox.clone();
+
+		// ...
+		
+		// In the animation loop, to keep the bounding box updated after move/rotate/scale operations
+		sphereObject.updateMatrixWorld( true );
+		box.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+		</code>
+
+
+		
 		<h2>Constructor</h2>
 
 

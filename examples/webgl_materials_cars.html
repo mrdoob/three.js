@@ -4,35 +4,24 @@
 		<title>three.js webgl - materials - car</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-			}
-			#info a {
-				color: blue;
-				font-weight: bold;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo :
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
 			<span>Body: <select id="body-mat"></select></span>
-			<span>Rims / Trim: <select id="rim-mat"></select></span>
+			<span>Details: <select id="rim-mat"></select></span>
 			<span>Glass: <select id="glass-mat"></select></span>
 			<br><br>
 			<span>Follow camera: <input type="checkbox" id="camera-toggle"></span>
@@ -40,26 +29,19 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Car.js"></script>
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import { CarControls } from './jsm/misc/CarControls.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var camera, scene, renderer, stats, carModel, materialsLib, envMap;
 
@@ -70,12 +52,12 @@
 			var followCamera = document.getElementById( 'camera-toggle' );
 
 			var clock = new THREE.Clock();
-			var car = new THREE.Car();
-			car.turningRadius = 75;
+			var carControls = new CarControls();
+			carControls.turningRadius = 75;
 
 			var carParts = {
 				body: [],
-				rims:[],
+				rims: [],
 				glass: [],
 			};
 
@@ -88,22 +70,22 @@
 				var container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( 3.25, 2.0, -5 );
+				camera.position.set( 3.25, 2.0, - 5 );
 				camera.lookAt( 0, 0.5, 0 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
 
 				var urls = [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ];
-				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/skyboxsun25deg/');
+				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/skyboxsun25deg/' );
 				loader.load( urls, function ( texture ) {
 
 					scene.background = texture;
 
-					var pmremGenerator = new THREE.PMREMGenerator( texture );
+					var pmremGenerator = new PMREMGenerator( texture );
 					pmremGenerator.update( renderer );
 
-					var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
+					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
 
 					envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
@@ -122,7 +104,7 @@
 				var ground = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 2400, 2400 ),
 					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.15, depthWrite: false }
-				) );
+					) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				ground.renderOrder = 1;
@@ -146,7 +128,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				renderer.setAnimationLoop( function() {
+				renderer.setAnimationLoop( function () {
 
 					update();
 
@@ -158,20 +140,20 @@
 
 			function initCar() {
 
-				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
-				var loader = new THREE.GLTFLoader();
-				loader.setDRACOLoader( new THREE.DRACOLoader() );
+				var loader = new GLTFLoader();
+				loader.setDRACOLoader( new DRACOLoader() );
 
-				loader.load( 'models/gltf/ferrari.glb', function( gltf ) {
+				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
 
 					carModel = gltf.scene.children[ 0 ];
 
-					car.setModel( carModel );
+					carControls.setModel( carModel );
 
 					carModel.traverse( function ( child ) {
 
-						if ( child.isMesh  ) {
+						if ( child.isMesh ) {
 
 							child.material.envMap = envMap;
 
@@ -207,7 +189,7 @@
 
 					updateMaterials();
 
-				});
+				} );
 
 			}
 
@@ -234,7 +216,7 @@
 
 					],
 
-				}
+				};
 
 			}
 
@@ -249,14 +231,14 @@
 
 				}
 
-				materialsLib.main.forEach( function( material ) {
+				materialsLib.main.forEach( function ( material ) {
 
 					addOption( material.name, bodyMatSelect );
 					addOption( material.name, rimMatSelect );
 
 				} );
 
-				materialsLib.glass.forEach( function( material ) {
+				materialsLib.glass.forEach( function ( material ) {
 
 					addOption( material.name, glassMatSelect );
 
@@ -279,9 +261,9 @@
 				var rimMat = materialsLib.main[ rimMatSelect.selectedIndex ];
 				var glassMat = materialsLib.glass[ glassMatSelect.selectedIndex ];
 
-				carParts.body.forEach( function ( part ) { part.material = bodyMat; } );
-				carParts.rims.forEach( function ( part ) { part.material = rimMat; } );
-				carParts.glass.forEach( function ( part ) { part.material = glassMat; } );
+				carParts.body.forEach( part => part.material = bodyMat );
+				carParts.rims.forEach( part => part.material = rimMat );
+				carParts.glass.forEach( part => part.material = glassMat );
 
 			}
 
@@ -300,14 +282,12 @@
 
 				if ( carModel ) {
 
-					car.update( delta / 3 );
-
-					console.log(   );
+					carControls.update( delta / 3 );
 
 					if ( carModel.position.length() > 200 ) {
 
 						carModel.position.set( 0, 0, 0 );
-						car.speed = 0;
+						carControls.speed = 0;
 
 					}
 
@@ -324,7 +304,7 @@
 						carModel.getWorldPosition( cameraTarget );
 						cameraTarget.y += 0.5;
 
-						camera.position.set( 3.25, 2.0, -5 );
+						camera.position.set( 3.25, 2.0, - 5 );
 
 					}
 

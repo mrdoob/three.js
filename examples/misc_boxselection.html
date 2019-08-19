@@ -4,12 +4,15 @@
 		<title>three.js webgl - box selection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #000;
+			}
+
+			a {
+				color: #08e;
 			}
 
 			.selectBox {
@@ -21,13 +24,18 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection
+		</div>
 
-		<script src="js/interactive/SelectionBox.js"></script>
-		<script src="js/interactive/SelectionHelper.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { SelectionBox } from './jsm/interactive/SelectionBox.js';
+			import { SelectionHelper } from './jsm/interactive/SelectionHelper.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -94,14 +102,6 @@
 
 				container.appendChild( renderer.domElement );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection';
-				container.appendChild( info );
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -135,14 +135,14 @@
 
 			}
 
-			var selectionBox = new THREE.SelectionBox( camera, scene );
-			var helper = new THREE.SelectionHelper( selectionBox, renderer, 'selectBox' );
+			var selectionBox = new SelectionBox( camera, scene );
+			var helper = new SelectionHelper( selectionBox, renderer, 'selectBox' );
 
 			document.addEventListener( 'mousedown', function ( event ) {
 
 				for ( var item of selectionBox.collection ) {
 
-					item.material.emissive = new THREE.Color( 0x000000 );
+					item.material.emissive.set( 0x000000 );
 
 				}
 
@@ -159,7 +159,7 @@
 
 					for ( var i = 0; i < selectionBox.collection.length; i ++ ) {
 
-						selectionBox.collection[ i ].material.emissive = new THREE.Color( 0x000000 );
+						selectionBox.collection[ i ].material.emissive.set( 0x000000 );
 
 					}
 
@@ -172,7 +172,7 @@
 
 					for ( var i = 0; i < allSelected.length; i ++ ) {
 
-						allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+						allSelected[ i ].material.emissive.set( 0xffffff );
 
 					}
 
@@ -191,7 +191,7 @@
 
 				for ( var i = 0; i < allSelected.length; i ++ ) {
 
-					allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+					allSelected[ i ].material.emissive.set( 0xffffff );
 
 				}
 

@@ -10,6 +10,9 @@ import { Quaternion } from './Quaternion.js';
  * @author WestLangley / http://github.com/WestLangley
  */
 
+var _vector = new Vector3();
+var _quaternion = new Quaternion();
+
 function Vector3( x, y, z ) {
 
 	this.x = x || 0;
@@ -231,35 +234,23 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
+	applyEuler: function ( euler ) {
 
-		var quaternion = new Quaternion();
+		if ( ! ( euler && euler.isEuler ) ) {
 
-		return function applyEuler( euler ) {
+			console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
-			if ( ! ( euler && euler.isEuler ) ) {
+		}
 
-				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
+		return this.applyQuaternion( _quaternion.setFromEuler( euler ) );
 
-			}
+	},
 
-			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
+	applyAxisAngle: function ( axis, angle ) {
 
-		};
+		return this.applyQuaternion( _quaternion.setFromAxisAngle( axis, angle ) );
 
-	}(),
-
-	applyAxisAngle: function () {
-
-		var quaternion = new Quaternion();
-
-		return function applyAxisAngle( axis, angle ) {
-
-			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-		};
-
-	}(),
+	},
 
 	applyMatrix3: function ( m ) {
 
@@ -387,21 +378,15 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	clampScalar: function () {
+	clampScalar: function ( minVal, maxVal ) {
 
-		var min = new Vector3();
-		var max = new Vector3();
+		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
+		this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
 
-		return function clampScalar( minVal, maxVal ) {
+		return this;
 
-			min.set( minVal, minVal, minVal );
-			max.set( maxVal, maxVal, maxVal );
-
-			return this.clamp( min, max );
-
-		};
-
-	}(),
+	},
 
 	clampLength: function ( min, max ) {
 
@@ -549,34 +534,22 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	projectOnPlane: function () {
+	projectOnPlane: function ( planeNormal ) {
 
-		var v1 = new Vector3();
+		_vector.copy( this ).projectOnVector( planeNormal );
 
-		return function projectOnPlane( planeNormal ) {
+		return this.sub( _vector );
 
-			v1.copy( this ).projectOnVector( planeNormal );
+	},
 
-			return this.sub( v1 );
-
-		};
-
-	}(),
-
-	reflect: function () {
+	reflect: function ( normal ) {
 
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		var v1 = new Vector3();
+		return this.sub( _vector.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-		return function reflect( normal ) {
-
-			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
-
-		};
-
-	}(),
+	},
 
 	angleTo: function ( v ) {
 

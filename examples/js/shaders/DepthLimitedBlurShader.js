@@ -1,3 +1,7 @@
+/**
+ * TODO
+ */
+
 THREE.DepthLimitedBlurShader = {
 	defines: {
 		'KERNEL_RADIUS': 4,

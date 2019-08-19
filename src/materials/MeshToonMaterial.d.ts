@@ -6,9 +6,11 @@ export interface MeshToonMaterialParameters extends MeshPhongMaterialParameters 
 }
 
 export class MeshToonMaterial extends MeshPhongMaterial {
-	constructor(parameters?: MeshToonMaterialParameters);
+
+	constructor( parameters?: MeshToonMaterialParameters );
 
 	gradientMap: Texture | null;
 
-	setValues(parameters: MeshToonMaterialParameters): void;
+	setValues( parameters: MeshToonMaterialParameters ): void;
+
 }

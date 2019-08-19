@@ -78,6 +78,12 @@ var d = a.dot( b );
 
 		<h3>[property:Float w]</h3>
 
+		<h3>[property:Float width]</h3>
+		<p>Alias for [page:.z z].</p>
+
+		<h3>[property:Float height]</h3>
+		<p>Alias for [page:.w w].</p>
+
 
 		<h2>Methods</h2>
 
@@ -205,20 +211,20 @@ var d = a.dot( b );
 		<h3>[method:this lerp]( [param:Vector4 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector4 v] - [page:Vector4] to interpolate towards.<br />
-		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
 
 		Linearly interpolates between this vector and [page:Vector4 v], where alpha is the
-		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
+		percent distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
 		</p>
 
 		<h3>[method:this lerpVectors]( [param:Vector4 v1], [param:Vector4 v2], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector4 v1] - the starting [page:Vector4].<br />
 		[page:Vector4 v2] - [page:Vector4] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector4 v1] and
-		[page:Vector4 v2] where alpha is the distance along the line connecting the two vectors
+		[page:Vector4 v2] where alpha is the percent distance along the line connecting the two vectors
 		- alpha = 0 will be [page:Vector4 v1], and alpha = 1 will be [page:Vector4 v2].
 		</p>
 

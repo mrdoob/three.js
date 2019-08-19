@@ -1,55 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - level-of-details</title>
+		<title>three.js webgl - level of detail</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index:100;
-			}
-
-			a { color:red }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - level-of-details WebGL example
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - level of detail
 		</div>
 
+		<script type="module">
 
-		<script src="../build/three.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/controls/FlyControls.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FlyControls } from './jsm/controls/FlyControls.js';
 
 			var container;
 
@@ -68,13 +35,12 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 1000;
 
-				controls = new THREE.FlyControls( camera );
+				controls = new FlyControls( camera );
 				controls.movementSpeed = 1000;
 				controls.rollSpeed = Math.PI / 10;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
-				scene.autoUpdate = false;
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );
@@ -152,17 +118,6 @@
 			function render() {
 
 				controls.update( clock.getDelta() );
-
-				scene.updateMatrixWorld();
-				scene.traverse( function ( object ) {
-
-					if ( object instanceof THREE.LOD ) {
-
-						object.update( camera );
-
-					}
-
-				} );
 
 				renderer.render( scene, camera );
 

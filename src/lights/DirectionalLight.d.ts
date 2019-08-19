@@ -15,18 +15,20 @@ import { Light } from './Light';
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/lights/DirectionalLight.js">src/lights/DirectionalLight.js</a>
  */
 export class DirectionalLight extends Light {
-  constructor(color?: Color | string | number, intensity?: number);
 
-  /**
-   * Target used for shadow camera orientation.
-   */
-  target: Object3D;
+	constructor( color?: Color | string | number, intensity?: number );
 
-  /**
-   * Light's intensity.
-   * Default — 1.0.
-   */
-  intensity: number;
+	/**
+	 * Target used for shadow camera orientation.
+	 */
+	target: Object3D;
 
-  shadow: DirectionalLightShadow;
+	/**
+	 * Light's intensity.
+	 * Default — 1.0.
+	 */
+	intensity: number;
+
+	shadow: DirectionalLightShadow;
+
 }

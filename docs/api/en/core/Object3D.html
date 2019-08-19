@@ -217,6 +217,9 @@
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
+		<h3>[method:this attach]( [param:Object3D object] )</h3>
+		<p>Adds *object* as a child of this, while maintaining the object's world transform.</p>
+
 		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 		<p>
 		recursive -- if true, descendants of the object are also cloned. Default is true.<br /><br />
@@ -389,9 +392,10 @@
 			Copy the given quaternion into [page:.quaternion].
 		</p>
 
-		<h3>[method:null toJSON]( [param:Quaternion q] )</h3>
+		<h3>[method:Object toJSON]( [param:object meta] )</h3>
 		<p>
-			Convert the object to JSON format.
+		meta -- object containing metadata such as materials, textures or images for the object.<br />
+		Convert the object to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
 		</p>
 
 		<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>

@@ -51,6 +51,7 @@
 			bevelEnabled: true,
 			bevelThickness: 1,
 			bevelSize: 1,
+			bevelOffset: 0,
 			bevelSegments: 1
 		};
 
@@ -76,8 +77,9 @@
 				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
 				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 6.</li>
 				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 2.</li>
+				<li>bevelOffset — float. Distance from the shape outline that the bevel starts. Default is 0.</li>
 				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.CurvePath. A 3D spline path along which the shape should be extruded.</li>
+				<li>extrudePath — THREE.Curve. A 3D spline path along which the shape should be extruded.</li>
 				<li>UVGenerator —  Object. object that provides UV generator functions</li>
 			</ul>
 
@@ -93,11 +95,15 @@
 		</p>
 
 		<h2>Properties</h2>
+		<p>See the base [page:Geometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Geometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

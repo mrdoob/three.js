@@ -18,18 +18,18 @@ import { EventDispatcher } from './EventDispatcher';
  */
 
 export interface MorphTarget {
-  name: string;
-  vertices: Vector3[];
+	name: string;
+	vertices: Vector3[];
 }
 
 export interface MorphColor {
-  name: string;
-  colors: Color[];
+	name: string;
+	colors: Color[];
 }
 
 export interface MorphNormals {
-  name: string;
-  normals: Vector3[];
+	name: string;
+	normals: Vector3[];
 }
 
 export let GeometryIdCount: number;
@@ -37,229 +37,225 @@ export let GeometryIdCount: number;
 /**
  * Base class for geometries
  *
- * # Example
- *     var geometry = new THREE.Geometry();
- *     geometry.vertices.push( new THREE.Vector3( -10, 10, 0 ) );
- *     geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
- *     geometry.vertices.push( new THREE.Vector3( 10, -10, 0 ) );
- *     geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
- *     geometry.computeBoundingSphere();
- *
  * @see https://github.com/mrdoob/three.js/blob/master/src/core/Geometry.js
  */
 export class Geometry extends EventDispatcher {
-  constructor();
 
-  /**
-   * Unique number of this geometry instance
-   */
-  id: number;
+	constructor();
 
-  uuid: string;
+	/**
+	 * Unique number of this geometry instance
+	 */
+	id: number;
 
-  /**
-   * Name for this geometry. Default is an empty string.
-   */
-  name: string;
+	uuid: string;
 
-  type: string;
+	isGeometry: boolean;
 
-  /**
-   * The array of vertices hold every position of points of the model.
-   * To signal an update in this array, Geometry.verticesNeedUpdate needs to be set to true.
-   */
-  vertices: Vector3[];
+	/**
+	 * Name for this geometry. Default is an empty string.
+	 */
+	name: string;
 
-  /**
-   * Array of vertex colors, matching number and order of vertices.
-   * Used in ParticleSystem, Line and Ribbon.
-   * Meshes use per-face-use-of-vertex colors embedded directly in faces.
-   * To signal an update in this array, Geometry.colorsNeedUpdate needs to be set to true.
-   */
-  colors: Color[];
+	type: string;
 
-  /**
-   * Array of triangles or/and quads.
-   * The array of faces describe how each vertex in the model is connected with each other.
-   * To signal an update in this array, Geometry.elementsNeedUpdate needs to be set to true.
-   */
-  faces: Face3[];
+	/**
+	 * The array of vertices hold every position of points of the model.
+	 * To signal an update in this array, Geometry.verticesNeedUpdate needs to be set to true.
+	 */
+	vertices: Vector3[];
 
-  /**
-   * Array of face UV layers.
-   * Each UV layer is an array of UV matching order and number of vertices in faces.
-   * To signal an update in this array, Geometry.uvsNeedUpdate needs to be set to true.
-   */
-  faceVertexUvs: Vector2[][][];
+	/**
+	 * Array of vertex colors, matching number and order of vertices.
+	 * Used in ParticleSystem, Line and Ribbon.
+	 * Meshes use per-face-use-of-vertex colors embedded directly in faces.
+	 * To signal an update in this array, Geometry.colorsNeedUpdate needs to be set to true.
+	 */
+	colors: Color[];
 
-  /**
-   * Array of morph targets. Each morph target is a Javascript object:
-   *
-   *     { name: "targetName", vertices: [ new THREE.Vector3(), ... ] }
-   *
-   * Morph vertices match number and order of primary vertices.
-   */
-  morphTargets: MorphTarget[];
+	/**
+	 * Array of triangles or/and quads.
+	 * The array of faces describe how each vertex in the model is connected with each other.
+	 * To signal an update in this array, Geometry.elementsNeedUpdate needs to be set to true.
+	 */
+	faces: Face3[];
 
-  /**
-   * Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
-   *
-   *     morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }
-   */
-  morphNormals: MorphNormals[];
+	/**
+	 * Array of face UV layers.
+	 * Each UV layer is an array of UV matching order and number of vertices in faces.
+	 * To signal an update in this array, Geometry.uvsNeedUpdate needs to be set to true.
+	 */
+	faceVertexUvs: Vector2[][][];
 
-  /**
-   * Array of skinning weights, matching number and order of vertices.
-   */
-  skinWeights: Vector4[];
+	/**
+	 * Array of morph targets. Each morph target is a Javascript object:
+	 *
+	 *		 { name: "targetName", vertices: [ new THREE.Vector3(), ... ] }
+	 *
+	 * Morph vertices match number and order of primary vertices.
+	 */
+	morphTargets: MorphTarget[];
 
-  /**
-   * Array of skinning indices, matching number and order of vertices.
-   */
-  skinIndices: Vector4[];
+	/**
+	 * Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
+	 *
+	 *		 morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }
+	 */
+	morphNormals: MorphNormals[];
 
-  /**
-   *
-   */
-  lineDistances: number[];
+	/**
+	 * Array of skinning weights, matching number and order of vertices.
+	 */
+	skinWeights: Vector4[];
 
-  /**
-   * Bounding box.
-   */
-  boundingBox: Box3;
+	/**
+	 * Array of skinning indices, matching number and order of vertices.
+	 */
+	skinIndices: Vector4[];
 
-  /**
-   * Bounding sphere.
-   */
-  boundingSphere: Sphere;
+	/**
+	 *
+	 */
+	lineDistances: number[];
 
-  /**
-   * Set to true if the vertices array has been updated.
-   */
-  verticesNeedUpdate: boolean;
+	/**
+	 * Bounding box.
+	 */
+	boundingBox: Box3;
 
-  /**
-   * Set to true if the faces array has been updated.
-   */
-  elementsNeedUpdate: boolean;
+	/**
+	 * Bounding sphere.
+	 */
+	boundingSphere: Sphere;
 
-  /**
-   * Set to true if the uvs array has been updated.
-   */
-  uvsNeedUpdate: boolean;
+	/**
+	 * Set to true if the vertices array has been updated.
+	 */
+	verticesNeedUpdate: boolean;
 
-  /**
-   * Set to true if the normals array has been updated.
-   */
-  normalsNeedUpdate: boolean;
+	/**
+	 * Set to true if the faces array has been updated.
+	 */
+	elementsNeedUpdate: boolean;
 
-  /**
-   * Set to true if the colors array has been updated.
-   */
-  colorsNeedUpdate: boolean;
+	/**
+	 * Set to true if the uvs array has been updated.
+	 */
+	uvsNeedUpdate: boolean;
 
-  /**
-   * Set to true if the linedistances array has been updated.
-   */
-  lineDistancesNeedUpdate: boolean;
+	/**
+	 * Set to true if the normals array has been updated.
+	 */
+	normalsNeedUpdate: boolean;
 
-  /**
-   *
-   */
-  groupsNeedUpdate: boolean;
+	/**
+	 * Set to true if the colors array has been updated.
+	 */
+	colorsNeedUpdate: boolean;
 
-  /**
-   * Bakes matrix transform directly into vertex coordinates.
-   */
-  applyMatrix(matrix: Matrix4): Geometry;
+	/**
+	 * Set to true if the linedistances array has been updated.
+	 */
+	lineDistancesNeedUpdate: boolean;
 
-  rotateX(angle: number): Geometry;
-  rotateY(angle: number): Geometry;
-  rotateZ(angle: number): Geometry;
+	/**
+	 *
+	 */
+	groupsNeedUpdate: boolean;
 
-  translate(x: number, y: number, z: number): Geometry;
-  scale(x: number, y: number, z: number): Geometry;
-  lookAt(vector: Vector3): void;
+	/**
+	 * Bakes matrix transform directly into vertex coordinates.
+	 */
+	applyMatrix( matrix: Matrix4 ): Geometry;
 
-  fromBufferGeometry(geometry: BufferGeometry): Geometry;
+	rotateX( angle: number ): Geometry;
+	rotateY( angle: number ): Geometry;
+	rotateZ( angle: number ): Geometry;
 
-  center(): Geometry;
+	translate( x: number, y: number, z: number ): Geometry;
+	scale( x: number, y: number, z: number ): Geometry;
+	lookAt( vector: Vector3 ): void;
 
-  normalize(): Geometry;
+	fromBufferGeometry( geometry: BufferGeometry ): Geometry;
 
-  /**
-   * Computes face normals.
-   */
-  computeFaceNormals(): void;
+	center(): Geometry;
 
-  /**
-   * Computes vertex normals by averaging face normals.
-   * Face normals must be existing / computed beforehand.
-   */
-  computeVertexNormals(areaWeighted?: boolean): void;
+	normalize(): Geometry;
 
-  /**
-   * Compute vertex normals, but duplicating face normals.
-   */
-  computeFlatVertexNormals(): void;
+	/**
+	 * Computes face normals.
+	 */
+	computeFaceNormals(): void;
 
-  /**
-   * Computes morph normals.
-   */
-  computeMorphNormals(): void;
+	/**
+	 * Computes vertex normals by averaging face normals.
+	 * Face normals must be existing / computed beforehand.
+	 */
+	computeVertexNormals( areaWeighted?: boolean ): void;
 
-  /**
-   * Computes bounding box of the geometry, updating {@link Geometry.boundingBox} attribute.
-   */
-  computeBoundingBox(): void;
+	/**
+	 * Compute vertex normals, but duplicating face normals.
+	 */
+	computeFlatVertexNormals(): void;
 
-  /**
-   * Computes bounding sphere of the geometry, updating Geometry.boundingSphere attribute.
-   * Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are null.
-   */
-  computeBoundingSphere(): void;
+	/**
+	 * Computes morph normals.
+	 */
+	computeMorphNormals(): void;
 
-  merge(
-    geometry: Geometry,
-    matrix?: Matrix,
-    materialIndexOffset?: number
-  ): void;
+	/**
+	 * Computes bounding box of the geometry, updating {@link Geometry.boundingBox} attribute.
+	 */
+	computeBoundingBox(): void;
 
-  mergeMesh(mesh: Mesh): void;
+	/**
+	 * Computes bounding sphere of the geometry, updating Geometry.boundingSphere attribute.
+	 * Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are null.
+	 */
+	computeBoundingSphere(): void;
 
-  /**
-   * Checks for duplicate vertices using hashmap.
-   * Duplicated vertices are removed and faces' vertices are updated.
-   */
-  mergeVertices(): number;
+	merge(
+		geometry: Geometry,
+		matrix?: Matrix,
+		materialIndexOffset?: number
+	): void;
 
-  setFromPoints(points: Array<Vector2> | Array<Vector3>): this;
+	mergeMesh( mesh: Mesh ): void;
 
-  sortFacesByMaterialIndex(): void;
+	/**
+	 * Checks for duplicate vertices using hashmap.
+	 * Duplicated vertices are removed and faces' vertices are updated.
+	 */
+	mergeVertices(): number;
 
-  toJSON(): any;
+	setFromPoints( points: Array<Vector2> | Array<Vector3> ): this;
 
-  /**
-   * Creates a new clone of the Geometry.
-   */
-  clone(): this;
+	sortFacesByMaterialIndex(): void;
 
-  copy(source: Geometry): this;
+	toJSON(): any;
 
-  /**
-   * Removes The object from memory.
-   * Don't forget to call this method when you remove an geometry because it can cuase meomory leaks.
-   */
-  dispose(): void;
+	/**
+	 * Creates a new clone of the Geometry.
+	 */
+	clone(): this;
 
-  // These properties do not exist in a normal Geometry class, but if you use the instance that was passed by JSONLoader, it will be added.
-  bones: Bone[];
-  animation: AnimationClip;
-  animations: AnimationClip[];
+	copy( source: Geometry ): this;
 
-  // EventDispatcher mixins
-  addEventListener(type: string, listener: (event: Event) => void): void;
-  hasEventListener(type: string, listener: (event: Event) => void): boolean;
-  removeEventListener(type: string, listener: (event: Event) => void): void;
-  dispatchEvent(event: { type: string; [attachment: string]: any }): void;
+	/**
+	 * Removes The object from memory.
+	 * Don't forget to call this method when you remove an geometry because it can cuase meomory leaks.
+	 */
+	dispose(): void;
+
+	// These properties do not exist in a normal Geometry class, but if you use the instance that was passed by JSONLoader, it will be added.
+	bones: Bone[];
+	animation: AnimationClip;
+	animations: AnimationClip[];
+
+	// EventDispatcher mixins
+	addEventListener( type: string, listener: ( event: Event ) => void ): void;
+	hasEventListener( type: string, listener: ( event: Event ) => void ): boolean;
+	removeEventListener( type: string, listener: ( event: Event ) => void ): void;
+	dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
+
 }

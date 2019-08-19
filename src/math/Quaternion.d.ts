@@ -12,118 +12,120 @@ import { Matrix4 } from './Matrix4';
  * vector.applyQuaternion( quaternion );
  */
 export class Quaternion {
-  /**
-   * @param x x coordinate
-   * @param y y coordinate
-   * @param z z coordinate
-   * @param w w coordinate
-   */
-  constructor(x?: number, y?: number, z?: number, w?: number);
 
-  x: number;
-  y: number;
-  z: number;
-  w: number;
+	/**
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @param z z coordinate
+	 * @param w w coordinate
+	 */
+	constructor( x?: number, y?: number, z?: number, w?: number );
 
-  /**
-   * Sets values of this quaternion.
-   */
-  set(x: number, y: number, z: number, w: number): Quaternion;
+	x: number;
+	y: number;
+	z: number;
+	w: number;
 
-  /**
-   * Clones this quaternion.
-   */
-  clone(): this;
+	/**
+	 * Sets values of this quaternion.
+	 */
+	set( x: number, y: number, z: number, w: number ): Quaternion;
 
-  /**
-   * Copies values of q to this quaternion.
-   */
-  copy(q: Quaternion): this;
+	/**
+	 * Clones this quaternion.
+	 */
+	clone(): this;
 
-  /**
-   * Sets this quaternion from rotation specified by Euler angles.
-   */
-  setFromEuler(euler: Euler, update?: boolean): Quaternion;
+	/**
+	 * Copies values of q to this quaternion.
+	 */
+	copy( q: Quaternion ): this;
 
-  /**
-   * Sets this quaternion from rotation specified by axis and angle.
-   * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm.
-   * Axis have to be normalized, angle is in radians.
-   */
-  setFromAxisAngle(axis: Vector3, angle: number): Quaternion;
+	/**
+	 * Sets this quaternion from rotation specified by Euler angles.
+	 */
+	setFromEuler( euler: Euler ): Quaternion;
 
-  /**
-   * Sets this quaternion from rotation component of m. Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm.
-   */
-  setFromRotationMatrix(m: Matrix4): Quaternion;
-  setFromUnitVectors(vFrom: Vector3, vTo: Vector3): Quaternion;
-  angleTo(q: Quaternion): number;
-  rotateTowards(q: Quaternion, step: number): Quaternion;
+	/**
+	 * Sets this quaternion from rotation specified by axis and angle.
+	 * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm.
+	 * Axis have to be normalized, angle is in radians.
+	 */
+	setFromAxisAngle( axis: Vector3, angle: number ): Quaternion;
 
-  /**
-   * Inverts this quaternion.
-   */
-  inverse(): Quaternion;
+	/**
+	 * Sets this quaternion from rotation component of m. Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm.
+	 */
+	setFromRotationMatrix( m: Matrix4 ): Quaternion;
+	setFromUnitVectors( vFrom: Vector3, vTo: Vector3 ): Quaternion;
+	angleTo( q: Quaternion ): number;
+	rotateTowards( q: Quaternion, step: number ): Quaternion;
 
-  conjugate(): Quaternion;
-  dot(v: Quaternion): number;
-  lengthSq(): number;
+	/**
+	 * Inverts this quaternion.
+	 */
+	inverse(): Quaternion;
 
-  /**
-   * Computes length of this quaternion.
-   */
-  length(): number;
+	conjugate(): Quaternion;
+	dot( v: Quaternion ): number;
+	lengthSq(): number;
 
-  /**
-   * Normalizes this quaternion.
-   */
-  normalize(): Quaternion;
+	/**
+	 * Computes length of this quaternion.
+	 */
+	length(): number;
 
-  /**
-   * Multiplies this quaternion by b.
-   */
-  multiply(q: Quaternion): Quaternion;
-  premultiply(q: Quaternion): Quaternion;
+	/**
+	 * Normalizes this quaternion.
+	 */
+	normalize(): Quaternion;
 
-  /**
-   * Sets this quaternion to a x b
-   * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm.
-   */
-  multiplyQuaternions(a: Quaternion, b: Quaternion): Quaternion;
+	/**
+	 * Multiplies this quaternion by b.
+	 */
+	multiply( q: Quaternion ): Quaternion;
+	premultiply( q: Quaternion ): Quaternion;
 
-  slerp(qb: Quaternion, t: number): Quaternion;
-  equals(v: Quaternion): boolean;
-  fromArray(n: number[]): Quaternion;
-  toArray(): number[];
+	/**
+	 * Sets this quaternion to a x b
+	 * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm.
+	 */
+	multiplyQuaternions( a: Quaternion, b: Quaternion ): Quaternion;
 
-  fromArray(xyzw: number[], offset?: number): Quaternion;
-  toArray(xyzw?: number[], offset?: number): number[];
+	slerp( qb: Quaternion, t: number ): Quaternion;
+	equals( v: Quaternion ): boolean;
+	fromArray( n: number[] ): Quaternion;
+	toArray(): number[];
 
-  onChange(callback: Function): Quaternion;
-  onChangeCallback: Function;
+	fromArray( xyzw: number[], offset?: number ): Quaternion;
+	toArray( xyzw?: number[], offset?: number ): number[];
 
-  /**
-   * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/.
-   */
-  static slerp(
-    qa: Quaternion,
-    qb: Quaternion,
-    qm: Quaternion,
-    t: number
-  ): Quaternion;
+	_onChange( callback: Function ): Quaternion;
+	_onChangeCallback: Function;
 
-  static slerpFlat(
-    dst: number[],
-    dstOffset: number,
-    src0: number[],
-    srcOffset: number,
-    src1: number[],
-    stcOffset1: number,
-    t: number
-  ): Quaternion;
+	/**
+	 * Adapted from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/.
+	 */
+	static slerp(
+		qa: Quaternion,
+		qb: Quaternion,
+		qm: Quaternion,
+		t: number
+	): Quaternion;
 
-  /**
-   * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
-   */
-  multiplyVector3(v: any): any;
+	static slerpFlat(
+		dst: number[],
+		dstOffset: number,
+		src0: number[],
+		srcOffset: number,
+		src1: number[],
+		stcOffset1: number,
+		t: number
+	): Quaternion;
+
+	/**
+	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
+	 */
+	multiplyVector3( v: any ): any;
+
 }

@@ -499,6 +499,7 @@ THREE.BufferGeometryUtils = {
 
 		// initialize the arrays
 		for ( var i = 0, l = attributeNames.length; i < l; i ++ ) {
+
 			var name = attributeNames[ i ];
 
 			attrArrays[ name ] = [];

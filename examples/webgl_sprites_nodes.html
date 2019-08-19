@@ -4,27 +4,7 @@
 		<title>three.js webgl - sprites nodes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-
-			a { color: white; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -33,21 +13,31 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Sprites
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
 		<script type="module">
 
-			import './js/nodes/THREE.Nodes.js';
-			import './js/loaders/NodeMaterialLoader.js';
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
+
+			import {
+				NodeFrame,
+				SpriteNodeMaterial,
+				MathNode,
+				OperatorNode,
+				TextureNode,
+				Vector2Node,
+				TimerNode,
+				FunctionNode,
+				FunctionCallNode,
+				PositionNode,
+				UVNode
+			} from './jsm/nodes/Nodes.js';
 
 			var container = document.getElementById( 'container' );
 
 			var renderer, scene, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new THREE.NodeFrame();
+			var frame = new NodeFrame();
 			var sprite1, sprite2, sprite3;
 			var walkingManTexture, walkingManTextureURL;
 			var library = {};
@@ -73,7 +63,7 @@
 				camera.position.z = 100;
 				camera.target = new THREE.Vector3();
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
@@ -93,36 +83,36 @@
 
 				function createHorizontalSpriteSheetNode( hCount, speed ) {
 
-					var speed = new THREE.Vector2Node( speed, 0 ); // frame per second
-					var scale = new THREE.Vector2Node( 1 / hCount, 1 ); // 8 horizontal images in sprite-sheet
+					var speed = new Vector2Node( speed, 0 ); // frame per second
+					var scale = new Vector2Node( 1 / hCount, 1 ); // 8 horizontal images in sprite-sheet
 
-					var uvTimer = new THREE.OperatorNode(
-						new THREE.TimerNode(),
+					var uvTimer = new OperatorNode(
+						new TimerNode(),
 						speed,
-						THREE.OperatorNode.MUL
+						OperatorNode.MUL
 					);
 
-					var uvIntegerTimer = new THREE.Math1Node(
+					var uvIntegerTimer = new MathNode(
 						uvTimer,
-						THREE.Math1Node.FLOOR
+						MathNode.FLOOR
 					);
 
-					var uvFrameOffset = new THREE.OperatorNode(
+					var uvFrameOffset = new OperatorNode(
 						uvIntegerTimer,
 						scale,
-						THREE.OperatorNode.MUL
+						OperatorNode.MUL
 					);
 
-					var uvScale = new THREE.OperatorNode(
-						new THREE.UVNode(),
+					var uvScale = new OperatorNode(
+						new UVNode(),
 						scale,
-						THREE.OperatorNode.MUL
+						OperatorNode.MUL
 					);
 
-					var uvFrame = new THREE.OperatorNode(
+					var uvFrame = new OperatorNode(
 						uvScale,
 						uvFrameOffset,
-						THREE.OperatorNode.ADD
+						OperatorNode.ADD
 					);
 
 					return uvFrame;
@@ -134,32 +124,32 @@
 				var spriteWidth = 20,
 					spriteHeight = 20;
 
-				scene.add( sprite1 = new THREE.Sprite( new THREE.SpriteNodeMaterial() ) );
+				scene.add( sprite1 = new THREE.Sprite( new SpriteNodeMaterial() ) );
 				sprite1.scale.x = spriteWidth;
 				sprite1.scale.y = spriteHeight;
-				sprite1.material.color = new THREE.TextureNode( walkingManTexture );
+				sprite1.material.color = new TextureNode( walkingManTexture );
 				sprite1.material.color.uv = createHorizontalSpriteSheetNode( 8, 10 );
 
-				scene.add( sprite2 = new THREE.Sprite( new THREE.SpriteNodeMaterial() ) );
+				scene.add( sprite2 = new THREE.Sprite( new SpriteNodeMaterial() ) );
 				sprite2.position.x = 30;
 				sprite2.scale.x = spriteWidth;
 				sprite2.scale.y = spriteHeight;
-				sprite2.material.color = new THREE.TextureNode( walkingManTexture );
+				sprite2.material.color = new TextureNode( walkingManTexture );
 				sprite2.material.color.uv = createHorizontalSpriteSheetNode( 8, 30 );
-				sprite2.material.color = new THREE.Math1Node( sprite2.material.color, THREE.Math1Node.INVERT );
+				sprite2.material.color = new MathNode( sprite2.material.color, MathNode.INVERT );
 				sprite2.material.spherical = false; // look at camera horizontally only, very used in vegetation
 				// horizontal zigzag sprite
-				sprite2.material.position = new THREE.OperatorNode(
-					new THREE.OperatorNode(
-						new THREE.Math1Node( new THREE.TimerNode( 3 ), THREE.Math1Node.SIN ), // 3 is speed (time scale)
-						new THREE.Vector2Node( .3, 0 ), // horizontal scale (position)
-						THREE.OperatorNode.MUL
+				sprite2.material.position = new OperatorNode(
+					new OperatorNode(
+						new MathNode( new TimerNode( 3 ), MathNode.SIN ), // 3 is speed (time scale)
+						new Vector2Node( .3, 0 ), // horizontal scale (position)
+						OperatorNode.MUL
 					),
-					new THREE.PositionNode(),
-					THREE.OperatorNode.ADD
+					new PositionNode(),
+					OperatorNode.ADD
 				);
 
-				var sineWaveFunction = new THREE.FunctionNode( [
+				var sineWaveFunction = new FunctionNode( [
 					// https://stackoverflow.com/questions/36174431/how-to-make-a-wave-warp-effect-in-shader
 					"vec2 sineWave(vec2 uv, vec2 phase) {",
 					// wave distortion
@@ -169,14 +159,14 @@
 					"}"
 				].join( "\n" ) );
 
-				scene.add( sprite3 = new THREE.Sprite( new THREE.SpriteNodeMaterial() ) );
+				scene.add( sprite3 = new THREE.Sprite( new SpriteNodeMaterial() ) );
 				sprite3.position.x = - 30;
 				sprite3.scale.x = spriteWidth;
 				sprite3.scale.y = spriteHeight;
-				sprite3.material.color = new THREE.TextureNode( walkingManTexture );
-				sprite3.material.color.uv = new THREE.FunctionCallNode( sineWaveFunction, {
+				sprite3.material.color = new TextureNode( walkingManTexture );
+				sprite3.material.color.uv = new FunctionCallNode( sineWaveFunction, {
 					"uv": createHorizontalSpriteSheetNode( 8, 10 ),
-					"phase": new THREE.TimerNode()
+					"phase": new TimerNode()
 				} );
 				sprite3.material.fog = true;
 
@@ -207,11 +197,11 @@
 
 				// replace uuid to url (facilitates the load of textures using url otherside uuid)
 
-				THREE.NodeMaterialLoaderUtils.replaceUUID( json, walkingManTexture, walkingManTextureURL );
+				NodeMaterialLoaderUtils.replaceUUID( json, walkingManTexture, walkingManTextureURL );
 
 				// deserialize
 
-				var material = new THREE.NodeMaterialLoader( null, library ).parse( json );
+				var material = new NodeMaterialLoader( null, library ).parse( json );
 
 				// replace material
 

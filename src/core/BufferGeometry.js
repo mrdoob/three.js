@@ -15,11 +15,18 @@ import { arrayMax } from '../utils.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
+
+var _m1 = new Matrix4();
+var _obj = new Object3D();
+var _offset = new Vector3();
+var _box = new Box3();
+var _boxMorphTargets = new Box3();
+var _vector = new Vector3();
 
 function BufferGeometry() {
 
-	Object.defineProperty( this, 'id', { value: bufferGeometryId += 2 } );
+	Object.defineProperty( this, 'id', { value: _bufferGeometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -182,129 +189,89 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	rotateX: function () {
+	rotateX: function ( angle ) {
 
 		// rotate geometry around world x-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationX( angle );
 
-		return function rotateX( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationX( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	rotateY: function () {
+	rotateY: function ( angle ) {
 
 		// rotate geometry around world y-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationY( angle );
 
-		return function rotateY( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationY( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	rotateZ: function () {
+	rotateZ: function ( angle ) {
 
 		// rotate geometry around world z-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationZ( angle );
 
-		return function rotateZ( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationZ( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	translate: function () {
+	translate: function ( x, y, z ) {
 
 		// translate geometry
 
-		var m1 = new Matrix4();
+		_m1.makeTranslation( x, y, z );
 
-		return function translate( x, y, z ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeTranslation( x, y, z );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	scale: function () {
+	scale: function ( x, y, z ) {
 
 		// scale geometry
 
-		var m1 = new Matrix4();
+		_m1.makeScale( x, y, z );
 
-		return function scale( x, y, z ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeScale( x, y, z );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
+	lookAt: function ( vector ) {
 
-		};
+		_obj.lookAt( vector );
 
-	}(),
+		_obj.updateMatrix();
 
-	lookAt: function () {
+		this.applyMatrix( _obj.matrix );
 
-		var obj = new Object3D();
+		return this;
 
-		return function lookAt( vector ) {
-
-			obj.lookAt( vector );
-
-			obj.updateMatrix();
-
-			this.applyMatrix( obj.matrix );
-
-		};
-
-	}(),
+	},
 
 	center: function () {
 
-		var offset = new Vector3();
+		this.computeBoundingBox();
 
-		return function center() {
+		this.boundingBox.getCenter( _offset ).negate();
 
-			this.computeBoundingBox();
+		this.translate( _offset.x, _offset.y, _offset.z );
 
-			this.boundingBox.getCenter( offset ).negate();
+		return this;
 
-			this.translate( offset.x, offset.y, offset.z );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setFromObject: function ( object ) {
 
@@ -601,144 +568,130 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	computeBoundingBox: function () {
 
-		var box = new Box3();
+		if ( this.boundingBox === null ) {
 
-		return function computeBoundingBox() {
+			this.boundingBox = new Box3();
 
-			if ( this.boundingBox === null ) {
+		}
 
-				this.boundingBox = new Box3();
+		var position = this.attributes.position;
+		var morphAttributesPosition = this.morphAttributes.position;
 
-			}
+		if ( position !== undefined ) {
 
-			var position = this.attributes.position;
-			var morphAttributesPosition = this.morphAttributes.position;
+			this.boundingBox.setFromBufferAttribute( position );
 
-			if ( position !== undefined ) {
+			// process morph attributes if present
 
-				this.boundingBox.setFromBufferAttribute( position );
+			if ( morphAttributesPosition ) {
 
-				// process morph attributes if present
+				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
-				if ( morphAttributesPosition ) {
+					var morphAttribute = morphAttributesPosition[ i ];
+					_box.setFromBufferAttribute( morphAttribute );
 
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-						var morphAttribute = morphAttributesPosition[ i ];
-						box.setFromBufferAttribute( morphAttribute );
-
-						this.boundingBox.expandByPoint( box.min );
-						this.boundingBox.expandByPoint( box.max );
-
-					}
+					this.boundingBox.expandByPoint( _box.min );
+					this.boundingBox.expandByPoint( _box.max );
 
 				}
 
-			} else {
-
-				this.boundingBox.makeEmpty();
-
 			}
 
-			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
+		} else {
 
-				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+			this.boundingBox.makeEmpty();
 
-			}
+		}
 
-		};
+		if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-	}(),
+			console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+
+		}
+
+	},
 
 	computeBoundingSphere: function () {
 
-		var box = new Box3();
-		var boxMorphTargets = new Box3();
-		var vector = new Vector3();
+		if ( this.boundingSphere === null ) {
 
-		return function computeBoundingSphere() {
+			this.boundingSphere = new Sphere();
 
-			if ( this.boundingSphere === null ) {
+		}
 
-				this.boundingSphere = new Sphere();
+		var position = this.attributes.position;
+		var morphAttributesPosition = this.morphAttributes.position;
 
-			}
+		if ( position ) {
 
-			var position = this.attributes.position;
-			var morphAttributesPosition = this.morphAttributes.position;
+			// first, find the center of the bounding sphere
 
-			if ( position ) {
+			var center = this.boundingSphere.center;
 
-				// first, find the center of the bounding sphere
+			_box.setFromBufferAttribute( position );
 
-				var center = this.boundingSphere.center;
+			// process morph attributes if present
 
-				box.setFromBufferAttribute( position );
+			if ( morphAttributesPosition ) {
 
-				// process morph attributes if present
+				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
-				if ( morphAttributesPosition ) {
+					var morphAttribute = morphAttributesPosition[ i ];
+					_boxMorphTargets.setFromBufferAttribute( morphAttribute );
 
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-						var morphAttribute = morphAttributesPosition[ i ];
-						boxMorphTargets.setFromBufferAttribute( morphAttribute );
-
-						box.expandByPoint( boxMorphTargets.min );
-						box.expandByPoint( boxMorphTargets.max );
-
-					}
-
-				}
-
-				box.getCenter( center );
-
-				// second, try to find a boundingSphere with a radius smaller than the
-				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
-
-				var maxRadiusSq = 0;
-
-				for ( var i = 0, il = position.count; i < il; i ++ ) {
-
-					vector.fromBufferAttribute( position, i );
-
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-				}
-
-				// process morph attributes if present
-
-				if ( morphAttributesPosition ) {
-
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
-
-						var morphAttribute = morphAttributesPosition[ i ];
-
-						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
-
-							vector.fromBufferAttribute( morphAttribute, i );
-
-							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
-
-						}
-
-					}
-
-				}
-
-				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-				if ( isNaN( this.boundingSphere.radius ) ) {
-
-					console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+					_box.expandByPoint( _boxMorphTargets.min );
+					_box.expandByPoint( _boxMorphTargets.max );
 
 				}
 
 			}
 
-		};
+			_box.getCenter( center );
 
-	}(),
+			// second, try to find a boundingSphere with a radius smaller than the
+			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
+
+			var maxRadiusSq = 0;
+
+			for ( var i = 0, il = position.count; i < il; i ++ ) {
+
+				_vector.fromBufferAttribute( position, i );
+
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+			}
+
+			// process morph attributes if present
+
+			if ( morphAttributesPosition ) {
+
+				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+
+					var morphAttribute = morphAttributesPosition[ i ];
+
+					for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
+
+						_vector.fromBufferAttribute( morphAttribute, j );
+
+						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+					}
+
+				}
+
+			}
+
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			if ( isNaN( this.boundingSphere.radius ) ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The "position" attribute is likely to have NaN values.', this );
+
+			}
+
+		}
+
+	},
 
 	computeFaceNormals: function () {
 
@@ -883,9 +836,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			var attribute2 = geometry.attributes[ key ];
 			var attributeArray2 = attribute2.array;
 
-			var attributeSize = attribute2.itemSize;
+			var attributeOffset = attribute2.itemSize * offset;
+			var length = Math.min( attributeArray2.length, attributeArray1.length - attributeOffset );
 
-			for ( var i = 0, j = attributeSize * offset; i < attributeArray2.length; i ++, j ++ ) {
+			for ( var i = 0, j = attributeOffset; i < length; i ++, j ++ ) {
 
 				attributeArray1[ j ] = attributeArray2[ i ];
 
@@ -899,27 +853,21 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	normalizeNormals: function () {
 
-		var vector = new Vector3();
+		var normals = this.attributes.normal;
 
-		return function normalizeNormals() {
+		for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-			var normals = this.attributes.normal;
+			_vector.x = normals.getX( i );
+			_vector.y = normals.getY( i );
+			_vector.z = normals.getZ( i );
 
-			for ( var i = 0, il = normals.count; i < il; i ++ ) {
+			_vector.normalize();
 
-				vector.x = normals.getX( i );
-				vector.y = normals.getY( i );
-				vector.z = normals.getZ( i );
+			normals.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
-				vector.normalize();
+		}
 
-				normals.setXYZ( i, vector.x, vector.y, vector.z );
-
-			}
-
-		};
-
-	}(),
+	},
 
 	toNonIndexed: function () {
 
@@ -1062,12 +1010,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var attribute = attributes[ key ];
 
-			var attributeData = {
-				itemSize: attribute.itemSize,
-				type: attribute.array.constructor.name,
-				array: Array.prototype.slice.call( attribute.array ),
-				normalized: attribute.normalized
-			};
+			var attributeData = attribute.toJSON();
 
 			if ( attribute.name !== '' ) attributeData.name = attribute.name;
 
@@ -1088,12 +1031,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				var attribute = attributeArray[ i ];
 
-				var attributeData = {
-					itemSize: attribute.itemSize,
-					type: attribute.array.constructor.name,
-					array: Array.prototype.slice.call( attribute.array ),
-					normalized: attribute.normalized
-				};
+				var attributeData = attribute.toJSON();
 
 				if ( attribute.name !== '' ) attributeData.name = attribute.name;
 

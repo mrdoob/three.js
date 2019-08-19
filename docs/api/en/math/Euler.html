@@ -58,29 +58,21 @@
 			to the <em>local</em> coordinate system. That is, for order 'XYZ', the rotation is first around the local-X
 			axis (which is the same as the world-X axis), then around local-Y (which may now be different from the
 			world Y-axis), then local-Z (which may be different from the world Z-axis).<br /><br />
-
-			If the order is changed, [page:.onChangeCallback onChangeCallback] will be called.
 		</p>
 
 		<h3>[property:Float x]</h3>
 		<p>
 			The current value of the x component.<br /><br />
-
-			If this is changed, [page:.onChangeCallback onChangeCallback] will be called.
 		</p>
 
 		<h3>[property:Float y]</h3>
 		<p>
 			The current value of the y component.<br /><br />
-
-			If this is changed, [page:.onChangeCallback onChangeCallback] will be called.
 		</p>
 
 		<h3>[property:Float z]</h3>
 		<p>
 			The current value of the z component.<br /><br />
-
-			If this is changed, [page:.onChangeCallback onChangeCallback] will be called.
 		</p>
 
 		<h2>Methods</h2>
@@ -104,18 +96,6 @@
 		Optionally assigns this euler's [page:.order order] to array[3].
 		</p>
 
-		<h3>[method:Euler onChange]( [param:Function onChangeCallback] )</h3>
-		<p>
-			[page:Function onChangeCallback] - set the value of the onChangeCallback() function.
-		</p>
-
-		<h3>[method:Euler onChangeCallback](  )</h3>
-		<p>
-			By default this is an empty function, however it can be set via [page:.onChange onChange]().<br />
-			It gets called after changing the [page:.x x], [page:.y y], [page:.z z] or [page:.order order] properties,
-			and also after calling most setter functions (see those for details).
-		</p>
-
 		<h3>[method:Euler reorder]( [param:String newOrder] )</h3>
 		<p>
 		Resets the euler angle with a new order by creating a quaternion from this euler angle
@@ -131,27 +111,23 @@
 			[page:.z z] - the angle of the z axis in radians.<br />
 			[page:.order order] - (optional) a string representing the order that the rotations are applied.<br /><br />
 
-			Sets the angles of this euler transform and optionally the [page:.order order] and then call [page:.onChangeCallback onChangeCallback]().
+			Sets the angles of this euler transform and optionally the [page:.order order].
 		</p>
 
-		<h3>[method:Euler setFromRotationMatrix]( [param:Matrix4 m], [param:String order], [param:Boolean update] )</h3>
+		<h3>[method:Euler setFromRotationMatrix]( [param:Matrix4 m], [param:String order] )</h3>
 		<p>
 		[page:Matrix4 m] - a [page:Matrix4] of which the upper 3x3 of matrix is a pure
 		[link:https://en.wikipedia.org/wiki/Rotation_matrix rotation matrix] (i.e. unscaled).<br />
 		[page:.order order] - (optional) a string representing the order that the rotations are applied.<br />
-		[page:Boolean update] - (optional) whether to call [page:.onChangeCallback onChangeCallback]() after applying
-		the matrix.<br /><br />
 
 		Sets the angles of this euler transform from a pure rotation matrix based on the orientation
 		specified by order.
 		</p>
 
-		<h3>[method:Euler setFromQuaternion]( [param:Quaternion q], [param:String order], [param:Boolean update] )</h3>
+		<h3>[method:Euler setFromQuaternion]( [param:Quaternion q], [param:String order] )</h3>
 		<p>
 		[page:Quaternion q] - a normalized quaternion.<br />
 		[page:.order order] - (optional) a string representing the order that the rotations are applied.<br />
-		[page:Boolean update] - (optional) whether to call [page:.onChangeCallback onChangeCallback]() after applying
-		the matrix.<br /><br />
 
 		Sets the angles of this euler transform from a normalized quaternion based on the orientation
 		specified by [page:.order order].
@@ -163,8 +139,7 @@
 		[page:Vector3 vector] - [page:Vector3].<br />
 		[page:.order order] - (optional) a string representing the order that the rotations are applied.<br /><br />
 
-		Set the [page:.x x], [page:.y y] and [page:.z z], and optionally update the [page:.order order]. [page:.onChangeCallback onChangeCallback]()
-		is called after these changes are made.
+		Set the [page:.x x], [page:.y y] and [page:.z z], and optionally update the [page:.order order].
 		</p>
 
 

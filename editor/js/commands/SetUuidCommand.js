@@ -4,14 +4,15 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newUuid string
  * @constructor
  */
 
-var SetUuidCommand = function ( object, newUuid ) {
+var SetUuidCommand = function ( editor, object, newUuid ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetUuidCommand';
 	this.name = 'Update UUID';
