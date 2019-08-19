@@ -14041,7 +14041,7 @@
 
 	var fog_pars_vertex = "#ifdef USE_FOG\n\tvarying float fogDepth;\n#endif";
 
-	var fog_fragment = "#ifdef USE_FOG\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = whiteCompliment( exp2( - fogDensity * fogDensity * fogDepth * fogDepth * LOG2 ) );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, fogDepth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif";
+	var fog_fragment = "#ifdef USE_FOG\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = 1.0 - exp( - fogDensity * fogDensity * fogDepth * fogDepth );\n\t#else\n\t\tfloat fogFactor = smoothstep( fogNear, fogFar, fogDepth );\n\t#endif\n\tgl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\n#endif";
 
 	var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying float fogDepth;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif";
 
@@ -15762,13 +15762,13 @@
 
 	function WebGLGeometries( gl, attributes, info ) {
 
-		var geometries = {};
-		var wireframeAttributes = {};
+		var geometries = new WeakMap();
+		var wireframeAttributes = new WeakMap();
 
 		function onGeometryDispose( event ) {
 
 			var geometry = event.target;
-			var buffergeometry = geometries[ geometry.id ];
+			var buffergeometry = geometries.get( geometry );
 
 			if ( buffergeometry.index !== null ) {
 
@@ -15784,14 +15784,14 @@
 
 			geometry.removeEventListener( 'dispose', onGeometryDispose );
 
-			delete geometries[ geometry.id ];
+			geometries.delete( geometry );
 
-			var attribute = wireframeAttributes[ buffergeometry.id ];
+			var attribute = wireframeAttributes.get( buffergeometry );
 
 			if ( attribute ) {
 
 				attributes.remove( attribute );
-				delete wireframeAttributes[ buffergeometry.id ];
+				wireframeAttributes.delete( buffergeometry );
 
 			}
 
@@ -15803,7 +15803,7 @@
 
 		function get( object, geometry ) {
 
-			var buffergeometry = geometries[ geometry.id ];
+			var buffergeometry = geometries.get( geometry );
 
 			if ( buffergeometry ) return buffergeometry;
 
@@ -15825,7 +15825,7 @@
 
 			}
 
-			geometries[ geometry.id ] = buffergeometry;
+			geometries.set( geometry, buffergeometry );
 
 			info.memory.geometries ++;
 
@@ -15915,19 +15915,19 @@
 
 			//
 
-			var previousAttribute = wireframeAttributes[ geometry.id ];
+			var previousAttribute = wireframeAttributes.get( geometry );
 
 			if ( previousAttribute ) attributes.remove( previousAttribute );
 
 			//
 
-			wireframeAttributes[ geometry.id ] = attribute;
+			wireframeAttributes.set( geometry, attribute );
 
 		}
 
 		function getWireframeAttribute( geometry ) {
 
-			var currentAttribute = wireframeAttributes[ geometry.id ];
+			var currentAttribute = wireframeAttributes.get( geometry );
 
 			if ( currentAttribute ) {
 
@@ -15951,7 +15951,7 @@
 
 			}
 
-			return wireframeAttributes[ geometry.id ];
+			return wireframeAttributes.get( geometry );
 
 		}
 
@@ -16007,7 +16007,7 @@
 
 			} else {
 
-				var extension = extensions.get( 'ANGLE_instanced_arrays' );
+				extension = extensions.get( 'ANGLE_instanced_arrays' );
 
 				if ( extension === null ) {
 
@@ -17600,7 +17600,7 @@
 
 				'#define MAX_BONES ' + parameters.maxBones,
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
-				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
+				( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
 				parameters.map ? '#define USE_MAP' : '',
 				parameters.envMap ? '#define USE_ENVMAP' : '',
@@ -17715,7 +17715,7 @@
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 				( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
-				( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
+				( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
 				parameters.map ? '#define USE_MAP' : '',
 				parameters.matcap ? '#define USE_MATCAP' : '',
@@ -18013,7 +18013,7 @@
 			"precision", "supportsVertexTextures", "map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
 			"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "clearCoatNormalMap", "displacementMap", "specularMap",
 			"roughnessMap", "metalnessMap", "gradientMap",
-			"alphaMap", "combine", "vertexColors", "vertexTangents", "fog", "useFog", "fogExp",
+			"alphaMap", "combine", "vertexColors", "vertexTangents", "fog", "useFog", "fogExp2",
 			"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 			"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 			"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
@@ -18152,7 +18152,7 @@
 
 				fog: !! fog,
 				useFog: material.fog,
-				fogExp: ( fog && fog.isFogExp2 ),
+				fogExp2: ( fog && fog.isFogExp2 ),
 
 				flatShading: material.flatShading,
 
@@ -18501,7 +18501,7 @@
 
 	function WebGLRenderLists() {
 
-		var lists = {};
+		var lists = new WeakMap();
 
 		function onSceneDispose( event ) {
 
@@ -18509,29 +18509,29 @@
 
 			scene.removeEventListener( 'dispose', onSceneDispose );
 
-			delete lists[ scene.id ];
+			lists.delete( scene );
 
 		}
 
 		function get( scene, camera ) {
 
-			var cameras = lists[ scene.id ];
+			var cameras = lists.get( scene );
 			var list;
 			if ( cameras === undefined ) {
 
 				list = new WebGLRenderList();
-				lists[ scene.id ] = {};
-				lists[ scene.id ][ camera.id ] = list;
+				lists.set( scene, new WeakMap() );
+				lists.get( scene ).set( camera, list );
 
 				scene.addEventListener( 'dispose', onSceneDispose );
 
 			} else {
 
-				list = cameras[ camera.id ];
+				list = cameras.get( camera );
 				if ( list === undefined ) {
 
 					list = new WebGLRenderList();
-					cameras[ camera.id ] = list;
+					cameras.set( camera, list );
 
 				}
 
@@ -18543,7 +18543,7 @@
 
 		function dispose() {
 
-			lists = {};
+			lists = new WeakMap();
 
 		}
 
@@ -19012,7 +19012,7 @@
 
 	function WebGLRenderStates() {
 
-		var renderStates = {};
+		var renderStates = new WeakMap();
 
 		function onSceneDispose( event ) {
 
@@ -19020,7 +19020,7 @@
 
 			scene.removeEventListener( 'dispose', onSceneDispose );
 
-			delete renderStates[ scene.id ];
+			renderStates.delete( scene );
 
 		}
 
@@ -19028,24 +19028,24 @@
 
 			var renderState;
 
-			if ( renderStates[ scene.id ] === undefined ) {
+			if ( renderStates.has( scene ) === false ) {
 
 				renderState = new WebGLRenderState();
-				renderStates[ scene.id ] = {};
-				renderStates[ scene.id ][ camera.id ] = renderState;
+				renderStates.set( scene, new WeakMap() );
+				renderStates.get( scene ).set( camera, renderState );
 
 				scene.addEventListener( 'dispose', onSceneDispose );
 
 			} else {
 
-				if ( renderStates[ scene.id ][ camera.id ] === undefined ) {
+				if ( renderStates.get( scene ).has( camera ) === false ) {
 
 					renderState = new WebGLRenderState();
-					renderStates[ scene.id ][ camera.id ] = renderState;
+					renderStates.get( scene ).set( camera, renderState );
 
 				} else {
 
-					renderState = renderStates[ scene.id ][ camera.id ];
+					renderState = renderStates.get( scene ).get( camera );
 
 				}
 
@@ -19057,7 +19057,7 @@
 
 		function dispose() {
 
-			renderStates = {};
+			renderStates = new WeakMap();
 
 		}
 
@@ -20642,7 +20642,7 @@
 
 	function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
-		var _videoTextures = {};
+		var _videoTextures = new WeakMap();
 		var _canvas;
 
 		//
@@ -20824,7 +20824,7 @@
 
 			if ( texture.isVideoTexture ) {
 
-				delete _videoTextures[ texture.id ];
+				_videoTextures.delete( texture );
 
 			}
 
@@ -21045,9 +21045,9 @@
 								for ( var j = 0; j < mipmaps.length; ++ j ) {
 
 									var mipmap = mipmaps[ j ];
-									var image = mipmap.image[ i ].image;
+									var mipmapImage = mipmap.image[ i ].image;
 
-									state.texImage2D( 34069 + i, j + 1, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+									state.texImage2D( 34069 + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
 
 								}
 
@@ -21067,7 +21067,7 @@
 
 						} else {
 
-							var mipmaps = cubeImage[ i ].mipmaps;
+							mipmaps = cubeImage[ i ].mipmaps;
 
 							for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
@@ -21733,14 +21733,13 @@
 
 		function updateVideoTexture( texture ) {
 
-			var id = texture.id;
 			var frame = info.render.frame;
 
 			// Check the last frame we updated the VideoTexture
 
-			if ( _videoTextures[ id ] !== frame ) {
+			if ( _videoTextures.get( texture ) !== frame ) {
 
-				_videoTextures[ id ] = frame;
+				_videoTextures.set( texture, frame );
 				texture.update();
 
 			}
@@ -41053,6 +41052,7 @@
 		this.loop = false;
 		this.startTime = 0;
 		this.offset = 0;
+		this.duration = undefined;
 		this.playbackRate = 1;
 		this.isPlaying = false;
 		this.hasPlaybackControl = true;
@@ -41127,7 +41127,7 @@
 			source.loop = this.loop;
 			source.onended = this.onEnded.bind( this );
 			this.startTime = this.context.currentTime;
-			source.start( this.startTime, this.offset );
+			source.start( this.startTime, this.offset, this.duration );
 
 			this.isPlaying = true;
 
