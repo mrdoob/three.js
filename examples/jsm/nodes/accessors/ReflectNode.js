@@ -3,6 +3,8 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { PositionNode } from './PositionNode.js';
+import { NormalNode } from './NormalNode.js';
 
 function ReflectNode( scope ) {
 
@@ -44,7 +46,10 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.VECTOR:
 
-				builder.addNodeCode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( vViewPosition ), normal ), viewMatrix );' );
+				var viewNormal = new NormalNode().build( builder, 'v3' );
+				var viewPosition = new PositionNode( PositionNode.VIEW ).build( builder, 'v3' );
+
+				builder.addNodeCode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( ' + viewPosition + ' ), ' + viewNormal + ' ), viewMatrix );' );
 
 				result = 'reflectVec';
 
