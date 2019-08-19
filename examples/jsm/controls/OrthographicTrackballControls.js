@@ -272,7 +272,7 @@ var OrthographicTrackballControls = function ( object, domElement ) {
 
 			mouseChange.copy( _panEnd ).sub( _panStart );
 
-			if ( mouseChange.lengthSq() ) {
+			if ( mouseChange.lengthSq() > EPS ) {
 
 				// Scale movement to keep clicked/dragged position under cursor
 				var scale_x = ( _this.object.right - _this.object.left ) / _this.object.zoom;
