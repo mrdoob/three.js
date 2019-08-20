@@ -60,7 +60,7 @@ function MeshStandardMaterial( parameters ) {
 	Material.call( this );
 
 	this.defines = { 'PHYSICAL': '' };
-	
+
 	this.type = 'MeshStandardMaterial';
 
 	this.color = new Color( 0xffffff ); // diffuse
