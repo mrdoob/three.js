@@ -8,6 +8,7 @@ import {
 } from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
+import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
@@ -122,10 +123,17 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var contextEnvironment = {
 			bias: RoughnessToBlinnExponentNode,
+			viewNormal: new ExpressionNode('normal', 'v3'),
 			gamma: true
 		};
 
 		var contextGammaOnly = {
+			gamma: true
+		};
+
+		var contextClearCoatEnvironment = {
+			bias: RoughnessToBlinnExponentNode,
+			viewNormal: new ExpressionNode('clearCoatNormal', 'v3'),
 			gamma: true
 		};
 
@@ -212,7 +220,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
+		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'environment' } ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -493,6 +501,7 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.clearCoat ) this.clearCoat = source.clearCoat;
 	if ( source.clearCoatRoughness ) this.clearCoatRoughness = source.clearCoatRoughness;
+	if ( source.clearCoatNormal ) this.clearCoatNormal = source.clearCoatNormal;
 
 	if ( source.reflectivity ) this.reflectivity = source.reflectivity;
 
@@ -536,6 +545,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		if ( this.clearCoat ) data.clearCoat = this.clearCoat.toJSON( meta ).uuid;
 		if ( this.clearCoatRoughness ) data.clearCoatRoughness = this.clearCoatRoughness.toJSON( meta ).uuid;
+		if ( this.clearCoatNormal ) data.clearCoatNormal = this.clearCoatNormal.toJSON( meta ).uuid;
 
 		if ( this.reflectivity ) data.reflectivity = this.reflectivity.toJSON( meta ).uuid;
 
