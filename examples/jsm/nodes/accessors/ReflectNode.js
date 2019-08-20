@@ -63,7 +63,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 				if ( isUnique ) {
 
-					builder.addNodeCode( `vec3 reflectVec = ${result};` );
+					builder.addNodeCode( `vec3 reflectVec = ${code};` );
 
 					result = 'reflectVec';
 
@@ -83,7 +83,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 				if ( isUnique ) {
 
-					builder.addNodeCode( `vec3 reflectCubeVec = ${result};` );
+					builder.addNodeCode( `vec3 reflectCubeVec = ${code};` );
 
 					result = 'reflectCubeVec';
 
@@ -103,7 +103,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 				if ( isUnique ) {
 
-					builder.addNodeCode( `vec2 reflectSphereVec = ${result};` );
+					builder.addNodeCode( `vec2 reflectSphereVec = ${code};` );
 
 					result = 'reflectSphereVec';
 
