@@ -1,4 +1,4 @@
-/*
+/**
  * @author Daosheng Mu / https://github.com/DaoshengMu/
  * @author mrdoob / http://mrdoob.com/
  * @author takahirox / https://github.com/takahirox/

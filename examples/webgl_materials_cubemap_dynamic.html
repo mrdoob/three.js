@@ -53,7 +53,7 @@
 					resolution: 1024,
 
 					generateMipmaps: true,
-					minFilter: THREE.LinearMipMapLinearFilter,
+					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter
 				};
 
@@ -63,12 +63,12 @@
 
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
 				cubeCamera1.renderTarget.texture.generateMipmaps = true;
-				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				scene.add( cubeCamera1 );
 
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
 				cubeCamera2.renderTarget.texture.generateMipmaps = true;
-				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				scene.add( cubeCamera2 );
 
 				document.body.appendChild( renderer.domElement );

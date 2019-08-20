@@ -17,6 +17,7 @@ function ColorsNode( index ) {
 
 ColorsNode.prototype = Object.create( TempNode.prototype );
 ColorsNode.prototype.constructor = ColorsNode;
+ColorsNode.prototype.nodeType = "Colors";
 
 ColorsNode.prototype.generate = function ( builder, output ) {
 

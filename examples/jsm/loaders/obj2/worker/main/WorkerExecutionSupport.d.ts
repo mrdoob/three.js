@@ -30,7 +30,7 @@ export class WorkerExecutionSupport {
   };
 
   worker: {
-    native: null;
+    native: Worker;
     jsmWorker: boolean;
     logging: boolean;
     workerRunner: {
@@ -41,13 +41,13 @@ export class WorkerExecutionSupport {
     terminateWorkerOnLoad: boolean;
     forceWorkerDataCopy: boolean;
     started: boolean;
-    queuedMessage: null;
+    queuedMessage: object;
     callbacks: {
       onAssetAvailable: Function;
       onLoad: Function;
       terminate: Function;
     };
-  }
+  };
 
   setLogging(enabled: boolean, debug: boolean): this;
   setForceWorkerDataCopy(forceWorkerDataCopy: boolean): this;

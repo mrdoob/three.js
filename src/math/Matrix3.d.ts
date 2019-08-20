@@ -100,6 +100,17 @@ export class Matrix3 implements Matrix {
 	 * Transposes this matrix into the supplied array r, and returns itself.
 	 */
 	transposeIntoArray( r: number[] ): number[];
+
+	setUvTransform( tx: number, ty: number, sx: number, sy: number, rotation: number, cx: number, cy: number ): Matrix3;
+
+	scale( sx: number, sy: number ): Matrix3;
+
+	rotate( theta: number ): Matrix3;
+
+	translate( tx: number, ty: number ): Matrix3;
+
+	equals( matrix: Matrix3 ): boolean;
+
 	fromArray( array: number[], offset?: number ): Matrix3;
 
 	toArray( array?: number[], offset?: number ): number[];

@@ -103,7 +103,7 @@
 
 				var cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				scene.background = cubeCamera.renderTarget;
 

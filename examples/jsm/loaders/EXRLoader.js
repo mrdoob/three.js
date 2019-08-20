@@ -91,10 +91,18 @@ var EXRLoader = function ( manager ) {
 
 EXRLoader.prototype = Object.create( DataTextureLoader.prototype );
 
-EXRLoader.prototype.setType = function ( value ) {
+EXRLoader.prototype.setDataType = function ( value ) {
 
 	this.type = value;
 	return this;
+
+};
+
+EXRLoader.prototype.setType = function ( value ) {
+
+	console.warn( 'THREE.EXRLoader: .setType() has been renamed to .setDataType().' );
+
+	return this.setDataType( value );
 
 };
 

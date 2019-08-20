@@ -496,7 +496,7 @@ ColladaExporter.prototype = {
 
 					(
 						m.side === DoubleSide ?
-							`<extra><technique><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
+							`<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
 							''
 					) +
 

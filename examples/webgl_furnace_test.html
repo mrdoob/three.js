@@ -60,18 +60,22 @@
 
 			function createObjects() {
 
-				var geo = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+				var geometry = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+
 				var count = 10;
+
 				for ( var x = 0; x <= count; x ++ ) {
 
-					var mesh = new THREE.Mesh( geo, new THREE.MeshPhysicalMaterial( {
+					var material = new THREE.MeshPhysicalMaterial( {
 						roughness: x / count,
 						metalness: 1,
 						color: 0xffffff,
 						envMap: radianceMap,
 						envMapIntensity: 1,
 						reflectivity: 1,
-					} ) );
+					} );
+
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = x - ( Math.floor( count / 2 ) );
 					scene.add( mesh );
 

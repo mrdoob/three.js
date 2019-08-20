@@ -15,5 +15,5 @@ export class HDRCubeTextureLoader {
 
   load(url: string, onLoad: (texture: CubeTexture) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   setPath(value: string): this;
-  setType(type: TextureDataType): this;
+  setDataType(type: TextureDataType): this;
 }

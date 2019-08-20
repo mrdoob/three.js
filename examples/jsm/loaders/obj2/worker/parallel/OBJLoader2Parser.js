@@ -1,10 +1,10 @@
 /**
- * @author Kai Salmen / www.kaisalmen.de
+ * @author Kai Salmen / https://kaisalmen.de
+ * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
 /**
  * Parse OBJ data either from ArrayBuffer or string
- * @class
  */
 const OBJLoader2Parser = function () {
 

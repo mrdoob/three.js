@@ -124,7 +124,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		_this.renderer = parameters.renderer !== undefined ? parameters.renderer : new THREE.WebGLRenderer();
 		_this.domElement = _this.renderer.domElement;
 
-		_context = _this.renderer.context;
+		_context = _this.renderer.getContext();
 		_state = _this.renderer.state;
 
 		_width = parameters.width !== undefined ? parameters.width : _this.renderer.getSize( new THREE.Vector2() ).width;

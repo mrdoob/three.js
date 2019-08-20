@@ -5,10 +5,6 @@ import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector } from './Vector2';
 
 /**
- * @deprecated use {@link Vector3 THREE.Vector3} instead.
- */
-
-/**
  * 4D vector.
  *
  * ( class Vector4 implements Vector<Vector4> )

@@ -11,17 +11,19 @@ import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { BlinnExponentToRoughnessNode } from '../bsdfs/BlinnExponentToRoughnessNode.js';
 
-function TextureCubeNode( value, textureSize ) {
+function TextureCubeNode( value, textureSize, uv, bias ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
 	this.textureSize = textureSize || new FloatNode( 1024 );
+	this.uv = uv || new ReflectNode( ReflectNode.VECTOR );
+	this.bias = bias || new BlinnExponentToRoughnessNode();
 
 	this.radianceCache = { uv: new TextureCubeUVNode(
-		new ReflectNode( ReflectNode.VECTOR ),
+		this.uv,
 		this.textureSize,
-		new BlinnExponentToRoughnessNode()
+		this.bias
 	) };
 
 	this.irradianceCache = { uv: new TextureCubeUVNode(
@@ -79,12 +81,12 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		var radiance = this.generateTextureCubeUV( builder, this.radianceCache );
-		var irradiance = this.generateTextureCubeUV( builder, this.irradianceCache );
+		builder.require( 'irradiance' );
 
-		builder.context.extra.irradiance = irradiance;
+		var cache = builder.slot === 'irradiance' ? this.irradianceCache : this.radianceCache;
+		var result = this.generateTextureCubeUV( builder, cache );
 
-		return builder.format( 'vec4( ' + radiance + ', 1.0 )', this.getType( builder ), output );
+		return builder.format( 'vec4( ' + result + ', 1.0 )', this.getType( builder ), output );
 
 	} else {
 
@@ -93,6 +95,16 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 		return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 
 	}
+
+};
+
+TextureCubeNode.prototype.copy = function ( source ) {
+
+	TempNode.prototype.copy.call( this, source );
+
+	this.value = source.value;
+
+	return this;
 
 };
 

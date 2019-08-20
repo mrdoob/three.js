@@ -470,10 +470,18 @@ THREE.RGBELoader.prototype._parser = function ( buffer ) {
 
 };
 
-THREE.RGBELoader.prototype.setType = function ( value ) {
+THREE.RGBELoader.prototype.setDataType = function ( value ) {
 
 	this.type = value;
 	return this;
+
+};
+
+THREE.RGBELoader.prototype.setType = function ( value ) {
+
+	console.warn( 'THREE.RGBELoader: .setType() has been renamed to .setDataType().' );
+
+	return this.setDataType( value );
 
 };
 

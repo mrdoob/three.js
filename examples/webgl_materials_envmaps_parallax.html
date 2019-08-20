@@ -156,15 +156,15 @@
 					return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
 				}
 
-				vec3 getLightProbeIndirectRadiance( const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+				vec3 getLightProbeIndirectRadiance( const in vec3 viewDir, const in vec3 normal, const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
 					#ifdef ENVMAP_MODE_REFLECTION
 
-						vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );
+						vec3 reflectVec = reflect( -viewDir, normal );
 
 					#else
 
-						vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );
+						vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
 
 					#endif
 
@@ -308,7 +308,7 @@
 				// cube camera for environment map
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
 				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
 				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
 
 				cubeCamera.position.set( 0, - 100, 0 );

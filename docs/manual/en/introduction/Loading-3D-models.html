@@ -92,18 +92,15 @@
 		// commonjs
 		var THREE = window.THREE = require('three');
 		require('three/examples/js/loaders/GLTFLoader');
-	</code>
 
-	<p>
-		Currently three.js examples are not available as ES modules (import &hellip; from '&hellip;').
-		Several workarounds are discussed in
-		<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank" rel="noopener">#9562</a>.
-	</p>
+		// ES modules
+		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+	</code>
 
 	<p>
 		Once you've imported a loader, you're ready to add a model to your scene. Syntax varies among
 		different loaders — when using another format, check the examples and documentation for that
-		loader. For glTF, basic usage would be:
+		loader. For glTF, usage with global scripts would be:
 	</p>
 
 	<code>

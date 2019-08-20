@@ -54,6 +54,17 @@
 			Default is a [page:PointsMaterial] with a random color.
 		</p>
 
+		<h3>[property:Array morphTargetInfluences]</h3>
+		<p>
+		An array of weights typically from 0-1 that specify how much of the morph is applied.
+		Undefined by default, but reset to a blank array by [page:Points.updateMorphTargets updateMorphTargets].
+		</p>
+
+		<h3>[property:Object morphTargetDictionary]</h3>
+		<p>
+		A dictionary of morphTargets based on the morphTarget.name property.
+		Undefined by default, but rebuilt [page:Points.updateMorphTargets updateMorphTargets].
+		</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
@@ -69,6 +80,12 @@
 		Returns a clone of this Points object and its descendants.
 		</p>
 
+		<h3>[method:null updateMorphTargets]()</h3>
+		<p>
+		Updates the morphTargets to have no influence on the object. Resets the
+		[page:Points.morphTargetInfluences morphTargetInfluences] and
+		[page:Points.morphTargetDictionary morphTargetDictionary] properties.
+		</p>
 
 		<h2>Source</h2>
 

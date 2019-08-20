@@ -116,8 +116,6 @@ OBJLoader2Parallel.prototype.buildWorkerCode = function () {
 		codeBuilderInstructions.addCodeFragment( codeParserPayloadHandler );
 		codeBuilderInstructions.addCodeFragment( codeWorkerRunner );
 
-		// allows to include full libraries as importScripts
-		//		codeBuilderInstructions.addLibraryImport( '../../node_modules/three/build/three.js' );
 		codeBuilderInstructions.addStartCode( 'new WorkerRunner( new DefaultWorkerPayloadHandler( new OBJLoader2Parser() ) );' );
 
 	}
