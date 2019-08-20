@@ -275,7 +275,7 @@ ShaderLib.physical = {
 		{
 			clearCoat: { value: 0 },
 			clearCoatRoughness: { value: 0 },
-			sheenColor: { value: new Color( 0x000000 ) },
+			sheen: { value: new Color( 0x000000 ) },
 			clearCoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearCoatNormalMap: { value: null },
 		}

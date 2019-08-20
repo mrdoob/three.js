@@ -10,6 +10,6 @@ material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );
 	material.clearCoatRoughness = clamp( clearCoatRoughness, 0.04, 1.0 );
 #endif
 #ifdef USE_SHEEN
-	material.sheenColor = sheenColor;
+	material.sheenColor = sheen;
 #endif
 `;

@@ -38,7 +38,7 @@
 				nodeMaterial: true,
 				color: new THREE.Color( 255, 0, 127 ),
 				sheenBRDF: true,
-				sheenColor: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
+				sheen: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
 				roughness: .9,
 				exposure: 2,
 			};
@@ -121,7 +121,7 @@
 				gui.add( params, 'nodeMaterial' );
 				gui.addColor( params, 'color' );
 				gui.add( params, 'sheenBRDF' );
-				gui.addColor( params, 'sheenColor' );
+				gui.addColor( params, 'sheen' );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'exposure', 0, 3 );
 				gui.open();
@@ -156,8 +156,8 @@
 
 				//
 
-				material.sheenColor = params.sheenBRDF
-					? new THREE.Color().copy( params.sheenColor ).multiplyScalar( 1 / 255 )
+				material.sheen = params.sheenBRDF
+					? new THREE.Color().copy( params.sheen ).multiplyScalar( 1 / 255 )
 					: null;
 
 				material.color.copy( params.color ).multiplyScalar( 1 / 255 );
@@ -167,8 +167,8 @@
 
 				//
 
-				nodeMaterial.sheenColor = params.sheenBRDF
-					? new Nodes.ColorNode( material.sheenColor )
+				nodeMaterial.sheen = params.sheenBRDF
+					? new Nodes.ColorNode( material.sheen )
 					: undefined;
 
 				nodeMaterial.color.value.copy( material.color );

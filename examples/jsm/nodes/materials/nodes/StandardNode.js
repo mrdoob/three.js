@@ -179,7 +179,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		if ( this.sheenColor ) this.sheenColor.analyze( builder );
+		if ( this.sheen ) this.sheen.analyze( builder );
 
 		// build code
 
@@ -224,7 +224,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'environment' } ) : undefined;
 
-		var sheenColor = this.sheenColor ? this.sheenColor.flow( builder, 'c' ) : undefined;
+		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -346,9 +346,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		if ( sheenColor ) {
+		if ( sheen ) {
 
-			output.push( 'material.sheenColor = ' + sheenColor.result + ';' );
+			output.push( 'material.sheenColor = ' + sheen.result + ';' );
 
 		}
 
@@ -525,7 +525,7 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.environment ) this.environment = source.environment;
 
-	if ( source.sheenColor ) this.sheenColor = source.sheenColor;
+	if ( source.sheen ) this.sheen = source.sheen;
 
 	return this;
 
@@ -571,7 +571,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
 
-		if ( this.sheenColor ) data.sheenColor = this.sheenColor.toJSON( meta ).uuid;
+		if ( this.sheen ) data.sheen = this.sheen.toJSON( meta ).uuid;
 
 	}
 
