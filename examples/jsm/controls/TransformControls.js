@@ -817,7 +817,7 @@ var TransformControlsGizmo = function () {
 			[ new Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
 		],
 		XYZ: [
-			[ new Mesh( new OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransperent ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
+			[ new Mesh( new OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransperent.clone() ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
 		],
 		XY: [
 			[ new Mesh( new PlaneBufferGeometry( 0.295, 0.295 ), matYellowTransparent ), [ 0.15, 0.15, 0 ]],
@@ -959,13 +959,13 @@ var TransformControlsGizmo = function () {
 			[ new Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XYZX: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent.clone() ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent.clone() ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
+			[ new Mesh( new BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent.clone() ), [ 0, 0, 1.1 ]],
 		]
 	};
 
