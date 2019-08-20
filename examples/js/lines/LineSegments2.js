@@ -74,9 +74,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 			// If using a persepective-line material, there is a known precision:
 			// This doesn't work correctly though; the collision distance turns out too large.
-			// if(this.material && this.material.worldlinewidth) precision = this.material.worldlinewidth;
-
-			if(this.material.)
+			if(this.material && this.material.worldlinewidth) precision = this.material.worldlinewidth;
 
 			var geometry = this.geometry;
 			var matrixWorld = this.matrixWorld;
@@ -84,7 +82,6 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			// Checking boundingSphere distance to ray
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
-
 			sphere.copy( geometry.boundingSphere );
 			sphere.applyMatrix4( matrixWorld );
 			sphere.radius += precision;
@@ -94,13 +91,18 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			inverseMatrix.getInverse( matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-			var localPrecisionSq = localPrecision * localPrecision;
+			// This was in the orignal Line.js raycast code, but it's correctness is debatable. Line objects
+			// have infintesimal width, so exapnding the size of the object should not exapand the width of the line.
+			// var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			//var localPrecisionSq = localPrecision * localPrecision;
 
-			var vStart = new THREE.Vector3();
-			var vEnd = new THREE.Vector3();
-			var interSegment = new THREE.Vector3();
-			var interRay = new THREE.Vector3();
+			var localPrecisionSq = precision * precision;
+
+
+			var vStart = new Vector3();
+			var vEnd = new Vector3();
+			var interSegment = new Vector3();
+			var interRay = new Vector3();
 
 	     	// Currently, the geometry is always a LineSegments2 geometry, which uses the instanceStart/instanceEnd to store segment locations
 	     	var starts = geometry.attributes.instanceStart;
@@ -110,7 +112,6 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 		        vStart.fromArray( starts.data.array, i * starts.data.stride + starts.offset );
 		        vEnd.fromArray( ends.data.array, i * ends.data.stride + ends.offset );
-
 		        var distSq = ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
 		        if ( distSq > localPrecisionSq ) continue;
@@ -127,11 +128,13 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 		          // What do we want? intersection point on the ray or on the segment??
 		          // point: raycaster.ray.at( distance ),
 		          point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+		          transverseDistance: Math.sqrt(distSq),   // Special value indicating the distance of interesection from the ray
 		          index: i,
 		          face: null,
 		          faceIndex: null,
 		          object: this
 		        } );
+
 
       		}
 
