@@ -4,7 +4,7 @@ import { Vector2 } from './Vector2.js';
  * @author bhouston / http://clara.io
  */
 
-var _vector;
+var _vector = new Vector2();
 
 function Box2( min, max ) {
 
@@ -39,8 +39,6 @@ Object.assign( Box2.prototype, {
 	},
 
 	setFromCenterAndSize: function ( center, size ) {
-
-		if ( _vector === undefined ) _vector = new Vector2();
 
 		var halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).sub( halfSize );
@@ -191,8 +189,6 @@ Object.assign( Box2.prototype, {
 	},
 
 	distanceToPoint: function ( point ) {
-
-		if ( _vector === undefined ) _vector = new Vector2();
 
 		var clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 		return clampedPoint.sub( point ).length();

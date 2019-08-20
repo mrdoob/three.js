@@ -6,7 +6,8 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _start, _end;
+var _start = new Vector3();
+var _end = new Vector3();
 
 function LineSegments( geometry, material ) {
 
@@ -23,13 +24,6 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 	isLineSegments: true,
 
 	computeLineDistances: function () {
-
-		if ( _end === undefined ) {
-
-			_start = new Vector3();
-			_end = new Vector3();
-
-		}
 
 		var geometry = this.geometry;
 

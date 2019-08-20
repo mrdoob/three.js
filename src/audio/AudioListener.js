@@ -8,8 +8,10 @@ import { Clock } from '../core/Clock.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
-var _position, _quaternion, _scale;
-var _orientation;
+var _position = new Vector3();
+var _quaternion = new Quaternion();
+var _scale = new Vector3();
+var _orientation = new Vector3();
 
 function AudioListener() {
 
@@ -101,15 +103,6 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	updateMatrixWorld: function ( force ) {
 
 		Object3D.prototype.updateMatrixWorld.call( this, force );
-
-		if ( _position === undefined ) {
-
-			_position = new Vector3();
-			_quaternion = new Quaternion();
-			_scale = new Vector3();
-			_orientation = new Vector3();
-
-		}
 
 		var listener = this.context.listener;
 		var up = this.up;
