@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - terrain</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #bfd1e5;
+				color: #61443e;
+			}
+			a {
+				color: #a06851;
+			}
+		</style>
+	</head>	
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl of Skye terrain demo</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+			var fov = 50;
+
+			var mesh, texture;
+
+			var worldWidth, worldDepth, worldHalfWidth, worldHalfDepth;
+
+			var clock = new THREE.Clock();
+
+
+			// Get Bathymetric data
+			var xmlhttp;
+
+			if(window.XMLHttpRequest) {
+				xmlhttp=new XMLHttpRequest();
+			}
+			else {
+				xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			xmlhttp.onreadystatechange=function() {
+				if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+					
+					var data = xmlhttp.responseText.split(" ");
+
+					function NODATA_value(value) {
+						// return first time we find null value, data start after
+						return value.includes("9.9692099683868690468e+36");
+					}
+
+					function find_ncols(value) {
+						// return first time we find "360↵nrows"
+						return value.includes("nrows");
+					}
+
+					function find_nrows(value) {
+						// return first time we find 360↵xllcorner"
+						return value.includes("xllcorner");
+					}
+
+					var nrows = data.find(find_nrows).split('\n')[0]; 
+					var ncols = data.find(find_ncols).split('\n')[0];
+					var index = data.findIndex(NODATA_value);
+
+					var returnArray = data.slice(index+1);
+
+					var filtered = returnArray.filter(function (el) {
+						return el != "";
+					});
+					
+					// sanity check
+					if (nrows * ncols == filtered.length){
+						console.log("Success Processing Bathymetric Data")
+
+						worldWidth = ncols;
+						worldDepth = nrows;
+						worldHalfDepth = worldDepth/2;
+						worldHalfWidth = worldWidth/2;
+						
+						init(filtered);
+						animate();
+					}
+					else {
+						console.log("Error Processing Bathymetric Data")
+						return null
+					}
+				}
+			}
+
+			// Bathymetric Data available from 
+			// https://www.bodc.ac.uk/data/hosted_data_systems/gebco_gridded_bathymetry_data/
+
+			xmlhttp.open("GET","models/asc/GEBCO_2019_-7.0_58.0_-5.5_56.5_ESRIASCII.asc",true);
+			xmlhttp.send();
+			// if successs, we intialise
+			
+			function init(bathydata) {
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 200000 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfd1e5 );
+
+				controls = new OrbitControls( camera );
+				
+				
+				var size = worldWidth * worldDepth;
+				//data =
+				camera.position.x =-10000;
+				camera.position.y = 12000;
+				camera.position.z = 24000;
+
+				controls.update();
+
+				var geometry = new THREE.PlaneBufferGeometry( worldWidth*80, worldDepth*80, worldWidth - 1, worldDepth - 1 );
+				geometry.rotateX( - Math.PI / 2 );
+
+				var vertices = geometry.attributes.position.array;
+
+				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+					vertices[ j + 1 ] = bathydata[i] ;
+				}
+                
+				texture = new THREE.CanvasTexture( generateTexture( bathydata, worldWidth, worldDepth ) );
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+			}
+
+
+			function generateTexture( data, width, height ) {
+
+				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
+
+				vector3 = new THREE.Vector3( 0, 0, 0 );
+
+				sun = new THREE.Vector3( 1, 1, 1 );
+				sun.normalize();
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+				context = canvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, width, height );
+
+				image = context.getImageData( 0, 0, canvas.width, canvas.height );
+				imageData = image.data;
+
+				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
+					
+					var altitude = data[j];
+
+					var colourchartr;
+					var colourchartg;
+					var colourchartb;
+
+					if (altitude>0){
+						colourchartr = 0;
+						colourchartg = altitude/5 + 50;
+						colourchartb = 0;
+					} else{
+						colourchartr = altitude	+50;
+						colourchartg = altitude	+50;
+						colourchartb = altitude/3	+150;
+					}
+					if (altitude>700){
+							colourchartr = 255;
+							colourchartb = 255;
+						}
+					
+
+					imageData[ i ] = colourchartr;
+					imageData[ i + 1 ] = colourchartg;
+					imageData[ i + 2 ] = colourchartb;
+
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				// Scaled 4x
+
+				canvasScaled = document.createElement( 'canvas' );
+				canvasScaled.width = width * 4;
+				canvasScaled.height = height * 4;
+
+				context = canvasScaled.getContext( '2d' );
+				context.scale( 4, 4 );
+				context.drawImage( canvas, 0, 0 );
+
+				image = context.getImageData( 0, 0, canvasScaled.width, canvasScaled.height );
+				imageData = image.data;
+
+				context.putImageData( image, 0, 0 );
+
+				return canvasScaled;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				controls.update( clock.getDelta() );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
+
