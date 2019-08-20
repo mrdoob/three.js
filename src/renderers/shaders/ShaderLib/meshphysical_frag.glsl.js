@@ -1,5 +1,11 @@
 export default /* glsl */`
-#define PHYSICAL
+#define PHYSICAL_REFLECTION
+
+#ifdef PHYSICAL
+
+	#define CLEARCOAT
+	// TODO: ANISOTROPY and SHEEN when merged
+#endif
 
 #ifdef ADVANCED_PHYSICAL
 	#define REFLECTIVITY
