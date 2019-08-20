@@ -459,8 +459,23 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						for ( var j = 0; j < mipmaps.length; j ++ ) {
 
 							var mipmap = mipmaps[ j ];
+							var mipmapTex = properties.get( mipmap ).__webglTexture;
 
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+							if ( _gl.isTexture( mipmapTex ) ) {
+
+								var cfb = _gl.getParameter( _gl.FRAMEBUFFER_BINDING );
+								var fb = _gl.createFramebuffer();
+								_gl.bindFramebuffer( _gl.FRAMEBUFFER, fb );
+								_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, 34069 + i, mipmapTex, 0 );
+								_gl.copyTexImage2D( 34069 + i, j, glInternalFormat, 0, 0, mipmap.image.width, mipmap.image.height, 0 );
+								_gl.bindFramebuffer( _gl.FRAMEBUFFER, cfb );
+								_gl.deleteFramebuffer( fb );
+
+							} else {
+
+								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+							}
 
 						}
 
