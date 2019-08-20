@@ -44,17 +44,6 @@ export class Loader {
 	 */
 	crossOrigin: string;
 
-	/**
-	 * @deprecated Use THREE.LoaderUtils.extractUrlBase() instead.
-	 */
-	extractUrlBase( url: string ): string;
-	initMaterials( materials: Material[], texturePath: string ): Material[];
-	createMaterial(
-		m: Material,
-		texturePath: string,
-		crossOrigin?: string
-	): boolean;
-
 	static Handlers: LoaderHandler;
 
 }
