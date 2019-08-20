@@ -800,8 +800,6 @@
 							Nodes.OperatorNode.MUL
 						);
 
-						var sheen = new Nodes.FloatNode(.5);
-
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
@@ -811,8 +809,6 @@
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
-
-						mtl.sheen = sheen;
 
 						// GUI
 
@@ -867,12 +863,6 @@
 						addGui( 'normalScale', normalScale.value, function ( val ) {
 
 							normalScale.value = val;
-
-						}, false, 0, 1 );
-
-						addGui( 'sheen', sheen.value, function ( val ) {
-
-							sheen.value = val;
 
 						}, false, 0, 1 );
 

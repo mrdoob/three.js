@@ -32,7 +32,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define( this.clearCoat || this.clearCoatRoughness || this.sheen ? 'PHYSICAL' : 'STANDARD' );
+	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
 
 	if ( this.energyPreservation ) builder.define( 'ENERGY_PRESERVATION' );
 
@@ -162,17 +162,17 @@ StandardNode.prototype.build = function ( builder ) {
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
+			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } );
 
 			if ( builder.requires.irradiance ) {
 
-				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
 
 			}
 
 		}
 
-		if ( this.sheen ) this.sheen.analyze( builder );
+		if ( this.sheenColor ) this.sheenColor.analyze( builder );
 
 		// build code
 
@@ -216,7 +216,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
 
-		var sheen = ! builder.isDefined( 'STANDARD' ) && this.sheen ? this.sheen.flow( builder, 'f' ) : undefined;
+		var sheenColor = this.sheenColor ? this.sheenColor.flow( builder, 'c' ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -328,9 +328,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		if ( sheen ) {
+		if ( sheenColor ) {
 
-			output.push( 'material.sheen = ' + sheen.result + ';' );
+			output.push( 'material.sheenColor = ' + sheenColor.result + ';' );
 
 		}
 
@@ -506,7 +506,7 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.environment ) this.environment = source.environment;
 
-	if ( source.sheen ) this.sheen = source.sheen;
+	if ( source.sheenColor ) this.sheenColor = source.sheenColor;
 
 	return this;
 
@@ -551,7 +551,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
 
-		if ( this.sheen ) data.sheen = this.sheen.toJSON( meta ).uuid;
+		if ( this.sheenColor ) data.sheenColor = this.sheenColor.toJSON( meta ).uuid;
 
 	}
 

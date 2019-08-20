@@ -20,6 +20,8 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import * as Nodes from './jsm/nodes/Nodes.js';
+
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
@@ -28,10 +30,12 @@
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 			// Graphics variables
-			var camera, controls, scene, renderer, mesh, stats;
+			var camera, controls, scene, renderer, stats;
 			var directionalLight;
+			var mesh, sphere, material, nodeMaterial;
 
 			var params = {
+				nodeMaterial: true,
 				color: new THREE.Color( 255, 0, 127 ),
 				sheenBRDF: true,
 				sheenColor: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
@@ -55,15 +59,28 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				mesh.material = new THREE.MeshPhysicalMaterial();
-				mesh.material.side = THREE.DoubleSide;
-				mesh.material.metalness = 0;
 				mesh.scale.multiplyScalar( .5 );
 				scene.add( mesh );
 
-				var sphere = new THREE.Mesh(
+				//
+
+				material = new THREE.MeshPhysicalMaterial();
+				material.side = THREE.DoubleSide;
+				material.metalness = 0;
+
+				//
+
+				nodeMaterial = new Nodes.StandardNodeMaterial();
+				nodeMaterial.side = THREE.DoubleSide;
+				nodeMaterial.metalness = new Nodes.FloatNode( 0 );
+				nodeMaterial.roughness = new Nodes.FloatNode();
+				nodeMaterial.color = new Nodes.ColorNode( params.color.clone() );
+
+				//
+
+				sphere = new THREE.Mesh(
 					new THREE.SphereBufferGeometry( 1, 100, 100 ),
-					mesh.material
+					material
 				);
 				scene.add(sphere);
 
@@ -101,6 +118,7 @@
 
 				var gui = new GUI();
 
+				gui.add( params, 'nodeMaterial' );
 				gui.addColor( params, 'color' );
 				gui.add( params, 'sheenBRDF' );
 				gui.addColor( params, 'sheenColor' );
@@ -132,15 +150,36 @@
 
 			function render() {
 
-				mesh.material.sheenColor = params.sheenBRDF
+				mesh.material = sphere.material = params.nodeMaterial
+					? nodeMaterial
+					: material;
+
+				//
+
+				material.sheenColor = params.sheenBRDF
 					? new THREE.Color().copy( params.sheenColor ).multiplyScalar( 1 / 255 )
 					: null;
 
-				mesh.material.color.copy(params.color).multiplyScalar( 1 / 255 );
-				mesh.material.roughness = params.roughness;
-				renderer.toneMappingExposure = params.exposure;
-				mesh.material.needsUpdate = true;
+				material.color.copy( params.color ).multiplyScalar( 1 / 255 );
+				material.roughness = params.roughness;
 
+				material.needsUpdate = true;
+
+				//
+
+				nodeMaterial.sheenColor = params.sheenBRDF
+					? new Nodes.ColorNode( material.sheenColor )
+					: undefined;
+
+				nodeMaterial.color.value.copy( material.color );
+
+				nodeMaterial.roughness.value = params.roughness;
+
+				nodeMaterial.needsCompile = true;
+
+				//
+
+				renderer.toneMappingExposure = params.exposure;
 				renderer.render( scene, camera );
 
 			}

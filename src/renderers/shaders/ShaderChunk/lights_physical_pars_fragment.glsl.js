@@ -107,7 +107,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 			material.specularRoughness,
 			directLight.direction,
 			geometry,
-			sheenColor
+			material.sheenColor
 		);
 	#else
 		reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness);
