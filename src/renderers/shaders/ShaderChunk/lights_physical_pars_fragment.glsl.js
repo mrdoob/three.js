@@ -10,6 +10,10 @@ struct PhysicalMaterial {
 		float clearCoatRoughness;
 	#endif
 
+	#ifdef USE_SHEEN
+		vec3 sheenColor;
+	#endif
+
 };
 
 #define MAXIMUM_SPECULAR_COEFFICIENT 0.16
@@ -98,10 +102,18 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#endif
 
-	reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness );
+	#ifdef USE_SHEEN
+		reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_Sheen(
+			material.specularRoughness,
+			directLight.direction,
+			geometry,
+			material.sheenColor
+		);
+	#else
+		reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness);
+	#endif
 
 	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {

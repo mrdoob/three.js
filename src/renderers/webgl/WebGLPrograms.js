@@ -37,7 +37,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
+		"sheen"
 	];
 
 
@@ -161,6 +162,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			alphaMap: !! material.alphaMap,
 
 			gradientMap: !! material.gradientMap,
+
+			sheen: !! material.sheenColor,
 
 			combine: material.combine,
 

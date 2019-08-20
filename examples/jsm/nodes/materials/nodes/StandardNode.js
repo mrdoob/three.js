@@ -169,15 +169,17 @@ StandardNode.prototype.build = function ( builder ) {
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
+			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } );
 
 			if ( builder.requires.irradiance ) {
 
-				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
 
 			}
 
 		}
+
+		if ( this.sheenColor ) this.sheenColor.analyze( builder );
 
 		// build code
 
@@ -221,6 +223,8 @@ StandardNode.prototype.build = function ( builder ) {
 		}
 
 		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextClearCoatEnvironment, slot: 'environment' } ) : undefined;
+
+		var sheenColor = this.sheenColor ? this.sheenColor.flow( builder, 'c' ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -339,6 +343,12 @@ StandardNode.prototype.build = function ( builder ) {
 		} else if ( useClearCoat ) {
 
 			output.push( 'material.clearCoatRoughness = 0.0;' );
+
+		}
+
+		if ( sheenColor ) {
+
+			output.push( 'material.sheenColor = ' + sheenColor.result + ';' );
 
 		}
 
@@ -515,6 +525,8 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.environment ) this.environment = source.environment;
 
+	if ( source.sheenColor ) this.sheenColor = source.sheenColor;
+
 	return this;
 
 };
@@ -558,6 +570,8 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
+
+		if ( this.sheenColor ) data.sheenColor = this.sheenColor.toJSON( meta ).uuid;
 
 	}
 

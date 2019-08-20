@@ -1,5 +1,6 @@
 import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
+import { Color } from '../math/Color.js';
 
 /**
  * @author WestLangley / http://github.com/WestLangley
@@ -8,6 +9,8 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
  *  reflectivity: <float>
  *  clearCoat: <float>
  *  clearCoatRoughness: <float>
+ *
+ *  sheen: <Color>
  *
  *  clearCoatNormalScale: <Vector2>,
  *  clearCoatNormalMap: new THREE.Texture( <Image> ),
@@ -26,6 +29,8 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.clearCoat = 0.0;
 	this.clearCoatRoughness = 0.0;
+
+	this.sheenColor = null; // null will disable sheen bsdf
 
 	this.clearCoatNormalScale = new Vector2( 1, 1 );
 	this.clearCoatNormalMap = null;
@@ -49,6 +54,9 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	this.clearCoat = source.clearCoat;
 	this.clearCoatRoughness = source.clearCoatRoughness;
+
+	if ( source.sheenColor ) this.sheenColor = ( this.sheenColor || new Color() ).copy( source.sheenColor );
+	else this.sheenColor = null;
 
 	this.clearCoatNormalMap = source.clearCoatNormalMap;
 	this.clearCoatNormalScale.copy( source.clearCoatNormalScale );

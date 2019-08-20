@@ -9,4 +9,7 @@ material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );
 	material.clearCoat = saturate( clearCoat ); // Burley clearcoat model
 	material.clearCoatRoughness = clamp( clearCoatRoughness, 0.04, 1.0 );
 #endif
+#ifdef USE_SHEEN
+	material.sheenColor = sheenColor;
+#endif
 `;

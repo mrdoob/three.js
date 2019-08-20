@@ -12,6 +12,10 @@ uniform float opacity;
 	uniform float clearCoatRoughness;
 #endif
 
+#ifdef USE_SHEEN
+	uniform vec3 sheenColor;
+#endif
+
 varying vec3 vViewPosition;
 
 #ifndef FLAT_SHADED
