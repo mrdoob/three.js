@@ -1,5 +1,4 @@
 import {
-	REVISION,
 	RGBAFormat,
 	HalfFloatType,
 	FloatType,

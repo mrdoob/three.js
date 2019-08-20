@@ -29,7 +29,7 @@ export interface MeshStandardMaterialParameters extends MaterialParameters {
 	alphaMap?: Texture;
 	envMap?: Texture;
 	envMapIntensity?: number;
-	energyPreservation: boolean;
+	energyPreservation?: boolean;
 	refractionRatio?: number;
 	wireframe?: boolean;
 	wireframeLinewidth?: number;

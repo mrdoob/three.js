@@ -71,6 +71,38 @@
 
 			}
 
+			var premTexture, pmremCube, pmremGenerator, pmremCubeUVPacker, premSize = 1024;
+
+			function updatePREM( textureCube ) {
+
+				pmremCube = pmremCube || textureCube;
+
+				if ( ! pmremCube || ! renderer ) return;
+
+				var minFilter = pmremCube.minFilter;
+				var magFilter = pmremCube.magFilter;
+				var generateMipmaps = pmremCube.generateMipmaps;
+
+				pmremGenerator = new PMREMGenerator( pmremCube, undefined, premSize / 4 );
+				pmremGenerator.update( renderer );
+
+				pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+				pmremCubeUVPacker.update( renderer );
+
+				pmremCube.minFilter = minFilter;
+				pmremCube.magFilter = magFilter;
+				pmremCube.generateMipmaps = pmremCube.generateMipmaps;
+				pmremCube.needsUpdate = true;
+
+				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture
+
+				library[ premTexture.uuid ] = premTexture;
+
+				pmremGenerator.dispose();
+				pmremCubeUVPacker.dispose();
+
+			}
+
 			var cubemap = function () {
 
 				var path = "textures/cube/Park2/";
@@ -81,7 +113,7 @@
 					path + 'posz' + format, path + 'negz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				var textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
 				textureCube.format = THREE.RGBFormat;
 
 				library[ textureCube.uuid ] = textureCube;
@@ -89,45 +121,6 @@
 				return textureCube;
 
 			}();
-
-			function generatePREM( cubeMap, textureSize ) {
-
-				textureSize = textureSize || 1024;
-
-				var pmremGenerator = new PMREMGenerator( cubeMap, undefined, textureSize / 4 );
-				pmremGenerator.update( renderer );
-
-				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-				pmremCubeUVPacker.update( renderer );
-
-				pmremGenerator.dispose();
-				pmremCubeUVPacker.dispose();
-
-				return pmremCubeUVPacker.CubeUVRenderTarget.texture;
-
-			}
-
-			var premTexture;
-
-			function getPREM( callback, textureSize ) {
-
-				if ( premTexture ) return callback( premTexture );
-
-				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-				var hdrCubeMap = new HDRCubeTextureLoader()
-					.setPath( './textures/cube/pisaHDR/' )
-					.setDataType( THREE.UnsignedByteType )
-					.load( hdrUrls, function () {
-
-						premTexture = generatePREM( hdrCubeMap, textureSize );
-
-						library[ premTexture.uuid ] = premTexture;
-
-						callback( premTexture );
-
-					} );
-
-			}
 
 			window.addEventListener( 'load', init );
 
@@ -175,6 +168,8 @@
 				library[ renderer.uuid ] = renderer;
 				library[ camera.uuid ] = camera;
 				library[ mesh.uuid ] = mesh;
+
+				updatePREM();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -226,6 +221,7 @@
 					'adv / expression': 'expression',
 					'adv / sss': 'sss',
 					'adv / translucent': 'translucent',
+					'adv / bias': 'bias',
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
 					'node / reflect': 'node-reflect',
@@ -504,14 +500,8 @@
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
 
-						getPREM(function(texture) {
-
-							var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( texture ) );
-
-							mtl.environment = new Nodes.OperatorNode( envNode, intensity, Nodes.OperatorNode.MUL );
-							mtl.needsUpdate = true;
-
-						});
+						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+						mtl.environment = new Nodes.OperatorNode( envNode, intensity, Nodes.OperatorNode.MUL );
 
 						// GUI
 
@@ -587,18 +577,13 @@
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalScale;
 
-						getPREM(function(texture) {
+						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
 
-							var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( texture ) );
+						var subSlotNode = new Nodes.SubSlotNode();
+						subSlotNode.slots['radiance'] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots['irradiance'] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
 
-							var subSlotNode = new Nodes.SubSlotNode();
-							subSlotNode.slots['radiance'] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
-							subSlotNode.slots['irradiance'] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
-
-							mtl.environment = subSlotNode;
-							mtl.needsUpdate = true;
-
-						});
+						mtl.environment = subSlotNode
 
 						// GUI
 
@@ -757,6 +742,7 @@
 						//mtl.reflectivity = // reflectivity (float)
 						//mtl.clearCoat = // clearCoat (float)
 						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.clearCoatNormal = // clearCoatNormal (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -769,6 +755,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
+						var clearCoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -800,12 +787,20 @@
 							Nodes.OperatorNode.MUL
 						);
 
+						var clearCoatNormalMask = new Nodes.OperatorNode(
+							mask,
+							clearCoatNormalScale,
+							Nodes.OperatorNode.MUL
+						);
+
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
 						mtl.clearCoat = clearCoat;
 						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.clearCoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearCoatNormal.scale = clearCoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
@@ -833,6 +828,12 @@
 						addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
 
 							clearCoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoatNormalScale', clearCoatNormalScale.value, function ( val ) {
+
+							clearCoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 
@@ -2483,6 +2484,67 @@
 
 						break;
 
+					case 'bias':
+
+						// MATERIAL
+
+						var bias = new Nodes.FloatNode( .5 );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap ) );
+						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
+
+						mtl = new Nodes.PhongNodeMaterial();
+						mtl.color.value.setHex( 0xFFFFFF );
+
+						function biasMode( val ) {
+
+							switch( val ) {
+
+								case 'prem':
+
+									mtl.color = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ), undefined, undefined, bias );
+
+									break;
+
+								case 'lod':
+
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );', undefined, { shaderTextureLOD: true } 								);
+
+									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
+
+									break;
+
+								case 'basic':
+
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCube( samplerCube texture, vec3 uv, float bias );' );
+
+									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
+
+									break;
+
+							}
+
+							mtl.needsUpdate = true;
+
+						}
+
+						biasMode( 'prem' );
+
+						// GUI
+
+						addGui( 'scope', {
+							PREM: 'prem',
+							LOD: 'lod',
+							BASIC: 'basic'
+						}, biasMode );
+
+						addGui( 'bias', bias.value, function ( val ) {
+
+							bias.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
 					case 'node-position':
 
 						// MATERIAL
@@ -2534,28 +2596,42 @@
 
 					case 'node-reflect':
 
-						// MATERIAL
+							// MATERIAL
 
-						var node = new Nodes.ReflectNode();
+							var node = new Nodes.ReflectNode();
 
-						mtl = new Nodes.PhongNodeMaterial();
-						mtl.environment = new Nodes.CubeTextureNode( cubemap, node );
+							var nodeMaterial = new Nodes.StandardNodeMaterial();
+							nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+							nodeMaterial.roughness.value = .5;
+							nodeMaterial.metalness.value = 1;
 
-						// GUI
+							var standardMaterial = new THREE.MeshStandardMaterial( {
+								color: nodeMaterial.color.value,
+								side: defaultSide,
+								envMap: cubemap,
+								roughness: nodeMaterial.roughness.value,
+								metalness: 1
+							} );
 
-						addGui( 'scope', {
-							vector: Nodes.ReflectNode.VECTOR,
-							cube: Nodes.ReflectNode.CUBE,
-							sphere: Nodes.ReflectNode.SPHERE
-						}, function ( val ) {
+							mtl = nodeMaterial;
 
-							node.scope = val;
+							// GUI
 
-							mtl.needsUpdate = true;
+							addGui( 'node', true, function ( val ) {
 
-						} );
+								mtl = val ? nodeMaterial : standardMaterial;
+								mesh.material = mtl;
 
-						break;
+							} );
+
+							addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
+
+								nodeMaterial.roughness.value = val;
+								standardMaterial.roughness = val;
+
+							}, false, 0, 1 );
+
+							break;
 
 
 					case 'varying':

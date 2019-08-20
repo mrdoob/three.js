@@ -1,4 +1,4 @@
-/*
+/**
  * @author zz85 / https://github.com/zz85
  *
  * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/

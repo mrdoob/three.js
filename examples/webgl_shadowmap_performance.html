@@ -100,6 +100,8 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
+				renderer.gammaOutput = true;
+				renderer.gammaFactor = 2.2;
 				renderer.autoClear = false;
 
 				//
@@ -137,7 +139,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 

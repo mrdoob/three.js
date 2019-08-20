@@ -5,7 +5,7 @@ struct PhysicalMaterial {
 	float	specularRoughness;
 	vec3	specularColor;
 
-	#ifndef STANDARD
+	#ifdef PHYSICAL
 		float clearCoat;
 		float clearCoatRoughness;
 	#endif
@@ -80,7 +80,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#endif
 
-	#ifndef STANDARD
+	#ifdef PHYSICAL
 
 		float ccDotNL = saturate( dot( geometry.clearCoatNormal, directLight.direction ) );
 

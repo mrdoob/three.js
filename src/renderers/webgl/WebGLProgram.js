@@ -380,7 +380,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			'#define MAX_BONES ' + parameters.maxBones,
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
-			( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
+			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
@@ -400,6 +400,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
+			parameters.vertexUvs ? '#define USE_UV' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -494,7 +495,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'#define GAMMA_FACTOR ' + gammaFactorDefine,
 
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
-			( parameters.useFog && parameters.fogExp ) ? '#define FOG_EXP2' : '',
+			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',
@@ -518,6 +519,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
+			parameters.vertexUvs ? '#define USE_UV' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
@@ -536,7 +538,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			parameters.envMap && ( capabilities.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
+			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( capabilities.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',

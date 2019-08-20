@@ -22,15 +22,17 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 	function renderInstances( geometry, start, count ) {
 
-		var extension;
+		var extension, methodName;
 
 		if ( capabilities.isWebGL2 ) {
 
 			extension = gl;
+			methodName = 'drawArraysInstanced';
 
 		} else {
 
 			extension = extensions.get( 'ANGLE_instanced_arrays' );
+			methodName = 'drawArraysInstancedANGLE';
 
 			if ( extension === null ) {
 
@@ -41,7 +43,7 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		}
 
-		extension[ capabilities.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
+		extension[ methodName ]( mode, start, count, geometry.maxInstancedCount );
 
 		info.update( count, mode, geometry.maxInstancedCount );
 

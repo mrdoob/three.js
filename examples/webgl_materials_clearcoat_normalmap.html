@@ -85,9 +85,9 @@
 						normalMap.wrapS = THREE.RepeatWrapping;
 						normalMap.wrapT = THREE.RepeatWrapping;
 
-						var clearCoatNormaMap = textureLoader.load( "textures/waternormals.jpg" );
-						clearCoatNormaMap.wrapS = THREE.RepeatWrapping;
-						clearCoatNormaMap.wrapT = THREE.RepeatWrapping;
+						var normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
+
+						var clearCoatNormaMap = textureLoader.load( "textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png" );
 
 						//
 
@@ -119,9 +119,11 @@
 
 						var material = new THREE.MeshPhysicalMaterial( {
 							clearCoat: 1.0,
+							metalness: 0.0,
+							color: 0xff0000,
 							envMap: hdrCubeRenderTarget.texture,
-							map: diffuse,
-							clearCoatNormalMap: clearCoatNormaMap
+							clearCoatNormalMap: clearCoatNormaMap,
+							clearCoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = - 100;
@@ -132,10 +134,13 @@
 
 						var material = new THREE.MeshPhysicalMaterial( {
 							clearCoat: 1.0,
+							metalness: 1.0,
+							color: 0xff0000,
 							envMap: hdrCubeRenderTarget.texture,
-							map: diffuse,
-							normalMap: normalMap,
-							clearCoatNormalMap: clearCoatNormaMap
+							normalMap: normalMap2,
+							normalScale: new THREE.Vector2( 0.15, 0.15 ),
+							clearCoatNormalMap: clearCoatNormaMap,
+							clearCoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = 100;
