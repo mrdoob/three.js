@@ -13,6 +13,8 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
+var _vector, _color1, _color2;
+
 function HemisphereLightHelper( light, size, color ) {
 
 	Object3D.call( this );
@@ -54,43 +56,42 @@ HemisphereLightHelper.prototype.dispose = function () {
 
 HemisphereLightHelper.prototype.update = function () {
 
-	var vector = new Vector3();
+	if ( _color2 === undefined ) {
 
-	var color1 = new Color();
-	var color2 = new Color();
+		_vector = new Vector3();
+		_color1 = new Color();
+		_color2 = new Color();
 
-	return function update() {
+	}
 
-		var mesh = this.children[ 0 ];
+	var mesh = this.children[ 0 ];
 
-		if ( this.color !== undefined ) {
+	if ( this.color !== undefined ) {
 
-			this.material.color.set( this.color );
+		this.material.color.set( this.color );
 
-		} else {
+	} else {
 
-			var colors = mesh.geometry.getAttribute( 'color' );
+		var colors = mesh.geometry.getAttribute( 'color' );
 
-			color1.copy( this.light.color );
-			color2.copy( this.light.groundColor );
+		_color1.copy( this.light.color );
+		_color2.copy( this.light.groundColor );
 
-			for ( var i = 0, l = colors.count; i < l; i ++ ) {
+		for ( var i = 0, l = colors.count; i < l; i ++ ) {
 
-				var color = ( i < ( l / 2 ) ) ? color1 : color2;
+			var color = ( i < ( l / 2 ) ) ? _color1 : _color2;
 
-				colors.setXYZ( i, color.r, color.g, color.b );
-
-			}
-
-			colors.needsUpdate = true;
+			colors.setXYZ( i, color.r, color.g, color.b );
 
 		}
 
-		mesh.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		colors.needsUpdate = true;
 
-	};
+	}
 
-}();
+	mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+
+};
 
 
 export { HemisphereLightHelper };

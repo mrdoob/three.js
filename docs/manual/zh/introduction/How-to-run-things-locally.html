@@ -116,6 +116,12 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 					</li>
 				</ol>
 			</div>
+			<h3>IIS</h3>
+			<div>
+				<p>如果你正在使用Microsoft IIS来作为网站服务器，在服务器载入之前，请为.fbx扩展名增加MIME类型。</p>
+				<code>File name externsion: fbx        MIME Type: text/plain</code>
+				<p>在默认情况下，IIS阻止 .fbx、 .obj 文件的下载，因此你必须对IIS进行配置，使得这些类型的文件可以被下载。</p>
+			</div>
 
 			<p>
                 其它简单的替代方案你可以在Stack Overflow上找到：[link:http://stackoverflow.com/q/12905426/24874 click here]。
