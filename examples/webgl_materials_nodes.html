@@ -742,6 +742,7 @@
 						//mtl.reflectivity = // reflectivity (float)
 						//mtl.clearCoat = // clearCoat (float)
 						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.clearCoatNormal = // clearCoatNormal (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -754,6 +755,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
+						var clearCoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -785,12 +787,20 @@
 							Nodes.OperatorNode.MUL
 						);
 
+						var clearCoatNormalMask = new Nodes.OperatorNode(
+							mask,
+							clearCoatNormalScale,
+							Nodes.OperatorNode.MUL
+						);
+
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
 						mtl.clearCoat = clearCoat;
 						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.clearCoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearCoatNormal.scale = clearCoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
@@ -818,6 +828,12 @@
 						addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
 
 							clearCoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearCoatNormalScale', clearCoatNormalScale.value, function ( val ) {
+
+							clearCoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 
@@ -2586,30 +2602,20 @@
 
 							var nodeMaterial = new Nodes.StandardNodeMaterial();
 							nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
-							nodeMaterial.roughness = new Nodes.FloatNode(0);
-							nodeMaterial.metalness = new Nodes.FloatNode(1);
+							nodeMaterial.roughness.value = .5;
+							nodeMaterial.metalness.value = 1;
 
 							var standardMaterial = new THREE.MeshStandardMaterial( {
+								color: nodeMaterial.color.value,
+								side: defaultSide,
 								envMap: cubemap,
-								roughness: 0,
+								roughness: nodeMaterial.roughness.value,
 								metalness: 1
 							} );
 
 							mtl = nodeMaterial;
 
 							// GUI
-
-							addGui( 'scope', {
-								vector: Nodes.ReflectNode.VECTOR,
-								cube: Nodes.ReflectNode.CUBE,
-								sphere: Nodes.ReflectNode.SPHERE
-							}, function ( val ) {
-
-								node.scope = val;
-
-								nodeMaterial.needsUpdate = true;
-
-							} );
 
 							addGui( 'node', true, function ( val ) {
 
@@ -2618,7 +2624,7 @@
 
 							} );
 
-							addGui( 'roughness', 0, function ( val ) {
+							addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
 
 								nodeMaterial.roughness.value = val;
 								standardMaterial.roughness = val;

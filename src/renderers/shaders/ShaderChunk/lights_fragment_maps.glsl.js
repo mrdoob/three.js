@@ -27,7 +27,7 @@ export default /* glsl */`
 
 	radiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.normal, Material_BlinnShininessExponent( material ), maxMipLevel );
 
-	#ifndef STANDARD
+	#ifdef PHYSICAL
 
 		clearCoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.clearCoatNormal, Material_ClearCoat_BlinnShininessExponent( material ), maxMipLevel );
 

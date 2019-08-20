@@ -9,7 +9,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-var _box;
+var _box = new Box3();
 
 function BoxHelper( object, color ) {
 
@@ -36,8 +36,6 @@ BoxHelper.prototype = Object.create( LineSegments.prototype );
 BoxHelper.prototype.constructor = BoxHelper;
 
 BoxHelper.prototype.update = function ( object ) {
-
-	if ( _box === undefined ) _box = new Box3();
 
 	if ( object !== undefined ) {
 

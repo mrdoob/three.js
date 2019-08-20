@@ -16,7 +16,9 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Object3D } from '../core/Object3D.js';
 
-var _vector, _boneMatrix, _matrixWorldInv;
+var _vector = new Vector3();
+var _boneMatrix = new Matrix4();
+var _matrixWorldInv = new Matrix4();
 
 function getBoneList( object ) {
 
@@ -84,14 +86,6 @@ SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
 
 SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
-
-	if ( _matrixWorldInv === undefined ) {
-
-		_vector = new Vector3();
-		_boneMatrix = new Matrix4();
-		_matrixWorldInv = new Matrix4();
-
-	}
 
 	var bones = this.bones;
 
