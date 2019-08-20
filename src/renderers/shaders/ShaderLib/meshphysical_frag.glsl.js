@@ -7,7 +7,7 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
-#ifndef STANDARD
+#ifdef PHYSICAL
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
 #endif

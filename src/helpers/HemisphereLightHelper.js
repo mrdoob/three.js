@@ -13,7 +13,9 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-var _vector, _color1, _color2;
+var _vector = new Vector3();
+var _color1 = new Color();
+var _color2 = new Color();
 
 function HemisphereLightHelper( light, size, color ) {
 
@@ -55,14 +57,6 @@ HemisphereLightHelper.prototype.dispose = function () {
 };
 
 HemisphereLightHelper.prototype.update = function () {
-
-	if ( _color2 === undefined ) {
-
-		_vector = new Vector3();
-		_color1 = new Color();
-		_color2 = new Color();
-
-	}
 
 	var mesh = this.children[ 0 ];
 

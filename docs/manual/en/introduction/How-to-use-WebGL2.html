@@ -48,9 +48,14 @@ if ( WEBGL.isWebGL2Available() === false ) {
 		automatically convert the built-in material's shader code to GLSL ES 3.00.
 	</p>
 
+	<p>
+		Since you are manually creating the WebGL 2 rendering context, you also have to pass in all necessary context attributes.
+		Note: It's not possible to modify these attributes after the context has been created, so passing them to the WebGLRenderer won't have any effect.
+	</p>
+
 	<code>
 var canvas = document.createElement( 'canvas' );
-var context = canvas.getContext( 'webgl2' );
+var context = canvas.getContext( 'webgl2', { alpha: false } );
 var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 	</code>
 

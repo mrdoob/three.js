@@ -24,7 +24,7 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var _axis;
+var _axis = new Vector3();
 var _lineGeometry, _coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
@@ -69,8 +69,6 @@ ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
 
 ArrowHelper.prototype.setDirection = function ( dir ) {
-
-	if ( _axis === undefined ) _axis = new Vector3();
 
 	// dir is assumed to be normalized
 

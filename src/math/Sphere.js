@@ -1,12 +1,12 @@
 import { Box3 } from './Box3.js';
 import { Vector3 } from './Vector3.js';
 
+var _box = new Box3();
+
 /**
  * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
  */
-
-var _box;
 
 function Sphere( center, radius ) {
 
@@ -27,8 +27,6 @@ Object.assign( Sphere.prototype, {
 	},
 
 	setFromPoints: function ( points, optionalCenter ) {
-
-		if ( _box === undefined ) _box = new Box3();
 
 		var center = this.center;
 
