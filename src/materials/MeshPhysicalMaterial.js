@@ -55,7 +55,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearCoat = source.clearCoat;
 	this.clearCoatRoughness = source.clearCoatRoughness;
 
-	if( source.sheenColor ) this.sheenColor = ( this.sheenColor || new Color() ).copy( source.sheenColor );
+	if ( source.sheenColor ) this.sheenColor = ( this.sheenColor || new Color() ).copy( source.sheenColor );
 	else this.sheenColor = null;
 
 	this.clearCoatNormalMap = source.clearCoatNormalMap;
