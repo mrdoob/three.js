@@ -194,7 +194,7 @@ var LightProbeGenerator = {
 				dir.copy( coord ).normalize();
 
 				// evaluate SH basis functions in direction dir
-				THREE.SphericalHarmonics3.getBasisAt( dir, shBasis );
+				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
 				// accummuulate
 				for ( var j = 0; j < 9; j ++ ) {
