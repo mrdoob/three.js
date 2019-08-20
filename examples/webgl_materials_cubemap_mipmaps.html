@@ -40,11 +40,9 @@
 
 					return new Promise( function ( resolve, reject) {
 
-						new THREE.CubeTextureLoader().load( urls,function ( cubeTexture ) {
+						new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
 
 							resolve( cubeTexture );
-
-						}, function ( error ) {
 
 						} );
 
