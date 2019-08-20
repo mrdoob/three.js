@@ -47,11 +47,8 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( - 40, 0, 60 );
-
-				camera2 = new THREE.PerspectiveCamera( 40, 1, 1, 1000 );
-				camera2.position.copy( camera.position );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 10;
@@ -70,7 +67,7 @@
 				for ( var i = 0, l = divisions; i < l; i ++ ) {
 
 					var point = spline.getPoint( i / l );
-					positions.push( point.x, point.y, point.z );
+					positions.push( point.x, point.y, point.z*3 );
 
 				}
 
@@ -90,10 +87,10 @@
 
 
 				var mat_b = new PerspectiveLineMaterial( {
-					color: 0x00ff00,
-					worldlinewidth: 0.15,
-					maxlinewidth: 100,
-					minlinewidth: 0.1,
+					color: 0xffff00,
+					worldlinewidth: 0.3,
+					maxlinewidth: 1000,
+					minlinewidth: 0.01,
 				} );
 				line_materials.push(mat_b);
 				line_b = new Line2( geometry, mat_b );
@@ -104,7 +101,7 @@
 
 				//
 				// A marker to show mouse intersect
-				markergeo = new THREE.SphereBufferGeometry( 0.3 );
+				markergeo = new THREE.SphereBufferGeometry( 0.15 );
 				markermat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 				marker = new THREE.Mesh( markergeo, markermat );
 				marker.visible=false;
@@ -163,7 +160,12 @@
 
 				if ( intersects.length > 0 ) {
 
-					console.log( 'Found intersect at', intersects[ 0 ].point );
+					// The default sorting for intersects is to take the intersect closest to the camera along the raycast line.
+					// However, in our case that's not what we want, since two candidate segments may lay close to each other: we actually want the one that's closest to the to the cursor.
+					intersects.sort((a,b)=>a.transverseDistance-b.transverseDistance);
+
+
+					console.log( 'Found intersect at', intersects[ 0 ] );
 					marker.visible = true;
 					marker.position.copy( intersects[ 0 ].point );
 					intersects[0].object.material.color.set(  0x0000ff );

@@ -87,7 +87,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			// If using a persepective-line material, there is a known precision:
 			// This doesn't work correctly though; the collision distance turns out too large.
-			// if(this.material && this.material.worldlinewidth) precision = this.material.worldlinewidth;
+			if(this.material && this.material.worldlinewidth) precision = this.material.worldlinewidth;
 
 			var geometry = this.geometry;
 			var matrixWorld = this.matrixWorld;
@@ -104,8 +104,13 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			inverseMatrix.getInverse( matrixWorld );
 			ray.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-			var localPrecisionSq = localPrecision * localPrecision;
+			// This was in the orignal Line.js raycast code, but it's correctness is debatable. Line objects
+			// have infintesimal width, so exapnding the size of the object should not exapand the width of the line.
+			// var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			//var localPrecisionSq = localPrecision * localPrecision;
+
+			var localPrecisionSq = precision * precision;
+
 
 			var vStart = new Vector3();
 			var vEnd = new Vector3();
@@ -136,6 +141,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		          // What do we want? intersection point on the ray or on the segment??
 		          // point: raycaster.ray.at( distance ),
 		          point: interSegment.clone().applyMatrix4( this.matrixWorld ),
+		          transverseDistance: Math.sqrt(distSq),   // Special value indicating the distance of interesection from the ray
 		          index: i,
 		          face: null,
 		          faceIndex: null,
