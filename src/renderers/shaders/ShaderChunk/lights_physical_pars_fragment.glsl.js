@@ -5,7 +5,7 @@ struct PhysicalMaterial {
 	float	specularRoughness;
 	vec3	specularColor;
 
-	#ifdef PHYSICAL
+	#ifdef CLEARCOAT
 		float clearCoat;
 		float clearCoatRoughness;
 	#endif
@@ -76,7 +76,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#endif
 
-	#ifdef PHYSICAL
+	#ifdef CLEARCOAT
 
 		float ccDotNL = saturate( dot( geometry.clearCoatNormal, directLight.direction ) );
 
@@ -111,7 +111,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 
 void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
-	#ifdef PHYSICAL
+	#ifdef CLEARCOAT
 
 		float ccDotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
 

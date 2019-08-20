@@ -18,7 +18,12 @@ function MeshPhysicalMaterial( parameters ) {
 
 	MeshStandardMaterial.call( this );
 
-	this.defines = { 'PHYSICAL': '' };
+	this.defines = {
+
+		'PHYSICAL': '',
+		'ADVANCED_PHYSICAL': ''
+
+	};
 
 	this.type = 'MeshPhysicalMaterial';
 

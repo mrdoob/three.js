@@ -1,13 +1,19 @@
 export default /* glsl */`
 #define PHYSICAL
 
+#ifdef ADVANCED_PHYSICAL
+	#define REFLECTIVITY
+	#define CLEARCOAT
+	// TODO: ANISOTROPY and SHEEN when merged
+#endif
+
 uniform vec3 diffuse;
 uniform vec3 emissive;
 uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
-#ifdef PHYSICAL
+#ifdef CLEARCOAT
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
 #endif

@@ -32,7 +32,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define( this.clearCoat || this.clearCoatRoughness || this.clearCoatNormal ? 'PHYSICAL' : 'STANDARD' );
+	builder.define('PHYSICAL');
+
+	var useClearCoat = this.clearCoat;
+
+	if( useClearCoat ){
+
+		builder.define( 'CLEARCOAT' );
+
+	}
 
 	builder.requires.lights = true;
 
@@ -129,7 +137,6 @@ StandardNode.prototype.build = function ( builder ) {
 			gamma: true
 		};
 
-		var useClearCoat = ! builder.isDefined( 'STANDARD' );
 
 		// analyze all nodes to reuse generate codes
 
@@ -161,11 +168,11 @@ StandardNode.prototype.build = function ( builder ) {
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
+			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } );
 
 			if ( builder.requires.irradiance ) {
 
-				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
 
 			}
 
