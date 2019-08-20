@@ -514,6 +514,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 
+			parameters.sheen ? '#define USE_SHEEN' : '',
+
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 

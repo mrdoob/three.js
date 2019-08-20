@@ -27,23 +27,16 @@
 
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
-
 			// Graphics variables
 			var camera, controls, scene, renderer, mesh, stats;
-			var envMap, directionalLight, ambientLight;
+			var directionalLight;
 
 			var params = {
-				sheen: .8,
-				hue: 265,
+				color: new THREE.Color( 255, 0, 127 ),
+				sheenBRDF: true,
+				sheenColor: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
 				roughness: .9,
 				exposure: 2,
-				envMap: true,
-				directionalLight: false,
-				ambientLight: false
 			};
 
 			// model
@@ -83,41 +76,11 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.dfgLut = new THREE.TextureLoader().load( 'textures/dfg.png' );
-				renderer.dfgLut.generateMipmaps = false;
-				renderer.dfgLut.magFilter = THREE.LinearFilter;
-				renderer.dfgLut.minFilter = THREE.LinearFilter;
-
-				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-
-				new THREE.CubeTextureLoader()
-					.setPath( 'textures/cube/Park3Med/' )
-					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ], function ( ldrCubeMap ) {
-
-						envMap = ldrCubeMap;
-
-						var pmremGenerator = new PMREMGenerator( envMap, 128 );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						mesh.material.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-						mesh.material.needsUpdate = true;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
-
-					} );
-
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				ambientLight = new THREE.AmbientLight( 0x404040 );
-				scene.add( ambientLight );
-
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, .5 );
 				directionalLight.position.set( 0, 10, 0 );
 				directionalLight.castShadow = true;
 				directionalLight.add(
@@ -138,13 +101,11 @@
 
 				var gui = new GUI();
 
-				gui.add( params, 'sheen', 0, 1 );
-				gui.add( params, 'hue', 0, 360 );
+				gui.addColor( params, 'color' );
+				gui.add( params, 'sheenBRDF' );
+				gui.addColor( params, 'sheenColor' );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'exposure', 0, 3 );
-				gui.add( params, 'envMap' );
-				gui.add( params, 'directionalLight' );
-				gui.add( params, 'ambientLight' );
 				gui.open();
 
 				animate();
@@ -171,14 +132,14 @@
 
 			function render() {
 
-				mesh.material.sheen = params.sheen;
-				mesh.material.color = new THREE.Color().setHSL(params.hue / 360, 1, .5);
+				mesh.material.sheenColor = params.sheenBRDF
+					? new THREE.Color().copy( params.sheenColor ).multiplyScalar( 1 / 255 )
+					: null;
+
+				mesh.material.color.copy(params.color).multiplyScalar( 1 / 255 );
 				mesh.material.roughness = params.roughness;
 				renderer.toneMappingExposure = params.exposure;
-				scene.background = params.envMap && envMap || null;
-				mesh.material.envMapIntensity = params.envMap ? 1 : 0;
-				directionalLight.visible = params.directionalLight;
-				ambientLight.visible = params.ambientLight;
+				mesh.material.needsUpdate = true;
 
 				renderer.render( scene, camera );
 

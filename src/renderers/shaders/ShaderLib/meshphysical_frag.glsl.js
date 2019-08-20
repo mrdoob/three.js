@@ -6,12 +6,14 @@ uniform vec3 emissive;
 uniform float roughness;
 uniform float metalness;
 uniform float opacity;
-uniform float sheen;
-uniform sampler2D dfgLut;
 
 #ifndef STANDARD
 	uniform float clearCoat;
 	uniform float clearCoatRoughness;
+#endif
+
+#ifdef USE_SHEEN
+	uniform vec3 sheenColor;
 #endif
 
 varying vec3 vViewPosition;

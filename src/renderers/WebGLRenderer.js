@@ -2272,8 +2272,7 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.clearCoat.value = material.clearCoat;
 		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
-		uniforms.sheen.value = material.sheen;
-		uniforms.dfgLut.value = _this.dfgLut || null;
+		if( material.sheenColor ) uniforms.sheenColor.value.copy( material.sheenColor );
 
 		if ( material.clearCoatNormalMap ) {
 

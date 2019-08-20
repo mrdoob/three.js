@@ -337,6 +337,8 @@ float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
 	return sqrt( 2.0 / ( blinnExponent + 2.0 ) );
 }
 
+#if defined( USE_SHEEN )
+
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L94
 float D_Charlie(float roughness, float NoH) {
 	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
@@ -364,8 +366,5 @@ vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in Ge
 
 }
 
-vec3 BRDF_Specular_Sheen_Environment( const in GeometricContext geometry, const in vec3 specularColor, const in float roughness ) {
-	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
-	return specularColor * texture2D(dfgLut, vec2(dotNV, roughness)).b;
-}
+#endif
 `;

@@ -8,7 +8,10 @@ struct PhysicalMaterial {
 	#ifndef STANDARD
 		float clearCoat;
 		float clearCoatRoughness;
-		float sheen;
+	#endif
+
+	#ifdef USE_SHEEN
+		vec3 sheenColor;
 	#endif
 
 };
@@ -99,20 +102,18 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#endif
 
-	reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * (sheen > 0. ?
-		BRDF_Specular_Sheen(
+	#ifdef USE_SHEEN
+		reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_Sheen(
 			material.specularRoughness,
 			directLight.direction,
 			geometry,
-			mix(
-				material.specularColor,
-				material.diffuseColor,
-				sheen
-			)
-		)
-		: BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness)
-	);
-	reflectedLight.directDiffuse += ( 1. - sheen ) * ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+			sheenColor
+		);
+	#else
+		reflectedLight.directSpecular += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Specular_GGX( directLight, geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness);
+	#endif
+
+	reflectedLight.directDiffuse += ( 1.0 - clearCoatDHR ) * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 }
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
@@ -122,7 +123,7 @@ void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricCo
 
 void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearCoatRadiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {
 
-	#ifndef STANDARD
+	#ifdef PHYSICAL
 
 		float ccDotNV = saturate( dot( geometry.clearCoatNormal, geometry.viewDir ) );
 
@@ -138,8 +139,6 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	#endif
 
 	float clearCoatInv = 1.0 - clearCoatDHR;
-	float sheen = material.sheen;
-	float sheenInv = 1. - sheen;
 
 	// Both indirect specular and diffuse light accumulate here
 	// if energy preservation enabled, and PMREM provided.
@@ -150,27 +149,11 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
 
-	vec3 diffuse = material.diffuseColor * mix(
-		( 1.0 - ( singleScattering + multiScattering ) ),
-		vec3(0),
-		sheen
-	);
+	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
 
-	reflectedLight.indirectSpecular += sheenInv * clearCoatInv * radiance * singleScattering;
-	reflectedLight.indirectDiffuse += sheenInv * multiScattering * cosineWeightedIrradiance;
+	reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
+	reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
 	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
-
-	#ifndef STANDARD
-
-		reflectedLight.indirectSpecular += sheenInv * clearCoatInv * radiance * BRDF_Specular_GGX_Environment( geometry.viewDir, geometry.normal, material.specularColor, material.specularRoughness );
-
-	#endif
-
-	reflectedLight.indirectSpecular += sheen * cosineWeightedIrradiance * BRDF_Specular_Sheen_Environment(
-		geometry,
-		material.diffuseColor,
-		material.specularRoughness
-	);
 
 }
 

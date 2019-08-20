@@ -8,6 +8,8 @@ material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );
 	material.specularColor = mix( vec3( MAXIMUM_SPECULAR_COEFFICIENT * pow2( reflectivity ) ), diffuseColor.rgb, metalnessFactor );
 	material.clearCoat = saturate( clearCoat ); // Burley clearcoat model
 	material.clearCoatRoughness = clamp( clearCoatRoughness, 0.04, 1.0 );
-	material.sheen = sheen;
+#endif
+#ifdef USE_SHEEN
+	material.sheenColor = sheenColor;
 #endif
 `;
