@@ -10,4 +10,7 @@ export class Layers {
 	disable( channel: number ): void;
 	test( layers: Layers ): boolean;
 
+	enableAll (): void;
+	disableAll (): void;
+
 }
