@@ -97,6 +97,9 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
+
+		if ( json.toneMapped !== undefined ) material.toneMapped = json.toneMapped;
+
 		if ( json.userData !== undefined ) material.userData = json.userData;
 
 		// Shader Material
