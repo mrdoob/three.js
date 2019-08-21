@@ -8,7 +8,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-function WebGLMultiview( renderer, gl, contextAttributes ) {
+function WebGLMultiview( renderer, gl ) {
 
 	var DEFAULT_NUMVIEWS = 2;
 
@@ -49,12 +49,6 @@ function WebGLMultiview( renderer, gl, contextAttributes ) {
 	}
 
 	//
-
-	function isAvailable() {
-
-		return capabilities.multiview && ! contextAttributes.antialias;
-
-	}
 
 	function updateCameraProjectionMatricesUniform( camera, uniforms ) {
 
@@ -203,7 +197,7 @@ function WebGLMultiview( renderer, gl, contextAttributes ) {
 	}
 
 
-	if ( isAvailable() ) {
+	if ( renderer.capabilities.multiview ) {
 
 		renderTarget = new WebGLMultiviewRenderTarget( 0, 0, DEFAULT_NUMVIEWS );
 
@@ -224,7 +218,6 @@ function WebGLMultiview( renderer, gl, contextAttributes ) {
 
 	this.attachRenderTarget = attachRenderTarget;
 	this.detachRenderTarget = detachRenderTarget;
-	this.isAvailable = isAvailable;
 	this.getNumViews = getNumViews;
 	this.updateCameraProjectionMatricesUniform = updateCameraProjectionMatricesUniform;
 	this.updateCameraViewMatricesUniform = updateCameraViewMatricesUniform;
