@@ -740,9 +740,9 @@
 						//mtl.roughness = // roughness (float)
 						//mtl.metalness = // metalness (float)
 						//mtl.reflectivity = // reflectivity (float)
-						//mtl.clearCoat = // clearCoat (float)
-						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
-						//mtl.clearCoatNormal = // clearCoatNormal (vec3)
+						//mtl.clearcoat = // clearcoat (float)
+						//mtl.clearcoatRoughness = // clearcoatRoughness (float)
+						//mtl.clearcoatNormal = // clearcoatNormal (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -755,7 +755,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
-						var clearCoatNormalScale = new Nodes.FloatNode( .1 );
+						var clearcoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -764,8 +764,8 @@
 						var metalnessB = new Nodes.FloatNode( 1 );
 
 						var reflectivity = new Nodes.FloatNode( 0 );
-						var clearCoat = new Nodes.FloatNode( 1 );
-						var clearCoatRoughness = new Nodes.FloatNode( 1 );
+						var clearcoat = new Nodes.FloatNode( 1 );
+						var clearcoatRoughness = new Nodes.FloatNode( 1 );
 
 						var roughness = new Nodes.MathNode(
 							roughnessA,
@@ -787,9 +787,9 @@
 							Nodes.OperatorNode.MUL
 						);
 
-						var clearCoatNormalMask = new Nodes.OperatorNode(
+						var clearcoatNormalMask = new Nodes.OperatorNode(
 							mask,
-							clearCoatNormalScale,
+							clearcoatNormalScale,
 							Nodes.OperatorNode.MUL
 						);
 
@@ -797,10 +797,10 @@
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
-						mtl.clearCoat = clearCoat;
-						mtl.clearCoatRoughness = clearCoatRoughness;
-						mtl.clearCoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
-						mtl.clearCoatNormal.scale = clearCoatNormalMask;
+						mtl.clearcoat = clearcoat;
+						mtl.clearcoatRoughness = clearcoatRoughness;
+						mtl.clearcoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearcoatNormal.scale = clearcoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
@@ -819,21 +819,21 @@
 
 						}, false, 0, 1 );
 
-						addGui( 'clearCoat', clearCoat.value, function ( val ) {
+						addGui( 'clearcoat', clearcoat.value, function ( val ) {
 
-							clearCoat.value = val;
-
-						}, false, 0, 1 );
-
-						addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
-
-							clearCoatRoughness.value = val;
+							clearcoat.value = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'clearCoatNormalScale', clearCoatNormalScale.value, function ( val ) {
+						addGui( 'clearcoatRoughness', clearcoatRoughness.value, function ( val ) {
 
-							clearCoatNormalScale.value = val;
+							clearcoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatNormalScale', clearcoatNormalScale.value, function ( val ) {
+
+							clearcoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 
@@ -2236,8 +2236,8 @@
 							mtl.metalness = new Nodes.FloatNode( 0 );
 							mtl.roughness = new Nodes.FloatNode( 1 );
 							mtl.reflectivity = new Nodes.FloatNode( 0 );
-							mtl.clearCoat = new Nodes.FloatNode( .2 );
-							mtl.clearCoatRoughness = new Nodes.FloatNode( .3 );
+							mtl.clearcoat = new Nodes.FloatNode( .2 );
+							mtl.clearcoatRoughness = new Nodes.FloatNode( .3 );
 							mtl.environment = new Nodes.CubeTextureNode( cubemap );
 
 						} else {

@@ -1,30 +1,3 @@
-import { Geometry } from './../core/Geometry';
-import { Material } from './../materials/Material';
-import { Loader } from './Loader';
-/**
- * A loader for loading objects in JSON format.
- */
-export class JSONLoader extends Loader {
-
-	constructor( manager?: LoadingManager );
-
-	manager: LoadingManager;
-	withCredentials: boolean;
-
-	load(
-		url: string,
-		onLoad?: ( geometry: Geometry, materials: Material[] ) => void,
-		onProgress?: ( event: ProgressEvent ) => void,
-		onError?: ( event: ErrorEvent ) => void
-	): void;
-	setTexturePath( value: string ): void;
-	parse(
-		json: any,
-		texturePath?: string
-	): { geometry: Geometry; materials?: Material[] };
-
-}
-
 export const DefaultLoadingManager: LoadingManager;
 
 /**

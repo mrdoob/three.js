@@ -172,13 +172,13 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
-		if ( this.clearCoat !== undefined ) data.clearCoat = this.clearCoat;
-		if ( this.clearCoatRoughness !== undefined ) data.clearCoatRoughness = this.clearCoatRoughness;
+		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
+		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
 
-		if ( this.clearCoatNormalMap && this.clearCoatNormalMap.isTexture ) {
+		if ( this.clearcoatNormalMap && this.clearcoatNormalMap.isTexture ) {
 
-			data.clearCoatNormalMap = this.clearCoatNormalMap.toJSON( meta ).uuid;
-			data.clearCoatNormalScale = this.clearCoatNormalScale.toArray();
+			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
+			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
 
 		}
 

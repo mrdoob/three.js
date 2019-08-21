@@ -40,7 +40,7 @@ struct GeometricContext {
 	vec3 normal;
 	vec3 viewDir;
 #ifdef CLEARCOAT
-	vec3 clearCoatNormal;
+	vec3 clearcoatNormal;
 #endif
 };
 

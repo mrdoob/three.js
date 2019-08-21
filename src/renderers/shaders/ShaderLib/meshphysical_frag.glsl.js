@@ -4,7 +4,7 @@ export default /* glsl */`
 #ifdef PHYSICAL
 
 	#define CLEARCOAT
-	// TODO: ANISOTROPY and SHEEN when merged
+
 #endif
 
 #ifdef ADVANCED_PHYSICAL
@@ -23,8 +23,11 @@ uniform float opacity;
 	uniform float reflectivity;
 #endif
 #ifdef CLEARCOAT
-	uniform float clearCoat;
-	uniform float clearCoatRoughness;
+	uniform float clearcoat;
+	uniform float clearcoatRoughness;
+#endif
+#ifdef USE_SHEEN
+	uniform vec3 sheen;
 #endif
 
 varying vec3 vViewPosition;
