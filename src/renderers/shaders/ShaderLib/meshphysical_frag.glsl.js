@@ -10,7 +10,6 @@ export default /* glsl */`
 #ifdef ADVANCED_PHYSICAL
 	#define REFLECTIVITY
 	#define CLEARCOAT
-	// TODO: ANISOTROPY and SHEEN when merged
 #endif
 
 uniform vec3 diffuse;
