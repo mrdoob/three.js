@@ -19,7 +19,8 @@ export interface MeshPhysicalMaterialParameters
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
-	constructor(parameters: MeshPhysicalMaterialParameters);
+
+	constructor( parameters: MeshPhysicalMaterialParameters );
 
 	defines: any;
 	reflectivity: number;
@@ -30,4 +31,5 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	clearcoatNormalScale: Vector2;
 	clearcoatNormalMap: Texture | null;
+
 }
