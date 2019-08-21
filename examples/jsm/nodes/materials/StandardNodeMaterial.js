@@ -37,7 +37,7 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'environment',
 	'mask',
 	'position',
-	'sheenColor'
+	'sheen'
 ] );
 
 export { StandardNodeMaterial };
