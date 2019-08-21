@@ -150,7 +150,7 @@ THREE.LightProbeGenerator = {
 
 				if (renderer.gammaOutput) {
 					// convert to linear color space
-					color.copySRGBToLinear( color );
+					color.copyGammaToLinear( color, renderer.gammaFactor );
 				}
 
 				var pixelIndex = i / 4;
