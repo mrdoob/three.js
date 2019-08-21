@@ -20,7 +20,7 @@ geometry.position = - vViewPosition;
 geometry.normal = normal;
 geometry.viewDir = normalize( vViewPosition );
 
-#ifdef PHYSICAL
+#ifdef CLEARCOAT
 
 	geometry.clearcoatNormal = clearcoatNormal;
 

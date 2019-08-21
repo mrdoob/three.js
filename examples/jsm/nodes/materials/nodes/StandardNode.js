@@ -33,7 +33,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define( this.clearcoat || this.clearcoatRoughness || this.clearcoatNormal ? 'PHYSICAL' : 'STANDARD' );
+	builder.define('PHYSICAL');
+
+	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearCoatNormal;
+
+	if( useClearcoat ){
+
+		builder.define( 'CLEARCOAT' );
+
+	}
 
 	builder.requires.lights = true;
 
@@ -136,8 +144,6 @@ StandardNode.prototype.build = function ( builder ) {
 			viewNormal: new ExpressionNode('clearcoatNormal', 'v3'),
 			gamma: true
 		};
-
-		var useClearcoat = ! builder.isDefined( 'STANDARD' );
 
 		// analyze all nodes to reuse generate codes
 

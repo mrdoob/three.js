@@ -1,5 +1,16 @@
 export default /* glsl */`
-#define PHYSICAL
+#define PHYSICAL_REFLECTION
+
+#ifdef PHYSICAL
+
+	#define CLEARCOAT
+
+#endif
+
+#ifdef ADVANCED_PHYSICAL
+	#define REFLECTIVITY
+	#define CLEARCOAT
+#endif
 
 uniform vec3 diffuse;
 uniform vec3 emissive;
@@ -7,11 +18,13 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
-#ifdef PHYSICAL
+#ifdef REFLECTIVITY
+	uniform float reflectivity;
+#endif
+#ifdef CLEARCOAT
 	uniform float clearcoat;
 	uniform float clearcoatRoughness;
 #endif
-
 #ifdef USE_SHEEN
 	uniform vec3 sheen;
 #endif
@@ -44,7 +57,7 @@ varying vec3 vViewPosition;
 #include <emissivemap_pars_fragment>
 #include <bsdfs>
 #include <cube_uv_reflection_fragment>
-#include <envmap_pars_fragment>
+#include <envmap_common_pars_fragment>
 #include <envmap_physical_pars_fragment>
 #include <fog_pars_fragment>
 #include <lights_pars_begin>
