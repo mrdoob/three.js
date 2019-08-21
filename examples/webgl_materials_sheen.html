@@ -103,7 +103,7 @@
 				//
 
 				sphere = new THREE.Mesh(
-					new THREE.BoxBufferGeometry( 3, 3, 3 ),
+					new THREE.SphereBufferGeometry( 2, 100, 100 ),
 					material
 				);
 				scene.add(sphere);
@@ -231,10 +231,6 @@
 
 			function updateParams() {
 
-				mesh.material = sphere.material = params.nodeMaterial
-					? nodeMaterial
-					: material;
-
 				//
 
 				material.sheen = params.sheenBRDF
@@ -255,7 +251,6 @@
 					: undefined;
 
 				nodeMaterial.color.value.copy( material.color );
-
 				nodeMaterial.roughness.value = params.roughness;
 				nodeMaterial.environment = params.envMap ? envMapNode : undefined;
 				nodeMaterial.needsCompile = true;
@@ -265,6 +260,12 @@
 				scene.background = params.envMap ? envMap : new THREE.Color( 0 );
 				directionalLight.visible = params.directionalLight;
 				ambientLight.visible = params.ambientLight;
+
+				//
+
+				mesh.material = sphere.material = params.nodeMaterial
+					? nodeMaterial
+					: material;
 
 				//
 

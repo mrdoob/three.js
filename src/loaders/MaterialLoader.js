@@ -61,8 +61,8 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
-		if ( json.clearCoat !== undefined ) material.clearCoat = json.clearCoat;
-		if ( json.clearCoatRoughness !== undefined ) material.clearCoatRoughness = json.clearCoatRoughness;
+		if ( json.clearcoat !== undefined ) material.clearcoat = json.clearcoat;
+		if ( json.clearcoatRoughness !== undefined ) material.clearcoatRoughness = json.clearcoatRoughness;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 		if ( json.fog !== undefined ) material.fog = json.fog;
 		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
@@ -229,8 +229,8 @@ Object.assign( MaterialLoader.prototype, {
 
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
-		if ( json.clearCoatNormalMap !== undefined ) material.clearCoatNormalMap = getTexture( json.clearCoatNormalMap );
-		if ( json.clearCoatNormalScale !== undefined ) material.clearCoatNormalScale = new Vector2().fromArray( json.clearCoatNormalScale );
+		if ( json.clearcoatNormalMap !== undefined ) material.clearcoatNormalMap = getTexture( json.clearcoatNormalMap );
+		if ( json.clearcoatNormalScale !== undefined ) material.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
 
 		return material;
 

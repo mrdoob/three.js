@@ -8,7 +8,7 @@ import { NormalNode } from './NormalNode.js';
 
 function ReflectNode( scope ) {
 
-	TempNode.call( this, 'v3', { unique: true } );
+	TempNode.call( this, 'v3' );
 
 	this.scope = scope || ReflectNode.CUBE;
 
@@ -21,6 +21,12 @@ ReflectNode.VECTOR = 'vector';
 ReflectNode.prototype = Object.create( TempNode.prototype );
 ReflectNode.prototype.constructor = ReflectNode;
 ReflectNode.prototype.nodeType = "Reflect";
+
+ReflectNode.prototype.getUnique = function ( builder ) {
+
+	return !builder.context.viewNormal;
+
+};
 
 ReflectNode.prototype.getType = function ( /* builder */ ) {
 
@@ -38,6 +44,8 @@ ReflectNode.prototype.getType = function ( /* builder */ ) {
 
 ReflectNode.prototype.generate = function ( builder, output ) {
 
+	var isUnique = this.getUnique( builder );
+
 	if ( builder.isShader( 'fragment' ) ) {
 
 		var result;
@@ -46,12 +54,24 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.VECTOR:
 
-				var viewNormal = new NormalNode().build( builder, 'v3' );
+				var viewNormalNode = builder.context.viewNormal || new NormalNode();
+
+				var viewNormal = viewNormalNode.build( builder, 'v3' );
 				var viewPosition = new PositionNode( PositionNode.VIEW ).build( builder, 'v3' );
 
-				builder.addNodeCode( 'vec3 reflectVec = inverseTransformDirection( reflect( -normalize( ' + viewPosition + ' ), ' + viewNormal + ' ), viewMatrix );' );
+				var code = `inverseTransformDirection( reflect( -normalize( ${viewPosition} ), ${viewNormal} ), viewMatrix )`;
 
-				result = 'reflectVec';
+				if ( isUnique ) {
+
+					builder.addNodeCode( `vec3 reflectVec = ${code};` );
+
+					result = 'reflectVec';
+
+				} else {
+
+					result = code;
+
+				}
 
 				break;
 
@@ -59,9 +79,19 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
 
-				builder.addNodeCode( 'vec3 reflectCubeVec = vec3( -1.0 * ' + reflectVec + '.x, ' + reflectVec + '.yz );' );
+				var code = 'vec3( -' + reflectVec + '.x, ' + reflectVec + '.yz )';
 
-				result = 'reflectCubeVec';
+				if ( isUnique ) {
+
+					builder.addNodeCode( `vec3 reflectCubeVec = ${code};` );
+
+					result = 'reflectCubeVec';
+
+				} else {
+
+					result = code;
+
+				}
 
 				break;
 
@@ -69,9 +99,19 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
 
-				builder.addNodeCode( 'vec2 reflectSphereVec = normalize( ( viewMatrix * vec4( ' + reflectVec + ', 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) ).xy * 0.5 + 0.5;' );
+				var code = 'normalize( ( viewMatrix * vec4( ' + reflectVec + ', 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) ).xy * 0.5 + 0.5';
 
-				result = 'reflectSphereVec';
+				if ( isUnique ) {
+
+					builder.addNodeCode( `vec2 reflectSphereVec = ${code};` );
+
+					result = 'reflectSphereVec';
+
+				} else {
+
+					result = code;
+
+				}
 
 				break;
 

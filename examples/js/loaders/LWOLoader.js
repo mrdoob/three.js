@@ -2593,11 +2593,11 @@ MaterialParser.prototype = {
 
 		if ( attributes.Clearcoat && attributes.Clearcoat.value > 0 ) {
 
-			params.clearCoat = attributes.Clearcoat.value;
+			params.clearcoat = attributes.Clearcoat.value;
 
 			if ( attributes[ 'Clearcoat Gloss' ] ) {
 
-				params.clearCoatRoughness = 0.5 * ( 1 - attributes[ 'Clearcoat Gloss' ].value );
+				params.clearcoatRoughness = 0.5 * ( 1 - attributes[ 'Clearcoat Gloss' ].value );
 
 			}
 
