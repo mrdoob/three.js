@@ -74,7 +74,7 @@
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - multiview<br/>';
-				info.innerHTML += renderer.multiview.isAvailable() ? `<span style="color: #33ff33"><b>OVR_multiview2</b> is supported in your browser</span>` :
+				info.innerHTML += renderer.capabilities.multiview ? `<span style="color: #33ff33"><b>OVR_multiview2</b> is supported in your browser</span>` :
 					`<span style="color: #ff3333"><b>OVR_multiview2</b> is not supported or enabled in your browser</span>`;
 
 				container.appendChild( info );
@@ -86,7 +86,7 @@
 
 				room = new THREE.LineSegments(
 					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
-					new THREE.LineBasicMaterial( { color: renderer.multiview.isAvailable() ? 0x99ff99 : 0xff3333 } )
+					new THREE.LineBasicMaterial( { color: renderer.capabilities.multiview ? 0x99ff99 : 0xff3333 } )
 				);
 				room.geometry.translate( 0, 3, 0 );
 				scene.add( room );

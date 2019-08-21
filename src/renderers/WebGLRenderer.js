@@ -314,7 +314,7 @@ function WebGLRenderer( parameters ) {
 
 	// Multiview
 
-	var multiview = new WebGLMultiview( _this, _gl, _gl.getContextAttributes() );
+	var multiview = new WebGLMultiview( _this, _gl );
 
 	this.multiview = multiview;
 
@@ -1181,7 +1181,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( multiview.isAvailable() ) {
+		if ( capabilities.multiview ) {
 
 			multiview.attachRenderTarget( camera );
 
@@ -1241,7 +1241,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( multiview.isAvailable() ) {
+		if ( capabilities.multiview ) {
 
 			multiview.detachRenderTarget( camera );
 
@@ -1389,7 +1389,7 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			if ( multiview.isAvailable() ) {
+			if ( capabilities.multiview ) {
 
 				_currentArrayCamera = camera;
 
