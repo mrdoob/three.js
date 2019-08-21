@@ -69,8 +69,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
-    "concurrently": "^4.1.1",
-    "eslint": "^6.1.0",
+    "concurrently": "^4.1.2",
+    "eslint": "^6.2.1",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^6.0.0",
     "failonlyreporter": "^1.0.0",
@@ -78,8 +78,8 @@
     "http-server": "^0.11.1",
     "qunit": "^2.9.2",
     "rollup": "^1.19.4",
-    "rollup-plugin-buble": "^0.19.8",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.3",
+		"rollup-plugin-buble": "^0.19.8"
   },
   "jspm": {
     "files": [

@@ -8,7 +8,7 @@ export default /* glsl */`
 #define EPSILON 1e-6
 
 #define saturate(a) clamp( a, 0.0, 1.0 )
-#define whiteCompliment(a) ( 1.0 - saturate( a ) )
+#define whiteComplement(a) ( 1.0 - saturate( a ) )
 
 float pow2( const in float x ) { return x*x; }
 float pow3( const in float x ) { return x*x*x; }
@@ -39,7 +39,9 @@ struct GeometricContext {
 	vec3 position;
 	vec3 normal;
 	vec3 viewDir;
-	vec3 clearCoatNormal;
+#ifdef PHYSICAL
+	vec3 clearcoatNormal;
+#endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {

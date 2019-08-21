@@ -33,7 +33,7 @@ export default /* glsl */`
 
 #endif
 
-// non perturbed normal for clearcoat
+// non perturbed normal for clearcoat among others
 
 vec3 geometryNormal = normal;
 

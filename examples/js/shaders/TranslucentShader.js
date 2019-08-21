@@ -187,7 +187,7 @@ THREE.TranslucentShader = {
 		"	#if defined( RE_IndirectSpecular )",
 
 		"		vec3 radiance = vec3( 0.0 );",
-		"		vec3 clearCoatRadiance = vec3( 0.0 );",
+		"		vec3 clearcoatRadiance = vec3( 0.0 );",
 
 		"	#endif",
 		THREE.ShaderChunk[ "lights_fragment_end" ],
