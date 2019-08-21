@@ -21,7 +21,12 @@ function MeshPhysicalMaterial( parameters ) {
 
 	MeshStandardMaterial.call( this );
 
-	this.defines = { 'PHYSICAL': '' };
+	this.defines = {
+
+		'PHYSICAL': '',
+		'ADVANCED_PHYSICAL': ''
+
+	};
 
 	this.type = 'MeshPhysicalMaterial';
 
@@ -48,7 +53,12 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	MeshStandardMaterial.prototype.copy.call( this, source );
 
-	this.defines = { 'PHYSICAL': '' };
+	this.defines = {
+
+		'PHYSICAL': '',
+		'ADVANCED_PHYSICAL': ''
+
+	};
 
 	this.reflectivity = source.reflectivity;
 
