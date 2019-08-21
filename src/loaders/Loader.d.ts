@@ -1,19 +1,26 @@
 import { LoaderHandler } from './FileLoader';
-
-// Loaders //////////////////////////////////////////////////////////////////////////////////
+import { LoadingManager } from './LoadingManager';
 
 /**
  * Base class for implementing loaders.
  */
 export class Loader {
 
-	constructor();
+	constructor( manager?: LoadingManager );
 
-	/**
-	 * default — anonymous.
-	 * If set, assigns the crossOrigin attribute of the image to the value of crossOrigin, prior to starting the load.
-	 */
 	crossOrigin: string;
+	path: string;
+	resourcePath: string;
+	manager: LoadingManager;
+
+	/*
+	load(): void;
+	parse(): void;
+	*/
+
+	setCrossOrigin( crossOrigin: string ): this;
+	setPath( path: string ): this;
+	setResourcePath( resourcePath: string ): this;
 
 	static Handlers: LoaderHandler;
 
