@@ -19246,13 +19246,11 @@
 	function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		var _frustum = new Frustum(),
-			_projScreenMatrix = new Matrix4(),
 
 			_shadowMapSize = new Vector2(),
-			_maxShadowMapSize = new Vector2( maxTextureSize, maxTextureSize ),
+			_viewportSize = new Vector2(),
 
-			_lookTarget = new Vector3(),
-			_lightPositionWorld = new Vector3(),
+			_viewport = new Vector4(),
 
 			_MorphingFlag = 1,
 			_SkinningFlag = 2,
@@ -19265,21 +19263,6 @@
 			_materialCache = {};
 
 		var shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
-
-		var cubeDirections = [
-			new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
-			new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
-		];
-
-		var cubeUps = [
-			new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
-			new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
-		];
-
-		var cube2DViewPorts = [
-			new Vector4(), new Vector4(), new Vector4(),
-			new Vector4(), new Vector4(), new Vector4()
-		];
 
 		// init
 
@@ -19299,8 +19282,6 @@
 
 			_depthMaterials[ i ] = depthMaterial;
 
-			//
-
 			var distanceMaterial = new MeshDistanceMaterial( {
 
 				morphTargets: useMorphing,
@@ -19311,8 +19292,6 @@
 			_distanceMaterials[ i ] = distanceMaterial;
 
 		}
-
-		//
 
 		var scope = this;
 
@@ -19344,13 +19323,10 @@
 
 			// render depth map
 
-			var faceCount;
-
 			for ( var i = 0, il = lights.length; i < il; i ++ ) {
 
 				var light = lights[ i ];
 				var shadow = light.shadow;
-				var isPointLight = light && light.isPointLight;
 
 				if ( shadow === undefined ) {
 
@@ -19359,44 +19335,33 @@
 
 				}
 
-				var shadowCamera = shadow.camera;
-
 				_shadowMapSize.copy( shadow.mapSize );
-				_shadowMapSize.min( _maxShadowMapSize );
 
-				if ( isPointLight ) {
+				var shadowFrameExtents = shadow.getFrameExtents();
 
-					var vpWidth = _shadowMapSize.x;
-					var vpHeight = _shadowMapSize.y;
+				_shadowMapSize.multiply( shadowFrameExtents );
 
-					// These viewports map a cube-map onto a 2D texture with the
-					// following orientation:
-					//
-					//  xzXZ
-					//   y Y
-					//
-					// X - Positive x direction
-					// x - Negative x direction
-					// Y - Positive y direction
-					// y - Negative y direction
-					// Z - Positive z direction
-					// z - Negative z direction
+				_viewportSize.copy( shadow.mapSize );
 
-					// positive X
-					cube2DViewPorts[ 0 ].set( vpWidth * 2, vpHeight, vpWidth, vpHeight );
-					// negative X
-					cube2DViewPorts[ 1 ].set( 0, vpHeight, vpWidth, vpHeight );
-					// positive Z
-					cube2DViewPorts[ 2 ].set( vpWidth * 3, vpHeight, vpWidth, vpHeight );
-					// negative Z
-					cube2DViewPorts[ 3 ].set( vpWidth, vpHeight, vpWidth, vpHeight );
-					// positive Y
-					cube2DViewPorts[ 4 ].set( vpWidth * 3, 0, vpWidth, vpHeight );
-					// negative Y
-					cube2DViewPorts[ 5 ].set( vpWidth, 0, vpWidth, vpHeight );
+				if ( _shadowMapSize.x > maxTextureSize || _shadowMapSize.y > maxTextureSize ) {
 
-					_shadowMapSize.x *= 4.0;
-					_shadowMapSize.y *= 2.0;
+					console.warn( 'THREE.WebGLShadowMap:', light, 'has shadow exceeding max texture size, reducing' );
+
+					if ( _shadowMapSize.x > maxTextureSize ) {
+
+						_viewportSize.x = Math.floor( maxTextureSize / shadowFrameExtents.x );
+						_shadowMapSize.x = _viewportSize.x * shadowFrameExtents.x;
+						shadow.mapSize.x = _viewportSize.x;
+
+					}
+
+					if ( _shadowMapSize.y > maxTextureSize ) {
+
+						_viewportSize.y = Math.floor( maxTextureSize / shadowFrameExtents.y );
+						_shadowMapSize.y = _viewportSize.y * shadowFrameExtents.y;
+						shadow.mapSize.y = _viewportSize.y;
+
+					}
 
 				}
 
@@ -19407,82 +19372,31 @@
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 					shadow.map.texture.name = light.name + ".shadowMap";
 
-					shadowCamera.updateProjectionMatrix();
-
 				}
 
-				if ( shadow.isSpotLightShadow ) {
-
-					shadow.update( light );
-
-				}
-
-				var shadowMap = shadow.map;
-				var shadowMatrix = shadow.matrix;
-
-				_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-				shadowCamera.position.copy( _lightPositionWorld );
-
-				if ( isPointLight ) {
-
-					faceCount = 6;
-
-					// for point lights we set the shadow matrix to be a translation-only matrix
-					// equal to inverse of the light's position
-
-					shadowMatrix.makeTranslation( - _lightPositionWorld.x, - _lightPositionWorld.y, - _lightPositionWorld.z );
-
-				} else {
-
-					faceCount = 1;
-
-					_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-					shadowCamera.lookAt( _lookTarget );
-					shadowCamera.updateMatrixWorld();
-
-					// compute shadow matrix
-
-					shadowMatrix.set(
-						0.5, 0.0, 0.0, 0.5,
-						0.0, 0.5, 0.0, 0.5,
-						0.0, 0.0, 0.5, 0.5,
-						0.0, 0.0, 0.0, 1.0
-					);
-
-					shadowMatrix.multiply( shadowCamera.projectionMatrix );
-					shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
-
-				}
-
-				_renderer.setRenderTarget( shadowMap );
+				_renderer.setRenderTarget( shadow.map );
 				_renderer.clear();
 
-				// render shadow map for each cube face (if omni-directional) or
-				// run a single pass if not
+				var viewportCount = shadow.getViewportCount();
 
-				for ( var face = 0; face < faceCount; face ++ ) {
+				for ( var vp = 0; vp < viewportCount; vp ++ ) {
 
-					if ( isPointLight ) {
+					var viewport = shadow.getViewport( vp );
 
-						_lookTarget.copy( shadowCamera.position );
-						_lookTarget.add( cubeDirections[ face ] );
-						shadowCamera.up.copy( cubeUps[ face ] );
-						shadowCamera.lookAt( _lookTarget );
-						shadowCamera.updateMatrixWorld();
+					_viewport.set(
+						_viewportSize.x * viewport.x,
+						_viewportSize.y * viewport.y,
+						_viewportSize.x * viewport.z,
+						_viewportSize.y * viewport.w
+					);
 
-						var vpDimensions = cube2DViewPorts[ face ];
-						_state.viewport( vpDimensions );
+					_state.viewport( _viewport );
 
-					}
+					shadow.updateMatrices( light, camera, vp );
 
-					// update camera matrices and frustum
+					_frustum = shadow.getFrustum();
 
-					_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-					_frustum.setFromMatrix( _projScreenMatrix );
-
-					// set object matrices & frustum culling
-
-					renderObject( scene, camera, shadowCamera, isPointLight );
+					renderObject( scene, camera, shadow.camera, light );
 
 				}
 
@@ -19494,7 +19408,7 @@
 
 		};
 
-		function getDepthMaterial( object, material, isPointLight, lightPositionWorld, shadowCameraNear, shadowCameraFar ) {
+		function getDepthMaterial( object, material, light, shadowCameraNear, shadowCameraFar ) {
 
 			var geometry = object.geometry;
 
@@ -19503,7 +19417,7 @@
 			var materialVariants = _depthMaterials;
 			var customMaterial = object.customDepthMaterial;
 
-			if ( isPointLight ) {
+			if ( light.isPointLight ) {
 
 				materialVariants = _distanceMaterials;
 				customMaterial = object.customDistanceMaterial;
@@ -19592,9 +19506,9 @@
 			result.wireframeLinewidth = material.wireframeLinewidth;
 			result.linewidth = material.linewidth;
 
-			if ( isPointLight && result.isMeshDistanceMaterial ) {
+			if ( light.isPointLight && result.isMeshDistanceMaterial ) {
 
-				result.referencePosition.copy( lightPositionWorld );
+				result.referencePosition.setFromMatrixPosition( light.matrixWorld );
 				result.nearDistance = shadowCameraNear;
 				result.farDistance = shadowCameraFar;
 
@@ -19604,7 +19518,7 @@
 
 		}
 
-		function renderObject( object, camera, shadowCamera, isPointLight ) {
+		function renderObject( object, camera, shadowCamera, light ) {
 
 			if ( object.visible === false ) return;
 
@@ -19630,7 +19544,7 @@
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								var depthMaterial = getDepthMaterial( object, groupMaterial, isPointLight, _lightPositionWorld, shadowCamera.near, shadowCamera.far );
+								var depthMaterial = getDepthMaterial( object, groupMaterial, light, shadowCamera.near, shadowCamera.far );
 								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
 							}
@@ -19639,7 +19553,7 @@
 
 					} else if ( material.visible ) {
 
-						var depthMaterial = getDepthMaterial( object, material, isPointLight, _lightPositionWorld, shadowCamera.near, shadowCamera.far );
+						var depthMaterial = getDepthMaterial( object, material, light, shadowCamera.near, shadowCamera.far );
 						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 					}
@@ -19652,7 +19566,7 @@
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				renderObject( children[ i ], camera, shadowCamera, isPointLight );
+				renderObject( children[ i ], camera, shadowCamera, light );
 
 			}
 
@@ -37426,9 +37340,71 @@
 		this.map = null;
 		this.matrix = new Matrix4();
 
+		this._frustum = new Frustum();
+		this._frameExtents = new Vector2( 1, 1 );
+
+		this._viewportCount = 1;
+
+		this._viewports = [
+
+			new Vector4( 0, 0, 1, 1 )
+
+		];
+
 	}
 
 	Object.assign( LightShadow.prototype, {
+
+		_projScreenMatrix: new Matrix4(),
+
+		_lightPositionWorld: new Vector3(),
+
+		_lookTarget: new Vector3(),
+
+		getViewportCount: function () {
+
+			return this._viewportCount;
+
+		},
+
+		getFrustum: function () {
+
+			return this._frustum;
+
+		},
+
+		updateMatrices: function () {
+
+			var shadowCamera = this.camera,
+				shadowMatrix = this.matrix,
+				projScreenMatrix = this._projScreenMatrix;
+
+			projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+			this._frustum.setFromMatrix( projScreenMatrix );
+
+			shadowMatrix.set(
+				0.5, 0.0, 0.0, 0.5,
+				0.0, 0.5, 0.0, 0.5,
+				0.0, 0.0, 0.5, 0.5,
+				0.0, 0.0, 0.0, 1.0
+			);
+
+			shadowMatrix.multiply( shadowCamera.projectionMatrix );
+			shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+
+		},
+
+		getViewport: function ( viewportIndex ) {
+
+			return this._viewports[ viewportIndex ];
+
+		},
+
+		getFrameExtents: function () {
+
+			return this._frameExtents;
+
+		},
 
 		copy: function ( source ) {
 
@@ -37482,9 +37458,11 @@
 
 		isSpotLightShadow: true,
 
-		update: function ( light ) {
+		updateMatrices: function ( light, viewCamera, viewportIndex ) {
 
-			var camera = this.camera;
+			var camera = this.camera,
+				lookTarget = this._lookTarget,
+				lightPositionWorld = this._lightPositionWorld;
 
 			var fov = _Math.RAD2DEG * 2 * light.angle;
 			var aspect = this.mapSize.width / this.mapSize.height;
@@ -37498,6 +37476,15 @@
 				camera.updateProjectionMatrix();
 
 			}
+
+			lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			camera.position.copy( lightPositionWorld );
+
+			lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+			camera.lookAt( lookTarget );
+			camera.updateMatrixWorld();
+
+			LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
 
 		}
 
@@ -37569,6 +37556,87 @@
 
 	} );
 
+	function PointLightShadow() {
+
+		LightShadow.call( this, new PerspectiveCamera( 90, 1, 0.5, 500 ) );
+
+		this._frameExtents = new Vector2( 4, 2 );
+
+		this._viewportCount = 6;
+
+		this._viewports = [
+			// These viewports map a cube-map onto a 2D texture with the
+			// following orientation:
+			//
+			//  xzXZ
+			//   y Y
+			//
+			// X - Positive x direction
+			// x - Negative x direction
+			// Y - Positive y direction
+			// y - Negative y direction
+			// Z - Positive z direction
+			// z - Negative z direction
+
+			// positive X
+			new Vector4( 2, 1, 1, 1 ),
+			// negative X
+			new Vector4( 0, 1, 1, 1 ),
+			// positive Z
+			new Vector4( 3, 1, 1, 1 ),
+			// negative Z
+			new Vector4( 1, 1, 1, 1 ),
+			// positive Y
+			new Vector4( 3, 0, 1, 1 ),
+			// negative Y
+			new Vector4( 1, 0, 1, 1 )
+		];
+
+		this._cubeDirections = [
+			new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
+			new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
+		];
+
+		this._cubeUps = [
+			new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
+			new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
+		];
+
+	}
+
+	PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
+
+		constructor: PointLightShadow,
+
+		isPointLightShadow: true,
+
+		updateMatrices: function ( light, viewCamera, viewportIndex ) {
+
+			var camera = this.camera,
+				shadowMatrix = this.matrix,
+				lightPositionWorld = this._lightPositionWorld,
+				lookTarget = this._lookTarget,
+				shadowMatrix = this.matrix,
+				projScreenMatrix = this._projScreenMatrix;
+
+			lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			camera.position.copy( lightPositionWorld );
+
+			lookTarget.copy( camera.position );
+			lookTarget.add( this._cubeDirections[ viewportIndex ] );
+			camera.up.copy( this._cubeUps[ viewportIndex ] );
+			camera.lookAt( lookTarget );
+			camera.updateMatrixWorld();
+
+			shadowMatrix.makeTranslation( - lightPositionWorld.x, - lightPositionWorld.y, - lightPositionWorld.z );
+
+			projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			this._frustum.setFromMatrix( projScreenMatrix );
+
+		}
+
+	} );
+
 	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
@@ -37600,7 +37668,7 @@
 		this.distance = ( distance !== undefined ) ? distance : 0;
 		this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-		this.shadow = new LightShadow( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
+		this.shadow = new PointLightShadow();
 
 	}
 
@@ -37771,7 +37839,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function DirectionalLightShadow( ) {
+	function DirectionalLightShadow() {
 
 		LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
@@ -37779,7 +37847,26 @@
 
 	DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
-		constructor: DirectionalLightShadow
+		constructor: DirectionalLightShadow,
+
+		isDirectionalLightShadow: true,
+
+		updateMatrices: function ( light, viewCamera, viewportIndex ) {
+
+			var camera = this.camera,
+				lightPositionWorld = this._lightPositionWorld,
+				lookTarget = this._lookTarget;
+
+			lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+			camera.position.copy( lightPositionWorld );
+
+			lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+			camera.lookAt( lookTarget );
+			camera.updateMatrixWorld();
+
+			LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+
+		}
 
 	} );
 
@@ -38426,25 +38513,102 @@
 	};
 
 	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+
+	function Loader( manager ) {
+
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+
+		this.crossOrigin = 'anonymous';
+		this.path = '';
+		this.resourcePath = '';
+
+	}
+
+	Object.assign( Loader.prototype, {
+
+		load: function ( /* url, onLoad, onProgress, onError */ ) {},
+
+		parse: function ( /* data */ ) {},
+
+		setCrossOrigin: function ( crossOrigin ) {
+
+			this.crossOrigin = crossOrigin;
+			return this;
+
+		},
+
+		setPath: function ( path ) {
+
+			this.path = path;
+			return this;
+
+		},
+
+		setResourcePath: function ( resourcePath ) {
+
+			this.resourcePath = resourcePath;
+			return this;
+
+		}
+
+	} );
+
+	//
+
+	Loader.Handlers = {
+
+		handlers: [],
+
+		add: function ( regex, loader ) {
+
+			this.handlers.push( regex, loader );
+
+		},
+
+		get: function ( file ) {
+
+			var handlers = this.handlers;
+
+			for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
+
+				var regex = handlers[ i ];
+				var loader = handlers[ i + 1 ];
+
+				if ( regex.test( file ) ) {
+
+					return loader;
+
+				}
+
+			}
+
+			return null;
+
+		}
+
+	};
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
 	function ObjectLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-		this.resourcePath = '';
+		Loader.call( this, manager );
 
 	}
 
-	Object.assign( ObjectLoader.prototype, {
+	ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-		crossOrigin: 'anonymous',
+		constructor: ObjectLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+			var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 			this.resourcePath = this.resourcePath || path;
 
 			var loader = new FileLoader( scope.manager );
@@ -38479,27 +38643,6 @@
 				scope.parse( json, onLoad );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -39988,57 +40131,6 @@
 			return this;
 
 		}
-
-	} );
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	function Loader() {}
-
-	Loader.Handlers = {
-
-		handlers: [],
-
-		add: function ( regex, loader ) {
-
-			this.handlers.push( regex, loader );
-
-		},
-
-		get: function ( file ) {
-
-			var handlers = this.handlers;
-
-			for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
-
-				var regex = handlers[ i ];
-				var loader = handlers[ i + 1 ];
-
-				if ( regex.test( file ) ) {
-
-					return loader;
-
-				}
-
-			}
-
-			return null;
-
-		}
-
-	};
-
-	Object.assign( Loader.prototype, {
-
-		crossOrigin: 'anonymous',
-
-		onLoadStart: function () {},
-
-		onLoadProgress: function () {},
-
-		onLoadComplete: function () {}
 
 	} );
 
