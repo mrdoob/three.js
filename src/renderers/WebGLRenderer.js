@@ -319,8 +319,6 @@ function WebGLRenderer( parameters ) {
 
 	var multiview = new WebGLMultiview( _this, _gl );
 
-	this.multiview = multiview;
-
 	// shadow map
 
 	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );

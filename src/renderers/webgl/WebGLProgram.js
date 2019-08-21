@@ -5,6 +5,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
+import { WebGLMultiviewRenderTarget } from '../WebGLMultiviewRenderTarget.js';
 import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding } from '../../constants.js';
 
 var programIdCount = 0;
@@ -329,7 +330,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	var prefixVertex, prefixFragment;
 
-	var numMultiviewViews = renderer.multiview.getNumViews();
+	var renderTarget = renderer.getRenderTarget();
+	var numMultiviewViews = renderTarget instanceof WebGLMultiviewRenderTarget ? renderTarget.numViews : 0;
 
 	if ( material.isRawShaderMaterial ) {
 
