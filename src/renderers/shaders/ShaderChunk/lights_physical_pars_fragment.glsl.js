@@ -140,20 +140,30 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	float clearCoatInv = 1.0 - clearCoatDHR;
 
-	// Both indirect specular and diffuse light accumulate here
-	// if energy preservation enabled, and PMREM provided.
-
-	vec3 singleScattering = vec3( 0.0 );
-	vec3 multiScattering = vec3( 0.0 );
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
-	BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
+	#ifdef USE_SHEEN
 
-	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+		reflectedLight.indirectSpecular = clearCoatInv * radiance * BRDF_Specular_Sheen_Environment( sheenIblLut, geometry, material.sheenColor, material.specularRoughness );
+		reflectedLight.indirectDiffuse += material.diffuseColor * cosineWeightedIrradiance;
 
-	reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
-	reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
-	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+	#else
+
+		// Both indirect specular and diffuse light accumulate here
+		// if energy preservation enabled, and PMREM provided.
+
+		vec3 singleScattering = vec3( 0.0 );
+		vec3 multiScattering = vec3( 0.0 );
+
+		BRDF_Specular_Multiscattering_Environment( geometry, material.specularColor, material.specularRoughness, singleScattering, multiScattering );
+
+		vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+
+		reflectedLight.indirectSpecular += clearCoatInv * radiance * singleScattering;
+		reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
+		reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
+
+	#endif
 
 }
 

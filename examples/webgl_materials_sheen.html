@@ -29,18 +29,28 @@
 
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { SheenIBLUniformsLib } from './jsm/lights/SheenIBLUniformsLib.js';
+
 			// Graphics variables
 			var camera, controls, scene, renderer, stats;
-			var directionalLight;
+			var directionalLight, ambientLight, envMap;
 			var mesh, sphere, material, nodeMaterial;
+			var envMapNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( new THREE.Texture() ) );
 
 			var params = {
-				nodeMaterial: true,
+				nodeMaterial: false,
 				color: new THREE.Color( 255, 0, 127 ),
 				sheenBRDF: true,
 				sheenColor: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
 				roughness: .9,
-				exposure: 2,
+				exposure: 1,
+				envMap: true,
+				directionalLight: true,
+				ambientLight: true
 			};
 
 			// model
@@ -54,10 +64,24 @@
 
 			function init( ) {
 
+				SheenIBLUniformsLib.init();
+
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+
+				var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry(20, 20),
+					new Nodes.StandardNodeMaterial()
+				);
+				plane.material.emissive = new Nodes.SwitchNode(
+					new Nodes.TextureNode( THREE.UniformsLib.SheenIblLut ),
+					'w'
+				);
+				plane.material.color = new Nodes.ColorNode( new THREE.Color( 0 ) );
+				plane.material.needsCompile = true;
+				plane.position.set( 0, 3, -20 );
+				scene.add(plane);
 
 				mesh.scale.multiplyScalar( .5 );
 				scene.add( mesh );
@@ -79,7 +103,7 @@
 				//
 
 				sphere = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 1, 100, 100 ),
+					new THREE.BoxBufferGeometry( 3, 3, 3 ),
 					material
 				);
 				scene.add(sphere);
@@ -93,11 +117,32 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
+ 				new THREE.CubeTextureLoader()
+					.setPath( 'textures/cube/Park3Med/' )
+					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ], function ( ldrCubeMap ) {
+						ldrCubeMap.encoding = THREE.sRGBEncoding;
+ 						envMap = ldrCubeMap;
+ 						var pmremGenerator = new PMREMGenerator( envMap, 128 );
+						pmremGenerator.update( renderer );
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
+
+						const pmremTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+
+						material.envMap = pmremTexture;
+						material.needsUpdate = true;
+						envMapNode.value.value = pmremTexture;
+						updateParams();
+
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
+ 					} );
+
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, .5 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, .3 );
 				directionalLight.position.set( 0, 10, 0 );
 				directionalLight.castShadow = true;
 				directionalLight.add(
@@ -106,8 +151,10 @@
 						new THREE.MeshBasicMaterial( { color: 0xffffff } )
 					)
 				);
-
 				scene.add( directionalLight );
+
+				ambientLight = new THREE.AmbientLight( 0xffffff, .3 );
+				scene.add(ambientLight);
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -118,13 +165,47 @@
 
 				var gui = new GUI();
 
-				gui.add( params, 'nodeMaterial' );
-				gui.addColor( params, 'color' );
-				gui.add( params, 'sheenBRDF' );
-				gui.addColor( params, 'sheenColor' );
-				gui.add( params, 'roughness', 0, 1 );
-				gui.add( params, 'exposure', 0, 3 );
+				gui.add( params, 'nodeMaterial' ).onChange( updateParams );
+				gui.addColor( params, 'color' ).onChange( updateParams );
+				gui.add( params, 'sheenBRDF' ).onChange( updateParams );
+				gui.addColor( params, 'sheenColor' ).onChange( updateParams );
+				gui.add( params, 'roughness', 0, 1 ).onChange( updateParams );
+				gui.add( params, 'exposure', 0, 2 ).onChange( updateParams );
+				gui.add( params, 'envMap' ).onChange( updateParams );
+				gui.add( params, 'directionalLight' ).onChange( updateParams );
+				gui.add( params, 'ambientLight' ).onChange( updateParams );
 				gui.open();
+
+				updateParams();
+
+				//
+
+				new THREE.FontLoader().load( 'fonts/gentilis_regular.typeface.json', function ( font ) {
+
+					addLabel( 'IBL DG LUT', plane.position.clone().add( new THREE.Vector3( -10, 10, 0 ) ) );
+
+					function addLabel( name, location ) {
+
+						var textGeo = new THREE.TextBufferGeometry( name, {
+
+							font: font,
+
+							size: 3,
+							height: 0,
+							curveSegments: 1
+
+						} );
+
+						var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+						var textMesh = new THREE.Mesh( textGeo, textMaterial );
+						textMesh.position.copy( location );
+						scene.add( textMesh );
+
+					}
+
+				} );
+
+				//
 
 				animate();
 
@@ -148,7 +229,7 @@
 
 			}
 
-			function render() {
+			function updateParams() {
 
 				mesh.material = sphere.material = params.nodeMaterial
 					? nodeMaterial
@@ -165,6 +246,8 @@
 
 				material.needsUpdate = true;
 
+				material.envMapIntensity = params.envMap ? 1 : 0;
+
 				//
 
 				nodeMaterial.sheenColor = params.sheenBRDF
@@ -174,12 +257,23 @@
 				nodeMaterial.color.value.copy( material.color );
 
 				nodeMaterial.roughness.value = params.roughness;
-
+				nodeMaterial.environment = params.envMap ? envMapNode : undefined;
 				nodeMaterial.needsCompile = true;
 
 				//
 
+				scene.background = params.envMap ? envMap : new THREE.Color( 0 );
+				directionalLight.visible = params.directionalLight;
+				ambientLight.visible = params.ambientLight;
+
+				//
+
 				renderer.toneMappingExposure = params.exposure;
+
+			}
+
+			function render() {
+
 				renderer.render( scene, camera );
 
 			}

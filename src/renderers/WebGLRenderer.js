@@ -1909,6 +1909,8 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_1 !== undefined ) m_uniforms.ltc_1.value = UniformsLib.LTC_1;
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
+			if ( m_uniforms.sheenIblLut !== undefined ) m_uniforms.sheenIblLut.value = UniformsLib.SheenIblLut;
+
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 
 		}
