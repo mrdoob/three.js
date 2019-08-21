@@ -118,13 +118,35 @@
 
 				var gui = new GUI();
 
-				gui.add( params, 'nodeMaterial' );
+				function onUpdate() {
+
+					mesh.material = sphere.material = params.nodeMaterial
+					? nodeMaterial
+					: material;
+
+					material.sheen = params.sheenBRDF
+					? new THREE.Color()
+					: null;
+
+					material.needsUpdate = true;
+
+					nodeMaterial.sheen = params.sheenBRDF
+					? new Nodes.ColorNode( material.sheen )
+					: undefined;
+
+					nodeMaterial.needsCompile = true;
+
+				}
+
+				gui.add( params, 'nodeMaterial' ).onChange( onUpdate );
 				gui.addColor( params, 'color' );
-				gui.add( params, 'sheenBRDF' );
+				gui.add( params, 'sheenBRDF' ).onChange( onUpdate );
 				gui.addColor( params, 'sheen' );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'exposure', 0, 3 );
 				gui.open();
+
+				onUpdate();
 
 				animate();
 
@@ -150,32 +172,23 @@
 
 			function render() {
 
-				mesh.material = sphere.material = params.nodeMaterial
-					? nodeMaterial
-					: material;
-
 				//
-
-				material.sheen = params.sheenBRDF
-					? new THREE.Color().copy( params.sheen ).multiplyScalar( 1 / 255 )
-					: null;
 
 				material.color.copy( params.color ).multiplyScalar( 1 / 255 );
 				material.roughness = params.roughness;
 
-				material.needsUpdate = true;
+				//
+
+				nodeMaterial.color.value.copy( material.color );
+				nodeMaterial.roughness.value = params.roughness;
 
 				//
 
-				nodeMaterial.sheen = params.sheenBRDF
-					? new Nodes.ColorNode( material.sheen )
-					: undefined;
+				if ( params.sheenBRDF ) {
 
-				nodeMaterial.color.value.copy( material.color );
+					material.sheen.copy( params.sheen ).multiplyScalar( 1 / 255 );
 
-				nodeMaterial.roughness.value = params.roughness;
-
-				nodeMaterial.needsCompile = true;
+				}
 
 				//
 
