@@ -26,18 +26,6 @@ function WebGLMultiview( renderer, gl ) {
 
 	}
 
-	function getNumViews() {
-
-		if ( renderTarget && renderer.getRenderTarget() === renderTarget ) {
-
-			return renderTarget.numViews;
-
-		}
-
-		return 0;
-
-	}
-
 	function getCameraArray( camera ) {
 
 		if ( camera.isArrayCamera ) return camera.cameras;
@@ -218,7 +206,6 @@ function WebGLMultiview( renderer, gl ) {
 
 	this.attachRenderTarget = attachRenderTarget;
 	this.detachRenderTarget = detachRenderTarget;
-	this.getNumViews = getNumViews;
 	this.updateCameraProjectionMatricesUniform = updateCameraProjectionMatricesUniform;
 	this.updateCameraViewMatricesUniform = updateCameraViewMatricesUniform;
 	this.updateObjectMatricesUniforms = updateObjectMatricesUniforms;
