@@ -23,8 +23,8 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.defines = {
 
-		'PHYSICAL': '',
-		'ADVANCED_PHYSICAL': ''
+		'STANDARD': '',
+		'PHYSICAL': ''
 
 	};
 
@@ -55,8 +55,8 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	this.defines = {
 
-		'PHYSICAL': '',
-		'ADVANCED_PHYSICAL': ''
+		'STANDARD': '',
+		'PHYSICAL': ''
 
 	};
 
