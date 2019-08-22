@@ -7,13 +7,16 @@ import {
 	LessEqualDepth,
 	NoColors,
 	NormalBlending,
-	ShaderMaterial
+	ShaderMaterial,
+	ShaderChunk
 } from '../../../../build/three.module.js';
 
 import { NodeBuilder } from '../core/NodeBuilder.js';
 import { ColorNode } from '../inputs/ColorNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 import { RawNode } from './nodes/RawNode.js';
+
+import Parser from '../../parser/Parser.js';
 
 function NodeMaterial( vertex, fragment ) {
 
@@ -32,11 +35,17 @@ function NodeMaterial( vertex, fragment ) {
 
 		if ( this.needsUpdate ) {
 
+			var parser = new Parser( Parser.UNEMIT );
+			parser.addLibrary( ShaderChunk );
+
 			this.build( { renderer: renderer } );
 
 			shader.uniforms = this.uniforms;
 			shader.vertexShader = this.vertexShader;
 			shader.fragmentShader = this.fragmentShader;
+			
+			shader.vertexShader = parser.compile( shader.vertexShader );
+			shader.fragmentShader = parser.compile( shader.fragmentShader );
 
 		}
 

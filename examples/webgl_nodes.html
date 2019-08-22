@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - node material</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material<br />
+			Serialized using <a href="webgl_materials_nodes.html">webgl_materials_nodes.html</a>
+		</div>
+
+		<script type="module">
+
+				import * as THREE from '../build/three.module.js';
+
+
+				import Parser from './jsm/parser/Parser.js';
+
+				var source = `
+
+namespace threejs {
+
+	void hello_world() { vec3 abc; }
+	
+	void not_call_not_compile() {  }
+
+}
+				
+void main() {
+
+	threejs.hello_world();
+
+	//threejs.not_call_not_compile();
+
+}
+
+`;
+				
+				
+			var parser = new Parser();
+			parser.addLibrary( THREE.ShaderChunk );
+			console.log( parser.compile( source ) );
+
+
+/*uniform vec3 position;
+
+float test = 123;
+
+#ifdef TEST
+
+#endif
+
+//#include <common>
+
+const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
+const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
+const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
+
+struct GeometricContext {
+	vec3 position;
+	vec3 normal;
+	vec3 viewDir;
+	vec3 clearCoatNormal;
+};
+
+highp float rand( const in vec2 uv ) {
+	const highp float a = 12.9898, b = 78.233, c = 43758.5453;
+	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
+	//test;
+	//GeometricContext;
+	UnpackFactors;
+	return fract(sin(sn) * c);
+}
+
+highp float rand2( const in vec2 uv ) {
+	const highp float a = 12.9898, b = 78.233, c = 43758.5453;
+	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
+	return fract(sin(sn) * c);
+}
+
+void main() {
+
+	rand(2);
+	position;
+
+}*/
+
+
+/*environment {
+
+	//precision mediump float;
+
+	attribute vec4 a_position;
+	uniform vec4 u_offset;
+	
+	varying vec4 v_positionWithOffset;
+
+}
+
+vertex { 
+
+	void main() {
+	
+	  gl_Position = a_position + u_offset;
+	  v_positionWithOffset = a_position + u_offset;
+	  
+	}
+
+}
+
+fragment {
+
+	void main() {
+	
+	  // convert from clipspace (-1 <-> +1) to color space (0 -> 1).
+	  vec4 color = v_positionWithOffset * 0.5 + 0.5
+	  gl_FragColor = color;
+	  
+	}
+
+}*/
+	
+				//parser.parse(`'test '`);
+				//parser.parse(`"test\\" "`);
+
+		</script>
+	</body>
+</html>
