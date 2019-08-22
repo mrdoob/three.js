@@ -174,9 +174,35 @@ export class Vector4 implements Vector {
 	 */
 	equals( v: Vector4 ): boolean;
 
-	fromArray( xyzw: number[], offset?: number ): this;
+	/**
+	 * Sets this vector's x, y, z and w value from the provided array.
+	 * @param array the source array.
+	 * @param offset (optional) offset into the array. Default is 0.
+	 */
+	fromArray( array: number[], offset?: number ): this;
 
-	toArray( xyzw?: number[], offset?: number ): number[];
+	/**
+	 * Sets this vector's x, y, z and w value from the provided array-like.
+	 * @param array the source array-like.
+	 * @param offset (optional) offset into the array-like. Default is 0.
+	 */
+	fromArray( array: ArrayLike<number>, offset?: number ): this;
+
+	/**
+	 * Returns an array [x, y, z, w], or copies x, y, z and w into the provided array.
+	 * @param array (optional) array to store the vector to. If this is not provided, a new array will be created.
+	 * @param offset (optional) optional offset into the array.
+	 * @return The created or provided array.
+	 */
+	toArray( array?: number[], offset?: number ): number[];
+
+	/**
+	 * Copies x, y, z and w into the provided array-like.
+	 * @param array array-like to store the vector to.
+	 * @param offset (optional) optional offset into the array.
+	 * @return The provided array-like.
+	 */
+	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,
