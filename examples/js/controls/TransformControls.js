@@ -216,7 +216,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		} else if ( this.camera instanceof THREE.OrthographicCamera ) {
 
-			eye.copy( cameraPosition ).normalize();
+			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
 
 		}
 
