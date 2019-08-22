@@ -199,7 +199,7 @@ export class Vector4 implements Vector {
 	/**
 	 * Copies x, y, z and w into the provided array-like.
 	 * @param array array-like to store the vector to.
-	 * @param offset (optional) optional offset into the array.
+	 * @param offset (optional) optional offset into the array-like.
 	 * @return The provided array-like.
 	 */
 	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;

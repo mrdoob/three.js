@@ -256,7 +256,7 @@ export class Vector3 implements Vector {
 	fromArray( array: number[], offset?: number ): this;
 
 	/**
-	 * Sets this vector's x, y and z value from the provided array-lik.
+	 * Sets this vector's x, y and z value from the provided array-like.
 	 * @param array the source array-like.
 	 * @param offset (optional) offset into the array-like. Default is 0.
 	 */
@@ -273,7 +273,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Copies x, y and z into the provided array-like.
 	 * @param array array-like to store the vector to.
-	 * @param offset (optional) optional offset into the array.
+	 * @param offset (optional) optional offset into the array-like.
 	 * @return The provided array-like.
 	 */
 	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;
