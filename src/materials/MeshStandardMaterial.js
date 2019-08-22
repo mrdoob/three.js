@@ -59,7 +59,7 @@ function MeshStandardMaterial( parameters ) {
 
 	Material.call( this );
 
-	this.defines = { 'STANDARD': '' };
+	this.defines = { 'PHYSICAL': '' };
 
 	this.type = 'MeshStandardMaterial';
 
@@ -123,7 +123,7 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
 
-	this.defines = { 'STANDARD': '' };
+	this.defines = { 'PHYSICAL': '' };
 
 	this.color.copy( source.color );
 	this.roughness = source.roughness;

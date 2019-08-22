@@ -1,5 +1,6 @@
 import { ShaderChunk } from './ShaderChunk.js';
 import { mergeUniforms } from './UniformsUtils.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { UniformsLib } from './UniformsLib.js';
 import { Color } from '../../math/Color.js';
@@ -272,9 +273,12 @@ ShaderLib.physical = {
 	uniforms: mergeUniforms( [
 		ShaderLib.standard.uniforms,
 		{
-			clearCoat: { value: 0 },
-			clearCoatRoughness: { value: 0 },
-			transparency: { value: 0 }
+			transparency: { value: 0 },
+			clearcoat: { value: 0 },
+			clearcoatRoughness: { value: 0 },
+			sheen: { value: new Color( 0x000000 ) },
+			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
+			clearcoatNormalMap: { value: null },
 		}
 	] ),
 

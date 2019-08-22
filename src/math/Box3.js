@@ -1,5 +1,34 @@
 import { Vector3 } from './Vector3.js';
 
+var _points = [
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3()
+];
+var _vector = new Vector3();
+
+// triangle centered vertices
+
+var _v0 = new Vector3();
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+
+// triangle edge vectors
+
+var _f0 = new Vector3();
+var _f1 = new Vector3();
+var _f2 = new Vector3();
+
+var _center = new Vector3();
+var _extents = new Vector3();
+var _triangleNormal = new Vector3();
+var _testAxis = new Vector3();
+
 /**
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
@@ -105,22 +134,16 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	setFromCenterAndSize: function () {
+	setFromCenterAndSize: function ( center, size ) {
 
-		var v1 = new Vector3();
+		var halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 
-		return function setFromCenterAndSize( center, size ) {
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
-			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+		return this;
 
-			this.min.copy( center ).sub( halfSize );
-			this.max.copy( center ).add( halfSize );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	setFromObject: function ( object ) {
 
@@ -215,47 +238,43 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	expandByObject: function () {
+	expandByObject: function ( object ) {
+
+		var i, l;
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
-		var scope, i, l;
+		object.updateWorldMatrix( false, false );
 
-		var v1 = new Vector3();
+		var geometry = object.geometry;
 
-		function traverse( node ) {
+		if ( geometry !== undefined ) {
 
-			var geometry = node.geometry;
+			if ( geometry.isGeometry ) {
 
-			if ( geometry !== undefined ) {
+				var vertices = geometry.vertices;
 
-				if ( geometry.isGeometry ) {
+				for ( i = 0, l = vertices.length; i < l; i ++ ) {
 
-					var vertices = geometry.vertices;
+					_vector.copy( vertices[ i ] );
+					_vector.applyMatrix4( object.matrixWorld );
 
-					for ( i = 0, l = vertices.length; i < l; i ++ ) {
+					this.expandByPoint( _vector );
 
-						v1.copy( vertices[ i ] );
-						v1.applyMatrix4( node.matrixWorld );
+				}
 
-						scope.expandByPoint( v1 );
+			} else if ( geometry.isBufferGeometry ) {
 
-					}
+				var attribute = geometry.attributes.position;
 
-				} else if ( geometry.isBufferGeometry ) {
+				if ( attribute !== undefined ) {
 
-					var attribute = geometry.attributes.position;
+					for ( i = 0, l = attribute.count; i < l; i ++ ) {
 
-					if ( attribute !== undefined ) {
+						_vector.fromBufferAttribute( attribute, i ).applyMatrix4( object.matrixWorld );
 
-						for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-							v1.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-							scope.expandByPoint( v1 );
-
-						}
+						this.expandByPoint( _vector );
 
 					}
 
@@ -265,19 +284,19 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		return function expandByObject( object ) {
+		//
 
-			scope = this;
+		var children = object.children;
 
-			object.updateMatrixWorld( true );
+		for ( i = 0, l = children.length; i < l; i ++ ) {
 
-			object.traverse( traverse );
+			this.expandByObject( children[ i ] );
 
-			return this;
+		}
 
-		};
+		return this;
 
-	}(),
+	},
 
 	containsPoint: function ( point ) {
 
@@ -324,21 +343,15 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	intersectsSphere: ( function () {
+	intersectsSphere: function ( sphere ) {
 
-		var closestPoint = new Vector3();
+		// Find the point on the AABB closest to the sphere center.
+		this.clampPoint( sphere.center, _vector );
 
-		return function intersectsSphere( sphere ) {
+		// If that point is inside the sphere, the AABB and sphere intersect.
+		return _vector.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
-			// Find the point on the AABB closest to the sphere center.
-			this.clampPoint( sphere.center, closestPoint );
-
-			// If that point is inside the sphere, the AABB and sphere intersect.
-			return closestPoint.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
-
-		};
-
-	} )(),
+	},
 
 	intersectsPlane: function ( plane ) {
 
@@ -387,106 +400,58 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	intersectsTriangle: ( function () {
+	intersectsTriangle: function ( triangle ) {
 
-		// triangle centered vertices
-		var v0 = new Vector3();
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+		if ( this.isEmpty() ) {
 
-		// triangle edge vectors
-		var f0 = new Vector3();
-		var f1 = new Vector3();
-		var f2 = new Vector3();
-
-		var testAxis = new Vector3();
-
-		var center = new Vector3();
-		var extents = new Vector3();
-
-		var triangleNormal = new Vector3();
-
-		function satForAxes( axes ) {
-
-			var i, j;
-
-			for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
-
-				testAxis.fromArray( axes, i );
-				// project the aabb onto the seperating axis
-				var r = extents.x * Math.abs( testAxis.x ) + extents.y * Math.abs( testAxis.y ) + extents.z * Math.abs( testAxis.z );
-				// project all 3 vertices of the triangle onto the seperating axis
-				var p0 = v0.dot( testAxis );
-				var p1 = v1.dot( testAxis );
-				var p2 = v2.dot( testAxis );
-				// actual test, basically see if either of the most extreme of the triangle points intersects r
-				if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
-
-					// points of the projected triangle are outside the projected half-length of the aabb
-					// the axis is seperating and we can exit
-					return false;
-
-				}
-
-			}
-
-			return true;
+			return false;
 
 		}
 
-		return function intersectsTriangle( triangle ) {
+		// compute box center and extents
+		this.getCenter( _center );
+		_extents.subVectors( this.max, _center );
 
-			if ( this.isEmpty() ) {
+		// translate triangle to aabb origin
+		_v0.subVectors( triangle.a, _center );
+		_v1.subVectors( triangle.b, _center );
+		_v2.subVectors( triangle.c, _center );
 
-				return false;
+		// compute edge vectors for triangle
+		_f0.subVectors( _v1, _v0 );
+		_f1.subVectors( _v2, _v1 );
+		_f2.subVectors( _v0, _v2 );
 
-			}
+		// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
+		// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
+		// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
+		var axes = [
+			0, - _f0.z, _f0.y, 0, - _f1.z, _f1.y, 0, - _f2.z, _f2.y,
+			_f0.z, 0, - _f0.x, _f1.z, 0, - _f1.x, _f2.z, 0, - _f2.x,
+			- _f0.y, _f0.x, 0, - _f1.y, _f1.x, 0, - _f2.y, _f2.x, 0
+		];
+		if ( ! satForAxes( axes, _v0, _v1, _v2, _extents ) ) {
 
-			// compute box center and extents
-			this.getCenter( center );
-			extents.subVectors( this.max, center );
+			return false;
 
-			// translate triangle to aabb origin
-			v0.subVectors( triangle.a, center );
-			v1.subVectors( triangle.b, center );
-			v2.subVectors( triangle.c, center );
+		}
 
-			// compute edge vectors for triangle
-			f0.subVectors( v1, v0 );
-			f1.subVectors( v2, v1 );
-			f2.subVectors( v0, v2 );
+		// test 3 face normals from the aabb
+		axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
+		if ( ! satForAxes( axes, _v0, _v1, _v2, _extents ) ) {
 
-			// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
-			// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
-			// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
-			var axes = [
-				0, - f0.z, f0.y, 0, - f1.z, f1.y, 0, - f2.z, f2.y,
-				f0.z, 0, - f0.x, f1.z, 0, - f1.x, f2.z, 0, - f2.x,
-				- f0.y, f0.x, 0, - f1.y, f1.x, 0, - f2.y, f2.x, 0
-			];
-			if ( ! satForAxes( axes ) ) {
+			return false;
 
-				return false;
+		}
 
-			}
+		// finally testing the face normal of the triangle
+		// use already existing triangle edge vectors here
+		_triangleNormal.crossVectors( _f0, _f1 );
+		axes = [ _triangleNormal.x, _triangleNormal.y, _triangleNormal.z ];
 
-			// test 3 face normals from the aabb
-			axes = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
-			if ( ! satForAxes( axes ) ) {
+		return satForAxes( axes, _v0, _v1, _v2, _extents );
 
-				return false;
-
-			}
-
-			// finally testing the face normal of the triangle
-			// use already existing triangle edge vectors here
-			triangleNormal.crossVectors( f0, f1 );
-			axes = [ triangleNormal.x, triangleNormal.y, triangleNormal.z ];
-			return satForAxes( axes );
-
-		};
-
-	} )(),
+	},
 
 	clampPoint: function ( point, target ) {
 
@@ -501,41 +466,30 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	distanceToPoint: function () {
+	distanceToPoint: function ( point ) {
 
-		var v1 = new Vector3();
+		var clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 
-		return function distanceToPoint( point ) {
+		return clampedPoint.sub( point ).length();
 
-			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
+	},
 
-		};
+	getBoundingSphere: function ( target ) {
 
-	}(),
+		if ( target === undefined ) {
 
-	getBoundingSphere: function () {
+			console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
+			//target = new Sphere(); // removed to avoid cyclic dependency
 
-		var v1 = new Vector3();
+		}
 
-		return function getBoundingSphere( target ) {
+		this.getCenter( target.center );
 
-			if ( target === undefined ) {
+		target.radius = this.getSize( _vector ).length() * 0.5;
 
-				console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
-				//target = new Sphere(); // removed to avoid cyclic dependency
+		return target;
 
-			}
-
-			this.getCenter( target.center );
-
-			target.radius = this.getSize( v1 ).length() * 0.5;
-
-			return target;
-
-		};
-
-	}(),
+	},
 
 	intersect: function ( box ) {
 
@@ -558,41 +512,26 @@ Object.assign( Box3.prototype, {
 
 	},
 
-	applyMatrix4: function () {
+	applyMatrix4: function ( matrix ) {
 
-		var points = [
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3(),
-			new Vector3()
-		];
+		// transform of empty box is an empty box.
+		if ( this.isEmpty() ) return this;
 
-		return function applyMatrix4( matrix ) {
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		_points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+		_points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+		_points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+		_points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+		_points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+		_points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+		_points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+		_points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
 
-			// transform of empty box is an empty box.
-			if ( this.isEmpty() ) return this;
+		this.setFromPoints( _points );
 
-			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-			points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-			points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-			points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-			points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-			points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-			points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-			points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-			points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
+		return this;
 
-			this.setFromPoints( points );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	translate: function ( offset ) {
 
@@ -611,5 +550,32 @@ Object.assign( Box3.prototype, {
 
 } );
 
+function satForAxes( axes, v0, v1, v2, extents ) {
+
+	var i, j;
+
+	for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+
+		_testAxis.fromArray( axes, i );
+		// project the aabb onto the seperating axis
+		var r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
+		// project all 3 vertices of the triangle onto the seperating axis
+		var p0 = v0.dot( _testAxis );
+		var p1 = v1.dot( _testAxis );
+		var p2 = v2.dot( _testAxis );
+		// actual test, basically see if either of the most extreme of the triangle points intersects r
+		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
+
+			// points of the projected triangle are outside the projected half-length of the aabb
+			// the axis is seperating and we can exit
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+}
 
 export { Box3 };

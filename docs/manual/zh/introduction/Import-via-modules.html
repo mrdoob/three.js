@@ -62,11 +62,20 @@
 		...
 		</code>
 
-		<h2>注意事项</h2>
-
+		<h2>Importable Examples</h2>
 		<p>
-			目前，无法用这种方式导入"examples/js"目录中的文件。
-			这是因为一些文件依赖于THREE的全局命名空间污染。了解更多详情，请参阅<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>。
+			The core of three.js is focused on the most important components of a 3D engine. Many other components like loaders or controls are part of the
+			examples directory. three.js ensures that these files are kept in sync with the core but users have to import them separately if they are required
+			for a project. You can find in the [link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm] directory an ES6
+			module version for almost all example files. If you install three.js via npm, you can import them like so:
+		</p>
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		</code>
+		<p>
+			Note: When using code from the examples directory, it's important that all files match the version of
+			your three.js main file. For example, it's not acceptable to use *GLTFLoader* and *OrbitControls* from R96 together
+			with three.js R103.
 		</p>
 	</body>
 </html>

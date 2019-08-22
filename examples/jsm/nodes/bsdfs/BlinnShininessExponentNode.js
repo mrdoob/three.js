@@ -16,9 +16,9 @@ BlinnShininessExponentNode.prototype.nodeType = "BlinnShininessExponent";
 
 BlinnShininessExponentNode.prototype.generate = function ( builder, output ) {
 
-	if ( builder.isCache( 'clearCoat' ) ) {
+	if ( builder.isCache( 'clearcoat' ) ) {
 
-		return builder.format( 'Material_ClearCoat_BlinnShininessExponent( material )', this.type, output );
+		return builder.format( 'Material_Clearcoat_BlinnShininessExponent( material )', this.type, output );
 
 	} else {
 

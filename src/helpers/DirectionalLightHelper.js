@@ -11,6 +11,10 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+var _v3 = new Vector3();
+
 function DirectionalLightHelper( light, size, color ) {
 
 	Object3D.call( this );
@@ -63,36 +67,28 @@ DirectionalLightHelper.prototype.dispose = function () {
 
 DirectionalLightHelper.prototype.update = function () {
 
-	var v1 = new Vector3();
-	var v2 = new Vector3();
-	var v3 = new Vector3();
+	_v1.setFromMatrixPosition( this.light.matrixWorld );
+	_v2.setFromMatrixPosition( this.light.target.matrixWorld );
+	_v3.subVectors( _v2, _v1 );
 
-	return function update() {
+	this.lightPlane.lookAt( _v2 );
 
-		v1.setFromMatrixPosition( this.light.matrixWorld );
-		v2.setFromMatrixPosition( this.light.target.matrixWorld );
-		v3.subVectors( v2, v1 );
+	if ( this.color !== undefined ) {
 
-		this.lightPlane.lookAt( v2 );
+		this.lightPlane.material.color.set( this.color );
+		this.targetLine.material.color.set( this.color );
 
-		if ( this.color !== undefined ) {
+	} else {
 
-			this.lightPlane.material.color.set( this.color );
-			this.targetLine.material.color.set( this.color );
+		this.lightPlane.material.color.copy( this.light.color );
+		this.targetLine.material.color.copy( this.light.color );
 
-		} else {
+	}
 
-			this.lightPlane.material.color.copy( this.light.color );
-			this.targetLine.material.color.copy( this.light.color );
+	this.targetLine.lookAt( _v2 );
+	this.targetLine.scale.z = _v3.length();
 
-		}
-
-		this.targetLine.lookAt( v2 );
-		this.targetLine.scale.z = v3.length();
-
-	};
-
-}();
+};
 
 
 export { DirectionalLightHelper };

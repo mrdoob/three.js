@@ -5,7 +5,8 @@ import { _Math } from './Math.js';
  * @author bhouston / http://clara.io
  */
 
-var _startP, _startEnd;
+var _startP = new Vector3();
+var _startEnd = new Vector3();
 
 function Line3( start, end ) {
 
@@ -92,13 +93,6 @@ Object.assign( Line3.prototype, {
 	},
 
 	closestPointToPointParameter: function ( point, clampToLine ) {
-
-		if ( _startP === undefined ) {
-
-			_startP = new Vector3();
-			_startEnd = new Vector3();
-
-		}
 
 		_startP.subVectors( point, this.start );
 		_startEnd.subVectors( this.end, this.start );
