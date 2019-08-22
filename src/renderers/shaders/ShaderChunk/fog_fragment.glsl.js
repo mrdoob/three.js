@@ -1,6 +1,8 @@
 export default /* glsl */`
 #ifdef USE_FOG
 
+	float fogDepth = precisionSafeLength( fogPosition );
+
 	#ifdef FOG_EXP2
 
 		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * fogDepth * fogDepth );
