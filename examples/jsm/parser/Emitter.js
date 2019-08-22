@@ -93,8 +93,8 @@ export class Emitter {
 
 		var node = this.scope.findProperty( name );
 		
-		//this.emitArray( this.scope.attributes );
-		//this.emitArray( this.scope.uniforms );
+		this.emitArray( this.scope.attributes );
+		this.emitArray( this.scope.uniforms );
 		
 		this.flow( node );
 		

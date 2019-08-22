@@ -160,8 +160,6 @@ class ShaderProperty {
 		
 		var source = this.start.tokenizer.source.substring( start, end );
 		
-		var nodes = this.nodes;
-		
 		function replaceAt(absoluteStart, absoluteEnd, str) {
 			
 			var len = source.length;
@@ -172,16 +170,22 @@ class ShaderProperty {
 			
 		}
 		
-		for(var i = 0; i < nodes.length; i++) {
-			
-			if (nodes[i].property) {
+		var nodes = this.nodes;
+		
+		if (nodes) {
+		
+			for(var i = 0; i < nodes.length; i++) {
 				
-				var token = nodes[i].token;
-				var realName = nodes[i].property.getName();
-				
-				if (token.str !== realName) {
-				
-					replaceAt(token.pos, token.endPos, realName);
+				if (nodes[i].property) {
+					
+					var token = nodes[i].token;
+					var realName = nodes[i].property.getName();
+					
+					if (token.str !== realName) {
+					
+						replaceAt(token.pos, token.endPos, realName);
+						
+					}
 					
 				}
 				
@@ -288,19 +292,19 @@ class ShaderEnvironment extends ShaderBlock {
 		
 	}
 	
-	addAttribute( node ) {
+	addAttribute( property ) {
 		
-		this.attributes.push( node );
+		this.attributes.push( property );
 		
-		return this.addProperty( node );
+		return this.addProperty( property );
 		
 	}
 	
-	addUniform( node ) {
+	addUniform( property ) {
 		
-		this.uniforms.push( node );
+		this.uniforms.push( property );
 		
-		return this.addProperty( node );
+		return this.addProperty( property );
 		
 	}
 	
@@ -448,7 +452,7 @@ export class Analyzer {
 					codeBlock = this.readPropertyOrFunction();
 					codeBlock.start = token;
 					
-					this.scope.addProperty( codeBlock );
+					this.scope.addAttribute( codeBlock );
 					this.env.addDeclaration( codeBlock );
 					
 				} else if (token.str === 'uniform') {
@@ -456,7 +460,7 @@ export class Analyzer {
 					codeBlock = this.readPropertyOrFunction();
 					codeBlock.start = token;
 					
-					this.scope.addProperty( codeBlock );
+					this.scope.addUniform( codeBlock );
 					this.env.addDeclaration( codeBlock );
 					
 				} else if (token.str === 'struct') {
