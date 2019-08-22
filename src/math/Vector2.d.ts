@@ -396,11 +396,18 @@ export class Vector2 implements Vector {
 	equals( v: Vector2 ): boolean;
 
 	/**
-	 * Sets this vector's x value to be array[offset] and y value to be array[offset + 1].
+	 * Sets this vector's x and y value from the provided array.
 	 * @param array the source array.
 	 * @param offset (optional) offset into the array. Default is 0.
 	 */
 	fromArray( array: number[], offset?: number ): this;
+
+	/**
+	 * Sets this vector's x and y value from the provided array-like.
+	 * @param array the source array-like.
+	 * @param offset (optional) offset into the array-like. Default is 0.
+	 */
+	fromArray( array: ArrayLike<number>, offset?: number ): this;
 
 	/**
 	 * Returns an array [x, y], or copies x and y into the provided array.
