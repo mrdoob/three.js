@@ -791,7 +791,7 @@ var GLTFLoader = ( function () {
 				materialParams.vertexShader = shader.vertexShader;
 				materialParams.fragmentShader = fragmentShader;
 				materialParams.uniforms = uniforms;
-				materialParams.defines = { 'PHYSICAL': '' }
+				materialParams.defines = { 'STANDARD': '' }
 
 				materialParams.color = new Color( 1.0, 1.0, 1.0 );
 				materialParams.opacity = 1.0;

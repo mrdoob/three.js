@@ -1,13 +1,7 @@
 export default /* glsl */`
-#define PHYSICAL_REFLECTION
+#define STANDARD
 
 #ifdef PHYSICAL
-
-	#define CLEARCOAT
-
-#endif
-
-#ifdef ADVANCED_PHYSICAL
 	#define REFLECTIVITY
 	#define CLEARCOAT
 	#define TRANSPARENCY
