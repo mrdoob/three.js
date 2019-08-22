@@ -19387,6 +19387,8 @@
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 					shadow.map.texture.name = light.name + ".shadowMap";
 
+					shadow.camera.updateProjectionMatrix();
+
 				}
 
 				_renderer.setRenderTarget( shadow.map );
