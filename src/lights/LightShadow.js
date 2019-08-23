@@ -53,11 +53,20 @@ Object.assign( LightShadow.prototype, {
 
 	},
 
-	updateMatrices: function () {
+	updateMatrices: function ( light ) {
 
 		var shadowCamera = this.camera,
 			shadowMatrix = this.matrix,
-			projScreenMatrix = this._projScreenMatrix;
+			projScreenMatrix = this._projScreenMatrix,
+			lookTarget = this._lookTarget,
+			lightPositionWorld = this._lightPositionWorld;
+
+		lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+		shadowCamera.position.copy( lightPositionWorld );
+
+		lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+		shadowCamera.lookAt( lookTarget );
+		shadowCamera.updateMatrixWorld();
 
 		projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 		this._frustum.setFromMatrix( projScreenMatrix );
