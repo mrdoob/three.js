@@ -370,6 +370,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
 
+			( parameters.precision === 'highp' ) ? '#define HIGH_PRECISION' : '',
+
 			'#define SHADER_NAME ' + shader.name,
 
 			customDefines,
@@ -487,6 +489,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
+
+			( parameters.precision === 'highp' ) ? '#define HIGH_PRECISION' : '',
 
 			'#define SHADER_NAME ' + shader.name,
 
