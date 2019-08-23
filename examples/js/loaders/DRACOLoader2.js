@@ -472,7 +472,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 			var attributeId = attributeIDs[ attributeName ];
 			var attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeId );
 
-			geometry.attributes.push( this.decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
+			geometry.attributes.push( decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
 
 		}
 
