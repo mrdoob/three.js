@@ -1,3 +1,4 @@
+import { BufferAttribute } from './BufferAttribute.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -130,6 +131,16 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 		this.data.array[ index + 3 ] = w;
 
 		return this;
+
+	},
+
+	toJSON: function ()	{
+
+		var data = BufferAttribute.prototype.toJSON.call( this );
+
+		data.isInterleavedBufferAttribute = true;
+
+		return data;
 
 	}
 
