@@ -17,8 +17,6 @@ import {
 	MeshBasicMaterial,
 	Object3D,
 	OctahedronBufferGeometry,
-	OrthographicCamera,
-	PerspectiveCamera,
 	PlaneBufferGeometry,
 	Quaternion,
 	Raycaster,
@@ -235,15 +233,7 @@ var TransformControls = function ( camera, domElement ) {
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
 
-		if ( this.camera instanceof PerspectiveCamera ) {
-
-			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
-
-		} else if ( this.camera instanceof OrthographicCamera ) {
-
-			eye.copy( cameraPosition ).normalize();
-
-		}
+		eye.copy( cameraPosition ).sub( worldPosition ).normalize();
 
 		Object3D.prototype.updateMatrixWorld.call( this );
 
