@@ -2,8 +2,8 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-const SpaceRegExp = /^\s*/s;
-const CommentRegExp = /^\/\*.*?\*\//s;
+const SpaceRegExp = /^\s*/;
+const CommentRegExp = /^\/\*.*?\*\//;
 const InlineCommentRegExp = /^\/\/.*?(\n|$)/;
 
 const PreprocessorRegExp = /^\#.*?(\n|$)/;
@@ -19,12 +19,6 @@ const OperatorsRegExp = new RegExp( '^(\\' + [
 ].join('$').split('').join('\\').replace(/\\\$/g, '|') + ')' );
 
 class Token {
-	
-	static PREPROCESSOR = 'preprocessor';
-	static NUMBER = 'number';
-	static STRING = 'string';
-	static LITERAL_STRING = 'literalString';
-	static OPERATOR = 'operator';
 	
 	constructor( tokenizer, type, str, pos ) {
 		
@@ -74,6 +68,12 @@ class Token {
 	}
 	
 }
+
+Token.PREPROCESSOR = 'preprocessor';
+Token.NUMBER = 'number';
+Token.STRING = 'string';
+Token.LITERAL_STRING = 'literalString';
+Token.OPERATOR = 'operator';
 
 const TokenParserList = [
 	{ type: Token.PREPROCESSOR, regexp: PreprocessorRegExp },

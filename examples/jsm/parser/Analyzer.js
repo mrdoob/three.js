@@ -15,30 +15,18 @@ const QualifierRegExp = /^(in|out|inout|highp|mediump|lowp|const)$/;
 
 class ShaderNode {
 	
-	isNode = true;
-	
 	constructor( token, property = undefined ) {
 		
 		this.token = token;
 		this.property = property;
-		
+	
+		this.isNode = true;
+	
 	}
 	
 }
 
 class ShaderProperty {
-	
-	isProperty = true;
-	
-	start = undefined;
-	end = undefined;
-	
-	nameToken = undefined;
-	typeToken = undefined;
-	
-	calls = [];
-	
-	properties = [];
 	
 	constructor( parent, type, name, qualifiers = [], length = undefined ) {
 		
@@ -48,7 +36,19 @@ class ShaderProperty {
 		this.name = name;
 		this.qualifiers = qualifiers;
 		
-		this.length = undefined;
+		this.length = length;
+		
+		this.start = undefined;
+		this.end = undefined;
+		
+		this.nameToken = undefined;
+		this.typeToken = undefined;
+		
+		this.calls = [];
+		
+		this.properties = [];
+		
+		this.isProperty = true;
 			
 	}
 	
@@ -207,13 +207,13 @@ class ShaderProperty {
 
 class ShaderBlock extends ShaderProperty {
 	
-	isBlock = true;
-	
-	nodes = []
-	
 	constructor( parent, type, name, qualifiers ) {
 		
 		super( parent, type, name, qualifiers );
+		
+		this.nodes = [];
+		
+		this.isBlock = true;
 		
 	}
 	
@@ -231,11 +231,11 @@ class ShaderBlock extends ShaderProperty {
 
 class ShaderNamespace extends ShaderBlock {
 	
-	isNamespace = true;
-	
 	constructor( parent, name ) {
 		
 		super( parent, 'namespace', name );
+			
+		this.isNamespace = true;
 			
 	}
 	
@@ -243,25 +243,25 @@ class ShaderNamespace extends ShaderBlock {
 
 class ShaderStruct extends ShaderBlock {
 	
-	isStruct = true;
-	
 	constructor( parent, name ) {
 		
 		super( parent, 'struct', name );
-			
+	
+		this.isStruct = true;
+		
 	}
 	
 }
 
 class ShaderFunction extends ShaderBlock {
 	
-	isFunction = true;
-	
 	constructor( parent, type, name, qualifiers, args = [] ) {
 		
 		super( parent, type, name, qualifiers );
 		
 		this.args = args;
+		
+		this.isFunction = true;
 			
 	}
 	
@@ -269,18 +269,20 @@ class ShaderFunction extends ShaderBlock {
 
 class ShaderEnvironment extends ShaderBlock {
 	
-	isEnvironment = true;
 	
-	declarations = [];
-	
-	attributes = [];
-	uniforms = [];
 	
 	constructor( tokenizer ) {
 		
 		super(undefined, 'env', 'Environment');
 		
 		this.tokenizer = tokenizer;
+		
+		this.declarations = [];
+		
+		this.attributes = [];
+		this.uniforms = [];
+		
+		this.isEnvironment = true;
 		
 	}
 	

@@ -61,13 +61,15 @@ function parseIncludes( source, libs ) {
 	
 }
 
+
+
+
 class ParsePreprocessor {
-	
-	libraries = [];
 	
 	constructor( source ) {
 		
 		this.source = source;
+		this.libraries = [];
 		
 	}
 	
@@ -91,15 +93,11 @@ class ParsePreprocessor {
 }
 
 export default class Parser {
-	
-	static EMIT = 'emit';
-	static UNEMIT = 'unemit';
-	
-	libraries = [];
-	
-	constructor( method = Parser.EMIT ) {
+
+	constructor( method = 'emit' ) {
 		
 		this.method = method;
+		this.libraries = [];
 		
 	}
 	
@@ -125,3 +123,6 @@ export default class Parser {
 	}
 	
 }
+
+Parser.EMIT = 'emit';
+Parser.UNEMIT = 'unemit';
