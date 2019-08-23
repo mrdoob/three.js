@@ -19,17 +19,6 @@ DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.pro
 
 	updateMatrices: function ( light, viewCamera, viewportIndex ) {
 
-		var camera = this.camera,
-			lightPositionWorld = this._lightPositionWorld,
-			lookTarget = this._lookTarget;
-
-		lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-		camera.position.copy( lightPositionWorld );
-
-		lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-		camera.lookAt( lookTarget );
-		camera.updateMatrixWorld();
-
 		LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
 
 	}
