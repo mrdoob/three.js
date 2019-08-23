@@ -42,7 +42,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = API.exposure;
 
 				renderer.gammaOutput = true;
@@ -122,27 +122,33 @@
 				var fl = gui.addFolder( 'BACKGROUND' );
 
 				fl.add( API, 'fit', [ 'cover', 'contain', 'fill' ] )
-					.name( 'texture fit')
+					.name( 'texture fit' )
 					.onChange( onWindowResize );
 
 				fl.open();
 
 				var fl = gui.addFolder( 'TONEMAPPING' );
 
-				fl.add( API, 'toneMapping' )
-					.onChange( function( value ) {
-						renderer.toneMapping = value ? DefaultToneMapping : THREE.NoToneMapping;
-						textureViewer.update();
-						render();
-					} );
+				//fl.add( API, 'toneMapping' )
+				//	.onChange( function ( value ) {
+
+				//		renderer.toneMapping = value ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+				//		// doesn't work - no needsUpdate available for background material
+				//		render();
+
+				//	} );
 
 				fl.add( API, 'exposure', 0, 2, 0.1 )
-					.onChange( function() { renderer.toneMappingExposure = API.exposure; render(); } );
+					.onChange( function ( value ) {
+
+						renderer.toneMappingExposure = value;
+						render();
+
+					} );
 
 				fl.open();
 
 			}
-
 		</script>
 	</body>
 </html>
