@@ -6,6 +6,7 @@ THREE.DRACOLoader = function ( manager ) {
 
 	this.manager = manager || THREE.DefaultLoadingManager;
 
+	this.path = '';
 	this.crossOrigin = 'anonymous';
 
 	this.decoderPath = '';
@@ -36,6 +37,14 @@ THREE.DRACOLoader = function ( manager ) {
 THREE.DRACOLoader.prototype = {
 
 	constructor: THREE.DRACOLoader,
+
+	setPath: function ( path ) {
+
+		this.path = path;
+
+		return this;
+
+	},
 
 	setCrossOrigin: function ( crossOrigin ) {
 
@@ -94,6 +103,7 @@ THREE.DRACOLoader.prototype = {
 
 		var loader = new THREE.FileLoader( this.manager );
 
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		if ( this.crossOrigin === 'use-credentials' ) {

@@ -13,6 +13,7 @@ var DRACOLoader = function ( manager ) {
 
 	this.manager = manager || DefaultLoadingManager;
 
+	this.path = '';
 	this.crossOrigin = 'anonymous';
 
 	this.decoderPath = '';
@@ -43,6 +44,14 @@ var DRACOLoader = function ( manager ) {
 DRACOLoader.prototype = {
 
 	constructor: DRACOLoader,
+
+	setPath: function ( path ) {
+
+		this.path = path;
+
+		return this;
+
+	},
 
 	setCrossOrigin: function ( crossOrigin ) {
 
@@ -101,6 +110,7 @@ DRACOLoader.prototype = {
 
 		var loader = new FileLoader( this.manager );
 
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		if ( this.crossOrigin === 'use-credentials' ) {
