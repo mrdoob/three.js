@@ -40,6 +40,8 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearcoatNormalScale = new Vector2( 1, 1 );
 	this.clearcoatNormalMap = null;
 
+	this.transparency = 0.0;
+
 	this.setValues( parameters );
 
 }
@@ -71,9 +73,10 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearcoatNormalMap = source.clearcoatNormalMap;
 	this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 
+	this.transparency = source.transparency;
+
 	return this;
 
 };
-
 
 export { MeshPhysicalMaterial };

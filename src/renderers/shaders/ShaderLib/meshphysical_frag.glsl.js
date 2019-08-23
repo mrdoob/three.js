@@ -4,6 +4,7 @@ export default /* glsl */`
 #ifdef PHYSICAL
 	#define REFLECTIVITY
 	#define CLEARCOAT
+	#define TRANSPARENCY
 #endif
 
 uniform vec3 diffuse;
@@ -12,13 +13,19 @@ uniform float roughness;
 uniform float metalness;
 uniform float opacity;
 
+#ifdef TRANSPARENCY
+	uniform float transparency;
+#endif
+
 #ifdef REFLECTIVITY
 	uniform float reflectivity;
 #endif
+
 #ifdef CLEARCOAT
 	uniform float clearcoat;
 	uniform float clearcoatRoughness;
 #endif
+
 #ifdef USE_SHEEN
 	uniform vec3 sheen;
 #endif
@@ -96,6 +103,11 @@ void main() {
 	#include <aomap_fragment>
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+
+	// this is a stub for the transparency model
+	#ifdef TRANSPARENCY
+		diffuseColor.a *= saturate( 1. - transparency + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) );
+	#endif
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 

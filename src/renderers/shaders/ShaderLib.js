@@ -273,6 +273,7 @@ ShaderLib.physical = {
 	uniforms: mergeUniforms( [
 		ShaderLib.standard.uniforms,
 		{
+			transparency: { value: 0 },
 			clearcoat: { value: 0 },
 			clearcoatRoughness: { value: 0 },
 			sheen: { value: new Color( 0x000000 ) },

@@ -2286,6 +2286,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		uniforms.transparency.value = material.transparency;
+
 	}
 
 	function refreshUniformsMatcap( uniforms, material ) {
