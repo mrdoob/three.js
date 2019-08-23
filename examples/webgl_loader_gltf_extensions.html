@@ -267,8 +267,10 @@
 
 				loader = new GLTFLoader();
 
-				DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
-				loader.setDRACOLoader( new DRACOLoader() );
+				var dracoLoader = new THREE.DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' )
+				loader.setDRACOLoader( dracoLoader );
+
 				loader.setDDSLoader( new DDSLoader() );
 
 				var url = sceneInfo.url.replace( /%s/g, state.extension );
