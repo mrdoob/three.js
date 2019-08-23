@@ -210,15 +210,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
 
-		if ( this.camera instanceof THREE.PerspectiveCamera ) {
-
-			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
-
-		} else if ( this.camera instanceof THREE.OrthographicCamera ) {
-
-			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
-
-		}
+		eye.copy( cameraPosition ).sub( worldPosition ).normalize();
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this );
 
