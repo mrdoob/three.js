@@ -52,6 +52,8 @@
 
 			var mouseX = 0, mouseY = 0;
 
+			var defaultCount = parseInt( new URL( window.location.href ).searchParams.get( 'count' ) ) || 70;
+
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
@@ -62,7 +64,7 @@
 
 			function createScene( MaterialClass, count ) {
 
-				count = count !== undefined ? count : 70;
+				count = count !== undefined ? count : defaultCount;
 
 				var i = 0;
 
