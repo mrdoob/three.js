@@ -14,6 +14,8 @@ function AnimationLoader( manager ) {
 
 AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
+	constructor: AnimationLoader,
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
