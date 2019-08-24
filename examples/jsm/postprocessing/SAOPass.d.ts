@@ -14,16 +14,26 @@ import {
 import { Pass } from './Pass';
 
 interface SAOPassParams {
-	output: SAOPass.OUTPUT;
+  output: SAOPass.OUTPUT;
   saoBias: number;
-	saoIntensity: number;
-	saoScale: number;
-	saoKernelRadius: number;
-	saoMinResolution: number;
-	saoBlur: number;
-	saoBlurRadius: number;
-	saoBlurStdDev: number;
-	saoBlurDepthCutoff: number;
+  saoIntensity: number;
+  saoScale: number;
+  saoKernelRadius: number;
+  saoMinResolution: number;
+  saoBlur: number;
+  saoBlurRadius: number;
+  saoBlurStdDev: number;
+  saoBlurDepthCutoff: number;
+}
+
+export namespace SAOPass {
+  enum OUTPUT {
+    Default,
+    Beauty,
+    SAO,
+    Depth,
+    Normal
+  }
 }
 
 export class SAOPass extends Pass {
@@ -50,14 +60,6 @@ export class SAOPass extends Pass {
   depthCopy: ShaderMaterial;
   fsQuad: object;
   params: SAOPassParams;
-	
-  static OUTPUT: {
-    Default: number;
-    Beauty: number;
-    SAO: number;
-    Depth: number;
-    Normal: number;
-  };
 
   renderPass(renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number): void;
   renderPass(renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number): void;
