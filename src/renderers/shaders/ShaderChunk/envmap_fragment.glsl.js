@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_ENVMAP
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( PHONG )
+	#ifdef ENV_WORLDPOS
 
 		vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );
 

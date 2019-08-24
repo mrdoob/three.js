@@ -44,7 +44,7 @@
  *
  *  for (var i = 0; i < nGeometryGroups; i++) {
  *
- *		var material = new THREE.MeshStandardMaterial({
+ *		var material = new THREE.MeshPhongMaterial({
  *			color: colorMap[i],
  *			wireframe: false
  *		});

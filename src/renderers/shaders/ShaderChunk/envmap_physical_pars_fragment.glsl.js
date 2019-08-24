@@ -1,5 +1,9 @@
 export default /* glsl */`
-#if defined( USE_ENVMAP ) && defined( PHYSICAL )
+#if defined( USE_ENVMAP )
+
+	#ifdef ENVMAP_MODE_REFRACTION
+		uniform float refractionRatio;
+	#endif
 
 	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 

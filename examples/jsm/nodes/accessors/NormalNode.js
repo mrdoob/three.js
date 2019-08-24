@@ -87,7 +87,7 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addKeyword( 'normal', function () {
+NodeLib.addKeyword( 'viewNormal', function () {
 
 	return new NormalNode();
 

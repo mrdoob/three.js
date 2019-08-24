@@ -4,14 +4,15 @@ export default /* glsl */`
 	uniform sampler2D normalMap;
 	uniform vec2 normalScale;
 
-	#ifdef OBJECTSPACE_NORMALMAP
-
-		uniform mat3 normalMatrix;
-
-	#endif
 #endif
 
-#if ( defined ( USE_NORMALMAP ) && !defined ( OBJECTSPACE_NORMALMAP )) || defined ( USE_CLEARCOAT_NORMALMAP )
+#ifdef OBJECTSPACE_NORMALMAP
+
+	uniform mat3 normalMatrix;
+
+#endif
+
+#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )
 
 	// Per-Pixel Tangent Space Normal Mapping
 	// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
