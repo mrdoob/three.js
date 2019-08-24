@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -65,22 +67,10 @@
 		</p>
 
 		<h2>属性</h2>
-
-		<h3>[property:String crossOrigin]</h3>
-		<p>
-            如果设置了，在开始加载前， 将为图片分配 [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
-            属性，其值为 *crossOrigin*, 默认为"anonymous"。
-		</p>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			加载器正在使用的[page:LoadingManager loadingManager]，默认值为[page:DefaultLoadingManager].
-		</p>
-
-		<h3>[property:String path]</h3>
-		<p>所要加载文件的基本路径。 请参考[page:.setPath]，默认为*undefined*。</p>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h2>方法</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -92,14 +82,6 @@
 		</p>
 		<p>
             从URL中进行加载，并返回将包含数据的[page:Image image]对象。
-		</p>
-
-		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
-		<p>设置[page:.crossOrigin]的属性。</p>
-
-		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
-		<p>
-            设置加载文件的基本路径或URL。当加载同一目录中下的许多图片时，此方法将很有用。
 		</p>
 
 		<h2>源</h2>
