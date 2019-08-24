@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -68,19 +70,13 @@
 		</p>
 
 		<h2>Properties</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
-		</p>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h3>[property:String options]</h3>
 		<p>An optional object that sets options for the internally used [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap] factory method. Default is *undefined*.</p>
 
-		<h3>[property:String path]</h3>
-		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
-
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -94,20 +90,10 @@
 		Begin loading from url and return the [page:ImageBitmap image] object that will contain the data.
 		</p>
 
-		<h3>[method:ImageBitmapLoader setCrossOrigin]()</h3>
-		<p>This method exists for compatibility reasons and implements no logic. It ensures that [name] has a similar interface like [page:ImageLoader].</p>
-
 		<h3>[method:ImageBitmapLoader setOptions]( [param:Object options] )</h3>
 		<p>
 			Sets the options object for [link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap].
 		</p>
-
-		<h3>[method:ImageBitmapLoader setPath]( [param:String path] )</h3>
-		<p>
-			Sets the base path or URL from which to load files. This can be useful if
-			you are loading many images from the same directory.
-		</p>
-
 
 		<h2>Source</h2>
 
