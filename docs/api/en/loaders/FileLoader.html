@@ -8,6 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
 
 		<h1>[name]</h1>
 
@@ -59,22 +60,14 @@
 			Default is [page:DefaultLoadingManager].
 		</p>
 
-
 		<h2>Properties</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
-		</p>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h3>[property:String mimeType]</h3>
 		<p>
 			The expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
 			See [page:.setMimeType]. Default is *undefined*.
 		</p>
-
-		<h3>[property:String path]</h3>
-		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
 
 		<h3>[property:Object requestHeader]</h3>
 		<p>The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is *undefined*.</p>
@@ -88,8 +81,8 @@
 			Default is *undefined*.
 		</p>
 
-
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:XMLHttpRequest load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -107,12 +100,6 @@
 		<p>
 			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
 			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
-		</p>
-
-		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
-		<p>
-			Set the base path or URL from which to load files. This can be useful if
-			you are loading many models from the same directory.
 		</p>
 
 		<h3>[method:FileLoader setRequestHeader]( [param:Object requestHeader] )</h3>
