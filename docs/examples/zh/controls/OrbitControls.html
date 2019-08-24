@@ -187,12 +187,12 @@ controls.keys = {
 		<h3>
 			[property:Object mouseButtons]</h3>
 		<p>
-			This object contains references to the mouse buttons used for the controls.
+			This object contains references to the mouse actions used by the controls.
 			<code>
 controls.mouseButtons = {
-	LEFT: THREE.MOUSE.LEFT,
-	MIDDLE: THREE.MOUSE.MIDDLE,
-	RIGHT: THREE.MOUSE.RIGHT
+	LEFT: THREE.MOUSE.ROTATE,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.PAN
 }
 			</code>
 		</p>
@@ -232,6 +232,17 @@ controls.mouseButtons = {
 		<p>
 			The focus point of the controls, the [page:.object] orbits around this. It can be updated manually at any point to change
 			the focus of the controls.
+		</p>
+
+		<h3>[property:Object touches]</h3>
+		<p>
+			This object contains references to the touch actions used by the controls.
+			<code>
+controls.touches = {
+	ONE: THREE.TOUCH.ROTATE,
+	TWO: THREE.TOUCH.DOLLY_PAN
+}
+			</code>
 		</p>
 
 		<h3>[property:Float zoom0]</h3>
@@ -281,6 +292,8 @@ controls.mouseButtons = {
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+		</p>
 	</body>
 </html>
