@@ -832,11 +832,11 @@ var list = {
 			},
 
 			"QuickHull": {
-				"Face": "examples/zh/quickhull/Face",
-				"HalfEdge": "examples/zh/quickhull/HalfEdge",
-				"QuickHull": "examples/zh/quickhull/QuickHull",
-				"VertexNode": "examples/zh/quickhull/VertexNode",
-				"VertexList": "examples/zh/quickhull/VertexList"
+				"Face": "examples/zh/math/convexhull/Face",
+				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/zh/math/convexhull/ConvexHull",
+				"VertexNode": "examples/zh/math/convexhull/VertexNode",
+				"VertexList": "examples/zh/math/convexhull/VertexList"
 			},
 
 			"渲染器": {
