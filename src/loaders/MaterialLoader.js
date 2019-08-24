@@ -5,7 +5,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { FileLoader } from './FileLoader.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 import * as Materials from '../materials/Materials.js';
 
 /**
@@ -14,12 +14,15 @@ import * as Materials from '../materials/Materials.js';
 
 function MaterialLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
+
 	this.textures = {};
 
 }
 
-Object.assign( MaterialLoader.prototype, {
+MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: MaterialLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -236,13 +239,6 @@ Object.assign( MaterialLoader.prototype, {
 		if ( json.clearcoatNormalScale !== undefined ) material.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
 
 		return material;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 

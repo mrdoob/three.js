@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -54,17 +56,13 @@
 		</p>
 
 		<h2>Properties</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
-		</p>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h3>[property:Object textures]</h3>
 		<p>Object holding any textures used by the material. See [page:.setTextures].</p>
 
-
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -82,14 +80,6 @@
 		[page:Object json] — The json object containing the parameters of the Material.<br /><br />
 
 		Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object.
-		</p>
-
-		<h3>[method:MaterialLoader setPath]( [param:String path] )</h3>
-		<p>
-			[page:String path] — Base path of the file to load.<br /><br />
-
-			Sets the base path or URL from which to load files. This can be useful if
-			you are loading many materials from the same directory.
 		</p>
 
 		<h3>[method:MaterialLoader setTextures]( [param:Object textures] )</h3>
