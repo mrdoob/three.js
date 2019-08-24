@@ -13,6 +13,19 @@ import {
 
 import { Pass } from './Pass';
 
+interface SAOPassParams {
+	output: SAOPass.OUTPUT;
+  saoBias: number;
+	saoIntensity: number;
+	saoScale: number;
+	saoKernelRadius: number;
+	saoMinResolution: number;
+	saoBlur: number;
+	saoBlurRadius: number;
+	saoBlurStdDev: number;
+	saoBlurDepthCutoff: number;
+}
+
 export class SAOPass extends Pass {
   constructor(scene: Scene, camera: Camera, depthTexture?: boolean, useNormals?: boolean, resolution?: Vector2);
   scene: Scene;
@@ -36,7 +49,8 @@ export class SAOPass extends Pass {
   materialCopy: ShaderMaterial;
   depthCopy: ShaderMaterial;
   fsQuad: object;
-
+  params: SAOPassParams;
+	
   static OUTPUT: {
     Default: number;
     Beauty: number;
