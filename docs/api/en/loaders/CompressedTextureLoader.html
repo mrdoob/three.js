@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -33,20 +35,11 @@
 		Creates a new [name].
 		</p>
 
-
 		<h2>Properties</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
-		</p>
-
-		<h3>[property:String path]</h3>
-		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
-
-
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:CompressedTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -58,12 +51,6 @@
 		</p>
 		<p>
 		Begin loading from url and pass the loaded texture to onLoad.
-		</p>
-
-		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
-		<p>
-			Set the base path or URL from which to load files. This can be useful if
-			you are loading many textures from the same directory.
 		</p>
 
 		<h2>Source</h2>
