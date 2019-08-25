@@ -8,18 +8,18 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>轨道控制器（[name]）</h1>
 
 		<p class="desc">
-		Orbit controls allow the camera to orbit around a target.<br>
+		Orbit controls（轨道控制器）可以使得相机围绕目标进行轨道运动。<br>
 
-		To use this, as with all files in the /examples directory, you will have to
-		include the file seperately in your HTML.
+		要使用这一功能，就像在/examples（示例）目录中的所有文件一样，
+		您必须在HTML中包含这个文件。
 
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>示例</h2>
 
 		<p>[example:misc_controls_orbit misc / controls / orbit ]</p>
 
@@ -54,10 +54,10 @@ function animate() {
 
 		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
 		<p>
-			[page:Camera object]: (required) The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.<br><br>
+			[page:Camera object]: （必须）将要被控制的相机。该相机不允许是其他任何对象的子级，除非该对象是场景自身。<br><br>
 
-			[page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the whole document,
-			however if you only want the controls to work over a specific element (e.g. the canvas) you can specify that here.
+			[page:HTMLDOMElement domElement]: （可选）用于事件监听的HTML元素，其默认值为整个文档，
+			但是如果你只希望在特定的元素上（例如Canvas上）进行控制，在这里进行指定即可。
 		</p>
 
 
@@ -65,72 +65,71 @@ function animate() {
 
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
-			Set to true to automatically rotate around the target.<br> Note that if this is enabled, you must call [page:.update]
-			() in your animation loop.
+			将其设为true，以自动围绕目标旋转。<br>
+			请注意，如果它被启用，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
-			How fast to rotate around the target if [property:Boolean autoRotate] is true. Default is 2.0, which equates to 30 seconds
-			per rotation at 60fps.<br> Note that if [property:Boolean autoRotate] is enabled, you must call [page:.update]
-			() in your animation loop.
+			当[property:Boolean autoRotate]为true时，围绕目标旋转的速度将有多快，默认值为2.0，相当于在60fps时每旋转一次需要30秒。<br>
+			请注意，如果[property:Boolean autoRotate]被启用，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>
 			[property:Float dampingFactor]</h3>
 		<p>
-			The damping inertia used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
-			call [page:.update] () in your animation loop.
+			当[property:Boolean enableDamping]设置为true的时候，阻尼惯性有多大。<br>
+			请注意，要使得这一值生效，你必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners. Default is the whole document.
+			用于监听鼠标事件或触摸事件的HTMLDOMElement（DOM元素）。该值必须在构造函数中进行传入；
+			在此更改它将不会设置新的事件监听器。默认值是整个文档。
 		</p>
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			Whether or not the controls are enabled.
+			控制器是否被启用。
 		</p>
 
 		<h3>[property:Boolean enableDamping]</h3>
 		<p>
-			Set to true to enable damping (inertia), which can be used to give a sense of weight to the controls. Default is false.<br>
-			Note that if this is enabled, you must call [page:.update] () in your animation loop.
+			将其设置为true以启用阻尼（惯性），这将给控制器带来重量感。默认值为false。<br>
+			请注意，如果该值被启用，你将必须在你的动画循环里调用[page:.update]()。
 		</p>
 
 		<h3>[property:Boolean enableKeys]</h3>
 		<p>
-			Enable or disable the use of keyboard controls.
+			启用或禁用键盘控制。
 		</p>
 
 		<h3>[property:Boolean enablePan]</h3>
 		<p>
-			Enable or disable camera panning. Default is true.
+			启用或禁用摄像机平移，默认为true。
 		</p>
 
 		<h3>[property:Boolean enableRotate]</h3>
 		<p>
-			Enable or disable horizontal and vertical rotation of the camera. Default is true.<br>
-			Note that it is possible to disable a single axis by setting the min and max of the
-			[page:.minPolarAngle polar angle] or [page:.minAzimuthAngle azimuth angle] to the same value,
-			which will cause the vertical or horizontal rotation to be fixed at that value.
+			启用或禁用摄像机水平或垂直旋转。默认值为true。<br>
+			请注意，可以通过将[page:.minPolarAngle polar angle]或者[page:.minAzimuthAngle azimuth angle]
+			的min和max设置为相同的值来禁用单个轴，
+			这将使得水平旋转或垂直旋转固定为所设置的值。
 		</p>
 
 		<h3>[property:Boolean enableZoom]</h3>
 		<p>
-			Enable or disable zooming (dollying) of the camera.
+			启用或禁用摄像机的缩放。
 		</p>
 
 		<h3>[property:Float keyPanSpeed]</h3>
 		<p>
-			How fast to pan the camera when the keyboard is used. Default is 7.0 pixels per keypress.
+			当使用键盘按键的时候，相机平移的速度有多快。默认值为每次按下按键时平移7像素。
 		</p>
 
 		<h3>[property:Object keys]</h3>
 		<p>
-			This object contains references to the keycodes for controlling camera panning. Default is the 4 arrow keys.
+			这一对象包含了用于控制相机平移的按键代码的引用。默认值为4个箭头（方向）键。
 			<code>
 controls.keys = {
 	LEFT: 37, //left arrow
@@ -138,56 +137,55 @@ controls.keys = {
 	RIGHT: 39, // right arrow
 	BOTTOM: 40 // down arrow
 }
-			 </code> See [link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page] for a full
-			list of keycodes.
+			 </code>请参阅[link:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode this page]来查看所有按键的代码列表。
 		</p>
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
 		<p>
-			How far you can orbit horizontally, upper limit. Range is - Math.PI to Math.PI ( or Infinity for no limit ) and default is
-			Infinity;
+			你能够水平旋转的角度的上限，范围是-Math.PI到Math.PI（或Infinity无限制），
+			其默认值为Infinity。
 		</p>
 
 		<h3>[property:Float maxDistance]</h3>
 		<p>
-			How far you can dolly out ( [page:PerspectiveCamera] only ). Default is Infinity.
+			你能够将相机向外移动多少（仅适用于[page:PerspectiveCamera]），其默认值为Infinity。
 		</p>
 
 		<h3>[property:Float maxPolarAngle]</h3>
 		<p>
-			How far you can orbit vertically, upper limit. Range is 0 to Math.PI radians, and default is Math.PI.
+			你能够垂直旋转的角度的上限，范围是0到Math.PI，其默认值为Math.PI。
 		</p>
 
 		<h3>[property:Float maxZoom]</h3>
 		<p>
-			How far you can zoom out ( [page:OrthographicCamera] only ). Default is Infinity.
+			你能够将相机缩小多少( 仅适用于[page:OrthographicCamera] only )，其默认值为Infinity。
 		</p>
 
 		<h3>[property:Float minAzimuthAngle]</h3>
 		<p>
-			How far you can orbit horizontally, lower limit. Range is - Math.PI to Math.PI ( or - Infinity for no limit ) and default
-			is - Infinity;
+			你能够水平旋转的角度的下限，范围是-Math.PI到Math.PI（或-Infinity无限制），
+			其默认值为-Infinity。
 		</p>
 
 		<h3>[property:Float minDistance]</h3>
 		<p>
-			 How far you can dolly in ( [page:PerspectiveCamera] only ). Default is 0.
+			你能够将相机向内移动多少（仅适用于[page:PerspectiveCamera]），其默认值为0。
 		</p>
 
 		<h3>[property:Float minPolarAngle]</h3>
 		<p>
-			How far you can orbit vertically, lower limit. Range is 0 to Math.PI radians, and default is 0.
+			你能够垂直旋转的角度的下限，范围是0到Math.PI，其默认值为0。
 		</p>
 
 		<h3>[property:Float minZoom]</h3>
 		<p>
-			How far you can zoom in ( [page:OrthographicCamera] only ). Default is 0.
+			你能够将相机放大多少( 仅适用于[page:OrthographicCamera] )，其默认值为0。
 		</p>
 
 		<h3>
 			[property:Object mouseButtons]</h3>
 		<p>
-			This object contains references to the mouse buttons used for the controls.
+			这一对象包含了对用于控制的鼠标按钮的引用。
 			<code>
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.LEFT,
@@ -199,48 +197,49 @@ controls.mouseButtons = {
 
 		<h3>[property:Camera object]</h3>
 		<p>
-			The camera being controlled.
+			正被控制的摄像机。
 		</p>
 
 		<h3>[property:Float panSpeed]</h3>
 		<p>
-			Speed of panning. Default is 1.
+			位移的速度，其默认值为1。
 		</p>
 
 		<h3>[property:Vector3 position0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			由[method:saveState]和[method:reset]方法在内部使用。
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
 		<p>
-			Speed of rotation. Default is 1.
+			旋转的速度，其默认值为1.
 		</p>
 
 		<h3>[property:Boolean screenSpacePanning]</h3>
 		<p>
-		Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
-		Otherwise, the camera pans in the plane orthogonal to the camera's up direction. Default is false.
+			定义当平移的时候摄像机的位置将如何移动。如果为true，摄像机将在屏幕空间内平移。
+			否则，摄像机将在与摄像机向上方向垂直的平面中平移。其默认值为false。
 		</p>
 
 		<h3>[property:Vector3 target0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			由[method:saveState]和[method:reset]方法在内部使用。
 		</p>
 
 		<h3>[property:Vector3 target]</h3>
 		<p>
-			The focus point of the controls, the [page:.object] orbits around this. It can be updated manually at any point to change
-			the focus of the controls.
+			控制器的焦点，[page:.object]的轨道围绕它运行。
+			它可以在任何时候被手动更新，以更改控制器的焦点。
 		</p>
 
 		<h3>[property:Float zoom0]</h3>
 		<p>
-			Used internally by the [method:saveState] and [method:reset] methods.
+			由[method:saveState]和[method:reset]方法在内部使用。
 		</p>
 
 		<h3>[property:Float zoomSpeed]</h3>
 		<p>
+			摄像机缩放的速度，其默认值为1。
 			Speed of zooming / dollying. Default is 1.
 		</p>
 
@@ -250,36 +249,36 @@ controls.mouseButtons = {
 
 		<h3>[method:null dispose] ()</h3>
 		<p>
-			Remove all the event listeners.
+			移除所有的事件监听。
 		</p>
 
 		<h3>[method:radians getAzimuthalAngle] ()</h3>
 		<p>
-			Get the current horizontal rotation, in radians.
+			获得当前的水平旋转，单位为弧度。
 		</p>
 
 		<h3>[method:radians getPolarAngle] ()</h3>
 		<p>
-			Get the current vertical rotation, in radians.
+			获得当前的垂直旋转，单位为弧度。
 		</p>
 
 		<h3>[method:null reset] ()</h3>
 		<p>
-			Reset the controls to their state from either the last time the [page:.saveState] was called, or the initial state.
+			将控制器重置为上次调用[page:.saveState]时的状态，或者初始状态。
 		</p>
 
 		<h3>[method:null saveState] ()</h3>
 		<p>
-			Save the current state of the controls. This can later be recovered with [page:.reset].
+			保存当前控制器的状态。这一状态可在之后由[page:.reset]所恢复。
 		</p>
 
 		<h3>[method:Boolean update] ()</h3>
 		<p>
-			Update the controls. Must be called after any manual changes to the camera's transform,
-			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set.
+			更新控制器。必须在摄像机的变换发生任何手动改变后调用，
+			或如果[page:.autoRotate]或[page:.enableDamping]被设置时，在update循环里调用。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
 	</body>

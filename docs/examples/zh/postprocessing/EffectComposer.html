@@ -9,13 +9,14 @@
 	</head>
 	<body>
 
-		<h1>[name]</h1>
+		<h1>效果合成器（[name]）</h1>
 
 		<p class="desc">
-			TODO
+			用于在three.js中实现后期处理效果。该类管理了产生最终视觉效果的后期处理过程链。
+			后期处理过程根据它们添加/插入的顺序来执行，最后一个过程会被自动渲染到屏幕上。
 		</p>
 
-		<h2>Examples</h2>
+		<h2>示例</h2>
 
 		<p>
 			[example:webgl_postprocessing postprocessing]<br />
@@ -43,110 +44,112 @@
 			[example:webgl_postprocessing_unreal_bloom_selective postprocessing unreal bloom selective]<br />
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:WebGLRenderer renderer], [param:WebGLRenderTarget renderTarget] )</h3>
 		<p>
-		[page:WebGLRenderer renderer] -- The renderer used to render the scene. <br />
-		[page:WebGLRenderTarget renderTarget] -- (optional) A preconfigured render target internally used by [name].
+		[page:WebGLRenderer renderer] —— 用于渲染场景的渲染器。<br />
+		[page:WebGLRenderTarget renderTarget] —— （可选）一个预先配置的渲染目标，内部由 [name] 使用。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Boolean passes]</h3>
 		<p>
-			An array representing the (ordered) chain of post-processing passes.
+			一个用于表示后期处理过程链（包含顺序）的数组。
 		</p>
 
 		<h3>[property:WebGLRendererTarget readBuffer]</h3>
 		<p>
-			A reference to the internal read buffer. Passes usually read the previous render result from this buffer.
+			内部读缓冲区的引用。过程一般从该缓冲区读取先前的渲染结果。
 		</p>
 
 		<h3>[property:WebGLRenderer renderer]</h3>
 		<p>
-			A reference to the internal renderer.
+			内部渲染器的引用。
 		</p>
 
 		<h3>[property:Boolean renderToScreen]</h3>
 		<p>
-			Whether the final pass is rendered to the screen (default framebuffer) or not.
+			最终过程是否被渲染到屏幕（默认帧缓冲区）。
 		</p>
 
 		<h3>[property:WebGLRendererTarget writeBuffer]</h3>
 		<p>
-			A reference to the internal write buffer. Passes usually write their result into this buffer.
+			内部写缓冲区的引用。过程常将它们的渲染结果写入该缓冲区。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:void addPass]( [param:Pass pass] )</h3>
 
 		<p>
-			pass -- The pass to add to the pass chain.<br /><br />
+			pass —— 将被添加到过程链的过程<br /><br />
 
-			Adds the given pass to the pass chain.
+			将传入的过程添加到过程链。
 		</p>
 
 		<h3>[method:void insertPass]( [param:Pass pass], [param:Integer index] )</h3>
 
 		<p>
-			pass -- The pass to insert into the pass chain.<br />
-			index -- Defines the position in the pass chain where the pass should be inserted.<br /><br />
+			pass —— 将被插入到过程链的过程。<br />
+			index —— 定义过程链中过程应插入的位置。<br /><br />
 
-			Inserts the given pass into the pass chain at the given index.
+			将传入的过程插入到过程链中所给定的索引处。
 		</p>
 
 		<h3>[method:boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
 
 		<p>
-			passIndex -- The pass to check.<br /><br />
+			passIndex —— 被用于检查的过程<br /><br />
 
-			Returns true if the pass for the given index is the last enabled pass in the pass chain.
-			Used by [name] to determine when a pass should be rendered to screen.
+			如果给定索引的过程在过程链中是最后一个启用的过程，则返回true。
+			由[name]所使用，来决定哪一个过程应当被渲染到屏幕上。
 		</p>
 
 		<h3>[method:void render]( [param:Float deltaTime] )</h3>
 
 		<p>
-			deltaTime -- The delta time value.<br /><br />
+			deltaTime —— The delta time value.<br /><br />
 
-			Executes all enabled post-processing passes in order to produce the final frame.
+			执行所有启用的后期处理过程，来产生最终的帧，
 		</p>
 
 		<h3>[method:void reset]( [param:WebGLRenderTarget renderTarget] )</h3>
 
 		<p>
-			[page:WebGLRenderTarget renderTarget] -- (optional) A preconfigured render target internally used by [name]..<br /><br />
+			[page:WebGLRenderTarget renderTarget] —— （可选）一个预先配置的渲染目标，内部由 [name] 使用。<br /><br />
 
-			Resets the internal state of the [name].
+			重置所有[name]的内部状态。
 		</p>
 
 		<h3>[method:void setPixelRatio]( [param:Float pixelRatio] )</h3>
 
 		<p>
-			pixelRatio -- The device pixel ratio.<br /><br />
+			pixelRatio —— 设备像素比<br /><br />
 
-			Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output.
-				Thus, the semantic of the method is similar to [page:WebGLRenderer.setPixelRatio]().
+			设置设备的像素比。该值通常被用于HiDPI设备，以阻止模糊的输出。
+			因此，该方法语义类似于[page:WebGLRenderer.setPixelRatio]()。
+
 		</p>
 
 		<h3>[method:void setSize]( [param:Integer width], [param:Integer height] )</h3>
 
 		<p>
-			width -- The width of the [name].<br />
-			height -- The height of the [name].<br /><br />
+			width —— [name]的宽度。<br />
+			height —— [name]的高度。<br /><br />
 
-				Resizes the internal render buffers and passes to (width, height) with device pixel ratio taken into account.
-				Thus, the semantic of the method is similar to [page:WebGLRenderer.setSize]().
+			考虑设备像素比，重新设置内部渲染缓冲和过程的大小为(width, height)。
+			因此，该方法语义类似于[page:WebGLRenderer.setSize]()。
+
 		</p>
 
 		<h3>[method:void swapBuffers]()</h3>
 
-		<p>Swaps the internal read/write buffers.</p>
+		<p>交换内部的读/写缓冲。</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/EffectComposer.js examples/js/postprocessing/EffectComposer.js]
 	</body>
