@@ -188,9 +188,9 @@ controls.keys = {
 			这一对象包含了对用于控制的鼠标按钮的引用。
 			<code>
 controls.mouseButtons = {
-	LEFT: THREE.MOUSE.LEFT,
-	MIDDLE: THREE.MOUSE.MIDDLE,
-	RIGHT: THREE.MOUSE.RIGHT
+	LEFT: THREE.MOUSE.ROTATE,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.PAN
 }
 			</code>
 		</p>
@@ -230,6 +230,17 @@ controls.mouseButtons = {
 		<p>
 			控制器的焦点，[page:.object]的轨道围绕它运行。
 			它可以在任何时候被手动更新，以更改控制器的焦点。
+		</p>
+
+		<h3>[property:Object touches]</h3>
+		<p>
+			This object contains references to the touch actions used by the controls.
+			<code>
+controls.touches = {
+	ONE: THREE.TOUCH.ROTATE,
+	TWO: THREE.TOUCH.DOLLY_PAN
+}
+			</code>
 		</p>
 
 		<h3>[property:Float zoom0]</h3>
@@ -280,6 +291,8 @@ controls.mouseButtons = {
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+		</p>
 	</body>
 </html>

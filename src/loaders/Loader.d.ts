@@ -1,4 +1,3 @@
-import { LoaderHandler } from './FileLoader';
 import { LoadingManager } from './LoadingManager';
 
 /**
@@ -24,4 +23,13 @@ export class Loader {
 
 	static Handlers: LoaderHandler;
 
+}
+
+// LoaderHandler
+
+export interface LoaderHandler {
+	handlers: ( RegExp | Loader )[];
+
+	add( regex: RegExp, loader: Loader ): void;
+	get( file: string ): Loader | null;
 }

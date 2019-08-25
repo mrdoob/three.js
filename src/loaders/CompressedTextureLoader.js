@@ -1,7 +1,7 @@
 import { LinearFilter } from '../constants.js';
 import { FileLoader } from './FileLoader.js';
 import { CompressedTexture } from '../textures/CompressedTexture.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -11,14 +11,16 @@ import { DefaultLoadingManager } from './LoadingManager.js';
 
 function CompressedTextureLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	// override in sub classes
 	this._parser = null;
 
 }
 
-Object.assign( CompressedTextureLoader.prototype, {
+CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: CompressedTextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -125,13 +127,6 @@ Object.assign( CompressedTextureLoader.prototype, {
 		}
 
 		return texture;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 
