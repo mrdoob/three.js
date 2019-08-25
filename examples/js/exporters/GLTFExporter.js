@@ -868,7 +868,9 @@ THREE.GLTFExporter.prototype = {
 			};
 
 			if ( map.name ) {
+
 				gltfTexture.name = map.name;
+
 			}
 
 			outputJSON.textures.push( gltfTexture );
