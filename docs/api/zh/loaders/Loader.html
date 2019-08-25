@@ -16,49 +16,65 @@
 		<h2>构造方法</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		当创建一个新的 [name]， 将调用此基类。
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</p>
+		<p>
+			Creates a new [name].
 		</p>
 
 
 		<h2>属性</h2>
 
-		<h3>[property:Function onLoadStart]</h3>
-		<p>当加载开始时，将被调用。</p>
-		<p>默认实现是一个空函数体。</p>
-
-		<h3>[property:Function onLoadProgress]</h3>
-		<p>当进入加载流程中，将被调用。</p>
-		<p>默认实现是一个空函数体。</p>
-
-		<h3>[property:Function onLoadComplete]</h3>
-		<p>当加载完成时，将被调用。</p>
-		<p>默认实现是一个空函数体。</p>
-
 		<h3>[property:string crossOrigin]</h3>
 		<p>
-            跨域字符串，用于实现跨域，以便从允许CORS从其他域加载url。默认为"anonymous"。
+		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		Default is *anonymous*.
 		</p>
 
-		<h2>Methods</h2>
-
-		<h3>[method:Material createMaterial]( [param:object m], [param:string texturePath] )</h3>
+		<h3>[property:LoadingManager manager]</h3>
 		<p>
-		[page:Object m] — 所要创建的材质的参数。 <br />
-		[page:String texturePath] — 纹理加载路径。
-		</p>
-		<p>
-		基于参数m来创建材质。
+			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
 		</p>
 
-		<h3>[method:Array initMaterials]( [param:Array materials], [param:string texturePath] )</h3>
+		<h3>[property:String path]</h3>
 		<p>
-		[page:Array materials] — 用于创建材质的参数数组。 <br />
-		[page:String texturePath] —  纹理加载路径。
+			The base path from which the asset will be loaded.
+			Default is the empty string.
 		</p>
+
+		<h3>[property:String resourcePath]</h3>
 		<p>
-		基于参数数组m,来创建 [page:Material] 数组. 参数索引与材质的索引一致。
+			The base path from which additional resources like textures will be loaded.
+			Default is the empty string.
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:void load]()</h3>
+		<p>
+			This method needs to be implement by all concrete loaders. It holds the logic for loading the asset from the backend.
+		</p>
+
+		<h3>[method:void parse]()</h3>
+		<p>
+			This method needs to be implement by all concrete loaders. It holds the logic for parsing the asset into three.js entities.
+		</p>
+
+		<h3>[method:Loader setCrossOrigin]( [param:String crossOrigin] )</h3>
+		<p>
+			[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</p>
+
+		<h3>[method:Loader setPath]( [param:String path] )</h3>
+		<p>
+			[page:String path] — Set the base path for the asset.
+		</p>
+
+		<h3>[method:Loader setResourcePath]( [param:String resourcePath] )</h3>
+		<p>
+			[page:String resourcePath] — Set the base path for dependent resources like textures.
 		</p>
 
 		<h2>Handlers</h2>
@@ -67,10 +83,10 @@
 		*[name].Handlers* is a special object normally used by other loaders like [page:GLTFLoader] or [page:MTLLoader]. It provides an
 		API that allows the definition of special mappings: What loaders should be used in order to load specific files. A typical use case
 		is to overwrite the default loader for textures.<br /><br />
-	
+
 		Note: It's only possible to use *[name].Handlers* if the respective loader support the usage.
 		</p>
-	
+
 		<h3>[method:null add]( [param:Object regex], [param:Loader loader] )</h3>
 		<p>
 		[page:Object regex] — A regular expression.<br />
@@ -78,14 +94,14 @@
 		<p>
 		Registers a loader with the given regular expression.
 		</p>
-	
+
 		<h3>[method:null get]( [param:String file] )</h3>
 		<p>
 		[page:String file] — The file path.
 		<p>
 		Can be used to retrieve the registered loader for the given file path.
 		</p>
-		
+
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

@@ -166,6 +166,7 @@ var files = {
 		"webgl_materials_parallaxmap",
 		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
+		"webgl_materials_sheen",
 		"webgl_materials_skin",
 		"webgl_materials_standard",
 		"webgl_materials_texture_anisotropy",

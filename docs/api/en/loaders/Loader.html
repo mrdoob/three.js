@@ -16,50 +16,65 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		Creates a new [name]. This should be called as base class.
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</p>
+		<p>
+			Creates a new [name].
 		</p>
 
 
 		<h2>Properties</h2>
 
-		<h3>[property:Function onLoadStart]</h3>
-		<p>Will be called when load starts.</p>
-		<p>The default is a function with empty body.</p>
-
-		<h3>[property:Function onLoadProgress]</h3>
-		<p>Will be called while load progresses.</p>
-		<p>The default is a function with empty body.</p>
-
-		<h3>[property:Function onLoadComplete]</h3>
-		<p>Will be called when load completes.</p>
-		<p>The default is a function with empty body.</p>
-
 		<h3>[property:string crossOrigin]</h3>
 		<p>
 		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		Default is *"anonymous"*.
+		Default is *anonymous*.
+		</p>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<p>
+			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+		</p>
+
+		<h3>[property:String path]</h3>
+		<p>
+			The base path from which the asset will be loaded.
+			Default is the empty string.
+		</p>
+
+		<h3>[property:String resourcePath]</h3>
+		<p>
+			The base path from which additional resources like textures will be loaded.
+			Default is the empty string.
 		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:Material createMaterial]( [param:object m], [param:string texturePath] )</h3>
+		<h3>[method:void load]()</h3>
 		<p>
-		[page:Object m] — The parameters to create the material. <br />
-		[page:String texturePath] — The base path of the textures.
-		</p>
-		<p>
-		Creates the Material based on the parameters m.
+			This method needs to be implement by all concrete loaders. It holds the logic for loading the asset from the backend.
 		</p>
 
-		<h3>[method:Array initMaterials]( [param:Array materials], [param:string texturePath] )</h3>
+		<h3>[method:void parse]()</h3>
 		<p>
-		[page:Array materials] — an array of parameters to create materials. <br />
-		[page:String texturePath] —  The base path of the textures.
+			This method needs to be implement by all concrete loaders. It holds the logic for parsing the asset into three.js entities.
 		</p>
+
+		<h3>[method:Loader setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<p>
-		Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials.
+			[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</p>
+
+		<h3>[method:Loader setPath]( [param:String path] )</h3>
+		<p>
+			[page:String path] — Set the base path for the asset.
+		</p>
+
+		<h3>[method:Loader setResourcePath]( [param:String resourcePath] )</h3>
+		<p>
+			[page:String resourcePath] — Set the base path for dependent resources like textures.
 		</p>
 
 		<h2>Handlers</h2>

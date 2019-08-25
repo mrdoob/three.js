@@ -28,12 +28,13 @@
 			init();
 			animate();
 
-			//load custmized cube texture
+			//load customized cube texture
 			async function loadCubeTextureWithMipmaps() {
 
 				var path = 'textures/cube/angus/';
 				var format = '.jpg';
 				var mipmaps = [];
+				var maxLevel = 8;
 
 				async function loadCubeTexture( urls ) {
 
@@ -53,7 +54,7 @@
 				// load mipmaps
 				var pendings = [];
 
-				for ( var level = 0; level < 9; ++ level ) {
+				for ( var level = 0; level <= maxLevel; ++ level ) {
 
 					var urls = [];
 
@@ -63,9 +64,11 @@
 
 					}
 
+					let mipmapLevel = level;
+
 					pendings.push( loadCubeTexture( urls ).then( function ( cubeTexture ) {
 
-						mipmaps.push( cubeTexture );
+						mipmaps[ mipmapLevel ] = cubeTexture;
 
 					} ) );
 

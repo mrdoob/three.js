@@ -231,7 +231,9 @@ ColladaExporter.prototype = {
 						bufferGeometry.groups :
 						[ { start: 0, count: indexCount, materialIndex: 0 } ];
 
-				var gnode = `<geometry id="${ meshid }" name="${ g.name }"><mesh>`;
+
+				var gname = g.name ? ` name="${ g.name }"` : '';
+				var gnode = `<geometry id="${ meshid }"${ gname }><mesh>`;
 
 				// define the geometry node and the vertices for the geometry
 				var posName = `${ meshid }-position`;
@@ -504,7 +506,10 @@ ColladaExporter.prototype = {
 
 					'</effect>';
 
-				libraryMaterials.push( `<material id="${ matid }" name="${ m.name }"><instance_effect url="#${ matid }-effect" /></material>` );
+				var materialName = m.name ? ` name="${ m.name }"` : '';
+				var materialNode = `<material id="${ matid }"${ materialName }><instance_effect url="#${ matid }-effect" /></material>`;
+
+				libraryMaterials.push( materialNode );
 				libraryEffects.push( effectnode );
 				materialMap.set( m, matid );
 

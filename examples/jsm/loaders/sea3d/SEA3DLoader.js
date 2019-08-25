@@ -2715,8 +2715,8 @@ SEA3D.prototype.materialTechnique =
 	techniques[ SEA3DSDK.Material.CLEAR_COAT ] =
 	function ( mat, tech ) {
 
-		mat.clearCoat = tech.strength;
-		mat.clearCoatRoughness = tech.roughness;
+		mat.clearcoat = tech.strength;
+		mat.clearcoatRoughness = tech.roughness;
 
 	};
 
