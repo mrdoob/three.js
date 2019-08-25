@@ -891,6 +891,10 @@ GLTFExporter.prototype = {
 
 			};
 
+			if ( map.name ) {
+				gltfTexture.name = map.name;
+			}
+
 			outputJSON.textures.push( gltfTexture );
 
 			var index = outputJSON.textures.length - 1;
