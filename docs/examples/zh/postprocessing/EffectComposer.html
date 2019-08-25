@@ -49,8 +49,8 @@
 
 		<h3>[name]( [param:WebGLRenderer renderer], [param:WebGLRenderTarget renderTarget] )</h3>
 		<p>
-		[page:WebGLRenderer renderer] —— 用于渲染场景的渲染器。<br />
-		[page:WebGLRenderTarget renderTarget] —— （可选）一个预先配置的渲染目标，内部由 [name] 使用。
+		[page:WebGLRenderer renderer] -- 用于渲染场景的渲染器。<br />
+		[page:WebGLRenderTarget renderTarget] -- （可选）一个预先配置的渲染目标，内部由 [name] 使用。
 		</p>
 
 		<h2>属性</h2>
@@ -85,7 +85,7 @@
 		<h3>[method:void addPass]( [param:Pass pass] )</h3>
 
 		<p>
-			pass —— 将被添加到过程链的过程<br /><br />
+			pass -- 将被添加到过程链的过程<br /><br />
 
 			将传入的过程添加到过程链。
 		</p>
@@ -93,8 +93,8 @@
 		<h3>[method:void insertPass]( [param:Pass pass], [param:Integer index] )</h3>
 
 		<p>
-			pass —— 将被插入到过程链的过程。<br />
-			index —— 定义过程链中过程应插入的位置。<br /><br />
+			pass -- 将被插入到过程链的过程。<br />
+			index -- 定义过程链中过程应插入的位置。<br /><br />
 
 			将传入的过程插入到过程链中所给定的索引处。
 		</p>
@@ -102,7 +102,7 @@
 		<h3>[method:boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
 
 		<p>
-			passIndex —— 被用于检查的过程<br /><br />
+			passIndex -- 被用于检查的过程<br /><br />
 
 			如果给定索引的过程在过程链中是最后一个启用的过程，则返回true。
 			由[name]所使用，来决定哪一个过程应当被渲染到屏幕上。
@@ -111,7 +111,7 @@
 		<h3>[method:void render]( [param:Float deltaTime] )</h3>
 
 		<p>
-			deltaTime —— The delta time value.<br /><br />
+			deltaTime -- The delta time value.<br /><br />
 
 			执行所有启用的后期处理过程，来产生最终的帧，
 		</p>
@@ -119,7 +119,7 @@
 		<h3>[method:void reset]( [param:WebGLRenderTarget renderTarget] )</h3>
 
 		<p>
-			[page:WebGLRenderTarget renderTarget] —— （可选）一个预先配置的渲染目标，内部由 [name] 使用。<br /><br />
+			[page:WebGLRenderTarget renderTarget] -- （可选）一个预先配置的渲染目标，内部由 [name] 使用。<br /><br />
 
 			重置所有[name]的内部状态。
 		</p>
@@ -127,7 +127,7 @@
 		<h3>[method:void setPixelRatio]( [param:Float pixelRatio] )</h3>
 
 		<p>
-			pixelRatio —— 设备像素比<br /><br />
+			pixelRatio -- 设备像素比<br /><br />
 
 			设置设备的像素比。该值通常被用于HiDPI设备，以阻止模糊的输出。
 			因此，该方法语义类似于[page:WebGLRenderer.setPixelRatio]()。
@@ -137,8 +137,8 @@
 		<h3>[method:void setSize]( [param:Integer width], [param:Integer height] )</h3>
 
 		<p>
-			width —— [name]的宽度。<br />
-			height —— [name]的高度。<br /><br />
+			width -- [name]的宽度。<br />
+			height -- [name]的高度。<br /><br />
 
 			考虑设备像素比，重新设置内部渲染缓冲和过程的大小为(width, height)。
 			因此，该方法语义类似于[page:WebGLRenderer.setSize]()。
