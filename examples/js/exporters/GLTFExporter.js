@@ -1320,14 +1320,14 @@ THREE.GLTFExporter.prototype = {
 
 				if ( geometry.index !== null ) {
 
-					if ( cachedData.attributes.has( groups[ i ] ) ) {
+					if ( cachedData.attributes.has( geometry.index ) ) {
 
 						primitive.indices = cachedData.attributes.get( geometry.index );
 
 					} else {
 
 						primitive.indices = processAccessor( geometry.index, geometry, groups[ i ].start, groups[ i ].count );
-						cachedData.attributes.set( groups[ i ], primitive.indices );
+						cachedData.attributes.set( geometry.index, primitive.indices );
 
 					}
 
