@@ -233,7 +233,15 @@ var TransformControls = function ( camera, domElement ) {
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
 
-		eye.copy( cameraPosition ).sub( worldPosition ).normalize();
+		if ( this.camera.isPerspectiveCamera ) {
+
+			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
+
+		} else if ( this.camera.isOrthographicCamera ) {
+
+			eye.copy( cameraPosition ).normalize();
+
+		}
 
 		Object3D.prototype.updateMatrixWorld.call( this );
 
