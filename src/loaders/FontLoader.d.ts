@@ -1,11 +1,10 @@
+import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 import { Font } from './../extras/core/Font';
 
-export class FontLoader {
+export class FontLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-
-	manager: LoadingManager;
 
 	load(
 		url: string,
