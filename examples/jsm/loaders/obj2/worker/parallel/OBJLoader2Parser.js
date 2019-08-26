@@ -10,8 +10,8 @@ const OBJLoader2Parser = function () {
 
 	let scope = this;
 	this.callbacks = {
-		onProgress: function ( type, text, numericalValue ) {
-			scope._onProgress( type, text, numericalValue )
+		onProgress: function ( text ) {
+			scope._onProgress( text )
 		},
 		onAssetAvailable: function ( payload ) {
 			scope._onAssetAvailable( payload )
@@ -217,26 +217,14 @@ OBJLoader2Parser.prototype = {
 	},
 
 	/**
-	 * Announce feedback which is give to the registered callbacks.
+	 * Announce parse progress feedback which is logged to the console.
 	 * @private
 	 *
-	 * @param {string} type The type of event
 	 * @param {string} text Textual description of the event
-	 * @param {number} numericalValue Numerical value describing the progress
 	 */
-	_onProgress: function ( type, text, numericalValue ) {
+	_onProgress: function ( text ) {
 
 		let message = text ? text : '';
-		let event = {
-			detail: {
-				type: type,
-				modelName: this.modelName,
-				instanceNo: this.instanceNo,
-				text: message,
-				numericalValue: numericalValue
-			}
-		};
-
 		if ( this.logging.enabled && this.logging.debug ) {
 
 			console.log( message );
@@ -246,7 +234,7 @@ OBJLoader2Parser.prototype = {
 	},
 
 	/**
-	 * Announce error feedback which is given to the generic error handler to the registered callbacks.
+	 * Announce error feedback which is logged as error message.
 	 * @private
 	 *
 	 * @param {String} errorMessage The event containing the error
@@ -825,8 +813,8 @@ OBJLoader2Parser.prototype = {
 
 			this._buildMesh( result );
 			let progressBytesPercent = this.globalCounts.currentByte / this.globalCounts.totalBytes;
-			this._onProgress( 'progressParse', 'Completed [o: ' + this.rawMesh.objectName + ' g:' + this.rawMesh.groupName + '' +
-					'] Total progress: ' + ( progressBytesPercent * 100 ).toFixed( 2 ) + '%', progressBytesPercent );
+			this._onProgress( 'Completed [o: ' + this.rawMesh.objectName + ' g:' + this.rawMesh.groupName + '' +
+				'] Total progress: ' + ( progressBytesPercent * 100 ).toFixed( 2 ) + '%' );
 			this._resetRawMesh();
 
 		}
