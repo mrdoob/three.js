@@ -37666,7 +37666,6 @@
 				shadowMatrix = this.matrix,
 				lightPositionWorld = this._lightPositionWorld,
 				lookTarget = this._lookTarget,
-				shadowMatrix = this.matrix,
 				projScreenMatrix = this._projScreenMatrix;
 
 			lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
