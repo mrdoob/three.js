@@ -80,6 +80,8 @@ import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
+import { DensityFog } from './scenes/DensityFog.js';
+import { RangeFog } from './scenes/RangeFog.js';
 
 export { BoxGeometry as CubeGeometry };
 
@@ -2002,4 +2004,19 @@ export function LensFlare() {
 
 	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js' );
 
+}
+
+export function Fog( color, near, far ) {
+	
+	console.warn( 'THREE.Fog has been renamed to THREE.RangeFog.' );
+	return new RangeFog( color, near, far );
+	
+}
+
+
+export function FogExp2( color, density ) {
+	
+	console.warn( 'THREE.FogExp2 has been deprecated. Use THREE.DensityFog( color, density, true) instead.' );
+	return new DensityFog( color, density, true );
+	
 }

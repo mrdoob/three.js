@@ -10,13 +10,13 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">This class contains the parameters that define exponential squared fog, which gives a clear view near the camera and a faster than exponentially densening fog farther from the camera.</p>
+		<p class="desc">This class contains the parameters that define density-based fog.</p>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [param:Integer color], [param:Float density] )</h3>
+		<h3>[name]( [param:Integer color], [param:Float density], [param:Boolean squared] )</h3>
 
 		<p>The color parameter is passed to the [page:Color] constructor to set the color property. Color can be a hexadecimal integer or a CSS-style string.</p>
 		<h2>Properties</h2>
@@ -30,14 +30,18 @@
 		<h3>[property:Float density]</h3>
 		<p>Defines how fast the fog will grow dense.</p>
 		<p>Default is 0.00025.</p>
+		
+		<h3>[property:Boolean squared]</h3>
+		<p>If false, the mode will be exponential fog, which is analogous to physical fog. If true, the mode will be exponential squared fog, which gives a clear view near the camera and a faster than exponentially densening fog farther from the camera.</p>
+		<p>Default is true, that is exponential squared fog.</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:FogExp2 clone]()</h3>
-		<p>Returns a new FogExp2 instance with the same parameters as this one.</p>
+		<h3>[method:DensityFog clone]()</h3>
+		<p>Returns a new DensityFog instance with the same parameters as this one.</p>
 
-		<h3>[method:FogExp2 toJSON]()</h3>
-		<p>Return FogExp2 data in JSON format.</p>
+		<h3>[method:DensityFog toJSON]()</h3>
+		<p>Return DensityFog data in JSON format.</p>
 
 		<h2>Source</h2>
 

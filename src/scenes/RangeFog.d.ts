@@ -1,16 +1,10 @@
 import { Color } from './../math/Color';
-
-export interface IFog {
-	name: string;
-	color: Color;
-	clone(): this;
-	toJSON(): any;
-}
+import { IFog } from './Fog';
 
 /**
- * This class contains the parameters that define linear fog, i.e., that grows linearly denser with the distance.
+ * This class contains the parameters that define smooth ranged fog, i.e., that grows smoothly denser from the near to the far distance.
  */
-export class Fog implements IFog {
+export class RangeFog implements IFog {
 
 	constructor( hex: number, near?: number, far?: number );
 

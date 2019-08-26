@@ -42,6 +42,7 @@ var files = {
 		"webgl_geometry_teapot",
 		"webgl_geometry_terrain",
 		"webgl_geometry_terrain_fog",
+		"webgl_geometry_terrain_fog_types",
 		"webgl_geometry_terrain_raycast",
 		"webgl_geometry_text",
 		"webgl_geometry_text_shapes",

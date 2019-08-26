@@ -1680,9 +1680,14 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.fog && materialProperties.fog !== fog ) {
+			} else if ( material.fog && (materialProperties.fog !== fog || (fog.isDensityFog && fog.needsUpdate))) {
 
 				material.needsUpdate = true;
+				if (fog.isDensityFog) {
+
+					fog.needsUpdate = false;
+
+				}
 
 			} else if ( material.lights && materialProperties.lightsStateVersion !== lights.state.version ) {
 
@@ -2215,12 +2220,12 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.fogColor.value.copy( fog.color );
 
-		if ( fog.isFog ) {
+		if ( fog.isRangeFog ) {
 
 			uniforms.fogNear.value = fog.near;
 			uniforms.fogFar.value = fog.far;
 
-		} else if ( fog.isFogExp2 ) {
+		} else if ( fog.isDensityFog ) {
 
 			uniforms.fogDensity.value = fog.density;
 
