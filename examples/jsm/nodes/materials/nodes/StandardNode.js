@@ -22,8 +22,6 @@ function StandardNode() {
 	this.roughness = new FloatNode( 0.5 );
 	this.metalness = new FloatNode( 0.5 );
 
-	this.energyPreservation = true;
-
 }
 
 StandardNode.prototype = Object.create( Node.prototype );
