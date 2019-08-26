@@ -32,7 +32,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
+	builder.define('STANDARD');
+
+	var useClearcoat = this.clearcoat;
+
+	if ( useClearcoat ) builder.define( 'CLEARCOAT' );
 
 	builder.requires.lights = true;
 
@@ -120,8 +124,6 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		var useClearCoat = ! builder.isDefined( 'STANDARD' );
-
 		// flow context
 
 		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
@@ -130,6 +132,16 @@ StandardNode.prototype.build = function ( builder ) {
 		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
 		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
 		var clearCoatRadianceFlowContext = new NodeContext().setSlot( 'clearCoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+
+		// context need to environment and clearcoat custom normals
+
+		var envViewNormalSystem = new ExpressionNode( 'normal', 'v3' );
+		var clearcoatViewNormalSystem = new ExpressionNode( 'clearcoatNormal', 'v3' );
+
+		radianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
+		irradianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
+
+		clearCoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormalSystem );
 
 		// analyze all nodes to reuse generate codes
 
@@ -210,7 +222,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		var clearCoatRadiance = useClearCoat && environment ? this.environment.flow( builder, 'c', clearCoatRadianceFlowContext ) : undefined;
+		var clearCoatRadiance = useClearcoat && environment ? this.environment.flow( builder, 'c', clearCoatRadianceFlowContext ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -303,7 +315,7 @@ StandardNode.prototype.build = function ( builder ) {
 				'material.clearCoat = saturate( ' + clearCoat.result + ' );'
 			);
 
-		} else if ( useClearCoat ) {
+		} else if ( useClearcoat ) {
 
 			output.push( 'material.clearCoat = 0.0;' );
 
@@ -316,9 +328,9 @@ StandardNode.prototype.build = function ( builder ) {
 				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', 0.04, 1.0 );'
 			);
 
-		} else if ( useClearCoat ) {
+		} else if ( useClearcoat ) {
 
-			output.push( 'material.clearCoatRoughness = 0.0;' );
+			output.push( 'material.clearCoatRoughness = 1.0;' );
 
 		}
 
