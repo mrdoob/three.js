@@ -242,6 +242,7 @@
 					'basic / bump': 'bump',
 					'basic / blur': 'blur',
 					'basic / spherical-reflection': 'spherical-reflection',
+					'basic / transparency': 'transparency',
 					'adv / fresnel': 'fresnel',
 					'adv / saturation': 'saturation',
 					'adv / top-bottom': 'top-bottom',
@@ -483,6 +484,41 @@
 							normalScale.value = val;
 
 						}, false, 0, 1 );
+
+						break;
+
+					case 'transparency':
+
+						defaultSide = THREE.FrontSide;
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						mtl.transparency = new Nodes.FloatNode( .5 );
+						mtl.alpha = new Nodes.FloatNode( 1 );
+
+						// GUI
+
+						addGui( 'transparency', mtl.transparency.value, function ( val ) {
+
+							mtl.transparency.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'alpha', mtl.alpha.value, function ( val ) {
+
+							mtl.alpha.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'premultiplied alpha', mtl.premultipliedAlpha, function ( val ) {
+
+							mtl.premultipliedAlpha = val;
+
+							mtl.needsUpdate = true;
+
+						} );
 
 						break;
 
@@ -780,12 +816,14 @@
 
 						//mtl.color = // albedo (vec3)
 						//mtl.alpha = // opacity (float)
+						//mtl.transparency = // opacity (float)
 						//mtl.roughness = // roughness (float)
 						//mtl.metalness = // metalness (float)
 						//mtl.reflectivity = // reflectivity (float)
 						//mtl.clearcoat = // clearcoat (float)
 						//mtl.clearcoatRoughness = // clearcoatRoughness (float)
 						//mtl.clearcoatNormal = // clearcoatNormal (vec3)
+						//mtl.sheen = // sheen (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)

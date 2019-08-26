@@ -35,6 +35,7 @@ StandardNode.prototype.build = function ( builder ) {
 	builder.define('STANDARD');
 
 	var useClearcoat = this.clearcoat || this.clearcoatRoughness;
+	var useTransparent = this.alpha !== undefined || this.transparency !== undefined
 
 	if ( useClearcoat ) builder.define( 'CLEARCOAT' );
 
@@ -185,6 +186,8 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		if ( this.transparency ) this.transparency.analyze( builder );
+
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
@@ -230,7 +233,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var clearcoatRadiance = useClearcoat && environment ? this.environment.flow( builder, 'c', clearcoatRadianceFlowContext ) : undefined;
 
-		builder.requires.transparent = alpha !== undefined;
+		var transparency = this.transparency ? this.transparency.flow( builder, 'f' ) : undefined;
+
+		builder.requires.transparent = useTransparent;
 
 		builder.addParsCode( [
 
@@ -286,10 +291,17 @@ StandardNode.prototype.build = function ( builder ) {
 			"	float metalnessFactor = " + metalness.result + ";"
 		);
 
+		if ( useTransparent ) {
+
+			output.push( "	float alpha = 1.0;" );
+
+		}
+
 		if ( alpha ) {
 
 			output.push(
 				alpha.code,
+				'alpha *= ' + alpha.result + ';',
 				'#ifdef ALPHATEST',
 
 				'	if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
@@ -471,9 +483,18 @@ StandardNode.prototype.build = function ( builder ) {
 
 		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
 
-		if ( alpha ) {
+		if ( useTransparent ) {
 
-			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
+			if ( transparency ) {
+
+				output.push(
+					transparency.code,
+					`alpha *= saturate( 1. - ${transparency.result} + linearToRelativeLuminance( reflectedLight.directSpecular + reflectedLight.indirectSpecular ) );`,
+				);
+
+			}
+
+			output.push( "gl_FragColor = vec4( outgoingLight, alpha );" );
 
 		} else {
 
@@ -514,6 +535,7 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.mask ) this.mask = source.mask;
 
 	if ( source.alpha ) this.alpha = source.alpha;
+	if ( source.transparency ) this.transparency = source.transparency;
 
 	if ( source.normal ) this.normal = source.normal;
 
@@ -560,6 +582,7 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.mask ) data.mask = this.mask.toJSON( meta ).uuid;
 
 		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
+		if ( this.transparency ) data.transparency = this.transparency.toJSON( meta ).uuid;
 
 		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
 
