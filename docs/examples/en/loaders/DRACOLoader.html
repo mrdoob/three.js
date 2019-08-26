@@ -34,10 +34,7 @@
 		var loader = new THREE.DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
-		THREE.DRACOLoader.setDecoderPath( '/examples/js/libs/draco' );
-
-		// Optional: Pre-fetch Draco WASM/JS module.
-		THREE.DRACOLoader.getDecoderModule();
+		loader.setDecoderPath( '/examples/js/libs/draco' );
 
 		// Load a Draco geometry
 		loader.load(
@@ -90,33 +87,6 @@
 		Creates a new [name].
 		</p>
 
-		<h2>Static Methods</h2>
-
-		<h3>[method:null setDecoderPath]( [param:String value] )</h3>
-		<p>
-		[page:String value] — Path to folder containing the JS and WASM decoder libraries.
-		</p>
-
-		<h3>[method:null setDecoderConfig]( [param:Object config] )</h3>
-		<p>
-			[page:String config.type] - (Optional) <em>"js"</em> or <em>"wasm"</em>.<br />
-		</p>
-		<p>
-		Provides configuration for the decoder libraries. Configuration cannot be changed
-		after loading the decoders.
-		</p>
-
-		<h3>[method:Promise getDecoderModule]()</h3>
-		<p>
-		Requests the decoder libraries, if not already loaded.
-		</p>
-
-		<h3>[method:null releaseDecoderModule]()</h3>
-		<p>
-		Disposes of the decoder library and deallocates memory. The decoder
-		[link:https://github.com/google/draco/issues/349 cannot be reloaded afterward].
-		</p>
-
 		<h2>Methods</h2>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
@@ -130,12 +100,47 @@
 		Begin loading from url and call the <em>onLoad</em> function with the decompressed geometry.
 		</p>
 
-		<h3>[method:DRACOLoader setPath]( [param:String path] )</h3>
+		<h3>[method:this setPath]( [param:String path] )</h3>
 		<p>
 		[page:String path] — Base path.
 		</p>
 		<p>
 		Set the base path for the <em>.drc</em> file.
+		</p>
+
+		<h3>[method:this setCrossOrigin]( [param:String value] )</h3>
+		<p>
+		[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</p>
+
+		<h3>[method:this setDecoderPath]( [param:String value] )</h3>
+		<p>
+		[page:String value] — Path to folder containing the JS and WASM decoder libraries.
+		</p>
+
+		<h3>[method:this setDecoderConfig]( [param:Object config] )</h3>
+		<p>
+			[page:String config.type] - (Optional) <em>"js"</em> or <em>"wasm"</em>.<br />
+		</p>
+		<p>
+		Provides configuration for the decoder libraries. Configuration cannot be changed
+		after decoding begins.
+		</p>
+
+		<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>
+		<p>
+			[page:Number workerLimit] - Maximum number of workers to be allocated. Default is 4.<br />
+		</p>
+		<p>
+		Sets the maximum number of [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers Web Workers]
+		to be used during decoding. A lower limit may be preferable if workers are also for other tasks
+		in the application.
+		</p>
+
+		<h3>[method:this dispose]()</h3>
+		<p>
+		Disposes of the decoder resources and deallocates memory. The decoder
+		[link:https://github.com/google/draco/issues/349 cannot be reloaded afterward].
 		</p>
 
 		<h2>Source</h2>
