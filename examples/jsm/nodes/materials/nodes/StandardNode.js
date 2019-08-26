@@ -9,6 +9,7 @@ import {
 
 import { Node } from '../../core/Node.js';
 import { NodeContext } from '../../core/NodeContext.js';
+import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
