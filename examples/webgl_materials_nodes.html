@@ -27,6 +27,8 @@
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
@@ -40,7 +42,7 @@
 			var move = false;
 			var rotate = false;
 			var rtTexture, rtMaterial;
-			var gui;
+			var gui, guiModel;
 			var library = {};
 			var serialized = false;
 			var textures = {
@@ -103,6 +105,41 @@
 				pmremCubeUVPacker.dispose();
 
 			}
+
+			var models = {teapot: 'teapot', bunny: 'bunny'};
+			var modelProp = { model: 'teapot' };
+
+			var bunnyLoader;
+			var bunnyGeometry;
+
+			function getBunnyGeometry() {
+
+				if ( bunnyLoader ) return bunnyGeometry;
+
+				bunnyLoader = new FBXLoader();
+				bunnyLoader.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
+
+					mesh.geometry = bunnyGeometry = object.children[ 0 ].geometry.scale( .08, .08, .08 );
+
+				} );
+
+			}
+
+			guiModel = new GUI( { autoPlace: false } );
+			guiModel.add(modelProp, 'model', models).onChange( function( val ) {
+
+				var geometry;
+
+				if ( val === 'bunny' ) geometry = getBunnyGeometry();
+
+				mesh.geometry = geometry || teapot;
+
+			});
+
+			guiModel.domElement.style = "position:absolute;top:0;left:10px";
+			document.body.appendChild( guiModel.domElement );
+
+			guiModel.open();
 
 			var cubemap = function () {
 
@@ -916,7 +953,7 @@
 						);
 
 						var displace = new Nodes.MulNode(
-							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
+							new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
 							displaceY
 						);
 
@@ -1497,7 +1534,7 @@
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var displace = new Nodes.MulNode(
-							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
+							new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
 							texArea
 						);
 
@@ -2947,6 +2984,8 @@
 
 					case 'triplanar-mapping':
 
+						rotate = true;
+
 						// MATERIAL
 
 						mtl = new Nodes.PhongNodeMaterial();
@@ -2978,8 +3017,8 @@
 
 						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
 							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
-							normal: new Nodes.NormalNode( Nodes.NormalNode.WORLD ),
-							position: new Nodes.PositionNode( Nodes.PositionNode.WORLD ),
+							normal: new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
+							position: new Nodes.PositionNode( Nodes.PositionNode.LOCAL ),
 							scale: scale,
 						} );
 
@@ -3090,6 +3129,10 @@
 						mtl = new Nodes.StandardNodeMaterial();
 
 						var backSideDepth = new Nodes.TextureNode( rtTexture.texture, new Nodes.ScreenUVNode() );
+
+						backSideDepth = new Nodes.BlurNode( backSideDepth, new Nodes.ScreenUVNode() );
+						backSideDepth.radius.x = 5;
+						backSideDepth.radius.y = 5;
 
 						var difference = new Nodes.SubNode(
 							objectDepth,
