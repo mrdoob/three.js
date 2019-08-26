@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -48,27 +50,11 @@ scene.background = new THREE.CubeTextureLoader()
 		Creates a new [name].
 		</p>
 
-
 		<h2>Properties</h2>
-
-		<h3>[property:String crossOrigin]</h3>
-		<p>
-		If set, assigns the [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
-	 attribute of the image to the value of *crossOrigin*,
-		prior to starting the load. Default is *"anonymous"*.
-		</p>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			The [page:LoadingManager loadingManager] the loader is using. Default is [page:DefaultLoadingManager].
-		</p>
-
-		<h3>[property:String path]</h3>
-		<p>The base path from which files will be loaded. See [page:.setPath]. Default is *undefined*.</p>
-
-
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -86,17 +72,10 @@ scene.background = new THREE.CubeTextureLoader()
 		Begin loading from url and pass the loaded [page:CubeTexture texture] to onLoad.
 		</p>
 
-		<h3>[method:null setCrossOrigin]( [param:String value] )</h3>
-		<p>		Set the [page:.crossOrigin] attribute.</p>
-
-		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
-		<p>
-			Set the base path or URL from which to load files. This can be useful if
-			you are loading many textures from the same directory.
-		</p>
-
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

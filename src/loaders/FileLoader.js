@@ -3,17 +3,19 @@
  */
 
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 var loading = {};
 
 function FileLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( FileLoader.prototype, {
+FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: FileLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -275,13 +277,6 @@ Object.assign( FileLoader.prototype, {
 		scope.manager.itemStart( url );
 
 		return request;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 

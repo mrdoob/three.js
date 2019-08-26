@@ -23,6 +23,7 @@ varying vec3 vIndirectFront;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
+#include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>

@@ -15,23 +15,16 @@ function NormalNode( scope ) {
 
 NormalNode.LOCAL = 'local';
 NormalNode.WORLD = 'world';
-NormalNode.VIEW = 'view';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
 NormalNode.prototype.nodeType = "Normal";
 
-NormalNode.prototype.getShared = function ( /* builder */ ) {
+NormalNode.prototype.getShared = function () {
 
-	switch ( this.scope ) {
+	// if shared is false, TempNode will not create temp variable (for optimization)
 
-		case NormalNode.WORLD:
-
-			return true;
-
-	}
-
-	return false;
+	return this.scope === NormalNode.WORLD;
 
 };
 
@@ -43,10 +36,8 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.LOCAL:
 
-			// to use vObjectNormal as vertex normal
-			//builder.requires.normal = true;
-
-			result = 'normal';
+			if ( builder.isShader( 'vertex' ) ) result = 'objectNormal';
+			else result = 'geometryNormal';
 
 			break;
 
@@ -54,21 +45,13 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 			if ( builder.isShader( 'vertex' ) ) {
 
-				return '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz';
+				result = '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz';
 
 			} else {
 
-				builder.requires.worldNormal = true;
-
-				result = 'vWNormal';
+				result = 'inverseTransformDirection( normal, viewMatrix )';
 
 			}
-
-			break;
-
-		case NormalNode.VIEW:
-
-			result = 'vNormal';
 
 			break;
 
@@ -104,7 +87,7 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addKeyword( 'normal', function () {
+NodeLib.addKeyword( 'viewNormal', function () {
 
 	return new NormalNode();
 
@@ -113,12 +96,6 @@ NodeLib.addKeyword( 'normal', function () {
 NodeLib.addKeyword( 'worldNormal', function () {
 
 	return new NormalNode( NormalNode.WORLD );
-
-} );
-
-NodeLib.addKeyword( 'viewNormal', function () {
-
-	return new NormalNode( NormalNode.VIEW );
 
 } );
 

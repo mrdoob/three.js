@@ -11,20 +11,20 @@
 		<h1>通过模块来引入（[name]）</h1>
 
 		<p>
-			虽然通过script标签来引入three.js是一个能够快速起步、快速运行的方式，但这种方式对于一些具有较长生命周期的项目来说是有一些缺点的。比如说：
+			虽然通过script标签来引入three.js是一个能够快速起步、快速运行的方式，但这种方式对于一些具有较长生命周期的项目来说是有一些缺点。比如：
 
 			<ul>
-				<li>你必须手动获得并在你的源代码中包含这个库的一个拷贝</li>
-				<li>更新这个库的版本是一个手动操作的过程</li>
-				<li>在检查新版本的库时，你的版本差异对比将会被许多行给弄乱。</li>
+				<li>你必须手动获得并在你的项目源代码中包含这个库的一个拷贝</li>
+				<li>更新库的版本是一个手动操作的过程</li>
+				<li>在检查新版本的库时，你的版本差异对比将会被许多行的构建文件给弄乱。</li>
 			</ul>
 		</p>
 
-		<p>使用像npm这样的依赖包管理器可以很好地避免这些需要注意的问题，只需在你的电脑上下载并导入你所需要的库的版本即可。</p>
+		<p>使用像npm这样的依赖包管理器，你只需在你的机器上下载并导入你所需要的版本的库就很好地避免这些需要注意的问题。</p>
 
 		<h2>通过npm来安装</h2>
 
-		<p>Three.js目前已经作为一个npm包来进行了发布，详情请参阅：[link:https://www.npmjs.com/package/three npm]。这意味着，在所有你需要包含three.js库的项目中，只需运行"npm install three"即可。</p>
+		<p>Three.js目前已经作为一个npm模块来进行了发布，详情请参阅：[link:https://www.npmjs.com/package/three npm]。这意味着你只需运行"npm install three"就可以使你的项目包含three.js库。</p>
 
 		<h2>导入这个模块</h2>
 
@@ -62,11 +62,19 @@
 		...
 		</code>
 
-		<h2>注意事项</h2>
-
+		<h2>可引入的示例</h2>
 		<p>
-			目前，无法用这种方式导入"examples/js"目录中的文件。
-			这是因为一些文件依赖于THREE的全局命名空间污染。了解更多详情，请参阅<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank">Transform `examples/js` to support modules #9562</a>。
+			three.js的核心专注于实现3D引擎中最为重要的组件。其他诸如加载器和控制器等组件，是示例文件夹中的一部分。
+			three.js确保这些文件能够与核心保持同步，但如果在一个项目中这些组件是必要的，用户将必须分别地引入它们。
+			你可以在[link:https://github.com/mrdoob/three.js/tree/master/examples/jsm examples/jsm]文件夹中找到所有示例文件的ES6版本。
+			如果你是通过npm来安装three.js的，那么你可以使用类似下面的代码来引入它们：
+		</p>
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		</code>
+		<p>
+			请注意：当你在使用来自示例（examples）文件夹中的代码时，其中的所有文件和你的three.js主文件版本相匹配是很重要的。
+			比如说，three.js的R103版本不能够接受和来自R96版本的*GLTFLoader*和*OrbitControls*一起使用。
 		</p>
 	</body>
 </html>

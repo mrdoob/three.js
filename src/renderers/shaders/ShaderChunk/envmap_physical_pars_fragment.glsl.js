@@ -1,5 +1,9 @@
 export default /* glsl */`
-#if defined( USE_ENVMAP ) && defined( PHYSICAL )
+#if defined( USE_ENVMAP )
+
+	#ifdef ENVMAP_MODE_REFRACTION
+		uniform float refractionRatio;
+	#endif
 
 	vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
 
@@ -54,15 +58,15 @@ export default /* glsl */`
 
 	}
 
-	vec3 getLightProbeIndirectRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+	vec3 getLightProbeIndirectRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in vec3 viewDir, const in vec3 normal, const in float blinnShininessExponent, const in int maxMIPLevel ) {
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
-			vec3 reflectVec = reflect( -geometry.viewDir, geometry.normal );
+		  vec3 reflectVec = reflect( -viewDir, normal );
 
 		#else
 
-			vec3 reflectVec = refract( -geometry.viewDir, geometry.normal, refractionRatio );
+		  vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
 
 		#endif
 

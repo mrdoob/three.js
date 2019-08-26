@@ -9,15 +9,15 @@
 	</head>
 	<body>
 		[page:Loader] &rarr;
-		<h1>[name]</h1>
+		<h1>MMD加载器（[name]）</h1>
 
-		<p class="desc"> A loader for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
-		[name] creates Three.js Objects from MMD resources as PMD, PMX, VMD, and VPD files.
-		See [page:MMDAnimationHelper] for MMD animation handling as IK, Grant, and Physics.<br /><br />
+ 		<p class="desc">一个用于加载<a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a>资源的加载器。<br /><br />
+		[name]从MMD资源（例如PMD、PMX、VMD和VPD文件）中创建Three.js物体（对象）。
+		请参阅[page:MMDAnimationHelper]来了解MMD动画的处理，例如IK、Grant和Physics。<br /><br />
 
-		If you want raw content of MMD resources, use .loadPMD/PMX/VMD/VPD methods.
+ 		如果你想要MMD资源的原始内容，请使用.loadPMD/PMX/VMD/VPD方法。
 
-		<h2>Example</h2>
+ 		<h2>示例</h2>
 
 		<code>
 		// Instantiate a loader
@@ -55,87 +55,89 @@
 		<br />
 		<hr>
 
-		<h2>Constructor</h2>
+ 		<h2>构造函数</h2>
 
-		<h3>[name]( [param:LoadingManager manager] )</h3>
+ 		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]（加载管理器），默认值是[page:LoadingManager THREE.DefaultLoadingManager]。
 		</p>
 		<p>
-		Creates a new [name].
+		创建一个新的[name]。
 		</p>
 
-		<h2>Properties</h2>
+ 		<h2>属性</h2>
 
 
-		<h2>Methods</h2>
+ 		<h2>方法</h2>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
-		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
+		[page:String url] — 一个包含有<em>.pmd</em>或<em>.pmx</em>文件的路径或URL的字符串。<br />
+		[page:Function onLoad] — 当加载过程成功完成以后将被调用的函数。<br />
+		[page:Function onProgress] — （可选）加载过程正在进行的时候被调用的函数。其参数是一个XMLHttpRequest实例，其包含了[page:Integer total] bytes（总的字节数）和[page:Integer loaded] bytes（已经载入的字节数）。<br />
+		[page:Function onError] — （可选） 加载过程中若发生了错误将被调用的函数。这一函数接收错误作为参数。<br />
 		</p>
 		<p>
-		Begin loading PMD/PMX model file from url and fire the callback function with the parsed [page:SkinnedMesh] containing [page:BufferGeometry] and an array of [page:MeshToonMaterial].
+		开始从URL中加载PMD/PMX模型文件，并使用包含有已被解析的[page:SkinnedMesh]和[page:MeshToonMaterial]数组的[page:BufferGeometry]对象来触发回调函数。
 		</p>
 
 		<h3>[method:null loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).If two or more files are specified, they'll be merged.<br />
-		[page:Object3D object] — [page:SkinnedMesh] or [page:Camera]. Clip and its tacks will be fitting to this object.<br />
-		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
+		[page:String url] — 一个包含有<em>.vmd</em>文件的路径或URL的字符串或字符串数组。如果两个及以上文件被指定，它们将会合并。<br />
+		[page:Object3D object] — [page:SkinnedMesh] 或 [page:Camera]。 剪辑及其轨道将会适应到该对象。<br />
+		[page:Function onLoad] — 成功加载完成后被调用的函数。<br />
+		[page:Function onProgress] — （可选）当加载正在进行时被调用的函数，参数将是XMLHttpRequest实例，其包含了 .[page:Integer total] （总的）和 .[page:Integer loaded] （已加载的）字节数。<br />
+		[page:Function onError] — （可选）如果加载过程中发生错误时被调用的函数，该函数接受一个错误来作为参数。<br />
 		</p>
 		<p>
-		Begin loading VMD motion file(s) from url(s) and fire the callback function with the parsed [page:AnimatioinClip].
+		开始从url(s)加载VMD动画文件（可能有多个文件），并使用已解析的[page:AnimatioinClip]触发回调函数。
 		</p>
 
 		<h3>[method:null loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String modelUrl] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
-		[page:String vmdUrl] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).<br />
-		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
+		[page:String modelUrl] — 一个包含有<em>.pmd</em>或<em>.pmx</em>文件的路径或URL的字符串。<br />
+		[page:String vmdUrl] — 一个包含有<em>.vmd</em>文件的路径或URL的字符串或字符串数组。<br />
+		[page:Function onLoad] — 成功加载完成后被调用的函数。<br />
+		[page:Function onProgress] — （可选）当加载正在进行时被调用的函数，参数将是XMLHttpRequest实例，其包含了 .[page:Integer total] （总的）和 .[page:Integer loaded] （已加载的）字节数。<br />
+		[page:Function onError] — （可选）如果加载过程中发生错误时被调用的函数，该函数接受一个错误来作为参数。<br />
 		</p>
 		<p>
-		Begin loading PMD/PMX model file and VMD motion file(s) from urls and fire the callback function with an [page:Object] containing parsed [page:SkinnedMesh] and [page:AnimationClip] fitting to the [page:SkinnedMesh].
+		开始从URL中加载PMD/PMX模型文件和VMD动画文件（可能有多个文件），并使用一个[page:Object] —— 包含有已解析的[page:SkinnedMesh]和适应[page:SkinnedMesh]的[page:AnimationClip]，来触发回调函数。 
 		</p>
 
 		<h3>[method:MMDLoader setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<p>
-		[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		[page:String crossOrigin] — crossOrigin字符串，用于实现CORS，以便从一个允许CORS的其它域加载url。
 		</p>
 
 		<h3>[method:MMDLoader setAnimationPath]( [param:String animationPath] )</h3>
 		<p>
-		[page:String animationPath] — Base path for loading animation data (VMD/VPD files).
+		[page:String animationPath] — 用于加载动画数据（VMD/VPD 文件）的基础路径。 Base path for loading animation data (VMD/VPD files).
 		</p>
 		<p>
-		Set the base path for additional resources like textures.
+		设置额外资源（例如贴图）的基础路径。
 		</p>
 
 		<h3>[method:MMDLoader setPath]( [param:String path] )</h3>
 		<p>
-		[page:String path] — Base path.
+		[page:String path] — 基础路径。
 		</p>
 		<p>
-		Sets the base path or URL from which to load files.
+		设置用于加载文件的基础路径或URL。
 		</p>
 
 		<h3>[method:MMDLoader setResourcePath]( [param:String resourcePath] )</h3>
 		<p>
-		[page:String resourcePath] — Base path for loading additional resources e.g. textures.
+		[page:String resourcePath] — 用于加载额外资源（例如贴图）的基础路径。
 		</p>
 		<p>
-		Set the base path for additional resources like textures.
+		设置额外资源（例如贴图）的基础路径。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/MMDLoader.js examples/js/loaders/MMDLoader.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/MMDLoader.js examples/js/loaders/MMDLoader.js]
+		</p>
 	</body>
 </html>

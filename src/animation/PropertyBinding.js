@@ -9,7 +9,40 @@
  */
 
 // Characters [].:/ are reserved for track binding syntax.
-var RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+var _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+var _reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
+
+// Attempts to allow node names from any language. ES5's `\w` regexp matches
+// only latin characters, and the unicode \p{L} is not yet supported. So
+// instead, we exclude reserved characters and match everything else.
+var _wordChar = '[^' + _RESERVED_CHARS_RE + ']';
+var _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+
+// Parent directories, delimited by '/' or ':'. Currently unused, but must
+// be matched to parse the rest of the track name.
+var _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
+
+// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+var _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
+
+// Object on target node, and accessor. May not contain reserved
+// characters. Accessor may contain any character except closing bracket.
+var _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
+
+// Property and accessor. May not contain reserved characters. Accessor may
+// contain any non-bracket characters.
+var _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
+
+var _trackRe = new RegExp( ''
+	+ '^'
+	+ _directoryRe
+	+ _nodeRe
+	+ _objectRe
+	+ _propertyRe
+	+ '$'
+);
+
+var _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
 function Composite( targetGroup, path, optionalParsedPath ) {
 
@@ -109,101 +142,59 @@ Object.assign( PropertyBinding, {
 	 * @param {string} name Node name to be sanitized.
 	 * @return {string}
 	 */
-	sanitizeNodeName: ( function () {
+	sanitizeNodeName: function ( name ) {
 
-		var reservedRe = new RegExp( '[' + RESERVED_CHARS_RE + ']', 'g' );
+		return name.replace( /\s/g, '_' ).replace( _reservedRe, '' );
 
-		return function sanitizeNodeName( name ) {
+	},
 
-			return name.replace( /\s/g, '_' ).replace( reservedRe, '' );
+	parseTrackName: function ( trackName ) {
 
+		var matches = _trackRe.exec( trackName );
+
+		if ( ! matches ) {
+
+			throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
+
+		}
+
+		var results = {
+			// directoryName: matches[ 1 ], // (tschw) currently unused
+			nodeName: matches[ 2 ],
+			objectName: matches[ 3 ],
+			objectIndex: matches[ 4 ],
+			propertyName: matches[ 5 ], // required
+			propertyIndex: matches[ 6 ]
 		};
 
-	}() ),
+		var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
 
-	parseTrackName: function () {
+		if ( lastDot !== undefined && lastDot !== - 1 ) {
 
-		// Attempts to allow node names from any language. ES5's `\w` regexp matches
-		// only latin characters, and the unicode \p{L} is not yet supported. So
-		// instead, we exclude reserved characters and match everything else.
-		var wordChar = '[^' + RESERVED_CHARS_RE + ']';
-		var wordCharOrDot = '[^' + RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+			var objectName = results.nodeName.substring( lastDot + 1 );
 
-		// Parent directories, delimited by '/' or ':'. Currently unused, but must
-		// be matched to parse the rest of the track name.
-		var directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', wordChar );
+			// Object names must be checked against a whitelist. Otherwise, there
+			// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
+			// 'bar' could be the objectName, or part of a nodeName (which can
+			// include '.' characters).
+			if ( _supportedObjectNames.indexOf( objectName ) !== - 1 ) {
 
-		// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-		var nodeRe = /(WCOD+)?/.source.replace( 'WCOD', wordCharOrDot );
-
-		// Object on target node, and accessor. May not contain reserved
-		// characters. Accessor may contain any character except closing bracket.
-		var objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', wordChar );
-
-		// Property and accessor. May not contain reserved characters. Accessor may
-		// contain any non-bracket characters.
-		var propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', wordChar );
-
-		var trackRe = new RegExp( ''
-			+ '^'
-			+ directoryRe
-			+ nodeRe
-			+ objectRe
-			+ propertyRe
-			+ '$'
-		);
-
-		var supportedObjectNames = [ 'material', 'materials', 'bones' ];
-
-		return function parseTrackName( trackName ) {
-
-			var matches = trackRe.exec( trackName );
-
-			if ( ! matches ) {
-
-				throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
+				results.nodeName = results.nodeName.substring( 0, lastDot );
+				results.objectName = objectName;
 
 			}
 
-			var results = {
-				// directoryName: matches[ 1 ], // (tschw) currently unused
-				nodeName: matches[ 2 ],
-				objectName: matches[ 3 ],
-				objectIndex: matches[ 4 ],
-				propertyName: matches[ 5 ], // required
-				propertyIndex: matches[ 6 ]
-			};
+		}
 
-			var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
+		if ( results.propertyName === null || results.propertyName.length === 0 ) {
 
-			if ( lastDot !== undefined && lastDot !== - 1 ) {
+			throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
 
-				var objectName = results.nodeName.substring( lastDot + 1 );
+		}
 
-				// Object names must be checked against a whitelist. Otherwise, there
-				// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
-				// 'bar' could be the objectName, or part of a nodeName (which can
-				// include '.' characters).
-				if ( supportedObjectNames.indexOf( objectName ) !== - 1 ) {
+		return results;
 
-					results.nodeName = results.nodeName.substring( 0, lastDot );
-					results.objectName = objectName;
-
-				}
-
-			}
-
-			if ( results.propertyName === null || results.propertyName.length === 0 ) {
-
-				throw new Error( 'PropertyBinding: can not parse propertyName from trackName: ' + trackName );
-
-			}
-
-			return results;
-
-		};
-
-	}(),
+	},
 
 	findNode: function ( root, nodeName ) {
 

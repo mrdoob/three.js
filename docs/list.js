@@ -14,8 +14,6 @@ var list = {
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
-				"Migration guide": "manual/en/introduction/Migration-guide",
-				"Code style guide": "manual/en/introduction/Code-style-guide",
 				"FAQ": "manual/en/introduction/FAQ",
 				"Useful links": "manual/en/introduction/Useful-links"
 			},
@@ -24,6 +22,7 @@ var list = {
 				"How to update things": "manual/en/introduction/How-to-update-things",
 				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
 				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
+				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system"
 			},
@@ -218,8 +217,9 @@ var list = {
 			},
 
 			"Lights / Shadows": {
-				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"LightShadow": "api/en/lights/shadows/LightShadow",
+				"PointLightShadow": "api/en/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/en/lights/shadows/SpotLightShadow"
 			},
 
@@ -384,6 +384,10 @@ var list = {
 				"Lensflare": "examples/en/objects/Lensflare",
 			},
 
+			"Post-Processing": {
+				"EffectComposer": "examples/en/postprocessing/EffectComposer"
+			},
+
 			"Exporters": {
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
@@ -447,8 +451,6 @@ var list = {
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
-				"迁移指南": "manual/zh/introduction/Migration-guide",
-				"代码风格指南": "manual/zh/introduction/Code-style-guide",
 				"常见问题": "manual/zh/introduction/FAQ",
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},
@@ -457,6 +459,7 @@ var list = {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
 				"如何废置对象": "manual/zh/introduction/How-to-dispose-of-objects",
 				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
+				"如何使用后期处理": "manual/zh/introduction/How-to-use-post-processing",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
 			},
@@ -815,6 +818,10 @@ var list = {
 				"Lensflare": "examples/zh/objects/Lensflare",
 			},
 
+			"Post-Processing": {
+				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
+			},
+
 			"导出器": {
 				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
 				"PLYExporter": "examples/zh/exporters/PLYExporter"
@@ -825,11 +832,11 @@ var list = {
 			},
 
 			"QuickHull": {
-				"Face": "examples/zh/quickhull/Face",
-				"HalfEdge": "examples/zh/quickhull/HalfEdge",
-				"QuickHull": "examples/zh/quickhull/QuickHull",
-				"VertexNode": "examples/zh/quickhull/VertexNode",
-				"VertexList": "examples/zh/quickhull/VertexList"
+				"Face": "examples/zh/math/convexhull/Face",
+				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/zh/math/convexhull/ConvexHull",
+				"VertexNode": "examples/zh/math/convexhull/VertexNode",
+				"VertexList": "examples/zh/math/convexhull/VertexList"
 			},
 
 			"渲染器": {

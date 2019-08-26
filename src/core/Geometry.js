@@ -19,11 +19,14 @@ import { _Math } from '../math/Math.js';
  * @author bhouston / http://clara.io
  */
 
-var geometryId = 0; // Geometry uses even numbers as Id
+var _geometryId = 0; // Geometry uses even numbers as Id
+var _m1 = new Matrix4();
+var _obj = new Object3D();
+var _offset = new Vector3();
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
+	Object.defineProperty( this, 'id', { value: _geometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -107,111 +110,77 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	rotateX: function () {
+	rotateX: function ( angle ) {
 
 		// rotate geometry around world x-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationX( angle );
 
-		return function rotateX( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationX( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	rotateY: function () {
+	rotateY: function ( angle ) {
 
 		// rotate geometry around world y-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationY( angle );
 
-		return function rotateY( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationY( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	rotateZ: function () {
+	rotateZ: function ( angle ) {
 
 		// rotate geometry around world z-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationZ( angle );
 
-		return function rotateZ( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationZ( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	translate: function () {
+	translate: function ( x, y, z ) {
 
 		// translate geometry
 
-		var m1 = new Matrix4();
+		_m1.makeTranslation( x, y, z );
 
-		return function translate( x, y, z ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeTranslation( x, y, z );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	scale: function () {
+	scale: function ( x, y, z ) {
 
 		// scale geometry
 
-		var m1 = new Matrix4();
+		_m1.makeScale( x, y, z );
 
-		return function scale( x, y, z ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeScale( x, y, z );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
+	lookAt: function ( vector ) {
 
-		};
+		_obj.lookAt( vector );
 
-	}(),
+		_obj.updateMatrix();
 
-	lookAt: function () {
+		this.applyMatrix( _obj.matrix );
 
-		var obj = new Object3D();
+		return this;
 
-		return function lookAt( vector ) {
-
-			obj.lookAt( vector );
-
-			obj.updateMatrix();
-
-			this.applyMatrix( obj.matrix );
-
-		};
-
-	}(),
+	},
 
 	fromBufferGeometry: function ( geometry ) {
 
@@ -348,21 +317,15 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	center: function () {
 
-		var offset = new Vector3();
+		this.computeBoundingBox();
 
-		return function center() {
+		this.boundingBox.getCenter( _offset ).negate();
 
-			this.computeBoundingBox();
+		this.translate( _offset.x, _offset.y, _offset.z );
 
-			this.boundingBox.getCenter( offset ).negate();
+		return this;
 
-			this.translate( offset.x, offset.y, offset.z );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	normalize: function () {
 

@@ -28,6 +28,8 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	var PI_2 = Math.PI / 2;
 
+	var vec = new Vector3();
+
 	function onMouseMove( event ) {
 
 		if ( scope.isLocked === false ) return;
@@ -111,6 +113,27 @@ var PointerLockControls = function ( camera, domElement ) {
 		};
 
 	}();
+
+	this.moveForward = function ( distance ) {
+
+		// move forward parallel to the xz-plane
+		// assumes camera.up is y-up
+
+		vec.setFromMatrixColumn( camera.matrix, 0 );
+
+		vec.crossVectors( camera.up, vec );
+
+		camera.position.addScaledVector( vec, distance );
+
+	};
+
+	this.moveRight = function ( distance ) {
+
+		vec.setFromMatrixColumn( camera.matrix, 0 );
+
+		camera.position.addScaledVector( vec, distance );
+
+	};
 
 	this.lock = function () {
 
