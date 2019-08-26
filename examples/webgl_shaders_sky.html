@@ -50,9 +50,9 @@
 				var effectController = {
 					turbidity: 10,
 					rayleigh: 2,
+					luminance: 1,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.8,
-					luminance: 1,
 					inclination: 0.49, // elevation / inclination
 					azimuth: 0.25, // Facing front,
 					sun: ! true
@@ -103,8 +103,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
 				camera.position.set( 0, 100, 2000 );
-
-				//camera.setLens(20);
 
 				scene = new THREE.Scene();
 
