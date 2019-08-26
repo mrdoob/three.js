@@ -38,6 +38,7 @@
 			var teapot, mesh;
 			var controls;
 			var move = false;
+			var rotate = false;
 			var rtTexture, rtMaterial;
 			var gui;
 			var library = {};
@@ -285,6 +286,7 @@
 			function updateMaterial() {
 
 				move = false;
+				rotate = false;
 
 				lightGroup.visible = true;
 
@@ -914,7 +916,7 @@
 						);
 
 						var displace = new Nodes.MulNode(
-							new Nodes.NormalNode(),
+							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
 							displaceY
 						);
 
@@ -988,7 +990,7 @@
 						var color = new Nodes.ColorNode( 0xFFFFFF );
 
 						var viewZ = new Nodes.MathNode(
-							new Nodes.NormalNode(),
+							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
 							new Nodes.Vector3Node( 0, 0, - intensity ),
 							Nodes.MathNode.DOT
 						);
@@ -1123,7 +1125,7 @@
 						mtl = new Nodes.PhongNodeMaterial();
 
 						var translate = new THREE.Vector2();
-						var rotate = 0;
+						var rotateUV  = 0;
 						var scale = new THREE.Vector2( 1, 1 );
 
 						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
@@ -1136,7 +1138,7 @@
 
 						function updateUVTransform() {
 
-							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
+							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotateUV  ) );
 
 						}
 
@@ -1172,9 +1174,9 @@
 
 						}, false, .1, 5 );
 
-						addGui( 'rotate', rotate, function ( val ) {
+						addGui( 'rotate', rotateUV , function ( val ) {
 
-							rotate = val;
+							rotateUV = val;
 
 							updateUVTransform();
 
@@ -1286,7 +1288,7 @@
 						var color = new Nodes.CubeTextureNode( cubemap );
 
 						var viewZ = new Nodes.MathNode(
-							new Nodes.NormalNode(),
+							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
 							new Nodes.Vector3Node( 0, 0, - 1 ),
 							Nodes.MathNode.DOT
 						);
@@ -1495,7 +1497,7 @@
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var displace = new Nodes.MulNode(
-							new Nodes.NormalNode(),
+							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
 							texArea
 						);
 
@@ -2113,7 +2115,7 @@
 						var fur = new Nodes.FloatNode( .5 );
 
 						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode(), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
 
 						var viewZ = new Nodes.MathNode(
 							posDirection,
@@ -2290,7 +2292,7 @@
 						// LINE
 
 						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode(), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
 
 						var viewZ = new Nodes.MathNode(
 							posDirection,
@@ -2546,9 +2548,11 @@
 
 					case 'node-normal':
 
+						rotate = true;
+
 						// MATERIAL
 
-						var node = new Nodes.NormalNode();
+						var node = new Nodes.NormalNode( Nodes.NormalNode.LOCAL );
 
 						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color = node;
@@ -2557,7 +2561,8 @@
 
 						addGui( 'scope', {
 							local: Nodes.NormalNode.LOCAL,
-							world: Nodes.NormalNode.WORLD
+							world: Nodes.NormalNode.WORLD,
+							view: Nodes.NormalNode.VIEW
 						}, function ( val ) {
 
 							node.scope = val;
@@ -3273,6 +3278,16 @@
 				} else {
 
 					mesh.position.z = mesh.position.y = 0;
+
+				}
+
+				if ( rotate ) {
+
+					mesh.rotation.y = Date.now() * 0.001;
+
+				} else {
+
+					mesh.rotation.y = 0;
 
 				}
 

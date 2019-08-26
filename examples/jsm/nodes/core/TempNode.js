@@ -118,7 +118,7 @@ TempNode.prototype.getLabel = function ( /* builder */ ) {
 
 TempNode.prototype.getUuid = function ( unique ) {
 
-	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
+	var uuid = unique || unique === undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
 	if ( typeof this.scope === "string" ) uuid = this.scope + '-' + uuid;
 

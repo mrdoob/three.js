@@ -61,6 +61,12 @@ function NodeBuilder() {
 
 	this.nodeData = {};
 
+	this.varyNodeCode = {};
+	this.vertexParsNodeCode = {};
+	this.vertexFinalNodeCode = {};
+	this.fragmentParsNodeCode = {};
+	this.fragmentFinalNodeCode = {};
+
 	this.requires = {
 		uv: [],
 		color: [],
@@ -216,22 +222,6 @@ NodeBuilder.prototype = {
 
 		}
 
-		if ( this.requires.normal ) {
-
-			this.addVaryCode( 'varying vec3 vObjectNormal;' );
-
-			this.addVertexFinalCode( 'vObjectNormal = normal;' );
-
-		}
-
-		if ( this.requires.worldNormal ) {
-
-			this.addVaryCode( 'varying vec3 vWNormal;' );
-
-			this.addVertexFinalCode( 'vWNormal = ( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz;' );
-
-		}
-
 		return this;
 
 	},
@@ -324,7 +314,6 @@ NodeBuilder.prototype = {
 
 	},
 
-
 	addVertexCode: function ( code ) {
 
 		this.addCode( code, 'vertex' );
@@ -342,7 +331,6 @@ NodeBuilder.prototype = {
 		this.code[ shader || this.shader ] += code + '\n';
 
 	},
-
 
 	addVertexNodeCode: function ( code ) {
 
@@ -392,9 +380,33 @@ NodeBuilder.prototype = {
 
 	},
 
+	addVertexFinalNodeCode: function ( node, code ) {
+
+		if ( ! this.vertexFinalNodeCode[ node.uuid ] ) {
+
+			this.addFinalCode( code, 'vertex' );
+
+			this.vertexFinalNodeCode[ node.uuid ] = true;
+
+		}
+
+	},
+
 	addFragmentFinalCode: function ( code ) {
 
 		this.addFinalCode( code, 'fragment' );
+
+	},
+
+	addFragmentFinalNodeCode: function ( node, code ) {
+
+		if ( ! this.fragmentFinalNodeCode[ node.uuid ] ) {
+
+			this.addFinalCode( code, 'fragment' );
+
+			this.fragmentFinalNodeCode[ node.uuid ] = true;
+
+		}
 
 	},
 
@@ -411,9 +423,33 @@ NodeBuilder.prototype = {
 
 	},
 
+	addVertexParsNodeCode: function ( node, code ) {
+
+		if ( ! this.vertexParsNodeCode[ node.uuid ] ) {
+
+			this.addParsCode( code, 'vertex' );
+
+			this.vertexParsNodeCode[ node.uuid ] = true;
+
+		}
+
+	},
+
 	addFragmentParsCode: function ( code ) {
 
 		this.addParsCode( code, 'fragment' );
+
+	},
+
+	addFragmentParsNodeCode: function ( node, code ) {
+
+		if ( ! this.fragmentParsNodeCode[ node.uuid ] ) {
+
+			this.addParsCode( code, 'fragment' );
+
+			this.fragmentParsNodeCode[ node.uuid ] = true;
+
+		}
 
 	},
 
@@ -431,6 +467,18 @@ NodeBuilder.prototype = {
 
 	},
 
+	addVaryNodeCode: function ( node, code ) {
+
+		if ( ! this.varyNodeCode[ node.uuid ] ) {
+
+			this.addVertexParsCode( code );
+			this.addFragmentParsCode( code );
+
+			this.varyNodeCode[ node.uuid ] = true;
+
+		}
+
+	},
 
 	isCache: function ( name ) {
 

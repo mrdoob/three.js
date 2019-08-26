@@ -9,49 +9,75 @@ function NormalNode( scope ) {
 
 	TempNode.call( this, 'v3' );
 
-	this.scope = scope || NormalNode.LOCAL;
+	this.scope = scope;
+
+	this.unique = true;
 
 }
 
 NormalNode.LOCAL = 'local';
 NormalNode.WORLD = 'world';
+NormalNode.VIEW = 'view';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
 NormalNode.prototype.nodeType = "Normal";
 
-NormalNode.prototype.getShared = function () {
-
-	// if shared is false, TempNode will not create temp variable (for optimization)
-
-	return this.scope === NormalNode.WORLD;
-
-};
-
 NormalNode.prototype.generate = function ( builder, output ) {
 
-	var result;
+	var result, setVaryCode;
+
+	var nodeData = builder.getNodeData( this );
 
 	switch ( this.scope ) {
 
+		case NormalNode.VIEW:
+
+			result = builder.isShader( 'vertex' ) ? 'objectNormal' : 'geometryNormal';
+
+			break;
+
 		case NormalNode.LOCAL:
 
-			if ( builder.isShader( 'vertex' ) ) result = 'objectNormal';
-			else result = 'geometryNormal';
+			builder.addVaryNodeCode( this, 'varying vec3 vObjectNormal;' );
+
+			setVaryCode = 'vObjectNormal = objectNormal;'
+
+			if ( builder.isShader( 'vertex' ) ) {
+
+				nodeData.defined = true;
+
+				builder.addNodeCode( setVaryCode );
+
+			} else if ( ! nodeData.defined ) {
+
+				builder.addVertexFinalNodeCode( this, setVaryCode );
+
+			}
+
+			result = 'vObjectNormal';
 
 			break;
 
 		case NormalNode.WORLD:
 
+			builder.addVaryNodeCode( this, 'varying vec3 vWNormal;' );
+
+			setVaryCode = 'vWNormal = ( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz;';
+
 			if ( builder.isShader( 'vertex' ) ) {
 
-				result = '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz';
+				nodeData.defined = true;
 
-			} else {
+				builder.addNodeCode( setVaryCode );
 
-				result = 'inverseTransformDirection( normal, viewMatrix )';
+			} else if ( ! nodeData.defined ) {
+
+				builder.addVertexFinalNodeCode( this, setVaryCode );
 
 			}
+
+			result = 'vWNormal';
 
 			break;
 
@@ -87,13 +113,19 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addKeyword( 'viewNormal', function () {
+NodeLib.addKeyword( 'normal.view', function () {
 
-	return new NormalNode();
+	return new NormalNode( NormalNode.VIEW );
 
 } );
 
-NodeLib.addKeyword( 'worldNormal', function () {
+NodeLib.addKeyword( 'normal.local', function () {
+
+	return new NormalNode( NormalNode.LOCAL );
+
+} );
+
+NodeLib.addKeyword( 'normal.world', function () {
 
 	return new NormalNode( NormalNode.WORLD );
 

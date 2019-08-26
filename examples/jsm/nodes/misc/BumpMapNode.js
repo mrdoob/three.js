@@ -120,7 +120,7 @@ BumpMapNode.prototype.generate = function ( builder, output ) {
 
 			var derivativeHeightCode = this.dHdxy_fwd.build( builder, 'v2' );
 
-			this.normal = this.normal || new NormalNode();
+			this.normal = this.normal || new NormalNode( NormalNode.VIEW );
 			this.position = this.position || new PositionNode( PositionNode.VIEW );
 
 			return builder.format( perturbNormalArb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
