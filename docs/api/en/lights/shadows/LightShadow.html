@@ -12,51 +12,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This is used internally by [page:PointLight PointLights] for calculating shadows, and also serves as
-			a base class for the other shadow classes.
+			Serves as a base class for the other shadow classes.
 		</p>
 
-
-		<h2>Example</h2>
-		<p>
-			<code>
-//Create a WebGLRenderer and turn on shadows in the renderer
-var renderer = new THREE.WebGLRenderer();
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
-
-//Create a PointLight and turn on shadows for the light
-var light = new THREE.PointLight( 0xffffff, 1, 100 );
-light.position.set( 0, 10, 0 );
-light.castShadow = true;            // default false
-scene.add( light );
-
-//Set up shadow properties for the light
-light.shadow.mapSize.width = 512;  // default
-light.shadow.mapSize.height = 512; // default
-light.shadow.camera.near = 0.5;       // default
-light.shadow.camera.far = 500      // default
-
-//Create a sphere that cast shadows (but does not receive them)
-var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
-var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
-var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
-sphere.castShadow = true; //default is false
-sphere.receiveShadow = false; //default
-scene.add( sphere );
-
-//Create a plane that receives shadows (but does not cast them)
-var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
-var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
-var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-plane.receiveShadow = true;
-scene.add( plane );
-
-//Create a helper for the shadow camera (optional)
-var helper = new THREE.CameraHelper( light.shadow.camera );
-scene.add( helper );
-			</code>
-		</p>
 
 		<h2>Constructor</h2>
 
@@ -64,8 +22,8 @@ scene.add( helper );
 		<p>
 		[page:Camera camera] - the light's view of the world.<br /><br />
 
-		Create a new [name]. This is not intended to be called directly - it is called
-		internally by [page:PointLight] or used as a base class by other light shadows.
+		Create a new [name]. This is not intended to be called directly - it is used as a base class by
+		other light shadows.
 		</p>
 
 		<h2>Properties</h2>
@@ -87,7 +45,6 @@ scene.add( helper );
 			The depth map generated using the internal camera; a location beyond a pixel's depth is
 			in shadow. Computed internally during rendering.
 		</p>
-
 
 		<h3>[property:Vector2 mapSize]</h3>
 		<p>
@@ -118,10 +75,35 @@ scene.add( helper );
 
 
 		<h2>Methods</h2>
+
+		<h3>[method:Vector2 getFrameExtents]()</h3>
+		<p>
+		Used internally by the renderer to extend the shadow map to contain all viewports
+		</p>
+
+		<h3>[method:null updateMatrices]( [param:Light light], [param:Camera viewCamera], [param:number viewportIndex])</h3>
+		<p>
+		Update the matrices for the camera and shadow, used internally by the renderer.<br /><br />
+
+		light -- the light for which the shadow is being rendered.<br />
+		viewCamera -- the camera view for which the shadow is being rendered.<br />
+		viewportIndex -- calculates the matrix for this viewport
+		</p>
+
+		<h3>[method:Frustum getFrustum]()</h3>
+		<p>
+		Gets the shadow cameras frustum. Used internally by the renderer to cull objects.
+		</p>
+
+		<h3>[method:number getViewportCount]()</h3>
+		<p>
+		Used internally by the renderer to get the number of viewports that need to be rendered for this shadow.
+		</p>
+
 		<h3>[method:LightShadow copy]( [param:LightShadow source] )</h3>
 		<p>
 		Copies value of all the properties from the [page:LightShadow source] to this
-		SpotLight.
+		Light.
 		</p>
 
 		<h3>[method:LightShadow clone]()</h3>
@@ -136,6 +118,8 @@ scene.add( helper );
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
 	</body>
 </html>

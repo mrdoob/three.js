@@ -22,6 +22,8 @@ function StandardNode() {
 	this.roughness = new FloatNode( 0.5 );
 	this.metalness = new FloatNode( 0.5 );
 
+	this.energyPreservation = true;
+
 }
 
 StandardNode.prototype = Object.create( Node.prototype );
@@ -154,9 +156,12 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.alpha ) this.alpha.analyze( builder );
 
 		if ( this.normal ) this.normal.analyze( builder );
+    if ( useClearcoat && this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
 
-		if ( this.clearCoat ) this.clearCoat.analyze( builder );
-		if ( this.clearCoatRoughness ) this.clearCoatRoughness.analyze( builder );
+		if ( useClearcoat ) this.clearcoat.analyze( builder );
+		if ( useClearcoat && this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
+
+    if ( this.sheen ) this.sheen.analyze( builder );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
@@ -193,9 +198,12 @@ StandardNode.prototype.build = function ( builder ) {
 		var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
+    var clearcoatNormal = useClearcoat && this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
 
-		var clearCoat = this.clearCoat ? this.clearCoat.flow( builder, 'f' ) : undefined;
-		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.flow( builder, 'f' ) : undefined;
+		var clearcoat = useClearcoat && this.clearcoat ? this.clearcoat.flow( builder, 'f' ) : undefined;
+		var clearcoatRoughness = useClearcoat && this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
+
+    var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
@@ -250,6 +258,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			// add before: prevent undeclared normal
 			"	#include <normal_fragment_begin>",
+			"	#include <clearcoat_normal_fragment_begin>",
 
 			// add before: prevent undeclared material
 			"	PhysicalMaterial material;",
@@ -301,6 +310,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		if ( clearcoatNormal ) {
+
+			output.push(
+				clearcoatNormal.code,
+				'clearcoatNormal = ' + clearcoatNormal.result + ';'
+			);
+
+		}
+
 		// optimization for now
 
 		output.push(
@@ -308,24 +326,20 @@ StandardNode.prototype.build = function ( builder ) {
 			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
 		);
 
-		if ( clearCoat ) {
+		if ( clearcoat ) {
 
 			output.push(
-				clearCoat.code,
-				'material.clearCoat = saturate( ' + clearCoat.result + ' );'
+				clearcoat.code,
+				'material.clearcoat = saturate( ' + clearcoat.result + ' );'
 			);
-
-		} else if ( useClearcoat ) {
-
-			output.push( 'material.clearCoat = 0.0;' );
 
 		}
 
-		if ( clearCoatRoughness ) {
+		if ( clearcoatRoughness ) {
 
 			output.push(
-				clearCoatRoughness.code,
-				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', 0.04, 1.0 );'
+				clearcoatRoughness.code,
+				'material.clearcoatRoughness = clamp( ' + clearcoatRoughness.result + ', 0.04, 1.0 );'
 			);
 
 		} else if ( useClearcoat ) {
@@ -333,6 +347,12 @@ StandardNode.prototype.build = function ( builder ) {
 			output.push( 'material.clearCoatRoughness = 1.0;' );
 
 		}
+
+    if ( sheen ) {
+
+			output.push( 'material.sheenColor = ' + sheen.result + ';' );
+
+    }
 
 		if ( reflectivity ) {
 
@@ -425,6 +445,7 @@ StandardNode.prototype.build = function ( builder ) {
 				output.push(
 					clearCoatRadiance.code,
 					"clearCoatRadiance += " + clearCoatRadiance.result + ";"
+
 				);
 
 			}
@@ -491,8 +512,9 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.normal ) this.normal = source.normal;
 
-	if ( source.clearCoat ) this.clearCoat = source.clearCoat;
-	if ( source.clearCoatRoughness ) this.clearCoatRoughness = source.clearCoatRoughness;
+	if ( source.clearcoat ) this.clearcoat = source.clearcoat;
+	if ( source.clearcoatRoughness ) this.clearcoatRoughness = source.clearcoatRoughness;
+	if ( source.clearcoatNormal ) this.clearcoatNormal = source.clearcoatNormal;
 
 	if ( source.reflectivity ) this.reflectivity = source.reflectivity;
 
@@ -505,6 +527,8 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.ambient ) this.ambient = source.ambient;
 
 	if ( source.environment ) this.environment = source.environment;
+
+	if ( source.sheen ) this.sheen = source.sheen;
 
 	return this;
 
@@ -534,8 +558,9 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
 
-		if ( this.clearCoat ) data.clearCoat = this.clearCoat.toJSON( meta ).uuid;
-		if ( this.clearCoatRoughness ) data.clearCoatRoughness = this.clearCoatRoughness.toJSON( meta ).uuid;
+		if ( this.clearcoat ) data.clearcoat = this.clearcoat.toJSON( meta ).uuid;
+		if ( this.clearcoatRoughness ) data.clearcoatRoughness = this.clearcoatRoughness.toJSON( meta ).uuid;
+		if ( this.clearcoatNormal ) data.clearcoatNormal = this.clearcoatNormal.toJSON( meta ).uuid;
 
 		if ( this.reflectivity ) data.reflectivity = this.reflectivity.toJSON( meta ).uuid;
 
@@ -548,6 +573,8 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
+
+		if ( this.sheen ) data.sheen = this.sheen.toJSON( meta ).uuid;
 
 	}
 

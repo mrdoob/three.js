@@ -96,8 +96,8 @@
 										color: diffuseColor,
 										metalness: 0,
 										roughness: 0.5,
-										clearCoat: 1.0 - alpha,
-										clearCoatRoughness: 1.0 - beta,
+										clearcoat: 1.0 - alpha,
+										clearcoatRoughness: 1.0 - beta,
 										reflectivity: 1.0 - gamma,
 										envMap: ( index % 2 ) == 1 ? hdrCubeRenderTarget.texture : null
 									} );
@@ -148,11 +148,11 @@
 
 				}
 
-				addLabel( "+clearCoat", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-clearCoat", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( "+clearcoat", new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( "-clearcoat", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "+clearCoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "-clearCoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( "+clearcoatRoughness", new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( "-clearcoatRoughness", new THREE.Vector3( 0, 300, 0 ) );
 
 				addLabel( "+reflectivity", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "-reflectivity", new THREE.Vector3( 0, 0, 300 ) );

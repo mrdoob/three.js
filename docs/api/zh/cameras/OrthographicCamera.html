@@ -63,7 +63,7 @@ scene.add( camera );</code>
 
 		<h2>属性</h2>
 		<p>
-			请参阅其基类[page:Camera]来查看其共有属性。
+			共有属性请参见其基类[page:Camera]。
 			<br>
 			请注意，在大多数属性发生改变之后，你将需要调用[page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix]来使得这些改变生效。
 		</p>
@@ -111,7 +111,7 @@ scene.add( camera );</code>
 			获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
 
 		<h2>方法</h2>
-		<p>请参阅其基类[page:Camera]来查看其共有方法。</p>
+		<p>共有方法请参见其基类[page:Camera]。</p>
 
 		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
@@ -138,14 +138,17 @@ scene.add( camera );</code>
 
 		</p>
 
-		<h3>[method:JSON toJSON]()</h3>
+		<h3>[method:Object toJSON]([param:object meta])</h3>
 		<p>
-		使用JSON格式来返回摄像机数据。
+		meta -- 包含有元数据的对象，例如对象后代中的纹理或图像<br />
+		将摄像机转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 		</p>
 
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

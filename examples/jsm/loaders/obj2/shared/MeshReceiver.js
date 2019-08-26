@@ -25,7 +25,7 @@ const MeshReceiver = function ( materialHandler ) {
 	};
 
 	this.callbacks = {
-		onParseProgress: null,
+		onProgress: null,
 		onMeshAlter: null
 	};
 	this.materialHandler = materialHandler;
@@ -51,18 +51,18 @@ MeshReceiver.prototype = {
 
 	/**
 	 *
-	 * @param {Function} onParseProgress
+	 * @param {Function} onProgress
 	 * @param {Function} onMeshAlter
 	 * @private
 	 */
-	_setCallbacks: function ( onParseProgress, onMeshAlter ) {
+	_setCallbacks: function ( onProgress, onMeshAlter ) {
 
-		if ( onParseProgress !== undefined && onParseProgress !== null ) {
+		if ( onProgress !== null && onProgress !== undefined && onProgress instanceof Function ) {
 
-			this.callbacks.onParseProgress = onParseProgress;
+			this.callbacks.onProgress = onProgress;
 
 		}
-		if ( onMeshAlter !== undefined && onMeshAlter !== null ) {
+		if ( onMeshAlter !== null && onMeshAlter !== undefined && onMeshAlter instanceof Function ) {
 
 			this.callbacks.onMeshAlter = onMeshAlter;
 
@@ -145,14 +145,13 @@ MeshReceiver.prototype = {
 
 		let meshes = [];
 		let mesh;
-		let callbackOnMeshAlter = this.callbacks.onMeshAlter;
 		let callbackOnMeshAlterResult;
 		let useOrgMesh = true;
 		let geometryType = meshPayload.geometryType === null ? 0 : meshPayload.geometryType;
 
-		if ( callbackOnMeshAlter ) {
+		if ( this.callbacks.onMeshAlter ) {
 
-			callbackOnMeshAlterResult = callbackOnMeshAlter(
+			callbackOnMeshAlterResult = this.callbacks.onMeshAlter(
 				{
 					detail: {
 						meshName: meshName,
@@ -224,10 +223,9 @@ MeshReceiver.prototype = {
 			progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100 ).toFixed( 2 ) + '%)';
 
 		}
-		let callbackOnParseProgress = this.callbacks.onParseProgress;
-		if ( callbackOnParseProgress ) {
+		if ( this.callbacks.onProgress ) {
 
-			callbackOnParseProgress( 'progress', progressMessage, meshPayload.progress.numericalValue );
+			this.callbacks.onProgress( 'progress', progressMessage, meshPayload.progress.numericalValue );
 
 		}
 

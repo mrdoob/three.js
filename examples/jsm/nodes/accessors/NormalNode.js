@@ -36,7 +36,8 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.LOCAL:
 
-			result = 'normal';
+			if ( builder.isShader( 'vertex' ) ) result = 'objectNormal';
+			else result = 'geometryNormal';
 
 			break;
 
@@ -86,7 +87,7 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addKeyword( 'normal', function () {
+NodeLib.addKeyword( 'viewNormal', function () {
 
 	return new NormalNode();
 

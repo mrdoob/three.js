@@ -8,6 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
 
 		<h1>[name]</h1>
 
@@ -64,22 +65,14 @@
 			默认为 [page:DefaultLoadingManager].
 		</p>
 
-
 		<h2>属性</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-            [page:LoadingManager loadingManager]  是加载器所使用的加载管理器，默认为 [page:DefaultLoadingManager].
-		</p>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h3>[property:String mimeType]</h3>
 		<p>
 			详情 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
 			请参考 [page:.setMimeType]。默认为 *undefined*。
 		</p>
-
-		<h3>[property:String path]</h3>
-		<p>将要加载的文件的基本路径。请参考 [page:.setPath]。 默认为 *undefined*.</p>
 
 		<h3>[property:object requestHeader]</h3>
 		<p>[link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] 在HTTP 请求中使用。 请参考 [page:.setRequestHeader]。 默认为 *undefined*.</p>
@@ -93,8 +86,8 @@
             默认为 *undefined*.
 		</p>
 
-
 		<h2>方法</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -112,11 +105,6 @@
 		<p>
             设置正在加载的文件预期类型 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
             。请注意，在许多情况下，这将自动确定，因此默认情况下它是 *undefined* 。
-		</p>
-
-		<h3>[method:FileLoader setPath]( [param:String path] )</h3>
-		<p>
-            设置加载文件的基本路径或URL。当加载同一目录中的许多模型，此方法将很有用。
 		</p>
 
 		<h3>[method:FileLoader setRequestHeader]( [param:object requestHeader] )</h3>
@@ -145,6 +133,8 @@
 
 		<h2>源</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

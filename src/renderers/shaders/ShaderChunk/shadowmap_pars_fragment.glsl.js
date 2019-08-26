@@ -1,24 +1,24 @@
 export default /* glsl */`
 #ifdef USE_SHADOWMAP
 
-	#if NUM_DIR_LIGHTS > 0
+	#if NUM_DIR_LIGHT_SHADOWS > 0
 
-		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
-		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
-
-	#endif
-
-	#if NUM_SPOT_LIGHTS > 0
-
-		uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHTS ];
-		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHTS ];
+		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];
+		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];
 
 	#endif
 
-	#if NUM_POINT_LIGHTS > 0
+	#if NUM_SPOT_LIGHT_SHADOWS > 0
 
-		uniform sampler2D pointShadowMap[ NUM_POINT_LIGHTS ];
-		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHTS ];
+		uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];
+		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHT_SHADOWS ];
+
+	#endif
+
+	#if NUM_POINT_LIGHT_SHADOWS > 0
+
+		uniform sampler2D pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];
+		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];
 
 	#endif
 
@@ -41,7 +41,7 @@ export default /* glsl */`
 		const vec2 offset = vec2( 0.0, 1.0 );
 
 		vec2 texelSize = vec2( 1.0 ) / size;
-		vec2 centroidUV = floor( uv * size + 0.5 ) / size;
+		vec2 centroidUV = ( floor( uv * size - 0.5 ) + 0.5 ) * texelSize;
 
 		float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );
 		float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );

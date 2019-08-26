@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author gero3 / https://github.com/gero3
  * @author Mugen87 / https://github.com/Mugen87
+ * @author neverhood311 / https://github.com/neverhood311
  *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
@@ -27,6 +28,31 @@
  *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
  *  } else { .... }
  *  var mesh = new THREE.Mesh( geometry, material );
+ *
+ * For ASCII STLs containing multiple solids, each solid is assigned to a different group.
+ * Groups can be used to assign a different color by defining an array of materials with the same length of
+ * geometry.groups and passing it to the Mesh constructor:
+ *
+ * var mesh = new THREE.Mesh( geometry, material );
+ *
+ * For example:
+ *
+ *  var materials = [];
+ *  var nGeometryGroups = geometry.groups.length;
+ *
+ *  var colorMap = ...; // Some logic to index colors.
+ *
+ *  for (var i = 0; i < nGeometryGroups; i++) {
+ *
+ *		var material = new THREE.MeshPhongMaterial({
+ *			color: colorMap[i],
+ *			wireframe: false
+ *		});
+ *
+ *  }
+ *
+ *  materials.push(material);
+ *  var mesh = new THREE.Mesh(geometry, materials);
  */
 
 import {
@@ -116,7 +142,7 @@ STLLoader.prototype = {
 
 				// If "solid" text is matched to the current offset, declare it to be an ASCII STL.
 
-				if ( matchDataViewAt ( solid, reader, off ) ) return false;
+				if ( matchDataViewAt( solid, reader, off ) ) return false;
 
 			}
 
@@ -158,7 +184,7 @@ STLLoader.prototype = {
 					( reader.getUint8( index + 5 ) == 0x3D /*'='*/ ) ) {
 
 					hasColors = true;
-					colors = [];
+					colors = new Float32Array( faces * 3 * 3 );
 
 					defaultR = reader.getUint8( index + 6 ) / 255;
 					defaultG = reader.getUint8( index + 7 ) / 255;
@@ -174,8 +200,8 @@ STLLoader.prototype = {
 
 			var geometry = new BufferGeometry();
 
-			var vertices = [];
-			var normals = [];
+			var vertices = new Float32Array( faces * 3 * 3 );
+			var normals = new Float32Array( faces * 3 * 3 );
 
 			for ( var face = 0; face < faces; face ++ ) {
 
@@ -209,16 +235,21 @@ STLLoader.prototype = {
 				for ( var i = 1; i <= 3; i ++ ) {
 
 					var vertexstart = start + i * 12;
+					var componentIdx = ( face * 3 * 3 ) + ( ( i - 1 ) * 3 );
 
-					vertices.push( reader.getFloat32( vertexstart, true ) );
-					vertices.push( reader.getFloat32( vertexstart + 4, true ) );
-					vertices.push( reader.getFloat32( vertexstart + 8, true ) );
+					vertices[ componentIdx ] = reader.getFloat32( vertexstart, true );
+					vertices[ componentIdx + 1 ] = reader.getFloat32( vertexstart + 4, true );
+					vertices[ componentIdx + 2 ] = reader.getFloat32( vertexstart + 8, true );
 
-					normals.push( normalX, normalY, normalZ );
+					normals[ componentIdx ] = normalX;
+					normals[ componentIdx + 1 ] = normalY;
+					normals[ componentIdx + 2 ] = normalZ;
 
 					if ( hasColors ) {
 
-						colors.push( r, g, b );
+						colors[ componentIdx ] = r;
+						colors[ componentIdx + 1 ] = g;
+						colors[ componentIdx + 2 ] = b;
 
 					}
 
@@ -226,12 +257,12 @@ STLLoader.prototype = {
 
 			}
 
-			geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-			geometry.addAttribute( 'normal', new BufferAttribute( new Float32Array( normals ), 3 ) );
+			geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			if ( hasColors ) {
 
-				geometry.addAttribute( 'color', new BufferAttribute( new Float32Array( colors ), 3 ) );
+				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
 				geometry.hasColors = true;
 				geometry.alpha = alpha;
 
@@ -244,6 +275,7 @@ STLLoader.prototype = {
 		function parseASCII( data ) {
 
 			var geometry = new BufferGeometry();
+			var patternSolid = /solid([\s\S]*?)endsolid/g;
 			var patternFace = /facet([\s\S]*?)endfacet/g;
 			var faceCounter = 0;
 
@@ -258,52 +290,79 @@ STLLoader.prototype = {
 
 			var result;
 
-			while ( ( result = patternFace.exec( data ) ) !== null ) {
+			var groupVertexes = [];
+			var groupCount = 0;
+			var startVertex = 0;
+			var endVertex = 0;
 
-				var vertexCountPerFace = 0;
-				var normalCountPerFace = 0;
+			while ( ( result = patternSolid.exec( data ) ) !== null ) {
 
-				var text = result[ 0 ];
+				startVertex = endVertex;
 
-				while ( ( result = patternNormal.exec( text ) ) !== null ) {
+				var solid = result[ 0 ];
 
-					normal.x = parseFloat( result[ 1 ] );
-					normal.y = parseFloat( result[ 2 ] );
-					normal.z = parseFloat( result[ 3 ] );
-					normalCountPerFace ++;
+				while ( ( result = patternFace.exec( solid ) ) !== null ) {
+
+					var vertexCountPerFace = 0;
+					var normalCountPerFace = 0;
+
+					var text = result[ 0 ];
+
+					while ( ( result = patternNormal.exec( text ) ) !== null ) {
+
+						normal.x = parseFloat( result[ 1 ] );
+						normal.y = parseFloat( result[ 2 ] );
+						normal.z = parseFloat( result[ 3 ] );
+						normalCountPerFace ++;
+
+					}
+
+					while ( ( result = patternVertex.exec( text ) ) !== null ) {
+
+						vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+						normals.push( normal.x, normal.y, normal.z );
+						vertexCountPerFace ++;
+						endVertex ++;
+
+					}
+
+					// every face have to own ONE valid normal
+
+					if ( normalCountPerFace !== 1 ) {
+
+						console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
+
+					}
+
+					// each face have to own THREE valid vertices
+
+					if ( vertexCountPerFace !== 3 ) {
+
+						console.error( 'THREE.STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
+
+					}
+
+					faceCounter ++;
 
 				}
 
-				while ( ( result = patternVertex.exec( text ) ) !== null ) {
-
-					vertices.push( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
-					normals.push( normal.x, normal.y, normal.z );
-					vertexCountPerFace ++;
-
-				}
-
-				// every face have to own ONE valid normal
-
-				if ( normalCountPerFace !== 1 ) {
-
-					console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
-
-				}
-
-				// each face have to own THREE valid vertices
-
-				if ( vertexCountPerFace !== 3 ) {
-
-					console.error( 'THREE.STLLoader: Something isn\'t right with the vertices of face number ' + faceCounter );
-
-				}
-
-				faceCounter ++;
+				groupVertexes.push( { startVertex: startVertex, endVertex: endVertex } );
+				groupCount ++;
 
 			}
 
 			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+
+			if ( groupCount > 0 ) {
+
+				for ( var i = 0; i < groupVertexes.length; i ++ ) {
+
+					geometry.addGroup( groupVertexes[ i ].startVertex, groupVertexes[ i ].endVertex, i );
+
+				}
+
+			}
 
 			return geometry;
 
@@ -331,6 +390,7 @@ STLLoader.prototype = {
 					array_buffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly assumes little-endian
 
 				}
+
 				return array_buffer.buffer || array_buffer;
 
 			} else {

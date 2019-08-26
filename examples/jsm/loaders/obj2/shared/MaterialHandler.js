@@ -46,7 +46,7 @@ MaterialHandler.prototype = {
 
 	_setCallbacks: function ( onLoadMaterials ) {
 
-		if ( onLoadMaterials !== undefined && onLoadMaterials !== null ) {
+		if ( onLoadMaterials !== undefined && onLoadMaterials !== null && onLoadMaterials instanceof Function ) {
 
 			this.callbacks.onLoadMaterials = onLoadMaterials;
 
@@ -175,6 +175,12 @@ MaterialHandler.prototype = {
 				if ( this.logging.enabled ) console.info( 'Material with name "' + materialName + '" was added.' );
 
 			}
+
+		}
+
+		if ( this.callbacks.onLoadMaterials ) {
+
+			this.callbacks.onLoadMaterials( newMaterials );
 
 		}
 		return newMaterials;

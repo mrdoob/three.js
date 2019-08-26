@@ -7,7 +7,7 @@ export default /* glsl */`
 
 #if defined( RE_IndirectSpecular )
 
-	RE_IndirectSpecular( radiance, irradiance, clearCoatRadiance, geometry, material, reflectedLight );
+	RE_IndirectSpecular( radiance, irradiance, clearcoatRadiance, geometry, material, reflectedLight );
 
 #endif
 `;
