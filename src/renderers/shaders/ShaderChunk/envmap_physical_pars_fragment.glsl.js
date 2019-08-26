@@ -63,6 +63,9 @@ export default /* glsl */ `
 
 		  vec3 reflectVec = reflect( -viewDir, normal );
 
+		  // Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+		  reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
+
 		#else
 
 		  vec3 reflectVec = refract( -viewDir, normal, refractionRatio );
