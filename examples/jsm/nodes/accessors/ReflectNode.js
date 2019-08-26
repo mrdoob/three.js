@@ -24,7 +24,7 @@ ReflectNode.prototype.nodeType = "Reflect";
 
 ReflectNode.prototype.getUnique = function ( builder ) {
 
-	return !builder.context.viewNormal;
+	return ! builder.getContextProperty( 'viewNormal' );
 
 };
 
@@ -54,7 +54,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.VECTOR:
 
-				var viewNormalNode = builder.context.viewNormal || new NormalNode();
+				var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
 
 				var viewNormal = viewNormalNode.build( builder, 'v3' );
 				var viewPosition = new PositionNode( PositionNode.VIEW ).build( builder, 'v3' );

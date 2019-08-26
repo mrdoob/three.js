@@ -133,7 +133,7 @@ StandardNode.prototype.build = function ( builder ) {
 		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
 		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
 		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
-		var clearCoatRadianceFlowContext = new NodeContext().setSlot( 'clearCoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+		var clearcoatRadianceFlowContext = new NodeContext().setSlot( 'clearcoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
 
 		// context need to environment and clearcoat custom normals
 
@@ -143,7 +143,7 @@ StandardNode.prototype.build = function ( builder ) {
 		radianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
 		irradianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
 
-		clearCoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormalSystem );
+		clearcoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormalSystem );
 
 		// analyze all nodes to reuse generate codes
 
@@ -230,7 +230,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		var clearCoatRadiance = useClearcoat && environment ? this.environment.flow( builder, 'c', clearCoatRadianceFlowContext ) : undefined;
+		var clearcoatRadiance = useClearcoat && environment ? this.environment.flow( builder, 'c', clearcoatRadianceFlowContext ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -344,7 +344,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		} else if ( useClearcoat ) {
 
-			output.push( 'material.clearCoatRoughness = 1.0;' );
+			output.push( 'material.clearcoatRoughness = 1.0;' );
 
 		}
 
@@ -440,11 +440,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 			}
 
-			if ( clearCoatRadiance ) {
+			if ( clearcoatRadiance ) {
 
 				output.push(
-					clearCoatRadiance.code,
-					"clearCoatRadiance += " + clearCoatRadiance.result + ";"
+					clearcoatRadiance.code,
+					"clearcoatRadiance += " + clearcoatRadiance.result + ";"
 
 				);
 
