@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 #if defined( USE_ENVMAP )
 
 	#ifdef ENVMAP_MODE_REFRACTION
@@ -44,21 +44,20 @@ export default /* glsl */`
 
 	}
 
-	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-	float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
-
-		//float envMapWidth = pow( 2.0, maxMIPLevelScalar );
-		//float desiredMIPLevel = log2( envMapWidth * sqrt( 3.0 ) ) - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
+	// Trowbridge-Reitz distribution to Mip level, following the logic of http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
+	float getSpecularMIPLevel( const in float roughness, const in int maxMIPLevel ) {
 
 		float maxMIPLevelScalar = float( maxMIPLevel );
-		float desiredMIPLevel = maxMIPLevelScalar + 0.79248 - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
+
+		float sigma = PI * roughness * roughness / ( 1.0 + roughness );
+		float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );
 
 		// clamp to allowable LOD ranges.
 		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
 
 	}
 
-	vec3 getLightProbeIndirectRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in vec3 viewDir, const in vec3 normal, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+	vec3 getLightProbeIndirectRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in vec3 viewDir, const in vec3 normal, const in float roughness, const in int maxMIPLevel ) {
 
 		#ifdef ENVMAP_MODE_REFLECTION
 
@@ -72,7 +71,7 @@ export default /* glsl */`
 
 		reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
-		float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
+		float specularMIPLevel = getSpecularMIPLevel( roughness, maxMIPLevel );
 
 		#ifdef ENVMAP_TYPE_CUBE
 
@@ -93,7 +92,7 @@ export default /* glsl */`
 		#elif defined( ENVMAP_TYPE_CUBE_UV )
 
 			vec3 queryReflectVec = vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
-			vec4 envMapColor = textureCubeUV( envMap, queryReflectVec, BlinnExponentToGGXRoughness(blinnShininessExponent ));
+			vec4 envMapColor = textureCubeUV( envMap, queryReflectVec, roughness );
 
 		#elif defined( ENVMAP_TYPE_EQUIREC )
 
