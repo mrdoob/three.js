@@ -23,7 +23,6 @@
 
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
@@ -91,10 +90,10 @@
 
 				pmremCube.minFilter = minFilter;
 				pmremCube.magFilter = magFilter;
-				pmremCube.generateMipmaps = pmremCube.generateMipmaps;
+				pmremCube.generateMipmaps = generateMipmaps;
 				pmremCube.needsUpdate = true;
 
-				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture
+				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
 				library[ premTexture.uuid ] = premTexture;
 
