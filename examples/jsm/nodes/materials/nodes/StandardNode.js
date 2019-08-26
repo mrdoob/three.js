@@ -8,6 +8,7 @@ import {
 } from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
+import { NodeContext } from '../../core/NodeContext.js';
 import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
@@ -35,13 +36,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 	builder.define('STANDARD');
 
-	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearCoatNormal;
+	var useClearcoat = this.clearcoat;
 
-	if( useClearcoat ){
-
-		builder.define( 'CLEARCOAT' );
-
-	}
+	if ( useClearcoat ) builder.define( 'CLEARCOAT' );
 
 	builder.requires.lights = true;
 
@@ -49,7 +46,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	if ( builder.isShader( 'vertex' ) ) {
 
-		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', { cache: 'position' } ) : undefined;
+		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
 
 		builder.mergeUniform( UniformsUtils.merge( [
 
@@ -129,108 +126,111 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		var contextEnvironment = {
-			bias: RoughnessToBlinnExponentNode,
-			viewNormal: new ExpressionNode('normal', 'v3'),
-			gamma: true
-		};
+		// flow context
 
-		var contextGammaOnly = {
-			gamma: true
-		};
+		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
+		var lightFlowContext = new NodeContext().setCache( 'light' );
+		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
+		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+		var clearCoatRadianceFlowContext = new NodeContext().setSlot( 'clearCoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
 
-		var contextClearcoatEnvironment = {
-			bias: RoughnessToBlinnExponentNode,
-			viewNormal: new ExpressionNode('clearcoatNormal', 'v3'),
-			gamma: true
-		};
+		// context need to environment and clearcoat custom normals
+
+		var envViewNormalSystem = new ExpressionNode( 'normal', 'v3' );
+		var clearcoatViewNormalSystem = new ExpressionNode( 'clearcoatNormal', 'v3' );
+
+		radianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
+		irradianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
+
+		clearCoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormalSystem );
 
 		// analyze all nodes to reuse generate codes
 
 		if ( this.mask ) this.mask.analyze( builder );
 
-		this.color.analyze( builder, { slot: 'color', context: contextGammaOnly } );
+		this.color.analyze( builder, colorFlowContext );
 		this.roughness.analyze( builder );
 		this.metalness.analyze( builder );
 
 		if ( this.alpha ) this.alpha.analyze( builder );
 
 		if ( this.normal ) this.normal.analyze( builder );
+    if ( useClearcoat && this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
 
-		if ( this.clearcoat ) this.clearcoat.analyze( builder );
-		if ( this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
-		if ( this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
+		if ( useClearcoat ) this.clearcoat.analyze( builder );
+		if ( useClearcoat && this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
+
+    if ( this.sheen ) this.sheen.analyze( builder );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
-		if ( this.light ) this.light.analyze( builder, { cache: 'light' } );
+		if ( this.light ) this.light.analyze( builder, lightFlowContext );
 
 		if ( this.ao ) this.ao.analyze( builder );
 		if ( this.ambient ) this.ambient.analyze( builder );
 		if ( this.shadow ) this.shadow.analyze( builder );
-		if ( this.emissive ) this.emissive.analyze( builder, { slot: 'emissive' } );
+		if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowContext );
 
 		if ( this.environment ) {
 
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } );
+			this.environment.analyze( builder, radianceFlowContext ); 
 
 			if ( builder.requires.irradiance ) {
 
-				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
+				this.environment.analyze( builder, irradianceFlowContext ); 
 
 			}
 
 		}
 
-		if ( this.sheen ) this.sheen.analyze( builder );
-
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
 
-		var color = this.color.flow( builder, 'c', { slot: 'color', context: contextGammaOnly } );
+		var color = this.color.flow( builder, 'c', colorFlowContext );
 		var roughness = this.roughness.flow( builder, 'f' );
 		var metalness = this.metalness.flow( builder, 'f' );
 
 		var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
+    var clearcoatNormal = useClearcoat && this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
 
-		var clearcoat = this.clearcoat ? this.clearcoat.flow( builder, 'f' ) : undefined;
-		var clearcoatRoughness = this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
-		var clearcoatNormal = this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
+		var clearcoat = useClearcoat && this.clearcoat ? this.clearcoat.flow( builder, 'f' ) : undefined;
+		var clearcoatRoughness = useClearcoat && this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
+
+    var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
-		var light = this.light ? this.light.flow( builder, 'v3', { cache: 'light' } ) : undefined;
+		var light = this.light ? this.light.flow( builder, 'v3', lightFlowContext ) : undefined;
 
 		var ao = this.ao ? this.ao.flow( builder, 'f' ) : undefined;
 		var ambient = this.ambient ? this.ambient.flow( builder, 'c' ) : undefined;
 		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.flow( builder, 'c', { slot: 'emissive' } ) : undefined;
+		var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowContext ) : undefined;
 
 		var environment;
 
 		if ( this.environment ) {
 
-			environment = {
-				radiance: this.environment.flow( builder, 'c', { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } )
-			};
+			environment = {};
+
+			environment.radiance = this.environment.flow( builder, 'c', radianceFlowContext )
 
 			if ( builder.requires.irradiance ) {
 
-				environment.irradiance = this.environment.flow( builder, 'c', { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
+				environment.irradiance = this.environment.flow( builder, 'c', irradianceFlowContext );
 
 			}
 
 		}
 
-		var clearcoatEnv = useClearcoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearcoat', context: contextClearcoatEnvironment, slot: 'environment' } ) : undefined;
-
-		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
+		var clearCoatRadiance = useClearcoat && environment ? this.environment.flow( builder, 'c', clearCoatRadianceFlowContext ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -333,10 +333,6 @@ StandardNode.prototype.build = function ( builder ) {
 				'material.clearcoat = saturate( ' + clearcoat.result + ' );'
 			);
 
-		} else if ( useClearcoat ) {
-
-			output.push( 'material.clearcoat = 0.0;' );
-
 		}
 
 		if ( clearcoatRoughness ) {
@@ -348,15 +344,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 		} else if ( useClearcoat ) {
 
-			output.push( 'material.clearcoatRoughness = 0.0;' );
+			output.push( 'material.clearCoatRoughness = 1.0;' );
 
 		}
 
-		if ( sheen ) {
+    if ( sheen ) {
 
 			output.push( 'material.sheenColor = ' + sheen.result + ';' );
 
-		}
+    }
 
 		if ( reflectivity ) {
 
@@ -444,11 +440,12 @@ StandardNode.prototype.build = function ( builder ) {
 
 			}
 
-			if ( clearcoatEnv ) {
+			if ( clearCoatRadiance ) {
 
 				output.push(
-					clearcoatEnv.code,
-					"clearcoatRadiance += " + clearcoatEnv.result + ";"
+					clearCoatRadiance.code,
+					"clearCoatRadiance += " + clearCoatRadiance.result + ";"
+
 				);
 
 			}

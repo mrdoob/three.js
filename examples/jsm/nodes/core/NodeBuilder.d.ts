@@ -6,6 +6,7 @@ import {
 } from '../../../../src/Three';
 
 import { Node } from './Node';
+import { NodeContext } from './NodeContext';
 import { NodeUniform } from './NodeUniform';
 
 export class NodeBuilder {
@@ -83,12 +84,12 @@ export class NodeBuilder {
   build(vertex: Node, fragment: Node): this;
   buildShader(shader: string, node: Node): void;
   setMaterial(material: Material, renderer: WebGLRenderer): this;
-  addFlow(slot: string, cache?: string, context?: object): this;
-  removeFlow(): this;
+  addContext(context?: NodeContext): this;
+  removeContext(): this;
   addCache(name: string): this;
   removeCache(): this;
-  addContext(context: object): this;
-  removeContext(): this;
+  addContextData(context: object): this;
+  removeContextData(): this;
   addSlot(name: string): this;
   removeSlot(): this;
   addVertexCode(code: string): void;
@@ -126,6 +127,8 @@ export class NodeBuilder {
   colorToVector(color: string): string;
   getIncludes(type: string, shader: string): object[];
   getIncludesCode(type: string, shader: string): string;
+  getContextProperty(name: string): string;
+  getContextClass(name: string): string;
   getConstructorFromLength(len: number): string;
   isTypeMatrix(format: string): boolean;
   getTypeLength(type: string): number;

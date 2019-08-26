@@ -50,9 +50,9 @@ export { ResolutionNode } from './accessors/ResolutionNode.js';
 
 // math
 
-export { MathNode } from './math/MathNode.js';
-export { OperatorNode } from './math/OperatorNode.js';
+export { OperatorNode, AddNode, SubNode, MulNode, DivNode } from './math/OperatorNode.js';
 export { CondNode } from './math/CondNode.js';
+export { MathNode } from './math/MathNode.js';
 
 // procedural
 
