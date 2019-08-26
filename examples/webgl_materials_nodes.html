@@ -55,7 +55,9 @@
 				spherical: { url: 'textures/envmap.png' }
 			};
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
+			var url = new URL( window.location.href );
+
+			var param = { example: url.searchParams.get( 'e' ) || 'mesh-standard' };
 
 			function getTexture( name ) {
 
@@ -106,8 +108,8 @@
 
 			}
 
-			var models = {teapot: 'teapot', bunny: 'bunny'};
-			var modelProp = { model: 'teapot' };
+			var models = { teapot: 'teapot', bunny: 'bunny' };
+			var modelProp = { model: url.searchParams.get( 'm' ) || 'teapot' };
 
 			var bunnyLoader;
 			var bunnyGeometry;
@@ -125,16 +127,18 @@
 
 			}
 
-			guiModel = new GUI( { autoPlace: false } );
-			guiModel.add(modelProp, 'model', models).onChange( function( val ) {
-
+			function updateModel() {
+			
 				var geometry;
 
-				if ( val === 'bunny' ) geometry = getBunnyGeometry();
+				if ( modelProp.model === 'bunny' ) geometry = getBunnyGeometry();
 
 				mesh.geometry = geometry || teapot;
 
-			});
+			}
+
+			guiModel = new GUI( { autoPlace: false } );
+			guiModel.add(modelProp, 'model', models).onChange( updateModel );
 
 			guiModel.domElement.style = "position:absolute;top:0;left:10px";
 			document.body.appendChild( guiModel.domElement );
@@ -212,6 +216,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				updateMaterial();
+				updateModel();
 
 				onWindowResize();
 				animate();
