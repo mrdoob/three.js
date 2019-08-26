@@ -352,7 +352,10 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( sheen ) {
 
-			output.push( 'material.sheenColor = ' + sheen.result + ';' );
+			output.push( 
+				sheen.code,
+				'material.sheenColor = ' + sheen.result + ';' 
+			);
 
 		}
 
