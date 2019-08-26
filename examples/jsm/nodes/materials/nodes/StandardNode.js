@@ -34,7 +34,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	builder.define('STANDARD');
 
-	var useClearcoat = this.clearcoat;
+	var useClearcoat = this.clearcoat || this.clearcoatRoughness;
 
 	if ( useClearcoat ) builder.define( 'CLEARCOAT' );
 
@@ -156,7 +156,7 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.normal ) this.normal.analyze( builder );
 		if ( useClearcoat && this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
 
-		if ( useClearcoat ) this.clearcoat.analyze( builder );
+		if ( useClearcoat && this.clearcoat ) this.clearcoat.analyze( builder );
 		if ( useClearcoat && this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
 
 		if ( this.sheen ) this.sheen.analyze( builder );
@@ -331,6 +331,10 @@ StandardNode.prototype.build = function ( builder ) {
 				'material.clearcoat = saturate( ' + clearcoat.result + ' );'
 			);
 
+		} else if ( useClearcoat ) {
+
+			output.push( 'material.clearcoat = 0.0;' );
+
 		}
 
 		if ( clearcoatRoughness ) {
@@ -342,7 +346,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 		} else if ( useClearcoat ) {
 
-			output.push( 'material.clearcoatRoughness = 1.0;' );
+			output.push( 'material.clearcoatRoughness = 0.0;' );
 
 		}
 
