@@ -156,12 +156,12 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.alpha ) this.alpha.analyze( builder );
 
 		if ( this.normal ) this.normal.analyze( builder );
-    if ( useClearcoat && this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
+		if ( useClearcoat && this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
 
 		if ( useClearcoat ) this.clearcoat.analyze( builder );
 		if ( useClearcoat && this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
 
-    if ( this.sheen ) this.sheen.analyze( builder );
+		if ( this.sheen ) this.sheen.analyze( builder );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
@@ -198,12 +198,12 @@ StandardNode.prototype.build = function ( builder ) {
 		var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
 
 		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
-    var clearcoatNormal = useClearcoat && this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
+		var clearcoatNormal = useClearcoat && this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
 
 		var clearcoat = useClearcoat && this.clearcoat ? this.clearcoat.flow( builder, 'f' ) : undefined;
 		var clearcoatRoughness = useClearcoat && this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
 
-    var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
+		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
@@ -348,11 +348,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-    if ( sheen ) {
+		if ( sheen ) {
 
 			output.push( 'material.sheenColor = ' + sheen.result + ';' );
 
-    }
+		}
 
 		if ( reflectivity ) {
 
