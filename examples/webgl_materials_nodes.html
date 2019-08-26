@@ -3141,7 +3141,7 @@
 
 						var sss = new Nodes.MathNode(
 							new Nodes.FloatNode( - .1 ),
-							new Nodes.FloatNode( .5 ),
+							new Nodes.FloatNode( .13 ),
 							difference,
 							Nodes.MathNode.SMOOTHSTEP
 						);
@@ -3159,7 +3159,7 @@
 							);
 
 							frontColor = new Nodes.ColorNode( 0xd4cfbb );
-							backColor = new Nodes.ColorNode( 0xd04327 );
+							backColor = new Nodes.ColorNode( 0xff2a00 );
 
 							var color = new Nodes.MathNode(
 								backColor,
@@ -3181,6 +3181,8 @@
 							mtl.environment = color;
 
 						} else {
+
+							sss.b.value = .5;
 
 							frontColor = new Nodes.ColorNode( 0xd04327 );
 							backColor = new Nodes.ColorNode( 0x1a0e14 );
