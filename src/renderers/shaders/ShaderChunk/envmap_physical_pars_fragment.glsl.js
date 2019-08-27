@@ -1,4 +1,4 @@
-export default /* glsl */ `
+export default /* glsl */`
 #if defined( USE_ENVMAP )
 
 	#ifdef ENVMAP_MODE_REFRACTION
