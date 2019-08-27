@@ -29,7 +29,7 @@ export default /* glsl */`
 
 	#ifdef CLEARCOAT
 
-		clearcoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.clearcoatNormal, material.clearCoatRoughness, maxMipLevel );
+		clearcoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.clearcoatNormal, material.clearcoatRoughness, maxMipLevel );
 
 	#endif
 
