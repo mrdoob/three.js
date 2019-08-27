@@ -50,9 +50,9 @@
 				var effectController = {
 					turbidity: 10,
 					rayleigh: 2,
-					luminance: 1,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.8,
+					luminance: 1,
 					inclination: 0.49, // elevation / inclination
 					azimuth: 0.25, // Facing front,
 					sun: ! true
@@ -65,10 +65,10 @@
 					var uniforms = sky.material.uniforms;
 					uniforms[ "turbidity" ].value = effectController.turbidity;
 					uniforms[ "rayleigh" ].value = effectController.rayleigh;
-					uniforms[ "luminance" ].value = effectController.luminance;
 					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
 					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
-
+					uniforms[ "luminance" ].value = effectController.luminance;
+					
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
 
