@@ -582,7 +582,7 @@
 						subSlotNode.slots['radiance'] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
 						subSlotNode.slots['irradiance'] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
 
-						mtl.environment = subSlotNode
+						mtl.environment = subSlotNode;
 
 						// GUI
 
@@ -2488,7 +2488,7 @@
 						// MATERIAL
 
 						var bias = new Nodes.FloatNode( .5 );
-						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap ) );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap, undefined, undefined, bias ) );
 						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
 
 						mtl = new Nodes.PhongNodeMaterial();
