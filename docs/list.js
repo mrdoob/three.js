@@ -801,6 +801,8 @@ var list = {
 
 			"加载器": {
 				"BabylonLoader": "examples/zh/loaders/BabylonLoader",
+				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
+				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",

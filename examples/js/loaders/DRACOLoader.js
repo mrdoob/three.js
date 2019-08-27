@@ -4,10 +4,7 @@
 
 THREE.DRACOLoader = function ( manager ) {
 
-	this.manager = manager || THREE.DefaultLoadingManager;
-
-	this.path = '';
-	this.crossOrigin = 'anonymous';
+	THREE.Loader.call( this, manager );
 
 	this.decoderPath = '';
 	this.decoderConfig = {};
@@ -34,25 +31,9 @@ THREE.DRACOLoader = function ( manager ) {
 
 };
 
-THREE.DRACOLoader.prototype = {
+THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.DRACOLoader,
-
-	setPath: function ( path ) {
-
-		this.path = path;
-
-		return this;
-
-	},
-
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
 
 	setDecoderPath: function ( path ) {
 
@@ -367,7 +348,8 @@ THREE.DRACOLoader.prototype = {
 		return this;
 
 	}
-};
+
+} );
 
 /* WEB WORKER */
 

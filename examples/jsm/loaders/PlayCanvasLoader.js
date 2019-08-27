@@ -5,11 +5,11 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
+	Loader,
 	Mesh,
 	MeshPhongMaterial,
 	Uint16BufferAttribute,
@@ -18,11 +18,11 @@ import {
 
 var PlayCanvasLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-PlayCanvasLoader.prototype = {
+PlayCanvasLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: PlayCanvasLoader,
 
@@ -37,13 +37,6 @@ PlayCanvasLoader.prototype = {
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -213,6 +206,6 @@ PlayCanvasLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { PlayCanvasLoader };
