@@ -269,6 +269,7 @@
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
 					'node / reflect': 'node-reflect',
+					'node / refract': 'node-refract',
 					'misc / sub-slot': 'sub-slot',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
@@ -332,6 +333,10 @@
 				rotate = false;
 
 				lightGroup.visible = true;
+
+				scene.background = undefined;
+
+				cubemap.mapping = THREE.CubeReflectionMapping;
 
 				if ( mesh.material ) mesh.material.dispose();
 
@@ -2655,43 +2660,101 @@
 
 					case 'node-reflect':
 
-							// MATERIAL
+						// MATERIAL
 
-							var node = new Nodes.ReflectNode();
+						var node = new Nodes.ReflectNode();
 
-							var nodeMaterial = new Nodes.StandardNodeMaterial();
-							nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
-							nodeMaterial.roughness.value = .5;
-							nodeMaterial.metalness.value = 1;
+						var nodeMaterial = new Nodes.StandardNodeMaterial();
+						nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+						nodeMaterial.roughness.value = .5;
+						nodeMaterial.metalness.value = 1;
 
-							var standardMaterial = new THREE.MeshStandardMaterial( {
-								color: nodeMaterial.color.value,
-								side: defaultSide,
-								envMap: cubemap,
-								roughness: nodeMaterial.roughness.value,
-								metalness: 1
-							} );
+						var standardMaterial = new THREE.MeshStandardMaterial( {
+							color: nodeMaterial.color.value,
+							side: defaultSide,
+							envMap: cubemap,
+							roughness: nodeMaterial.roughness.value,
+							metalness: 1
+						} );
 
-							mtl = nodeMaterial;
+						mtl = nodeMaterial;
 
-							// GUI
+						// GUI
 
-							addGui( 'node', true, function ( val ) {
+						addGui( 'node', true, function ( val ) {
 
-								mtl = val ? nodeMaterial : standardMaterial;
-								mesh.material = mtl;
+							mtl = val ? nodeMaterial : standardMaterial;
+							mesh.material = mtl;
 
-							} );
+						} );
 
-							addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
+						addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
 
-								nodeMaterial.roughness.value = val;
-								standardMaterial.roughness = val;
+							nodeMaterial.roughness.value = val;
+							standardMaterial.roughness = val;
 
-							}, false, 0, 1 );
+						}, false, 0, 1 );
 
-							break;
+						break;
 
+					case 'node-refract':
+
+						// MATERIAL
+
+						var node = new Nodes.ReflectNode();
+						node.ratio = new Nodes.FloatNode( .98 );
+
+						var nodeMaterial = new Nodes.StandardNodeMaterial();
+						nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+						nodeMaterial.roughness.value = .5;
+						nodeMaterial.metalness.value = 1;
+
+						cubemap.mapping = THREE.CubeRefractionMapping;
+
+						var standardMaterial = new THREE.MeshStandardMaterial( {
+							color: nodeMaterial.color.value,
+							side: defaultSide,
+							envMap: cubemap,
+							refractionRatio: node.ratio.value,
+							roughness: nodeMaterial.roughness.value,
+							metalness: 1
+						} );
+
+						mtl = nodeMaterial;
+
+						scene.background = cubemap;
+
+						// GUI
+
+						addGui( 'node', true, function ( val ) {
+
+							mtl = val ? nodeMaterial : standardMaterial;
+							mesh.material = mtl;
+
+						} );
+
+						addGui( 'ratio', node.ratio.value, function ( val ) {
+
+							node.ratio.value = val;
+							standardMaterial.refractionRatio = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
+
+							nodeMaterial.roughness.value = val;
+							standardMaterial.roughness = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalness', nodeMaterial.metalness.value, function ( val ) {
+
+							nodeMaterial.metalness.value = val;
+							standardMaterial.metalness = val;
+
+						}, false, 0, 1 );
+
+						break;
 
 					case 'varying':
 
