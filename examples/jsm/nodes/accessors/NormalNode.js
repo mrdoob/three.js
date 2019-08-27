@@ -4,6 +4,7 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
+import { ReflectNode } from './ReflectNode.js';
 
 function NormalNode( scope ) {
 
@@ -33,7 +34,7 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.VIEW:
 
-			result = builder.isShader( 'vertex' ) ? 'objectNormal' : 'geometryNormal';
+			result = builder.isShader( 'vertex' ) ? 'transformedNormal' : 'geometryNormal';
 
 			break;
 
@@ -61,9 +62,11 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 		case NormalNode.WORLD:
 
+			var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
+
 			builder.addVaryNodeCode( this, 'varying vec3 vWNormal;' );
 
-			setVaryCode = 'vWNormal = ( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz;';
+			setVaryCode = `vWNormal = inverseTransformDirection( transformedNormal, viewMatrix ).xyz;`;
 
 			if ( builder.isShader( 'vertex' ) ) {
 
