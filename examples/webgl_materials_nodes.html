@@ -2488,7 +2488,7 @@
 						// MATERIAL
 
 						var bias = new Nodes.FloatNode( .5 );
-						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap, undefined, undefined, bias ) );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureNode( cubemap ) );
 						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
 
 						mtl = new Nodes.PhongNodeMaterial();
