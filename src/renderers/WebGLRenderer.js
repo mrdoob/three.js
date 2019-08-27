@@ -1571,22 +1571,31 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.lights ) {
 
+			// get all lights affecting this object's layers
+
+			var ambientLightSetup = filterAmbientLights( object, lights.state.ambientAffectedLayers, lights.state.ambient );
+			var directionalSetup = filterLights( object, lights.state.directionalAffectedLayers, lights.state.directional, lights.state.directionalShadowMap, lights.state.directionalShadowMatrix );
+			var spotSetup = filterLights( object, lights.state.spotAffectedLayers, lights.state.spot, lights.state.spotShadowMap, lights.state.spotShadowMatrix );
+			var rectAreaSetup = filterLights( object, lights.state.rectAreaAffectedLayers, lights.state.rectArea );
+			var pointSetup = filterLights( object, lights.state.pointAffectedLayers, lights.state.point, lights.state.pointShadowMap, lights.state.pointShadowMatrix );
+			var hemiSetup = filterLights( object, lights.state.hemiAffectedLayers, lights.state.hemi );
+
 			// wire up the material to this renderer's lighting state
 
-			uniforms.ambientLightColor.value = lights.state.ambient;
+			uniforms.ambientLightColor.value = ambientLightSetup;
 			uniforms.lightProbe.value = lights.state.probe;
-			uniforms.directionalLights.value = lights.state.directional;
-			uniforms.spotLights.value = lights.state.spot;
-			uniforms.rectAreaLights.value = lights.state.rectArea;
-			uniforms.pointLights.value = lights.state.point;
-			uniforms.hemisphereLights.value = lights.state.hemi;
+			uniforms.directionalLights.value = directionalSetup.lights;
+			uniforms.spotLights.value = spotSetup.lights;
+			uniforms.rectAreaLights.value = rectAreaSetup.lights;
+			uniforms.pointLights.value = pointSetup.lights;
+			uniforms.hemisphereLights.value = hemiSetup.lights;
 
-			uniforms.directionalShadowMap.value = lights.state.directionalShadowMap;
-			uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
-			uniforms.spotShadowMap.value = lights.state.spotShadowMap;
-			uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
-			uniforms.pointShadowMap.value = lights.state.pointShadowMap;
-			uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
+			uniforms.directionalShadowMap.value = directionalSetup.shadowMaps;
+			uniforms.directionalShadowMatrix.value = directionalSetup.shadowMatrices;
+			uniforms.spotShadowMap.value = spotSetup.shadowMaps;
+			uniforms.spotShadowMatrix.value = spotSetup.shadowMatrices;
+			uniforms.pointShadowMap.value = pointSetup.shadowMaps;
+			uniforms.pointShadowMatrix.value = pointSetup.shadowMatrices;
 			// TODO (abelnation): add area lights shadow info to uniforms
 
 		}
@@ -1596,6 +1605,64 @@ function WebGLRenderer( parameters ) {
 				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 		materialProperties.uniformsList = uniformsList;
+
+	}
+
+	/* Function to only consider lights and shadow maps/matrices that should
+	affect the considered object */
+	function filterLights( object, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
+
+		var materialLayers = object.layers;
+		var result = { lights: [], shadowMaps: [], shadowMatrices: [] };
+		var i = 0, light, lightLayers;
+		var lightsLength = 0, shadowMapsLength = 0, shadowMatricesLength = 0;
+		for ( i = 0; i < lights.length; i ++ ) {
+
+			light = lights[ i ];
+			lightLayers = lightAffectedLayers[ i ];
+			if ( lightLayers.test( materialLayers ) ) {
+
+				result.lights[ lightsLength ++ ] = light;
+				if ( shadowMaps ) {
+
+					result.shadowMaps[ shadowMapsLength ++ ] = shadowMaps[ i ];
+
+				}
+				if ( shadowMatrices ) {
+
+					result.shadowMatrices[ shadowMatricesLength ++ ] = shadowMatrices[ i ];
+
+				}
+
+			}
+
+		}
+		result.lights.length = lightsLength;
+		result.shadowMaps.length = shadowMapsLength;
+		result.shadowMatrices.length = shadowMatricesLength;
+		return result;
+
+	}
+	/* Merge all ambient colors affecting the object's layer into a single color. */
+	function filterAmbientLights( object, lightAffectedLayers, lights ) {
+
+		var materialLayers = object.layers;
+		var result = [ 0, 0, 0 ];
+		var i = 0, light, lightLayers;
+		for ( i = 0; i < lights.length; i ++ ) {
+
+			light = lights[ i ];
+			lightLayers = lightAffectedLayers[ i ];
+			if ( lightLayers.test( materialLayers ) ) {
+
+				result[ 0 ] += light.r;
+				result[ 1 ] += light.g;
+				result[ 2 ] += light.b;
+
+			}
+
+		}
+		return result;
 
 	}
 
