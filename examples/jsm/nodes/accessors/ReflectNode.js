@@ -6,11 +6,12 @@ import { TempNode } from '../core/TempNode.js';
 import { PositionNode } from './PositionNode.js';
 import { NormalNode } from './NormalNode.js';
 
-function ReflectNode( scope ) {
+function ReflectNode( scope, ratio ) {
 
 	TempNode.call( this, 'v3' );
 
 	this.scope = scope || ReflectNode.CUBE;
+	this.ratio = ratio;
 
 }
 
@@ -24,7 +25,7 @@ ReflectNode.prototype.nodeType = "Reflect";
 
 ReflectNode.prototype.getUnique = function ( builder ) {
 
-	return ! builder.getContextProperty( 'viewNormal' );
+	return ! builder.getContextProperty( 'viewNormal' ) && this.ratio === undefined;
 
 };
 
@@ -57,9 +58,23 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 				var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
 
 				var viewNormal = viewNormalNode.build( builder, 'v3' );
-				var viewPosition = new PositionNode( PositionNode.VIEW ).build( builder, 'v3' );
+				var viewPosition = '-normalize( ' + new PositionNode( PositionNode.VIEW ).build( builder, 'v3' ) + ' )';
 
-				var code = `inverseTransformDirection( reflect( -normalize( ${viewPosition} ), ${viewNormal} ), viewMatrix )`;
+				var method;
+
+				if ( this.ratio ) {
+
+					var ratio = this.ratio.build( builder, 'f' );
+
+					method = `refract( ${viewPosition}, ${viewNormal}, ${ratio} )`;
+
+				} else {
+
+					method = `reflect( ${viewPosition}, ${viewNormal} )`;
+
+				}
+
+				var code = `inverseTransformDirection( ${method}, viewMatrix )`;
 
 				if ( isUnique ) {
 
@@ -77,7 +92,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.CUBE:
 
-				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
+				var reflectVec = new ReflectNode( ReflectNode.VECTOR, this.ratio ).build( builder, 'v3' );
 
 				var code = 'vec3( -' + reflectVec + '.x, ' + reflectVec + '.yz )';
 
@@ -97,7 +112,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.SPHERE:
 
-				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
+				var reflectVec = new ReflectNode( ReflectNode.VECTOR, this.ratio ).build( builder, 'v3' );
 
 				var code = 'normalize( ( viewMatrix * vec4( ' + reflectVec + ', 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) ).xy * 0.5 + 0.5';
 
