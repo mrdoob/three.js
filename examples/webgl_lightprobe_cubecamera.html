@@ -80,7 +80,7 @@
 
 					cubeCamera.update( renderer, scene );
 
-					lightProbe.copy( LightProbeGenerator.fromCubeCamera( renderer, cubeCamera ) );
+					lightProbe.copy( LightProbeGenerator.fromCubeRenderTarget( renderer, cubeCamera.renderTarget ) );
 
 					scene.add( new THREE.LightProbeHelper(lightProbe, 5) );
 

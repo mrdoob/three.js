@@ -118,9 +118,9 @@ THREE.LightProbeGenerator = {
 
 	},
 
-	fromCubeCamera: function ( renderer, cubeCamera ) {
+	fromCubeRenderTarget: function ( renderer, renderTarget ) {
 		
-		// The cubeCamera renderTarget must be set to RGBA in order to make readRenderTargetPixels works
+		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		var norm, lengthSq, weight, totalWeight = 0;
 
 		var coord = new THREE.Vector3();
@@ -136,9 +136,9 @@ THREE.LightProbeGenerator = {
 
 		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
-			var imageWidth = cubeCamera.renderTarget.width; // assumed to be square
+			var imageWidth = renderTarget.width; // assumed to be square
 			var data = new Uint8Array(imageWidth * imageWidth * 4);
-			renderer.readRenderTargetPixels(cubeCamera.renderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex);
+			renderer.readRenderTargetPixels(renderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex);
 
 			var pixelSize = 2 / imageWidth;
 
