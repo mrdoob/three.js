@@ -2706,8 +2706,17 @@
 
 						var nodeMaterial = new Nodes.StandardNodeMaterial();
 						nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
-						nodeMaterial.roughness.value = .05;
+						nodeMaterial.roughness.value = .5;
 						nodeMaterial.metalness.value = 1;
+
+						var mix = new Nodes.FloatNode( .5 );
+
+						nodeMaterial.environment = new Nodes.MathNode(
+							nodeMaterial.environment,
+							new Nodes.CubeTextureNode( cubemap ),
+							mix,
+							Nodes.MathNode.MIX
+						);
 
 						cubemap.mapping = THREE.CubeRefractionMapping;
 
@@ -2739,6 +2748,12 @@
 							standardMaterial.refractionRatio = val;
 
 						}, false, 0, 2 );
+
+						addGui( 'mix', mix.value, function ( val ) {
+
+							mix.value = val;
+
+						}, false, 0, 1 );
 
 						addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
 
