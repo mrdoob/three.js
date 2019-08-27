@@ -10,7 +10,6 @@ body {
 a {
 	color: #ff0;
 	text-decoration: none;
-	pointer-events: auto;
 }
 
 a:hover {
@@ -39,6 +38,10 @@ canvas {
 	user-select: none;
 	pointer-events: none;
 	z-index: 1; /* TODO Solve this in HTML */
+}
+
+a, input, select {
+	pointer-events: auto;
 }
 
 .dg.ac {
