@@ -6,7 +6,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Triangle } from '../math/Triangle.js';
 import { Face3 } from '../core/Face3.js';
-import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants.js';
+import { DoubleSide, BackSide, TrianglesDrawMode, TriangleStripDrawMode } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
@@ -278,7 +278,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					start = Math.max( 0, drawRange.start );
 					end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
 
-					if ( this.drawMode === THREE.TriangleStripDrawMode ) {
+					if ( this.drawMode === TriangleStripDrawMode ) {
 
 						var order = 0;
 
@@ -288,13 +288,13 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = i + 1 + order;
 							c = i + 2 - order;
 
-							order = ++ order % 2;
+							order = ( order + 1 ) % 2;
 
 							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 
-								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+								intersection.faceIndex = Math.floor( i ); // triangle number in non-indexed buffer semantics
 								intersects.push( intersection );
 
 							}
