@@ -11,7 +11,7 @@ import { Node } from '../../core/Node.js';
 import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
-import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
+import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js';
 
 function StandardNode() {
 
@@ -129,8 +129,12 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
+		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
+		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
+
 		var contextEnvironment = {
-			bias: RoughnessToBlinnExponentNode,
+			roughness: specularRoughness,
+			bias: new SpecularMIPLevelNode( specularRoughness ),
 			viewNormal: new ExpressionNode('normal', 'v3'),
 			gamma: true
 		};
@@ -140,7 +144,8 @@ StandardNode.prototype.build = function ( builder ) {
 		};
 
 		var contextClearcoatEnvironment = {
-			bias: RoughnessToBlinnExponentNode,
+			roughness: clearcoatRoughness,
+			bias: new SpecularMIPLevelNode( clearcoatRoughness ),
 			viewNormal: new ExpressionNode('clearcoatNormal', 'v3'),
 			gamma: true
 		};
@@ -235,7 +240,6 @@ StandardNode.prototype.build = function ( builder ) {
 		builder.requires.transparent = alpha !== undefined;
 
 		builder.addParsCode( [
-
 			"varying vec3 vViewPosition;",
 
 			"#ifndef FLAT_SHADED",
@@ -457,7 +461,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			if ( builder.requires.irradiance ) {
 
-				output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
+				output.push( "iblIrradiance += PI * " + environment.irradiance.result + ";" );
 
 			}
 

@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.107.0",
+  "version": "0.108.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
