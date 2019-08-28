@@ -808,9 +808,13 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	copy: function ( source, recursive ) {
+	copy: function ( source, recursive, cache ) {
 
 		if ( recursive === undefined ) recursive = true;
+
+		if ( cache === undefined ) cache = {};
+
+		cache[ source.uuid ] = this;
 
 		this.name = source.name;
 
@@ -842,7 +846,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			for ( var i = 0; i < source.children.length; i ++ ) {
 
 				var child = source.children[ i ];
-				this.add( child.clone() );
+				this.add( cache[ child.uuid ] || child.clone( recursive, cache ) );
 
 			}
 
