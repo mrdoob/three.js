@@ -207,4 +207,11 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	}
 
 #endif
+
+#ifdef USE_SHEEN
+
+	uniform sampler2D sheenIblLut; // Alpha only texture
+
+#endif
+
 `;

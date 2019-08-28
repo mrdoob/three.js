@@ -67,6 +67,12 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		if ( UniformsLib.SheenIblLut ) {
+
+			builder.uniforms.sheenIblLut = { value: undefined };
+
+		}
+
 		builder.addParsCode( [
 			"varying vec3 vViewPosition;",
 

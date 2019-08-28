@@ -351,10 +351,10 @@ float D_Charlie(float roughness, float NoH) {
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L136
 float V_Neubelt(float NoV, float NoL) {
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
-	return saturate(1.0 / (4.0 * (NoL + NoV - NoL * NoV)));
+	return saturate( 1.0 / ( 4.0 * ( NoL + NoV - NoL * NoV) ) );
 }
 
-vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 specularColor ) {
+vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in GeometricContext geometry, vec3 sheenColor ) {
 
 	vec3 N = geometry.normal;
 	vec3 V = geometry.viewDir;
@@ -362,8 +362,13 @@ vec3 BRDF_Specular_Sheen( const in float roughness, const in vec3 L, const in Ge
 	vec3 H = normalize( V + L );
 	float dotNH = saturate( dot( N, H ) );
 
-	return specularColor * D_Charlie( roughness, dotNH ) * V_Neubelt( dot(N, V), dot(N, L) );
+	return sheenColor * D_Charlie( roughness, dotNH ) * V_Neubelt( dot( N, V ), dot( N, L ) );
 
+}
+
+vec3 BRDF_Specular_Sheen_Environment( const in sampler2D dfgLut, const in GeometricContext geometry, const in vec3 sheenColor, const in float roughness ) {
+	float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
+	return sheenColor * texture2D( dfgLut, vec2( dotNV, roughness ) ).a;
 }
 
 #endif
