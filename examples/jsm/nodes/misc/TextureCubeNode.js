@@ -9,26 +9,26 @@ import { TextureCubeUVNode } from './TextureCubeUVNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
-import { BlinnExponentToRoughnessNode } from '../bsdfs/BlinnExponentToRoughnessNode.js';
+import { SpecularMIPLevelNode } from '../utils/SpecularMIPLevelNode.js';
 
 function TextureCubeNode( value, textureSize, uv, bias ) {
 
 	TempNode.call( this, 'v4' );
 
 	this.value = value;
-	this.textureSize = textureSize || new FloatNode( 1024 );
-	this.uv = uv || new ReflectNode( ReflectNode.VECTOR );
-	this.bias = bias || new BlinnExponentToRoughnessNode();
+
+	textureSize = textureSize || new FloatNode( 1024 );
 
 	this.radianceCache = { uv: new TextureCubeUVNode(
-		this.uv,
-		this.textureSize,
-		this.bias
+		uv || new ReflectNode( ReflectNode.VECTOR ),
+		textureSize,
+		// bias should be replaced in builder.context in build process
+		bias
 	) };
 
 	this.irradianceCache = { uv: new TextureCubeUVNode(
 		new NormalNode( NormalNode.WORLD ),
-		this.textureSize,
+		textureSize,
 		new FloatNode( 1 ).setReadonly( true )
 	) };
 
@@ -82,6 +82,12 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 	if ( builder.isShader( 'fragment' ) ) {
 
 		builder.require( 'irradiance' );
+
+		if ( builder.context.bias ) {
+
+			builder.context.bias.setTexture( this );
+
+		}
 
 		var cache = builder.slot === 'irradiance' ? this.irradianceCache : this.radianceCache;
 		var result = this.generateTextureCubeUV( builder, cache );
