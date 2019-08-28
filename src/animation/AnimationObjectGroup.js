@@ -7,27 +7,27 @@ import { _Math } from '../math/Math.js';
  *
  * Usage:
  *
- * 	-	Add objects you would otherwise pass as 'root' to the
- * 		constructor or the .clipAction method of AnimationMixer.
+ *  - Add objects you would otherwise pass as 'root' to the
+ *    constructor or the .clipAction method of AnimationMixer.
  *
- * 	-	Instead pass this object as 'root'.
+ *  - Instead pass this object as 'root'.
  *
- * 	-	You can also add and remove objects later when the mixer
- * 		is running.
+ *  - You can also add and remove objects later when the mixer
+ *    is running.
  *
  * Note:
  *
- *  	Objects of this class appear as one object to the mixer,
- *  	so cache control of the individual objects must be done
- *  	on the group.
+ *    Objects of this class appear as one object to the mixer,
+ *    so cache control of the individual objects must be done
+ *    on the group.
  *
  * Limitation:
  *
- * 	- 	The animated properties must be compatible among the
- * 		all objects in the group.
+ *  - The animated properties must be compatible among the
+ *    all objects in the group.
  *
- *  -	A single property can either be controlled through a
- *  	target group or directly, but not both.
+ *  - A single property can either be controlled through a
+ *    target group or directly, but not both.
  *
  * @author tschw
  */
@@ -39,11 +39,11 @@ function AnimationObjectGroup() {
 	// cached objects followed by the active ones
 	this._objects = Array.prototype.slice.call( arguments );
 
-	this.nCachedObjects_ = 0;			// threshold
+	this.nCachedObjects_ = 0; // threshold
 	// note: read by PropertyBinding.Composite
 
 	var indices = {};
-	this._indicesByUUID = indices;		// for bookkeeping
+	this._indicesByUUID = indices; // for bookkeeping
 
 	for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
 
@@ -51,10 +51,10 @@ function AnimationObjectGroup() {
 
 	}
 
-	this._paths = [];					// inside: string
-	this._parsedPaths = [];				// inside: { we don't care, here }
-	this._bindings = []; 				// inside: Array< PropertyBinding >
-	this._bindingsIndicesByPath = {}; 	// inside: indices in these arrays
+	this._paths = []; // inside: string
+	this._parsedPaths = []; // inside: { we don't care, here }
+	this._bindings = []; // inside: Array< PropertyBinding >
+	this._bindingsIndicesByPath = {}; // inside: indices in these arrays
 
 	var scope = this;
 
@@ -162,7 +162,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 			} else if ( objects[ index ] !== knownObject ) {
 
 				console.error( 'THREE.AnimationObjectGroup: Different objects with the same UUID ' +
-						'detected. Clean the caches or recreate your infrastructure when reloading scenes.' );
+					'detected. Clean the caches or recreate your infrastructure when reloading scenes.' );
 
 			} // else the object is already where we want it to be
 

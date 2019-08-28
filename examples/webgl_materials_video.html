@@ -4,59 +4,74 @@
 		<title>three.js webgl - materials - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
 
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color:#fff;
+			#overlay {
 				position: absolute;
-				top: 5px; width: 100%;
-				z-index:100;
+				z-index: 1;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 1;
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			#overlay > div {
+				text-align: center;
+			}
+
+			#overlay > div > button {
+				height: 20px;
+				width: 100px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
+
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
 			}
 
 		</style>
 	</head>
 	<body>
 
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Video playback with audio requires user interaction.</p>
+			</div>
+		</div>
+		<div id="container"></div>
+
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo<br/>
+			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
-		<script src="js/Detector.js"></script>
-
-		<video id="video" autoplay loop crossOrigin="anonymous" webkit-playsinline style="display:none">
+		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 		</video>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var container;
 
@@ -80,10 +95,18 @@
 				xgrid = 20,
 				ygrid = 10;
 
-			init();
-			animate();
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
+
+				init();
+				animate();
+
+			}, false );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -103,11 +126,9 @@
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
+				video.play();
 
 				texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
 
 				//
 
@@ -126,42 +147,42 @@
 				cube_count = 0;
 
 				for ( i = 0; i < xgrid; i ++ )
-				for ( j = 0; j < ygrid; j ++ ) {
+					for ( j = 0; j < ygrid; j ++ ) {
 
-					ox = i;
-					oy = j;
+						ox = i;
+						oy = j;
 
-					geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
+						geometry = new THREE.BoxBufferGeometry( xsize, ysize, xsize );
 
-					change_uvs( geometry, ux, uy, ox, oy );
+						change_uvs( geometry, ux, uy, ox, oy );
 
-					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
+						materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
 
-					material = materials[ cube_count ];
+						material = materials[ cube_count ];
 
-					material.hue = i/xgrid;
-					material.saturation = 1 - j/ygrid;
+						material.hue = i / xgrid;
+						material.saturation = 1 - j / ygrid;
 
-					material.color.setHSL( material.hue, material.saturation, 0.5 );
+						material.color.setHSL( material.hue, material.saturation, 0.5 );
 
-					mesh = new THREE.Mesh( geometry, material );
+						mesh = new THREE.Mesh( geometry, material );
 
-					mesh.position.x =   ( i - xgrid/2 ) * xsize;
-					mesh.position.y =   ( j - ygrid/2 ) * ysize;
-					mesh.position.z = 0;
+						mesh.position.x = ( i - xgrid / 2 ) * xsize;
+						mesh.position.y = ( j - ygrid / 2 ) * ysize;
+						mesh.position.z = 0;
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 
-					scene.add( mesh );
+						scene.add( mesh );
 
-					mesh.dx = 0.001 * ( 0.5 - Math.random() );
-					mesh.dy = 0.001 * ( 0.5 - Math.random() );
+						mesh.dx = 0.001 * ( 0.5 - Math.random() );
+						mesh.dy = 0.001 * ( 0.5 - Math.random() );
 
-					meshes[ cube_count ] = mesh;
+						meshes[ cube_count ] = mesh;
 
-					cube_count += 1;
+						cube_count += 1;
 
-				}
+					}
 
 				renderer.autoClear = false;
 
@@ -169,13 +190,11 @@
 
 				// postprocessing
 
-				var renderModel = new THREE.RenderPass( scene, camera );
-				var effectBloom = new THREE.BloomPass( 1.3 );
-				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
+				var renderModel = new RenderPass( scene, camera );
+				var effectBloom = new BloomPass( 1.3 );
+				var effectCopy = new ShaderPass( CopyShader );
 
-				effectCopy.renderToScreen = true;
-
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );
@@ -196,7 +215,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.reset();
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -214,7 +233,7 @@
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY ) * 0.3;
@@ -274,8 +293,8 @@
 
 						mesh = meshes[ i ];
 
-						mesh.dx *= -1;
-						mesh.dy *= -1;
+						mesh.dx *= - 1;
+						mesh.dy *= - 1;
 
 					}
 

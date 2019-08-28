@@ -4,31 +4,8 @@
 		<title>three.js webgl - molecules</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-
-			body {
-				margin: 0;
-				font-family: Arial;
-				overflow: hidden;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				font-weight: bold;
-				text-align: center;
-				z-index: 1;
-			}
-
 			#menu {
 				position: absolute;
 				bottom: 20px;
@@ -56,23 +33,22 @@
 			.label {
 				text-shadow: -1px 1px 1px rgb(0,0,0);
 				margin-left: 25px;
+				font-size: 20px;
 			}
-
-
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/loaders/PDBLoader.js"></script>
-		<script src="js/renderers/CSS2DRenderer.js"></script>
-
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules</div>
 		<div id="menu"></div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
+			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
 
 			var camera, scene, renderer, labelRenderer;
 			var controls;
@@ -99,7 +75,7 @@
 				"Graphite": "graphite.pdb"
 			};
 
-			var loader = new THREE.PDBLoader();
+			var loader = new PDBLoader();
 			var offset = new THREE.Vector3();
 
 			var menu = document.getElementById( 'menu' );
@@ -121,7 +97,7 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				light.position.set( -1, -1, 1 );
+				light.position.set( - 1, - 1, 1 );
 				scene.add( light );
 
 				root = new THREE.Group();
@@ -134,7 +110,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
-				labelRenderer = new THREE.CSS2DRenderer();
+				labelRenderer = new CSS2DRenderer();
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
 				labelRenderer.domElement.style.top = '0';
@@ -143,7 +119,7 @@
 
 				//
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 500;
 				controls.maxDistance = 2000;
 
@@ -162,11 +138,11 @@
 
 			function generateButtonCallback( url ) {
 
-				return function ( event ) {
+				return function () {
 
 					loadMolecule( url );
 
-				}
+				};
 
 			}
 
@@ -178,7 +154,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = 'models/molecules/' +  MOLECULES[ m ];
+					var url = 'models/molecules/' + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
@@ -243,7 +219,7 @@
 						text.style.color = 'rgb(' + atom[ 3 ][ 0 ] + ',' + atom[ 3 ][ 1 ] + ',' + atom[ 3 ][ 2 ] + ')';
 						text.textContent = atom[ 4 ];
 
-						var label = new THREE.CSS2DObject( text );
+						var label = new CSS2DObject( text );
 						label.position.copy( object.position );
 						root.add( label );
 

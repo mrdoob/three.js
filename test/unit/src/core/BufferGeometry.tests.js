@@ -5,22 +5,20 @@
 /* global QUnit */
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { JSONLoader } from '../../../../src/loaders/JSONLoader';
-import { DirectGeometry } from '../../../../src/core/DirectGeometry';
 import {
 	BufferAttribute,
 	Uint16BufferAttribute,
-	Uint32BufferAttribute,
-	Float32BufferAttribute
+	Uint32BufferAttribute
 } from '../../../../src/core/BufferAttribute';
+import { Color } from '../../../../src/math/Color';
+import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
+import { Vector4 } from '../../../../src/math/Vector4';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Sphere } from '../../../../src/math/Sphere';
-import { Vector2 } from '../../../../src/math/Vector2';
 import { Geometry } from '../../../../src/core/Geometry';
 import { Face3 } from '../../../../src/core/Face3';
 import { Mesh } from '../../../../src/objects/Mesh';
-import { Color } from '../../../../src/math/Color';
 import { Line } from '../../../../src/objects/Line.js';
 import {
 	x,
@@ -547,128 +545,89 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( "fromGeometry/fromDirectGeometry", ( assert ) => {
 
-			if ( typeof XMLHttpRequest === 'undefined' ) {
+			// geometry definition
 
-				assert.expect( 0 );
-				return;
+			var geometry = new Geometry();
 
-			}
+			// vertices
 
-			assert.timeout( 1000 );
+			var v1 = new Vector3( 1, - 1, 0 );
+			var v2 = new Vector3( 1, 1, 0 );
+			var v3 = new Vector3( - 1, 1, 0 );
+			var v4 = new Vector3( - 1, - 1, 0 );
 
-			var a = new BufferGeometry();
-			// BoxGeometry is a bit too simple but works fine in a pinch
-			// var b = new BoxGeometry( 1, 1, 1 );
-			// b.mergeVertices();
-			// b.computeVertexNormals();
-			// b.computeBoundingBox();
-			// b.computeBoundingSphere();
-			var asyncDone = assert.async(); // tell QUnit we're done with asserts
+			// faces, normals and colors
 
-			var loader = new JSONLoader();
-			loader.load( "../../examples/models/skinned/simple/simple.js", function ( modelGeometry ) {
+			geometry.vertices.push( v1, v2, v3, v4 );
 
-				a.fromGeometry( modelGeometry );
+			var f1 = new Face3( 0, 1, 2 );
+			f1.normal.set( 0, 0, 1 );
+			f1.color.set( 0xff0000 );
+			var f2 = new Face3( 2, 3, 0 );
+			f2.normal.set( 0, 0, 1 );
+			f2.color.set( 0xff0000 );
 
-				var attr;
-				var geometry = new DirectGeometry().fromGeometry( modelGeometry );
+			geometry.faces.push( f1, f2 );
 
-				var positions = new Float32Array( geometry.vertices.length * 3 );
-				attr = new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices );
-				assert.ok( bufferAttributeEquals( a.attributes.position, attr ), "Vertices are identical" );
+			// uvs
 
-				if ( geometry.normals.length > 0 ) {
+			var uvs = geometry.faceVertexUvs[ 0 ];
+			uvs.length = 0;
 
-					var normals = new Float32Array( geometry.normals.length * 3 );
-					attr = new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals );
-					assert.ok( bufferAttributeEquals( a.attributes.normal, attr ), "Normals are identical" );
+			uvs.push( [
+				new Vector2( 1, 0 ),
+			  new Vector2( 1, 1 ),
+			  new Vector2( 0, 1 )
+			] );
 
-				}
+			uvs.push( [
+				new Vector2( 0, 1 ),
+			  new Vector2( 0, 0 ),
+			  new Vector2( 1, 0 )
+			] );
 
-				if ( geometry.colors.length > 0 ) {
+			// skin weights
 
-					var colors = new Float32Array( geometry.colors.length * 3 );
-					attr = new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors );
-					assert.ok( bufferAttributeEquals( a.attributes.color, attr ), "Colors are identical" );
+			var sw1 = new Vector4( 0.8, 0.2, 0, 0 );
+			var sw2 = new Vector4( 0.7, 0.2, 0.1, 0 );
+			var sw3 = new Vector4( 0.8, 0.1, 0.1, 0 );
+			var sw4 = new Vector4( 1, 0, 0, 0 );
 
-				}
+			geometry.skinWeights.push( sw1, sw2, sw3, sw4 );
 
-				if ( geometry.uvs.length > 0 ) {
+			 // skin indices
 
-					var uvs = new Float32Array( geometry.uvs.length * 2 );
-					attr = new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs );
-					assert.ok( bufferAttributeEquals( a.attributes.uv, attr ), "UVs are identical" );
+			var si1 = new Vector4( 0, 1, 2, 3 );
+			var si2 = new Vector4( 2, 3, 4, 5 );
+			var si3 = new Vector4( 4, 5, 6, 7 );
+			var si4 = new Vector4( 6, 7, 8, 9 );
 
-				}
+			geometry.skinIndices.push( si1, si2, si3, si4 );
 
-				if ( geometry.uvs2.length > 0 ) {
+			// create BufferGeometry
 
-					var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
-					attr = new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 );
-					assert.ok( bufferAttributeEquals( a.attributes.uv2, attr ), "UV2s are identical" );
+			var bufferGeometry = new BufferGeometry().fromGeometry( geometry );
 
-				}
+			// expected values
 
-				// groups
-				assert.deepEqual( a.groups, geometry.groups, "Groups are identical" );
+			var vertices = new Float32Array( [ 1, - 1, 0, 1, 1, 0, - 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ] );
+			var normals = new Float32Array( [ 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 ] );
+			var colors = new Float32Array( [ 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 ] );
+			var uvs = new Float32Array( [ 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0 ] );
+			var skinIndices = new Float32Array( [ 0, 1, 2, 3, 2, 3, 4, 5, 4, 5, 6, 7, 4, 5, 6, 7, 6, 7, 8, 9, 0, 1, 2, 3 ] );
+			var skindWeights = new Float32Array( [
+				0.8, 0.2, 0, 0, 0.7, 0.2, 0.1, 0, 0.8, 0.1, 0.1, 0,
+				0.8, 0.1, 0.1, 0, 1, 0, 0, 0, 0.8, 0.2, 0, 0
+			] );
 
-				// morphs
-				if ( geometry.morphTargets !== undefined ) {
+			var attributes = bufferGeometry.attributes;
 
-					for ( var name in geometry.morphTargets ) {
-
-						var morphTargets = geometry.morphTargets[ name ];
-
-						for ( var i = 0, l = morphTargets.length; i < l; i ++ ) {
-
-							var morphTarget = morphTargets[ i ];
-
-							attr = new Float32BufferAttribute( morphTarget.length * 3, 3 );
-							attr.copyVector3sArray( morphTarget );
-
-							assert.ok(
-								bufferAttributeEquals( a.morphAttributes[ name ][ i ], attr ),
-								"MorphTargets #" + i + " are identical"
-							);
-
-						}
-
-					}
-
-				}
-
-				// skinning
-				if ( geometry.skinIndices.length > 0 ) {
-
-					attr = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
-					attr.copyVector4sArray( geometry.skinIndices );
-					assert.ok( bufferAttributeEquals( a.attributes.skinIndex, attr ), "SkinIndices are identical" );
-
-				}
-
-				if ( geometry.skinWeights.length > 0 ) {
-
-					attr = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
-					attr.copyVector4sArray( geometry.skinWeights );
-					assert.ok( bufferAttributeEquals( a.attributes.skinWeight, attr ), "SkinWeights are identical" );
-
-				}
-
-				if ( geometry.boundingSphere !== null ) {
-
-					assert.ok( a.boundingSphere.equals( geometry.boundingSphere ), "BoundingSphere is identical" );
-
-				}
-
-				if ( geometry.boundingBox !== null ) {
-
-					assert.ok( a.boundingBox.equals( geometry.boundingBox ), "BoundingBox is identical" );
-
-				}
-
-				asyncDone();
-
-			} );
+			assert.deepEqual( attributes.position.array, vertices, "Vertices are as expected" );
+			assert.deepEqual( attributes.normal.array, normals, "Normals are as expected" );
+			assert.deepEqual( attributes.color.array, colors, "Colors are as expected" );
+			assert.deepEqual( attributes.uv.array, uvs, "Texture coordinates are as expected" );
+			assert.deepEqual( attributes.skinIndex.array, skinIndices, "Skin indices are as expected" );
+			assert.deepEqual( attributes.skinWeight.array, skindWeights, "Skin weights are as expected" );
 
 		} );
 
@@ -850,6 +809,7 @@ export default QUnit.module( 'Core', () => {
 
 			var index = new BufferAttribute( new Uint16Array( [ 0, 1, 2, 3 ] ), 1 );
 			var attribute1 = new BufferAttribute( new Uint16Array( [ 1, 3, 5, 7 ] ), 1 );
+			attribute1.name = "attribute1";
 			var a = new BufferGeometry();
 			a.name = "JSONQUnit.test";
 			// a.parameters = { "placeholder": 0 };
@@ -858,7 +818,6 @@ export default QUnit.module( 'Core', () => {
 			a.addGroup( 0, 1, 2 );
 			a.boundingSphere = new Sphere( new Vector3( x, y, z ), 0.5 );
 			var j = a.toJSON();
-
 			var gold = {
 				"metadata": {
 					"version": 4.5,
@@ -874,7 +833,8 @@ export default QUnit.module( 'Core', () => {
 							"itemSize": 1,
 							"type": "Uint16Array",
 							"array": [ 1, 3, 5, 7 ],
-							"normalized": false
+							"normalized": false,
+							"name": "attribute1"
 						}
 					},
 					"index": {
@@ -896,6 +856,22 @@ export default QUnit.module( 'Core', () => {
 			};
 
 			assert.deepEqual( j, gold, "Generated JSON is as expected" );
+
+			// add morphAttributes
+			a.morphAttributes.attribute1 = [];
+			a.morphAttributes.attribute1.push( attribute1.clone() );
+			j = a.toJSON();
+			gold.data.morphAttributes = {
+				"attribute1": [ {
+					"itemSize": 1,
+					"type": "Uint16Array",
+					"array": [ 1, 3, 5, 7 ],
+					"normalized": false,
+					"name": "attribute1"
+				} ]
+			};
+
+			assert.deepEqual( j, gold, "Generated JSON with morphAttributes is as expected" );
 
 		} );
 

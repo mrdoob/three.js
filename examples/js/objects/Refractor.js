@@ -56,9 +56,9 @@ THREE.Refractor = function ( geometry, options ) {
 		transparent: true // ensures, refractors are drawn from farthest to closest
 	} );
 
-	this.material.uniforms.color.value = color;
-	this.material.uniforms.tDiffuse.value = renderTarget.texture;
-	this.material.uniforms.textureMatrix.value = textureMatrix;
+	this.material.uniforms[ "color" ].value = color;
+	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
+	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
 	// functions
 
@@ -184,50 +184,36 @@ THREE.Refractor = function ( geometry, options ) {
 
 	//
 
-	var render = ( function () {
+	function render( renderer, scene, camera ) {
 
-		var viewport = new THREE.Vector4();
+		scope.visible = false;
 
-		return function render( renderer, scene, camera ) {
+		var currentRenderTarget = renderer.getRenderTarget();
+		var currentVrEnabled = renderer.vr.enabled;
+		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-			scope.visible = false;
+		renderer.vr.enabled = false; // avoid camera modification
+		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
-			var currentRenderTarget = renderer.getRenderTarget();
-			var currentVrEnabled = renderer.vr.enabled;
-			var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+		renderer.setRenderTarget( renderTarget );
+		renderer.clear();
+		renderer.render( scene, virtualCamera );
 
-			renderer.vr.enabled = false; // avoid camera modification
-			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
+		renderer.vr.enabled = currentVrEnabled;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+		renderer.setRenderTarget( currentRenderTarget );
 
-			renderer.render( scene, virtualCamera, renderTarget, true );
+		// restore viewport
 
-			renderer.vr.enabled = currentVrEnabled;
-			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-			renderer.setRenderTarget( currentRenderTarget );
+		if ( camera.isArrayCamera ) {
 
-			// restore viewport
+			renderer.state.viewport( camera.viewport );
 
-			var bounds = camera.bounds;
+		}
 
-			if ( bounds !== undefined ) {
+		scope.visible = true;
 
-				var size = renderer.getSize();
-				var pixelRatio = renderer.getPixelRatio();
-
-				viewport.x = bounds.x * size.width * pixelRatio;
-				viewport.y = bounds.y * size.height * pixelRatio;
-				viewport.z = bounds.z * size.width * pixelRatio;
-				viewport.w = bounds.w * size.height * pixelRatio;
-
-				renderer.state.viewport( viewport );
-
-			}
-
-			scope.visible = true;
-
-		};
-
-	} )();
+	}
 
 	//
 
@@ -269,17 +255,14 @@ THREE.Refractor.RefractorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 

@@ -4,28 +4,11 @@
 		<title>three.js webgl - buffergeometry - lines - indexed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-				color: #0080ff;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -33,20 +16,18 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - lines - indexed</div>
 
-		<script src="../build/three.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var mesh, parent_node;
+			var parent_node;
 
 			init();
 			animate();
@@ -86,7 +67,7 @@
 				}
 
 				// simple Koch curve
-				
+
 				function snowflake_iteration( p0, p4, depth ) {
 
 					if ( -- depth < 0 ) {
@@ -124,7 +105,7 @@
 
 						add_vertex( points[ 0 ] );
 
-						for ( var p_index=0, p_count = points.length - 1; p_index != p_count; p_index ++ ) {
+						for ( var p_index = 0, p_count = points.length - 1; p_index != p_count; p_index ++ ) {
 
 							snowflake_iteration( points[ p_index ], points[ p_index + 1 ], iteration );
 
@@ -136,7 +117,7 @@
 
 						for ( var p_index = 0, p_count = points.length; p_index != p_count; p_index ++ ) {
 
-							points[p_index].x += x_offset;
+							points[ p_index ].x += x_offset;
 
 						}
 
@@ -145,8 +126,7 @@
 				}
 
 				var y = 0;
-				snowflake
-				(
+				snowflake(
 					[
 						new THREE.Vector3( 0, y, 0 ),
 						new THREE.Vector3( 500, y, 0 )
@@ -155,10 +135,9 @@
 				);
 
 				y += 600;
-				snowflake
-				(
+				snowflake(
 					[
-						new THREE.Vector3( 0, y, 0) ,
+						new THREE.Vector3( 0, y, 0 ),
 						new THREE.Vector3( 250, y + 400, 0 ),
 						new THREE.Vector3( 500, y, 0 )
 					],
@@ -166,8 +145,7 @@
 				);
 
 				y += 600;
-				snowflake
-				(
+				snowflake(
 					[
 						new THREE.Vector3( 0, y, 0 ),
 						new THREE.Vector3( 500, y, 0 ),
@@ -178,8 +156,7 @@
 				);
 
 				y += 1000;
-				snowflake
-				(
+				snowflake(
 					[
 						new THREE.Vector3( 250, y, 0 ),
 						new THREE.Vector3( 500, y, 0 ),
@@ -201,12 +178,12 @@
 				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.LineSegments( geometry, material );
-				mesh.position.x -= 1200;
-				mesh.position.y -= 1200;
+				var lineSegments = new THREE.LineSegments( geometry, material );
+				lineSegments.position.x -= 1200;
+				lineSegments.position.y -= 1200;
 
 				parent_node = new THREE.Object3D();
-				parent_node.add( mesh );
+				parent_node.add( lineSegments );
 
 				scene.add( parent_node );
 

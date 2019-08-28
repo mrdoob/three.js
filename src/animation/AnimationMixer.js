@@ -176,8 +176,8 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		this._actionsByClip = {};
 		// inside:
 		// {
-		// 		knownActions: Array< AnimationAction >	- used as prototypes
-		// 		actionByRoot: AnimationAction			- lookup
+		// 	knownActions: Array< AnimationAction > - used as prototypes
+		// 	actionByRoot: AnimationAction - lookup
 		// }
 
 
@@ -428,9 +428,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		delete bindingByName[ trackName ];
 
-		remove_empty_map: {
-
-			for ( var _ in bindingByName ) break remove_empty_map; // eslint-disable-line no-unused-vars
+		if ( Object.keys( bindingByName ).length === 0 ) {
 
 			delete bindingsByRoot[ rootUuid ];
 

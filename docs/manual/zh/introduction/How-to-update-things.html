@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>如何更新场景（[name]）</h1>
+		<div>
+			<p>默认情况下，所有对象都会自动更新它们的矩阵（如果它们已添加到场景中）</p>
+			<code>
+var object = new THREE.Object3D();
+scene.add( object );
+			</code>
+			或者它们是已添加到场景中的另一个对象的子节点:
+			<code>
+var object1 = new THREE.Object3D();
+var object2 = new THREE.Object3D();
+
+object1.add( object2 );
+scene.add( object1 ); //object1 和 object2 会自动更新它们的矩阵
+			</code>
+		</div>
+
+		<p>但是，如果你知道对象将是静态的，则可以禁用此选项并在需要时手动更新转换矩阵。</p>
+
+		<code>
+object.matrixAutoUpdate  = false;
+object.updateMatrix();
+		</code>
+
+		<h2>几何形状（Geometries）</h2>
+		<div>
+			<h3>[page:BufferGeometry]</h3>
+			<div>
+				<p>
+					BufferGeometries 将信息（例如顶点位置，面索引，法线，颜色，uv和任何自定义属性）存储在[page:BufferAttribute buffers] —— 也就是，
+					[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays].
+					这使得它们通常比标准Geometries更快，缺点是更难用。
+				</p>
+				<p>
+					关于更新BufferGeometries，最重要的是理解你不能调整 buffers 大小（这种操作开销很大，相当于创建了个新的geometry）。
+					但你可以更新 buffers的内容。
+				</p>
+				<p>
+					这意味着如果你知道BufferGeometry的一个属性会增长，比如顶点的数量，
+					你必须预先分配足够大的buffer来容纳可能创建的任何新顶点。
+					当然，这也意味着BufferGeometry将有一个最大大小 —— 无法创建一个可以高效地无限扩展的BufferGeometry。
+				</p>
+				<p>
+					我们以在渲染时扩展的line来示例。我们将分配可容纳500个顶点的空间但起初仅绘制2个，使用
+					在500个顶点的缓冲区中，但首先只使用 [page:BufferGeometry.drawRange]。
+				</p>
+				<code>
+var MAX_POINTS = 500;
+
+// geometry
+var geometry = new THREE.BufferGeometry();
+
+// attributes
+var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+// draw range
+var drawCount = 2; // draw the first 2 points, only
+geometry.setDrawRange( 0, drawCount );
+
+// material
+var material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 2 } );
+
+// line
+var line = new THREE.Line( geometry,  material );
+scene.add( line );
+				</code>
+			 	<p>
+					然后我们随机增加顶点到line中，以这样的一种方式：
+				</p>
+				<code>
+var positions = line.geometry.attributes.position.array;
+
+var x, y, z, index;
+x = y = z = index = 0;
+
+for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
+
+    positions[ index ++ ] = x;
+    positions[ index ++ ] = y;
+    positions[ index ++ ] = z;
+
+    x += ( Math.random() - 0.5 ) * 30;
+    y += ( Math.random() - 0.5 ) * 30;
+    z += ( Math.random() - 0.5 ) * 30;
+
+}
+				</code>
+				<p>
+					如果要更改第一次渲染后渲染的<em>点数</em>，执行以下操作：
+				</p>
+				<code>
+line.geometry.setDrawRange( 0, newValue );
+				</code>
+				<p>
+					如果要在第一次渲染后更改position数值，则需要像这样设置needsUpdate标志：
+				</p>
+				<code>
+line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次渲染之后
+				</code>
+
+				<p>
+					<a href="http://jsfiddle.net/w67tzfhx/">这个fiddle</a>展示了一个你可以参考的运动的line。
+				</p>
+
+				<h3>例子：</h3>
+					[example:webgl_custom_attributes WebGL / custom / attributes]<br />
+					[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
+
+
+			</div>
+
+			<h3>[page:Geometry]</h3>
+			<div>
+				<p>
+					以下标志控制各种geometry属性的更新。仅对于需要更新的属性设置标志，因为更新成本很高。
+					一旦buffers改变，这些标志位会自动重置为false。如果你想要持续更新buffers，你需要保持这些设置为true。
+					请注意这仅适用于[page:Geometry]而不是[page:BufferGeometry]。
+				</p>
+				<code>
+var geometry = new THREE.Geometry();
+geometry.verticesNeedUpdate = true;
+geometry.elementsNeedUpdate = true;
+geometry.morphTargetsNeedUpdate = true;
+geometry.uvsNeedUpdate = true;
+geometry.normalsNeedUpdate = true;
+geometry.colorsNeedUpdate = true;
+geometry.tangentsNeedUpdate = true;
+				</code>
+
+				<p>
+					在早于[link:https://github.com/mrdoob/three.js/releases/tag/r66 r66]的版本中，meshes
+					需要额外设定 <em>dynamic</em> 标志为true （为了维持内部的 typed arrays）：
+				</p>
+
+				<code>
+		//removed after r66
+		geometry.dynamic = true;
+				</code>
+
+				<h3>例子：</h3>
+					[example:webgl_geometry_dynamic WebGL / geometry / dynamic]<br />
+			</div>
+
+		</div>
+
+
+
+
+		<h2>材质（Materials）</h2>
+		<div>
+			<p>所有uniforms值都可以自由改变（比如 colors, textures, opacity 等等），这些数值在每帧都发给shader。</p>
+
+			<p>GL状态相关参数也可以随时改变（depthTest, blending, polygonOffset 等）。</p>
+
+			<p>平整/光滑阴影被作到法线。你需要重置法线 buffer（见上）。</p>
+
+			<p>在运行时无法轻松更改以下属性（一旦material被渲染了一次）：</p>
+			<ul>
+				<li>uniforms的数量和类型</li>
+				<li>lights的数量和类型</li>
+				<li>是否存在
+					<ul>
+						<li>texture</li>
+						<li>fog</li>
+						<li>vertex colors</li>
+						<li>skinning</li>
+						<li>morphing</li>
+						<li>shadow map</li>
+						<li>alpha test</li>
+					</ul>
+				</li>
+			</ul>
+
+			<p>这些变化需要建立新的shader程序。你需要设置</p>
+			<code>material.needsUpdate = true</code>
+
+			<p>请记住，这可能会非常缓慢并导致帧率的波动。（特别是在Windows上，因为shader编译在directx中比opengl慢）。</p>
+
+			<p>为了获得更流畅的体验，您可以通过“虚拟”值（如零强度光，白色纹理或零密度雾）在一定程度上模拟这些功能的变化。</p>
+
+			<p>您可以自由更改用于几何块的材质，但是无法更改对象如何划分为块（根据面材料）。</p>
+
+			<h3>如果你需要在运行时使用不同的材料配置：</h3>
+			<p>如果材料/块的数量很少，您可以事先预先划分物体（例如，人的头发/脸部/身体/上衣/裤子，汽车的前部/侧面/顶部/玻璃/轮胎/内部）。</p>
+
+			<p>如果数量很大（例如，每个面可能有所不同），请考虑不同的解决方案，例如使用属性/纹理来驱动不同的每个面部外观。</p>
+
+			<h3>例子：</h3>
+			[example:webgl_materials_cars WebGL / materials / cars]<br />
+			[example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
+		</div>
+
+
+		<h2>纹理（Textures）</h2>
+		<div>
+			<p>如果更改了图像，画布，视频和数据纹理，则需要设置以下标志：</p>
+			<code>
+				texture.needsUpdate = true;
+			</code>
+			<p>渲染对象就会自动更新。</p>
+
+			<h3>例子：</h3>
+			[example:webgl_materials_video WebGL / materials / video]<br />
+			[example:webgl_rtt WebGL / rtt]
+
+		</div>
+
+
+		<h2>相机（Cameras）</h2>
+		<div>
+			<p>相机的位置和目标会自动更新。 如果你需要改变</p>
+			<ul>
+				<li>
+					fov
+				</li>
+				<li>
+					aspect
+				</li>
+				<li>
+					near
+				</li>
+				<li>
+					far
+				</li>
+			</ul>
+			<p>
+				那么你需要重新计算投影矩阵：
+			</p>
+			<code>
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+			</code>
+		</div>
+	</body>
+</html>

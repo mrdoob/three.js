@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>绘图模式常量（Draw Mode Constants）</h1>
+
+		<p class="desc">
+			这些是[page:Mesh.drawMode]的有效值，控制着顶点列表一旦被发送到GPU中将如何被解释。
+			请注意，只有当[page:Mesh.geometry]是一个[page:BufferGeometry]的时候，这些值才会生效。当[page:Mesh.geometry]是一个
+			[page:Geometry]的时候，改变这个值不会有任何效果。
+<br /><br />
+
+
+
+		</p>
+
+
+		<h2>绘图模式</h2>
+
+		<code>
+			THREE.TrianglesDrawMode
+		</code>
+		<p>
+			这是默认值，这将使得每三个连续顶点(v0, v1, v2)，(v2, v3, v5)，……被解释为一个单独的三角形。
+			<br />
+			如果顶点的数量不是3的倍数，那么将会忽略多余的顶点。
+		</p>
+
+		<code>
+			THREE.TriangleStripDrawMode
+		</code>
+		<p>
+			这将使得一系列的三角形（由(v0, v1, v2)，(v2, v1, v3)，(v2, v3, v4)，……给定）一个一个地连在一起，每一个连续的三角形将和前一个三角形共享两个顶点。
+		</p>
+
+		<code>
+			THREE.TriangleFanDrawMode
+		</code>
+		<p>
+这将会使得一个序列中的每一个三角形（由(v0, v1, v2)，(v0, v2, v3)，(v0, v3, v4)，……给定）共享它们的第一个顶点（就像风扇一样）。<br /><br />
+
+			<em>注意：</em>截至[link:https://en.wikipedia.org/wiki/DirectX#DirectX_10 DirectX10]这个模式还没有被支持。
+			由于Chorme和Firefox在Windows上是使用[link:https://en.wikipedia.org/wiki/ANGLE_(software) ANGLE]来渲染WebGL的，所以这种模式将会在内部转换为受支持的模式，
+			但可能会导致这些浏览器在性能上降低一些。
+		</p>
+
+
+		<h2>用法</h2>
+
+		<code>
+		var geometry = new THREE.Geometry();
+
+		geometry.vertices.push(
+			new THREE.Vector3( -10,  10, 0 ),
+			new THREE.Vector3( -10, -10, 0 ),
+			new THREE.Vector3(  10, -10, 0 ),
+			...
+		);
+		geometry.faces.push( new THREE.Face3( 0, 1, 2 ), ... );
+
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+
+		var mesh = new THREE.Mesh( geometry, material );
+		mesh.drawMode = THREE.TrianglesDrawMode; //default
+
+		scene.add( mesh );
+		</code>
+
+
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+	</body>
+</html>

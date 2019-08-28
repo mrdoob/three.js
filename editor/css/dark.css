@@ -107,6 +107,7 @@ select {
 			color: #888;
 			margin: 0;
 			padding: 8px;
+			line-height: 16px;
 		}
 
 		#menubar .menu .options {
@@ -220,6 +221,8 @@ select {
 
 	#toolbar button {
 		margin-right: 6px;
+		line-height: 14px;
+		height: 24px;
 	}
 
 .Outliner {
@@ -247,3 +250,51 @@ select {
 	.Outliner .option.active {
 		background-color: rgba(21,60,94,1);
 	}
+
+/* */
+
+@media all and ( max-width: 600px ) {
+
+	#menubar .menu .options {
+		max-height: calc(100% - 372px);
+	}
+
+	#menubar .menu.right {
+		display: none;
+	}
+
+	#viewport {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#script {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#player {
+		left: 0;
+		right: 0;
+		top: 32px;
+		height: calc(100% - 352px);
+	}
+
+	#sidebar {
+		left: 0;
+		width: 100%;
+		top: calc(100% - 320px);
+		bottom: 0;
+	}
+
+	#toolbar {
+		left: calc(50% - 140px);
+		width: 280px;
+		top: 68px;
+	}
+
+}

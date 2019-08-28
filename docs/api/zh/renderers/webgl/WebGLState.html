@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc"></p>
+
+
+		<h2>方法</h2>
+
+		<h3>[method:null enable]( [param:integer id], [param:boolean boolean] )</h3>
+		<p>
+		未完成
+		</p>
+
+		<h3>[method:null disable]( [param:integer id], [param:boolean boolean] )</h3>
+		<p>
+		未完成
+		</p>
+
+		<h3>[method:null setDepthTest]( [param:boolean depthTest] )</h3>
+		<p>
+		depthTest -- 决定是否需要基于深度缓存对片元进行深度测试的布尔值<br />
+		</p>
+		<p>
+		该方法设置了depthTest的值，故可决定是否需要基于深度缓存测试深度数据
+		</p>
+
+		<h3>[method:null setDepthWrite]( [param:boolean depthWrite] )</h3>
+		<p>
+		depthWrite -- 决定是否需要保持片元深度的布尔值<br />
+		</p>
+		<p>
+		该方法设置depthWrite的值，故可决定是否要将深度数据写入深度缓存中
+		</p>
+
+		<h3>[method:null setBlending]( [param:number blending], [param:number blendEquation], [param:number blendSrc], [param:number blendDst] )</h3>
+		<p>
+		blending -- 一个表示混合模式的数字。可能的值有THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending 和 THREE.CustomBlending <br />
+		blendEquation -- 如果blending的值是THREE.CustomBlending，那么你可以设置blendEquation. 可能的值有THREE.AddEquation, THREE.SubtractEquation 和 THREE.ReverseSubtractEquation.<br />
+		blendSrc -- 如果blending的值是THREE.CustomBlending, 那么你可以设置blendSrc.可能的值有THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor 和 THREE.SrcAlphaSaturateFactor<br />
+		blendDst -- 如果blending的值是THREE.CustomBlending, 那么你可以设置blendDst. 可能的值有THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor
+		</p>
+		<p>
+		该方法设置正确的混合
+		</p>
+
+
+		<h2>源码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

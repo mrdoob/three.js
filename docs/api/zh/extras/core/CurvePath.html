@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>曲线路径（[name]）</h1>
+
+		<p class="desc">
+		
+		一个扩展了[page:Curve]的抽象基类。CurvePath仅仅是一个已连接的曲线的数组，但保留了曲线的API。
+		</p>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		构造函数中不传入参数。
+		</p>
+
+
+		<h2>属性</h2>
+		<p>请参阅其基类[page:Curve]来了解共有属性。</p>
+
+		<h3>[property:array curves]</h3>
+		<p>[page:Curve Curves]数组。</p>
+
+		<h3>[property:boolean autoClose]</h3>
+		<p>是否自动闭合路径。</p>
+
+
+
+
+
+		<h2>方法</h2>
+		<p>请参阅其基类[page:Curve]来了解共有方法。</p>
+
+		<h3>[method:null add]( [param:Curve curve] )</h3>
+		<p>添加一条曲线到[page:.curves]数组中。</p>
+
+		<h3>[method:null closePath]()</h3>
+		<p>添加一条[page:LineCurve lineCurve]用于闭合路径。</p>
+
+		<h3>[method:Float getCurveLengths]()</h3>
+		<p>将[page:.curves]数组中曲线的长度相加。</p>
+
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

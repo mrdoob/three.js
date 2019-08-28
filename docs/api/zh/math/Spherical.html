@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>球坐标（[name]）</h1>
+
+		<p class="desc">一个点的[link:https://en.wikipedia.org/wiki/Spherical_coordinate_system spherical coordinates]（球坐标）。</p>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<p>
+		[page:Float radius] - 半径值，或者说从该点到原点的
+		[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]（欧几里得距离，即直线距离）。默认值为*1.0*。<br />
+		[page:Float phi] - polar angle from the y (up) axis. Default is *0*.<br />
+		[page:Float theta] - equator angle around the y (up) axis. Default is *0*.<br /><br />
+
+		The poles (phi) are at the positive and negative y axis. The equator (theta) starts at positive z.
+		</p>
+
+
+		<h2>属性</h2>
+
+		<h3>[property:Float radius]</h3>
+
+		<h3>[property:Float phi]</h3>
+
+		<h3>[property:Float theta]</h3>
+
+
+		<h2>方法</h2>
+
+		<h3>[method:Spherical clone]()</h3>
+		<p>
+		返回一个新的球坐标，新的球坐标与该球坐标具有相同的
+		[page:.radius radius]、[page:.phi phi]和[page:.theta theta]。
+		</p>
+
+		<h3>[method:Spherical copy]( [param:Spherical s] )</h3>
+		<p>
+		复制所传入的球坐标的[page:.radius radius]、
+		[page:.phi phi] 和[page:.theta theta]属性到该球坐标中。
+		</p>
+
+		<h3>[method:Spherical makeSafe]()</h3>
+		<p>
+		将极角 [page:.phi phi] 的值限制在0.000001 和 pi - 0.000001 之间。
+		</p>
+
+		<h3>[method:Spherical set]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<p>设置球坐标中[page:.radius radius]、[page:.phi phi] 和 [page:.theta theta] 属性的值。</p>
+
+		<h3>[method:Spherical setFromVector3]( [param:Vector3 vec3] )</h3>
+		<p>
+			从[page:Vector3 Vector3]中设置球坐标的[page:.radius radius]、[page:.phi phi]和[page:.theta theta]值。
+		</p>
+
+		<h3>[method:Spherical setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			从笛卡尔坐标系中设置球坐标的[page:.radius radius]、[page:.phi phi]和[page:.theta theta]值。
+		</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

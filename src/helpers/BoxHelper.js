@@ -101,5 +101,20 @@ BoxHelper.prototype.setFromObject = function ( object ) {
 
 };
 
+BoxHelper.prototype.copy = function ( source ) {
+
+	LineSegments.prototype.copy.call( this, source );
+
+	this.object = source.object;
+
+	return this;
+
+};
+
+BoxHelper.prototype.clone = function () {
+
+	return new this.constructor().copy( this );
+
+};
 
 export { BoxHelper };

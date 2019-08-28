@@ -61,7 +61,6 @@
 			[example:webgl_interactive_lines Raycasting to a Line]<br />
 			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
 			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
-			[example:webgl_octree_raycasting Raycasting using an octree]<br />
 			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
 			[example:webgl_raycast_texture Raycast to a Texture]
 		</div>
@@ -147,7 +146,7 @@
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] — The object to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersecton with the object. Default is false.<br />
+		[page:Boolean recursive] — If true, it also checks all descendants. Otherwise it only checks intersection with the object. Default is false.<br />
 		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
 		</p>
 		<p>
@@ -162,7 +161,8 @@
 			[page:Face3 face] – intersected face<br />
 			[page:Integer faceIndex] – index of the intersected face<br />
 			[page:Object3D object] – the intersected object<br />
-			[page:Vector2 uv] - U,V coordinates at point of intersection
+			[page:Vector2 uv] - U,V coordinates at point of intersection<br />
+			[page:Vector2 uv2] - Second set of U,V coordinates at point of intersection
 		</p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
@@ -174,7 +174,7 @@
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Array objects] — The objects to check for intersection with the ray.<br />
-		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects. Default is false.<br />
+		[page:Boolean recursive] — If true, it also checks all descendants of the objects. Otherwise it only checks intersection with the objects. Default is false.<br />
 		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
 		</p>
 		<p>

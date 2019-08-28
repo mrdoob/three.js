@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="list.js"></script>
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+<body>
+	<h1>浏览器支持（[name]）</h1>
+
+	<h2>总览</h2>
+	<div>
+		<p>
+            在所有现代浏览器中，Three.js可以使用WebGL来渲染场景。对于较旧的浏览器，特别是Internet Explorer 10或者更低版本浏览器，你将需要回落到其它[link:https://github.com/mrdoob/three.js/tree/master/examples/js/renderers renderers]（CSS2DRenderer、CSS3DRenderer、SVGRenderer）。此外，你或许不得不包含一些额外的“填充物”来解决兼容性问题，特别是当你使用[link:https://github.com/mrdoob/three.js/tree/master/examples /examples]目录中的文件时。
+		</p>
+		<p>
+            注意：如果你并不需要支持较旧的浏览器，那就不推荐使用其他渲染器来进行渲染，因为与WebGLRenderer相比，其它渲染器渲染较慢，并且不支持WebGL的诸多特性。
+		</p>
+	</div>
+
+	<h2>支持WebGL的浏览器</h2>
+	<div>
+		<p>
+			Google Chrome 9+、Firefox 4+、Opera 15+、Safari 5.1+、Internet Explorer 11 和 Microsoft Edge。你可以点击[link:https://caniuse.com/#feat=webgl Can I use WebGL]来查阅各个浏览器对WebGL的支持性。
+		</p>
+	</div>
+
+	<h2>
+        在Three.js中所使用到的JavaScript语言特性或者Web API
+        </h2>
+	<div>
+		<p>
+            这里是一些在Three.js中使用到的特性，其中的一部分需要额外的“填充物”（Polyfills）来解决兼容性问题。
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>特性</th>
+					<th>适用范围</th>
+					<th>模块</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Typed Arrays</td>
+					<td>Source</td>
+					<td>BufferAttribute, BufferGeometry, etc.</td>
+				</tr>
+				<tr>
+					<td>Web Audio API</td>
+					<td>Source</td>
+					<td>Audio, AudioContext, AudioListener, etc.</td>
+				</tr>
+				<tr>
+					<td>WebVR API</td>
+					<td>Source</td>
+					<td>WebVRManager, etc.</td>
+				</tr>
+				<tr>
+					<td>Blob</td>
+					<td>Source</td>
+					<td>FileLoader, etc.</td>
+				</tr>
+				<tr>
+					<td>Promise</td>
+					<td>Examples</td>
+					<td>GLTFLoader, GLTFExporter, WebVR, VREffect, etc.</td>
+				</tr>
+				<tr>
+					<td>Fetch</td>
+					<td>Examples</td>
+					<td>ImageBitmapLoader, etc.</td>
+				</tr>
+				<tr>
+					<td>File API</td>
+					<td>Examples</td>
+					<td>GLTFExporter, etc.</td>
+				</tr>
+				<tr>
+					<td>URL API</td>
+					<td>Examples</td>
+					<td>GLTFLoader, etc.</td>
+				</tr>
+				<tr>
+					<td>Pointer Lock API</td>
+					<td>Examples</td>
+					<td>PointerLockControls</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>关于用于解决兼容性问题的“填充物”</h2>
+	<div>
+		<p>根据你的需求，引入相关的“填充物”即可。以IE9为例，你至少需要来使用“填充物”完成以下的功能。</p>
+		<ul>
+			<li>Typed Arrays</li>
+			<li>Blob</li>
+		</ul>
+	</div>
+
+	<h3>建议的“填充物”</h3>
+	<div>
+		<ul>
+			<li>
+				[link:https://github.com/zloirock/core-js core-js]
+			</li>
+			<li>
+				[link:https://github.com/inexorabletash/polyfill/blob/master/typedarray.js typedarray.js]
+			</li>
+			<li>
+				[link:https://github.com/stefanpenner/es6-promise/ ES6-Promise]
+			</li>
+			<li>
+				[link:https://github.com/eligrey/Blob.js Blob.js]
+			</li>
+			<li>
+				[link:https://github.com/github/fetch fetch]
+			</li>
+		</ul>
+	</div>
+</body>
+</html>

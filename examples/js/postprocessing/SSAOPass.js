@@ -1,190 +1,404 @@
-'use strict';
-
 /**
- * Screen-space ambient occlusion pass.
- *
- * Has the following parameters
- *  - radius
- *  	- Ambient occlusion shadow radius (numeric value).
- *  - onlyAO
- *  	- Display only ambient occlusion result (boolean value).
- *  - aoClamp
- *  	- Ambient occlusion clamp (numeric value).
- *  - lumInfluence
- *  	- Pixel luminosity influence in AO calculation (numeric value).
- *
- * To output to screen set renderToScreens true
- *
- * @author alteredq / http://alteredqualia.com/
- * @author tentone
- * @class SSAOPass
+ * @author Mugen87 / https://github.com/Mugen87
  */
+
 THREE.SSAOPass = function ( scene, camera, width, height ) {
+
+	THREE.Pass.call( this );
+
+	this.width = ( width !== undefined ) ? width : 512;
+	this.height = ( height !== undefined ) ? height : 512;
+
+	this.clear = true;
+
+	this.camera = camera;
+	this.scene = scene;
+
+	this.kernelRadius = 8;
+	this.kernelSize = 32;
+	this.kernel = [];
+	this.noiseTexture = null;
+	this.output = 0;
+
+	this.minDistance = 0.005;
+	this.maxDistance = 0.1;
+
+	//
+
+	this.generateSampleKernel();
+	this.generateRandomKernelRotations();
+
+	// beauty render target with depth buffer
+
+	var depthTexture = new THREE.DepthTexture();
+	depthTexture.type = THREE.UnsignedShortType;
+	depthTexture.minFilter = THREE.NearestFilter;
+	depthTexture.maxFilter = THREE.NearestFilter;
+
+	this.beautyRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+		minFilter: THREE.LinearFilter,
+		magFilter: THREE.LinearFilter,
+		format: THREE.RGBAFormat,
+		depthTexture: depthTexture,
+		depthBuffer: true
+	} );
+
+	// normal render target
+
+	this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+		minFilter: THREE.NearestFilter,
+		magFilter: THREE.NearestFilter,
+		format: THREE.RGBAFormat
+	} );
+
+	// ssao render target
+
+	this.ssaoRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
+		minFilter: THREE.LinearFilter,
+		magFilter: THREE.LinearFilter,
+		format: THREE.RGBAFormat
+	} );
+
+	this.blurRenderTarget = this.ssaoRenderTarget.clone();
+
+	// ssao material
 
 	if ( THREE.SSAOShader === undefined ) {
 
-		console.warn( 'THREE.SSAOPass depends on THREE.SSAOShader' );
-		return new THREE.ShaderPass();
+		console.error( 'THREE.SSAOPass: The pass relies on THREE.SSAOShader.' );
 
 	}
 
-	THREE.ShaderPass.call( this, THREE.SSAOShader );
-
-	this.width = ( width !== undefined ) ? width : 512;
-	this.height = ( height !== undefined ) ? height : 256;
-
-	this.renderToScreen = false;
-
-	this.camera2 = camera;
-	this.scene2 = scene;
-
-	//Depth material
-	this.depthMaterial = new THREE.MeshDepthMaterial();
-	this.depthMaterial.depthPacking = THREE.RGBADepthPacking;
-	this.depthMaterial.blending = THREE.NoBlending;
-
-	//Depth render target
-	this.depthRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter } );
-	//this.depthRenderTarget.texture.name = 'SSAOShader.rt';
-
-	//Shader uniforms
-	this.uniforms[ 'tDepth' ].value = this.depthRenderTarget.texture;
-	this.uniforms[ 'size' ].value.set( this.width, this.height );
-	this.uniforms[ 'cameraNear' ].value = this.camera2.near;
-	this.uniforms[ 'cameraFar' ].value = this.camera2.far;
-
-	this.uniforms[ 'radius' ].value = 4;
-	this.uniforms[ 'onlyAO' ].value = false;
-	this.uniforms[ 'aoClamp' ].value = 0.25;
-	this.uniforms[ 'lumInfluence' ].value = 0.7;
-
-	//Setters and getters for uniforms
-
-	Object.defineProperties( this, {
-
-		radius: {
-			get: function () {
-
-				return this.uniforms[ 'radius' ].value;
-
-			},
-			set: function ( value ) {
-
-				this.uniforms[ 'radius' ].value = value;
-
-			}
-		},
-
-		onlyAO: {
-			get: function () {
-
-				return this.uniforms[ 'onlyAO' ].value;
-
-			},
-			set: function ( value ) {
-
-				this.uniforms[ 'onlyAO' ].value = value;
-
-			}
-		},
-
-		aoClamp: {
-			get: function () {
-
-				return this.uniforms[ 'aoClamp' ].value;
-
-			},
-			set: function ( value ) {
-
-				this.uniforms[ 'aoClamp' ].value = value;
-
-			}
-		},
-
-		lumInfluence: {
-			get: function () {
-
-				return this.uniforms[ 'lumInfluence' ].value;
-
-			},
-			set: function ( value ) {
-
-				this.uniforms[ 'lumInfluence' ].value = value;
-
-			}
-		},
-
+	this.ssaoMaterial = new THREE.ShaderMaterial( {
+		defines: Object.assign( {}, THREE.SSAOShader.defines ),
+		uniforms: THREE.UniformsUtils.clone( THREE.SSAOShader.uniforms ),
+		vertexShader: THREE.SSAOShader.vertexShader,
+		fragmentShader: THREE.SSAOShader.fragmentShader,
+		blending: THREE.NoBlending
 	} );
 
+	this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+	this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+	this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
+	this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
+	this.ssaoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+	this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+	this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+
+	// normal material
+
+	this.normalMaterial = new THREE.MeshNormalMaterial();
+	this.normalMaterial.blending = THREE.NoBlending;
+
+	// blur material
+
+	this.blurMaterial = new THREE.ShaderMaterial( {
+		defines: Object.assign( {}, THREE.SSAOBlurShader.defines ),
+		uniforms: THREE.UniformsUtils.clone( THREE.SSAOBlurShader.uniforms ),
+		vertexShader: THREE.SSAOBlurShader.vertexShader,
+		fragmentShader: THREE.SSAOBlurShader.fragmentShader
+	} );
+	this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
+	this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+
+	// material for rendering the depth
+
+	this.depthRenderMaterial = new THREE.ShaderMaterial( {
+		defines: Object.assign( {}, THREE.SSAODepthShader.defines ),
+		uniforms: THREE.UniformsUtils.clone( THREE.SSAODepthShader.uniforms ),
+		vertexShader: THREE.SSAODepthShader.vertexShader,
+		fragmentShader: THREE.SSAODepthShader.fragmentShader,
+		blending: THREE.NoBlending
+	} );
+	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+	this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+
+	// material for rendering the content of a render target
+
+	this.copyMaterial = new THREE.ShaderMaterial( {
+		uniforms: THREE.UniformsUtils.clone( THREE.CopyShader.uniforms ),
+		vertexShader: THREE.CopyShader.vertexShader,
+		fragmentShader: THREE.CopyShader.fragmentShader,
+		transparent: true,
+		depthTest: false,
+		depthWrite: false,
+		blendSrc: THREE.DstColorFactor,
+		blendDst: THREE.ZeroFactor,
+		blendEquation: THREE.AddEquation,
+		blendSrcAlpha: THREE.DstAlphaFactor,
+		blendDstAlpha: THREE.ZeroFactor,
+		blendEquationAlpha: THREE.AddEquation
+	} );
+
+	this.fsQuad = new THREE.Pass.FullScreenQuad( null );
+
+	this.originalClearColor = new THREE.Color();
+
 };
 
-THREE.SSAOPass.prototype = Object.create( THREE.ShaderPass.prototype );
+THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-/**
- * Render using this pass.
- *
- * @method render
- * @param {WebGLRenderer} renderer
- * @param {WebGLRenderTarget} writeBuffer Buffer to write output.
- * @param {WebGLRenderTarget} readBuffer Input buffer.
- * @param {Number} delta Delta time in milliseconds.
- * @param {Boolean} maskActive Not used in this pass.
- */
-THREE.SSAOPass.prototype.render = function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	constructor: THREE.SSAOPass,
 
-	//Render depth into depthRenderTarget
-	this.scene2.overrideMaterial = this.depthMaterial;
+	dispose: function () {
 
-	renderer.render( this.scene2, this.camera2, this.depthRenderTarget, true );
+		// dispose render targets
 
-	this.scene2.overrideMaterial = null;
+		this.beautyRenderTarget.dispose();
+		this.normalRenderTarget.dispose();
+		this.ssaoRenderTarget.dispose();
+		this.blurRenderTarget.dispose();
 
+		// dispose geometry
 
-	//SSAO shaderPass
-	THREE.ShaderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, delta, maskActive );
+		this.quad.geometry.dispose();
 
-};
+		// dispose materials
 
-/**
- * Change scene to be renderer by this render pass.
- *
- * @method setScene
- * @param {Scene} scene
- */
-THREE.SSAOPass.prototype.setScene = function ( scene ) {
+		this.normalMaterial.dispose();
+		this.blurMaterial.dispose();
+		this.copyMaterial.dispose();
+		this.depthRenderMaterial.dispose();
 
-	this.scene2 = scene;
+	},
 
-};
+	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
-/**
- * Set camera used by this render pass.
- *
- * @method setCamera
- * @param {Camera} camera
- */
-THREE.SSAOPass.prototype.setCamera = function ( camera ) {
+		// render beauty and depth
 
-	this.camera2 = camera;
+		renderer.setRenderTarget( this.beautyRenderTarget );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
-	this.uniforms[ 'cameraNear' ].value = this.camera2.near;
-	this.uniforms[ 'cameraFar' ].value = this.camera2.far;
+		// render normals
 
-};
+		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
 
-/**
- * Set resolution of this render pass.
- *
- * @method setSize
- * @param {Number} width
- * @param {Number} height
- */
-THREE.SSAOPass.prototype.setSize = function ( width, height ) {
+		// render SSAO
 
-	this.width = width;
-	this.height = height;
+		this.ssaoMaterial.uniforms[ 'kernelRadius' ].value = this.kernelRadius;
+		this.ssaoMaterial.uniforms[ 'minDistance' ].value = this.minDistance;
+		this.ssaoMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
+		this.renderPass( renderer, this.ssaoMaterial, this.ssaoRenderTarget );
 
-	this.uniforms[ 'size' ].value.set( this.width, this.height );
-	this.depthRenderTarget.setSize( this.width, this.height );
+		// render blur
 
+		this.renderPass( renderer, this.blurMaterial, this.blurRenderTarget );
+
+		// output result to screen
+
+		switch ( this.output ) {
+
+			case THREE.SSAOPass.OUTPUT.SSAO:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
+				this.copyMaterial.blending = THREE.NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case THREE.SSAOPass.OUTPUT.Blur:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
+				this.copyMaterial.blending = THREE.NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case THREE.SSAOPass.OUTPUT.Beauty:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+				this.copyMaterial.blending = THREE.NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case THREE.SSAOPass.OUTPUT.Depth:
+
+				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case THREE.SSAOPass.OUTPUT.Normal:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
+				this.copyMaterial.blending = THREE.NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			case THREE.SSAOPass.OUTPUT.Default:
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+				this.copyMaterial.blending = THREE.NoBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
+				this.copyMaterial.blending = THREE.CustomBlending;
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+
+				break;
+
+			default:
+				console.warn( 'THREE.SSAOPass: Unknown output type.' );
+
+		}
+
+	},
+
+	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+
+		// save original state
+		this.originalClearColor.copy( renderer.getClearColor() );
+		var originalClearAlpha = renderer.getClearAlpha();
+		var originalAutoClear = renderer.autoClear;
+
+		renderer.setRenderTarget( renderTarget );
+
+		// setup pass state
+		renderer.autoClear = false;
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
+
+			renderer.setClearColor( clearColor );
+			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
+
+		}
+
+		this.fsQuad.material = passMaterial;
+		this.fsQuad.render( renderer );
+
+		// restore original state
+		renderer.autoClear = originalAutoClear;
+		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearAlpha( originalClearAlpha );
+
+	},
+
+	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+
+		this.originalClearColor.copy( renderer.getClearColor() );
+		var originalClearAlpha = renderer.getClearAlpha();
+		var originalAutoClear = renderer.autoClear;
+
+		renderer.setRenderTarget( renderTarget );
+		renderer.autoClear = false;
+
+		clearColor = overrideMaterial.clearColor || clearColor;
+		clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
+
+		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
+
+			renderer.setClearColor( clearColor );
+			renderer.setClearAlpha( clearAlpha || 0.0 );
+			renderer.clear();
+
+		}
+
+		this.scene.overrideMaterial = overrideMaterial;
+		renderer.render( this.scene, this.camera );
+		this.scene.overrideMaterial = null;
+
+		// restore original state
+
+		renderer.autoClear = originalAutoClear;
+		renderer.setClearColor( this.originalClearColor );
+		renderer.setClearAlpha( originalClearAlpha );
+
+	},
+
+	setSize: function ( width, height ) {
+
+		this.width = width;
+		this.height = height;
+
+		this.beautyRenderTarget.setSize( width, height );
+		this.ssaoRenderTarget.setSize( width, height );
+		this.normalRenderTarget.setSize( width, height );
+		this.blurRenderTarget.setSize( width, height );
+
+		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
+		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+
+		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
+
+	},
+
+	generateSampleKernel: function () {
+
+		var kernelSize = this.kernelSize;
+		var kernel = this.kernel;
+
+		for ( var i = 0; i < kernelSize; i ++ ) {
+
+			var sample = new THREE.Vector3();
+			sample.x = ( Math.random() * 2 ) - 1;
+			sample.y = ( Math.random() * 2 ) - 1;
+			sample.z = Math.random();
+
+			sample.normalize();
+
+			var scale = i / kernelSize;
+			scale = THREE.Math.lerp( 0.1, 1, scale * scale );
+			sample.multiplyScalar( scale );
+
+			kernel.push( sample );
+
+		}
+
+	},
+
+	generateRandomKernelRotations: function () {
+
+		var width = 4, height = 4;
+
+		if ( THREE.SimplexNoise === undefined ) {
+
+			console.error( 'THREE.SSAOPass: The pass relies on THREE.SimplexNoise.' );
+
+		}
+
+		var simplex = new THREE.SimplexNoise();
+
+		var size = width * height;
+		var data = new Float32Array( size * 4 );
+
+		for ( var i = 0; i < size; i ++ ) {
+
+			var stride = i * 4;
+
+			var x = ( Math.random() * 2 ) - 1;
+			var y = ( Math.random() * 2 ) - 1;
+			var z = 0;
+
+			var noise = simplex.noise3d( x, y, z );
+
+			data[ stride ] = noise;
+			data[ stride + 1 ] = noise;
+			data[ stride + 2 ] = noise;
+			data[ stride + 3 ] = 1;
+
+		}
+
+		this.noiseTexture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat, THREE.FloatType );
+		this.noiseTexture.wrapS = THREE.RepeatWrapping;
+		this.noiseTexture.wrapT = THREE.RepeatWrapping;
+		this.noiseTexture.needsUpdate = true;
+
+	}
+
+} );
+
+THREE.SSAOPass.OUTPUT = {
+	'Default': 0,
+	'SSAO': 1,
+	'Blur': 2,
+	'Beauty': 3,
+	'Depth': 4,
+	'Normal': 5
 };

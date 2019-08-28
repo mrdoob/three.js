@@ -4,32 +4,8 @@
 		<title>three.js webaudio - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family: Monospace;
-			}
-
-			#info {
-				position: absolute;
-				z-index: 2;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
 			#overlay {
 				position: absolute;
 				z-index: 1;
@@ -45,53 +21,50 @@
 				color: #ffffff;
 			}
 
-			#overlay > div {
-				text-align: center;
-			}
+				#overlay > div {
+					text-align: center;
+				}
 
-			#overlay > div > button {
-				height: 20px;
-				width: 100px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
+				#overlay > div > button {
+					height: 20px;
+					width: 100px;
+					background: transparent;
+					color: #ffffff;
+					outline: 1px solid #ffffff;
+					border: 0px;
+					cursor: pointer;
+				}
 
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
+				#overlay > div > p {
+					color: #777777;
+					font-size: 12px;
+				}
 		</style>
 	</head>
 	<body>
 		<div id="overlay">
 			<div>
 				<button id="startButton">Click to Play</button>
-				<p>Automatic audio playback requires a user interaction.</p>
+				<p>Audio playback requires user interaction.</p>
 			</div>
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox |
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox<br/>
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener">larrylarrybb</a>,
 			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a> and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			var camera, controls, scene, renderer;
-			var light, pointLight;
+			var camera, controls, scene, renderer, light;
 
 			var material1, material2, material3;
 
@@ -131,15 +104,17 @@
 				var audioLoader = new THREE.AudioLoader();
 
 				var mesh1 = new THREE.Mesh( sphere, material1 );
-				mesh1.position.set( -250, 30, 0 );
+				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
 				var sound1 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/358232_j_s_song.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
+
 					sound1.setBuffer( buffer );
 					sound1.setRefDistance( 20 );
 					sound1.play();
-				});
+
+				} );
 				mesh1.add( sound1 );
 
 				//
@@ -149,17 +124,19 @@
 				scene.add( mesh2 );
 
 				var sound2 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
+
 					sound2.setBuffer( buffer );
 					sound2.setRefDistance( 20 );
 					sound2.play();
-				});
+
+				} );
 				mesh2.add( sound2 );
 
 				//
 
 				var mesh3 = new THREE.Mesh( sphere, material3 );
-				mesh3.position.set( 0, 30, -250 );
+				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
 				var sound3 = new THREE.PositionalAudio( listener );
@@ -181,12 +158,14 @@
 				// global ambient audio
 
 				var sound4 = new THREE.Audio( listener );
-				audioLoader.load( 'sounds/Project_Utopia.ogg', function( buffer ) {
+				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
+
 					sound4.setBuffer( buffer );
-					sound4.setLoop(true);
-					sound4.setVolume(0.5);
+					sound4.setLoop( true );
+					sound4.setVolume( 0.5 );
 					sound4.play();
-				});
+
+				} );
 
 				// ground
 
@@ -196,24 +175,24 @@
 
 				//
 
-				var SoundControls = function() {
+				var SoundControls = function () {
 
 					this.master = listener.getMasterVolume();
-					this.firstSphere =  sound1.getVolume();
-					this.secondSphere =  sound2.getVolume();
+					this.firstSphere = sound1.getVolume();
+					this.secondSphere = sound2.getVolume();
 					this.thirdSphere = sound3.getVolume();
-					this.Ambient =  sound4.getVolume();
+					this.Ambient = sound4.getVolume();
 
 				};
 
-				var GeneratorControls = function() {
+				var GeneratorControls = function () {
 
 					this.frequency = oscillator.frequency.value;
 					this.wavetype = oscillator.type;
 
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var soundControls = new SoundControls();
 				var generatorControls = new GeneratorControls();
 				var volumeFolder = gui.addFolder( 'sound volume' );
@@ -268,7 +247,7 @@
 
 				//
 
-				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+				controls = new FirstPersonControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 70;
 				controls.lookSpeed = 0.05;

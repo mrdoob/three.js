@@ -519,13 +519,23 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	setPosition: function ( v ) {
+	setPosition: function ( x, y, z ) {
 
 		var te = this.elements;
 
-		te[ 12 ] = v.x;
-		te[ 13 ] = v.y;
-		te[ 14 ] = v.z;
+		if ( x.isVector3 ) {
+
+			te[ 12 ] = x.x;
+			te[ 13 ] = x.y;
+			te[ 14 ] = x.z;
+
+		} else {
+
+			te[ 12 ] = x;
+			te[ 13 ] = y;
+			te[ 14 ] = z;
+
+		}
 
 		return this;
 
@@ -750,27 +760,27 @@ Object.assign( Matrix4.prototype, {
 
 		var sx = scale.x, sy = scale.y, sz = scale.z;
 
-	        te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
-	        te[ 1 ] = ( xy + wz ) * sx;
-	        te[ 2 ] = ( xz - wy ) * sx;
-	        te[ 3 ] = 0;
+		te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
+		te[ 1 ] = ( xy + wz ) * sx;
+		te[ 2 ] = ( xz - wy ) * sx;
+		te[ 3 ] = 0;
 
-	        te[ 4 ] = ( xy - wz ) * sy;
-	        te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
-	        te[ 6 ] = ( yz + wx ) * sy;
-	        te[ 7 ] = 0;
+		te[ 4 ] = ( xy - wz ) * sy;
+		te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
+		te[ 6 ] = ( yz + wx ) * sy;
+		te[ 7 ] = 0;
 
-	        te[ 8 ] = ( xz + wy ) * sz;
-	        te[ 9 ] = ( yz - wx ) * sz;
-	        te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
-	        te[ 11 ] = 0;
+		te[ 8 ] = ( xz + wy ) * sz;
+		te[ 9 ] = ( yz - wx ) * sz;
+		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
+		te[ 11 ] = 0;
 
-	        te[ 12 ] = position.x;
-	        te[ 13 ] = position.y;
-	        te[ 14 ] = position.z;
-	        te[ 15 ] = 1;
+		te[ 12 ] = position.x;
+		te[ 13 ] = position.y;
+		te[ 14 ] = position.z;
+		te[ 15 ] = 1;
 
-	        return this;
+		return this;
 
 	},
 

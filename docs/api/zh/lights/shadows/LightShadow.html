@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			这在 [page:PointLight PointLights] 内部用于计算阴影，也可用作其他阴影类的基类。
+		</p>
+
+
+		<h2>例子</h2>
+		<p>
+			<code>
+//Create a WebGLRenderer and turn on shadows in the renderer
+var renderer = new THREE.WebGLRenderer();
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+//Create a PointLight and turn on shadows for the light
+var light = new THREE.PointLight( 0xffffff, 1, 100 );
+light.position.set( 0, 10, 0 );
+light.castShadow = true;            // default false
+scene.add( light );
+
+//Set up shadow properties for the light
+light.shadow.mapSize.width = 512;  // default
+light.shadow.mapSize.height = 512; // default
+light.shadow.camera.near = 0.5;       // default
+light.shadow.camera.far = 500      // default
+
+//Create a sphere that cast shadows (but does not receive them)
+var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+sphere.castShadow = true; //default is false
+sphere.receiveShadow = false; //default
+scene.add( sphere );
+
+//Create a plane that receives shadows (but does not cast them)
+var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
+var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
+scene.add( plane );
+
+//Create a helper for the shadow camera (optional)
+var helper = new THREE.CameraHelper( light.shadow.camera );
+scene.add( helper );
+			</code>
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+		[page:Camera camera] - 在光的世界里<br /><br />
+
+			创建一个新的[name]。这不能直接调用的 - 它由[page:PointLight]在内部调用，或者由其他阴影用作基类。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			光的世界里。这用于生成场景的深度图;从光的角度来看，其他物体背后的物体将处于阴影中。
+		</p>
+
+		<h3>[property:Float bias]</h3>
+		<p>
+			阴影贴图偏差，在确定曲面是否在阴影中时，从标准化深度添加或减去多少。<br />
+			默认值为0.此处非常小的调整（大约0.0001）可能有助于减少阴影中的伪影
+		</p>
+
+		<h3>[property:WebGLRenderTarget map]</h3>
+		<p>
+			使用内置摄像头生成的深度图;超出像素深度的位置在阴影中。在渲染期间内部计算。
+		</p>
+
+
+		<h3>[property:Vector2 mapSize]</h3>
+		<p>
+			一个[Page:Vector2]定义阴影贴图的宽度和高度。<br /><br />
+
+			较高的值会以计算时间为代价提供更好的阴影质量。值必须是2的幂，直到给定设备的[page:WebGLRenderer.capabilities].maxTextureSize，
+			虽然宽度和高度不必相同（例如，（512,1024）有效）。
+			默认值为*（512,512）*。
+		</p>
+
+
+		<h3>[property:Matrix4 matrix]</h3>
+		<p>
+			模拟阴影相机空间，计算阴影贴图中的位置和深度。存储在[page:Matrix4 Matrix4]中。这是在渲染期间内部计算的。
+		</p>
+
+		<h3>[property:Float radius]</h3>
+		<p>
+			将此值设置为大于1的值将模糊阴影的边缘。<br />
+
+
+			较高的值会在阴影中产生不必要的条带效果 - 更大的[page:.mapSize mapSize]将允许在这些效果变得可见之前使用更高的值。<br /><br />
+
+			请注意，如果[page：WebGLRenderer.shadowMap.type]设置为[page:Renderer BasicShadowMap]，将会无效。
+
+		</p>
+
+
+		<h2>方法</h2>
+		<h3>[method:LightShadow copy]( [param:LightShadow source] )</h3>
+		<p>
+			将[page:LightShadow]中的所有属性的值复制到 SpotLight。
+		</p>
+
+		<h3>[method:LightShadow clone]()</h3>
+		<p>
+			克隆与此相同属性的新LightShadow。
+		</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			序列化这个LightShadow。
+		</p>
+
+		<h2>源码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+	</body>
+</html>

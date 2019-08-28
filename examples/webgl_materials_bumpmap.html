@@ -4,53 +4,22 @@
 		<title>three.js webgl - materials - bump map [Lee Perry-Smith]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #ffffff;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			#oldie {
-				background:rgb(200,100,0) !important;
-				color:#fff;
-			}
-
-			#vt { display:none }
-			#vt, #vt a { color:orange; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl bump mapping without tangents -
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - bump mapping without tangents<br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var statsEnabled = true;
 
@@ -106,11 +75,11 @@
 
 				spotLight.shadow.camera.fov = 40;
 
-				spotLight.shadow.bias = -0.005;
+				spotLight.shadow.bias = - 0.005;
 
 				//
 
-				var mapHeight = new THREE.TextureLoader().load( "models/json/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var mapHeight = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0x552811,
@@ -120,8 +89,12 @@
 					bumpScale: 12
 				} );
 
-				loader = new THREE.JSONLoader();
-				loader.load( "models/json/leeperrysmith/LeePerrySmith.json", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader = new GLTFLoader();
+				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+
+					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
+
+				} );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -167,7 +140,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

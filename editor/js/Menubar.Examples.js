@@ -4,12 +4,14 @@
 
 Menubar.Examples = function ( editor ) {
 
+	var strings = editor.strings;
+
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 
 	var title = new UI.Panel();
 	title.setClass( 'title' );
-	title.setTextContent( 'Examples' );
+	title.setTextContent( strings.getKey( 'menubar/examples' ) );
 	container.add( title );
 
 	var options = new UI.Panel();

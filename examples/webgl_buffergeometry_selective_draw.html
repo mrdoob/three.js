@@ -4,31 +4,7 @@
 	<title>three.js webgl - buffergeometry - selective - draw</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-	body {
-		color: #cccccc;
-		font-family:Monospace;
-		font-size:13px;
-		text-align:center;
-
-		background-color: #050505;
-		margin: 0px;
-		overflow: hidden;
-	}
-
-	#info {
-		position: absolute;
-		top: 0px; width: 100%;
-		padding: 5px;
-	}
-
-	a {
-		color: #0080ff;
-	}
-	</style>
-	<script type="text/javascript" src="../build/three.js"></script>
-	<script type="text/javascript" src="js/Detector.js"></script>
-	<script type="text/javascript" src="js/libs/stats.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="main.css">
 
 	<script type="x-shader/x-vertex" id="vertexshader">
 		attribute float visible;
@@ -59,7 +35,7 @@
 				discard;
 
 			}
-			
+
 		}
 	</script>
 	</head>
@@ -67,178 +43,186 @@
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> buffergeometry - selective - draw
 			<div id="title"></div>
-			<div id="ui"><a href="#" onclick="hideLines();">CULL SOME LINES</a> - <a href="#" onclick="showAllLines();">SHOW ALL LINES</a></div>
+			<div id="ui"><a href="#" id="hideLines">CULL SOME LINES</a> - <a href="#" id="showAllLines">SHOW ALL LINES</a></div>
 		</div>
 
-		<script>
+		<script type="module">
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
-		var camera, scene, renderer, stats;
-		var geometry, mesh;
-		var numLat = 100;
-		var numLng = 200;
-		var numLinesCulled = 0;
+			import Stats from './jsm/libs/stats.module.js';
 
-		init();
-		animate();
+			var camera, scene, renderer, stats;
+			var geometry, mesh;
+			var numLat = 100;
+			var numLng = 200;
+			var numLinesCulled = 0;
 
-		function init() {
+			init();
+			animate();
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
+			function init() {
 
-			scene = new THREE.Scene();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
-			camera.position.z = 3.5;
+				scene = new THREE.Scene();
 
-			scene.add( new THREE.AmbientLight( 0x444444 ) );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.z = 3.5;
 
-			stats = new Stats();
-			document.body.appendChild( stats.dom );
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
-			addLines( 1.0 );
+				window.addEventListener( 'resize', onWindowResize, false );
 
-		}
+				addLines( 1.0 );
 
-		function addLines( radius ) {
+				var hideLinesButton = document.getElementById( 'hideLines' );
+				hideLinesButton.addEventListener( 'click', hideLines );
 
-			geometry = new THREE.BufferGeometry();
-			var linePositions = new Float32Array( numLat * numLng * 3 * 2 );
-			var lineColors = new Float32Array( numLat * numLng * 3 * 2 );
-			var visible = new Float32Array( numLat * numLng * 2 );
-
-			for ( var i = 0; i < numLat; ++ i ) {
-
-				for ( var j = 0; j < numLng; ++ j ) {
-
-					var lat = ( Math.random() * Math.PI ) / 50.0 + i / numLat * Math.PI;
-					var lng = ( Math.random() * Math.PI ) / 50.0 + j / numLng * 2 * Math.PI;
-
-					var index = i * numLng + j;
-
-					linePositions[ index * 6 + 0 ] = 0;
-					linePositions[ index * 6 + 1 ] = 0;
-					linePositions[ index * 6 + 2 ] = 0;
-					linePositions[ index * 6 + 3 ] = radius * Math.sin( lat ) * Math.cos( lng );
-					linePositions[ index * 6 + 4 ] = radius * Math.cos( lat );
-					linePositions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
-
-					var color = new THREE.Color( 0xffffff );
-
-					color.setHSL( lat / Math.PI, 1.0, 0.2 );
-					lineColors[ index * 6 + 0 ] = color.r;
-					lineColors[ index * 6 + 1 ] = color.g;
-					lineColors[ index * 6 + 2 ] = color.b;
-
-					color.setHSL( lat / Math.PI, 1.0, 0.7 );
-					lineColors[ index * 6 + 3 ] = color.r;
-					lineColors[ index * 6 + 4 ] = color.g;
-					lineColors[ index * 6 + 5 ] = color.b;
-
-					// non-0 is visible
-					visible[ index * 2 + 0 ] = 1.0;
-					visible[ index * 2 + 1 ] = 1.0;
-
-				}
+				var showAllLinesButton = document.getElementById( 'showAllLines' );
+				showAllLinesButton.addEventListener( 'click', showAllLines );
 
 			}
 
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
-			geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
-			geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
+			function addLines( radius ) {
 
-			geometry.computeBoundingSphere();
+				geometry = new THREE.BufferGeometry();
+				var linePositions = new Float32Array( numLat * numLng * 3 * 2 );
+				var lineColors = new Float32Array( numLat * numLng * 3 * 2 );
+				var visible = new Float32Array( numLat * numLng * 2 );
 
-			var shaderMaterial = new THREE.ShaderMaterial( {
+				for ( var i = 0; i < numLat; ++ i ) {
 
-				vertexShader: document.getElementById( 'vertexshader' ).textContent,
-				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
-			} );
+					for ( var j = 0; j < numLng; ++ j ) {
 
-			mesh = new THREE.LineSegments( geometry, shaderMaterial );
-			scene.add( mesh );
+						var lat = ( Math.random() * Math.PI ) / 50.0 + i / numLat * Math.PI;
+						var lng = ( Math.random() * Math.PI ) / 50.0 + j / numLng * 2 * Math.PI;
 
-			updateCount();
+						var index = i * numLng + j;
 
-		}
+						linePositions[ index * 6 + 0 ] = 0;
+						linePositions[ index * 6 + 1 ] = 0;
+						linePositions[ index * 6 + 2 ] = 0;
+						linePositions[ index * 6 + 3 ] = radius * Math.sin( lat ) * Math.cos( lng );
+						linePositions[ index * 6 + 4 ] = radius * Math.cos( lat );
+						linePositions[ index * 6 + 5 ] = radius * Math.sin( lat ) * Math.sin( lng );
 
-		function updateCount() {
+						var color = new THREE.Color( 0xffffff );
 
-			var str = '1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
-			document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
+						color.setHSL( lat / Math.PI, 1.0, 0.2 );
+						lineColors[ index * 6 + 0 ] = color.r;
+						lineColors[ index * 6 + 1 ] = color.g;
+						lineColors[ index * 6 + 2 ] = color.b;
 
-		}
+						color.setHSL( lat / Math.PI, 1.0, 0.7 );
+						lineColors[ index * 6 + 3 ] = color.r;
+						lineColors[ index * 6 + 4 ] = color.g;
+						lineColors[ index * 6 + 5 ] = color.b;
 
-		function hideLines() {
-
-			for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
-
-				if ( Math.random() > 0.75 ) {
-
-					if ( geometry.attributes.visible.array[ i + 0 ] ) {
-
-						++ numLinesCulled;
+						// non-0 is visible
+						visible[ index * 2 + 0 ] = 1.0;
+						visible[ index * 2 + 1 ] = 1.0;
 
 					}
 
-					geometry.attributes.visible.array[ i + 0 ] = 0;
-					geometry.attributes.visible.array[ i + 1 ] = 0;
+				}
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+				geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
+				geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
+
+				geometry.computeBoundingSphere();
+
+				var shaderMaterial = new THREE.ShaderMaterial( {
+
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+				} );
+
+				mesh = new THREE.LineSegments( geometry, shaderMaterial );
+				scene.add( mesh );
+
+				updateCount();
+
+			}
+
+			function updateCount() {
+
+				var str = '1 draw call, ' + numLat * numLng + ' lines, ' + numLinesCulled + ' culled (<a target="_blank" href="http://callum.com">author</a>)';
+				document.getElementById( 'title' ).innerHTML = str.replace( /\B(?=(\d{3})+(?!\d))/g, "," );
+
+			}
+
+			function hideLines() {
+
+				for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
+
+					if ( Math.random() > 0.75 ) {
+
+						if ( geometry.attributes.visible.array[ i + 0 ] ) {
+
+							++ numLinesCulled;
+
+						}
+
+						geometry.attributes.visible.array[ i + 0 ] = 0;
+						geometry.attributes.visible.array[ i + 1 ] = 0;
+
+					}
 
 				}
 
-			}
+				geometry.attributes.visible.needsUpdate = true;
 
-			geometry.attributes.visible.needsUpdate = true;
-
-			updateCount();
-
-		}
-
-		function showAllLines() {
-
-			numLinesCulled = 0;
-
-			for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
-
-				geometry.attributes.visible.array[ i + 0 ] = 1;
-				geometry.attributes.visible.array[ i + 1 ] = 1;
+				updateCount();
 
 			}
 
-			geometry.attributes.visible.needsUpdate = true;
+			function showAllLines() {
 
-			updateCount();
+				numLinesCulled = 0;
 
-		}
+				for ( var i = 0; i < geometry.attributes.visible.array.length; i += 2 ) {
 
-		function onWindowResize() {
+					geometry.attributes.visible.array[ i + 0 ] = 1;
+					geometry.attributes.visible.array[ i + 1 ] = 1;
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
+				}
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+				geometry.attributes.visible.needsUpdate = true;
 
-		}
+				updateCount();
 
-		function animate( time ) {
+			}
 
-			requestAnimationFrame( animate );
+			function onWindowResize() {
 
-			var time = Date.now() * 0.001;
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-			mesh.rotation.x = time * 0.25;
-			mesh.rotation.y = time * 0.5;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			stats.update();
-			renderer.render( scene, camera );
+			}
 
-		}
+			function animate( time ) {
+
+				requestAnimationFrame( animate );
+
+				var time = Date.now() * 0.001;
+
+				mesh.rotation.x = time * 0.25;
+				mesh.rotation.y = time * 0.5;
+
+				stats.update();
+				renderer.render( scene, camera );
+
+			}
 
 		</script>
 	</body>

@@ -23,7 +23,7 @@ var light = new THREE.RectAreaLight( 0xffffbb, 1.0, 5, 5 );
 
 var helper = new THREE.RectAreaLightHelper( light );
 
-scene.add( helper );
+light.add( helper ); // helper must be added as a child of the light
 		</code>
 
 

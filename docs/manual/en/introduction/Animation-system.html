@@ -52,13 +52,13 @@
 		<p class="desc">
 
 			Inside of such an *AnimationClip* the data for each animated property are stored in a
-			separate [page:KeyframeTrack]. Assumed a character object has a [page:Skeleton skeleton],
+			separate [page:KeyframeTrack]. Assuming a character object has a [page:Skeleton skeleton],
 			one keyframe track could store the data for the position changes of the lower arm bone
 			over time, a different track the data for the rotation changes of the same bone, a third
 			the track position, rotation or scaling of another bone, and so on. It should be clear,
 			that an AnimationClip can be composed of lots of such tracks.<br /><br />
 
-			Assumed the model has [page:Geometry.morphTargets morph targets] (for example one morph
+			Assuming the model has [page:Geometry.morphTargets morph targets] (for example one morph
 			target showing a friendly face and another showing an angry face), each track holds the
 			information as to how the [page:Mesh.morphTargetInfluences influence] of a certain morph
 			target changes during the performance of the clip.
@@ -69,7 +69,7 @@
 
 		<p class="desc">
 
-			The stored data form only the basis for the animations - actual playback is controlled by
+			The stored data forms only the basis for the animations - actual playback is controlled by
 			the [page:AnimationMixer]. You can imagine this not only as a player for animations, but
 			as a simulation of a hardware like a real mixer console, which can control several animations
 			simultaneously, blending and merging them.
@@ -107,7 +107,6 @@
 		</p>
 
 			<ul>
-				<li>[page:JSONLoader THREE.JSONLoader]</li>
 				<li>[page:ObjectLoader THREE.ObjectLoader]</li>
 				<li>THREE.BVHLoader</li>
 				<li>THREE.ColladaLoader</li>

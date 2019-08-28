@@ -4,59 +4,36 @@
 		<title>three.js webgl - postprocessing backgrounds</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			a { color: #88f; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
+			by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ClearPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/CubeTexturePass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
+			import { CubeTexturePass } from './jsm/postprocessing/CubeTexturePass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var scene, renderer, composer;
 			var clearPass, texturePass, renderPass;
 			var cameraP, cubeTexturePassP;
-			//var cameraO, cubeTexturePassO;
-			var gui, stats, texture;
+			var gui, stats;
 
 			var params = {
 
@@ -71,11 +48,6 @@
 				cubeTexturePassOpacity: 1.0,
 
 				renderPass: true
-
-				//autoRotate: true,
-
-				//camera: 'perspective'
-
 			};
 
 			init();
@@ -87,7 +59,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( params, "clearPass" );
 				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
@@ -100,10 +72,6 @@
 				gui.add( params, "cubeTexturePassOpacity", 0, 1 );
 
 				gui.add( params, "renderPass" );
-
-				//gui.add( params, "autoRotate" );
-
-				//gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
 
 				gui.open();
 
@@ -131,14 +99,6 @@
 				cameraP = new THREE.PerspectiveCamera( 65, aspect, 1, 10 );
 				cameraP.position.z = 7;
 
-			//	cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
-			//	cameraO.position.z = 7;
-
-			//	var fov = THREE.Math.degToRad( cameraP.fov );
-			//	var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
-			//	var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
-			//	cameraO.zoom = height / _height;
-
 				scene = new THREE.Scene();
 
 				var group = new THREE.Group();
@@ -146,20 +106,20 @@
 
 				var light = new THREE.PointLight( 0xddffdd, 1.0 );
 				light.position.z = 70;
-				light.position.y = -70;
-				light.position.x = -70;
+				light.position.y = - 70;
+				light.position.x = - 70;
 				scene.add( light );
 
 				var light2 = new THREE.PointLight( 0xffdddd, 1.0 );
 				light2.position.z = 70;
-				light2.position.x = -70;
+				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
 				var light3 = new THREE.PointLight( 0xddddff, 1.0 );
 				light3.position.z = 70;
 				light3.position.x = 70;
-				light3.position.y = -70;
+				light3.position.y = - 70;
 				scene.add( light3 );
 
 				var geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
@@ -174,45 +134,49 @@
 
 				// postprocessing
 
-				var genCubeUrls = function( prefix, postfix ) {
+				var genCubeUrls = function ( prefix, postfix ) {
+
 					return [
 						prefix + 'px' + postfix, prefix + 'nx' + postfix,
 						prefix + 'py' + postfix, prefix + 'ny' + postfix,
 						prefix + 'pz' + postfix, prefix + 'nz' + postfix
 					];
+
 				};
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				clearPass = new THREE.ClearPass( params.clearColor, params.clearAlpha );
+				clearPass = new ClearPass( params.clearColor, params.clearAlpha );
 				composer.addPass( clearPass );
 
-				texturePass = new THREE.TexturePass();
+				texturePass = new TexturePass();
 				composer.addPass( texturePass );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "textures/hardwood2_diffuse.jpg", function( map ) {
-					texturePass.map = map;
-				});
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
 
-				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
+					texturePass.map = map;
+
+				} );
+
+				cubeTexturePassP = new CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
-					cubeTexturePassP.envMap = ldrCubeMap;
-					console.log( "loaded envmap");
-				});
 
-				renderPass = new THREE.RenderPass( scene, cameraP );
+					cubeTexturePassP.envMap = ldrCubeMap;
+
+				} );
+
+				renderPass = new RenderPass( scene, cameraP );
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
-				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
+				var controls = new OrbitControls( cameraP, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -227,18 +191,8 @@
 				cameraP.aspect = aspect;
 				cameraP.updateProjectionMatrix();
 
-				/*cameraO.left = - height * aspect;
-				cameraO.right = height * aspect;
-				cameraO.top = height;
-				cameraO.bottom = - height;
-				cameraO.updateProjectionMatrix();*/
-
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 
@@ -251,12 +205,14 @@
 				cameraP.updateMatrixWorld( true );
 
 				var newColor = clearPass.clearColor;
-				switch( params.clearColor ) {
+				switch ( params.clearColor ) {
+
 					case 'blue': newColor = 0x0000ff; break;
 					case 'red': newColor = 0xff0000; break;
 					case 'green': newColor = 0x00ff00; break;
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
+
 				}
 
 				clearPass.enabled = params.clearPass;

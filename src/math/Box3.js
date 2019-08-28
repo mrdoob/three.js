@@ -1,5 +1,4 @@
 import { Vector3 } from './Vector3.js';
-import { Sphere } from './Sphere.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -384,7 +383,7 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		return ( min <= plane.constant && max >= plane.constant );
+		return ( min <= - plane.constant && max >= - plane.constant );
 
 	},
 
@@ -523,8 +522,8 @@ Object.assign( Box3.prototype, {
 
 			if ( target === undefined ) {
 
-				console.warn( 'THREE.Box3: .getBoundingSphere() target is now required' );
-				target = new Sphere();
+				console.error( 'THREE.Box3: .getBoundingSphere() target is now required' );
+				//target = new Sphere(); // removed to avoid cyclic dependency
 
 			}
 

@@ -4,29 +4,7 @@
 		<title>three.js webgl - postprocessing manual ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			a { color: #88f; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -37,25 +15,22 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SSAARenderPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { SSAARenderPass } from './jsm/postprocessing/SSAARenderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var scene, renderer, composer, copyPass;
 			var cameraP, ssaaRenderPassP;
 			var cameraO, ssaaRenderPassO;
-			var gui, stats, texture;
+			var gui, stats;
 
 			var params = {
 				sampleLevel: 4,
@@ -77,7 +52,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( params, "unbiased" );
 				gui.add( params, "renderToScreen" );
@@ -134,20 +109,20 @@
 
 				var light = new THREE.PointLight( 0xddffdd, 1.0 );
 				light.position.z = 70;
-				light.position.y = -70;
-				light.position.x = -70;
+				light.position.y = - 70;
+				light.position.x = - 70;
 				scene.add( light );
 
 				var light2 = new THREE.PointLight( 0xffdddd, 1.0 );
 				light2.position.z = 70;
-				light2.position.x = -70;
+				light2.position.x = - 70;
 				light2.position.y = 70;
 				scene.add( light2 );
 
 				var light3 = new THREE.PointLight( 0xddddff, 1.0 );
 				light3.position.z = 70;
 				light3.position.x = 70;
-				light3.position.y = -70;
+				light3.position.y = - 70;
 				scene.add( light3 );
 
 				var light3 = new THREE.AmbientLight( 0xffffff, 0.05 );
@@ -176,13 +151,13 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				ssaaRenderPassP = new THREE.SSAARenderPass( scene, cameraP );
+				composer = new EffectComposer( renderer );
+				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
+				ssaaRenderPassP = new SSAARenderPass( scene, cameraP );
 				composer.addPass( ssaaRenderPassP );
-				ssaaRenderPassO = new THREE.SSAARenderPass( scene, cameraO );
+				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
 				composer.addPass( ssaaRenderPassO );
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -205,11 +180,7 @@
 				cameraO.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth  = Math.floor( width / pixelRatio ) || 1;
-				var newHeight = Math.floor( height / pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 
@@ -219,7 +190,8 @@
 
 				stats.begin();
 
-				if( params.autoRotate ) {
+				if ( params.autoRotate ) {
+
 					for ( var i = 0; i < scene.children.length; i ++ ) {
 
 						var child = scene.children[ i ];
@@ -228,15 +200,18 @@
 						child.rotation.y += 0.01;
 
 					}
+
 				}
 
 				var newColor = ssaaRenderPassP.clearColor;
-				switch( params.clearColor ) {
+				switch ( params.clearColor ) {
+
 					case 'blue': newColor = 0x0000ff; break;
 					case 'red': newColor = 0xff0000; break;
 					case 'green': newColor = 0x00ff00; break;
 					case 'white': newColor = 0xffffff; break;
 					case 'black': newColor = 0x000000; break;
+
 				}
 				ssaaRenderPassP.clearColor = ssaaRenderPassO.clearColor = newColor;
 				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
@@ -247,8 +222,7 @@
 				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
 				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
 
-				ssaaRenderPassP.renderToScreen = ssaaRenderPassO.renderToScreen = params.renderToScreen;
-				copyPass.enabled = !params.renderToScreen;
+				copyPass.enabled = ! params.renderToScreen;
 
 				composer.render();
 

@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newParent THREE.Object3D
  * @param newBefore THREE.Object3D
  * @constructor
  */
 
-var MoveObjectCommand = function ( object, newParent, newBefore ) {
+var MoveObjectCommand = function ( editor, object, newParent, newBefore ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'MoveObjectCommand';
 	this.name = 'Move Object';

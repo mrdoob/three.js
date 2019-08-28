@@ -4,15 +4,15 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newMaterial THREE.Material
  * @constructor
  */
 
+var SetMaterialCommand = function ( editor, object, newMaterial, materialSlot ) {
 
-var SetMaterialCommand = function ( object, newMaterial, materialSlot ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetMaterialCommand';
 	this.name = 'New Material';

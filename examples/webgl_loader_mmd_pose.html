@@ -4,23 +4,15 @@
 		<title>three.js webgl - loaders - MMD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #fff;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
+			a {
+				color: #08f;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
 	</head>
 
@@ -33,35 +25,33 @@
 		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/libs/mmdparser.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
 
-		<script src="js/loaders/TGALoader.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
-		<script src="js/effects/OutlineEffect.js"></script>
-		<script src="js/animation/CCDIKSolver.js"></script>
-		<script src="js/animation/MMDPhysics.js"></script>
-		<script src="js/animation/MMDAnimationHelper.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			var container, stats;
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+
+			var container;
 
 			var camera, scene, renderer, effect;
 			var mesh, helper;
 
 			var vpds = [];
 
-			var clock = new THREE.Clock();
+			Ammo().then( function ( AmmoLib ) {
 
-			init();
-			animate();
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
 
 			function init() {
 
@@ -90,7 +80,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				// model
 
@@ -103,10 +93,7 @@
 
 					}
 
-				};
-
-				function onError( xhr ) {
-				};
+				}
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vpdFiles = [
@@ -123,9 +110,9 @@
 					'models/mmd/vpds/11.vpd'
 				];
 
-				helper = new THREE.MMDAnimationHelper();
+				helper = new MMDAnimationHelper();
 
-				var loader = new THREE.MMDLoader();
+				var loader = new MMDLoader();
 
 				loader.load( modelFile, function ( object ) {
 
@@ -156,13 +143,13 @@
 
 							}
 
-						}, onProgress, onError );
+						}, onProgress, null );
 
 					}
 
 					loadVpd();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
 				//
 
@@ -170,7 +157,7 @@
 
 				function initGui() {
 
-					var gui = new dat.GUI();
+					var gui = new GUI();
 
 					var dictionary = mesh.morphTargetDictionary;
 
@@ -196,7 +183,7 @@
 
 						controls.pose = - 1;
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							controls[ getBaseName( vpdFiles[ i ] ) ] = false;
 
@@ -218,7 +205,7 @@
 
 						var files = { default: - 1 };
 
-						for ( var i = 0; i < vpdFiles.length; i++ ) {
+						for ( var i = 0; i < vpdFiles.length; i ++ ) {
 
 							files[ getBaseName( vpdFiles[ i ] ) ] = i;
 
@@ -240,7 +227,7 @@
 
 					function onChangeMorph() {
 
-						for ( var i = 0; i < keys.length; i++ ) {
+						for ( var i = 0; i < keys.length; i ++ ) {
 
 							var key = keys[ i ];
 							var value = controls[ key ];

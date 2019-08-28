@@ -4,41 +4,20 @@
 		<title>three.js webgl - loaders - Clara.io JSON loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://clara.io" target="_blank" rel="noopener">Clara.io</a> JSON Scene/Object Load Test<br/>
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://clara.io" target="_blank" rel="noopener">Clara.io</a> JSON THREE.Scene/Object Load Test<br/>
 		More Information: <a href="https://clara.io/learn/user-guide/data_exchange/threejs_export" target="_blank" rel="noopener">Clara.io ThreeJS Export Documentation</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -73,8 +52,10 @@
 
 				// BEGIN Clara.io JSON loader code
 				var objectLoader = new THREE.ObjectLoader();
-				objectLoader.load("models/json/teapot-claraio.json", function ( obj ) {
+				objectLoader.load( "models/json/teapot-claraio.json", function ( obj ) {
+
 				 	scene.add( obj );
+
 				} );
 				// END Clara.io JSON loader code
 

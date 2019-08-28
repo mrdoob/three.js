@@ -2,8 +2,6 @@
  * @author sunag / http://www.sunag.com.br
  */
 
-'use strict';
-
 THREE.SkeletonUtils = {
 
 	retarget: function () {
@@ -11,7 +9,6 @@ THREE.SkeletonUtils = {
 		var pos = new THREE.Vector3(),
 			quat = new THREE.Quaternion(),
 			scale = new THREE.Vector3(),
-			hipPosition = new THREE.Vector3(),
 			bindBoneMatrix = new THREE.Matrix4(),
 			relativeMatrix = new THREE.Matrix4(),
 			globalMatrix = new THREE.Matrix4();
@@ -93,7 +90,7 @@ THREE.SkeletonUtils = {
 						bone.updateMatrixWorld();
 
 					}
-					
+
 					bindBones.push( bone.matrixWorld.clone() );
 
 				}
@@ -112,7 +109,7 @@ THREE.SkeletonUtils = {
 				if ( boneTo ) {
 
 					boneTo.updateMatrixWorld();
-					
+
 					if ( options.useTargetMatrix ) {
 
 						relativeMatrix.copy( boneTo.matrixWorld );
@@ -158,11 +155,11 @@ THREE.SkeletonUtils = {
 				}
 
 				if ( options.preserveHipPosition && name === options.hip ) {
-					
+
 					bone.matrix.setPosition( pos.set( 0, bone.position.y, 0 ) );
-					
+
 				}
-				
+
 				bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
 				bone.updateMatrixWorld();
@@ -218,7 +215,7 @@ THREE.SkeletonUtils = {
 			bones = this.getBones( target.skeleton ),
 			boneDatas = [],
 			positionOffset,
-			bone, boneTo, boneData, 
+			bone, boneTo, boneData,
 			name, i, j;
 
 		mixer.clipAction( clip ).play();
@@ -235,7 +232,7 @@ THREE.SkeletonUtils = {
 			for ( j = 0; j < bones.length; ++ j ) {
 
 				name = options.names[ bones[ j ].name ] || bones[ j ].name;
-				
+
 				boneTo = this.getBoneByName( name, source.skeleton );
 
 				if ( boneTo ) {
@@ -326,16 +323,16 @@ THREE.SkeletonUtils = {
 		return new THREE.AnimationClip( clip.name, - 1, convertedTracks );
 
 	},
-	
-	getHelperFromSkeleton: function( skeleton ) {
-		
+
+	getHelperFromSkeleton: function ( skeleton ) {
+
 		var source = new THREE.SkeletonHelper( skeleton.bones[ 0 ] );
 		source.skeleton = skeleton;
-		
+
 		return source;
-		
+
 	},
-	
+
 	getSkeletonOffsets: function () {
 
 		var targetParentPos = new THREE.Vector3(),
@@ -356,50 +353,50 @@ THREE.SkeletonUtils = {
 				source = this.getHelperFromSkeleton( source );
 
 			}
-			
+
 			var nameKeys = Object.keys( options.names ),
 				nameValues = Object.values( options.names ),
 				sourceBones = source.isObject3D ? source.skeleton.bones : this.getBones( source ),
 				bones = target.isObject3D ? target.skeleton.bones : this.getBones( target ),
 				offsets = [],
-				bone, boneTo, 
+				bone, boneTo,
 				name, i;
-			
+
 			target.skeleton.pose();
-			
+
 			for ( i = 0; i < bones.length; ++ i ) {
 
 				bone = bones[ i ];
 				name = options.names[ bone.name ] || bone.name;
 
 				boneTo = this.getBoneByName( name, sourceBones );
-				
+
 				if ( boneTo && name !== options.hip ) {
-				
+
 					var boneParent = this.getNearestBone( bone.parent, nameKeys ),
 						boneToParent = this.getNearestBone( boneTo.parent, nameValues );
-				
+
 					boneParent.updateMatrixWorld();
 					boneToParent.updateMatrixWorld();
-				
-					targetParentPos.setFromMatrixPosition( boneParent.matrixWorld  );
+
+					targetParentPos.setFromMatrixPosition( boneParent.matrixWorld );
 					targetPos.setFromMatrixPosition( bone.matrixWorld );
-					
+
 					sourceParentPos.setFromMatrixPosition( boneToParent.matrixWorld );
 					sourcePos.setFromMatrixPosition( boneTo.matrixWorld );
-					
-					targetDir.subVectors( 
+
+					targetDir.subVectors(
 						new THREE.Vector2( targetPos.x, targetPos.y ),
-						new THREE.Vector2( targetParentPos.x, targetParentPos.y ), 
+						new THREE.Vector2( targetParentPos.x, targetParentPos.y )
 					).normalize();
-					
-					sourceDir.subVectors( 
+
+					sourceDir.subVectors(
 						new THREE.Vector2( sourcePos.x, sourcePos.y ),
-						new THREE.Vector2( sourceParentPos.x, sourceParentPos.y ),
+						new THREE.Vector2( sourceParentPos.x, sourceParentPos.y )
 					).normalize();
-					
+
 					var laterialAngle = targetDir.angle() - sourceDir.angle();
-					
+
 					var offset = new THREE.Matrix4().makeRotationFromEuler(
 						new THREE.Euler(
 							0,
@@ -407,22 +404,22 @@ THREE.SkeletonUtils = {
 							laterialAngle
 						)
 					);
-					
+
 					bone.matrix.multiply( offset );
 
 					bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
 					bone.updateMatrixWorld();
-					
+
 					offsets[ name ] = offset;
-					
+
 				}
-				
+
 			}
-			
+
 			return offsets;
-			
-		}
+
+		};
 
 	}(),
 
@@ -457,25 +454,25 @@ THREE.SkeletonUtils = {
 		for ( var i = 0, bones = this.getBones( skeleton ); i < bones.length; i ++ ) {
 
 			if ( name === bones[ i ].name )
-				
+
 				return bones[ i ];
 
 		}
 
 	},
-	
+
 	getNearestBone: function ( bone, names ) {
 
-		while( bone.isBone ) {
-			
-			if ( names.indexOf( bone.name ) !== -1 ) {
-				
+		while ( bone.isBone ) {
+
+			if ( names.indexOf( bone.name ) !== - 1 ) {
+
 				return bone;
-				
+
 			}
-			
+
 			bone = bone.parent;
-			
+
 		}
 
 	},
@@ -529,6 +526,58 @@ THREE.SkeletonUtils = {
 
 		return bones;
 
+	},
+
+	clone: function ( source ) {
+
+		var sourceLookup = new Map();
+		var cloneLookup = new Map();
+
+		var clone = source.clone();
+
+		parallelTraverse( source, clone, function ( sourceNode, clonedNode ) {
+
+			sourceLookup.set( clonedNode, sourceNode );
+			cloneLookup.set( sourceNode, clonedNode );
+
+		} );
+
+		clone.traverse( function ( node ) {
+
+			if ( ! node.isSkinnedMesh ) return;
+
+			var clonedMesh = node;
+			var sourceMesh = sourceLookup.get( node );
+			var sourceBones = sourceMesh.skeleton.bones;
+
+			clonedMesh.skeleton = sourceMesh.skeleton.clone();
+			clonedMesh.bindMatrix.copy( sourceMesh.bindMatrix );
+
+			clonedMesh.skeleton.bones = sourceBones.map( function ( bone ) {
+
+				return cloneLookup.get( bone );
+
+			} );
+
+			clonedMesh.bind( clonedMesh.skeleton, clonedMesh.bindMatrix );
+
+		} );
+
+		return clone;
+
 	}
 
 };
+
+
+function parallelTraverse( a, b, callback ) {
+
+	callback( a, b );
+
+	for ( var i = 0; i < a.children.length; i ++ ) {
+
+		parallelTraverse( a.children[ i ], b.children[ i ], callback );
+
+	}
+
+}

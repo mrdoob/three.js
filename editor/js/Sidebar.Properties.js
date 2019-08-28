@@ -5,23 +5,23 @@
 Sidebar.Properties = function ( editor ) {
 
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var container = new UI.Span();
 
-	var objectTab = new UI.Text( 'OBJECT' ).onClick( onClick );
-	var geometryTab = new UI.Text( 'GEOMETRY' ).onClick( onClick );
-	var materialTab = new UI.Text( 'MATERIAL' ).onClick( onClick );
+	var objectTab = new UI.Text( strings.getKey( 'sidebar/properties/object' ) ).setTextTransform( 'uppercase' );
+	objectTab.onClick( function () { select( 'OBJECT' ) } );
+
+	var geometryTab = new UI.Text( strings.getKey( 'sidebar/properties/geometry' ) ).setTextTransform( 'uppercase' );
+	geometryTab.onClick( function () { select( 'GEOMETRY' ) } );
+
+	var materialTab = new UI.Text( strings.getKey( 'sidebar/properties/material' ) ).setTextTransform( 'uppercase' );
+	materialTab.onClick( function () { select( 'MATERIAL' ) } );
 
 	var tabs = new UI.Div();
 	tabs.setId( 'tabs' );
 	tabs.add( objectTab, geometryTab, materialTab );
 	container.add( tabs );
-
-	function onClick( event ) {
-
-		select( event.target.textContent );
-
-	}
 
 	//
 

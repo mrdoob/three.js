@@ -305,6 +305,21 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "isFrontFacing", ( assert ) => {
+
+			var a = new Triangle();
+			var dir = new Vector3();
+			assert.ok( ! a.isFrontFacing( dir ), "Passed!" );
+
+			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			var dir = new Vector3( 0, 0, - 1 );
+			assert.ok( a.isFrontFacing( dir ), "Passed!" );
+
+			var a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 1, 0, 0 ) );
+			assert.ok( ! a.isFrontFacing( dir ), "Passed!" );
+
+		} );
+
 		QUnit.test( "equals", ( assert ) => {
 
 			var a = new Triangle(

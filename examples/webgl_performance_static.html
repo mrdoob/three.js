@@ -4,28 +4,24 @@
 		<title>three.js webgl - performance [static]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
+				background-color: #fff;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
 			var camera, scene, renderer;
-
-			var mesh, zmesh, lightMesh, geometry;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -48,6 +44,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
+				scene.matrixAutoUpdate = false;
 
 				var material = new THREE.MeshNormalMaterial();
 
@@ -103,7 +100,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

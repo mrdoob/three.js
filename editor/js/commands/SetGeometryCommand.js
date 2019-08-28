@@ -4,14 +4,15 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newGeometry THREE.Geometry
  * @constructor
  */
 
-var SetGeometryCommand = function ( object, newGeometry ) {
+var SetGeometryCommand = function ( editor, object, newGeometry ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetGeometryCommand';
 	this.name = 'Set Geometry';

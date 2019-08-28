@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			表示二维空间中的一个包围盒。
+		</p>
+
+
+		<h2>构造函数(Constructor)</h2>
+
+
+		<h3>[name]( [param:Vector2 min], [param:Vector2 max] )</h3>
+		<p>
+		[page:Vector2 min] - (可选) [page:Vector2] 表示该盒子的下边界(x, y)。默认值为( + Infinity, + Infinity )。<br>
+
+		[page:Vector2 max] - (可选) [page:Vector2] 表示该盒子的上边界(x, y)。默认值为( - Infinity, - Infinity )。<br /><br />
+		创建一个介于最小和最大值之间的[name]。
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+
+
+
+		<h3>[property:Vector2 min]</h3>
+		<p>
+			[page:Vector2] 表示该盒子的下边界(x, y)。<br />
+			默认值为( + Infinity, + Infinity )。
+		</p>
+
+		<h3>[property:Vector2 max]</h3>
+		<p>
+			[page:Vector2] 表示该盒子的上边界(x, y)。<br />
+			默认值为( - Infinity, - Infinity )。
+		</p>
+
+
+
+		<h2>方法(Methods)</h2>
+
+		<h3>[method:Vector2 clampPoint]( [param:Vector2 point], [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 point] - clamp 的位置 ([page:Vector2])  <br>
+		[page:Vector2 target] — 结果会被复制到该二维向量中。<br /><br />
+		在该盒子范围内夹紧（[link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps]）[page:Vector2 point]。<br />
+		</p>
+
+		<h3>[method:Box2 clone]()</h3>
+		<p>返回一个新的[page:Box2]，其[page:.min min]和[page:.max max]与此盒子相同。</p>
+
+		<h3>[method:Boolean containsBox]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - 要检查是否被包含的盒子。<br /><br />
+        如果盒子包含整个被检查盒子，则返回true。如果两者重叠，<br>
+		也会返回true。
+		</p>
+
+		<h3>[method:Boolean containsPoint]( [param:Vector2 point] )</h3>
+		<p>
+		[page:Vector2 point] - 要检查是否被包含的点[page:Vector2]。<br /><br />
+		如果指定的点([page:Vector2 point])位于盒子的边界内或边界上，则返回true。
+		</p>
+
+		<h3>[method:Box2 copy]( [param:Box2 box] )</h3>
+		<p>
+			将[page:Box2 box]的[page:.min min] 和 [page:.max max]复制到此盒子中。
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector2 point] )</h3>
+		<p>
+		[page:Vector2 point] - 要测量距离的点([page:Vector2])。<br /><br />
+		返回这个盒子的任何边缘到指定点的距离。如果这个点([page:Vector2 point])位于这个盒子里，距离将是0。
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - 要对比的盒子<br /><br />
+		如果这个盒子和被对比盒子具有相同的上下边界，则返回true。
+		</p>
+
+		<h3>[method:Box2 expandByPoint]( [param:Vector2 point] )</h3>
+		<p>
+		[page:Vector2 point] - 应该被盒子包含的点。<br /><br />
+		扩展盒子的边界来包含该点。
+		</p>
+
+		<h3>[method:Box2 expandByScalar]( [param:float scalar] )</h3>
+		<p>
+		[page:float scalar] - 盒子扩展的距离。<br /><br />
+		在每个维度上扩展参数scalar所指定的距离，如果为负数，则盒子空间将收缩。
+		</p>
+
+		<h3>[method:Box2 expandByVector]( [param:Vector2 vector] )</h3>
+		<p>
+		[page:Vector2 vector] - 按照该向量扩展。<br /><br />
+		在每个维度中按vector的数值进行扩展。宽度在两个方向上的扩展将由vector的x分量确定，
+			高度在两个方向上的扩展则由y分量确定。
+		</p>
+
+		<h3>[method:Vector2 getCenter]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — 结果将被复制到此二维向量中。<br /><br />
+		以二维向量形式返回盒子的中心点。
+		</p>
+
+		<h3>[method:Vector2 getParameter]( [param:Vector2 point], [param:Vector2 target] ) </h3>
+		<p>
+		[page:Vector2 point] - 二维向量([page:Vector2]).<br/>
+		[page:Vector2 target] — 结果将被复制到此二维向量中。<br /><br />
+
+			返回一个点作为此盒子的宽度和高度的比例。
+		</p>
+
+		<h3>[method:Vector2 getSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — 结果将被复制到此二维向量中。<br /><br />
+
+			返回此盒子的宽度和高度。
+		</p>
+
+		<h3>[method:Box2 intersect]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - 要相交的盒子。<br /><br />
+		返回两者的相交后的盒子，并将相交后的盒子的上限设置为两者的上限中的较小者，将下限设置为两者的下限中的较大者。
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - 用来检查相交的盒子。<br /><br />
+		确定该盒子是否和其相交。
+		</p>
+
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+			如果这个盒子包含0个顶点，则返回true。<br>
+			请注意，一个下上边界相等的的盒子仍然包括一个点，一个两个边界共享的点。
+		</p>
+
+		<h3>[method:Box2 makeEmpty]()</h3>
+		<p>使此盒子为空。</p>
+
+
+		<h3>[method:Box2 set]( [param:Vector2 min], [param:Vector2 max] )</h3>
+		<p>
+			[page:Vector2 min] - (必须 ) 表示该盒子的下边界(x, y)。 <br>
+			[page:Vector2 max]  - (必须) 表示该盒子的上边界(x, y)。 <br /><br />
+
+			设置这个盒子的上下(x, y)的界限。
+		</p>
+
+		<h3>[method:Box2 setFromCenterAndSize]( [param:Vector2 center], [param:Vector2 size] )</h3>
+		<p>
+		[page:Vector2 center] - 盒子所要设置的中心位置。 ([page:Vector2]). <br>
+		[page:Vector2 size] - 盒子所要设置的x和y尺寸 ([page:Vector2]).<br /><br />
+
+		使盒子的中心点位于[page:Vector2 center]，并设置宽高为[page:Vector2 size]中指定的值。
+		</p>
+
+		<h3>[method:Box2 setFromPoints]( [param:Array points] )</h3>
+		<p>
+		[page:Array points] - 点的集合，由这些点确定的空间将被盒子包围。<br /><br />
+		设置这个盒子的上下边界，来包含所有设置在[page:Array points]参数中的点。
+		</p>
+
+		<h3>[method:Box2 translate]( [param:Vector2 offset] )</h3>
+		<p>
+		[page:Vector2 offset] - 偏移方向和距离。<br /><br />
+		添加 [page:Vector2 offset] 到这个盒子的上下边界，实际上在2D空间移动这个盒子[page:Vector2 offset]个单位。
+		</p>
+
+		<h3>[method:Box2 union]( [param:Box2 box] )</h3>
+		<p>
+		[page:Box2 box] - 将要与该盒子联合的盒子<br /><br />
+		在[page:Box2 box]参数的上边界和该盒子的上边界之间取较大者，而对两者的下边界取较小者，这样获得一个新的较大的联合盒子。
+		</p>
+
+
+
+		<h2>源码(Source)</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

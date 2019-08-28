@@ -1,5 +1,5 @@
 language: node_js
 node_js:
-  - "8.9.4"
+  - node
 script:
   - npm run travis

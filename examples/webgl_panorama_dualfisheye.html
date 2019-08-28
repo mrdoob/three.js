@@ -4,26 +4,14 @@
 		<title>three.js webgl - dual fisheye panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #000000;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
 			a {
-				color: #0000ff;
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -31,21 +19,24 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - dualfisheye panorama.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - dualfisheye panorama
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 
 			var isUserInteracting = false,
-			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-			lon = 0, onMouseDownLon = 0,
-			lat = 0, onMouseDownLat = 0,
-			phi = 0, theta = 0,
-			distance = 500;
+				lon = 0, lat = 0,
+				phi = 0, theta = 0,
+				distance = 500,
+				onPointerDownPointerX = 0,
+				onPointerDownPointerY = 0,
+
+				onPointerDownLon = 0,
+				onPointerDownLat = 0;
 
 			init();
 			animate();
@@ -96,6 +87,7 @@
 				//
 
 				var texture = new THREE.TextureLoader().load( 'textures/ricoh_theta_s.jpg' );
+				texture.minFilter = THREE.LinearFilter;
 				texture.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
@@ -153,7 +145,7 @@
 
 			}
 
-			function onDocumentMouseUp( event ) {
+			function onDocumentMouseUp() {
 
 				isUserInteracting = false;
 
