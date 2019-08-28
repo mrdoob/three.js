@@ -1387,29 +1387,31 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			if ( capabilities.multiview ) {
+			if ( camera.isArrayCamera ) {
 
 				_currentArrayCamera = camera;
 
-				renderObject(	object, scene, camera, geometry, material, group );
+				if ( capabilities.multiview ) {
 
-			} else if ( camera.isArrayCamera ) {
+					renderObject(	object, scene, camera, geometry, material, group );
 
-				_currentArrayCamera = camera;
+				} else {
 
-				var cameras = camera.cameras;
+					var cameras = camera.cameras;
 
-				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
+					for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
-					var camera2 = cameras[ j ];
+						var camera2 = cameras[ j ];
 
-					if ( object.layers.test( camera2.layers ) ) {
+						if ( object.layers.test( camera2.layers ) ) {
 
-						state.viewport( _currentViewport.copy( camera2.viewport ) );
+							state.viewport( _currentViewport.copy( camera2.viewport ) );
 
-						currentRenderState.setupLights( camera2 );
+							currentRenderState.setupLights( camera2 );
 
-						renderObject( object, scene, camera2, geometry, material, group );
+							renderObject( object, scene, camera2, geometry, material, group );
+
+						}
 
 					}
 
