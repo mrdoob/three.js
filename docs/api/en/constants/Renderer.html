@@ -39,13 +39,15 @@
 		THREE.BasicShadowMap
 		THREE.PCFShadowMap
 		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
 		</code>
 		<p>
 		These define the WebGLRenderer's [page:WebGLRenderer.shadowMap.type shadowMap.type] property.<br /><br />
 
 		[page:constant BasicShadowMap] gives unfiltered shadow maps - fastest, but lowest quality.<br />
 		[page:constant PCFShadowMap] filters shadow maps using the Percentage-Closer Filtering (PCF) algorithm (default).<br />
-		[page:constant PCFSoftShadowMap] filters shadow maps using the Percentage-Closer Soft Shadows (PCSS) algorithm.
+		[page:constant PCFSoftShadowMap] filters shadow maps using the Percentage-Closer Soft Shadows (PCSS) algorithm.<br />
+		[page:constant VSMShadowMap] filters shadow maps using the Variance Shadow Map (VSM) algorithm.
 		</p>
 
 		<h2>Tone Mapping</h2>

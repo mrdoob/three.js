@@ -10,6 +10,7 @@ export var FrontFaceDirectionCCW = 1;
 export var BasicShadowMap = 0;
 export var PCFShadowMap = 1;
 export var PCFSoftShadowMap = 2;
+export var VSMShadowMap = 3;
 export var FrontSide = 0;
 export var BackSide = 1;
 export var DoubleSide = 2;

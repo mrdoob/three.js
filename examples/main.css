@@ -40,7 +40,7 @@ canvas {
 	z-index: 1; /* TODO Solve this in HTML */
 }
 
-a, input, select {
+a, button, input, select {
 	pointer-events: auto;
 }
 
