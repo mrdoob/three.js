@@ -145,7 +145,6 @@ var files = {
 		"webgl_materials_cars",
 		"webgl_materials_channels",
 		"webgl_materials_clearcoat_normalmap",
-		"webgl_materials_compile",
 		"webgl_materials_cubemap",
 		"webgl_materials_cubemap_balls_reflection",
 		"webgl_materials_cubemap_balls_refraction",
@@ -232,6 +231,7 @@ var files = {
 		"webgl_shadowmap_performance",
 		"webgl_shadowmap_pointlight",
 		"webgl_shadowmap_viewer",
+		"webgl_shadowmap_vsm",
 		"webgl_shadowmesh",
 		"webgl_skinning_simple",
 		"webgl_sprites",
@@ -246,6 +246,7 @@ var files = {
 	],
 	"webgl / nodes": [
 		"webgl_loader_nodes",
+		"webgl_materials_compile",
 		"webgl_materials_envmaps_hdr_nodes",
 		"webgl_materials_envmaps_pmrem_nodes",
 		"webgl_materials_nodes",
