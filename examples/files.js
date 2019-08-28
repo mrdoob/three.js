@@ -229,6 +229,7 @@ var files = {
 		"webgl_shaders_vector",
 		"webgl_shading_physical",
 		"webgl_shadowmap",
+		"webgl_shadowmap_vsm",
 		"webgl_shadowmap_performance",
 		"webgl_shadowmap_pointlight",
 		"webgl_shadowmap_viewer",
