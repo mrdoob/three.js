@@ -27,8 +27,6 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	copy: function ( source, recursive, cache ) {
 
-		if ( cache === undefined ) cache = {};
-
 		Object3D.prototype.copy.call( this, source, recursive, cache );
 
 		this.color.copy( source.color );
