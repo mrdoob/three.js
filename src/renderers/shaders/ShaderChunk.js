@@ -1,6 +1,8 @@
 import alphamap_fragment from './ShaderChunk/alphamap_fragment.glsl.js';
 import alphamap_pars_fragment from './ShaderChunk/alphamap_pars_fragment.glsl.js';
 import alphatest_fragment from './ShaderChunk/alphatest_fragment.glsl.js';
+import anisotropy_fragment from './ShaderChunk/anisotropy_fragment.glsl.js';
+import anisotropy_pars_fragment from './ShaderChunk/anisotropy_pars_fragment.glsl.js';
 import aomap_fragment from './ShaderChunk/aomap_fragment.glsl.js';
 import aomap_pars_fragment from './ShaderChunk/aomap_pars_fragment.glsl.js';
 import begin_vertex from './ShaderChunk/begin_vertex.glsl.js';
@@ -129,6 +131,8 @@ export var ShaderChunk = {
 	alphatest_fragment: alphatest_fragment,
 	aomap_fragment: aomap_fragment,
 	aomap_pars_fragment: aomap_pars_fragment,
+	anisotropy_fragment: anisotropy_fragment,
+	anisotropy_pars_fragment: anisotropy_pars_fragment,
 	begin_vertex: begin_vertex,
 	beginnormal_vertex: beginnormal_vertex,
 	bsdfs: bsdfs,

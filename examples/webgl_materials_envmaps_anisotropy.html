@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			a { color:skyblue; text-decoration:none }
+			#info {
+				position: absolute;
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl anistropic roughness example<br/>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+
+			var controls, camera, scene, renderer;
+			var textureCube;
+			var anisoMaterial, isoMaterial;
+			var pointLight1, pointLight1Helper;
+			var pointLight2, pointLight2Helper;
+
+			var params = {
+				metalness: 1.0,
+				roughness: 0.3,
+
+				anisotropy: 1.0,
+				anisotropyMap: true,
+				anisotropyRotation: 0.0,
+				anisotropyRotationMap: true,
+				vertexTangents: true,
+
+				lightAnimation: true,
+				pointLight2x: 0.0,
+				pointLight2y: 0.0,
+				"point light 1": function () {
+					pointLight1.visible = !pointLight1.visible;
+					pointLight1Helper.visible = !pointLight1Helper.visible;
+				},
+				"point light 2": function () {
+					pointLight2.visible = !pointLight2.visible;
+					pointLight2Helper.visible = !pointLight2Helper.visible;
+				},
+			};
+
+			init();
+			animate();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				// CAMERAS
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.set( 0, 750, 2500 );
+
+				// BACKGROUND
+
+				var r = "textures/cube/Bridge2/";
+				var urls = [ r + "posx.jpg", r + "negx.jpg",
+							 r + "posy.jpg", r + "negy.jpg",
+							 r + "posz.jpg", r + "negz.jpg" ];
+
+				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.format = THREE.RGBFormat;
+				textureCube.mapping = THREE.CubeReflectionMapping;
+				scene.background = textureCube;
+
+				// LIGHTS
+
+				pointLight1 = new THREE.PointLight( 0xff0000, .1, 100000.0, 2 );
+        pointLight1.position.set( 0, 500, 1000 );
+				pointLight1Helper = new THREE.PointLightHelper( pointLight1, 100.0 );
+				scene.add( pointLight1 );
+				scene.add( pointLight1Helper );
+
+				pointLight2 = new THREE.PointLight( 0x00ff00, .1, 100000.0, 2 );
+        pointLight2.position.set( 1500, 500, 500 );
+				pointLight2Helper = new THREE.PointLightHelper( pointLight2, 100.0 );
+				scene.add( pointLight2 );
+				scene.add( pointLight2Helper );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffeeaa );
+				directionalLight.position.set( -1, 1, 1 );
+				scene.add( directionalLight )
+
+				// MATERIALS
+
+				var textureLoader = new THREE.TextureLoader();
+
+				var textureAnisotropyRotation = textureLoader.load( "textures/carbon_fibre_rotation.png" );
+        textureAnisotropyRotation.wrapS = textureAnisotropyRotation.wrapT = THREE.RepeatWrapping;
+        textureAnisotropyRotation.minFilter = textureAnisotropyRotation.magFilter = THREE.NearestFilter;
+
+        var textureAnisotropy = textureLoader.load( "textures/anisotropy.png" );
+        textureAnisotropy.wrapS = textureAnisotropy.wrapT = THREE.RepeatWrapping;
+
+				isoMaterial = new THREE.MeshPhysicalMaterial( {
+					map: null,
+					color: 0x7f7f7f,
+					metalness: params.metalness,
+					roughness: params.roughness,
+
+					anisotropy: 0,
+
+					envMap: textureCube,
+				});
+
+				anisoMaterial = new THREE.MeshPhysicalMaterial( {
+          map: null,
+          color: 0x7f7f7f,
+          metalness: params.metalness,
+          roughness: params.roughness,
+
+					anisotropy: params.anisotropy,
+          anisotropyMap: textureAnisotropy,
+          anisotropyRotation: params.anisotropyRotation,
+					anisotropyRotationMap: textureAnisotropyRotation,
+					vertexTangents: params.vertexTangents,
+
+					envMap: textureCube
+				});
+
+				// MESHES
+
+				var sphereGeometry = new THREE.SphereBufferGeometry( 400.0, 60, 60 );
+				BufferGeometryUtils.computeTangents( sphereGeometry );
+
+				var boxGeometry = new THREE.BoxBufferGeometry( .5, .5, .5 );
+				BufferGeometryUtils.computeTangents( boxGeometry );
+
+				var torusGeometry = new THREE.TorusBufferGeometry( 0.3, 0.2, 60, 60 );
+        BufferGeometryUtils.computeTangents( torusGeometry );
+
+				[anisoMaterial, isoMaterial].forEach( function( material ) {
+					var isAniso = material === anisoMaterial;
+
+					var sphereMesh = new THREE.Mesh( sphereGeometry, material );
+					sphereMesh.position.set( -1000, isAniso ? 500 : -500, 0 );
+					scene.add( sphereMesh );
+
+					var box1Mesh = new THREE.Mesh( boxGeometry, material );
+					box1Mesh.rotation.x = - Math.PI / 2;
+					box1Mesh.scale.set( 1000, 1000, 1000 );
+					box1Mesh.position.set( 0, isAniso ? 500 : -500, 0 );
+					scene.add( box1Mesh );
+
+					var torus1Mesh = new THREE.Mesh( torusGeometry, material );
+					torus1Mesh.rotation.x = - Math.PI / 2;
+					torus1Mesh.scale.set( 1000, 1000, 1000 );
+					torus1Mesh.position.set( 1000, isAniso ? 500 : -500, 0 );
+					scene.add( torus1Mesh );
+				} );
+
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.autoClear = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 500;
+				controls.maxDistance = 5000;
+
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				var gui = new GUI();
+
+				function updateParams() {
+				  anisoMaterial.metalness = params.metalness;
+          isoMaterial.metalness = params.metalness;
+          anisoMaterial.roughness = params.roughness;
+          isoMaterial.roughness = params.roughness;
+        	anisoMaterial.anisotropy = params.anisotropy;
+          anisoMaterial.anisotropyMap = params.anisotropyMap ? textureAnisotropy : null;
+        	anisoMaterial.anisotropyRotation = params.anisotropyRotation;
+        	anisoMaterial.anisotropyRotationMap = params.anisotropyRotationMap ? textureAnisotropyRotation : null;
+					anisoMaterial.vertexTangents = params.vertexTangents;
+
+					anisoMaterial.needsUpdate = true;
+
+					pointLight2.position.set( params.pointLight2x, pointLight2.position.y, pointLight2.position.z );
+					pointLight2.position.set( pointLight2.position.x, params.pointLight2y, pointLight2.position.z );
+				}
+
+				updateParams();
+
+				gui.add( params, "metalness", 0.0, 1.0, 0.01 ).onChange( updateParams );
+				gui.add( params, "roughness", 0.0, 1.0, 0.01 ).onChange( updateParams );
+				gui.add( params, "anisotropy", -1.0, 1.0, 0.01 ).onChange( updateParams );
+        gui.add( params, "anisotropyMap" ).onChange( updateParams );
+        gui.add( params, "anisotropyRotation", 0.0, 0.5, 0.01 ).onChange( updateParams );
+        gui.add( params, "anisotropyRotationMap" ).onChange( updateParams );
+				gui.add( params, "vertexTangents" ).onChange( updateParams );
+				gui.add( params, "lightAnimation" ).onChange( updateParams );
+				gui.add( params, "point light 1" ).onChange( updateParams );
+				gui.add( params, "point light 2" ).onChange( updateParams );
+				gui.add( params, "pointLight2x", -1000.0, 1000.0, 10.0).onChange( updateParams );
+				gui.add( params, "pointLight2y", -1000.0, 1000.0, 10.0).onChange( updateParams );
+
+				gui.open();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+				controls.update();
+
+			}
+
+			var lastTime = Date.now();
+			var lightPositionAccumulator = 0;
+
+			function render() {
+
+				var timer = -0.0002 * Date.now();
+
+				var time = Date.now();
+        var delta = time - lastTime;
+        lastTime = time;
+
+        if ( !isNaN( delta ) ) {
+          if ( params.lightAnimation ) {
+            lightPositionAccumulator += delta;
+            pointLight1.position.x = Math.sin( lightPositionAccumulator * 0.0015 ) * 400;
+            pointLight1.position.y = Math.cos( lightPositionAccumulator * 0.0008 ) * 400;
+          }
+        }
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

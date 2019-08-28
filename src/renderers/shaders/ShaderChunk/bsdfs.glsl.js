@@ -97,6 +97,18 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 } // validated
 
+float D_GGXAniso( const in vec2 anisotropicM, const in vec2 xyDotH, const in float dotNH ) {
+
+	// ORIGINAL formula: float anisoTerm = ( xyDotH.x * xyDotH.x / ( anisotropicM.x * anisotropicM.x ) + xyDotH.y * xyDotH.y / ( anisotropicM.y * anisotropicM.y ) + dotNH * dotNH );
+
+	vec3 aniso = vec3(xyDotH.xy / anisotropicM.xy, dotNH);
+
+	float anisoTerm = dot(aniso, aniso);
+
+	return RECIPROCAL_PI / ( anisotropicM.x * anisotropicM.y * anisoTerm * anisoTerm + EPSILON );
+
+}
+
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
@@ -125,14 +137,14 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 }
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
+vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
-	vec3 halfDir = normalize( incidentLight.direction + viewDir );
+	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
 	float dotNL = saturate( dot( normal, incidentLight.direction ) );
-	float dotNV = saturate( dot( normal, viewDir ) );
+	float dotNV = saturate( dot( normal, geometry.viewDir ) );
 	float dotNH = saturate( dot( normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
@@ -140,7 +152,17 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 
 	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
-	float D = D_GGX( alpha, dotNH );
+	#ifdef ANISOTROPY
+
+		vec2 xyDotH = vec2( dot( geometry.anisotropicS, halfDir ), dot( geometry.anisotropicT, halfDir ) );
+
+		float D = D_GGXAniso( geometry.anisotropicM, xyDotH, dotNH );
+
+	#else
+
+		float D = D_GGX( alpha, dotNH );
+
+	#endif
 
 	return F * ( G * D );
 

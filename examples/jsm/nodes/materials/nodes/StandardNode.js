@@ -35,7 +35,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	builder.define('STANDARD');
 
-	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearCoatNormal;
+	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearcoatNormal;
 
 	if( useClearcoat ){
 

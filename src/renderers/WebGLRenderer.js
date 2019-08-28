@@ -2269,9 +2269,10 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
+		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
+
 		uniforms.clearcoat.value = material.clearcoat;
 		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
-		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
 
 		if ( material.clearcoatNormalMap ) {
 
@@ -2287,6 +2288,12 @@ function WebGLRenderer( parameters ) {
 		}
 
 		uniforms.transparency.value = material.transparency;
+
+		uniforms.anisotropy.value = material.anisotropy;
+		uniforms.anisotropyMap.value = material.anisotropyMap;
+
+		uniforms.anisotropyRotation.value = material.anisotropyRotation;
+		uniforms.anisotropyRotationMap.value = material.anisotropyRotationMap;
 
 	}
 
