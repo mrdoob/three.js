@@ -36,7 +36,7 @@ DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 		if ( ( source.target.uuid in cache ) === false ) {
 
-			cache[ source.target.uuid ] = source.target.clone();
+			cache[ source.target.uuid ] = source.target.clone( recursive, cache );
 
 		}
 		this.target = cache[ source.target.uuid ];
