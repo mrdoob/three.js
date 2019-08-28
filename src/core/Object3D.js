@@ -802,9 +802,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	clone: function ( recursive ) {
+	clone: function ( recursive, cache ) {
 
-		return new this.constructor().copy( this, recursive );
+		return new this.constructor().copy( this, recursive, cache );
 
 	},
 
