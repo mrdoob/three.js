@@ -49,7 +49,7 @@ scene.add( camera );</code>
 
 		<h2>属性</h2>
 		<p>
-			请参阅其基类 [page:Camera] 来查看共有属性。<br>
+			共有属性请参见其基类 [page:Camera] 。<br>
 			请注意，在大多数属性发生改变之后，你将需要调用[page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix]来使得这些改变生效。
 		</p>
 
@@ -107,7 +107,7 @@ scene.add( camera );</code>
 
 
 		<h2>方法</h2>
-		<p>请参阅其基类[page:Camera]来查看共有属性。</p>
+		<p>共有方法请参见其基类[page:Camera]。</p>
 
 		<h3>[method:null clearViewOffset]()</h3>
 		<p>清除任何由[page:PerspectiveCamera.setViewOffset .setViewOffset]设置的偏移量。</p>
@@ -184,19 +184,19 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<p>
-
 		更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
-
 		</p>
 
-		<h3>[method:JSON toJSON]()</h3>
+		<h3>[method:Object toJSON]([param:object meta])</h3>
 		<p>
-
-				使用JSON格式来返回摄像机数据。
-			</p>
+		meta -- 包含有元数据的对象，例如对象后代中的纹理或图像<br />
+		将摄像机转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+		</p>
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

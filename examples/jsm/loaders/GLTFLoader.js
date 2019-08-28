@@ -791,7 +791,7 @@ var GLTFLoader = ( function () {
 				materialParams.vertexShader = shader.vertexShader;
 				materialParams.fragmentShader = fragmentShader;
 				materialParams.uniforms = uniforms;
-				materialParams.defines = { 'STANDARD': '' };
+				materialParams.defines = { 'STANDARD': '' }
 
 				materialParams.color = new Color( 1.0, 1.0, 1.0 );
 				materialParams.opacity = 1.0;
@@ -2205,6 +2205,7 @@ var GLTFLoader = ( function () {
 				pointsMaterial.color.copy( material.color );
 				pointsMaterial.map = material.map;
 				pointsMaterial.lights = false; // PointsMaterial doesn't support lights yet
+				pointsMaterial.sizeAttenuation = false; // glTF spec says points should be 1px
 
 				this.cache.add( cacheKey, pointsMaterial );
 

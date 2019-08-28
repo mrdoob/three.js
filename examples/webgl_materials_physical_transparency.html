@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>threejs webgl - materials - transparency</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+
+			var params = {
+				color: 0xffffff,
+				transparency: 0.90,
+				envMapIntensity: 1,
+				lightIntensity: 1,
+				exposure: 1
+			};
+
+			var container, stats;
+			var camera, scene, renderer;
+
+			var hdrCubeRenderTarget;
+			var spotLight1, spotLight2;
+			var mesh1, mesh2;
+
+			var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+
+			var hdrCubeMap = new HDRCubeTextureLoader()
+				.setPath( './textures/cube/pisaHDR/' )
+				.setDataType( THREE.UnsignedByteType )
+				.load( hdrUrls, function () {
+
+					init();
+					animate();
+
+				} );
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = params.exposure;
+
+				renderer.gammaOutput = true;
+
+				scene = new THREE.Scene();
+				scene.background = hdrCubeMap;
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0, 0, 120 );
+
+				//
+
+				var pmremGenerator = new PMREMGenerator( hdrCubeMap );
+				pmremGenerator.update( renderer );
+
+				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+				pmremCubeUVPacker.update( renderer );
+
+				hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+
+				hdrCubeMap.magFilter = THREE.LinearFilter;
+				hdrCubeMap.needsUpdate = true;
+
+				pmremGenerator.dispose();
+				pmremCubeUVPacker.dispose();
+
+				//
+
+				var geometry = new THREE.SphereBufferGeometry( 20, 64, 32 );
+
+				var texture = new THREE.CanvasTexture( generateTexture() );
+				texture.magFilter = THREE.NearestFilter;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.repeat.set( 1, 3.5 );
+
+				var material = new THREE.MeshPhysicalMaterial( {
+					color: params.color,
+					metalness: 0,
+					roughness: 0,
+					alphaMap: texture,
+					alphaTest: 0.5,
+					envMap: hdrCubeRenderTarget.texture,
+					envMapIntensity: params.envMapIntensity,
+					depthTest: false,
+					transparency: params.transparency,
+					transparent: true
+				} );
+
+				var material1 = new THREE.MeshPhysicalMaterial().copy( material );
+
+				var material1b = new THREE.MeshPhysicalMaterial().copy( material );
+				material1b.side = THREE.BackSide;
+
+				var material2 = new THREE.MeshPhysicalMaterial().copy( material );
+				material2.premultipliedAlpha = true;
+
+				var material2b = new THREE.MeshPhysicalMaterial().copy( material );
+				material2b.premultipliedAlpha = true;
+				material2b.side = THREE.BackSide;
+
+				mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 30.0;
+				scene.add( mesh1 );
+
+				var mesh = new THREE.Mesh( geometry, material1b );
+				mesh.renderOrder = - 1;
+				mesh1.add( mesh );
+
+				mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 30.0;
+				scene.add( mesh2 );
+
+				var mesh = new THREE.Mesh( geometry, material2b );
+				mesh.renderOrder = - 1;
+				mesh2.add( mesh );
+
+				//
+
+				spotLight1 = new THREE.SpotLight( 0xffffff, params.lightIntensity );
+				spotLight1.position.set( 100, 200, 100 );
+				spotLight1.angle = Math.PI / 6;
+				scene.add( spotLight1 );
+
+				spotLight2 = new THREE.SpotLight( 0xffffff, params.lightIntensity );
+				spotLight2.position.set( - 100, - 200, - 100 );
+				spotLight2.angle = Math.PI / 6;
+				scene.add( spotLight2 );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 150;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				//
+
+				var gui = new GUI();
+
+				gui.addColor( params, 'color' )
+					.onChange( function () {
+
+						material1.color.set( params.color );
+						material2.color.set( params.color );
+						material1b.color.set( params.color );
+						material2b.color.set( params.color );
+
+					} );
+
+				gui.add( params, 'transparency', 0, 1 )
+					.onChange( function () {
+
+						material1.transparency = material2.transparency = params.transparency;
+						material1b.transparency = material2b.transparency = params.transparency;
+
+					} );
+
+				gui.add( params, 'envMapIntensity', 0, 1 )
+					.name( 'envMap intensity' )
+					.onChange( function () {
+
+						material1.envMapIntensity = material2.envMapIntensity = params.envMapIntensity;
+						material1b.envMapIntensity = material2b.envMapIntensity = params.envMapIntensity;
+
+					} );
+
+				gui.add( params, 'lightIntensity', 0, 1 )
+					.name( 'light intensity' )
+					.onChange( function () {
+
+						spotLight1.intensity = spotLight2.intensity = params.lightIntensity;
+
+					} );
+
+				gui.add( params, 'exposure', 0, 1 )
+					.onChange( function () {
+
+						renderer.toneMappingExposure = params.exposure;
+
+					} );
+
+				gui.open();
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			//
+
+			function generateTexture() {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 2;
+				canvas.height = 2;
+
+				var context = canvas.getContext( '2d' );
+				context.fillStyle = 'white';
+				context.fillRect( 0, 1, 2, 1 );
+
+				return canvas;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var t = performance.now();
+
+				mesh1.rotation.x = mesh2.rotation.x = t * 0.0002;
+				mesh1.rotation.z = mesh2.rotation.z = - t * 0.0002;
+
+				stats.begin();
+				renderer.render( scene, camera );
+				stats.end();
+
+			}
+
+		</script>
+	</body>
+</html>
