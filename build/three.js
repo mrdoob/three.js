@@ -24427,12 +24427,12 @@
 				if ( lightLayers.test( materialLayers ) ) {
 
 					result.lights[ lightsLength ++ ] = light;
-					if ( shadowMaps ) {
+					if ( shadowMaps.length ) {
 
 						result.shadowMaps[ shadowMapsLength ++ ] = shadowMaps[ i ];
 
 					}
-					if ( shadowMatrices ) {
+					if ( shadowMatrices.length ) {
 
 						result.shadowMatrices[ shadowMatricesLength ++ ] = shadowMatrices[ i ];
 
