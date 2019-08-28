@@ -278,18 +278,45 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					start = Math.max( 0, drawRange.start );
 					end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
 
-					for ( i = start, il = end; i < il; i += 3 ) {
+					if ( this.drawMode === THREE.TriangleStripDrawMode ) {
 
-						a = i;
-						b = i + 1;
-						c = i + 2;
+						var order = 0;
 
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+						for ( i = start, il = end; i < il - 2; i ++ ) {
 
-						if ( intersection ) {
+							a = i;
+							b = i + 1 + order;
+							c = i + 2 - order;
 
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
-							intersects.push( intersection );
+							order = ++ order % 2;
+
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+
+							if ( intersection ) {
+
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+								intersects.push( intersection );
+
+							}
+
+						}
+
+					} else {
+
+						for ( i = start, il = end; i < il; i += 3 ) {
+
+							a = i;
+							b = i + 1;
+							c = i + 2;
+
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+
+							if ( intersection ) {
+
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+								intersects.push( intersection );
+
+							}
 
 						}
 
