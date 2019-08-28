@@ -11,10 +11,12 @@ import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { BufferAttribute } from '../../core/BufferAttribute.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { ShaderChunk } from '../shaders/ShaderChunk.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Frustum } from '../../math/Frustum.js';
+
+import vsm_frag from '../shaders/ShaderLib/vsm_frag.glsl.js';
+import vsm_vert from '../shaders/ShaderLib/vsm_vert.glsl.js';
 
 function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
@@ -50,9 +52,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			radius: { value: 4.0 }
 		},
 
-		vertexShader: ShaderChunk.vsm_vert,
+		vertexShader: vsm_vert,
 
-		fragmentShader: ShaderChunk.vsm_frag
+		fragmentShader: vsm_frag
 
 	} );
 

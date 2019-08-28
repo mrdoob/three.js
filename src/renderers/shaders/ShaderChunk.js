@@ -122,8 +122,6 @@ import shadow_frag from './ShaderLib/shadow_frag.glsl.js';
 import shadow_vert from './ShaderLib/shadow_vert.glsl.js';
 import sprite_frag from './ShaderLib/sprite_frag.glsl.js';
 import sprite_vert from './ShaderLib/sprite_vert.glsl.js';
-import vsm_frag from './ShaderLib/vsm_frag.glsl.js';
-import vsm_vert from './ShaderLib/vsm_vert.glsl.js';
 
 export var ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
@@ -249,7 +247,5 @@ export var ShaderChunk = {
 	shadow_frag: shadow_frag,
 	shadow_vert: shadow_vert,
 	sprite_frag: sprite_frag,
-	sprite_vert: sprite_vert,
-	vsm_frag: vsm_frag,
-	vsm_vert: vsm_vert
+	sprite_vert: sprite_vert
 };
