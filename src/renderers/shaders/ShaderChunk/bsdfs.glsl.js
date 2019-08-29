@@ -97,15 +97,28 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 } // validated
 
+// https://google.github.io/filament/Filament.md.html
 float D_GGXAniso( const in vec2 anisotropicM, const in vec2 xyDotH, const in float dotNH ) {
 
-	// ORIGINAL formula: float anisoTerm = ( xyDotH.x * xyDotH.x / ( anisotropicM.x * anisotropicM.x ) + xyDotH.y * xyDotH.y / ( anisotropicM.y * anisotropicM.y ) + dotNH * dotNH );
+	float a2 = anisotropicM.s * anisotropicM.t;
+	highp vec3 v = vec3( anisotropicM.t * xyDotH.x, anisotropicM.s * xyDotH.y, a2 * dotNH );
+	highp float v2 = dot( v, v );
+	float w2 = a2 / v2;
+	return a2 * w2 * w2 * RECIPROCAL_PI;
+}
 
-	vec3 aniso = vec3(xyDotH.xy / anisotropicM.xy, dotNH);
+// https://google.github.io/filament/Filament.md.html
+float G_GGX_SmithCorrelated_Anisotropic(
+	vec2 anisotropicM,
+	float ToV, float BoV,
+	float ToL, float BoL,
+	float NoV, float NoL
+) {
 
-	float anisoTerm = dot(aniso, aniso);
-
-	return RECIPROCAL_PI / ( anisotropicM.x * anisotropicM.y * anisoTerm * anisoTerm + EPSILON );
+	float lambdaV = NoL * length( vec3( anisotropicM.s * ToV, anisotropicM.t * BoV, NoV ) );
+	float lambdaL = NoV * length( vec3( anisotropicM.s * ToL, anisotropicM.t * BoL, NoL ) );
+	float v = 0.5 / ( lambdaV + lambdaL );
+	return saturate( v );
 
 }
 
@@ -150,17 +163,27 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in Geometric
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
-	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
-
 	#ifdef ANISOTROPY
 
 		vec2 xyDotH = vec2( dot( geometry.anisotropicS, halfDir ), dot( geometry.anisotropicT, halfDir ) );
 
 		float D = D_GGXAniso( geometry.anisotropicM, xyDotH, dotNH );
 
+		float G = G_GGX_SmithCorrelated_Anisotropic(
+			geometry.anisotropicM,
+			dot( geometry.anisotropicS, geometry.viewDir ),
+			dot( geometry.anisotropicT, geometry.viewDir ),
+			dot( geometry.anisotropicS, incidentLight.direction ),
+			dot( geometry.anisotropicT, incidentLight.direction ),
+			dotNV,
+			dotNL
+		);
+
 	#else
 
 		float D = D_GGX( alpha, dotNH );
+
+		float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
 	#endif
 

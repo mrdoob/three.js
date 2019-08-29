@@ -12,6 +12,7 @@ import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js';
+import { NormalNode } from '../../accessors/NormalNode.js';
 
 function StandardNode() {
 
@@ -149,7 +150,7 @@ StandardNode.prototype.build = function ( builder ) {
 		var contextEnvironment = {
 			roughness: specularRoughness,
 			bias: new SpecularMIPLevelNode( specularRoughness ),
-			viewNormal: new ExpressionNode('normal', 'v3'),
+			viewNormal: new NormalNode( NormalNode.BENT ),
 			gamma: true
 		};
 
