@@ -31,6 +31,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
+			import * as Nodes from './jsm/nodes/Nodes.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -38,9 +39,10 @@
 
 			var controls, camera, scene, renderer;
 			var textureCube;
-			var anisoMaterial, isoMaterial;
+			var anisoMaterial, isoMaterial, anisoNodeMaterial;
 			var pointLight1, pointLight1Helper;
 			var pointLight2, pointLight2Helper;
+			var anisotropyNode, anisotropyMapMulNode, anisotropyRotationNode, anisotropyRotationMapMulNode;
 
 			var params = {
 				metalness: 1.0,
@@ -50,7 +52,9 @@
 				anisotropyMap: true,
 				anisotropyRotation: 0.0,
 				anisotropyRotationMap: true,
+
 				vertexTangents: true,
+				flatShading: false,
 
 				lightAnimation: true,
 				pointLight2x: 0.0,
@@ -126,6 +130,9 @@
 
 					anisotropy: 0,
 
+					vertexTangents: params.vertexTangents,
+					flatShading: params.flatShading,
+
 					envMap: textureCube,
 				});
 
@@ -139,10 +146,28 @@
           anisotropyMap: textureAnisotropy,
           anisotropyRotation: params.anisotropyRotation,
 					anisotropyRotationMap: textureAnisotropyRotation,
+
 					vertexTangents: params.vertexTangents,
+					flatShading: params.flatShading,
 
 					envMap: textureCube
-				});
+				} );
+
+				anisoNodeMaterial = new Nodes.StandardNodeMaterial();
+				anisoNodeMaterial.metalness = new Nodes.FloatNode();
+				anisoNodeMaterial.roughness = new Nodes.FloatNode();
+				anisoNodeMaterial.environment = new Nodes.CubeTextureNode( textureCube );
+				anisoNodeMaterial.color = new Nodes.ColorNode( 0x7f7f7f );
+				anisoNodeMaterial.vertexTangents = params.vertexTangents;
+				anisoNodeMaterial.flatShading = params.flatShading;
+
+				anisotropyNode = new Nodes.FloatNode( params.anisotropy );
+				anisotropyMapMulNode = new Nodes.OperatorNode( anisotropyNode, new Nodes.TextureNode( textureAnisotropy ), Nodes.OperatorNode.MUL );
+				// anisoNodeMaterial.anisotropy assigned in updateParams
+
+				anisotropyRotationNode = new Nodes.FloatNode( params.anisotropyRotation );
+				anisotropyRotationMapMulNode = new Nodes.OperatorNode( anisotropyRotationNode, new Nodes.TextureNode( textureAnisotropyRotation ), Nodes.OperatorNode.ADD );
+				// anisoNodeMaterial.anisotropyRotation assigned in updateParams
 
 				// MESHES
 
@@ -204,6 +229,12 @@
         	anisoMaterial.anisotropyRotationMap = params.anisotropyRotationMap ? textureAnisotropyRotation : null;
 					anisoMaterial.vertexTangents = params.vertexTangents;
 
+					anisoMaterial.flatShading =
+					isoMaterial.flatShading =
+					anisoNodeMaterial.flatShading = params.flatShading;
+
+					//
+
 					anisoMaterial.needsUpdate = true;
 
 					pointLight2.position.set( params.pointLight2x, pointLight2.position.y, pointLight2.position.z );
@@ -214,11 +245,15 @@
 
 				gui.add( params, "metalness", 0.0, 1.0, 0.01 ).onChange( updateParams );
 				gui.add( params, "roughness", 0.0, 1.0, 0.01 ).onChange( updateParams );
+
 				gui.add( params, "anisotropy", -1.0, 1.0, 0.01 ).onChange( updateParams );
         gui.add( params, "anisotropyMap" ).onChange( updateParams );
         gui.add( params, "anisotropyRotation", 0.0, 0.5, 0.01 ).onChange( updateParams );
         gui.add( params, "anisotropyRotationMap" ).onChange( updateParams );
+
 				gui.add( params, "vertexTangents" ).onChange( updateParams );
+				gui.add( params, "flatShading" ).onChange( updateParams );
+
 				gui.add( params, "lightAnimation" ).onChange( updateParams );
 				gui.add( params, "point light 1" ).onChange( updateParams );
 				gui.add( params, "point light 2" ).onChange( updateParams );
