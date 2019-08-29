@@ -3,6 +3,18 @@
 /* global THREE, threejsLessonUtils */
 
 {
+  const darkMatcher = window.matchMedia('(prefers-color-scheme: dark)');
+  const isDarkMode = darkMatcher.matches;
+
+  const darkColors = {
+    wire: '#DDD',
+  };
+  const lightColors = {
+    wore: '#000',
+  };
+  const colors = isDarkMode ? darkColors : lightColors;
+
+
   threejsLessonUtils.addDiagrams({
     mergedCubes: {
       create() {
@@ -21,7 +33,7 @@
         }
         const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries, false);
         const material = new THREE.MeshBasicMaterial({
-          color: 'black',
+          color: colors.wire,
           wireframe: true,
         });
         const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -39,7 +51,7 @@
       create() {
         const geometry = new THREE.BoxBufferGeometry(3, 2, 2, 3, 2, 2);
         const material = new THREE.MeshBasicMaterial({
-          color: 'black',
+          color: colors.wire,
           wireframe: true,
         });
         const mesh = new THREE.Mesh(geometry, material);
