@@ -12,6 +12,9 @@ uniform vec3 emissive;
 uniform float roughness;
 uniform float metalness;
 uniform float opacity;
+uniform float anisotropy;
+uniform float anisotropyRotation;
+uniform float sheen;
 
 #ifdef TRANSPARENCY
 	uniform float transparency;
@@ -32,16 +35,16 @@ uniform float opacity;
 
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
+#if !defined( FLAT_SHADED ) || defined( USE_TANGENT )
 
 	varying vec3 vNormal;
 
-	#ifdef USE_TANGENT
+#endif
 
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
+#ifdef USE_TANGENT
 
-	#endif
+	varying vec3 vTangent;
+	varying vec3 vBitangent;
 
 #endif
 

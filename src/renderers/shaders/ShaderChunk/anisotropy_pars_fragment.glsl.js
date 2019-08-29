@@ -1,9 +1,6 @@
 export default /* glsl */`
 #ifdef ANISOTROPY
 
-  uniform float anisotropy;
-  uniform float anisotropyRotation;
-
   #ifdef USE_ANISOTROPYMAP
 
     uniform sampler2D anisotropyMap;

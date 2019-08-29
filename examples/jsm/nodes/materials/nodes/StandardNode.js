@@ -70,9 +70,16 @@ StandardNode.prototype.build = function ( builder ) {
 		builder.addParsCode( [
 			"varying vec3 vViewPosition;",
 
-			"#ifndef FLAT_SHADED",
+			"#if !defined( FLAT_SHADED ) || defined( USE_TANGENT )",
 
 			"	varying vec3 vNormal;",
+
+			"#endif",
+
+			"#ifdef USE_TANGENT",
+
+			" varying vec3 vTangent;",
+			" varying vec3 vBitangent;",
 
 			"#endif",
 
@@ -93,9 +100,16 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <skinnormal_vertex>",
 			"#include <defaultnormal_vertex>",
 
-			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
+			"#if !defined( FLAT_SHADED ) || defined( USE_TANGENT )", // Normal computed with derivatives when FLAT_SHADED
 
 			"	vNormal = normalize( transformedNormal );",
+
+			"#endif",
+
+			"#ifdef USE_TANGENT",
+
+			" vTangent = normalize( transformedTangent );",
+			" vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );",
 
 			"#endif",
 
@@ -192,6 +206,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.sheen ) this.sheen.analyze( builder );
 
+		if ( this.anisotropy ) this.anisotropy.analyze( builder );
+		if ( this.anisotropyRotation ) this.anisotropyRotation.analyze( builder );
+
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
@@ -237,14 +254,24 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
 
+		var anisotropy = this.anisotropy ? this.anisotropy.flow( builder, 'f' ) : undefined;
+		var anisotropyRotation = anisotropy && this.anisotropyRotation ? this.anisotropyRotation.flow( builder, 'f' ) : undefined;
+
 		builder.requires.transparent = alpha !== undefined;
 
 		builder.addParsCode( [
 			"varying vec3 vViewPosition;",
 
-			"#ifndef FLAT_SHADED",
+			"#if !defined( FLAT_SHADED ) || defined( USE_TANGENT )",
 
 			"	varying vec3 vNormal;",
+
+			"#endif",
+
+			"#ifdef USE_TANGENT",
+
+			" varying vec3 vTangent;",
+			" varying vec3 vBitangent;",
 
 			"#endif",
 
@@ -254,7 +281,8 @@ StandardNode.prototype.build = function ( builder ) {
 			"#include <lights_pars_begin>",
 			"#include <lights_physical_pars_fragment>",
 			"#include <shadowmap_pars_fragment>",
-			"#include <logdepthbuf_pars_fragment>"
+			"#include <logdepthbuf_pars_fragment>",
+			"#include <anisotropy_pars_fragment>"
 		].join( "\n" ) );
 
 		var output = [
@@ -353,6 +381,13 @@ StandardNode.prototype.build = function ( builder ) {
 		} else if ( useClearcoat ) {
 
 			output.push( 'material.clearcoatRoughness = 0.0;' );
+
+		}
+
+		if ( anisotropy ) {
+
+			output.push( 'float anisotropyFactor = ' + anisotropy.result + ';' );
+			output.push( 'float anisotropyRotationFactor = ' + ( anisotropyRotation ? anisotropyRotation.result : '0.' ) + ';' );
 
 		}
 
