@@ -258,6 +258,8 @@ StandardNode.prototype.build = function ( builder ) {
 		var anisotropy = this.anisotropy ? this.anisotropy.flow( builder, 'f' ) : undefined;
 		var anisotropyRotation = anisotropy && this.anisotropyRotation ? this.anisotropyRotation.flow( builder, 'f' ) : undefined;
 
+		builder.requires.uv[0] = builder.requires.uv[0] || !!anisotropy; // if tangents aren't available
+
 		builder.requires.transparent = alpha !== undefined;
 
 		builder.addParsCode( [
