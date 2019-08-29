@@ -219,7 +219,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				_frustum = shadow.getFrustum();
 
-				renderObject( scene, camera, shadow.camera, light, this.type );
+				renderObject( scene, camera, shadow.camera, light, this.type, light.layers );
 
 			}
 
@@ -381,13 +381,15 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function renderObject( object, camera, shadowCamera, light, type ) {
+	function renderObject( object, camera, shadowCamera, light, type, shadowLayers ) {
 
 		if ( object.visible === false ) return;
 
 		var visible = object.layers.test( camera.layers );
 
-		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
+		// Objects not affected by current light should not project shadows.
+		var projectsShadowOnLayer = ! object.material || object.layers.test( shadowLayers );
+		if ( visible && projectsShadowOnLayer && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( ( object.castShadow || ( object.receiveShadow && type === VSMShadowMap ) ) && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
@@ -431,7 +433,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			renderObject( children[ i ], camera, shadowCamera, light, type );
+			renderObject( children[ i ], camera, shadowCamera, light, type, shadowLayers );
 
 		}
 
