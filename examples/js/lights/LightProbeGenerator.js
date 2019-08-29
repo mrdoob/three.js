@@ -137,8 +137,8 @@ THREE.LightProbeGenerator = {
 		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
 			var imageWidth = renderTarget.width; // assumed to be square
-			var data = new Uint8Array(imageWidth * imageWidth * 4);
-			renderer.readRenderTargetPixels(renderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex);
+			var data = new Uint8Array( imageWidth * imageWidth * 4 );
+			renderer.readRenderTargetPixels( renderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			var pixelSize = 2 / imageWidth;
 
