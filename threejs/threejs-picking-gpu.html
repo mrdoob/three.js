@@ -205,9 +205,18 @@ function main() {
   }
   requestAnimationFrame(render);
 
+  function getCanvasRelativePosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  }
+
   function setPickPosition(event) {
-    pickPosition.x = event.clientX;
-    pickPosition.y = event.clientY;
+    const pos = getCanvasRelativePosition(event);
+    pickPosition.x = pos.x;
+    pickPosition.y = pos.y;
   }
 
   function clearPickPosition() {

@@ -159,13 +159,21 @@ Now we can use that to pick countries.
 ```js
 const pickHelper = new GPUPickHelper();
 
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
 function pickCountry(event) {
   // exit if we have not loaded the data yet
   if (!countryInfos) {
     return;
   }
 
-  const position = {x: event.clientX, y: event.clientY};
+  const position = getCanvasRelativePosition(event);
   const id = pickHelper.pick(position, pickingScene, camera);
   if (id > 0) {
     // we clicked a country. Toggle its 'selected' property
@@ -527,13 +535,21 @@ Now let's use those functions to update the palette when a country
 is selected
 
 ```js
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
 function pickCountry(event) {
   // exit if we have not loaded the data yet
   if (!countryInfos) {
     return;
   }
 
-  const position = {x: event.clientX, y: event.clientY};
+  const position = getCanvasRelativePosition(event);
   const id = pickHelper.pick(position, pickingScene, camera);
   if (id > 0) {
     const countryInfo = countryInfos[id - 1];
@@ -582,11 +598,21 @@ to drag the globe.
 +const maxMoveDeltaSq = 5 * 5;
 +const startPosition = {};
 +let startTimeMs;
++
 +function recordStartTimeAndPosition(event) {
 +  startTimeMs = performance.now();
-+  startPosition.x = event.clientX;
-+  startPosition.y = event.clientY;
++  const pos = getCanvasRelativePosition(event);
++  startPosition.x = pos.x;
++  startPosition.y = pos.y;
 +}
+
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
 
 function pickCountry(event) {
   // exit if we have not loaded the data yet
@@ -602,14 +628,14 @@ function pickCountry(event) {
 +  }
 +
 +  // if they moved assume it was a drag action
-+  const moveDeltaSq = (startPosition.x - event.clientX) ** 2 +
-+                      (startPosition.y - event.clientY) ** 2;
++  const position = getCanvasRelativePosition(event);
++  const moveDeltaSq = (startPosition.x - position.x) ** 2 +
++                      (startPosition.y - position.y) ** 2;
 +  if (moveDeltaSq > maxMoveDeltaSq) {
 +    return;
 +  }
 
-
-  const position = {x: event.clientX, y: event.clientY};
+-  const position = {x: event.clientX, y: event.clientY};
   const id = pickHelper.pick(position, pickingScene, camera);
   if (id > 0) {
     const countryInfo = countryInfos[id - 1];

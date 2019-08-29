@@ -348,13 +348,21 @@ function main() {
 
   const pickHelper = new GPUPickHelper();
 
+  function getCanvasRelativePosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  }
+
   function pickCountry(event) {
     // exit if we have not loaded the data yet
     if (!countryInfos) {
       return;
     }
 
-    const position = {x: event.clientX, y: event.clientY};
+    const position = getCanvasRelativePosition(event);
     const id = pickHelper.pick(position, pickingScene, camera);
     if (id > 0) {
       const countryInfo = countryInfos[id - 1];

@@ -969,13 +969,18 @@ the position of intersection and the normal of the face
 hit.
 
 ```js
-const mouse = {
-  x: 0,
-  y: 0,
-};
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
 function placeVoxel(event) {
-  const x = (event.clientX / canvas.clientWidth ) *  2 - 1;
-  const y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
+  const pos = getCanvasRelativePosition(event);
+  const x = (pos.x / canvas.clientWidth ) *  2 - 1;
+  const y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
 
   const start = new THREE.Vector3();
   const end = new THREE.Vector3();
@@ -997,6 +1002,12 @@ function placeVoxel(event) {
     requestRenderIfNotRequested();
   }
 }
+
+const mouse = {
+  x: 0,
+  y: 0,
+};
+
 function recordStartPosition(event) {
   mouse.x = event.clientX;
   mouse.y = event.clientY;

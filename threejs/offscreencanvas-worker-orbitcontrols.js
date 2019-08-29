@@ -19,8 +19,20 @@ class ElementProxyReceiver extends THREE.EventDispatcher {
   get clientHeight() {
     return this.height;
   }
+  getBoundingClientRect() {
+    return {
+      left: this.left,
+      top: this.top,
+      width: this.width,
+      height: this.height,
+      right: this.left + this.width,
+      bottom: this.top + this.height,
+    };
+  }
   handleEvent(data) {
     if (data.type === 'size') {
+      this.left = data.left;
+      this.top = data.top;
       this.width = data.width;
       this.height = data.height;
       return;

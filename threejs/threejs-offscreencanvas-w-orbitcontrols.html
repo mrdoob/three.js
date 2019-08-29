@@ -128,8 +128,11 @@ class ElementProxy {
     }
 
     function sendSize() {
+      const rect = element.getBoundingClientRect();
       sendEvent({
         type: 'size',
+        left: rect.left,
+        top: rect.top,
         width: element.clientWidth,
         height: element.clientHeight,
       });

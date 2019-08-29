@@ -131,9 +131,18 @@ clearPickPosition();
 
 ...
 
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
 function setPickPosition(event) {
-  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
-  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
 }
 
 function clearPickPosition() {
@@ -318,10 +327,11 @@ Because we're picking from pixels instead of ray casting we can change the code 
 
 ```js
 function setPickPosition(event) {
--  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
--  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
-+  pickPosition.x = event.clientX;
-+  pickPosition.y = event.clientY;
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  pickPosition.x = pos.x;
++  pickPosition.y = pos.y;
 }
 ```
 

@@ -81,10 +81,19 @@ function main() {  /* eslint consistent-return: 0 */
     startMainPage(canvas);
   }
 
+  function getCanvasRelativePosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  }
+
   function setPickPosition(event) {
+    const pos = getCanvasRelativePosition(event);
     sendMouse(
-        (event.clientX / canvas.clientWidth ) *  2 - 1,
-        (event.clientY / canvas.clientHeight) * -2 + 1);  // note we flip Y
+        (pos.x / canvas.clientWidth ) *  2 - 1,
+        (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
   }
 
   function clearPickPosition() {

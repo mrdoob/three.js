@@ -106,10 +106,19 @@ function main() {
   }
   requestAnimationFrame(render);
 
+  function getCanvasRelativePosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  }
+
   const temp = new THREE.Vector3();
   function setPosition(e) {
-    const x = e.clientX / canvas.clientWidth  *  2 - 1;
-    const y = e.clientY / canvas.clientHeight * -2 + 1;
+    const pos = getCanvasRelativePosition(e);
+    const x = pos.x / canvas.clientWidth  *  2 - 1;
+    const y = pos.y / canvas.clientHeight * -2 + 1;
     temp.set(x, y, 0).unproject(camera);
     state.x = temp.x;
     state.y = temp.y;

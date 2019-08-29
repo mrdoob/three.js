@@ -118,9 +118,18 @@ function init(data) {   /* eslint-disable-line no-unused-vars */
 
   requestAnimationFrame(render);
 
+  function getCanvasRelativePosition(event) {
+    const rect = inputElement.getBoundingClientRect();
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  }
+
   function setPickPosition(event) {
-    pickPosition.x = (event.clientX / inputElement.clientWidth ) *  2 - 1;
-    pickPosition.y = (event.clientY / inputElement.clientHeight) * -2 + 1;  // note we flip Y
+    const pos = getCanvasRelativePosition(event);
+    pickPosition.x = (pos.x / inputElement.clientWidth ) *  2 - 1;
+    pickPosition.y = (pos.y / inputElement.clientHeight) * -2 + 1;  // note we flip Y
   }
 
   function clearPickPosition() {

@@ -22,7 +22,7 @@ copy all the JavaScript from [the responsive example](threejs-responsive.html) i
 make the changes needed for it to run in a worker.
 
 We still need some JavaScript in our HTML file. The first thing
-we do there is look up the canvas and then transfer control of that
+we need to do there is look up the canvas and then transfer control of that
 canvas to be offscreen by calling `canvas.transferControlToOffscreen`.
 
 ```js
@@ -34,7 +34,7 @@ function main() {
 ```
 
 We can then start our worker with `new Worker(pathToScript)`.
-We then pass the `offscreen` object to the worker.
+and pass the `offscreen` object to it.
 
 ```js
 function main() {
@@ -270,7 +270,7 @@ we will now have 3 files
 
    `threejs-offscreencanvas-w-fallback.html`
 
-2. a JavaScript the contains our three.js code.
+2. a JavaScript that contains our three.js code.
 
    `shared-cubes.js`
 
@@ -456,9 +456,18 @@ const pickHelper = new PickHelper();
 We updated `pickPosition` from the mouse like this
 
 ```js
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
 function setPickPosition(event) {
-  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
-  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
 }
 window.addEventListener('mousemove', setPickPosition);
 ```
@@ -551,11 +560,12 @@ make just minor changes to use `sendMouse`
 
 ```js
 function setPickPosition(event) {
--  pickPosition.x = (event.clientX / canvas.clientWidth ) *  2 - 1;
--  pickPosition.y = (event.clientY / canvas.clientHeight) * -2 + 1;  // note we flip Y
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
 +  sendMouse(
-+      (event.clientX / canvas.clientWidth ) *  2 - 1,
-+      (event.clientY / canvas.clientHeight) * -2 + 1);  // note we flip Y
++      (pos.x / canvas.clientWidth ) *  2 - 1,
++      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
 }
 
 function clearPickPosition() {
@@ -745,12 +755,22 @@ to the shared three.js code as well while changing
 `canvas` to `inputElement`.
 
 ```js
+function getCanvasRelativePosition(event) {
+-  const rect = canvas.getBoundingClientRect();
++  const rect = inputElement.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
 function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
 -  sendMouse(
--      (event.clientX / canvas.clientWidth ) *  2 - 1,
--      (event.clientY / canvas.clientHeight) * -2 + 1);  // note we flip Y
-+  pickPosition.x = (event.clientX / inputElement.clientWidth ) *  2 - 1;
-+  pickPosition.y = (event.clientY / inputElement.clientHeight) * -2 + 1;  // note we flip Y
+-      (pos.x / canvas.clientWidth ) *  2 - 1,
+-      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
++  pickPosition.x = (pos.x / inputElement.clientWidth ) *  2 - 1;
++  pickPosition.y = (pos.y / inputElement.clientHeight) * -2 + 1;  // note we flip Y
 }
 
 function clearPickPosition() {
@@ -985,8 +1005,20 @@ class ElementProxyReceiver extends THREE.EventDispatcher {
 +  get clientHeight() {
 +    return this.height;
 +  }
++  getBoundingClientRect() {
++    return {
++      left: this.left,
++      top: this.top,
++      width: this.width,
++      height: this.height,
++      right: this.left + this.width,
++      bottom: this.top + this.height,
++    };
++  }
   handleEvent(data) {
 +    if (data.type === 'size') {
++      this.left = data.left;
++      this.top = data.top;
 +      this.width = data.width;
 +      this.height = data.height;
 +      return;
@@ -1001,7 +1033,9 @@ class ElementProxyReceiver extends THREE.EventDispatcher {
 }
 ```
 
-back in the main page we need to send the size
+back in the main page we need to send the size and the left and top positions as well.
+Note that as is we don't handle if the canvas moves, only if it resizes. If you wanted
+to handle moving you'd need to call `sendSize` anytime something moved the canvas.
 
 ```js
 class ElementProxy {
@@ -1029,8 +1063,11 @@ class ElementProxy {
     }
 
 +    function sendSize() {
++      const rect = element.getBoundingClientRect();
 +      sendEvent({
 +        type: 'size',
++        left: rect.left,
++        top: rect.top,
 +        width: element.clientWidth,
 +        height: element.clientHeight,
 +      });
