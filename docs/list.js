@@ -217,8 +217,9 @@ var list = {
 			},
 
 			"Lights / Shadows": {
-				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"LightShadow": "api/en/lights/shadows/LightShadow",
+				"PointLightShadow": "api/en/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/en/lights/shadows/SpotLightShadow"
 			},
 
@@ -458,7 +459,7 @@ var list = {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
 				"如何废置对象": "manual/zh/introduction/How-to-dispose-of-objects",
 				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
-				"How to use post-processing": "manual/zh/introduction/How-to-use-post-processing",
+				"如何使用后期处理": "manual/zh/introduction/How-to-use-post-processing",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
 			},
@@ -831,11 +832,11 @@ var list = {
 			},
 
 			"QuickHull": {
-				"Face": "examples/zh/quickhull/Face",
-				"HalfEdge": "examples/zh/quickhull/HalfEdge",
-				"QuickHull": "examples/zh/quickhull/QuickHull",
-				"VertexNode": "examples/zh/quickhull/VertexNode",
-				"VertexList": "examples/zh/quickhull/VertexList"
+				"Face": "examples/zh/math/convexhull/Face",
+				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/zh/math/convexhull/ConvexHull",
+				"VertexNode": "examples/zh/math/convexhull/VertexNode",
+				"VertexList": "examples/zh/math/convexhull/VertexList"
 			},
 
 			"渲染器": {

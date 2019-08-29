@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -68,20 +70,15 @@
 		</p>
 
 		<h2>属性</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
 
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-            加载器正在使用的[page:LoadingManager loadingManager] ，默认为[page:DefaultLoadingManager].
-		</p>
 
 		<h3>[property:String options]</h3>
 		<p>一个可选对象，用来设置内部使用的[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]工厂方法，
             默认为*undefined*.</p>
 
-		<h3>[property:String path]</h3>
-		<p>所要加载文件的基本路径。 请参考[page:.setPath]，默认为*undefined*。</p>
-
 		<h2>方法</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -95,22 +92,15 @@
             从URL中进行加载，并返回将包含数据的[page:ImageBitmap image]对象。
 		</p>
 
-		<h3>[method:ImageBitmapLoader setCrossOrigin]()</h3>
-		<p>此方法出于兼容性原因而存在，并且不实现逻辑。它确保[name]具有[page:ImageLoader]的类似接口。</p>
-
 		<h3>[method:ImageBitmapLoader setOptions]( [param:Object options] )</h3>
 		<p>
 			设置[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]的选项对象。
 		</p>
 
-		<h3>[method:ImageBitmapLoader setPath]( [param:String path] )</h3>
-		<p>
-            设置加载文件的基本路径或URL。当加载同一目录中下的许多图片时，此方法将很有用。
-		</p>
-
-
 		<h2>源</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>
