@@ -802,9 +802,9 @@ var list = {
 
 			"加载器": {
 				"BabylonLoader": "examples/zh/loaders/BabylonLoader",
-                "BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
-                "DRACOLoader": "examples/zh/loaders/DRACOLoader",
-                "GLTFLoader": "examples/zh/loaders/GLTFLoader",
+				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
+				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
+				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
@@ -828,8 +828,8 @@ var list = {
 			"导出器": {
 				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
 				"PLYExporter": "examples/zh/exporters/PLYExporter",
-                "ColladaExporter": "examples/zh/exporters/ColladaExporter"
-            },
+				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
+			},
 
 			"插件": {
 				"LookupTable": "examples/zh/Lut",
@@ -847,13 +847,12 @@ var list = {
 				"CSS2DRenderer": "examples/zh/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/zh/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/zh/renderers/SVGRenderer"
-
 			},
 
 			"实用工具": {
 				"BufferGeometryUtils": "examples/zh/utils/BufferGeometryUtils",
-                "SceneUtils": "examples/zh/utils/SceneUtils",
-                "SkeletonUtils": "examples/zh/utils/SkeletonUtils"
+				"SceneUtils": "examples/zh/utils/SceneUtils",
+				"SkeletonUtils": "examples/zh/utils/SkeletonUtils"
 			}
 
 		},
