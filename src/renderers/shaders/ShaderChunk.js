@@ -170,8 +170,6 @@ export var ShaderChunk = {
 	lights_fragment_begin: lights_fragment_begin,
 	lights_fragment_maps: lights_fragment_maps,
 	lights_fragment_end: lights_fragment_end,
-	logdepthbuf_fragment: logdepthbuf_fragment,
-	logdepthbuf_pars_fragment: logdepthbuf_pars_fragment,
 	logdepthbuf_pars_vertex: logdepthbuf_pars_vertex,
 	logdepthbuf_vertex: logdepthbuf_vertex,
 	map_fragment: map_fragment,

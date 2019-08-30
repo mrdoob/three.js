@@ -58,8 +58,6 @@ export let ShaderChunk: {
 	lights_fragment_begin: string;
 	lights_fragment_maps: string;
 	lights_fragment_end: string;
-	logdepthbuf_fragment: string;
-	logdepthbuf_pars_fragment: string;
 	logdepthbuf_pars_vertex: string;
 	logdepthbuf_vertex: string;
 	map_fragment: string;
