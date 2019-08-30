@@ -135,7 +135,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
-		var anisotropy = !!material.anisotropy;
+		var anisotropy = !! material.anisotropy;
 
 		var parameters = {
 
@@ -230,7 +230,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		};
 
-		if( anisotropy && !parameters.vertexTangents && !warnedAnisotropy ) {
+		if ( anisotropy && ! parameters.vertexTangents && ! warnedAnisotropy ) {
 
 			console.warn( 'Warning: implicit tangents for anisotropy will be flat shaded. Consider using BufferGeometryUtils.computeTangents().', material );
 			warnedAnisotropy = true;
