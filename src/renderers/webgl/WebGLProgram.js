@@ -5,7 +5,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
 
 var programIdCount = 0;
 
@@ -121,6 +121,7 @@ function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 	var chunks = [
 		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.tangentSpaceNormalMap || parameters.clearcoatNormalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.tangentSpaceNormalMap || parameters.clearcoatNormalMap || parameters.flatShading ) || ( parameters.anisotropy && ! parameters.vertexTangents ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 		( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 		( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 		( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
@@ -261,6 +262,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	} else if ( parameters.shadowMapType === PCFSoftShadowMap ) {
 
 		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF_SOFT';
+
+	} else if ( parameters.shadowMapType === VSMShadowMap ) {
+
+		shadowMapTypeDefine = 'SHADOWMAP_TYPE_VSM';
 
 	}
 
@@ -408,6 +413,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
+			parameters.anisotropy ? "#define ANISOTROPY" : '',
+
 			parameters.skinning ? '#define USE_SKINNING' : '',
 			parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
 
@@ -531,6 +538,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
+
+			parameters.anisotropy ? "#define ANISOTROPY" : "",
+			parameters.anisotropyMap ? "#define USE_ANISOTROPYMAP" : "",
+			parameters.anisotropyRotationMap ? "#define USE_ANISOTROPYROTATIONMAP" : "",
 
 			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 			parameters.flipSided ? '#define FLIP_SIDED' : '',

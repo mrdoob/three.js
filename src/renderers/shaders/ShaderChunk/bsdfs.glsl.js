@@ -97,6 +97,31 @@ float G_GGX_Smith( const in float alpha, const in float dotNL, const in float do
 
 } // validated
 
+// https://google.github.io/filament/Filament.md.html
+float D_GGXAniso( const in vec2 anisotropicM, const in vec2 xyDotH, const in float dotNH ) {
+
+	float a2 = anisotropicM.s * anisotropicM.t;
+	highp vec3 v = vec3( anisotropicM.t * xyDotH.x, anisotropicM.s * xyDotH.y, a2 * dotNH );
+	highp float v2 = dot( v, v );
+	float w2 = a2 / v2;
+	return a2 * w2 * w2 * RECIPROCAL_PI;
+}
+
+// https://google.github.io/filament/Filament.md.html
+float G_GGX_SmithCorrelated_Anisotropic(
+	vec2 anisotropicM,
+	float ToV, float BoV,
+	float ToL, float BoL,
+	float NoV, float NoL
+) {
+
+	float lambdaV = NoL * length( vec3( anisotropicM.s * ToV, anisotropicM.t * BoV, NoV ) );
+	float lambdaL = NoV * length( vec3( anisotropicM.s * ToL, anisotropicM.t * BoL, NoL ) );
+	float v = 0.5 / ( lambdaV + lambdaL );
+	return saturate( v );
+
+}
+
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float G_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
@@ -125,22 +150,42 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 }
 
 // GGX Distribution, Schlick Fresnel, GGX-Smith Visibility
-vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
+vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in GeometricContext geometry, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
-	vec3 halfDir = normalize( incidentLight.direction + viewDir );
+	vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );
 
 	float dotNL = saturate( dot( normal, incidentLight.direction ) );
-	float dotNV = saturate( dot( normal, viewDir ) );
+	float dotNV = saturate( dot( normal, geometry.viewDir ) );
 	float dotNH = saturate( dot( normal, halfDir ) );
 	float dotLH = saturate( dot( incidentLight.direction, halfDir ) );
 
 	vec3 F = F_Schlick( specularColor, dotLH );
 
-	float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+	#ifdef ANISOTROPY
 
-	float D = D_GGX( alpha, dotNH );
+		vec2 xyDotH = vec2( dot( geometry.anisotropicS, halfDir ), dot( geometry.anisotropicT, halfDir ) );
+
+		float D = D_GGXAniso( geometry.anisotropicM, xyDotH, dotNH );
+
+		float G = G_GGX_SmithCorrelated_Anisotropic(
+			geometry.anisotropicM,
+			dot( geometry.anisotropicS, geometry.viewDir ),
+			dot( geometry.anisotropicT, geometry.viewDir ),
+			dot( geometry.anisotropicS, incidentLight.direction ),
+			dot( geometry.anisotropicT, incidentLight.direction ),
+			dotNV,
+			dotNL
+		);
+
+	#else
+
+		float D = D_GGX( alpha, dotNH );
+
+		float G = G_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+
+	#endif
 
 	return F * ( G * D );
 

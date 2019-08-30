@@ -65,10 +65,10 @@
 					var uniforms = sky.material.uniforms;
 					uniforms[ "turbidity" ].value = effectController.turbidity;
 					uniforms[ "rayleigh" ].value = effectController.rayleigh;
-					uniforms[ "luminance" ].value = effectController.luminance;
 					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
 					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
-
+					uniforms[ "luminance" ].value = effectController.luminance;
+					
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
 
@@ -103,8 +103,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
 				camera.position.set( 0, 100, 2000 );
-
-				//camera.setLens(20);
 
 				scene = new THREE.Scene();
 

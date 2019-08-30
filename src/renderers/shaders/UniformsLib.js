@@ -20,6 +20,15 @@ var UniformsLib = {
 
 	},
 
+	anisotropy: {
+
+		anisotropy: { value: 0.0 },
+		anisotropyMap: { value: null },
+		anisotropyRotation: { value: 0.0 },
+		anisotropyRotationMap: { value: null },
+
+	},
+
 	specularmap: {
 
 		specularMap: { value: null },

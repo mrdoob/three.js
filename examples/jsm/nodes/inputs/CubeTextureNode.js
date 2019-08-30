@@ -6,13 +6,14 @@ import { InputNode } from '../core/InputNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
+import { NormalNode } from '../accessors/NormalNode.js';
 
 function CubeTextureNode( value, uv, bias ) {
 
 	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.uv = uv || new ReflectNode();
+	this.uv = uv || new ReflectNode( ReflectNode.CUBE, new NormalNode( NormalNode.BENT ) );
 	this.bias = bias;
 
 }
@@ -41,7 +42,7 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( bias === undefined && builder.context.bias ) {
 
-		bias = new builder.context.bias( this ).build( builder, 'f' );
+		bias = builder.context.bias.setTexture( this ).build( builder, 'f' );
 
 	}
 
