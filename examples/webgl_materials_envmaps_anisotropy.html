@@ -39,7 +39,7 @@
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
 			var controls, camera, scene, renderer;
-			var textureCube;
+			var textureCube, normalMap;
 			var anisoMaterial, isoMaterial, anisoNodeMaterial;
 			var pointLight1, pointLight1Helper;
 			var pointLight2, pointLight2Helper;
@@ -70,6 +70,7 @@
 					pointLight2.visible = !pointLight2.visible;
 					pointLight2Helper.visible = !pointLight2Helper.visible;
 				},
+				normalMap: true
 			};
 
 			init();
@@ -124,7 +125,11 @@
 
         var textureAnisotropy = textureLoader.load( "textures/checkers.png" );
         textureAnisotropy.wrapS = textureAnisotropy.wrapT = THREE.RepeatWrapping;
-        textureAnisotropy.minFilter = textureAnisotropy.magFilter = THREE.LinearFilter;
+				textureAnisotropy.minFilter = textureAnisotropy.magFilter = THREE.LinearFilter;
+
+        normalMap = textureLoader.load( "textures/decal/decal-normal.jpg" );
+        normalMap.wrapS = normalMap.wrapT = THREE.RepeatWrapping;
+        normalMap.minFilter = normalMap.magFilter = THREE.LinearFilter;
 
 				isoMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
@@ -231,6 +236,10 @@
 					isoMaterial.roughness =
 					anisoNodeMaterial.roughness.value = params.roughness;
 
+					anisoMaterial.normalMap =
+					isoMaterial.normalMap = params.normalMap ? normalMap : null;
+					anisoNodeMaterial.normal = params.normalMap ? new Nodes.NormalMapNode( new Nodes.TextureNode( normalMap ) ) : undefined;
+
 					//
 
 					anisoMaterial.anisotropy =
@@ -281,6 +290,8 @@
 				gui.add( params, "point light 2" ).onChange( updateParams );
 				gui.add( params, "pointLight2x", -1000.0, 1000.0, 10.0 ).onChange( updateParams );
 				gui.add( params, "pointLight2y", -1000.0, 1000.0, 10.0 ).onChange( updateParams );
+
+				gui.add( params, "normalMap" ).onChange( updateParams );
 
 				gui.open();
 

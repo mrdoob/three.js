@@ -147,10 +147,16 @@ StandardNode.prototype.build = function ( builder ) {
 		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
 		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
 
+		if ( this.anisotropy ) this.anisotropy.analyze( builder );
+		if ( this.anisotropyRotation ) this.anisotropyRotation.analyze( builder );
+
+		var anisotropy = this.anisotropy ? this.anisotropy.flow( builder, 'f' ) : undefined;
+		var anisotropyRotation = anisotropy && this.anisotropyRotation ? this.anisotropyRotation.flow( builder, 'f' ) : undefined;
+
 		var contextEnvironment = {
 			roughness: specularRoughness,
 			bias: new SpecularMIPLevelNode( specularRoughness ),
-			viewNormal: new NormalNode( NormalNode.BENT ),
+			viewNormal: new ExpressionNode('normal', 'vec3'),
 			gamma: true
 		};
 
@@ -207,9 +213,6 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.sheen ) this.sheen.analyze( builder );
 
-		if ( this.anisotropy ) this.anisotropy.analyze( builder );
-		if ( this.anisotropyRotation ) this.anisotropyRotation.analyze( builder );
-
 		// build code
 
 		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
@@ -254,10 +257,6 @@ StandardNode.prototype.build = function ( builder ) {
 		var clearcoatEnv = useClearcoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearcoat', context: contextClearcoatEnvironment, slot: 'environment' } ) : undefined;
 
 		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
-
-		var anisotropy = this.anisotropy ? this.anisotropy.flow( builder, 'f' ) : undefined;
-		var anisotropyRotation = anisotropy && this.anisotropyRotation ? this.anisotropyRotation.flow( builder, 'f' ) : undefined;
-
 		builder.requires.uv[0] = builder.requires.uv[0] || !!anisotropy; // if tangents aren't available
 
 		builder.requires.transparent = alpha !== undefined;
