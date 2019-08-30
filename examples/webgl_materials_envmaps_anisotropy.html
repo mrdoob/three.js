@@ -111,10 +111,6 @@
 				scene.add( pointLight2 );
 				scene.add( pointLight2Helper );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeeaa );
-				directionalLight.position.set( -1, 1, 1 );
-				scene.add( directionalLight )
-
 				// MATERIALS
 
 				var textureLoader = new THREE.TextureLoader();
@@ -216,6 +212,7 @@
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMappingExposure = 1.5;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 500;
@@ -297,6 +294,49 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				// carbon fiber
+
+				var carbonMap = textureLoader.load( "textures/carbon/Carbon.png" );
+				carbonMap.wrapS = carbonMap.wrapT = THREE.RepeatWrapping;
+
+				var carbonAnisoMap = textureLoader.load( "textures/carbon/carbon-fiber-tiny.png" );
+				carbonAnisoMap.wrapS = carbonAnisoMap.wrapT = THREE.RepeatWrapping;
+				carbonAnisoMap.minFilter = carbonAnisoMap.magFilter = THREE.NearestFilter;
+
+				var carbonMat = new Nodes.StandardNodeMaterial();
+				carbonMat.vertexTangents = true;
+				carbonMat.metalness = new Nodes.FloatNode( 1 );
+				carbonMat.roughness = new Nodes.FloatNode( .6 );
+
+				carbonMat.anisotropy = new Nodes.TextureNode( carbonAnisoMap, new Nodes.OperatorNode(
+					new Nodes.UVNode(),
+					new Nodes.FloatNode( 10 ),
+					Nodes.OperatorNode.MUL
+				) );
+				carbonMat.anisotropy = new Nodes.SwitchNode( carbonMat.anisotropy, 'x' );
+				carbonMat.anisotropy = new Nodes.ExpressionNode( "(x * 2. - 1.) * -.6", "float", {
+					x: carbonMat.anisotropy
+				} );
+
+				carbonMat.environment = new Nodes.CubeTextureNode( textureCube );
+
+				// carbonMat.color = new Nodes.TextureNode( carbonMap, new Nodes.OperatorNode(
+				// 	new Nodes.UVNode(),
+				// 	new Nodes.FloatNode( 5 ),
+				// 	Nodes.OperatorNode.MUL
+				// ) );
+				carbonMat.color = new Nodes.ColorNode( 0x404040 );
+
+				var carbonSphere = new THREE.Mesh(
+					new THREE.SphereBufferGeometry( 100, 100, 100 ),
+					carbonMat
+				);
+
+				carbonMat.clearcoat = new Nodes.FloatNode( .3 );
+				carbonMat.clearcoatRoughness = new Nodes.FloatNode( 0 );
+
+				BufferGeometryUtils.computeTangents( carbonSphere.geometry );
+				scene.add( carbonSphere );
 			}
 
 			function onWindowResize() {

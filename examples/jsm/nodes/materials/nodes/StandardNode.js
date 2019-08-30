@@ -157,7 +157,8 @@ StandardNode.prototype.build = function ( builder ) {
 			roughness: specularRoughness,
 			bias: new SpecularMIPLevelNode( specularRoughness ),
 			viewNormal: new ExpressionNode('normal', 'vec3'),
-			gamma: true
+			gamma: true,
+			anisotropy: !!anisotropy
 		};
 
 		var contextGammaOnly = {

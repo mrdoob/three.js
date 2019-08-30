@@ -45,7 +45,8 @@ NormalNode.prototype.generate = function ( builder, output ) {
 		case NormalNode.BENT:
 
 			if ( builder.isShader( 'fragment' ) ) {
-				result = 'getBentNormal( geometry, anisotropyFactor, roughnessFactor )';
+				if( builder.context.anisotropy ) result = 'getBentNormal( geometry, anisotropyFactor, roughnessFactor )';
+				else result = 'geometry.normal';
 			} else {
 				result = 'geometryNormal';
 			}
