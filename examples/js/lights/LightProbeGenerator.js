@@ -50,7 +50,7 @@ THREE.LightProbeGenerator = {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				color.copySRGBToLinear( color );
+				convertColorToLinear( color, cubeTexture.encoding );
 
 				// pixel coordinate on unit cube
 
@@ -117,5 +117,30 @@ THREE.LightProbeGenerator = {
 		return new THREE.LightProbe( sh );
 
 	}
+
+};
+
+var convertColorToLinear = function ( color, encoding, gammaFactor ) {
+
+	switch ( encoding ) {
+
+		case THREE.sRGBEncoding:
+
+			color.convertSRGBToLinear();
+			break;
+
+		case THREE.GammaEncoding:
+
+			color.convertGammaToLinear( gammaFactor );
+			break;
+
+		default:
+
+			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported encoding.' );
+			break;
+
+	}
+
+	return color;
 
 };

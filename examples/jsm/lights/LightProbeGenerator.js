@@ -4,9 +4,11 @@
 
 import {
 	Color,
+	GammaEncoding,
 	LightProbe,
 	SphericalHarmonics3,
-	Vector3
+	Vector3,
+	sRGBEncoding
 } from "../../../build/three.module.js";
 
 var LightProbeGenerator = {
@@ -57,7 +59,7 @@ var LightProbeGenerator = {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				color.copySRGBToLinear( color );
+				convertColorToLinear( color, cubeTexture.encoding );
 
 				// pixel coordinate on unit cube
 
@@ -124,6 +126,31 @@ var LightProbeGenerator = {
 		return new LightProbe( sh );
 
 	}
+
+};
+
+var convertColorToLinear = function ( color, encoding, gammaFactor ) {
+
+	switch ( encoding ) {
+
+		case sRGBEncoding:
+
+			color.convertSRGBToLinear();
+			break;
+
+		case GammaEncoding:
+
+			color.convertGammaToLinear( gammaFactor );
+			break;
+
+		default:
+
+			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported encoding.' );
+			break;
+
+	}
+
+	return color;
 
 };
 
