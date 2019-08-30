@@ -10,7 +10,6 @@ export default /* glsl */`
 #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
-#include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main() {
@@ -28,8 +27,6 @@ void main() {
 	#include <map_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
-
-	#include <logdepthbuf_fragment>
 
 	#if DEPTH_PACKING == 3200
 

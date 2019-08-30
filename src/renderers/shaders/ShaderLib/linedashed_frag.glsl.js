@@ -10,7 +10,6 @@ varying float vLineDistance;
 #include <common>
 #include <color_pars_fragment>
 #include <fog_pars_fragment>
-#include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main() {
@@ -26,7 +25,6 @@ void main() {
 	vec3 outgoingLight = vec3( 0.0 );
 	vec4 diffuseColor = vec4( diffuse, opacity );
 
-	#include <logdepthbuf_fragment>
 	#include <color_fragment>
 
 	outgoingLight = diffuseColor.rgb; // simple shader
