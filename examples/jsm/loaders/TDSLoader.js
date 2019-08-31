@@ -56,7 +56,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var scope = this;
 
-		var path = this.path !== undefined ? this.path : LoaderUtils.extractUrlBase( url );
+		var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
