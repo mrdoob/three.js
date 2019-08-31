@@ -45,7 +45,6 @@ export class MTLLoader extends Loader {
 
   load(url: string, onLoad: (materialCreator: MaterialCreator) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   parse(text: string) : MaterialCreator;
-  setBaseUrl(path: string) : void;
   setMaterialOptions(value: MaterialCreatorOptions) : void;
 }
 
