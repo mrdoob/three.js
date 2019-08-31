@@ -5,16 +5,13 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
-	FileLoader
+	FileLoader,
+	Loader
 } from "../../../build/three.module.js";
 
 var DRACOLoader = function ( manager ) {
 
-	this.manager = manager || DefaultLoadingManager;
-
-	this.path = '';
-	this.crossOrigin = 'anonymous';
+	Loader.call( this, manager );
 
 	this.decoderPath = '';
 	this.decoderConfig = {};
@@ -41,25 +38,9 @@ var DRACOLoader = function ( manager ) {
 
 };
 
-DRACOLoader.prototype = {
+DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: DRACOLoader,
-
-	setPath: function ( path ) {
-
-		this.path = path;
-
-		return this;
-
-	},
-
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
 
 	setDecoderPath: function ( path ) {
 
@@ -374,7 +355,8 @@ DRACOLoader.prototype = {
 		return this;
 
 	}
-};
+
+} );
 
 /* WEB WORKER */
 

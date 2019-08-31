@@ -1,5 +1,6 @@
 import {
   AnimationClip,
+  Loader,
   LoadingManager,
   Scene
 } from '../../../src/Three';
@@ -12,17 +13,9 @@ export interface Collada {
   scene: Scene;
 }
 
-export class ColladaLoader {
+export class ColladaLoader extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  crossOrigin: string;
-  path: string;
-  resourcePath: string;
 
   load(url: string, onLoad: (collada: Collada) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
-  setResourcePath(path: string) : this;
-  setCrossOrigin(value: string): this;
-
   parse(text: string, path: string) : Collada;
 }
