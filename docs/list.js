@@ -375,9 +375,9 @@ var list = {
 				"LoaderSupport": "examples/en/loaders/LoaderSupport",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
 				"PDBLoader": "examples/en/loaders/PDBLoader",
+				"PRWMLoader": "examples/en/loaders/PRWMLoader",
 				"SVGLoader": "examples/en/loaders/SVGLoader",
-				"TGALoader": "examples/en/loaders/TGALoader",
-				"PRWMLoader": "examples/en/loaders/PRWMLoader"
+				"TGALoader": "examples/en/loaders/TGALoader"
 			},
 
 			"Objects": {
@@ -812,9 +812,9 @@ var list = {
 				"LoaderSupport": "examples/zh/loaders/LoaderSupport",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
 				"PDBLoader": "examples/zh/loaders/PDBLoader",
+				"PRWMLoader": "examples/zh/loaders/PRWMLoader",
 				"SVGLoader": "examples/zh/loaders/SVGLoader",
-				"TGALoader": "examples/zh/loaders/TGALoader",
-				"PRWMLoader": "examples/zh/loaders/PRWMLoader"
+				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
 
 			"物体": {

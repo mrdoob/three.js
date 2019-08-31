@@ -20,9 +20,7 @@
  */
 THREE.BasisTextureLoader = function ( manager ) {
 
-	this.manager = manager || THREE.DefaultLoadingManager;
-
-	this.crossOrigin = 'anonymous';
+	THREE.Loader.call( this, manager );
 
 	this.transcoderPath = '';
 	this.transcoderBinary = null;
@@ -41,17 +39,9 @@ THREE.BasisTextureLoader = function ( manager ) {
 
 };
 
-THREE.BasisTextureLoader.prototype = {
+THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.BasisTextureLoader,
-
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
 
 	setTranscoderPath: function ( path ) {
 
@@ -315,7 +305,8 @@ THREE.BasisTextureLoader.prototype = {
 		return this;
 
 	}
-};
+
+} );
 
 /* CONSTANTS */
 
