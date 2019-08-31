@@ -654,8 +654,9 @@ var list = {
 			},
 
 			"灯光 / 阴影": {
-				"DirectionalLightShadow": "api/zh/lights/shadows/DirectionalLightShadow",
 				"LightShadow": "api/zh/lights/shadows/LightShadow",
+				"PointLightShadow": "api/zh/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/zh/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/zh/lights/shadows/SpotLightShadow"
 			},
 
@@ -801,6 +802,8 @@ var list = {
 
 			"加载器": {
 				"BabylonLoader": "examples/zh/loaders/BabylonLoader",
+				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
+				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
@@ -818,13 +821,14 @@ var list = {
 				"Lensflare": "examples/zh/objects/Lensflare",
 			},
 
-			"Post-Processing": {
+			"后期处理": {
 				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
 			},
 
 			"导出器": {
 				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
-				"PLYExporter": "examples/zh/exporters/PLYExporter"
+				"PLYExporter": "examples/zh/exporters/PLYExporter",
+				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
 			},
 
 			"插件": {
@@ -843,12 +847,12 @@ var list = {
 				"CSS2DRenderer": "examples/zh/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/zh/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/zh/renderers/SVGRenderer"
-
 			},
 
 			"实用工具": {
 				"BufferGeometryUtils": "examples/zh/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/zh/utils/SceneUtils"
+				"SceneUtils": "examples/zh/utils/SceneUtils",
+				"SkeletonUtils": "examples/zh/utils/SkeletonUtils"
 			}
 
 		},

@@ -66,6 +66,7 @@
 						var textureLoader = new THREE.TextureLoader();
 
 						var diffuse = textureLoader.load( "textures/carbon/Carbon.png" );
+						diffuse.encoding = THREE.sRGBEncoding;
 						diffuse.wrapS = THREE.RepeatWrapping;
 						diffuse.wrapT = THREE.RepeatWrapping;
 						diffuse.repeat.x = 10;
@@ -183,7 +184,11 @@
 
 			//
 
-			renderer.gammaInput = true;
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+
+			//
+
 			renderer.gammaOutput = true;
 
 			//
