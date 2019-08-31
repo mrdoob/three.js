@@ -9,7 +9,6 @@ import {
 	BackSide,
 	Color,
 	CustomBlending,
-	DefaultLoadingManager,
 	DoubleSide,
 	Face3,
 	FaceColors,
@@ -43,21 +42,21 @@ var LegacyJSONLoader = ( function () {
 
 		}
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 		this.withCredentials = false;
 
 	}
 
-	Object.assign( LegacyJSONLoader.prototype, {
+	LegacyJSONLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-		crossOrigin: 'anonymous',
+		constructor: LegacyJSONLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+			var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
 			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
@@ -88,27 +87,6 @@ var LegacyJSONLoader = ( function () {
 				onLoad( object.geometry, object.materials );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -173,7 +151,7 @@ var LegacyJSONLoader = ( function () {
 							break;
 						case 'colorAmbient':
 						case 'mapAmbient':
-							console.warn( 'THREE.Loader.createMaterial:', name, 'is no longer supported.' );
+							console.warn( 'THREE.LegacyJSONLoader.createMaterial:', name, 'is no longer supported.' );
 							break;
 						case 'colorDiffuse':
 							json.color = _color.fromArray( value ).getHex();
@@ -285,7 +263,7 @@ var LegacyJSONLoader = ( function () {
 							json.side = DoubleSide;
 							break;
 						case 'transparency':
-							console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
+							console.warn( 'THREE.LegacyJSONLoader.createMaterial: transparency has been renamed to opacity' );
 							json.opacity = value;
 							break;
 						case 'depthTest':
@@ -303,7 +281,7 @@ var LegacyJSONLoader = ( function () {
 							if ( value === 'face' ) json.vertexColors = FaceColors;
 							break;
 						default:
-							console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
+							console.error( 'THREE.LegacyJSONLoader.createMaterial: Unsupported', name, value );
 							break;
 
 					}

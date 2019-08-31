@@ -10,12 +10,14 @@
 
 THREE.TTFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
+
 	this.reversed = false;
 
 };
 
-THREE.TTFLoader.prototype = {
+
+THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.TTFLoader,
 
@@ -34,13 +36,6 @@ THREE.TTFLoader.prototype = {
 
 	},
 
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
 	parse: function ( arraybuffer ) {
 
 		function convert( font, reversed ) {
@@ -49,7 +44,7 @@ THREE.TTFLoader.prototype = {
 
 			var glyphs = {};
 			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
-			
+
 			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
 			var unicodes = Object.keys( glyphIndexMap );
 
@@ -202,4 +197,4 @@ THREE.TTFLoader.prototype = {
 
 	}
 
-};
+} );
