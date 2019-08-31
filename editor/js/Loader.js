@@ -182,10 +182,11 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					THREE.DRACOLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+					var dracoLoader = new THREE.DRACOLoader();
+					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
 
 					var loader = new THREE.GLTFLoader();
-					loader.setDRACOLoader( new THREE.DRACOLoader() );
+					loader.setDRACOLoader( dracoLoader );
 					loader.parse( contents, '', function ( result ) {
 
 						var scene = result.scene;

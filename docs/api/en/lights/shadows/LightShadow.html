@@ -22,7 +22,7 @@
 		<p>
 		[page:Camera camera] - the light's view of the world.<br /><br />
 
-		Create a new [name]. This is not intended to be called directly - it is used as a base class by
+		Create a new [name]. This is not intended to be called directly - it is used as a base class by 
 		other light shadows.
 		</p>
 
@@ -46,6 +46,12 @@
 			in shadow. Computed internally during rendering.
 		</p>
 
+		<h3>[property:WebGLRenderTarget mapPass]</h3>
+		<p>
+			The distribution map generated using the internal camera; an occlusion is calculated based 
+			on the distribution of depths. Computed internally during rendering.
+		</p>
+
 		<h3>[property:Vector2 mapSize]</h3>
 		<p>
 			A [Page:Vector2] defining the width and height of the shadow map.<br /><br />
@@ -55,7 +61,6 @@
 			although the width and height don't have to be the same (so, for example, (512, 1024) is valid).
 			The default is *( 512, 512 )*.
 		</p>
-
 
 		<h3>[property:Matrix4 matrix]</h3>
 		<p>
@@ -118,8 +123,6 @@
 
 		<h2>Source</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
-		</p>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
 	</body>
 </html>
