@@ -1,6 +1,7 @@
 import {
   AnimationClip,
   FileLoader,
+  Loader,
   LoadingManager,
   SkinnedMesh
 } from '../../../src/Three';
@@ -10,17 +11,13 @@ export interface MMDLoaderAnimationObject {
   mesh: SkinnedMesh;
 }
 
-export class MMDLoader {
+export class MMDLoader extends Loader {
   constructor(manager?: LoadingManager);
   animationBuilder: object;
   animationPath: string;
-  crossOrigin: string;
   loader: FileLoader;
-  manager: LoadingManager;
   meshBuilder: object;
-  path: string;
   parser: object | null;
-  resourcePath: string;
 
   load(url: string, onLoad: (mesh: SkinnedMesh) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   loadAnimation(url: string, onLoad: (object: SkinnedMesh | AnimationClip) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
@@ -30,7 +27,4 @@ export class MMDLoader {
   loadVPD(url: string, onLoad: (object: object) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   loadWithAnimation(url: string, vmdUrl: string | string[], onLoad: (object: MMDLoaderAnimationObject) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   setAnimationPath(animationPath: string): this;
-  setCrossOrigin(crossOrigin: string): this;
-  setPath(path: string): this;
-  setResoucePath(resourcePath: string): this;
 }

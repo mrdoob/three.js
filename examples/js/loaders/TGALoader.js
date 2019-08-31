@@ -6,11 +6,11 @@
 
 THREE.TGALoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.TGALoader.prototype = {
+THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.TGALoader,
 
@@ -60,7 +60,7 @@ THREE.TGALoader.prototype = {
 					}
 					break;
 
-				// check colormap type
+					// check colormap type
 
 				case TGA_TYPE_RGB:
 				case TGA_TYPE_GREY:
@@ -73,12 +73,12 @@ THREE.TGALoader.prototype = {
 					}
 					break;
 
-				// What the need of a file without data ?
+					// What the need of a file without data ?
 
 				case TGA_TYPE_NO_DATA:
 					console.error( 'THREE.TGALoader: No data.' );
 
-				// Invalid type ?
+					// Invalid type ?
 
 				default:
 					console.error( 'THREE.TGALoader: Invalid type "%s".', header.image_type );
@@ -471,7 +471,7 @@ THREE.TGALoader.prototype = {
 				flags: content[ offset ++ ]
 			};
 
-			// check tga if it is valid format
+		// check tga if it is valid format
 
 		tgaCheckHeader( header );
 
@@ -538,13 +538,6 @@ THREE.TGALoader.prototype = {
 
 		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
 
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
 	}
 
-};
+} );
