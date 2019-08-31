@@ -2,7 +2,7 @@ import {
   Material,
   LoadingManager,
   Mapping,
-  EventDispatcher,
+  Loader,
   BufferGeometry,
   Side,
   Texture,
@@ -39,20 +39,12 @@ export interface MaterialCreatorOptions {
   invertTrProperty?: boolean;
 }
 
-export class MTLLoader extends EventDispatcher {
+export class MTLLoader extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
   materialOptions: MaterialCreatorOptions;
-  path: string;
-  texturePath: string;
-  crossOrigin: boolean;
 
   load(url: string, onLoad: (materialCreator: MaterialCreator) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   parse(text: string) : MaterialCreator;
-  setPath(path: string) : void;
-  setTexturePath(path: string) : void;
-  setBaseUrl(path: string) : void;
-  setCrossOrigin(value: boolean) : void;
   setMaterialOptions(value: MaterialCreatorOptions) : void;
 }
 
