@@ -11,7 +11,8 @@
 
 THREE.TDSLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
+
 	this.debug = false;
 
 	this.group = null;
@@ -22,11 +23,9 @@ THREE.TDSLoader = function ( manager ) {
 
 };
 
-THREE.TDSLoader.prototype = {
+THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.TDSLoader,
-
-	crossOrigin: 'anonymous',
 
 	/**
 	 * Load 3ds file from url.
@@ -41,7 +40,7 @@ THREE.TDSLoader.prototype = {
 
 		var scope = this;
 
-		var path = this.path !== undefined ? this.path : THREE.LoaderUtils.extractUrlBase( url );
+		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
@@ -846,52 +845,6 @@ THREE.TDSLoader.prototype = {
 	},
 
 	/**
-	 * Set path to adjust the path to the original 3ds file.
-	 *
-	 * @method setPath
-	 * @param {String} path Path to file.
-	 * @return Self for chaining.
-	 */
-	setPath: function ( path ) {
-
-		this.path = path;
-
-		return this;
-
-	},
-
-	/**
-	 * Set resource path used to determine the path to attached resources like textures.
-	 *
-	 * @method setResourcePath
-	 * @param {String} resourcePath Path to resources.
-	 * @return Self for chaining.
-	 */
-	setResourcePath: function ( resourcePath ) {
-
-		this.resourcePath = resourcePath;
-
-		return this;
-
-	},
-
-	/**
-	 * Set crossOrigin value to configure CORS settings
-	 * for the image loading process.
-	 *
-	 * @method setCrossOrigin
-	 * @param {String} crossOrigin crossOrigin string.
-	 * @return Self for chaining.
-	 */
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
-
-	/**
 	 * Print debug message to the console.
 	 *
 	 * Is controlled by a flag to show or hide debug messages.
@@ -908,7 +861,8 @@ THREE.TDSLoader.prototype = {
 		}
 
 	}
-};
+
+} );
 
 // var NULL_CHUNK = 0x0000;
 var M3DMAGIC = 0x4D4D;

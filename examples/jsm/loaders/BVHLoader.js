@@ -11,8 +11,8 @@
 import {
 	AnimationClip,
 	Bone,
-	DefaultLoadingManager,
 	FileLoader,
+	Loader,
 	Quaternion,
 	QuaternionKeyframeTrack,
 	Skeleton,
@@ -22,14 +22,14 @@ import {
 
 var BVHLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	this.animateBonePositions = true;
 	this.animateBoneRotations = true;
 
 };
 
-BVHLoader.prototype = {
+BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: BVHLoader,
 
@@ -44,13 +44,6 @@ BVHLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -423,6 +416,6 @@ BVHLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { BVHLoader };
