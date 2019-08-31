@@ -33,9 +33,11 @@
 
 		<p>All of the above are called in the same way.</p>
 
-		<h3>TypedBufferAttribute( [param:Array array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
+		<h3>TypedBufferAttribute( [param:Array_or_Integer array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
 		<p>
-			array -- this can be a typed or untyped (normal) array. It will be converted to the Type specified.<br /><br />
+			array -- this can be a typed or untyped (normal) array or an integer length.
+			An array value will be converted to the Type specified.
+			If a length is given a new TypedArray will created, initialized with all elements set to zero.<br /><br />
 
 			itemSize -- the number of values of the array that should be associated with a particular vertex.<br /><br />
 
