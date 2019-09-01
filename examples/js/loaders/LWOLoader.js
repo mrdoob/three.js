@@ -2021,25 +2021,23 @@ var lwoTree;
 
 THREE.LWOLoader = function ( manager, parameters ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	parameters = parameters || {};
 
-	this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : undefined;
+	this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : '';
 
 };
 
-THREE.LWOLoader.prototype = {
+THREE.LWOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.LWOLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var self = this;
 
-		var path = ( self.path === undefined ) ? extractParentUrl( url, 'Objects' ) : self.path;
+		var path = ( self.path === '' ) ? extractParentUrl( url, 'Objects' ) : self.path;
 
 		// give the mesh a default name based on the filename
 		var modelName = url.split( path ).pop().split( '.' )[ 0 ];
@@ -2058,27 +2056,6 @@ THREE.LWOLoader.prototype = {
 
 	},
 
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
 	parse: function ( iffBuffer, path, modelName ) {
 
 		lwoTree = new IFFParser().parse( iffBuffer );
@@ -2091,7 +2068,7 @@ THREE.LWOLoader.prototype = {
 
 	}
 
-};
+} );
 
 // Parse the lwoTree object
 function LWOTreeParser( textureLoader ) {
