@@ -14,7 +14,6 @@ function NormalNode( scope ) {
 }
 
 NormalNode.LOCAL = 'local';
-NormalNode.BENT = 'bent';
 NormalNode.WORLD = 'world';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
@@ -39,17 +38,6 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 			if ( builder.isShader( 'vertex' ) ) result = 'objectNormal';
 			else result = 'geometryNormal';
-
-			break;
-
-		case NormalNode.BENT:
-
-			if ( builder.isShader( 'fragment' ) ) {
-				if( builder.context.anisotropy ) result = 'getBentNormal( geometry, anisotropyFactor, roughnessFactor )';
-				else result = 'geometry.normal';
-			} else {
-				result = 'geometryNormal';
-			}
 
 			break;
 
