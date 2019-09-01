@@ -16,6 +16,5 @@ export interface PVR {
 export class PVRLoader extends CompressedTextureLoader {
   constructor(manager?: LoadingManager);
 
-  parse(buffer: ArrayBuffer, loadMipmaps: boolean) : PVR;
-  _parser(buffer: ArrayBuffer, loadMipmaps: boolean) : PVR;
+  parse(buffer: ArrayBuffer, loadMipmaps: boolean): PVR;
 }
