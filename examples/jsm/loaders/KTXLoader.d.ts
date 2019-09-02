@@ -18,5 +18,4 @@ export class KTXLoader extends CompressedTextureLoader {
   constructor(manager?: LoadingManager);
 
   parse(buffer: ArrayBuffer, loadMipmaps: boolean) : KTX;
-  _parser(buffer: ArrayBuffer, loadMipmaps: boolean) : KTX;
 }

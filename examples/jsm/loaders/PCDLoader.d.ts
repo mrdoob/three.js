@@ -1,6 +1,6 @@
 import {
   Points,
-  Lodaer,
+  Loader,
   LoadingManager
 } from '../../../src/Three';
 
