@@ -52,6 +52,7 @@
 				decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
 				decalNormal: { url: 'textures/decal/decal-normal.jpg' },
 				cloud: { url: 'textures/lava/cloud.png' },
+				sparkle: { url: 'textures/SparkleNoiseMap.png' },
 				spherical: { url: 'textures/envmap.png' }
 			};
 
@@ -244,6 +245,7 @@
 					'basic / spherical-reflection': 'spherical-reflection',
 					'basic / transparency': 'transparency',
 					'adv / fresnel': 'fresnel',
+					'adv / car-paint': 'car-paint',
 					'adv / saturation': 'saturation',
 					'adv / top-bottom': 'top-bottom',
 					'adv / skin': 'skin',
@@ -338,7 +340,8 @@
 
 				cubemap.mapping = THREE.CubeReflectionMapping;
 
-				if ( mesh.material ) mesh.material.dispose();
+				if ( Array.isArray( mesh.material ) ) for( var i = 0; i < mesh.material.length; i++ ) mesh.material[i].dispose();
+				else if ( mesh.material ) mesh.material.dispose();
 
 				if ( rtTexture ) {
 
@@ -2189,15 +2192,21 @@
 
 						break;
 
-					case 'plush':
+					case 'car-paint':
 
 						// MATERIAL
+						// REFERENCE https://2pha.com/blog/threejs-car-paint-shader-recreating-radeon-9700-demo/
 
-						mtl = new Nodes.PhongNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var color = new Nodes.ColorNode( 0x8D8677 );
-						var mildness = new Nodes.FloatNode( 1.6 );
-						var fur = new Nodes.FloatNode( .5 );
+						var colorA = new Nodes.ColorNode( 0x660059 );
+						var colorB = new Nodes.ColorNode( 0x990000 );
+						var colorC = new Nodes.ColorNode( 0xFFFF00 );
+						var saturation = new Nodes.FloatNode( 1 );
+						var clearcoat = new Nodes.FloatNode( .5 );
+						var clearcoatRoughness = new Nodes.FloatNode( .6 );
+						var clearcoatNormal = new Nodes.FloatNode( .5 );
+						var scale = new Nodes.FloatNode( 4 );
 
 						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
 						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
@@ -2208,10 +2217,130 @@
 							Nodes.MathNode.DOT
 						);
 
-						// without luma correction for now
-						var mildnessColor = new Nodes.MulNode(
-							color,
-							mildness
+						var viewZSquare = new Nodes.MulNode( viewZ, viewZ );
+
+						var viewZColorA = new Nodes.MulNode(
+							viewZ,
+							colorA
+						);
+
+						var viewZColorB = new Nodes.MulNode(
+							viewZSquare,
+							colorB
+						);
+
+						var viewZColorC = new Nodes.MulNode(
+							new Nodes.MulNode( viewZSquare, viewZSquare ),
+							colorC
+						);
+
+						var sparkleScale = new Nodes.MulNode(
+							new Nodes.UVNode(),
+							scale
+						);
+
+						var sparkle = new Nodes.TextureNode( getTexture( "sparkle" ), sparkleScale );
+
+						var color = new Nodes.AddNode( new Nodes.AddNode( viewZColorA, viewZColorB ), viewZColorC );
+						//color = new Nodes.MathNode( color, Nodes.MathNode.SATURATE );
+
+						var finalColor = new Nodes.ColorAdjustmentNode( color, saturation, Nodes.ColorAdjustmentNode.SATURATION );
+
+						mtl.color = finalColor;
+						mtl.roughness = new Nodes.FloatNode( .2 );
+						mtl.metalness = new Nodes.FloatNode( .2 );
+						mtl.clearcoat = new Nodes.MulNode( clearcoat, sparkle );
+						mtl.clearcoatRoughness = clearcoatRoughness;
+						mtl.clearcoatNormal = new Nodes.BumpMapNode( sparkle );
+						mtl.clearcoatNormal.scale = clearcoatNormal;
+						mtl.environment = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+
+						// GUI
+
+						addGui( 'colorA', colorA.value.getHex(), function ( val ) {
+
+							colorA.value.setHex( val );
+
+						}, true );
+
+						addGui( 'colorB', colorB.value.getHex(), function ( val ) {
+
+							colorB.value.setHex( val );
+
+						}, true );
+
+						addGui( 'colorC', colorC.value.getHex(), function ( val ) {
+
+							colorC.value.setHex( val );
+
+						}, true );
+
+						addGui( 'saturation', saturation.value, function ( val ) {
+
+							saturation.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'sparkleScale', scale.value, function ( val ) {
+
+							scale.value = val;
+
+						}, false, 1, 8 );
+
+						addGui( 'clearcoat', clearcoat.value, function ( val ) {
+
+							clearcoat.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatRoughness', mtl.clearcoatRoughness.value, function ( val ) {
+
+							mtl.clearcoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatNormal', clearcoatNormal.value, function ( val ) {
+
+							clearcoatNormal.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughness', mtl.roughness.value, function ( val ) {
+
+							mtl.roughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalness', mtl.metalness.value, function ( val ) {
+
+							mtl.metalness.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'plush':
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						var color = new Nodes.ColorNode( 0x8D8677 );
+						var fur = new Nodes.FloatNode( .5 );
+						var scale = new Nodes.FloatNode( 1.2 );
+
+						var uvScale = new Nodes.MulNode(
+							new Nodes.UVNode(),
+							scale
+						);
+
+						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
+
+						var viewZ = new Nodes.MathNode(
+							posDirection,
+							norDirection,
+							Nodes.MathNode.DOT
 						);
 
 						var furScale = new Nodes.MulNode(
@@ -2220,11 +2349,12 @@
 						);
 
 						mtl.color = color;
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ), uvScale ) );
 						mtl.normal.scale = furScale;
-						mtl.environment = mildnessColor;
-						mtl.environmentAlpha = new Nodes.MathNode( viewZ, Nodes.MathNode.INVERT );
-						mtl.shininess = new Nodes.FloatNode( 0 );
+						mtl.environment = new Nodes.CubeTextureNode( cubemap );
+						mtl.sheen = new Nodes.FloatNode( 1 );
+						mtl.roughness = new Nodes.FloatNode( 1 );
+						mtl.metalness = new Nodes.FloatNode( 0 );
 
 						// GUI
 
@@ -2234,17 +2364,17 @@
 
 						}, true );
 
-						addGui( 'mildness', mildness.value, function ( val ) {
-
-							mildness.value = val;
-
-						}, false, 1, 2 );
-
 						addGui( 'fur', fur.value, function ( val ) {
 
 							fur.value = val;
 
 						}, false, 0, 2 );
+
+						addGui( 'scale', scale.value, function ( val ) {
+
+							scale.value = val;
+
+						}, false, 0, 5 );
 
 						break;
 
@@ -2345,15 +2475,17 @@
 
 						// MATERIAL
 
-						mtl = new Nodes.PhongNodeMaterial();
+						var celMtl = new Nodes.PhongNodeMaterial();
 
 						var count = new Nodes.FloatNode( 3.43 );
 						var sceneDirectLight = new Nodes.LightNode();
 						var color = new Nodes.ColorNode( 0xAABBFF );
 
 						var lineColor = new Nodes.ColorNode( 0xFF0000 );
-						var lineSize = new Nodes.FloatNode( 0.23 );
-						var lineInner = new Nodes.FloatNode( 0 );
+						var innerline = new Nodes.FloatNode( 0.1 );
+						var inner = new Nodes.FloatNode( 0.05 );
+
+						var outline = new Nodes.FloatNode( 0.4 );
 
 						// CEL
 
@@ -2397,8 +2529,8 @@
 
 						var lineScaled = new Nodes.MathNode(
 							line,
-							lineSize,
-							lineInner,
+							innerline,
+							inner,
 							Nodes.MathNode.SMOOTHSTEP
 						);
 
@@ -2406,12 +2538,38 @@
 
 						// APPLY
 
-						mtl.color = color;
-						mtl.light = posCelLight;
-						mtl.shininess = new Nodes.FloatNode( 0 );
+						celMtl.color = color;
+						celMtl.light = posCelLight;
+						celMtl.shininess = new Nodes.FloatNode( 0 );
 
-						mtl.environment = lineColor;
-						mtl.environmentAlpha = innerContour;
+						celMtl.environment = lineColor;
+						celMtl.environmentAlpha = innerContour;
+
+						// OUTLINE
+
+						var outlineMtl = new Nodes.PhongNodeMaterial()
+						outlineMtl.depthWrite = false;
+						outlineMtl.side = THREE.BackSide;
+						outlineMtl.position = new Nodes.AddNode(
+							new Nodes.PositionNode(),
+							new Nodes.MulNode(
+								new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
+								outline
+							)
+						);
+
+						outlineMtl.environment = lineColor;
+
+						// MULTIPASS
+
+						if ( mesh.geometry.groups.length === 0 ) {
+
+							mesh.geometry.addGroup( 0, Infinity, 0 );
+							mesh.geometry.addGroup( 0, Infinity, 1 );
+
+						}
+
+						mtl = [ outlineMtl, celMtl ];
 
 						// GUI
 
@@ -2433,23 +2591,29 @@
 
 						}, false, 1, 8 );
 
-						addGui( 'lineSize', lineSize.value, function ( val ) {
+						addGui( 'inner', inner.value, function ( val ) {
 
-							lineSize.value = val;
+							inner.value = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'lineInner', lineInner.value, function ( val ) {
+						addGui( 'innerline', innerline.value, function ( val ) {
 
-							lineInner.value = val;
+							innerline.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'outline', outline.value, function ( val ) {
+
+							outline.value = val;
 
 						}, false, 0, 1 );
 
 						addGui( 'ignoreIndirectLight', false, function ( val ) {
 
-							mtl.ao = val ? new Nodes.FloatNode() : undefined;
+							celMtl.ao = val ? new Nodes.FloatNode() : undefined;
 
-							mtl.needsUpdate = true;
+							celMtl.needsUpdate = true;
 
 						} );
 
@@ -2488,7 +2652,7 @@
 						mtl.color = new Nodes.ExpressionNode( "myCustomUv + (sin(myspeed)*.5) + (position * .05)", "vec3" );
 						mtl.color.keywords[ "myspeed" ] = myspeed;
 
-						mtl.position = new Nodes.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
+						mtl.position = new Nodes.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (normal.world*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
 						mtl.position.keywords[ "myspeed" ] = myspeed;
 
 						// add global keyword ( variable or const )
@@ -2607,6 +2771,8 @@
 						break;
 
 					case 'node-position':
+
+						move = true;
 
 						// MATERIAL
 
