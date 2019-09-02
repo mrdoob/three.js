@@ -79,7 +79,7 @@ THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loade
 
 					loaded ++;
 
-					var texData = scope.hdrLoader._parser( buffer );
+					var texData = scope.hdrLoader.parse( buffer );
 
 					if ( ! texData ) return;
 
