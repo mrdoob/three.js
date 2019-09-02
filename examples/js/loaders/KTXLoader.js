@@ -12,27 +12,28 @@ THREE.KTXLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
 
-	this._parser = THREE.KTXLoader.parse;
-
 };
 
-THREE.KTXLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.KTXLoader.prototype.constructor = THREE.KTXLoader;
+THREE.KTXLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
 
-THREE.KTXLoader.parse = function ( buffer, loadMipmaps ) {
+	constructor: THREE.KTXLoader,
 
-	var ktx = new KhronosTextureContainer( buffer, 1 );
+	parse: function ( buffer, loadMipmaps ) {
 
-	return {
-		mipmaps: ktx.mipmaps( loadMipmaps ),
-		width: ktx.pixelWidth,
-		height: ktx.pixelHeight,
-		format: ktx.glInternalFormat,
-		isCubemap: ktx.numberOfFaces === 6,
-		mipmapCount: ktx.numberOfMipmapLevels
-	};
+		var ktx = new KhronosTextureContainer( buffer, 1 );
 
-};
+		return {
+			mipmaps: ktx.mipmaps( loadMipmaps ),
+			width: ktx.pixelWidth,
+			height: ktx.pixelHeight,
+			format: ktx.glInternalFormat,
+			isCubemap: ktx.numberOfFaces === 6,
+			mipmapCount: ktx.numberOfMipmapLevels
+		};
+
+	}
+
+} );
 
 var KhronosTextureContainer = ( function () {
 
