@@ -96,7 +96,7 @@ HDRCubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 					loaded ++;
 
-					var texData = scope.hdrLoader._parser( buffer );
+					var texData = scope.hdrLoader.parse( buffer );
 
 					if ( ! texData ) return;
 

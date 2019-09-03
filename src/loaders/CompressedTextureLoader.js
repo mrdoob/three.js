@@ -7,6 +7,8 @@ import { Loader } from './Loader.js';
  * @author mrdoob / http://mrdoob.com/
  *
  * Abstract Base class to block based textures loader (dds, pvr, ...)
+ *
+ * Sub classes have to implement the parse() method which will be used in load().
  */
 
 function CompressedTextureLoader( manager ) {

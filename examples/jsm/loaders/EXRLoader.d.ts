@@ -18,6 +18,6 @@ export class EXRLoader extends DataTextureLoader {
   constructor(manager?: LoadingManager);
   type: TextureDataType;
 
-  _parser(buffer: ArrayBuffer) : EXR;
+  parse(buffer: ArrayBuffer) : EXR;
   setDataType(type: TextureDataType): this;
 }
