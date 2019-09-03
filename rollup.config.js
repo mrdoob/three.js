@@ -201,14 +201,19 @@ export default [
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble()
+			buble( {
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+			} )
 		],
 		output: [
 			{
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.js',
-				indent: '\t',
+				indent: '\t'
 			}
 		]
 	},
