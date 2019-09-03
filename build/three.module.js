@@ -35107,6 +35107,8 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
  * @author mrdoob / http://mrdoob.com/
  *
  * Abstract Base class to block based textures loader (dds, pvr, ...)
+ *
+ * Sub classes have to implement the parse() method which will be used in load().
  */
 
 function CompressedTextureLoader( manager ) {
@@ -35233,14 +35235,13 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
  * @author Nikos M. / https://github.com/foo123/
  *
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
+ *
+ * Sub classes have to implement the parse() method which will be used in load().
  */
 
 function DataTextureLoader( manager ) {
 
 	Loader.call( this, manager );
-
-	// override in sub classes
-	this._parser = null;
 
 }
 
@@ -35259,7 +35260,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
-			var texData = scope._parser( buffer );
+			var texData = scope.parse( buffer );
 
 			if ( ! texData ) return;
 
