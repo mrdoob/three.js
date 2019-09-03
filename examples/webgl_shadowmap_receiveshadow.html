@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shadow map - per-object receive shadow</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			var camera, scene, renderer;
+			var caster;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set(0, 200, 400);
+				camera.lookAt( new THREE.Vector3(0, 0, 0) );
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				var material = new THREE.MeshPhysicalMaterial( { color: 0xff8800 } );
+
+				caster = new THREE.Mesh( geometry, material );
+				caster.castShadow = true;
+				caster.receiveShadow = false;
+				scene.add( caster );
+
+				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1000, 1000 ), material );
+				scene.add( ground );
+				ground.position.set(0, -80, 0);
+				ground.rotation.x = - Math.PI / 2;
+				ground.castShadow = false;
+				ground.receiveShadow = true;
+
+				var light = new THREE.PointLight();
+				scene.add(light);
+				light.position.set(0, 600, 0);
+				light.castShadow = true;
+				light.shadow.camera.far = 1000;
+
+				// We use a high bias value mostly because that can reveal bugs in the implementation of caster.receiveShadow
+				light.shadow.bias = 0.05;
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				caster.rotation.x += 0.005;
+				caster.rotation.y += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
