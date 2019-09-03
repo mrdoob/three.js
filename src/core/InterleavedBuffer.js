@@ -40,7 +40,15 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		}
 
-		this.count = array !== undefined ? array.length / this.stride : 0;
+		var count = array !== undefined ? array.length / this.stride : 0;
+
+		if ( count !== this.count ) {
+
+			console.warn( 'THREE.InterleavedBuffer: Changing the size of an attribute with .setArray() has been deprecated. Replace with a new buffer instead.' );
+
+		}
+
+		this.count = count;
 		this.array = array;
 
 		return this;

@@ -53,7 +53,15 @@ Object.assign( BufferAttribute.prototype, {
 
 		}
 
-		this.count = array !== undefined ? array.length / this.itemSize : 0;
+		var count = array !== undefined ? array.length / this.itemSize : 0;
+
+		if ( count !== this.count ) {
+
+			console.warn( 'THREE.BufferAttribute: Changing the size of an attribute with .setArray() has been deprecated. Replace with a new buffer instead.' );
+
+		}
+
+		this.count = count;
 		this.array = array;
 
 		return this;
