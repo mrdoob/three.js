@@ -128,7 +128,6 @@ export class NodeBuilder {
   getIncludes(type: string, shader: string): object[];
   getIncludesCode(type: string, shader: string): string;
   getContextProperty(name: string): string;
-  getContextClass(name: string): string;
   getConstructorFromLength(len: number): string;
   isTypeMatrix(format: string): boolean;
   getTypeLength(type: string): number;

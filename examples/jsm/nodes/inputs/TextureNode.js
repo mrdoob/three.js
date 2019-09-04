@@ -40,7 +40,7 @@ TextureNode.prototype.getUVNode = function ( builder ) {
 TextureNode.prototype.getBiasNode = function ( builder ) {
 	
 	// contextually bias is used normally in physically-based material
-  var contextuallyBias = builder.getContextProperty( 'bias' );
+	var contextuallyBias = builder.getContextProperty( 'bias' );
 
 	return contextuallyBias ? contextuallyBias.setTexture( this ) : this.bias;
 
@@ -81,7 +81,10 @@ TextureNode.prototype.generate = function ( builder, output ) {
 	// include => is used to include or not functions if used FunctionNode
 	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
 
-	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( false );
+	var colorSpaceContext = new NodeContext()
+		.setProperty( 'include', builder.isShader( 'vertex' ) )
+		.setProperty( 'caching', false );
+
 	var outputType = this.getType( builder );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );

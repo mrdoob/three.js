@@ -109,10 +109,20 @@ PhongNode.prototype.build = function ( builder ) {
 
 		// flow context
 
-		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
-		var lightFlowContext = new NodeContext().setCache( 'light' );
+		var colorFlowContext = new NodeContext().setSlot( 'color' );
+		var lightFlowContext = new NodeContext().setSlot( 'light' );
 		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
-		var environmentFlowContext = new NodeContext().setSlot( 'environment' ).setGamma( true );
+		var environmentFlowContext = new NodeContext().setSlot( 'environment' );
+
+		// custom caching
+
+		lightFlowContext.setCache( 'light' );
+
+		// contextually gamma
+
+		colorFlowContext.setProperty( 'gamma', true );
+
+		environmentFlowContext.setProperty( 'gamma', true );
 
 		// analyze all nodes to reuse generate codes
 

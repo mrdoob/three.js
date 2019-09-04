@@ -56,7 +56,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 			case ReflectNode.VECTOR:
 
 				var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
-				var roughnessNode = builder.context.roughness;
+				var roughnessNode = builder.getContextProperty( 'roughness' );
 
 				var viewNormal = viewNormalNode.build( builder, 'v3' );
 				var viewPosition = '-normalize( ' + new PositionNode( PositionNode.VIEW ).build( builder, 'v3' ) + ' )';

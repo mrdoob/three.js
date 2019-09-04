@@ -2,18 +2,13 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-function NodeContext() {
+function NodeContext( slot ) {
 
-	this.slot = '';
+	this.slot = slot || '';
 	this.cache = '';
 	this.data = {};
 
 }
-
-NodeContext.GAMMA = 'gamma';
-NodeContext.INCLUDE = 'include';
-NodeContext.CACHING = 'caching';
-NodeContext.UV = 'uv';
 
 NodeContext.prototype = {
 
@@ -43,35 +38,11 @@ NodeContext.prototype = {
 
 	},
 
-	setClass: function ( name, value ) {
-
-		return this.setProperty( name + 'Class', value );
-
-	},
-
-	setGamma: function ( value ) {
-
-		return this.setProperty( NodeContext.GAMMA, value );
-
-	},
-
-	setInclude: function ( value ) {
-
-		return this.setProperty( NodeContext.INCLUDE, value );
-
-	},
-
 	setSampler: function ( uv ) {
 
 		var cacheId = `sampler-uv-${uv.uuid}`;
 
-		return this.setCache( cacheId ).setProperty( NodeContext.UV, uv );
-
-	},
-
-	setCaching: function ( value ) {
-
-		return this.setProperty( NodeContext.CACHING, value );
+		return this.setCache( cacheId ).setProperty( 'uv', uv );
 
 	}
 

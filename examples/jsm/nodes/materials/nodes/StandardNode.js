@@ -125,36 +125,62 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		
-
 		// flow context
 
-		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
-		var lightFlowContext = new NodeContext().setCache( 'light' );
-		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
-		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setProperty( 'bias', RoughnessToBlinnExponentNode );
-		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setProperty( 'bias', RoughnessToBlinnExponentNode );
-		var clearcoatRadianceFlowContext = new NodeContext().setSlot( 'clearcoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setProperty( 'bias', RoughnessToBlinnExponentNode );
+		var colorFlowContext = new NodeContext( 'color' );
+		var lightFlowContext = new NodeContext( 'light' );
+		var emissiveFlowContext = new NodeContext( 'emissive' );
+		var radianceFlowContext = new NodeContext( 'radiance' );
+		var irradianceFlowContext = new NodeContext( 'irradiance' );
+		var clearcoatRadianceFlowContext = new NodeContext( 'clearcoatRadiance' );
 
-    // context need to environment custom roughness
+		// custom caching
+
+		lightFlowContext.setCache( 'light' );
+
+		radianceFlowContext.setCache( 'radiance' );
+		irradianceFlowContext.setCache( 'irradiance' );
+
+		clearcoatRadianceFlowContext.setCache( 'radiance' );
+
+		// contextually gamma
+
+		colorFlowContext.setProperty( 'gamma', true );
+
+		radianceFlowContext.setProperty( 'gamma', true );
+		irradianceFlowContext.setProperty( 'gamma', true );
+
+		clearcoatRadianceFlowContext.setProperty( 'gamma', true );
+
+		// contextually roughness
 
 		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
 		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
-    
-    radianceFlowContext.setProperty( 'roughness', specularRoughness );
-    irradianceFlowContext.setProperty( 'roughness', specularRoughness );
-    
-    irradianceFlowContext.setProperty( 'roughness', clearcoatRoughness );
-    
-		// context need to environment and clearcoat custom normals
 
-		var envViewNormalSystem = new ExpressionNode( 'normal', 'v3' );
-		var clearcoatViewNormalSystem = new ExpressionNode( 'clearcoatNormal', 'v3' );
+		radianceFlowContext.setProperty( 'roughness', specularRoughness );
+		irradianceFlowContext.setProperty( 'roughness', specularRoughness );
 
-		radianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
-		irradianceFlowContext.setProperty( 'viewNormal', envViewNormalSystem );
+		clearcoatRadianceFlowContext.setProperty( 'roughness', clearcoatRoughness );
 
-		clearcoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormalSystem );
+		// contextually normals
+
+		var envViewNormal = new ExpressionNode( 'normal', 'v3' );
+		var clearcoatViewNormal = new ExpressionNode( 'clearcoatNormal', 'v3' );
+
+		radianceFlowContext.setProperty( 'viewNormal', envViewNormal );
+		irradianceFlowContext.setProperty( 'viewNormal', envViewNormal );
+
+		clearcoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormal );
+
+		// contextually bias
+
+		var specularBias = new SpecularMIPLevelNode( specularRoughness );
+		var clearcoatBias = new SpecularMIPLevelNode( clearcoatRoughness );
+
+		radianceFlowContext.setProperty( 'bias', specularBias );
+		irradianceFlowContext.setProperty( 'bias', specularBias );
+
+		clearcoatRadianceFlowContext.setProperty( 'bias', clearcoatBias );
 
 		// analyze all nodes to reuse generate codes
 
@@ -460,11 +486,17 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( environment ) {
 
-			output.push( environment.radiance.code );
+			output.push(
+				environment.radiance.code,
+				"radiance += " + environment.radiance.result + ";"
+			);
 
 			if ( builder.requires.irradiance ) {
 
-				output.push( environment.irradiance.code );
+				output.push(
+					environment.irradiance.code,
+					"iblIrradiance += PI * " + environment.irradiance.result + ";"
+				);
 
 			}
 
@@ -473,26 +505,18 @@ StandardNode.prototype.build = function ( builder ) {
 				output.push(
 					clearcoatRadiance.code,
 					"clearcoatRadiance += " + clearcoatRadiance.result + ";"
-
 				);
-
-			}
-
-			output.push( "radiance += " + environment.radiance.result + ";" );
-
-			if ( builder.requires.irradiance ) {
-
-				output.push( "iblIrradiance += PI * " + environment.irradiance.result + ";" );
 
 			}
 
 		}
 
-		output.push(
-			"#include <lights_fragment_end>"
-		);
+		// compute outgoing light
 
-		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
+		output.push( 
+			"#include <lights_fragment_end>",
+			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" 
+		);
 
 		if ( useTransparent ) {
 

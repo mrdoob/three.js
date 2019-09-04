@@ -60,7 +60,10 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	// include => is used to include or not functions if used FunctionNode
 	// ignoreCache => not create variables temp nodeT0..9 to optimize the code
 
-	var contextSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( false );
+	var contextSpaceContext = new NodeContext()
+		.setProperty( 'include', builder.isShader( 'vertex' ) )
+		.setProperty( 'caching', false );
+
 	var outputType = this.getType( builder );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );

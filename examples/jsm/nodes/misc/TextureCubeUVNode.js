@@ -7,13 +7,13 @@ import { ConstNode } from '../core/ConstNode.js';
 import { StructNode } from '../core/StructNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 
-function TextureCubeUVNode( uv, textureSize, bias ) {
+function TextureCubeUVNode( uv, textureSize, roughness ) {
 
 	TempNode.call( this, 'TextureCubeUVData' ); // TextureCubeUVData is type as StructNode
 
 	this.uv = uv;
 	this.textureSize = textureSize;
-	this.bias = bias;
+	this.roughness = roughness;
 
 }
 
@@ -171,10 +171,10 @@ TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 
 		var textureCubeUV = builder.include( TextureCubeUVNode.Nodes.textureCubeUV );
 
-		var biasNode = this.bias || builder.context.bias;
+		var roughnessNode = this.roughness || builder.getContextProperty( 'roughness' );
 
 		return builder.format( textureCubeUV + '( ' + this.uv.build( builder, 'v3' ) + ', ' +
-			biasNode.build( builder, 'f' ) + ', ' +
+			roughnessNode.build( builder, 'f' ) + ', ' +
 			this.textureSize.build( builder, 'f' ) + ' )', this.getType( builder ), output );
 
 	} else {
@@ -197,7 +197,7 @@ TextureCubeUVNode.prototype.toJSON = function ( meta ) {
 
 		data.uv = this.uv.toJSON( meta ).uuid;
 		data.textureSize = this.textureSize.toJSON( meta ).uuid;
-		data.blinnExponentToRoughness = this.blinnExponentToRoughness.toJSON( meta ).uuid;
+		if ( data.roughness ) data.roughness = this.roughness.toJSON( meta ).uuid;
 
 	}
 

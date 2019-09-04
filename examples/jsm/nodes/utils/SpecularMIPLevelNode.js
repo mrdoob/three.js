@@ -21,12 +21,14 @@ SpecularMIPLevelNode.Nodes = ( function () {
 
 	var getSpecularMIPLevel = new FunctionNode( [
 		// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-		"float getSpecularMIPLevel( const in float roughness, const in float maxMIPLevelScalar ) {",
+		"float getSpecularMIPLevel( const in float roughness, const in int maxMIPLevel ) {",
+
+		"	float maxMIPLevelScalar = float( maxMIPLevel );",
 
 		"	float sigma = PI * roughness * roughness / ( 1.0 + roughness );",
 		"	float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );",
 
-		// clamp to allowable LOD ranges.
+			// clamp to allowable LOD ranges.
 		"	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );",
 
 		"}"
@@ -59,7 +61,7 @@ SpecularMIPLevelNode.prototype.generate = function ( builder, output ) {
 
 		var getSpecularMIPLevel = builder.include( SpecularMIPLevelNode.Nodes.getSpecularMIPLevel );
 
-		return builder.format( getSpecularMIPLevel + '( ' + this.roughness.build( builder, 'f' ) + ', ' + this.maxMIPLevel.build( builder, 'f' ) + ' )', this.type, output );
+		return builder.format( getSpecularMIPLevel + '( ' + this.roughness.build( builder, 'f' ) + ', ' + this.maxMIPLevel.build( builder, 'i' ) + ' )', this.type, output );
 
 	} else {
 

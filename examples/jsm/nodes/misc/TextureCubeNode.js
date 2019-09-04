@@ -17,7 +17,7 @@ function TextureCubeNode( value, textureSize, uv, bias ) {
 
 	this.value = value;
 
-	textureSize = textureSize || new FloatNode( 1024 );
+	textureSize = textureSize || new FloatNode( 1024 ).setReadonly( true );
 
 	this.radianceCache = { uv: new TextureCubeUVNode(
 		uv || new ReflectNode( ReflectNode.VECTOR ),
@@ -53,7 +53,10 @@ TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache ) {
 	// include => is used to include or not functions if used FunctionNode
 	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
 
-	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( false );
+	var colorSpaceContext = new NodeContext()
+		.setProperty( 'include', builder.isShader( 'vertex' ) )
+		.setProperty( 'caching', false );
+
 	var outputType = this.getType( builder );
 
 	cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
@@ -76,13 +79,15 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 	if ( builder.isShader( 'fragment' ) ) {
 
-		builder.require( 'irradiance' );
+		var contextuallyBias = builder.getContextProperty( 'bias' );
 
-		if ( builder.context.bias ) {
+		if ( contextuallyBias ) {
 
-			builder.context.bias.setTexture( this );
+			contextuallyBias.setTexture( this.value );
 
 		}
+
+		builder.require( 'irradiance' );
 
 		var cache = builder.slot === 'irradiance' ? this.irradianceCache : this.radianceCache;
 		var result = this.generateTextureCubeUV( builder, cache );

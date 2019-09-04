@@ -657,7 +657,7 @@ NodeBuilder.prototype = {
 
 		node = typeof node === 'string' ? NodeLib.get( node ) : node;
 
-		if ( this.getContextProperty( NodeContext.INCLUDE ) === false ) {
+		if ( this.getContextProperty( 'include' ) === false ) {
 
 			return node.name;
 
@@ -1012,7 +1012,7 @@ NodeBuilder.prototype = {
 
 	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
 
-		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.getContextProperty( NodeContext.GAMMA ) && ( this.renderer ? this.renderer.gammaInput : false );
+		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.getContextProperty( 'gamma' ) && ( this.renderer ? this.renderer.gammaInput : false );
 
 		var encoding;
 
