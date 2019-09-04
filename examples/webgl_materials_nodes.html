@@ -2200,10 +2200,10 @@
 						var colorB = new Nodes.ColorNode( 0x990000 );
 						var colorC = new Nodes.ColorNode( 0xFFFF00 );
 						var saturation = new Nodes.FloatNode( 1 );
-						var clearcoat = new Nodes.FloatNode( .5 );
-						var clearcoatRoughness = new Nodes.FloatNode( .6 );
-						var clearcoatNormal = new Nodes.FloatNode( .5 );
-						var scale = new Nodes.FloatNode( 4 );
+						var clearcoat = new Nodes.FloatNode( 1 );
+						var clearcoatRoughness = new Nodes.FloatNode( .4 );
+						var clearcoatNormal = new Nodes.FloatNode( 0 );
+						var scale = new Nodes.FloatNode( 1 );
 
 						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
 						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
