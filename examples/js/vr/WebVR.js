@@ -47,6 +47,33 @@ THREE.WEBVR = {
 
 		}
 
+		function getXRSessionInit( mode, options) {
+			var space = (options || {}).referenceSpaceType || 'local-floor';
+			var sessionInit = options.sessionInit || {};
+
+			// Nothing to do for default features.
+			if ( space == 'viewer' )
+				return sessionInit;
+			if ( space == 'local' && mode.startsWith('immersive' ) )
+				return sessionInit;
+
+			// If the user already specified the space as an optional or required feature, don't do anything.
+			if ( sessionInit.optionalFeatures && sessionInit.optionalFeatures.includes(space) )
+				return sessionInit;
+			if ( sessionInit.requiredFeatures && sessionInit.requiredFeatures.includes(space) )
+				return sessionInit;
+
+			// The user didn't request the reference space type as a feature. Add it to a shallow copy
+			// of the user-supplied sessionInit requiredFeatures (if any) to ensure it's valid to
+			// request it later.
+			var newInit = Object.assign( {}, sessionInit );
+			newInit.requiredFeatures = [ space ];
+			if ( sessionInit.requiredFeatures ) {
+				newInit.requiredFeatures = newInit.requiredFeatures.concat( sessionInit.requiredFeatures );
+			}
+			return newSessionInit;
+		}
+
 		function showEnterXR( /*device*/ ) {
 
 			var currentSession = null;
@@ -100,7 +127,7 @@ THREE.WEBVR = {
 				if ( currentSession === null ) {
 
 					var mode = options.mode || 'immersive-vr';
-					var sessionInit = options.sessionInit || {};
+					var sessionInit = getXRSessionInit( mode, options );
 					navigator.xr.requestSession( mode, sessionInit ).then( onSessionStarted );
 
 				} else {

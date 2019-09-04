@@ -70,11 +70,13 @@ renderer.setAnimationLoop( function () {
 	<code>
 let options = {
 	mode: 'immersive-ar', // Default is "immersive-vr"
+	referenceSpaceType: 'local', // Default is "local-floor"
 	sessionInit: {
 		// These options are passed as-is to WebXR's "createSession" call,
 		// use them to request non-default reference space types or potential future features.
-		requiredFeatures: ['local-floor'],
-		optionalFeatures: ['bounded-floor', 'unbounded']
+		// The requested referenceSpaceType is automatically added to requiredFeatures.
+		requiredFeatures: [],
+		optionalFeatures: ['unbounded']
 	}
 };
 document.body.appendChild( WEBVR.createButton( renderer, options ) );
