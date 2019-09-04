@@ -5,6 +5,7 @@
 
 import { Math as _Math } from '../../../../build/three.module.js';
 import { Node } from './Node.js';
+import { NodeContext } from './NodeContext.js';
 
 function TempNode( type, params ) {
 
@@ -57,7 +58,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 			return data.name;
 
-		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( builder.context.ignoreCache || data.deps === 1 ) ) ) {
+		} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( builder.getContextProperty( NodeContext.CACHING ) === false || data.deps === 1 ) ) ) {
 
 			return Node.prototype.build.call( this, builder, output, uuid );
 
@@ -117,7 +118,7 @@ TempNode.prototype.getLabel = function ( /* builder */ ) {
 
 TempNode.prototype.getUuid = function ( unique ) {
 
-	var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
+	var uuid = unique || unique === undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
 	if ( typeof this.scope === "string" ) uuid = this.scope + '-' + uuid;
 

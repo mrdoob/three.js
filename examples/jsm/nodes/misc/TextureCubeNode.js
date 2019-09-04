@@ -2,10 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { TempNode } from '../core/TempNode.js';
-import { FloatNode } from '../inputs/FloatNode.js';
-import { ExpressionNode } from '../core/ExpressionNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
+import { TempNode } from '../core/TempNode.js';
+import { NodeContext } from '../core/NodeContext.js';
+import { ExpressionNode } from '../core/ExpressionNode.js';
+import { FloatNode } from '../inputs/FloatNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
@@ -49,28 +50,23 @@ TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache ) {
 	// add a custom context for fix incompatibility with the core
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
-	// context.include =: is used to include or not functions if used FunctionNode
-	// context.ignoreCache =: not create temp variables nodeT0..9 to optimize the code
-	var context = { include: builder.isShader( 'vertex' ), ignoreCache: true };
-	var outputType = this.getType( builder );
+	// include => is used to include or not functions if used FunctionNode
+	// ignoreCache => not create temp variables nodeT0..9 to optimize the code
 
-	builder.addContext( context );
+	var colorSpaceContext = new NodeContext().setInclude( builder.isShader( 'vertex' ) ).setCaching( false );
+	var outputType = this.getType( builder );
 
 	cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	cache.colorSpace10.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 	cache.colorSpace10.input.parse( color10 );
 
-	color10 = cache.colorSpace10.build( builder, outputType );
+	color10 = cache.colorSpace10.buildContext( colorSpaceContext, builder, outputType );
 
 	cache.colorSpace20 = cache.colorSpace20 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
 	cache.colorSpace20.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 	cache.colorSpace20.input.parse( color20 );
 
-	color20 = cache.colorSpace20.build( builder, outputType );
-
-	// end custom context
-
-	builder.removeContext();
+	color20 = cache.colorSpace20.buildContext( colorSpaceContext,builder, outputType );
 
 	return 'mix( ' + color10 + ', ' + color20 + ', ' + t + ' ).rgb';
 

@@ -26,6 +26,8 @@
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
@@ -37,8 +39,9 @@
 			var teapot, mesh;
 			var controls;
 			var move = false;
+			var rotate = false;
 			var rtTexture, rtMaterial;
-			var gui;
+			var gui, guiModel;
 			var library = {};
 			var serialized = false;
 			var textures = {
@@ -48,10 +51,13 @@
 				decalDiffuse: { url: 'textures/decal/decal-diffuse.png' },
 				decalNormal: { url: 'textures/decal/decal-normal.jpg' },
 				cloud: { url: 'textures/lava/cloud.png' },
+				sparkle: { url: 'textures/SparkleNoiseMap.png' },
 				spherical: { url: 'textures/envmap.png' }
 			};
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
+			var url = new URL( window.location.href );
+
+			var param = { example: url.searchParams.get( 'e' ) || 'mesh-standard' };
 
 			function getTexture( name ) {
 
@@ -101,6 +107,43 @@
 				pmremCubeUVPacker.dispose();
 
 			}
+
+			var models = { teapot: 'teapot', bunny: 'bunny' };
+			var modelProp = { model: url.searchParams.get( 'm' ) || 'teapot' };
+
+			var bunnyLoader;
+			var bunnyGeometry;
+
+			function getBunnyGeometry() {
+
+				if ( bunnyLoader ) return bunnyGeometry;
+
+				bunnyLoader = new FBXLoader();
+				bunnyLoader.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
+
+					mesh.geometry = bunnyGeometry = object.children[ 0 ].geometry.scale( .08, .08, .08 );
+
+				} );
+
+			}
+
+			function updateModel() {
+			
+				var geometry;
+
+				if ( modelProp.model === 'bunny' ) geometry = getBunnyGeometry();
+
+				mesh.geometry = geometry || teapot;
+
+			}
+
+			guiModel = new GUI( { autoPlace: false } );
+			guiModel.add(modelProp, 'model', models).onChange( updateModel );
+
+			guiModel.domElement.style = "position:absolute;top:0;left:10px";
+			document.body.appendChild( guiModel.domElement );
+
+			guiModel.open();
 
 			var cubemap = function () {
 
@@ -173,6 +216,7 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				updateMaterial();
+				updateModel();
 
 				onWindowResize();
 				animate();
@@ -198,7 +242,9 @@
 					'basic / bump': 'bump',
 					'basic / blur': 'blur',
 					'basic / spherical-reflection': 'spherical-reflection',
+					'basic / transparency': 'transparency',
 					'adv / fresnel': 'fresnel',
+					'adv / car-paint': 'car-paint',
 					'adv / saturation': 'saturation',
 					'adv / top-bottom': 'top-bottom',
 					'adv / skin': 'skin',
@@ -224,6 +270,7 @@
 					'node / position': 'node-position',
 					'node / normal': 'node-normal',
 					'node / reflect': 'node-reflect',
+					'node / refract': 'node-refract',
 					'misc / sub-slot': 'sub-slot',
 					'misc / smoke': 'smoke',
 					'misc / firefly': 'firefly',
@@ -284,10 +331,16 @@
 			function updateMaterial() {
 
 				move = false;
+				rotate = false;
 
 				lightGroup.visible = true;
 
-				if ( mesh.material ) mesh.material.dispose();
+				scene.background = undefined;
+
+				cubemap.mapping = THREE.CubeReflectionMapping;
+
+				if ( Array.isArray( mesh.material ) ) for( var i = 0; i < mesh.material.length; i++ ) mesh.material[i].dispose();
+				else if ( mesh.material ) mesh.material.dispose();
 
 				if ( rtTexture ) {
 
@@ -389,10 +442,9 @@
 							Nodes.MathNode.MIX
 						);
 
-						var normalMask = new Nodes.OperatorNode(
+						var normalMask = new Nodes.MulNode(
 							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
-							normalScale,
-							Nodes.OperatorNode.MUL
+							normalScale
 						);
 
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
@@ -439,6 +491,41 @@
 							normalScale.value = val;
 
 						}, false, 0, 1 );
+
+						break;
+
+					case 'transparency':
+
+						defaultSide = THREE.FrontSide;
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						mtl.transparency = new Nodes.FloatNode( .5 );
+						mtl.alpha = new Nodes.FloatNode( 1 );
+
+						// GUI
+
+						addGui( 'transparency', mtl.transparency.value, function ( val ) {
+
+							mtl.transparency.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'alpha', mtl.alpha.value, function ( val ) {
+
+							mtl.alpha.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'premultiplied alpha', mtl.premultipliedAlpha, function ( val ) {
+
+							mtl.premultipliedAlpha = val;
+
+							mtl.needsUpdate = true;
+
+						} );
 
 						break;
 
@@ -734,12 +821,14 @@
 
 						//mtl.color = // albedo (vec3)
 						//mtl.alpha = // opacity (float)
+						//mtl.transparency = // opacity (float)
 						//mtl.roughness = // roughness (float)
 						//mtl.metalness = // metalness (float)
 						//mtl.reflectivity = // reflectivity (float)
 						//mtl.clearcoat = // clearcoat (float)
 						//mtl.clearcoatRoughness = // clearcoatRoughness (float)
 						//mtl.clearcoatNormal = // clearcoatNormal (vec3)
+						//mtl.sheen = // sheen (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -778,10 +867,9 @@
 							Nodes.MathNode.MIX
 						);
 
-						var normalMask = new Nodes.OperatorNode(
+						var normalMask = new Nodes.MulNode(
 							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
-							normalScale,
-							Nodes.OperatorNode.MUL
+							normalScale
 						);
 
 						var clearcoatNormalMask = new Nodes.OperatorNode(
@@ -883,31 +971,27 @@
 						time.name = "time";
 						speed.name = "speed";
 
-						var timeScale = new Nodes.OperatorNode(
+						var timeScale = new Nodes.MulNode(
 							time,
-							speed,
-							Nodes.OperatorNode.MUL
+							speed
 						);
 
-						var worldScl = new Nodes.OperatorNode(
+						var worldScl = new Nodes.MulNode(
 							new Nodes.PositionNode(),
-							worldScale,
-							Nodes.OperatorNode.MUL
+							worldScale
 						);
 
-						var posContinuous = new Nodes.OperatorNode(
+						var posContinuous = new Nodes.AddNode(
 							worldScl,
-							timeScale,
-							Nodes.OperatorNode.ADD
+							timeScale
 						);
 
 						var wave = new Nodes.MathNode( posContinuous, Nodes.MathNode.SIN );
 						wave = new Nodes.SwitchNode( wave, 'x' );
 
-						var waveScale = new Nodes.OperatorNode(
+						var waveScale = new Nodes.MulNode(
 							wave,
-							scale,
-							Nodes.OperatorNode.MUL
+							scale
 						);
 
 						var displaceY = new Nodes.JoinNode(
@@ -916,16 +1000,14 @@
 							new Nodes.FloatNode()
 						);
 
-						var displace = new Nodes.OperatorNode(
-							new Nodes.NormalNode(),
-							displaceY,
-							Nodes.OperatorNode.MUL
+						var displace = new Nodes.MulNode(
+							new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
+							displaceY
 						);
 
-						var blend = new Nodes.OperatorNode(
+						var blend = new Nodes.AddNode(
 							new Nodes.PositionNode(),
-							displaceY,
-							Nodes.OperatorNode.ADD
+							displaceY
 						);
 
 						var color = new Nodes.MathNode(
@@ -993,15 +1075,14 @@
 						var color = new Nodes.ColorNode( 0xFFFFFF );
 
 						var viewZ = new Nodes.MathNode(
-							new Nodes.NormalNode(),
+							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
 							new Nodes.Vector3Node( 0, 0, - intensity ),
 							Nodes.MathNode.DOT
 						);
 
-						var rim = new Nodes.OperatorNode(
+						var rim = new Nodes.AddNode(
 							viewZ,
-							new Nodes.FloatNode( intensity ),
-							Nodes.OperatorNode.ADD
+							new Nodes.FloatNode( intensity )
 						);
 
 						var rimPower = new Nodes.MathNode(
@@ -1010,10 +1091,9 @@
 							Nodes.MathNode.POW
 						);
 
-						var rimColor = new Nodes.OperatorNode(
+						var rimColor = new Nodes.MulNode(
 							rimPower,
-							color,
-							Nodes.OperatorNode.MUL
+							color
 						);
 
 						mtl.color = new Nodes.ColorNode( 0x111111 );
@@ -1130,7 +1210,7 @@
 						mtl = new Nodes.PhongNodeMaterial();
 
 						var translate = new THREE.Vector2();
-						var rotate = 0;
+						var rotateUV  = 0;
 						var scale = new THREE.Vector2( 1, 1 );
 
 						var texture = new Nodes.TextureNode( getTexture( "brick" ) );
@@ -1143,7 +1223,7 @@
 
 						function updateUVTransform() {
 
-							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
+							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotateUV  ) );
 
 						}
 
@@ -1179,9 +1259,9 @@
 
 						}, false, .1, 5 );
 
-						addGui( 'rotate', rotate, function ( val ) {
+						addGui( 'rotate', rotateUV , function ( val ) {
 
-							rotate = val;
+							rotateUV = val;
 
 							updateUVTransform();
 
@@ -1195,9 +1275,14 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
+						var saturation = new Nodes.FloatNode( 1 );
+
 						var diffuse = new Nodes.TextureNode( getTexture( "brick" ) );
 
-						var bumpMap = new Nodes.BumpMapNode( new Nodes.TextureNode( getTexture( "brick" ) ) );
+						var bumpMapContrast = new Nodes.ColorAdjustmentNode( diffuse, saturation, Nodes.ColorAdjustmentNode.SATURATION );
+						var bumpMapChannel = new Nodes.SwitchNode( bumpMapContrast, 'r' );
+
+						var bumpMap = new Nodes.BumpMapNode( bumpMapChannel );
 						bumpMap.scale = new Nodes.FloatNode( .5 );
 
 						mtl.color = diffuse;
@@ -1208,6 +1293,20 @@
 						//mtl.normal = new Nodes.NormalMapNode( bumpMap );
 
 						// GUI
+
+						addGui( 'saturation', saturation.value, function ( val ) {
+
+							saturation.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'channel', [ 'r', 'g', 'b' ], function ( val ) {
+
+							bumpMapChannel.components = val;
+
+							mtl.needsUpdate = true;
+
+						} );
 
 						addGui( 'scale', bumpMap.scale.value, function ( val ) {
 
@@ -1274,15 +1373,14 @@
 						var color = new Nodes.CubeTextureNode( cubemap );
 
 						var viewZ = new Nodes.MathNode(
-							new Nodes.NormalNode(),
+							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
 							new Nodes.Vector3Node( 0, 0, - 1 ),
 							Nodes.MathNode.DOT
 						);
 
-						var theta = new Nodes.OperatorNode(
+						var theta = new Nodes.AddNode(
 							viewZ,
-							new Nodes.FloatNode( 1 ),
-							Nodes.OperatorNode.ADD
+							new Nodes.FloatNode( 1 )
 						);
 
 						var thetaPower = new Nodes.MathNode(
@@ -1291,10 +1389,9 @@
 							Nodes.MathNode.POW
 						);
 
-						var fresnel = new Nodes.OperatorNode(
+						var fresnel = new Nodes.MulNode(
 							reflectance,
-							thetaPower,
-							Nodes.OperatorNode.MUL
+							thetaPower
 						);
 
 						mtl.color = new Nodes.ColorNode( 0x3399FF );
@@ -1330,16 +1427,14 @@
 						var scale = new Nodes.FloatNode( 1 );
 						var uv = new Nodes.UVNode();
 
-						var uvOffset = new Nodes.OperatorNode(
+						var uvOffset = new Nodes.AddNode(
 							offset,
-							uv,
-							Nodes.OperatorNode.ADD
+							uv
 						);
 
-						var uvScale = new Nodes.OperatorNode(
+						var uvScale = new Nodes.MulNode(
 							uvOffset,
-							scale,
-							Nodes.OperatorNode.MUL
+							scale
 						);
 
 						var mask = new Nodes.TextureNode( getTexture( "decalDiffuse" ), uvScale );
@@ -1423,16 +1518,14 @@
 						var hard = new Nodes.FloatNode( 9 );
 						var offset = new Nodes.FloatNode( - 2.5 );
 
-						var hardClamp = new Nodes.OperatorNode(
+						var hardClamp = new Nodes.MulNode(
 							normalY,
-							hard,
-							Nodes.OperatorNode.MUL
+							hard
 						);
 
-						var offsetClamp = new Nodes.OperatorNode(
+						var offsetClamp = new Nodes.AddNode(
 							hardClamp,
-							offset,
-							Nodes.OperatorNode.ADD
+							offset
 						);
 
 						var clamp0at1 = new Nodes.MathNode( offsetClamp, Nodes.MathNode.SATURATE );
@@ -1475,37 +1568,32 @@
 
 						var uv = new Nodes.UVNode();
 
-						var timeScl = new Nodes.OperatorNode(
+						var timeScl = new Nodes.MulNode(
 							time,
-							speed,
-							Nodes.OperatorNode.MUL
+							speed
 						);
 
-						var displaceOffset = new Nodes.OperatorNode(
+						var displaceOffset = new Nodes.AddNode(
 							timeScl,
-							uv,
-							Nodes.OperatorNode.ADD
+							uv
 						);
 
 						var tex = new Nodes.TextureNode( getTexture( "cloud" ), displaceOffset );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
-						var displace = new Nodes.OperatorNode(
-							new Nodes.NormalNode(),
-							texArea,
-							Nodes.OperatorNode.MUL
+						var displace = new Nodes.MulNode(
+							new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
+							texArea
 						);
 
-						var displaceScale = new Nodes.OperatorNode(
+						var displaceScale = new Nodes.MulNode(
 							displace,
-							scale,
-							Nodes.OperatorNode.MUL
+							scale
 						);
 
-						var blend = new Nodes.OperatorNode(
+						var blend = new Nodes.AddNode(
 							new Nodes.PositionNode(),
-							displaceScale,
-							Nodes.OperatorNode.ADD
+							displaceScale
 						);
 
 						var color = new Nodes.MathNode(
@@ -1563,16 +1651,15 @@
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var thresholdBorder = new Nodes.MathNode(
-							new Nodes.OperatorNode( threshold, borderSize, Nodes.OperatorNode.ADD ),
+							new Nodes.AddNode( threshold, borderSize ),
 							threshold,
 							texArea,
 							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var thresholdEmissive = new Nodes.OperatorNode(
+						var thresholdEmissive = new Nodes.MulNode(
 							borderColor,
-							thresholdBorder,
-							Nodes.OperatorNode.MUL
+							thresholdBorder
 						);
 
 						// APPLY
@@ -1628,26 +1715,25 @@
 						var burnedSize = new Nodes.FloatNode( .5 );
 						var timer = new Nodes.TimerNode( 0.8 );
 
-						var sinCycleInSecs = new Nodes.OperatorNode(
+						var sinCycleInSecs = new Nodes.MulNode(
 							timer,
-							new Nodes.ConstNode( Nodes.ConstNode.PI2 ),
-							Nodes.OperatorNode.MUL
+							new Nodes.ConstNode( Nodes.ConstNode.PI2 )
 						);
 
 						var cycle = new Nodes.MathNode( sinCycleInSecs, Nodes.MathNode.SIN );
 
 						// round sin to 0 at 1
-						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( 1 ), Nodes.OperatorNode.ADD );
-						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( 2 ), Nodes.OperatorNode.DIV );
+						cycle = new Nodes.AddNode( cycle, new Nodes.FloatNode( 1 ) );
+						cycle = new Nodes.DivNode( cycle, new Nodes.FloatNode( 2 ) );
 
 						// offset to +.9
-						cycle = new Nodes.OperatorNode( cycle, new Nodes.FloatNode( .9 ), Nodes.OperatorNode.ADD );
+						cycle = new Nodes.AddNode( cycle, new Nodes.FloatNode( .9 ) );
 
 						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
 						var thresholdBorder = new Nodes.MathNode(
-							new Nodes.OperatorNode( threshold, fireSize, Nodes.OperatorNode.ADD ),
+							new Nodes.AddNode( threshold, fireSize ),
 							threshold,
 							texArea,
 							Nodes.MathNode.SMOOTHSTEP
@@ -1673,16 +1759,15 @@
 						);
 
 						var thresholdBurnedBorder = new Nodes.MathNode(
-							new Nodes.OperatorNode( threshold, burnedSize, Nodes.OperatorNode.ADD ),
+							new Nodes.AddNode( threshold, burnedSize ),
 							threshold,
 							texArea,
 							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var fireEmissive = new Nodes.OperatorNode(
+						var fireEmissive = new Nodes.MulNode(
 							fireColor,
-							thresholdBorder,
-							Nodes.OperatorNode.MUL
+							thresholdBorder
 						);
 
 						var burnedResultColor = new Nodes.MathNode(
@@ -1765,37 +1850,32 @@
 						var time = new Nodes.TimerNode();
 						var uv = new Nodes.UVNode();
 
-						var timeSpeedA = new Nodes.OperatorNode(
+						var timeSpeedA = new Nodes.MulNode(
 							time,
-							new Nodes.Vector2Node( 0.3, 0.1 ),
-							Nodes.OperatorNode.MUL
+							new Nodes.Vector2Node( 0.3, 0.1 )
 						);
 
-						var timeSpeedB = new Nodes.OperatorNode(
+						var timeSpeedB = new Nodes.MulNode(
 							time,
-							new Nodes.Vector2Node( 0.15, 0.4 ),
-							Nodes.OperatorNode.MUL
+							new Nodes.Vector2Node( 0.15, 0.4 )
 						);
 
-						var uvOffsetA = new Nodes.OperatorNode(
+						var uvOffsetA = new Nodes.AddNode(
 							timeSpeedA,
-							uv,
-							Nodes.OperatorNode.ADD
+							uv
 						);
 
-						var uvOffsetB = new Nodes.OperatorNode(
+						var uvOffsetB = new Nodes.AddNode(
 							timeSpeedB,
-							uv,
-							Nodes.OperatorNode.ADD
+							uv
 						);
 
 						var cloudA = new Nodes.TextureNode( getTexture( "cloud" ), uvOffsetA );
 						var cloudB = new Nodes.TextureNode( getTexture( "cloud" ), uvOffsetB );
 
-						var clouds = new Nodes.OperatorNode(
+						var clouds = new Nodes.AddNode(
 							cloudA,
-							cloudB,
-							Nodes.OperatorNode.ADD
+							cloudB
 						);
 
 						mtl.environment = new Nodes.ColorNode( 0xFFFFFF );
@@ -1935,32 +2015,28 @@
 						// clamp0at1
 						mask = new Nodes.MathNode( mask, Nodes.MathNode.SATURATE );
 
-						var timeOffset = new Nodes.OperatorNode(
+						var timeOffset = new Nodes.MulNode(
 							time,
-							timeScale,
-							Nodes.OperatorNode.MUL
+							timeScale
 						);
 
-						var uvPos = new Nodes.OperatorNode(
+						var uvPos = new Nodes.MulNode(
 							worldPosTop,
-							scale,
-							Nodes.OperatorNode.MUL
+							scale
 						);
 
 						var voronoi = new Nodes.FunctionCallNode( voronoiLayers );
 						voronoi.inputs.p = uvPos;
 						voronoi.inputs.time = timeOffset;
 
-						var maskCaustic = new Nodes.OperatorNode(
+						var maskCaustic = new Nodes.MulNode(
 							alpha,
-							mask,
-							Nodes.OperatorNode.MUL
+							mask
 						);
 
-						var voronoiIntensity = new Nodes.OperatorNode(
+						var voronoiIntensity = new Nodes.MulNode(
 							voronoi,
-							intensity,
-							Nodes.OperatorNode.MUL
+							intensity
 						);
 
 						var voronoiColors = new Nodes.MathNode(
@@ -1977,10 +2053,9 @@
 							Nodes.MathNode.MIX
 						);
 
-						var causticLights = new Nodes.OperatorNode(
+						var causticLights = new Nodes.MulNode(
 							voronoiIntensity,
-							maskCaustic,
-							Nodes.OperatorNode.MUL
+							maskCaustic
 						);
 
 						mtl.color = caustic;
@@ -2055,22 +2130,19 @@
 							damping: .95
 						} );
 
-						var velocityArea = new Nodes.OperatorNode(
+						var velocityArea = new Nodes.MulNode(
 							mask,
-							scale,
-							Nodes.OperatorNode.MUL
+							scale
 						);
 
-						var softVelocity = new Nodes.OperatorNode(
+						var softVelocity = new Nodes.MulNode(
 							velocity,
-							velocityArea,
-							Nodes.OperatorNode.MUL
+							velocityArea
 						);
 
-						var softPosition = new Nodes.OperatorNode(
+						var softPosition = new Nodes.AddNode(
 							new Nodes.PositionNode(),
-							softVelocity,
-							Nodes.OperatorNode.ADD
+							softVelocity
 						);
 
 						var colors = new Nodes.MathNode(
@@ -2117,18 +2189,24 @@
 
 						break;
 
-					case 'plush':
+					case 'car-paint':
 
 						// MATERIAL
+						// REFERENCE https://2pha.com/blog/threejs-car-paint-shader-recreating-radeon-9700-demo/
 
-						mtl = new Nodes.PhongNodeMaterial();
+						mtl = new Nodes.StandardNodeMaterial();
 
-						var color = new Nodes.ColorNode( 0x8D8677 );
-						var mildness = new Nodes.FloatNode( 1.6 );
-						var fur = new Nodes.FloatNode( .5 );
+						var colorA = new Nodes.ColorNode( 0x660059 );
+						var colorB = new Nodes.ColorNode( 0x990000 );
+						var colorC = new Nodes.ColorNode( 0xFFFF00 );
+						var saturation = new Nodes.FloatNode( 1 );
+						var clearcoat = new Nodes.FloatNode( .5 );
+						var clearcoatRoughness = new Nodes.FloatNode( .6 );
+						var clearcoatNormal = new Nodes.FloatNode( .5 );
+						var scale = new Nodes.FloatNode( 4 );
 
 						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode(), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
 
 						var viewZ = new Nodes.MathNode(
 							posDirection,
@@ -2136,25 +2214,144 @@
 							Nodes.MathNode.DOT
 						);
 
-						// without luma correction for now
-						var mildnessColor = new Nodes.OperatorNode(
-							color,
-							mildness,
-							Nodes.OperatorNode.MUL
+						var viewZSquare = new Nodes.MulNode( viewZ, viewZ );
+
+						var viewZColorA = new Nodes.MulNode(
+							viewZ,
+							colorA
 						);
 
-						var furScale = new Nodes.OperatorNode(
+						var viewZColorB = new Nodes.MulNode(
+							viewZSquare,
+							colorB
+						);
+
+						var viewZColorC = new Nodes.MulNode(
+							new Nodes.MulNode( viewZSquare, viewZSquare ),
+							colorC
+						);
+
+						var sparkleScale = new Nodes.MulNode(
+							new Nodes.UVNode(),
+							scale
+						);
+
+						var sparkle = new Nodes.TextureNode( getTexture( "sparkle" ), sparkleScale );
+
+						var color = new Nodes.AddNode( new Nodes.AddNode( viewZColorA, viewZColorB ), viewZColorC );
+						//color = new Nodes.MathNode( color, Nodes.MathNode.SATURATE );
+
+						var finalColor = new Nodes.ColorAdjustmentNode( color, saturation, Nodes.ColorAdjustmentNode.SATURATION );
+
+						mtl.color = finalColor;
+						mtl.roughness = new Nodes.FloatNode( .2 );
+						mtl.metalness = new Nodes.FloatNode( .2 );
+						mtl.clearcoat = new Nodes.MulNode( clearcoat, sparkle );
+						mtl.clearcoatRoughness = clearcoatRoughness;
+						mtl.clearcoatNormal = new Nodes.BumpMapNode( sparkle );
+						mtl.clearcoatNormal.scale = clearcoatNormal;
+						mtl.environment = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+
+						// GUI
+
+						addGui( 'colorA', colorA.value.getHex(), function ( val ) {
+
+							colorA.value.setHex( val );
+
+						}, true );
+
+						addGui( 'colorB', colorB.value.getHex(), function ( val ) {
+
+							colorB.value.setHex( val );
+
+						}, true );
+
+						addGui( 'colorC', colorC.value.getHex(), function ( val ) {
+
+							colorC.value.setHex( val );
+
+						}, true );
+
+						addGui( 'saturation', saturation.value, function ( val ) {
+
+							saturation.value = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'sparkleScale', scale.value, function ( val ) {
+
+							scale.value = val;
+
+						}, false, 1, 8 );
+
+						addGui( 'clearcoat', clearcoat.value, function ( val ) {
+
+							clearcoat.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatRoughness', mtl.clearcoatRoughness.value, function ( val ) {
+
+							mtl.clearcoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatNormal', clearcoatNormal.value, function ( val ) {
+
+							clearcoatNormal.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughness', mtl.roughness.value, function ( val ) {
+
+							mtl.roughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalness', mtl.metalness.value, function ( val ) {
+
+							mtl.metalness.value = val;
+
+						}, false, 0, 1 );
+
+						break;
+
+					case 'plush':
+
+						// MATERIAL
+
+						mtl = new Nodes.StandardNodeMaterial();
+
+						var color = new Nodes.ColorNode( 0x8D8677 );
+						var fur = new Nodes.FloatNode( .5 );
+						var scale = new Nodes.FloatNode( 1.2 );
+
+						var uvScale = new Nodes.MulNode(
+							new Nodes.UVNode(),
+							scale
+						);
+
+						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
+
+						var viewZ = new Nodes.MathNode(
+							posDirection,
+							norDirection,
+							Nodes.MathNode.DOT
+						);
+
+						var furScale = new Nodes.MulNode(
 							viewZ,
-							fur,
-							Nodes.OperatorNode.MUL
+							fur
 						);
 
 						mtl.color = color;
-						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ), uvScale ) );
 						mtl.normal.scale = furScale;
-						mtl.environment = mildnessColor;
-						mtl.environmentAlpha = new Nodes.MathNode( viewZ, Nodes.MathNode.INVERT );
-						mtl.shininess = new Nodes.FloatNode( 0 );
+						mtl.environment = new Nodes.CubeTextureNode( cubemap );
+						mtl.sheen = new Nodes.FloatNode( 1 );
+						mtl.roughness = new Nodes.FloatNode( 1 );
+						mtl.metalness = new Nodes.FloatNode( 0 );
 
 						// GUI
 
@@ -2164,17 +2361,17 @@
 
 						}, true );
 
-						addGui( 'mildness', mildness.value, function ( val ) {
-
-							mildness.value = val;
-
-						}, false, 1, 2 );
-
 						addGui( 'fur', fur.value, function ( val ) {
 
 							fur.value = val;
 
 						}, false, 0, 2 );
+
+						addGui( 'scale', scale.value, function ( val ) {
+
+							scale.value = val;
+
+						}, false, 0, 5 );
 
 						break;
 
@@ -2201,26 +2398,23 @@
 							Nodes.MathNode.SMOOTHSTEP
 						);
 
-						var lightTransition = new Nodes.OperatorNode(
+						var lightTransition = new Nodes.MulNode(
 							lightWrap,
-							new Nodes.ConstNode( Nodes.ConstNode.PI2 ),
-							Nodes.OperatorNode.MUL
+							new Nodes.ConstNode( Nodes.ConstNode.PI2 )
 						);
 
 						var wrappedLight = new Nodes.MathNode( lightTransition, Nodes.MathNode.SIN );
 
-						var wrappedLightColor = new Nodes.OperatorNode(
+						var wrappedLightColor = new Nodes.MulNode(
 							wrappedLight,
-							bloodColor,
-							Nodes.OperatorNode.MUL
+							bloodColor
 						);
 
 						var bloodArea = new Nodes.MathNode( wrappedLightColor, Nodes.MathNode.SATURATE );
 
-						var totalLight = new Nodes.OperatorNode(
+						var totalLight = new Nodes.AddNode(
 							directLight,
-							bloodArea,
-							Nodes.OperatorNode.ADD
+							bloodArea
 						);
 
 						mtl.color = skinColor;
@@ -2278,24 +2472,25 @@
 
 						// MATERIAL
 
-						mtl = new Nodes.PhongNodeMaterial();
+						var celMtl = new Nodes.PhongNodeMaterial();
 
 						var count = new Nodes.FloatNode( 3.43 );
 						var sceneDirectLight = new Nodes.LightNode();
 						var color = new Nodes.ColorNode( 0xAABBFF );
 
 						var lineColor = new Nodes.ColorNode( 0xFF0000 );
-						var lineSize = new Nodes.FloatNode( 0.23 );
-						var lineInner = new Nodes.FloatNode( 0 );
+						var innerline = new Nodes.FloatNode( 0.1 );
+						var inner = new Nodes.FloatNode( 0.05 );
+
+						var outline = new Nodes.FloatNode( 0.4 );
 
 						// CEL
 
 						var lightLuminance = new Nodes.LuminanceNode( sceneDirectLight );
 
-						var preCelLight = new Nodes.OperatorNode(
+						var preCelLight = new Nodes.MulNode(
 							lightLuminance,
-							count,
-							Nodes.OperatorNode.MUL
+							count
 						);
 
 						var celLight = new Nodes.MathNode(
@@ -2303,16 +2498,15 @@
 							Nodes.MathNode.CEIL
 						);
 
-						var posCelLight = new Nodes.OperatorNode(
+						var posCelLight = new Nodes.DivNode(
 							celLight,
-							count,
-							Nodes.OperatorNode.DIV
+							count
 						);
 
 						// LINE
 
 						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode(), Nodes.MathNode.NORMALIZE );
+						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
 
 						var viewZ = new Nodes.MathNode(
 							posDirection,
@@ -2325,16 +2519,15 @@
 							Nodes.MathNode.ABS
 						);
 
-						var line = new Nodes.OperatorNode(
+						var line = new Nodes.DivNode(
 							lineOutside,
-							new Nodes.FloatNode( 1 ),
-							Nodes.OperatorNode.DIV
+							new Nodes.FloatNode( 1 )
 						);
 
 						var lineScaled = new Nodes.MathNode(
 							line,
-							lineSize,
-							lineInner,
+							innerline,
+							inner,
 							Nodes.MathNode.SMOOTHSTEP
 						);
 
@@ -2342,12 +2535,38 @@
 
 						// APPLY
 
-						mtl.color = color;
-						mtl.light = posCelLight;
-						mtl.shininess = new Nodes.FloatNode( 0 );
+						celMtl.color = color;
+						celMtl.light = posCelLight;
+						celMtl.shininess = new Nodes.FloatNode( 0 );
 
-						mtl.environment = lineColor;
-						mtl.environmentAlpha = innerContour;
+						celMtl.environment = lineColor;
+						celMtl.environmentAlpha = innerContour;
+
+						// OUTLINE
+
+						var outlineMtl = new Nodes.PhongNodeMaterial()
+						outlineMtl.depthWrite = false;
+						outlineMtl.side = THREE.BackSide;
+						outlineMtl.position = new Nodes.AddNode(
+							new Nodes.PositionNode(),
+							new Nodes.MulNode(
+								new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
+								outline
+							)
+						);
+
+						outlineMtl.environment = lineColor;
+
+						// MULTIPASS
+
+						if ( mesh.geometry.groups.length === 0 ) {
+
+							mesh.geometry.addGroup( 0, Infinity, 0 );
+							mesh.geometry.addGroup( 0, Infinity, 1 );
+
+						}
+
+						mtl = [ outlineMtl, celMtl ];
 
 						// GUI
 
@@ -2369,23 +2588,29 @@
 
 						}, false, 1, 8 );
 
-						addGui( 'lineSize', lineSize.value, function ( val ) {
+						addGui( 'inner', inner.value, function ( val ) {
 
-							lineSize.value = val;
+							inner.value = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'lineInner', lineInner.value, function ( val ) {
+						addGui( 'innerline', innerline.value, function ( val ) {
 
-							lineInner.value = val;
+							innerline.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'outline', outline.value, function ( val ) {
+
+							outline.value = val;
 
 						}, false, 0, 1 );
 
 						addGui( 'ignoreIndirectLight', false, function ( val ) {
 
-							mtl.ao = val ? new Nodes.FloatNode() : undefined;
+							celMtl.ao = val ? new Nodes.FloatNode() : undefined;
 
-							mtl.needsUpdate = true;
+							celMtl.needsUpdate = true;
 
 						} );
 
@@ -2424,7 +2649,7 @@
 						mtl.color = new Nodes.ExpressionNode( "myCustomUv + (sin(myspeed)*.5) + (position * .05)", "vec3" );
 						mtl.color.keywords[ "myspeed" ] = myspeed;
 
-						mtl.position = new Nodes.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (worldNormal*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
+						mtl.position = new Nodes.ExpressionNode( "mod(myspeed,1.0) < 0.5 ? position + (normal.world*(1.0+sin(myspeed*1.0))*3.0) : position + sin( position.x * sin(myspeed*2.0))", "vec3" );
 						mtl.position.keywords[ "myspeed" ] = myspeed;
 
 						// add global keyword ( variable or const )
@@ -2544,6 +2769,8 @@
 
 					case 'node-position':
 
+						move = true;
+
 						// MATERIAL
 
 						var node = new Nodes.PositionNode();
@@ -2569,9 +2796,11 @@
 
 					case 'node-normal':
 
+						rotate = true;
+
 						// MATERIAL
 
-						var node = new Nodes.NormalNode();
+						var node = new Nodes.NormalNode( Nodes.NormalNode.LOCAL );
 
 						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color = node;
@@ -2580,7 +2809,8 @@
 
 						addGui( 'scope', {
 							local: Nodes.NormalNode.LOCAL,
-							world: Nodes.NormalNode.WORLD
+							world: Nodes.NormalNode.WORLD,
+							view: Nodes.NormalNode.VIEW
 						}, function ( val ) {
 
 							node.scope = val;
@@ -2630,6 +2860,79 @@
 
 						break;
 
+					case 'node-refract':
+
+						// MATERIAL
+
+						var node = new Nodes.ReflectNode();
+						node.ratio = new Nodes.FloatNode( .98 );
+
+						var nodeMaterial = new Nodes.StandardNodeMaterial();
+						nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+						nodeMaterial.roughness.value = .05;
+						nodeMaterial.metalness.value = 1;
+
+						var mix = new Nodes.FloatNode( .5 );
+
+						nodeMaterial.environment = new Nodes.MathNode(
+							nodeMaterial.environment,
+							new Nodes.CubeTextureNode( cubemap ),
+							mix,
+							Nodes.MathNode.MIX
+						);
+
+						cubemap.mapping = THREE.CubeRefractionMapping;
+
+						var standardMaterial = new THREE.MeshStandardMaterial( {
+							color: nodeMaterial.color.value,
+							side: defaultSide,
+							envMap: cubemap,
+							refractionRatio: node.ratio.value,
+							roughness: nodeMaterial.roughness.value,
+							metalness: 1
+						} );
+
+						mtl = nodeMaterial;
+
+						scene.background = cubemap;
+
+						// GUI
+
+						addGui( 'node', true, function ( val ) {
+
+							mtl = val ? nodeMaterial : standardMaterial;
+							mesh.material = mtl;
+
+						} );
+
+						addGui( 'ratio', node.ratio.value, function ( val ) {
+
+							node.ratio.value = val;
+							standardMaterial.refractionRatio = val;
+
+						}, false, 0, 2 );
+
+						addGui( 'mix', mix.value, function ( val ) {
+
+							mix.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
+
+							nodeMaterial.roughness.value = val;
+							standardMaterial.roughness = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'metalness', nodeMaterial.metalness.value, function ( val ) {
+
+							nodeMaterial.metalness.value = val;
+							standardMaterial.metalness = val;
+
+						}, false, 0, 1 );
+
+						break;
 
 					case 'varying':
 
@@ -2875,10 +3178,9 @@
 						var colorInput = new Nodes.ColorNode( 0xFFFFFF ).setLabel( "colorInput" );
 						var specularInput = new Nodes.FloatNode( .5 ).setLabel( "specularInput" );
 
-						var colorMix = new Nodes.OperatorNode(
+						var colorMix = new Nodes.MulNode(
 							colorInput,
-							new Nodes.ColorNode( 0x6495ED ).setReadonly( true ),
-							Nodes.OperatorNode.MUL
+							new Nodes.ColorNode( 0x6495ED ).setReadonly( true )
 						).setLabel( "colorMix" );
 
 						mtl.color = colorMix;
@@ -2887,10 +3189,9 @@
 						// default: without use label
 						// this is optimized writed the code in a single line (inline)
 						// for the reason that this node is used only once in this shader program
-						mtl.shininess = new Nodes.OperatorNode(
+						mtl.shininess = new Nodes.AddNode(
 							new Nodes.FloatNode( 10 ).setReadonly( true ),
-							new Nodes.FloatNode( 5 ).setReadonly( true ),
-							Nodes.OperatorNode.ADD
+							new Nodes.FloatNode( 5 ).setReadonly( true )
 						);
 
 						mtl.build();
@@ -2967,6 +3268,8 @@
 
 					case 'triplanar-mapping':
 
+						rotate = true;
+
 						// MATERIAL
 
 						mtl = new Nodes.PhongNodeMaterial();
@@ -2998,8 +3301,8 @@
 
 						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
 							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
-							normal: new Nodes.NormalNode( Nodes.NormalNode.WORLD ),
-							position: new Nodes.PositionNode( Nodes.PositionNode.WORLD ),
+							normal: new Nodes.NormalNode( Nodes.NormalNode.LOCAL ),
+							position: new Nodes.PositionNode( Nodes.PositionNode.LOCAL ),
 							scale: scale,
 						} );
 
@@ -3026,24 +3329,21 @@
 
 						var color = new Nodes.ColorNode( 0x98ff00 );
 
-						var timeSpeed = new Nodes.OperatorNode(
+						var timeSpeed = new Nodes.MulNode(
 							time,
-							speed,
-							Nodes.OperatorNode.MUL
+							speed
 						);
 
-						var sinCycleInSecs = new Nodes.OperatorNode(
+						var sinCycleInSecs = new Nodes.MulNode(
 							timeSpeed,
-							new Nodes.ConstNode( Nodes.ConstNode.PI2 ),
-							Nodes.OperatorNode.MUL
+							new Nodes.ConstNode( Nodes.ConstNode.PI2 )
 						);
 
 						var cycle = new Nodes.MathNode( sinCycleInSecs, Nodes.MathNode.SIN );
 
-						var cycleColor = new Nodes.OperatorNode(
+						var cycleColor = new Nodes.MulNode(
 							cycle,
-							color,
-							Nodes.OperatorNode.MUL
+							color
 						);
 
 						var cos = new Nodes.MathNode( cycleColor, Nodes.MathNode.SIN );
@@ -3079,16 +3379,14 @@
 
 						var viewPosZ = new Nodes.SwitchNode( viewPos, 'z' );
 
-						var distance = new Nodes.OperatorNode(
+						var distance = new Nodes.SubNode(
 							cameraDistance,
-							viewPosZ,
-							Nodes.OperatorNode.SUB
+							viewPosZ
 						);
 
-						var distanceRadius = new Nodes.OperatorNode(
+						var distanceRadius = new Nodes.AddNode(
 							distance,
-							new Nodes.FloatNode( 70 ),
-							Nodes.OperatorNode.ADD
+							new Nodes.FloatNode( 70 )
 						);
 
 						var objectDepth = new Nodes.MathNode(
@@ -3116,15 +3414,18 @@
 
 						var backSideDepth = new Nodes.TextureNode( rtTexture.texture, new Nodes.ScreenUVNode() );
 
-						var difference = new Nodes.OperatorNode(
+						backSideDepth = new Nodes.BlurNode( backSideDepth, new Nodes.ScreenUVNode() );
+						backSideDepth.radius.x = 5;
+						backSideDepth.radius.y = 5;
+
+						var difference = new Nodes.SubNode(
 							objectDepth,
-							backSideDepth,
-							Nodes.OperatorNode.SUB
+							backSideDepth
 						);
 
 						var sss = new Nodes.MathNode(
 							new Nodes.FloatNode( - .1 ),
-							new Nodes.FloatNode( .5 ),
+							new Nodes.FloatNode( .13 ),
 							difference,
 							Nodes.MathNode.SMOOTHSTEP
 						);
@@ -3142,7 +3443,7 @@
 							);
 
 							frontColor = new Nodes.ColorNode( 0xd4cfbb );
-							backColor = new Nodes.ColorNode( 0xd04327 );
+							backColor = new Nodes.ColorNode( 0xff2a00 );
 
 							var color = new Nodes.MathNode(
 								backColor,
@@ -3151,10 +3452,9 @@
 								Nodes.MathNode.MIX
 							);
 
-							var light = new Nodes.OperatorNode(
+							var light = new Nodes.AddNode(
 								new Nodes.LightNode(),
-								color,
-								Nodes.OperatorNode.ADD
+								color
 							);
 
 							mtl.color = frontColor;
@@ -3166,6 +3466,8 @@
 
 						} else {
 
+							sss.b.value = .5;
+
 							frontColor = new Nodes.ColorNode( 0xd04327 );
 							backColor = new Nodes.ColorNode( 0x1a0e14 );
 
@@ -3176,10 +3478,9 @@
 								Nodes.MathNode.MIX
 							);
 
-							var light = new Nodes.OperatorNode(
+							var light = new Nodes.AddNode(
 								new Nodes.LightNode(),
-								color,
-								Nodes.OperatorNode.ADD
+								color
 							);
 
 							mtl.color = new Nodes.ColorNode( 0xffffff );
@@ -3306,6 +3607,16 @@
 				} else {
 
 					mesh.position.z = mesh.position.y = 0;
+
+				}
+
+				if ( rotate ) {
+
+					mesh.rotation.y = Date.now() * 0.001;
+
+				} else {
+
+					mesh.rotation.y = 0;
 
 				}
 

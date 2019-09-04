@@ -17,6 +17,7 @@ import { NodeLib } from './NodeLib.js';
 import { FunctionNode } from './FunctionNode.js';
 import { ConstNode } from './ConstNode.js';
 import { StructNode } from './StructNode.js';
+import { NodeContext } from './NodeContext.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { Vector3Node } from '../inputs/Vector3Node.js';
 import { Vector4Node } from '../inputs/Vector4Node.js';
@@ -54,11 +55,17 @@ function NodeBuilder() {
 
 	this.slots = [];
 	this.caches = [];
-	this.contexts = [];
+	this.contextsData = [];
 
 	this.keywords = {};
 
 	this.nodeData = {};
+
+	this.varyNodeCode = {};
+	this.vertexParsNodeCode = {};
+	this.vertexFinalNodeCode = {};
+	this.fragmentParsNodeCode = {};
+	this.fragmentFinalNodeCode = {};
 
 	this.requires = {
 		uv: [],
@@ -215,22 +222,6 @@ NodeBuilder.prototype = {
 
 		}
 
-		if ( this.requires.normal ) {
-
-			this.addVaryCode( 'varying vec3 vObjectNormal;' );
-
-			this.addVertexFinalCode( 'vObjectNormal = normal;' );
-
-		}
-
-		if ( this.requires.worldNormal ) {
-
-			this.addVaryCode( 'varying vec3 vWNormal;' );
-
-			this.addVertexFinalCode( 'vWNormal = ( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz;' );
-
-		}
-
 		return this;
 
 	},
@@ -255,15 +246,17 @@ NodeBuilder.prototype = {
 
 	},
 
-	addFlow: function ( slot, cache, context ) {
+	addContext: function ( context ) {
 
-		return this.addSlot( slot ).addCache( cache ).addContext( context );
+		context = context || new NodeContext();
+
+		return this.addSlot( context.slot ).addCache( context.cache ).addContextData( context.data );
 
 	},
 
-	removeFlow: function () {
+	removeContext: function () {
 
-		return this.removeSlot().removeCache().removeContext();
+		return this.removeSlot().removeCache().removeContextData();
 
 	},
 
@@ -285,21 +278,19 @@ NodeBuilder.prototype = {
 
 	},
 
-	addContext: function ( context ) {
+	addContextData: function ( context ) {
 
-		this.context = Object.assign( {}, this.context, context );
-		this.context.extra = this.context.extra || {};
-
-		this.contexts.push( this.context );
+		this.contextData = Object.assign( {}, this.contextData, context || {} );
+		this.contextsData.push( this.contextData );
 
 		return this;
 
 	},
 
-	removeContext: function () {
+	removeContextData: function () {
 
-		this.contexts.pop();
-		this.context = this.contexts[ this.contexts.length - 1 ] || {};
+		this.contextsData.pop();
+		this.contextData = this.contextsData[ this.contextsData.length - 1 ] || {};
 
 		return this;
 
@@ -323,7 +314,6 @@ NodeBuilder.prototype = {
 
 	},
 
-
 	addVertexCode: function ( code ) {
 
 		this.addCode( code, 'vertex' );
@@ -341,7 +331,6 @@ NodeBuilder.prototype = {
 		this.code[ shader || this.shader ] += code + '\n';
 
 	},
-
 
 	addVertexNodeCode: function ( code ) {
 
@@ -391,9 +380,33 @@ NodeBuilder.prototype = {
 
 	},
 
+	addVertexFinalNodeCode: function ( node, code ) {
+
+		if ( ! this.vertexFinalNodeCode[ node.uuid ] ) {
+
+			this.addFinalCode( code, 'vertex' );
+
+			this.vertexFinalNodeCode[ node.uuid ] = true;
+
+		}
+
+	},
+
 	addFragmentFinalCode: function ( code ) {
 
 		this.addFinalCode( code, 'fragment' );
+
+	},
+
+	addFragmentFinalNodeCode: function ( node, code ) {
+
+		if ( ! this.fragmentFinalNodeCode[ node.uuid ] ) {
+
+			this.addFinalCode( code, 'fragment' );
+
+			this.fragmentFinalNodeCode[ node.uuid ] = true;
+
+		}
 
 	},
 
@@ -410,9 +423,33 @@ NodeBuilder.prototype = {
 
 	},
 
+	addVertexParsNodeCode: function ( node, code ) {
+
+		if ( ! this.vertexParsNodeCode[ node.uuid ] ) {
+
+			this.addParsCode( code, 'vertex' );
+
+			this.vertexParsNodeCode[ node.uuid ] = true;
+
+		}
+
+	},
+
 	addFragmentParsCode: function ( code ) {
 
 		this.addParsCode( code, 'fragment' );
+
+	},
+
+	addFragmentParsNodeCode: function ( node, code ) {
+
+		if ( ! this.fragmentParsNodeCode[ node.uuid ] ) {
+
+			this.addParsCode( code, 'fragment' );
+
+			this.fragmentParsNodeCode[ node.uuid ] = true;
+
+		}
 
 	},
 
@@ -430,6 +467,18 @@ NodeBuilder.prototype = {
 
 	},
 
+	addVaryNodeCode: function ( node, code ) {
+
+		if ( ! this.varyNodeCode[ node.uuid ] ) {
+
+			this.addVertexParsCode( code );
+			this.addFragmentParsCode( code );
+
+			this.varyNodeCode[ node.uuid ] = true;
+
+		}
+
+	},
 
 	isCache: function ( name ) {
 
@@ -608,7 +657,7 @@ NodeBuilder.prototype = {
 
 		node = typeof node === 'string' ? NodeLib.get( node ) : node;
 
-		if ( this.context.include === false ) {
+		if ( this.getContextProperty( NodeContext.INCLUDE ) === false ) {
 
 			return node.name;
 
@@ -728,6 +777,18 @@ NodeBuilder.prototype = {
 		};
 
 	}(),
+
+	getContextProperty: function ( name ) {
+
+		return this.contextData[ name ];
+
+	},
+
+	getContextClass: function ( name ) {
+
+		return this.getContextProperty( name + 'Class' );
+
+	},
 
 	getConstructorFromLength: function ( len ) {
 
@@ -951,7 +1012,7 @@ NodeBuilder.prototype = {
 
 	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
 
-		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.context.gamma && ( this.renderer ? this.renderer.gammaInput : false );
+		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.getContextProperty( NodeContext.GAMMA ) && ( this.renderer ? this.renderer.gammaInput : false );
 
 		var encoding;
 

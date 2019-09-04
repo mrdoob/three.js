@@ -83,12 +83,13 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 
 		var perturbNormal2Arb = builder.include( NormalMapNode.Nodes.perturbNormal2Arb );
 
-		this.normal = this.normal || new NormalNode();
+		var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
+
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
-			this.normal.build( builder, 'v3' ) + ', ' +
+			viewNormalNode.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
 			this.uv.build( builder, 'v2' ) + ', ' +
 			this.scale.build( builder, 'v2' ) + ' )', this.getType( builder ), output );

@@ -3,6 +3,14 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeUtils } from '../core/NodeUtils.js';
+
+const operatorsDict = {
+	'add': '+',
+	'sub': '-',
+	'mul': '*',
+	'div': '/'
+};
 
 function OperatorNode( a, b, op ) {
 
@@ -14,10 +22,10 @@ function OperatorNode( a, b, op ) {
 
 }
 
-OperatorNode.ADD = '+';
-OperatorNode.SUB = '-';
-OperatorNode.MUL = '*';
-OperatorNode.DIV = '/';
+OperatorNode.ADD = 'add';
+OperatorNode.SUB = 'sub';
+OperatorNode.MUL = 'mul';
+OperatorNode.DIV = 'div';
 
 OperatorNode.prototype = Object.create( TempNode.prototype );
 OperatorNode.prototype.constructor = OperatorNode;
@@ -49,9 +57,10 @@ OperatorNode.prototype.generate = function ( builder, output ) {
 	var type = this.getType( builder );
 
 	var a = this.a.build( builder, type ),
-		b = this.b.build( builder, type );
+		b = this.b.build( builder, type ),
+		op = operatorsDict[ this.op ] || this.op;
 
-	return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
+	return builder.format( '( ' + a + ' ' + op + ' ' + b + ' )', type, output );
 
 };
 
@@ -84,5 +93,15 @@ OperatorNode.prototype.toJSON = function ( meta ) {
 	return data;
 
 };
+
+const AddNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.ADD );
+const SubNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.SUB );
+const MulNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.MUL );
+const DivNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.DIV );
+
+export { AddNode };
+export { SubNode };
+export { MulNode };
+export { DivNode };
 
 export { OperatorNode };

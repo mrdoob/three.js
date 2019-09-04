@@ -56,7 +56,7 @@ RTTNode.prototype.build = function ( builder, output, uuid ) {
 
 };
 
-RTTNode.prototype.updateFramesaveTo = function ( frame ) {
+RTTNode.prototype.updateFrameSaveTo = function ( frame ) {
 
 	this.saveTo.render = false;
 
@@ -95,7 +95,7 @@ RTTNode.prototype.updateFrame = function ( frame ) {
 
 		if ( this.saveTo && this.saveTo.render === false ) {
 
-			this.updateFramesaveTo( frame );
+			this.updateFrameSaveTo( frame );
 
 		}
 
@@ -117,7 +117,7 @@ RTTNode.prototype.updateFrame = function ( frame ) {
 
 		if ( this.saveTo && this.saveTo.render === true ) {
 
-			this.updateFramesaveTo( frame );
+			this.updateFrameSaveTo( frame );
 
 		}
 
