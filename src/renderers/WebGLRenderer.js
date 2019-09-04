@@ -1181,7 +1181,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( capabilities.multiview ) {
 
-			multiview.attachRenderTarget( camera );
+			multiview.attachCamera( camera );
 
 		}
 

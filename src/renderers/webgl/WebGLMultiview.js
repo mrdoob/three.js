@@ -20,12 +20,6 @@ function WebGLMultiview( renderer, gl ) {
 	var renderTarget, currentRenderTarget;
 	var mat3, mat4, cameraArray, renderSize;
 
-	function getMaxViews() {
-
-		return capabilities.maxMultiviewViews;
-
-	}
-
 	function getCameraArray( camera ) {
 
 		if ( camera.isArrayCamera ) return camera.cameras;
@@ -130,7 +124,7 @@ function WebGLMultiview( renderer, gl ) {
 
 	}
 
-	function attachRenderTarget( camera ) {
+	function attachCamera( camera ) {
 
 		if ( ! isMultiviewCompatible( camera ) ) return;
 
@@ -194,7 +188,9 @@ function WebGLMultiview( renderer, gl ) {
 		mat3 = [];
 		cameraArray = [];
 
-		for ( var i = 0; i < getMaxViews(); i ++ ) {
+		var maxViews = capabilities.maxMultiviewViews;
+
+		for ( var i = 0; i < maxViews; i ++ ) {
 
 			mat4[ i ] = new Matrix4();
 			mat3[ i ] = new Matrix3();
@@ -204,7 +200,7 @@ function WebGLMultiview( renderer, gl ) {
 	}
 
 
-	this.attachRenderTarget = attachRenderTarget;
+	this.attachCamera = attachCamera;
 	this.detachRenderTarget = detachRenderTarget;
 	this.updateCameraProjectionMatricesUniform = updateCameraProjectionMatricesUniform;
 	this.updateCameraViewMatricesUniform = updateCameraViewMatricesUniform;
