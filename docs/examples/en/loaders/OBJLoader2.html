@@ -25,8 +25,8 @@
 		var loader = new THREE.OBJLoader2();
 
 		// function called on successful load
-		var callbackOnLoad = function ( event ) {
-			scene.add( event.detail.loaderRootNode );
+		var callbackOnLoad = function ( object3d ) {
+			scene.add( object3d );
 		};
 
 		// load a resource from provided URL synchronously
