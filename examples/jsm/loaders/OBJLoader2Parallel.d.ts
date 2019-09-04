@@ -16,4 +16,7 @@ export class OBJLoader2Parallel extends OBJLoader2 {
   setExecuteParallel(executeParallel: boolean): this;
   getWorkerExecutionSupport(): object;
   buildWorkerCode(): object;
+
+  // @ts-ignore
+  parse(content: ArrayBuffer): void;
 }

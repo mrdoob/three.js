@@ -172,7 +172,7 @@ MaterialHandler.prototype = {
 				material = materials[ materialName ];
 				this.materials[ materialName ] = material;
 				newMaterials[ materialName ] = material;
-				if ( this.logging.enabled ) console.info( 'Material with name "' + materialName + '" was added.' );
+				if ( this.logging.enabled && this.logging.debug ) console.info( 'Material with name "' + materialName + '" was added.' );
 
 			}
 
