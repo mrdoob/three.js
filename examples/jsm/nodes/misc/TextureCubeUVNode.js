@@ -7,13 +7,13 @@ import { ConstNode } from '../core/ConstNode.js';
 import { StructNode } from '../core/StructNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 
-function TextureCubeUVNode( uv, textureSize, blinnExponentToRoughness ) {
+function TextureCubeUVNode( uv, textureSize, bias ) {
 
 	TempNode.call( this, 'TextureCubeUVData' ); // TextureCubeUVData is type as StructNode
 
 	this.uv = uv;
 	this.textureSize = textureSize;
-	this.blinnExponentToRoughness = blinnExponentToRoughness;
+	this.bias = bias;
 
 }
 
@@ -171,8 +171,10 @@ TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 
 		var textureCubeUV = builder.include( TextureCubeUVNode.Nodes.textureCubeUV );
 
+		var biasNode = this.bias || builder.context.bias;
+
 		return builder.format( textureCubeUV + '( ' + this.uv.build( builder, 'v3' ) + ', ' +
-			this.blinnExponentToRoughness.build( builder, 'f' ) + ', ' +
+			biasNode.build( builder, 'f' ) + ', ' +
 			this.textureSize.build( builder, 'f' ) + ' )', this.getType( builder ), output );
 
 	} else {

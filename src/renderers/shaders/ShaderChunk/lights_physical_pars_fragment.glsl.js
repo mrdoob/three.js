@@ -117,6 +117,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 void RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in GeometricContext geometry, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {
 
+	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 }
 
@@ -139,8 +140,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	float clearcoatInv = 1.0 - clearcoatDHR;
 
-	// Both indirect specular and diffuse light accumulate here
-	// if energy preservation enabled, and PMREM provided.
+	// Both indirect specular and indirect diffuse light accumulate here
 
 	vec3 singleScattering = vec3( 0.0 );
 	vec3 multiScattering = vec3( 0.0 );
@@ -151,7 +151,8 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
 
 	reflectedLight.indirectSpecular += clearcoatInv * radiance * singleScattering;
-	reflectedLight.indirectDiffuse += multiScattering * cosineWeightedIrradiance;
+	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;
+
 	reflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;
 
 }
@@ -160,9 +161,6 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 #define RE_Direct_RectArea		RE_Direct_RectArea_Physical
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Physical
 #define RE_IndirectSpecular		RE_IndirectSpecular_Physical
-
-#define Material_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.specularRoughness )
-#define Material_Clearcoat_BlinnShininessExponent( material )   GGXRoughnessToBlinnExponent( material.clearcoatRoughness )
 
 // ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {

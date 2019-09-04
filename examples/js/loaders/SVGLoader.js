@@ -6,11 +6,11 @@
 
 THREE.SVGLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.SVGLoader.prototype = {
+THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.SVGLoader,
 
@@ -25,13 +25,6 @@ THREE.SVGLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -1172,7 +1165,7 @@ THREE.SVGLoader.prototype = {
 
 	}
 
-};
+} );
 
 THREE.SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 

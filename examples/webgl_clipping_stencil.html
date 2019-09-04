@@ -4,25 +4,7 @@
 		<title>three.js webgl - clipping stencil</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -34,7 +16,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, startTime, object, stats;
+			var camera, scene, renderer, object, stats;
 			var planes, planeObjects, planeHelpers;
 			var clock;
 
@@ -156,7 +138,7 @@
 
 					var poGroup = new THREE.Group();
 					var plane = planes[ i ];
-					var stencilGroup = createPlaneStencilGroup( geometry, plane, i + 1 )
+					var stencilGroup = createPlaneStencilGroup( geometry, plane, i + 1 );
 
 					// plane is clipped by the other clipping planes
 					var planeMat =
@@ -246,7 +228,7 @@
 				var planeX = gui.addFolder( 'planeX' );
 				planeX.add( params.planeX, 'displayHelper' ).onChange( v => planeHelpers[ 0 ].visible = v );
 				planeX.add( params.planeX, 'constant' ).min( - 1 ).max( 1 ).onChange( d => planes[ 0 ].constant = d );
-				planeX.add( params.planeX, 'negated' ).onChange( d => {
+				planeX.add( params.planeX, 'negated' ).onChange( () => {
 
 					planes[ 0 ].negate();
 					params.planeX.constant = planes[ 0 ].constant;
@@ -257,7 +239,7 @@
 				var planeY = gui.addFolder( 'planeY' );
 				planeY.add( params.planeY, 'displayHelper' ).onChange( v => planeHelpers[ 1 ].visible = v );
 				planeY.add( params.planeY, 'constant' ).min( - 1 ).max( 1 ).onChange( d => planes[ 1 ].constant = d );
-				planeY.add( params.planeY, 'negated' ).onChange( d => {
+				planeY.add( params.planeY, 'negated' ).onChange( () => {
 
 					planes[ 1 ].negate();
 					params.planeY.constant = planes[ 1 ].constant;
@@ -268,7 +250,7 @@
 				var planeZ = gui.addFolder( 'planeZ' );
 				planeZ.add( params.planeZ, 'displayHelper' ).onChange( v => planeHelpers[ 2 ].visible = v );
 				planeZ.add( params.planeZ, 'constant' ).min( - 1 ).max( 1 ).onChange( d => planes[ 2 ].constant = d );
-				planeZ.add( params.planeZ, 'negated' ).onChange( d => {
+				planeZ.add( params.planeZ, 'negated' ).onChange( () => {
 
 					planes[ 2 ].negate();
 					params.planeZ.constant = planes[ 2 ].constant;

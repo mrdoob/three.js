@@ -39,10 +39,10 @@ TextureNode.prototype.getUVNode = function ( builder ) {
 
 TextureNode.prototype.getBiasNode = function ( builder ) {
 	
-	// automatic bias is used normally in physically-based material
-	const BiasClass = builder.getContextClass( 'Bias' );
+	// contextually bias is used normally in physically-based material
+  var contextuallyBias = builder.getContextProperty( 'bias' );
 
-	return BiasClass ? new BiasClass( this ) : this.bias;
+	return contextuallyBias ? contextuallyBias.setTexture( this ) : this.bias;
 
 };
 

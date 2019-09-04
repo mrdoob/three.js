@@ -9,18 +9,20 @@
  */
 
 import {
-	DefaultLoadingManager,
-	FileLoader
+	FileLoader,
+	Loader
 } from "../../../build/three.module.js";
 
 var TTFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
+
 	this.reversed = false;
 
 };
 
-TTFLoader.prototype = {
+
+TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: TTFLoader,
 
@@ -39,13 +41,6 @@ TTFLoader.prototype = {
 
 	},
 
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
 	parse: function ( arraybuffer ) {
 
 		function convert( font, reversed ) {
@@ -54,7 +49,7 @@ TTFLoader.prototype = {
 
 			var glyphs = {};
 			var scale = ( 100000 ) / ( ( font.unitsPerEm || 2048 ) * 72 );
-			
+
 			var glyphIndexMap = font.encoding.cmap.glyphIndexMap;
 			var unicodes = Object.keys( glyphIndexMap );
 
@@ -207,6 +202,6 @@ TTFLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { TTFLoader };

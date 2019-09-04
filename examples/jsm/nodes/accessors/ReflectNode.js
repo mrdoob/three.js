@@ -56,9 +56,11 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 			case ReflectNode.VECTOR:
 
 				var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
+				var roughnessNode = builder.context.roughness;
 
 				var viewNormal = viewNormalNode.build( builder, 'v3' );
 				var viewPosition = '-normalize( ' + new PositionNode( PositionNode.VIEW ).build( builder, 'v3' ) + ' )';
+				var roughness = roughnessNode ? roughnessNode.build( builder, 'f' ) : undefined;
 
 				var method;
 
@@ -71,6 +73,13 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 				} else {
 
 					method = `reflect( ${viewPosition}, ${viewNormal} )`;
+
+				}
+
+				if ( roughness ) {
+
+					// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+					method = `normalize( mix( ${method}, ${viewNormal}, ${roughness} * ${roughness} ) )`;
 
 				}
 

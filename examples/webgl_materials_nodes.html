@@ -23,7 +23,6 @@
 
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
@@ -97,10 +96,10 @@
 
 				pmremCube.minFilter = minFilter;
 				pmremCube.magFilter = magFilter;
-				pmremCube.generateMipmaps = pmremCube.generateMipmaps;
+				pmremCube.generateMipmaps = generateMipmaps;
 				pmremCube.needsUpdate = true;
 
-				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture
+				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
 				library[ premTexture.uuid ] = premTexture;
 
@@ -648,8 +647,6 @@
 
 						// NODES
 
-						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
-
 						var normalScale = new Nodes.FloatNode( .3 );
 
 						var radiance = new Nodes.FloatNode( 1 );
@@ -667,10 +664,10 @@
 						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
 
 						var subSlotNode = new Nodes.SubSlotNode();
-						subSlotNode.slots['radiance'] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
-						subSlotNode.slots['irradiance'] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots[ 'radiance' ] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots[ 'irradiance' ] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
 
-						mtl.environment = subSlotNode
+						mtl.environment = subSlotNode;
 
 						// GUI
 
@@ -2714,7 +2711,7 @@
 						// MATERIAL
 
 						var bias = new Nodes.FloatNode( .5 );
-						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap ) );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureNode( cubemap ) );
 						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
 
 						mtl = new Nodes.PhongNodeMaterial();
@@ -2722,7 +2719,7 @@
 
 						function biasMode( val ) {
 
-							switch( val ) {
+							switch ( val ) {
 
 								case 'prem':
 

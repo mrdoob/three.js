@@ -7,10 +7,10 @@ import {
 	AnimationMixer,
 	Bone,
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,
+	Loader,
 	LoaderUtils,
 	Matrix4,
 	Mesh,
@@ -223,10 +223,11 @@ var XLoader = ( function () {
 
 		function XLoader( manager ) {
 
+			Loader.call( this, manager );
+
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
-			this.manager = manager !== undefined ? manager : DefaultLoadingManager;
 			this.texloader = new TextureLoader( this.manager );
 			this.url = "";
 			this._putMatLength = 0;
@@ -250,9 +251,6 @@ var XLoader = ( function () {
 		}
 
 		createClass( XLoader, [ {
-			key: 'crossOrigin',
-			value: 'anonymous'
-		}, {
 			key: '_setArgOption',
 			value: function _setArgOption( _arg ) {
 
@@ -299,30 +297,6 @@ var XLoader = ( function () {
 					_this.parse( response, onLoad );
 
 				}, onProgress, onError );
-
-			}
-		}, {
-			key: 'setCrossOrigin',
-			value: function setCrossOrigin( value ) {
-
-				this.crossOrigin = value;
-				return this;
-
-			}
-		}, {
-			key: 'setPath',
-			value: function setPath( value ) {
-
-				this.path = value;
-				return this;
-
-			}
-		}, {
-			key: 'setResourcePath',
-			value: function setResourcePath( value ) {
-
-				this.resourcePath = value;
-				return this;
 
 			}
 		}, {
@@ -504,11 +478,11 @@ var XLoader = ( function () {
 
 				var path;
 
-				if ( this.resourcePath !== undefined ) {
+				if ( this.resourcePath !== '' ) {
 
 					path = this.resourcePath;
 
-				} else if ( this.path !== undefined ) {
+				} else if ( this.path !== '' ) {
 
 					path = this.path;
 

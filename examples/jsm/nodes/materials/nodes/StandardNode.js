@@ -12,7 +12,7 @@ import { NodeContext } from '../../core/NodeContext.js';
 import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
-import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
+import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js';
 
 function StandardNode() {
 
@@ -125,15 +125,27 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
+		
+
 		// flow context
 
 		var colorFlowContext = new NodeContext().setSlot( 'color' ).setGamma( true );
 		var lightFlowContext = new NodeContext().setCache( 'light' );
 		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
-		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
-		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
-		var clearcoatRadianceFlowContext = new NodeContext().setSlot( 'clearcoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setClass( 'Bias', RoughnessToBlinnExponentNode );
+		var radianceFlowContext = new NodeContext().setSlot( 'radiance' ).setCache( 'radiance' ).setGamma( true ).setProperty( 'bias', RoughnessToBlinnExponentNode );
+		var irradianceFlowContext = new NodeContext().setSlot( 'irradiance' ).setCache( 'irradiance' ).setGamma( true ).setProperty( 'bias', RoughnessToBlinnExponentNode );
+		var clearcoatRadianceFlowContext = new NodeContext().setSlot( 'clearcoatRadiance' ).setCache( 'radiance' ).setGamma( true ).setProperty( 'bias', RoughnessToBlinnExponentNode );
 
+    // context need to environment custom roughness
+
+		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
+		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
+    
+    radianceFlowContext.setProperty( 'roughness', specularRoughness );
+    irradianceFlowContext.setProperty( 'roughness', specularRoughness );
+    
+    irradianceFlowContext.setProperty( 'roughness', clearcoatRoughness );
+    
 		// context need to environment and clearcoat custom normals
 
 		var envViewNormalSystem = new ExpressionNode( 'normal', 'v3' );
@@ -238,7 +250,6 @@ StandardNode.prototype.build = function ( builder ) {
 		builder.requires.transparent = useTransparent;
 
 		builder.addParsCode( [
-
 			"varying vec3 vViewPosition;",
 
 			"#ifndef FLAT_SHADED",
@@ -471,7 +482,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			if ( builder.requires.irradiance ) {
 
-				output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
+				output.push( "iblIrradiance += PI * " + environment.irradiance.result + ";" );
 
 			}
 

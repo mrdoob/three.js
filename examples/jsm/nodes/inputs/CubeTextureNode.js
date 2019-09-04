@@ -36,16 +36,16 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	}
 
-	// automatic bias is used normally in physically-based material
-	const BiasClass = builder.getContextClass( 'Bias' );
+	// contextually bias is used normally in physically-based material
+	var contextuallyBias = builder.getContextProperty( 'bias' );
 
 	var cubetex = this.getTexture( builder, output );
 	var uv = this.uv.build( builder, 'v3' );
 	var bias = this.bias ? this.bias.build( builder, 'f' ) : undefined;
 
-	if ( bias === undefined && BiasClass !== undefined ) {
+	if ( bias === undefined && contextuallyBias !== undefined ) {
 
-		bias = new BiasClass( this ).build( builder, 'f' );
+		bias = builder.getContextProperty( 'bias' ).setTexture( this ).build( builder, 'f' );
 
 	}
 
