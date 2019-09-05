@@ -2,7 +2,6 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { EventDispatcher } from './EventDispatcher.js';
 import { Vector2 } from '../math/Vector2.js';
 
 function DirectGeometry() {
@@ -35,7 +34,7 @@ function DirectGeometry() {
 
 }
 
-DirectGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+Object.assign( DirectGeometry.prototype, {
 
 	computeGroups: function ( geometry ) {
 
