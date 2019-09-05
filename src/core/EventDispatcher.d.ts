@@ -17,7 +17,7 @@ export class EventDispatcher {
 	 * @param type The type of event to listen to.
 	 * @param listener The function that gets called when the event is fired.
 	 */
-	addEventListener( type: string, listener: ( event: Event ) => void ): void;
+	addEventListener( type: string, listener: ( event: Event ) => void ): EventDispatcher;
 
 	/**
 	 * Checks if listener is added to an event type.
@@ -31,12 +31,12 @@ export class EventDispatcher {
 	 * @param type The type of the listener that gets removed.
 	 * @param listener The listener function that gets removed.
 	 */
-	removeEventListener( type: string, listener: ( event: Event ) => void ): void;
+	removeEventListener( type: string, listener: ( event: Event ) => void ): EventDispatcher;
 
 	/**
 	 * Fire an event type.
 	 * @param type The type of event that gets fired.
 	 */
-	dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
+	dispatchEvent( event: { type: string; [attachment: string]: any } ): EventDispatcher;
 
 }

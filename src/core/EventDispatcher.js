@@ -24,6 +24,8 @@ Object.assign( EventDispatcher.prototype, {
 
 		}
 
+		return this;
+
 	},
 
 	hasEventListener: function ( type, listener ) {
@@ -55,6 +57,8 @@ Object.assign( EventDispatcher.prototype, {
 
 		}
 
+		return this;
+
 	},
 
 	dispatchEvent: function ( event ) {
@@ -77,6 +81,8 @@ Object.assign( EventDispatcher.prototype, {
 			}
 
 		}
+
+		return this;
 
 	}
 
