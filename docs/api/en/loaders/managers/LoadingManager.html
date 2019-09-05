@@ -198,12 +198,34 @@
 		This should be called by any loader using the manager when the loader ended loading an url.
 		</p>
 
-
 		<h3>[method:null itemError]( [param:String url] )</h3>
 		<p>
 		[page:String url] — the loaded url<br /><br />
 
 		This should be called by any loader using the manager when the loader errors loading an url.
+		</p>
+
+		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.<br />
+		[page:Loader loader] — The loader.
+		<p>
+		Registers a loader with the given regular expression. Can be used to define what loader should be used in
+		order to load specific files. A typical use case is to overwrite the default loader for textures.
+		</p>
+
+		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.
+		<p>
+		Removes the loader for the given regular expression.
+		</p>
+
+		<h3>[method:null getHandler]( [param:String file] )</h3>
+		<p>
+		[page:String file] — The file path.
+		<p>
+		Can be used to retrieve the registered loader for the given file path.
 		</p>
 
 		<h2>Source</h2>

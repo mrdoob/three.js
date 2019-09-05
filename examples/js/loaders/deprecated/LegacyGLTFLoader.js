@@ -1079,7 +1079,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						}
 
-						var textureLoader = THREE.Loader.Handlers.get( sourceUri );
+						var textureLoader = options.manager.getHanlder( sourceUri );
 
 						if ( textureLoader === null ) {
 
