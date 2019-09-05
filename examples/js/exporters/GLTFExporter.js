@@ -961,11 +961,11 @@ THREE.GLTFExporter.prototype = {
 
 			// pbrSpecularGlossiness diffuse, specular and glossiness factor
 			if ( material.isGLTFSpecularGlossinessMaterial ) {
-				
+
 				if ( gltfMaterial.pbrMetallicRoughness.baseColorFactor ) {
 
 					gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor = gltfMaterial.pbrMetallicRoughness.baseColorFactor;
-				  
+
 				}
 
 				var specularFactor = [ 1, 1, 1 ];
@@ -973,7 +973,7 @@ THREE.GLTFExporter.prototype = {
 				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor = specularFactor;
 
 				gltfMaterial.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor = material.glossiness;
-			
+
 			}
 
 			// pbrMetallicRoughness.metallicRoughnessTexture
@@ -1006,7 +1006,7 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				gltfMaterial.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
-				
+
 			}
 
 			// pbrSpecularGlossiness specular map
