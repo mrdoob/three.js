@@ -5,7 +5,6 @@ import { Vector4 } from './../math/Vector4';
 import { Box3 } from './../math/Box3';
 import { Sphere } from './../math/Sphere';
 import { Geometry } from './Geometry';
-import { Event } from './Face3';
 import { EventDispatcher } from './EventDispatcher';
 import { MorphTarget } from './Geometry';
 /**
@@ -42,11 +41,5 @@ export class DirectGeometry extends EventDispatcher {
 	computeGroups( geometry: Geometry ): void;
 	fromGeometry( geometry: Geometry ): DirectGeometry;
 	dispose(): void;
-
-	// EventDispatcher mixins
-	addEventListener( type: string, listener: ( event: Event ) => void ): void;
-	hasEventListener( type: string, listener: ( event: Event ) => void ): boolean;
-	removeEventListener( type: string, listener: ( event: Event ) => void ): void;
-	dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
 
 }
