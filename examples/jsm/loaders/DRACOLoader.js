@@ -196,7 +196,7 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		for ( var i = 0; i < geometryData.attributes.length; i++ ) {
+		for ( var i = 0; i < geometryData.attributes.length; i ++ ) {
 
 			var attribute = geometryData.attributes[ i ];
 			var name = attribute.name;
@@ -373,7 +373,7 @@ DRACOLoader.DRACOWorker = function () {
 
 			case 'init':
 				decoderConfig = message.decoderConfig;
-				decoderPending = new Promise( function ( resolve, reject ) {
+				decoderPending = new Promise( function ( resolve/*, reject*/ ) {
 
 					decoderConfig.onModuleLoaded = function ( draco ) {
 
@@ -464,8 +464,10 @@ DRACOLoader.DRACOWorker = function () {
 		var numPoints = dracoGeometry.num_points();
 		var numAttributes = dracoGeometry.num_attributes();
 
+		console.log( numPoints, numAttributes );
+
 		// Add attributes of user specified unique id.
-		for (var attributeName in attributeIDs) {
+		for ( var attributeName in attributeIDs ) {
 
 			var attributeType = self[ attributeTypes[ attributeName ] ];
 			var attributeId = attributeIDs[ attributeName ];
@@ -506,9 +508,9 @@ DRACOLoader.DRACOWorker = function () {
 
 		return geometry;
 
-	};
+	}
 
-	function decodeAttribute ( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) {
+	function decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) {
 
 		var numComponents = attribute.num_components();
 		var numPoints = dracoGeometry.num_points();
@@ -527,7 +529,7 @@ DRACOLoader.DRACOWorker = function () {
 
 			case Int8Array:
 				dracoArray = new draco.DracoInt8Array();
-				decoder.GetAttributeInt8ForAllPoints( dracoGeometry, attribute, dracoArray  );
+				decoder.GetAttributeInt8ForAllPoints( dracoGeometry, attribute, dracoArray );
 				array = new Int8Array( numValues );
 				break;
 
@@ -566,7 +568,7 @@ DRACOLoader.DRACOWorker = function () {
 
 		}
 
-		for ( var i = 0; i < numValues; i++ ) {
+		for ( var i = 0; i < numValues; i ++ ) {
 
 			array[ i ] = dracoArray.GetValue( i );
 
@@ -580,7 +582,7 @@ DRACOLoader.DRACOWorker = function () {
 			itemSize: numComponents
 		};
 
-	};
+	}
 
 };
 
