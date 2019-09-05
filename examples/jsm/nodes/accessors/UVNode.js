@@ -8,53 +8,57 @@ import { NodeLib } from '../core/NodeLib.js';
 var vertexDict = [ 'uv', 'uv2' ],
 	fragmentDict = [ 'vUv', 'vUv2' ];
 
-function UVNode( index ) {
+export class UVNode extends TempNode {
 
-	TempNode.call( this, 'v2', { shared: false } );
+	constructor( index ) {
 
-	this.index = index || 0;
+		super( 'v2' );
 
-}
+		this.index = index || 0;
 
-UVNode.prototype = Object.create( TempNode.prototype );
-UVNode.prototype.constructor = UVNode;
-UVNode.prototype.nodeType = "UV";
+		this.shared = false;
 
-UVNode.prototype.generate = function ( builder, output ) {
-
-	builder.requires.uv[ this.index ] = true;
-
-	var result = builder.isShader( 'vertex' ) ? vertexDict[ this.index ] : fragmentDict[ this.index ];
-
-	return builder.format( result, this.getType( builder ), output );
-
-};
-
-UVNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.index = source.index;
-
-	return this;
-
-};
-
-UVNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.index = this.index;
+		this.nodeType = "UV";
 
 	}
 
-	return data;
+	generate( builder, output ) {
 
-};
+		builder.requires.uv[ this.index ] = true;
+
+		var result = builder.isShader( 'vertex' ) ? vertexDict[ this.index ] : fragmentDict[ this.index ];
+
+		return builder.format( result, this.getType( builder ), output );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.index = source.index;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		var data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.index = this.index;
+
+		}
+
+		return data;
+
+	}
+
+}
 
 NodeLib.addKeyword( 'uv', function () {
 
@@ -67,5 +71,3 @@ NodeLib.addKeyword( 'uv2', function () {
 	return new UVNode( 1 );
 
 } );
-
-export { UVNode };

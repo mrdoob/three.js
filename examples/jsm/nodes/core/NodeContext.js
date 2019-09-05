@@ -2,43 +2,41 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-function NodeContext( slot ) {
+export class NodeContext {
 
-	this.slot = slot || '';
-	this.cache = '';
-	this.data = {};
+	constructor( slot ) {
 
-}
+		this.slot = slot || '';
+		this.cache = '';
+		this.data = {};
 
-NodeContext.prototype = {
+	}
 
-	constructor: NodeContext,
-
-	setSlot: function ( slot ) {
+	setSlot ( slot ) {
 
 		this.slot = slot;
 
 		return this;
 
-	},
+	}
 
-	setCache: function ( cache ) {
+	setCache ( cache ) {
 
 		this.cache = cache;
 
 		return this;
 
-	},
+	}
 
-	setProperty: function ( name, value ) {
+	setProperty ( name, value ) {
 
 		this.data[ name ] = value;
 
 		return this;
 
-	},
+	}
 
-	setSampler: function ( uv ) {
+	setSampler ( uv ) {
 
 		var cacheId = `sampler-uv-${uv.uuid}`;
 
@@ -46,6 +44,4 @@ NodeContext.prototype = {
 
 	}
 
-};
-
-export { NodeContext };
+}

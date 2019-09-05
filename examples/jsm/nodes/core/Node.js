@@ -4,25 +4,23 @@
 
 import { Math as _Math } from '../../../../build/three.module.js';
 
-function Node( type ) {
+export class Node {
 
-	this.uuid = _Math.generateUUID();
+	constructor( type ) {
 
-	this.name = "";
+		this.uuid = _Math.generateUUID();
 
-	this.type = type;
+		this.name = "";
 
-	this.userData = {};
+		this.type = type;
 
-}
+		this.userData = {};
 
-Node.prototype = {
+		this.isNode = true;
 
-	constructor: Node,
+	}
 
-	isNode: true,
-
-	analyze: function ( builder, context ) {
+	analyze( builder, context ) {
 
 		builder.analyzing = true;
 
@@ -35,17 +33,17 @@ Node.prototype = {
 
 		builder.analyzing = false;
 
-	},
+	}
 
-	analyzeAndFlow: function ( builder, output, settings ) {
+	analyzeAndFlow( builder, output, settings ) {
 
 		this.analyze( builder, settings );
 
 		return this.flow( builder, output, settings );
 
-	},
+	}
 
-	flow: function ( builder, output, context ) {
+	flow( builder, output, context ) {
 
 		builder.addContext( context );
 
@@ -57,9 +55,9 @@ Node.prototype = {
 
 		return flow;
 
-	},
+	}
 
-	buildContext: function ( context, builder, output, uuid ) {
+	buildContext( context, builder, output, uuid ) {
 
 		builder.addContext( context );
 
@@ -69,9 +67,9 @@ Node.prototype = {
 
 		return result;
 
-	},
+	}
 
-	build: function ( builder, output, uuid ) {
+	build( builder, output, uuid ) {
 
 		output = output || this.getType( builder, output );
 
@@ -97,9 +95,9 @@ Node.prototype = {
 
 		return this.generate( builder, output, uuid );
 
-	},
+	}
 
-	appendDepsNode: function ( builder, data, output ) {
+	appendDepsNode( builder, data, output ) {
 
 		data.deps = ( data.deps || 0 ) + 1;
 
@@ -112,29 +110,29 @@ Node.prototype = {
 
 		}
 
-	},
+	}
 
-	setName: function ( name ) {
+	setName( name ) {
 
 		this.name = name;
 
 		return this;
 
-	},
+	}
 
-	getName: function ( /* builder */ ) {
+	getName() {
 
 		return this.name;
 
-	},
+	}
 
-	getType: function ( builder, output ) {
+	getType( builder, output ) {
 
 		return output === 'sampler2D' || output === 'samplerCube' ? output : this.type;
 
-	},
+	}
 
-	getJSONNode: function ( meta ) {
+	getJSONNode( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
 
@@ -144,9 +142,9 @@ Node.prototype = {
 
 		}
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		if ( source.name !== undefined ) this.name = source.name;
 
@@ -154,9 +152,9 @@ Node.prototype = {
 
 		return this;
 
-	},
+	}
 
-	createJSONNode: function ( meta ) {
+	createJSONNode( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
 
@@ -179,14 +177,12 @@ Node.prototype = {
 
 		return data;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		return this.getJSONNode( meta ) || this.createJSONNode( meta );
 
 	}
 
-};
-
-export { Node };
+}

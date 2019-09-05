@@ -18,69 +18,59 @@ import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
 
-function ColorSpaceNode( input, method ) {
+// For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
 
-	TempNode.call( this, 'v4' );
+export const ENCODINGS = {
 
-	this.input = input;
-
-	this.method = method || ColorSpaceNode.LINEAR_TO_LINEAR;
-
-}
-
-ColorSpaceNode.Nodes = ( function () {
-
-	// For a discussion of what this is, please read this: http://lousodrome.net/blog/light/2013/05/26/gamma-correct-and-hdr-rendering-in-a-32-bits-buffer/
-
-	var LinearToLinear = new FunctionNode( [
+	LinearToLinear: new FunctionNode( [
 		"vec4 LinearToLinear( in vec4 value ) {",
 
 		"	return value;",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var GammaToLinear = new FunctionNode( [
+	GammaToLinear: new FunctionNode( [
 		"vec4 GammaToLinear( in vec4 value, in float gammaFactor ) {",
 
 		"	return vec4( pow( value.xyz, vec3( gammaFactor ) ), value.w );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var LinearToGamma = new FunctionNode( [
+	LinearToGamma: new FunctionNode( [
 		"vec4 LinearToGamma( in vec4 value, in float gammaFactor ) {",
 
 		"	return vec4( pow( value.xyz, vec3( 1.0 / gammaFactor ) ), value.w );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var sRGBToLinear = new FunctionNode( [
+	sRGBToLinear: new FunctionNode( [
 		"vec4 sRGBToLinear( in vec4 value ) {",
 
 		"	return vec4( mix( pow( value.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), value.rgb * 0.0773993808, vec3( lessThanEqual( value.rgb, vec3( 0.04045 ) ) ) ), value.w );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var LinearTosRGB = new FunctionNode( [
+	LinearTosRGB: new FunctionNode( [
 		"vec4 LinearTosRGB( in vec4 value ) {",
 
 		"	return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.w );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var RGBEToLinear = new FunctionNode( [
+	RGBEToLinear: new FunctionNode( [
 		"vec4 RGBEToLinear( in vec4 value ) {",
 
 		"	return vec4( value.rgb * exp2( value.a * 255.0 - 128.0 ), 1.0 );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var LinearToRGBE = new FunctionNode( [
+	LinearToRGBE: new FunctionNode( [
 		"vec4 LinearToRGBE( in vec4 value ) {",
 
 		"	float maxComponent = max( max( value.r, value.g ), value.b );",
@@ -89,19 +79,19 @@ ColorSpaceNode.Nodes = ( function () {
 		//  return vec4( value.brg, ( 3.0 + 128.0 ) / 256.0 );
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
 	// reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
 
-	var RGBMToLinear = new FunctionNode( [
+	RGBMToLinear: new FunctionNode( [
 		"vec3 RGBMToLinear( in vec4 value, in float maxRange ) {",
 
 		"	return vec4( value.xyz * value.w * maxRange, 1.0 );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
-	var LinearToRGBM = new FunctionNode( [
+	LinearToRGBM: new FunctionNode( [
 		"vec3 LinearToRGBM( in vec4 value, in float maxRange ) {",
 
 		"	float maxRGB = max( value.x, max( value.g, value.b ) );",
@@ -110,20 +100,20 @@ ColorSpaceNode.Nodes = ( function () {
 		"	return vec4( value.rgb / ( M * maxRange ), M );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
 	// reference: http://iwasbeingirony.blogspot.ca/2010/06/difference-between-rgbm-and-rgbd.html
 
-	var RGBDToLinear = new FunctionNode( [
+	RGBDToLinear: new FunctionNode( [
 		"vec3 RGBDToLinear( in vec4 value, in float maxRange ) {",
 
 		"	return vec4( value.rgb * ( ( maxRange / 255.0 ) / value.a ), 1.0 );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
 
-	var LinearToRGBD = new FunctionNode( [
+	LinearToRGBD: new FunctionNode( [
 		"vec3 LinearToRGBD( in vec4 value, in float maxRange ) {",
 
 		"	float maxRGB = max( value.x, max( value.g, value.b ) );",
@@ -132,15 +122,11 @@ ColorSpaceNode.Nodes = ( function () {
 		"	return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );",
 
 		"}"
-	].join( "\n" ) );
+	].join( "\n" ) ),
 
 	// LogLuv reference: http://graphicrants.blogspot.ca/2009/04/rgbm-color-encoding.html
 
-	// M matrix, for encoding
-
-	var cLogLuvM = new ConstNode( "const mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );" );
-
-	var LinearToLogLuv = new FunctionNode( [
+	LinearToLogLuv: new FunctionNode( [
 		"vec4 LinearToLogLuv( in vec4 value ) {",
 
 		"	vec3 Xp_Y_XYZp = cLogLuvM * value.rgb;",
@@ -153,13 +139,11 @@ ColorSpaceNode.Nodes = ( function () {
 		"	return vResult;",
 
 		"}"
-	].join( "\n" ), [ cLogLuvM ] );
+	].join( "\n" ), [ /* M matrix, for encoding */ new ConstNode( "const mat3 cLogLuvM = mat3( 0.2209, 0.3390, 0.4184, 0.1138, 0.6780, 0.7319, 0.0102, 0.1130, 0.2969 );" ) ] ),
 
 	// Inverse M matrix, for decoding
 
-	var cLogLuvInverseM = new ConstNode( "const mat3 cLogLuvInverseM = mat3( 6.0014, -2.7008, -1.7996, -1.3320, 3.1029, -5.7721, 0.3008, -1.0882, 5.6268 );" );
-
-	var LogLuvToLinear = new FunctionNode( [
+	LogLuvToLinear: new FunctionNode( [
 		"vec4 LogLuvToLinear( in vec4 value ) {",
 
 		"	float Le = value.z * 255.0 + value.w;",
@@ -171,47 +155,101 @@ ColorSpaceNode.Nodes = ( function () {
 		"	return vec4( max(vRGB, 0.0), 1.0 );",
 
 		"}"
-	].join( "\n" ), [ cLogLuvInverseM ] );
+	].join( "\n" ), [ /* M matrix, for encoding */ new ConstNode( "const mat3 cLogLuvInverseM = mat3( 6.0014, -2.7008, -1.7996, -1.3320, 3.1029, -5.7721, 0.3008, -1.0882, 5.6268 );" ) ] )
 
-	return {
-		LinearToLinear: LinearToLinear,
-		GammaToLinear: GammaToLinear,
-		LinearToGamma: LinearToGamma,
-		sRGBToLinear: sRGBToLinear,
-		LinearTosRGB: LinearTosRGB,
-		RGBEToLinear: RGBEToLinear,
-		LinearToRGBE: LinearToRGBE,
-		RGBMToLinear: RGBMToLinear,
-		LinearToRGBM: LinearToRGBM,
-		RGBDToLinear: RGBDToLinear,
-		LinearToRGBD: LinearToRGBD,
-		cLogLuvM: cLogLuvM,
-		LinearToLogLuv: LinearToLogLuv,
-		cLogLuvInverseM: cLogLuvInverseM,
-		LogLuvToLinear: LogLuvToLinear
-	};
+}
 
-} )();
+export class ColorSpaceNode extends TempNode {
 
-ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
+	constructor( input, method ) {
 
-ColorSpaceNode.GAMMA_TO_LINEAR = 'GammaToLinear';
-ColorSpaceNode.LINEAR_TO_GAMMA = 'LinearToGamma';
+		super( 'v4' );
 
-ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear';
-ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
+		this.input = input;
 
-ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear';
-ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE';
+		this.method = method || ColorSpaceNode.LINEAR_TO_LINEAR;
 
-ColorSpaceNode.RGBM_TO_LINEAR = 'RGBMToLinear';
-ColorSpaceNode.LINEAR_TO_RGBM = 'LinearToRGBM';
+		this.nodeType = "ColorSpace";
 
-ColorSpaceNode.RGBD_TO_LINEAR = 'RGBDToLinear';
-ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD';
+	}
 
-ColorSpaceNode.LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
-ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';
+	generate( builder, output ) {
+
+		var input = this.input.build( builder, 'v4' );
+		var outputType = this.getType( builder );
+
+		var methodNode = ENCODINGS[ this.method ];
+		var method = builder.include( methodNode );
+
+		if ( method === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+
+			return builder.format( input, outputType, output );
+
+		} else {
+
+			if ( methodNode.inputs.length === 2 ) {
+
+				var factor = this.factor.build( builder, 'f' );
+
+				return builder.format( method + '( ' + input + ', ' + factor + ' )', outputType, output );
+
+			} else {
+
+				return builder.format( method + '( ' + input + ' )', outputType, output );
+
+			}
+
+		}
+
+	}
+
+	fromEncoding( encoding ) {
+
+		var components = ColorSpaceNode.getEncodingComponents( encoding );
+
+		this.method = 'LinearTo' + components[ 0 ];
+		this.factor = components[ 1 ];
+
+	}
+
+	fromDecoding( encoding ) {
+
+		var components = ColorSpaceNode.getEncodingComponents( encoding );
+
+		this.method = components[ 0 ] + 'ToLinear';
+		this.factor = components[ 1 ];
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.input = source.input;
+		this.method = source.method;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		var data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.input = this.input.toJSON( meta ).uuid;
+			data.method = this.method;
+
+		}
+
+		return data;
+
+	}
+
+}
 
 ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
@@ -234,86 +272,24 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 
 	}
 
-};
+}
 
-ColorSpaceNode.prototype = Object.create( TempNode.prototype );
-ColorSpaceNode.prototype.constructor = ColorSpaceNode;
-ColorSpaceNode.prototype.nodeType = "ColorSpace";
+ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
 
-ColorSpaceNode.prototype.generate = function ( builder, output ) {
+ColorSpaceNode.GAMMA_TO_LINEAR = 'GammaToLinear';
+ColorSpaceNode.LINEAR_TO_GAMMA = 'LinearToGamma';
 
-	var input = this.input.build( builder, 'v4' );
-	var outputType = this.getType( builder );
+ColorSpaceNode.SRGB_TO_LINEAR = 'sRGBToLinear';
+ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
 
-	var methodNode = ColorSpaceNode.Nodes[ this.method ];
-	var method = builder.include( methodNode );
+ColorSpaceNode.RGBE_TO_LINEAR = 'RGBEToLinear';
+ColorSpaceNode.LINEAR_TO_RGBE = 'LinearToRGBE';
 
-	if ( method === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+ColorSpaceNode.RGBM_TO_LINEAR = 'RGBMToLinear';
+ColorSpaceNode.LINEAR_TO_RGBM = 'LinearToRGBM';
 
-		return builder.format( input, outputType, output );
+ColorSpaceNode.RGBD_TO_LINEAR = 'RGBDToLinear';
+ColorSpaceNode.LINEAR_TO_RGBD = 'LinearToRGBD';
 
-	} else {
-
-		if ( methodNode.inputs.length === 2 ) {
-
-			var factor = this.factor.build( builder, 'f' );
-
-			return builder.format( method + '( ' + input + ', ' + factor + ' )', outputType, output );
-
-		} else {
-
-			return builder.format( method + '( ' + input + ' )', outputType, output );
-
-		}
-
-	}
-
-};
-
-ColorSpaceNode.prototype.fromEncoding = function ( encoding ) {
-
-	var components = ColorSpaceNode.getEncodingComponents( encoding );
-
-	this.method = 'LinearTo' + components[ 0 ];
-	this.factor = components[ 1 ];
-
-};
-
-ColorSpaceNode.prototype.fromDecoding = function ( encoding ) {
-
-	var components = ColorSpaceNode.getEncodingComponents( encoding );
-
-	this.method = components[ 0 ] + 'ToLinear';
-	this.factor = components[ 1 ];
-
-};
-
-ColorSpaceNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.input = source.input;
-	this.method = source.method;
-
-	return this;
-
-};
-
-ColorSpaceNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.input = this.input.toJSON( meta ).uuid;
-		data.method = this.method;
-
-	}
-
-	return data;
-
-};
-
-export { ColorSpaceNode };
+ColorSpaceNode.LINEAR_TO_LOG_LUV = 'LinearToLogLuv';
+ColorSpaceNode.LOG_LUV_TO_LINEAR = 'LogLuvToLinear';

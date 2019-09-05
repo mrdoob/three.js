@@ -11,160 +11,151 @@ import { NormalNode } from '../accessors/NormalNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 import { UVNode } from '../accessors/UVNode.js';
 
-function BumpMapNode( value, scale ) {
+export const PERTURB_NORMAL_ARB = new FunctionNode( [
 
-	TempNode.call( this, 'v3' );
+	"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {",
 
-	this.value = value;
-	this.scale = scale || new FloatNode( 1 );
+	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-	this.normal = undefined;
-	this.position = undefined;
+	"	vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );",
+	"	vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );",
+	"	vec3 vN = surf_norm;", // normalized
 
-	this.toNormalMap = false;
+	"	vec3 R1 = cross( vSigmaY, vN );",
+	"	vec3 R2 = cross( vN, vSigmaX );",
 
-}
+	"	float fDet = dot( vSigmaX, R1 );",
 
-BumpMapNode.Nodes = ( function () {
+	"	fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );",
 
-	var perturbNormalArb = new FunctionNode( [
+	"	vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
 
-		"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {",
+	"	return normalize( abs( fDet ) * surf_norm - vGrad );",
 
-		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+	"}"
 
-		"	vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );",
-		"	vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );",
-		"	vec3 vN = surf_norm;", // normalized
+].join( "\n" ), undefined, { derivatives: true } );
 
-		"	vec3 R1 = cross( vSigmaY, vN );",
-		"	vec3 R2 = cross( vN, vSigmaX );",
+export const BUMP_TO_NORMAL = new FunctionNode( [
+	"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
 
-		"	float fDet = dot( vSigmaX, R1 );",
+	"	vec2 dSTdx = dFdx( uv );",
+	"	vec2 dSTdy = dFdy( uv );",
 
-		"	fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );",
+	"	float Hll = texture2D( bumpMap, uv ).x;",
+	"	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;",
+	"	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;",
 
-		"	vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
+	"	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );",
 
-		"	return normalize( abs( fDet ) * surf_norm - vGrad );",
+	"}"
+].join( "\n" ), null, { derivatives: true } );
 
-		"}"
+export class BumpMapNode extends TempNode {
 
-	].join( "\n" ), undefined, { derivatives: true } );
+	constructor( value, scale ) {
 
-	var bumpToNormal = new FunctionNode( [
-		"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
+		super( 'v3' );
 
-		"	vec2 dSTdx = dFdx( uv );",
-		"	vec2 dSTdy = dFdy( uv );",
+		this.value = value;
+		this.scale = scale || new FloatNode( 1 );
 
-		"	float Hll = texture2D( bumpMap, uv ).x;",
-		"	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;",
-		"	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;",
+		this.normal = undefined;
+		this.position = undefined;
 
-		"	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );",
+		this.toNormalMap = false;
 
-		"}"
-	].join( "\n" ), null, { derivatives: true } );
+		this.nodeType = "BumpMap";
 
-	return {
-		perturbNormalArb: perturbNormalArb,
-		bumpToNormal: bumpToNormal
-	};
+	}
 
-} )();
+	generate( builder, output ) {
 
-BumpMapNode.prototype = Object.create( TempNode.prototype );
-BumpMapNode.prototype.constructor = BumpMapNode;
-BumpMapNode.prototype.nodeType = "BumpMap";
+		if ( builder.isShader( 'fragment' ) ) {
 
-BumpMapNode.prototype.generate = function ( builder, output ) {
+			if ( this.toNormalMap ) {
 
-	if ( builder.isShader( 'fragment' ) ) {
+				var bumpToNormal = builder.include( BUMP_TO_NORMAL );
 
-		if ( this.toNormalMap ) {
+				return builder.format( bumpToNormal + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
+					this.value.uv.build( builder, 'v2' ) + ', ' +
+					this.scale.build( builder, 'f' ) + ' )', this.getType( builder ), output );
 
-			var bumpToNormal = builder.include( BumpMapNode.Nodes.bumpToNormal );
+			} else {
 
-			return builder.format( bumpToNormal + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
-				this.value.uv.build( builder, 'v2' ) + ', ' +
-				this.scale.build( builder, 'f' ) + ' )', this.getType( builder ), output );
+				var perturbNormalArb = builder.include( PERTURB_NORMAL_ARB );
+
+				// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
+				// http://api.unrealengine.com/attachments/Engine/Rendering/LightingAndShadows/BumpMappingWithoutTangentSpace/mm_sfgrad_bump.pdf
+
+				// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
+
+				// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+
+				var extensions = { derivatives: true };
+
+				this.HllContext = this.HllContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv', 'v2' ) );
+				this.dSTdxContext = this.dSTdxContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdx( texture.uv )', 'v2', undefined, extensions ) );
+				this.dSTdyContext = this.dSTdyContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdy( texture.uv )', 'v2', undefined, extensions ) );
+
+				// Hll is used two times, is necessary to cache, calls the same count
+				var HllA = this.value.buildContext( this.HllContext, builder, 'f' );
+				var HllB = this.value.buildContext( this.HllContext, builder, 'f' );
+				
+				var dBx = this.value.buildContext( this.dSTdxContext, builder, 'f' );
+				var dBy = this.value.buildContext( this.dSTdyContext, builder, 'f' );
+				var scale = this.scale.build( builder, 'f' );
+
+				this.dHdxy_fwd = this.dHdxy_fwd || new ExpressionNode( '', 'v2' );
+				this.dHdxy_fwd.parse( `vec2( ${dBx} - ${HllA}, ${dBy} - ${HllB} ) * ${scale}` );
+
+				var derivativeHeightCode = this.dHdxy_fwd.build( builder, 'v2' );
+
+				this.normal = this.normal || new NormalNode( NormalNode.VIEW );
+				this.position = this.position || new PositionNode( PositionNode.VIEW );
+
+				return builder.format( perturbNormalArb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
+					this.normal.build( builder, 'v3' ) + ', ' +
+					derivativeHeightCode + ' )', this.getType( builder ), output );
+
+			}
 
 		} else {
 
-			var perturbNormalArb = builder.include( BumpMapNode.Nodes.perturbNormalArb );
+			console.warn( "THREE.BumpMapNode is not compatible with " + builder.shader + " shader." );
 
-			// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
-			// http://api.unrealengine.com/attachments/Engine/Rendering/LightingAndShadows/BumpMappingWithoutTangentSpace/mm_sfgrad_bump.pdf
-
-			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
-
-			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-			var extensions = { derivatives: true };
-
-			this.HllContext = this.HllContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv', 'v2' ) );
-			this.dSTdxContext = this.dSTdxContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdx( texture.uv )', 'v2', undefined, extensions ) );
-			this.dSTdyContext = this.dSTdyContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdy( texture.uv )', 'v2', undefined, extensions ) );
-
-			// Hll is used two times, is necessary to cache, calls the same count
-			var HllA = this.value.buildContext( this.HllContext, builder, 'f' );
-			var HllB = this.value.buildContext( this.HllContext, builder, 'f' );
-			
-			var dBx = this.value.buildContext( this.dSTdxContext, builder, 'f' );
-			var dBy = this.value.buildContext( this.dSTdyContext, builder, 'f' );
-			var scale = this.scale.build( builder, 'f' );
-
-			this.dHdxy_fwd = this.dHdxy_fwd || new ExpressionNode( '', 'v2' );
-			this.dHdxy_fwd.parse( `vec2( ${dBx} - ${HllA}, ${dBy} - ${HllB} ) * ${scale}` );
-
-			var derivativeHeightCode = this.dHdxy_fwd.build( builder, 'v2' );
-
-			this.normal = this.normal || new NormalNode( NormalNode.VIEW );
-			this.position = this.position || new PositionNode( PositionNode.VIEW );
-
-			return builder.format( perturbNormalArb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
-				this.normal.build( builder, 'v3' ) + ', ' +
-				derivativeHeightCode + ' )', this.getType( builder ), output );
+			return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 
 		}
 
-	} else {
+	}
 
-		console.warn( "THREE.BumpMapNode is not compatible with " + builder.shader + " shader." );
+	copy( source ) {
 
-		return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
+		super.copy( source );
+
+		this.value = source.value;
+		this.scale = source.scale;
+
+		return this;
 
 	}
 
-};
+	toJSON( meta ) {
 
-BumpMapNode.prototype.copy = function ( source ) {
+		var data = this.getJSONNode( meta );
 
-	TempNode.prototype.copy.call( this, source );
+		if ( ! data ) {
 
-	this.value = source.value;
-	this.scale = source.scale;
+			data = this.createJSONNode( meta );
 
-	return this;
+			data.value = this.value.toJSON( meta ).uuid;
+			data.scale = this.scale.toJSON( meta ).uuid;
 
-};
+		}
 
-BumpMapNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.value = this.value.toJSON( meta ).uuid;
-		data.scale = this.scale.toJSON( meta ).uuid;
+		return data;
 
 	}
 
-	return data;
-
-};
-
-export { BumpMapNode };
+}

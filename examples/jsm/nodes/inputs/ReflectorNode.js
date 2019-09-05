@@ -9,84 +9,84 @@ import { OperatorNode } from '../math/OperatorNode.js';
 import { TextureNode } from './TextureNode.js';
 import { Matrix4Node } from './Matrix4Node.js';
 
-function ReflectorNode( mirror ) {
+export class ReflectorNode extends TempNode {
 
-	TempNode.call( this, 'v4' );
+	constructor( mirror ) {
 
-	if ( mirror ) this.setMirror( mirror );
+		super( 'v4' );
 
-}
+		if ( mirror ) this.setMirror( mirror );
 
-ReflectorNode.prototype = Object.create( TempNode.prototype );
-ReflectorNode.prototype.constructor = ReflectorNode;
-ReflectorNode.prototype.nodeType = "Reflector";
+		this.nodeType = "Reflector";
 
-ReflectorNode.prototype.setMirror = function ( mirror ) {
+	}
 
-	this.mirror = mirror;
+	setMirror( mirror ) {
 
-	this.textureMatrix = new Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
+		this.mirror = mirror;
 
-	this.localPosition = new PositionNode( PositionNode.LOCAL );
+		this.textureMatrix = new Matrix4Node( this.mirror.material.uniforms.textureMatrix.value );
 
-	this.uv = new OperatorNode( this.textureMatrix, this.localPosition, OperatorNode.MUL );
-	this.uvResult = new OperatorNode( null, this.uv, OperatorNode.ADD );
+		this.localPosition = new PositionNode( PositionNode.LOCAL );
 
-	this.texture = new TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.uv, null, true );
+		this.uv = new OperatorNode( this.textureMatrix, this.localPosition, OperatorNode.MUL );
+		this.uvResult = new OperatorNode( null, this.uv, OperatorNode.ADD );
 
-};
+		this.texture = new TextureNode( this.mirror.material.uniforms.tDiffuse.value, this.uv, null, true );
 
-ReflectorNode.prototype.generate = function ( builder, output ) {
+	}
 
-	if ( builder.isShader( 'fragment' ) ) {
+	generate( builder, output ) {
 
-		this.uvResult.a = this.offset;
-		this.texture.uv = this.offset ? this.uvResult : this.uv;
+		if ( builder.isShader( 'fragment' ) ) {
 
-		if ( output === 'sampler2D' ) {
+			this.uvResult.a = this.offset;
+			this.texture.uv = this.offset ? this.uvResult : this.uv;
 
-			return this.texture.build( builder, output );
+			if ( output === 'sampler2D' ) {
+
+				return this.texture.build( builder, output );
+
+			}
+
+			return builder.format( this.texture.build( builder, this.type ), this.type, output );
+
+		} else {
+
+			console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
+
+			return builder.format( 'vec4( 0.0 )', this.type, output );
 
 		}
 
-		return builder.format( this.texture.build( builder, this.type ), this.type, output );
+	}
 
-	} else {
+	copy( source ) {
 
-		console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
+		super.copy( source );
 
-		return builder.format( 'vec4( 0.0 )', this.type, output );
+		this.scope.mirror = source.mirror;
+
+		return this;
 
 	}
 
-};
+	toJSON( meta ) {
 
-ReflectorNode.prototype.copy = function ( source ) {
+		var data = this.getJSONNode( meta );
 
-	InputNode.prototype.copy.call( this, source );
+		if ( ! data ) {
 
-	this.scope.mirror = source.mirror;
+			data = this.createJSONNode( meta );
 
-	return this;
+			data.mirror = this.mirror.uuid;
 
-};
+			if ( this.offset ) data.offset = this.offset.toJSON( meta ).uuid;
 
-ReflectorNode.prototype.toJSON = function ( meta ) {
+		}
 
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.mirror = this.mirror.uuid;
-
-		if ( this.offset ) data.offset = this.offset.toJSON( meta ).uuid;
+		return data;
 
 	}
 
-	return data;
-
-};
-
-export { ReflectorNode };
+}

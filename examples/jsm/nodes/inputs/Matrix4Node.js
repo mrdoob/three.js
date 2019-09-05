@@ -6,68 +6,61 @@ import { Matrix4 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
 
-function Matrix4Node( matrix ) {
+export class Matrix4Node extends InputNode {
 
-	InputNode.call( this, 'm4' );
+	constructor( matrix ) {
 
-	this.value = matrix || new Matrix4();
+		super( 'm4' );
 
-}
+		this.value = matrix || new Matrix4();
 
-Matrix4Node.prototype = Object.create( InputNode.prototype );
-Matrix4Node.prototype.constructor = Matrix4Node;
-Matrix4Node.prototype.nodeType = "Matrix4";
+		this.nodeType = "Matrix4";
 
-Object.defineProperties( Matrix4Node.prototype, {
+	}
 
-	elements: {
+	set elements( val ) {
+		
+		this.value.elements = val;
+		
+	}
+	
+	get elements() {
+		
+		return this.value.elements;
+		
+	}
 
-		set: function ( val ) {
 
-			this.value.elements = val;
+	generateReadonly( builder, output, uuid, type ) {
 
-		},
+		return builder.format( "mat4( " + this.value.elements.join( ", " ) + " )", type, output );
 
-		get: function () {
+	}
 
-			return this.value.elements;
+	copy( source ) {
+
+		super.copy( source );
+
+		this.scope.value.fromArray( source.elements );
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		var data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.elements = this.value.elements.concat();
 
 		}
 
-	}
-
-} );
-
-Matrix4Node.prototype.generateReadonly = function ( builder, output, uuid, type /*, ns, needsUpdate */ ) {
-
-	return builder.format( "mat4( " + this.value.elements.join( ", " ) + " )", type, output );
-
-};
-
-Matrix4Node.prototype.copy = function ( source ) {
-
-	InputNode.prototype.copy.call( this, source );
-
-	this.scope.value.fromArray( source.elements );
-
-	return this;
-
-};
-
-Matrix4Node.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.elements = this.value.elements.concat();
+		return data;
 
 	}
 
-	return data;
-
-};
-
-export { Matrix4Node };
+}

@@ -12,426 +12,426 @@ import { NodeContext } from '../../core/NodeContext.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 
-function PhongNode() {
+export class PhongNode extends Node {
 
-	Node.call( this );
+	constructor() {
 
-	this.color = new ColorNode( 0xEEEEEE );
-	this.specular = new ColorNode( 0x111111 );
-	this.shininess = new FloatNode( 30 );
+		super();
 
-}
+		this.color = new ColorNode( 0xEEEEEE );
+		this.specular = new ColorNode( 0x111111 );
+		this.shininess = new FloatNode( 30 );
 
-PhongNode.prototype = Object.create( Node.prototype );
-PhongNode.prototype.constructor = PhongNode;
-PhongNode.prototype.nodeType = "Phong";
+		this.nodeType = "Phong";
 
-PhongNode.prototype.build = function ( builder ) {
+	}
 
-	var code;
+	build( builder ) {
 
-	builder.define( 'PHONG' );
+		var code;
 
-	builder.requires.lights = true;
+		builder.define( 'PHONG' );
 
-	if ( builder.isShader( 'vertex' ) ) {
+		builder.requires.lights = true;
 
-		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
+		if ( builder.isShader( 'vertex' ) ) {
 
-		builder.mergeUniform( UniformsUtils.merge( [
+			var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
 
-			UniformsLib.fog,
-			UniformsLib.lights
+			builder.mergeUniform( UniformsUtils.merge( [
 
-		] ) );
+				UniformsLib.fog,
+				UniformsLib.lights
 
-		builder.addParsCode( [
-			"varying vec3 vViewPosition;",
+			] ) );
 
-			"#ifndef FLAT_SHADED",
+			builder.addParsCode( [
+				"varying vec3 vViewPosition;",
 
-			"	varying vec3 vNormal;",
+				"#ifndef FLAT_SHADED",
 
-			"#endif",
+				"	varying vec3 vNormal;",
 
-			//"#include <encodings_pars_fragment>", // encoding functions
-			"#include <fog_pars_vertex>",
-			"#include <morphtarget_pars_vertex>",
-			"#include <skinning_pars_vertex>",
-			"#include <shadowmap_pars_vertex>",
-			"#include <logdepthbuf_pars_vertex>",
-			"#include <clipping_planes_pars_vertex>"
-		].join( "\n" ) );
+				"#endif",
 
-		var output = [
-			"#include <beginnormal_vertex>",
-			"#include <morphnormal_vertex>",
-			"#include <skinbase_vertex>",
-			"#include <skinnormal_vertex>",
-			"#include <defaultnormal_vertex>",
+				//"#include <encodings_pars_fragment>", // encoding functions
+				"#include <fog_pars_vertex>",
+				"#include <morphtarget_pars_vertex>",
+				"#include <skinning_pars_vertex>",
+				"#include <shadowmap_pars_vertex>",
+				"#include <logdepthbuf_pars_vertex>",
+				"#include <clipping_planes_pars_vertex>"
+			].join( "\n" ) );
 
-			"#ifndef FLAT_SHADED", // normal computed with derivatives when FLAT_SHADED
+			var output = [
+				"#include <beginnormal_vertex>",
+				"#include <morphnormal_vertex>",
+				"#include <skinbase_vertex>",
+				"#include <skinnormal_vertex>",
+				"#include <defaultnormal_vertex>",
 
-			"	vNormal = normalize( transformedNormal );",
+				"#ifndef FLAT_SHADED", // normal computed with derivatives when FLAT_SHADED
 
-			"#endif",
+				"	vNormal = normalize( transformedNormal );",
 
-			"#include <begin_vertex>"
-		];
+				"#endif",
 
-		if ( position ) {
+				"#include <begin_vertex>"
+			];
 
-			output.push(
-				position.code,
-				position.result ? "transformed = " + position.result + ";" : ''
-			);
-
-		}
-
-		output.push(
-			"	#include <morphtarget_vertex>",
-			"	#include <skinning_vertex>",
-			"	#include <project_vertex>",
-			"	#include <fog_vertex>",
-			"	#include <logdepthbuf_vertex>",
-			"	#include <clipping_planes_vertex>",
-
-			"	vViewPosition = - mvPosition.xyz;",
-
-			"	#include <worldpos_vertex>",
-			"	#include <shadowmap_vertex>",
-			"	#include <fog_vertex>"
-		);
-
-		code = output.join( "\n" );
-
-	} else {
-
-		// flow context
-
-		var colorFlowContext = new NodeContext().setSlot( 'color' );
-		var lightFlowContext = new NodeContext().setSlot( 'light' );
-		var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
-		var environmentFlowContext = new NodeContext().setSlot( 'environment' );
-
-		// custom caching
-
-		lightFlowContext.setCache( 'light' );
-
-		// contextually gamma
-
-		colorFlowContext.setProperty( 'gamma', true );
-
-		environmentFlowContext.setProperty( 'gamma', true );
-
-		// analyze all nodes to reuse generate codes
-
-		if ( this.mask ) this.mask.analyze( builder );
-
-		this.color.analyze( builder, colorFlowContext );
-		this.specular.analyze( builder );
-		this.shininess.analyze( builder );
-
-		if ( this.alpha ) this.alpha.analyze( builder );
-
-		if ( this.normal ) this.normal.analyze( builder );
-
-		if ( this.light ) this.light.analyze( builder, lightFlowContext );
-
-		if ( this.ao ) this.ao.analyze( builder );
-		if ( this.ambient ) this.ambient.analyze( builder );
-		if ( this.shadow ) this.shadow.analyze( builder );
-		if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowContext );
-
-		if ( this.environment ) this.environment.analyze( builder, environmentFlowContext );
-		if ( this.environmentAlpha && this.environment ) this.environmentAlpha.analyze( builder );
-
-		// build code
-
-		var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
-
-		var color = this.color.flow( builder, 'c', colorFlowContext );
-		var specular = this.specular.flow( builder, 'c' );
-		var shininess = this.shininess.flow( builder, 'f' );
-
-		var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
-
-		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
-
-		var light = this.light ? this.light.flow( builder, 'v3', lightFlowContext ) : undefined;
-
-		var ao = this.ao ? this.ao.flow( builder, 'f' ) : undefined;
-		var ambient = this.ambient ? this.ambient.flow( builder, 'c' ) : undefined;
-		var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
-		var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowContext ) : undefined;
-
-		var environment = this.environment ? this.environment.flow( builder, 'c', environmentFlowContext ) : undefined;
-		var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.flow( builder, 'f' ) : undefined;
-
-		builder.requires.transparent = alpha !== undefined;
-
-		builder.addParsCode( [
-			"#include <fog_pars_fragment>",
-			"#include <bsdfs>",
-			"#include <lights_pars_begin>",
-			"#include <lights_phong_pars_fragment>",
-			"#include <shadowmap_pars_fragment>",
-			"#include <logdepthbuf_pars_fragment>"
-		].join( "\n" ) );
-
-		var output = [
-			// prevent undeclared normal
-			"#include <normal_fragment_begin>",
-
-			// prevent undeclared material
-			"	BlinnPhongMaterial material;"
-		];
-
-		if ( mask ) {
-
-			output.push(
-				mask.code,
-				'if ( ! ' + mask.result + ' ) discard;'
-			);
-
-		}
-
-		output.push(
-			color.code,
-			"	vec3 diffuseColor = " + color.result + ";",
-			"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
-
-			"#include <logdepthbuf_fragment>",
-
-			specular.code,
-			"	vec3 specular = " + specular.result + ";",
-
-			shininess.code,
-			"	float shininess = max( 0.0001, " + shininess.result + " );",
-
-			"	float specularStrength = 1.0;" // Ignored in MaterialNode ( replace to specular )
-		);
-
-		if ( alpha ) {
-
-			output.push(
-				alpha.code,
-				'#ifdef ALPHATEST',
-
-				'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
-
-				'#endif'
-			);
-
-		}
-
-		if ( normal ) {
-
-			output.push(
-				normal.code,
-				'normal = ' + normal.result + ';'
-			);
-
-		}
-
-		// optimization for now
-
-		output.push( 'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor' ) + ';' );
-
-		output.push(
-			// accumulation
-			'material.specularColor = specular;',
-			'material.specularShininess = shininess;',
-			'material.specularStrength = specularStrength;',
-
-			"#include <lights_fragment_begin>",
-			"#include <lights_fragment_end>"
-		);
-
-		if ( light ) {
-
-			output.push(
-				light.code,
-				"reflectedLight.directDiffuse = " + light.result + ";"
-			);
-
-			// apply color
-
-			output.push(
-				"reflectedLight.directDiffuse *= diffuseColor;",
-				"reflectedLight.indirectDiffuse *= diffuseColor;"
-			);
-
-		}
-
-		if ( ao ) {
-
-			output.push(
-				ao.code,
-				"reflectedLight.indirectDiffuse *= " + ao.result + ";"
-			);
-
-		}
-
-		if ( ambient ) {
-
-			output.push(
-				ambient.code,
-				"reflectedLight.indirectDiffuse += " + ambient.result + ";"
-			);
-
-		}
-
-		if ( shadow ) {
-
-			output.push(
-				shadow.code,
-				"reflectedLight.directDiffuse *= " + shadow.result + ";",
-				"reflectedLight.directSpecular *= " + shadow.result + ";"
-			);
-
-		}
-
-		if ( emissive ) {
-
-			output.push(
-				emissive.code,
-				"reflectedLight.directDiffuse += " + emissive.result + ";"
-			);
-
-		}
-
-		output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;" );
-
-		if ( environment ) {
-
-			output.push( environment.code );
-
-			if ( environmentAlpha ) {
+			if ( position ) {
 
 				output.push(
-					environmentAlpha.code,
-					"outgoingLight = mix( outgoingLight, " + environment.result + ", " + environmentAlpha.result + " );"
+					position.code,
+					position.result ? "transformed = " + position.result + ";" : ''
 				);
-
-			} else {
-
-				output.push( "outgoingLight = " + environment.result + ";" );
 
 			}
 
-		}
-		/*
-		switch( builder.material.combine ) {
+			output.push(
+				"	#include <morphtarget_vertex>",
+				"	#include <skinning_vertex>",
+				"	#include <project_vertex>",
+				"	#include <fog_vertex>",
+				"	#include <logdepthbuf_vertex>",
+				"	#include <clipping_planes_vertex>",
 
-			case ENVMAP_BLENDING_MULTIPLY:
+				"	vViewPosition = - mvPosition.xyz;",
 
-				//output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
-				//outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
+				"	#include <worldpos_vertex>",
+				"	#include <shadowmap_vertex>",
+				"	#include <fog_vertex>"
+			);
 
-				break;
-
-
-		}
-	*/
-		if ( alpha ) {
-
-			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
+			code = output.join( "\n" );
 
 		} else {
 
-			output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
+			// flow context
+
+			var colorFlowContext = new NodeContext().setSlot( 'color' );
+			var lightFlowContext = new NodeContext().setSlot( 'light' );
+			var emissiveFlowContext = new NodeContext().setSlot( 'emissive' );
+			var environmentFlowContext = new NodeContext().setSlot( 'environment' );
+
+			// custom caching
+
+			lightFlowContext.setCache( 'light' );
+
+			// contextually gamma
+
+			colorFlowContext.setProperty( 'gamma', true );
+
+			environmentFlowContext.setProperty( 'gamma', true );
+
+			// analyze all nodes to reuse generate codes
+
+			if ( this.mask ) this.mask.analyze( builder );
+
+			this.color.analyze( builder, colorFlowContext );
+			this.specular.analyze( builder );
+			this.shininess.analyze( builder );
+
+			if ( this.alpha ) this.alpha.analyze( builder );
+
+			if ( this.normal ) this.normal.analyze( builder );
+
+			if ( this.light ) this.light.analyze( builder, lightFlowContext );
+
+			if ( this.ao ) this.ao.analyze( builder );
+			if ( this.ambient ) this.ambient.analyze( builder );
+			if ( this.shadow ) this.shadow.analyze( builder );
+			if ( this.emissive ) this.emissive.analyze( builder, emissiveFlowContext );
+
+			if ( this.environment ) this.environment.analyze( builder, environmentFlowContext );
+			if ( this.environmentAlpha && this.environment ) this.environmentAlpha.analyze( builder );
+
+			// build code
+
+			var mask = this.mask ? this.mask.flow( builder, 'b' ) : undefined;
+
+			var color = this.color.flow( builder, 'c', colorFlowContext );
+			var specular = this.specular.flow( builder, 'c' );
+			var shininess = this.shininess.flow( builder, 'f' );
+
+			var alpha = this.alpha ? this.alpha.flow( builder, 'f' ) : undefined;
+
+			var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
+
+			var light = this.light ? this.light.flow( builder, 'v3', lightFlowContext ) : undefined;
+
+			var ao = this.ao ? this.ao.flow( builder, 'f' ) : undefined;
+			var ambient = this.ambient ? this.ambient.flow( builder, 'c' ) : undefined;
+			var shadow = this.shadow ? this.shadow.flow( builder, 'c' ) : undefined;
+			var emissive = this.emissive ? this.emissive.flow( builder, 'c', emissiveFlowContext ) : undefined;
+
+			var environment = this.environment ? this.environment.flow( builder, 'c', environmentFlowContext ) : undefined;
+			var environmentAlpha = this.environmentAlpha && this.environment ? this.environmentAlpha.flow( builder, 'f' ) : undefined;
+
+			builder.requires.transparent = alpha !== undefined;
+
+			builder.addParsCode( [
+				"#include <fog_pars_fragment>",
+				"#include <bsdfs>",
+				"#include <lights_pars_begin>",
+				"#include <lights_phong_pars_fragment>",
+				"#include <shadowmap_pars_fragment>",
+				"#include <logdepthbuf_pars_fragment>"
+			].join( "\n" ) );
+
+			var output = [
+				// prevent undeclared normal
+				"#include <normal_fragment_begin>",
+
+				// prevent undeclared material
+				"	BlinnPhongMaterial material;"
+			];
+
+			if ( mask ) {
+
+				output.push(
+					mask.code,
+					'if ( ! ' + mask.result + ' ) discard;'
+				);
+
+			}
+
+			output.push(
+				color.code,
+				"	vec3 diffuseColor = " + color.result + ";",
+				"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
+
+				"#include <logdepthbuf_fragment>",
+
+				specular.code,
+				"	vec3 specular = " + specular.result + ";",
+
+				shininess.code,
+				"	float shininess = max( 0.0001, " + shininess.result + " );",
+
+				"	float specularStrength = 1.0;" // Ignored in MaterialNode ( replace to specular )
+			);
+
+			if ( alpha ) {
+
+				output.push(
+					alpha.code,
+					'#ifdef ALPHATEST',
+
+					'if ( ' + alpha.result + ' <= ALPHATEST ) discard;',
+
+					'#endif'
+				);
+
+			}
+
+			if ( normal ) {
+
+				output.push(
+					normal.code,
+					'normal = ' + normal.result + ';'
+				);
+
+			}
+
+			// optimization for now
+
+			output.push( 'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor' ) + ';' );
+
+			output.push(
+				// accumulation
+				'material.specularColor = specular;',
+				'material.specularShininess = shininess;',
+				'material.specularStrength = specularStrength;',
+
+				"#include <lights_fragment_begin>",
+				"#include <lights_fragment_end>"
+			);
+
+			if ( light ) {
+
+				output.push(
+					light.code,
+					"reflectedLight.directDiffuse = " + light.result + ";"
+				);
+
+				// apply color
+
+				output.push(
+					"reflectedLight.directDiffuse *= diffuseColor;",
+					"reflectedLight.indirectDiffuse *= diffuseColor;"
+				);
+
+			}
+
+			if ( ao ) {
+
+				output.push(
+					ao.code,
+					"reflectedLight.indirectDiffuse *= " + ao.result + ";"
+				);
+
+			}
+
+			if ( ambient ) {
+
+				output.push(
+					ambient.code,
+					"reflectedLight.indirectDiffuse += " + ambient.result + ";"
+				);
+
+			}
+
+			if ( shadow ) {
+
+				output.push(
+					shadow.code,
+					"reflectedLight.directDiffuse *= " + shadow.result + ";",
+					"reflectedLight.directSpecular *= " + shadow.result + ";"
+				);
+
+			}
+
+			if ( emissive ) {
+
+				output.push(
+					emissive.code,
+					"reflectedLight.directDiffuse += " + emissive.result + ";"
+				);
+
+			}
+
+			output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;" );
+
+			if ( environment ) {
+
+				output.push( environment.code );
+
+				if ( environmentAlpha ) {
+
+					output.push(
+						environmentAlpha.code,
+						"outgoingLight = mix( outgoingLight, " + environment.result + ", " + environmentAlpha.result + " );"
+					);
+
+				} else {
+
+					output.push( "outgoingLight = " + environment.result + ";" );
+
+				}
+
+			}
+			/*
+			switch( builder.material.combine ) {
+
+				case ENVMAP_BLENDING_MULTIPLY:
+
+					//output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
+					//outgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );
+
+					break;
+
+
+			}
+		*/
+			if ( alpha ) {
+
+				output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
+
+			} else {
+
+				output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
+
+			}
+
+			output.push(
+				"#include <premultiplied_alpha_fragment>",
+				"#include <tonemapping_fragment>",
+				"#include <encodings_fragment>",
+				"#include <fog_fragment>"
+			);
+
+			code = output.join( "\n" );
 
 		}
 
-		output.push(
-			"#include <premultiplied_alpha_fragment>",
-			"#include <tonemapping_fragment>",
-			"#include <encodings_fragment>",
-			"#include <fog_fragment>"
-		);
-
-		code = output.join( "\n" );
+		return code;
 
 	}
 
-	return code;
+	copy( source ) {
 
-};
-
-PhongNode.prototype.copy = function ( source ) {
-
-	Node.prototype.copy.call( this, source );
-
-	// vertex
-
-	if ( source.position ) this.position = source.position;
-
-	// fragment
-
-	this.color = source.color;
-	this.specular = source.specular;
-	this.shininess = source.shininess;
-
-	if ( source.mask ) this.mask = source.mask;
-
-	if ( source.alpha ) this.alpha = source.alpha;
-
-	if ( source.normal ) this.normal = source.normal;
-
-	if ( source.light ) this.light = source.light;
-	if ( source.shadow ) this.shadow = source.shadow;
-
-	if ( source.ao ) this.ao = source.ao;
-
-	if ( source.emissive ) this.emissive = source.emissive;
-	if ( source.ambient ) this.ambient = source.ambient;
-
-	if ( source.environment ) this.environment = source.environment;
-	if ( source.environmentAlpha ) this.environmentAlpha = source.environmentAlpha;
-
-	return this;
-
-};
-
-PhongNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
+		super.copy( source );
 
 		// vertex
 
-		if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
+		if ( source.position ) this.position = source.position;
 
 		// fragment
 
-		data.color = this.color.toJSON( meta ).uuid;
-		data.specular = this.specular.toJSON( meta ).uuid;
-		data.shininess = this.shininess.toJSON( meta ).uuid;
+		this.color = source.color;
+		this.specular = source.specular;
+		this.shininess = source.shininess;
 
-		if ( this.mask ) data.mask = this.mask.toJSON( meta ).uuid;
+		if ( source.mask ) this.mask = source.mask;
 
-		if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
+		if ( source.alpha ) this.alpha = source.alpha;
 
-		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
+		if ( source.normal ) this.normal = source.normal;
 
-		if ( this.light ) data.light = this.light.toJSON( meta ).uuid;
+		if ( source.light ) this.light = source.light;
+		if ( source.shadow ) this.shadow = source.shadow;
 
-		if ( this.ao ) data.ao = this.ao.toJSON( meta ).uuid;
-		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
-		if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
-		if ( this.emissive ) data.emissive = this.emissive.toJSON( meta ).uuid;
+		if ( source.ao ) this.ao = source.ao;
 
-		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
-		if ( this.environmentAlpha ) data.environmentAlpha = this.environmentAlpha.toJSON( meta ).uuid;
+		if ( source.emissive ) this.emissive = source.emissive;
+		if ( source.ambient ) this.ambient = source.ambient;
+
+		if ( source.environment ) this.environment = source.environment;
+		if ( source.environmentAlpha ) this.environmentAlpha = source.environmentAlpha;
+
+		return this;
 
 	}
 
-	return data;
+	toJSON( meta ) {
 
-};
+		var data = this.getJSONNode( meta );
 
-export { PhongNode };
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			// vertex
+
+			if ( this.position ) data.position = this.position.toJSON( meta ).uuid;
+
+			// fragment
+
+			data.color = this.color.toJSON( meta ).uuid;
+			data.specular = this.specular.toJSON( meta ).uuid;
+			data.shininess = this.shininess.toJSON( meta ).uuid;
+
+			if ( this.mask ) data.mask = this.mask.toJSON( meta ).uuid;
+
+			if ( this.alpha ) data.alpha = this.alpha.toJSON( meta ).uuid;
+
+			if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
+
+			if ( this.light ) data.light = this.light.toJSON( meta ).uuid;
+
+			if ( this.ao ) data.ao = this.ao.toJSON( meta ).uuid;
+			if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
+			if ( this.shadow ) data.shadow = this.shadow.toJSON( meta ).uuid;
+			if ( this.emissive ) data.emissive = this.emissive.toJSON( meta ).uuid;
+
+			if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
+			if ( this.environmentAlpha ) data.environmentAlpha = this.environmentAlpha.toJSON( meta ).uuid;
+
+		}
+
+		return data;
+
+	}
+
+}

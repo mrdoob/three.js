@@ -6,18 +6,19 @@ import { PhongNode } from './nodes/PhongNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function PhongNodeMaterial() {
+export class PhongNodeMaterial extends NodeMaterial {
 
-	var node = new PhongNode();
+	constructor() {
 
-	NodeMaterial.call( this, node, node );
+		var node = new PhongNode();
 
-	this.type = "PhongNodeMaterial";
+		super( node, node );
+
+		this.type = "PhongNodeMaterial";
+
+	}
 
 }
-
-PhongNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
-PhongNodeMaterial.prototype.constructor = PhongNodeMaterial;
 
 NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [
 	'color',
@@ -35,5 +36,3 @@ NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [
 	'mask',
 	'position'
 ] );
-
-export { PhongNodeMaterial };

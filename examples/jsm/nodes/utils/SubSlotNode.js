@@ -4,76 +4,76 @@
 
 import { TempNode } from '../core/TempNode.js';
 
-function SubSlotNode( slots ) {
+export class SubSlotNode extends TempNode {
 
-	TempNode.call( this );
+	constructor( slots ) {
 
-	this.slots = slots || {};
+		super();
 
-}
+		this.slots = slots || {};
 
-SubSlotNode.prototype = Object.create( TempNode.prototype );
-SubSlotNode.prototype.constructor = SubSlotNode;
-SubSlotNode.prototype.nodeType = "SubSlot";
-
-SubSlotNode.prototype.getType = function ( builder, output ) {
-
-	return output;
-
-};
-
-SubSlotNode.prototype.generate = function ( builder, output ) {
-
-	if ( this.slots[ builder.slot ] ) {
-
-		return this.slots[ builder.slot ].build( builder, output )
+		this.nodeType = "SubSlot";
 
 	}
 
-	return builder.format( '0.0', 'f', output );
+	getType( builder, output ) {
 
-};
-
-SubSlotNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	for ( var prop in source.slots ) {
-
-		this.slots[ prop ] = source.slots[ prop ];
+		return output;
 
 	}
 
-	return this;
+	generate( builder, output ) {
 
-};
+		if ( this.slots[ builder.slot ] ) {
 
-SubSlotNode.prototype.toJSON = function ( meta ) {
+			return this.slots[ builder.slot ].build( builder, output )
 
-	var data = this.getJSONNode( meta );
+		}
 
-	if ( ! data ) {
+		return builder.format( '0.0', 'f', output );
 
-		data = this.createJSONNode( meta );
+	}
 
-		data.slots = {};
+	copy( source ) {
 
-		for ( var prop in this.slots ) {
+		super.copy( source );
 
-			var slot = this.slots[ prop ];
+		for ( var prop in source.slots ) {
 
-			if ( slot ) {
+			this.slots[ prop ] = source.slots[ prop ];
 
-				data.slots[ prop ] = slot.toJSON( meta ).uuid;
+		}
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		var data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.slots = {};
+
+			for ( var prop in this.slots ) {
+
+				var slot = this.slots[ prop ];
+
+				if ( slot ) {
+
+					data.slots[ prop ] = slot.toJSON( meta ).uuid;
+
+				}
 
 			}
 
 		}
 
+		return data;
+
 	}
 
-	return data;
-
-};
-
-export { SubSlotNode };
+}

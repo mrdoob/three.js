@@ -4,92 +4,91 @@
 
 import { TempNode } from './TempNode.js';
 
-function InputNode( type, params ) {
+export class InputNode extends TempNode {
 
-	params = params || {};
-	params.shared = params.shared !== undefined ? params.shared : false;
+	constructor( type, params ) {
 
-	TempNode.call( this, type, params );
+		params = params || {};
+		params.shared = params.shared !== undefined ? params.shared : false;
 
-	this.readonly = false;
+		super( type, params );
 
-}
+		this.readonly = false;
+		
+	}
 
-InputNode.prototype = Object.create( TempNode.prototype );
-InputNode.prototype.constructor = InputNode;
+	setReadonly( value ) {
 
-InputNode.prototype.setReadonly = function ( value ) {
+		this.readonly = value;
 
-	this.readonly = value;
+		return this;
 
-	return this;
+	}
 
-};
+	getReadonly() {
 
-InputNode.prototype.getReadonly = function ( /* builder */ ) {
+		return this.readonly;
 
-	return this.readonly;
+	}
 
-};
+	copy( source ) {
 
-InputNode.prototype.copy = function ( source ) {
+		super.copy( source );
 
-	TempNode.prototype.copy.call( this, source );
+		if ( source.readonly !== undefined ) this.readonly = source.readonly;
 
-	if ( source.readonly !== undefined ) this.readonly = source.readonly;
+		return this;
 
-	return this;
+	}
 
-};
+	createJSONNode( meta ) {
 
-InputNode.prototype.createJSONNode = function ( meta ) {
+		var data = super.createJSONNode( meta );
 
-	var data = TempNode.prototype.createJSONNode.call( this, meta );
+		if ( this.readonly === true ) data.readonly = this.readonly;
 
-	if ( this.readonly === true ) data.readonly = this.readonly;
+		return data;
 
-	return data;
+	}
 
-};
+	generate( builder, output, uuid, type, ns, needsUpdate ) {
 
-InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
+		uuid = builder.getUuid( uuid || this.getUuid() );
+		type = type || this.getType( builder );
 
-	uuid = builder.getUuid( uuid || this.getUuid() );
-	type = type || this.getType( builder );
+		var data = builder.getNodeData( uuid ),
+			readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
 
-	var data = builder.getNodeData( uuid ),
-		readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
+		if ( readonly ) {
 
-	if ( readonly ) {
-
-		return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
-
-	} else {
-
-		if ( builder.isShader( 'vertex' ) ) {
-
-			if ( ! data.vertex ) {
-
-				data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate, this.getLabel() );
-
-			}
-
-			return builder.format( data.vertex.name, type, output );
+			return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
 
 		} else {
 
-			if ( ! data.fragment ) {
+			if ( builder.isShader( 'vertex' ) ) {
 
-				data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate, this.getLabel() );
+				if ( ! data.vertex ) {
+
+					data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate, this.getLabel() );
+
+				}
+
+				return builder.format( data.vertex.name, type, output );
+
+			} else {
+
+				if ( ! data.fragment ) {
+
+					data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate, this.getLabel() );
+
+				}
+
+				return builder.format( data.fragment.name, type, output );
 
 			}
-
-			return builder.format( data.fragment.name, type, output );
 
 		}
 
 	}
 
-};
-
-export { InputNode };
+}

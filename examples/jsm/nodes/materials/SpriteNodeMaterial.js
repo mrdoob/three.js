@@ -6,18 +6,19 @@ import { SpriteNode } from './nodes/SpriteNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function SpriteNodeMaterial() {
+export class SpriteNodeMaterial extends NodeMaterial {
 
-	var node = new SpriteNode();
+	constructor() {
 
-	NodeMaterial.call( this, node, node );
+		var node = new SpriteNode();
 
-	this.type = "SpriteNodeMaterial";
+		super( node, node );
+
+		this.type = "SpriteNodeMaterial";
+
+	}
 
 }
-
-SpriteNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
-SpriteNodeMaterial.prototype.constructor = SpriteNodeMaterial;
 
 NodeUtils.addShortcuts( SpriteNodeMaterial.prototype, 'fragment', [
 	'color',
@@ -26,5 +27,3 @@ NodeUtils.addShortcuts( SpriteNodeMaterial.prototype, 'fragment', [
 	'position',
 	'spherical'
 ] );
-
-export { SpriteNodeMaterial };

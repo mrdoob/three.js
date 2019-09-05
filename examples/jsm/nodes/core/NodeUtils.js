@@ -44,7 +44,7 @@ function applyShortcut( proxy, property, subProperty ) {
 
 }
 
-var NodeUtils = {
+export const NodeUtils = {
 
 	elements: [ 'x', 'y', 'z', 'w' ],
 
@@ -81,5 +81,3 @@ var NodeUtils = {
 	}
 
 };
-
-export { NodeUtils };

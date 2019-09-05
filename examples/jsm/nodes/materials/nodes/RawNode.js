@@ -4,61 +4,61 @@
 
 import { Node } from '../../core/Node.js';
 
-function RawNode( value ) {
+export class RawNode extends Node {
 
-	Node.call( this, 'v4' );
+	constructor( value ) {
 
-	this.value = value;
+		super( 'v4' );
+
+		this.value = value;
+
+		this.nodeType = "Raw";
+
+	}
+
+	generate( builder ) {
+
+		var data = this.value.analyzeAndFlow( builder, this.type ),
+			code = data.code + '\n';
+
+		if ( builder.isShader( 'vertex' ) ) {
+
+			code += 'gl_Position = ' + data.result + ';';
+
+		} else {
+
+			code += 'gl_FragColor = ' + data.result + ';';
+
+		}
+
+		return code;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.value = source.value;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		var data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.value = this.value.toJSON( meta ).uuid;
+
+		}
+
+		return data;
+
+	}
 
 }
-
-RawNode.prototype = Object.create( Node.prototype );
-RawNode.prototype.constructor = RawNode;
-RawNode.prototype.nodeType = "Raw";
-
-RawNode.prototype.generate = function ( builder ) {
-
-	var data = this.value.analyzeAndFlow( builder, this.type ),
-		code = data.code + '\n';
-
-	if ( builder.isShader( 'vertex' ) ) {
-
-		code += 'gl_Position = ' + data.result + ';';
-
-	} else {
-
-		code += 'gl_FragColor = ' + data.result + ';';
-
-	}
-
-	return code;
-
-};
-
-RawNode.prototype.copy = function ( source ) {
-
-	Node.prototype.copy.call( this, source );
-
-	this.value = source.value;
-
-	return this;
-
-};
-
-RawNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.value = this.value.toJSON( meta ).uuid;
-
-	}
-
-	return data;
-
-};
-
-export { RawNode };

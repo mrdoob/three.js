@@ -4,67 +4,67 @@
 
 import { Node } from './Node.js';
 
-function AttributeNode( name, type ) {
+export class AttributeNode extends Node {
 
-	Node.call( this, type );
+	constructor( name, type ) {
 
-	this.name = name;
+		super( type );
 
-}
+		this.name = name;
 
-AttributeNode.prototype = Object.create( Node.prototype );
-AttributeNode.prototype.constructor = AttributeNode;
-AttributeNode.prototype.nodeType = "Attribute";
-
-AttributeNode.prototype.getAttributeType = function ( builder ) {
-
-	return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
-
-};
-
-AttributeNode.prototype.getType = function ( builder ) {
-
-	var type = this.getAttributeType( builder );
-
-	return builder.getTypeByFormat( type );
-
-};
-
-AttributeNode.prototype.generate = function ( builder, output ) {
-
-	var type = this.getAttributeType( builder );
-
-	var attribute = builder.getAttribute( this.name, type ),
-		name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
-
-	return builder.format( name, this.getType( builder ), output );
-
-};
-
-AttributeNode.prototype.copy = function ( source ) {
-
-	Node.prototype.copy.call( this, source );
-
-	this.type = source.type;
-
-	return this;
-
-};
-
-AttributeNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.type = this.type;
+		this.nodeType = "Attribute";
 
 	}
 
-	return data;
+	getAttributeType( builder ) {
 
-};
+		return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
 
-export { AttributeNode };
+	}
+
+	getType( builder ) {
+
+		var type = this.getAttributeType( builder );
+
+		return builder.getTypeByFormat( type );
+
+	}
+
+	generate( builder, output ) {
+
+		var type = this.getAttributeType( builder );
+
+		var attribute = builder.getAttribute( this.name, type ),
+			name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
+
+		return builder.format( name, this.getType( builder ), output );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.type = source.type;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		var data = this.getJSONNode( meta );
+
+		if ( ! data ) {
+
+			data = this.createJSONNode( meta );
+
+			data.type = this.type;
+
+		}
+
+		return data;
+
+	}
+
+}

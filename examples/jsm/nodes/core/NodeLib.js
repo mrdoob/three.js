@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-var NodeLib = {
+export const NodeLib = {
 
 	nodes: {},
 	keywords: {},
@@ -10,6 +10,8 @@ var NodeLib = {
 	add: function ( node ) {
 
 		this.nodes[ node.name ] = node;
+
+		return node;
 
 	},
 
@@ -64,5 +66,3 @@ var NodeLib = {
 	}
 
 };
-
-export { NodeLib };
