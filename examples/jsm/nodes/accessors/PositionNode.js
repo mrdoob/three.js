@@ -135,20 +135,7 @@ PositionNode.WORLD = 'world';
 PositionNode.VIEW = 'view';
 PositionNode.PROJECTION = 'projection';
 
-NodeLib.addKeyword( 'position.local', function () {
-
-	return new PositionNode( PositionNode.LOCAL );
-
-} );
-
-NodeLib.addKeyword( 'position.world', function () {
-
-	return new PositionNode( PositionNode.WORLD );
-
-} );
-
-NodeLib.addKeyword( 'position.view', function () {
-
-	return new PositionNode( PositionNode.VIEW );
-
-} );
+NodeLib.addKeyword( 'position.local', () => { return new PositionNode( PositionNode.LOCAL ); } );
+NodeLib.addKeyword( 'position.world', () => { return new PositionNode( PositionNode.WORLD ); } );
+NodeLib.addKeyword( 'position.view', () => { return new PositionNode( PositionNode.VIEW ); } );
+NodeLib.addKeyword( 'position.projection', () => { return new PositionNode( PositionNode.PROJECTION ); } );
