@@ -5,12 +5,11 @@ import { Vector4 } from './../math/Vector4';
 import { Box3 } from './../math/Box3';
 import { Sphere } from './../math/Sphere';
 import { Geometry } from './Geometry';
-import { EventDispatcher } from './EventDispatcher';
 import { MorphTarget } from './Geometry';
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js">src/core/DirectGeometry.js</a>
  */
-export class DirectGeometry extends EventDispatcher {
+export class DirectGeometry {
 
 	constructor();
 
