@@ -1,3 +1,5 @@
+import buble from 'rollup-plugin-buble';
+
 function glconstants() {
 
 	var constants = {
@@ -193,23 +195,40 @@ function glsl() {
 
 }
 
-export default {
-	input: 'src/Three.js',
-	plugins: [
-		glconstants(),
-		glsl()
-	],
-	output: [
-		{
-			format: 'umd',
-			name: 'THREE',
-			file: 'build/three.js',
-			indent: '\t'
-		},
-		{
-			format: 'esm',
-			file: 'build/three.module.js',
-			indent: '\t'
-		}
-	]
-};
+export default [
+	{
+		input: 'src/Three.js',
+		plugins: [
+			glconstants(),
+			glsl(),
+			buble( {
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+			} )
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			glconstants(),
+			glsl()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.js',
+				indent: '\t'
+			}
+		]
+	}
+];
