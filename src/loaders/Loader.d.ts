@@ -21,6 +21,4 @@ export class Loader {
 	setPath( path: string ): this;
 	setResourcePath( resourcePath: string ): this;
 
-	static Handlers: LoaderHandler;
-
 }

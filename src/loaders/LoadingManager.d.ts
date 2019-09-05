@@ -1,3 +1,5 @@
+import { Loader } from './Loader';
+
 export const DefaultLoadingManager: LoadingManager;
 
 /**
