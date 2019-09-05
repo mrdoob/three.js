@@ -137,7 +137,6 @@ PositionNode.PROJECTION = 'projection';
 
 NodeLib.addKeyword( 'position.local', function () {
 
-console.log(1);
 	return new PositionNode( PositionNode.LOCAL );
 
 } );
