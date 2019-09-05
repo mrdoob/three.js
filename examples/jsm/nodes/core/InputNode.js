@@ -13,21 +13,21 @@ export class InputNode extends TempNode {
 
 		super( type, params );
 
-		this.readonly = false;
+		this.constant = false;
 		
 	}
 
-	setReadonly( value ) {
+	setConst( value ) {
 
-		this.readonly = value;
+		this.constant = value;
 
 		return this;
 
 	}
 
-	getReadonly() {
+	getConst() {
 
-		return this.readonly;
+		return this.constant;
 
 	}
 
@@ -35,7 +35,7 @@ export class InputNode extends TempNode {
 
 		super.copy( source );
 
-		if ( source.readonly !== undefined ) this.readonly = source.readonly;
+		if ( source.constant !== undefined ) this.constant = source.constant;
 
 		return this;
 
@@ -45,7 +45,7 @@ export class InputNode extends TempNode {
 
 		var data = super.createJSONNode( meta );
 
-		if ( this.readonly === true ) data.readonly = this.readonly;
+		if ( this.constant === true ) data.constant = this.constant;
 
 		return data;
 
@@ -57,11 +57,11 @@ export class InputNode extends TempNode {
 		type = type || this.getType( builder );
 
 		var data = builder.getNodeData( uuid ),
-			readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
+			constant = this.getConst( builder ) && this.generateConst !== undefined;
 
-		if ( readonly ) {
+		if ( constant ) {
 
-			return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
+			return this.generateConst( builder, output, uuid, type, ns, needsUpdate );
 
 		} else {
 

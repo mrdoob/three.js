@@ -262,11 +262,11 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 		case RGBEEncoding:
 			return [ 'RGBE' ];
 		case RGBM7Encoding:
-			return [ 'RGBM', new FloatNode( 7.0 ).setReadonly( true ) ];
+			return [ 'RGBM', new FloatNode( 7.0 ).setConst( true ) ];
 		case RGBM16Encoding:
-			return [ 'RGBM', new FloatNode( 16.0 ).setReadonly( true ) ];
+			return [ 'RGBM', new FloatNode( 16.0 ).setConst( true ) ];
 		case RGBDEncoding:
-			return [ 'RGBD', new FloatNode( 256.0 ).setReadonly( true ) ];
+			return [ 'RGBD', new FloatNode( 256.0 ).setConst( true ) ];
 		case GammaEncoding:
 			return [ 'Gamma', new ExpressionNode( 'float( GAMMA_FACTOR )', 'f' ) ];
 

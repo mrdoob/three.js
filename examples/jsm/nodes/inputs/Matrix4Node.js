@@ -31,7 +31,7 @@ export class Matrix4Node extends InputNode {
 	}
 
 
-	generateReadonly( builder, output, uuid, type ) {
+	generateConst( builder, output, uuid, type ) {
 
 		return builder.format( "mat4( " + this.value.elements.join( ", " ) + " )", type, output );
 

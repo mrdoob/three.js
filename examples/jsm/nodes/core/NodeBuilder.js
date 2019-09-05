@@ -22,6 +22,7 @@ import { NodeContext } from './NodeContext.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { BoolNode } from '../inputs/BoolNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
+import { ColorNode } from '../inputs/ColorNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { Vector3Node } from '../inputs/Vector3Node.js';
 import { Vector4Node } from '../inputs/Vector4Node.js';
@@ -1013,14 +1014,14 @@ NodeBuilder.resolve = ( value, primitives ) => {
 					return new CubeTextureNode( value );
 
 				case CubeRefractionMapping:
-					var uv = new ReflectNode( ReflectNode.CUBE, new FloatNode( 1 ).setReadonly( true ) );
+					var uv = new ReflectNode( ReflectNode.CUBE, new FloatNode( 1 ).setConst( true ) );
 					return new CubeTextureNode( value, uv );
 
 				case CubeUVReflectionMapping:
 					return new TextureCubeNode( new TextureNode( value ) );
 
 				case CubeUVRefractionMapping:
-					var uv = new ReflectNode( ReflectNode.VECTOR, new FloatNode( 1 ).setReadonly( true ) );
+					var uv = new ReflectNode( ReflectNode.VECTOR, new FloatNode( 1 ).setConst( true ) );
 					return new TextureCubeNode( new TextureNode( value ), uv );
 
 				default:
@@ -1044,9 +1045,18 @@ NodeBuilder.resolve = ( value, primitives ) => {
 
 			var type = typeof value;
 
-			if ( type === 'number' ) return new FloatNode( value ).setReadonly( true );
-			else if ( type === 'boolean' ) return new BoolNode( value ).setReadonly( true );
-			else if ( type === 'string' ) return NodeLib.get( value ) || NodeLib.getKeyword( value ) || new ExpressionNode( value );
+			if ( type === 'number' ) return new FloatNode( value ).setConst( true );
+			else if ( type === 'boolean' ) return new BoolNode( value ).setConst( true );
+			else if ( type === 'string' ) {
+
+				if ( value.substr( 0, 1 ) === '#' ) return new ColorNode( parseInt( value.substr( 1 ) ) ).setConst( true );
+				else if ( value.substr( 0, 2 ) === '0x' ) return new ColorNode( parseInt( value ) ).setConst( true );
+
+				return NodeLib.get( value ) || NodeLib.getKeyword( value ) || new ExpressionNode( value );
+
+			}
+
+
 
 		}
 

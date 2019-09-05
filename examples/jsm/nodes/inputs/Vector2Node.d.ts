@@ -9,6 +9,6 @@ export class Vector2Node extends InputNode {
   value: Vector2;
   nodeType: string;
 
-  generateReadonly(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
+  generateConst(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
   copy(source: Vector2Node): this;
 }

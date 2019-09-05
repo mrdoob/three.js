@@ -30,7 +30,7 @@ export class Matrix3Node extends InputNode {
 		
 	}
 
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate */ ) {
+	generateConst( builder, output, uuid, type/*, ns, needsUpdate */ ) {
 
 		return builder.format( "mat3( " + this.value.elements.join( ", " ) + " )", type, output );
 

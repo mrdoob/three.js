@@ -61,10 +61,9 @@ export class OperatorNode extends TempNode {
 		var type = this.getType( builder );
 
 		var a = this.a.build( builder, type ),
-			b = this.b.build( builder, type ),
-			op = OperatorsDict[ this.op ] || this.op;
+			b = this.b.build( builder, type );
 
-		return builder.format( '( ' + a + ' ' + op + ' ' + b + ' )', type, output );
+		return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
 
 	}
 
@@ -72,9 +71,9 @@ export class OperatorNode extends TempNode {
 
 		super.copy( source );
 
+		this.op = source.op;
 		this.a = source.a;
 		this.b = source.b;
-		this.op = source.op;
 
 		return this;
 
@@ -100,17 +99,10 @@ export class OperatorNode extends TempNode {
 
 }
 
-OperatorNode.ADD = 'add';
-OperatorNode.SUB = 'sub';
-OperatorNode.MUL = 'mul';
-OperatorNode.DIV = 'div';
-
-const OperatorsDict = {
-	'add': '+',
-	'sub': '-',
-	'mul': '*',
-	'div': '/'
-};
+OperatorNode.ADD = '+';
+OperatorNode.SUB = '-';
+OperatorNode.MUL = '*';
+OperatorNode.DIV = '/';
 
 const AddNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.ADD, 2 );
 const SubNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.SUB, 2 );

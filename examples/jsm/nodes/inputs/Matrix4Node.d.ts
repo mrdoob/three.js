@@ -10,6 +10,6 @@ export class Matrix4Node extends InputNode {
   nodeType: string;
   elements: number[];
 
-  generateReadonly(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
+  generateConst(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
   copy(source: Matrix4Node): this;
 }

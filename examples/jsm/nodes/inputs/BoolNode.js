@@ -42,7 +42,7 @@ export class BoolNode extends InputNode {
 
 			data.value = this.value;
 
-			if ( this.readonly === true ) data.readonly = true;
+			if ( this.constant === true ) data.constant = true;
 
 		}
 

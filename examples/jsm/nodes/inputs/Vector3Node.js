@@ -19,7 +19,7 @@ export class Vector3Node extends InputNode {
 
 	}
 
-	generateReadonly( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
+	generateConst( builder, output, uuid, type ) {
 
 		return builder.format( "vec3( " + this.x + ", " + this.y + ", " + this.z + " )", type, output );
 

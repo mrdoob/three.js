@@ -9,6 +9,6 @@ export class ColorNode extends InputNode {
   value: Color;
   nodeType: string;
 
-  generateReadonly(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
+  generateConst(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
   copy(source: ColorNode): this;
 }

@@ -20,9 +20,9 @@ export class TimerNode extends FloatNode {
 
 	}
 
-	getReadonly() {
+	getConst() {
 
-		// never use TimerNode as readonly but aways as "uniform"
+		// never use TimerNode as constant but aways as "uniform"
 
 		return false;
 

@@ -23,7 +23,7 @@ export class VelocityNode extends Vector3Node {
 
 	}
 
-	getReadonly() {
+	getConst() {
 
 		return false;
 

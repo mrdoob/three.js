@@ -3,20 +3,20 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
 
 export class CondNode extends TempNode {
 
-	constructor( a, b, op, ifNode, elseNode ) {
+	constructor( op, a, b, ifNode, elseNode ) {
 
 		super();
 
-		this.a = a;
-		this.b = b;
-
 		this.op = op;
+		this.a = NodeBuilder.resolve( a );
+		this.b = NodeBuilder.resolve( b );
 
-		this.ifNode = ifNode;
-		this.elseNode = elseNode;
+		this.ifNode = NodeBuilder.resolve( ifNode );
+		this.elseNode = NodeBuilder.resolve( elseNode );
 
 		this.nodeType = "Cond";
 
@@ -84,10 +84,9 @@ export class CondNode extends TempNode {
 
 		super.copy( source );
 
+		this.op = source.op;
 		this.a = source.a;
 		this.b = source.b;
-
-		this.op = source.op;
 
 		this.ifNode = source.ifNode;
 		this.elseNode = source.elseNode;
@@ -104,10 +103,9 @@ export class CondNode extends TempNode {
 
 			data = this.createJSONNode( meta );
 
+			data.op = this.op;
 			data.a = this.a.toJSON( meta ).uuid;
 			data.b = this.b.toJSON( meta ).uuid;
-
-			data.op = this.op;
 
 			if ( data.ifNode ) data.ifNode = this.ifNode.toJSON( meta ).uuid;
 			if ( data.elseNode ) data.elseNode = this.elseNode.toJSON( meta ).uuid;

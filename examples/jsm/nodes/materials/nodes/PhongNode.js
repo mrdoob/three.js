@@ -8,6 +8,7 @@ import {
 } from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
+import { NodeBuilder } from '../../core/NodeBuilder.js';
 import { NodeContext } from '../../core/NodeContext.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
@@ -35,6 +36,8 @@ export class PhongNode extends Node {
 		builder.requires.lights = true;
 
 		if ( builder.isShader( 'vertex' ) ) {
+
+			this.position = NodeBuilder.resolve( this.position );
 
 			var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
 
@@ -106,6 +109,22 @@ export class PhongNode extends Node {
 			code = output.join( "\n" );
 
 		} else {
+
+			// resolve primitives
+
+			this.mask = NodeBuilder.resolve( this.mask );
+			this.color = NodeBuilder.resolve( this.color );
+			this.specular = NodeBuilder.resolve( this.specular );
+			this.shininess = NodeBuilder.resolve( this.shininess );
+			this.alpha = NodeBuilder.resolve( this.alpha );
+			this.normal = NodeBuilder.resolve( this.normal );
+			this.light = NodeBuilder.resolve( this.light );
+			this.ao = NodeBuilder.resolve( this.ao );
+			this.ambient = NodeBuilder.resolve( this.ambient );
+			this.shadow = NodeBuilder.resolve( this.shadow );
+			this.emissive = NodeBuilder.resolve( this.emissive );
+			this.environment = NodeBuilder.resolve( this.environment );
+			this.environmentAlpha = NodeBuilder.resolve( this.environmentAlpha );
 
 			// flow context
 

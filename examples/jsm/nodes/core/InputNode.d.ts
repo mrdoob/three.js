@@ -6,8 +6,8 @@ export class InputNode extends TempNode {
 
   readonly: boolean;
 
-  setReadonly(value: boolean): this;
-  getReadonly(builder: NodeBuilder): boolean;
+  setConst(value: boolean): this;
+  getConst(builder: NodeBuilder): boolean;
   copy(source: InputNode): this;
   generate(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
 }

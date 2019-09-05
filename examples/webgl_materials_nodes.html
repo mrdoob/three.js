@@ -277,7 +277,7 @@
 					'misc / reserved-keywords': 'reserved-keywords',
 					'misc / varying': 'varying',
 					'misc / void-function': 'void-function',
-					'misc / readonly': 'readonly',
+					'misc / constant': 'constant',
 					'misc / label': 'label',
 					'misc / custom-attribute': 'custom-attribute'
 				} ).onFinishChange( function () {
@@ -1609,9 +1609,9 @@
 						mtl.color = color;
 						mtl.emissive = thresholdEmissive;
 						mtl.mask = new Nodes.CondNode(
+							Nodes.CondNode.GREATER, // condition
 							texArea, // a: value
-							threshold, // b: value
-							Nodes.CondNode.GREATER // condition
+							threshold // b: value
 						);
 
 						// GUI
@@ -1720,9 +1720,9 @@
 						mtl.color = burnedResultColor;
 						mtl.emissive = fireEmissive;
 						mtl.mask = new Nodes.CondNode(
+							Nodes.CondNode.GREATER, // condition
 							texArea, // a: value
-							threshold, // b: value
-							Nodes.CondNode.GREATER // condition
+							threshold // b: value
 						);
 
 						// GUI
@@ -2880,7 +2880,7 @@
 							ifNode = new Nodes.ColorNode( 0x0000FF ),
 							elseNode = new Nodes.ColorNode( 0xFF0000 );
 
-						var cond = new Nodes.CondNode( a, b, Nodes.CondNode.EQUAL, ifNode, elseNode );
+						var cond = new Nodes.CondNode( Nodes.CondNode.EQUAL, a, b, ifNode, elseNode );
 
 						mtl.color = cond;
 
@@ -3008,7 +3008,7 @@
 
 						break;
 
-					case 'readonly':
+					case 'constant':
 
 						// MATERIAL
 
@@ -3017,11 +3017,11 @@
 						// not use "uniform" input ( for optimization )
 						// instead use explicit declaration, for example:
 						// vec3( 1.0, 1.0, 1.0 ) instead "uniform vec3"
-						// if readonly is true not allow change the value after build the shader material
+						// if constant is true not allow change the value after build the shader material
 
-						mtl.color = new Nodes.ColorNode( 0xFFFFFF ).setReadonly( true );
-						mtl.specular = new Nodes.FloatNode( .5 ).setReadonly( true );
-						mtl.shininess = new Nodes.FloatNode( 15 ).setReadonly( true );
+						mtl.color = new Nodes.ColorNode( 0xFFFFFF ).setConst( true );
+						mtl.specular = new Nodes.FloatNode( .5 ).setConst( true );
+						mtl.shininess = 15; // it generate FloatNode automatically: "new Nodes.FloatNode( 15 ).setConst( true )"
 
 						break;
 
@@ -3039,10 +3039,7 @@
 						var colorInput = new Nodes.ColorNode( 0xFFFFFF ).setLabel( "colorInput" );
 						var specularInput = new Nodes.FloatNode( .5 ).setLabel( "specularInput" );
 
-						var colorMix = new Nodes.MulNode(
-							colorInput,
-							new Nodes.ColorNode( 0x6495ED ).setReadonly( true )
-						).setLabel( "colorMix" );
+						var colorMix = new Nodes.MulNode( colorInput, '#6495ED' ).setLabel( "colorMix" );
 
 						mtl.color = colorMix;
 						mtl.specular = specularInput;
@@ -3050,10 +3047,7 @@
 						// default: without use label
 						// this is optimized writed the code in a single line (inline)
 						// for the reason that this node is used only once in this shader program
-						mtl.shininess = new Nodes.AddNode(
-							new Nodes.FloatNode( 10 ).setReadonly( true ),
-							new Nodes.FloatNode( 5 ).setReadonly( true )
-						);
+						mtl.shininess = new Nodes.AddNode( 10, 5 );
 
 						mtl.build();
 

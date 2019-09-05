@@ -19,7 +19,7 @@ export class ColorNode extends InputNode {
 
 	}
 
-	generateReadonly( builder, output, uuid, type ) {
+	generateConst( builder, output, uuid, type ) {
 
 		return builder.format( "vec3( " + this.r + ", " + this.g + ", " + this.b + " )", type, output );
 
@@ -47,7 +47,7 @@ export class ColorNode extends InputNode {
 			data.g = this.g;
 			data.b = this.b;
 
-			if ( this.readonly === true ) data.readonly = true;
+			if ( this.constant === true ) data.constant = true;
 
 		}
 

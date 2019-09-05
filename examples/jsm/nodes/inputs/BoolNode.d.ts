@@ -7,6 +7,6 @@ export class BoolNode extends InputNode {
   value: boolean;
   nodeType: string;
 
-  generateReadonly(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
+  generateConst(builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string, needsUpdate?: boolean): string;
   copy(source: BoolNode): this;
 }

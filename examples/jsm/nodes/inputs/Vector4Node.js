@@ -19,7 +19,7 @@ export class Vector4Node extends InputNode {
 
 	}
 
-	generateReadonly( builder, output, uuid, type ) {
+	generateConst( builder, output, uuid, type ) {
 
 		return builder.format( "vec4( " + this.x + ", " + this.y + ", " + this.z + ", " + this.w + " )", type, output );
 
@@ -48,7 +48,7 @@ export class Vector4Node extends InputNode {
 			data.z = this.z;
 			data.w = this.w;
 
-			if ( this.readonly === true ) data.readonly = true;
+			if ( this.constant === true ) data.constant = true;
 
 		}
 

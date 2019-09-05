@@ -16,7 +16,7 @@ export class IntNode extends InputNode {
 
 	}
 
-	generateReadonly( builder, output, uuid, type ) {
+	generateConst( builder, output, uuid, type ) {
 
 		return builder.format( this.value, type, output );
 
@@ -42,7 +42,7 @@ export class IntNode extends InputNode {
 
 			data.value = this.value;
 
-			if ( this.readonly === true ) data.readonly = true;
+			if ( this.constant === true ) data.constant = true;
 
 		}
 
