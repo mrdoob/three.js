@@ -52,7 +52,47 @@ export { ResolutionNode } from './accessors/ResolutionNode.js';
 
 export { OperatorNode, AddNode, SubNode, MulNode, DivNode } from './math/OperatorNode.js';
 export { CondNode } from './math/CondNode.js';
-export { MathNode } from './math/MathNode.js';
+export { 
+	MathNode,
+	RadianNode,
+	DegreesNode,
+	ExpNode, 
+	Exp2Node,
+	LogNode,
+	Log2Node,
+	SqrtNode,
+	InvSqrtNode,
+	FloorNode,
+	CeilNode,
+	NormalizeNode,
+	FractNode,
+	SaturateNode,
+	SinNode,
+	CosNode,
+	TanNode,
+	AsinNode,
+	AcosNode,
+	ArctanNode,
+	AbsNode,
+	SignNode,
+	LengthNode,
+	NegateNode,
+	InvertNode,
+	MinNode,
+	MaxNode,
+	ModNode,
+	StepNode,
+	MathReflectNode,
+	DistanceNode,
+	DotNode,
+	CrossNode,
+	PowNode,
+	MixNode,
+	ClampNode,
+	MathRefractNode,
+	SmoothstepNode,
+	FaceforwardNode
+} from './math/MathNode.js';
 
 // procedural
 

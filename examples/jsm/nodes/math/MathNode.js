@@ -3,18 +3,20 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeUtils } from '../core/NodeUtils.js';
 
 export class MathNode extends TempNode {
 
-	constructor( a, bOrMethod, cOrMethod, method ) {
+	constructor( method, a, b, c ) {
 
 		super();
 
-		this.a = a;
-		typeof bOrMethod !== 'string' ? this.b = bOrMethod : method = bOrMethod;
-		typeof cOrMethod !== 'string' ? this.c = cOrMethod : method = cOrMethod;
-
 		this.method = method;
+
+		this.a = NodeBuilder.resolve( a );
+		this.b = NodeBuilder.resolve( b );
+		this.c = NodeBuilder.resolve( c );
 
 		this.nodeType = "Math";
 
@@ -191,10 +193,11 @@ export class MathNode extends TempNode {
 
 		super.copy( source );
 
+		this.method = source.method;
+
 		this.a = source.a;
 		this.b = source.b;
 		this.c = source.c;
-		this.method = source.method;
 
 		return this;
 
@@ -208,11 +211,11 @@ export class MathNode extends TempNode {
 
 			data = this.createJSONNode( meta );
 
+			data.method = this.method;
+
 			data.a = this.a.toJSON( meta ).uuid;
 			if ( this.b ) data.b = this.b.toJSON( meta ).uuid;
 			if ( this.c ) data.c = this.c.toJSON( meta ).uuid;
-
-			data.method = this.method;
 
 		}
 
@@ -268,3 +271,87 @@ MathNode.CLAMP = 'clamp';
 MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
+
+// proxys
+
+const RadianNode = NodeUtils.createProxyClass( MathNode, MathNode.RADIANS );
+const DegreesNode = NodeUtils.createProxyClass( MathNode, MathNode.DEGREES );
+const ExpNode = NodeUtils.createProxyClass( MathNode, MathNode.EXP );
+const Exp2Node = NodeUtils.createProxyClass( MathNode, MathNode.EXP2 );
+const LogNode = NodeUtils.createProxyClass( MathNode, MathNode.LOG );
+const Log2Node = NodeUtils.createProxyClass( MathNode, MathNode.LOG2 );
+const SqrtNode = NodeUtils.createProxyClass( MathNode, MathNode.SQRT );
+const InvSqrtNode = NodeUtils.createProxyClass( MathNode, MathNode.INV_SQRT );
+const FloorNode = NodeUtils.createProxyClass( MathNode, MathNode.FLOOR );
+const CeilNode = NodeUtils.createProxyClass( MathNode, MathNode.CEIL );
+const NormalizeNode = NodeUtils.createProxyClass( MathNode, MathNode.NORMALIZE );
+const FractNode = NodeUtils.createProxyClass( MathNode, MathNode.FRACT );
+const SaturateNode = NodeUtils.createProxyClass( MathNode, MathNode.SATURATE );
+const SinNode = NodeUtils.createProxyClass( MathNode, MathNode.SIN );
+const CosNode = NodeUtils.createProxyClass( MathNode, MathNode.COS );
+const TanNode = NodeUtils.createProxyClass( MathNode, MathNode.TAN );
+const AsinNode = NodeUtils.createProxyClass( MathNode, MathNode.ASIN );
+const AcosNode = NodeUtils.createProxyClass( MathNode, MathNode.ACOS );
+const ArctanNode = NodeUtils.createProxyClass( MathNode, MathNode.ARCTAN );
+const AbsNode = NodeUtils.createProxyClass( MathNode, MathNode.ABS );
+const SignNode = NodeUtils.createProxyClass( MathNode, MathNode.SIGN );
+const LengthNode = NodeUtils.createProxyClass( MathNode, MathNode.LENGTH );
+const NegateNode = NodeUtils.createProxyClass( MathNode, MathNode.NEGATE );
+const InvertNode = NodeUtils.createProxyClass( MathNode, MathNode.INVERT );
+
+const MinNode = NodeUtils.createProxyClass( MathNode, MathNode.MIN );
+const MaxNode = NodeUtils.createProxyClass( MathNode, MathNode.MAX );
+const ModNode = NodeUtils.createProxyClass( MathNode, MathNode.MOD );
+const StepNode = NodeUtils.createProxyClass( MathNode, MathNode.STEP );
+const MathReflectNode = NodeUtils.createProxyClass( MathNode, MathNode.REFLECT );
+const DistanceNode = NodeUtils.createProxyClass( MathNode, MathNode.DISTANCE );
+const DotNode = NodeUtils.createProxyClass( MathNode, MathNode.DOT );
+const CrossNode = NodeUtils.createProxyClass( MathNode, MathNode.CROSS );
+const PowNode = NodeUtils.createProxyClass( MathNode, MathNode.POW );
+
+const MixNode = NodeUtils.createProxyClass( MathNode, MathNode.MIX );
+const ClampNode = NodeUtils.createProxyClass( MathNode, MathNode.CLAMP );
+const MathRefractNode = NodeUtils.createProxyClass( MathNode, MathNode.REFRACT );
+const SmoothstepNode = NodeUtils.createProxyClass( MathNode, MathNode.SMOOTHSTEP );
+const FaceforwardNode = NodeUtils.createProxyClass( MathNode, MathNode.FACEFORWARD );
+
+export { 
+	RadianNode,
+	DegreesNode,
+	ExpNode, 
+	Exp2Node,
+	LogNode,
+	Log2Node,
+	SqrtNode,
+	InvSqrtNode,
+	FloorNode,
+	CeilNode,
+	NormalizeNode,
+	FractNode,
+	SaturateNode,
+	SinNode,
+	CosNode,
+	TanNode,
+	AsinNode,
+	AcosNode,
+	ArctanNode,
+	AbsNode,
+	SignNode,
+	LengthNode,
+	NegateNode,
+	InvertNode,
+	MinNode,
+	MaxNode,
+	ModNode,
+	StepNode,
+	MathReflectNode,
+	DistanceNode,
+	DotNode,
+	CrossNode,
+	PowNode,
+	MixNode,
+	ClampNode,
+	MathRefractNode,
+	SmoothstepNode,
+	FaceforwardNode
+};

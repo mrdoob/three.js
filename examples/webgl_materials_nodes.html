@@ -395,7 +395,7 @@
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.environmentAlpha = mask;
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
-						mtl.normal.scale = new Nodes.MathNode( mask, Nodes.MathNode.INVERT );
+						mtl.normal.scale = new Nodes.InvertNode( mask );
 
 						break;
 
@@ -428,24 +428,10 @@
 						var roughnessB = new Nodes.FloatNode( 0 );
 						var metalnessB = new Nodes.FloatNode( 1 );
 
-						var roughness = new Nodes.MathNode(
-							roughnessA,
-							roughnessB,
-							mask,
-							Nodes.MathNode.MIX
-						);
+						var roughness = new Nodes.MixNode( roughnessA, roughnessB, mask );
+						var metalness = new Nodes.MixNode( metalnessA, metalnessB, mask	);
 
-						var metalness = new Nodes.MathNode(
-							metalnessA,
-							metalnessB,
-							mask,
-							Nodes.MathNode.MIX
-						);
-
-						var normalMask = new Nodes.MulNode(
-							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
-							normalScale
-						);
+						var normalMask = new Nodes.MulNode( new Nodes.InvertNode( mask ), normalScale );
 
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
@@ -560,25 +546,10 @@
 						var roughnessB = new Nodes.FloatNode( 0 );
 						var metalnessB = new Nodes.FloatNode( 1 );
 
-						var roughness = new Nodes.MathNode(
-							roughnessA,
-							roughnessB,
-							mask,
-							Nodes.MathNode.MIX
-						);
+						var roughness = new Nodes.MixNode( roughnessA, roughnessB, mask );
+						var metalness = new Nodes.MixNode( metalnessA, metalnessB, mask );
 
-						var metalness = new Nodes.MathNode(
-							metalnessA,
-							metalnessB,
-							mask,
-							Nodes.MathNode.MIX
-						);
-
-						var normalMask = new Nodes.OperatorNode(
-							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
-							normalScale,
-							Nodes.OperatorNode.MUL
-						);
+						var normalMask = new Nodes.MulNode( new Nodes.InvertNode( mask ), normalScale );
 
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
@@ -586,8 +557,8 @@
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
 
-						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
-						mtl.environment = new Nodes.OperatorNode( envNode, intensity, Nodes.OperatorNode.MUL );
+						var envNode = new Nodes.TextureCubeNode( premTexture );
+						mtl.environment = new Nodes.MulNode( envNode, intensity );
 
 						// GUI
 
@@ -661,11 +632,11 @@
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalScale;
 
-						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+						var envNode = new Nodes.TextureCubeNode( premTexture );
 
 						var subSlotNode = new Nodes.SubSlotNode();
-						subSlotNode.slots[ 'radiance' ] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
-						subSlotNode.slots[ 'irradiance' ] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots[ 'radiance' ] = new Nodes.MulNode( radiance, envNode );
+						subSlotNode.slots[ 'irradiance' ] = new Nodes.MulNode( irradiance, envNode );
 
 						mtl.environment = subSlotNode;
 
@@ -853,30 +824,12 @@
 						var clearcoat = new Nodes.FloatNode( 1 );
 						var clearcoatRoughness = new Nodes.FloatNode( 1 );
 
-						var roughness = new Nodes.MathNode(
-							roughnessA,
-							roughnessB,
-							mask,
-							Nodes.MathNode.MIX
-						);
+						var roughness = new Nodes.MixNode( roughnessA, roughnessB, mask );
+						var metalness = new Nodes.MixNode( metalnessA, metalnessB, mask );
 
-						var metalness = new Nodes.MathNode(
-							metalnessA,
-							metalnessB,
-							mask,
-							Nodes.MathNode.MIX
-						);
+						var normalMask = new Nodes.MulNode( new Nodes.InvertNode( mask ), normalScale );
 
-						var normalMask = new Nodes.MulNode(
-							new Nodes.MathNode( mask, Nodes.MathNode.INVERT ),
-							normalScale
-						);
-
-						var clearcoatNormalMask = new Nodes.OperatorNode(
-							mask,
-							clearcoatNormalScale,
-							Nodes.OperatorNode.MUL
-						);
+						var clearcoatNormalMask = new Nodes.MulNode( mask, clearcoatNormalScale );
 
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
@@ -986,7 +939,7 @@
 							timeScale
 						);
 
-						var wave = new Nodes.MathNode( posContinuous, Nodes.MathNode.SIN );
+						var wave = new Nodes.SinNode( posContinuous );
 						wave = new Nodes.SwitchNode( wave, 'x' );
 
 						var waveScale = new Nodes.MulNode(
@@ -1010,11 +963,10 @@
 							displaceY
 						);
 
-						var color = new Nodes.MathNode(
+						var color = new Nodes.MixNode(
 							colorB,
 							colorA,
-							wave,
-							Nodes.MathNode.MIX
+							wave
 						);
 
 						mtl.color = color;
@@ -1074,10 +1026,9 @@
 						var power = new Nodes.FloatNode( 3 );
 						var color = new Nodes.ColorNode( 0xFFFFFF );
 
-						var viewZ = new Nodes.MathNode(
+						var viewZ = new Nodes.DotNode(
 							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
-							new Nodes.Vector3Node( 0, 0, - intensity ),
-							Nodes.MathNode.DOT
+							new Nodes.Vector3Node( 0, 0, - intensity )
 						);
 
 						var rim = new Nodes.AddNode(
@@ -1085,10 +1036,9 @@
 							new Nodes.FloatNode( intensity )
 						);
 
-						var rimPower = new Nodes.MathNode(
+						var rimPower = new Nodes.PowNode(
 							rim,
-							power,
-							Nodes.MathNode.POW
+							power
 						);
 
 						var rimColor = new Nodes.MulNode(
@@ -1372,10 +1322,9 @@
 						var power = new Nodes.FloatNode( 1 );
 						var color = new Nodes.CubeTextureNode( cubemap );
 
-						var viewZ = new Nodes.MathNode(
+						var viewZ = new Nodes.DotNode(
 							new Nodes.NormalNode( Nodes.NormalNode.VIEW ),
-							new Nodes.Vector3Node( 0, 0, - 1 ),
-							Nodes.MathNode.DOT
+							new Nodes.Vector3Node( 0, 0, - 1 )
 						);
 
 						var theta = new Nodes.AddNode(
@@ -1383,10 +1332,9 @@
 							new Nodes.FloatNode( 1 )
 						);
 
-						var thetaPower = new Nodes.MathNode(
+						var thetaPower = new Nodes.PowNode(
 							theta,
-							power,
-							Nodes.MathNode.POW
+							power
 						);
 
 						var fresnel = new Nodes.MulNode(
@@ -1396,7 +1344,7 @@
 
 						mtl.color = new Nodes.ColorNode( 0x3399FF );
 						mtl.environment = color;
-						mtl.environmentAlpha = new Nodes.MathNode( fresnel, Nodes.MathNode.SATURATE );
+						mtl.environmentAlpha = new Nodes.SaturateNode( fresnel );
 
 						// GUI
 
@@ -1440,11 +1388,10 @@
 						var mask = new Nodes.TextureNode( getTexture( "decalDiffuse" ), uvScale );
 						var maskAlphaChannel = new Nodes.SwitchNode( mask, 'w' );
 
-						var blend = new Nodes.MathNode(
+						var blend = new Nodes.MixNode(
 							tex1,
 							tex2,
-							maskAlphaChannel,
-							Nodes.MathNode.MIX
+							maskAlphaChannel
 						);
 
 						mtl.color = blend;
@@ -1528,9 +1475,9 @@
 							offset
 						);
 
-						var clamp0at1 = new Nodes.MathNode( offsetClamp, Nodes.MathNode.SATURATE );
+						var clamp0at1 = new Nodes.SaturateNode( offsetClamp );
 
-						var blend = new Nodes.MathNode( top, bottom, clamp0at1, Nodes.MathNode.MIX );
+						var blend = new Nodes.MixNode( top, bottom, clamp0at1 );
 
 						mtl.color = blend;
 
@@ -1596,11 +1543,10 @@
 							displaceScale
 						);
 
-						var color = new Nodes.MathNode(
+						var color = new Nodes.MixNode(
 							colorB,
 							colorA,
-							texArea,
-							Nodes.MathNode.MIX
+							texArea
 						);
 
 						mtl.color = mtl.specular = new Nodes.ColorNode( 0 );
@@ -1650,17 +1596,13 @@
 						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
-						var thresholdBorder = new Nodes.MathNode(
+						var thresholdBorder = new Nodes.SmoothstepNode(
 							new Nodes.AddNode( threshold, borderSize ),
 							threshold,
-							texArea,
-							Nodes.MathNode.SMOOTHSTEP
+							texArea
 						);
 
-						var thresholdEmissive = new Nodes.MulNode(
-							borderColor,
-							thresholdBorder
-						);
+						var thresholdEmissive = new Nodes.MulNode( borderColor, thresholdBorder );
 
 						// APPLY
 
@@ -1720,23 +1662,22 @@
 							new Nodes.ConstNode( Nodes.ConstNode.PI2 )
 						);
 
-						var cycle = new Nodes.MathNode( sinCycleInSecs, Nodes.MathNode.SIN );
+						var cycle = new Nodes.SinNode( sinCycleInSecs );
 
 						// round sin to 0 at 1
-						cycle = new Nodes.AddNode( cycle, new Nodes.FloatNode( 1 ) );
-						cycle = new Nodes.DivNode( cycle, new Nodes.FloatNode( 2 ) );
+						cycle = new Nodes.AddNode( cycle, 1 );
+						cycle = new Nodes.DivNode( cycle, 2 );
 
 						// offset to +.9
-						cycle = new Nodes.AddNode( cycle, new Nodes.FloatNode( .9 ) );
+						cycle = new Nodes.AddNode( cycle, .9 );
 
 						var tex = new Nodes.TextureNode( getTexture( "cloud" ) );
 						var texArea = new Nodes.SwitchNode( tex, 'w' );
 
-						var thresholdBorder = new Nodes.MathNode(
+						var thresholdBorder = new Nodes.SmoothstepNode(
 							new Nodes.AddNode( threshold, fireSize ),
 							threshold,
-							texArea,
-							Nodes.MathNode.SMOOTHSTEP
+							texArea
 						);
 
 						var fireStartAnimatedColor = new Nodes.ColorAdjustmentNode(
@@ -1751,18 +1692,16 @@
 							Nodes.ColorAdjustmentNode.SATURATION
 						);
 
-						var fireColor = new Nodes.MathNode(
+						var fireColor = new Nodes.MixNode(
 							fireEndAnimatedColor,
 							fireStartAnimatedColor,
-							thresholdBorder,
-							Nodes.MathNode.MIX
+							thresholdBorder
 						);
 
-						var thresholdBurnedBorder = new Nodes.MathNode(
+						var thresholdBurnedBorder = new Nodes.SmoothstepNode(
 							new Nodes.AddNode( threshold, burnedSize ),
 							threshold,
-							texArea,
-							Nodes.MathNode.SMOOTHSTEP
+							texArea
 						);
 
 						var fireEmissive = new Nodes.MulNode(
@@ -1770,11 +1709,10 @@
 							thresholdBorder
 						);
 
-						var burnedResultColor = new Nodes.MathNode(
+						var burnedResultColor = new Nodes.MixNode(
 							color,
 							burnedColor,
-							thresholdBurnedBorder,
-							Nodes.MathNode.MIX
+							thresholdBurnedBorder
 						);
 
 						// APPLY
@@ -1902,11 +1840,10 @@
 						depth.near.value = 1;
 						depth.far.value = 200;
 
-						var colors = new Nodes.MathNode(
+						var colors = new Nodes.MixNode(
 							colorB,
 							colorA,
-							depth,
-							Nodes.MathNode.MIX
+							depth
 						);
 
 						mtl = new Nodes.PhongNodeMaterial();
@@ -2013,7 +1950,7 @@
 						var mask = new Nodes.SwitchNode( worldNormal, 'y' );
 
 						// clamp0at1
-						mask = new Nodes.MathNode( mask, Nodes.MathNode.SATURATE );
+						mask = new Nodes.SaturateNode( mask );
 
 						var timeOffset = new Nodes.MulNode(
 							time,
@@ -2039,18 +1976,16 @@
 							intensity
 						);
 
-						var voronoiColors = new Nodes.MathNode(
+						var voronoiColors = new Nodes.MixNode(
 							colorB,
 							colorA,
-							new Nodes.MathNode( voronoiIntensity, Nodes.MathNode.SATURATE ), // mix needs clamp
-							Nodes.MathNode.MIX
+							new Nodes.SaturateNode( voronoiIntensity ), // mix needs clamp
 						);
 
-						var caustic = new Nodes.MathNode(
+						var caustic = new Nodes.MixNode(
 							color,
 							voronoiColors,
-							maskCaustic,
-							Nodes.MathNode.MIX
+							maskCaustic
 						);
 
 						var causticLights = new Nodes.MulNode(
@@ -2120,7 +2055,7 @@
 						var colorB = new Nodes.ColorNode( 0x3366FF );
 
 						var pos = new Nodes.PositionNode();
-						var posNorm = new Nodes.MathNode( pos, Nodes.MathNode.NORMALIZE );
+						var posNorm = new Nodes.NormalizeNode( pos );
 
 						var mask = new Nodes.SwitchNode( posNorm, 'y' );
 
@@ -2145,11 +2080,10 @@
 							softVelocity
 						);
 
-						var colors = new Nodes.MathNode(
+						var colors = new Nodes.MixNode(
 							colorB,
 							colorA,
-							mask,
-							Nodes.MathNode.MIX
+							mask
 						);
 
 						mtl.color = colors;
@@ -2205,41 +2139,23 @@
 						var clearcoatNormal = new Nodes.FloatNode( 0 );
 						var scale = new Nodes.FloatNode( 1 );
 
-						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var posDirection = new Nodes.NormalizeNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ) );
+						var norDirection = new Nodes.NormalizeNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ) );
 
-						var viewZ = new Nodes.MathNode(
-							posDirection,
-							norDirection,
-							Nodes.MathNode.DOT
-						);
+						var viewZ = new Nodes.DotNode( posDirection, norDirection );
 
 						var viewZSquare = new Nodes.MulNode( viewZ, viewZ );
 
-						var viewZColorA = new Nodes.MulNode(
-							viewZ,
-							colorA
-						);
+						var viewZColorA = new Nodes.MulNode( viewZ, colorA );
+						var viewZColorB = new Nodes.MulNode( viewZSquare, colorB );
+						var viewZColorC = new Nodes.MulNode( viewZSquare, viewZSquare, colorC );
 
-						var viewZColorB = new Nodes.MulNode(
-							viewZSquare,
-							colorB
-						);
-
-						var viewZColorC = new Nodes.MulNode(
-							new Nodes.MulNode( viewZSquare, viewZSquare ),
-							colorC
-						);
-
-						var sparkleScale = new Nodes.MulNode(
-							new Nodes.UVNode(),
-							scale
-						);
+						var sparkleScale = new Nodes.MulNode( 'uv', scale );
 
 						var sparkle = new Nodes.TextureNode( getTexture( "sparkle" ), sparkleScale );
 
 						var color = new Nodes.AddNode( viewZColorA, viewZColorB, viewZColorC );
-						//color = new Nodes.MathNode( color, Nodes.MathNode.SATURATE );
+						//color = new Nodes.SaturateNode( color );
 
 						var finalColor = new Nodes.ColorAdjustmentNode( color, saturation, Nodes.ColorAdjustmentNode.SATURATION );
 
@@ -2250,7 +2166,7 @@
 						mtl.clearcoatRoughness = clearcoatRoughness;
 						mtl.clearcoatNormal = new Nodes.BumpMapNode( sparkle );
 						mtl.clearcoatNormal.scale = clearcoatNormal;
-						mtl.environment = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
+						mtl.environment = new Nodes.TextureCubeNode( premTexture );
 
 						// GUI
 
@@ -2326,24 +2242,14 @@
 						var fur = new Nodes.FloatNode( .5 );
 						var scale = new Nodes.FloatNode( 1.2 );
 
-						var uvScale = new Nodes.MulNode(
-							new Nodes.UVNode(),
-							scale
-						);
+						var uvScale = new Nodes.MulNode( new Nodes.UVNode(), scale );
 
-						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var posDirection = new Nodes.NormalizeNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ) );
+						var norDirection = new Nodes.NormalizeNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ) );
 
-						var viewZ = new Nodes.MathNode(
-							posDirection,
-							norDirection,
-							Nodes.MathNode.DOT
-						);
+						var viewZ = new Nodes.DotNode( posDirection, norDirection );
 
-						var furScale = new Nodes.MulNode(
-							viewZ,
-							fur
-						);
+						var furScale = new Nodes.MulNode( viewZ, fur );
 
 						mtl.color = color;
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ), uvScale ) );
@@ -2380,7 +2286,7 @@
 
 						// MATERIAL
 
-						mtl = name == 'skin' ? new Nodes.StandardNodeMaterial() : new Nodes.PhongNodeMaterial();
+						mtl = name === 'skin' ? new Nodes.StandardNodeMaterial() : new Nodes.PhongNodeMaterial();
 
 						var skinColor = new Nodes.ColorNode( 0xFFC495 );
 						var bloodColor = new Nodes.ColorNode( 0x6b0602 );
@@ -2391,36 +2297,22 @@
 
 						var lightLuminance = new Nodes.LuminanceNode( directLight );
 
-						var lightWrap = new Nodes.MathNode(
-							wrapShadow,
-							wrapLight,
-							lightLuminance,
-							Nodes.MathNode.SMOOTHSTEP
-						);
+						var lightWrap = new Nodes.SmoothstepNode( wrapShadow, wrapLight, lightLuminance );
 
-						var lightTransition = new Nodes.MulNode(
-							lightWrap,
-							new Nodes.ConstNode( Nodes.ConstNode.PI2 )
-						);
+						var lightTransition = new Nodes.MulNode( lightWrap, new Nodes.ConstNode( Nodes.ConstNode.PI2 ) );
 
-						var wrappedLight = new Nodes.MathNode( lightTransition, Nodes.MathNode.SIN );
+						var wrappedLight = new Nodes.SinNode( lightTransition );
 
-						var wrappedLightColor = new Nodes.MulNode(
-							wrappedLight,
-							bloodColor
-						);
+						var wrappedLightColor = new Nodes.MulNode( wrappedLight, bloodColor );
 
-						var bloodArea = new Nodes.MathNode( wrappedLightColor, Nodes.MathNode.SATURATE );
+						var bloodArea = new Nodes.SaturateNode( wrappedLightColor );
 
-						var totalLight = new Nodes.AddNode(
-							directLight,
-							bloodArea
-						);
+						var totalLight = new Nodes.AddNode( directLight, bloodArea );
 
 						mtl.color = skinColor;
 						mtl.light = totalLight;
 
-						if ( name == 'skin' ) {
+						if ( name === 'skin' ) {
 
 							// StandardNodeMaterial
 
@@ -2488,50 +2380,25 @@
 
 						var lightLuminance = new Nodes.LuminanceNode( sceneDirectLight );
 
-						var preCelLight = new Nodes.MulNode(
-							lightLuminance,
-							count
-						);
+						var preCelLight = new Nodes.MulNode( lightLuminance, count );
 
-						var celLight = new Nodes.MathNode(
-							preCelLight,
-							Nodes.MathNode.CEIL
-						);
+						var celLight = new Nodes.CeilNode( preCelLight );
 
-						var posCelLight = new Nodes.DivNode(
-							celLight,
-							count
-						);
+						var posCelLight = new Nodes.DivNode( celLight, count );
 
 						// LINE
 
-						var posDirection = new Nodes.MathNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ), Nodes.MathNode.NORMALIZE );
-						var norDirection = new Nodes.MathNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ), Nodes.MathNode.NORMALIZE );
+						var posDirection = new Nodes.NormalizeNode( new Nodes.PositionNode( Nodes.PositionNode.VIEW ) );
+						var norDirection = new Nodes.NormalizeNode( new Nodes.NormalNode( Nodes.NormalNode.VIEW ) );
 
-						var viewZ = new Nodes.MathNode(
-							posDirection,
-							norDirection,
-							Nodes.MathNode.DOT
-						);
+						var viewZ = new Nodes.DotNode( posDirection, norDirection );
+						var lineOutside = new Nodes.AbsNode( viewZ );
 
-						var lineOutside = new Nodes.MathNode(
-							viewZ,
-							Nodes.MathNode.ABS
-						);
+						var line = new Nodes.DivNode( lineOutside, 1 );
 
-						var line = new Nodes.DivNode(
-							lineOutside,
-							new Nodes.FloatNode( 1 )
-						);
+						var lineScaled = new Nodes.SmoothstepNode( line, innerline, inner );
 
-						var lineScaled = new Nodes.MathNode(
-							line,
-							innerline,
-							inner,
-							Nodes.MathNode.SMOOTHSTEP
-						);
-
-						var innerContour = new Nodes.MathNode( new Nodes.MathNode( lineScaled, Nodes.MathNode.SATURATE ), Nodes.MathNode.INVERT );
+						var innerContour = new Nodes.InvertNode( new Nodes.SaturateNode( lineScaled ) );
 
 						// APPLY
 
@@ -2712,7 +2579,7 @@
 
 						var bias = new Nodes.FloatNode( .5 );
 						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureNode( cubemap ) );
-						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
+						var mipsBias = new Nodes.MulNode( bias, maxMIPLevel );
 
 						mtl = new Nodes.PhongNodeMaterial();
 						mtl.color.value.setHex( 0xFFFFFF );
@@ -2723,13 +2590,13 @@
 
 								case 'prem':
 
-									mtl.color = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ), undefined, undefined, bias );
+									mtl.color = new Nodes.TextureCubeNode( premTexture, undefined, bias );
 
 									break;
 
 								case 'lod':
 
-									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );', undefined, { shaderTextureLOD: true } 								);
+									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );', undefined, { shaderTextureLOD: true } );
 
 									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
 
@@ -2874,11 +2741,10 @@
 
 						var mix = new Nodes.FloatNode( .5 );
 
-						nodeMaterial.environment = new Nodes.MathNode(
+						nodeMaterial.environment = new Nodes.MixNode(
 							nodeMaterial.environment,
 							new Nodes.CubeTextureNode( cubemap ),
-							mix,
-							Nodes.MathNode.MIX
+							mix
 						);
 
 						cubemap.mapping = THREE.CubeRefractionMapping;
@@ -3117,12 +2983,7 @@
 
 						var timer = new Nodes.TimerNode( .01, Nodes.TimerNode.LOCAL );
 
-						var color = new Nodes.MathNode(
-							rttStore,
-							blur,
-							new Nodes.FloatNode( .6 ),
-							Nodes.MathNode.MIX
-						);
+						var color = new Nodes.MixNode( rttStore, blur, .6 );
 
 						blur.horizontal = blur.vertical = timer;
 
@@ -3235,12 +3096,7 @@
 							uv: new Nodes.UVNode()
 						} );
 
-						var color = new Nodes.MathNode(
-							new Nodes.TextureNode( getTexture( "brick" ) ),
-							blurredTexture,
-							alpha,
-							Nodes.MathNode.MIX
-						);
+						var color = new Nodes.MixNode( new Nodes.TextureNode( getTexture( "brick" ) ), blurredTexture, alpha );
 
 						mtl.color = color;
 
@@ -3339,14 +3195,10 @@
 							new Nodes.ConstNode( Nodes.ConstNode.PI2 )
 						);
 
-						var cycle = new Nodes.MathNode( sinCycleInSecs, Nodes.MathNode.SIN );
+						var cycle = new Nodes.SinNode( sinCycleInSecs );
+						var cycleColor = new Nodes.MulNode( cycle, color );
 
-						var cycleColor = new Nodes.MulNode(
-							cycle,
-							color
-						);
-
-						var cos = new Nodes.MathNode( cycleColor, Nodes.MathNode.SIN );
+						var cos = new Nodes.SinNode( cycleColor );
 
 						mtl.color = new Nodes.ColorNode( 0 );
 						mtl.emissive = cos;
@@ -3371,30 +3223,15 @@
 						var viewPos = new Nodes.PositionNode( Nodes.PositionNode.VIEW );
 						var cameraPosition = new Nodes.CameraNode( Nodes.CameraNode.POSITION );
 
-						var cameraDistance = new Nodes.MathNode(
-							modelPos,
-							cameraPosition,
-							Nodes.MathNode.DISTANCE
-						);
+						var cameraDistance = new Nodes.DistanceNode( modelPos, cameraPosition );
 
 						var viewPosZ = new Nodes.SwitchNode( viewPos, 'z' );
 
-						var distance = new Nodes.SubNode(
-							cameraDistance,
-							viewPosZ
-						);
+						var distance = new Nodes.SubNode( cameraDistance, viewPosZ );
 
-						var distanceRadius = new Nodes.AddNode(
-							distance,
-							new Nodes.FloatNode( 70 )
-						);
+						var distanceRadius = new Nodes.AddNode( distance, new Nodes.FloatNode( 70 ) );
 
-						var objectDepth = new Nodes.MathNode(
-							distanceRadius,
-							new Nodes.FloatNode( 0 ),
-							new Nodes.FloatNode( 50 ),
-							Nodes.MathNode.SMOOTHSTEP
-						);
+						var objectDepth = new Nodes.SmoothstepNode( distanceRadius, new Nodes.FloatNode( 0 ), new Nodes.FloatNode( 50 ) );
 
 						// RTT ( get back distance )
 
@@ -3418,44 +3255,24 @@
 						backSideDepth.radius.x = 5;
 						backSideDepth.radius.y = 5;
 
-						var difference = new Nodes.SubNode(
-							objectDepth,
-							backSideDepth
-						);
+						var difference = new Nodes.SubNode( objectDepth, backSideDepth );
 
-						var sss = new Nodes.MathNode(
-							new Nodes.FloatNode( - .1 ),
-							new Nodes.FloatNode( .13 ),
-							difference,
-							Nodes.MathNode.SMOOTHSTEP
-						);
+						var sss = new Nodes.SmoothstepNode( new Nodes.FloatNode( - .1 ), new Nodes.FloatNode( .13 ), difference );
 
-						var sssAlpha = new Nodes.MathNode( sss, Nodes.MathNode.SATURATE );
+						var sssAlpha = new Nodes.SaturateNode( sss );
 
 						var frontColor, backColor;
 
 						if ( name == 'sss' ) {
 
-							var sssOut = new Nodes.MathNode(
-								objectDepth,
-								sssAlpha,
-								Nodes.MathNode.MIN
-							);
+							var sssOut = new Nodes.MinNode( objectDepth, sssAlpha );
 
 							frontColor = new Nodes.ColorNode( 0xd4cfbb );
 							backColor = new Nodes.ColorNode( 0xff2a00 );
 
-							var color = new Nodes.MathNode(
-								backColor,
-								frontColor,
-								sssOut,
-								Nodes.MathNode.MIX
-							);
+							var color = new Nodes.MixNode( backColor, frontColor, sssOut );
 
-							var light = new Nodes.AddNode(
-								new Nodes.LightNode(),
-								color
-							);
+							var light = new Nodes.AddNode( new Nodes.LightNode(), color );
 
 							mtl.color = frontColor;
 							mtl.roughness = new Nodes.FloatNode( .1 );
@@ -3471,17 +3288,9 @@
 							frontColor = new Nodes.ColorNode( 0xd04327 );
 							backColor = new Nodes.ColorNode( 0x1a0e14 );
 
-							var color = new Nodes.MathNode(
-								frontColor,
-								backColor,
-								sssAlpha,
-								Nodes.MathNode.MIX
-							);
+							var color = new Nodes.MixNode( frontColor, backColor, sssAlpha );
 
-							var light = new Nodes.AddNode(
-								new Nodes.LightNode(),
-								color
-							);
+							var light = new Nodes.AddNode( new Nodes.LightNode(), color );
 
 							mtl.color = new Nodes.ColorNode( 0xffffff );
 							mtl.roughness = new Nodes.FloatNode( .1 );

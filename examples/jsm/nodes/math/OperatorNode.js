@@ -4,6 +4,7 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
 
 export class OperatorNode extends TempNode {
 
@@ -27,8 +28,8 @@ export class OperatorNode extends TempNode {
 
 		}
 
-		this.a = a;
-		this.b = b;
+		this.a = NodeBuilder.resolve( a );
+		this.b = NodeBuilder.resolve( b );
 
 		this.nodeType = "Operator";
 
@@ -116,7 +117,4 @@ const SubNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.SUB, 2 );
 const MulNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.MUL, 2 );
 const DivNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.DIV, 2 );
 
-export { AddNode };
-export { SubNode };
-export { MulNode };
-export { DivNode };
+export { AddNode, SubNode, MulNode, DivNode };

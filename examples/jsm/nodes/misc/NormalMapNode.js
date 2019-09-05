@@ -3,6 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { UVNode } from '../accessors/UVNode.js';
@@ -62,8 +63,8 @@ export class NormalMapNode extends TempNode {
 
 		super( 'v3' );
 
-		this.value = value;
-		this.scale = scale || new Vector2Node( 1, 1 );
+		this.value = NodeBuilder.resolve( value );
+		this.scale = NodeBuilder.resolve( scale ) || new Vector2Node( 1, 1 );
 
 		this.nodeType = "NormalMap";
 

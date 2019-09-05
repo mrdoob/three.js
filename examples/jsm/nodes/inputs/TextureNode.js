@@ -3,6 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
 import { NodeContext } from '../core/NodeContext.js';
 import { UVNode } from '../accessors/UVNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
@@ -12,12 +13,14 @@ export class TextureNode extends InputNode {
 
 	constructor( value, uv, bias, project ) {
 
-		super( 'v4', { shared: true } );
+		super( 'v4' );
 
 		this.value = value;
-		this.uv = uv;
-		this.bias = bias;
+		this.uv = NodeBuilder.resolve( uv );
+		this.bias = NodeBuilder.resolve( bias );
 		this.project = project !== undefined ? project : false;
+
+		this.shared = true;
 
 		this.nodeType = "Texture";
 

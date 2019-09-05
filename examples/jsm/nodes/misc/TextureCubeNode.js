@@ -2,8 +2,9 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import { TextureNode } from '../inputs/TextureNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
-import { TempNode } from '../core/TempNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
 import { NodeContext } from '../core/NodeContext.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
@@ -11,15 +12,13 @@ import { ReflectNode } from '../accessors/ReflectNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 
-export class TextureCubeNode extends TempNode {
+export class TextureCubeNode extends TextureNode {
 
-	constructor( value, textureSize, uv, bias ) {
+	constructor( value, uv, bias, textureSize ) {
 
-		super( 'v4' );
+		super( value, uv, bias );
 
-		this.value = value;
-
-		textureSize = textureSize || new FloatNode( 1024 ).setReadonly( true );
+		textureSize = NodeBuilder.resolve( textureSize || 1024 );
 
 		this.radianceCache = { uv: new TextureCubeUVNode(
 			uv || new ReflectNode( ReflectNode.VECTOR ),
@@ -31,10 +30,22 @@ export class TextureCubeNode extends TempNode {
 		this.irradianceCache = { uv: new TextureCubeUVNode(
 			new NormalNode( NormalNode.WORLD ),
 			textureSize,
-			new FloatNode( 1 ).setReadonly( true )
+			1
 		) };
 
 		this.nodeType = "TextureCube";
+
+	}
+
+	set textureSize( val ) {
+
+		this.radianceCache.textureSize = this.irradianceCache.textureSize = val;
+
+	}
+
+	get textureSize() {
+
+		return this.radianceCache.textureSize;
 
 	}
 
@@ -44,8 +55,8 @@ export class TextureCubeNode extends TempNode {
 			uv_20 = cache.uv.build( builder ) + '.uv_20',
 			t = cache.uv.build( builder ) + '.t';
 
-		var color10 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_10 + ' )',
-			color20 = 'texture2D( ' + this.value.build( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
+		var color10 = 'texture2D( ' + super.generate( builder, 'sampler2D' ) + ', ' + uv_10 + ' )',
+			color20 = 'texture2D( ' + super.generate( builder, 'sampler2D' ) + ', ' + uv_20 + ' )';
 
 		// add a custom context for fix incompatibility with the core
 		// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
@@ -83,7 +94,7 @@ export class TextureCubeNode extends TempNode {
 
 			if ( contextuallyBias ) {
 
-				contextuallyBias.setTexture( this.value );
+				contextuallyBias.setTexture( this );
 
 			}
 
@@ -108,7 +119,7 @@ export class TextureCubeNode extends TempNode {
 
 		super.copy( source );
 
-		this.value = source.value;
+		this.textureSize = source.textureSize;
 
 		return this;
 
@@ -116,13 +127,11 @@ export class TextureCubeNode extends TempNode {
 
 	toJSON( meta ) {
 
-		var data = this.getJSONNode( meta );
+		var data = super.toJSON( meta );
 
-		if ( ! data ) {
+		if ( ! data.textureSize ) {
 
-			data = this.createJSONNode( meta );
-
-			data.value = this.value.toJSON( meta ).uuid;
+			data.textureSize = this.textureSize.toJSON( meta ).uuid;
 
 		}
 
