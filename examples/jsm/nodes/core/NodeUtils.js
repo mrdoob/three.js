@@ -54,7 +54,7 @@ export const NodeUtils = {
 
 			constructor() {
 
-				super( ...arguments, property );
+				super( property, ...arguments );
 
 			}
 

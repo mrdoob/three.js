@@ -9,7 +9,7 @@ import {
 
 import { StandardNode } from './StandardNode.js';
 import { PropertyNode } from '../../inputs/PropertyNode.js';
-import { OperatorNode } from '../../math/OperatorNode.js';
+import { MulNode } from '../../math/OperatorNode.js';
 import { SwitchNode } from '../../utils/SwitchNode.js';
 import { NormalMapNode } from '../../misc/NormalMapNode.js';
 
@@ -51,7 +51,7 @@ export class MeshStandardNode extends StandardNode {
 			var color = builder.findNode( props.color, inputs.color ),
 				map = builder.resolve( props.map );
 
-			this.color = map ? new OperatorNode( color, map, OperatorNode.MUL ) : color;
+			this.color = map ? new MulNode( color, map ) : color;
 
 			// slots
 			// * roughness
@@ -60,7 +60,7 @@ export class MeshStandardNode extends StandardNode {
 			var roughness = builder.findNode( props.roughness, inputs.roughness ),
 				roughnessMap = builder.resolve( props.roughnessMap );
 
-			this.roughness = roughnessMap ? new OperatorNode( roughness, new SwitchNode( roughnessMap, "g" ), OperatorNode.MUL ) : roughness;
+			this.roughness = roughnessMap ? new MulNode( roughness, new SwitchNode( roughnessMap, "g" ) ) : roughness;
 
 			// slots
 			// * metalness
@@ -69,7 +69,7 @@ export class MeshStandardNode extends StandardNode {
 			var metalness = builder.findNode( props.metalness, inputs.metalness ),
 				metalnessMap = builder.resolve( props.metalnessMap );
 
-			this.metalness = metalnessMap ? new OperatorNode( metalness, new SwitchNode( metalnessMap, "b" ), OperatorNode.MUL ) : metalness;
+			this.metalness = metalnessMap ? new MulNode( metalness, new SwitchNode( metalnessMap, "b" ) ) : metalness;
 
 			// slots
 			// * normalMap

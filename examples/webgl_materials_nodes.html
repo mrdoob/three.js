@@ -2238,7 +2238,7 @@
 
 						var sparkle = new Nodes.TextureNode( getTexture( "sparkle" ), sparkleScale );
 
-						var color = new Nodes.AddNode( new Nodes.AddNode( viewZColorA, viewZColorB ), viewZColorC );
+						var color = new Nodes.AddNode( viewZColorA, viewZColorB, viewZColorC );
 						//color = new Nodes.MathNode( color, Nodes.MathNode.SATURATE );
 
 						var finalColor = new Nodes.ColorAdjustmentNode( color, saturation, Nodes.ColorAdjustmentNode.SATURATION );

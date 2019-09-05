@@ -5,22 +5,30 @@
 import { TempNode } from '../core/TempNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-const OperatorsDict = {
-	'add': '+',
-	'sub': '-',
-	'mul': '*',
-	'div': '/'
-};
-
 export class OperatorNode extends TempNode {
 
-	constructor( a, b, op ) {
+	constructor( op, a, b ) {
 
 		super();
 
+		this.op = op;
+
+		if ( arguments.length > 3 ) {
+
+			var finalNodeIndex = arguments.length - 1;
+
+			for(var i = 2; i < finalNodeIndex; i++) {
+
+				a = new OperatorNode( op, a, arguments[i] );
+
+			}
+
+			b = arguments[ finalNodeIndex ];
+
+		}
+
 		this.a = a;
 		this.b = b;
-		this.op = op;
 
 		this.nodeType = "Operator";
 
@@ -79,9 +87,9 @@ export class OperatorNode extends TempNode {
 
 			data = this.createJSONNode( meta );
 
+			data.op = this.op;
 			data.a = this.a.toJSON( meta ).uuid;
 			data.b = this.b.toJSON( meta ).uuid;
-			data.op = this.op;
 
 		}
 
@@ -96,10 +104,17 @@ OperatorNode.SUB = 'sub';
 OperatorNode.MUL = 'mul';
 OperatorNode.DIV = 'div';
 
-const AddNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.ADD );
-const SubNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.SUB );
-const MulNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.MUL );
-const DivNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.DIV );
+const OperatorsDict = {
+	'add': '+',
+	'sub': '-',
+	'mul': '*',
+	'div': '/'
+};
+
+const AddNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.ADD, 2 );
+const SubNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.SUB, 2 );
+const MulNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.MUL, 2 );
+const DivNode = NodeUtils.createProxyClass( OperatorNode, OperatorNode.DIV, 2 );
 
 export { AddNode };
 export { SubNode };
