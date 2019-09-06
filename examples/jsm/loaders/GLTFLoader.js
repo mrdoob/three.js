@@ -2050,7 +2050,7 @@ var GLTFLoader = ( function () {
 
 			// Load Texture resource.
 
-			var loader = Loader.Handlers.get( sourceURI );
+			var loader = options.manager.getHandler( sourceURI );
 
 			if ( ! loader ) {
 

@@ -97,16 +97,17 @@ THREE.FBXLoader = ( function () {
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-			return new FBXTreeParser( textureLoader ).parse( fbxTree );
+			return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
 		}
 
 	} );
 
 	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a THREE.Group
-	function FBXTreeParser( textureLoader ) {
+	function FBXTreeParser( textureLoader, manager ) {
 
 		this.textureLoader = textureLoader;
+		this.manager = manager;
 
 	}
 
@@ -265,7 +266,7 @@ THREE.FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+					if ( this.manager.getHandler( '.tga' ) === null ) {
 
 						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
@@ -378,7 +379,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( extension === 'tga' ) {
 
-				var loader = THREE.Loader.Handlers.get( '.tga' );
+				var loader = this.manager.getHandler( '.tga' );
 
 				if ( loader === null ) {
 
