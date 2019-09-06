@@ -4,7 +4,6 @@
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "repository": "mrdoob/three.js",
-  "jsnext:main": "build/three.module.js",
   "module": "build/three.module.js",
   "types": "src/Three.d.ts",
   "files": [
