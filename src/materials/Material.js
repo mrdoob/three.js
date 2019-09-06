@@ -50,6 +50,24 @@ function Material() {
 	this.stencilZPass = KeepStencilOp;
 	this.stencilWrite = false;
 
+	Object.defineProperty( this, 'stencilMask', {
+
+		set: function( value ) {
+
+			console.warn( 'Material.stencilMask has been removed. Use Material.stencilFuncMask instead.' );
+			this.stencilFuncMask = value;
+
+		},
+
+		get: function() {
+
+			console.warn( 'Material.stencilMask has been removed. Use Material.stencilFuncMask instead.' );
+			return this.stencilFuncMask;
+
+		}
+
+	} );
+
 	this.clippingPlanes = null;
 	this.clipIntersection = false;
 	this.clipShadows = false;
