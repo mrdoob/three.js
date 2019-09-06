@@ -3,9 +3,12 @@
   "version": "0.108.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
-  "repository": "mrdoob/three.js",
   "module": "build/three.module.js",
   "types": "src/Three.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrdoob/three.js"
+  },
   "files": [
     "build/three.js",
     "build/three.min.js",
