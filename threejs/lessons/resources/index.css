@@ -1,13 +1,13 @@
 body {
   margin: 0;
-  width: 100vw;
+  width: 100%;
 }
 .lesson-main>* {
     margin: 1em 0;
 }
 iframe.background {
     position: fixed;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     border: none;
     top: 0;
