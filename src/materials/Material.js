@@ -381,9 +381,10 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.depthWrite = source.depthWrite;
 
 		this.stencilWrite = source.stencilWrite;
+		this.stencilWriteMask = source.stencilWriteMask;
 		this.stencilFunc = source.stencilFunc;
 		this.stencilRef = source.stencilRef;
-		this.stencilMask = source.stencilMask;
+		this.stencilFuncMask = source.stencilFuncMask;
 		this.stencilFail = source.stencilFail;
 		this.stencilZFail = source.stencilZFail;
 		this.stencilZPass = source.stencilZPass;
