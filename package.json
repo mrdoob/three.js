@@ -60,6 +60,8 @@
     "three",
     "three.js",
     "3d",
+    "canvas",
+    "svg",
     "webgl"
   ],
   "author": "mrdoob",
