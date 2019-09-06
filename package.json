@@ -81,7 +81,7 @@
     "google-closure-compiler": "20190729.0.0",
     "http-server": "^0.11.1",
     "qunit": "^2.9.2",
-    "glob": "^7.1.4"
+    "glob": "^7.1.4",
     "rollup": "^1.19.4",
     "typescript": "^3.5.3",
     "rollup-plugin-buble": "^0.19.8"
