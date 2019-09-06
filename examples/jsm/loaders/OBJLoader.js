@@ -4,12 +4,12 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	Material,
 	Mesh,
 	MeshPhongMaterial,
@@ -381,13 +381,13 @@ var OBJLoader = ( function () {
 
 	function OBJLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 		this.materials = null;
 
 	}
 
-	OBJLoader.prototype = {
+	OBJLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: OBJLoader,
 
@@ -402,14 +402,6 @@ var OBJLoader = ( function () {
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-			return this;
 
 		},
 
@@ -476,7 +468,7 @@ var OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
-							if ( data.length === 8 ) {
+							if ( data.length >= 7 ) {
 
 								state.colors.push(
 									parseFloat( data[ 4 ] ),
@@ -807,7 +799,7 @@ var OBJLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return OBJLoader;
 

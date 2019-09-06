@@ -26,7 +26,7 @@
 		scene.add( cubeCamera );
 
 		// Create car
-		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget } );
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
@@ -60,7 +60,7 @@
 
 
 		<h2>属性</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
 
 		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
 		<p>
@@ -69,7 +69,7 @@
 		</p>
 
 		<h2>方法</h2>
-		<p>请参阅其基类[page:Object3D]来查看其共有方法。</p>
+		<p>共有方法请参见其基类[page:Object3D]。</p>
 
 
 
@@ -91,6 +91,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

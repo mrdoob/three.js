@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface SAOShader {
+export const SAOShader: {
   defines: {
     NUM_SAMPLES: number;
     NUM_RINGS: number;
@@ -29,4 +29,4 @@ export interface SAOShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

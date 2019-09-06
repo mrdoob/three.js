@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface WaterRefractionShader {
+export const WaterRefractionShader: {
   uniforms: {
     color: Uniform;
     time: Uniform;
@@ -12,4 +12,4 @@ export interface WaterRefractionShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

@@ -24,7 +24,8 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var lineGeometry, coneGeometry;
+var _axis = new Vector3();
+var _lineGeometry, _coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
@@ -39,23 +40,23 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	if ( lineGeometry === undefined ) {
+	if ( _lineGeometry === undefined ) {
 
-		lineGeometry = new BufferGeometry();
-		lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+		_lineGeometry = new BufferGeometry();
+		_lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-		coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-		coneGeometry.translate( 0, - 0.5, 0 );
+		_coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+		_coneGeometry.translate( 0, - 0.5, 0 );
 
 	}
 
 	this.position.copy( origin );
 
-	this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color } ) );
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
+	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
@@ -67,36 +68,29 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
 
-ArrowHelper.prototype.setDirection = ( function () {
+ArrowHelper.prototype.setDirection = function ( dir ) {
 
-	var axis = new Vector3();
-	var radians;
+	// dir is assumed to be normalized
 
-	return function setDirection( dir ) {
+	if ( dir.y > 0.99999 ) {
 
-		// dir is assumed to be normalized
+		this.quaternion.set( 0, 0, 0, 1 );
 
-		if ( dir.y > 0.99999 ) {
+	} else if ( dir.y < - 0.99999 ) {
 
-			this.quaternion.set( 0, 0, 0, 1 );
+		this.quaternion.set( 1, 0, 0, 0 );
 
-		} else if ( dir.y < - 0.99999 ) {
+	} else {
 
-			this.quaternion.set( 1, 0, 0, 0 );
+		_axis.set( dir.z, 0, - dir.x ).normalize();
 
-		} else {
+		var radians = Math.acos( dir.y );
 
-			axis.set( dir.z, 0, - dir.x ).normalize();
+		this.quaternion.setFromAxisAngle( _axis, radians );
 
-			radians = Math.acos( dir.y );
+	}
 
-			this.quaternion.setFromAxisAngle( axis, radians );
-
-		}
-
-	};
-
-}() );
+};
 
 ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 

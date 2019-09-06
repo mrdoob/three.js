@@ -140,35 +140,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			case 'ctm':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var data = new Uint8Array( event.target.result );
-
-					var stream = new CTM.Stream( data );
-					stream.offset = 0;
-
-					var loader = new THREE.CTMLoader();
-					loader.createModel( new CTM.File( stream ), function ( geometry ) {
-
-						geometry.sourceType = "ctm";
-						geometry.sourceFile = file.name;
-
-						var material = new THREE.MeshStandardMaterial();
-
-						var mesh = new THREE.Mesh( geometry, material );
-						mesh.name = filename;
-
-						editor.execute( new AddObjectCommand( editor, mesh ) );
-
-					} );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
 			case 'dae':
 
 				reader.addEventListener( 'load', function ( event ) {
@@ -211,10 +182,11 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					THREE.DRACOLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+					var dracoLoader = new THREE.DRACOLoader();
+					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
 
 					var loader = new THREE.GLTFLoader();
-					loader.setDRACOLoader( new THREE.DRACOLoader() );
+					loader.setDRACOLoader( dracoLoader );
 					loader.parse( contents, '', function ( result ) {
 
 						var scene = result.scene;

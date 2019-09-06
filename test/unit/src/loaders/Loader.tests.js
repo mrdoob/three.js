@@ -29,19 +29,6 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( "initMaterials", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "createMaterial", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 	} );
 
 } );

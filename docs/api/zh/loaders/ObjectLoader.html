@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -66,27 +68,11 @@
 		创建一个新的[name].
 		</p>
 
-
 		<h2>属性</h2>
-
-		<h3>[property:String crossOrigin]</h3>
-		<p>
-            如果设置了，在开始加载前， 将为图片分配 [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
-            属性，其值为 *crossOrigin*, 默认为"anonymous"。
-		</p>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			加载器正在使用的[page:LoadingManager loadingManager]，默认值为[page:DefaultLoadingManager]。
-		</p>
-
-		<h3>[property:String texturePath]</h3>
-		<p>
-			将要被加载的纹理的路径或者URL，详情请参考[page:.setTexturePath]。
-			默认值为空字符串。
-		</p>
+		<p>共有属性请参见其基类[page:Loader]。</p>
 
 		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -204,20 +190,10 @@
 		</ul>
 		</p>
 
-		<h3>[method:ObjectLoader setCrossOrigin]( [param:String value] )</h3>
-		<p>
-		[page:String value] — 在允许CROS时，跨域字段通过实现CORS来加载不同域下的URL。
-		</p>
-
-		<h3>[method:ObjectLoader setTexturePath]( [param:String value] )</h3>
-		<p>
-		[page:String value] — 设置将要加载为纹理的路径或者URL<br /><br />
-
-
-		</p>
-
 		<h2>源</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

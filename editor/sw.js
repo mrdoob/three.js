@@ -1,4 +1,4 @@
-// r106
+// r108
 
 const staticAssets = [
 	'./',
@@ -6,7 +6,6 @@ const staticAssets = [
 	'../files/favicon.ico',
 
 	'../build/three.js',
-	'../examples/js/libs/system.min.js',
 
 	'../examples/js/controls/EditorControls.js',
 	'../examples/js/controls/TransformControls.js',
@@ -14,8 +13,6 @@ const staticAssets = [
 	'../examples/js/libs/chevrotain.min.js',
 	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/inflate.min.js',
-	'../examples/js/libs/lzma.js',
-	'../examples/js/libs/ctm.js',
 
 	'../examples/js/loaders/AMFLoader.js',
 	'../examples/js/loaders/AWDLoader.js',
@@ -37,7 +34,6 @@ const staticAssets = [
 	'../examples/js/loaders/TDSLoader.js',
 	'../examples/js/loaders/VRMLLoader.js',
 	'../examples/js/loaders/VTKLoader.js',
-	'../examples/js/loaders/ctm/CTMLoader.js',
 
 	'../examples/js/exporters/ColladaExporter.js',
 	'../examples/js/exporters/GLTFExporter.js',
@@ -56,6 +52,7 @@ const staticAssets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
+	'./js/libs/system.min.js',
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
 	'./js/libs/glslprep.min.js',
@@ -169,9 +166,10 @@ const staticAssets = [
 	'./js/commands/RemoveScriptCommand.js',
 	'./js/commands/SetScriptValueCommand.js',
 	'./js/commands/SetMaterialCommand.js',
-	'./js/commands/SetMaterialValueCommand.js',
 	'./js/commands/SetMaterialColorCommand.js',
 	'./js/commands/SetMaterialMapCommand.js',
+	'./js/commands/SetMaterialValueCommand.js',
+	'./js/commands/SetMaterialVectorCommand.js',
 	'./js/commands/SetSceneCommand.js',
 
 	//

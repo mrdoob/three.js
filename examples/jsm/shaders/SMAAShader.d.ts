@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface SMAAEdgesShader {
+export const SMAAEdgesShader: {
   defines: {
     SMAA_THRESHOLD: string;
   },
@@ -12,9 +12,9 @@ export interface SMAAEdgesShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
-export interface SMAAWeightsShader {
+export const SMAAWeightsShader: {
   defines: {
     SMAA_MAX_SEARCH_STEPS: string;
     SMAA_AREATEX_MAX_DISTANCE: string;
@@ -29,9 +29,9 @@ export interface SMAAWeightsShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};
 
-export interface SMAABlendShader {
+export const SMAABlendShader: {
   uniforms: {
     tDiffuse: Uniform;
     tColor: Uniform;
@@ -39,4 +39,4 @@ export interface SMAABlendShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

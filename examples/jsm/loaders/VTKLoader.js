@@ -12,21 +12,22 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
-	EventDispatcher,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	LoaderUtils
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
 
 var VTKLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-Object.assign( VTKLoader.prototype, EventDispatcher.prototype, {
+VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: VTKLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -40,13 +41,6 @@ Object.assign( VTKLoader.prototype, EventDispatcher.prototype, {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 

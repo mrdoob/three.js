@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor } from '../constants.js';
+import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import { _Math } from '../math/Math.js';
 
 /**
@@ -41,6 +41,14 @@ function Material() {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.stencilFunc = AlwaysStencilFunc;
+	this.stencilRef = 0;
+	this.stencilMask = 0xff;
+	this.stencilFail = KeepStencilOp;
+	this.stencilZFail = KeepStencilOp;
+	this.stencilZPass = KeepStencilOp;
+	this.stencilWrite = false;
+
 	this.clippingPlanes = null;
 	this.clipIntersection = false;
 	this.clipShadows = false;
@@ -61,6 +69,8 @@ function Material() {
 	this.premultipliedAlpha = false;
 
 	this.visible = true;
+
+	this.toneMapped = true;
 
 	this.userData = {};
 
@@ -164,8 +174,15 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
-		if ( this.clearCoat !== undefined ) data.clearCoat = this.clearCoat;
-		if ( this.clearCoatRoughness !== undefined ) data.clearCoatRoughness = this.clearCoatRoughness;
+		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
+		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
+
+		if ( this.clearcoatNormalMap && this.clearcoatNormalMap.isTexture ) {
+
+			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
+			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
+
+		}
 
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
@@ -240,6 +257,14 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
 
+		data.stencilWrite = this.stencilWrite;
+		data.stencilFunc = this.stencilFunc;
+		data.stencilRef = this.stencilRef;
+		data.stencilMask = this.stencilMask;
+		data.stencilFail = this.stencilFail;
+		data.stencilZFail = this.stencilZFail;
+		data.stencilZPass = this.stencilZPass;
+
 		// rotation (SpriteMaterial)
 		if ( this.rotation && this.rotation !== 0 ) data.rotation = this.rotation;
 
@@ -267,6 +292,9 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.skinning === true ) data.skinning = true;
 
 		if ( this.visible === false ) data.visible = false;
+
+		if ( this.toneMapped === false ) data.toneMapped = false;
+
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
 		// TODO: Copied from Object3D.toJSON
@@ -333,6 +361,14 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
 
+		this.stencilWrite = source.stencilWrite;
+		this.stencilFunc = source.stencilFunc;
+		this.stencilRef = source.stencilRef;
+		this.stencilMask = source.stencilMask;
+		this.stencilFail = source.stencilFail;
+		this.stencilZFail = source.stencilZFail;
+		this.stencilZPass = source.stencilZPass;
+
 		this.colorWrite = source.colorWrite;
 
 		this.precision = source.precision;
@@ -347,6 +383,9 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.premultipliedAlpha = source.premultipliedAlpha;
 
 		this.visible = source.visible;
+
+		this.toneMapped = source.toneMapped;
+
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		this.clipShadows = source.clipShadows;
