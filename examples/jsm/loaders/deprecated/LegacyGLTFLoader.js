@@ -1169,7 +1169,7 @@ var LegacyGLTFLoader = ( function () {
 
 						}
 
-						var textureLoader = options.manager.getHanlder( sourceUri );
+						var textureLoader = options.manager.getHandler( sourceUri );
 
 						if ( textureLoader === null ) {
 
