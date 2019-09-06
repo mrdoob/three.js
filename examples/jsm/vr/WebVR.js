@@ -14,6 +14,7 @@ var WEBVR = {
 		if ( options && options.referenceSpaceType ) {
 
 			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
+
 		}
 
 		function showEnterVR( device ) {
