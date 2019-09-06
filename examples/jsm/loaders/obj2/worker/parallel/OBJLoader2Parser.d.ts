@@ -4,6 +4,7 @@ export class OBJLoader2Parser {
     onProgress: Function;
     onAssetAvailable: Function;
     onError: Function;
+    onLoad: Function;
   };
   contentRef: Uint8Array;
   legacyMode: boolean;
@@ -63,6 +64,7 @@ export class OBJLoader2Parser {
   setCallbackOnAssetAvailable(onAssetAvailable: Function): this;
   setCallbackOnProgress(onProgress: Function): this;
   setCallbackOnError(onError: Function): this;
+  setCallbackOnLoad(onLoad: Function): this;
   setLogging(enabled: boolean, debug: boolean): this;
   execute(arrayBuffer: Uint8Array): void;
   executeLegacy(text: string): void;

@@ -182,6 +182,17 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 	},
 
 	/**
+	 * See {@link OBJLoader2Parser.setCallbackOnLoad}
+	 * @return {OBJLoader2}
+	 */
+	setCallbackOnLoad: function ( onLoad ) {
+
+		this.parser.setCallbackOnLoad( onLoad );
+		return this;
+
+	},
+
+	/**
 	 * Register a function that is called once a single mesh is available and it could be altered by the supplied function.
 	 *
 	 * @param {Function} [onMeshAlter]
@@ -224,6 +235,11 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			let errorMessage = 'onLoad is not a function! Aborting...';
 			scope.parser.callbacks.onError( errorMessage );
 			throw errorMessage
+
+		}
+		else {
+
+			this.parser.setCallbackOnLoad( onLoad );
 
 		}
 		if ( onError === null || onError === undefined || !(onError instanceof Function) ) {
@@ -280,7 +296,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 		this.setCallbackOnMeshAlter( onMeshAlter );
 		let fileLoaderOnLoad = function ( content ) {
 
-			onLoad( scope.parse( content ) );
+			scope.parser.callbacks.onLoad( scope.parse( content ), "OBJLoader2#load: Parsing completed" );
 
 		};
 		let fileLoader = new FileLoader( this.manager );

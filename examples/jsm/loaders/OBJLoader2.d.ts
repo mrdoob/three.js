@@ -34,6 +34,7 @@ export class OBJLoader2 extends Loader {
   setCallbackOnAssetAvailable(onAssetAvailable: Function): this;
   setCallbackOnProgress(onProgress: Function): this;
   setCallbackOnError(onError: Function): this;
+  setCallbackOnLoad(onLoad: Function): this;
   setCallbackOnMeshAlter(onMeshAlter: Function): this;
   setCallbackOnLoadMaterials(onLoadMaterials: Function): this;
 

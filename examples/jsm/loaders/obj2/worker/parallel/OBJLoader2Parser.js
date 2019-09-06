@@ -18,7 +18,10 @@ const OBJLoader2Parser = function () {
 		},
 		onError: function ( errorMessage ) {
 			scope._onError( errorMessage )
-		}
+		},
+		onLoad: function ( object3d, message ) {
+			scope._onLoad( object3d, message )
+		},
 	};
 	this.contentRef = null;
 	this.legacyMode = false;
@@ -217,6 +220,23 @@ OBJLoader2Parser.prototype = {
 	},
 
 	/**
+	 * Register a function that is called when parsing was completed.
+	 *
+	 * @param {Function} onLoad
+	 * @return {OBJLoader2Parser}
+	 */
+	setCallbackOnLoad: function ( onLoad ) {
+
+		if ( onLoad !== null && onLoad !== undefined && onLoad instanceof Function ) {
+
+			this.callbacks.onLoad = onLoad;
+
+		}
+		return this;
+
+	},
+
+	/**
 	 * Announce parse progress feedback which is logged to the console.
 	 * @private
 	 *
@@ -254,6 +274,12 @@ OBJLoader2Parser.prototype = {
 		let errorMessage = 'OBJLoader2Parser does not provide implementation for onAssetAvailable. Aborting...';
 		this.callbacks.onError( errorMessage );
 		throw errorMessage;
+
+	},
+
+	_onLoad: function ( object3d, message ) {
+
+		console.log( "You reached parser default onLoad callback: " + message );
 
 	},
 

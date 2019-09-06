@@ -5,6 +5,9 @@
 
 // Imports only related to wrapper
 import {
+	Object3D
+} from "../../../build/three.module.js";
+import {
 	CodeBuilderInstructions,
 	WorkerExecutionSupport
 } from "./obj2/worker/main/WorkerExecutionSupport.js";
@@ -19,6 +22,7 @@ import {
 	DefaultWorkerPayloadHandler
 } from "./obj2/worker/parallel/WorkerRunner.js";
 
+
 /**
  * Extends {OBJLoader2} with the capability to run the parser {OBJLoader2Parser} in web worker
  * with help of {WorkerExecutionSupport}.
@@ -31,7 +35,6 @@ const OBJLoader2Parallel = function ( manager ) {
 	OBJLoader2.call( this, manager );
 	this.preferJsmWorker = false;
 
-	this.parser.callbacks.onParseComplete = null;
 	this.executeParallel = true;
 	this.workerExecutionSupport = new WorkerExecutionSupport();
 
@@ -48,23 +51,6 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	setPreferJsmWorker: function ( preferJsmWorker ) {
 
 		this.preferJsmWorker = preferJsmWorker === true;
-		return this;
-
-	},
-
-	/**
-	 * If this call back is not set, then the completion message from worker will not be received.
-	 *
-	 * @param {function} onParseComplete
-	 * @return {OBJLoader2Parallel}
-	 */
-	setCallbackOnParseComplete: function ( onParseComplete ) {
-
-		if ( onParseComplete !== undefined && onParseComplete !== null ) {
-
-			this.parser.callbacks.onParseComplete = onParseComplete;
-
-		}
 		return this;
 
 	},
@@ -130,9 +116,9 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	 */
 	_configure: function () {
 
-		if ( this.parser.callbacks.onParseComplete === null ) {
+		if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
 
-			throw "No callbackOnLoad was provided! Aborting!";
+			throw "No callback other than the default callback was provided! Aborting!";
 
 		}
 		// check if worker is already available and if so, then fast-fail
@@ -147,7 +133,10 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 		};
 
-		this.workerExecutionSupport.updateCallbacks( scopedOnAssetAvailable, this.parser.callbacks.onParseComplete );
+		function scopedOnLoad ( message ) {
+			scope.parser.callbacks.onLoad( scope.baseObject3d, message );
+		}
+		this.workerExecutionSupport.updateCallbacks( scopedOnAssetAvailable, scopedOnLoad );
 
 	},
 
@@ -163,10 +152,27 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	 */
 	load: function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
-		this.setCallbackOnParseComplete( onLoad );
+ 		let scope = this;
+		function interceptOnLoad ( object3d, message ) {
 
-		OBJLoader2.prototype.load.call( this, content, function () {
-		}, onFileLoadProgress, onError, onMeshAlter );
+			if ( object3d instanceof Object3D ) {
+
+				onLoad( object3d, message );
+
+			}
+			else {
+
+				if ( object3d == 'OBJLoader2Parallel' && scope.parser.logging.enabled && scope.parser.logging.debug ) {
+
+					console.debug( 'Received dummy answer from OBJLoader2Parallel#parse' );
+
+				}
+
+			}
+
+		}
+
+		OBJLoader2.prototype.load.call( this, content, interceptOnLoad, onFileLoadProgress, onError, onMeshAlter );
 
 	},
 
@@ -202,9 +208,11 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 					}
 				} );
 
-		} else {
+			return 'OBJLoader2Parallel';
+		}
+		else {
 
-			this.parser.callbacks.onParseComplete( OBJLoader2.prototype.parse.call( this, content ) );
+			return OBJLoader2.prototype.parse.call( this, content );
 
 		}
 

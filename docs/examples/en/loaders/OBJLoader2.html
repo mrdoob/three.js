@@ -22,30 +22,29 @@
 
 		<code>
 		// instantiate the loader
-		var loader = new THREE.OBJLoader2();
+		let loader = new THREE.OBJLoader2();
 
 		// function called on successful load
-		var callbackOnLoad = function ( object3d ) {
+		function callbackOnLoad ( object3d ) {
 			scene.add( object3d );
-		};
+		}
 
 		// load a resource from provided URL synchronously
-		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
+		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null );
 		</code>
 
 		[example:webgl_loader_obj2] - Simple example <br>
-		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse, load and run with instructions (sync and async)<br>
+		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse and load, sync or in parallel to main (see [page:OBJLoader2Parallel]))<br>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:LoadingManager manager], [param:LoaderSupport.ConsoleLogger logger] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
 			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br>
-			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</p>
 		<p>
-			Use [name] to load OBJ data from files or to parse OBJ data from arraybuffer or text.
+			Creates a new [name]. Use it to load OBJ data from files or to parse OBJ data from arraybuffer or text.
 		</p>
 
 
