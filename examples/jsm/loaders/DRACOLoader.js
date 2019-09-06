@@ -461,11 +461,6 @@ DRACOLoader.DRACOWorker = function () {
 
 		var geometry = { index: null, attributes: [] };
 
-		var numPoints = dracoGeometry.num_points();
-		var numAttributes = dracoGeometry.num_attributes();
-
-		console.log( numPoints, numAttributes );
-
 		// Add attributes of user specified unique id.
 		for ( var attributeName in attributeIDs ) {
 
