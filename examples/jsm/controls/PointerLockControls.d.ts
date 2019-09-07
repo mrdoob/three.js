@@ -8,7 +8,6 @@ export class PointerLockControls extends EventDispatcher {
   constructor(camera: Camera, domElement?: HTMLElement);
 
   domElement: HTMLElement;
-  object: Camera;
 
   // API
 
@@ -19,6 +18,8 @@ export class PointerLockControls extends EventDispatcher {
   dispose(): void;
   getObject(): Camera;
   getDirection(v: Vector3): Vector3;
+  moveForward(distance: number): void;
+  moveRight(distance: number): void;
   lock(): void;
   unlock(): void;
 
