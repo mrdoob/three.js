@@ -162,7 +162,7 @@
 			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 			// per instance data
-			instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setDynamic( true );
+			instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setUsage( THREE.DynamicDrawUsage );
 			var offsets = new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 );
 
 			var vector = new THREE.Vector4();

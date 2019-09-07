@@ -8,6 +8,7 @@ import { Color } from '../../../../src/math/Color';
 import { Vector2 } from '../../../../src/math/Vector2';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Vector4 } from '../../../../src/math/Vector4';
+import { DynamicDrawUsage } from '../../../../src/constants';
 
 export default QUnit.module( 'Core', () => {
 
@@ -64,23 +65,26 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "setDynamic", ( assert ) => {
+		QUnit.test( "setUsage", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var attr = new BufferAttribute();
+			attr.setUsage( DynamicDrawUsage );
+
+			assert.strictEqual( attr.usage, DynamicDrawUsage, "Usage was set" );
 
 		} );
 
 		QUnit.test( "copy", ( assert ) => {
 
 			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
-			attr.setDynamic( true );
+			attr.setUsage( DynamicDrawUsage );
 			attr.needsUpdate = true;
 
 			var attrCopy = new BufferAttribute().copy( attr );
 
 			assert.ok( attr.count === attrCopy.count, 'count is equal' );
 			assert.ok( attr.itemSize === attrCopy.itemSize, 'itemSize is equal' );
-			assert.ok( attr.dynamic === attrCopy.dynamic, 'dynamic is equal' );
+			assert.ok( attr.usage === attrCopy.usage, 'usage is equal' );
 			assert.ok( attr.array.length === attrCopy.array.length, 'array length is equal' );
 			assert.ok( attr.version === 1 && attrCopy.version === 0, 'version is not copied which is good' );
 

@@ -1,3 +1,7 @@
+import {
+	Usage
+} from '../constants';
+
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js">src/core/BufferAttribute.js</a>
  */
@@ -8,7 +12,7 @@ export class BufferAttribute {
 	name: string;
 	array: ArrayLike<number>;
 	itemSize: number;
-	dynamic: boolean;
+	usage: Usage;
 	updateRange: { offset: number; count: number };
 	version: number;
 	normalized: boolean;
@@ -17,7 +21,7 @@ export class BufferAttribute {
 	onUpload: Function;
 
 	setArray( array?: ArrayBufferView ): void;
-	setDynamic( dynamic: boolean ): BufferAttribute;
+	setUsage( usage: Usage ): BufferAttribute;
 	clone(): this;
 	copy( source: BufferAttribute ): this;
 	copyAt(

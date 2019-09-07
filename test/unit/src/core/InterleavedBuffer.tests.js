@@ -4,6 +4,7 @@
 /* global QUnit */
 
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
+import { DynamicDrawUsage } from '../../../../src/constants';
 
 export default QUnit.module( 'Core', () => {
 
@@ -20,7 +21,7 @@ export default QUnit.module( 'Core', () => {
 			}
 
 			assert.ok( copiedInstance.stride === instance.stride, "stride was copied" );
-			assert.ok( copiedInstance.dynamic === true, "dynamic was copied" );
+			assert.ok( copiedInstance.usage === DynamicDrawUsage, "usage was copied" );
 
 		}
 
@@ -77,9 +78,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( "setDynamic", ( assert ) => {
+		QUnit.test( "setUsage", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var instance = new InterleavedBuffer();
+			instance.setUsage( DynamicDrawUsage );
+
+			assert.strictEqual( instance.usage, DynamicDrawUsage, "Usage was set" );
 
 		} );
 
@@ -87,7 +91,7 @@ export default QUnit.module( 'Core', () => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InterleavedBuffer( array, 3 );
-			instance.setDynamic( true );
+			instance.setUsage( DynamicDrawUsage );
 
 			checkInstanceAgainstCopy( instance, instance.copy( instance ), assert );
 
@@ -120,7 +124,7 @@ export default QUnit.module( 'Core', () => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InterleavedBuffer( array, 3 );
-			instance.setDynamic( true );
+			instance.setUsage( DynamicDrawUsage );
 
 			checkInstanceAgainstCopy( instance, instance.clone(), assert );
 

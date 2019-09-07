@@ -166,3 +166,13 @@ export var GreaterStencilFunc = 516;
 export var NotEqualStencilFunc = 517;
 export var GreaterEqualStencilFunc = 518;
 export var AlwaysStencilFunc = 519;
+
+export var StaticDrawUsage = 35044;
+export var DynamicDrawUsage = 35048;
+export var StreamDrawUsage = 35040;
+export var StaticReadUsage = 35045;
+export var DynamicReadUsage = 35049;
+export var StreamReadUsage = 35041;
+export var StaticCopyUsage = 35046;
+export var DynamicCopyUsage = 35050;
+export var StreamCopyUsage = 35042;

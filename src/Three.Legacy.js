@@ -5,7 +5,11 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { FlatShading } from './constants.js';
+import {
+	FlatShading,
+	StaticDrawUsage,
+	DynamicDrawUsage
+} from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -19,6 +23,7 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
+import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
@@ -1164,12 +1169,36 @@ Object.defineProperties( BufferAttribute.prototype, {
 
 		}
 	},
+	dynamic: {
+		get: function () {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			this.setUsage( value );
+
+		}
+	}
+
+} );
+
+Object.assign( BufferAttribute.prototype, {
+	setDynamic: function ( value ) {
+
+		console.warn( 'THREE.BufferAttribute: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
 	copyIndicesArray: function ( /* indices */ ) {
 
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
 	}
-
 } );
 
 Object.assign( BufferGeometry.prototype, {
@@ -1229,6 +1258,35 @@ Object.defineProperties( BufferGeometry.prototype, {
 		}
 	}
 
+} );
+
+Object.defineProperties( InterleavedBuffer.prototype, {
+
+	dynamic: {
+		get: function () {
+
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			this.setUsage( value );
+
+		}
+	}
+
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
+	setDynamic: function ( value ) {
+
+		console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	}
 } );
 
 //

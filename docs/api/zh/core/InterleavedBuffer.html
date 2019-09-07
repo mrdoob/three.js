@@ -44,11 +44,6 @@
 			类型化队列中，所有元素的数目。
 		</p>
 
-		<h3>[property:Boolean dynamic]</h3>
-		<p>
-			默认值为 *false*。
-		</p>
-
 		<h3>[property:Object updateRange]</h3>
 		<p>
 			对象存储着需要更新的数据的偏移量和数量。
@@ -79,17 +74,13 @@
 			默认值为 *false*。该值被设置为 true 时，会导致 [page:InterleavedBuffer.version version] 增加。
 		</p>
 
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+		</p>
+
 		<h2>方法</h2>
-
-		<h3>[method:InterleavedBuffer setArray] ( [param:TypedArray array] ) </h3>
-		<p>
-		 array - 必须是一个类型化的队列。
-		</p>
-
-		<h3>[method:InterleavedBuffer setDynamic] ( [param:Boolean value] ) </h3>
-		<p>
-			根据输入参数设置 [page:InterleavedBuffer.dynamic dynamic] 的值。
-		</p>
 
 		<h3>[method:InterleavedBuffer copy]( [param:InterleavedBuffer source] ) </h3>
 		<p>
@@ -111,6 +102,14 @@
 		<p>
 			克隆当前 [name]。
 		</p>
+
+		<h3>[method:InterleavedBuffer setArray] ( [param:TypedArray array] ) </h3>
+		<p>
+		 array - 必须是一个类型化的队列。
+		</p>
+
+		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value.</p>
 
 		<h2>源代码</h2>
 

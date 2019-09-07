@@ -139,7 +139,7 @@
 				}
 
 				particles.setDrawRange( 0, particleCount );
-				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setDynamic( true ) );
+				particles.addAttribute( 'position', new THREE.BufferAttribute( particlePositions, 3 ).setUsage( THREE.DynamicDrawUsage ) );
 
 				// create the particle system
 				pointCloud = new THREE.Points( particles, pMaterial );
@@ -147,8 +147,8 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setDynamic( true ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setDynamic( true ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ).setUsage( THREE.DynamicDrawUsage ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setUsage( THREE.DynamicDrawUsage ) );
 
 				geometry.computeBoundingSphere();
 

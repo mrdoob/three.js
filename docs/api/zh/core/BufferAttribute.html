@@ -52,16 +52,6 @@
 			若缓存存储三元组（例如顶点位置、法向量、颜色值），则该值应等于队列中三元组的个数。
 		</p>
 
-		<h3>[property:Boolean dynamic]</h3>
-		<p>
-			不论缓存是否是动态的，默认值都将是 *false*<br />
-
-			如果该值为 false，即告知 GPU 缓存中的数据会经常使用但不经常变化。
-			该值与 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] 标志位相一致。<br />
-			如果该值为 true，即告知 GPU 缓存中的数据会经常使用且经常变化。
-			该值与 [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] 标志位相一致。
-		</p>
-
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>
 			指示当前类或派生类是 BufferAttributes. 默认值为 *true*.<br /><br />
@@ -99,6 +89,13 @@
 			[page:Integer count]: 默认值为 *-1*，表示不指定更新范围。<br /><br />
 
 			该值只可以被用于更新某些矢量数据（例如，颜色相关数据）。
+		</p>
+
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			Default is *THREE.StaticDrawUsage*.
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -165,8 +162,8 @@
 		队列被复制后，[page:BufferAttribute.needsUpdate needsUpdate] 应当被设置为 true。
 		</p>
 
-		<h3>[method:BufferAttribute setDynamic] ( [param:Boolean value] ) </h3>
-		<p>将 [page:BufferAttribute.dynamic dynamic] 设置为 value.</p>
+		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value.</p>
 
 		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>设置给定索引的矢量的第一维数据（设置 X 值）。</p>

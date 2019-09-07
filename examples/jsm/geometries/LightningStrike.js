@@ -103,6 +103,7 @@
 
 import {
 	BufferGeometry,
+	DynamicDrawUsage,
 	Float32BufferAttribute,
 	Math as _Math,
 	Uint32BufferAttribute,
@@ -439,11 +440,11 @@ LightningStrike.prototype.createMesh = function () {
 
 	if ( ! this.isStatic ) {
 
-		this.index.dynamic = true;
-		this.positionAttribute.dynamic = true;
+		this.index.usage = DynamicDrawUsage;
+		this.positionAttribute.usage = DynamicDrawUsage;
 		if ( this.generateUVs ) {
 
-			this.uvsAttribute.dynamic = true;
+			this.uvsAttribute.usage = DynamicDrawUsage;
 
 		}
 

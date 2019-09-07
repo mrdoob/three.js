@@ -58,16 +58,6 @@
 		then this will count the number of such vectors stored.
 		</p>
 
-		<h3>[property:Boolean dynamic]</h3>
-		<p>
-			Whether the buffer is dynamic or not. Default is *false*.<br />
-
-			If false, the GPU is informed that contents of the buffer are likely to be used often and not change often.
-			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] flag.<br />
-			if true, the GPU is informed that contents of the buffer are likely to be used often and change often.
-			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] flag.
-		</p>
-
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>
 			Used to check whether this or derived classes are BufferAttributes. Default is *true*.<br /><br />
@@ -111,9 +101,15 @@
 			related to color).
 		</p>
 
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			Default is *THREE.StaticDrawUsage*.
+		</p>
+
 		<h3>[property:Integer version]</h3>
 		<p>A version number, incremented every time the [page:BufferAttribute.needsUpdate needsUpdate] property is set to true.</p>
-
 
 		<h2>Methods</h2>
 
@@ -185,8 +181,8 @@
 		After setting the array, [page:BufferAttribute.needsUpdate needsUpdate] should be set to true.
 		</p>
 
-		<h3>[method:BufferAttribute setDynamic] ( [param:Boolean value] ) </h3>
-		<p>Set [page:BufferAttribute.dynamic dynamic] to value.</p>
+		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value.</p>
 
 		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>Sets the x component of the vector at the given index.</p>
