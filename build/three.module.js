@@ -34468,6 +34468,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	var itemsLoaded = 0;
 	var itemsTotal = 0;
 	var urlModifier = undefined;
+	var handlers = [];
 
 	// Refer to #5689 for the reason why we don't set .onStart
 	// in the constructor
@@ -34544,7 +34545,49 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	this.setURLModifier = function ( transform ) {
 
 		urlModifier = transform;
+
 		return this;
+
+	};
+
+	this.addHandler = function ( regex, loader ) {
+
+		handlers.push( regex, loader );
+
+		return this;
+
+	};
+
+	this.removeHandler = function ( regex ) {
+
+		var index = handlers.indexOf( regex );
+
+		if ( index !== - 1 ) {
+
+			handlers.splice( index, 2 );
+
+		}
+
+		return this;
+
+	};
+
+	this.getHandler = function ( file ) {
+
+		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
+
+			var regex = handlers[ i ];
+			var loader = handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
 
 	};
 
@@ -34594,41 +34637,6 @@ Object.assign( Loader.prototype, {
 	}
 
 } );
-
-//
-
-Loader.Handlers = {
-
-	handlers: [],
-
-	add: function ( regex, loader ) {
-
-		this.handlers.push( regex, loader );
-
-	},
-
-	get: function ( file ) {
-
-		var handlers = this.handlers;
-
-		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
-
-			var regex = handlers[ i ];
-			var loader = handlers[ i + 1 ];
-
-			if ( regex.test( file ) ) {
-
-				return loader;
-
-			}
-
-		}
-
-		return null;
-
-	}
-
-};
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -46970,6 +46978,22 @@ Object.assign( Loader.prototype, {
 	}
 
 } );
+
+Loader.Handlers = {
+
+	add: function ( /* regex, loader */ ) {
+
+		console.error( 'THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.' );
+
+	},
+
+	get: function ( /* file */ ) {
+
+		console.error( 'THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.' );
+
+	}
+
+};
 
 function XHRLoader( manager ) {
 
