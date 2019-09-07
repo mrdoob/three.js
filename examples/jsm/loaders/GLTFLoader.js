@@ -13,7 +13,6 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	DefaultLoadingManager,
 	DirectionalLight,
 	DoubleSide,
 	FileLoader,
@@ -75,17 +74,16 @@ var GLTFLoader = ( function () {
 
 	function GLTFLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
+
 		this.dracoLoader = null;
 		this.ddsLoader = null;
 
 	}
 
-	GLTFLoader.prototype = {
+	GLTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: GLTFLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -93,11 +91,11 @@ var GLTFLoader = ( function () {
 
 			var resourcePath;
 
-			if ( this.resourcePath !== undefined ) {
+			if ( this.resourcePath !== '' ) {
 
 				resourcePath = this.resourcePath;
 
-			} else if ( this.path !== undefined ) {
+			} else if ( this.path !== '' ) {
 
 				resourcePath = this.path;
 
@@ -159,27 +157,6 @@ var GLTFLoader = ( function () {
 				}
 
 			}, onProgress, _onError );
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
 
 		},
 
@@ -301,7 +278,7 @@ var GLTFLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	/* GLTFREGISTRY */
 
@@ -1252,11 +1229,11 @@ var GLTFLoader = ( function () {
 
 		// Invalid URL
 		if ( typeof url !== 'string' || url === '' ) return '';
-		
+
 		// Host Relative URL
 		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
 
-			path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
+			path = path.replace( /(^https?:\/\/[^\/]+).*/i, '$1' );
 
 		}
 
@@ -1964,7 +1941,7 @@ var GLTFLoader = ( function () {
 
 				}
 
-				bufferAttribute = new InterleavedBufferAttribute( ib, itemSize, (byteOffset % byteStride) / elementBytes, normalized );
+				bufferAttribute = new InterleavedBufferAttribute( ib, itemSize, ( byteOffset % byteStride ) / elementBytes, normalized );
 
 			} else {
 
@@ -1997,7 +1974,7 @@ var GLTFLoader = ( function () {
 				if ( bufferView !== null ) {
 
 					// Avoid modifying the original ArrayBuffer, if the bufferView wasn't initialized with zeroes.
-					bufferAttribute.setArray( bufferAttribute.array.slice() );
+					bufferAttribute = new BufferAttribute( bufferAttribute.array.slice(), bufferAttribute.itemSize, bufferAttribute.normalized );
 
 				}
 
@@ -2073,7 +2050,7 @@ var GLTFLoader = ( function () {
 
 			// Load Texture resource.
 
-			var loader = Loader.Handlers.get( sourceURI );
+			var loader = options.manager.getHandler( sourceURI );
 
 			if ( ! loader ) {
 

@@ -18,5 +18,4 @@ export class DDSLoader extends CompressedTextureLoader {
   constructor(manager?: LoadingManager);
 
   parse(buffer: ArrayBuffer, loadMipmaps: boolean) : DDS;
-  _parser(buffer: ArrayBuffer, loadMipmaps: boolean) : DDS;
 }

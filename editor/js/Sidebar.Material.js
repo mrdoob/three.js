@@ -225,25 +225,25 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialShininessRow );
 
-	// clearCoat
+	// clearcoat
 
-	var materialClearCoatRow = new UI.Row();
-	var materialClearCoat = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+	var materialClearcoatRow = new UI.Row();
+	var materialClearcoat = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
-	materialClearCoatRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoat' ) ).setWidth( '90px' ) );
-	materialClearCoatRow.add( materialClearCoat );
+	materialClearcoatRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoat' ) ).setWidth( '90px' ) );
+	materialClearcoatRow.add( materialClearcoat );
 
-	container.add( materialClearCoatRow );
+	container.add( materialClearcoatRow );
 
-	// clearCoatRoughness
+	// clearcoatRoughness
 
-	var materialClearCoatRoughnessRow = new UI.Row();
-	var materialClearCoatRoughness = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+	var materialClearcoatRoughnessRow = new UI.Row();
+	var materialClearcoatRoughness = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
-	materialClearCoatRoughnessRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoatroughness' ) ).setWidth( '90px' ) );
-	materialClearCoatRoughnessRow.add( materialClearCoatRoughness );
+	materialClearcoatRoughnessRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoatroughness' ) ).setWidth( '90px' ) );
+	materialClearcoatRoughnessRow.add( materialClearcoatRoughness );
 
-	container.add( materialClearCoatRoughnessRow );
+	container.add( materialClearcoatRoughnessRow );
 
 	// vertex colors
 
@@ -353,19 +353,19 @@ Sidebar.Material = function ( editor ) {
 
 	// clearcoat normal map
 
-	var materialClearCoatNormalMapRow = new UI.Row();
-	var materialClearCoatNormalMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialClearCoatNormalMap = new UI.Texture().onChange( update );
-	var materialClearCoatNormalScaleX = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
-	var materialClearCoatNormalScaleY = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
+	var materialClearcoatNormalMapRow = new UI.Row();
+	var materialClearcoatNormalMapEnabled = new UI.Checkbox( false ).onChange( update );
+	var materialClearcoatNormalMap = new UI.Texture().onChange( update );
+	var materialClearcoatNormalScaleX = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
+	var materialClearcoatNormalScaleY = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
 
-	materialClearCoatNormalMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoatnormalmap' ) ).setWidth( '90px' ) );
-	materialClearCoatNormalMapRow.add( materialClearCoatNormalMapEnabled );
-	materialClearCoatNormalMapRow.add( materialClearCoatNormalMap );
-	materialClearCoatNormalMapRow.add( materialClearCoatNormalScaleX );
-	materialClearCoatNormalMapRow.add( materialClearCoatNormalScaleY );
+	materialClearcoatNormalMapRow.add( new UI.Text( strings.getKey( 'sidebar/material/clearcoatnormalmap' ) ).setWidth( '90px' ) );
+	materialClearcoatNormalMapRow.add( materialClearcoatNormalMapEnabled );
+	materialClearcoatNormalMapRow.add( materialClearcoatNormalMap );
+	materialClearcoatNormalMapRow.add( materialClearcoatNormalScaleX );
+	materialClearcoatNormalMapRow.add( materialClearcoatNormalScaleY );
 
-	container.add( materialClearCoatNormalMapRow );
+	container.add( materialClearcoatNormalMapRow );
 
 	// displacement map
 
@@ -654,15 +654,15 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.clearCoat !== undefined && Math.abs( material.clearCoat - materialClearCoat.getValue() ) >= 0.01 ) {
+			if ( material.clearcoat !== undefined && Math.abs( material.clearcoat - materialClearcoat.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearCoat', materialClearCoat.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearcoat', materialClearcoat.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.clearCoatRoughness !== undefined && Math.abs( material.clearCoatRoughness - materialClearCoatRoughness.getValue() ) >= 0.01 ) {
+			if ( material.clearcoatRoughness !== undefined && Math.abs( material.clearcoatRoughness - materialClearcoatRoughness.getValue() ) >= 0.01 ) {
 
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearCoatRoughness', materialClearCoatRoughness.getValue(), currentMaterialSlot ) );
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearcoatRoughness', materialClearcoatRoughness.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -817,34 +817,34 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material.clearCoatNormalMap !== undefined ) {
+			if ( material.clearcoatNormalMap !== undefined ) {
 
-				var clearCoatNormalMapEnabled = materialClearCoatNormalMapEnabled.getValue() === true;
+				var clearcoatNormalMapEnabled = materialClearcoatNormalMapEnabled.getValue() === true;
 
 				if ( objectHasUvs ) {
 
-					var clearCoatNormalMap = clearCoatNormalMapEnabled ? materialClearCoatNormalMap.getValue() : null;
+					var clearcoatNormalMap = clearcoatNormalMapEnabled ? materialClearcoatNormalMap.getValue() : null;
 
-					if ( material.clearCoatNormalMap !== clearCoatNormalMap ) {
+					if ( material.clearcoatNormalMap !== clearcoatNormalMap ) {
 
-						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'clearCoatNormalMap', clearCoatNormalMap, currentMaterialSlot ) );
+						editor.execute( new SetMaterialMapCommand( editor, currentObject, 'clearcoatNormalMap', clearcoatNormalMap, currentMaterialSlot ) );
 
 					}
 
-					if ( material.clearCoatNormalScale.x !== materialClearCoatNormalScaleX.getValue() ||
-						material.clearCoatNormalScale.y !== materialClearCoatNormalScaleY.getValue() ) {
+					if ( material.clearcoatNormalScale.x !== materialClearcoatNormalScaleX.getValue() ||
+						material.clearcoatNormalScale.y !== materialClearcoatNormalScaleY.getValue() ) {
 
 						var value = [
-							materialClearCoatNormalScaleX.getValue(),
-							materialClearCoatNormalScaleY.getValue()
+							materialClearcoatNormalScaleX.getValue(),
+							materialClearcoatNormalScaleY.getValue()
 						];
-						editor.execute( new SetMaterialVectorCommand( editor, currentObject, 'clearCoatNormalScale', value, currentMaterialSlot ) );
+						editor.execute( new SetMaterialVectorCommand( editor, currentObject, 'clearcoatNormalScale', value, currentMaterialSlot ) );
 
 					}
 
 				} else {
 
-					if ( clearCoatNormalMapEnabled ) textureWarning = true;
+					if ( clearcoatNormalMapEnabled ) textureWarning = true;
 
 				}
 
@@ -1159,8 +1159,8 @@ Sidebar.Material = function ( editor ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
-			'clearCoat': materialClearCoatRow,
-			'clearCoatRoughness': materialClearCoatRoughnessRow,
+			'clearcoat': materialClearcoatRow,
+			'clearcoatRoughness': materialClearcoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
 			'depthPacking': materialDepthPackingRow,
@@ -1287,15 +1287,15 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-		if ( material.clearCoat !== undefined ) {
+		if ( material.clearcoat !== undefined ) {
 
-			materialClearCoat.setValue( material.clearCoat );
+			materialClearcoat.setValue( material.clearcoat );
 
 		}
 
-		if ( material.clearCoatRoughness !== undefined ) {
+		if ( material.clearcoatRoughness !== undefined ) {
 
-			materialClearCoatRoughness.setValue( material.clearCoatRoughness );
+			materialClearcoatRoughness.setValue( material.clearcoatRoughness );
 
 		}
 
@@ -1382,18 +1382,18 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
-		if ( material.clearCoatNormalMap !== undefined ) {
+		if ( material.clearcoatNormalMap !== undefined ) {
 
-			materialClearCoatNormalMapEnabled.setValue( material.clearCoatNormalMap !== null );
+			materialClearcoatNormalMapEnabled.setValue( material.clearcoatNormalMap !== null );
 
-			if ( material.clearCoatNormalMap !== null || resetTextureSelectors ) {
+			if ( material.clearcoatNormalMap !== null || resetTextureSelectors ) {
 
-				materialClearCoatNormalMap.setValue( material.clearCoatNormalMap );
+				materialClearcoatNormalMap.setValue( material.clearcoatNormalMap );
 
 			}
 
-			materialClearCoatNormalScaleX.setValue( material.clearCoatNormalScale.x );
-			materialClearCoatNormalScaleY.setValue( material.clearCoatNormalScale.y );
+			materialClearcoatNormalScaleX.setValue( material.clearcoatNormalScale.x );
+			materialClearcoatNormalScaleY.setValue( material.clearcoatNormalScale.y );
 
 		}
 

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, ObjectSpaceNormalMap } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping } from '../../constants.js';
 import { WebGLProgram } from './WebGLProgram.js';
 
 function WebGLPrograms( renderer, extensions, capabilities ) {
@@ -29,7 +29,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
-		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "clearCoatNormalMap", "displacementMap", "specularMap",
+		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap", "gradientMap",
 		"alphaMap", "combine", "vertexColors", "vertexTangents", "fog", "useFog", "fogExp2",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
@@ -37,7 +37,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering"
+		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
+		"sheen"
 	];
 
 
@@ -153,7 +154,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
-			clearCoatNormalMap: !! material.clearCoatNormalMap,
+			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
+			clearcoatNormalMap: !! material.clearcoatNormalMap,
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
 			metalnessMap: !! material.metalnessMap,
@@ -162,11 +164,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			gradientMap: !! material.gradientMap,
 
+			sheen: !! material.sheen,
+
 			combine: material.combine,
 
 			vertexTangents: ( material.normalMap && material.vertexTangents ),
 			vertexColors: material.vertexColors,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearCoatNormalMap,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap,
 
 			fog: !! fog,
 			useFog: material.fog,
@@ -201,10 +205,10 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			dithering: material.dithering,
 
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && shadows.length > 0,
+			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
-			toneMapping: renderer.toneMapping,
+			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
 			physicallyCorrectLights: renderer.physicallyCorrectLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,

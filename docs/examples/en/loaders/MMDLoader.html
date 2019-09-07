@@ -9,6 +9,7 @@
 	</head>
 	<body>
 		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc"> A loader for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
@@ -66,9 +67,10 @@
 		</p>
 
 		<h2>Properties</h2>
-
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -84,7 +86,7 @@
 		<h3>[method:null loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).If two or more files are specified, they'll be merged.<br />
-		[page:Object3D object] — [page:SkinnedMesh] or [page:Camera]. Clip and its tacks will be fitting to this object.<br />
+		[page:Object3D object] — [page:SkinnedMesh] or [page:Camera]. Clip and its tracks will be fitting to this object.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
@@ -105,11 +107,6 @@
 		Begin loading PMD/PMX model file and VMD motion file(s) from urls and fire the callback function with an [page:Object] containing parsed [page:SkinnedMesh] and [page:AnimationClip] fitting to the [page:SkinnedMesh].
 		</p>
 
-		<h3>[method:MMDLoader setCrossOrigin]( [param:String crossOrigin] )</h3>
-		<p>
-		[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
-		</p>
-
 		<h3>[method:MMDLoader setAnimationPath]( [param:String animationPath] )</h3>
 		<p>
 		[page:String animationPath] — Base path for loading animation data (VMD/VPD files).
@@ -118,24 +115,10 @@
 		Set the base path for additional resources like textures.
 		</p>
 
-		<h3>[method:MMDLoader setPath]( [param:String path] )</h3>
-		<p>
-		[page:String path] — Base path.
-		</p>
-		<p>
-		Sets the base path or URL from which to load files.
-		</p>
-
-		<h3>[method:MMDLoader setResourcePath]( [param:String resourcePath] )</h3>
-		<p>
-		[page:String resourcePath] — Base path for loading additional resources e.g. textures.
-		</p>
-		<p>
-		Set the base path for additional resources like textures.
-		</p>
-
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/MMDLoader.js examples/js/loaders/MMDLoader.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/MMDLoader.js examples/js/loaders/MMDLoader.js]
+		</p>
 	</body>
 </html>

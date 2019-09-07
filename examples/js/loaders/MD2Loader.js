@@ -4,11 +4,11 @@
 
 THREE.MD2Loader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.MD2Loader.prototype = {
+THREE.MD2Loader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.MD2Loader,
 
@@ -24,13 +24,6 @@ THREE.MD2Loader.prototype = {
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -384,4 +377,4 @@ THREE.MD2Loader.prototype = {
 
 	} )()
 
-};
+} );

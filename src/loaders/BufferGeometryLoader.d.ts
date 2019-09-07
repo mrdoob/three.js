@@ -1,11 +1,10 @@
+import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 import { BufferGeometry } from './../core/BufferGeometry';
 
-export class BufferGeometryLoader {
+export class BufferGeometryLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-
-	manager: LoadingManager;
 
 	load(
 		url: string,

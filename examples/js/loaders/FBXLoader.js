@@ -27,21 +27,19 @@ THREE.FBXLoader = ( function () {
 
 	function FBXLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 	}
 
-	FBXLoader.prototype = {
+	FBXLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: FBXLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var self = this;
 
-			var path = ( self.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : self.path;
+			var path = ( self.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : self.path;
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( self.path );
@@ -66,27 +64,6 @@ THREE.FBXLoader = ( function () {
 				}
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -120,16 +97,17 @@ THREE.FBXLoader = ( function () {
 
 			var textureLoader = new THREE.TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-			return new FBXTreeParser( textureLoader ).parse( fbxTree );
+			return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
 		}
 
-	};
+	} );
 
 	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a THREE.Group
-	function FBXTreeParser( textureLoader ) {
+	function FBXTreeParser( textureLoader, manager ) {
 
 		this.textureLoader = textureLoader;
+		this.manager = manager;
 
 	}
 
@@ -288,7 +266,7 @@ THREE.FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( THREE.Loader.Handlers.get( '.tga' ) === null ) {
+					if ( this.manager.getHandler( '.tga' ) === null ) {
 
 						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
@@ -401,7 +379,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( extension === 'tga' ) {
 
-				var loader = THREE.Loader.Handlers.get( '.tga' );
+				var loader = this.manager.getHandler( '.tga' );
 
 				if ( loader === null ) {
 

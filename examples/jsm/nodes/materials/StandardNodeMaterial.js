@@ -25,8 +25,9 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'roughness',
 	'metalness',
 	'reflectivity',
-	'clearCoat',
-	'clearCoatRoughness',
+	'clearcoat',
+	'clearcoatRoughness',
+	'clearcoatNormal',
 	'normal',
 	'emissive',
 	'ambient',
@@ -35,7 +36,8 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'ao',
 	'environment',
 	'mask',
-	'position'
+	'position',
+	'sheen'
 ] );
 
 export { StandardNodeMaterial };

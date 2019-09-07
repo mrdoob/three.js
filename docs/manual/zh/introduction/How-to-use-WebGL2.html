@@ -46,9 +46,14 @@ if ( WEBGL.isWebGL2Available() === false ) {
 		最终，three.js将在内部使用所给定的绘图环境来渲染，并自动将内置的材质的着色器代码转化为GLSL ES 3.00。
 	</p>
 
+	<p>
+		由于你是手动创建WebGL 2渲染上下文，因此还必须传入所有必需的上下文属性。
+		请注意：在上下文被创建后，将无法修改这些属性，因此将它们传递给WebGLRenderer将不会产生任何影响。
+	</p>
+
 	<code>
 var canvas = document.createElement( 'canvas' );
-var context = canvas.getContext( 'webgl2' );
+var context = canvas.getContext( 'webgl2', { alpha: false } );
 var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 	</code>
 

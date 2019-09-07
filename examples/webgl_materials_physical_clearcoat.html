@@ -2,25 +2,15 @@
 <html lang="en">
 
 <head>
-	<title>three.js webgl - materials - clearcoat normal</title>
+	<title>three.js webgl - materials - clearcoat</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
-	<style>
-		#vt {
-			display: none
-		}
-
-		#vt,
-		#vt a {
-			color: orange;
-		}
-	</style>
 </head>
 
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - materials - clearcoat normal map<br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - materials - clearcoat
 	</div>
 
 	<script type="module">
@@ -76,6 +66,7 @@
 						var textureLoader = new THREE.TextureLoader();
 
 						var diffuse = textureLoader.load( "textures/carbon/Carbon.png" );
+						diffuse.encoding = THREE.sRGBEncoding;
 						diffuse.wrapS = THREE.RepeatWrapping;
 						diffuse.wrapT = THREE.RepeatWrapping;
 						diffuse.repeat.x = 10;
@@ -87,14 +78,28 @@
 
 						var normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
 
-						var clearCoatNormaMap = textureLoader.load( "textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png" );
+						var normalMap3 = textureLoader.load( "textures/flakes.png" );
+						normalMap3.wrapS = THREE.RepeatWrapping;
+						normalMap3.wrapT = THREE.RepeatWrapping;
+						normalMap3.repeat.x = 10;
+						normalMap3.repeat.y = 10;
+						normalMap3.anisotropy = 16;
 
-						//
+						var normalMap4 = textureLoader.load( "textures/golfball.jpg" );
+
+						var clearcoatNormaMap = textureLoader.load( "textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png" );
+
+						// car paint
 
 						var material = new THREE.MeshPhysicalMaterial( {
-							clearCoat: 1.0,
+							clearcoat: 1.0,
+							clearcoatRoughness: 0.1,
+							metalness: 0.9,
+							roughness: 0.5,
+							color: 0x0000ff,
 							envMap: hdrCubeRenderTarget.texture,
-							map: diffuse
+							normalMap: normalMap3,
+							normalScale: new THREE.Vector2( 0.1, 0.1 )
 						} );
 
 						var mesh = new THREE.Mesh( geometry, material );
@@ -102,10 +107,11 @@
 						mesh.position.y = 100;
 						group.add( mesh );
 
-						// normalmap
+						// fibers
 
 						var material = new THREE.MeshPhysicalMaterial( {
-							clearCoat: 1.0,
+							clearcoat: 1.0,
+							clearcoatRoughness: 0.1,
 							envMap: hdrCubeRenderTarget.texture,
 							map: diffuse,
 							normalMap: normalMap
@@ -115,15 +121,16 @@
 						mesh.position.y = 100;
 						group.add( mesh );
 
-						// clearcoat
+						// golf
 
 						var material = new THREE.MeshPhysicalMaterial( {
-							clearCoat: 1.0,
 							metalness: 0.0,
-							color: 0xff0000,
+							roughness: 0.1,
+							clearcoat: 1.0,
+							normalMap: normalMap4,
 							envMap: hdrCubeRenderTarget.texture,
-							clearCoatNormalMap: clearCoatNormaMap,
-							clearCoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
+							clearcoatNormalMap: clearcoatNormaMap,
+							clearcoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = - 100;
@@ -133,14 +140,14 @@
 						// clearcoat + normalmap
 
 						var material = new THREE.MeshPhysicalMaterial( {
-							clearCoat: 1.0,
+							clearcoat: 1.0,
 							metalness: 1.0,
 							color: 0xff0000,
 							envMap: hdrCubeRenderTarget.texture,
 							normalMap: normalMap2,
 							normalScale: new THREE.Vector2( 0.15, 0.15 ),
-							clearCoatNormalMap: clearCoatNormaMap,
-							clearCoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
+							clearcoatNormalMap: clearcoatNormaMap,
+							clearcoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
 						} );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.x = 100;
@@ -168,7 +175,7 @@
 			);
 			scene.add( particleLight );
 
-			particleLight.add( new THREE.PointLight( 0xffffff, 1.25 ) );
+			particleLight.add( new THREE.PointLight( 0xffffff, 1 ) );
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -177,7 +184,11 @@
 
 			//
 
-			renderer.gammaInput = true;
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+
+			//
+
 			renderer.gammaOutput = true;
 
 			//

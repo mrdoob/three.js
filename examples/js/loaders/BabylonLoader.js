@@ -5,11 +5,11 @@
 
 THREE.BabylonLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.BabylonLoader.prototype = {
+THREE.BabylonLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.BabylonLoader,
 
@@ -24,13 +24,6 @@ THREE.BabylonLoader.prototype = {
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -252,4 +245,4 @@ THREE.BabylonLoader.prototype = {
 
 	}
 
-};
+} );

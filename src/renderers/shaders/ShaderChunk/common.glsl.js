@@ -8,7 +8,7 @@ export default /* glsl */`
 #define EPSILON 1e-6
 
 #define saturate(a) clamp( a, 0.0, 1.0 )
-#define whiteCompliment(a) ( 1.0 - saturate( a ) )
+#define whiteComplement(a) ( 1.0 - saturate( a ) )
 
 float pow2( const in float x ) { return x*x; }
 float pow3( const in float x ) { return x*x*x; }
@@ -21,6 +21,16 @@ highp float rand( const in vec2 uv ) {
 	highp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );
 	return fract(sin(sn) * c);
 }
+
+#ifdef HIGH_PRECISION
+	float precisionSafeLength( vec3 v ) { return length( v ); }
+#else
+	float max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }
+	float precisionSafeLength( vec3 v ) {
+		float maxComponent = max3( abs( v ) );
+		return length( v / maxComponent ) * maxComponent;
+	}
+#endif
 
 struct IncidentLight {
 	vec3 color;
@@ -39,7 +49,9 @@ struct GeometricContext {
 	vec3 position;
 	vec3 normal;
 	vec3 viewDir;
-	vec3 clearCoatNormal;
+#ifdef CLEARCOAT
+	vec3 clearcoatNormal;
+#endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {

@@ -1792,6 +1792,13 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( refreshMaterial || materialProperties.receiveShadow !== object.receiveShadow ) {
+
+			materialProperties.receiveShadow = object.receiveShadow;
+			p_uniforms.setValue( _gl, 'receiveShadow', object.receiveShadow );
+
+		}
+
 		if ( refreshMaterial ) {
 
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
@@ -2269,21 +2276,24 @@ function WebGLRenderer( parameters ) {
 
 		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
-		uniforms.clearCoat.value = material.clearCoat;
-		uniforms.clearCoatRoughness.value = material.clearCoatRoughness;
+		uniforms.clearcoat.value = material.clearcoat;
+		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
+		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
 
-		if ( material.clearCoatNormalMap ) {
+		if ( material.clearcoatNormalMap ) {
 
-			uniforms.clearCoatNormalScale.value.copy( material.clearCoatNormalScale );
-			uniforms.clearCoatNormalMap.value = material.clearCoatNormalMap;
+			uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
+			uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
 
 			if ( material.side === BackSide ) {
 
-				uniforms.clearCoatNormalScale.value.negate();
+				uniforms.clearcoatNormalScale.value.negate();
 
 			}
 
 		}
+
+		uniforms.transparency.value = material.transparency;
 
 	}
 

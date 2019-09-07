@@ -45,11 +45,12 @@ import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
 import { ImageLoader } from './ImageLoader.js';
-import { LoadingManager, DefaultLoadingManager } from './LoadingManager.js';
+import { LoadingManager } from './LoadingManager.js';
 import { AnimationClip } from '../animation/AnimationClip.js';
 import { MaterialLoader } from './MaterialLoader.js';
 import { LoaderUtils } from './LoaderUtils.js';
 import { BufferGeometryLoader } from './BufferGeometryLoader.js';
+import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
@@ -60,20 +61,19 @@ import * as Curves from '../extras/curves/Curves.js';
 
 function ObjectLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-	this.resourcePath = '';
+	Loader.call( this, manager );
 
 }
 
-Object.assign( ObjectLoader.prototype, {
+ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-	crossOrigin: 'anonymous',
+	constructor: ObjectLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
 		var loader = new FileLoader( scope.manager );
@@ -108,27 +108,6 @@ Object.assign( ObjectLoader.prototype, {
 			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 

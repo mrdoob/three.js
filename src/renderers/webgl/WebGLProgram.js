@@ -5,7 +5,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
 
 var programIdCount = 0;
 
@@ -120,7 +120,7 @@ function generateExtensions( extensions, parameters, rendererExtensions ) {
 	extensions = extensions || {};
 
 	var chunks = [
-		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || ( parameters.normalMap && ! parameters.objectSpaceNormalMap ) || parameters.clearCoatNormalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+		( extensions.derivatives || parameters.envMapCubeUV || parameters.bumpMap || parameters.tangentSpaceNormalMap || parameters.clearcoatNormalMap || parameters.flatShading ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 		( extensions.fragDepth || parameters.logarithmicDepthBuffer ) && rendererExtensions.get( 'EXT_frag_depth' ) ? '#extension GL_EXT_frag_depth : enable' : '',
 		( extensions.drawBuffers ) && rendererExtensions.get( 'WEBGL_draw_buffers' ) ? '#extension GL_EXT_draw_buffers : require' : '',
 		( extensions.shaderTextureLOD || parameters.envMap ) && rendererExtensions.get( 'EXT_shader_texture_lod' ) ? '#extension GL_EXT_shader_texture_lod : enable' : ''
@@ -262,6 +262,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF_SOFT';
 
+	} else if ( parameters.shadowMapType === VSMShadowMap ) {
+
+		shadowMapTypeDefine = 'SHADOWMAP_TYPE_VSM';
+
 	}
 
 	var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
@@ -370,6 +374,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
 
+			( parameters.precision === 'highp' ) ? '#define HIGH_PRECISION' : '',
+
 			'#define SHADER_NAME ' + shader.name,
 
 			customDefines,
@@ -391,7 +397,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 			parameters.normalMap ? '#define USE_NORMALMAP' : '',
 			( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
-			parameters.clearCoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
+			( parameters.normalMap && parameters.tangentSpaceNormalMap ) ? '#define TANGENTSPACE_NORMALMAP' : '',
+
+			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
 			parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
@@ -486,6 +494,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'precision ' + parameters.precision + ' float;',
 			'precision ' + parameters.precision + ' int;',
 
+			( parameters.precision === 'highp' ) ? '#define HIGH_PRECISION' : '',
+
 			'#define SHADER_NAME ' + shader.name,
 
 			customDefines,
@@ -509,11 +519,14 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 			parameters.normalMap ? '#define USE_NORMALMAP' : '',
 			( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
-			parameters.clearCoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
+			( parameters.normalMap && parameters.tangentSpaceNormalMap ) ? '#define TANGENTSPACE_NORMALMAP' : '',
+			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
+
+			parameters.sheen ? '#define USE_SHEEN' : '',
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
