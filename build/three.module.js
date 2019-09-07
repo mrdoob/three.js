@@ -8452,6 +8452,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
+		if ( this.sheen && this.sheen.isColor ) data.sheen = this.sheen.getHex();
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
 		if ( this.emissiveIntensity && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
@@ -32035,7 +32036,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	this.clearcoat = source.clearcoat;
 	this.clearcoatRoughness = source.clearcoatRoughness;
-
+	
 	if ( source.sheen ) this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
 	else this.sheen = null;
 
@@ -34468,6 +34469,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	var itemsLoaded = 0;
 	var itemsTotal = 0;
 	var urlModifier = undefined;
+	var handlers = [];
 
 	// Refer to #5689 for the reason why we don't set .onStart
 	// in the constructor
@@ -34544,7 +34546,49 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	this.setURLModifier = function ( transform ) {
 
 		urlModifier = transform;
+
 		return this;
+
+	};
+
+	this.addHandler = function ( regex, loader ) {
+
+		handlers.push( regex, loader );
+
+		return this;
+
+	};
+
+	this.removeHandler = function ( regex ) {
+
+		var index = handlers.indexOf( regex );
+
+		if ( index !== - 1 ) {
+
+			handlers.splice( index, 2 );
+
+		}
+
+		return this;
+
+	};
+
+	this.getHandler = function ( file ) {
+
+		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
+
+			var regex = handlers[ i ];
+			var loader = handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
 
 	};
 
@@ -34594,41 +34638,6 @@ Object.assign( Loader.prototype, {
 	}
 
 } );
-
-//
-
-Loader.Handlers = {
-
-	handlers: [],
-
-	add: function ( regex, loader ) {
-
-		this.handlers.push( regex, loader );
-
-	},
-
-	get: function ( file ) {
-
-		var handlers = this.handlers;
-
-		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
-
-			var regex = handlers[ i ];
-			var loader = handlers[ i + 1 ];
-
-			if ( regex.test( file ) ) {
-
-				return loader;
-
-			}
-
-		}
-
-		return null;
-
-	}
-
-};
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -38181,6 +38190,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.color !== undefined ) material.color.setHex( json.color );
 		if ( json.roughness !== undefined ) material.roughness = json.roughness;
 		if ( json.metalness !== undefined ) material.metalness = json.metalness;
+		if ( json.sheen !== undefined ) material.sheen = (new Color()).setHex( json.sheen );
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
@@ -46970,6 +46980,22 @@ Object.assign( Loader.prototype, {
 	}
 
 } );
+
+Loader.Handlers = {
+
+	add: function ( /* regex, loader */ ) {
+
+		console.error( 'THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.' );
+
+	},
+
+	get: function ( /* file */ ) {
+
+		console.error( 'THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.' );
+
+	}
+
+};
 
 function XHRLoader( manager ) {
 
