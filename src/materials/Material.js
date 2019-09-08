@@ -52,14 +52,14 @@ function Material() {
 
 	Object.defineProperty( this, 'stencilMask', {
 
-		set: function( value ) {
+		set: function ( value ) {
 
 			console.warn( 'Material.stencilMask has been removed. Use Material.stencilFuncMask instead.' );
 			this.stencilFuncMask = value;
 
 		},
 
-		get: function() {
+		get: function () {
 
 			console.warn( 'Material.stencilMask has been removed. Use Material.stencilFuncMask instead.' );
 			return this.stencilFuncMask;
