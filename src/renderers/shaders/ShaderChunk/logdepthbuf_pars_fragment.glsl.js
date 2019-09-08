@@ -3,7 +3,7 @@ export default /* glsl */`
 
 	uniform float logDepthBufFC;
 	varying float vFragDepth;
-	varying float skipLogDepth;
+	varying float vIsPerspective;
 
 #endif
 `;

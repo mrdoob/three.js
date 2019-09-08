@@ -4,7 +4,7 @@ export default /* glsl */`
 	#ifdef USE_LOGDEPTHBUF_EXT
 
 		vFragDepth = 1.0 + gl_Position.w;
-		skipLogDepth = isPerspectiveMatrix( projectionMatrix ) ? 0.0 : 1.0;
+		vIsPerspective = float( isPerspectiveMatrix( projectionMatrix ) );
 
 	#else
 
