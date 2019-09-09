@@ -44,10 +44,6 @@
 		</div>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<script id="vertexShader1" type="x-shader/x-vertex">#version 300 es
 
 			uniform ViewData {
@@ -163,13 +159,9 @@
 		</script>
 
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGL2Available() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer, clock;
 
