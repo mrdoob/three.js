@@ -6,7 +6,8 @@ import {
 	Color,
 	LightProbe,
 	SphericalHarmonics3,
-	Vector3
+	Vector3,
+	sRGBEncoding
 } from "../../../build/three.module.js";
 
 var LightProbeGenerator = {
@@ -57,7 +58,7 @@ var LightProbeGenerator = {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				color.copySRGBToLinear( color );
+				convertColorToLinear( color, cubeTexture.encoding );
 
 				// pixel coordinate on unit cube
 
@@ -125,7 +126,7 @@ var LightProbeGenerator = {
 
 	},
 
-	fromCubeRenderTarget: function ( renderer, renderTarget ) {
+	fromRenderTargetCube: function ( renderer, renderTargetCube ) {
 		
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		var norm, lengthSq, weight, totalWeight = 0;
@@ -143,9 +144,9 @@ var LightProbeGenerator = {
 
 		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
-			var imageWidth = renderTarget.width; // assumed to be square
+			var imageWidth = renderTargetCube.width; // assumed to be square
 			var data = new Uint8Array( imageWidth * imageWidth * 4 );
-			renderer.readRenderTargetPixels( renderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
+			renderer.readRenderTargetPixels( renderTargetCube, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			var pixelSize = 2 / imageWidth;
 
@@ -153,12 +154,11 @@ var LightProbeGenerator = {
 
 				// pixel color
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
-				// pixel coordinate on unit cube
 
-				if (renderer.gammaOutput) {
-					// convert to linear color space
-					color.copyGammaToLinear( color, renderer.gammaFactor );
-				}
+				// convert to linear color space
+				convertColorToLinear( color, renderTargetCube.encoding );
+
+				// pixel coordinate on unit cube
 
 				var pixelIndex = i / 4;
 
@@ -223,6 +223,26 @@ var LightProbeGenerator = {
 		return new LightProbe( sh );
 
 	}
+
+};
+
+var convertColorToLinear = function ( color, encoding ) {
+
+	switch ( encoding ) {
+
+		case sRGBEncoding:
+
+			color.convertSRGBToLinear();
+			break;
+
+		default:
+
+			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported encoding.' );
+			break;
+
+	}
+
+	return color;
 
 };
 
