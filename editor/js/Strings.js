@@ -225,6 +225,7 @@ var Strings = function ( config ) {
 			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
 			'sidebar/material/metalness': 'Metalness',
+			'sidebar/material/sheen': 'Sheen',
 			'sidebar/material/emissive': 'Emissive',
 			'sidebar/material/specular': 'Specular',
 			'sidebar/material/shininess': 'Shininess',
