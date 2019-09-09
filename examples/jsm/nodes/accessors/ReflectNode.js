@@ -71,12 +71,12 @@ export class ReflectNode extends TempNode {
 
 						method = `reflect( ${viewPosition}, ${viewNormal} )`;
 
-					}
+						if ( roughness ) {
 
-					if ( roughness ) {
+							// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+							method = `normalize( mix( ${method}, ${viewNormal}, ${roughness} * ${roughness} ) )`;
 
-						// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-						method = `normalize( mix( ${method}, ${viewNormal}, ${roughness} * ${roughness} ) )`;
+						}
 
 					}
 
