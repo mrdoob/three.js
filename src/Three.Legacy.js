@@ -19,6 +19,7 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
+import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
@@ -1228,6 +1229,27 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 		}
 	}
+
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
+
+	setArray: function ( array ) {
+
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecatted. Use BufferGeometry.setAttribute to replace/resize attribute buffers' );
+
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
+
+		return this;
+
+	},
 
 } );
 
