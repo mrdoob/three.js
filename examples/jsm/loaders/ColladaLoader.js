@@ -10,7 +10,6 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	DefaultLoadingManager,
 	DirectionalLight,
 	DoubleSide,
 	Euler,
@@ -20,6 +19,7 @@ import {
 	Line,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	LoaderUtils,
 	Math as _Math,
 	Matrix4,
@@ -45,21 +45,19 @@ import { TGALoader } from "../loaders/TGALoader.js";
 
 var ColladaLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-ColladaLoader.prototype = {
+ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: ColladaLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
@@ -71,20 +69,6 @@ ColladaLoader.prototype = {
 
 	},
 
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
 	options: {
 
 		set convertUpAxis( value ) {
@@ -92,13 +76,6 @@ ColladaLoader.prototype = {
 			console.warn( 'THREE.ColladaLoader: options.convertUpAxis() has been removed. Up axis is converted automatically.' );
 
 		}
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -4008,6 +3985,6 @@ ColladaLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { ColladaLoader };

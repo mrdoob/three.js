@@ -7,12 +7,13 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - panorama demo. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
 			var target = new THREE.Vector3();
@@ -72,14 +73,14 @@
 					element.width = 1026; // 2 pixels extra to close the gap.
 					element.src = side.url;
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new CSS3DObject( element );
 					object.position.fromArray( side.position );
 					object.rotation.fromArray( side.rotation );
 					scene.add( object );
 
 				}
 
-				renderer = new THREE.CSS3DRenderer();
+				renderer = new CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

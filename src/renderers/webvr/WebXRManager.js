@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -10,9 +11,9 @@ import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { setProjectionFromUnion } from './WebVRUtils.js';
 
-function WebXRManager( renderer ) {
+function WebXRManager( renderer, gl ) {
 
-	var gl = renderer.context;
+	var scope = this;
 
 	var session = null;
 
@@ -90,6 +91,8 @@ function WebXRManager( renderer ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
+		scope.dispatchEvent( { type: 'sessionend' } );
+
 	}
 
 	function onRequestReferenceSpace( value ) {
@@ -98,6 +101,8 @@ function WebXRManager( renderer ) {
 
 		animation.setContext( session );
 		animation.start();
+
+		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
@@ -110,6 +115,12 @@ function WebXRManager( renderer ) {
 	this.setReferenceSpaceType = function ( value ) {
 
 		referenceSpaceType = value;
+
+	};
+
+	this.getSession = function () {
+
+		return session;
 
 	};
 
@@ -314,5 +325,7 @@ function WebXRManager( renderer ) {
 	this.submitFrame = function () {};
 
 }
+
+Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
 
 export { WebXRManager };

@@ -14,20 +14,13 @@
 			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/PLYLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
 			var container, stats;
 
@@ -99,7 +92,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var loader = new THREE.PLYLoader();
+				var loader = new PLYLoader();
 				loader.load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
 					createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 );

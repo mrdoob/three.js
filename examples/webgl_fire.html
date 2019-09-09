@@ -5,13 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/objects/Fire.js"></script>
-
 	</head>
 	<body>
 
@@ -19,13 +12,14 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> fire and smoke demo
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
+			import { Fire } from './jsm/objects/Fire.js';
 
 			var camera, scene, renderer, stats;
 			var fire;
@@ -70,7 +64,7 @@
 				scene.add( camera );
 
 				var plane = new THREE.PlaneBufferGeometry( 20, 20 );
-				fire = new THREE.Fire( plane, {
+				fire = new Fire( plane, {
 					textureWidth: 512,
 					textureHeight: 512,
 					debug: false
@@ -217,7 +211,7 @@
 				};
 
 				// dat.gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, "Single" );
 				gui.add( params, "Multiple" );

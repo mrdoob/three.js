@@ -5,12 +5,12 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	DirectionalLight,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	HemisphereLight,
+	Loader,
 	Mesh,
 	MeshPhongMaterial,
 	PerspectiveCamera,
@@ -21,11 +21,11 @@ import {
 
 var BabylonLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-BabylonLoader.prototype = {
+BabylonLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: BabylonLoader,
 
@@ -40,13 +40,6 @@ BabylonLoader.prototype = {
 			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -268,6 +261,6 @@ BabylonLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { BabylonLoader };

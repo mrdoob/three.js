@@ -26,7 +26,6 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	DefaultLoadingManager,
 	DirectionalLight,
 	EquirectangularReflectionMapping,
 	Euler,
@@ -61,9 +60,10 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	VertexColors
+	VertexColors,
+	sRGBEncoding
 } from "../../../build/three.module.js";
-import { TGALoader } from "../loaders/TGALoader.js";
+import { Zlib } from "../libs/inflate.module.min.js";
 import { NURBSCurve } from "../curves/NURBSCurve.js";
 
 
@@ -75,21 +75,19 @@ var FBXLoader = ( function () {
 
 	function FBXLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	FBXLoader.prototype = {
+	FBXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: FBXLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var self = this;
 
-			var path = ( self.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : self.path;
+			var path = ( self.path === '' ) ? LoaderUtils.extractUrlBase( url ) : self.path;
 
 			var loader = new FileLoader( this.manager );
 			loader.setPath( self.path );
@@ -114,27 +112,6 @@ var FBXLoader = ( function () {
 				}
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -168,16 +145,17 @@ var FBXLoader = ( function () {
 
 			var textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-			return new FBXTreeParser( textureLoader ).parse( fbxTree );
+			return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
 		}
 
-	};
+	} );
 
 	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a Group
-	function FBXTreeParser( textureLoader ) {
+	function FBXTreeParser( textureLoader, manager ) {
 
 		this.textureLoader = textureLoader;
+		this.manager = manager;
 
 	}
 
@@ -336,26 +314,14 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( typeof TGALoader !== 'function' ) {
+					if ( this.manager.getHandler( '.tga' ) === null ) {
 
-						console.warn( 'FBXLoader: TGALoader is required to load TGA textures' );
-						return;
-
-					} else {
-
-						if ( Loader.Handlers.get( '.tga' ) === null ) {
-
-							var tgaLoader = new TGALoader();
-							tgaLoader.setPath( this.textureLoader.path );
-
-							Loader.Handlers.add( /\.tga$/i, tgaLoader );
-
-						}
-
-						type = 'image/tga';
-						break;
+						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
 					}
+
+					type = 'image/tga';
+					break;
 
 				default:
 
@@ -461,11 +427,11 @@ var FBXLoader = ( function () {
 
 			if ( extension === 'tga' ) {
 
-				var loader = Loader.Handlers.get( '.tga' );
+				var loader = this.manager.getHandler( '.tga' );
 
 				if ( loader === null ) {
 
-					console.warn( 'FBXLoader: TGALoader not found, creating empty placeholder texture for', fileName );
+					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
 					texture = new Texture();
 
 				} else {
@@ -476,7 +442,7 @@ var FBXLoader = ( function () {
 
 			} else if ( extension === 'psd' ) {
 
-				console.warn( 'FBXLoader: PSD textures are not supported, creating empty placeholder texture for', fileName );
+				console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
 				texture = new Texture();
 
 			} else {
@@ -657,6 +623,7 @@ var FBXLoader = ( function () {
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
 						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map.encoding = sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
@@ -665,6 +632,7 @@ var FBXLoader = ( function () {
 
 					case 'EmissiveColor':
 						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap.encoding = sRGBEncoding;
 						break;
 
 					case 'NormalMap':
@@ -675,10 +643,12 @@ var FBXLoader = ( function () {
 					case 'ReflectionColor':
 						parameters.envMap = self.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
+						parameters.envMap.encoding = sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
 						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap.encoding = sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
@@ -1601,6 +1571,7 @@ var FBXLoader = ( function () {
 			}
 
 		},
+
 
 		// Parse single node mesh geometry in FBXTree.Objects.Geometry
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {

@@ -33,10 +33,11 @@
 			<button id="export">export to obj</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/exporters/OBJExporter.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OBJExporter } from './jsm/exporters/OBJExporter.js';
 
 			var camera, scene, light, renderer;
 			var exportButton, floatingDiv;
@@ -44,7 +45,7 @@
 
 			function exportToObj() {
 
-				var exporter = new THREE.OBJExporter();
+				var exporter = new OBJExporter();
 				var result = exporter.parse( scene );
 				floatingDiv.style.display = 'block';
 				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );

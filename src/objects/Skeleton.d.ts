@@ -14,8 +14,8 @@ export class Skeleton {
 	constructor( bones: Bone[], boneInverses?: Matrix4[] );
 
 	/**
-   * @deprecated This property has been removed completely.
-   */
+	 * @deprecated This property has been removed completely.
+	 */
 	useVertexTexture: boolean;
 	identityMatrix: Matrix4;
 	bones: Bone[];

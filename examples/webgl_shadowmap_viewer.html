@@ -11,20 +11,14 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - ShadowMapViewer example by <a href="https://github.com/arya-s">arya-s</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
-		<script src="js/utils/ShadowMapViewer.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
 
 			var camera, scene, renderer, clock, stats;
 			var dirLight, spotLight;
@@ -126,14 +120,14 @@
 
 			function initShadowMapViewers() {
 
-				dirLightShadowMapViewer = new THREE.ShadowMapViewer( dirLight );
+				dirLightShadowMapViewer = new ShadowMapViewer( dirLight );
 				dirLightShadowMapViewer.position.x = 10;
 				dirLightShadowMapViewer.position.y = 10;
 				dirLightShadowMapViewer.size.width = 256;
 				dirLightShadowMapViewer.size.height = 256;
 				dirLightShadowMapViewer.update(); //Required when setting position or size directly
 
-				spotLightShadowMapViewer = new THREE.ShadowMapViewer( spotLight );
+				spotLightShadowMapViewer = new ShadowMapViewer( spotLight );
 				spotLightShadowMapViewer.size.set( 256, 256 );
 				spotLightShadowMapViewer.position.set( 276, 10 );
 				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
@@ -149,7 +143,7 @@
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 
 				// Mouse control
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 

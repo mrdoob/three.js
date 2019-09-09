@@ -123,6 +123,41 @@
 		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
 		</p>
 
+		<h3>[property:Boolean stencilWrite]</h3>
+		<p>
+		Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean stencilFunc]</h3>
+		<p>
+		The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Integer stencilRef]</h3>
+		<p>
+		The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+		</p>
+
+		<h3>[property:Boolean stencilMask]</h3>
+		<p>
+		The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+		</p>
+
+		<h3>[property:Integer stencilFail]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns false. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean stencilZFail]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
+		<h3>[property:Boolean stencilZPass]</h3>
+		<p>
+		Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
+		</p>
+
 		<h3>[property:Boolean flatShading]</h3>
 		<p>
 		Define whether the material is rendered with flat shading. Default is false.
@@ -232,13 +267,18 @@
 		Other options are [page:Materials THREE.BackSide] and [page:Materials THREE.DoubleSide].
 		</p>
 
+		<h3>[property:Boolean toneMapped]</h3>
+		<p>
+		Defines whether this material is tone mapped according to the renderer's [page:WebGLRenderer.toneMapping toneMapping] setting. Default is *true*.
+		</p>
+
 		<h3>[property:Boolean transparent]</h3>
 		<p>
 		Defines whether this material is transparent. This has an effect on rendering
 		as transparent objects need special treatment and are rendered after
 		non-transparent objects. <br />
 		When set to true, the extent to which the material is transparent is
-		controlled by setting it's [page:Float opacity] property. <br />
+		controlled by setting its [page:Float opacity] property. <br />
 		Default is *false*.
 		</p>
 
@@ -315,6 +355,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

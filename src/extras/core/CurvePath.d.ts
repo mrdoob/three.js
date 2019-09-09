@@ -20,16 +20,16 @@ export class CurvePath<T extends Vector> extends Curve<T> {
 	getPoints( divisions?: number ): T[];
 
 	/**
-   * @deprecated Use {@link Geometry#setFromPoints new THREE.Geometry().setFromPoints( points )} instead.
-   */
+	 * @deprecated Use {@link Geometry#setFromPoints new THREE.Geometry().setFromPoints( points )} instead.
+	 */
 	createPointsGeometry( divisions: number ): Geometry;
 	/**
-   * @deprecated Use {@link Geometry#setFromPoints new THREE.Geometry().setFromPoints( points )} instead.
-   */
+	 * @deprecated Use {@link Geometry#setFromPoints new THREE.Geometry().setFromPoints( points )} instead.
+	 */
 	createSpacedPointsGeometry( divisions: number ): Geometry;
 	/**
-   * @deprecated Use {@link Geometry#setFromPoints new THREE.Geometry().setFromPoints( points )} instead.
-   */
+	 * @deprecated Use {@link Geometry#setFromPoints new THREE.Geometry().setFromPoints( points )} instead.
+	 */
 	createGeometry( points: T[] ): Geometry;
 
 }

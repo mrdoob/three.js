@@ -1,5 +1,6 @@
 import { Vector4 } from './../math/Vector4';
 import { Texture } from './../textures/Texture';
+import { DepthTexture } from './../textures/DepthTexture';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { Wrapping, TextureFilter, TextureDataType } from '../constants';
 
@@ -14,6 +15,7 @@ export interface WebGLRenderTargetOptions {
 	depthBuffer?: boolean; // true;
 	stencilBuffer?: boolean; // true;
 	generateMipmaps?: boolean; // true;
+	depthTexture?: DepthTexture;
 }
 
 export class WebGLRenderTarget extends EventDispatcher {
@@ -33,46 +35,46 @@ export class WebGLRenderTarget extends EventDispatcher {
 	texture: Texture;
 	depthBuffer: boolean;
 	stencilBuffer: boolean;
-	depthTexture: Texture;
+	depthTexture: DepthTexture;
 	/**
-   * @deprecated Use {@link Texture#wrapS texture.wrapS} instead.
-   */
+	 * @deprecated Use {@link Texture#wrapS texture.wrapS} instead.
+	 */
 	wrapS: any;
 	/**
-   * @deprecated Use {@link Texture#wrapT texture.wrapT} instead.
-   */
+	 * @deprecated Use {@link Texture#wrapT texture.wrapT} instead.
+	 */
 	wrapT: any;
 	/**
-   * @deprecated Use {@link Texture#magFilter texture.magFilter} instead.
-   */
+	 * @deprecated Use {@link Texture#magFilter texture.magFilter} instead.
+	 */
 	magFilter: any;
 	/**
-   * @deprecated Use {@link Texture#minFilter texture.minFilter} instead.
-   */
+	 * @deprecated Use {@link Texture#minFilter texture.minFilter} instead.
+	 */
 	minFilter: any;
 	/**
-   * @deprecated Use {@link Texture#anisotropy texture.anisotropy} instead.
-   */
+	 * @deprecated Use {@link Texture#anisotropy texture.anisotropy} instead.
+	 */
 	anisotropy: any;
 	/**
-   * @deprecated Use {@link Texture#offset texture.offset} instead.
-   */
+	 * @deprecated Use {@link Texture#offset texture.offset} instead.
+	 */
 	offset: any;
 	/**
-   * @deprecated Use {@link Texture#repeat texture.repeat} instead.
-   */
+	 * @deprecated Use {@link Texture#repeat texture.repeat} instead.
+	 */
 	repeat: any;
 	/**
-   * @deprecated Use {@link Texture#format texture.format} instead.
-   */
+	 * @deprecated Use {@link Texture#format texture.format} instead.
+	 */
 	format: any;
 	/**
-   * @deprecated Use {@link Texture#type texture.type} instead.
-   */
+	 * @deprecated Use {@link Texture#type texture.type} instead.
+	 */
 	type: any;
 	/**
-   * @deprecated Use {@link Texture#generateMipmaps texture.generateMipmaps} instead.
-   */
+	 * @deprecated Use {@link Texture#generateMipmaps texture.generateMipmaps} instead.
+	 */
 	generateMipmaps: any;
 
 	setSize( width: number, height: number ): void;

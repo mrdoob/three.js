@@ -21,8 +21,8 @@ export class Frustum {
 	);
 
 	/**
-   * Array of 6 vectors.
-   */
+	 * Array of 6 vectors.
+	 */
 	planes: Plane[];
 
 	set(

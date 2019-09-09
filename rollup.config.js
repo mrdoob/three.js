@@ -1,3 +1,5 @@
+import buble from 'rollup-plugin-buble';
+
 function glconstants() {
 
 	var constants = {
@@ -39,6 +41,7 @@ function glconstants() {
 		SCISSOR_TEST: 3089,
 		UNPACK_ALIGNMENT: 3317,
 		MAX_TEXTURE_SIZE: 3379,
+		DEPTH24_STENCIL8: 35056,
 		TEXTURE_2D: 3553,
 		BYTE: 5120,
 		UNSIGNED_BYTE: 5121,
@@ -194,23 +197,40 @@ function glsl() {
 
 }
 
-export default {
-	input: 'src/Three.js',
-	plugins: [
-		glconstants(),
-		glsl()
-	],
-	output: [
-		{
-			format: 'umd',
-			name: 'THREE',
-			file: 'build/three.js',
-			indent: '\t'
-		},
-		{
-			format: 'es',
-			file: 'build/three.module.js',
-			indent: '\t'
-		}
-	]
-};
+export default [
+	{
+		input: 'src/Three.js',
+		plugins: [
+			glconstants(),
+			glsl(),
+			buble( {
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+			} )
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			glconstants(),
+			glsl()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.js',
+				indent: '\t'
+			}
+		]
+	}
+];

@@ -13,12 +13,14 @@
 		Press "Q" to toggle world/local space, hold down "Ctrl" to snap to grid
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/TransformControls.js"></script>
 		<script src="js/libs/timeliner_gui.min.js"></script>
-		<script src="js/animation/TimelinerController.js"></script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { TimelinerController } from './jsm/animation/TimelinerController.js';
 
 			var camera, scene, renderer, control;
 
@@ -53,7 +55,7 @@
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture } );
 
-				control = new THREE.TransformControls( camera, renderer.domElement );
+				control = new TransformControls( camera, renderer.domElement );
 				control.addEventListener( 'change', render );
 
 				var mesh = new THREE.Mesh( geometry, material );
@@ -136,7 +138,7 @@
 
 				];
 
-				new Timeliner( new THREE.TimelinerController( scene, trackInfo, render ) );
+				new Timeliner( new TimelinerController( scene, trackInfo, render ) );
 
 			}
 

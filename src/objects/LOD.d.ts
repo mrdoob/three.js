@@ -18,8 +18,8 @@ export class LOD extends Object3D {
 	toJSON( meta: any ): any;
 
 	/**
-   * @deprecated Use {@link LOD#levels .levels} instead.
-   */
+	 * @deprecated Use {@link LOD#levels .levels} instead.
+	 */
 	objects: any[];
 
 }

@@ -14,19 +14,13 @@
 			Elf Girl by <a href="https://sketchfab.com/yellow09" target="_blank" rel="noopener">halloween</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/ColladaLoader.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
 
 			var container, stats, clock;
 			var camera, scene, renderer, elf;
@@ -56,7 +50,7 @@
 
 				// collada
 
-				var loader = new THREE.ColladaLoader( loadingManager );
+				var loader = new ColladaLoader( loadingManager );
 				loader.load( './models/collada/elf/elf.dae', function ( collada ) {
 
 					elf = collada.scene;

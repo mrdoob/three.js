@@ -3,11 +3,11 @@
  * Date: 09/12/2013 17:21
  */
 
-( function () {
+THREE.AWDLoader = ( function () {
 
-	var UNCOMPRESSED = 0,
-		DEFLATE = 1,
-		LZMA = 2,
+	var //UNCOMPRESSED = 0,
+		//DEFLATE = 1,
+		//LZMA = 2,
 
 		AWD_FIELD_INT8 = 1,
 		AWD_FIELD_INT16 = 2,
@@ -18,10 +18,10 @@
 		AWD_FIELD_FLOAT32 = 7,
 		AWD_FIELD_FLOAT64 = 8,
 		AWD_FIELD_BOOL = 21,
-		AWD_FIELD_COLOR = 22,
+		//AWD_FIELD_COLOR = 22,
 		AWD_FIELD_BADDR = 23,
-		AWD_FIELD_STRING = 31,
-		AWD_FIELD_BYTEARRAY = 32,
+		//AWD_FIELD_STRING = 31,
+		//AWD_FIELD_BYTEARRAY = 32,
 		AWD_FIELD_VECTOR2x1 = 41,
 		AWD_FIELD_VECTOR3x1 = 42,
 		AWD_FIELD_VECTOR4x1 = 43,
@@ -31,15 +31,15 @@
 		AWD_FIELD_MTX4x4 = 47,
 
 		BOOL = 21,
-		COLOR = 22,
+		//COLOR = 22,
 		BADDR = 23,
 
-		INT8 = 1,
-		INT16 = 2,
-		INT32 = 3,
+		//INT8 = 1,
+		//INT16 = 2,
+		//INT32 = 3,
 		UINT8 = 4,
 		UINT16 = 5,
-		UINT32 = 6,
+		//UINT32 = 6,
 		FLOAT32 = 7,
 		FLOAT64 = 8;
 
@@ -49,6 +49,8 @@
 
 		this.id = 0;
 		this.data = null;
+		this.namespace = 0;
+		this.flags = 0;
 
 	}
 
@@ -76,9 +78,9 @@
 		}
 	};
 
-	THREE.AWDLoader = function ( manager ) {
+	var AWDLoader = function ( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.trunk = new THREE.Object3D();
 
@@ -104,9 +106,9 @@
 
 	};
 
-	THREE.AWDLoader.prototype = {
+	AWDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
-		constructor: THREE.AWDLoader,
+		constructor: AWDLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -123,13 +125,6 @@
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
 
 		},
 
@@ -167,7 +162,7 @@
 		parseNextBlock: function () {
 
 			var assetData,
-				ns, type, len, block,
+				block,
 				blockId = this.readU32(),
 				ns = this.readU8(),
 				type = this.readU8(),
@@ -178,56 +173,48 @@
 			switch ( type ) {
 
 				case 1:
-					assetData = this.parseMeshData( len );
+					assetData = this.parseMeshData();
 					break;
 
 				case 22:
-					assetData = this.parseContainer( len );
+					assetData = this.parseContainer();
 					break;
 
 				case 23:
-					assetData = this.parseMeshInstance( len );
+					assetData = this.parseMeshInstance();
 					break;
 
 				case 81:
-					assetData = this.parseMaterial( len );
+					assetData = this.parseMaterial();
 					break;
 
 				case 82:
-					assetData = this.parseTexture( len );
+					assetData = this.parseTexture();
 					break;
 
 				case 101:
-					assetData = this.parseSkeleton( len );
+					assetData = this.parseSkeleton();
 					break;
 
-	    //  case 111:
-	    //    assetData = this.parseMeshPoseAnimation(len, true);
-	    //    break;
-
 				case 112:
-					assetData = this.parseMeshPoseAnimation( len, false );
+					assetData = this.parseMeshPoseAnimation( false );
 					break;
 
 				case 113:
-					assetData = this.parseVertexAnimationSet( len );
+					assetData = this.parseVertexAnimationSet();
 					break;
 
 				case 102:
-					assetData = this.parseSkeletonPose( len );
+					assetData = this.parseSkeletonPose();
 					break;
 
 				case 103:
-					assetData = this.parseSkeletonAnimation( len );
+					assetData = this.parseSkeletonAnimation();
 					break;
 
 				case 122:
-					assetData = this.parseAnimatorSet( len );
+					assetData = this.parseAnimatorSet();
 					break;
-
-				// case 121:
-				//  assetData = parseUVAnimation(len);
-				//  break;
 
 				default:
 					//debug('Ignoring block!',type, len);
@@ -241,6 +228,8 @@
 			this._blocks[ blockId ] = block = new Block();
 			block.data = assetData;
 			block.id = blockId;
+			block.namespace = ns;
+			block.flags = flags;
 
 
 		},
@@ -279,7 +268,7 @@
 
 		},
 
-		parseContainer: function ( len ) {
+		parseContainer: function () {
 
 			var parent,
 				ctr = new THREE.Object3D(),
@@ -305,7 +294,7 @@
 
 		},
 
-		parseMeshInstance: function ( len ) {
+		parseMeshInstance: function () {
 
 			var name,
 				mesh, geometries, meshLen, meshes,
@@ -379,14 +368,13 @@
 
 		},
 
-		parseMaterial: function ( len ) {
+		parseMaterial: function () {
 
 			var name,
 				type,
 				props,
 				mat,
 				attributes,
-				finalize,
 				num_methods,
 				methods_parsed;
 
@@ -410,7 +398,8 @@
 
 			while ( methods_parsed < num_methods ) {
 
-				var method_type = this.readU16();
+				// read method_type before
+				this.readU16();
 				this.parseProperties( null );
 				this.parseUserAttributes();
 
@@ -449,7 +438,7 @@
 
 		},
 
-		parseTexture: function ( len ) {
+		parseTexture: function () {
 
 			var name = this.readUTF(),
 				type = this.readU8(),
@@ -464,6 +453,8 @@
 				console.log( url );
 
 				asset = this.loadTexture( url );
+				asset.userData = {};
+				asset.userData.name = name;
 
 			} else {
 				// embed texture not supported
@@ -493,11 +484,12 @@
 
 		},
 
-		parseSkeleton: function ( len ) {
+		parseSkeleton: function () {
 
 			// Array<Bone>
-			var name = this.readUTF(),
-				num_joints = this.readU16(),
+			//
+			this.readUTF();
+			var	num_joints = this.readU16(),
 				skeleton = [],
 				joints_parsed = 0;
 
@@ -534,7 +526,7 @@
 
 		},
 
-		parseSkeletonPose: function ( blockID ) {
+		parseSkeletonPose: function () {
 
 			var name = this.readUTF();
 
@@ -548,8 +540,6 @@
 			var joints_parsed = 0;
 
 			while ( joints_parsed < num_joints ) {
-
-				var joint_pose;
 
 				var has_transform; //:uint;
 				var mtx_data;
@@ -577,7 +567,7 @@
 
 		},
 
-		parseSkeletonAnimation: function ( blockID ) {
+		parseSkeletonAnimation: function () {
 
 			var frame_dur;
 			var pose_addr;
@@ -591,7 +581,6 @@
 			this.parseProperties( null );
 
 			var frames_parsed = 0;
-			var returnedArray;
 
 			// debug( 'parse Skeleton Animation. frames : ' + num_frames);
 
@@ -623,7 +612,7 @@
 
 		},
 
-		parseVertexAnimationSet: function ( len ) {
+		parseVertexAnimationSet: function () {
 
 			var poseBlockAdress,
 				name = this.readUTF(),
@@ -647,14 +636,11 @@
 
 		},
 
-		parseAnimatorSet: function ( len ) {
-
-			var targetMesh;
+		parseAnimatorSet: function () {
 
 			var animSetBlockAdress; //:int
 
 			var targetAnimationSet; //:AnimationSetBase;
-			var outputString = ""; //:String = "";
 			var name = this.readUTF();
 			var type = this.readU16();
 
@@ -673,13 +659,12 @@
 			this.parseUserAttributes();
 			this.parseUserAttributes();
 
-			var returnedArray;
 			var targetMeshes = []; //:Vector.<Mesh> = new Vector.<Mesh>;
 
 			for ( i = 0; i < meshAdresses.length; i ++ ) {
 
-				//      returnedArray = getAssetByID(meshAdresses[i], [AssetType.MESH]);
-				//      if (returnedArray[0])
+				//			returnedArray = getAssetByID(meshAdresses[i], [AssetType.MESH]);
+				//			if (returnedArray[0])
 				targetMeshes.push( this._blocks[ meshAdresses[ i ] ].data );
 
 			}
@@ -711,14 +696,13 @@
 
 		},
 
-		parseMeshData: function ( len ) {
+		parseMeshData: function () {
 
 			var name = this.readUTF(),
 				num_subs = this.readU16(),
 				geom,
 				subs_parsed = 0,
 				buffer,
-				skinW, skinI,
 				geometries = [];
 
 			// Ignore for now
@@ -848,29 +832,23 @@
 
 		},
 
-		parseMeshPoseAnimation: function ( len, poseOnly ) {
+		parseMeshPoseAnimation: function ( poseOnly ) {
 
 			var num_frames = 1,
 				num_submeshes,
 				frames_parsed,
 				subMeshParsed,
-				frame_dur,
-				x, y, z,
 
 				str_len,
 				str_end,
 				geom,
-				subGeom,
 				idx = 0,
 				clip = {},
-				indices,
-				verts,
 				num_Streams,
 				streamsParsed,
 				streamtypes = [],
 
 				props,
-				thisGeo,
 				name = this.readUTF(),
 				geoAdress = this.readU32();
 
@@ -912,7 +890,7 @@
 
 			while ( frames_parsed < num_frames ) {
 
-				frame_dur = this.readU16();
+				this.readU16();
 				subMeshParsed = 0;
 
 				while ( subMeshParsed < num_submeshes ) {
@@ -1234,6 +1212,8 @@
 
 		}
 
-	};
+	} );
+
+	return AWDLoader;
 
 } )();

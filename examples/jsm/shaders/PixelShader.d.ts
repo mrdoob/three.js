@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface PixelShader {
+export const PixelShader: {
   uniforms: {
     tDiffuse: Uniform;
     resolution: Uniform;
@@ -10,4 +10,4 @@ export interface PixelShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

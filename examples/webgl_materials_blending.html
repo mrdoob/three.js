@@ -14,16 +14,9 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 			var mapBg;
@@ -78,9 +71,15 @@
 
 				// OBJECTS
 
-				var blendings = [ 'NoBlending', 'NormalBlending', 'AdditiveBlending', 'SubtractiveBlending', 'MultiplyBlending' ];
+				var blendings = [
+					{ name: 'No', constant: THREE.NoBlending },
+					{ name: 'Normal', constant: THREE.NormalBlending },
+					{ name: 'Additive', constant: THREE.AdditiveBlending },
+					{ name: 'Subtractive', constant: THREE.SubtractiveBlending },
+					{ name: 'Multiply', constant: THREE.MultiplyBlending }
+				];
 
-				var map0 = textureLoader.load( 'textures/UV_Grid_Sm.jpg' );
+				var map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
 				var map1 = textureLoader.load( 'textures/sprite0.jpg' );
 				var map2 = textureLoader.load( 'textures/sprite0.png' );
 				var map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
@@ -103,7 +102,7 @@
 
 						var material = new THREE.MeshBasicMaterial( { map: map } );
 						material.transparent = true;
-						material.blending = THREE[ blending ];
+						material.blending = blending.constant;
 
 						var x = ( i - blendings.length / 2 ) * 110;
 						var z = 0;
@@ -113,7 +112,7 @@
 						scene.add( mesh );
 
 
-						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( 'Blending', '' ) ) );
+						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.name ) );
 						mesh.position.set( x, y - 75, z );
 						scene.add( mesh );
 

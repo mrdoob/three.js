@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface DotScreenShader {
+export const DotScreenShader: {
   uniforms: {
     tDiffuse: Uniform;
     tSize: Uniform;
@@ -12,4 +12,4 @@ export interface DotScreenShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

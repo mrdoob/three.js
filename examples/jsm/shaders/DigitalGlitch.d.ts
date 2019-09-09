@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface DigitalGlitch {
+export const DigitalGlitch: {
   uniforms: {
     tDiffuse: Uniform;
     tDisp: Uniform;
@@ -18,4 +18,4 @@ export interface DigitalGlitch {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

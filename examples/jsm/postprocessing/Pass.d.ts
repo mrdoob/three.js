@@ -1,4 +1,5 @@
 import {
+  Material,
   WebGLRenderer,
   WebGLRenderTarget
 } from '../../../src/Three';
@@ -12,4 +13,14 @@ export class Pass {
 
   setSize(width: number, height: number): void;
   render(renderer: WebGLRenderer, writeBuffer: WebGLRenderTarget, readBuffer: WebGLRenderTarget, deltaTime: number, maskActive: boolean): void;
+}
+
+export namespace Pass {
+	class FullScreenQuad {
+		constructor( material?: Material );
+
+		render( renderer: WebGLRenderer ): void;
+
+		material: Material;
+	}
 }

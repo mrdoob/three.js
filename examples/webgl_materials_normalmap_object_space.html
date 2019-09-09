@@ -15,20 +15,12 @@
 
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var renderer, scene, camera;
 
@@ -52,7 +44,7 @@
 				scene.add( camera );
 
 				// controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 10;
 				controls.maxDistance = 50;
@@ -66,7 +58,7 @@
 				camera.add( light );
 
 				// model
-				new THREE.GLTFLoader().load( 'models/gltf/Nefertiti/Nefertiti.glb', function ( gltf ) {
+				new GLTFLoader().load( 'models/gltf/Nefertiti/Nefertiti.glb', function ( gltf ) {
 
 					gltf.scene.traverse( function ( child ) {
 

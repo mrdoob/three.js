@@ -18,19 +18,13 @@
 			<a id="permalink" href="#">permalink</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/utils/GeometryUtils.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			THREE.Cache.enabled = true;
 
@@ -387,7 +381,7 @@
 							var vb = textGeo.vertices[ face.b ];
 							var vc = textGeo.vertices[ face.c ];
 
-							var s = THREE.GeometryUtils.triangleArea( va, vb, vc );
+							var s = GeometryUtils.triangleArea( va, vb, vc );
 
 							if ( s > triangleAreaHeuristics ) {
 

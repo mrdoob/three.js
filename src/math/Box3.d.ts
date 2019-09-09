@@ -3,6 +3,7 @@ import { Object3D } from './../core/Object3D';
 import { Sphere } from './Sphere';
 import { Plane } from './Plane';
 import { Matrix4 } from './Matrix4';
+import { Triangle } from './Triangle';
 
 export class Box3 {
 
@@ -32,6 +33,7 @@ export class Box3 {
 	intersectsBox( box: Box3 ): boolean;
 	intersectsSphere( sphere: Sphere ): boolean;
 	intersectsPlane( plane: Plane ): boolean;
+	intersectsTriangle( triangle: Triangle ): boolean;
 	clampPoint( point: Vector3, target: Vector3 ): Vector3;
 	distanceToPoint( point: Vector3 ): number;
 	getBoundingSphere( target: Sphere ): Sphere;
@@ -41,16 +43,16 @@ export class Box3 {
 	translate( offset: Vector3 ): this;
 	equals( box: Box3 ): boolean;
 	/**
-   * @deprecated Use {@link Box3#isEmpty .isEmpty()} instead.
-   */
+	 * @deprecated Use {@link Box3#isEmpty .isEmpty()} instead.
+	 */
 	empty(): any;
 	/**
-   * @deprecated Use {@link Box3#intersectsBox .intersectsBox()} instead.
-   */
+	 * @deprecated Use {@link Box3#intersectsBox .intersectsBox()} instead.
+	 */
 	isIntersectionBox( b: any ): any;
 	/**
-   * @deprecated Use {@link Box3#intersectsSphere .intersectsSphere()} instead.
-   */
+	 * @deprecated Use {@link Box3#intersectsSphere .intersectsSphere()} instead.
+	 */
 	isIntersectionSphere( s: any ): any;
 
 }

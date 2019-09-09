@@ -33,16 +33,15 @@
 		<div id="container">
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { WEBGL } from './jsm/WebGL.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -50,7 +49,7 @@
 
 			}
 
-			var camera, scene, renderer, clock, group;
+			var camera, scene, renderer, clock, group, container;
 
 			var composer1, composer2;
 
@@ -59,7 +58,7 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
@@ -120,18 +119,18 @@
 				var size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 				var renderTarget = new THREE.WebGLMultisampleRenderTarget( size.width, size.height, parameters );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var renderPass = new RenderPass( scene, camera );
+				var copyPass = new ShaderPass( CopyShader );
 
 				//
 
-				composer1 = new THREE.EffectComposer( renderer, renderTarget );
+				composer1 = new EffectComposer( renderer, renderTarget );
 				composer1.addPass( renderPass );
 				composer1.addPass( copyPass );
 
 				//
 
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 
@@ -146,9 +145,9 @@
 				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( container.offsetWidth, container.offsetHeight  );
-				composer1.setSize( container.offsetWidth, container.offsetHeight  );
-				composer2.setSize( container.offsetWidth, container.offsetHeight  );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				composer1.setSize( container.offsetWidth, container.offsetHeight );
+				composer2.setSize( container.offsetWidth, container.offsetHeight );
 
 			}
 

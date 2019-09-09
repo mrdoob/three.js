@@ -14,21 +14,14 @@
 	<div id="info">Ammo.js physics soft body rope demo<br>Press Q or A to move the arm.</div>
 	<div id="container"></div>
 
-	<script src="../build/three.js"></script>
 	<script src="js/libs/ammo.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-		// Detects webgl
+		import Stats from './jsm/libs/stats.module.js';
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-		}
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 		// Graphics variables
 		var container, stats;
@@ -52,7 +45,7 @@
 
 		var armMovement = 0;
 
-		Ammo().then( function( AmmoLib ) {
+		Ammo().then( function ( AmmoLib ) {
 
 			Ammo = AmmoLib;
 
@@ -90,7 +83,7 @@
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 2, 0 );
 			controls.update();
 

@@ -51,6 +51,8 @@ export class SSAOPass extends Pass {
   dipose(): void;
   generateSampleKernel(): Vector3[];
   generateRandomKernelRotations(): void;
-  renderPass(renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderer, clearColor: Color, clearAlpha: number): void;
-  renderOverride(renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderer, clearColor: Color, clearAlpha: number): void;
+  renderPass(renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number): void;
+  renderPass(renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number): void;
+  renderOverride(renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number): void;
+  renderOverride(renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number): void;
 }

@@ -17,20 +17,16 @@
 		</div>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			// Graphics variables
 			var container, stats;
@@ -53,7 +49,7 @@
 			var transformAux1;
 			var softBodyHelpers;
 
-			Ammo().then( function( AmmoLib ) {
+			Ammo().then( function ( AmmoLib ) {
 
 				Ammo = AmmoLib;
 
@@ -91,7 +87,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.update();
 
@@ -191,7 +187,7 @@
 				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles
-				var indexedBufferGeom = THREE.BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
+				var indexedBufferGeom = BufferGeometryUtils.mergeVertices( posOnlyBufGeometry );
 
 				// Create index arrays mapping the indexed vertices to bufGeometry vertices
 				mapIndices( bufGeometry, indexedBufferGeom );

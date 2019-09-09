@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author yomboprime / https://github.com/yomboprime/
+ * @author gkjohnson / https://github.com/gkjohnson/
  *
  *
  */
@@ -521,15 +522,13 @@ THREE.LDrawLoader = ( function () {
 
 	function LDrawLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		// This is a stack of 'parse scopes' with one level per subobject loaded file.
 		// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
 		// When searching for a material code, the stack is read from top of the stack to bottom
 		// Each material library is an object map keyed by colour codes.
 		this.parseScopesStack = null;
-
-		this.path = '';
 
 		// Array of THREE.Material
 		this.materials = [];
@@ -575,7 +574,7 @@ THREE.LDrawLoader = ( function () {
 	LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE = 5;
 	LDrawLoader.FILE_LOCATION_NOT_FOUND = 6;
 
-	LDrawLoader.prototype = {
+	LDrawLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: LDrawLoader,
 
@@ -604,14 +603,6 @@ THREE.LDrawLoader = ( function () {
 			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
 			this.processObject( text, onLoad, null, path );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-			return this;
 
 		},
 
@@ -683,6 +674,9 @@ THREE.LDrawLoader = ( function () {
 				triangles: null,
 				lineSegments: null,
 				conditionalSegments: null,
+
+				// If true, this object is the start of a construction step
+				startingConstructionStep: false
 			};
 
 			this.parseScopesStack.push( newParseScope );
@@ -1045,8 +1039,6 @@ THREE.LDrawLoader = ( function () {
 			var mainColourCode = parentParseScope.mainColourCode;
 			var mainEdgeColourCode = parentParseScope.mainEdgeColourCode;
 
-			var url = parentParseScope.url;
-
 			var currentParseScope = this.getCurrentParseScope();
 
 			// Parse result variables
@@ -1079,6 +1071,8 @@ THREE.LDrawLoader = ( function () {
 			var bfcInverted = false;
 			var bfcCull = true;
 			var type = '';
+
+			var startingConstructionStep = false;
 
 			var scope = this;
 			function parseColourCode( lineParser, forEdge ) {
@@ -1193,6 +1187,8 @@ THREE.LDrawLoader = ( function () {
 										if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
 											currentParseScope.groupObject = new THREE.Group();
+
+											currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
 
 										}
 
@@ -1321,6 +1317,12 @@ THREE.LDrawLoader = ( function () {
 
 									break;
 
+								case 'STEP':
+
+									startingConstructionStep = true;
+
+									break;
+
 								default:
 									// Other meta directives are not implemented
 									break;
@@ -1356,7 +1358,7 @@ THREE.LDrawLoader = ( function () {
 							0, 0, 0, 1
 						);
 
-						var fileName = lp.getRemainingString().trim().replace( "\\", "/" );
+						var fileName = lp.getRemainingString().trim().replace( /\\/g, "/" );
 
 						if ( scope.fileMap[ fileName ] ) {
 
@@ -1386,7 +1388,8 @@ THREE.LDrawLoader = ( function () {
 							locationState: LDrawLoader.FILE_LOCATION_AS_IS,
 							url: null,
 							triedLowerCase: false,
-							inverted: bfcInverted !== currentParseScope.inverted
+							inverted: bfcInverted !== currentParseScope.inverted,
+							startingConstructionStep: startingConstructionStep
 						} );
 
 						bfcInverted = false;
@@ -1595,6 +1598,32 @@ THREE.LDrawLoader = ( function () {
 
 		},
 
+		computeConstructionSteps: function ( model ) {
+
+			// Sets userdata.constructionStep number in Group objects and userData.numConstructionSteps number in the root Group object.
+
+			var stepNumber = 0;
+
+			model.traverse( c => {
+
+				if ( c.isGroup ) {
+
+					if ( c.userData.startingConstructionStep ) {
+
+						stepNumber ++;
+
+					}
+
+					c.userData.constructionStep = stepNumber;
+
+				}
+
+			} );
+
+			model.userData.numConstructionSteps = stepNumber + 1;
+
+		},
+
 		processObject: function ( text, onProcessed, subobject, url ) {
 
 			var scope = this;
@@ -1610,6 +1639,7 @@ THREE.LDrawLoader = ( function () {
 				parseScope.currentMatrix.multiplyMatrices( parentParseScope.currentMatrix, subobject.matrix );
 				parseScope.matrix.copy( subobject.matrix );
 				parseScope.inverted = subobject.inverted;
+				parseScope.startingConstructionStep = subobject.startingConstructionStep;
 
 			}
 
@@ -1764,6 +1794,13 @@ THREE.LDrawLoader = ( function () {
 
 				scope.removeScopeLevel();
 
+				// If it is root object, compute construction steps
+				if ( ! parentParseScope.isFromParse ) {
+
+					scope.computeConstructionSteps( parseScope.groupObject );
+
+				}
+
 				if ( onProcessed ) {
 
 					onProcessed( parseScope.groupObject );
@@ -1900,7 +1937,7 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return LDrawLoader;
 

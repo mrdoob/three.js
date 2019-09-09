@@ -5,7 +5,7 @@ export class BufferAttribute {
 
 	constructor( array: ArrayLike<number>, itemSize: number, normalized?: boolean ); // array parameter should be TypedArray.
 
-	uuid: string;
+	name: string;
 	array: ArrayLike<number>;
 	itemSize: number;
 	dynamic: boolean;
@@ -58,8 +58,8 @@ export class BufferAttribute {
 		w: number
 	): BufferAttribute;
 	/**
-   * @deprecated Use {@link BufferAttribute#count .count} instead.
-   */
+	 * @deprecated Use {@link BufferAttribute#count .count} instead.
+	 */
 	length: number;
 
 }

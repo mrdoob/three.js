@@ -12,13 +12,13 @@ import { Camera } from './Camera';
 export class OrthographicCamera extends Camera {
 
 	/**
-   * @param left Camera frustum left plane.
-   * @param right Camera frustum right plane.
-   * @param top Camera frustum top plane.
-   * @param bottom Camera frustum bottom plane.
-   * @param near Camera frustum near plane.
-   * @param far Camera frustum far plane.
-   */
+	 * @param left Camera frustum left plane.
+	 * @param right Camera frustum right plane.
+	 * @param top Camera frustum top plane.
+	 * @param bottom Camera frustum bottom plane.
+	 * @param near Camera frustum near plane.
+	 * @param far Camera frustum far plane.
+	 */
 	constructor(
 		left: number,
 		right: number,
@@ -44,38 +44,38 @@ export class OrthographicCamera extends Camera {
 	};
 
 	/**
-   * Camera frustum left plane.
-   */
+	 * Camera frustum left plane.
+	 */
 	left: number;
 
 	/**
-   * Camera frustum right plane.
-   */
+	 * Camera frustum right plane.
+	 */
 	right: number;
 
 	/**
-   * Camera frustum top plane.
-   */
+	 * Camera frustum top plane.
+	 */
 	top: number;
 
 	/**
-   * Camera frustum bottom plane.
-   */
+	 * Camera frustum bottom plane.
+	 */
 	bottom: number;
 
 	/**
-   * Camera frustum near plane.
-   */
+	 * Camera frustum near plane.
+	 */
 	near: number;
 
 	/**
-   * Camera frustum far plane.
-   */
+	 * Camera frustum far plane.
+	 */
 	far: number;
 
 	/**
-   * Updates the camera projection matrix. Must be called after change of parameters.
-   */
+	 * Updates the camera projection matrix. Must be called after change of parameters.
+	 */
 	updateProjectionMatrix(): void;
 	setViewOffset(
 		fullWidth: number,

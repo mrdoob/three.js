@@ -236,13 +236,14 @@
 
 		</script>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var dolly, camera, scene, renderer;
 			var geometry, material, mesh;
@@ -271,7 +272,7 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				// Scene
+				// THREE.Scene
 				scene = new THREE.Scene();
 
 				dolly = new THREE.Group();
@@ -296,10 +297,10 @@
 				scene.add( mesh );
 
 				// Controls
-				var controls = new THREE.OrbitControls( camera, canvas );
+				var controls = new OrbitControls( camera, canvas );
 
 				// GUI
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 

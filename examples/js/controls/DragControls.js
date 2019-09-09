@@ -1,17 +1,10 @@
-/*
+/**
  * @author zz85 / https://github.com/zz85
  * @author mrdoob / http://mrdoob.com
  * Running this will allow you to drag three.js objects around the screen.
  */
 
 THREE.DragControls = function ( _objects, _camera, _domElement ) {
-
-	if ( _objects instanceof THREE.Camera ) {
-
-		console.warn( 'THREE.DragControls: Constructor now expects ( objects, camera, domElement )' );
-		var temp = _objects; _objects = _camera; _camera = temp;
-
-	}
 
 	var _plane = new THREE.Plane();
 	var _raycaster = new THREE.Raycaster();
@@ -85,7 +78,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		var intersects = _raycaster.intersectObjects( _objects );
+		var intersects = _raycaster.intersectObjects( _objects, true );
 
 		if ( intersects.length > 0 ) {
 
@@ -123,7 +116,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		var intersects = _raycaster.intersectObjects( _objects );
+		var intersects = _raycaster.intersectObjects( _objects, true );
 
 		if ( intersects.length > 0 ) {
 
@@ -201,7 +194,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		var intersects = _raycaster.intersectObjects( _objects );
+		var intersects = _raycaster.intersectObjects( _objects, true );
 
 		if ( intersects.length > 0 ) {
 
@@ -250,35 +243,6 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
-
-	// Backward compatibility
-
-	this.setObjects = function () {
-
-		console.error( 'THREE.DragControls: setObjects() has been removed.' );
-
-	};
-
-	this.on = function ( type, listener ) {
-
-		console.warn( 'THREE.DragControls: on() has been deprecated. Use addEventListener() instead.' );
-		scope.addEventListener( type, listener );
-
-	};
-
-	this.off = function ( type, listener ) {
-
-		console.warn( 'THREE.DragControls: off() has been deprecated. Use removeEventListener() instead.' );
-		scope.removeEventListener( type, listener );
-
-	};
-
-	this.notify = function ( type ) {
-
-		console.error( 'THREE.DragControls: notify() has been deprecated. Use dispatchEvent() instead.' );
-		scope.dispatchEvent( { type: type } );
-
-	};
 
 };
 

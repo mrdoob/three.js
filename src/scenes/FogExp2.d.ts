@@ -11,9 +11,9 @@ export class FogExp2 implements IFog {
 	color: Color;
 
 	/**
-   * Defines how fast the fog will grow dense.
-   * Default is 0.00025.
-   */
+	 * Defines how fast the fog will grow dense.
+	 * Default is 0.00025.
+	 */
 	density: number;
 
 	clone(): this;

@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface HorizontalTiltShiftShader {
+export const HorizontalTiltShiftShader: {
   uniforms: {
     tDiffuse: Uniform;
     h: Uniform;
@@ -10,4 +10,4 @@ export interface HorizontalTiltShiftShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

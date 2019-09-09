@@ -11,20 +11,13 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/utils/GeometryUtils.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			var renderer, scene, camera, stats;
 			var objects = [];
@@ -46,7 +39,7 @@
 				var subdivisions = 6;
 				var recursion = 1;
 
-				var points = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
 				var spline = new THREE.CatmullRomCurve3( points );
 
 				var samples = spline.getPoints( points.length * subdivisions );

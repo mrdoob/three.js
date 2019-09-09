@@ -13,37 +13,27 @@
 			<div id="description">Right click to clone</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
-
-		<script src="js/loaders/sea3d/SEA3D.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLZMA.js"></script>
-		<script src="js/loaders/sea3d/SEA3DLoader.js"></script>
-
 		<script src="js/libs/ammo.js"></script>
-		<script src="js/loaders/sea3d/physics/SEA3DRigidBody.js"></script>
-		<script src="js/loaders/sea3d/physics/SEA3DAmmo.js"></script>
-		<script src="js/loaders/sea3d/physics/SEA3DAmmoLoader.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
+			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
 
-			}
+			import { SEA3D } from './jsm/loaders/sea3d/SEA3DLoader.js';
+			import { AMMO } from './jsm/loaders/sea3d/physics/SEA3DAmmoLoader.js'; // sea3d ammo.js extension
+			import './jsm/loaders/sea3d/SEA3DLZMA.js'; // sea3d lzma extension
+			import './jsm/loaders/sea3d/physics/SEA3DSDKRigidBody.js'; // sea3d physics extension
+
+			import Stats from './jsm/libs/stats.module.js';
 
 			console.log( "Visit https://github.com/sunag/sea3d to all codes and builds under development." );
 
@@ -53,7 +43,7 @@
 
 			var loader;
 
-			Ammo().then( function( AmmoLib ) {
+			Ammo().then( function ( AmmoLib ) {
 
 				// Initialize Three.JS
 
@@ -62,13 +52,13 @@
 				// Initialize Physics Engine
 
 				Ammo = AmmoLib;
-				SEA3D.AMMO.init();
+				AMMO.init();
 
 				//
 				// SEA3D Loader
 				//
 
-				loader = new THREE.SEA3D( {
+				loader = new SEA3D( {
 
 					container: scene // Container to add models
 
@@ -76,7 +66,7 @@
 
 				loader.onComplete = function () {
 
-					new THREE.OrbitControls( camera, renderer.domElement );
+					new OrbitControls( camera, renderer.domElement );
 
 					// events
 
@@ -104,7 +94,7 @@
 
 					return function () {
 
-						var domain = this.loader.clone( { lights: false, runScripts: false, autoPlay: false, enabledPhysics: false } );
+						var domain = loader.clone( { lights: false, runScripts: false, autoPlay: false, enabledPhysics: false } );
 
 						offset -= 180;
 
@@ -113,12 +103,11 @@
 						domain.enabledPhysics( true );
 						domain.runScripts();
 
-						this.scene.add( domain.container );
+						scene.add( domain.container );
 
 					};
 
 				}();
-
 
 			} );
 
@@ -145,20 +134,20 @@
 
 				// post-processing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var renderPass = new THREE.RenderPass( scene, camera );
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var renderPass = new RenderPass( scene, camera );
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( renderPass );
 
 				var vh = 1.4, vl = 1.2;
 
-				var colorCorrectionPass = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				var colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
 				colorCorrectionPass.uniforms[ "powRGB" ].value = new THREE.Vector3( vh, vh, vh );
 				colorCorrectionPass.uniforms[ "mulRGB" ].value = new THREE.Vector3( vl, vl, vl );
 				composer.addPass( colorCorrectionPass );
 
-				var vignettePass = new THREE.ShaderPass( THREE.VignetteShader );
+				var vignettePass = new ShaderPass( VignetteShader );
 				vignettePass.uniforms[ "darkness" ].value = 1.0;
 				composer.addPass( vignettePass );
 
@@ -192,11 +181,11 @@
 
 				// Update Physics Engine ( fix delta-time in 60fps for more stability )
 
-				SEA3D.AMMO.update( 1 / 60 );
+				AMMO.update( 1 / 60 );
 
 				// Update SEA3D Animations
 
-				THREE.SEA3D.AnimationHandler.update( delta );
+				SEA3D.AnimationHandler.update( delta );
 
 				render( delta );
 

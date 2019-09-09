@@ -1,16 +1,13 @@
 import {
   Group,
+  Loader,
   LoadingManager
 } from '../../../src/Three';
 
-export class GCodeLoader {
+export class GCodeLoader extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
   splitLayer: boolean;
 
   load(url: string, onLoad: (object: Group) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
-
   parse(data: string) : Group;
 }

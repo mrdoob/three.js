@@ -11,7 +11,6 @@
 
 <body>
 	<h1>载入3D模型（[name]）</h1>
-	<br />
 
 	<p>
 	目前，3D模型的格式有成千上万种可供选择，但每一种格式都具有不同的目的、用途以及复杂性。
@@ -46,14 +45,16 @@
 	</p>
 
 	<ul>
-		<li><a href="https://github.com/KhronosGroup/glTF-Blender-Exporter" target="_blank" rel="noopener">glTF-Blender-Exporter</a> by the Khronos Group</li>
+		<li><a href="https://github.com/KhronosGroup/glTF-Blender-IO" target="_blank" rel="noopener">glTF-Blender-IO</a> by the Khronos Group</li>
 		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
 		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
 		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
 		<li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> by Allegorithmic</li>
 		<li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> by Foundry</li>
 		<li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> by Marmoset</li>
-		<li>……<a href="https://github.com/khronosgroup/gltf#gltf-tools" target="_blank" rel="noopener">还有更多</a></li>
+		<li><a href="https://www.sidefx.com/products/houdini/" target="_blank" rel="noopener">Houdini</a> by SideFX</li>
+		<li><a href="https://labs.maxon.net/?p=3360" target="_blank" rel="noopener">Cinema 4D</a> by MAXON</li>
+		<li>&hellip;<a href="https://github.com/khronosgroup/gltf#gltf-tools" target="_blank" rel="noopener">还有更多</a></li>
 	</ul>
 
 	<p>
@@ -80,17 +81,14 @@
 		// commonjs
 		var THREE = window.THREE = require('three');
 		require('three/examples/js/loaders/GLTFLoader');
+
+		// ES modules
+		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 	</code>
 
 	<p>
-		目前three.js示例不能作为ES modules （import &hellip; from '&hellip;'）来使用。
-		这里讨论了一些解决方法：
-		<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank" rel="noopener">#9562</a>.
-	</p>
-
-	<p>
 		一旦你引入了一个加载器，你就已经准备好为场景添加模型了。不同加载器之间可能具有不同的语法 ——
-		当使用其它格式的时候请参阅该格式加载器的示例以及文档。对于glTF，基本用法类似：
+		当使用其它格式的时候请参阅该格式加载器的示例以及文档。对于glTF，使用全局script的用法类似：
 	</p>
 
 	<code>

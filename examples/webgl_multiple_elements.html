@@ -63,22 +63,16 @@
 			<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements - webgl</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/WebGL.js"></script>
-
 		<script id="template" type="notjs">
 			<div class="scene"></div>
 			<div class="description">Scene $</div>
 		</script>
-		<script>
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+		<script type="module">
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import * as THREE from '../build/three.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var canvas;
 
@@ -119,7 +113,7 @@
 					camera.position.z = 2;
 					scene.userData.camera = camera;
 
-					var controls = new THREE.OrbitControls( scene.userData.camera, scene.userData.element );
+					var controls = new OrbitControls( scene.userData.camera, scene.userData.element );
 					controls.minDistance = 2;
 					controls.maxDistance = 5;
 					controls.enablePan = false;

@@ -22,15 +22,15 @@ basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
 basisLoader.detectSupport( renderer );
 basisLoader.load( 'diffuse.basis', function ( texture ) {
 
-  var material = new THREE.MeshStandardMaterial( { map: texture } );
+	var material = new THREE.MeshStandardMaterial( { map: texture } );
 
 }, function () {
 
-  console.log( 'onProgress' );
+	console.log( 'onProgress' );
 
 }, function ( e ) {
 
-  console.error( e );
+	console.error( e );
 
 } );
 ```

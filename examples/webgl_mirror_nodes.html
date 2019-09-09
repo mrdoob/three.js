@@ -20,16 +20,26 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - mirror node-based
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/objects/Reflector.js"></script>
-		<script src="js/objects/ReflectorRTT.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script type="module">
+			import * as THREE from '../build/three.module.js';
 
-			import './js/nodes/THREE.Nodes.js';
-			import './js/loaders/NodeMaterialLoader.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ReflectorRTT } from './jsm/objects/ReflectorRTT.js';
+
+			import {
+				NodeFrame,
+				ExpressionNode,
+				PhongNodeMaterial,
+				MathNode,
+				OperatorNode,
+				TextureNode,
+				BlurNode,
+				FloatNode,
+				ReflectorNode,
+				SwitchNode,
+				NormalMapNode,
+			} from './jsm/nodes/Nodes.js';
 
 			// scene size
 			var WIDTH = window.innerWidth;
@@ -51,12 +61,12 @@
 
 			var cameraControls;
 
-			var gui = new dat.GUI();
+			var gui = new GUI();
 
 			var sphereGroup, smallSphere;
 			var groundMirrorMaterial;
 
-			var frame = new THREE.NodeFrame();
+			var frame = new NodeFrame();
 
 			function init() {
 
@@ -72,7 +82,7 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 40, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
@@ -89,35 +99,35 @@
 
 				// reflector/mirror plane
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
+				var groundMirror = new ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: WIDTH, textureHeight: HEIGHT } );
 
-				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
+				var mask = new SwitchNode( new TextureNode( decalDiffuse ), 'w' );
 
-				var mirror = new THREE.ReflectorNode( groundMirror );
+				var mirror = new ReflectorNode( groundMirror );
 
-				var normalMap = new THREE.TextureNode( decalNormal );
-				var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
-				var normalXYFlip = new THREE.Math1Node(
+				var normalMap = new TextureNode( decalNormal );
+				var normalXY = new SwitchNode( normalMap, 'xy' );
+				var normalXYFlip = new MathNode(
 					normalXY,
-					THREE.Math1Node.INVERT
+					MathNode.INVERT
 				);
 
-				var offsetNormal = new THREE.OperatorNode(
+				var offsetNormal = new OperatorNode(
 					normalXYFlip,
-					new THREE.FloatNode( .5 ),
-					THREE.OperatorNode.SUB
+					new FloatNode( .5 ),
+					OperatorNode.SUB
 				);
 
-				mirror.offset = new THREE.OperatorNode(
+				mirror.offset = new OperatorNode(
 					offsetNormal, // normal
-					new THREE.FloatNode( 6 ), // scale
-					THREE.OperatorNode.MUL
+					new FloatNode( 6 ), // scale
+					OperatorNode.MUL
 				);
 
-				var blurMirror = new THREE.BlurNode( mirror );
+				var blurMirror = new BlurNode( mirror );
 				blurMirror.size = new THREE.Vector2( WIDTH, HEIGHT );
-				blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
-				blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
+				blurMirror.uv = new ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
+				blurMirror.uv.keywords[ "projCoord" ] = new OperatorNode( mirror.offset, mirror.uv, OperatorNode.ADD );
 				blurMirror.radius.x = blurMirror.radius.y = 0;
 
 				gui.add( { blur: blurMirror.radius.x }, "blur", 0, 25 ).onChange( function ( v ) {
@@ -126,11 +136,11 @@
 
 				} );
 
-				groundMirrorMaterial = new THREE.PhongNodeMaterial();
+				groundMirrorMaterial = new PhongNodeMaterial();
 				groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
 				groundMirrorMaterial.environmentAlpha = mask;
-				groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
-				//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
+				groundMirrorMaterial.normal = new NormalMapNode( normalMap );
+				//groundMirrorMaterial.normalScale = new FloatNode( 1 );
 
 				// test serialization
 				/*
@@ -142,7 +152,7 @@
 
 						var json = groundMirrorMaterial.toJSON();
 
-						groundMirrorMaterial = new THREE.NodeMaterialLoader( null, library ).parse( json );
+						groundMirrorMaterial = new NodeMaterialLoader( null, library ).parse( json );
 					*/
 				//--
 
