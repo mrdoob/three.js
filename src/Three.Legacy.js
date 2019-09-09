@@ -1164,13 +1164,30 @@ Object.defineProperties( BufferAttribute.prototype, {
 			return this.array.length;
 
 		}
-	},
+	}
+
+} );
+
+Object.assign( BufferAttribute.prototype, {
 	copyIndicesArray: function ( /* indices */ ) {
 
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
-	}
+	},
+	setArray: function ( array ) {
 
+		if ( Array.isArray( array ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
+
+		this.count = array !== undefined ? array.length / this.itemSize : 0;
+		this.array = array;
+
+		return this;
+
+	},
 } );
 
 Object.assign( BufferGeometry.prototype, {
