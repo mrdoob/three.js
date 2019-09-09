@@ -4,7 +4,7 @@
 
 import { TempNode } from '../core/TempNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class OperatorNode extends TempNode {
 
@@ -28,8 +28,8 @@ export class OperatorNode extends TempNode {
 
 		}
 
-		this.a = NodeBuilder.resolve( a );
-		this.b = NodeBuilder.resolve( b );
+		this.a = NodeLib.resolve( a );
+		this.b = NodeLib.resolve( b );
 
 		this.nodeType = "Operator";
 

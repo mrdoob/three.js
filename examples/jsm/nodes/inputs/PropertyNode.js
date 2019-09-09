@@ -18,15 +18,15 @@ export class PropertyNode extends InputNode {
 	}
 
 	set value( val ) {
-		
+
 		this.object[ this.property ] = val;
-		
+
 	}
 	
 	get value() {
-		
+
 		return this.object[ this.property ];
-		
+
 	}
 
 	toJSON( meta ) {

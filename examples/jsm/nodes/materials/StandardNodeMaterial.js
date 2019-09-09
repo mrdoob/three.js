@@ -40,4 +40,4 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'position',
 	'sheen',
 	'transparency'
-] );
+], true );

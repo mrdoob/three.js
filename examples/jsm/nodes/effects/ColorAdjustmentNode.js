@@ -3,18 +3,18 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 
 export class ColorAdjustmentNode extends TempNode {
 
-	constructor( rgb, adjustment, method ) {
+	constructor( method, rgb, adjustment ) {
 
 		super( 'v3' );
 
-		this.rgb = rgb;
-		this.adjustment = adjustment;
-
-		this.method = method || ColorAdjustmentNode.SATURATION;
+		this.method = method
+		this.rgb = NodeLib.resolve( rgb );
+		this.adjustment = NodeLib.resolve( adjustment );
 
 		this.nodeType = "ColorAdjustment";
 
@@ -51,9 +51,9 @@ export class ColorAdjustmentNode extends TempNode {
 
 		super.copy( source );
 
+		this.method = source.method;
 		this.rgb = source.rgb;
 		this.adjustment = source.adjustment;
-		this.method = source.method;
 
 		return this;
 
@@ -67,9 +67,9 @@ export class ColorAdjustmentNode extends TempNode {
 
 			data = this.createJSONNode( meta );
 
+			data.method = this.method;
 			data.rgb = this.rgb.toJSON( meta ).uuid;
 			data.adjustment = this.adjustment.toJSON( meta ).uuid;
-			data.method = this.method;
 
 		}
 

@@ -8,7 +8,6 @@ import {
 } from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
-import { NodeBuilder } from '../../core/NodeBuilder.js';
 import { NodeContext } from '../../core/NodeContext.js';
 import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
@@ -45,8 +44,6 @@ export class StandardNode extends Node {
 		builder.extensions.shaderTextureLOD = true;
 
 		if ( builder.isShader( 'vertex' ) ) {
-
-			this.position = NodeBuilder.resolve( this.position );
 
 			var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', new NodeContext().setCache( 'position' ) ) : undefined;
 
@@ -127,27 +124,6 @@ export class StandardNode extends Node {
 			code = output.join( "\n" );
 
 		} else {
-
-			// resolve primitives
-
-			this.mask = NodeBuilder.resolve( this.mask );
-			this.color = NodeBuilder.resolve( this.color );
-			this.roughness = NodeBuilder.resolve( this.roughness );
-			this.metalness = NodeBuilder.resolve( this.metalness );
-			this.alpha = NodeBuilder.resolve( this.alpha );
-			this.normal = NodeBuilder.resolve( this.normal );
-			this.clearcoatNormal = NodeBuilder.resolve( this.clearcoatNormal );
-			this.clearcoat = NodeBuilder.resolve( this.clearcoat );
-			this.clearcoatRoughness = NodeBuilder.resolve( this.clearcoatRoughness );
-			this.sheen = NodeBuilder.resolve( this.sheen );
-			this.reflectivity = NodeBuilder.resolve( this.reflectivity );
-			this.light = NodeBuilder.resolve( this.light );
-			this.ao = NodeBuilder.resolve( this.ao );
-			this.ambient = NodeBuilder.resolve( this.ambient );
-			this.shadow = NodeBuilder.resolve( this.shadow );
-			this.emissive = NodeBuilder.resolve( this.emissive );
-			this.environment = NodeBuilder.resolve( this.environment );
-			this.transparency = NodeBuilder.resolve( this.transparency );
 
 			// flow context
 

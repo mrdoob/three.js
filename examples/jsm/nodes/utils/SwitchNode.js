@@ -3,6 +3,7 @@
  */
 
 import { Node } from '../core/Node.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class SwitchNode extends Node {
 
@@ -10,7 +11,7 @@ export class SwitchNode extends Node {
 
 		super();
 
-		this.node = node;
+		this.node = NodeLib.resolve( node );
 		this.components = components || 'x';
 
 		this.nodeType = "Switch";

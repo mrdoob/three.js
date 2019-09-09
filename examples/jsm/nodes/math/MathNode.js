@@ -3,7 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
 export class MathNode extends TempNode {
@@ -14,9 +14,9 @@ export class MathNode extends TempNode {
 
 		this.method = method;
 
-		this.a = NodeBuilder.resolve( a );
-		this.b = NodeBuilder.resolve( b );
-		this.c = NodeBuilder.resolve( c );
+		this.a = NodeLib.resolve( a );
+		this.b = NodeLib.resolve( b );
+		this.c = NodeLib.resolve( c );
 
 		this.nodeType = "Math";
 

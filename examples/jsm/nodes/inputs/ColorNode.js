@@ -6,6 +6,7 @@ import { Color } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class ColorNode extends InputNode {
 
@@ -58,3 +59,21 @@ export class ColorNode extends InputNode {
 }
 
 NodeUtils.addShortcuts( ColorNode.prototype, 'value', [ 'r', 'g', 'b' ] );
+
+NodeLib.addResolver( ( value ) => {
+
+	if ( typeof value === 'string' ) {
+
+		if ( value.substr( 0, 1 ) === '#' ) {
+
+			return new ColorNode( parseInt( value.substr( 1 ) ) ).setConst( true );
+
+		} else if ( value.substr( 0, 2 ) === '0x' ) {
+
+			return new ColorNode( parseInt( value ) ).setConst( true );
+
+		}
+
+	}
+
+} );

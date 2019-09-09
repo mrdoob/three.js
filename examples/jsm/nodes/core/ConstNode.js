@@ -3,6 +3,7 @@
  */
 
 import { TempNode } from './TempNode.js';
+import { NodeLib } from './NodeLib.js';
 
 var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
 
@@ -125,3 +126,6 @@ ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
 ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
 ConstNode.LOG2 = 'LOG2';
 ConstNode.EPSILON = 'EPSILON';
+
+NodeLib.add( new ConstNode( ConstNode.PI ) );
+NodeLib.add( new ConstNode( ConstNode.PI2 ) );

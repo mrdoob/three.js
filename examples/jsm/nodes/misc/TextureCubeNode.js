@@ -2,9 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	CubeUVReflectionMapping,
+	CubeUVRefractionMapping
+} from '../../../../build/three.module.js';
+
 import { TextureNode } from '../inputs/TextureNode.js';
 import { TextureCubeUVNode } from './TextureCubeUVNode.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { NodeContext } from '../core/NodeContext.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
@@ -18,7 +23,7 @@ export class TextureCubeNode extends TextureNode {
 
 		super( value, uv, bias );
 
-		textureSize = NodeBuilder.resolve( textureSize || 1024 );
+		textureSize = NodeLib.resolve( textureSize || 1024 );
 
 		this.radianceCache = { uv: new TextureCubeUVNode(
 			uv || new ReflectNode( ReflectNode.VECTOR ),
@@ -140,3 +145,21 @@ export class TextureCubeNode extends TextureNode {
 	}
 
 }
+
+NodeLib.addResolver( ( value ) => { 
+
+	if ( value.isTexture && ! value.isCubeTexture ) {
+
+		switch ( value.mapping ) {
+
+			case CubeUVReflectionMapping:
+				return new TextureCubeNode( value );
+
+			case CubeUVRefractionMapping:
+				return new TextureCubeNode( value, new ReflectNode( ReflectNode.VECTOR, 1 ) );
+
+		}
+
+	}
+
+} );

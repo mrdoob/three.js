@@ -6,6 +6,7 @@ import { Vector2 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class Vector2Node extends InputNode {
 
@@ -57,3 +58,5 @@ export class Vector2Node extends InputNode {
 }
 
 NodeUtils.addShortcuts( Vector2Node.prototype, 'value', [ 'x', 'y' ] );
+
+NodeLib.addResolver( ( value ) => { if ( value.isVector2 ) return new Vector2Node( value ).setConst( true ); } );

@@ -3,7 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class CondNode extends TempNode {
 
@@ -12,11 +12,11 @@ export class CondNode extends TempNode {
 		super();
 
 		this.op = op;
-		this.a = NodeBuilder.resolve( a );
-		this.b = NodeBuilder.resolve( b );
+		this.a = NodeLib.resolve( a );
+		this.b = NodeLib.resolve( b );
 
-		this.ifNode = NodeBuilder.resolve( ifNode );
-		this.elseNode = NodeBuilder.resolve( elseNode );
+		this.ifNode = NodeLib.resolve( ifNode );
+		this.elseNode = NodeLib.resolve( elseNode );
 
 		this.nodeType = "Cond";
 

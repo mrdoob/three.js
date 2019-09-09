@@ -3,7 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { ConstNode } from '../core/ConstNode.js';
 import { StructNode } from '../core/StructNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -150,8 +150,8 @@ export class TextureCubeUVNode extends TempNode {
 		super( 'TextureCubeUVData' ); // TextureCubeUVData is type as StructNode
 
 		this.uv = uv;
-		this.textureSize = NodeBuilder.resolve( textureSize );
-		this.roughness = NodeBuilder.resolve( roughness );
+		this.textureSize = NodeLib.resolve( textureSize );
+		this.roughness = NodeLib.resolve( roughness );
 
 		this.nodeType = "TextureCubeUV";
 

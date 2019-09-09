@@ -26,7 +26,7 @@ export class MeshStandardNode extends StandardNode {
 			normalScale: new Vector2( 1, 1 )
 		};
 
-		this.inputs = {
+		this.nodes = {
 			color: new PropertyNode( this.properties, 'color', 'c' ),
 			roughness: new PropertyNode( this.properties, 'roughness', 'f' ),
 			metalness: new PropertyNode( this.properties, 'metalness', 'f' ),
@@ -40,7 +40,7 @@ export class MeshStandardNode extends StandardNode {
 	build( builder ) {
 
 		var props = this.properties,
-			inputs = this.inputs;
+			nodes = this.nodes;
 
 		if ( builder.isShader( 'fragment' ) ) {
 
@@ -48,8 +48,8 @@ export class MeshStandardNode extends StandardNode {
 			// * color
 			// * map
 
-			var color = builder.findNode( props.color, inputs.color ),
-				map = builder.resolve( props.map );
+			var color = builder.findNode( props.color, nodes.color ),
+				map = props.map;
 
 			this.color = map ? new MulNode( color, map ) : color;
 
@@ -57,8 +57,8 @@ export class MeshStandardNode extends StandardNode {
 			// * roughness
 			// * roughnessMap
 
-			var roughness = builder.findNode( props.roughness, inputs.roughness ),
-				roughnessMap = builder.resolve( props.roughnessMap );
+			var roughness = builder.findNode( props.roughness, nodes.roughness ),
+				roughnessMap = props.roughnessMap;
 
 			this.roughness = roughnessMap ? new MulNode( roughness, new SwitchNode( roughnessMap, "g" ) ) : roughness;
 
@@ -66,8 +66,8 @@ export class MeshStandardNode extends StandardNode {
 			// * metalness
 			// * metalnessMap
 
-			var metalness = builder.findNode( props.metalness, inputs.metalness ),
-				metalnessMap = builder.resolve( props.metalnessMap );
+			var metalness = builder.findNode( props.metalness, nodes.metalness ),
+				metalnessMap = props.metalnessMap;
 
 			this.metalness = metalnessMap ? new MulNode( metalness, new SwitchNode( metalnessMap, "b" ) ) : metalness;
 
@@ -77,8 +77,8 @@ export class MeshStandardNode extends StandardNode {
 
 			if ( props.normalMap ) {
 
-				this.normal = new NormalMapNode( builder.resolve( props.normalMap ) );
-				this.normal.scale = builder.findNode( props.normalScale, inputs.normalScale );
+				this.normal = new NormalMapNode( props.normalMap );
+				this.normal.scale = builder.findNode( props.normalScale, nodes.normalScale );
 
 			} else {
 
@@ -101,6 +101,11 @@ export class MeshStandardNode extends StandardNode {
 
 	toJSON( meta ) {
 
+		var data = super.toJSON( meta );
+
+		console.log( props.envMap );
+
+/*
 		var data = this.getJSONNode( meta );
 
 		if ( ! data ) {
@@ -110,7 +115,7 @@ export class MeshStandardNode extends StandardNode {
 			console.warn( ".toJSON not implemented in", this );
 
 		}
-
+*/
 		return data;
 
 	}

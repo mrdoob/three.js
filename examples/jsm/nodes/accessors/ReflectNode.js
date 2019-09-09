@@ -3,6 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { PositionNode } from './PositionNode.js';
 import { NormalNode } from './NormalNode.js';
 
@@ -13,7 +14,7 @@ export class ReflectNode extends TempNode {
 		super( 'v3' );
 
 		this.scope = scope || ReflectNode.CUBE;
-		this.ratio = ratio;
+		this.ratio = NodeLib.resolve( ratio );
 
 		this.nodeType = "Reflect";
 

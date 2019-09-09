@@ -5,6 +5,7 @@
 import { Vector2 } from '../../../../build/three.module.js';
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
@@ -44,15 +45,12 @@ export const BLUR_Y = new FunctionNode( [
 
 export class BlurNode extends TempNode {
 
-	constructor( value, uv, radius, size ) {
+	constructor( value, radius, size ) {
 
 		super( 'v4' );
 
-		this.nodeType = "Blur";
-
-		this.value = value;
-		this.uv = uv || new UVNode();
-		this.radius = radius || new Vector2Node( 1, 1 );
+		this.value = NodeLib.resolve( value );
+		this.radius = NodeLib.resolve( radius ) || new Vector2Node( 1, 1 );
 
 		this.size = size;
 
@@ -61,6 +59,8 @@ export class BlurNode extends TempNode {
 
 		this.horizontal = new FloatNode( 1 / 64 );
 		this.vertical = new FloatNode( 1 / 64 );
+
+		this.nodeType = "Blur";
 
 	}
 

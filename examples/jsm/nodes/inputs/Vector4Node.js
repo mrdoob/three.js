@@ -6,6 +6,7 @@ import { Vector4 } from '../../../../build/three.module.js';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class Vector4Node extends InputNode {
 
@@ -59,3 +60,5 @@ export class Vector4Node extends InputNode {
 }
 
 NodeUtils.addShortcuts( Vector4Node.prototype, 'value', [ 'x', 'y', 'z', 'w' ] );
+
+NodeLib.addResolver( ( value ) => { if ( value.isVector4 ) return new Vector4Node( value ).setConst( true ); } );

@@ -3,10 +3,6 @@
  */
 
 import {
-	CubeReflectionMapping,
-	CubeRefractionMapping,
-	CubeUVReflectionMapping,
-	CubeUVRefractionMapping,
 	LinearEncoding,
 	GammaEncoding
 } from '../../../../build/three.module.js';
@@ -19,19 +15,9 @@ import { ExpressionNode } from './ExpressionNode.js';
 import { ConstNode } from './ConstNode.js';
 import { StructNode } from './StructNode.js';
 import { NodeContext } from './NodeContext.js';
-import { ReflectNode } from '../accessors/ReflectNode.js';
-import { BoolNode } from '../inputs/BoolNode.js';
-import { FloatNode } from '../inputs/FloatNode.js';
-import { ColorNode } from '../inputs/ColorNode.js';
-import { Vector2Node } from '../inputs/Vector2Node.js';
-import { Vector3Node } from '../inputs/Vector3Node.js';
-import { Vector4Node } from '../inputs/Vector4Node.js';
-import { TextureNode } from '../inputs/TextureNode.js';
-import { CubeTextureNode } from '../inputs/CubeTextureNode.js';
-import { TextureCubeNode } from '../misc/TextureCubeNode.js';
 
-
-var elements = NodeUtils.elements,
+const 
+	elements = [ 'x', 'y', 'z', 'w' ],
 	constructors = [ 'float', 'vec2', 'vec3', 'vec4' ],
 	convertFormatToType = {
 		float: 'f',
@@ -815,7 +801,7 @@ export class NodeBuilder {
 
 			var nodeCandidate = arguments[ i ];
 
-			if ( nodeCandidate !== undefined && nodeCandidate.isNode ) {
+			if ( nodeCandidate.isNode ) {
 
 				return nodeCandidate;
 
@@ -829,10 +815,9 @@ export class NodeBuilder {
 
 		for ( var i = 0; i < arguments.length; i ++ ) {
 
-			var nodeCandidate = arguments[ i ];
-			var resolvedNode = NodeBuilder.resolve( nodeCandidate, false );
+			var resolvedNode = NodeLib.resolve( arguments[ i ] );
 
-			if ( resolvedNode !== undefined && resolvedNode.isNode ) {
+			if ( resolvedNode && resolvedNode.isNode ) {
 
 				return resolvedNode;
 
@@ -994,72 +979,4 @@ export class NodeBuilder {
 
 	}
 
-}
-
-NodeBuilder.resolve = ( value, primitives ) => {
-
-	primitives = primitives !== undefined ? primitives : true;
-
-	if ( value !== undefined ) {
-
-		if ( value.isNode ) {
-
-			return value;
-
-		} else if ( value.isTexture ) {
-
-			switch ( value.mapping ) {
-
-				case CubeReflectionMapping:
-					return new CubeTextureNode( value );
-
-				case CubeRefractionMapping:
-					var uv = new ReflectNode( ReflectNode.CUBE, new FloatNode( 1 ).setConst( true ) );
-					return new CubeTextureNode( value, uv );
-
-				case CubeUVReflectionMapping:
-					return new TextureCubeNode( new TextureNode( value ) );
-
-				case CubeUVRefractionMapping:
-					var uv = new ReflectNode( ReflectNode.VECTOR, new FloatNode( 1 ).setConst( true ) );
-					return new TextureCubeNode( new TextureNode( value ), uv );
-
-				default:
-					return new TextureNode( value );
-
-			}
-
-		} else if ( value.isVector2 ) {
-
-			return new Vector2Node( value );
-
-		} else if ( value.isVector3 ) {
-
-			return new Vector3Node( value );
-
-		} else if ( value.isVector4 ) {
-
-			return new Vector4Node( value );
-
-		} else if ( primitives ) {
-
-			var type = typeof value;
-
-			if ( type === 'number' ) return new FloatNode( value ).setConst( true );
-			else if ( type === 'boolean' ) return new BoolNode( value ).setConst( true );
-			else if ( type === 'string' ) {
-
-				if ( value.substr( 0, 1 ) === '#' ) return new ColorNode( parseInt( value.substr( 1 ) ) ).setConst( true );
-				else if ( value.substr( 0, 2 ) === '0x' ) return new ColorNode( parseInt( value ) ).setConst( true );
-
-				return NodeLib.get( value ) || NodeLib.getKeyword( value ) || new ExpressionNode( value );
-
-			}
-
-
-
-		}
-
-	}
-	
 }

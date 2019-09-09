@@ -2,7 +2,12 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	CubeRefractionMapping
+} from '../../../../build/three.module.js';
+
 import { InputNode } from '../core/InputNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { NodeContext } from '../core/NodeContext.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
@@ -15,8 +20,8 @@ export class CubeTextureNode extends InputNode {
 		super( 'v4' );
 
 		this.value = value;
-		this.uv = uv || new ReflectNode();
-		this.bias = bias;
+		this.uv = NodeLib.resolve( uv ) || new ReflectNode();
+		this.bias = NodeLib.resolve( bias );
 
 		this.shared = true;
 
@@ -112,3 +117,21 @@ export class CubeTextureNode extends InputNode {
 	}
 
 }
+
+NodeLib.addResolver( ( value ) => { 
+
+	if ( value.isCubeTexture ) {
+
+		var uv;
+
+		if ( value.mapping === CubeRefractionMapping ) {
+
+			uv = new ReflectNode( ReflectNode.CUBE, 1 );
+
+		}
+
+		return new CubeTextureNode( value, uv );
+
+	}
+
+} );

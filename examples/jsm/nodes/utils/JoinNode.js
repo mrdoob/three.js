@@ -3,9 +3,10 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
-import { NodeUtils } from '../core/NodeUtils.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 
-var inputs = NodeUtils.elements;
+const inputs = [ 'x', 'y', 'z', 'w' ];
 
 export class JoinNode extends TempNode {
 
@@ -13,10 +14,10 @@ export class JoinNode extends TempNode {
 
 		super( 'f' );
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.w = w;
+		this.x = NodeLib.resolve( x );
+		this.y = NodeLib.resolve( y );
+		this.z = NodeLib.resolve( z );
+		this.w = NodeLib.resolve( w );
 
 		this.nodeType = "Join";
 

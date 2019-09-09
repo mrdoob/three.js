@@ -26,4 +26,4 @@ NodeUtils.addShortcuts( SpriteNodeMaterial.prototype, 'fragment', [
 	'mask',
 	'position',
 	'spherical'
-] );
+], true );

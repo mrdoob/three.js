@@ -2,7 +2,9 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-function applyShortcut( proxy, property, subProperty ) {
+import { NodeLib } from './NodeLib.js';
+
+function applyShortcut( proxy, property, subProperty, resolve ) {
 
 	if ( subProperty ) {
 
@@ -16,11 +18,13 @@ function applyShortcut( proxy, property, subProperty ) {
 
 			set: function ( val ) {
 
+				if ( resolve ) val = NodeLib.resolve( val );
+
 				this[ proxy ][ property ][ subProperty ] = val;
 
 			}
 
-		};
+		}
 
 	} else {
 
@@ -34,11 +38,13 @@ function applyShortcut( proxy, property, subProperty ) {
 
 			set: function ( val ) {
 
+				if ( resolve ) val = NodeLib.resolve( val );
+
 				this[ proxy ][ property ] = val;
 
 			}
 
-		};
+		}
 
 	}
 
@@ -46,9 +52,7 @@ function applyShortcut( proxy, property, subProperty ) {
 
 export const NodeUtils = {
 
-	elements: [ 'x', 'y', 'z', 'w' ],
-
-	createProxyClass: function ( baseClass, property ) {
+	createProxyClass: ( baseClass, property ) => {
 
 		return class ProxyClass extends baseClass {
 
@@ -62,7 +66,7 @@ export const NodeUtils = {
 
 	}, 
 
-	addShortcuts: function ( proto, proxy, list ) {
+	addShortcuts: ( proto, proxy, list, resolve ) => {
 
 		var shortcuts = {};
 
@@ -72,7 +76,7 @@ export const NodeUtils = {
 				property = data[ 0 ],
 				subProperty = data[ 1 ];
 
-			shortcuts[ property ] = applyShortcut( proxy, property, subProperty );
+			shortcuts[ property ] = applyShortcut( proxy, property, subProperty, resolve );
 
 		}
 

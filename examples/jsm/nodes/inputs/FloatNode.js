@@ -3,6 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class FloatNode extends InputNode {
 
@@ -51,3 +52,13 @@ export class FloatNode extends InputNode {
 	}
 
 }
+
+NodeLib.addResolver( ( value ) => {
+
+	if ( typeof value === 'number' ) {
+
+		return new FloatNode( value ).setConst( true ); 
+
+	}
+
+} );

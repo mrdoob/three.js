@@ -6,6 +6,39 @@ export const NodeLib = {
 
 	nodes: {},
 	keywords: {},
+	resolvers: [],
+
+	addResolver: function ( resolver ) {
+
+		this.resolvers.push( resolver );
+
+	},
+
+	resolve: function( value ) {
+
+		if ( value === undefined || value.isNode ) return value;
+		else if ( typeof value === 'string' ) {
+
+			if ( this.contains( value ) ) return this.get( value );
+			else if ( this.containsKeyword( value ) ) return this.getKeyword( value );
+
+		}
+
+		var i = this.resolvers.length;
+
+		// is necessary descending order to search from extended objects 
+
+		while ( i -- ) {
+
+			var node = this.resolvers[ i ]( value );
+
+			if ( node ) return node;
+
+		}
+
+		return value;
+
+	},
 
 	add: function ( node ) {
 

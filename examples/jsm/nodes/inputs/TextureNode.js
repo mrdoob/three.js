@@ -3,7 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
-import { NodeBuilder } from '../core/NodeBuilder.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { NodeContext } from '../core/NodeContext.js';
 import { UVNode } from '../accessors/UVNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
@@ -16,8 +16,8 @@ export class TextureNode extends InputNode {
 		super( 'v4' );
 
 		this.value = value;
-		this.uv = NodeBuilder.resolve( uv );
-		this.bias = NodeBuilder.resolve( bias );
+		this.uv = NodeLib.resolve( uv );
+		this.bias = NodeLib.resolve( bias );
 		this.project = project !== undefined ? project : false;
 
 		this.shared = true;
@@ -137,3 +137,13 @@ export class TextureNode extends InputNode {
 	}
 
 }
+
+NodeLib.addResolver( ( value ) => { 
+
+	if ( value.isTexture && ! value.isCubeTexture ) {
+
+		return new TextureNode( value );
+
+	}
+
+} );

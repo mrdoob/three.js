@@ -6,6 +6,7 @@
 import { Math as _Math } from '../../../../build/three.module.js';
 import { Node } from './Node.js';
 import { NodeContext } from './NodeContext.js';
+import { SwitchNode } from '../utils/SwitchNode.js';
 
 export class TempNode extends Node {
 
@@ -112,6 +113,12 @@ export class TempNode extends Node {
 	getLabel() {
 
 		return this.label;
+
+	}
+
+	getPropertyNode( property ) {
+
+		return new SwitchNode( this, property );
 
 	}
 

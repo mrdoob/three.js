@@ -3,6 +3,7 @@
  */
 
 import { InputNode } from '../core/InputNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 
 export class BoolNode extends InputNode {
 
@@ -51,3 +52,13 @@ export class BoolNode extends InputNode {
 	}
 
 }
+
+NodeLib.addResolver( ( value ) => {
+
+	if ( typeof value === 'boolean' ) {
+
+		return new BoolNode( value ).setConst( true ); 
+
+	}
+
+} );
