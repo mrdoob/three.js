@@ -53,11 +53,9 @@ export class ReflectNode extends TempNode {
 				case ReflectNode.VECTOR:
 
 					var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
-					var roughnessNode = builder.getContextProperty( 'roughness' );
 
 					var viewNormal = viewNormalNode.build( builder, 'v3' );
 					var viewPosition = '-normalize( ' + new PositionNode( PositionNode.VIEW ).build( builder, 'v3' ) + ' )';
-					var roughness = roughnessNode ? roughnessNode.build( builder, 'f' ) : undefined;
 
 					var method;
 
@@ -70,6 +68,9 @@ export class ReflectNode extends TempNode {
 					} else {
 
 						method = `reflect( ${viewPosition}, ${viewNormal} )`;
+
+						var roughnessNode = builder.getContextProperty( 'roughness' );
+						var roughness = roughnessNode ? roughnessNode.build( builder, 'f' ) : undefined;
 
 						if ( roughness ) {
 
