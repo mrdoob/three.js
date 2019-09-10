@@ -1312,6 +1312,21 @@ Object.defineProperties( Material.prototype, {
 			this.flatShading = ( value === FlatShading );
 
 		}
+	},
+
+	stencilMask: {
+		get: function () {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			return this.stencilFuncMask;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			this.stencilFuncMask = value;
+
+		}
 	}
 
 } );
