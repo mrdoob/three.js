@@ -106,7 +106,7 @@ module.exports = function(grunt) {
         copy.cwd = `${path.dirname(file)}/`;
         copy.src = path.basename(file);
         copy.expand = true;
-        copy.dest = 'out/webgl/resources/';
+        copy.dest = 'out/threejs/resources/';
       }
       return copy;
     }));
