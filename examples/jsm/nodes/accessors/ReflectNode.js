@@ -70,9 +70,10 @@ export class ReflectNode extends TempNode {
 						method = `reflect( ${viewPosition}, ${viewNormal} )`;
 
 						var roughnessNode = builder.getContextProperty( 'roughness' );
-						var roughness = roughnessNode ? roughnessNode.build( builder, 'f' ) : undefined;
 
-						if ( roughness ) {
+						if ( roughnessNode ) {
+
+							var roughness = roughnessNode ? roughnessNode.build( builder, 'f' ) : undefined;
 
 							// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
 							method = `normalize( mix( ${method}, ${viewNormal}, ${roughness} * ${roughness} ) )`;
