@@ -63,6 +63,8 @@ function WebGLGeometries( gl, attributes, info ) {
 
 			if ( geometry._bufferGeometry === undefined ) {
 
+				console.warn( 'THREE.WebGLGeometries: three.js will stop rendering geometries of type "THREE.Geometry" in R111. Please use "THREE.BufferGeometry" instead.' );
+
 				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
 
 			}
