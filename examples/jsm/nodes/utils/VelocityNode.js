@@ -8,16 +8,17 @@ import { Vector3Node } from '../inputs/Vector3Node.js';
 
 export class VelocityNode extends Vector3Node {
 
-	constructor( target, params ) {
+	constructor( scope, target ) {
 
 		super();
 
-		this.params = {};
+		this.fps = 60;
+		this.scope = undefined;
 
 		this.velocity = new Vector3();
 
+		this.setScope( scope );
 		this.setTarget( target );
-		this.setParams( params );
 
 		this.nodeType = "Velocity";
 
@@ -29,28 +30,33 @@ export class VelocityNode extends Vector3Node {
 
 	}
 
-	setParams( params ) {
+	setScope( scope ) {
 
-		switch ( this.params.type ) {
+		switch ( this.scope ) {
 
-			case "elastic":
+			case 'elastic':
 
-				delete this.moment;
+				this.spring = 0;
+				this.damping = 0;
 
-				delete this.speed;
-				delete this.springVelocity;
+				this.moment = new Vector3();
 
-				delete this.lastVelocity;
+				this.speed = new Vector3();
+				this.springVelocity = new Vector3();
+
+				this.lastVelocity = new Vector3();
 
 				break;
-
 		}
 
-		this.params = params || {};
+		this.scope = scope;
 
-		switch ( this.params.type ) {
+		switch ( scope ) {
 
-			case "elastic":
+			case 'elastic':
+
+				this.spring = 0;
+				this.damping = 0;
 
 				this.moment = new Vector3();
 
@@ -101,18 +107,18 @@ export class VelocityNode extends Vector3Node {
 
 		this.updateFrameVelocity( frame );
 
-		switch ( this.params.type ) {
+		switch ( this.scope ) {
 
-			case "elastic":
+			case 'elastic':
 
 				// convert to real scale: 0 at 1 values
-				var deltaFps = frame.delta * ( this.params.fps || 60 );
+				var deltaFps = frame.delta * ( this.fps || 60 );
 
-				var spring = Math.pow( this.params.spring, deltaFps ),
-					damping = Math.pow( this.params.damping, deltaFps );
+				var spring = Math.pow( this.spring, deltaFps ),
+					damping = Math.pow( this.damping, deltaFps );
 
 				// fix relative frame-rate
-				this.velocity.multiplyScalar( Math.exp( - this.params.damping * deltaFps ) );
+				this.velocity.multiplyScalar( Math.exp( - this.damping * deltaFps ) );
 
 				// elastic
 				this.velocity.add( this.springVelocity );
@@ -150,7 +156,10 @@ export class VelocityNode extends Vector3Node {
 
 		if ( source.target ) this.setTarget( source.target );
 
-		this.setParams( source.params );
+		this.setScope( source.scope );
+
+		if ( source.damping !== undefined ) this.damping = source.damping;
+		if ( source.spring !== undefined ) this.spring = source.spring;
 
 		return this;
 
@@ -164,10 +173,13 @@ export class VelocityNode extends Vector3Node {
 
 			data = this.createJSONNode( meta );
 
-			if ( this.target ) data.target = this.target.uuid;
+			data.type = this.type;
+			data.fps = this.fps;
 
-			// clone params
-			data.params = JSON.parse( JSON.stringify( this.params ) );
+			if ( this.damping !== undefined ) data.damping = this.damping;
+			if ( this.spring !== undefined ) data.spring = this.spring;
+
+			if ( this.target ) data.target = this.target.uuid;
 
 		}
 
@@ -176,3 +188,6 @@ export class VelocityNode extends Vector3Node {
 	}
 
 }
+
+VelocityNode.VELOCITY = 'velocity';
+VelocityNode.ELASTIC = 'elastic';

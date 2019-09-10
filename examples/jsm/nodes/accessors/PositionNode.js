@@ -130,12 +130,9 @@ export class PositionNode extends TempNode {
 
 }
 
-PositionNode.LOCAL = 'local';
-PositionNode.WORLD = 'world';
-PositionNode.VIEW = 'view';
-PositionNode.PROJECTION = 'projection';
+PositionNode.LOCAL = 'position.local';
+PositionNode.WORLD = 'position.world';
+PositionNode.VIEW = 'position.view';
+PositionNode.PROJECTION = 'position.projection';
 
-NodeLib.addKeyword( 'position.local', () => { return new PositionNode( PositionNode.LOCAL ); } );
-NodeLib.addKeyword( 'position.world', () => { return new PositionNode( PositionNode.WORLD ); } );
-NodeLib.addKeyword( 'position.view', () => { return new PositionNode( PositionNode.VIEW ); } );
-NodeLib.addKeyword( 'position.projection', () => { return new PositionNode( PositionNode.PROJECTION ); } );
+NodeLib.addStaticKeywords( PositionNode );

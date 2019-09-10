@@ -170,6 +170,8 @@ export class ReflectNode extends TempNode {
 	
 }
 
-ReflectNode.CUBE = 'cube';
-ReflectNode.SPHERE = 'sphere';
-ReflectNode.VECTOR = 'vector';
+ReflectNode.CUBE = 'reflect.cube';
+ReflectNode.SPHERE = 'reflect.sphere';
+ReflectNode.VECTOR = 'reflect.vector';
+
+NodeLib.addStaticKeywords( ReflectNode );

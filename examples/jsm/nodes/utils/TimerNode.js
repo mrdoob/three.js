@@ -7,12 +7,12 @@ import { NodeLib } from '../core/NodeLib.js';
 
 export class TimerNode extends FloatNode {
 
-	constructor( scale, scope, timeScale ) {
+	constructor( scope, scale, timeScale ) {
 
 		super();
 
-		this.scale = scale !== undefined ? scale : 1;
 		this.scope = scope || TimerNode.GLOBAL;
+		this.scale = scale !== undefined ? scale : 1;
 
 		this.timeScale = timeScale !== undefined ? timeScale : scale !== undefined;
 
@@ -96,12 +96,8 @@ export class TimerNode extends FloatNode {
 
 }
 
-TimerNode.GLOBAL = 'global';
-TimerNode.LOCAL = 'local';
-TimerNode.DELTA = 'delta';
+TimerNode.GLOBAL = 'timer.global';
+TimerNode.LOCAL = 'timer.local';
+TimerNode.DELTA = 'timer.delta';
 
-NodeLib.addKeyword( 'time', function () {
-
-	return new TimerNode();
-
-} );
+NodeLib.addStaticKeywords( TimerNode );

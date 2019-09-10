@@ -3,6 +3,7 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
+import { NodeLib } from '../core/NodeLib.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
@@ -31,7 +32,7 @@ export class CameraNode extends TempNode {
 
 		super( 'v3' );
 
-		this.setScope( scope || CameraNode.POSITION );
+		this.setScope( scope );
 		this.setCamera( camera );
 
 		this.nodeType = "Camera";
@@ -40,7 +41,8 @@ export class CameraNode extends TempNode {
 
 	setCamera( camera ) {
 
-		this.camera = camera;
+		this.camera = NodeLib.resolve( camera );
+
 		this.updateFrame = camera !== undefined ? this.onUpdateFrame : undefined;
 
 	};
@@ -225,6 +227,8 @@ export class CameraNode extends TempNode {
 
 }
 
-CameraNode.POSITION = 'position';
-CameraNode.DEPTH = 'depth';
-CameraNode.TO_VERTEX = 'toVertex';
+CameraNode.POSITION = 'camera.position';
+CameraNode.DEPTH = 'camera.depth';
+CameraNode.TO_VERTEX = 'camera.to_vertex';
+
+NodeLib.addStaticKeywords( CameraNode );

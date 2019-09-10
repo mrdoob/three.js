@@ -56,6 +56,28 @@ export const NodeLib = {
 
 	},
 
+	addStaticKeyword: function ( nodeClass, name ) {
+
+		this.addKeyword( name, function () { return new nodeClass( name, ...arguments ); } );
+
+	},
+
+	addStaticKeywords: function ( nodeClass ) {
+
+		for( var property in nodeClass ) {
+
+			// detect if the property is static
+
+			if ( property === property.toUpperCase() ) {
+
+				this.addStaticKeyword( nodeClass, nodeClass[property] );
+
+			}
+
+		}
+
+	},
+
 	remove: function ( node ) {
 
 		delete this.nodes[ node.name ];
@@ -74,9 +96,9 @@ export const NodeLib = {
 
 	},
 
-	getKeyword: function ( name, builder ) {
+	getKeyword: function ( name, ...args ) {
 
-		return this.keywords[ name ].callback.call( this, builder );
+		return this.keywords[ name ].callback.call( this, ...args );
 
 	},
 

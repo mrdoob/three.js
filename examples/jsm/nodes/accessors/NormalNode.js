@@ -114,24 +114,8 @@ export class NormalNode extends TempNode {
 	
 }
 
-NormalNode.LOCAL = 'local';
-NormalNode.WORLD = 'world';
-NormalNode.VIEW = 'view';
+NormalNode.LOCAL = 'normal.local';
+NormalNode.WORLD = 'normal.world';
+NormalNode.VIEW = 'normal.view';
 
-NodeLib.addKeyword( 'normal.view', function () {
-
-	return new NormalNode( NormalNode.VIEW );
-
-} );
-
-NodeLib.addKeyword( 'normal.local', function () {
-
-	return new NormalNode( NormalNode.LOCAL );
-
-} );
-
-NodeLib.addKeyword( 'normal.world', function () {
-
-	return new NormalNode( NormalNode.WORLD );
-
-} );
+NodeLib.addStaticKeywords( NormalNode );
