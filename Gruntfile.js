@@ -124,7 +124,7 @@ module.exports = function(grunt) {
 
   const buildSettings = {
     outDir: 'out',
-    baseUrl: 'http://threejsfundamentals.org',
+    baseUrl: 'https://threejsfundamentals.org',
     rootFolder: 'threejs',
     lessonGrep: 'threejs*.md',
     siteName: 'ThreeJSFundamentals',
