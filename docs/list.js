@@ -354,6 +354,7 @@ var list = {
 			},
 
 			"Controls": {
+				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"OrbitControls": "examples/en/controls/OrbitControls"
 			},
@@ -791,7 +792,8 @@ var list = {
 			},
 
 			"控制": {
-				"DragControls": "examples/en/controls/DragControls",
+				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
+				"DragControls": "examples/zh/controls/DragControls",
 				"OrbitControls": "examples/zh/controls/OrbitControls"
 			},
 
