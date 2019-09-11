@@ -82,6 +82,22 @@ UI.Element.prototype = {
 
 	},
 
+	addClass: function ( name ) {
+
+		this.dom.classList.add( name );
+
+		return this;
+
+	},
+
+	removeClass: function ( name ) {
+
+		this.dom.classList.remove( name );
+
+		return this;
+
+	},
+
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -995,3 +1011,122 @@ UI.Button.prototype.setLabel = function ( value ) {
 	return this;
 
 };
+
+
+// TabbedPanel
+
+UI.TabbedPanel = function ( ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement('div');
+	
+	this.dom = dom;
+
+	this.setClass( 'TabbedPanel' );
+
+	this.tabs = [];
+	this.panels = [];
+
+	this.tabsDiv = new UI.Div();
+	this.tabsDiv.setClass( 'Tabs' );
+
+	this.panelsDiv = new UI.Div();
+	this.panelsDiv.setClass( 'Panels' );
+
+	this.add( this.tabsDiv );
+	this.add( this.panelsDiv );
+
+	this.selected = '';
+
+	return this;
+
+}
+
+UI.TabbedPanel.prototype = Object.create( UI.Element.prototype );
+UI.TabbedPanel.prototype.constructor = UI.TabbedPanel;
+
+UI.TabbedPanel.prototype.select = function ( id ) {
+
+	var tab;
+	var panel;
+	var scope = this;
+	
+	// Deselect current selection
+	if ( this.selected && this.selected.length ) {
+		tab = this.tabs.find( function ( item ) { return item.dom.id === scope.selected } );
+		panel = this.panels.find( function ( item ) { return item.dom.id === scope.selected } );
+
+		if ( tab ) {
+
+			tab.removeClass( 'selected' );
+
+		}
+
+		if( panel ) {
+
+			panel.setDisplay( 'none' );
+
+		}
+
+	}
+
+	tab = this.tabs.find( function ( item ) { return item.dom.id === id } );
+	panel = this.panels.find( function ( item ) { return item.dom.id === id } );
+	
+	if ( tab ) {
+
+		tab.addClass( 'selected' );
+
+	}
+
+	if( panel ) {
+
+		panel.setDisplay( '' );
+
+	}
+
+	this.selected = id;
+
+	return this;
+
+}
+
+UI.TabbedPanel.prototype.addPanel = function ( id, label, items ) {
+
+	var tab = new UI.TabbedPanel.Tab( label, this );
+	tab.setId( id );
+	this.tabs.push( tab );
+	this.tabsDiv.add( tab );
+
+	var panel = new UI.Div();
+	panel.setId( id );
+	panel.add( items );
+	panel.setDisplay( 'none' );
+	this.panels.push( panel );
+	this.panelsDiv.add( panel );
+
+	this.select( id );
+
+}
+
+UI.TabbedPanel.Tab = function ( text, parent ) {
+
+	UI.Text.call( this, text );
+	this.parent = parent;
+
+	this.setClass( 'Tab' );
+
+	var scope = this;
+	this.dom.addEventListener( 'click', function ( event ) {
+
+		scope.parent.select( scope.dom.id );
+
+	} )
+
+	return this;
+
+}
+
+UI.TabbedPanel.Tab.prototype = Object.create( UI.Text.prototype );
+UI.TabbedPanel.Tab.prototype.constructor = UI.TabbedPanel.Tab;

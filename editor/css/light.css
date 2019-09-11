@@ -244,6 +244,21 @@ select {
 		background-color: rgba(0,0,0,0.04);
 	}
 
+
+.TabbedPanel .Tabs {
+	background-color: #ddd;
+	border-top: 1px solid #ccc;
+}
+
+	.TabbedPanel .Tab {
+		color: #aaa;
+		border-right: 1px solid #ccc;
+	}
+
+	.TabbedPanel .Tab.selected {
+		color: #888;
+		background-color: #eee;
+	}
 /* */
 
 @media all and ( max-width: 600px ) {
