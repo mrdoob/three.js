@@ -523,8 +523,8 @@ MTLLoader.MaterialCreator.prototype = {
 	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
-		var loader = Loader.Handlers.get( url );
 		var manager = ( this.manager !== undefined ) ? this.manager : DefaultLoadingManager;
+		var loader = manager.getHandler( url );
 
 		if ( loader === null ) {
 

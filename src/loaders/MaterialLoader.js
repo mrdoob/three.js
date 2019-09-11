@@ -61,6 +61,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.color !== undefined ) material.color.setHex( json.color );
 		if ( json.roughness !== undefined ) material.roughness = json.roughness;
 		if ( json.metalness !== undefined ) material.metalness = json.metalness;
+		if ( json.sheen !== undefined ) material.sheen = new Color().setHex( json.sheen );
 		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
 		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
@@ -78,6 +79,16 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
+
+		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
+		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
+		if ( json.stencilFunc !== undefined ) material.stencilFunc = json.stencilFunc;
+		if ( json.stencilRef !== undefined ) material.stencilRef = json.stencilRef;
+		if ( json.stencilFuncMask !== undefined ) material.stencilFuncMask = json.stencilFuncMask;
+		if ( json.stencilFail !== undefined ) material.stencilFail = json.stencilFail;
+		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
+		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
+
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;

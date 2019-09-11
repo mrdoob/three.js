@@ -4,7 +4,7 @@ import {
   LoadingManager
 } from '../../../src/Three';
 
-export class VRMLLoader extends Loader {
+export class VTKLoader extends Loader {
   constructor(manager?: LoadingManager);
 
   load(url: string, onLoad: (geometry: BufferGeometry) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - draggable cubes</title>
+		<title>three.js webgl - drag controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - draggable cubes
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls
 		</div>
 
 		<script type="module">
@@ -27,11 +27,10 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { DragControls } from './jsm/controls/DragControls.js';
 
 			var container, stats;
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer;
 			var objects = [];
 
 			init();
@@ -98,24 +97,17 @@
 
 				container.appendChild( renderer.domElement );
 
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-				controls.noZoom = false;
-				controls.noPan = false;
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
+				var controls = new DragControls( objects, camera, renderer.domElement );
 
-				var dragControls = new DragControls( objects, camera, renderer.domElement );
-				dragControls.addEventListener( 'dragstart', function () {
+				controls.addEventListener( 'dragstart', function ( event ) {
 
-					controls.enabled = false;
+					event.object.material.emissive.set( 0xaaaaaa );
 
 				} );
-				dragControls.addEventListener( 'dragend', function () {
 
-					controls.enabled = true;
+				controls.addEventListener( 'dragend', function ( event ) {
+
+					event.object.material.emissive.set( 0x000000 );
 
 				} );
 
@@ -149,8 +141,6 @@
 			}
 
 			function render() {
-
-				controls.update();
 
 				renderer.render( scene, camera );
 

@@ -424,6 +424,22 @@ Object.assign( Loader.prototype, {
 
 } );
 
+Loader.Handlers = {
+
+	add: function ( /* regex, loader */ ) {
+
+		console.error( 'THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.' );
+
+	},
+
+	get: function ( /* file */ ) {
+
+		console.error( 'THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.' );
+
+	}
+
+};
+
 export function XHRLoader( manager ) {
 
 	console.warn( 'THREE.XHRLoader has been renamed to THREE.FileLoader.' );
@@ -1310,6 +1326,21 @@ Object.defineProperties( Material.prototype, {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
 			this.flatShading = ( value === FlatShading );
+
+		}
+	},
+
+	stencilMask: {
+		get: function () {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			return this.stencilFuncMask;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			this.stencilFuncMask = value;
 
 		}
 	}
