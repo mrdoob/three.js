@@ -661,8 +661,8 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.position );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( programAttributes.position );
-			_gl.vertexAttribPointer( programAttributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( programAttributes.position.location );
+			_gl.vertexAttribPointer( programAttributes.position.location, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -671,8 +671,8 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normal );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( programAttributes.normal );
-			_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( programAttributes.normal.location );
+			_gl.vertexAttribPointer( programAttributes.normal.location, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -681,8 +681,8 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uv );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( programAttributes.uv );
-			_gl.vertexAttribPointer( programAttributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( programAttributes.uv.location );
+			_gl.vertexAttribPointer( programAttributes.uv.location, 2, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -691,8 +691,8 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.color );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
 
-			state.enableAttribute( programAttributes.color );
-			_gl.vertexAttribPointer( programAttributes.color, 3, _gl.FLOAT, false, 0, 0 );
+			state.enableAttribute( programAttributes.color.location );
+			_gl.vertexAttribPointer( programAttributes.color.location, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -900,7 +900,7 @@ function WebGLRenderer( parameters ) {
 
 			var programAttribute = programAttributes[ name ];
 
-			if ( programAttribute >= 0 ) {
+			if ( programAttribute.location >= 0 ) {
 
 				var geometryAttribute = geometryAttributes[ name ];
 
@@ -919,6 +919,12 @@ function WebGLRenderer( parameters ) {
 					var type = attribute.type;
 					var bytesPerElement = attribute.bytesPerElement;
 
+					var locationsNum = 1;
+
+					if ( programAttribute.type === _gl.FLOAT_MAT2 ) locationsNum = 2;
+					if ( programAttribute.type === _gl.FLOAT_MAT3 ) locationsNum = 3;
+					if ( programAttribute.type === _gl.FLOAT_MAT4 ) locationsNum = 4;
+
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 						var data = geometryAttribute.data;
@@ -927,7 +933,11 @@ function WebGLRenderer( parameters ) {
 
 						if ( data && data.isInstancedInterleavedBuffer ) {
 
-							state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
+							for ( var i = 0; i < locationsNum; i ++ ) {
+
+								state.enableAttributeAndDivisor( programAttribute.location + i, data.meshPerAttribute );
+
+							}
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -937,18 +947,48 @@ function WebGLRenderer( parameters ) {
 
 						} else {
 
-							state.enableAttribute( programAttribute );
+							for ( var i = 0; i < locationsNum; i ++ ) {
+
+								state.enableAttribute( programAttribute.location + i );
+
+							}
 
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+
+						if ( locationsNum === 2 && size === 4 ||
+							locationsNum === 3 && size === 9 ||
+							locationsNum === 4 && size === 16 ) {
+
+							for ( var i = 0; i < locationsNum; i ++ ) {
+
+								_gl.vertexAttribPointer(
+									programAttribute.location + i,
+									size / locationsNum,
+									type,
+									normalized,
+									stride * bytesPerElement,
+									( offset + ( size / locationsNum ) * i ) * bytesPerElement
+								);
+
+							}
+
+						} else {
+
+							_gl.vertexAttribPointer( programAttribute.location, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+
+						}
 
 					} else {
 
 						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-							state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
+							for ( var i = 0; i < locationsNum; i ++ ) {
+
+								state.enableAttributeAndDivisor( programAttribute.location + i, geometryAttribute.meshPerAttribute );
+
+							}
 
 							if ( geometry.maxInstancedCount === undefined ) {
 
@@ -958,12 +998,38 @@ function WebGLRenderer( parameters ) {
 
 						} else {
 
-							state.enableAttribute( programAttribute );
+							for ( var i = 0; i < locationsNum; i ++ ) {
+
+								state.enableAttribute( programAttribute.location + i );
+
+							}
 
 						}
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+
+						if ( locationsNum === 2 && size === 4 ||
+							locationsNum === 3 && size === 9 ||
+							locationsNum === 4 && size === 16 ) {
+
+							for ( var i = 0; i < locationsNum; i ++ ) {
+
+								_gl.vertexAttribPointer(
+									programAttribute.location + i,
+									size / locationsNum,
+									type,
+									normalized,
+									size * bytesPerElement,
+									( size / locationsNum ) * i * bytesPerElement
+								);
+
+							}
+
+						} else {
+
+							_gl.vertexAttribPointer( programAttribute.location, size, type, normalized, 0, 0 );
+
+						}
 
 					}
 
@@ -976,19 +1042,19 @@ function WebGLRenderer( parameters ) {
 						switch ( value.length ) {
 
 							case 2:
-								_gl.vertexAttrib2fv( programAttribute, value );
+								_gl.vertexAttrib2fv( programAttribute.location, value );
 								break;
 
 							case 3:
-								_gl.vertexAttrib3fv( programAttribute, value );
+								_gl.vertexAttrib3fv( programAttribute.location, value );
 								break;
 
 							case 4:
-								_gl.vertexAttrib4fv( programAttribute, value );
+								_gl.vertexAttrib4fv( programAttribute.location, value );
 								break;
 
 							default:
-								_gl.vertexAttrib1fv( programAttribute, value );
+								_gl.vertexAttrib1fv( programAttribute.location, value );
 
 						}
 
@@ -1525,7 +1591,7 @@ function WebGLRenderer( parameters ) {
 
 			for ( var i = 0; i < _this.maxMorphTargets; i ++ ) {
 
-				if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
+				if ( programAttributes[ 'morphTarget' + i ].location >= 0 ) {
 
 					material.numSupportedMorphTargets ++;
 
@@ -1541,7 +1607,7 @@ function WebGLRenderer( parameters ) {
 
 			for ( var i = 0; i < _this.maxMorphNormals; i ++ ) {
 
-				if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
+				if ( programAttributes[ 'morphNormal' + i ].location >= 0 ) {
 
 					material.numSupportedMorphNormals ++;
 

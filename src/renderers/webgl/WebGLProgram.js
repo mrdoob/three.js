@@ -161,7 +161,12 @@ function fetchAttributeLocations( gl, program ) {
 
 		// console.log( 'THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
 
-		attributes[ name ] = gl.getAttribLocation( program, name );
+		attributes[ name ] = {
+
+			type: info.type,
+			location: gl.getAttribLocation( program, name )
+
+		};
 
 	}
 
