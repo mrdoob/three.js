@@ -8324,9 +8324,10 @@ function Material() {
 	this.depthTest = true;
 	this.depthWrite = true;
 
+	this.stencilWriteMask = 0xff;
 	this.stencilFunc = AlwaysStencilFunc;
 	this.stencilRef = 0;
-	this.stencilMask = 0xff;
+	this.stencilFuncMask = 0xff;
 	this.stencilFail = KeepStencilOp;
 	this.stencilZFail = KeepStencilOp;
 	this.stencilZPass = KeepStencilOp;
@@ -8542,9 +8543,10 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		data.depthWrite = this.depthWrite;
 
 		data.stencilWrite = this.stencilWrite;
+		data.stencilWriteMask = this.stencilWriteMask;
 		data.stencilFunc = this.stencilFunc;
 		data.stencilRef = this.stencilRef;
-		data.stencilMask = this.stencilMask;
+		data.stencilFuncMask = this.stencilFuncMask;
 		data.stencilFail = this.stencilFail;
 		data.stencilZFail = this.stencilZFail;
 		data.stencilZPass = this.stencilZPass;
@@ -8646,9 +8648,10 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.depthWrite = source.depthWrite;
 
 		this.stencilWrite = source.stencilWrite;
+		this.stencilWriteMask = source.stencilWriteMask;
 		this.stencilFunc = source.stencilFunc;
 		this.stencilRef = source.stencilRef;
-		this.stencilMask = source.stencilMask;
+		this.stencilFuncMask = source.stencilFuncMask;
 		this.stencilFail = source.stencilFail;
 		this.stencilZFail = source.stencilZFail;
 		this.stencilZPass = source.stencilZPass;
@@ -20386,7 +20389,8 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		stencilBuffer.setTest( stencilWrite );
 		if ( stencilWrite ) {
 
-			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilMask );
+			stencilBuffer.setMask( material.stencilWriteMask );
+			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
 			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
 
 		}
@@ -38208,6 +38212,16 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
+
+		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
+		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
+		if ( json.stencilFunc !== undefined ) material.stencilFunc = json.stencilFunc;
+		if ( json.stencilRef !== undefined ) material.stencilRef = json.stencilRef;
+		if ( json.stencilFuncMask !== undefined ) material.stencilFuncMask = json.stencilFuncMask;
+		if ( json.stencilFail !== undefined ) material.stencilFail = json.stencilFail;
+		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
+		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
+
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
 		if ( json.wireframeLinecap !== undefined ) material.wireframeLinecap = json.wireframeLinecap;
@@ -46568,7 +46582,7 @@ ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.line.scale.set( 1, Math.max( 0, length - headLength ), 1 );
+	this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
 	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
@@ -47883,6 +47897,21 @@ Object.defineProperties( Material.prototype, {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
 			this.flatShading = ( value === FlatShading );
+
+		}
+	},
+
+	stencilMask: {
+		get: function () {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			return this.stencilFuncMask;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			this.stencilFuncMask = value;
 
 		}
 	}
