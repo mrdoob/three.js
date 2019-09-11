@@ -134,7 +134,7 @@ function WebGLMultiview( renderer, gl ) {
 
 	}
 
-	function detachRenderTarget( camera ) {
+	function detachCamera( camera ) {
 
 		if ( renderTarget !== renderer.getRenderTarget() ) return;
 
@@ -201,7 +201,7 @@ function WebGLMultiview( renderer, gl ) {
 
 
 	this.attachCamera = attachCamera;
-	this.detachRenderTarget = detachRenderTarget;
+	this.detachCamera = detachCamera;
 	this.updateCameraProjectionMatricesUniform = updateCameraProjectionMatricesUniform;
 	this.updateCameraViewMatricesUniform = updateCameraViewMatricesUniform;
 	this.updateObjectMatricesUniforms = updateObjectMatricesUniforms;

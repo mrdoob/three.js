@@ -58,6 +58,7 @@ function WebGLRenderer( parameters ) {
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' ),
 		_context = parameters.context !== undefined ? parameters.context : null,
+
 		_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 		_depth = parameters.depth !== undefined ? parameters.depth : true,
 		_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
@@ -1241,7 +1242,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( capabilities.multiview ) {
 
-			multiview.detachRenderTarget( camera );
+			multiview.detachCamera( camera );
 
 		}
 
