@@ -354,6 +354,7 @@ var list = {
 			},
 
 			"Controls": {
+				"DragControls": "examples/en/controls/DragControls",
 				"OrbitControls": "examples/en/controls/OrbitControls"
 			},
 
@@ -790,6 +791,7 @@ var list = {
 			},
 
 			"控制": {
+				"DragControls": "examples/en/controls/DragControls",
 				"OrbitControls": "examples/zh/controls/OrbitControls"
 			},
 

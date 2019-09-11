@@ -1341,7 +1341,7 @@ var MMDLoader = ( function () {
 
 			if ( textures[ fullPath ] !== undefined ) return textures[ fullPath ];
 
-			var loader = Loader.Handlers.get( fullPath );
+			var loader = this.manager.getHandler( fullPath );
 
 			if ( loader === null ) {
 

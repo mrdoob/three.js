@@ -326,7 +326,7 @@ export class WebGLRenderer implements Renderer {
 	 * A build in function that can be used instead of requestAnimationFrame. For WebVR projects this function must be used.
 	 * @param callback The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.
 	 */
-	setAnimationLoop( callback: Function ): void;
+	setAnimationLoop( callback: Function | null ): void;
 
 	/**
 	 * @deprecated Use {@link WebGLRenderer#setAnimationLoop .setAnimationLoop()} instead.

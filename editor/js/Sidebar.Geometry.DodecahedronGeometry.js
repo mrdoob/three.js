@@ -1,9 +1,8 @@
 /**
- * @author Temdog007 / http://github.com/Temdog007
+ * @author mrdoob / http://mrdoob.com/
  */
 
-
-Sidebar.Geometry.TetrahedronGeometry = function ( editor, object ) {
+Sidebar.Geometry.DodecahedronGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -17,7 +16,7 @@ Sidebar.Geometry.TetrahedronGeometry = function ( editor, object ) {
 	var radiusRow = new UI.Row();
 	var radius = new UI.Number( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tetrahedron_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/dodecahedron_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -27,11 +26,10 @@ Sidebar.Geometry.TetrahedronGeometry = function ( editor, object ) {
 	var detailRow = new UI.Row();
 	var detail = new UI.Integer( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
-	detailRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/tetrahedron_geometry/detail' ) ).setWidth( '90px' ) );
+	detailRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/dodecahedron_geometry/detail' ) ).setWidth( '90px' ) );
 	detailRow.add( detail );
 
 	container.add( detailRow );
-
 
 	//
 
@@ -48,4 +46,4 @@ Sidebar.Geometry.TetrahedronGeometry = function ( editor, object ) {
 
 };
 
-Sidebar.Geometry.TetrahedronBufferGeometry = Sidebar.Geometry.TetrahedronGeometry;
+Sidebar.Geometry.DodecahedronBufferGeometry = Sidebar.Geometry.DodecahedronGeometry;
