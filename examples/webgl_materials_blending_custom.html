@@ -77,34 +77,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AddEquation,
-				CanvasTexture,
-				CustomBlending,
-				DstAlphaFactor,
-				DstColorFactor,
-				MaxEquation,
-				Mesh,
-				MeshBasicMaterial,
-				MinEquation,
-				OneFactor,
-				OneMinusDstAlphaFactor,
-				OneMinusDstColorFactor,
-				OneMinusSrcAlphaFactor,
-				OneMinusSrcColorFactor,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RepeatWrapping,
-				ReverseSubtractEquation,
-				Scene,
-				SrcAlphaFactor,
-				SrcAlphaSaturateFactor,
-				SrcColorFactor,
-				SubtractEquation,
-				TextureLoader,
-				WebGLRenderer,
-				ZeroFactor
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 
@@ -124,16 +98,16 @@
 
 				// CAMERA
 
-				camera = new PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 700;
 
 				// SCENE
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// TEXTURE LOADER
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				// BACKGROUND IMAGES
 
@@ -169,39 +143,39 @@
 
 				document.getElementById( 'bg_2' ).appendChild( canvas2 );
 
-				var mapBg0 = new CanvasTexture( canvas1 );
-				mapBg0.wrapS = mapBg0.wrapT = RepeatWrapping;
+				var mapBg0 = new THREE.CanvasTexture( canvas1 );
+				mapBg0.wrapS = mapBg0.wrapT = THREE.RepeatWrapping;
 				mapBg0.repeat.set( 128, 64 );
 
-				var mapBg1 = new CanvasTexture( canvas2 );
-				mapBg1.wrapS = mapBg1.wrapT = RepeatWrapping;
+				var mapBg1 = new THREE.CanvasTexture( canvas2 );
+				mapBg1.wrapS = mapBg1.wrapT = THREE.RepeatWrapping;
 				mapBg1.repeat.set( 128, 64 );
 
 				var mapBg2 = textureLoader.load( 'textures/disturb.jpg' );
-				mapBg2.wrapS = mapBg2.wrapT = RepeatWrapping;
+				mapBg2.wrapS = mapBg2.wrapT = THREE.RepeatWrapping;
 				mapBg2.repeat.set( 8, 4 );
 
 				var mapBg3 = textureLoader.load( 'textures/crate.gif' );
-				mapBg3.wrapS = mapBg3.wrapT = RepeatWrapping;
+				mapBg3.wrapS = mapBg3.wrapT = THREE.RepeatWrapping;
 				mapBg3.repeat.set( 32, 16 );
 
 				var mapBg4 = textureLoader.load( 'textures/lava/lavatile.jpg' );
-				mapBg4.wrapS = mapBg4.wrapT = RepeatWrapping;
+				mapBg4.wrapS = mapBg4.wrapT = THREE.RepeatWrapping;
 				mapBg4.repeat.set( 8, 4 );
 
 				var mapBg5 = textureLoader.load( 'textures/water.jpg' );
-				mapBg5.wrapS = mapBg5.wrapT = RepeatWrapping;
+				mapBg5.wrapS = mapBg5.wrapT = THREE.RepeatWrapping;
 				mapBg5.repeat.set( 8, 4 );
 
 				var mapBg6 = textureLoader.load( 'textures/lava/cloud.png' );
-				mapBg6.wrapS = mapBg6.wrapT = RepeatWrapping;
+				mapBg6.wrapS = mapBg6.wrapT = THREE.RepeatWrapping;
 				mapBg6.repeat.set( 2, 1 );
 
 				// BACKGROUND
 
-				materialBg = new MeshBasicMaterial( { map: mapBg1 } );
+				materialBg = new THREE.MeshBasicMaterial( { map: mapBg1 } );
 
-				var meshBg = new Mesh( new PlaneBufferGeometry( 4000, 2000 ), materialBg );
+				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
@@ -229,34 +203,34 @@
 
 				// FOREGROUND OBJECTS
 				var src = [
-					{ name: 'Zero', constant: ZeroFactor },
-					{ name: 'One', constant: OneFactor },
-					{ name: 'SrcColor', constant: SrcColorFactor },
-					{ name: 'OneMinusSrcColor', constant: OneMinusSrcColorFactor },
-					{ name: 'SrcAlpha', constant: SrcAlphaFactor },
-					{ name: 'OneMinusSrcAlpha', constant: OneMinusSrcAlphaFactor },
-					{ name: 'DstAlpha', constant: DstAlphaFactor },
-					{ name: 'OneMinusDstAlpha', constant: OneMinusDstAlphaFactor },
-					{ name: 'DstColor', constant: DstColorFactor },
-					{ name: 'OneMinusDstColor', constant: OneMinusDstColorFactor },
-					{ name: 'SrcAlphaSaturate', constant: SrcAlphaSaturateFactor }
+					{ name: 'Zero', constant: THREE.ZeroFactor },
+					{ name: 'One', constant: THREE.OneFactor },
+					{ name: 'SrcColor', constant: THREE.SrcColorFactor },
+					{ name: 'OneMinusSrcColor', constant: THREE.OneMinusSrcColorFactor },
+					{ name: 'SrcAlpha', constant: THREE.SrcAlphaFactor },
+					{ name: 'OneMinusSrcAlpha', constant: THREE.OneMinusSrcAlphaFactor },
+					{ name: 'DstAlpha', constant: THREE.DstAlphaFactor },
+					{ name: 'OneMinusDstAlpha', constant: THREE.OneMinusDstAlphaFactor },
+					{ name: 'DstColor', constant: THREE.DstColorFactor },
+					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor },
+					{ name: 'SrcAlphaSaturate', constant: THREE.SrcAlphaSaturateFactor }
 				];
 
 				var dst = [
-					{ name: 'Zero', constant: ZeroFactor },
-					{ name: 'One', constant: OneFactor },
-					{ name: 'SrcColor', constant: SrcColorFactor },
-					{ name: 'OneMinusSrcColor', constant: OneMinusSrcColorFactor },
-					{ name: 'SrcAlpha', constant: SrcAlphaFactor },
-					{ name: 'OneMinusSrcAlpha', constant: OneMinusSrcAlphaFactor },
-					{ name: 'DstAlpha', constant: DstAlphaFactor },
-					{ name: 'OneMinusDstAlpha', constant: OneMinusDstAlphaFactor },
-					{ name: 'DstColor', constant: DstColorFactor },
-					{ name: 'OneMinusDstColor', constant: OneMinusDstColorFactor }
+					{ name: 'Zero', constant: THREE.ZeroFactor },
+					{ name: 'One', constant: THREE.OneFactor },
+					{ name: 'SrcColor', constant: THREE.SrcColorFactor },
+					{ name: 'OneMinusSrcColor', constant: THREE.OneMinusSrcColorFactor },
+					{ name: 'SrcAlpha', constant: THREE.SrcAlphaFactor },
+					{ name: 'OneMinusSrcAlpha', constant: THREE.OneMinusSrcAlphaFactor },
+					{ name: 'DstAlpha', constant: THREE.DstAlphaFactor },
+					{ name: 'OneMinusDstAlpha', constant: THREE.OneMinusDstAlphaFactor },
+					{ name: 'DstColor', constant: THREE.DstColorFactor },
+					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor }
 				];
 
-				var geo1 = new PlaneBufferGeometry( 100, 100 );
-				var geo2 = new PlaneBufferGeometry( 100, 25 );
+				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
+				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
 
 				for ( var i = 0; i < dst.length; i ++ ) {
 
@@ -266,19 +240,19 @@
 
 						var blendSrc = src[ j ];
 
-						var material = new MeshBasicMaterial( { map: currentMaps[ currentIndex ] } );
+						var material = new THREE.MeshBasicMaterial( { map: currentMaps[ currentIndex ] } );
 						material.transparent = true;
 
-						material.blending = CustomBlending;
+						material.blending = THREE.CustomBlending;
 						material.blendSrc = blendSrc.constant;
 						material.blendDst = blendDst.constant;
-						material.blendEquation = AddEquation;
+						material.blendEquation = THREE.AddEquation;
 
 						var x = ( j - src.length / 2 ) * 110;
 						var z = 0;
 						var y = ( i - dst.length / 2 ) * 110 + 50;
 
-						var mesh = new Mesh( geo1, material );
+						var mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, - y, z );
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
@@ -298,7 +272,7 @@
 					var z = 0;
 					var y = ( 0 - dst.length / 2 ) * 110 + 50;
 
-					var mesh = new Mesh( geo2, generateLabelMaterial( blendSrc.name, 'rgba( 0, 150, 0, 1 )' ) );
+					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.name, 'rgba( 0, 150, 0, 1 )' ) );
 					mesh.position.set( x, - ( y - 70 ), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -314,7 +288,7 @@
 					var z = 0;
 					var y = ( i - dst.length / 2 ) * 110 + 165;
 
-					var mesh = new Mesh( geo2, generateLabelMaterial( blendDst.name, 'rgba( 150, 0, 0, 1 )' ) );
+					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.name, 'rgba( 150, 0, 0, 1 )' ) );
 					mesh.position.set( x, - ( y - 120 ), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
@@ -324,7 +298,7 @@
 
 				// RENDERER
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -353,11 +327,11 @@
 				addBgHandler( 'bg_5', mapBg5 );
 				addBgHandler( 'bg_6', mapBg6 );
 
-				addEqHandler( 'btn_add', AddEquation );
-				addEqHandler( 'btn_sub', SubtractEquation );
-				addEqHandler( 'btn_rsub', ReverseSubtractEquation );
-				addEqHandler( 'btn_min', MinEquation );
-				addEqHandler( 'btn_max', MaxEquation );
+				addEqHandler( 'btn_add', THREE.AddEquation );
+				addEqHandler( 'btn_sub', THREE.SubtractEquation );
+				addEqHandler( 'btn_rsub', THREE.ReverseSubtractEquation );
+				addEqHandler( 'btn_min', THREE.MinEquation );
+				addEqHandler( 'btn_max', THREE.MaxEquation );
 
 				addPreHandler( 'btn_pre', mapsPre );
 				addPreHandler( 'btn_nopre', mapsNoPre );
@@ -468,9 +442,9 @@
 				ctx.font = '12pt arial bold';
 				ctx.fillText( text, 8, 22 );
 
-				var map = new CanvasTexture( canvas );
+				var map = new THREE.CanvasTexture( canvas );
 
-				var material = new MeshBasicMaterial( { map: map, transparent: true } );
+				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 				return material;
 
 			}

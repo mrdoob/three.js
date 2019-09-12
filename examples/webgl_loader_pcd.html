@@ -16,12 +16,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -35,17 +31,17 @@
 			animate();
 			function init() {
 
-				scene = new Scene();
-				scene.background = new Color( 0x000000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
 
-				camera = new PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
+				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
 				camera.position.x = 0.4;
 				camera.position.z = - 2;
 				camera.up.set( 0, 0, 1 );
 
 				scene.add( camera );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

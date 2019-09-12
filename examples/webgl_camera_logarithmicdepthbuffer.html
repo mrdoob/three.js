@@ -60,21 +60,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DirectionalLight,
-				FontLoader,
-				Group,
-				Math as _Math,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				TextBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -119,7 +106,7 @@
 
 				container = document.getElementById( 'container' );
 
-				var loader = new FontLoader();
+				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var scene = initScene( font );
@@ -149,10 +136,10 @@
 
 				var framecontainer = document.getElementById( 'container_' + name );
 
-				var camera = new PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				var camera = new THREE.PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				scene.add( camera );
 
-				var renderer = new WebGLRenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
+				var renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
@@ -165,11 +152,11 @@
 
 			function initScene( font ) {
 
-				var scene = new Scene();
+				var scene = new THREE.Scene();
 
-				scene.add( new AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var light = new DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 100, 100, 100 );
 				scene.add( light );
 
@@ -180,13 +167,13 @@
 					emissive: 0x000000
 				};
 
-				var geometry = new SphereBufferGeometry( 0.5, 24, 12 );
+				var geometry = new THREE.SphereBufferGeometry( 0.5, 24, 12 );
 
 				for ( var i = 0; i < labeldata.length; i ++ ) {
 
 					var scale = labeldata[ i ].scale || 1;
 
-					var labelgeo = new TextBufferGeometry( labeldata[ i ].label, {
+					var labelgeo = new THREE.TextBufferGeometry( labeldata[ i ].label, {
 						font: font,
 						size: labeldata[ i ].size,
 						height: labeldata[ i ].size / 2
@@ -197,21 +184,21 @@
 					// center text
 					labelgeo.translate( - labelgeo.boundingSphere.radius, 0, 0 );
 
-					materialargs.color = new Color().setHSL( Math.random(), 0.5, 0.5 );
+					materialargs.color = new THREE.Color().setHSL( Math.random(), 0.5, 0.5 );
 
-					var material = new MeshPhongMaterial( materialargs );
+					var material = new THREE.MeshPhongMaterial( materialargs );
 
-					var group = new Group();
+					var group = new THREE.Group();
 					group.position.z = - labeldata[ i ].size * scale;
 					scene.add( group );
 
-					var textmesh = new Mesh( labelgeo, material );
+					var textmesh = new THREE.Mesh( labelgeo, material );
 					textmesh.scale.set( scale, scale, scale );
 					textmesh.position.z = - labeldata[ i ].size * scale;
 					textmesh.position.y = labeldata[ i ].size / 4 * scale;
 					group.add( textmesh );
 
-					var dotmesh = new Mesh( geometry, material );
+					var dotmesh = new THREE.Mesh( geometry, material );
 					dotmesh.position.y = - labeldata[ i ].size / 4 * scale;
 					dotmesh.scale.multiplyScalar( labeldata[ i ].size * scale );
 					group.add( dotmesh );
@@ -262,7 +249,7 @@
 				var damping = ( Math.abs( zoomspeed ) > minzoomspeed ? .95 : 1.0 );
 
 				// Zoom out faster the further out you go
-				var zoom = _Math.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
+				var zoom = THREE.Math.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
 				zoompos = Math.log( zoom );
 
 				// Slow down quickly at the zoom limits

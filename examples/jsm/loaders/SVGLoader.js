@@ -7,9 +7,9 @@
 import {
 	BufferGeometry,
 	Color,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	Matrix3,
 	Path,
 	ShapePath,
@@ -19,11 +19,11 @@ import {
 
 var SVGLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-SVGLoader.prototype = {
+SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: SVGLoader,
 
@@ -38,13 +38,6 @@ SVGLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -894,18 +887,14 @@ SVGLoader.prototype = {
 
 			var transform = parseNodeTransform( node );
 
-			if ( transform ) {
+			if ( transformStack.length > 0 ) {
 
-				if ( transformStack.length > 0 ) {
-
-					transform.premultiply( transformStack[ transformStack.length - 1 ] );
-
-				}
-
-				currentTransform.copy( transform );
-				transformStack.push( transform );
+				transform.premultiply( transformStack[ transformStack.length - 1 ] );
 
 			}
+
+			currentTransform.copy( transform );
+			transformStack.push( transform );
 
 			return transform;
 
@@ -1189,13 +1178,12 @@ SVGLoader.prototype = {
 
 	}
 
-};
+} );
 
-SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap, miterLimit ) {
+SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 
 	// Param width: Stroke width
 	// Param color: As returned by Color.getStyle()
-	// Param opacity: 0 (transparent) to 1 (opaque)
 	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
 	// Param lineCap: One of "round", "square" or "butt"
 	// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
@@ -1203,7 +1191,6 @@ SVGLoader.getStrokeStyle = function ( width, color, opacity, lineJoin, lineCap, 
 
 	width = width !== undefined ? width : 1;
 	color = color !== undefined ? color : '#000';
-	opacity = opacity !== undefined ? opacity : 1;
 	lineJoin = lineJoin !== undefined ? lineJoin : 'miter';
 	lineCap = lineCap !== undefined ? lineCap : 'butt';
 	miterLimit = miterLimit !== undefined ? miterLimit : 4;

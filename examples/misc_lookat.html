@@ -20,16 +20,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Object3D.lookAt() example</div>
 
 		<script type="module">
-			import {
-				Color,
-				CylinderBufferGeometry,
-				Mesh,
-				MeshNormalMaterial,
-				PerspectiveCamera,
-				Scene,
-				SphereBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -50,23 +42,23 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 3200;
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				sphere = new Mesh( new SphereBufferGeometry( 100, 20, 20 ), new MeshNormalMaterial() );
+				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial() );
 				scene.add( sphere );
 
-				var geometry = new CylinderBufferGeometry( 0, 10, 100, 12 );
+				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 100, 12 );
 				geometry.rotateX( Math.PI / 2 );
 
-				var material = new MeshNormalMaterial();
+				var material = new THREE.MeshNormalMaterial();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 4000 - 2000;
 					mesh.position.y = Math.random() * 4000 - 2000;
 					mesh.position.z = Math.random() * 4000 - 2000;
@@ -75,7 +67,7 @@
 
 				}
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

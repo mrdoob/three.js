@@ -17,27 +17,7 @@
 	<script src="js/libs/ammo.js"></script>
 
 	<script type="module">
-		import {
-			AmbientLight,
-			BoxBufferGeometry,
-			BufferAttribute,
-			BufferGeometry,
-			Clock,
-			Color,
-			DirectionalLight,
-			LineSegments,
-			LineBasicMaterial,
-			Mesh,
-			MeshPhongMaterial,
-			PerspectiveCamera,
-			Quaternion,
-			RepeatWrapping,
-			Scene,
-			SphereBufferGeometry,
-			TextureLoader,
-			Vector3,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -47,7 +27,7 @@
 		var container, stats;
 		var camera, controls, scene, renderer;
 		var textureLoader;
-		var clock = new Clock();
+		var clock = new THREE.Clock();
 
 		// Physics variables
 		var gravityConstant = - 9.8;
@@ -90,14 +70,14 @@
 
 			container = document.getElementById( 'container' );
 
-			camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
-			scene = new Scene();
-			scene.background = new Color( 0xbfd1e5 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfd1e5 );
 
 			camera.position.set( - 7, 5, 8 );
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
@@ -107,12 +87,12 @@
 			controls.target.set( 0, 2, 0 );
 			controls.update();
 
-			textureLoader = new TextureLoader();
+			textureLoader = new THREE.TextureLoader();
 
-			var ambientLight = new AmbientLight( 0x404040 );
+			var ambientLight = new THREE.AmbientLight( 0x404040 );
 			scene.add( ambientLight );
 
-			var light = new DirectionalLight( 0xffffff, 1 );
+			var light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( - 10, 10, 5 );
 			light.castShadow = true;
 			var d = 10;
@@ -159,19 +139,19 @@
 
 		function createObjects() {
 
-			var pos = new Vector3();
-			var quat = new Quaternion();
+			var pos = new THREE.Vector3();
+			var quat = new THREE.Quaternion();
 
 			// Ground
 			pos.set( 0, - 0.5, 0 );
 			quat.set( 0, 0, 0, 1 );
-			var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new MeshPhongMaterial( { color: 0xFFFFFF } ) );
+			var ground = createParalellepiped( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.castShadow = true;
 			ground.receiveShadow = true;
 			textureLoader.load( "textures/grid.png", function ( texture ) {
 
-				texture.wrapS = RepeatWrapping;
-				texture.wrapT = RepeatWrapping;
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 40, 40 );
 				ground.material.map = texture;
 				ground.material.needsUpdate = true;
@@ -183,7 +163,7 @@
 			var ballMass = 1.2;
 			var ballRadius = 0.6;
 
-			var ball = new Mesh( new SphereBufferGeometry( ballRadius, 20, 20 ), new MeshPhongMaterial( { color: 0x202020 } ) );
+			var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 20, 20 ), new THREE.MeshPhongMaterial( { color: 0x202020 } ) );
 			ball.castShadow = true;
 			ball.receiveShadow = true;
 			var ballShape = new Ammo.btSphereShape( ballRadius );
@@ -255,8 +235,8 @@
 			ropePos.y += ballRadius;
 
 			var segmentLength = ropeLength / ropeNumSegments;
-			var ropeGeometry = new BufferGeometry();
-			var ropeMaterial = new LineBasicMaterial( { color: 0x000000 } );
+			var ropeGeometry = new THREE.BufferGeometry();
+			var ropeMaterial = new THREE.LineBasicMaterial( { color: 0x000000 } );
 			var ropePositions = [];
 			var ropeIndices = [];
 
@@ -272,10 +252,10 @@
 
 			}
 
-			ropeGeometry.setIndex( new BufferAttribute( new Uint16Array( ropeIndices ), 1 ) );
-			ropeGeometry.addAttribute( 'position', new BufferAttribute( new Float32Array( ropePositions ), 3 ) );
+			ropeGeometry.setIndex( new THREE.BufferAttribute( new Uint16Array( ropeIndices ), 1 ) );
+			ropeGeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ropePositions ), 3 ) );
 			ropeGeometry.computeBoundingSphere();
-			rope = new LineSegments( ropeGeometry, ropeMaterial );
+			rope = new THREE.LineSegments( ropeGeometry, ropeMaterial );
 			rope.castShadow = true;
 			rope.receiveShadow = true;
 			scene.add( rope );
@@ -299,7 +279,7 @@
 			var armMass = 2;
 			var armLength = 3;
 			var pylonHeight = ropePos.y + ropeLength;
-			var baseMaterial = new MeshPhongMaterial( { color: 0x606060 } );
+			var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x606060 } );
 			pos.set( ropePos.x, 0.1, ropePos.z - armLength );
 			quat.set( 0, 0, 0, 1 );
 			var base = createParalellepiped( 1, 0.2, 1, 0, pos, quat, baseMaterial );
@@ -331,7 +311,7 @@
 
 		function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
 
-			var threeObject = new Mesh( new BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			var threeObject = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
@@ -383,7 +363,7 @@
 
 		function createMaterial() {
 
-			return new MeshPhongMaterial( { color: createRandomColor() } );
+			return new THREE.MeshPhongMaterial( { color: createRandomColor() } );
 
 		}
 

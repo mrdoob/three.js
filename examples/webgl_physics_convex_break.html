@@ -18,25 +18,7 @@
 	<script src="js/libs/ammo.js"></script>
 
 	<script type="module">
-		import {
-			AmbientLight,
-			BoxBufferGeometry,
-			Clock,
-			Color,
-			DirectionalLight,
-			Mesh,
-			MeshPhongMaterial,
-			PerspectiveCamera,
-			Quaternion,
-			Raycaster,
-			RepeatWrapping,
-			Scene,
-			SphereBufferGeometry,
-			TextureLoader,
-			Vector2,
-			Vector3,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -50,11 +32,11 @@
 		var container, stats;
 		var camera, controls, scene, renderer;
 		var textureLoader;
-		var clock = new Clock();
+		var clock = new THREE.Clock();
 
-		var mouseCoords = new Vector2();
-		var raycaster = new Raycaster();
-		var ballMaterial = new MeshPhongMaterial( { color: 0x202020 } );
+		var mouseCoords = new THREE.Vector2();
+		var raycaster = new THREE.Raycaster();
+		var ballMaterial = new THREE.MeshPhongMaterial( { color: 0x202020 } );
 
 		// Physics variables
 		var gravityConstant = 7.8;
@@ -70,8 +52,8 @@
 		// Rigid bodies include all movable objects
 		var rigidBodies = [];
 
-		var pos = new Vector3();
-		var quat = new Quaternion();
+		var pos = new THREE.Vector3();
+		var quat = new THREE.Quaternion();
 		var transformAux1;
 		var tempBtVec3_1;
 
@@ -83,8 +65,8 @@
 		}
 		var numObjectsToRemove = 0;
 
-		var impactPoint = new Vector3();
-		var impactNormal = new Vector3();
+		var impactPoint = new THREE.Vector3();
+		var impactNormal = new THREE.Vector3();
 
 		// - Main code -
 
@@ -116,14 +98,14 @@
 
 			container = document.getElementById( 'container' );
 
-			camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
+			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.2, 2000 );
 
-			scene = new Scene();
-			scene.background = new Color( 0xbfd1e5 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfd1e5 );
 
 			camera.position.set( - 14, 8, 16 );
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
@@ -133,12 +115,12 @@
 			controls.target.set( 0, 2, 0 );
 			controls.update();
 
-			textureLoader = new TextureLoader();
+			textureLoader = new THREE.TextureLoader();
 
-			var ambientLight = new AmbientLight( 0x707070 );
+			var ambientLight = new THREE.AmbientLight( 0x707070 );
 			scene.add( ambientLight );
 
-			var light = new DirectionalLight( 0xffffff, 1 );
+			var light = new THREE.DirectionalLight( 0xffffff, 1 );
 			light.position.set( - 10, 18, 5 );
 			light.castShadow = true;
 			var d = 14;
@@ -184,10 +166,10 @@
 
 		function createObject( mass, halfExtents, pos, quat, material ) {
 
-			var object = new Mesh( new BoxBufferGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
+			var object = new THREE.Mesh( new THREE.BoxBufferGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
 			object.position.copy( pos );
 			object.quaternion.copy( quat );
-			convexBreaker.prepareBreakableObject( object, mass, new Vector3(), new Vector3(), true );
+			convexBreaker.prepareBreakableObject( object, mass, new THREE.Vector3(), new THREE.Vector3(), true );
 			createDebrisFromBreakableObject( object );
 
 		}
@@ -197,12 +179,12 @@
 			// Ground
 			pos.set( 0, - 0.5, 0 );
 			quat.set( 0, 0, 0, 1 );
-			var ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new MeshPhongMaterial( { color: 0xFFFFFF } ) );
+			var ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.receiveShadow = true;
 			textureLoader.load( "textures/grid.png", function ( texture ) {
 
-				texture.wrapS = RepeatWrapping;
-				texture.wrapT = RepeatWrapping;
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 40, 40 );
 				ground.material.map = texture;
 				ground.material.needsUpdate = true;
@@ -211,7 +193,7 @@
 
 			// Tower 1
 			var towerMass = 1000;
-			var towerHalfExtents = new Vector3( 2, 5, 2 );
+			var towerHalfExtents = new THREE.Vector3( 2, 5, 2 );
 			pos.set( - 8, 5, 0 );
 			quat.set( 0, 0, 0, 1 );
 			createObject( towerMass, towerHalfExtents, pos, quat, createMaterial( 0xB03014 ) );
@@ -223,14 +205,14 @@
 
 			//Bridge
 			var bridgeMass = 100;
-			var bridgeHalfExtents = new Vector3( 7, 0.2, 1.5 );
+			var bridgeHalfExtents = new THREE.Vector3( 7, 0.2, 1.5 );
 			pos.set( 0, 10.2, 0 );
 			quat.set( 0, 0, 0, 1 );
 			createObject( bridgeMass, bridgeHalfExtents, pos, quat, createMaterial( 0xB3B865 ) );
 
 			// Stones
 			var stoneMass = 120;
-			var stoneHalfExtents = new Vector3( 1, 2, 0.15 );
+			var stoneHalfExtents = new THREE.Vector3( 1, 2, 0.15 );
 			var numStones = 8;
 			quat.set( 0, 0, 0, 1 );
 			for ( var i = 0; i < numStones; i ++ ) {
@@ -243,26 +225,26 @@
 
 			// Mountain
 			var mountainMass = 860;
-			var mountainHalfExtents = new Vector3( 4, 5, 4 );
+			var mountainHalfExtents = new THREE.Vector3( 4, 5, 4 );
 			pos.set( 5, mountainHalfExtents.y * 0.5, - 7 );
 			quat.set( 0, 0, 0, 1 );
 			var mountainPoints = [];
-			mountainPoints.push( new Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
-			mountainPoints.push( new Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
-			mountainPoints.push( new Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
-			mountainPoints.push( new Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
-			mountainPoints.push( new Vector3( 0, mountainHalfExtents.y, 0 ) );
-			var mountain = new Mesh( new ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
+			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
+			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, mountainHalfExtents.z ) );
+			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
+			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
+			mountainPoints.push( new THREE.Vector3( 0, mountainHalfExtents.y, 0 ) );
+			var mountain = new THREE.Mesh( new ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
 			mountain.position.copy( pos );
 			mountain.quaternion.copy( quat );
-			convexBreaker.prepareBreakableObject( mountain, mountainMass, new Vector3(), new Vector3(), true );
+			convexBreaker.prepareBreakableObject( mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true );
 			createDebrisFromBreakableObject( mountain );
 
 		}
 
 		function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) {
 
-			var object = new Mesh( new BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			var object = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			var shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
@@ -388,7 +370,7 @@
 		function createMaterial( color ) {
 
 			color = color || createRandomColor();
-			return new MeshPhongMaterial( { color: color } );
+			return new THREE.MeshPhongMaterial( { color: color } );
 
 		}
 
@@ -407,7 +389,7 @@
 				var ballMass = 35;
 				var ballRadius = 0.4;
 
-				var ball = new Mesh( new SphereBufferGeometry( ballRadius, 14, 10 ), ballMaterial );
+				var ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 14, 10 ), ballMaterial );
 				ball.castShadow = true;
 				ball.receiveShadow = true;
 				var ballShape = new Ammo.btSphereShape( ballRadius );

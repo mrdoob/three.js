@@ -13,24 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AnimationClip,
-				AnimationMixer,
-				AnimationObjectGroup,
-				BoxBufferGeometry,
-				Clock,
-				ColorKeyframeTrack,
-				InterpolateDiscrete,
-				Mesh,
-				MeshBasicMaterial,
-				NumberKeyframeTrack,
-				PerspectiveCamera,
-				Quaternion,
-				QuaternionKeyframeTrack,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -42,22 +26,22 @@
 
 			function init() {
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				//
 
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 50, 50, 100 );
 				camera.lookAt( scene.position );
 
 				// all objects of this animation group share a common animation state
 
-				var animationGroup = new AnimationObjectGroup();
+				var animationGroup = new THREE.AnimationObjectGroup();
 
 				//
 
-				var geometry = new BoxBufferGeometry( 5, 5, 5 );
-				var material = new MeshBasicMaterial( { transparent: true } );
+				var geometry = new THREE.BoxBufferGeometry( 5, 5, 5 );
+				var material = new THREE.MeshBasicMaterial( { transparent: true } );
 
 				//
 
@@ -65,7 +49,7 @@
 
 					for ( var j = 0; j < 5; j ++ ) {
 
-						var mesh = new Mesh( geometry, material );
+						var mesh = new THREE.Mesh( geometry, material );
 
 						mesh.position.x = 32 - ( 16 * i );
 						mesh.position.y = 0;
@@ -80,28 +64,28 @@
 
 				// create some keyframe tracks
 
-				var xAxis = new Vector3( 1, 0, 0 );
-				var qInitial = new Quaternion().setFromAxisAngle( xAxis, 0 );
-				var qFinal = new Quaternion().setFromAxisAngle( xAxis, Math.PI );
-				var quaternionKF = new QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+				var xAxis = new THREE.Vector3( 1, 0, 0 );
+				var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
+				var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
+				var quaternionKF = new THREE.QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
 
-				var colorKF = new ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], InterpolateDiscrete );
-				var opacityKF = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+				var colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
+				var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
 
 				// create clip
 
-				var clip = new AnimationClip( 'default', 3, [ quaternionKF, colorKF, opacityKF ] );
+				var clip = new THREE.AnimationClip( 'default', 3, [ quaternionKF, colorKF, opacityKF ] );
 
 				// apply the animation group to the mixer as the root object
 
-				mixer = new AnimationMixer( animationGroup );
+				mixer = new THREE.AnimationMixer( animationGroup );
 
 				var clipAction = mixer.clipAction( clip );
 				clipAction.play();
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -113,7 +97,7 @@
 
 				//
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				//
 

@@ -11,22 +11,8 @@
 		<div id="container"></div>
 
 		<script type="module">
-			import {
-				AnimationMixer,
-				Clock,
-				DirectionalLight,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhongMaterial,
-				Object3D,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				PointLight,
-				Scene,
-				SphereBufferGeometry,
-				SpotLight,
-				Vector3
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -61,10 +47,10 @@
 				renderer = new WebGLDeferredRenderer();
 				renderer.setSize( WIDTH, HEIGHT );
 
-				camera = new PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
 				camera.position.z = 150;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				stats = new Stats();
 
@@ -80,7 +66,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 			}
 
@@ -102,7 +88,7 @@
 
 					} );
 
-					mixer = new AnimationMixer( model );
+					mixer = new THREE.AnimationMixer( model );
 
 					var dance = gltf.animations.find( function ( clip ) {
 
@@ -126,28 +112,28 @@
 
 				var distance = 20;
 
-				var c = new Vector3();
-				var geometry = new SphereBufferGeometry( 1, 1, 1 );
+				var c = new THREE.Vector3();
+				var geometry = new THREE.SphereBufferGeometry( 1, 1, 1 );
 
 				for ( var i = 0; i < numLights; i ++ ) {
 
-					var light = new PointLight( 0xffffff, 2.0, distance );
+					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
 					c.set( Math.random(), Math.random(), Math.random() ).normalize();
 					light.color.setRGB( c.x, c.y, c.z );
 					scene.add( light );
 					lights.push( light );
 
-					var material = new MeshBasicMaterial( { color: light.color } );
-					var emitter = new Mesh( geometry, material );
+					var material = new THREE.MeshBasicMaterial( { color: light.color } );
+					var emitter = new THREE.Mesh( geometry, material );
 					light.add( emitter );
 
 				}
 
-				var directionalLight = new DirectionalLight( 0x101010 );
+				var directionalLight = new THREE.DirectionalLight( 0x101010 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var spotLight = new SpotLight( 0x404040 );
+				var spotLight = new THREE.SpotLight( 0x404040 );
 				spotLight.position.set( 0, 50, 0 );
 				scene.add( spotLight );
 
@@ -156,44 +142,44 @@
 			function initRoom() {
 
 				var size = 100;
-				var geometry = new PlaneBufferGeometry( size, size );
-				var material = new MeshPhongMaterial( { color: 0x222222, specular: 0x222222, shininess: 75 } );
-				var transparentMaterial = new MeshPhongMaterial( { color: 0x222222, emissive: 0x88888888, specular: 0x222222, shininess: 75, opacity: 0.3, transparent: true } );
+				var geometry = new THREE.PlaneBufferGeometry( size, size );
+				var material = new THREE.MeshPhongMaterial( { color: 0x222222, specular: 0x222222, shininess: 75 } );
+				var transparentMaterial = new THREE.MeshPhongMaterial( { color: 0x222222, emissive: 0x88888888, specular: 0x222222, shininess: 75, opacity: 0.3, transparent: true } );
 
-				var room = new Object3D();
+				var room = new THREE.Object3D();
 				room.position.y = size / 2 - 30;
 
 				// top
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = Math.PI / 2;
 				mesh.position.y = size / 2;
 				room.add( mesh );
 
 				// bottom
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.position.y = - size / 2;
 				room.add( mesh );
 
 				// left
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = - size / 2;
 				mesh.rotation.y = Math.PI / 2;
 				room.add( mesh );
 
 				// right
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = size / 2;
 				mesh.rotation.y = - Math.PI / 2;
 				room.add( mesh );
 
 				// back
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.z = - size / 2;
 				room.add( mesh );
 
 				// front, to check if transparency works
-				mesh = new Mesh( geometry, transparentMaterial );
+				mesh = new THREE.Mesh( geometry, transparentMaterial );
 				mesh.position.z = size / 2;
 				mesh.scale.multiplyScalar( 0.33 );
 				mesh.visible = false;
@@ -201,7 +187,7 @@
 				room.add( mesh );
 
 				// back2, to check if transparency works
-				mesh = new Mesh( geometry, transparentMaterial );
+				mesh = new THREE.Mesh( geometry, transparentMaterial );
 				mesh.position.z = - size / 4;
 				mesh.scale.multiplyScalar( 0.75 );
 				mesh.visible = false;

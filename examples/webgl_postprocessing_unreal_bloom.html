@@ -22,17 +22,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				AnimationMixer,
-				Clock,
-				PerspectiveCamera,
-				PointLight,
-				ReinhardToneMapping,
-				Scene,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -53,21 +44,21 @@
 				bloomRadius: 0
 			};
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 			var container = document.getElementById( 'container' );
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.toneMapping = ReinhardToneMapping;
+			renderer.toneMapping = THREE.ReinhardToneMapping;
 			container.appendChild( renderer.domElement );
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 
-			camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
 			camera.position.set( - 5, 2.5, - 3.5 );
 			scene.add( camera );
 
@@ -76,14 +67,14 @@
 			controls.minDistance = 1;
 			controls.maxDistance = 10;
 
-			scene.add( new AmbientLight( 0x404040 ) );
+			scene.add( new THREE.AmbientLight( 0x404040 ) );
 
-			pointLight = new PointLight( 0xffffff, 1 );
+			pointLight = new THREE.PointLight( 0xffffff, 1 );
 			camera.add( pointLight );
 
 			var renderScene = new RenderPass( scene, camera );
 
-			var bloomPass = new UnrealBloomPass( new Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			var bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
@@ -103,7 +94,7 @@
 				var core = model.getObjectByName( 'geo1_HoloFillDark_0' );
 				core.material.depthWrite = false;
 
-				mixer = new AnimationMixer( model );
+				mixer = new THREE.AnimationMixer( model );
 				var clip = gltf.animations[ 0 ];
 				mixer.clipAction( clip.optimize() ).play();
 

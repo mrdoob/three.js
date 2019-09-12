@@ -8,9 +8,9 @@ import {
 export interface WebGLDeferredRendererParameters {
   antialias?: boolean;
   cacheKeepAlive?: boolean;
-  height?: Vector2;
+  height?: number;
   renderer?: WebGLRenderer;
-  width?: Vector2;
+  width?: number;
 }
 
 export class WebGLDeferredRenderer {

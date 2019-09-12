@@ -21,16 +21,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Color,
-				Float32BufferAttribute,
-				Line,
-				LineBasicMaterial,
-				LineDashedMaterial,
-				PerspectiveCamera,
-				Scene
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { SVGRenderer } from './jsm/renderers/SVGRenderer.js';
 
@@ -41,11 +33,11 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 10;
 
-				scene = new Scene();
-				scene.background = new Color( 0, 0, 0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0, 0, 0 );
 
 				renderer = new SVGRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -67,30 +59,30 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				//
 
 				for ( var i = 1; i <= 3; i ++ ) {
 
-					var material = new LineBasicMaterial( {
+					var material = new THREE.LineBasicMaterial( {
 						color: Math.random() * 0xffffff,
 						linewidth: 10
 					} );
-					var line = new Line( geometry, material );
+					var line = new THREE.Line( geometry, material );
 					line.scale.setScalar( i / 3 );
 					scene.add( line );
 
 				}
 
-				var material = new LineDashedMaterial( {
+				var material = new THREE.LineDashedMaterial( {
 					color: 'blue',
 					linewidth: 1,
 					dashSize: 10,
 					gapSize: 10
 				} );
-				var line = new Line( geometry, material );
+				var line = new THREE.Line( geometry, material );
 				line.scale.setScalar( 2 );
 				scene.add( line );
 

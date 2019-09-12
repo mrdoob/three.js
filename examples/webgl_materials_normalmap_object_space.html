@@ -16,16 +16,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Box3,
-				DoubleSide,
-				ObjectSpaceNormalMap,
-				PerspectiveCamera,
-				PointLight,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
@@ -37,17 +29,17 @@
 			function init() {
 
 				// renderer
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.gammaOutput = true;
 
 				// scene
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// camera
-				camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( - 10, 0, 23 );
 				scene.add( camera );
 
@@ -59,10 +51,10 @@
 				controls.enablePan = false;
 
 				// ambient
-				scene.add( new AmbientLight( 0xffffff, .2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, .2 ) );
 
 				// light
-				var light = new PointLight( 0xffffff, 1.5 );
+				var light = new THREE.PointLight( 0xffffff, 1.5 );
 				camera.add( light );
 
 				// model
@@ -75,7 +67,7 @@
 							// glTF currently supports only tangent-space normal maps.
 							// this model has been modified to demonstrate the use of an object-space normal map.
 
-							child.material.normalMapType = ObjectSpaceNormalMap;
+							child.material.normalMapType = THREE.ObjectSpaceNormalMap;
 
 							// attribute normals are not required with an object-space normal map. remove them.
 
@@ -83,13 +75,13 @@
 
 							//
 
-							child.material.side = DoubleSide;
+							child.material.side = THREE.DoubleSide;
 
 							child.scale.multiplyScalar( 0.5 );
 
 							// recenter
 
-							new Box3().setFromObject( child ).getCenter( child.position ).multiplyScalar( - 1 );
+							new THREE.Box3().setFromObject( child ).getCenter( child.position ).multiplyScalar( - 1 );
 
 							scene.add( child );
 

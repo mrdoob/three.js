@@ -35,23 +35,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AnimationMixer,
-				Clock,
-				Color,
-				DirectionalLight,
-				Fog,
-				GridHelper,
-				HemisphereLight,
-				LoopOnce,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -71,33 +56,33 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
 				camera.position.set( - 5, 3, 10 );
-				camera.lookAt( new Vector3( 0, 2, 0 ) );
+				camera.lookAt( new THREE.Vector3( 0, 2, 0 ) );
 
-				scene = new Scene();
-				scene.background = new Color( 0xe0e0e0 );
-				scene.fog = new Fog( 0xe0e0e0, 20, 100 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xe0e0e0 );
+				scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				// lights
 
-				var light = new HemisphereLight( 0xffffff, 0x444444 );
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				light.position.set( 0, 20, 0 );
 				scene.add( light );
 
-				light = new DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 20, 10 );
 				scene.add( light );
 
 				// ground
 
-				var mesh = new Mesh( new PlaneBufferGeometry( 2000, 2000 ), new MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
-				var grid = new GridHelper( 200, 40, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
@@ -118,7 +103,7 @@
 
 				} );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaOutput = true;
@@ -140,7 +125,7 @@
 
 				gui = new GUI();
 
-				mixer = new AnimationMixer( model );
+				mixer = new THREE.AnimationMixer( model );
 
 				actions = {};
 
@@ -153,7 +138,7 @@
 					if ( emotes.indexOf( clip.name ) >= 0 || states.indexOf( clip.name ) >= 4 ) {
 
 						action.clampWhenFinished = true;
-						action.loop = LoopOnce;
+						action.loop = THREE.LoopOnce;
 
 					}
 

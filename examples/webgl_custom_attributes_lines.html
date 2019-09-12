@@ -48,18 +48,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				AdditiveBlending,
-				Color,
-				Float32BufferAttribute,
-				FontLoader,
-				Line,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				TextBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -67,7 +57,7 @@
 
 			var line, uniforms;
 
-			var loader = new FontLoader();
+			var loader = new THREE.FontLoader();
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 				init( font );
@@ -77,33 +67,33 @@
 
 			function init( font ) {
 
-				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 400;
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				uniforms = {
 
 					amplitude: { value: 5.0 },
 					opacity: { value: 0.3 },
-					color: { value: new Color( 0xffffff ) }
+					color: { value: new THREE.Color( 0xffffff ) }
 
 				};
 
-				var shaderMaterial = new ShaderMaterial( {
+				var shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-					blending: AdditiveBlending,
+					blending: THREE.AdditiveBlending,
 					depthTest: false,
 					transparent: true
 
 				} );
 
 
-				var geometry = new TextBufferGeometry( 'three.js', {
+				var geometry = new THREE.TextBufferGeometry( 'three.js', {
 
 					font: font,
 
@@ -122,13 +112,13 @@
 
 				var count = geometry.attributes.position.count;
 
-				var displacement = new Float32BufferAttribute( count * 3, 3 );
+				var displacement = new THREE.Float32BufferAttribute( count * 3, 3 );
 				geometry.addAttribute( 'displacement', displacement );
 
-				var customColor = new Float32BufferAttribute( count * 3, 3 );
+				var customColor = new THREE.Float32BufferAttribute( count * 3, 3 );
 				geometry.addAttribute( 'customColor', customColor );
 
-				var color = new Color( 0xffffff );
+				var color = new THREE.Color( 0xffffff );
 
 				for ( var i = 0, l = customColor.count; i < l; i ++ ) {
 
@@ -137,11 +127,11 @@
 
 				}
 
-				line = new Line( geometry, shaderMaterial );
+				line = new THREE.Line( geometry, shaderMaterial );
 				line.rotation.x = 0.2;
 				scene.add( line );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

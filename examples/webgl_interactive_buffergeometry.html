@@ -12,26 +12,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - buffergeometry</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				DirectionalLight,
-				DoubleSide,
-				Fog,
-				Line,
-				LineBasicMaterial,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Raycaster,
-				Scene,
-				Vector2,
-				Vector3,
-				VertexColors,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -52,22 +34,22 @@
 
 				//
 
-				camera = new PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
 				camera.position.z = 2750;
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
-				scene.fog = new Fog( 0x050505, 2000, 3500 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
 
 				//
 
-				scene.add( new AmbientLight( 0x444444 ) );
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				var light1 = new DirectionalLight( 0xffffff, 0.5 );
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
 				scene.add( light1 );
 
-				var light2 = new DirectionalLight( 0xffffff, 1.5 );
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
@@ -75,23 +57,23 @@
 
 				var triangles = 5000;
 
-				var geometry = new BufferGeometry();
+				var geometry = new THREE.BufferGeometry();
 
 				var positions = new Float32Array( triangles * 3 * 3 );
 				var normals = new Float32Array( triangles * 3 * 3 );
 				var colors = new Float32Array( triangles * 3 * 3 );
 
-				var color = new Color();
+				var color = new THREE.Color();
 
 				var n = 800, n2 = n / 2;	// triangles spread in the cube
 				var d = 120, d2 = d / 2;	// individual triangle size
 
-				var pA = new Vector3();
-				var pB = new Vector3();
-				var pC = new Vector3();
+				var pA = new THREE.Vector3();
+				var pB = new THREE.Vector3();
+				var pC = new THREE.Vector3();
 
-				var cb = new Vector3();
-				var ab = new Vector3();
+				var cb = new THREE.Vector3();
+				var ab = new THREE.Vector3();
 
 				for ( var i = 0; i < positions.length; i += 9 ) {
 
@@ -175,37 +157,37 @@
 
 				}
 
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 
-				var material = new MeshPhongMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-					side: DoubleSide, vertexColors: VertexColors
+					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
 				} );
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				raycaster = new Raycaster();
+				raycaster = new THREE.Raycaster();
 
-				mouse = new Vector2();
+				mouse = new THREE.Vector2();
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
 
-				var material = new LineBasicMaterial( { color: 0xffffff, transparent: true } );
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true } );
 
-				line = new Line( geometry, material );
+				line = new THREE.Line( geometry, material );
 				scene.add( line );
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

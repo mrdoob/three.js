@@ -20,9 +20,7 @@
  */
 THREE.BasisTextureLoader = function ( manager ) {
 
-	this.manager = manager || THREE.DefaultLoadingManager;
-
-	this.crossOrigin = 'anonymous';
+	THREE.Loader.call( this, manager );
 
 	this.transcoderPath = '';
 	this.transcoderBinary = null;
@@ -41,17 +39,9 @@ THREE.BasisTextureLoader = function ( manager ) {
 
 };
 
-THREE.BasisTextureLoader.prototype = {
+THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.BasisTextureLoader,
-
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
 
 	setTranscoderPath: function ( path ) {
 
@@ -71,13 +61,12 @@ THREE.BasisTextureLoader.prototype = {
 
 	detectSupport: function ( renderer ) {
 
-		var context = renderer.context;
 		var config = this.workerConfig;
 
-		config.etcSupported = !! context.getExtension( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! context.getExtension( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! context.getExtension( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! context.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.etcSupported ) {
 
@@ -169,7 +158,7 @@ THREE.BasisTextureLoader.prototype = {
 
 				}
 
-				texture.minFilter = mipmaps.length === 1 ? THREE.LinearFilter : THREE.LinearMipMapLinearFilter;
+				texture.minFilter = mipmaps.length === 1 ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
@@ -316,7 +305,8 @@ THREE.BasisTextureLoader.prototype = {
 		return this;
 
 	}
-};
+
+} );
 
 /* CONSTANTS */
 

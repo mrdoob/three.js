@@ -97,7 +97,7 @@ Menubar.Edit = function ( editor ) {
 
 		object = object.clone();
 
-		editor.execute( new AddObjectCommand( object ) );
+		editor.execute( new AddObjectCommand( editor, object ) );
 
 	} );
 	options.add( option );
@@ -114,7 +114,7 @@ Menubar.Edit = function ( editor ) {
 		var parent = object.parent;
 		if ( parent === undefined ) return; // avoid deleting the camera or scene
 
-		editor.execute( new RemoveObjectCommand( object ) );
+		editor.execute( new RemoveObjectCommand( editor, object ) );
 
 	} );
 	options.add( option );
@@ -158,8 +158,8 @@ Menubar.Edit = function ( editor ) {
 					var shader = glslprep.minifyGlsl( [
 							material.vertexShader, material.fragmentShader ] );
 
-					cmds.push( new SetMaterialValueCommand( object, 'vertexShader', shader[ 0 ] ) );
-					cmds.push( new SetMaterialValueCommand( object, 'fragmentShader', shader[ 1 ] ) );
+					cmds.push( new SetMaterialValueCommand( editor, object, 'vertexShader', shader[ 0 ] ) );
+					cmds.push( new SetMaterialValueCommand( editor, object, 'fragmentShader', shader[ 1 ] ) );
 
 					++nMaterialsChanged;
 
@@ -189,7 +189,7 @@ Menubar.Edit = function ( editor ) {
 
 		if ( nMaterialsChanged > 0 ) {
 
-			editor.execute( new MultiCmdsCommand( cmds ), 'Minify Shaders' );
+			editor.execute( new MultiCmdsCommand( editor, cmds ), 'Minify Shaders' );
 
 		}
 

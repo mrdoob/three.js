@@ -19,31 +19,14 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Cache as _Cache,
-				Color,
-				DirectionalLight,
-				Fog,
-				FontLoader,
-				Group,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				PointLight,
-				Scene,
-				TextGeometry,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
-			_Cache.enabled = true;
+			THREE.Cache.enabled = true;
 
 			var container, stats, permalink, hex;
 
@@ -125,24 +108,24 @@
 
 				// CAMERA
 
-				camera = new PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.set( 0, 400, 700 );
 
-				cameraTarget = new Vector3( 0, 150, 0 );
+				cameraTarget = new THREE.Vector3( 0, 150, 0 );
 
 				// SCENE
 
-				scene = new Scene();
-				scene.background = new Color( 0x000000 );
-				scene.fog = new Fog( 0x000000, 250, 1400 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				// LIGHTS
 
-				var dirLight = new DirectionalLight( 0xffffff, 0.125 );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 				dirLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var pointLight = new PointLight( 0xffffff, 1.5 );
+				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
 				scene.add( pointLight );
 
@@ -178,20 +161,20 @@
 				}
 
 				materials = [
-					new MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-					new MeshPhongMaterial( { color: 0xffffff } ) // side
+					new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+					new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
 				];
 
-				group = new Group();
+				group = new THREE.Group();
 				group.position.y = 100;
 
 				scene.add( group );
 
 				loadFont();
 
-				var plane = new Mesh(
-					new PlaneBufferGeometry( 10000, 10000 ),
-					new MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
+				var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
 				plane.position.y = 100;
 				plane.rotation.x = - Math.PI / 2;
@@ -199,7 +182,7 @@
 
 				// RENDERER
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -344,7 +327,7 @@
 
 			function loadFont() {
 
-				var loader = new FontLoader();
+				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', function ( response ) {
 
 					font = response;
@@ -357,7 +340,7 @@
 
 			function createText() {
 
-				textGeo = new TextGeometry( text, {
+				textGeo = new THREE.TextGeometry( text, {
 
 					font: font,
 
@@ -418,9 +401,9 @@
 
 				var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				textGeo = new BufferGeometry().fromGeometry( textGeo );
+				textGeo = new THREE.BufferGeometry().fromGeometry( textGeo );
 
-				textMesh1 = new Mesh( textGeo, materials );
+				textMesh1 = new THREE.Mesh( textGeo, materials );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -433,7 +416,7 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new Mesh( textGeo, materials );
+					textMesh2 = new THREE.Mesh( textGeo, materials );
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = - hover;

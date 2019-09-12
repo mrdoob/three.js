@@ -14,28 +14,8 @@
 	<body>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				BoxBufferGeometry,
-				BufferGeometry,
-				BufferGeometryLoader,
-				Color,
-				CylinderBufferGeometry,
-				DirectionalLight,
-				DoubleSide,
-				FileLoader,
-				Float32BufferAttribute,
-				Mesh,
-				MeshBasicMaterial,
-				MeshLambertMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				Sprite,
-				SpriteMaterial,
-				Vector3,
-				VertexColors
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -50,18 +30,18 @@
 
 			function init() {
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				// QRCODE
 
-				var loader = new BufferGeometryLoader();
+				var loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/QRCode_buffergeometry.json', function ( geometry ) {
 
-					mesh = new Mesh( geometry, new MeshLambertMaterial( { vertexColors: VertexColors } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { vertexColors: THREE.VertexColors } ) );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 					scene.add( mesh );
 
@@ -69,16 +49,16 @@
 
 				// CUBES
 
-				var cube = new BoxBufferGeometry( 100, 100, 100 );
+				var cube = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
-				mesh = new Mesh( cube, new MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
+				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
 				mesh.position.x = 500;
 				mesh.rotation.x = Math.random();
 				mesh.rotation.y = Math.random();
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
-				mesh = new Mesh( cube, new MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = 500;
 				mesh.position.y = 500;
 				mesh.rotation.x = Math.random();
@@ -88,14 +68,14 @@
 
 				// PLANE
 
-				mesh = new Mesh( new PlaneBufferGeometry( 100, 100 ), new MeshBasicMaterial( { color: Math.random() * 0xffffff, side: DoubleSide } ) );
+				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 				mesh.position.y = - 500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
 				// CYLINDER
 
-				mesh = new Mesh( new CylinderBufferGeometry( 20, 100, 200, 10 ), new MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.CylinderBufferGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = - 500;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
@@ -103,14 +83,14 @@
 
 				// POLYFIELD
 
-				var geometry = new BufferGeometry();
-				var material = new MeshBasicMaterial( { vertexColors: VertexColors, side: DoubleSide } );
+				var geometry = new THREE.BufferGeometry();
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors, side: THREE.DoubleSide } );
 
-				var v = new Vector3();
-				var v0 = new Vector3();
-				var v1 = new Vector3();
-				var v2 = new Vector3();
-				var color = new Color();
+				var v = new THREE.Vector3();
+				var v0 = new THREE.Vector3();
+				var v1 = new THREE.Vector3();
+				var v2 = new THREE.Vector3();
+				var color = new THREE.Color();
 
 				var vertices = [];
 				var colors = [];
@@ -159,10 +139,10 @@
 
 				}
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				group = new Mesh( geometry, material );
+				group = new THREE.Mesh( geometry, material );
 				group.scale.set( 2, 2, 2 );
 				scene.add( group );
 
@@ -170,8 +150,8 @@
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					var material = new SpriteMaterial( { color: Math.random() * 0xffffff } );
-					var sprite = new Sprite( material );
+					var material = new THREE.SpriteMaterial( { color: Math.random() * 0xffffff } );
+					var sprite = new THREE.Sprite( material );
 					sprite.position.x = Math.random() * 1000 - 500;
 					sprite.position.y = Math.random() * 1000 - 500;
 					sprite.position.z = Math.random() * 1000 - 500;
@@ -199,7 +179,7 @@
 
 				// CUSTOM FROM FILE
 
-				var fileLoader = new FileLoader();
+				var fileLoader = new THREE.FileLoader();
 				fileLoader.load( 'models/svg/hexagon.svg', function ( svg ) {
 
 					var node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
@@ -216,10 +196,10 @@
 
 				// LIGHTS
 
-				var ambient = new AmbientLight( 0x80ffff );
+				var ambient = new THREE.AmbientLight( 0x80ffff );
 				scene.add( ambient );
 
-				var directional = new DirectionalLight( 0xffff00 );
+				var directional = new THREE.DirectionalLight( 0xffff00 );
 				directional.position.set( - 1, 0.5, 0 );
 				scene.add( directional );
 

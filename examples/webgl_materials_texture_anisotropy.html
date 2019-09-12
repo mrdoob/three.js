@@ -54,21 +54,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DirectionalLight,
-				Fog,
-				Math as _Math,
-				Mesh,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				RepeatWrapping,
-				Scene,
-				TextureLoader,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -93,50 +80,50 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 				//
 
-				camera = new PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 25000 );
+				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 25000 );
 				camera.position.z = 1500;
 
-				scene1 = new Scene();
-				scene1.background = new Color( 0xf2f7ff );
-				scene1.fog = new Fog( 0xf2f7ff, 1, 25000 );
+				scene1 = new THREE.Scene();
+				scene1.background = new THREE.Color( 0xf2f7ff );
+				scene1.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
-				scene2 = new Scene();
-				scene2.background = new Color( 0xf2f7ff );
-				scene2.fog = new Fog( 0xf2f7ff, 1, 25000 );
+				scene2 = new THREE.Scene();
+				scene2.background = new THREE.Color( 0xf2f7ff );
+				scene2.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
-				scene1.add( new AmbientLight( 0xeef0ff ) );
-				scene2.add( new AmbientLight( 0xeef0ff ) );
+				scene1.add( new THREE.AmbientLight( 0xeef0ff ) );
+				scene2.add( new THREE.AmbientLight( 0xeef0ff ) );
 
-				var light1 = new DirectionalLight( 0xffffff, 2 );
+				var light1 = new THREE.DirectionalLight( 0xffffff, 2 );
 				light1.position.set( 1, 1, 1 );
 				scene1.add( light1 );
 
-				var light2 = new DirectionalLight( 0xffffff, 2 );
+				var light2 = new THREE.DirectionalLight( 0xffffff, 2 );
 				light2.position.set( 1, 1, 1 );
 				scene2.add( light2 );
 
 				// GROUND
 
-				var textureLoader = new TextureLoader();
+				var textureLoader = new THREE.TextureLoader();
 
 				var maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				var texture1 = textureLoader.load( "textures/crate.gif" );
-				var material1 = new MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
+				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				texture1.anisotropy = maxAnisotropy;
-				texture1.wrapS = texture1.wrapT = RepeatWrapping;
+				texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 				texture1.repeat.set( 512, 512 );
 
 				var texture2 = textureLoader.load( "textures/crate.gif" );
-				var material2 = new MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
+				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				texture2.anisotropy = 1;
-				texture2.wrapS = texture2.wrapT = RepeatWrapping;
+				texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
 				texture2.repeat.set( 512, 512 );
 
 				if ( maxAnisotropy > 0 ) {
@@ -153,13 +140,13 @@
 
 				//
 
-				var geometry = new PlaneBufferGeometry( 100, 100 );
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
 
-				var mesh1 = new Mesh( geometry, material1 );
+				var mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.rotation.x = - Math.PI / 2;
 				mesh1.scale.set( 1000, 1000, 1000 );
 
-				var mesh2 = new Mesh( geometry, material2 );
+				var mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.rotation.x = - Math.PI / 2;
 				mesh2.scale.set( 1000, 1000, 1000 );
 
@@ -205,7 +192,7 @@
 			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y = _Math.clamp( camera.position.y + ( - ( mouseY - 200 ) - camera.position.y ) * .05, 50, 1000 );
+				camera.position.y = THREE.Math.clamp( camera.position.y + ( - ( mouseY - 200 ) - camera.position.y ) * .05, 50, 1000 );
 
 				camera.lookAt( scene1.position );
 

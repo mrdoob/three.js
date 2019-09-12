@@ -36,7 +36,7 @@ THREE.MMDLoader = ( function () {
 	 */
 	function MMDLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.loader = new THREE.FileLoader( this.manager );
 
@@ -46,22 +46,9 @@ THREE.MMDLoader = ( function () {
 
 	}
 
-	MMDLoader.prototype = {
+	MMDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: MMDLoader,
-
-		crossOrigin: 'anonymous',
-
-		/**
-		 * @param {string} crossOrigin
-		 * @return {THREE.MMDLoader}
-		 */
-		setCrossOrigin: function ( crossOrigin ) {
-
-			this.crossOrigin = crossOrigin;
-			return this;
-
-		},
 
 		/**
 		 * @param {string} animationPath
@@ -70,28 +57,6 @@ THREE.MMDLoader = ( function () {
 		setAnimationPath: function ( animationPath ) {
 
 			this.animationPath = animationPath;
-			return this;
-
-		},
-
-		/**
-		 * @param {string} path
-		 * @return {THREE.MMDLoader}
-		 */
-		setPath: function ( path ) {
-
-			this.path = path;
-			return this;
-
-		},
-
-		/**
-		 * @param {string} resourcePath
-		 * @return {THREE.MMDLoader}
-		 */
-		setResoucePath: function ( resourcePath ) {
-
-			this.resourcePath = resourcePath;
 			return this;
 
 		},
@@ -114,11 +79,11 @@ THREE.MMDLoader = ( function () {
 
 			var resourcePath;
 
-			if ( this.resourcePath !== undefined ) {
+			if ( this.resourcePath !== '' ) {
 
 				resourcePath = this.resourcePath;
 
-			} else if ( this.path !== undefined ) {
+			} else if ( this.path !== '' ) {
 
 				resourcePath = this.path;
 
@@ -340,7 +305,7 @@ THREE.MMDLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	// Utilities
 
@@ -1340,7 +1305,7 @@ THREE.MMDLoader = ( function () {
 
 			if ( textures[ fullPath ] !== undefined ) return textures[ fullPath ];
 
-			var loader = THREE.Loader.Handlers.get( fullPath );
+			var loader = this.manager.getHandler( fullPath );
 
 			if ( loader === null ) {
 

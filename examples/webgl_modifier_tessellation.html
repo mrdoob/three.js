@@ -54,18 +54,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				BufferGeometry,
-				Color,
-				FontLoader,
-				Mesh,
-				PerspectiveCamera,
-				Scene,
-				ShaderMaterial,
-				TextGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -82,7 +72,7 @@
 			var WIDTH = window.innerWidth,
 				HEIGHT = window.innerHeight;
 
-			var loader = new FontLoader();
+			var loader = new THREE.FontLoader();
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 				init( font );
@@ -92,15 +82,15 @@
 
 			function init( font ) {
 
-				camera = new PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
 				camera.position.set( - 100, 100, 200 );
 
-				scene = new Scene();
-				scene.background = new Color( 0x050505 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
 
 				//
 
-				var geometry = new TextGeometry( "THREE.JS", {
+				var geometry = new THREE.TextGeometry( "THREE.JS", {
 
 					font: font,
 
@@ -126,14 +116,14 @@
 
 				//
 
-				geometry = new BufferGeometry().fromGeometry( geometry );
+				geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
 				var numFaces = geometry.attributes.position.count / 3;
 
 				var colors = new Float32Array( numFaces * 3 * 3 );
 				var displacement = new Float32Array( numFaces * 3 * 3 );
 
-				var color = new Color();
+				var color = new THREE.Color();
 
 				for ( var f = 0; f < numFaces; f ++ ) {
 
@@ -161,8 +151,8 @@
 
 				}
 
-				geometry.addAttribute( 'customColor', new BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'displacement', new BufferAttribute( displacement, 3 ) );
+				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.addAttribute( 'displacement', new THREE.BufferAttribute( displacement, 3 ) );
 
 				//
 
@@ -172,7 +162,7 @@
 
 				};
 
-				var shaderMaterial = new ShaderMaterial( {
+				var shaderMaterial = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
@@ -182,11 +172,11 @@
 
 				//
 
-				mesh = new Mesh( geometry, shaderMaterial );
+				mesh = new THREE.Mesh( geometry, shaderMaterial );
 
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
 

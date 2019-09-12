@@ -69,19 +69,7 @@
 	</script>
 
 	<script type="module">
-		import {
-			Float32BufferAttribute,
-			IcosahedronBufferGeometry,
-			InstancedBufferAttribute,
-			InstancedBufferGeometry,
-			Mesh,
-			MeshBasicMaterial,
-			PerspectiveCamera,
-			Scene,
-			ShaderMaterial,
-			VertexColors,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 
@@ -100,14 +88,14 @@
 
 			container = document.getElementById( 'container' );
 
-			camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
 			camera.position.z = 4;
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 
 			//
 
-			var geometry = new IcosahedronBufferGeometry( 0.1, 1 );
+			var geometry = new THREE.IcosahedronBufferGeometry( 0.1, 1 );
 
 			var colors = [];
 
@@ -117,9 +105,9 @@
 
 			}
 
-			geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-			var material = new MeshBasicMaterial( { color: 0xff0000, vertexColors: VertexColors } );
+			var material = new THREE.MeshBasicMaterial( { color: 0xff0000, vertexColors: THREE.VertexColors } );
 
 			//
 
@@ -135,7 +123,7 @@
 
 				// the red meshes are drawn with separate draw calls
 
-				var mesh = new Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				var position = mesh.position;
@@ -157,17 +145,17 @@
 
 			}
 
-			var instancedGeometry = new InstancedBufferGeometry();
+			var instancedGeometry = new THREE.InstancedBufferGeometry();
 			instancedGeometry.attributes.position = geometry.attributes.position;
 			instancedGeometry.attributes.color = geometry.attributes.color;
 
-			instancedGeometry.addAttribute( 'instancePosition', new InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
-			instancedGeometry.addAttribute( 'instanceQuaternion', new InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 ) );
-			instancedGeometry.addAttribute( 'instanceScale', new InstancedBufferAttribute( new Float32Array( instanceScales ), 3 ) );
+			instancedGeometry.addAttribute( 'instancePosition', new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 ) );
+			instancedGeometry.addAttribute( 'instanceQuaternion', new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 ) );
+			instancedGeometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 ) );
 
 			//
 
-			var shaderMaterial = new ShaderMaterial( {
+			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: {},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -178,13 +166,13 @@
 
 			// counterparts are drawn all at once with a single draw call (via instanced rendering)
 
-			var instancedMesh = new Mesh( instancedGeometry, shaderMaterial );
+			var instancedMesh = new THREE.Mesh( instancedGeometry, shaderMaterial );
 			instancedMesh.position.x = 0.1;
 			scene.add( instancedMesh );
 
 			//
 
-			renderer = new WebGLRenderer();
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );

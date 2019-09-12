@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface HueSaturationShader {
+export const HueSaturationShader: {
   uniforms: {
     tDiffuse: Uniform;
     hue: Uniform;
@@ -10,4 +10,4 @@ export interface HueSaturationShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

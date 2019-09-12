@@ -364,13 +364,13 @@ THREE.OBJLoader = ( function () {
 
 	function OBJLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.materials = null;
 
 	}
 
-	OBJLoader.prototype = {
+	OBJLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: OBJLoader,
 
@@ -385,14 +385,6 @@ THREE.OBJLoader = ( function () {
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-			return this;
 
 		},
 
@@ -459,7 +451,7 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
-							if ( data.length === 8 ) {
+							if ( data.length >= 7 ) {
 
 								state.colors.push(
 									parseFloat( data[ 4 ] ),
@@ -790,7 +782,7 @@ THREE.OBJLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return OBJLoader;
 

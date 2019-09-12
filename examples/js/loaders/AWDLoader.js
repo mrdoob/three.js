@@ -80,7 +80,7 @@ THREE.AWDLoader = ( function () {
 
 	var AWDLoader = function ( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.trunk = new THREE.Object3D();
 
@@ -106,7 +106,7 @@ THREE.AWDLoader = ( function () {
 
 	};
 
-	AWDLoader.prototype = {
+	AWDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: AWDLoader,
 
@@ -125,13 +125,6 @@ THREE.AWDLoader = ( function () {
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
 
 		},
 
@@ -1219,7 +1212,7 @@ THREE.AWDLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return AWDLoader;
 

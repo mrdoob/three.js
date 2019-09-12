@@ -4,11 +4,11 @@
 
 THREE.KMZLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.KMZLoader.prototype = {
+THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.KMZLoader,
 
@@ -24,13 +24,6 @@ THREE.KMZLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -109,4 +102,4 @@ THREE.KMZLoader.prototype = {
 
 	}
 
-};
+} );

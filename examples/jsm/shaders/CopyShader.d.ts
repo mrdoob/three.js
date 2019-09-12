@@ -2,11 +2,11 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface CopyShader {
+export const CopyShader: {
   uniforms: {
     tDiffuse: Uniform;
     opacity: Uniform;
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

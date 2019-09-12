@@ -4,7 +4,7 @@ import {
   Vector2,
 } from '../../../src/Three';
 
-export interface OceanShaders {
+export const OceanShaders: {
 
   ocean_sim_vertex: {
     vertexShader: string;
@@ -72,4 +72,4 @@ export interface OceanShaders {
     fragmentShader: string;
   }
 
-}
+};

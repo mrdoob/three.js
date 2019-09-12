@@ -232,16 +232,8 @@
 		</script>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				BufferGeometry,
-				Math as _Math,
-				PerspectiveCamera,
-				Points,
-				Scene,
-				ShaderMaterial,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -275,13 +267,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 5, 15000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 5, 15000 );
 				camera.position.y = 120;
 				camera.position.z = 400;
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -364,7 +356,7 @@
 
 			function initProtoplanets() {
 
-				geometry = new BufferGeometry();
+				geometry = new THREE.BufferGeometry();
 
 				var positions = new Float32Array( PARTICLES * 3 );
 				var p = 0;
@@ -391,8 +383,8 @@
 
 				}
 
-				geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
 					"texturePosition": { value: null },
@@ -401,8 +393,8 @@
 					"density": { value: 0.0 }
 				};
 
-				// ShaderMaterial
-				var material = new ShaderMaterial( {
+				// THREE.ShaderMaterial
+				var material = new THREE.ShaderMaterial( {
 					uniforms: particleUniforms,
 					vertexShader: document.getElementById( 'particleVertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
@@ -410,7 +402,7 @@
 
 				material.extensions.drawBuffers = true;
 
-				var particles = new Points( geometry, material );
+				var particles = new THREE.Points( geometry, material );
 				particles.matrixAutoUpdate = false;
 				particles.updateMatrix();
 
@@ -531,7 +523,7 @@
 
 			function getCameraConstant( camera ) {
 
-				return window.innerHeight / ( Math.tan( _Math.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
+				return window.innerHeight / ( Math.tan( THREE.Math.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
 
 			}
 

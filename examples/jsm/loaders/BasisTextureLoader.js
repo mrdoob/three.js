@@ -6,10 +6,10 @@
 
 import {
 	CompressedTexture,
-	DefaultLoadingManager,
 	FileLoader,
 	LinearFilter,
-	LinearMipMapLinearFilter,
+	LinearMipmapLinearFilter,
+	Loader,
 	RGB_ETC1_Format,
 	RGB_PVRTC_4BPPV1_Format,
 	UnsignedByteType
@@ -31,9 +31,7 @@ import {
  */
 var BasisTextureLoader = function ( manager ) {
 
-	this.manager = manager || DefaultLoadingManager;
-
-	this.crossOrigin = 'anonymous';
+	Loader.call( this, manager );
 
 	this.transcoderPath = '';
 	this.transcoderBinary = null;
@@ -52,17 +50,9 @@ var BasisTextureLoader = function ( manager ) {
 
 };
 
-BasisTextureLoader.prototype = {
+BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: BasisTextureLoader,
-
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
 
 	setTranscoderPath: function ( path ) {
 
@@ -82,13 +72,12 @@ BasisTextureLoader.prototype = {
 
 	detectSupport: function ( renderer ) {
 
-		var context = renderer.context;
 		var config = this.workerConfig;
 
-		config.etcSupported = !! context.getExtension( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! context.getExtension( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! context.getExtension( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! context.getExtension( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.etcSupported ) {
 
@@ -180,7 +169,7 @@ BasisTextureLoader.prototype = {
 
 				}
 
-				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipMapLinearFilter;
+				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
@@ -327,7 +316,8 @@ BasisTextureLoader.prototype = {
 		return this;
 
 	}
-};
+
+} );
 
 /* CONSTANTS */
 

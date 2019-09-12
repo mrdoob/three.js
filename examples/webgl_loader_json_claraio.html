@@ -9,19 +9,13 @@
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://clara.io" target="_blank" rel="noopener">Clara.io</a> JSON Scene/Object Load Test<br/>
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://clara.io" target="_blank" rel="noopener">Clara.io</a> JSON THREE.Scene/Object Load Test<br/>
 		More Information: <a href="https://clara.io/learn/user-guide/data_exchange/threejs_export" target="_blank" rel="noopener">Clara.io ThreeJS Export Documentation</a>
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				DirectionalLight,
-				ObjectLoader,
-				PerspectiveCamera,
-				Scene,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var container;
 
@@ -42,22 +36,22 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 4;
 
 				// scene
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var ambient = new AmbientLight( 0x444444 );
+				var ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				var directionalLight = new DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
 				// BEGIN Clara.io JSON loader code
-				var objectLoader = new ObjectLoader();
+				var objectLoader = new THREE.ObjectLoader();
 				objectLoader.load( "models/json/teapot-claraio.json", function ( obj ) {
 
 				 	scene.add( obj );
@@ -65,7 +59,7 @@
 				} );
 				// END Clara.io JSON loader code
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

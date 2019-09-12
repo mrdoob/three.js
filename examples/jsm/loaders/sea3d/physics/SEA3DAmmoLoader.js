@@ -172,7 +172,7 @@ var AMMO = {
 	},
 	containsConstraint: function ( ctrt ) {
 
-		return this.constraints.indexOf( rb ) > - 1;
+		return this.constraints.indexOf( ctrt ) > - 1;
 
 	},
 
@@ -248,8 +248,6 @@ var AMMO = {
 		index = index == undefined ? - 1 : index;
 
 		var mConvexHull = new Ammo.btConvexHullShape();
-
-		var v0 = new Ammo.btVector3( 0, 0, 0 );
 
 		var vertex = geometry.getAttribute( 'position' ).array;
 		var indexes = geometry.getIndex().array;

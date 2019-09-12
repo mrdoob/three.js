@@ -19,7 +19,6 @@ import {
 	ClampToEdgeWrapping,
 	Color,
 	CustomBlending,
-	DefaultLoadingManager,
 	DirectionalLight,
 	DoubleSide,
 	DstAlphaFactor,
@@ -39,8 +38,8 @@ import {
 	LineLoop,
 	LineSegments,
 	LinearFilter,
-	LinearMipMapLinearFilter,
-	LinearMipMapNearestFilter,
+	LinearMipmapLinearFilter,
+	LinearMipmapNearestFilter,
 	Loader,
 	LoaderUtils,
 	LuminanceAlphaFormat,
@@ -54,8 +53,8 @@ import {
 	MeshPhongMaterial,
 	MirroredRepeatWrapping,
 	NearestFilter,
-	NearestMipMapLinearFilter,
-	NearestMipMapNearestFilter,
+	NearestMipmapLinearFilter,
+	NearestMipmapNearestFilter,
 	NeverDepth,
 	NoBlending,
 	NotEqualDepth,
@@ -100,15 +99,13 @@ var LegacyGLTFLoader = ( function () {
 
 	function LegacyGLTFLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	LegacyGLTFLoader.prototype = {
+	LegacyGLTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: LegacyGLTFLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -116,11 +113,11 @@ var LegacyGLTFLoader = ( function () {
 
 			var resourcePath;
 
-			if ( this.resourcePath !== undefined ) {
+			if ( this.resourcePath !== '' ) {
 
 				resourcePath = this.resourcePath;
 
-			} else if ( this.path !== undefined ) {
+			} else if ( this.path !== '' ) {
 
 				resourcePath = this.path;
 
@@ -140,26 +137,6 @@ var LegacyGLTFLoader = ( function () {
 				scope.parse( data, resourcePath, onLoad );
 
 			}, onProgress, onError );
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
 
 		},
 
@@ -212,7 +189,7 @@ var LegacyGLTFLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	/* GLTFREGISTRY */
 
@@ -554,10 +531,10 @@ var LegacyGLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: NearestFilter,
 		9729: LinearFilter,
-		9984: NearestMipMapNearestFilter,
-		9985: LinearMipMapNearestFilter,
-		9986: NearestMipMapLinearFilter,
-		9987: LinearMipMapLinearFilter
+		9984: NearestMipmapNearestFilter,
+		9985: LinearMipmapNearestFilter,
+		9986: NearestMipmapLinearFilter,
+		9987: LinearMipmapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -1192,7 +1169,7 @@ var LegacyGLTFLoader = ( function () {
 
 						}
 
-						var textureLoader = Loader.Handlers.get( sourceUri );
+						var textureLoader = options.manager.getHandler( sourceUri );
 
 						if ( textureLoader === null ) {
 
@@ -1226,7 +1203,7 @@ var LegacyGLTFLoader = ( function () {
 								var sampler = json.samplers[ texture.sampler ];
 
 								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || LinearFilter;
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || NearestMipMapLinearFilter;
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || NearestMipmapLinearFilter;
 								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 

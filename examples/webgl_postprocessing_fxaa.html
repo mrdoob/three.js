@@ -34,20 +34,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Clock,
-				Color,
-				DirectionalLight,
-				Fog,
-				Group,
-				HemisphereLight,
-				Mesh,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				Scene,
-				TetrahedronBufferGeometry,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -66,35 +54,35 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
-				scene.fog = new Fog( 0xcccccc, 100, 1500 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
 
-				clock = new Clock();
+				clock = new THREE.Clock();
 
 				//
 
-				var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new DirectionalLight( 0xffffff, 0.8 );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
 				//
 
-				group = new Group();
+				group = new THREE.Group();
 
-				var geometry = new TetrahedronBufferGeometry( 10 );
-				var material = new MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				var geometry = new THREE.TetrahedronBufferGeometry( 10 );
+				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = Math.random() * 500 - 250;
 					mesh.position.y = Math.random() * 500 - 250;
@@ -114,7 +102,7 @@
 
 				//
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );

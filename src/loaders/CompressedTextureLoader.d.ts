@@ -1,16 +1,10 @@
+import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 import { CompressedTexture } from './../textures/CompressedTexture';
 
-/**
- * @deprecated since 0.84.0. Use {@link DataTextureLoader} (renamed)
- */
-
-export class CompressedTextureLoader {
+export class CompressedTextureLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-
-	manager: LoadingManager;
-	path: string;
 
 	load(
 		url: string,
@@ -18,6 +12,5 @@ export class CompressedTextureLoader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): void;
-	setPath( path: string ): CompressedTextureLoader;
 
 }

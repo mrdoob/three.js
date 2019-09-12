@@ -13,15 +13,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BoxBufferGeometry,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				Texture,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -36,14 +29,14 @@
 
 				var container = document.getElementById( 'container' );
 
-				renderer = new WebGLRenderer();
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				camera = new PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 0.01;
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -58,11 +51,11 @@
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( new MeshBasicMaterial( { map: textures[ i ] } ) );
+					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
 
 				}
 
-				var skyBox = new Mesh( new BoxBufferGeometry( 1, 1, 1 ), materials );
+				var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
 				skyBox.geometry.scale( 1, 1, - 1 );
 				scene.add( skyBox );
 
@@ -76,7 +69,7 @@
 
 				for ( var i = 0; i < tilesNum; i ++ ) {
 
-					textures[ i ] = new Texture();
+					textures[ i ] = new THREE.Texture();
 
 				}
 

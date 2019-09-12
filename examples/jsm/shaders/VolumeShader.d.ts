@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface VolumeShader {
+export const VolumeShader: {
   uniforms: {
     u_size: Uniform;
     u_renderstyle: Uniform;
@@ -13,4 +13,4 @@ export interface VolumeShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

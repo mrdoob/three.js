@@ -60,26 +60,7 @@
 	</div>
 
 	<script type="module">
-		import {
-			AudioListener as _AudioListener, // we don't want to override the native AudioListener function
-			BoxBufferGeometry,
-			Color,
-			CubeTextureLoader,
-			DirectionalLight,
-			Fog,
-			HemisphereLight,
-			GridHelper,
-			MeshBasicMaterial,
-			MeshPhongMaterial,
-			Mesh,
-			PerspectiveCamera,
-			PlaneBufferGeometry,
-			PositionalAudio,
-			PositionalAudioHelper,
-			RGBFormat,
-			Scene,
-			WebGLRenderer
-		} from "../build/three.module.js";
+		import * as THREE from '../build/three.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
@@ -98,25 +79,25 @@
 
 			//
 
-			camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 			camera.position.set( 3, 2, 3 );
 
-			var reflectionCube = new CubeTextureLoader()
+			var reflectionCube = new THREE.CubeTextureLoader()
 				.setPath( 'textures/cube/SwedishRoyalCastle/' )
 				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-			reflectionCube.format = RGBFormat;
+			reflectionCube.format = THREE.RGBFormat;
 
-			scene = new Scene();
-			scene.background = new Color( 0xa0a0a0 );
-			scene.fog = new Fog( 0xa0a0a0, 2, 20 );
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xa0a0a0 );
+			scene.fog = new THREE.Fog( 0xa0a0a0, 2, 20 );
 
 			//
 
-			var hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+			var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
 			hemiLight.position.set( 0, 20, 0 );
 			scene.add( hemiLight );
 
-			var dirLight = new DirectionalLight( 0xffffff );
+			var dirLight = new THREE.DirectionalLight( 0xffffff );
 			dirLight.position.set( 5, 5, 0 );
 			dirLight.castShadow = true;
 			dirLight.shadow.camera.top = 1;
@@ -131,28 +112,28 @@
 
 			//
 
-			var mesh = new Mesh( new PlaneBufferGeometry( 50, 50 ), new MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+			var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
 			mesh.rotation.x = - Math.PI / 2;
 			mesh.receiveShadow = true;
 			scene.add( mesh );
 
-			var grid = new GridHelper( 50, 50, 0x888888, 0x888888 );
+			var grid = new THREE.GridHelper( 50, 50, 0x888888, 0x888888 );
 			scene.add( grid );
 
 			//
 
-			var listener = new _AudioListener();
+			var listener = new THREE.AudioListener();
 			camera.add( listener );
 
 			var audioElement = document.getElementById( 'music' );
 			audioElement.play();
 
-			var positionalAudio = new PositionalAudio( listener );
+			var positionalAudio = new THREE.PositionalAudio( listener );
 			positionalAudio.setMediaElementSource( audioElement );
 			positionalAudio.setRefDistance( 1 );
 			positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-			var helper = new PositionalAudioHelper( positionalAudio, 0.1 );
+			var helper = new THREE.PositionalAudioHelper( positionalAudio, 0.1 );
 			positionalAudio.add( helper );
 
 			//
@@ -184,17 +165,17 @@
 
 			// sound is damped behind this wall
 
-			var wallGeometry = new BoxBufferGeometry( 2, 1, 0.1 );
-			var wallMaterial = new MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.5 } );
+			var wallGeometry = new THREE.BoxBufferGeometry( 2, 1, 0.1 );
+			var wallMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true, opacity: 0.5 } );
 
-			var wall = new Mesh( wallGeometry, wallMaterial );
+			var wall = new THREE.Mesh( wallGeometry, wallMaterial );
 			wall.position.set( 0, 0.5, - 0.5 );
 			scene.add( wall );
 
 
 			//
 
-			renderer = new WebGLRenderer( { antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.gammaOutput = true;

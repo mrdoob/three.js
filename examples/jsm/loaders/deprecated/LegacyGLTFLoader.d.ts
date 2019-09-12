@@ -1,6 +1,7 @@
 import {
   AnimationClip,
   Camera,
+  Loader,
   LoadingManager,
   Scene
 } from '../../../../src/Three';
@@ -12,16 +13,9 @@ export interface GLTF {
   cameras: Camera[];
 }
 
-export class LegacyGLTFLoader {
+export class LegacyGLTFLoader extends Loader {
   constructor(manager?: LoadingManager);
-  crossOrigin: string;
-  manager: LoadingManager;
-  path: string;
-  resourcePath: string;
 
   load(url: string, onLoad: (gltf: GLTF) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setPath(path: string): this;
-  setResourcePath(path: string): this;
-  setCrossOrigin(value: string): this;
   parse(data: ArrayBuffer | string, path: string, callback: (gltf: GLTF) => void): void;
 }

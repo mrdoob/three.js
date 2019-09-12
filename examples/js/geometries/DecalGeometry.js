@@ -149,6 +149,8 @@ THREE.DecalGeometry = function ( mesh, position, orientation, size ) {
 		vertex.applyMatrix4( mesh.matrixWorld );
 		vertex.applyMatrix4( projectorMatrixInverse );
 
+		normal.transformDirection( mesh.matrixWorld );
+
 		decalVertices.push( new THREE.DecalVertex( vertex.clone(), normal.clone() ) );
 
 	}

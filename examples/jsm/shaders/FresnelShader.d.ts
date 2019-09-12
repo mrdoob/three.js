@@ -2,7 +2,7 @@ import {
   Uniform
 } from '../../../src/Three';
 
-export interface FresnelShader {
+export const FresnelShader: {
   uniforms: {
     mRefractionRatio: Uniform;
     mFresnelBias: Uniform;
@@ -12,4 +12,4 @@ export interface FresnelShader {
   };
   vertexShader: string;
   fragmentShader: string;
-}
+};

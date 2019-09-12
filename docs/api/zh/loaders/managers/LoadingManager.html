@@ -202,6 +202,29 @@
             任何使用管理器的加载器都会调用此方法， 当加载器出现加载错误时。
 		</p>
 
+		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.<br />
+		[page:Loader loader] — The loader.
+		<p>
+		Registers a loader with the given regular expression. Can be used to define what loader should be used in
+		order to load specific files. A typical use case is to overwrite the default loader for textures.
+		</p>
+
+		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.
+		<p>
+		Removes the loader for the given regular expression.
+		</p>
+
+		<h3>[method:null getHandler]( [param:String file] )</h3>
+		<p>
+		[page:String file] — The file path.
+		<p>
+		Can be used to retrieve the registered loader for the given file path.
+		</p>
+
 		<h2>源</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]

@@ -21,18 +21,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				DoubleSide,
-				FontLoader,
-				Group,
-				Mesh,
-				MeshBasicMaterial,
-				PerspectiveCamera,
-				Scene,
-				ShapeBufferGeometry,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
@@ -44,36 +34,36 @@
 
 			function init( ) {
 
-				camera = new PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, - 400, 600 );
 
-				scene = new Scene();
-				scene.background = new Color( 0xf0f0f0 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				var loader = new FontLoader();
+				var loader = new THREE.FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					var xMid, text;
 
-					var color = new Color( 0x006699 );
+					var color = new THREE.Color( 0x006699 );
 
-					var matDark = new MeshBasicMaterial( {
+					var matDark = new THREE.MeshBasicMaterial( {
 						color: color,
-						side: DoubleSide
+						side: THREE.DoubleSide
 					} );
 
-					var matLite = new MeshBasicMaterial( {
+					var matLite = new THREE.MeshBasicMaterial( {
 						color: color,
 						transparent: true,
 						opacity: 0.4,
-						side: DoubleSide
+						side: THREE.DoubleSide
 					} );
 
 					var message = "   Three.js\nStroke text.";
 
 					var shapes = font.generateShapes( message, 100 );
 
-					var geometry = new ShapeBufferGeometry( shapes );
+					var geometry = new THREE.ShapeBufferGeometry( shapes );
 
 					geometry.computeBoundingBox();
 
@@ -83,7 +73,7 @@
 
 					// make shape ( N.B. edge view not visible )
 
-					text = new Mesh( geometry, matLite );
+					text = new THREE.Mesh( geometry, matLite );
 					text.position.z = - 150;
 					scene.add( text );
 
@@ -112,7 +102,7 @@
 
 					var style = SVGLoader.getStrokeStyle( 5, color.getStyle() );
 
-					var strokeText = new Group();
+					var strokeText = new THREE.Group();
 
 					for ( var i = 0; i < shapes.length; i ++ ) {
 
@@ -124,7 +114,7 @@
 
 						geometry.translate( xMid, 0, 0 );
 
-						var strokeMesh = new Mesh( geometry, matDark );
+						var strokeMesh = new THREE.Mesh( geometry, matDark );
 						strokeText.add( strokeMesh );
 
 					}
@@ -133,7 +123,7 @@
 
 				} ); //end load function
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

@@ -14,20 +14,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				Color,
-				DirectionalLight,
-				Fog,
-				HemisphereLight,
-				Mesh,
-				MeshPhongMaterial,
-				MeshStandardMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				Vector3,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -45,21 +33,21 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.15, 3 );
 
-				cameraTarget = new Vector3( 0, - 0.1, 0 );
+				cameraTarget = new THREE.Vector3( 0, - 0.1, 0 );
 
-				scene = new Scene();
-				scene.background = new Color( 0x72645b );
-				scene.fog = new Fog( 0x72645b, 2, 15 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x72645b );
+				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
 
 				// Ground
 
-				var plane = new Mesh(
-					new PlaneBufferGeometry( 40, 40 ),
-					new MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+				var plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 40, 40 ),
+					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
 				plane.position.y = - 0.5;
@@ -75,8 +63,8 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new Mesh( geometry, material );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
 					mesh.position.z = 0.3;
@@ -94,8 +82,8 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new Mesh( geometry, material );
+					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
 					mesh.position.y = - 0.02;
@@ -111,14 +99,14 @@
 
 				// Lights
 
-				scene.add( new HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
 				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
 
 				// renderer
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -142,7 +130,7 @@
 
 			function addShadowedLight( x, y, z, color, intensity ) {
 
-				var directionalLight = new DirectionalLight( color, intensity );
+				var directionalLight = new THREE.DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 

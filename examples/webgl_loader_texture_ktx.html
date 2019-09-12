@@ -14,15 +14,7 @@
 </div>
 
 <script type="module">
-	import {
-		BoxBufferGeometry,
-		DoubleSide,
-		PerspectiveCamera,
-		Mesh,
-		MeshBasicMaterial,
-		Scene,
-		WebGLRenderer,
-	} from "../build/three.module.js";
+	import * as THREE from '../build/three.module.js';
 
 	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
 
@@ -49,7 +41,7 @@
 
 	function init() {
 
-		renderer = new WebGLRenderer( { antialias: true } );
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
@@ -61,12 +53,12 @@
 			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
 		};
 
-		camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 		camera.position.z = 1000;
 
-		scene = new Scene();
+		scene = new THREE.Scene();
 
-		var geometry = new BoxBufferGeometry( 200, 200, 200 );
+		var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 		var material1, material2;
 
 		// TODO: add cubemap support
@@ -74,62 +66,62 @@
 
 		if ( formats.pvrtc ) {
 
-			material1 = new MeshBasicMaterial( {
+			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_PVR2bpp.ktx' )
 			} );
-			material2 = new MeshBasicMaterial( {
+			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_PVR4bpp.ktx' ),
 				depthTest: false,
 				transparent: true,
-				side: DoubleSide
+				side: THREE.DoubleSide
 			} );
 
-			meshes.push( new Mesh( geometry, material1 ) );
-			meshes.push( new Mesh( geometry, material2 ) );
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material2 ) );
 
 		}
 
 		if ( formats.s3tc ) {
 
-			material1 = new MeshBasicMaterial( {
+			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_BC1.ktx' )
 			} );
-			material2 = new MeshBasicMaterial( {
+			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_BC3.ktx' ),
 				depthTest: false,
 				transparent: true,
-				side: DoubleSide
+				side: THREE.DoubleSide
 			} );
 
-			meshes.push( new Mesh( geometry, material1 ) );
-			meshes.push( new Mesh( geometry, material2 ) );
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material2 ) );
 
 		}
 
 		if ( formats.etc1 ) {
 
-			material1 = new MeshBasicMaterial( {
+			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_ETC1.ktx' )
 			} );
 
-			meshes.push( new Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
 
 		}
 
 		if ( formats.astc ) {
 
-			material1 = new MeshBasicMaterial( {
+			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_ASTC4x4.ktx' )
 			} );
-			material2 = new MeshBasicMaterial( {
+			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' ),
 				depthTest: false,
 				transparent: true,
-				side: DoubleSide
+				side: THREE.DoubleSide
 			} );
 
-			meshes.push( new Mesh( geometry, material1 ) );
-			meshes.push( new Mesh( geometry, material2 ) );
+			meshes.push( new THREE.Mesh( geometry, material1 ) );
+			meshes.push( new THREE.Mesh( geometry, material2 ) );
 
 		}
 

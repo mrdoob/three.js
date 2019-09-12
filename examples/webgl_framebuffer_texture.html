@@ -36,24 +36,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				AmbientLight,
-				Color,
-				DataTexture,
-				Mesh,
-				MeshStandardMaterial,
-				NearestFilter,
-				OrthographicCamera,
-				PerspectiveCamera,
-				PointLight,
-				RGBFormat,
-				Scene,
-				Sprite,
-				SpriteMaterial,
-				TorusKnotBufferGeometry,
-				Vector2,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
@@ -65,7 +49,7 @@
 			var dpr = window.devicePixelRatio;
 
 			var textureSize = 128 * dpr;
-			var vector = new Vector2();
+			var vector = new THREE.Vector2();
 
 			init();
 			animate();
@@ -77,29 +61,29 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				camera = new PerspectiveCamera( 70, width / height, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
 				camera.position.z = 20;
 
-				cameraOrtho = new OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
+				cameraOrtho = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
 				cameraOrtho.position.z = 10;
 
-				scene = new Scene();
-				scene.background = new Color( 0x20252f );
-				sceneOrtho = new Scene();
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x20252f );
+				sceneOrtho = new THREE.Scene();
 
 				//
 
-				var geometry = new TorusKnotBufferGeometry( 3, 1, 256, 32 );
-				var material = new MeshStandardMaterial( { color: 0x6083c2 } );
+				var geometry = new THREE.TorusKnotBufferGeometry( 3, 1, 256, 32 );
+				var material = new THREE.MeshStandardMaterial( { color: 0x6083c2 } );
 
-				mesh = new Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
-				var ambientLight = new AmbientLight( 0xcccccc, 0.4 );
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new PointLight( 0xffffff, 0.8 );
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -107,15 +91,15 @@
 
 				var data = new Uint8Array( textureSize * textureSize * 3 );
 
-				texture = new DataTexture( data, textureSize, textureSize, RGBFormat );
-				texture.minFilter = NearestFilter;
-				texture.magFilter = NearestFilter;
+				texture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
 				texture.needsUpdate = true;
 
 				//
 
-				var spriteMaterial = new SpriteMaterial( { map: texture } );
-				sprite = new Sprite( spriteMaterial );
+				var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
+				sprite = new THREE.Sprite( spriteMaterial );
 				sprite.scale.set( textureSize, textureSize, 1 );
 				sceneOrtho.add( sprite );
 
@@ -123,7 +107,7 @@
 
 				//
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;

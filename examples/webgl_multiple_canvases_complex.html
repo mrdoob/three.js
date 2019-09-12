@@ -49,21 +49,8 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple canvases - complex</div>
 
 		<script type="module">
-			import {
-				BufferAttribute,
-				CanvasTexture,
-				Color,
-				DirectionalLight,
-				IcosahedronBufferGeometry,
-				Mesh,
-				MeshBasicMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				PlaneBufferGeometry,
-				Scene,
-				VertexColors,
-				WebGLRenderer,
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			var views = [];
 
@@ -86,7 +73,7 @@
 
 				var context = canvas.getContext( '2d' );
 
-				var camera = new PerspectiveCamera( 20, viewWidth / viewHeight, 1, 10000 );
+				var camera = new THREE.PerspectiveCamera( 20, viewWidth / viewHeight, 1, 10000 );
 				camera.setViewOffset( fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight );
 				camera.position.z = 1800;
 
@@ -122,10 +109,10 @@
 
 				//
 
-				scene = new Scene();
-				scene.background = new Color( 0xffffff );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
-				var light = new DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();
 				scene.add( light );
 
@@ -143,24 +130,24 @@
 				context.fillStyle = gradient;
 				context.fillRect( 0, 0, canvas.width, canvas.height );
 
-				var shadowTexture = new CanvasTexture( canvas );
+				var shadowTexture = new THREE.CanvasTexture( canvas );
 
-				var shadowMaterial = new MeshBasicMaterial( { map: shadowTexture } );
-				var shadowGeo = new PlaneBufferGeometry( 300, 300, 1, 1 );
+				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
+				var shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
 				var shadowMesh;
 
-				shadowMesh = new Mesh( shadowGeo, shadowMaterial );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.y = - 250;
 				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
-				shadowMesh = new Mesh( shadowGeo, shadowMaterial );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = - 400;
 				shadowMesh.position.y = - 250;
 				shadowMesh.rotation.x = - Math.PI / 2;
 				scene.add( shadowMesh );
 
-				shadowMesh = new Mesh( shadowGeo, shadowMaterial );
+				shadowMesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				shadowMesh.position.x = 400;
 				shadowMesh.position.y = - 250;
 				shadowMesh.rotation.x = - Math.PI / 2;
@@ -168,15 +155,15 @@
 
 				var radius = 200;
 
-				var geometry1 = new IcosahedronBufferGeometry( radius, 1 );
+				var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
 				var count = geometry1.attributes.position.count;
-				geometry1.addAttribute( 'color', new BufferAttribute( new Float32Array( count * 3 ), 3 ) );
+				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
 				var geometry2 = geometry1.clone();
 				var geometry3 = geometry1.clone();
 
-				var color = new Color();
+				var color = new THREE.Color();
 				var positions1 = geometry1.attributes.position;
 				var positions2 = geometry2.attributes.position;
 				var positions3 = geometry3.attributes.position;
@@ -197,34 +184,34 @@
 
 				}
 
-				var material = new MeshPhongMaterial( {
+				var material = new THREE.MeshPhongMaterial( {
 					color: 0xffffff,
 					flatShading: true,
-					vertexColors: VertexColors,
+					vertexColors: THREE.VertexColors,
 					shininess: 0
 				} );
 
-				var wireframeMaterial = new MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
+				var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
 
-				var mesh = new Mesh( geometry1, material );
-				var wireframe = new Mesh( geometry1, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry1, material );
+				var wireframe = new THREE.Mesh( geometry1, wireframeMaterial );
 				mesh.add( wireframe );
 				mesh.position.x = - 400;
 				mesh.rotation.x = - 1.87;
 				scene.add( mesh );
 
-				var mesh = new Mesh( geometry2, material );
-				var wireframe = new Mesh( geometry2, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry2, material );
+				var wireframe = new THREE.Mesh( geometry2, wireframeMaterial );
 				mesh.add( wireframe );
 				mesh.position.x = 400;
 				scene.add( mesh );
 
-				var mesh = new Mesh( geometry3, material );
-				var wireframe = new Mesh( geometry3, wireframeMaterial );
+				var mesh = new THREE.Mesh( geometry3, material );
+				var wireframe = new THREE.Mesh( geometry3, wireframeMaterial );
 				mesh.add( wireframe );
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( fullWidth, fullHeight );
 

@@ -10,6 +10,7 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	var itemsLoaded = 0;
 	var itemsTotal = 0;
 	var urlModifier = undefined;
+	var handlers = [];
 
 	// Refer to #5689 for the reason why we don't set .onStart
 	// in the constructor
@@ -86,7 +87,49 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	this.setURLModifier = function ( transform ) {
 
 		urlModifier = transform;
+
 		return this;
+
+	};
+
+	this.addHandler = function ( regex, loader ) {
+
+		handlers.push( regex, loader );
+
+		return this;
+
+	};
+
+	this.removeHandler = function ( regex ) {
+
+		var index = handlers.indexOf( regex );
+
+		if ( index !== - 1 ) {
+
+			handlers.splice( index, 2 );
+
+		}
+
+		return this;
+
+	};
+
+	this.getHandler = function ( file ) {
+
+		for ( var i = 0, l = handlers.length; i < l; i += 2 ) {
+
+			var regex = handlers[ i ];
+			var loader = handlers[ i + 1 ];
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
 
 	};
 

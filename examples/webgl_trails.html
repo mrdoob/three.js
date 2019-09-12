@@ -8,17 +8,8 @@
 	</head>
 	<body>
 		<script type="module">
-			import {
-				BufferGeometry,
-				Color,
-				Float32BufferAttribute,
-				PerspectiveCamera,
-				Points,
-				PointsMaterial,
-				Scene,
-				VertexColors,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -34,12 +25,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 0, 1 );
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
-				var colorArray = [ new Color( 0xff0080 ), new Color( 0xffffff ), new Color( 0x8000ff ) ];
+				var colorArray = [ new THREE.Color( 0xff0080 ), new THREE.Color( 0xffffff ), new THREE.Color( 0x8000ff ) ];
 				var positions = [];
 				var colors = [];
 
@@ -53,16 +44,16 @@
 
 				}
 
-				var geometry = new BufferGeometry();
-				geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				var geometry = new THREE.BufferGeometry();
+				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new PointsMaterial( { size: 4, vertexColors: VertexColors, depthTest: false, sizeAttenuation: false } );
+				var material = new THREE.PointsMaterial( { size: 4, vertexColors: THREE.VertexColors, depthTest: false, sizeAttenuation: false } );
 
-				var mesh = new Points( geometry, material );
+				var mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
 
-				renderer = new WebGLRenderer( { preserveDrawingBuffer: true } );
+				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClearColor = false;

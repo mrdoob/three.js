@@ -1,4 +1,5 @@
 import './polyfills.js';
+import { REVISION } from './constants.js';
 
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
 export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
@@ -158,3 +159,13 @@ export { ShapeUtils } from './extras/ShapeUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
+
+if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+	/* eslint-disable no-undef */
+	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
+		revision: REVISION,
+	} } ) );
+	/* eslint-enable no-undef */
+
+}

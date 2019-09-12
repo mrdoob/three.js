@@ -28,25 +28,8 @@
 		</div>
 
 		<script type="module">
-			import {
-				BufferGeometry,
-				Clock,
-				DirectionalLight,
-				Float32BufferAttribute,
-				FogExp2,
-				Mesh,
-				MeshLambertMaterial,
-				MeshPhongMaterial,
-				PerspectiveCamera,
-				Points,
-				PointsMaterial,
-				Scene,
-				SphereBufferGeometry,
-				TextureLoader,
-				Vector2,
-				Vector3,
-				WebGLRenderer
-			} from "../build/three.module.js";
+
+			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -72,82 +55,82 @@
 
 			var composer;
 
-			var textureLoader = new TextureLoader();
+			var textureLoader = new THREE.TextureLoader();
 
-			var d, dPlanet, dMoon, dMoonVec = new Vector3();
+			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
 
-			var clock = new Clock();
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
+				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 50, 1e7 );
 				camera.position.z = radius * 5;
 
-				scene = new Scene();
-				scene.fog = new FogExp2( 0x000000, 0.00000025 );
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.00000025 );
 
-				dirLight = new DirectionalLight( 0xffffff );
+				dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( - 1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var materialNormalMap = new MeshPhongMaterial( {
+				var materialNormalMap = new THREE.MeshPhongMaterial( {
 
 					specular: 0x333333,
 					shininess: 15,
 					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
 					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
 					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
-					normalScale: new Vector2( 0.85, 0.85 )
+					normalScale: new THREE.Vector2( 0.85, 0.85 )
 
 				} );
 
 				// planet
 
-				geometry = new SphereBufferGeometry( radius, 100, 50 );
+				geometry = new THREE.SphereBufferGeometry( radius, 100, 50 );
 
-				meshPlanet = new Mesh( geometry, materialNormalMap );
+				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
 				meshPlanet.rotation.y = 0;
 				meshPlanet.rotation.z = tilt;
 				scene.add( meshPlanet );
 
 				// clouds
 
-				var materialClouds = new MeshLambertMaterial( {
+				var materialClouds = new THREE.MeshLambertMaterial( {
 
 					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
 					transparent: true
 
 				} );
 
-				meshClouds = new Mesh( geometry, materialClouds );
+				meshClouds = new THREE.Mesh( geometry, materialClouds );
 				meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
 				meshClouds.rotation.z = tilt;
 				scene.add( meshClouds );
 
 				// moon
 
-				var materialMoon = new MeshPhongMaterial( {
+				var materialMoon = new THREE.MeshPhongMaterial( {
 
 					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
 
 				} );
 
-				meshMoon = new Mesh( geometry, materialMoon );
+				meshMoon = new THREE.Mesh( geometry, materialMoon );
 				meshMoon.position.set( radius * 5, 0, 0 );
 				meshMoon.scale.set( moonScale, moonScale, moonScale );
 				scene.add( meshMoon );
 
 				// stars
 
-				var i, r = radius, starsGeometry = [ new BufferGeometry(), new BufferGeometry() ];
+				var i, r = radius, starsGeometry = [ new THREE.BufferGeometry(), new THREE.BufferGeometry() ];
 
 				var vertices1 = [];
 				var vertices2 = [];
 
-				var vertex = new Vector3();
+				var vertex = new THREE.Vector3();
 
 				for ( i = 0; i < 250; i ++ ) {
 
@@ -171,22 +154,22 @@
 
 				}
 
-				starsGeometry[ 0 ].addAttribute( 'position', new Float32BufferAttribute( vertices1, 3 ) );
-				starsGeometry[ 1 ].addAttribute( 'position', new Float32BufferAttribute( vertices2, 3 ) );
+				starsGeometry[ 0 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
+				starsGeometry[ 1 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
 				var stars;
 				var starsMaterials = [
-					new PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-					new PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-					new PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-					new PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-					new PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-					new PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
 				for ( i = 10; i < 30; i ++ ) {
 
-					stars = new Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+					stars = new THREE.Points( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
 
 					stars.rotation.x = Math.random() * 6;
 					stars.rotation.y = Math.random() * 6;
@@ -200,7 +183,7 @@
 
 				}
 
-				renderer = new WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.body.appendChild( renderer.domElement );
