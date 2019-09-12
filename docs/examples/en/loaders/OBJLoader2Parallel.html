@@ -46,39 +46,64 @@
 			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br>
 		</p>
 		<p>
-			Creates a new [name]. Use it to load OBJ data from files or to parse OBJ data from arraybuffer or text.
+			Creates a new [name]. Use it to load OBJ data from files or to parse OBJ data from arraybuffer.
+			It extends [page:OBJLoader2]  with the capability to run the parser in a web worker.
 		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:OBJLoader2] class for common properties.</p>
 
 
 		<h2>Methods</h2>
-
-		<h3>[method:Object3D parse]( [param:arraybuffer content]|[param:String content] )</h3>
-		<p>
-			[[page:arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
-		</p>
-		<p>
-			Parses OBJ data synchronously from arraybuffer or string and returns the [page:Object3D loaderRoorNode].
-		</p>
+		<p>See the base [page:OBJLoader2] class for common methods. </p>
 
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError], [param:Function onMeshAlter], [param:boolean useAsync] )</h3>
+		<h3>[method:Object3D parse]</h3>
+		<p>See [page:OBJLoader2.parse].<br>
+			The callback [page:OBJLoader2.setCallbackOnLoad OBJLoader2.onLoad] needs to be set to be able to receive the content if used in parallel mode.
+			Fallback is possible via [page:OBJLoader2Parallel.setExecuteParallel].
+		</p>
+
+
+		<h3>[method:null load]</h3>
+		<p>See [page:OBJLoader2.load].</p>
+
+
+		<h3>[method:OBJLoader2Parallel setExecuteParallel] ( [param:boolean executeParallel] )</h3>
 		<p>
-			[page:String url] - A string containing the path/URL of the file to be loaded.<br>
-			[page:Function onLoad] - A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
-			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
-			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
-			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>
-			[page:boolean useAsync] - (optional) If true, uses async loading with worker, if false loads data synchronously.
+			[page:boolean executeParallel] - True or False
 		</p>
 		<p>
-			Use this convenient method to load a file at the given URL. By default the fileLoader uses an ArrayBuffer.
+			Execution of parse in parallel via Worker is default, but synchronous [page:OBJLoader2] parsing can be enforced via false here.
+		</p>
+
+
+		<h3>[method:OBJLoader2Parallel setPreferJsmWorker] ( [param:boolean preferJsmWorker] )</h3>
+		<p>
+			[page:boolean preferJsmWorker] - True or False
+		</p>
+		<p>
+			Set whether jsm modules in workers should be used. This requires browser support which is currently only experimental.
+		</p>
+
+
+		<h3>[method:WorkerExecutionSupport getWorkerExecutionSupport] ()</h3>
+		<p>
+			Allow to get hold of [page:WorkerExecutionSupport] for configuration purposes.
+		</p>
+
+
+		<h3>[method:CodeBuilderInstructions buildWorkerCode] ()</h3>
+		<p>
+			Provide instructions on what is to be contained in the worker.
 		</p>
 
 
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/OBJLoader2Parallel.js examples/jsm/loaders/OBJLoader2.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/OBJLoader2Parallel.js examples/jsm/loaders/OBJLoader2Parallel.js]
 		</p>
 	</body>
 </html>

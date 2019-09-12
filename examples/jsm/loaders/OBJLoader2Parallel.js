@@ -24,10 +24,10 @@ import {
 
 
 /**
- * Extends {OBJLoader2} with the capability to run the parser {OBJLoader2Parser} in web worker
- * with help of {WorkerExecutionSupport}.
+ * Creates a new OBJLoader2Parallel. Use it to load OBJ data from files or to parse OBJ data from arraybuffer.
+ * It extends {@link OBJLoader2} with the capability to run the parser in a web worker.
  *
- * @param [LoadingManager] manager
+ * @param [LoadingManager] manager The loadingManager for the loader to use. Default is {@link LoadingManager}
  * @constructor
  */
 const OBJLoader2Parallel = function ( manager ) {
@@ -48,17 +48,10 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 	constructor: OBJLoader2Parallel,
 
-	setPreferJsmWorker: function ( preferJsmWorker ) {
-
-		this.preferJsmWorker = preferJsmWorker === true;
-		return this;
-
-	},
-
 	/**
 	 * Execution of parse in parallel via Worker is default, but normal {OBJLoader2} parsing can be enforced via false here.
 	 *
-	 * @param executeParallel
+	 * @param executeParallel True or False
 	 * @return {OBJLoader2Parallel}
 	 */
 	setExecuteParallel: function ( executeParallel ) {
@@ -69,9 +62,20 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	},
 
 	/**
-	 * Allow to get hold of {WorkerExecutionSupport} for configuratin purposes
-	 *
-	 * @return {WorkerExecutionSupport|WorkerExecutionSupport}
+	 * Set whether jsm modules in workers should be used. This requires browser support which is currently only experimental.
+	 * @param preferJsmWorker True or False
+	 * @return {OBJLoader2Parallel}
+	 */
+	setPreferJsmWorker: function ( preferJsmWorker ) {
+
+		this.preferJsmWorker = preferJsmWorker === true;
+		return this;
+
+	},
+
+	/**
+	 * Allow to get hold of {@link WorkerExecutionSupport} for configuration purposes.
+	 * @return {WorkerExecutionSupport}
 	 */
 	getWorkerExecutionSupport: function () {
 
@@ -80,8 +84,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	},
 
 	/**
-	 * Provides instructions on what is to be contained in the worker
-	 *
+	 * Provide instructions on what is to be contained in the worker.
 	 * @return {CodeBuilderInstructions}
 	 */
 	buildWorkerCode: function () {
@@ -111,9 +114,6 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 	},
 
-	/**
-	 * @private
-	 */
 	_configure: function () {
 
 		if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
@@ -141,32 +141,25 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	},
 
 	/**
-	 * Load is intercepted from {OBJLoader2}. It replaces the regular onLoad callback as the final worker result will be
-	 * returned later by its own callbackOnLoad.
-	 *
-	 * @param {string}  url A string containing the path/URL of the file to be loaded.
-	 * @param {function} onLoad A function to be called after loading is successfully completed. The function receives loaded Object3D as an argument.
-	 * @param {function} [onFileLoadProgress] A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains total and Integer bytes.
-	 * @param {function} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
-	 * @param {function} [onMeshAlter] Called after worker successfully delivered a single mesh
+	 * See {@link OBJLoader2.load}
 	 */
 	load: function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
  		let scope = this;
 		function interceptOnLoad ( object3d, message ) {
 
-			if ( object3d instanceof Object3D ) {
+			if ( object3d.name === 'OBJLoader2ParallelDummy' ) {
 
-				onLoad( object3d, message );
-
-			}
-			else {
-
-				if ( object3d == 'OBJLoader2Parallel' && scope.parser.logging.enabled && scope.parser.logging.debug ) {
+				if ( scope.parser.logging.enabled && scope.parser.logging.debug ) {
 
 					console.debug( 'Received dummy answer from OBJLoader2Parallel#parse' );
 
 				}
+
+			}
+			else {
+
+				onLoad( object3d, message );
 
 			}
 
@@ -177,9 +170,9 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	},
 
 	/**
-	 * Parses OBJ data in parallel with web worker.
-	 *
-	 * @param {arraybuffer} content OBJ data as Uint8Array or String
+	 * See {@link OBJLoader2.parse}
+	 * The callback onLoad needs to be set to be able to receive the content if used in parallel mode.
+	 * Fallback is possible via {@link OBJLoader2Parallel#setExecuteParallel}.
 	 */
 	parse: function ( content ) {
 
@@ -188,27 +181,29 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 			this._configure();
 
 			this.workerExecutionSupport.executeParallel(
-				{
-					params: {
-						modelName: this.modelName,
-						instanceNo: this.instanceNo,
-						useIndices: this.parser.useIndices,
-						disregardNormals: this.parser.disregardNormals,
-						materialPerSmoothingGroup: this.parser.materialPerSmoothingGroup,
-						useOAsMesh: this.parser.useOAsMesh,
-					},
-					materials: this.materialHandler.getMaterialsJSON(),
-					data: {
-						input: content,
-						options: null
-					},
-					logging: {
-						enabled: this.parser.logging.enabled,
-						debug: this.parser.logging.debug
-					}
-				} );
+			{
+				params: {
+					modelName: this.modelName,
+					instanceNo: this.instanceNo,
+					useIndices: this.parser.useIndices,
+					disregardNormals: this.parser.disregardNormals,
+					materialPerSmoothingGroup: this.parser.materialPerSmoothingGroup,
+					useOAsMesh: this.parser.useOAsMesh,
+				},
+				materials: this.materialHandler.getMaterialsJSON(),
+				data: {
+					input: content,
+					options: null
+				},
+				logging: {
+					enabled: this.parser.logging.enabled,
+					debug: this.parser.logging.debug
+				}
+			} );
 
-			return 'OBJLoader2Parallel';
+			let dummy = new Object3D();
+			dummy.name = 'OBJLoader2ParallelDummy';
+			return dummy;
 		}
 		else {
 

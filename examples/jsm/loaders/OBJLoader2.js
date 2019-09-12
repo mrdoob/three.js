@@ -15,10 +15,10 @@ import { MeshReceiver } from "./obj2/shared/MeshReceiver.js";
 import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
 
 /**
- * Use this class to load OBJ data from files or to parse OBJ data from an arraybuffer
- * @class
+ * Creates a new OBJLoader2. Use it to load OBJ data from files or to parse OBJ data from arraybuffer or text.
  *
  * @param {LoadingManager} [manager] The loadingManager for the loader to use. Default is {@link LoadingManager}
+ * @constructor
  */
 const OBJLoader2 = function ( manager ) {
 	Loader.call( this, manager );
@@ -307,7 +307,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 	},
 
 	/**
-	 * Parses OBJ data synchronously from arraybuffer or string.
+	 * Parses OBJ data synchronously from arraybuffer or string and returns the {@link Object3D}.
 	 *
 	 * @param {arraybuffer|string} content OBJ data as Uint8Array or String
 	 * @return {Object3D}
