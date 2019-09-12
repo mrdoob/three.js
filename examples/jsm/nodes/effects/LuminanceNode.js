@@ -57,7 +57,7 @@ export class LuminanceNode extends TempNode {
 
 export const LuminanceNodeLib = {
 
-	LUMA: NodeLib.add( new ConstNode( "vec3 LUMA vec3( 0.2125, 0.7154, 0.0721 )" ) ),
+	LUMA: NodeLib.add( new ConstNode( 'LUMA', 'v3', 'vec3( 0.2125, 0.7154, 0.0721 )' ) ),
 
 	luminance: NodeLib.add( new FunctionNode( [
 		// Algorithm from Chapter 10 of Graphics Shaders

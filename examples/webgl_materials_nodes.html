@@ -1361,13 +1361,18 @@
 						var tex = new Nodes.TextureNode( getTexture( "brick" ) );
 						var sat = new Nodes.FloatNode( 0 );
 
-						var satrgb = new Nodes.FunctionNode( [
-							"vec3 satrgb( vec3 rgb, float adjustment ) {",
-							// include luminance function from LuminanceNode
-							"	vec3 intensity = vec3( luminance( rgb ) );",
-							"	return mix( intensity, rgb, adjustment );",
-							"}"
-						].join( "\n" ) );
+						var satrgb = new Nodes.FunctionNode( `
+						
+							vec3 satrgb( vec3 rgb, float adjustment ) {
+							
+								// include luminance function from LuminanceNode
+								vec3 intensity = vec3( luminance( rgb ) );
+								
+								return mix( intensity, rgb, adjustment );
+								
+							}
+							
+						` );
 
 						var saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = tex;
@@ -1774,49 +1779,47 @@
 
 						mtl = new Nodes.StandardNodeMaterial();
 
-						var hash2 = new Nodes.FunctionNode( [
-							"vec2 hash2(vec2 p) {",
-							"	return fract(sin(vec2(dot(p, vec2(123.4, 748.6)), dot(p, vec2(547.3, 659.3))))*5232.85324);",
-							"}"
-						].join( "\n" ) );
+						var voronoiLayers = new Nodes.FunctionNode( `
+						
+							vec2 hash2(vec2 p) {
+								return fract(sin(vec2(dot(p, vec2(123.4, 748.6)), dot(p, vec2(547.3, 659.3))))*5232.85324);
+							}
 
-						var voronoi = new Nodes.FunctionNode( [
 							// Based off of iq's described here: http://www.iquilezles.org/www/articles/voronoili
-							"float voronoi(vec2 p, in float time) {",
-							"	vec2 n = floor(p);",
-							"	vec2 f = fract(p);",
-							"	float md = 5.0;",
-							"	vec2 m = vec2(0.0);",
-							"	for (int i = -1; i <= 1; i++) {",
-							"		for (int j = -1; j <= 1; j++) {",
-							"			vec2 g = vec2(i, j);",
-							"			vec2 o = hash2(n + g);",
-							"			o = 0.5 + 0.5 * sin(time + 5.038 * o);",
-							"			vec2 r = g + o - f;",
-							"			float d = dot(r, r);",
-							"			if (d < md) {",
-							"				md = d;",
-							"				m = n+g+o;",
-							"			}",
-							"		}",
-							"	}",
-							"	return md;",
-							"}"
-						].join( "\n" ), [ hash2 ] ); // define hash2 as dependencies
+							float voronoi(vec2 p, in float time) {
+								vec2 n = floor(p);
+								vec2 f = fract(p);
+								float md = 5.0;
+								vec2 m = vec2(0.0);
+								for (int i = -1; i <= 1; i++) {
+									for (int j = -1; j <= 1; j++) {
+										vec2 g = vec2(i, j);
+										vec2 o = hash2(n + g);
+										o = 0.5 + 0.5 * sin(time + 5.038 * o);
+										vec2 r = g + o - f;
+										float d = dot(r, r);
+										if (d < md) {
+											md = d;
+											m = n+g+o;
+										}
+									}
+								}
+								return md;
+							}
 
-						var voronoiLayers = new Nodes.FunctionNode( [
 							// based on https://www.shadertoy.com/view/4tXSDf
-							"float voronoiLayers(vec2 p, in float time) {",
-							"	float v = 0.0;",
-							"	float a = 0.4;",
-							"	for (int i = 0; i < 3; i++) {",
-							"		v += voronoi(p, time) * a;",
-							"		p *= 2.0;",
-							"		a *= 0.5;",
-							"	}",
-							"	return v;",
-							"}"
-						].join( "\n" ), [ voronoi ] ); // define voronoi as dependencies
+							float voronoiLayers(vec2 p, in float time) {
+								float v = 0.0;
+								float a = 0.4;
+								for (int i = 0; i < 3; i++) {
+									v += voronoi(p, time) * a;
+									p *= 2.0;
+									a *= 0.5;
+								}
+								return v;
+							}
+							
+						` );
 
 						var time = new Nodes.TimerNode();
 						var timeScale = new Nodes.FloatNode( 2 );
@@ -1843,15 +1846,9 @@
 						// clamp0at1
 						mask = new Nodes.SaturateNode( mask );
 
-						var timeOffset = new Nodes.MulNode(
-							time,
-							timeScale
-						);
+						var timeOffset = new Nodes.MulNode( time, timeScale );
 
-						var uvPos = new Nodes.MulNode(
-							worldPosTop,
-							scale
-						);
+						var uvPos = new Nodes.MulNode( worldPosTop, scale );
 
 						var voronoi = new Nodes.FunctionCallNode( voronoiLayers );
 						voronoi.inputs.p = uvPos;
@@ -2157,7 +2154,7 @@
 
 						var lightLuminance = new Nodes.LuminanceNode( directLight );
 						var lightWrap = new Nodes.SmoothstepNode( wrapShadow, wrapLight, lightLuminance );
-						var lightTransition = new Nodes.MulNode( lightWrap, new Nodes.ConstNode( Nodes.ConstNode.PI2 ) );
+						var lightTransition = new Nodes.MulNode( lightWrap, Nodes.ConstNode.PI2 );
 
 						var wrappedLight = new Nodes.SinNode( lightTransition );
 						var wrappedLightColor = new Nodes.MulNode( wrappedLight, bloodColor );
@@ -2398,15 +2395,18 @@
 
 						mtl = new Nodes.PhongNodeMaterial();
 
-						var keywordsexample = new Nodes.FunctionNode( [
-							// use "uv" reserved keyword
-							"vec4 keywordsexample( sampler2D texture ) {",
-							"	return texture2D( texture, myUV ) + vec4( position.local * myAlpha, 0.0 );",
-							"}"
-						].join( "\n" ) );
+						var keywordsexample = new Nodes.FunctionNode( `
+						
+							vec4 keywordsexample( sampler2D texture ) {
+							
+								return texture2D( texture, myUV ) + vec4( position.local * myAlpha, 0.0 );
+								
+							}
+							
+						` );
 
 						// add local keyword ( const only )
-						keywordsexample.keywords[ "myAlpha" ] = new Nodes.ConstNode( "float myAlpha .05" );
+						keywordsexample.keywords[ "myAlpha" ] = new Nodes.ConstNode( 'myAlpha', 'f', '.05' );
 
 						// add global keyword ( const only )
 						Nodes.NodeLib.addKeyword( 'myUV', function () {
@@ -2416,7 +2416,7 @@
 						} );
 
 						// add global const or function
-						//Nodes.NodeLib.add( new Nodes.ConstNode("float MY_CONST .05") )
+						//Nodes.NodeLib.add( new Nodes.ConstNode( 'myAlpha', 'f', '.05' ) )
 
 						// reserved keywords
 
@@ -2452,7 +2452,7 @@
 
 								case 'lod':
 
-									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );', undefined, { shaderTextureLOD: true } );
+									var textureCubeFunction = new Nodes.FunctionNode( `vec4 textureCubeLodEXT( samplerCube texture, vec3 uv, float bias );`, undefined, { shaderTextureLOD: true } );
 
 									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
 
@@ -2460,7 +2460,7 @@
 
 								case 'basic':
 
-									var textureCubeFunction = new Nodes.FunctionNode( 'vec4 textureCube( samplerCube texture, vec3 uv, float bias );' );
+									var textureCubeFunction = new Nodes.FunctionNode( `vec4 textureCube( samplerCube texture, vec3 uv, float bias );` );
 
 									mtl.color = new Nodes.FunctionCallNode( textureCubeFunction, [ new Nodes.CubeTextureNode( cubemap ), new Nodes.ReflectNode(), mipsBias ] );
 
@@ -2688,14 +2688,16 @@
 
 						// VERTEX
 
-						var setMyVar = new Nodes.FunctionNode( [
-							"void setMyVar( vec3 pos ) {",
+						var setMyVar = new Nodes.FunctionNode( `
+						
+							void setMyVar( vec3 pos ) {
 							// set "myVar" in vertex shader in this example,
 							// can be used in fragment shader too or in rest of the current shader
-							"	myVar = pos;",
+								myVar = pos;
 
-							"}"
-						].join( "\n" ) );
+							}
+							
+						` );
 
 						// add keyword
 						setMyVar.keywords[ "myVar" ] = varying;
@@ -2709,13 +2711,15 @@
 
 						// FRAGMENT
 
-						var clipFromPos = new Nodes.FunctionNode( [
-							"void clipFromPos( vec3 pos ) {",
+						var clipFromPos = new Nodes.FunctionNode( `
+						
+							void clipFromPos( vec3 pos ) {
 
-							"	if ( pos.y < .0 ) discard;",
+								if ( pos.y < .0 ) discard;
 
-							"}"
-						].join( "\n" ) );
+							} 
+							
+						` );
 
 						var clipFromPosCall = new Nodes.FunctionCallNode( clipFromPos, {
 							pos: varying
@@ -2923,22 +2927,27 @@
 						var delta = new Nodes.Vector2Node( .5, .25 );
 						var alpha = new Nodes.FloatNode( 1 );
 
-						var blurtexture = new Nodes.FunctionNode( [
+						var blurtexture = new Nodes.FunctionNode( `
+						
 							// Reference: TriangleBlurShader.js
-							"vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta) {",
-							"	vec4 color = vec4( 0.0 );",
-							"	float total = 0.0;",
-							// randomize the lookup values to hide the fixed number of samples
-							"	float offset = rand( uv );",
-							"	for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {",
-							"		float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;",
-							"		float weight = 1.0 - abs( percent );",
-							"		color += texture2D( texture, uv + delta * percent ) * weight;",
-							"		total += weight;",
-							"	}",
-							"	return color / total;",
-							"}"
-						].join( "\n" ), [ new Nodes.ConstNode( "float BLUR_ITERATIONS 10.0" ) ] );
+							
+							const float BLUR_ITERATIONS = 10.0;
+							
+							vec4 blurtexture(sampler2D texture, vec2 uv, vec2 delta) {
+								vec4 color = vec4( 0.0 );
+								float total = 0.0;
+								// randomize the lookup values to hide the fixed number of samples
+								float offset = rand( uv );
+								for ( float t = -BLUR_ITERATIONS; t <= BLUR_ITERATIONS; t ++ ) {
+									float percent = ( t + offset - 0.5 ) / BLUR_ITERATIONS;
+									float weight = 1.0 - abs( percent );
+									color += texture2D( texture, uv + delta * percent ) * weight;
+									total += weight;
+								}
+								return color / total;
+							}
+							
+						` );
 
 						var blurredTexture = new Nodes.FunctionCallNode( blurtexture, {
 							texture: new Nodes.TextureNode( getTexture( "brick" ) ),
@@ -2982,28 +2991,30 @@
 
 						var scale = new Nodes.FloatNode( .02 );
 
-						var triplanarMapping = new Nodes.FunctionNode( [
+						var triplanarMapping = new Nodes.FunctionNode( `
+						
 							// Reference: https://github.com/keijiro/StandardTriplanar
-							"vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {",
+							vec4 triplanar_mapping( sampler2D texture, vec3 normal, vec3 position, float scale ) {
 
-							// Blending factor of triplanar mapping
-							"	vec3 bf = normalize( abs( normal ) );",
-							"	bf /= dot( bf, vec3( 1.0 ) );",
+								// Blending factor of triplanar mapping
+								vec3 bf = normalize( abs( normal ) );
+								bf /= dot( bf, vec3( 1.0 ) );
 
-							// Triplanar mapping
-							"	vec2 tx = position.yz * scale;",
-							"	vec2 ty = position.zx * scale;",
-							"	vec2 tz = position.xy * scale;",
+								// Triplanar mapping
+								vec2 tx = position.yz * scale;
+								vec2 ty = position.zx * scale;
+								vec2 tz = position.xy * scale;
 
-							// Base color
-							"	vec4 cx = texture2D(texture, tx) * bf.x;",
-							"	vec4 cy = texture2D(texture, ty) * bf.y;",
-							"	vec4 cz = texture2D(texture, tz) * bf.z;",
+								// Base color
+								vec4 cx = texture2D(texture, tx) * bf.x;
+								vec4 cy = texture2D(texture, ty) * bf.y;
+								vec4 cz = texture2D(texture, tz) * bf.z;
 
-							"	return cx + cy + cz;",
+								return cx + cy + cz;
 
-							"}"
-						].join( "\n" ) );
+							}
+							
+						` );
 
 						var triplanarMappingTexture = new Nodes.FunctionCallNode( triplanarMapping, {
 							texture: new Nodes.TextureNode( getTexture( "brick" ) ),

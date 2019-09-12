@@ -5,15 +5,19 @@
 import { TempNode } from './TempNode.js';
 import { NodeLib } from './NodeLib.js';
 
-var declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
+import { GLSLParser } from './GLSLParser.js';
 
 export class ConstNode extends TempNode {
 
-	constructor( src, useDefine ) {
+	constructor( name, type = 'f', value = '', isDefine = false ) {
 
 		super();
 
-		this.parse( src || ConstNode.PI, useDefine );
+		this.name = name;
+		this.type = type;
+		this.value = value;
+
+		this.isDefine = isDefine;
 
 		this.nodeType = "Const";
 
@@ -25,52 +29,52 @@ export class ConstNode extends TempNode {
 
 	}
 
-	parse( src, useDefine ) {
+	fromParser( parser, prop ) {
 
-		this.src = src || '';
+		if ( prop.type === 'define' ) {
 
-		var name, type, value = "";
-
-		var match = this.src.match( declarationRegexp );
-
-		this.useDefine = useDefine || this.src.charAt( 0 ) === '#';
-
-		if ( match && match.length > 1 ) {
-
-			type = match[ 1 ];
-			name = match[ 2 ];
-			value = match[ 3 ];
-
+			this.type = 'f';
+			this.isDefine = true;
+			
 		} else {
-
-			name = this.src;
-			type = 'f';
-
+			
+			this.type = prop.type;
+			this.isDefine = false;
+			
 		}
 
-		this.name = name;
-		this.type = type;
-		this.value = value;
+		this.name = prop.name;
+		this.value = prop.getSourceValue();
+
+		return this;
 
 	}
 
+	parse( src ) {
+
+		var parser = new GLSLParser( src );
+
+		return this.fromParser( parser, parser.getMainProperty() );
+		
+	}
+	
 	build( builder, output ) {
 
 		if ( output === 'source' ) {
+			
+			if (this.value) {
 
-			if ( this.value ) {
-
-				if ( this.useDefine ) {
-
-					return '#define ' + this.name + ' ' + this.value;
-
+				if (this.isDefine) {
+					
+					return `#define ${this.name} ${this.value}`;
+					
+				} else {
+					
+					var type = builder.getFormatByType( this.type );
+					
+					return `const ${type} ${this.name} = ${this.value};`;
+					
 				}
-
-				return 'const ' + this.type + ' ' + this.name + ' = ' + this.value + ';';
-
-			} else if ( this.useDefine ) {
-
-				return this.src;
 
 			}
 
@@ -94,7 +98,11 @@ export class ConstNode extends TempNode {
 
 		TempNode.prototype.copy.call( this, source );
 
-		this.parse( source.src, source.useDefine );
+		this.name = source.name;
+		this.type = source.type;
+		this.value = source.value;
+
+		this.isDefine = source.isDefine;
 
 		return this;
 
@@ -108,9 +116,11 @@ export class ConstNode extends TempNode {
 
 			data = this.createJSONNode( meta );
 
-			data.src = this.src;
+			data.name = source.name;
+			data.type = source.type;
+			data.value = source.value;
 
-			if ( data.useDefine === true ) data.useDefine = true;
+			data.isDefine = source.isDefine;
 
 		}
 
@@ -127,5 +137,4 @@ ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
 ConstNode.LOG2 = 'LOG2';
 ConstNode.EPSILON = 'EPSILON';
 
-NodeLib.add( new ConstNode( ConstNode.PI ) );
-NodeLib.add( new ConstNode( ConstNode.PI2 ) );
+NodeLib.addStaticKeywords( ConstNode );

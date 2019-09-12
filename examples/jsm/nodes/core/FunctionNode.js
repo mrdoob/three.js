@@ -6,8 +6,7 @@
 import { TempNode } from './TempNode.js';
 import { NodeLib } from './NodeLib.js';
 
-const declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s*\((.*?)\)/i;
-const propertiesRegexp = /[a-z_0-9\.]+/ig;
+import { GLSLParser } from './GLSLParser.js';
 
 export class FunctionNode extends TempNode {
 
@@ -17,6 +16,8 @@ export class FunctionNode extends TempNode {
 
 		this.isMethod = type === undefined;
 		this.isInterface = false;
+
+		this.tokenProperties = [];
 
 		this.parse( src, includes, extensions, keywords );
 
@@ -87,31 +88,26 @@ export class FunctionNode extends TempNode {
 
 		}
 
-		var matches = [];
+		for ( var i = 0; i < this.tokenProperties.length; i ++ ) {
 
-		while ( match = propertiesRegexp.exec( this.src ) ) matches.push( match );
+			var property = this.tokenProperties[ i ],
+				propertyName = property.token.str,
+				isGlobal = this.isMethod ? ! this.getInputByName( propertyName ) : true,
+				reference = propertyName;
 
-		for ( var i = 0; i < matches.length; i ++ ) {
+			if ( this.keywords[ propertyName ] || ( this.useKeywords && isGlobal && NodeLib.containsKeyword( propertyName ) ) ) {
 
-			var match = matches[ i ];
-
-			var prop = match[ 0 ],
-				isGlobal = this.isMethod ? ! this.getInputByName( prop ) : true,
-				reference = prop;
-
-			if ( this.keywords[ prop ] || ( this.useKeywords && isGlobal && NodeLib.containsKeyword( prop ) ) ) {
-
-				var node = this.keywords[ prop ];
+				var node = this.keywords[ propertyName ];
 
 				if ( ! node ) {
 
-					var keyword = NodeLib.getKeywordData( prop );
+					var keyword = NodeLib.getKeywordData( propertyName );
 
-					if ( keyword.cache ) node = builder.keywords[ prop ];
+					if ( keyword.cache ) node = builder.keywords[ propertyName ];
 
-					node = node || NodeLib.getKeyword( prop, builder );
+					node = node || NodeLib.getKeyword( propertyName, builder );
 
-					if ( keyword.cache ) builder.keywords[ prop ] = node;
+					if ( keyword.cache ) builder.keywords[ propertyName ] = node;
 
 				}
 
@@ -119,11 +115,15 @@ export class FunctionNode extends TempNode {
 
 			}
 
-			if ( prop !== reference ) {
+			if ( propertyName !== reference ) {
+				
+				var codeBlockStartPos = property.codeBlock.start.pos,
+					relativeStartPos = ( property.token.pos - codeBlockStartPos ) + offset,
+					relativeEndPos = ( property.token.endPos - codeBlockStartPos ) + offset;
+				
+				src = src.substring( 0, relativeStartPos ) + reference + src.substring( relativeEndPos );
 
-				src = src.substring( 0, match.index + offset ) + reference + src.substring( match.index + prop.length + offset );
-
-				offset += reference.length - prop.length;
+				offset += reference.length - propertyName.length;
 
 			}
 
@@ -157,6 +157,34 @@ export class FunctionNode extends TempNode {
 
 	}
 
+	fromParser( parser, prop ) {
+
+		this.name = prop.name;
+		this.type = prop.type;
+
+		this.src = prop.getSource();
+
+		this.tokenProperties = prop.nodes;
+
+		this.inputs = [];
+
+		for ( var i = 0; i < prop.args.length; i ++ ) {
+
+			var argument = prop.args[i];
+
+			this.inputs.push( {
+				type: argument.type,
+				name: argument.name
+			} );
+
+		}
+
+		parser.getIncludes( prop, this.includes );
+
+		return this;
+
+	}
+
 	parse( src, includes, extensions, keywords ) {
 
 		this.src = src || '';
@@ -165,60 +193,12 @@ export class FunctionNode extends TempNode {
 		this.extensions = extensions || {};
 		this.keywords = keywords || {};
 
-		if ( this.isMethod ) {
-
-			var match = this.src.match( declarationRegexp );
-
-			this.inputs = [];
-
-			if ( match && match.length == 4 ) {
-
-				this.type = match[ 1 ];
-				this.name = match[ 2 ];
-
-				var inputs = match[ 3 ].match( propertiesRegexp );
-
-				if ( inputs ) {
-
-					var i = 0;
-
-					while ( i < inputs.length ) {
-
-						var qualifier = inputs[ i ++ ];
-						var type, name;
-
-						if ( qualifier === 'in' || qualifier === 'out' || qualifier === 'inout' ) {
-
-							type = inputs[ i ++ ];
-
-						} else {
-
-							type = qualifier;
-							qualifier = '';
-
-						}
-
-						name = inputs[ i ++ ];
-
-						this.inputs.push( {
-							name: name,
-							type: type,
-							qualifier: qualifier
-						} );
-
-					}
-
-				}
-
-				this.isInterface = this.src.indexOf('{') === -1;
-
-			} else {
-
-				this.type = '';
-				this.name = '';
-
-			}
-
+		if ( this.isMethod && src ) {
+			
+			var parser = new GLSLParser( src );
+			
+			this.fromParser( parser, parser.getMainProperty() );
+			
 		}
 
 	}

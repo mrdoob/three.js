@@ -67,7 +67,7 @@ export class TextureCubeNode extends TextureNode {
 		// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 		// this should be removed in the future
 		// include => is used to include or not functions if used FunctionNode
-		// ignoreCache => not create temp variables nodeT0..9 to optimize the code
+		// caching => create temp variables nodeT0..9 to optimize the code
 
 		var colorSpaceContext = new NodeContext()
 			.setProperty( 'include', builder.isShader( 'vertex' ) )
@@ -75,15 +75,15 @@ export class TextureCubeNode extends TextureNode {
 
 		var outputType = this.getType( builder );
 
-		cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
+		cache.colorSpace10 = cache.colorSpace10 || new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, new ExpressionNode( '', outputType ) );
 		cache.colorSpace10.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
-		cache.colorSpace10.input.parse( color10 );
+		cache.colorSpace10.input.src = color10;
 
 		color10 = cache.colorSpace10.buildContext( colorSpaceContext, builder, outputType );
 
-		cache.colorSpace20 = cache.colorSpace20 || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
+		cache.colorSpace20 = cache.colorSpace20 || new ColorSpaceNode( ColorSpaceNode.LINEAR_TO_LINEAR, new ExpressionNode( '', outputType ) );
 		cache.colorSpace20.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
-		cache.colorSpace20.input.parse( color20 );
+		cache.colorSpace20.input.src = color20;
 
 		color20 = cache.colorSpace20.buildContext( colorSpaceContext,builder, outputType );
 
