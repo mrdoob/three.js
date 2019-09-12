@@ -1289,6 +1289,8 @@ function WebGLRenderer( parameters ) {
 
 				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
 
+					object.inFrustum = true;
+
 					if ( sortObjects ) {
 
 						_vector3.setFromMatrixPosition( object.matrixWorld )
@@ -1304,6 +1306,10 @@ function WebGLRenderer( parameters ) {
 						currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
 
 					}
+
+				} else {
+
+					object.inFrustum = false;
 
 				}
 
@@ -1327,6 +1333,8 @@ function WebGLRenderer( parameters ) {
 				}
 
 				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+
+					object.inFrustum = true;
 
 					if ( sortObjects ) {
 
@@ -1360,6 +1368,10 @@ function WebGLRenderer( parameters ) {
 						currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
 
 					}
+
+				} else {
+
+					object.inFrustum = false;
 
 				}
 
