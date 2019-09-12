@@ -122,6 +122,11 @@ export class Object3D extends EventDispatcher {
 	frustumCulled: boolean;
 
 	/**
+	 * When this is set, this object was in the frustum of the camera in the most recent render pass.
+	 */
+	inFrustum: boolean;
+
+	/**
 	 * Overrides the default rendering order of scene graph objects, from lowest to highest renderOrder. Opaque and transparent objects remain sorted independently though. When this property is set for an instance of Group, all descendants objects will be sorted and rendered together.
 	 */
 	renderOrder: number;
