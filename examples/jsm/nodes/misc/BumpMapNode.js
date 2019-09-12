@@ -2,6 +2,8 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import { ShaderChunk } from '../../../../build/three.module.js';
+
 import { TempNode } from '../core/TempNode.js';
 import { NodeContext } from '../core/NodeContext.js'
 import { ExpressionNode } from '../core/ExpressionNode.js';
@@ -10,31 +12,9 @@ import { FloatNode } from '../inputs/FloatNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 import { UVNode } from '../accessors/UVNode.js';
+import { GLSLParser } from '../core/GLSLParser.js';
 
-export const PERTURB_NORMAL_ARB = new FunctionNode( [
-
-	"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {",
-
-	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-	"	vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );",
-	"	vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );",
-	"	vec3 vN = surf_norm;", // normalized
-
-	"	vec3 R1 = cross( vSigmaY, vN );",
-	"	vec3 R2 = cross( vN, vSigmaX );",
-
-	"	float fDet = dot( vSigmaX, R1 );",
-
-	"	fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );",
-
-	"	vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
-
-	"	return normalize( abs( fDet ) * surf_norm - vGrad );",
-
-	"}"
-
-].join( "\n" ) );
+var perturbNormalArbFunctionNode;
 
 export const BUMP_TO_NORMAL = new FunctionNode( [
 	"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
@@ -83,7 +63,9 @@ export class BumpMapNode extends TempNode {
 
 			} else {
 
-				var perturbNormalArb = builder.include( PERTURB_NORMAL_ARB );
+				perturbNormalArbFunctionNode = perturbNormalArbFunctionNode || new GLSLParser( ShaderChunk['bumpmap_pars_fragment'] ).getNodeByName( 'perturbNormalArb' );
+
+				var perturbNormalArb = builder.include( perturbNormalArbFunctionNode );
 
 				// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 				// http://api.unrealengine.com/attachments/Engine/Rendering/LightingAndShadows/BumpMappingWithoutTangentSpace/mm_sfgrad_bump.pdf
