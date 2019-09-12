@@ -15,21 +15,7 @@ import { UVNode } from '../accessors/UVNode.js';
 import { GLSLParser } from '../core/GLSLParser.js';
 
 var perturbNormalArbFunctionNode;
-
-export const BUMP_TO_NORMAL = new FunctionNode( [
-	"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
-
-	"	vec2 dSTdx = dFdx( uv );",
-	"	vec2 dSTdy = dFdy( uv );",
-
-	"	float Hll = texture2D( bumpMap, uv ).x;",
-	"	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;",
-	"	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;",
-
-	"	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );",
-
-	"}"
-].join( "\n" ) );
+var bumpToNormalFunctionNode;
 
 export class BumpMapNode extends TempNode {
 
@@ -55,7 +41,24 @@ export class BumpMapNode extends TempNode {
 
 			if ( this.toNormalMap ) {
 
-				var bumpToNormal = builder.include( BUMP_TO_NORMAL );
+				bumpToNormalFunctionNode = bumpToNormalFunctionNode || new FunctionNode( `
+
+					vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {
+
+						vec2 dSTdx = dFdx( uv );
+						vec2 dSTdy = dFdy( uv );
+
+						float Hll = texture2D( bumpMap, uv ).x;
+						float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;
+						float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;
+
+						return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );
+
+					}
+
+				` );
+
+				var bumpToNormal = builder.include( bumpToNormalFunctionNode );
 
 				return builder.format( bumpToNormal + '( ' + this.value.build( builder, 'sampler2D' ) + ', ' +
 					this.value.uv.build( builder, 'v2' ) + ', ' +
