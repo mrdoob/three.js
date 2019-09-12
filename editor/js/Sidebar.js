@@ -21,9 +21,9 @@ var Sidebar = function ( editor ) {
 		new Sidebar.History( editor )
 	);
 
-	container.addPanel( 'scene', strings.getKey( 'sidebar/scene' ), scene );
-	container.addPanel( 'project', strings.getKey( 'sidebar/project' ), new Sidebar.Project( editor ) );
-	container.addPanel( 'settings', strings.getKey( 'sidebar/settings' ), settings );
+	container.addTab( 'scene', strings.getKey( 'sidebar/scene' ), scene );
+	container.addTab( 'project', strings.getKey( 'sidebar/project' ), new Sidebar.Project( editor ) );
+	container.addTab( 'settings', strings.getKey( 'sidebar/settings' ), settings );
 
 	return container;
 
