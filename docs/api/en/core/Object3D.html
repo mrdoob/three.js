@@ -58,6 +58,13 @@
 		<h3>[property:Integer id]</h3>
 		<p>readonly – Unique number for this object instance.</p>
 
+		<h3>[property:Boolean inFrustum]</h3>
+		<p>
+			If frustumCulled is set, this is set if the object is within the frustum of the camera in the last render pass. Default is *false*.<br /><br />
+
+			This is not checked if .visible is false or the object fails the layer test.
+		</p>
+
 		<h3>[property:Boolean isObject3D]</h3>
 		<p>
 			Used to check whether this or derived classes are Object3Ds. Default is *true*.<br /><br />

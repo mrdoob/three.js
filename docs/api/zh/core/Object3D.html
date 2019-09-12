@@ -56,6 +56,13 @@
 	<h3>[property:Integer id]</h3>
 	<p>只读 —— 表示该对象实例ID的唯一数字。</p>
 
+	<h3>[property:Boolean inFrustum]</h3>
+	<p>
+		If frustumCulled is set, this is set if the object is within the frustum of the camera in the last render pass. Default is *false*.<br /><br />
+
+		This is not checked if .visible is false or the object fails the layer test.
+	</p>
+
 	<h3>[property:Boolean isObject3D]</h3>
 	<p>
 
