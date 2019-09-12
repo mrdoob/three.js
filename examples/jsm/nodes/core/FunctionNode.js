@@ -82,18 +82,15 @@ export class FunctionNode extends TempNode {
 
 		}
 
-		for ( var ext in this.extensions ) {
-
-			builder.extensions[ ext ] = true;
-
-		}
-
 		for ( var i = 0; i < this.tokenProperties.length; i ++ ) {
 
 			var property = this.tokenProperties[ i ],
 				propertyName = property.token.str,
 				isGlobal = this.isMethod ? ! this.getInputByName( propertyName ) : true,
 				reference = propertyName;
+
+			if ( propertyName === 'dFdx' || propertyName === 'dFdy' ) this.extensions.derivatives = true;
+			else if ( propertyName === 'texture2DLodEXT' || propertyName === 'textureCubeLodEXT' ) this.extensions.shaderTextureLOD = true;
 
 			if ( this.keywords[ propertyName ] || ( this.useKeywords && isGlobal && NodeLib.containsKeyword( propertyName ) ) ) {
 
@@ -132,6 +129,12 @@ export class FunctionNode extends TempNode {
 				builder.include( NodeLib.get( reference ) );
 
 			}
+
+		}
+
+		for ( var ext in this.extensions ) {
+
+			builder.extensions[ ext ] = true;
 
 		}
 

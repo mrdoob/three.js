@@ -55,7 +55,7 @@ export const PERTURB_NORMAL_2_ARB = new FunctionNode(
 	mat3 tsn = mat3( S, T, N );
 	return normalize( tsn * mapN );
 
-}`, null, { derivatives: true } );
+}` );
 
 export class NormalMapNode extends TempNode {
 

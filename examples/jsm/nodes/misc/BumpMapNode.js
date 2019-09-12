@@ -34,7 +34,7 @@ export const PERTURB_NORMAL_ARB = new FunctionNode( [
 
 	"}"
 
-].join( "\n" ), undefined, { derivatives: true } );
+].join( "\n" ) );
 
 export const BUMP_TO_NORMAL = new FunctionNode( [
 	"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
@@ -49,7 +49,7 @@ export const BUMP_TO_NORMAL = new FunctionNode( [
 	"	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );",
 
 	"}"
-].join( "\n" ), null, { derivatives: true } );
+].join( "\n" ) );
 
 export class BumpMapNode extends TempNode {
 
@@ -92,11 +92,9 @@ export class BumpMapNode extends TempNode {
 
 				// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-				var extensions = { derivatives: true };
-
 				this.HllContext = this.HllContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv', 'v2' ) );
-				this.dSTdxContext = this.dSTdxContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdx( texture.uv )', 'v2', undefined, extensions ) );
-				this.dSTdyContext = this.dSTdyContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdy( texture.uv )', 'v2', undefined, extensions ) );
+				this.dSTdxContext = this.dSTdxContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdx( texture.uv )', 'v2' ) );
+				this.dSTdyContext = this.dSTdyContext || new NodeContext().setSampler( new ExpressionNode( 'texture.uv + dFdy( texture.uv )', 'v2' ) );
 
 				// Hll is used two times, is necessary to cache, calls the same count
 				var HllA = this.value.buildContext( this.HllContext, builder, 'f' );
