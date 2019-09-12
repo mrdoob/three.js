@@ -1,6 +1,5 @@
 import {
-  Camera,
-  Vector3
+  Camera
 } from '../../../src/Three';
 
 export class DeviceOrientationControls {
@@ -14,7 +13,6 @@ export class DeviceOrientationControls {
   deviceOrientation: any;
   enabled: boolean;
   screenOrientation: number;
-  target: Vector3;
 
   connect(): void;
   disconnect(): void;
