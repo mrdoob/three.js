@@ -14,12 +14,4 @@ export class ExpressionNode extends FunctionNode {
 
 	}
 
-	fromParser( parser, prop ) {
-
-		this.tokenProperties = prop.nodes;
-
-		return this;
-
-	}
-
 }

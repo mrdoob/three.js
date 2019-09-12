@@ -199,11 +199,12 @@ export class FunctionNode extends TempNode {
 		this.keywords = keywords || {};
 
 		if ( src ) {
-
+			
 			var parser = new GLSLParser( src );
-
-			this.fromParser( parser, parser.getMainProperty() );
-
+			
+			if ( this.isMethod ) this.fromParser( parser, parser.getMainProperty() );
+			else this.tokenProperties = parser.getMainProperty().nodes;
+			
 		}
 
 	}
