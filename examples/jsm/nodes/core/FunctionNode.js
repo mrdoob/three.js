@@ -169,6 +169,8 @@ export class FunctionNode extends TempNode {
 
 		this.tokenProperties = prop.nodes;
 
+		this.isInterface = prop.isInterface;
+
 		this.inputs = [];
 
 		for ( var i = 0; i < prop.args.length; i ++ ) {

@@ -228,6 +228,7 @@ export class ShaderFunction extends ShaderBlock {
 		this.args = args;
 		
 		this.isFunction = true;
+		this.isInterface = false;
 			
 	}
 	
@@ -356,6 +357,7 @@ export class Analyzer {
 			this.readToken();
 
 			prop = new ShaderFunction( this.scope, type.str, name.str, qualifiers, args );
+			prop.isInterface = this.getToken() !== '{';
 			
 		} else {
 			
