@@ -200,10 +200,11 @@ export class FunctionNode extends TempNode {
 
 		if ( src ) {
 			
-			var parser = new GLSLParser( src );
+			var parser = new GLSLParser( src ),
+				prop = parser.getMainProperty();
 			
-			if ( this.isMethod ) this.fromParser( parser, parser.getMainProperty() );
-			else this.tokenProperties = parser.getMainProperty().nodes;
+			if ( this.isMethod ) this.fromParser( parser, prop );
+			else this.tokenProperties = prop.nodes;
 			
 		}
 
