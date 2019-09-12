@@ -122,7 +122,7 @@ export class Object3D extends EventDispatcher {
 	frustumCulled: boolean;
 
 	/**
-	 * When this is set, this object was in the frustum of the camera in the most recent render pass.
+	 * When this and frustumCulled are set, this object was in the frustum of the camera in the most recent render pass.
 	 */
 	inFrustum: boolean;
 
