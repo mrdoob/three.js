@@ -71,6 +71,12 @@ export class GLSLParser {
 	
 	}
 	
+	getMainNode() {
+		
+		return this.getNode( this.getMainProperty() );
+		
+	}
+	
 	getNodeByNane( name ) {
 		
 		return this.getNode( this.getProperty( name ) );
