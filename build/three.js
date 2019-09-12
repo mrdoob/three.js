@@ -245,7 +245,6 @@
 	var RGBDEncoding = 3006;
 	var BasicDepthPacking = 3200;
 	var RGBADepthPacking = 3201;
-	var NumberOfLightTypes = 6;
 	var TangentSpaceNormalMap = 0;
 	var ObjectSpaceNormalMap = 1;
 
@@ -18274,11 +18273,11 @@
 				maxMorphTargets: renderer.maxMorphTargets,
 				maxMorphNormals: renderer.maxMorphNormals,
 
-				numDirLights: countLights( object, lights.directionalAffectedLayers ),
-				numPointLights: countLights( object, lights.pointAffectedLayers ),
-				numSpotLights: countLights( object, lights.spotAffectedLayers ),
-				numRectAreaLights: countLights( object, lights.rectAreaAffectedLayers ),
-				numHemiLights: countLights( object, lights.hemiAffectedLayers ),
+				numDirLights: lights.directional.length,
+				numPointLights: lights.point.length,
+				numSpotLights: lights.spot.length,
+				numRectAreaLights: lights.rectArea.length,
+				numHemiLights: lights.hemi.length,
 
 				numDirLightShadows: lights.directionalShadowMap.length,
 				numPointLightShadows: lights.pointShadowMap.length,
@@ -18308,25 +18307,6 @@
 			return parameters;
 
 		};
-
-		function countLights( object, lightLayers ) {
-
-			var i = 0, result = 0;
-			var len = 0;
-			if ( lightLayers != undefined )
-				{ len = lightLayers.length; }
-			for ( i = 0; i < len; i ++ ) {
-
-				if ( ! object.material || object.layers.test( lightLayers[ i ] ) ) {
-
-					result ++;
-
-				}
-
-			}
-			return result;
-
-		}
 
 		this.getProgramCode = function ( material, parameters ) {
 
@@ -18804,26 +18784,19 @@
 				numSpotShadows: - 1,
 			},
 
-			config: new Uint16Array( 32 * NumberOfLightTypes ),
-			ambientAffectedLayers: [],
 			ambient: [ 0, 0, 0 ],
 			probe: [],
 			directional: [],
-			directionalAffectedLayers: [],
 			directionalShadowMap: [],
 			directionalShadowMatrix: [],
 			spot: [],
-			spotAffectedLayers: [],
 			spotShadowMap: [],
 			spotShadowMatrix: [],
 			rectArea: [],
-			rectAreaAffectedLayers: [],
 			point: [],
-			pointAffectedLayers: [],
 			pointShadowMap: [],
 			pointShadowMatrix: [],
 			hemi: [],
-			hemiAffectedLayers: [],
 
 			numDirectionalShadows: - 1,
 			numPointShadows: - 1,
@@ -18839,6 +18812,7 @@
 
 		function setup( lights, shadows, camera ) {
 
+			var r = 0, g = 0, b = 0;
 
 			for ( var i = 0; i < 9; i ++ ) { state.probe[ i ].set( 0, 0, 0 ); }
 
@@ -18847,15 +18821,12 @@
 			var spotLength = 0;
 			var rectAreaLength = 0;
 			var hemiLength = 0;
-			var ambientLength = 0;
 
 			var numDirectionalShadows = 0;
 			var numPointShadows = 0;
 			var numSpotShadows = 0;
 
 			var viewMatrix = camera.matrixWorldInverse;
-
-			var affectedLayers;
 
 			lights.sort( shadowCastingLightsFirst );
 
@@ -18867,17 +18838,13 @@
 				var intensity = light.intensity;
 				var distance = light.distance;
 
-				affectedLayers = light.layers;
-
 				var shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 				if ( light.isAmbientLight ) {
 
-					color = color.clone().multiplyScalar( intensity );
-					state.ambientAffectedLayers[ ambientLength ] = affectedLayers;
-					state.ambient[ ambientLength ] = color;
-					addLightToLightConfig( affectedLayers, state.config, 0, false );
-					ambientLength ++;
+					r += color.r * intensity;
+					g += color.g * intensity;
+					b += color.b * intensity;
 
 				} else if ( light.isLightProbe ) {
 
@@ -18914,10 +18881,8 @@
 
 					}
 
-					state.directionalAffectedLayers[ directionalLength ] = affectedLayers;
 					state.directional[ directionalLength ] = uniforms;
 
-					addLightToLightConfig( affectedLayers, state.config, 1, light.castShadow );
 					directionalLength ++;
 
 				} else if ( light.isSpotLight ) {
@@ -18956,10 +18921,8 @@
 
 					}
 
-					state.spotAffectedLayers[ spotLength ] = affectedLayers;
 					state.spot[ spotLength ] = uniforms;
 
-					addLightToLightConfig( affectedLayers, state.config, 2, light.castShadow );
 					spotLength ++;
 
 				} else if ( light.isRectAreaLight ) {
@@ -18989,10 +18952,9 @@
 
 					// TODO (abelnation): RectAreaLight distance?
 					// uniforms.distance = distance;
-					state.rectAreaAffectedLayers[ rectAreaLength ] = affectedLayers;
+
 					state.rectArea[ rectAreaLength ] = uniforms;
 
-					addLightToLightConfig( affectedLayers, state.config, 3, light.castShadow );
 					rectAreaLength ++;
 
 				} else if ( light.isPointLight ) {
@@ -19025,10 +18987,8 @@
 
 					}
 
-					state.pointAffectedLayers[ pointLength ] = affectedLayers;
 					state.point[ pointLength ] = uniforms;
 
-					addLightToLightConfig( affectedLayers, state.config, 4, light.castShadow );
 					pointLength ++;
 
 				} else if ( light.isHemisphereLight ) {
@@ -19042,16 +19002,17 @@
 					uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
 					uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-					state.hemiAffectedLayers[ hemiLength ] = affectedLayers;
 					state.hemi[ hemiLength ] = uniforms;
 
-					addLightToLightConfig( affectedLayers, state.config, 5, light.castShadow );
 					hemiLength ++;
 
 				}
 
 			}
 
+			state.ambient[ 0 ] = r;
+			state.ambient[ 1 ] = g;
+			state.ambient[ 2 ] = b;
 
 			var hash = state.hash;
 
@@ -19064,7 +19025,6 @@
 				hash.numPointShadows !== numPointShadows ||
 				hash.numSpotShadows !== numSpotShadows ) {
 
-				state.ambient.length = ambientLength;
 				state.directional.length = directionalLength;
 				state.spot.length = spotLength;
 				state.rectArea.length = rectAreaLength;
@@ -19083,32 +19043,12 @@
 				hash.spotLength = spotLength;
 				hash.rectAreaLength = rectAreaLength;
 				hash.hemiLength = hemiLength;
-				hash.shadowsLength = shadows.length;
 
 				hash.numDirectionalShadows = numDirectionalShadows;
 				hash.numPointShadows = numPointShadows;
 				hash.numSpotShadows = numSpotShadows;
 
 				state.version = nextVersion ++;
-
-			}
-
-		}
-
-		// Function used to count lights per type and per layer using a flat array.
-
-		function addLightToLightConfig( layers, config, typeIndex, castShadow ) {
-
-			var i = 0, mask = 0, index = 0;
-			for ( i = 0; i < 32; i ++ ) {
-
-				mask = 1 << i;
-				if ( mask & layers.mask && castShadow ) {
-
-					index = i * NumberOfLightTypes + typeIndex;
-					config[ index ] ++;
-
-				}
 
 			}
 
@@ -19603,7 +19543,7 @@
 
 					_frustum = shadow.getFrustum();
 
-					renderObject( scene, camera, shadow.camera, light, this.type, light.layers );
+					renderObject( scene, camera, shadow.camera, light, this.type );
 
 				}
 
@@ -19765,15 +19705,13 @@
 
 		}
 
-		function renderObject( object, camera, shadowCamera, light, type, shadowLayers ) {
+		function renderObject( object, camera, shadowCamera, light, type ) {
 
 			if ( object.visible === false ) { return; }
 
 			var visible = object.layers.test( camera.layers );
 
-			// Objects not affected by current light should not project shadows.
-			var projectsShadowOnLayer = ! object.material || object.layers.test( shadowLayers );
-			if ( visible && projectsShadowOnLayer && ( object.isMesh || object.isLine || object.isPoints ) ) {
+			if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 				if ( ( object.castShadow || ( object.receiveShadow && type === VSMShadowMap ) ) && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
 
@@ -19817,7 +19755,7 @@
 
 			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-				renderObject( children[ i ], camera, shadowCamera, light, type, shadowLayers );
+				renderObject( children[ i ], camera, shadowCamera, light, type );
 
 			}
 
@@ -24875,31 +24813,22 @@
 
 			if ( material.lights ) {
 
-				// get all lights affecting this object's layers
-
-				var ambientLightSetup = filterAmbientLights( object, lights.state.ambientAffectedLayers, lights.state.ambient );
-				var directionalSetup = filterLights( object, lights.state.directionalAffectedLayers, lights.state.directional, lights.state.directionalShadowMap, lights.state.directionalShadowMatrix );
-				var spotSetup = filterLights( object, lights.state.spotAffectedLayers, lights.state.spot, lights.state.spotShadowMap, lights.state.spotShadowMatrix );
-				var rectAreaSetup = filterLights( object, lights.state.rectAreaAffectedLayers, lights.state.rectArea );
-				var pointSetup = filterLights( object, lights.state.pointAffectedLayers, lights.state.point, lights.state.pointShadowMap, lights.state.pointShadowMatrix );
-				var hemiSetup = filterLights( object, lights.state.hemiAffectedLayers, lights.state.hemi );
-
 				// wire up the material to this renderer's lighting state
 
-				uniforms.ambientLightColor.value = ambientLightSetup;
+				uniforms.ambientLightColor.value = lights.state.ambient;
 				uniforms.lightProbe.value = lights.state.probe;
-				uniforms.directionalLights.value = directionalSetup.lights;
-				uniforms.spotLights.value = spotSetup.lights;
-				uniforms.rectAreaLights.value = rectAreaSetup.lights;
-				uniforms.pointLights.value = pointSetup.lights;
-				uniforms.hemisphereLights.value = hemiSetup.lights;
+				uniforms.directionalLights.value = lights.state.directional;
+				uniforms.spotLights.value = lights.state.spot;
+				uniforms.rectAreaLights.value = lights.state.rectArea;
+				uniforms.pointLights.value = lights.state.point;
+				uniforms.hemisphereLights.value = lights.state.hemi;
 
-				uniforms.directionalShadowMap.value = directionalSetup.shadowMaps;
-				uniforms.directionalShadowMatrix.value = directionalSetup.shadowMatrices;
-				uniforms.spotShadowMap.value = spotSetup.shadowMaps;
-				uniforms.spotShadowMatrix.value = spotSetup.shadowMatrices;
-				uniforms.pointShadowMap.value = pointSetup.shadowMaps;
-				uniforms.pointShadowMatrix.value = pointSetup.shadowMatrices;
+				uniforms.directionalShadowMap.value = lights.state.directionalShadowMap;
+				uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
+				uniforms.spotShadowMap.value = lights.state.spotShadowMap;
+				uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
+				uniforms.pointShadowMap.value = lights.state.pointShadowMap;
+				uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
 				// TODO (abelnation): add area lights shadow info to uniforms
 
 			}
@@ -24909,64 +24838,6 @@
 					WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
 
 			materialProperties.uniformsList = uniformsList;
-
-		}
-
-		/* Function to only consider lights and shadow maps/matrices that should
-		affect the considered object */
-		function filterLights( object, lightAffectedLayers, lights, shadowMaps, shadowMatrices ) {
-
-			var materialLayers = object.layers;
-			var result = { lights: [], shadowMaps: [], shadowMatrices: [] };
-			var i = 0, light, lightLayers;
-			var lightsLength = 0, shadowMapsLength = 0, shadowMatricesLength = 0;
-			for ( i = 0; i < lights.length; i ++ ) {
-
-				light = lights[ i ];
-				lightLayers = lightAffectedLayers[ i ];
-				if ( lightLayers.test( materialLayers ) ) {
-
-					result.lights[ lightsLength ++ ] = light;
-					if ( shadowMaps.length ) {
-
-						result.shadowMaps[ shadowMapsLength ++ ] = shadowMaps[ i ];
-
-					}
-					if ( shadowMatrices.length ) {
-
-						result.shadowMatrices[ shadowMatricesLength ++ ] = shadowMatrices[ i ];
-
-					}
-
-				}
-
-			}
-			result.lights.length = lightsLength;
-			result.shadowMaps.length = shadowMapsLength;
-			result.shadowMatrices.length = shadowMatricesLength;
-			return result;
-
-		}
-		/* Merge all ambient colors affecting the object's layer into a single color. */
-		function filterAmbientLights( object, lightAffectedLayers, lights ) {
-
-			var materialLayers = object.layers;
-			var result = [ 0, 0, 0 ];
-			var i = 0, light, lightLayers;
-			for ( i = 0; i < lights.length; i ++ ) {
-
-				light = lights[ i ];
-				lightLayers = lightAffectedLayers[ i ];
-				if ( lightLayers.test( materialLayers ) ) {
-
-					result[ 0 ] += light.r;
-					result[ 1 ] += light.g;
-					result[ 2 ] += light.b;
-
-				}
-
-			}
-			return result;
 
 		}
 
@@ -49356,7 +49227,6 @@
 	exports.NotEqualDepth = NotEqualDepth;
 	exports.NotEqualStencilFunc = NotEqualStencilFunc;
 	exports.NumberKeyframeTrack = NumberKeyframeTrack;
-	exports.NumberOfLightTypes = NumberOfLightTypes;
 	exports.Object3D = Object3D;
 	exports.ObjectLoader = ObjectLoader;
 	exports.ObjectSpaceNormalMap = ObjectSpaceNormalMap;
