@@ -2,24 +2,14 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import { ShaderChunk } from '../../../../build/three.module.js';
+
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { MaxMIPLevelNode } from './MaxMIPLevelNode.js';
+import { GLSLParser } from '../core/GLSLParser.js';
 
-export const GET_SPECULAR_MIP_LEVEL = new FunctionNode( [
-	// taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
-	"float getSpecularMIPLevel( const in float roughness, const in int maxMIPLevel ) {",
-
-	"	float maxMIPLevelScalar = float( maxMIPLevel );",
-
-	"	float sigma = PI * roughness * roughness / ( 1.0 + roughness );",
-	"	float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );",
-
-		// clamp to allowable LOD ranges.
-	"	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );",
-
-	"}"
-].join( "\n" ) );
+var getSpecularMIPLevelFunctionNode;
 
 export class SpecularMIPLevelNode extends TempNode {
 
@@ -51,7 +41,9 @@ export class SpecularMIPLevelNode extends TempNode {
 			this.maxMIPLevel = this.maxMIPLevel || new MaxMIPLevelNode();
 			this.maxMIPLevel.texture = this.texture;
 
-			var getSpecularMIPLevel = builder.include( GET_SPECULAR_MIP_LEVEL );
+			getSpecularMIPLevelFunctionNode = getSpecularMIPLevelFunctionNode || new GLSLParser( ShaderChunk['envmap_physical_pars_fragment'] ).getNodeByName( 'getSpecularMIPLevel' );
+
+			var getSpecularMIPLevel = builder.include( getSpecularMIPLevelFunctionNode );
 
 			return builder.format( getSpecularMIPLevel + '( ' + this.roughness.build( builder, 'f' ) + ', ' + this.maxMIPLevel.build( builder, 'i' ) + ' )', this.type, output );
 
