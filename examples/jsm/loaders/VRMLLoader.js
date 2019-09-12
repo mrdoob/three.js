@@ -11,7 +11,6 @@ import {
 	Color,
 	ConeBufferGeometry,
 	CylinderBufferGeometry,
-	DefaultLoadingManager,
 	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
@@ -19,6 +18,7 @@ import {
 	Group,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	LoaderUtils,
 	Mesh,
 	MeshBasicMaterial,
@@ -52,21 +52,19 @@ var VRMLLoader = ( function () {
 
 	function VRMLLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	VRMLLoader.prototype = {
+	VRMLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: VRMLLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new FileLoader( this.manager );
 			loader.setPath( scope.path );
@@ -75,27 +73,6 @@ var VRMLLoader = ( function () {
 				onLoad( scope.parse( text, path ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -2387,7 +2364,7 @@ var VRMLLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	function VRMLLexer( tokens ) {
 

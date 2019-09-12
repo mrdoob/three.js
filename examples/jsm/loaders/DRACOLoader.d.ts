@@ -1,16 +1,15 @@
 import {
+  Loader,
   LoadingManager,
   BufferGeometry
 } from '../../../src/Three';
 
-export class DRACOLoader {
+export class DRACOLoader extends Loader {
   constructor(manager?: LoadingManager);
 
   load(url: string, onLoad: (geometry: BufferGeometry) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setPath(path: string): DRACOLoader;
   setDecoderPath(path: string): DRACOLoader;
   setDecoderConfig(config: object): DRACOLoader;
-  setCrossOrigin(crossOrigin: string): DRACOLoader;
   setWorkerLimit(workerLimit: number): DRACOLoader;
   dispose(): DRACOLoader;
 }

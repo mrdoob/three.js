@@ -11,13 +11,13 @@
 
 THREE.GCodeLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	this.splitLayer = false;
 
 };
 
-THREE.GCodeLoader.prototype = {
+THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.GCodeLoader,
 
@@ -32,13 +32,6 @@ THREE.GCodeLoader.prototype = {
 			onLoad( self.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -227,4 +220,4 @@ THREE.GCodeLoader.prototype = {
 
 	}
 
-};
+} );

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - spot light</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Selective Lights<br/>
+			by <a href="https://github.com/navenedrob" target="_blank" rel="noopener">navenedrob</a> and <a href="https://github.com/byondrnd" target="_blank" rel="noopener">byondrnd</a>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			var container, stats;
+
+			var renderer, scene, camera;
+
+			var ambient, spotLight;
+
+			var cube1, cube2, cube3;
+
+			var params, gui;
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				container.appendChild(renderer.domElement);
+
+				stats = new Stats();
+				container.appendChild(stats.dom);
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 1000);
+				camera.position.set(65, 8, - 10);
+				camera.layers.enable(1);
+				camera.layers.enable(2);
+				camera.layers.enable(3);
+
+				var controls = new THREE.OrbitControls(camera, renderer.domElement);
+				controls.minDistance = 20;
+				controls.maxDistance = 500;
+				controls.enablePan = false;
+
+				ambient = new THREE.AmbientLight(0xffffff, 0.1);
+				ambient.layers.enable(1);
+				ambient.layers.enable(2);
+				ambient.layers.enable(3);
+				ambient.name = 'AmbientLight';
+				scene.add(ambient);
+
+				// Spot Light
+				spotLight = new THREE.SpotLight(0xffffff, 1);
+				spotLight.position.set(15, 40, 35);
+				spotLight.angle = Math.PI / 4;
+				spotLight.penumbra = 0.05;
+				spotLight.decay = 2;
+				spotLight.distance = 200;
+
+				spotLight.castShadow = true;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+
+				spotLight.layers.enable(1);
+				spotLight.layers.enable(3);
+
+				scene.add(spotLight);
+
+
+				//Ground
+				var material = new THREE.MeshPhongMaterial({ color: 0x808080, dithering: true });
+				var geometry = new THREE.PlaneBufferGeometry(2000, 2000);
+
+				var mesh = new THREE.Mesh(geometry, material);
+				mesh.position.set(0, - 1, 0);
+				mesh.rotation.x = - Math.PI * 0.5;
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+
+				//Cubes
+				var material1 = new THREE.MeshPhongMaterial({ color: 0x4080ff, dithering: true });
+				var geometry1 = new THREE.BoxBufferGeometry(3, 1, 2);
+
+				cube1 = new THREE.Mesh(geometry1, material1);
+				cube1.position.set(0, 2, 0);
+				cube1.castShadow = true;
+				cube1.layers.set(1);
+				scene.add(cube1);
+
+				var material2 = new THREE.MeshPhongMaterial({ color: 0x4080ff, dithering: true });
+				var geometry2 = new THREE.BoxBufferGeometry(3, 1, 2);
+				cube2 = new THREE.Mesh(geometry2, material2);
+				cube2.position.set(20, 2, 0);
+				cube2.castShadow = true;
+				cube2.layers.set(2);
+				scene.add(cube2);
+
+				var material3 = new THREE.MeshPhongMaterial({ color: 0x4080ff, dithering: true });
+				var geometry3 = new THREE.BoxBufferGeometry(3, 1, 2);
+				cube3 = new THREE.Mesh(geometry3, material3);
+				cube3.position.set(40, 2, 0);
+				cube3.castShadow = true;
+				cube3.layers.set(3);
+				scene.add(cube3);
+
+				controls.target.copy(cube2.position);
+				controls.update();
+
+				window.addEventListener('resize', onResize, false);
+
+				// GUI
+
+				var gui = new dat.GUI();
+
+				var layers = { layer1: true, layer2: false, layer3: true };
+
+				var leverFolder = gui.addFolder('Layers');
+				gui.add(layers, 'layer1').onChange(function () {
+
+					spotLight.layers.toggle(1);
+					cube1.material.needsUpdate = true;
+				});
+
+				gui.add(layers, 'layer2').onChange(function () {
+
+					spotLight.layers.toggle(2);
+					cube2.material.needsUpdate = true;
+				});
+
+				gui.add(layers, 'layer3').onChange(function () {
+
+					spotLight.layers.toggle(3);
+					cube3.material.needsUpdate = true;
+
+				});
+
+			}
+
+			function onResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				stats.update();
+
+				renderer.render( scene, camera );
+
+				requestAnimationFrame( render );
+
+			}
+
+			init();
+
+			render();
+
+		</script>
+	</body>
+</html>

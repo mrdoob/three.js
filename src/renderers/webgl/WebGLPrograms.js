@@ -190,11 +190,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			maxMorphTargets: renderer.maxMorphTargets,
 			maxMorphNormals: renderer.maxMorphNormals,
 
-			numDirLights: lights.directional.length,
-			numPointLights: lights.point.length,
-			numSpotLights: lights.spot.length,
-			numRectAreaLights: lights.rectArea.length,
-			numHemiLights: lights.hemi.length,
+			numDirLights: countLights( object, lights.directionalAffectedLayers ),
+			numPointLights: countLights( object, lights.pointAffectedLayers ),
+			numSpotLights: countLights( object, lights.spotAffectedLayers ),
+			numRectAreaLights: countLights( object, lights.rectAreaAffectedLayers ),
+			numHemiLights: countLights( object, lights.hemiAffectedLayers ),
 
 			numDirLightShadows: lights.directionalShadowMap.length,
 			numPointLightShadows: lights.pointShadowMap.length,
@@ -205,7 +205,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			dithering: material.dithering,
 
-			shadowMapEnabled: renderer.shadowMap.enabled && object.receiveShadow && shadows.length > 0,
+			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
@@ -224,6 +224,25 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		return parameters;
 
 	};
+
+	function countLights( object, lightLayers ) {
+
+		var i = 0, result = 0;
+		var len = 0;
+		if ( lightLayers != undefined )
+			len = lightLayers.length;
+		for ( i = 0; i < len; i ++ ) {
+
+			if ( ! object.material || object.layers.test( lightLayers[ i ] ) ) {
+
+				result ++;
+
+			}
+
+		}
+		return result;
+
+	}
 
 	this.getProgramCode = function ( material, parameters ) {
 

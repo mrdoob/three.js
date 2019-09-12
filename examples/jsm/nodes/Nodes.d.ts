@@ -57,12 +57,6 @@ export * from './math/CondNode';
 export * from './procedural/NoiseNode';
 export * from './procedural/CheckerNode';
 
-// bsdfs
-
-export * from './bsdfs/BlinnShininessExponentNode';
-export * from './bsdfs/BlinnExponentToRoughnessNode';
-export * from './bsdfs/RoughnessToBlinnExponentNode';
-
 // misc
 
 export * from './misc/TextureCubeUVNode';
@@ -79,6 +73,7 @@ export * from './utils/TimerNode';
 export * from './utils/VelocityNode';
 export * from './utils/UVTransformNode';
 export * from './utils/MaxMIPLevelNode';
+export * from './utils/SpecularMIPLevelNode';
 export * from './utils/ColorSpaceNode';
 
 // effects

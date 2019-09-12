@@ -9,6 +9,7 @@
 	</head>
 	<body>
 		[page:Loader] &rarr;
+
 		<h1>MMD加载器（[name]）</h1>
 
  		<p class="desc">一个用于加载<a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a>资源的加载器。<br /><br />
@@ -65,10 +66,11 @@
 		创建一个新的[name]。
 		</p>
 
- 		<h2>属性</h2>
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
 
-
- 		<h2>方法</h2>
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -102,33 +104,12 @@
 		[page:Function onError] — （可选）如果加载过程中发生错误时被调用的函数，该函数接受一个错误来作为参数。<br />
 		</p>
 		<p>
-		开始从URL中加载PMD/PMX模型文件和VMD动画文件（可能有多个文件），并使用一个[page:Object] —— 包含有已解析的[page:SkinnedMesh]和适应[page:SkinnedMesh]的[page:AnimationClip]，来触发回调函数。 
-		</p>
-
-		<h3>[method:MMDLoader setCrossOrigin]( [param:String crossOrigin] )</h3>
-		<p>
-		[page:String crossOrigin] — crossOrigin字符串，用于实现CORS，以便从一个允许CORS的其它域加载url。
+		开始从URL中加载PMD/PMX模型文件和VMD动画文件（可能有多个文件），并使用一个[page:Object] —— 包含有已解析的[page:SkinnedMesh]和适应[page:SkinnedMesh]的[page:AnimationClip]，来触发回调函数。
 		</p>
 
 		<h3>[method:MMDLoader setAnimationPath]( [param:String animationPath] )</h3>
 		<p>
 		[page:String animationPath] — 用于加载动画数据（VMD/VPD 文件）的基础路径。 Base path for loading animation data (VMD/VPD files).
-		</p>
-		<p>
-		设置额外资源（例如贴图）的基础路径。
-		</p>
-
-		<h3>[method:MMDLoader setPath]( [param:String path] )</h3>
-		<p>
-		[page:String path] — 基础路径。
-		</p>
-		<p>
-		设置用于加载文件的基础路径或URL。
-		</p>
-
-		<h3>[method:MMDLoader setResourcePath]( [param:String resourcePath] )</h3>
-		<p>
-		[page:String resourcePath] — 用于加载额外资源（例如贴图）的基础路径。
 		</p>
 		<p>
 		设置额外资源（例如贴图）的基础路径。
