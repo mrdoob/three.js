@@ -357,7 +357,8 @@ var list = {
 				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"FlyControls": "examples/en/controls/FlyControls",
-				"OrbitControls": "examples/en/controls/OrbitControls"
+				"OrbitControls": "examples/en/controls/OrbitControls",
+				"PointerLockControls": "examples/en/controls/PointerLockControls"
 			},
 
 			"Geometries": {
@@ -796,7 +797,8 @@ var list = {
 				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
 				"DragControls": "examples/zh/controls/DragControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
-				"OrbitControls": "examples/zh/controls/OrbitControls"
+				"OrbitControls": "examples/zh/controls/OrbitControls",
+				"PointerLockControls": "examples/zh/controls/PointerLockControls"
 			},
 
 			"几何体": {
