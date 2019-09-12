@@ -76,7 +76,7 @@ export class NormalMapNode extends TempNode {
 
 			var perturbNormal2Arb = builder.include( PERTURB_NORMAL_2_ARB );
 
-			var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
+			var viewNormalNode = builder.getContextProperty( NormalNode.VIEW ) || new NormalNode( NormalNode.VIEW );
 
 			this.position = this.position || new PositionNode( PositionNode.VIEW );
 			this.uv = this.uv || new UVNode();

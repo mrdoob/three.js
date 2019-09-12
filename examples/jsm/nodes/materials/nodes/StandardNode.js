@@ -13,6 +13,7 @@ import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js';
+import { NormalNode } from '../../accessors/NormalNode.js';
 
 export class StandardNode extends Node {
 
@@ -167,10 +168,10 @@ export class StandardNode extends Node {
 			var envViewNormal = new ExpressionNode( 'normal', 'v3' );
 			var clearcoatViewNormal = new ExpressionNode( 'clearcoatNormal', 'v3' );
 
-			radianceFlowContext.setProperty( 'viewNormal', envViewNormal );
-			irradianceFlowContext.setProperty( 'viewNormal', envViewNormal );
+			radianceFlowContext.setProperty( NormalNode.VIEW, envViewNormal );
+			irradianceFlowContext.setProperty( NormalNode.VIEW, envViewNormal );
 
-			clearcoatRadianceFlowContext.setProperty( 'viewNormal', clearcoatViewNormal );
+			clearcoatRadianceFlowContext.setProperty( NormalNode.VIEW, clearcoatViewNormal );
 
 			// contextually bias
 

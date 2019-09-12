@@ -22,7 +22,7 @@ export class ReflectNode extends TempNode {
 
 	getUnique( builder ) {
 
-		return ! builder.getContextProperty( 'viewNormal' ) && this.ratio === undefined;
+		return ! builder.getContextProperty( NormalNode.VIEW ) && this.ratio === undefined;
 
 	}
 
@@ -52,7 +52,7 @@ export class ReflectNode extends TempNode {
 
 				case ReflectNode.VECTOR:
 
-					var viewNormalNode = builder.getContextProperty( 'viewNormal' ) || new NormalNode( NormalNode.VIEW );
+					var viewNormalNode = builder.getContextProperty( NormalNode.VIEW ) || new NormalNode( NormalNode.VIEW );
 
 					var viewNormal = viewNormalNode.build( builder, 'v3' );
 					var viewPosition = '-normalize( ' + new PositionNode( PositionNode.VIEW ).build( builder, 'v3' ) + ' )';
