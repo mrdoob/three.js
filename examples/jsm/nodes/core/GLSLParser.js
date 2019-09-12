@@ -43,7 +43,7 @@ export class GLSLParser {
 	
 	getMainProperty() {
 
-		return this.properties[ this.properties.length - 1 ];
+		return this.properties.length > 0 ? this.properties[ this.properties.length - 1 ] : this.analyzer.scope;
 
 	}
 	

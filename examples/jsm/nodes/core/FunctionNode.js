@@ -198,12 +198,12 @@ export class FunctionNode extends TempNode {
 		this.extensions = extensions || {};
 		this.keywords = keywords || {};
 
-		if ( this.isMethod && src ) {
-			
+		if ( src ) {
+
 			var parser = new GLSLParser( src );
-			
+
 			this.fromParser( parser, parser.getMainProperty() );
-			
+
 		}
 
 	}

@@ -248,7 +248,9 @@ export class ShaderEnvironment extends ShaderBlock {
 		this.uniforms = [];
 		
 		this.isEnvironment = true;
-		
+
+		this.codeBlock = this;
+
 	}
 	
 	addDeclaration( property ) {
@@ -293,6 +295,7 @@ export class Analyzer {
 		this.position = 0;
 		
 		this.env = new ShaderEnvironment( this.tokenizer );
+		this.env.start = this.tokens[0];
 		
 		this.scope = this.env;
 		
