@@ -8,23 +8,7 @@ import { FunctionNode } from '../core/FunctionNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
 
-export const DEPTH_COLOR = new FunctionNode( [
-	"float depthColor( float mNear, float mFar ) {",
-
-	"	#ifdef USE_LOGDEPTHBUF_EXT",
-
-	"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
-
-	"	#else",
-
-	"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
-
-	"	#endif",
-
-	"	return 1.0 - smoothstep( mNear, mFar, depth );",
-
-	"}"
-].join( "\n" ) );
+var depthColorFunctionNode;
 
 export class CameraNode extends TempNode {
 
@@ -134,7 +118,27 @@ export class CameraNode extends TempNode {
 
 			case CameraNode.DEPTH:
 
-				var depthColor = builder.include( DEPTH_COLOR );
+				depthColorFunctionNode = depthColorFunctionNode || new FunctionNode( `
+
+					float depthColor( float mNear, float mFar ) {
+
+						#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
+
+							float depth = gl_FragDepthEXT / gl_FragCoord.w;
+
+						#else
+
+							float depth = gl_FragCoord.z / gl_FragCoord.w;
+
+						#endif
+
+						return 1.0 - smoothstep( mNear, mFar, depth );
+
+					}
+
+				` );
+
+				var depthColor = builder.include( depthColorFunctionNode );
 
 				result = depthColor + '( ' + this.near.build( builder, 'f' ) + ', ' + this.far.build( builder, 'f' ) + ' )';
 
