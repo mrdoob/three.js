@@ -13,8 +13,13 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		[name] is similar to [page:OrbitControls]. However, it does not maintain a constant camera [page:Object3D.up up] vector.
-		That means if the camera orbits over the “north” and “south” poles, it does not flip to stay "right side up".
+			<p>
+				[name] is similar to [page:OrbitControls]. However, it does not maintain a constant camera [page:Object3D.up up] vector.
+				That means if the camera orbits over the “north” and “south” poles, it does not flip to stay "right side up".
+			</p>
+			<p>
+				Notice that [name] can only be used with a perspective camera. Use [page:OrthographicTrackballControls] when working with an orthographic camera.
+			</p>
 		</p>
 
 		<h2>Example</h2>
@@ -23,10 +28,10 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<h3>[name]( [param:PerspectiveCamera camera], [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			<p>
-				[page:Camera camera]: The camera of the rendered scene.
+				[page:PerspectiveCamera camera]: The perspective camera of the rendered scene.
 			</p>
 			<p>
 				[page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the whole document,
@@ -119,7 +124,7 @@
 			Whether or not zooming is disabled. Default is *false*.
 		</p>
 
-		<h3>[property:Camera object]</h3>
+		<h3>[property:PerspectiveCamera object]</h3>
 		<p>
 			The camera being controlled.
 		</p>
