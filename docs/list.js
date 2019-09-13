@@ -357,9 +357,12 @@ var list = {
 				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
 				"EditorControls": "examples/en/controls/EditorControls",
+				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
 				"OrbitControls": "examples/en/controls/OrbitControls",
-				"PointerLockControls": "examples/en/controls/PointerLockControls"
+				"OrthographicTrackballControls": "examples/en/controls/OrthographicTrackballControls",
+				"PointerLockControls": "examples/en/controls/PointerLockControls",
+				"TrackballControls": "examples/en/controls/TrackballControls"
 			},
 
 			"Geometries": {
@@ -798,9 +801,12 @@ var list = {
 				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
 				"DragControls": "examples/zh/controls/DragControls",
 				"EditorControls": "examples/zh/controls/EditorControls",
+				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
 				"OrbitControls": "examples/zh/controls/OrbitControls",
-				"PointerLockControls": "examples/zh/controls/PointerLockControls"
+				"OrthographicTrackballControls": "examples/zh/controls/OrthographicTrackballControls",
+				"PointerLockControls": "examples/zh/controls/PointerLockControls",
+				"TrackballControls": "examples/zh/controls/TrackballControls"
 			},
 
 			"几何体": {
