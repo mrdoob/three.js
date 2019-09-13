@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class can be used to transform objects in 3D space by adapting a similar interaction model of DCC tools like Blender.
+			Unlike other controls, it is not intended to transform the scene's camera.
+		</p>
+
+		<h2>Example</h2>
+
+		<p>[example:misc_controls_transform misc / controls / transform ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera camera]: The camera of the rendered scene.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the whole document,
+				however if you only want the controls to work over a specific element (e.g. the canvas) you can specify that here.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Events</h2>
+
+		<h3>change</h3>
+		<p>
+			Fires if any type of change (object or property change) is performed. Property changes
+			are separate events you can add event listeners to. The event type is "propertyname-changed".
+		</p>
+
+		<h3>mouseDown</h3>
+		<p>
+			Fires if a pointer (mouse/touch) becomes active.
+		</p>
+
+		<h3>mouseUp</h3>
+		<p>
+			Fires if a pointer (mouse/touch) is no longer active.
+		</p>
+
+		<h3>objectChange</h3>
+		<p>
+			Fires if the controlled 3D object is changed.
+		</p>
+
+		<h2>Properties</h2>
+
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:String axis]</h3>
+		<p>
+			The current transformation axis.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			The camera of the rendered scene.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
+			not set up new event listeners. Default is the whole document.
+		</p>
+
+		<h3>[property:Boolean dragging]</h3>
+		<p>
+			Whether or not dragging is currently performed. Read-only property.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			Whether or not the controls are enabled.
+		</p>
+
+		<h3>[property:String mode]</h3>
+		<p>
+			The current transformation mode. Possible values are "translate", "rotate" and "scale". Default is *translate*.
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>
+			The 3D object being controlled.
+		</p>
+
+		<h3>[property:Number rotationSnap]</h3>
+		<p>
+			By default, 3D objects are continously rotated. If you set this property to a numeric value (radians), you can define in which
+			steps the 3D object should be rotated. Deault is *null*.
+		</p>
+
+		<h3>[property:Boolean showX]</h3>
+		<p>
+			Whether or not the x-axis helper should be visible. Default is *true*.
+		</p>
+
+		<h3>[property:Boolean showX]</h3>
+		<p>
+			Whether or not the x-axis helper should be visible. Default is *true*.
+		</p>
+
+		<h3>[property:Boolean showY]</h3>
+		<p>
+			Whether or not the y-axis helper should be visible. Default is *true*.
+		</p>
+
+		<h3>[property:Boolean showZ]</h3>
+		<p>
+			Whether or not the z-axis helper should be visible. Default is *true*.
+		</p>
+
+		<h3>[property:Number size]</h3>
+		<p>
+			The size of the helper UI (axes/planes). Default is *1*.
+		</p>
+
+		<h3>[property:String space]</h3>
+		<p>
+			Defines in which coordinate space transformations should be performed. Possible values are "world" and "local". Default is *world*.
+		</p>
+
+		<h3>[property:Number translationSnap]</h3>
+		<p>
+			By default, 3D objects are continously translated. If you set this property to a numeric value (world units), you can define in which
+			steps the 3D object should be translated. Deault is *null*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:TransformControls attach] ( [param:Object3D object] )</h3>
+		<p>
+			<p>
+				[page:Object3D object]: The 3D object that should be transformed.
+			</p>
+			<p>
+				Sets the 3D object that should be transformed and ensures the controls UI is visible.
+			</p>
+		</p>
+
+		<h3>[method:TransformControls detach] ()</h3>
+		<p>
+			Removes the current 3D object from the controls and makes the helper UI is invisible.
+		</p>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:String getMode] ()</h3>
+		<p>
+			Returns the transformation mode.
+		</p>
+
+		<h3>[method:null setMode] ( [param:String mode] )</h3>
+		<p>
+			<p>
+				[page:String mode]: The transformation mode.
+			</p>
+			<p>
+				Sets the transformation mode.
+			</p>
+		</p>
+
+		<h3>[method:null setRotationSnap] ( [param:Number rotationSnap] )</h3>
+		<p>
+			<p>
+				[page:Number rotationSnap]: The rotation snap.
+			</p>
+			<p>
+				Sets the rotation snap.
+			</p>
+		</p>
+
+		<h3>[method:null setSize] ( [param:Number size] )</h3>
+		<p>
+			<p>
+				[page:Number size]: The size of the helper UI.
+			</p>
+			<p>
+				Sets the size of the helper UI.
+			</p>
+		</p>
+
+		<h3>[method:null setSpace] ( [param:String space] )</h3>
+		<p>
+			<p>
+				[page:String space]: The coordinate space in which transformations are applied.
+			</p>
+			<p>
+				Sets the coordinate space in which transformations are applied.
+			</p>
+		</p>
+
+		<h3>[method:null setTranslationSnap] ( [param:Number translationSnap] )</h3>
+		<p>
+			<p>
+				[page:Number translationSnap]: The translation snap.
+			</p>
+			<p>
+				Sets the translation snap.
+			</p>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/TransformControls.js examples/js/controls/TransformControls.js]
+		</p>
+	</body>
+</html>

@@ -361,7 +361,8 @@ var list = {
 				"OrbitControls": "examples/en/controls/OrbitControls",
 				"OrthographicTrackballControls": "examples/en/controls/OrthographicTrackballControls",
 				"PointerLockControls": "examples/en/controls/PointerLockControls",
-				"TrackballControls": "examples/en/controls/TrackballControls"
+				"TrackballControls": "examples/en/controls/TrackballControls",
+				"TransformControls": "examples/en/controls/TransformControls"
 			},
 
 			"Geometries": {
@@ -804,7 +805,8 @@ var list = {
 				"OrbitControls": "examples/zh/controls/OrbitControls",
 				"OrthographicTrackballControls": "examples/zh/controls/OrthographicTrackballControls",
 				"PointerLockControls": "examples/zh/controls/PointerLockControls",
-				"TrackballControls": "examples/zh/controls/TrackballControls"
+				"TrackballControls": "examples/zh/controls/TrackballControls",
+				"TransformControls": "examples/zh/controls/TransformControls"
 			},
 
 			"几何体": {
