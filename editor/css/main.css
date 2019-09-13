@@ -41,6 +41,37 @@ textarea, input { outline: none; } /* osx */
 	user-select: none;
 }
 
+.TabbedPanel {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
+	/* No support for these yet */
+	-o-user-select: none;
+	user-select: none;
+	position: relative;
+	display: block;
+	width: 100%;
+}
+
+.TabbedPanel .Tabs {
+	position: relative;
+	display: block;
+	width: 100%;
+}
+
+.TabbedPanel .Tabs .Tab {
+	padding: 10px;
+	vertical-align: middle;
+}
+
+.TabbedPanel .Tabs .Panels {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
 /* CodeMirror */
 
 .CodeMirror {
