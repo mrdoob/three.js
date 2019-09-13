@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "noEmit": true,
-  },
-  // NOTE (from https://www.typescriptlang.org/docs/handbook/tsconfig-json.html):
-  // 'If the "files" and "include" are both left unspecified, the compiler defaults to including
-  // all TypeScript (.ts, .d.ts and .tsx) files in the containing directory and subdirectories ...'
-}

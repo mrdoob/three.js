@@ -50,7 +50,7 @@
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
-    "lint": "eslint src --ext js --ext ts && tsc -p tsconfig.lint.json",
+    "lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
     "travis": "npm run lint && npm test"
   },
