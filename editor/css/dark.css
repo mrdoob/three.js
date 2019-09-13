@@ -251,6 +251,21 @@ select {
 		background-color: rgba(21,60,94,1);
 	}
 
+.TabbedPanel .Tabs {
+	background-color: #1b1b1b;
+	border-top: 1px solid #222;
+}
+
+	.TabbedPanel .Tab {
+		color: #555;
+		border-right: 1px solid #222;
+	}
+
+	.TabbedPanel .Tab.selected {
+		color: #888;
+		background-color: #111;
+	}
+
 .Listbox {
 	color: #888;
 	background: #222;

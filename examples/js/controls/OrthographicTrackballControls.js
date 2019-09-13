@@ -19,8 +19,6 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	this.screen = { left: 0, top: 0, width: 0, height: 0 };
 
-	this.radius = 0;
-
 	this.rotateSpeed = 1.0;
 	this.zoomSpeed = 1.2;
 
@@ -35,6 +33,8 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
 	// internals
+
+	this.radius = 0;
 
 	this.target = new THREE.Vector3();
 
