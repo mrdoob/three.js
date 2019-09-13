@@ -14,24 +14,20 @@
 
 		<p class="desc">
 			<p>
-				[name] is similar to [page:OrbitControls]. However, it does not maintain a constant camera [page:Object3D.up up] vector.
-				That means if the camera orbits over the “north” and “south” poles, it does not flip to stay "right side up".
-			</p>
-			<p>
-				Notice that [name] can only be used with a perspective camera. Use [page:OrthographicTrackballControls] when working with an orthographic camera.
+				This class is a special version of [page:TrackballControls] which supports orthographic cameras.
 			</p>
 		</p>
 
 		<h2>Example</h2>
 
-		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
+		<p>[example:misc_controls_trackball_orthographic misc / controls / trackball / orthographic ]</p>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:PerspectiveCamera camera], [param:HTMLDOMElement domElement] )</h3>
+		<h3>[name]( [param:OrthographicCamera camera], [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			<p>
-				[page:PerspectiveCamera camera]: The perspective camera of the rendered scene.
+				[page:OrthographicCamera camera]: The orthographic camera of the rendered scene.
 			</p>
 			<p>
 				[page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the whole document,
@@ -88,30 +84,14 @@
 			Default is *65, 83, 68* which represents A, S, D.
 		</p>
 
-		<h3>[property:Number maxDistance]</h3>
-		<p>
-			 How far you can zoom in. Default is *Infinity*.
-		</p>
-
-		<h3>[property:Number minDistance]</h3>
-		<p>
-			 How far you can zoom in. Default is *0*.
-		</p>
-
-		<h3>
-			[property:Object mouseButtons]</h3>
-		<p>
-			This object contains references to the mouse actions used by the controls.
-			<ul>
-				<li>.LEFT is assinged with *THREE.MOUSE.ROTATE*</li>
-				<li>.MIDDLE is assinged with *THREE.MOUSE.ZOOM*</li>
-				<li>.RIGHT is assinged with *THREE.MOUSE.PAN*</li>
-			</ul>
-		</p>
-
 		<h3>[property:Boolean noPan]</h3>
 		<p>
 			Whether or not panning is disabled. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean noRoll]</h3>
+		<p>
+			Whether or not rolling is disabled. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean noRotate]</h3>
@@ -124,7 +104,7 @@
 			Whether or not zooming is disabled. Default is *false*.
 		</p>
 
-		<h3>[property:PerspectiveCamera object]</h3>
+		<h3>[property:OrthographicCamera object]</h3>
 		<p>
 			The camera being controlled.
 		</p>
@@ -162,10 +142,6 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null checkDistances] ()</h3>
-		<p>
-			Ensures the controls stay in the range [minDistance, maxDistance]. Called by [page:.update update]().
-		</p>
 
 		<h3>[method:null dispose] ()</h3>
 		<p>

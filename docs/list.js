@@ -358,6 +358,7 @@ var list = {
 				"DragControls": "examples/en/controls/DragControls",
 				"FlyControls": "examples/en/controls/FlyControls",
 				"OrbitControls": "examples/en/controls/OrbitControls",
+				"OrthographicTrackballControls": "examples/en/controls/OrthographicTrackballControls",
 				"PointerLockControls": "examples/en/controls/PointerLockControls",
 				"TrackballControls": "examples/en/controls/TrackballControls"
 			},
@@ -799,6 +800,7 @@ var list = {
 				"DragControls": "examples/zh/controls/DragControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
 				"OrbitControls": "examples/zh/controls/OrbitControls",
+				"OrthographicTrackballControls": "examples/zh/controls/OrthographicTrackballControls",
 				"PointerLockControls": "examples/zh/controls/PointerLockControls",
 				"TrackballControls": "examples/zh/controls/TrackballControls"
 			},
