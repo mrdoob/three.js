@@ -356,6 +356,7 @@ var list = {
 			"Controls": {
 				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
+				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
 				"OrbitControls": "examples/en/controls/OrbitControls",
 				"OrthographicTrackballControls": "examples/en/controls/OrthographicTrackballControls",
@@ -798,6 +799,7 @@ var list = {
 			"控制": {
 				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
 				"DragControls": "examples/zh/controls/DragControls",
+				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
 				"OrbitControls": "examples/zh/controls/OrbitControls",
 				"OrthographicTrackballControls": "examples/zh/controls/OrthographicTrackballControls",

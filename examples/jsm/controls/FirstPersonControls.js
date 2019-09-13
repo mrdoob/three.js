@@ -16,6 +16,8 @@ var FirstPersonControls = function ( object, domElement ) {
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
+	// API
+
 	this.enabled = true;
 
 	this.movementSpeed = 1.0;
@@ -35,17 +37,19 @@ var FirstPersonControls = function ( object, domElement ) {
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
 
-	this.autoSpeedFactor = 0.0;
-
-	this.mouseX = 0;
-	this.mouseY = 0;
-
 	this.moveForward = false;
 	this.moveBackward = false;
 	this.moveLeft = false;
 	this.moveRight = false;
 
 	this.mouseDragOn = false;
+
+	// internals
+
+	this.autoSpeedFactor = 0.0;
+
+	this.mouseX = 0;
+	this.mouseY = 0;
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
