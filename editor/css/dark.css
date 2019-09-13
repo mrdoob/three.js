@@ -251,6 +251,15 @@ select {
 		background-color: rgba(21,60,94,1);
 	}
 
+.Listbox {
+	color: #888;
+	background: #222;
+}
+
+.Panel {
+	color: #888;
+	border-top: 1px solid #222;
+}
 /* */
 
 @media all and ( max-width: 600px ) {
