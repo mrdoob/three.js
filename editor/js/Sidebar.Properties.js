@@ -9,9 +9,9 @@ Sidebar.Properties = function ( editor ) {
 	var container = new UI.TabbedPanel();
 	container.setId( 'properties' );
 
-	container.addPanel( 'object', strings.getKey( 'sidebar/properties/object' ), new Sidebar.Object( editor ) );
-	container.addPanel( 'geometry', strings.getKey( 'sidebar/properties/geometry' ), new Sidebar.Geometry( editor ) );
-	container.addPanel( 'material', strings.getKey( 'sidebar/properties/material' ), new Sidebar.Material( editor ) );
+	container.addTab( 'object', strings.getKey( 'sidebar/properties/object' ), new Sidebar.Object( editor ) );
+	container.addTab( 'geometry', strings.getKey( 'sidebar/properties/geometry' ), new Sidebar.Geometry( editor ) );
+	container.addTab( 'material', strings.getKey( 'sidebar/properties/material' ), new Sidebar.Material( editor ) );
 
 	return container;
 

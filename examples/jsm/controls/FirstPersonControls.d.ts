@@ -22,7 +22,7 @@ export class FirstPersonControls {
   constrainVertical: boolean;
   verticalMin: number;
   verticalMax: number;
-  autoSpeedFactor: number;
+	mouseDragOn: boolean;
 
   handleResize(): void;
   lookAt(x: number | Vector3, y: number, z: number): this;

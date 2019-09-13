@@ -14,12 +14,12 @@ export class TransformControls extends Object3D {
   // API
 
   camera: Camera;
-  object: Object3D;
+  object: Object3D | undefined;
   enabled: boolean;
-  axis: string;
+  axis: string | null;
   mode: string;
-  translationSnap: Vector3;
-  rotationSnap: Vector3;
+  translationSnap: number | null;
+  rotationSnap: number | null;
   space: string;
   size: number;
   dragging: boolean;
@@ -27,19 +27,14 @@ export class TransformControls extends Object3D {
   showY: boolean;
   showZ: boolean;
   isTransformControls: boolean;
-  visible: boolean;
   mouseButtons: {
-    LEFT: MOUSE; 
+    LEFT: MOUSE;
     MIDDLE: MOUSE;
     RIGHT: MOUSE;
   };
 
   attach(object: Object3D): this;
   detach(): this;
-  pointerHover(pointer: Object): void;
-  pointerDown(pointer: Object): void;
-  pointerMove(pointer: Object): void;
-  pointerUp(pointer: Object): void;
   getMode(): string;
   setMode(mode: string): void;
   setTranslationSnap(translationSnap: Number | null): void;
@@ -47,6 +42,5 @@ export class TransformControls extends Object3D {
   setSize(size: number): void;
   setSpace(space: string): void;
   dispose(): void;
-  update(): void;
 
 }

@@ -1098,7 +1098,7 @@ UI.TabbedPanel.prototype.select = function ( id ) {
 
 }
 
-UI.TabbedPanel.prototype.addPanel = function ( id, label, items ) {
+UI.TabbedPanel.prototype.addTab = function ( id, label, items ) {
 
 	var tab = new UI.TabbedPanel.Tab( label, this );
 	tab.setId( id );
