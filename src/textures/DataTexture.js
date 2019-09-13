@@ -18,6 +18,11 @@ function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, 
 	this.flipY = false;
 	this.unpackAlignment = 1;
 
+	if ( data ) {
+
+		this.needsUpdate = true;
+
+	}
 }
 
 DataTexture.prototype = Object.create( Texture.prototype );
