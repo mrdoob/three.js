@@ -72,6 +72,28 @@ textarea, input { outline: none; } /* osx */
 	height: 100%;
 }
 
+/* Listbox */
+.Listbox {
+	color: #444;
+	background-color: #fff;
+	padding: 0;
+	width: 100%;
+	min-height: 140px;
+	font-size: 12px;
+	cursor: default;
+	overflow: auto;
+}
+
+.Listbox .ListboxItem {
+	padding: 6px;
+	color: #666;
+	white-space: nowrap;
+}
+
+.Listbox .ListboxItem.active {
+	background-color: rgba(0, 0, 0, 0.04);
+}
+
 /* CodeMirror */
 
 .CodeMirror {

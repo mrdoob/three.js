@@ -74,6 +74,12 @@ UI.Element.prototype = {
 
 	},
 
+	getId: function ( id ) {
+
+		return this.dom.id;
+
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;
@@ -1130,3 +1136,147 @@ UI.TabbedPanel.Tab = function ( text, parent ) {
 
 UI.TabbedPanel.Tab.prototype = Object.create( UI.Text.prototype );
 UI.TabbedPanel.Tab.prototype.constructor = UI.TabbedPanel.Tab;
+
+// Listbox
+UI.Listbox = function ( ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'Listbox';
+	dom.tabIndex = 0;
+
+	this.dom = dom;
+	this.items = [];
+	this.listitems = [];
+	this.selectedIndex = 0;
+	this.selectedValue = null;
+
+	return this;
+
+}
+
+UI.Listbox.prototype = Object.create( UI.Element.prototype );
+UI.Listbox.prototype.constructor = UI.ListboxItem;
+
+UI.Listbox.prototype.setItems = function ( items ) {
+
+	if ( Array.isArray( items ) ) {
+
+		this.items = items;
+
+	}
+
+	this.render( );
+
+}
+
+UI.Listbox.prototype.render = function ( ) {
+
+	while( this.listitems.length ) {
+
+		var item = this.listitems[0];
+
+		item.dom.remove();
+
+		this.listitems.splice(0, 1);
+
+	}
+
+	for ( var i = 0; i < this.items.length; i ++ ) {
+
+		var item = this.items[i];
+
+		var listitem = new UI.Listbox.ListboxItem( this );
+		listitem.setId( item.id || `Listbox-${i}` );
+		listitem.setTextContent( item.name || item.type );
+		this.add( listitem );
+
+	}
+
+}
+
+// Assuming user passes valid list items
+UI.Listbox.prototype.add = function (  ) {
+
+	var items = Array.from( arguments );
+
+	this.listitems = this.listitems.concat( items );
+
+	UI.Element.prototype.add.apply( this, items );
+
+}
+
+UI.Listbox.prototype.selectIndex = function ( index ) {
+
+	if ( index >= 0 && index < this.items.length ) {
+
+		this.setValue( this.listitems[ index ].getId(  ) );
+
+	}
+
+	this.selectIndex = index;
+
+}
+
+UI.Listbox.prototype.getValue = function ( index ) {
+
+	return this.selectedValue;
+
+}
+
+UI.Listbox.prototype.setValue = function ( value ) {
+
+	for ( var i = 0; i < this.listitems.length; i ++ ) {
+
+		var element = this.listitems[ i ];
+
+		if ( element.getId( ) === value ) {
+
+			element.addClass( 'active' );
+
+		} else {
+			
+			element.removeClass( 'active' );
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
+	this.dom.dispatchEvent( changeEvent );
+
+}
+
+// Listbox Item
+UI.Listbox.ListboxItem = function ( parent ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'ListboxItem';
+
+	this.parent = parent;
+	this.dom = dom;
+
+	var scope = this;
+
+	function onClick ( ) {
+		
+		if( scope.parent ) {
+			scope.parent.setValue( scope.getId( ) );
+		}
+
+	}
+
+	dom.addEventListener( 'click', onClick, false );
+
+	return this;
+
+}
+
+UI.Listbox.ListboxItem.prototype = Object.create( UI.Element.prototype );
+UI.Listbox.ListboxItem.prototype.constructor = UI.Listbox.ListboxItem;
