@@ -155,6 +155,7 @@ var Viewport = function ( editor ) {
 	var onDownPosition = new THREE.Vector2();
 	var onUpPosition = new THREE.Vector2();
 	var onDoubleClickPosition = new THREE.Vector2();
+	var onDropPosition = new THREE.Vector2();
 
 	function getMousePosition( dom, x, y ) {
 
@@ -260,9 +261,41 @@ var Viewport = function ( editor ) {
 
 	}
 
+	function onDragOver ( event ) {
+
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy';
+
+	}
+
+	function onDrop ( event ) {
+
+		var json = JSON.parse( event.dataTransfer.getData( 'payload' ) );
+		var array = getMousePosition( container.dom, event.clientX, event.clientY );
+		onDropPosition.fromArray( array );
+
+		var intersects = getIntersects( onDropPosition, objects );
+
+		if ( intersects.length > 0 ) {
+
+			var object = intersects[ 0 ].object;
+
+			if ( json.type === 'material' ) {
+
+				var material = editor.getSceneMaterialById( json.id );
+				editor.execute( new SetMaterialCommand( editor, object, material ) );
+
+			}
+			
+		}
+
+	}
+
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'touchstart', onTouchStart, false );
 	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
+	container.dom.addEventListener( 'dragover', onDragOver, false );
+	container.dom.addEventListener( 'drop', onDrop, false );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.

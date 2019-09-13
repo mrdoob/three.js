@@ -57,7 +57,9 @@ var Editor = function () {
 		helperAdded: new Signal(),
 		helperRemoved: new Signal(),
 
+		materialAdded: new Signal(),
 		materialChanged: new Signal(),
+		materialRemoved: new Signal(),
 
 		scriptAdded: new Signal(),
 		scriptChanged: new Signal(),
@@ -286,6 +288,32 @@ Editor.prototype = {
 
 	},
 
+	// 
+
+	addMaterial: function ( material ) {
+
+		if ( material.isMaterial ) {
+
+			this.materials[ material.uuid ] = material;
+
+			this.signals.materialAdded.dispatch( material );
+
+		}
+
+	},
+
+	removeMaterial: function ( material ) {
+
+		if ( this.materials[ material.uuid ] !== undefined ) {
+
+			delete this.materials[ material.uuid ];
+
+			this.signals.materialRemoved.dispatch( material );
+
+		}
+
+	},
+
 	//
 
 	addHelper: function () {
@@ -386,6 +414,24 @@ Editor.prototype = {
 		}
 
 		this.signals.scriptRemoved.dispatch( script );
+
+	},
+
+	getSceneMaterialById: function ( id ) {
+
+		var material, 
+		materials = Object.values( this.materials );
+		
+		for ( var i = 0; i < materials.length; i ++ ) {
+
+			if ( materials[i].id === id ) {
+				material = materials[i];
+				break;
+			}
+
+		}
+
+		return material;
 
 	},
 

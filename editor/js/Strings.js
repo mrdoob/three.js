@@ -280,6 +280,7 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/materialbrowser': 'Material Browser',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',

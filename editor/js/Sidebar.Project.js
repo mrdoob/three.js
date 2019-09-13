@@ -17,9 +17,11 @@ Sidebar.Project = function ( editor ) {
 
 	};
 
-	var container = new UI.Panel();
-	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
+	var container = new UI.Div( );
+
+	var projectsettings = new UI.Panel(  );
+	
+	container.add( projectsettings );
 
 	// Title
 
@@ -33,7 +35,7 @@ Sidebar.Project = function ( editor ) {
 	titleRow.add( new UI.Text( strings.getKey( 'sidebar/project/title' ) ).setWidth( '90px' ) );
 	titleRow.add( title );
 
-	container.add( titleRow );
+	projectsettings.add( titleRow );
 
 	// Editable
 
@@ -47,7 +49,7 @@ Sidebar.Project = function ( editor ) {
 	editableRow.add( new UI.Text( strings.getKey( 'sidebar/project/editable' ) ).setWidth( '90px' ) );
 	editableRow.add( editable );
 
-	container.add( editableRow );
+	projectsettings.add( editableRow );
 
 	// VR
 
@@ -61,7 +63,7 @@ Sidebar.Project = function ( editor ) {
 	vrRow.add( new UI.Text( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
 	vrRow.add( vr );
 
-	container.add( vrRow );
+	projectsettings.add( vrRow );
 
 	// Renderer
 
@@ -89,7 +91,7 @@ Sidebar.Project = function ( editor ) {
 	rendererTypeRow.add( new UI.Text( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
 
-	container.add( rendererTypeRow );
+	projectsettings.add( rendererTypeRow );
 
 	if ( config.getKey( 'project/renderer' ) !== undefined ) {
 
@@ -119,7 +121,7 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
-	container.add( rendererPropertiesRow );
+	projectsettings.add( rendererPropertiesRow );
 
 	//
 
@@ -155,7 +157,6 @@ Sidebar.Project = function ( editor ) {
 		if ( shadows && renderer.shadowMap ) {
 
 			renderer.shadowMap.enabled = true;
-			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		}
 
@@ -164,6 +165,58 @@ Sidebar.Project = function ( editor ) {
 	}
 
 	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+
+
+	var materialbrowser = new UI.Panel( );
+
+	var headerRow = new UI.Row( );
+	var header = new UI.Text( strings.getKey( 'sidebar/project/materialbrowser' ) );
+	headerRow.add( header );
+
+	materialbrowser.add( headerRow );
+
+	var listbox = new UI.Listbox( );
+	function onListItemDrag ( event ) {
+
+		var materialId = parseInt( event.target.id );
+		event.dataTransfer.setData( 'payload', JSON.stringify( { type: 'material', id: materialId } ) );
+
+	}
+	listbox.dom.addEventListener( 'dragstart', onListItemDrag, false );
+
+	materialbrowser.add( listbox );
+
+	var buttonsRow = new UI.Row( );
+	buttonsRow.setPadding( '10px 0px' );
+
+	var addNewMaterialButton = new UI.Button( );
+	addNewMaterialButton.setMargin( '0px 5px' );
+	addNewMaterialButton.setLabel( 'Add' ).onClick( function ( ) {
+		
+		var material = new THREE.MeshStandardMaterial( );
+		
+		editor.addMaterial( material );
+
+	} );
+
+	buttonsRow.add( addNewMaterialButton );
+
+	materialbrowser.add( buttonsRow );
+	
+	container.add( materialbrowser );
+
+	signals.materialAdded.add( update );
+	signals.materialChanged.add( update );
+	signals.materialRemoved.add( update );
+
+	function update ( ) {
+
+		var materials = Object.values( editor.materials );
+		listbox.setItems( materials );
+
+	}
+
+	update();
 
 	return container;
 

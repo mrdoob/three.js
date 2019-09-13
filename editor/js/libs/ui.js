@@ -1219,7 +1219,7 @@ UI.Listbox.prototype.selectIndex = function ( index ) {
 
 }
 
-UI.Listbox.prototype.getValue = function ( index ) {
+UI.Listbox.prototype.getValue = function (  ) {
 
 	return this.selectedValue;
 
@@ -1258,6 +1258,7 @@ UI.Listbox.ListboxItem = function ( parent ) {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'ListboxItem';
+	dom.draggable = true;
 
 	this.parent = parent;
 	this.dom = dom;
