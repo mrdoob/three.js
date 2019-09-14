@@ -20,7 +20,6 @@ var files = [
 
 	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/DeviceOrientationControls.js', dependencies: [], ignoreList: [] },
-	{ path: 'controls/EditorControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/FirstPersonControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/FlyControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', dependencies: [], ignoreList: [] },
