@@ -284,4 +284,9 @@ export class Vector3 implements Vector {
 		offset?: number
 	): this;
 
+	/**
+	 * Convert this vector to string.
+	 */
+	toString(): string;
+
 }
