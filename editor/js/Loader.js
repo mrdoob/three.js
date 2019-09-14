@@ -101,45 +101,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			case 'babylon':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-					var json = JSON.parse( contents );
-
-					var loader = new THREE.BabylonLoader();
-					var scene = loader.parse( json );
-
-					editor.execute( new SetSceneCommand( editor, scene ) );
-
-				}, false );
-				reader.readAsText( file );
-
-				break;
-
-			case 'babylonmeshdata':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-					var json = JSON.parse( contents );
-
-					var loader = new THREE.BabylonLoader();
-
-					var geometry = loader.parseGeometry( json );
-					var material = new THREE.MeshStandardMaterial();
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, mesh ) );
-
-				}, false );
-				reader.readAsText( file );
-
-				break;
-
 			case 'dae':
 
 				reader.addEventListener( 'load', function ( event ) {

@@ -16,7 +16,6 @@ const staticAssets = [
 
 	'../examples/js/loaders/AMFLoader.js',
 	'../examples/js/loaders/AWDLoader.js',
-	'../examples/js/loaders/BabylonLoader.js',
 	'../examples/js/loaders/ColladaLoader.js',
 	'../examples/js/loaders/DRACOLoader.js',
 	'../examples/js/loaders/FBXLoader.js',

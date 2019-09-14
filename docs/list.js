@@ -372,7 +372,6 @@ var list = {
 			},
 
 			"Loaders": {
-				"BabylonLoader": "examples/en/loaders/BabylonLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
@@ -816,7 +815,6 @@ var list = {
 			},
 
 			"加载器": {
-				"BabylonLoader": "examples/zh/loaders/BabylonLoader",
 				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
