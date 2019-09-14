@@ -85,13 +85,23 @@ export class NodePostProcessing {
 
 	}
 
+	setPixelRatio( value ) {
+
+		this.renderer.setPixelRatio( value );
+
+		var size = this.renderer.getSize( new Vector2() );
+
+		this.setSize( size.width, size.height );
+
+	}
+
 	setSize( width, height ) {
 
 		var pixelRatio = this.renderer.getPixelRatio();
 
 		this.renderTarget.setSize( width * pixelRatio, height * pixelRatio );
 
-		this.renderer.setSize( width * pixelRatio, height * pixelRatio );
+		this.renderer.setSize( width, height );
 
 	}
 
