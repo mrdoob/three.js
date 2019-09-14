@@ -5,7 +5,6 @@
 var Loader = function ( editor ) {
 
 	var scope = this;
-	var signals = editor.signals;
 
 	this.texturePath = '';
 
