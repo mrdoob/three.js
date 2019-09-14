@@ -26,7 +26,6 @@ const staticAssets = [
 	'../examples/js/loaders/MD2Loader.js',
 	'../examples/js/loaders/OBJLoader.js',
 	'../examples/js/loaders/MTLLoader.js',
-	'../examples/js/loaders/PlayCanvasLoader.js',
 	'../examples/js/loaders/PLYLoader.js',
 	'../examples/js/loaders/STLLoader.js',
 	'../examples/js/loaders/SVGLoader.js',

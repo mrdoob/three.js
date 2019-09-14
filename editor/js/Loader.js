@@ -348,23 +348,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			case 'playcanvas':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-					var json = JSON.parse( contents );
-
-					var loader = new THREE.PlayCanvasLoader();
-					var object = loader.parse( json );
-
-					editor.execute( new AddObjectCommand( editor, object ) );
-
-				}, false );
-				reader.readAsText( file );
-
-				break;
-
 			case 'ply':
 
 				reader.addEventListener( 'load', function ( event ) {

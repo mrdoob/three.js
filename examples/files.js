@@ -107,7 +107,6 @@ var files = {
 		"webgl_loader_obj2_options",
 		"webgl_loader_pcd",
 		"webgl_loader_pdb",
-		"webgl_loader_playcanvas",
 		"webgl_loader_ply",
 		"webgl_loader_prwm",
 		"webgl_loader_sea3d",
