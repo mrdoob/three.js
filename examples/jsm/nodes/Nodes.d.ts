@@ -10,6 +10,7 @@ export * from './core/AttributeNode';
 export * from './core/FunctionNode';
 export * from './core/ExpressionNode';
 export * from './core/FunctionCallNode';
+export * from './core/RawNode';
 export * from './core/NodeLib';
 export * from './core/NodeUtils';
 export * from './core/NodeFrame';
@@ -81,14 +82,6 @@ export * from './utils/ColorSpaceNode';
 export * from './effects/BlurNode';
 export * from './effects/ColorAdjustmentNode';
 export * from './effects/LuminanceNode';
-
-// material nodes
-
-export * from './materials/nodes/RawNode';
-export * from './materials/nodes/SpriteNode';
-export * from './materials/nodes/PhongNode';
-export * from './materials/nodes/StandardNode';
-export * from './materials/nodes/MeshStandardNode';
 
 // materials
 

@@ -2,7 +2,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { Node } from '../../core/Node.js';
+import { Node } from './Node.js';
 
 export class RawNode extends Node {
 

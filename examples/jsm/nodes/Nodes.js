@@ -12,6 +12,7 @@ export { AttributeNode } from './core/AttributeNode.js';
 export { FunctionNode } from './core/FunctionNode.js';
 export { ExpressionNode } from './core/ExpressionNode.js';
 export { FunctionCallNode } from './core/FunctionCallNode.js';
+export { RawNode } from './core/RawNode.js';
 export { NodeLib } from './core/NodeLib.js';
 export { NodeUtils } from './core/NodeUtils.js';
 export { NodeFrame } from './core/NodeFrame.js';
@@ -124,14 +125,6 @@ export { SubSlotNode } from './utils/SubSlotNode.js';
 export { BlurNode } from './effects/BlurNode.js';
 export { ColorAdjustmentNode } from './effects/ColorAdjustmentNode.js';
 export { LuminanceNode } from './effects/LuminanceNode.js';
-
-// material nodes
-
-export { RawNode } from './materials/nodes/RawNode.js';
-export { SpriteNode } from './materials/nodes/SpriteNode.js';
-export { PhongNode } from './materials/nodes/PhongNode.js';
-export { StandardNode } from './materials/nodes/StandardNode.js';
-export { MeshStandardNode } from './materials/nodes/MeshStandardNode.js';
 
 // materials
 

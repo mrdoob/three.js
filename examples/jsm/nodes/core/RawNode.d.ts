@@ -1,5 +1,5 @@
-import { NodeBuilder } from '../../core/NodeBuilder';
-import { Node } from '../../core/Node';
+import { NodeBuilder } from './NodeBuilder';
+import { Node } from './Node';
 
 export class RawNode extends Node {
   constructor(value: Node);

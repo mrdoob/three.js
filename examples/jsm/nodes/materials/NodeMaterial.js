@@ -10,19 +10,19 @@ import {
 	ShaderMaterial
 } from '../../../../build/three.module.js';
 
-import { NodeBuilder } from '../core/NodeBuilder.js';
 import { ColorNode } from '../inputs/ColorNode.js';
 import { PositionNode } from '../accessors/PositionNode.js';
-import { RawNode } from './nodes/RawNode.js';
+import { RawNode } from '../core/RawNode.js';
+import { NodeBuilder } from '../core/NodeBuilder.js';
 
 export class NodeMaterial extends ShaderMaterial {
 
-	constructor( vertex, fragment ) {
+	constructor( fragment, vertex ) {
 
 		super();
 
-		this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 		this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
+		this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 
 		this.updaters = [];
 
