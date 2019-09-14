@@ -31,6 +31,8 @@ textarea {
 
 textarea, input { outline: none; } /* osx */
 
+/* Panel */
+
 .Panel {
 	-moz-user-select: none;
 	-webkit-user-select: none;
@@ -40,6 +42,8 @@ textarea, input { outline: none; } /* osx */
 	-o-user-select: none;
 	user-select: none;
 }
+
+/* TabbedPanel */
 
 .TabbedPanel {
 	-moz-user-select: none;
@@ -73,6 +77,7 @@ textarea, input { outline: none; } /* osx */
 }
 
 /* Listbox */
+
 .Listbox {
 	color: #444;
 	background-color: #fff;
@@ -84,15 +89,15 @@ textarea, input { outline: none; } /* osx */
 	overflow: auto;
 }
 
-.Listbox .ListboxItem {
-	padding: 6px;
-	color: #666;
-	white-space: nowrap;
-}
+	.Listbox .ListboxItem {
+		padding: 6px;
+		color: #666;
+		white-space: nowrap;
+	}
 
-.Listbox .ListboxItem.active {
-	background-color: rgba(0, 0, 0, 0.04);
-}
+	.Listbox .ListboxItem.active {
+		background-color: rgba(0, 0, 0, 0.04);
+	}
 
 /* CodeMirror */
 
