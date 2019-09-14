@@ -166,14 +166,20 @@ Sidebar.Project = function ( editor ) {
 
 	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
 
+	// Material Browser Component
 
 	var materialbrowser = new UI.Panel( );
+	container.add( materialbrowser );
+
+	// Header
 
 	var headerRow = new UI.Row( );
 	var header = new UI.Text( strings.getKey( 'sidebar/project/materialbrowser' ) );
 	headerRow.add( header );
 
 	materialbrowser.add( headerRow );
+
+	// Listbox
 
 	var listbox = new UI.Listbox( );
 	function onListItemDrag ( event ) {
@@ -186,9 +192,13 @@ Sidebar.Project = function ( editor ) {
 
 	materialbrowser.add( listbox );
 
+	// Actions button bar
 	var buttonsRow = new UI.Row( );
 	buttonsRow.setPadding( '10px 0px' );
 
+	materialbrowser.add( buttonsRow );
+
+	// Add material to the list
 	var addNewMaterialButton = new UI.Button( );
 	addNewMaterialButton.setMargin( '0px 5px' );
 	addNewMaterialButton.setLabel( 'Add' ).onClick( function ( ) {
@@ -201,9 +211,22 @@ Sidebar.Project = function ( editor ) {
 
 	buttonsRow.add( addNewMaterialButton );
 
-	materialbrowser.add( buttonsRow );
-	
-	container.add( materialbrowser );
+	// Apply selected Material to selected object in scene
+	var applyMaterialButton = new UI.Button( );
+	applyMaterialButton.setMargin( '0px 5px' );
+	applyMaterialButton.setLabel( 'Apply' ).onClick( function ( ) {
+
+		var id = parseInt( listbox.getValue( ) );
+		var material = editor.getSceneMaterialById( id );
+		
+		if ( typeof editor.selected !== 'undefined' && typeof material !== 'undefined' ) {
+
+			editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+
+		}
+
+	} );
+	buttonsRow.add( applyMaterialButton );
 
 	signals.materialAdded.add( update );
 	signals.materialChanged.add( update );
