@@ -364,7 +364,6 @@ var files = {
 		"misc_controls_orbit",
 		"misc_controls_pointerlock",
 		"misc_controls_trackball",
-		"misc_controls_trackball_orthographic",
 		"misc_controls_transform",
 		"misc_exporter_collada",
 		"misc_exporter_draco",
