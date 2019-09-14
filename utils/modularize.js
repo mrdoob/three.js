@@ -23,7 +23,6 @@ var files = [
 	{ path: 'controls/FirstPersonControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/FlyControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', dependencies: [], ignoreList: [] },
-	{ path: 'controls/OrthographicTrackballControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/PointerLockControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
