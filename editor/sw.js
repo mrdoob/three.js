@@ -15,7 +15,6 @@ const staticAssets = [
 	'../examples/js/libs/inflate.min.js',
 
 	'../examples/js/loaders/AMFLoader.js',
-	'../examples/js/loaders/AWDLoader.js',
 	'../examples/js/loaders/ColladaLoader.js',
 	'../examples/js/loaders/DRACOLoader.js',
 	'../examples/js/loaders/FBXLoader.js',

@@ -86,20 +86,6 @@ var Loader = function ( editor ) {
 
 				break;
 
-			case 'awd':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var loader = new THREE.AWDLoader();
-					var scene = loader.parse( event.target.result );
-
-					editor.execute( new SetSceneCommand( editor, scene ) );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
 			case 'dae':
 
 				reader.addEventListener( 'load', function ( event ) {

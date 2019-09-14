@@ -78,7 +78,6 @@ var files = {
 		"webgl_loader_amf",
 		"webgl_loader_assimp",
 		"webgl_loader_assimp2json",
-		"webgl_loader_awd",
 		"webgl_loader_bvh",
 		"webgl_loader_collada",
 		"webgl_loader_collada_kinematics",
