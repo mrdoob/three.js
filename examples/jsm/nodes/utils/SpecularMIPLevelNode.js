@@ -49,7 +49,7 @@ export class SpecularMIPLevelNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.SpecularMIPLevelNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "SpecularMIPLevelNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( '0.0', this.type, output );
 

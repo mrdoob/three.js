@@ -105,7 +105,7 @@ export class BumpMapNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.BumpMapNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "BumpMapNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 

@@ -163,7 +163,7 @@ export class TextureCubeUVNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.TextureCubeUVNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "TextureCubeUVNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 

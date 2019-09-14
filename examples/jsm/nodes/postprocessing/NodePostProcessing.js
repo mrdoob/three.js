@@ -87,9 +87,11 @@ export class NodePostProcessing {
 
 	setSize( width, height ) {
 
-		this.renderTarget.setSize( width, height );
+		var pixelRatio = this.renderer.getPixelRatio();
 
-		this.renderer.setSize( width, height );
+		this.renderTarget.setSize( width * pixelRatio, height * pixelRatio );
+
+		this.renderer.setSize( width * pixelRatio, height * pixelRatio );
 
 	}
 

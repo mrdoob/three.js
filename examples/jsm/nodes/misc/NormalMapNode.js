@@ -89,7 +89,7 @@ export class NormalMapNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.NormalMapNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "NormalMapNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 

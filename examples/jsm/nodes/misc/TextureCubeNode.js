@@ -112,7 +112,7 @@ export class TextureCubeNode extends TextureNode {
 
 		} else {
 
-			console.warn( "THREE.TextureCubeNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "TextureCubeNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 

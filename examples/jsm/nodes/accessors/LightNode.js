@@ -26,7 +26,7 @@ export class LightNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.LightNode is only compatible in \"light\" channel." );
+			console.warn( "LightNode is only compatible in \"light\" channel." );
 
 			return builder.format( 'vec3( 0.0 )', this.type, output );
 

@@ -21,8 +21,8 @@ export class NodeMaterial extends ShaderMaterial {
 
 		super();
 
-		this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
 		this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
+		this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
 
 		this.updaters = [];
 

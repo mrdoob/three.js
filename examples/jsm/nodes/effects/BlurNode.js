@@ -111,7 +111,7 @@ export class BlurNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.BlurNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "BlurNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 

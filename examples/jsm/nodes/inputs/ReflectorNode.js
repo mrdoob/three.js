@@ -53,7 +53,7 @@ export class ReflectorNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "ReflectorNode is not compatible with " + builder.shader + " shader." );
 
 			return builder.format( 'vec4( 0.0 )', this.type, output );
 

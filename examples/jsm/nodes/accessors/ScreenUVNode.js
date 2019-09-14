@@ -27,7 +27,7 @@ export class ScreenUVNode extends TempNode {
 
 		} else {
 
-			console.warn( "THREE.ScreenUVNode is not compatible with " + builder.shader + " shader." );
+			console.warn( "ScreenUVNode is not compatible with " + builder.shader + " shader." );
 
 			result = 'vec2( 0.0 )';
 
