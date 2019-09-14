@@ -696,7 +696,7 @@ Object.assign( Vector3.prototype, {
 
 	toString: function () {
 
-		return `{x: ${this.x}, y: ${this.y}, z: ${this.z}}`;
+		return '{x: ' + this.x + ', y: ' + this.y + ', z: ' + this.z + '}';
 
 	}
 
