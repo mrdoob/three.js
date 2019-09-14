@@ -37,11 +37,6 @@ var FirstPersonControls = function ( object, domElement ) {
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
 
-	this.moveForward = false;
-	this.moveBackward = false;
-	this.moveLeft = false;
-	this.moveRight = false;
-
 	this.mouseDragOn = false;
 
 	// internals
@@ -50,6 +45,11 @@ var FirstPersonControls = function ( object, domElement ) {
 
 	this.mouseX = 0;
 	this.mouseY = 0;
+
+	this.moveForward = false;
+	this.moveBackward = false;
+	this.moveLeft = false;
+	this.moveRight = false;
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
