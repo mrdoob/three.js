@@ -56,6 +56,7 @@ textarea, input { outline: none; } /* osx */
 	position: relative;
 	display: block;
 	width: 100%;
+	border-top: 1px solid #ccc;
 }
 
 	.TabbedPanel .Tabs {
@@ -67,6 +68,7 @@ textarea, input { outline: none; } /* osx */
 		.TabbedPanel .Tabs .Tab {
 			padding: 10px;
 			vertical-align: middle;
+			text-transform: uppercase;
 		}
 
 		.TabbedPanel .Tabs .Panels {

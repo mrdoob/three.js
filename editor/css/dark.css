@@ -56,9 +56,12 @@ select {
 
 /* TabbedPanel */
 
+.TabbedPanel {
+	border-top: 1px solid #222;
+}
+
 .TabbedPanel .Tabs {
 	background-color: #1b1b1b;
-	border-top: 1px solid #222;
 }
 
 	.TabbedPanel .Tab {
@@ -186,7 +189,7 @@ select {
 #sidebar {
 	position: absolute;
 	right: 0;
-	top: 32px;
+	top: 33px;
 	bottom: 0;
 	width: 300px;
 	background-color: #111;
