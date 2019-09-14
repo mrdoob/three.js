@@ -335,39 +335,4 @@ function addLineGeometry(x, y, geometry) {
 <script src="../../resources/threejs/r105/js/controls/TrackballControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-primitives.js"></script>
-<style>
-div[data-primitive] {
-    padding-bottom: 2em;
-    border-bottom: 1px solid #888;
-    margin-bottom: 2em;
-}
-div[data-primitive] .pair {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1em;
-}
-div[data-primitive] .shape {
-  flex: 0 0 auto;
-  width: 200px;
-  height: 200px;
-}
-div[data-primitive] .desc {
-  word-wrap: break-word;
-  padding: 1em;
-  min-width: 0;
-}
-div[data-primitive] .desc code {
-  white-space: normal;
-}
-@media (max-width: 550px) {
-  div[data-primitive] .shape {
-      width: 120px;
-      height: 120px;
-  }
-}
-div[data-primitive] .desc {
-  flex: 1 1 auto;
-}
-</style>
-
-
+<link rel="stylesheet" href="resources/threejs-primitives.css">

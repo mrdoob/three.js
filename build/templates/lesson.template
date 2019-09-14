@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <link href="/threejs/lessons/resources/threejsfundamentals-icon.png" rel="shortcut icon" type="image/png">
 <link rel="apple-touch-icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">
 <link rel="icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">
-<link rel="stylesheet" href="/threejs/lessons/resources/lesson.css" type="text/css" />
+<link rel="stylesheet" href="/threejs/lessons/resources/lesson.css" />
 </head>
 <body>
 {{{include "build/templates/header.template"}}}

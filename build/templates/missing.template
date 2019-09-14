@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <title>{{title}}</title>
 <link href="/threejs/lessons/resources/threejsfundamentals-icon.png" rel="shortcut icon" type="image/png">
-<link rel="stylesheet" href="/threejs/lessons/resources/lesson.css" type="text/css" />
+<link rel="stylesheet" href="/threejs/lessons/resources/lesson.css" />
 </head>
 <body>
 {{{include "build/templates/header.template"}}}

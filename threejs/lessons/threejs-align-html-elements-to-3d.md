@@ -784,12 +784,6 @@ elements with your 3D. A few things I might change.
 
 Next up let's make it so you can [pick and highlight a country](threejs-indexed-textures.html).
 
-<style>
-div[data-diagram] canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-</style>
+<link rel="stylesheet" href="resources/threejs-align-html-elements-to-3d.css">
 <script src="/3rdparty/dat.gui.min.js"></script>
 <script src="resources/threejs-align-html-elements-to-3d.js"></script>

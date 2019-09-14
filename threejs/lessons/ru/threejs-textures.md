@@ -620,17 +620,4 @@ roughness
 <script src="../../resources/threejs/r105/js/controls/TrackballControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-textures.js"></script>
-<style>
-.filter-caption {
-  position: absolute;
-  color: white;
-  line-height: 1.1;
-  font-family: monospace;
-  font-size: small;
-  text-shadow:
-    -1px -1px 0 #000,  
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
-}
-</style>
+<link rel="stylesheet" href="resources/threejs-textures.css">
