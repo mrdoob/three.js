@@ -8,6 +8,10 @@ var Editor = function () {
 	this.DEFAULT_CAMERA.name = 'Camera';
 	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
 	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+	this.DEFAULT_MATERIAL = new THREE.MeshBasicMaterial( {
+		color: 0xff00ff
+	} );
+	this.DEFAULT_MATERIAL.uuid = 'AFE5AF61-A88E-493B-90D1-6AB205395C0B';
 
 	var Signal = signals.Signal;
 
@@ -434,6 +438,52 @@ Editor.prototype = {
 		return material;
 
 	},
+
+	removeSceneMaterialById: function ( id ) {
+
+		var scope = this;
+
+		var materials = Object.values( this.materials );
+		var material;
+		for ( var i = 0; i < materials.length; i ++ ) {
+
+			if ( materials[i].id === id ) {
+
+				material = materials[i];
+				break;
+
+			}
+
+		}
+
+		if ( material ) {
+
+			delete this.materials[material.uuid];
+
+			this.scene.traverse( function ( child ) {
+				if ( child instanceof THREE.Mesh ) {
+
+					if ( child.material.id === material.id ) {
+
+						editor.execute( new SetMaterialCommand( scope, child, scope.DEFAULT_MATERIAL, 0 ) );
+
+					}
+
+				}
+			} )
+
+			this.signals.materialRemoved.dispatch( material );
+
+		}
+
+	},
+
+	removeSceneMaterial: function ( material ) {
+
+		this.removeSceneMaterialById( material.id );
+
+	},
+
 
 	getObjectMaterial: function ( object, slot ) {
 

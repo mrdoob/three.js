@@ -228,6 +228,18 @@ Sidebar.Project = function ( editor ) {
 	} );
 	buttonsRow.add( applyMaterialButton );
 
+	var deleteMaterialButton = new UI.Button(  );
+	deleteMaterialButton.setMargin( '0px 5px' );
+	deleteMaterialButton.setLabel( 'Delete' ).onClick( function ( ) {
+
+		var id = parseInt( listbox.getValue(  ) );
+
+		editor.removeSceneMaterialById( id );
+
+	} )
+
+	buttonsRow.add( deleteMaterialButton );
+
 	signals.materialAdded.add( update );
 	signals.materialChanged.add( update );
 	signals.materialRemoved.add( update );
@@ -235,6 +247,16 @@ Sidebar.Project = function ( editor ) {
 	function update ( ) {
 
 		var materials = Object.values( editor.materials );
+		var i = materials.length;
+		while( i -- ) {
+			
+			if ( materials[i].uuid === editor.DEFAULT_MATERIAL.uuid ) {
+
+				materials.splice( i, 1 );
+
+			}
+
+		}
 		listbox.setItems( materials );
 
 	}
