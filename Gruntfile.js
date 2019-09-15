@@ -185,8 +185,9 @@ module.exports = function(grunt) {
           files: [
             { expand: true, cwd: `${threePath}/build/`, src: 'three.js', dest: `${basePath}/`, },
             { expand: true, cwd: `${threePath}/build/`, src: 'three.min.js', dest: `${basePath}/`, },
+            { expand: true, cwd: `${threePath}/build/`, src: 'three.module.js', dest: `${basePath}/`, },
             { expand: true,  cwd: `${threePath}/examples/js/`, src: '**', dest: `${basePath}/js/`, },
-            { expand: true,  cwd: `${threePath}/examples/jsm/`, src: '**', dest: `${basePath}/js/`, },
+            { expand: true,  cwd: `${threePath}/examples/jsm/`, src: '**', dest: `${basePath}/jsm/`, },
           ],
         },
       },
