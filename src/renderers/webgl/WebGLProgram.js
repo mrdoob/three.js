@@ -324,7 +324,7 @@ function generateEnvMapTypeDefine( parameters, material ) {
 
 function generateEnvMapModeDefine( parameters, material ) {
 
-	var envMapModeDefine = 'ENVMAP_TYPE_CUBE';
+	var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 
 	if ( parameters.envMap ) {
 
@@ -345,7 +345,7 @@ function generateEnvMapModeDefine( parameters, material ) {
 
 function generateEnvMapBlendingDefine( parameters, material ) {
 
-	var envMapBlendingDefine = 'ENVMAP_TYPE_CUBE';
+	var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
 
 	if ( parameters.envMap ) {
 
