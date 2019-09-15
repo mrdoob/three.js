@@ -107,14 +107,14 @@ render to the next render target.
 To use these classes we need to include a bunch of scripts.
 
 ```html
-<script src="resources/threejs/r105/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r105/js/shaders/ConvolutionShader.js"></script>
-<script src="resources/threejs/r105/js/shaders/FilmShader.js"></script>
-<script src="resources/threejs/r105/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r105/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r105/js/postprocessing/ShaderPass.js"></script>
-<script src="resources/threejs/r105/js/postprocessing/BloomPass.js"></script>
-<script src="resources/threejs/r105/js/postprocessing/FilmPass.js"></script>
+<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
+<script src="resources/threejs/r108/js/shaders/ConvolutionShader.js"></script>
+<script src="resources/threejs/r108/js/shaders/FilmShader.js"></script>
+<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
+<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
+<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
+<script src="resources/threejs/r108/js/postprocessing/BloomPass.js"></script>
+<script src="resources/threejs/r108/js/postprocessing/FilmPass.js"></script>
 ```
 
 For pretty much any post processing `EffectComposer.js`, `RenderPass.js`,

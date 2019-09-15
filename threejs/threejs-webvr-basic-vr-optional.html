@@ -28,13 +28,13 @@
       <a href="?" id="nonvr">Use Non-VR Mode</a>
     </div>
   </body>
-<script src="resources/threejs/r105/three.min.js"></script>
-<script src="resources/threejs/r105/js/vr/WebVR.js"></script>
-<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
+<script src="resources/threejs/r108/js/vr/WebVR.js"></script>
+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
 <script>
 'use strict';
 
-/* global THREE, WEBVR */
+/* global THREE */
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -50,7 +50,7 @@ function main() {
   const allowvr = params.get('allowvr') === 'true';
   if (allowvr) {
     renderer.vr.enabled = true;
-    document.body.appendChild(WEBVR.createButton(renderer));
+    document.body.appendChild(THREE.WEBVR.createButton(renderer));
     document.querySelector('#vr').style.display = 'none';
   } else {
     // no VR, add some controls

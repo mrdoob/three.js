@@ -448,8 +448,8 @@ A few minor changes to make it easier to view.
 * include the `OrbitControls`
 
 ```html
-<script src="resources/threejs/r105/three.min.js"></script>
-+<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
++<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
 ```
 
 ```js

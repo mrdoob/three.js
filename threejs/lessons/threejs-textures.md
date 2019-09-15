@@ -377,19 +377,19 @@ you set the [`texture.minFilter`](Texture.minFilter) property to one of 6 values
 
    same as above, choose 4 pixels from the texture and blend them
 
-* `THREE.NearestMipMapNearestFilter`
+* `THREE.NearestMipmapNearestFilter`
 
    choose the appropriate mip then choose one pixel
 
-* `THREE.NearestMipMapLinearFilter`
+* `THREE.NearestMipmapLinearFilter`
 
    choose 2 mips, choose one pixel from each, blend the 2 pixels
 
-* `THREE.LinearMipMapNearestFilter`
+* `THREE.LinearMipmapNearestFilter`
 
    chose the appropriate mip then choose 4 pixels and blend them
 
-*  `THREE.LinearMipMapLinearFilter`
+*  `THREE.LinearMipmapLinearFilter`
 
    choose 2 mips, choose 4 pixels from each and blend all 8 into 1 pixel
 
@@ -432,7 +432,7 @@ don't use the mips. Because of that they flicker in the distance because the GPU
 picking pixels from the original texture. On the left just one pixel is chosen and
 in the middle 4 are chosen and blended but it's not enough come up with a good
 representative color. The other 4 strips do better with the bottom right,
-`LinearMipMapLinearFilter` being best.
+`LinearMipmapLinearFilter` being best.
 
 If you click the picture above it will toggle between the texture we've been using above
 and a texture where every mip level is a different color.
@@ -625,8 +625,8 @@ roughness
 -->
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r105/three.min.js"></script>
-<script src="../resources/threejs/r105/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r108/three.min.js"></script>
+<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-textures.js"></script>
 <link rel="stylesheet" href="resources/threejs-textures.css">

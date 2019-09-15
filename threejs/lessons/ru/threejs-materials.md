@@ -184,13 +184,13 @@ Rendering часто сокращается как PBR.
 
 <div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
 
-`MeshPhysicalMaterial` же самое, что и `MeshStandardMaterial` но он добавляет `clearCoat` 
+`MeshPhysicalMaterial` же самое, что и `MeshStandardMaterial` но он добавляет `clearcoat` 
 параметр, который идет от 0 до 1 для определения степени применения слоя 
 глянцевого покрытия, и  `clearCoatRoughness` параметр, который указывает, 
 насколько шероховатым является слой глянца.
 
 Вот та же сетка `roughness` по `metalness` как и до этого, но с 
-`clearCoat` и `clearCoatRoughness`.
+`clearcoat` и `clearCoatRoughness`.
 
 <div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
 
@@ -318,8 +318,8 @@ flat shaded
 </div>
 
 <canvas id="c"></canvas>
-<script src="../../resources/threejs/r105/three.min.js"></script>
-<script src="../../resources/threejs/r105/js/controls/TrackballControls.js"></script>
+<script src="../../resources/threejs/r108/three.min.js"></script>
+<script src="../../resources/threejs/r108/js/controls/TrackballControls.js"></script>
 <script src="../resources/threejs-lesson-utils.js"></script>
 <script src="../resources/threejs-materials.js"></script>
 

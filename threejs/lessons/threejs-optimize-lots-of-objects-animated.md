@@ -378,10 +378,10 @@ because the original webgl globe uses
 We need to include the library
 
 ```html
-<script src="resources/threejs/r105/three.min.js"></script>
-<script src="resources/threejs/r105/js/utils/BufferGeometryUtils.js"></script>
-<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
-+<script src="resources/threejs/r105/js/libs/tween.min.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
+<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
++<script src="resources/threejs/r108/js/libs/tween.min.js"></script>
 ```
 
 And then create a `Tween` to animate the influences.

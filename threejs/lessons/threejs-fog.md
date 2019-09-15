@@ -272,8 +272,8 @@ By turning fog off on the materials for the house we can fix that issue.
 </div>
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r105/three.min.js"></script>
-<script src="../resources/threejs/r105/js/controls/TrackballControls.js"></script>
-<script src="../resources/threejs/r105/js/loaders/GLTFLoader.js"></script>
+<script src="../resources/threejs/r108/three.min.js"></script>
+<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-fog.js"></script>

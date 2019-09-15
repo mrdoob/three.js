@@ -367,9 +367,9 @@ scene.
 We need to include them.
 
 ```html
-<script src="resources/threejs/r105/three.min.js"></script>
-<script src="resources/threejs/r105/js/vr/WebVR.js"></script>
-+<script src="resources/threejs/r105/js/utils/SceneUtils.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
+<script src="resources/threejs/r108/js/vr/WebVR.js"></script>
++<script src="resources/threejs/r108/js/utils/SceneUtils.js"></script>
 ```
 
 And with that we should be able to move the objects around with a 6DOF
