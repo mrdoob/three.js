@@ -27,19 +27,30 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
+			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
-			var camera, controls, scene, renderer, stats;
+			var params = {
+				orthographicCamera: false
+			};
+
+			var frustumSize = 400;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 500;
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
+				perspectiveCamera.position.z = 500;
+
+				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+				orthographicCamera.position.z = 500;
 
 				// world
 
@@ -62,7 +73,6 @@
 
 				}
 
-
 				// lights
 
 				var light = new THREE.DirectionalLight( 0xffffff );
@@ -76,7 +86,6 @@
 				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
 
-
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -84,14 +93,39 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				//
+
+				var gui = new GUI();
+				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( function ( value ) {
+
+					controls.dispose();
+
+					createControls( value ? orthographicCamera : perspectiveCamera );
+
+					render();
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				createControls( perspectiveCamera );
+
+				render();
+
+			}
+
+			function createControls( camera ) {
+
 				controls = new TrackballControls( camera, renderer.domElement );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
 
 				controls.staticMoving = true;
 				controls.dynamicDampingFactor = 0.3;
@@ -100,22 +134,20 @@
 
 				controls.addEventListener( 'change', render );
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-				//
-
-				render();
-
 			}
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera.aspect = aspect;
+				perspectiveCamera.updateProjectionMatrix();
+
+				orthographicCamera.left = - frustumSize * aspect / 2;
+				orthographicCamera.right = frustumSize * aspect / 2;
+				orthographicCamera.top = frustumSize / 2;
+				orthographicCamera.bottom = - frustumSize / 2;
+				orthographicCamera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -136,6 +168,8 @@
 			}
 
 			function render() {
+
+				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 
 				renderer.render( scene, camera );
 

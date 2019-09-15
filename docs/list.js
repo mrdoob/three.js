@@ -356,7 +356,12 @@ var list = {
 			"Controls": {
 				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
 				"DragControls": "examples/en/controls/DragControls",
-				"OrbitControls": "examples/en/controls/OrbitControls"
+				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
+				"FlyControls": "examples/en/controls/FlyControls",
+				"OrbitControls": "examples/en/controls/OrbitControls",
+				"PointerLockControls": "examples/en/controls/PointerLockControls",
+				"TrackballControls": "examples/en/controls/TrackballControls",
+				"TransformControls": "examples/en/controls/TransformControls"
 			},
 
 			"Geometries": {
@@ -366,7 +371,6 @@ var list = {
 			},
 
 			"Loaders": {
-				"BabylonLoader": "examples/en/loaders/BabylonLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
@@ -794,7 +798,12 @@ var list = {
 			"控制": {
 				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
 				"DragControls": "examples/zh/controls/DragControls",
-				"OrbitControls": "examples/zh/controls/OrbitControls"
+				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
+				"FlyControls": "examples/zh/controls/FlyControls",
+				"OrbitControls": "examples/zh/controls/OrbitControls",
+				"PointerLockControls": "examples/zh/controls/PointerLockControls",
+				"TrackballControls": "examples/zh/controls/TrackballControls",
+				"TransformControls": "examples/zh/controls/TransformControls"
 			},
 
 			"几何体": {
@@ -804,7 +813,6 @@ var list = {
 			},
 
 			"加载器": {
-				"BabylonLoader": "examples/zh/loaders/BabylonLoader",
 				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",

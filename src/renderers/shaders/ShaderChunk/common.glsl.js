@@ -107,4 +107,10 @@ float linearToRelativeLuminance( const in vec3 color ) {
 	return dot( weights, color.rgb );
 
 }
+
+bool isPerspectiveMatrix( mat4 projectionMatrix ) {
+
+  return projectionMatrix[ 2 ][ 3 ] == - 1.0;
+
+}
 `;
