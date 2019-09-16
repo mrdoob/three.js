@@ -23,7 +23,6 @@
 
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
@@ -91,10 +90,10 @@
 
 				pmremCube.minFilter = minFilter;
 				pmremCube.magFilter = magFilter;
-				pmremCube.generateMipmaps = pmremCube.generateMipmaps;
+				pmremCube.generateMipmaps = generateMipmaps;
 				pmremCube.needsUpdate = true;
 
-				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture
+				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
 				library[ premTexture.uuid ] = premTexture;
 
@@ -561,8 +560,6 @@
 
 						// NODES
 
-						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
-
 						var normalScale = new Nodes.FloatNode( .3 );
 
 						var radiance = new Nodes.FloatNode( 1 );
@@ -580,10 +577,10 @@
 						var envNode = new Nodes.TextureCubeNode( new Nodes.TextureNode( premTexture ) );
 
 						var subSlotNode = new Nodes.SubSlotNode();
-						subSlotNode.slots['radiance'] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
-						subSlotNode.slots['irradiance'] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots[ 'radiance' ] = new Nodes.OperatorNode( radiance, envNode, Nodes.OperatorNode.MUL );
+						subSlotNode.slots[ 'irradiance' ] = new Nodes.OperatorNode( irradiance, envNode, Nodes.OperatorNode.MUL );
 
-						mtl.environment = subSlotNode
+						mtl.environment = subSlotNode;
 
 						// GUI
 
@@ -740,8 +737,9 @@
 						//mtl.roughness = // roughness (float)
 						//mtl.metalness = // metalness (float)
 						//mtl.reflectivity = // reflectivity (float)
-						//mtl.clearCoat = // clearCoat (float)
-						//mtl.clearCoatRoughness = // clearCoatRoughness (float)
+						//mtl.clearcoat = // clearcoat (float)
+						//mtl.clearcoatRoughness = // clearcoatRoughness (float)
+						//mtl.clearcoatNormal = // clearcoatNormal (vec3)
 						//mtl.normal = // normal (vec3)
 						//mtl.emissive = // emissive color (vec3)
 						//mtl.ambient = // ambient color (vec3)
@@ -754,6 +752,7 @@
 						var mask = new Nodes.SwitchNode( new Nodes.TextureNode( getTexture( "decalDiffuse" ) ), 'w' );
 
 						var normalScale = new Nodes.FloatNode( .3 );
+						var clearcoatNormalScale = new Nodes.FloatNode( .1 );
 
 						var roughnessA = new Nodes.FloatNode( .5 );
 						var metalnessA = new Nodes.FloatNode( .5 );
@@ -762,8 +761,8 @@
 						var metalnessB = new Nodes.FloatNode( 1 );
 
 						var reflectivity = new Nodes.FloatNode( 0 );
-						var clearCoat = new Nodes.FloatNode( 1 );
-						var clearCoatRoughness = new Nodes.FloatNode( 1 );
+						var clearcoat = new Nodes.FloatNode( 1 );
+						var clearcoatRoughness = new Nodes.FloatNode( 1 );
 
 						var roughness = new Nodes.MathNode(
 							roughnessA,
@@ -785,12 +784,20 @@
 							Nodes.OperatorNode.MUL
 						);
 
+						var clearcoatNormalMask = new Nodes.OperatorNode(
+							mask,
+							clearcoatNormalScale,
+							Nodes.OperatorNode.MUL
+						);
+
 						mtl.color = new Nodes.ColorNode( 0xEEEEEE );
 						mtl.roughness = roughness;
 						mtl.metalness = metalness;
 						mtl.reflectivity = reflectivity;
-						mtl.clearCoat = clearCoat;
-						mtl.clearCoatRoughness = clearCoatRoughness;
+						mtl.clearcoat = clearcoat;
+						mtl.clearcoatRoughness = clearcoatRoughness;
+						mtl.clearcoatNormal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
+						mtl.clearcoatNormal.scale = clearcoatNormalMask;
 						mtl.environment = new Nodes.CubeTextureNode( cubemap );
 						mtl.normal = new Nodes.NormalMapNode( new Nodes.TextureNode( getTexture( "grassNormal" ) ) );
 						mtl.normal.scale = normalMask;
@@ -809,15 +816,21 @@
 
 						}, false, 0, 1 );
 
-						addGui( 'clearCoat', clearCoat.value, function ( val ) {
+						addGui( 'clearcoat', clearcoat.value, function ( val ) {
 
-							clearCoat.value = val;
+							clearcoat.value = val;
 
 						}, false, 0, 1 );
 
-						addGui( 'clearCoatRoughness', clearCoatRoughness.value, function ( val ) {
+						addGui( 'clearcoatRoughness', clearcoatRoughness.value, function ( val ) {
 
-							clearCoatRoughness.value = val;
+							clearcoatRoughness.value = val;
+
+						}, false, 0, 1 );
+
+						addGui( 'clearcoatNormalScale', clearcoatNormalScale.value, function ( val ) {
+
+							clearcoatNormalScale.value = val;
 
 						}, false, 0, 1 );
 
@@ -2220,8 +2233,8 @@
 							mtl.metalness = new Nodes.FloatNode( 0 );
 							mtl.roughness = new Nodes.FloatNode( 1 );
 							mtl.reflectivity = new Nodes.FloatNode( 0 );
-							mtl.clearCoat = new Nodes.FloatNode( .2 );
-							mtl.clearCoatRoughness = new Nodes.FloatNode( .3 );
+							mtl.clearcoat = new Nodes.FloatNode( .2 );
+							mtl.clearcoatRoughness = new Nodes.FloatNode( .3 );
 							mtl.environment = new Nodes.CubeTextureNode( cubemap );
 
 						} else {
@@ -2473,7 +2486,7 @@
 						// MATERIAL
 
 						var bias = new Nodes.FloatNode( .5 );
-						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureCubeNode( cubemap ) );
+						var maxMIPLevel = new Nodes.MaxMIPLevelNode( new Nodes.TextureNode( cubemap ) );
 						var mipsBias = new Nodes.OperatorNode( bias, maxMIPLevel, Nodes.OperatorNode.MUL );
 
 						mtl = new Nodes.PhongNodeMaterial();
@@ -2481,7 +2494,7 @@
 
 						function biasMode( val ) {
 
-							switch( val ) {
+							switch ( val ) {
 
 								case 'prem':
 
@@ -2580,52 +2593,42 @@
 
 					case 'node-reflect':
 
-							// MATERIAL
+						// MATERIAL
 
-							var node = new Nodes.ReflectNode();
+						var node = new Nodes.ReflectNode();
 
-							var nodeMaterial = new Nodes.StandardNodeMaterial();
-							nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
-							nodeMaterial.roughness = new Nodes.FloatNode(0);
-							nodeMaterial.metalness = new Nodes.FloatNode(1);
+						var nodeMaterial = new Nodes.StandardNodeMaterial();
+						nodeMaterial.environment = new Nodes.CubeTextureNode( cubemap, node );
+						nodeMaterial.roughness.value = .5;
+						nodeMaterial.metalness.value = 1;
 
-							var standardMaterial = new THREE.MeshStandardMaterial( {
-								envMap: cubemap,
-								roughness: 0,
-								metalness: 1
-							} );
+						var standardMaterial = new THREE.MeshStandardMaterial( {
+							color: nodeMaterial.color.value,
+							side: defaultSide,
+							envMap: cubemap,
+							roughness: nodeMaterial.roughness.value,
+							metalness: 1
+						} );
 
-							mtl = nodeMaterial;
+						mtl = nodeMaterial;
 
-							// GUI
+						// GUI
 
-							addGui( 'scope', {
-								vector: Nodes.ReflectNode.VECTOR,
-								cube: Nodes.ReflectNode.CUBE,
-								sphere: Nodes.ReflectNode.SPHERE
-							}, function ( val ) {
+						addGui( 'node', true, function ( val ) {
 
-								node.scope = val;
+							mtl = val ? nodeMaterial : standardMaterial;
+							mesh.material = mtl;
 
-								nodeMaterial.needsUpdate = true;
+						} );
 
-							} );
+						addGui( 'roughness', nodeMaterial.roughness.value, function ( val ) {
 
-							addGui( 'node', true, function ( val ) {
+							nodeMaterial.roughness.value = val;
+							standardMaterial.roughness = val;
 
-								mtl = val ? nodeMaterial : standardMaterial;
-								mesh.material = mtl;
+						}, false, 0, 1 );
 
-							} );
-
-							addGui( 'roughness', 0, function ( val ) {
-
-								nodeMaterial.roughness.value = val;
-								standardMaterial.roughness = val;
-
-							}, false, 0, 1 );
-
-							break;
+						break;
 
 
 					case 'varying':

@@ -1,28 +1,23 @@
 import {
   Color,
   Group,
+  Loader,
   LoadingManager,
   Material,
   Mesh,
   Texture
 } from '../../../src/Three';
 
-export class TDSLoader {
+export class TDSLoader extends Loader {
   constructor(manager?: LoadingManager);
-  crossOrigin: string;
   debug: boolean;
   group: Group;
   manager: LoadingManager;
   materials: Material[];
   meshes: Mesh[];
-  path: string;
   position: number;
-  resourcePath: string;
 
   load(url: string, onLoad: (object: Group) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setPath(path: string): this;
-  setResourcePath(path: string): this;
-  setCrossOrigin(path: string): this;
   parse(arraybuffer: ArrayBuffer, path: string): Group;
 
   debugMessage(message: object): void;

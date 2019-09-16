@@ -8,9 +8,10 @@ import {
 } from '../../../../../build/three.module.js';
 
 import { Node } from '../../core/Node.js';
+import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
-import { RoughnessToBlinnExponentNode } from '../../bsdfs/RoughnessToBlinnExponentNode.js';
+import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js';
 
 function StandardNode() {
 
@@ -32,7 +33,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define( this.clearCoat || this.clearCoatRoughness ? 'PHYSICAL' : 'STANDARD' );
+	builder.define('STANDARD');
+
+	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearCoatNormal;
+
+	if( useClearcoat ){
+
+		builder.define( 'CLEARCOAT' );
+
+	}
 
 	builder.requires.lights = true;
 
@@ -120,8 +129,13 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
+		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
+		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
+
 		var contextEnvironment = {
-			bias: RoughnessToBlinnExponentNode,
+			roughness: specularRoughness,
+			bias: new SpecularMIPLevelNode( specularRoughness ),
+			viewNormal: new ExpressionNode('normal', 'v3'),
 			gamma: true
 		};
 
@@ -129,7 +143,12 @@ StandardNode.prototype.build = function ( builder ) {
 			gamma: true
 		};
 
-		var useClearCoat = ! builder.isDefined( 'STANDARD' );
+		var contextClearcoatEnvironment = {
+			roughness: clearcoatRoughness,
+			bias: new SpecularMIPLevelNode( clearcoatRoughness ),
+			viewNormal: new ExpressionNode('clearcoatNormal', 'v3'),
+			gamma: true
+		};
 
 		// analyze all nodes to reuse generate codes
 
@@ -143,8 +162,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		if ( this.normal ) this.normal.analyze( builder );
 
-		if ( this.clearCoat ) this.clearCoat.analyze( builder );
-		if ( this.clearCoatRoughness ) this.clearCoatRoughness.analyze( builder );
+		if ( this.clearcoat ) this.clearcoat.analyze( builder );
+		if ( this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
+		if ( this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
@@ -160,15 +180,17 @@ StandardNode.prototype.build = function ( builder ) {
 			// isolate environment from others inputs ( see TextureNode, CubeTextureNode )
 			// environment.analyze will detect if there is a need of calculate irradiance
 
-			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } ); 
+			this.environment.analyze( builder, { cache: 'radiance', context: contextEnvironment, slot: 'radiance' } );
 
 			if ( builder.requires.irradiance ) {
 
-				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } ); 
+				this.environment.analyze( builder, { cache: 'irradiance', context: contextEnvironment, slot: 'irradiance' } );
 
 			}
 
 		}
+
+		if ( this.sheen ) this.sheen.analyze( builder );
 
 		// build code
 
@@ -182,8 +204,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 		var normal = this.normal ? this.normal.flow( builder, 'v3' ) : undefined;
 
-		var clearCoat = this.clearCoat ? this.clearCoat.flow( builder, 'f' ) : undefined;
-		var clearCoatRoughness = this.clearCoatRoughness ? this.clearCoatRoughness.flow( builder, 'f' ) : undefined;
+		var clearcoat = this.clearcoat ? this.clearcoat.flow( builder, 'f' ) : undefined;
+		var clearcoatRoughness = this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
+		var clearcoatNormal = this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
 
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
@@ -210,12 +233,13 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		var clearCoatEnv = useClearCoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearCoat', context: contextEnvironment, slot: 'environment' } ) : undefined;
+		var clearcoatEnv = useClearcoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearcoat', context: contextClearcoatEnvironment, slot: 'environment' } ) : undefined;
+
+		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
 
 		builder.requires.transparent = alpha !== undefined;
 
 		builder.addParsCode( [
-
 			"varying vec3 vViewPosition;",
 
 			"#ifndef FLAT_SHADED",
@@ -238,6 +262,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			// add before: prevent undeclared normal
 			"	#include <normal_fragment_begin>",
+			"	#include <clearcoat_normal_fragment_begin>",
 
 			// add before: prevent undeclared material
 			"	PhysicalMaterial material;",
@@ -289,6 +314,15 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		if ( clearcoatNormal ) {
+
+			output.push(
+				clearcoatNormal.code,
+				'clearcoatNormal = ' + clearcoatNormal.result + ';'
+			);
+
+		}
+
 		// optimization for now
 
 		output.push(
@@ -296,29 +330,35 @@ StandardNode.prototype.build = function ( builder ) {
 			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
 		);
 
-		if ( clearCoat ) {
+		if ( clearcoat ) {
 
 			output.push(
-				clearCoat.code,
-				'material.clearCoat = saturate( ' + clearCoat.result + ' );'
+				clearcoat.code,
+				'material.clearcoat = saturate( ' + clearcoat.result + ' );'
 			);
 
-		} else if ( useClearCoat ) {
+		} else if ( useClearcoat ) {
 
-			output.push( 'material.clearCoat = 0.0;' );
+			output.push( 'material.clearcoat = 0.0;' );
 
 		}
 
-		if ( clearCoatRoughness ) {
+		if ( clearcoatRoughness ) {
 
 			output.push(
-				clearCoatRoughness.code,
-				'material.clearCoatRoughness = clamp( ' + clearCoatRoughness.result + ', 0.04, 1.0 );'
+				clearcoatRoughness.code,
+				'material.clearcoatRoughness = clamp( ' + clearcoatRoughness.result + ', 0.04, 1.0 );'
 			);
 
-		} else if ( useClearCoat ) {
+		} else if ( useClearcoat ) {
 
-			output.push( 'material.clearCoatRoughness = 0.0;' );
+			output.push( 'material.clearcoatRoughness = 0.0;' );
+
+		}
+
+		if ( sheen ) {
+
+			output.push( 'material.sheenColor = ' + sheen.result + ';' );
 
 		}
 
@@ -408,11 +448,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 			}
 
-			if ( clearCoatEnv ) {
+			if ( clearcoatEnv ) {
 
 				output.push(
-					clearCoatEnv.code,
-					"clearCoatRadiance += " + clearCoatEnv.result + ";"
+					clearcoatEnv.code,
+					"clearcoatRadiance += " + clearcoatEnv.result + ";"
 				);
 
 			}
@@ -421,7 +461,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			if ( builder.requires.irradiance ) {
 
-				output.push( "irradiance += PI * " + environment.irradiance.result + ";" );
+				output.push( "iblIrradiance += PI * " + environment.irradiance.result + ";" );
 
 			}
 
@@ -479,8 +519,9 @@ StandardNode.prototype.copy = function ( source ) {
 
 	if ( source.normal ) this.normal = source.normal;
 
-	if ( source.clearCoat ) this.clearCoat = source.clearCoat;
-	if ( source.clearCoatRoughness ) this.clearCoatRoughness = source.clearCoatRoughness;
+	if ( source.clearcoat ) this.clearcoat = source.clearcoat;
+	if ( source.clearcoatRoughness ) this.clearcoatRoughness = source.clearcoatRoughness;
+	if ( source.clearcoatNormal ) this.clearcoatNormal = source.clearcoatNormal;
 
 	if ( source.reflectivity ) this.reflectivity = source.reflectivity;
 
@@ -493,6 +534,8 @@ StandardNode.prototype.copy = function ( source ) {
 	if ( source.ambient ) this.ambient = source.ambient;
 
 	if ( source.environment ) this.environment = source.environment;
+
+	if ( source.sheen ) this.sheen = source.sheen;
 
 	return this;
 
@@ -522,8 +565,9 @@ StandardNode.prototype.toJSON = function ( meta ) {
 
 		if ( this.normal ) data.normal = this.normal.toJSON( meta ).uuid;
 
-		if ( this.clearCoat ) data.clearCoat = this.clearCoat.toJSON( meta ).uuid;
-		if ( this.clearCoatRoughness ) data.clearCoatRoughness = this.clearCoatRoughness.toJSON( meta ).uuid;
+		if ( this.clearcoat ) data.clearcoat = this.clearcoat.toJSON( meta ).uuid;
+		if ( this.clearcoatRoughness ) data.clearcoatRoughness = this.clearcoatRoughness.toJSON( meta ).uuid;
+		if ( this.clearcoatNormal ) data.clearcoatNormal = this.clearcoatNormal.toJSON( meta ).uuid;
 
 		if ( this.reflectivity ) data.reflectivity = this.reflectivity.toJSON( meta ).uuid;
 
@@ -536,6 +580,8 @@ StandardNode.prototype.toJSON = function ( meta ) {
 		if ( this.ambient ) data.ambient = this.ambient.toJSON( meta ).uuid;
 
 		if ( this.environment ) data.environment = this.environment.toJSON( meta ).uuid;
+
+		if ( this.sheen ) data.sheen = this.sheen.toJSON( meta ).uuid;
 
 	}
 

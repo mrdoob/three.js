@@ -1,4 +1,4 @@
-/*
+/**
  * A bunch of parametric curves
  * @author zz85
  *

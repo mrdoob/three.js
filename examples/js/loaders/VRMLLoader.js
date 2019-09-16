@@ -18,21 +18,19 @@ THREE.VRMLLoader = ( function () {
 
 	function VRMLLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 	}
 
-	VRMLLoader.prototype = {
+	VRMLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: VRMLLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( scope.path );
@@ -41,27 +39,6 @@ THREE.VRMLLoader = ( function () {
 				onLoad( scope.parse( text, path ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -2353,7 +2330,7 @@ THREE.VRMLLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	function VRMLLexer( tokens ) {
 

@@ -17,12 +17,28 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
  * @author jonobr1 / http://jonobr1.com/
  */
 
-var _inverseMatrix, _ray, _sphere;
-var _vA, _vB, _vC;
-var _tempA, _tempB, _tempC;
-var _morphA, _morphB, _morphC;
-var _uvA, _uvB, _uvC;
-var _intersectionPoint, _intersectionPointWorld;
+var _inverseMatrix = new Matrix4();
+var _ray = new Ray();
+var _sphere = new Sphere();
+
+var _vA = new Vector3();
+var _vB = new Vector3();
+var _vC = new Vector3();
+
+var _tempA = new Vector3();
+var _tempB = new Vector3();
+var _tempC = new Vector3();
+
+var _morphA = new Vector3();
+var _morphB = new Vector3();
+var _morphC = new Vector3();
+
+var _uvA = new Vector2();
+var _uvB = new Vector2();
+var _uvC = new Vector2();
+
+var _intersectionPoint = new Vector3();
+var _intersectionPointWorld = new Vector3();
 
 function Mesh( geometry, material ) {
 
@@ -120,33 +136,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	},
 
 	raycast: function ( raycaster, intersects ) {
-
-		if ( _intersectionPointWorld === undefined ) {
-
-			_inverseMatrix = new Matrix4();
-			_ray = new Ray();
-			_sphere = new Sphere();
-
-			_vA = new Vector3();
-			_vB = new Vector3();
-			_vC = new Vector3();
-
-			_tempA = new Vector3();
-			_tempB = new Vector3();
-			_tempC = new Vector3();
-
-			_morphA = new Vector3();
-			_morphB = new Vector3();
-			_morphC = new Vector3();
-
-			_uvA = new Vector2();
-			_uvB = new Vector2();
-			_uvC = new Vector2();
-
-			_intersectionPoint = new Vector3();
-			_intersectionPointWorld = new Vector3();
-
-		}
 
 		var geometry = this.geometry;
 		var material = this.material;

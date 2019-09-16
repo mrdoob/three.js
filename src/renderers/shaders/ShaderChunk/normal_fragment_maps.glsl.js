@@ -1,38 +1,35 @@
 export default /* glsl */`
-#ifdef USE_NORMALMAP
 
-	#ifdef OBJECTSPACE_NORMALMAP
+#ifdef OBJECTSPACE_NORMALMAP
 
-		normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
+	normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
 
-		#ifdef FLIP_SIDED
+	#ifdef FLIP_SIDED
 
-			normal = - normal;
+		normal = - normal;
 
-		#endif
+	#endif
 
-		#ifdef DOUBLE_SIDED
+	#ifdef DOUBLE_SIDED
 
-			normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
-		#endif
+	#endif
 
-		normal = normalize( normalMatrix * normal );
+	normal = normalize( normalMatrix * normal );
 
-	#else // tangent-space normal map
+#elif defined( TANGENTSPACE_NORMALMAP )
 
-		#ifdef USE_TANGENT
+	#ifdef USE_TANGENT
 
-			mat3 vTBN = mat3( tangent, bitangent, normal );
-			vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-			mapN.xy = normalScale * mapN.xy;
-			normal = normalize( vTBN * mapN );
+		mat3 vTBN = mat3( tangent, bitangent, normal );
+		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+		mapN.xy = normalScale * mapN.xy;
+		normal = normalize( vTBN * mapN );
 
-		#else
+	#else
 
-			normal = perturbNormal2Arb( -vViewPosition, normal, normalScale, normalMap );
-
-		#endif
+		normal = perturbNormal2Arb( -vViewPosition, normal, normalScale, normalMap );
 
 	#endif
 

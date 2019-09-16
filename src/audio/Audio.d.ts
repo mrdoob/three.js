@@ -17,6 +17,7 @@ export class Audio extends Object3D {
 	loop: boolean;
 	startTime: number;
 	offset: number;
+	duration: number | undefined;
 	playbackRate: number;
 	isPlaying: boolean;
 	hasPlaybackControl: boolean;
@@ -26,7 +27,8 @@ export class Audio extends Object3D {
 
 	getOutput(): GainNode;
 	setNodeSource( audioNode: AudioBufferSourceNode ): this;
-	setMediaElementSource( mediaElement: MediaElementAudioSourceNode ): this;
+	setMediaElementSource( mediaElement: HTMLMediaElement ): this;
+	setMediaStreamSource( mediaStream: MediaStream ): this;
 	setBuffer( audioBuffer: AudioBuffer ): this;
 	play(): this;
 	onEnded(): void;

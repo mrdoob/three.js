@@ -3,8 +3,8 @@
  */
 
 import {
-	DefaultLoadingManager,
 	FileLoader,
+	Loader,
 	Matrix4,
 	Vector3
 } from "../../../build/three.module.js";
@@ -13,12 +13,11 @@ import { Volume } from "../misc/Volume.js";
 
 var NRRDLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-
+	Loader.call( this, manager );
 
 };
 
-NRRDLoader.prototype = {
+NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: NRRDLoader,
 
@@ -34,13 +33,6 @@ NRRDLoader.prototype = {
 			onLoad( scope.parse( data ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -71,7 +63,7 @@ NRRDLoader.prototype = {
 
 			switch ( type ) {
 
-			// 1 byte data types
+				// 1 byte data types
 				case 'uchar':
 					break;
 				case 'schar':
@@ -609,6 +601,6 @@ NRRDLoader.prototype = {
 		}
 	}
 
-};
+} );
 
 export { NRRDLoader };

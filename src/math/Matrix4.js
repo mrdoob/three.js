@@ -1,5 +1,13 @@
 import { Vector3 } from './Vector3.js';
 
+var _v1 = new Vector3();
+var _m1 = new Matrix4();
+var _zero = new Vector3( 0, 0, 0 );
+var _one = new Vector3( 1, 1, 1 );
+var _x = new Vector3();
+var _y = new Vector3();
+var _z = new Vector3();
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -12,10 +20,6 @@ import { Vector3 } from './Vector3.js';
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
-
-var _v1, _m1;
-var _zero, _one;
-var _x, _y, _z;
 
 function Matrix4() {
 
@@ -124,8 +128,6 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	extractRotation: function ( m ) {
-
-		if ( _v1 === undefined ) _v1 = new Vector3();
 
 		// this method does not support reflection matrices
 
@@ -290,26 +292,11 @@ Object.assign( Matrix4.prototype, {
 
 	makeRotationFromQuaternion: function ( q ) {
 
-		if ( _zero === undefined ) {
-
-			_zero = new Vector3( 0, 0, 0 );
-			_one = new Vector3( 1, 1, 1 );
-
-		}
-
 		return this.compose( _zero, q, _one );
 
 	},
 
 	lookAt: function ( eye, target, up ) {
-
-		if ( _x === undefined ) {
-
-			_x = new Vector3();
-			_y = new Vector3();
-			_z = new Vector3();
-
-		}
 
 		var te = this.elements;
 
@@ -429,8 +416,6 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	applyToBufferAttribute: function ( attribute ) {
-
-		if ( _v1 === undefined ) _v1 = new Vector3();
 
 		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
@@ -781,13 +766,6 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	decompose: function ( position, quaternion, scale ) {
-
-		if ( _m1 === undefined ) {
-
-			_m1 = new Matrix4();
-			_v1 = new Vector3();
-
-		}
 
 		var te = this.elements;
 

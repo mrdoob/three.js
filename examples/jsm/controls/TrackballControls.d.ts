@@ -42,6 +42,4 @@ export class TrackballControls extends EventDispatcher {
   rotateCamera(): void;
 
   handleResize(): void;
-
-  handleEvent(event: any): void;
 }
