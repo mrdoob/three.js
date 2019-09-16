@@ -258,7 +258,7 @@ function WebGLRenderer( parameters ) {
 
 		capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-		if ( ! capabilities.isWebGL2 ) {
+		if ( capabilities.isWebGL2 === false ) {
 
 			extensions.get( 'WEBGL_depth_texture' );
 			extensions.get( 'OES_texture_float' );
@@ -283,7 +283,7 @@ function WebGLRenderer( parameters ) {
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 		attributes = new WebGLAttributes( _gl );
 		geometries = new WebGLGeometries( _gl, attributes, info );
-		objects = new WebGLObjects( geometries, info );
+		objects = new WebGLObjects( _gl, geometries, attributes, info );
 		morphtargets = new WebGLMorphtargets( _gl );
 		programCache = new WebGLPrograms( _this, extensions, capabilities );
 		renderLists = new WebGLRenderLists();
@@ -765,7 +765,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( updateBuffers ) {
 
-			setupVertexAttributes( material, program, geometry );
+			setupVertexAttributes( object, geometry, material, program );
 
 			if ( index !== null ) {
 
@@ -831,7 +831,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-
 		} else if ( object.isLine ) {
 
 			var lineWidth = material.linewidth;
@@ -864,7 +863,17 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( geometry && geometry.isInstancedBufferGeometry ) {
+		if ( object.isInstancedMesh ) {
+
+			// HACK
+
+			geometry.maxInstancedCount = object.instanceMatrix.count;
+
+			renderer.renderInstances( geometry, drawStart, drawCount );
+
+		} else if ( geometry && geometry.isInstancedBufferGeometry ) {
+
+			// TODO: Remove all this?
 
 			if ( geometry.maxInstancedCount > 0 ) {
 
@@ -880,9 +889,20 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	function setupVertexAttributes( material, program, geometry ) {
+	function setupVertexAttributes( object, geometry, material, program ) {
 
-		if ( geometry && geometry.isInstancedBufferGeometry && ! capabilities.isWebGL2 ) {
+		if ( object.isInstancedMesh ) {
+
+			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
+				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
+				return;
+
+			}
+
+		} else if ( geometry && geometry.isInstancedBufferGeometry && ! capabilities.isWebGL2 ) {
+
+			// TODO Remove
 
 			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
@@ -971,6 +991,50 @@ function WebGLRenderer( parameters ) {
 						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 					}
+
+				} else if ( name === 'instanceMatrix' ) {
+
+					var attribute = attributes.get( object.instanceMatrix );
+
+					// TODO Attribute may not be available on context restore
+
+					if ( attribute === undefined ) continue;
+
+					var buffer = attribute.buffer;
+					var type = attribute.type;
+
+					state.enableAttributeAndDivisor( programAttribute + 0, 1 );
+					state.enableAttributeAndDivisor( programAttribute + 1, 1 );
+					state.enableAttributeAndDivisor( programAttribute + 2, 1 );
+					state.enableAttributeAndDivisor( programAttribute + 3, 1 );
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+
+					_gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
+					_gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
+					_gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
+					_gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
+
+				} else if ( name === 'instanceNormalMatrix' ) {
+
+					var attribute = attributes.get( object.instanceNormalMatrix );
+
+					// TODO Attribute may not be available on context restore
+
+					if ( attribute === undefined ) continue;
+
+					var buffer = attribute.buffer;
+					var type = attribute.type;
+
+					state.enableAttributeAndDivisor( programAttribute + 0, 1 );
+					state.enableAttributeAndDivisor( programAttribute + 1, 1 );
+					state.enableAttributeAndDivisor( programAttribute + 2, 1 );
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+
+					_gl.vertexAttribPointer( programAttribute + 0, 3, type, false, 36, 0 );
+					_gl.vertexAttribPointer( programAttribute + 1, 3, type, false, 36, 12 );
+					_gl.vertexAttribPointer( programAttribute + 2, 3, type, false, 36, 24 );
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 

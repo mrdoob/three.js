@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLObjects( geometries, info ) {
+function WebGLObjects( gl, geometries, attributes, info ) {
 
 	var updateList = {};
 
@@ -26,6 +26,13 @@ function WebGLObjects( geometries, info ) {
 			geometries.update( buffergeometry );
 
 			updateList[ buffergeometry.id ] = frame;
+
+		}
+
+		if ( object.isInstancedMesh ) {
+
+			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
+			attributes.update( object.instanceNormalMatrix, gl.ARRAY_BUFFER );
 
 		}
 

@@ -1,5 +1,13 @@
 export default /* glsl */`
-vec3 transformedNormal = normalMatrix * objectNormal;
+vec3 transformedNormal = objectNormal;
+
+#ifdef USE_INSTANCING
+
+	transformedNormal = instanceNormalMatrix * transformedNormal;
+
+#endif
+
+transformedNormal = normalMatrix * transformedNormal;
 
 #ifdef FLIP_SIDED
 
