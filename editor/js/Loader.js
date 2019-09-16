@@ -5,7 +5,6 @@
 var Loader = function ( editor ) {
 
 	var scope = this;
-	var signals = editor.signals;
 
 	this.texturePath = '';
 
@@ -84,59 +83,6 @@ var Loader = function ( editor ) {
 
 				}, false );
 				reader.readAsArrayBuffer( file );
-
-				break;
-
-			case 'awd':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var loader = new THREE.AWDLoader();
-					var scene = loader.parse( event.target.result );
-
-					editor.execute( new SetSceneCommand( editor, scene ) );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			case 'babylon':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-					var json = JSON.parse( contents );
-
-					var loader = new THREE.BabylonLoader();
-					var scene = loader.parse( json );
-
-					editor.execute( new SetSceneCommand( editor, scene ) );
-
-				}, false );
-				reader.readAsText( file );
-
-				break;
-
-			case 'babylonmeshdata':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-					var json = JSON.parse( contents );
-
-					var loader = new THREE.BabylonLoader();
-
-					var geometry = loader.parseGeometry( json );
-					var material = new THREE.MeshStandardMaterial();
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, mesh ) );
-
-				}, false );
-				reader.readAsText( file );
 
 				break;
 
@@ -340,23 +286,6 @@ var Loader = function ( editor ) {
 
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, object ) );
-
-				}, false );
-				reader.readAsText( file );
-
-				break;
-
-			case 'playcanvas':
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var contents = event.target.result;
-					var json = JSON.parse( contents );
-
-					var loader = new THREE.PlayCanvasLoader();
-					var object = loader.parse( json );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 

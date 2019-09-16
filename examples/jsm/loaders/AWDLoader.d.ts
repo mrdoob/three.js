@@ -1,6 +1,7 @@
 import {
   Bone,
   BufferGeometry,
+  Loader,
   LoadingManager,
   Material,
   Matrix4,
@@ -9,9 +10,8 @@ import {
   Texture
 } from '../../../src/Three';
 
-export class AWDLoader {
+export class AWDLoader extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
   materialFactory: any;
   path: string;
   trunk: Object3D;
@@ -19,7 +19,6 @@ export class AWDLoader {
   getBlock(id: number): any;
   load(url: string, onLoad: (result: Object3D) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   loadTexture(url: string): Texture;
-  setPath(path: string): this;
   parse(data: ArrayBuffer): Object3D;
   parseAnimatorSet(): object;
   parseAttrValue(type: number, value: number): any;

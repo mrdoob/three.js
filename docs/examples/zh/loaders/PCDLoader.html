@@ -8,6 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
 
 		<h1>[name]</h1>
 
@@ -62,6 +63,7 @@
 		</p>
 
 		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h3>[page:Boolean littleEndian]</h3>
 		<p>
@@ -69,6 +71,7 @@
 		</p>
 
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -91,14 +94,6 @@
 		<p>
 		Parse an <em>pcd</em> binary structure and return an [page:Object3D].<br />
 		The object is converted to [page:Points] with a [page:BufferGeometry] and a [page:PointsMaterial].
-		</p>
-
-		<h3>[method:PCDLoader setPath]( [param:String path] )</h3>
-		<p>
-		[page:String path] — Base path.
-		</p>
-		<p>
-		Set the base path for the file.
 		</p>
 
 		<h2>Source</h2>

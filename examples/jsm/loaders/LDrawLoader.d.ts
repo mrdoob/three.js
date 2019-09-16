@@ -1,16 +1,14 @@
 import {
+	Loader,
 	LoadingManager,
 	Group,
 	Material
 } from '../../../src/Three';
 
-export class LDrawLoader {
+export class LDrawLoader extends Loader {
 	constructor(manager?: LoadingManager);
-	manager: LoadingManager;
-	path: string;
 
 	load(url: string, onLoad: (data: Group) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-	setPath(path: string) : this;
 	setFileMap(fileMap: Record<string, string>): void;
 	setMaterials(materials: Material[]): void;
 

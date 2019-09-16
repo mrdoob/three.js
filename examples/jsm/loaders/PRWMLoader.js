@@ -6,8 +6,8 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
-	FileLoader
+	FileLoader,
+	Loader
 } from "../../../build/three.module.js";
 
 var PRWMLoader = ( function () {
@@ -231,11 +231,11 @@ var PRWMLoader = ( function () {
 
 	function PRWMLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	PRWMLoader.prototype = {
+	PRWMLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: PRWMLoader,
 
@@ -254,13 +254,6 @@ var PRWMLoader = ( function () {
 				onLoad( scope.parse( arrayBuffer ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
 
 		},
 
@@ -289,7 +282,7 @@ var PRWMLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	PRWMLoader.isBigEndianPlatform = function () {
 

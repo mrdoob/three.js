@@ -128,6 +128,11 @@
 		Whether rendering this material has any effect on the stencil buffer. Default is *false*.
 		</p>
 
+		<h3>[property:Boolean stencilWriteMask]</h3>
+		<p>
+		The bit mask to use when writing to the stencil buffer. Default is *0xFF*.
+		</p>
+
 		<h3>[property:Boolean stencilFunc]</h3>
 		<p>
 		The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
@@ -138,9 +143,9 @@
 		The value to use when performing stencil comparisons or stencil operations. Default is *0*.
 		</p>
 
-		<h3>[property:Boolean stencilMask]</h3>
+		<h3>[property:Boolean stencilFuncMask]</h3>
 		<p>
-		The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+		The bit mask to use when comparing against the stencil buffer. Default is *0xFF*.
 		</p>
 
 		<h3>[property:Integer stencilFail]</h3>
@@ -278,7 +283,7 @@
 		as transparent objects need special treatment and are rendered after
 		non-transparent objects. <br />
 		When set to true, the extent to which the material is transparent is
-		controlled by setting it's [page:Float opacity] property. <br />
+		controlled by setting its [page:Float opacity] property. <br />
 		Default is *false*.
 		</p>
 

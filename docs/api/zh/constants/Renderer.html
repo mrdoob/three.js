@@ -39,13 +39,15 @@
 		THREE.BasicShadowMap
 		THREE.PCFShadowMap
 		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
 		</code>
 		<p>
 			这些常量定义了WebGLRenderer中[page:WebGLRenderer.shadowMap.type shadowMap.type]的属性。<br /><br />
 
 		[page:constant BasicShadowMap] 能够给出没有经过过滤的阴影映射 —— 速度最快，但质量最差。<br />
 		[page:constant PCFShadowMap] 为默认值，使用Percentage-Closer Filtering (PCF)算法来过滤阴影映射。<br />
-		[page:constant PCFSoftShadowMap] 使用Percentage-Closer Soft Shadows (PCSS) 算法来过滤阴影映射。
+		[page:constant PCFSoftShadowMap] 使用Percentage-Closer Soft Shadows (PCSS) 算法来过滤阴影映射。<br />
+		[page:constant VSMShadowMap] filters shadow maps using the Variance Shadow Map (VSM) algorithm.
 		</p>
 
 		<h2>色调映射</h2>

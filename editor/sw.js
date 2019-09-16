@@ -15,8 +15,6 @@ const staticAssets = [
 	'../examples/js/libs/inflate.min.js',
 
 	'../examples/js/loaders/AMFLoader.js',
-	'../examples/js/loaders/AWDLoader.js',
-	'../examples/js/loaders/BabylonLoader.js',
 	'../examples/js/loaders/ColladaLoader.js',
 	'../examples/js/loaders/DRACOLoader.js',
 	'../examples/js/loaders/FBXLoader.js',
@@ -26,7 +24,6 @@ const staticAssets = [
 	'../examples/js/loaders/MD2Loader.js',
 	'../examples/js/loaders/OBJLoader.js',
 	'../examples/js/loaders/MTLLoader.js',
-	'../examples/js/loaders/PlayCanvasLoader.js',
 	'../examples/js/loaders/PLYLoader.js',
 	'../examples/js/loaders/STLLoader.js',
 	'../examples/js/loaders/SVGLoader.js',

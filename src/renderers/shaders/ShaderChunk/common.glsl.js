@@ -126,4 +126,10 @@ mat3 rotationMatrix3(vec3 axis, float angle) {
 							oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c);
 
 }
+
+bool isPerspectiveMatrix( mat4 projectionMatrix ) {
+
+	return projectionMatrix[ 2 ][ 3 ] == - 1.0;
+
+}
 `;

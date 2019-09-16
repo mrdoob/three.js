@@ -1,13 +1,12 @@
 import {
   CompressedTexture,
+  Loader,
   LoadingManager,
   WebGLRenderer
 } from '../../../src/Three';
 
-export class BasisTextureLoader {
+export class BasisTextureLoader extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  crossOrigin: string;
   transcoderBinary: ArrayBuffer | null;
   transcoderPath: string;
   transcoderPending: Promise<void> | null;
@@ -26,7 +25,6 @@ export class BasisTextureLoader {
   detectSupport(renderer: WebGLRenderer): this;
   dispose(): void;
   load(url: string, onLoad: (texture: CompressedTexture) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setCrossOrigin(crossOrigin: string): this;
   setTranscoderPath(path: string): this;
   setWorkerLimit(workerLimit: number): this;
 }
