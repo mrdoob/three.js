@@ -127,7 +127,7 @@ const WorkerExecutionSupport = function () {
 	this._reset();
 
 };
-WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.0.0';
+WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.1.0';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
 

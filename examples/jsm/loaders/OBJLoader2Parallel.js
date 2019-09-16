@@ -40,7 +40,7 @@ const OBJLoader2Parallel = function ( manager ) {
 
 };
 
-OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.0.1';
+OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.0';
 console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION );
 
 
