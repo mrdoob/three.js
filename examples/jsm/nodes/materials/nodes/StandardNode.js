@@ -12,7 +12,6 @@ import { ExpressionNode } from '../../core/ExpressionNode.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 import { FloatNode } from '../../inputs/FloatNode.js';
 import { SpecularMIPLevelNode } from '../../utils/SpecularMIPLevelNode.js';
-import { NormalNode } from '../../accessors/NormalNode.js';
 
 function StandardNode() {
 
@@ -37,6 +36,7 @@ StandardNode.prototype.build = function ( builder ) {
 	builder.define('STANDARD');
 
 	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearcoatNormal;
+	var useAnisotropy = !!this.anisotropy;
 
 	if( useClearcoat ){
 
@@ -147,18 +147,11 @@ StandardNode.prototype.build = function ( builder ) {
 		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
 		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
 
-		if ( this.anisotropy ) this.anisotropy.analyze( builder );
-		if ( this.anisotropyRotation ) this.anisotropyRotation.analyze( builder );
-
-		var anisotropy = this.anisotropy ? this.anisotropy.flow( builder, 'f' ) : undefined;
-		var anisotropyRotation = anisotropy && this.anisotropyRotation ? this.anisotropyRotation.flow( builder, 'f' ) : undefined;
-
 		var contextEnvironment = {
 			roughness: specularRoughness,
 			bias: new SpecularMIPLevelNode( specularRoughness ),
-			viewNormal: new ExpressionNode('normal', 'vec3'),
-			gamma: true,
-			anisotropy: !!anisotropy
+			viewNormal: useAnisotropy ? new ExpressionNode('getBentNormal( geometry, anisotropyFactor, roughnessFactor )', 'vec3') : new ExpressionNode('normal', 'vec3'),
+			gamma: true
 		};
 
 		var contextGammaOnly = {
@@ -187,6 +180,9 @@ StandardNode.prototype.build = function ( builder ) {
 		if ( this.clearcoat ) this.clearcoat.analyze( builder );
 		if ( this.clearcoatRoughness ) this.clearcoatRoughness.analyze( builder );
 		if ( this.clearcoatNormal ) this.clearcoatNormal.analyze( builder );
+
+		if ( useAnisotropy && this.anisotropy ) this.anisotropy.analyze( builder );
+		if ( useAnisotropy && this.anisotropyRotation ) this.anisotropyRotation.analyze( builder );
 
 		if ( this.reflectivity ) this.reflectivity.analyze( builder );
 
@@ -230,6 +226,9 @@ StandardNode.prototype.build = function ( builder ) {
 		var clearcoatRoughness = this.clearcoatRoughness ? this.clearcoatRoughness.flow( builder, 'f' ) : undefined;
 		var clearcoatNormal = this.clearcoatNormal ? this.clearcoatNormal.flow( builder, 'v3' ) : undefined;
 
+		var anisotropy = useAnisotropy ? this.anisotropy.flow( builder, 'f' ) : undefined;
+		var anisotropyRotation = useAnisotropy && this.anisotropyRotation ? this.anisotropyRotation.flow( builder, 'f' ) : undefined;
+
 		var reflectivity = this.reflectivity ? this.reflectivity.flow( builder, 'f' ) : undefined;
 
 		var light = this.light ? this.light.flow( builder, 'v3', { cache: 'light' } ) : undefined;
@@ -258,7 +257,7 @@ StandardNode.prototype.build = function ( builder ) {
 		var clearcoatEnv = useClearcoat && environment ? this.environment.flow( builder, 'c', { cache: 'clearcoat', context: contextClearcoatEnvironment, slot: 'environment' } ) : undefined;
 
 		var sheen = this.sheen ? this.sheen.flow( builder, 'c' ) : undefined;
-		builder.requires.uv[0] = builder.requires.uv[0] || !!anisotropy; // if tangents aren't available
+		builder.requires.uv[0] = builder.requires.uv[0] || useAnisotropy; // if tangents aren't available
 
 		builder.requires.transparent = alpha !== undefined;
 
@@ -387,10 +386,25 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
-		if ( anisotropy ) {
+		if ( useAnisotropy ) {
 
-			output.push( 'float anisotropyFactor = ' + anisotropy.result + ';' );
-			output.push( 'float anisotropyRotationFactor = ' + ( anisotropyRotation ? anisotropyRotation.result : '0.' ) + ';' );
+			output.push( 
+				anisotropy.code,
+				'float anisotropyFactor = ' + anisotropy.result + ';' 
+			);
+
+			if ( anisotropyRotation ) {
+
+				output.push( 
+					anisotropyRotation.code,
+					'float anisotropyRotationFactor = ' + anisotropyRotation.result + ';' 
+				);
+
+			} else {
+
+				output.push( 'float anisotropyRotationFactor = 0.;' );
+
+			}
 
 		}
 

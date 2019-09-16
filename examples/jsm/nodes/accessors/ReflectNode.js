@@ -6,12 +6,11 @@ import { TempNode } from '../core/TempNode.js';
 import { PositionNode } from './PositionNode.js';
 import { NormalNode } from './NormalNode.js';
 
-function ReflectNode( scope, normal ) {
+function ReflectNode( scope ) {
 
 	TempNode.call( this, 'v3' );
 
 	this.scope = scope || ReflectNode.CUBE;
-	this.normal = normal || null;
 
 }
 
@@ -55,7 +54,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.VECTOR:
 
-				var viewNormalNode = this.normal || builder.context.viewNormal || new NormalNode();
+				var viewNormalNode = builder.context.viewNormal || new NormalNode();
 				var roughnessNode = builder.context.roughness;
 
 				var viewNormal = viewNormalNode.build( builder, 'v3' );
@@ -89,7 +88,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.CUBE:
 
-				var reflectVec = new ReflectNode( ReflectNode.VECTOR, this.normal ).build( builder, 'v3' );
+				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
 
 				var code = 'vec3( -' + reflectVec + '.x, ' + reflectVec + '.yz )';
 
@@ -109,7 +108,7 @@ ReflectNode.prototype.generate = function ( builder, output ) {
 
 			case ReflectNode.SPHERE:
 
-				var reflectVec = new ReflectNode( ReflectNode.VECTOR, this.normal ).build( builder, 'v3' );
+				var reflectVec = new ReflectNode( ReflectNode.VECTOR ).build( builder, 'v3' );
 
 				var code = 'normalize( ( viewMatrix * vec4( ' + reflectVec + ', 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) ).xy * 0.5 + 0.5';
 

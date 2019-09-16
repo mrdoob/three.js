@@ -6,14 +6,13 @@ import { InputNode } from '../core/InputNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
 import { ExpressionNode } from '../core/ExpressionNode.js';
-import { NormalNode } from '../accessors/NormalNode.js';
 
 function CubeTextureNode( value, uv, bias ) {
 
 	InputNode.call( this, 'v4', { shared: true } );
 
 	this.value = value;
-	this.uv = uv || new ReflectNode( ReflectNode.CUBE, new NormalNode( NormalNode.BENT ) );
+	this.uv = uv || new ReflectNode();
 	this.bias = bias;
 
 }
