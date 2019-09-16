@@ -159,18 +159,7 @@ OBJLoader2Parser.prototype = {
 	 */
 	setMaterials: function ( materials ) {
 
- 		this.materials = {};
-		if ( materials === undefined || materials === null ) return;
-
-		for ( let materialName in materials ) {
-
-			if ( materials.hasOwnProperty( materialName ) ) {
-
-				this.materials[ materialName ] = materials[ materialName ];
-
-			}
-
-		}
+ 		this.materials = Object.assign( {}, materials );
 
 	},
 
