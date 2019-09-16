@@ -65,7 +65,9 @@
 		Default is *true*.<br />
 
 		[page:Boolean logarithmicDepthBuffer] -  whether to use a logarithmic depth buffer. It may
-		be neccesary to use this if dealing with huge differences in scale in a single scene.
+		be neccesary to use this if dealing with huge differences in scale in a single scene. Note that this setting
+		uses gl_FragDepth if available which disables the [link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
+		optimization and can cause a decrease in performance.
 		Default is *false*. See the [example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer] example.
 		</p>
 
