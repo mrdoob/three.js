@@ -104,7 +104,8 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var taskConfig = {
 				attributeIDs: this.defaultAttributeIDs,
-				attributeTypes: this.defaultAttributeTypes
+				attributeTypes: this.defaultAttributeTypes,
+				useUniqueIDs: false
 			};
 
 			this.decodeGeometry( buffer, taskConfig )
@@ -120,7 +121,8 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
-			attributeTypes: attributeTypes || this.defaultAttributeTypes
+			attributeTypes: attributeTypes || this.defaultAttributeTypes,
+			useUniqueIDs: !! attributeIDs
 		};
 
 		this.decodeGeometry( buffer, taskConfig ).then( callback );
@@ -461,12 +463,32 @@ DRACOLoader.DRACOWorker = function () {
 
 		var geometry = { index: null, attributes: [] };
 
-		// Add attributes of user specified unique id.
+		// Gather all vertex attributes.
 		for ( var attributeName in attributeIDs ) {
 
 			var attributeType = self[ attributeTypes[ attributeName ] ];
-			var attributeId = attributeIDs[ attributeName ];
-			var attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeId );
+
+			var attribute;
+			var attributeID;
+
+			// A Draco file may be created with default vertex attributes, whose attribute IDs
+			// are mapped 1:1 from their semantic name (POSITION, NORMAL, ...). Alternatively,
+			// a Draco file may contain a custom set of attributes, identified by known unique
+			// IDs. glTF files always do the latter, and `.drc` files typically do the former.
+			if ( taskConfig.useUniqueIDs ) {
+
+				attributeID = attributeIDs[ attributeName ];
+				attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeID );
+
+			} else {
+
+				attributeID = decoder.GetAttributeId( dracoGeometry, draco[ attributeIDs[ attributeName ] ] );
+
+				if ( attributeID === -1 ) continue;
+
+				attribute = decoder.GetAttribute( dracoGeometry, attributeID );
+
+			}
 
 			geometry.attributes.push( decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
 

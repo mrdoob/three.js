@@ -52,7 +52,7 @@
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
-    "lint": "eslint src --ext js --ext ts && tsc src/Three.d.ts --noEmit",
+    "lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
     "travis": "npm run lint && npm test"
   },
@@ -73,6 +73,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
+    "@types/webgl2": "0.0.5",
     "concurrently": "^4.1.2",
     "eslint": "^6.2.1",
     "eslint-config-mdcs": "^4.2.3",

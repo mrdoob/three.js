@@ -1828,7 +1828,6 @@ function WebGLRenderer( parameters ) {
 						boneMatrices.set( skeleton.boneMatrices ); // copy current values
 
 						var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
-						boneTexture.needsUpdate = true;
 
 						skeleton.boneMatrices = boneMatrices;
 						skeleton.boneTexture = boneTexture;
