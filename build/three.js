@@ -8869,21 +8869,6 @@
 
 		onUploadCallback: function () {},
 
-		setArray: function ( array ) {
-
-			if ( Array.isArray( array ) ) {
-
-				throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-			}
-
-			this.count = array !== undefined ? array.length / this.itemSize : 0;
-			this.array = array;
-
-			return this;
-
-		},
-
 		setDynamic: function ( value ) {
 
 			this.dynamic = value;
@@ -9635,15 +9620,21 @@
 
 			}
 
-			this.attributes[ name ] = attribute;
-
-			return this;
+			return this.setAttribute( name, attribute );
 
 		},
 
 		getAttribute: function ( name ) {
 
 			return this.attributes[ name ];
+
+		},
+
+		setAttribute: function ( name, attribute ) {
+
+			this.attributes[ name ] = attribute;
+
+			return this;
 
 		},
 
@@ -25992,21 +25983,6 @@
 		isInterleavedBuffer: true,
 
 		onUploadCallback: function () {},
-
-		setArray: function ( array ) {
-
-			if ( Array.isArray( array ) ) {
-
-				throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-			}
-
-			this.count = array !== undefined ? array.length / this.stride : 0;
-			this.array = array;
-
-			return this;
-
-		},
 
 		setDynamic: function ( value ) {
 
@@ -48169,10 +48145,25 @@
 				return this.array.length;
 
 			}
-		},
+		}
+
+	} );
+
+	Object.assign( BufferAttribute.prototype, {
+
 		copyIndicesArray: function ( /* indices */ ) {
 
 			console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
+
+		},
+		setArray: function ( array ) {
+
+			console.warn( 'THREE.BufferAttribute: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+			this.count = array !== undefined ? array.length / this.itemSize : 0;
+			this.array = array;
+
+			return this;
 
 		}
 
@@ -48233,6 +48224,21 @@
 				return this.groups;
 
 			}
+		}
+
+	} );
+
+	Object.assign( InterleavedBuffer.prototype, {
+
+		setArray: function ( array ) {
+
+			console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+			this.count = array !== undefined ? array.length / this.stride : 0;
+			this.array = array;
+
+			return this;
+
 		}
 
 	} );
