@@ -70,7 +70,6 @@ function Material() {
 	this.premultipliedAlpha = false;
 
 	this.visible = true;
-	this.parallelCompile = false;
 
 	this.toneMapped = true;
 
