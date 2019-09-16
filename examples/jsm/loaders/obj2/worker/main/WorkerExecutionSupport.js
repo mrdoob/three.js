@@ -138,7 +138,7 @@ WorkerExecutionSupport.prototype = {
 	_reset: function () {
 
 		this.logging = {
-			enabled: true,
+			enabled: false,
 			debug: false
 		};
 
@@ -437,7 +437,11 @@ WorkerExecutionSupport.prototype = {
 				}
 				if ( this.worker.terminateWorkerOnLoad ) {
 
-					if ( this.worker.logging.enabled ) console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
+					if ( this.worker.logging.enabled ) {
+
+						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
+
+					}
 					this.worker.callbacks.terminate();
 
 				}
@@ -454,7 +458,11 @@ WorkerExecutionSupport.prototype = {
 				}
 				if ( this.worker.terminateWorkerOnLoad ) {
 
-					if ( this.worker.logging.enabled ) console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
+					if ( this.worker.logging.enabled ) {
+
+						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
+
+					}
 					this.worker.callbacks.terminate();
 
 				}

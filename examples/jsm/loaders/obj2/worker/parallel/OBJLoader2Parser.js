@@ -8,6 +8,11 @@
  */
 const OBJLoader2Parser = function () {
 
+	this.logging = {
+		enabled: false,
+		debug: false
+	};
+
 	let scope = this;
 	this.callbacks = {
 		onProgress: function ( text ) {
@@ -69,11 +74,6 @@ const OBJLoader2Parser = function () {
 		lineByte: 0,
 		currentByte: 0,
 		totalBytes: 0
-	};
-
-	this.logging = {
-		enabled: true,
-		debug: false
 	};
 
 };
@@ -152,8 +152,14 @@ OBJLoader2Parser.prototype = {
 
 	},
 
-	_setMaterials: function ( materials ) {
+	/**
+	 * Clears materials object and sets the new ones.
+	 *
+	 * @param {Object} materials Object with named materials
+	 */
+	setMaterials: function ( materials ) {
 
+ 		this.materials = {};
 		if ( materials === undefined || materials === null ) return;
 
 		for ( let materialName in materials ) {

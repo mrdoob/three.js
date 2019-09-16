@@ -66,6 +66,7 @@ export class OBJLoader2Parser {
   setCallbackOnError(onError: Function): this;
   setCallbackOnLoad(onLoad: Function): this;
   setLogging(enabled: boolean, debug: boolean): this;
+  setMaterials(materials: Object): void;
   execute(arrayBuffer: Uint8Array): void;
   executeLegacy(text: string): void;
 }

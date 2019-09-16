@@ -13,10 +13,12 @@ export class MaterialHandler {
   };
   materials: object;
 
-  addMaterials(materials: object, newMaterials: object): object;
+  createDefaultMaterials(overrideExisting: boolean): void;
+  addMaterials(materials: object, overrideExisting: boolean, newMaterials: object): object;
   addPayloadMaterials(materialPayload: object): object;
   setLogging(enabled: boolean, debug: boolean): void;
   getMaterials(): object;
   getMaterial(materialName: string): Material;
   getMaterialsJSON(): object;
+  clearMaterials(): void;
 }

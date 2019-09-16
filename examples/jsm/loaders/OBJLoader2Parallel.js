@@ -114,32 +114,6 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 	},
 
-	_configure: function () {
-
-		if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
-
-			throw "No callback other than the default callback was provided! Aborting!";
-
-		}
-		// check if worker is already available and if so, then fast-fail
-		if ( this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) return;
-
-		this.workerExecutionSupport.buildWorker( this.buildWorkerCode() );
-
-		let scope = this;
-		let scopedOnAssetAvailable = function ( payload ) {
-
-			scope._onAssetAvailable( payload );
-
-		};
-
-		function scopedOnLoad ( message ) {
-			scope.parser.callbacks.onLoad( scope.baseObject3d, message );
-		}
-		this.workerExecutionSupport.updateCallbacks( scopedOnAssetAvailable, scopedOnLoad );
-
-	},
-
 	/**
 	 * See {@link OBJLoader2.load}
 	 */
@@ -178,7 +152,32 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 		if ( this.executeParallel ) {
 
-			this._configure();
+			if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
+
+				throw "No callback other than the default callback was provided! Aborting!";
+
+			}
+			// check if worker has been initialize before. If yes, skip init
+			if ( ! this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) {
+
+				this.workerExecutionSupport.buildWorker( this.buildWorkerCode() );
+
+				let scope = this;
+				let scopedOnAssetAvailable = function ( payload ) {
+
+					scope._onAssetAvailable( payload );
+
+				};
+				function scopedOnLoad( message ) {
+					scope.parser.callbacks.onLoad( scope.baseObject3d, message );
+				}
+
+				this.workerExecutionSupport.updateCallbacks( scopedOnAssetAvailable, scopedOnLoad );
+
+			}
+
+			// Create default materials beforehand, but do not override previously set materials (e.g. during init)
+			this.materialHandler.createDefaultMaterials( false );
 
 			this.workerExecutionSupport.executeParallel(
 			{

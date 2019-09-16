@@ -32,7 +32,12 @@ const OBJLoader2 = function ( manager ) {
 	this.materialHandler = new MaterialHandler();
 	this.meshReceiver = new MeshReceiver( this.materialHandler );
 
-	this._init();
+	// as OBJLoader2 is no longer derived from OBJLoader2Parser, we need to override the default onAssetAvailable callback
+	let scope = this;
+	let defaultOnAssetAvailable = function ( payload ) {
+		scope._onAssetAvailable( payload )
+	};
+	this.parser.setCallbackOnAssetAvailable( defaultOnAssetAvailable );
 };
 
 OBJLoader2.OBJLOADER2_VERSION = '3.0.1';
@@ -42,17 +47,6 @@ console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: OBJLoader2,
-
-	_init: function () {
-
-		// as OBJLoader2 is no longer derived from OBJLoader2Parser, we need to override the default onAssetAvailable callback
-		let scope = this;
-		let defaultOnAssetAvailable = function ( payload ) {
-			scope._onAssetAvailable( payload )
-		};
-		this.parser.setCallbackOnAssetAvailable( defaultOnAssetAvailable );
-
-	},
 
 	/**
 	 * See {@link OBJLoader2Parser.setLogging}
@@ -326,8 +320,11 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		// sync code works directly on the material references
-		this.parser._setMaterials( this.materialHandler.getMaterials() );
+		// Create default materials beforehand, but do not override previously set materials (e.g. during init)
+		this.materialHandler.createDefaultMaterials( false );
+
+		// code works directly on the material references, parser clear its materials before updating
+		this.parser.setMaterials( this.materialHandler.getMaterials() );
 
 		if ( content instanceof ArrayBuffer || content instanceof Uint8Array ) {
 
