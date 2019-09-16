@@ -37,7 +37,7 @@ export default /* glsl */`
 
 	radiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, bentNormal, material.specularRoughness, maxMipLevel );
 
-	#ifndef STANDARD
+	#ifndef CLEARCOAT
 		clearcoatRadiance += getLightProbeIndirectRadiance( /*specularLightProbe,*/ geometry.viewDir, geometry.clearcoatNormal, material.clearcoatNormal, maxMipLevel );
 	#endif
 
