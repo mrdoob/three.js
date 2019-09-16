@@ -931,7 +931,12 @@ var FBXLoader = ( function () {
 
 					}
 
-					model.name = PropertyBinding.sanitizeNodeName( node.attrName );
+					if ( model.name ) {
+
+						model.name = PropertyBinding.sanitizeNodeName( node.attrName );
+
+					}
+
 					model.ID = id;
 
 				}
@@ -965,7 +970,13 @@ var FBXLoader = ( function () {
 							bone.matrixWorld.copy( rawBone.transformLink );
 
 							// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
-							bone.name = PropertyBinding.sanitizeNodeName( name );
+
+							if ( bone.name ) {
+
+								bone.name = PropertyBinding.sanitizeNodeName( name );
+
+							}
+
 							bone.ID = id;
 
 							skeleton.bones[ i ] = bone;
@@ -1596,7 +1607,7 @@ var FBXLoader = ( function () {
 
 			}, null );
 
-			relationships.children.forEach( function( child ) {
+			relationships.children.forEach( function ( child ) {
 
 				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
 
@@ -2108,7 +2119,7 @@ var FBXLoader = ( function () {
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
 			 var self = this;
-			morphTargets.forEach( function( morphTarget ) {
+			morphTargets.forEach( function ( morphTarget ) {
 
 				morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
@@ -2537,10 +2548,17 @@ var FBXLoader = ( function () {
 									if ( modelID !== undefined ) {
 
 										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
+										var modelName = '';
+
+										if ( rawModel.attrName ) {
+
+											modelName = PropertyBinding.sanitizeNodeName( rawModel.attrName );
+
+										}
 
 										var node = {
 
-											modelName: PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+											modelName: modelName,
 											ID: rawModel.id,
 											initialPosition: [ 0, 0, 0 ],
 											initialRotation: [ 0, 0, 0 ],
@@ -2592,10 +2610,17 @@ var FBXLoader = ( function () {
 									var modelID = connections.get( geoID ).parents[ 0 ].ID;
 
 									var rawModel = fbxTree.Objects.Model[ modelID ];
+									var modelName = '';
+
+									if ( rawModel.attrName ) {
+
+										modelName = PropertyBinding.sanitizeNodeName( rawModel.attrName );
+
+									}
 
 									var node = {
 
-										modelName: PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+										modelName: modelName,
 										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName,
 
 									};
