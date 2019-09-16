@@ -40,6 +40,7 @@ import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
+import { WebGLMultiview } from './webgl/WebGLMultiview.js';
 import { WebVRManager } from './webvr/WebVRManager.js';
 import { WebXRManager } from './webvr/WebXRManager.js';
 
@@ -311,6 +312,10 @@ function WebGLRenderer( parameters ) {
 	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
 	this.vr = vr;
+
+	// Multiview
+
+	var multiview = new WebGLMultiview( _this, _gl );
 
 	// shadow map
 
@@ -1175,6 +1180,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( capabilities.multiview ) {
+
+			multiview.attachCamera( camera );
+
+		}
+
 		//
 
 		background.render( currentRenderList, scene, camera, forceClear );
@@ -1228,6 +1239,12 @@ function WebGLRenderer( parameters ) {
 		state.buffers.color.setMask( true );
 
 		state.setPolygonOffset( false );
+
+		if ( capabilities.multiview ) {
+
+			multiview.detachCamera( camera );
+
+		}
 
 		if ( vr.enabled ) {
 
@@ -1375,19 +1392,27 @@ function WebGLRenderer( parameters ) {
 
 				_currentArrayCamera = camera;
 
-				var cameras = camera.cameras;
+				if ( capabilities.multiview ) {
 
-				for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
+					renderObject(	object, scene, camera, geometry, material, group );
 
-					var camera2 = cameras[ j ];
+				} else {
 
-					if ( object.layers.test( camera2.layers ) ) {
+					var cameras = camera.cameras;
 
-						state.viewport( _currentViewport.copy( camera2.viewport ) );
+					for ( var j = 0, jl = cameras.length; j < jl; j ++ ) {
 
-						currentRenderState.setupLights( camera2 );
+						var camera2 = cameras[ j ];
 
-						renderObject( object, scene, camera2, geometry, material, group );
+						if ( object.layers.test( camera2.layers ) ) {
+
+							state.viewport( _currentViewport.copy( camera2.viewport ) );
+
+							currentRenderState.setupLights( camera2 );
+
+							renderObject( object, scene, camera2, geometry, material, group );
+
+						}
 
 					}
 
@@ -1682,7 +1707,15 @@ function WebGLRenderer( parameters ) {
 
 		if ( refreshProgram || _currentCamera !== camera ) {
 
-			p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+			if ( program.numMultiviewViews > 0 ) {
+
+				multiview.updateCameraProjectionMatricesUniform( camera, p_uniforms );
+
+			} else {
+
+				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+
+			}
 
 			if ( capabilities.logarithmicDepthBuffer ) {
 
@@ -1730,7 +1763,15 @@ function WebGLRenderer( parameters ) {
 				material.isShaderMaterial ||
 				material.skinning ) {
 
-				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
+				if ( program.numMultiviewViews > 0 ) {
+
+					multiview.updateCameraViewMatricesUniform( camera, p_uniforms );
+
+				} else {
+
+					p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
+
+				}
 
 			}
 
@@ -1771,7 +1812,6 @@ function WebGLRenderer( parameters ) {
 						boneMatrices.set( skeleton.boneMatrices ); // copy current values
 
 						var boneTexture = new DataTexture( boneMatrices, size, size, RGBAFormat, FloatType );
-						boneTexture.needsUpdate = true;
 
 						skeleton.boneMatrices = boneMatrices;
 						skeleton.boneTexture = boneTexture;
@@ -1935,8 +1975,17 @@ function WebGLRenderer( parameters ) {
 
 		// common matrices
 
-		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
-		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
+		if ( program.numMultiviewViews > 0 ) {
+
+			multiview.updateObjectMatricesUniforms( object, camera, p_uniforms );
+
+		} else {
+
+			p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
+			p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
+
+		}
+
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
 		return program;

@@ -1198,6 +1198,16 @@ Object.assign( BufferAttribute.prototype, {
 
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
+	},
+	setArray: function ( array ) {
+
+		console.warn( 'THREE.BufferAttribute: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+		this.count = array !== undefined ? array.length / this.itemSize : 0;
+		this.array = array;
+
+		return this;
+
 	}
 } );
 
@@ -1284,6 +1294,16 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
 		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
+	setArray: function ( array ) {
+
+		console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+		this.count = array !== undefined ? array.length / this.stride : 0;
+		this.array = array;
+
 		return this;
 
 	}
@@ -1384,6 +1404,21 @@ Object.defineProperties( Material.prototype, {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
 			this.flatShading = ( value === FlatShading );
+
+		}
+	},
+
+	stencilMask: {
+		get: function () {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			return this.stencilFuncMask;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			this.stencilFuncMask = value;
 
 		}
 	}

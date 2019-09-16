@@ -50,34 +50,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setArray", ( assert ) => {
-
-			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
-			var f32b = new Float32Array( [] );
-			var a = new InterleavedBuffer( f32a, 2, false );
-
-			a.setArray( f32a );
-
-			assert.strictEqual( a.count, 2, "Check item count for non-empty array" );
-			assert.strictEqual( a.array, f32a, "Check array itself" );
-
-			a.setArray( f32b );
-
-			assert.strictEqual( a.count, 0, "Check item count for empty array" );
-			assert.strictEqual( a.array, f32b, "Check array itself" );
-
-			assert.throws(
-				function () {
-
-					a.setArray( [ 1, 2, 3, 4 ] );
-
-				},
-				/array should be a Typed Array/,
-				"Calling setArray with a non-typed array throws Error"
-			);
-
-		} );
-
 		QUnit.test( "setUsage", ( assert ) => {
 
 			var instance = new InterleavedBuffer();

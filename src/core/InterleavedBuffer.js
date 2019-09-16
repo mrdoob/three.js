@@ -33,21 +33,6 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	onUploadCallback: function () {},
 
-	setArray: function ( array ) {
-
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
-
-		return this;
-
-	},
-
 	setUsage: function ( value ) {
 
 		this.usage = value;

@@ -74,9 +74,31 @@ UI.Element.prototype = {
 
 	},
 
+	getId: function ( id ) {
+
+		return this.dom.id;
+
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;
+
+		return this;
+
+	},
+
+	addClass: function ( name ) {
+
+		this.dom.classList.add( name );
+
+		return this;
+
+	},
+
+	removeClass: function ( name ) {
+
+		this.dom.classList.remove( name );
 
 		return this;
 
@@ -995,3 +1017,266 @@ UI.Button.prototype.setLabel = function ( value ) {
 	return this;
 
 };
+
+
+// TabbedPanel
+
+UI.TabbedPanel = function ( ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement('div');
+	
+	this.dom = dom;
+
+	this.setClass( 'TabbedPanel' );
+
+	this.tabs = [];
+	this.panels = [];
+
+	this.tabsDiv = new UI.Div();
+	this.tabsDiv.setClass( 'Tabs' );
+
+	this.panelsDiv = new UI.Div();
+	this.panelsDiv.setClass( 'Panels' );
+
+	this.add( this.tabsDiv );
+	this.add( this.panelsDiv );
+
+	this.selected = '';
+
+	return this;
+
+}
+
+UI.TabbedPanel.prototype = Object.create( UI.Element.prototype );
+UI.TabbedPanel.prototype.constructor = UI.TabbedPanel;
+
+UI.TabbedPanel.prototype.select = function ( id ) {
+
+	var tab;
+	var panel;
+	var scope = this;
+	
+	// Deselect current selection
+	if ( this.selected && this.selected.length ) {
+		tab = this.tabs.find( function ( item ) { return item.dom.id === scope.selected } );
+		panel = this.panels.find( function ( item ) { return item.dom.id === scope.selected } );
+
+		if ( tab ) {
+
+			tab.removeClass( 'selected' );
+
+		}
+
+		if( panel ) {
+
+			panel.setDisplay( 'none' );
+
+		}
+
+	}
+
+	tab = this.tabs.find( function ( item ) { return item.dom.id === id } );
+	panel = this.panels.find( function ( item ) { return item.dom.id === id } );
+	
+	if ( tab ) {
+
+		tab.addClass( 'selected' );
+
+	}
+
+	if( panel ) {
+
+		panel.setDisplay( '' );
+
+	}
+
+	this.selected = id;
+
+	return this;
+
+}
+
+UI.TabbedPanel.prototype.addTab = function ( id, label, items ) {
+
+	var tab = new UI.TabbedPanel.Tab( label, this );
+	tab.setId( id );
+	this.tabs.push( tab );
+	this.tabsDiv.add( tab );
+
+	var panel = new UI.Div();
+	panel.setId( id );
+	panel.add( items );
+	panel.setDisplay( 'none' );
+	this.panels.push( panel );
+	this.panelsDiv.add( panel );
+
+	this.select( id );
+
+}
+
+UI.TabbedPanel.Tab = function ( text, parent ) {
+
+	UI.Text.call( this, text );
+	this.parent = parent;
+
+	this.setClass( 'Tab' );
+
+	var scope = this;
+	this.dom.addEventListener( 'click', function ( event ) {
+
+		scope.parent.select( scope.dom.id );
+
+	} )
+
+	return this;
+
+}
+
+UI.TabbedPanel.Tab.prototype = Object.create( UI.Text.prototype );
+UI.TabbedPanel.Tab.prototype.constructor = UI.TabbedPanel.Tab;
+
+// Listbox
+UI.Listbox = function ( ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'Listbox';
+	dom.tabIndex = 0;
+
+	this.dom = dom;
+	this.items = [];
+	this.listitems = [];
+	this.selectedIndex = 0;
+	this.selectedValue = null;
+
+	return this;
+
+}
+
+UI.Listbox.prototype = Object.create( UI.Element.prototype );
+UI.Listbox.prototype.constructor = UI.ListboxItem;
+
+UI.Listbox.prototype.setItems = function ( items ) {
+
+	if ( Array.isArray( items ) ) {
+
+		this.items = items;
+
+	}
+
+	this.render( );
+
+}
+
+UI.Listbox.prototype.render = function ( ) {
+
+	while( this.listitems.length ) {
+
+		var item = this.listitems[0];
+
+		item.dom.remove();
+
+		this.listitems.splice(0, 1);
+
+	}
+
+	for ( var i = 0; i < this.items.length; i ++ ) {
+
+		var item = this.items[i];
+
+		var listitem = new UI.Listbox.ListboxItem( this );
+		listitem.setId( item.id || `Listbox-${i}` );
+		listitem.setTextContent( item.name || item.type );
+		this.add( listitem );
+
+	}
+
+}
+
+// Assuming user passes valid list items
+UI.Listbox.prototype.add = function (  ) {
+
+	var items = Array.from( arguments );
+
+	this.listitems = this.listitems.concat( items );
+
+	UI.Element.prototype.add.apply( this, items );
+
+}
+
+UI.Listbox.prototype.selectIndex = function ( index ) {
+
+	if ( index >= 0 && index < this.items.length ) {
+
+		this.setValue( this.listitems[ index ].getId(  ) );
+
+	}
+
+	this.selectIndex = index;
+
+}
+
+UI.Listbox.prototype.getValue = function ( index ) {
+
+	return this.selectedValue;
+
+}
+
+UI.Listbox.prototype.setValue = function ( value ) {
+
+	for ( var i = 0; i < this.listitems.length; i ++ ) {
+
+		var element = this.listitems[ i ];
+
+		if ( element.getId( ) === value ) {
+
+			element.addClass( 'active' );
+
+		} else {
+			
+			element.removeClass( 'active' );
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
+	this.dom.dispatchEvent( changeEvent );
+
+}
+
+// Listbox Item
+UI.Listbox.ListboxItem = function ( parent ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'ListboxItem';
+
+	this.parent = parent;
+	this.dom = dom;
+
+	var scope = this;
+
+	function onClick ( ) {
+		
+		if( scope.parent ) {
+			scope.parent.setValue( scope.getId( ) );
+		}
+
+	}
+
+	dom.addEventListener( 'click', onClick, false );
+
+	return this;
+
+}
+
+UI.Listbox.ListboxItem.prototype = Object.create( UI.Element.prototype );
+UI.Listbox.ListboxItem.prototype.constructor = UI.Listbox.ListboxItem;

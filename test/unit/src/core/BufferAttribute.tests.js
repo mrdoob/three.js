@@ -43,28 +43,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setArray", ( assert ) => {
-
-			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
-			var a = new BufferAttribute( f32a, 2, false );
-
-			a.setArray( f32a, 2 );
-
-			assert.strictEqual( a.count, 2, "Check item count" );
-			assert.strictEqual( a.array, f32a, "Check array" );
-
-			assert.throws(
-				function () {
-
-					a.setArray( [ 1, 2, 3, 4 ] );
-
-				},
-				/array should be a Typed Array/,
-				"Calling setArray with a simple array throws Error"
-			);
-
-		} );
-
 		QUnit.test( "setUsage", ( assert ) => {
 
 			var attr = new BufferAttribute();
