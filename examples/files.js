@@ -369,7 +369,6 @@ var files = {
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
 		"misc_exporter_stl",
-		"misc_fps",
 		"misc_lookat",
 	],
 	"css2d": [
