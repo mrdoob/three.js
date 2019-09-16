@@ -63,6 +63,8 @@ export class OrbitControls {
 
 	update(): void;
 
+	saveState(): void;
+
 	reset(): void;
 
 	dispose(): void;
