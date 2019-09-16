@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+  },
+  "include": [
+    "../../**/*.ts"
+  ]
+}
