@@ -16,7 +16,6 @@ export class BufferAttribute {
 	count: number;
 	onUpload: Function;
 
-	setArray( array?: ArrayBufferView ): void;
 	setDynamic( dynamic: boolean ): BufferAttribute;
 	clone(): this;
 	copy( source: BufferAttribute ): this;
