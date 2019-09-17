@@ -147,14 +147,14 @@
 						fileLoader.setPath( '' );
 						fileLoader.setResponseType( 'arraybuffer' );
 						fileLoader.load( 'models/obj/female02/female02.obj',
-							function ( content ) {
+							function ( content, message ) {
 								let local = new THREE.Object3D();
 								local.name = 'Pivot_female02';
 								local.position.set( 75, 0, 0 );
 								scope.pivot.add( local );
 								local.add( objLoader2.parse( content ) );
 
-								scope._reportProgress( { detail: { text: 'Loading complete: ' + modelName } } );
+								scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 							}
 						);
 					}
@@ -168,17 +168,23 @@
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
 					let scope = this;
-
-					let objLoader2Parallel = new OBJLoader2Parallel();
-					objLoader2Parallel.setModelName( modelName );
-
-					function callbackOnLoad ( message ) {
-						scope.scene.add( objLoader2Parallel.baseObject3d  );
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + message } } );
+					function callbackOnLoad( object3d, message ) {
+						scope.scene.add( object3d );
+						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 					}
 
-					let filename = 'models/obj/female02/female02_vertex_colors.obj';
-					objLoader2Parallel.load( filename, callbackOnLoad );
+					let objLoader2Parallel = new OBJLoader2Parallel()
+						.setModelName( modelName )
+						.setCallbackOnLoad( callbackOnLoad );
+
+					let fileLoader = new THREE.FileLoader();
+					fileLoader.setPath( '' );
+					fileLoader.setResponseType( 'arraybuffer' );
+					fileLoader.load( 'models/obj/female02/female02_vertex_colors.obj',
+						function ( content ) {
+							objLoader2Parallel.parse( content );
+						}
+					);
 				},
 
 				useLoadMain: function () {
@@ -190,14 +196,14 @@
 					.setUseIndices( true );
 
 					let scope = this;
-					function callbackOnLoad ( object3d ) {
+					function callbackOnLoad ( object3d, message ) {
 						let local = new THREE.Object3D();
 						local.name = 'Pivot_male02';
 						local.position.set( 0, 0, -75 );
 						scope.pivot.add( local );
 						local.add( object3d );
 
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + objLoader2.modelName } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 					}
 
 					function onLoadMtl ( mtlParseResult ) {
@@ -221,12 +227,12 @@
 					this.pivot.add( local );
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
-					.setModelName( modelName )
-					.setBaseObject3d( local );
+						.setModelName( modelName );
 
 					let scope = this;
-					function callbackOnLoad ( message ) {
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + message } } );
+					function callbackOnLoad ( object3d, message ) {
+						local.add( object3d );
+						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 					}
 					function onLoadMtl ( mtlParseResult ) {
 						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
@@ -246,13 +252,13 @@
 					this.pivot.add( local );
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
-					.setModelName( local.name )
-					.setExecuteParallel( false );
+						.setModelName( local.name )
+						.setExecuteParallel( false );
 
 					let scope = this;
-					function callbackOnLoad ( object3d ) {
+					function callbackOnLoad ( object3d, message ) {
 						local.add( object3d );
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + local.name } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + 'completed: ' + message } } );
 					}
 
 					objLoader2Parallel.load( 'models/obj/cerberus/Cerberus.obj', callbackOnLoad );
@@ -265,8 +271,8 @@
 					this.pivot.add( local );
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
-					.setModelName( local.name )
-					.setBaseObject3d( local );
+						.setModelName( local.name )
+						.setBaseObject3d( local );
 
 					// Configure WorkerExecutionSupport to not disregard worker after execution
 					objLoader2Parallel.getWorkerExecutionSupport().setTerminateWorkerOnLoad( false );
@@ -289,8 +295,8 @@
 					objLoader2Parallel.setCallbackOnMeshAlter( callbackMeshAlter );
 
 					let scope = this;
-					function callbackOnLoad ( message ) {
-						scope._reportProgress( { detail: { text: 'Loading complete: ' + message } } );
+					function callbackOnLoad ( object3d, message ) {
+						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + 'completed: ' + message } } );
 					}
 
 					objLoader2Parallel.load( 'models/obj/vive-controller/vr_controller_vive_1_5.obj', callbackOnLoad );
