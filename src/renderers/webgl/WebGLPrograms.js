@@ -137,6 +137,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			shaderID: shaderID,
 
 			precision: precision,
+			isWebGL2: capabilities.isWebGL2,
 			supportsVertexTextures: capabilities.vertexTextures,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
@@ -289,7 +290,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities );
+			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
 			programs.push( program );
 
 		}
