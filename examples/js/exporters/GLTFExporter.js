@@ -901,7 +901,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isShaderMaterial && !material.isGLTFSpecularGlossinessMaterial ) {
+			if ( material.isShaderMaterial && ! material.isGLTFSpecularGlossinessMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;

@@ -477,7 +477,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 				attributeID = decoder.GetAttributeId( dracoGeometry, draco[ attributeIDs[ attributeName ] ] );
 
-				if ( attributeID === -1 ) continue;
+				if ( attributeID === - 1 ) continue;
 
 				attribute = decoder.GetAttribute( dracoGeometry, attributeID );
 
