@@ -69,7 +69,7 @@ function Material() {
 	this.alphaTest = 0;
 	this.premultipliedAlpha = false;
 
-	this.parallelCompile = false;
+	this.parallelCompile = Material.DefaultParallelCompile;
 	this.visible = true;
 
 	this.toneMapped = true;
@@ -79,6 +79,8 @@ function Material() {
 	this.needsUpdate = true;
 
 }
+
+Material.DefaultParallelCompile = false;
 
 Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
