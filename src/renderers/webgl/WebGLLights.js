@@ -43,9 +43,13 @@ function UniformsCache() {
 						direction: new Vector3(),
 						color: new Color(),
 						distance: 0,
+						shape: 0,
+						aspect: 0,
 						coneCos: 0,
 						penumbraCos: 0,
 						decay: 0,
+
+						matrix: new Matrix4(),
 
 						shadow: false,
 						shadowBias: 0,
@@ -244,9 +248,19 @@ function WebGLLights() {
 				uniforms.direction.sub( vector3 );
 				uniforms.direction.transformDirection( viewMatrix );
 
+				uniforms.shape = light.shape;
+				uniforms.aspect = light.aspect;
 				uniforms.coneCos = Math.cos( light.angle );
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
 				uniforms.decay = light.decay;
+
+				var near = light.shadow.camera.near,
+				top = near * Math.tan( 0.5 * light.angle ),
+				height = 2 * top,
+				width = light.aspect * height,
+				left = - 0.5 * width,
+				far = light.distance || light.shadow.camera.far;
+				uniforms.matrix.makePerspective(left, left + width, top, top - height, near, far);
 
 				uniforms.shadow = light.castShadow;
 

@@ -129,6 +129,8 @@ var UniformsLib = {
 			position: {},
 			direction: {},
 			distance: {},
+			shape: {},
+			aspect: {},
 			coneCos: {},
 			penumbraCos: {},
 			decay: {},

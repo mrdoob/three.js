@@ -35,6 +35,11 @@ export const PCFShadowMap: ShadowMapType;
 export const PCFSoftShadowMap: ShadowMapType;
 export const VSMShadowMap: ShadowMapType;
 
+// Spot Light Type
+export enum SpotLightType {}
+export const CircleSpotLight: SpotLightType;
+export const RectangleSpotLight: SpotLightType;
+
 // MATERIAL CONSTANTS
 
 // side

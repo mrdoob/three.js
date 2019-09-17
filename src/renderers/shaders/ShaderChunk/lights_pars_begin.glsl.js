@@ -121,6 +121,8 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		vec3 direction;
 		vec3 color;
 		float distance;
+		int shape;
+		float aspect;
 		float decay;
 		float coneCos;
 		float penumbraCos;
@@ -142,12 +144,18 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		float lightDistance = length( lVector );
 		float angleCos = dot( directLight.direction, spotLight.direction );
 
-		if ( angleCos > spotLight.coneCos ) {
+		if ( angleCos > spotLight.coneCos && spotLight.shape == 0 ) {
 
 			float spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );
 
 			directLight.color = spotLight.color;
 			directLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
+			directLight.visible = true;
+
+		} else if (spotLight.shape == 1) {
+
+			directLight.color = spotLight.color;
+			directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
 			directLight.visible = true;
 
 		} else {
