@@ -109,12 +109,12 @@ class GPUPickHelper {
     // set the view offset to represent just a single pixel under the mouse
     const pixelRatio = renderer.getPixelRatio();
     camera.setViewOffset(
-        renderer.context.drawingBufferWidth,   // full width
-        renderer.context.drawingBufferHeight,  // full top
-        cssPosition.x * pixelRatio | 0,        // rect x
-        cssPosition.y * pixelRatio | 0,        // rect y
-        1,                                     // rect width
-        1,                                     // rect height
+        renderer.getContext().drawingBufferWidth,   // full width
+        renderer.getContext().drawingBufferHeight,  // full top
+        cssPosition.x * pixelRatio | 0,             // rect x
+        cssPosition.y * pixelRatio | 0,             // rect y
+        1,                                          // rect width
+        1,                                          // rect height
     );
     // render the scene
     renderer.setRenderTarget(pickingTexture);
