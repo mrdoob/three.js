@@ -654,12 +654,17 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	},
 
 	// Allows you to seek to a specific time in an animation.
-	setTime: function( timeInSeconds ) {
-		this.time=0; // Zero out time attribute for AnimationMixer object;
-    for(var i=0;i<this._actions.length;i++){
-      this._actions[i].time=0; // Zero out time attribute for all associated AnimationAction objects.
-    }
-    return this.update(timeInSeconds); // Update used to set exact time. Returns "this" AnimationMixer object.
+	setTime: function ( timeInSeconds ) {
+
+		this.time = 0; // Zero out time attribute for AnimationMixer object;
+		for ( var i = 0; i < this._actions.length; i ++ ) {
+
+			this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
+
+		}
+
+		return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
+
 	},
 
 	// return this mixer's root target object
