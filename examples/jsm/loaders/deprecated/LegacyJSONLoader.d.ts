@@ -14,6 +14,6 @@ export class LegacyJSONLoader extends Loader {
   constructor(manager?: LoadingManager);
   withCredentials: boolean;
 
-  load(url: string, onLoad: (object: LegacyJSONLoaderResult) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
+  load(url: string, onLoad: (geometry: Geometry, materials: Material[]) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
   parse(json: object, path: string): LegacyJSONLoaderResult;
 }
