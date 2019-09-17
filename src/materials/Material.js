@@ -86,6 +86,12 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	onBeforeCompile: function () {},
 
+	customProgramCacheKey: function () {
+
+		return this.onBeforeCompile.toString();
+
+	},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
