@@ -61,7 +61,7 @@ export class OrbitControls {
 
 	dollyOut(dollyScale: number): void;
 
-	update(): void;
+	update(): boolean;
 
 	saveState(): void;
 
