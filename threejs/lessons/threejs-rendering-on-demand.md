@@ -117,13 +117,10 @@ And with that we get something that renders on demand.
 {{{example url="../threejs-render-on-demand.html" }}}
 
 The `OrbitControls` have options to add a kind of inertia to make them feel less
-stiff. We can enable this by setting the `enableDamping` property to true and we
-can set how much inertia by adjusting the `dampingFactor`
+stiff. We can enable this by setting the `enableDamping` property to true.
 
 ```js
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.rotateSpeed = 0.1;
 ```
 
 With `enableDamping` on we need to call `controls.update` in our render function
