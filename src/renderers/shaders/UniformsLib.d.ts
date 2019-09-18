@@ -84,6 +84,7 @@ export let UniformsLib: {
 				coneCos: {};
 				penumbraCos: {};
 				decay: {};
+				spotProjectionMatrix: {};
 				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};

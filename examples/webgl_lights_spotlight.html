@@ -119,22 +119,36 @@
 
 			}
 
+			var spotLightShapeOptions = {
+				Circle: THREE.CircleSpotLight,
+				Rectangle: THREE.RectangleSpotLight
+			}
+
 			function buildGui() {
 
 				gui = new GUI();
 
 				var params = {
 					'light color': spotLight.color.getHex(),
+					shape: 'Circle',
 					intensity: spotLight.intensity,
 					distance: spotLight.distance,
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
-					decay: spotLight.decay
+					decay: spotLight.decay,
+					aspect: spotLight.aspect
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
 
 					spotLight.color.setHex( val );
+					render();
+
+				} );
+
+				gui.add( params, 'shape', Object.keys( spotLightShapeOptions ) ).onChange( function ( val ) {
+
+					spotLight.shape = val === 'Circle' ? 0 : 1;
 					render();
 
 				} );
@@ -154,7 +168,7 @@
 
 				} );
 
-				gui.add( params, 'angle', 0, Math.PI / 3 ).onChange( function ( val ) {
+				gui.add( params, 'angle', 0, Math.PI / 2.4 ).onChange( function ( val ) {
 
 					spotLight.angle = val;
 					render();
@@ -171,6 +185,13 @@
 				gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
 
 					spotLight.decay = val;
+					render();
+
+				} );
+
+				gui.add( params, 'aspect', 0.5, 2 ).onChange( function ( val ) {
+
+					spotLight.aspect = val;
 					render();
 
 				} );

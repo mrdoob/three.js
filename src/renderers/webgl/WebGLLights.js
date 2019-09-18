@@ -4,8 +4,10 @@
 
 import { Color } from '../../math/Color.js';
 import { Matrix4 } from '../../math/Matrix4.js';
+import { Quaternion } from '../../math/Quaternion.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { RectangleSpotLight } from '../../constants.js';
 
 function UniformsCache() {
 
@@ -46,6 +48,8 @@ function UniformsCache() {
 						coneCos: 0,
 						penumbraCos: 0,
 						decay: 0,
+
+						spotProjectionMatrix: new Matrix4(),
 
 						shadow: false,
 						shadowBias: 0,
@@ -151,6 +155,7 @@ function WebGLLights() {
 	for ( var i = 0; i < 9; i ++ ) state.probe.push( new Vector3() );
 
 	var vector3 = new Vector3();
+	var quaternion = new Quaternion();
 	var matrix4 = new Matrix4();
 	var matrix42 = new Matrix4();
 
@@ -247,6 +252,27 @@ function WebGLLights() {
 				uniforms.coneCos = Math.cos( light.angle );
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
 				uniforms.decay = light.decay;
+
+				if ( light.shape === RectangleSpotLight ) {
+					// construct a world-matrix from light-position, -target and z-rotation
+					matrix4.lookAt( light.position, light.target.position, light.up );
+					matrix4.multiply( matrix42.makeRotationZ( light.rotation.z ) );
+
+					quaternion.setFromRotationMatrix( matrix4 );
+
+					matrix4.compose( light.position, quaternion, vector3.set( 1, 1, 1 ) );
+					matrix42.getInverse( matrix4 );
+
+					var near = light.shadow.camera.near,
+					top = near * Math.tan( light.angle ),
+					height = 2 * top,
+					width = light.aspect * height,
+					left = - 0.5 * width,
+					far = light.distance || light.shadow.camera.far;
+					uniforms.spotProjectionMatrix.makePerspective(left, left + width, top, top - height, near, far)
+						.multiply( matrix42 )
+						.multiply( camera.matrixWorld );
+				}
 
 				uniforms.shadow = light.castShadow;
 
