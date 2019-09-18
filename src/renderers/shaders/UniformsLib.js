@@ -134,6 +134,7 @@ var UniformsLib = {
 			coneCos: {},
 			penumbraCos: {},
 			decay: {},
+			spotProjectionMatrix: {},
 
 			shadow: {},
 			shadowBias: {},

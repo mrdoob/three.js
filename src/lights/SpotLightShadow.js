@@ -1,6 +1,7 @@
 import { LightShadow } from './LightShadow.js';
 import { _Math } from '../math/Math.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
+import { CircleSpotLight } from '../constants.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -23,7 +24,7 @@ SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype 
 		var camera = this.camera;
 
 		var fov = _Math.RAD2DEG * 2 * light.angle;
-		var aspect = this.mapSize.width / this.mapSize.height;
+		var aspect = light.shape == CircleSpotLight ? this.mapSize.width / this.mapSize.height : light.aspect;
 		var far = light.distance || camera.far;
 
 		if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {

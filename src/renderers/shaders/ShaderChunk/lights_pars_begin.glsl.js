@@ -126,6 +126,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 		float decay;
 		float coneCos;
 		float penumbraCos;
+		mat4 spotProjectionMatrix;
 
 		int shadow;
 		float shadowBias;
@@ -154,9 +155,19 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 		} else if (spotLight.shape == 1) {
 
+			vec4 project = spotLight.spotProjectionMatrix * vec4( geometry.position, 1 );
+			project /= project.w;
 			directLight.color = spotLight.color;
-			directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
-			directLight.visible = true;
+			directLight.visible = all( bvec3( all( lessThanEqual( project.xy, vec2( 1.0 ) ) ), all( greaterThanEqual( project.xy, vec2( -1.0 ) ) ), project.z >= 0.0 ) );
+			if ( directLight.visible ) {
+
+				directLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );
+
+			} else {
+
+				directLight.color = vec3( 0.0 );
+
+			}
 
 		} else {
 
