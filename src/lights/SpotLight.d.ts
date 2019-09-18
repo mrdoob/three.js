@@ -2,6 +2,7 @@ import { Color } from './../math/Color';
 import { Object3D } from './../core/Object3D';
 import { SpotLightShadow } from './SpotLightShadow';
 import { Light } from './Light';
+import { SpotLightType } from '../constants';
 
 /**
  * A point light that can cast shadow in one direction.
@@ -12,6 +13,8 @@ export class SpotLight extends Light {
 		color?: Color | string | number,
 		intensity?: number,
 		distance?: number,
+		shape?: SpotLightType,
+		aspect?: number,
 		angle?: number,
 		exponent?: number,
 		decay?: number
@@ -34,6 +37,18 @@ export class SpotLight extends Light {
 	 * Default — 0.0.
 	 */
 	distance: number;
+
+	/**
+	 * Shape of the spot light, can be CircleSpotLight or RectangleSpotLight.
+	 * Default - CircleSpotLight.
+	 */
+	shape: SpotLightType;
+
+	/**
+	 * Aspect ratio of the RectangleSpotLight.
+	 * Default - 1.0.
+	 */
+	aspect: number;
 
 	/*
 	 * Maximum extent of the spotlight, in radians, from its direction.
