@@ -324,7 +324,10 @@ function main() {
     const width = 8;
     const height = 8;
     const depth = 8;
-    addLineGeometry(-1, -2, new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(width, height, depth)));
+    const thresholdAngle = 15;
+    addLineGeometry(-1, -2, new THREE.EdgesGeometry(
+        new THREE.BoxBufferGeometry(width, height, depth),
+        thresholdAngle));
   }
   {
     const width = 8;
