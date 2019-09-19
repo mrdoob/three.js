@@ -7,25 +7,27 @@ import { FunctionNode } from '../core/FunctionNode';
 import { FloatNode } from '../inputs/FloatNode';
 
 export class CameraNode extends TempNode {
-  constructor(scope?: string, camera?: Camera);
 
-  scope: string;
-  near: FloatNode | undefined;
-  far: FloatNode | undefined;
-  camera: Camera | undefined;
-  updateFrame: boolean | undefined;
-  nodeType: string;
+	constructor( scope?: string, camera?: Camera );
 
-  setCamera(camera: Camera): void;
-  setScope(scope: string): void;
-  generate(builder: NodeBuilder, output: string): string;
-  onUpdateFrame(frame: NodeFrame): void;
-  copy(source: CameraNode): this;
+	scope: string;
+	near: FloatNode | undefined;
+	far: FloatNode | undefined;
+	camera: Camera | undefined;
+	updateFrame: boolean | undefined;
+	nodeType: string;
 
-  static Nodes: {
-    depthColor: FunctionNode;
-  };
-  static POSITION: string;
-  static DEPTH: string;
-  static TO_VERTEX: string;
+	setCamera( camera: Camera ): void;
+	setScope( scope: string ): void;
+	generate( builder: NodeBuilder, output: string ): string;
+	onUpdateFrame( frame: NodeFrame ): void;
+	copy( source: CameraNode ): this;
+
+	static Nodes: {
+		depthColor: FunctionNode;
+	};
+	static POSITION: string;
+	static DEPTH: string;
+	static TO_VERTEX: string;
+
 }

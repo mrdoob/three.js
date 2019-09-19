@@ -1,24 +1,25 @@
 import {
-  OrthographicCamera,
-  Mesh,
-  Scene,
-  ShaderMaterial,
-  Vector3,
-  WebGLRenderer,
-  WebGLRenderTarget,
+	OrthographicCamera,
+	Mesh,
+	Scene,
+	ShaderMaterial,
+	Vector3,
+	WebGLRenderer,
+	WebGLRenderTarget,
 } from '../../../src/Three';
 
 export class Ocean {
-  constructor( renderer: WebGLRenderer, camera?: OrthographicCamera, scene?: Scene, options?: object );
+
+	constructor( renderer: WebGLRenderer, camera?: OrthographicCamera, scene?: Scene, options?: object );
 
 	changed: boolean;
 	initial: boolean;
 
 	oceanCamera: OrthographicCamera
 	renderer: WebGLRenderer;
-  scene: Scene;
+	scene: Scene;
 
-  clearColor: number[];
+	clearColor: number[];
 	geometryOrigin: number[];
 	sunDirectionX: number;
 	sunDirectionY: number;
@@ -33,9 +34,9 @@ export class Ocean {
 	windX: number;
 	windY: number;
 	size: number;
-  choppiness: number;
+	choppiness: number;
 
-  initialSpectrumFramebuffer: WebGLRenderTarget;
+	initialSpectrumFramebuffer: WebGLRenderTarget;
 	spectrumFramebuffer: WebGLRenderTarget;
 	pingPhaseFramebuffer: WebGLRenderTarget;
 	pongPhaseFramebuffer: WebGLRenderTarget;
@@ -44,25 +45,25 @@ export class Ocean {
 	displacementMapFramebuffer: WebGLRenderTarget;
 	normalMapFramebuffer: WebGLRenderTarget;
 
-  matrixNeedsUpdate: boolean;
+	matrixNeedsUpdate: boolean;
 
-  materialOceanHorizontal: ShaderMaterial;
-  materialOceanVertical: ShaderMaterial;
-  materialInitialSpectrum: ShaderMaterial;
-  materialPhase: ShaderMaterial;
-  materialSpectrum: ShaderMaterial;
-  materialNormal: ShaderMaterial;
-  materialOcean: ShaderMaterial;
+	materialOceanHorizontal: ShaderMaterial;
+	materialOceanVertical: ShaderMaterial;
+	materialInitialSpectrum: ShaderMaterial;
+	materialPhase: ShaderMaterial;
+	materialSpectrum: ShaderMaterial;
+	materialNormal: ShaderMaterial;
+	materialOcean: ShaderMaterial;
 
-  screenQuad: Mesh;
+	screenQuad: Mesh;
 
-  generateSeedPhaseTexture(): void;
+	generateSeedPhaseTexture(): void;
 	generateMesh(): void;
-  render(): void;
-  renderInitialSpectrum(): void;
-  renderWavePhase(): void;
-  renderSpectrum(): void;
-  renderSpectrumFFT(): void;
-  renderNormalMap(): void;
+	render(): void;
+	renderInitialSpectrum(): void;
+	renderWavePhase(): void;
+	renderSpectrum(): void;
+	renderSpectrumFFT(): void;
+	renderNormalMap(): void;
 
 }

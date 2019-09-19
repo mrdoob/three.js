@@ -20,8 +20,10 @@ export interface LWOLoaderParameters {
 }
 
 export class LWOLoader extends Loader {
-	constructor(manager?: LoadingManager, parameters?: LWOLoaderParameters);
 
-	load(url: string, onLoad: (lwo: LWO) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-	parse(data: ArrayBuffer, path: string, modelName: string): LWO;
+	constructor( manager?: LoadingManager, parameters?: LWOLoaderParameters );
+
+	load( url: string, onLoad: ( lwo: LWO ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( data: ArrayBuffer, path: string, modelName: string ): LWO;
+
 }

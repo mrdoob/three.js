@@ -2,16 +2,18 @@ import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 
 export class PositionNode extends TempNode {
-  constructor(scope?: string);
 
-  scope: string;
-  nodeType: string;
+	constructor( scope?: string );
 
-  generate(builder: NodeBuilder, output: string): string;
-  copy(source: PositionNode): this;
+	scope: string;
+	nodeType: string;
 
-  static LOCAL: string;
-  static WORLD: string;
-  static VIEW: string;
-  static PROJECTION: string;
+	generate( builder: NodeBuilder, output: string ): string;
+	copy( source: PositionNode ): this;
+
+	static LOCAL: string;
+	static WORLD: string;
+	static VIEW: string;
+	static PROJECTION: string;
+
 }
