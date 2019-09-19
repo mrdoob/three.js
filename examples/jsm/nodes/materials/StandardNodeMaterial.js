@@ -37,7 +37,9 @@ NodeUtils.addShortcuts( StandardNodeMaterial.prototype, 'fragment', [
 	'environment',
 	'mask',
 	'position',
-	'sheen'
+	'sheen',
+	'anisotropy',
+	'anisotropyRotation'
 ] );
 
 export { StandardNodeMaterial };

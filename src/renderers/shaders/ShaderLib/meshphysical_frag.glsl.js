@@ -12,6 +12,9 @@ uniform vec3 emissive;
 uniform float roughness;
 uniform float metalness;
 uniform float opacity;
+uniform float anisotropy;
+uniform float anisotropyRotation;
+uniform float sheen;
 
 #ifdef TRANSPARENCY
 	uniform float transparency;
@@ -32,16 +35,16 @@ uniform float opacity;
 
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
+#if !defined( FLAT_SHADED ) || defined( USE_TANGENT )
 
 	varying vec3 vNormal;
 
-	#ifdef USE_TANGENT
+#endif
 
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
+#ifdef USE_TANGENT
 
-	#endif
+	varying vec3 vTangent;
+	varying vec3 vBitangent;
 
 #endif
 
@@ -71,6 +74,7 @@ varying vec3 vViewPosition;
 #include <metalnessmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+#include <anisotropy_pars_fragment>
 
 void main() {
 
@@ -92,6 +96,7 @@ void main() {
 	#include <clearcoat_normal_fragment_begin>
 	#include <clearcoat_normal_fragment_maps>
 	#include <emissivemap_fragment>
+	#include <anisotropy_fragment>
 
 	// accumulation
 	#include <lights_physical_fragment>

@@ -52,6 +52,11 @@ struct GeometricContext {
 #ifdef CLEARCOAT
 	vec3 clearcoatNormal;
 #endif
+#ifdef ANISOTROPY
+	vec2 anisotropicM;
+	vec3 anisotropicS;
+	vec3 anisotropicT;
+#endif
 };
 
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
@@ -108,9 +113,23 @@ float linearToRelativeLuminance( const in vec3 color ) {
 
 }
 
+// http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
+mat3 rotationMatrix3(vec3 axis, float angle) {
+
+	axis = normalize(axis);
+	float s = sin(angle);
+	float c = cos(angle);
+	float oc = 1.0 - c;
+
+	return mat3(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,
+							oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,
+							oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c);
+
+}
+
 bool isPerspectiveMatrix( mat4 projectionMatrix ) {
 
-  return projectionMatrix[ 2 ][ 3 ] == - 1.0;
+	return projectionMatrix[ 2 ][ 3 ] == - 1.0;
 
 }
 `;

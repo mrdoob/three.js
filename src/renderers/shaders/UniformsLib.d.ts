@@ -13,6 +13,12 @@ export let UniformsLib: {
 	specularmap: {
 		specularMap: IUniform;
 	};
+	anisotropy: {
+		anisotropy: IUniform;
+		anisotropyMap: IUniform;
+		anisotropyRotation: IUniform;
+		anisotropyRotationMap: IUniform;
+	};
 	envmap: {
 		envMap: IUniform;
 		flipEnvMap: IUniform;

@@ -26,6 +26,40 @@ geometry.viewDir = normalize( vViewPosition );
 
 #endif
 
+#ifdef ANISOTROPY
+
+	geometry.anisotropicM = calcAnisotropyUV( anisotropyFactor ) * pow2( clamp( roughnessFactor, 0.02, 1.0 ) );
+
+	#ifdef USE_TANGENT
+
+		geometry.anisotropicS = normalize( vTangent.xyz  );
+		geometry.anisotropicT = normalize( vBitangent.xyz );
+
+	#else
+
+	  // stolen from normalmap_pars_fragment.glsl:perturbNormal2Arb
+		vec3 q0 = normalize( dFdx( geometry.position ) );
+		vec3 q1 = normalize( dFdy( geometry.position ) );
+
+		vec2 st0 = dFdx( vUv.st );
+		vec2 st1 = dFdy( vUv.st );
+
+		geometry.anisotropicS = normalize( + q0 * st1.t - q1 * st0.t );
+		geometry.anisotropicT = normalize( - q0 * st1.s + q1 * st0.s );
+
+	#endif
+
+	if( abs( anisotropyRotationFactor ) > EPSILON ) {
+
+		float anisotropyRotationAngle = -anisotropyRotationFactor * 2.0 * PI; // negative for CCW rotation
+		mat3 anisotropyRotationMatrix = rotationMatrix3(geometry.normal, anisotropyRotationAngle);
+		geometry.anisotropicS *= anisotropyRotationMatrix;
+		geometry.anisotropicT *= anisotropyRotationMatrix;
+
+	}
+
+#endif
+
 IncidentLight directLight;
 
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
@@ -120,7 +154,7 @@ IncidentLight directLight;
 
 			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
-		}
+	}
 
 	#endif
 

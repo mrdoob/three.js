@@ -42,6 +42,11 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.transparency = 0.0;
 
+	this.anisotropy = 0.0; // valid range is [-1,1]. -1 is max vertical elongation, 0 is normal, +1 is max horizontal elongation
+	this.anisotropyMap = null; // Maps to [0, 1] (horizontal) anisotropy. Only R is read and considered to be anisotropy
+	this.anisotropyRotation = 0.0; // [0, 1] maps to a full 360 degree rotation
+	this.anisotropyRotationMap = null; // only R is read and considered to be anisotropyRotation
+
 	this.setValues( parameters );
 
 }
@@ -74,6 +79,11 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 
 	this.transparency = source.transparency;
+
+	this.anisotropy = source.anisotropy;
+	this.anisotropyMap = source.anisotropyMap;
+	this.anisotropyRotation = source.anisotropyRotation;
+	this.anisotropyRotationMap = source.anisotropyRotationMap;
 
 	return this;
 

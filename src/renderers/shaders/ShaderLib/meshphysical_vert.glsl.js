@@ -3,16 +3,16 @@ export default /* glsl */`
 
 varying vec3 vViewPosition;
 
-#ifndef FLAT_SHADED
+#if !defined( FLAT_SHADED ) || defined( USE_TANGENT )
 
 	varying vec3 vNormal;
 
-	#ifdef USE_TANGENT
+#endif
 
-		varying vec3 vTangent;
-		varying vec3 vBitangent;
+#ifdef USE_TANGENT
 
-	#endif
+	varying vec3 vTangent;
+	varying vec3 vBitangent;
 
 #endif
 
@@ -40,16 +40,16 @@ void main() {
 	#include <skinnormal_vertex>
 	#include <defaultnormal_vertex>
 
-#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
+#if !defined( FLAT_SHADED ) || defined( USE_TANGENT ) // Normal computed with derivatives when FLAT_SHADED
 
 	vNormal = normalize( transformedNormal );
 
-	#ifdef USE_TANGENT
+#endif
 
-		vTangent = normalize( transformedTangent );
-		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
+#ifdef USE_TANGENT
 
-	#endif
+	vTangent = normalize( transformedTangent );
+	vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
 
 #endif
 

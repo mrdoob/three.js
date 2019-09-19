@@ -5,6 +5,8 @@ export let ShaderChunk: {
 	alphamap_fragment: string;
 	alphamap_pars_fragment: string;
 	alphatest_fragment: string;
+	anisotropy_fragment: string;
+	anisotropy_pars_fragment: string;
 	aomap_fragment: string;
 	aomap_pars_fragment: string;
 	begin_vertex: string;
