@@ -6,11 +6,11 @@
 var ParallaxShader = {
 	// Ordered from fastest to best quality.
 	modes: {
-		none:  'NO_PARALLAX',
-		basic: 'USE_BASIC_PARALLAX',
-		steep: 'USE_STEEP_PARALLAX',
-		occlusion: 'USE_OCLUSION_PARALLAX', // a.k.a. POM
-		relief: 'USE_RELIEF_PARALLAX'
+		none: "NO_PARALLAX",
+		basic: "USE_BASIC_PARALLAX",
+		steep: "USE_STEEP_PARALLAX",
+		occlusion: "USE_OCLUSION_PARALLAX", // a.k.a. POM
+		relief: "USE_RELIEF_PARALLAX"
 	},
 
 	uniforms: {
@@ -36,7 +36,7 @@ var ParallaxShader = {
 
 		"}"
 
-  ].join( "\n" ),
+	].join( "\n" ),
 
 	fragmentShader: [
 		"uniform sampler2D bumpMap;",
@@ -56,10 +56,10 @@ var ParallaxShader = {
 
 		"		float initialHeight = texture2D( bumpMap, vUv ).r;",
 
-				// No Offset Limitting: messy, floating output at grazing angles.
-				//"vec2 texCoordOffset = parallaxScale * V.xy / V.z * initialHeight;",
+		// No Offset Limitting: messy, floating output at grazing angles.
+		//"vec2 texCoordOffset = parallaxScale * V.xy / V.z * initialHeight;",
 
-				// Offset Limiting
+		// Offset Limiting
 		"		vec2 texCoordOffset = parallaxScale * V.xy * initialHeight;",
 		"		return vUv - texCoordOffset;",
 
@@ -69,27 +69,27 @@ var ParallaxShader = {
 
 		"	vec2 parallaxMap( in vec3 V ) {",
 
-				// Determine number of layers from angle between V and N
+		// Determine number of layers from angle between V and N
 		"		float numLayers = mix( parallaxMaxLayers, parallaxMinLayers, abs( dot( vec3( 0.0, 0.0, 1.0 ), V ) ) );",
 
 		"		float layerHeight = 1.0 / numLayers;",
 		"		float currentLayerHeight = 0.0;",
-				// Shift of texture coordinates for each iteration
+		// Shift of texture coordinates for each iteration
 		"		vec2 dtex = parallaxScale * V.xy / V.z / numLayers;",
 
 		"		vec2 currentTextureCoords = vUv;",
 
 		"		float heightFromTexture = texture2D( bumpMap, currentTextureCoords ).r;",
 
-				// while ( heightFromTexture > currentLayerHeight )
-				// Infinite loops are not well supported. Do a "large" finite
-				// loop, but not too large, as it slows down some compilers.
+		// while ( heightFromTexture > currentLayerHeight )
+		// Infinite loops are not well supported. Do a "large" finite
+		// loop, but not too large, as it slows down some compilers.
 		"		for ( int i = 0; i < 30; i += 1 ) {",
 		"			if ( heightFromTexture <= currentLayerHeight ) {",
 		"				break;",
 		"			}",
 		"			currentLayerHeight += layerHeight;",
-					// Shift texture coordinates along vector V
+		// Shift texture coordinates along vector V
 		"			currentTextureCoords -= dtex;",
 		"			heightFromTexture = texture2D( bumpMap, currentTextureCoords ).r;",
 		"		}",
@@ -103,18 +103,18 @@ var ParallaxShader = {
 		"			vec2 deltaTexCoord = dtex / 2.0;",
 		"			float deltaHeight = layerHeight / 2.0;",
 
-					// Return to the mid point of previous layer
+		// Return to the mid point of previous layer
 		"			currentTextureCoords += deltaTexCoord;",
 		"			currentLayerHeight -= deltaHeight;",
 
-					// Binary search to increase precision of Steep Parallax Mapping
+		// Binary search to increase precision of Steep Parallax Mapping
 		"			const int numSearches = 5;",
 		"			for ( int i = 0; i < numSearches; i += 1 ) {",
 
 		"				deltaTexCoord /= 2.0;",
 		"				deltaHeight /= 2.0;",
 		"				heightFromTexture = texture2D( bumpMap, currentTextureCoords ).r;",
-						// Shift along or against vector V
+		// Shift along or against vector V
 		"				if( heightFromTexture > currentLayerHeight ) {", // Below the surface
 
 		"					currentTextureCoords -= deltaTexCoord;",
@@ -134,14 +134,14 @@ var ParallaxShader = {
 
 		"			vec2 prevTCoords = currentTextureCoords + dtex;",
 
-					// Heights for linear interpolation
+		// Heights for linear interpolation
 		"			float nextH = heightFromTexture - currentLayerHeight;",
 		"			float prevH = texture2D( bumpMap, prevTCoords ).r - currentLayerHeight + layerHeight;",
 
-					// Proportions for linear interpolation
+		// Proportions for linear interpolation
 		"			float weight = nextH / ( nextH - prevH );",
 
-					// Interpolation of texture coordinates
+		// Interpolation of texture coordinates
 		"			return prevTCoords * weight + currentTextureCoords * ( 1.0 - weight );",
 
 		"		#else", // NO_PARALLAX
@@ -179,7 +179,7 @@ var ParallaxShader = {
 
 		"}"
 
-  ].join( "\n" )
+	].join( "\n" )
 
 };
 

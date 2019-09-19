@@ -42,7 +42,7 @@ var VignetteShader = {
 
 		"void main() {",
 
-			// Eskil's vignette
+		// Eskil's vignette
 
 		"	vec4 texel = texture2D( tDiffuse, vUv );",
 		"	vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );",

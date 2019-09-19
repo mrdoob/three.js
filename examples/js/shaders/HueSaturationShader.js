@@ -43,7 +43,7 @@ THREE.HueSaturationShader = {
 
 		"	gl_FragColor = texture2D( tDiffuse, vUv );",
 
-			// hue
+		// hue
 		"	float angle = hue * 3.14159265;",
 		"	float s = sin(angle), c = cos(angle);",
 		"	vec3 weights = (vec3(2.0 * c, -sqrt(3.0) * s - c, sqrt(3.0) * s - c) + 1.0) / 3.0;",
@@ -54,7 +54,7 @@ THREE.HueSaturationShader = {
 		"		dot(gl_FragColor.rgb, weights.yzx)",
 		"	);",
 
-			// saturation
+		// saturation
 		"	float average = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;",
 		"	if (saturation > 0.0) {",
 		"		gl_FragColor.rgb += (average - gl_FragColor.rgb) * (1.0 - 1.0 / (1.001 - saturation));",

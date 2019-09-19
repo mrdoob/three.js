@@ -48,16 +48,16 @@ THREE.ToneMapShader = {
 
 		"vec3 ToneMap( vec3 vColor ) {",
 		"	#ifdef ADAPTED_LUMINANCE",
-				// Get the calculated average luminance
+		// Get the calculated average luminance
 		"		float fLumAvg = texture2D(luminanceMap, vec2(0.5, 0.5)).r;",
 		"	#else",
 		"		float fLumAvg = averageLuminance;",
 		"	#endif",
 
-			// Calculate the luminance of the current pixel
+		// Calculate the luminance of the current pixel
 		"	float fLumPixel = linearToRelativeLuminance( vColor );",
 
-			// Apply the modified operator (Eq. 4)
+		// Apply the modified operator (Eq. 4)
 		"	float fLumScaled = (fLumPixel * middleGrey) / max( minLuminance, fLumAvg );",
 
 		"	float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (maxLuminance * maxLuminance)))) / (1.0 + fLumScaled);",

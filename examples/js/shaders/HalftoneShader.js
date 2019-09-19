@@ -27,14 +27,14 @@ THREE.HalftoneShader = {
 
 	vertexShader: [
 
-    "varying vec2 vUV;",
+		"varying vec2 vUV;",
 
-    "void main() {",
+		"void main() {",
 
-      "vUV = uv;",
-      "gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+		"	vUV = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
 
-    "}"
+		"}"
 
 	].join( "\n" ),
 
