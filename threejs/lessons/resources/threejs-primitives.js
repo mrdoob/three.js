@@ -3,6 +3,17 @@
 /* global THREE, threejsLessonUtils */
 
 {
+  const darkColors = {
+    lines: '#DDD',
+  };
+  const lightColors = {
+    lines: '#000',
+  };
+
+  const darkMatcher = window.matchMedia('(prefers-color-scheme: dark)');
+  const isDarkMode = darkMatcher.matches;
+  const colors = isDarkMode ? darkColors : lightColors;
+
   const diagrams = {
     BoxBufferGeometry: {
       create() {
@@ -276,8 +287,11 @@
         const width = 8;
         const height = 8;
         const depth = 8;
+        const thresholdAngle = 15;
         return {
-          lineGeometry: new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(width, height, depth)),
+          lineGeometry: new THREE.EdgesGeometry(
+              new THREE.BoxBufferGeometry(width, height, depth),
+              thresholdAngle),
         };
       },
       nonBuffer: false,
@@ -468,7 +482,7 @@
         const lineMesh = new THREE.LineSegments(
           geometryInfo.lineGeometry || geometryInfo.geometry,
           new THREE.LineBasicMaterial({
-            color: geometryInfo.geometry ? 0xffffff : 0x000000,
+            color: geometryInfo.geometry ? 0xffffff : colors.lines,
             transparent: true,
             opacity: 0.5,
           }));
