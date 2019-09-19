@@ -1,38 +1,39 @@
 import {
-  Matrix3,
+	Matrix3,
 } from '../../../src/Three';
 
 import { VolumeSlice } from "./VolumeSlice.js";
 
 export class Volume {
-  constructor( xLength?: number, yLength?: number, zLength?: number, type?:string, arrayBuffer?: ArrayLike<number> );
 
-  xLength: number;
-  yLength: number;
-  zLength: number;
+	constructor( xLength?: number, yLength?: number, zLength?: number, type?:string, arrayBuffer?: ArrayLike<number> );
 
-  data: ArrayLike<number>;
+	xLength: number;
+	yLength: number;
+	zLength: number;
 
-  spacing: number[];
-  offset: number[];
+	data: ArrayLike<number>;
 
-  matrix: Matrix3;
+	spacing: number[];
+	offset: number[];
 
-  lowerThreshold: number;
-  upperThreshold: number;
+	matrix: Matrix3;
 
-  sliceList: VolumeSlice[];
+	lowerThreshold: number;
+	upperThreshold: number;
 
-  getData( i: number, j: number, k: number ): number;
-  access( i: number, j: number, k: number ): number;
-  reverseAccess( index: number ): number[];
+	sliceList: VolumeSlice[];
 
-  map( functionToMap: Function, context: this ): this;
+	getData( i: number, j: number, k: number ): number;
+	access( i: number, j: number, k: number ): number;
+	reverseAccess( index: number ): number[];
 
-  extractPerpendicularPlane ( axis: string, RASIndex: number ): object;
-  extractSlice( axis: string, index: number ): VolumeSlice;
+	map( functionToMap: Function, context: this ): this;
 
-  repaintAllSlices(): this;
-  computeMinMax(): number[];
+	extractPerpendicularPlane ( axis: string, RASIndex: number ): object;
+	extractSlice( axis: string, index: number ): VolumeSlice;
+
+	repaintAllSlices(): this;
+	computeMinMax(): number[];
 
 }

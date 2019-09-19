@@ -5,17 +5,18 @@ import { ConstNode } from '../core/ConstNode';
 import { Node } from '../core/Node';
 
 export class LuminanceNode extends TempNode {
-  constructor(rgb: Node);
 
-  rgb: Node;
-  nodeType: string;
+	constructor( rgb: Node );
 
-  generate(builder: NodeBuilder, output: string): string;
-  copy(source: LuminanceNode): this;
+	rgb: Node;
+	nodeType: string;
 
-  static Nodes: {
-    LUMA: ConstNode;
-    luminance: FunctionNode;
-  }
+	generate( builder: NodeBuilder, output: string ): string;
+	copy( source: LuminanceNode ): this;
+
+	static Nodes: {
+		LUMA: ConstNode;
+		luminance: FunctionNode;
+	}
 
 }
