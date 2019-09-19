@@ -85,7 +85,15 @@ function main() {
 
   {
     const loader = new THREE.FontLoader();
-    loader.load('resources/threejs/fonts/helvetiker_regular.typeface.json', (font) => {
+    // promisify font loading
+    function loadFont(url) {
+      return new Promise((resolve, reject) => {
+        loader.load(url, resolve, undefined, reject);
+      });
+    }
+
+    async function doit() {
+      const font = await loadFont('resources/threejs/fonts/helvetiker_regular.typeface.json');   /* threejsfundamentals: url */
       const geometry = new THREE.TextBufferGeometry('three.js', {
         font: font,
         size: 3.0,
@@ -107,7 +115,8 @@ function main() {
       parent.add(mesh);
 
       addObject(.5, 0, parent);
-    });
+    }
+    doit();
   }
 
   function resizeRendererToDisplaySize(renderer) {

@@ -20,14 +20,16 @@
         const width = 8;
         const height = 8;
         const depth = 8;
-        return new THREE.BoxBufferGeometry(width, height, depth);
+        const geometry = new THREE.BoxBufferGeometry(width, height, depth);
+        return geometry;
       },
     },
     CircleBufferGeometry: {
       create() {
         const radius = 7;
         const segments = 24;
-        return new THREE.CircleBufferGeometry(radius, segments);
+        const geometry = new THREE.CircleBufferGeometry(radius, segments);
+        return geometry;
       },
     },
     ConeBufferGeometry: {
@@ -35,7 +37,8 @@
         const radius = 6;
         const height = 8;
         const segments = 16;
-        return new THREE.ConeBufferGeometry(radius, height, segments);
+        const geometry = new THREE.ConeBufferGeometry(radius, height, segments);
+        return geometry;
       },
     },
     CylinderBufferGeometry: {
@@ -44,13 +47,15 @@
         const radiusBottom = 4;
         const height = 8;
         const radialSegments = 12;
-        return new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments);
+        const geometry = new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments);
+        return geometry;
       },
     },
     DodecahedronBufferGeometry: {
       create() {
         const radius = 7;
-        return new THREE.DodecahedronBufferGeometry(radius);
+        const geometry = new THREE.DodecahedronBufferGeometry(radius);
+        return geometry;
       },
     },
     ExtrudeBufferGeometry: {
@@ -75,13 +80,15 @@
           bevelSegments: 2,
         };
 
-        return new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+        const geometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
+        return geometry;
       },
     },
     IcosahedronBufferGeometry: {
       create() {
         const radius = 7;
-        return new THREE.IcosahedronBufferGeometry(radius);
+        const geometry = new THREE.IcosahedronBufferGeometry(radius);
+        return geometry;
       },
     },
     LatheBufferGeometry: {
@@ -90,13 +97,15 @@
         for (let i = 0; i < 10; ++i) {
           points.push(new THREE.Vector2(Math.sin(i * 0.2) * 3 + 3, (i - 5) * .8));
         }
-        return new THREE.LatheBufferGeometry(points);
+        const geometry = new THREE.LatheBufferGeometry(points);
+        return geometry;
       },
     },
     OctahedronBufferGeometry: {
       create() {
         const radius = 7;
-        return new THREE.OctahedronBufferGeometry(radius);
+        const geometry = new THREE.OctahedronBufferGeometry(radius);
+        return geometry;
       },
     },
     ParametricBufferGeometry: {
@@ -151,7 +160,8 @@
 
         const slices = 25;
         const stacks = 25;
-        return new THREE.ParametricBufferGeometry(klein, slices, stacks);
+        const geometry = new THREE.ParametricBufferGeometry(klein, slices, stacks);
+        return geometry;
       },
     },
     PlaneBufferGeometry: {
@@ -160,7 +170,8 @@
         const height = 9;
         const widthSegments = 2;
         const heightSegments = 2;
-        return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        const geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        return geometry;
       },
     },
     PolyhedronBufferGeometry: {
@@ -179,7 +190,8 @@
         ];
         const radius = 7;
         const detail = 2;
-        return new THREE.PolyhedronBufferGeometry(verticesOfCube, indicesOfFaces, radius, detail);
+        const geometry = new THREE.PolyhedronBufferGeometry(verticesOfCube, indicesOfFaces, radius, detail);
+        return geometry;
       },
     },
     RingBufferGeometry: {
@@ -187,7 +199,8 @@
         const innerRadius = 2;
         const outerRadius = 7;
         const segments = 18;
-        return new THREE.RingBufferGeometry(innerRadius, outerRadius, segments);
+        const geometry = new THREE.RingBufferGeometry(innerRadius, outerRadius, segments);
+        return geometry;
       },
     },
     ShapeBufferGeometry: {
@@ -202,7 +215,8 @@
         shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
         shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
         shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
-        return new THREE.ShapeBufferGeometry(shape);
+        const geometry = new THREE.ShapeBufferGeometry(shape);
+        return geometry;
       },
     },
     SphereBufferGeometry: {
@@ -210,32 +224,37 @@
         const radius = 7;
         const widthSegments = 12;
         const heightSegments = 8;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
     },
     TetrahedronBufferGeometry: {
       create() {
         const radius = 7;
-        return new THREE.TetrahedronBufferGeometry(radius);
+        const geometry = new THREE.TetrahedronBufferGeometry(radius);
+        return geometry;
       },
     },
     TextBufferGeometry: {
-      create() {
-        return new Promise((resolve) => {
-          const loader = new THREE.FontLoader();
-
-          loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font) => {
-            resolve(new THREE.TextBufferGeometry('three.js', {
-              font: font,
-              size: 3.0,
-              height: .2,
-              curveSegments: 12,
-              bevelEnabled: true,
-              bevelThickness: 0.15,
-              bevelSize: .3,
-              bevelSegments: 5,
-            }));
+      async create() {
+        const loader = new THREE.FontLoader();
+        // promisify font loading
+        function loadFont(url) {
+          return new Promise((resolve, reject) => {
+            loader.load(url, resolve, undefined, reject);
           });
+        }
+
+        const font = await loadFont('../resources/threejs/fonts/helvetiker_regular.typeface.json');
+        return new THREE.TextBufferGeometry('three.js', {
+          font: font,
+          size: 3.0,
+          height: .2,
+          curveSegments: 12,
+          bevelEnabled: true,
+          bevelThickness: 0.15,
+          bevelSize: .3,
+          bevelSegments: 5,
         });
       },
     },
@@ -245,7 +264,8 @@
         const tubeRadius = 2;
         const radialSegments = 8;
         const tubularSegments = 24;
-        return new THREE.TorusBufferGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+        const geometry = new THREE.TorusBufferGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+        return geometry;
       },
     },
     TorusKnotBufferGeometry: {
@@ -256,7 +276,8 @@
         const tubularSegments = 64;
         const p = 2;
         const q = 3;
-        return new THREE.TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q);
+        const geometry = new THREE.TorusKnotBufferGeometry(radius, tube, tubularSegments, radialSegments, p, q);
+        return geometry;
       },
     },
     TubeBufferGeometry: {
@@ -279,7 +300,8 @@
         const radius = 1;
         const radialSegments = 8;
         const closed = false;
-        return new THREE.TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed);
+        const geometry = new THREE.TubeBufferGeometry(path, tubularSegments, radius, radialSegments, closed);
+        return geometry;
       },
     },
     EdgesGeometry: {
@@ -288,11 +310,10 @@
         const height = 8;
         const depth = 8;
         const thresholdAngle = 15;
-        return {
-          lineGeometry: new THREE.EdgesGeometry(
-              new THREE.BoxBufferGeometry(width, height, depth),
-              thresholdAngle),
-        };
+        const geometry = new THREE.EdgesGeometry(
+            new THREE.BoxBufferGeometry(width, height, depth),
+            thresholdAngle);
+        return { lineGeometry: geometry };
       },
       nonBuffer: false,
     },
@@ -301,9 +322,8 @@
         const width = 8;
         const height = 8;
         const depth = 8;
-        return {
-          lineGeometry: new THREE.WireframeGeometry(new THREE.BoxBufferGeometry(width, height, depth)),
-        };
+        const geometry = new THREE.WireframeGeometry(new THREE.BoxBufferGeometry(width, height, depth));
+        return { lineGeometry: geometry };
       },
       nonBuffer: false,
     },
@@ -312,7 +332,8 @@
         const radius = 7;
         const widthSegments = 5;
         const heightSegments = 3;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
     },
     SphereBufferGeometryMedium: {
@@ -320,7 +341,8 @@
         const radius = 7;
         const widthSegments = 24;
         const heightSegments = 10;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
     },
     SphereBufferGeometryHigh: {
@@ -328,7 +350,8 @@
         const radius = 7;
         const widthSegments = 50;
         const heightSegments = 50;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
     },
     SphereBufferGeometryLowSmooth: {
@@ -336,7 +359,8 @@
         const radius = 7;
         const widthSegments = 5;
         const heightSegments = 3;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
       showLines: false,
       flatShading: false,
@@ -346,7 +370,8 @@
         const radius = 7;
         const widthSegments = 24;
         const heightSegments = 10;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
       showLines: false,
       flatShading: false,
@@ -356,7 +381,8 @@
         const radius = 7;
         const widthSegments = 50;
         const heightSegments = 50;
-        return new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        return geometry;
       },
       showLines: false,
       flatShading: false,
@@ -367,7 +393,8 @@
         const height = 9;
         const widthSegments = 1;
         const heightSegments = 1;
-        return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        const geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        return geometry;
       },
     },
     PlaneBufferGeometryHigh: {
@@ -376,7 +403,8 @@
         const height = 9;
         const widthSegments = 10;
         const heightSegments = 10;
-        return new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        const geometry = new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments);
+        return geometry;
       },
     },
   };
@@ -429,7 +457,10 @@
     }
     addDiv(right, '.note').innerHTML = text;
 
-    const rawLines = info.create.toString().replace('return new', 'const geometry = new').split(/\n/);
+    const rawLines = info.create.toString()
+        .replace(/ +return geometry;\n/, '')
+        .replace(/ +return { lineGeometry: geometry };\n/, '')
+        .split(/\n/);
     const createRE = /^( *)[^ ]/;
     const m = createRE.exec(rawLines[1]);
     const prefixLen = m[1].length;
