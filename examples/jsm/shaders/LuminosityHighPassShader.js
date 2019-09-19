@@ -29,9 +29,9 @@ var LuminosityHighPassShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
+		"	vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -49,17 +49,17 @@ var LuminosityHighPassShader = {
 
 		"void main() {",
 
-			"vec4 texel = texture2D( tDiffuse, vUv );",
+		"	vec4 texel = texture2D( tDiffuse, vUv );",
 
-			"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
+		"	vec3 luma = vec3( 0.299, 0.587, 0.114 );",
 
-			"float v = dot( texel.xyz, luma );",
+		"	float v = dot( texel.xyz, luma );",
 
-			"vec4 outputColor = vec4( defaultColor.rgb, defaultOpacity );",
+		"	vec4 outputColor = vec4( defaultColor.rgb, defaultOpacity );",
 
-			"float alpha = smoothstep( luminosityThreshold, luminosityThreshold + smoothWidth, v );",
+		"	float alpha = smoothstep( luminosityThreshold, luminosityThreshold + smoothWidth, v );",
 
-			"gl_FragColor = mix( outputColor, texel, alpha );",
+		"	gl_FragColor = mix( outputColor, texel, alpha );",
 
 		"}"
 
