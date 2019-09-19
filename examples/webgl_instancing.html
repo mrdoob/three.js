@@ -16,52 +16,36 @@
 
 			var camera, scene, renderer, stats;
 
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var amount = 12;
+			var count = Math.pow( amount, 3 );
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.z = 25;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set( 10, 10, 10 );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
 
 				var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				var material = new THREE.MeshNormalMaterial();
-
-				var count = 10000;
+				// var material = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.1, transparent: true } ); // overdraw
 
 			 	var mesh = new THREE.InstancedMesh( geometry, material, count );
-
-				var dummy = new THREE.Object3D();
-
-				for ( var i = 0; i < count; i ++ ) {
-
-					dummy.position.set(
-						Math.random() * 20 - 10,
-						Math.random() * 20 - 10,
-						Math.random() * 20 - 10
-					);
-
-					dummy.rotation.set(
-						Math.random() * Math.PI,
-						Math.random() * Math.PI,
-						Math.random() * Math.PI
-					);
-
-					dummy.updateMatrix();
-
-					mesh.setMatrixAt( i, dummy.matrix );
-
-				}
-
 				scene.add( mesh );
+
+				var loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+					geometry.scale( 0.5, 0.5, 0.5 );
+
+					mesh.geometry = geometry;
+
+				} );
 
 				//
 
@@ -77,30 +61,16 @@
 
 				//
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 10;
-				mouseY = ( event.clientY - windowHalfY ) / 10;
 
 			}
 
@@ -119,19 +89,35 @@
 
 				var time = Date.now() * 0.001;
 
-				var rx = Math.sin( time * 0.7 ) * 0.5,
-					ry = Math.sin( time * 0.3 ) * 0.5,
-					rz = Math.sin( time * 0.2 ) * 0.5;
-
-				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
-
-				camera.lookAt( scene.position );
-
 				var mesh = scene.children[ 0 ];
-				mesh.rotation.x = rx;
-				mesh.rotation.y = ry;
-				mesh.rotation.z = rz;
+				mesh.rotation.x = Math.sin( time / 4 );
+				mesh.rotation.y = Math.sin( time / 2 );
+
+				var dummy = new THREE.Object3D();
+
+				var i = 0;
+
+				for ( var x = 0; x < amount; x ++ ) {
+
+					for ( var y = 0; y < amount; y ++ ) {
+
+						for ( var z = 0; z < amount; z ++ ) {
+
+							dummy.position.set( 6 - x, 6 - y, 6 - z );
+							dummy.rotation.y = ( Math.sin( x / 4 + time ) + Math.sin( y / 4 + time ) + Math.sin( z / 4 + time ) );
+							dummy.rotation.z = dummy.rotation.y * 2;
+
+							dummy.updateMatrix();
+
+							mesh.setMatrixAt( i ++, dummy.matrix );
+
+						}
+
+					}
+
+				}
+
+				mesh.instanceMatrix.needsUpdate = true;
 
 				renderer.render( scene, camera );
 
