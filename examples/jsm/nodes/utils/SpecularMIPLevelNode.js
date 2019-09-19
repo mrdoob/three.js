@@ -42,7 +42,7 @@ SpecularMIPLevelNode.prototype = Object.create( TempNode.prototype );
 SpecularMIPLevelNode.prototype.constructor = SpecularMIPLevelNode;
 SpecularMIPLevelNode.prototype.nodeType = "SpecularMIPLevel";
 
-SpecularMIPLevelNode.prototype.setTexture = function( texture ) {
+SpecularMIPLevelNode.prototype.setTexture = function ( texture ) {
 
 	this.texture = texture;
 

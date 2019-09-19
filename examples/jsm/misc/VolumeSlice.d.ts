@@ -1,32 +1,33 @@
 import {
-  Matrix3,
-  Mesh,
+	Matrix3,
+	Mesh,
 } from '../../../src/Three';
 
 import { Volume } from './Volume';
 
 export class VolumeSlice {
-  constructor( volume: Volume, index?: number, axis?: string );
 
-  index: number;
-  axis: string;
+	constructor( volume: Volume, index?: number, axis?: string );
 
-  canvas: HTMLCanvasElement;
-  canvasBuffer: HTMLCanvasElement;
+	index: number;
+	axis: string;
 
-  ctx: CanvasRenderingContext2D;
-  ctxBuffer: CanvasRenderingContext2D;
+	canvas: HTMLCanvasElement;
+	canvasBuffer: HTMLCanvasElement;
 
-  mesh: Mesh;
+	ctx: CanvasRenderingContext2D;
+	ctxBuffer: CanvasRenderingContext2D;
 
-  geometryNeedsUpdate: boolean;
+	mesh: Mesh;
 
-  sliceAccess: number;
-  jLength: number;
-  iLength: number;
-  matrix: Matrix3;
+	geometryNeedsUpdate: boolean;
 
-  repaint(): void;
-  updateGeometry(): void;
+	sliceAccess: number;
+	jLength: number;
+	iLength: number;
+	matrix: Matrix3;
+
+	repaint(): void;
+	updateGeometry(): void;
 
 }

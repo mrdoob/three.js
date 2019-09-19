@@ -20,12 +20,12 @@ function NormalMapNode( value, scale ) {
 
 NormalMapNode.Nodes = ( function () {
 
-	var perturbNormal2Arb = new FunctionNode( 
+	var perturbNormal2Arb = new FunctionNode(
 
-// Per-Pixel Tangent Space Normal Mapping
-// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
-	
-`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
+		// Per-Pixel Tangent Space Normal Mapping
+		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
+
+		`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
 
 	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 

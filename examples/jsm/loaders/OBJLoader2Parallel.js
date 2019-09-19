@@ -120,7 +120,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	load: function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
  		let scope = this;
-		function interceptOnLoad ( object3d, message ) {
+		function interceptOnLoad( object3d, message ) {
 
 			if ( object3d.name === 'OBJLoader2ParallelDummy' ) {
 
@@ -130,8 +130,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 				}
 
-			}
-			else {
+			} else {
 
 				onLoad( object3d, message );
 
@@ -169,7 +168,9 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 				};
 				function scopedOnLoad( message ) {
+
 					scope.parser.callbacks.onLoad( scope.baseObject3d, message );
+
 				}
 
 				this.workerExecutionSupport.updateCallbacks( scopedOnAssetAvailable, scopedOnLoad );
@@ -180,31 +181,31 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 			this.materialHandler.createDefaultMaterials( false );
 
 			this.workerExecutionSupport.executeParallel(
-			{
-				params: {
-					modelName: this.modelName,
-					instanceNo: this.instanceNo,
-					useIndices: this.parser.useIndices,
-					disregardNormals: this.parser.disregardNormals,
-					materialPerSmoothingGroup: this.parser.materialPerSmoothingGroup,
-					useOAsMesh: this.parser.useOAsMesh,
-				},
-				materials: this.materialHandler.getMaterialsJSON(),
-				data: {
-					input: content,
-					options: null
-				},
-				logging: {
-					enabled: this.parser.logging.enabled,
-					debug: this.parser.logging.debug
-				}
-			} );
+				{
+					params: {
+						modelName: this.modelName,
+						instanceNo: this.instanceNo,
+						useIndices: this.parser.useIndices,
+						disregardNormals: this.parser.disregardNormals,
+						materialPerSmoothingGroup: this.parser.materialPerSmoothingGroup,
+						useOAsMesh: this.parser.useOAsMesh,
+					},
+					materials: this.materialHandler.getMaterialsJSON(),
+					data: {
+						input: content,
+						options: null
+					},
+					logging: {
+						enabled: this.parser.logging.enabled,
+						debug: this.parser.logging.debug
+					}
+				} );
 
 			let dummy = new Object3D();
 			dummy.name = 'OBJLoader2ParallelDummy';
 			return dummy;
-		}
-		else {
+
+		} else {
 
 			return OBJLoader2.prototype.parse.call( this, content );
 
