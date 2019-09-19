@@ -49,7 +49,7 @@ THREE.TriangleBlurShader = {
 
 		"	float total = 0.0;",
 
-			// randomize the lookup values to hide the fixed number of samples
+		// randomize the lookup values to hide the fixed number of samples
 
 		"	float offset = rand( vUv );",
 
