@@ -35,7 +35,7 @@ var LuminosityHighPassShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -63,7 +63,7 @@ var LuminosityHighPassShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };
 

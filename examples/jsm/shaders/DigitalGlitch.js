@@ -39,7 +39,7 @@ var DigitalGlitch = {
 	].join( "\n" ),
 
 	fragmentShader: [
-		"uniform int byp;",//should we apply the glitch ?
+		"uniform int byp;", //should we apply the glitch ?
 
 		"uniform sampler2D tDiffuse;",
 		"uniform sampler2D tDisp;",
