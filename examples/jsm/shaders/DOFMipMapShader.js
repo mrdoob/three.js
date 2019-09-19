@@ -25,8 +25,8 @@ var DOFMipMapShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -44,14 +44,14 @@ var DOFMipMapShader = {
 
 		"void main() {",
 
-			"vec4 depth = texture2D( tDepth, vUv );",
+		"	vec4 depth = texture2D( tDepth, vUv );",
 
-			"float factor = depth.x - focus;",
+		"	float factor = depth.x - focus;",
 
-			"vec4 col = texture2D( tColor, vUv, 2.0 * maxblur * abs( focus - depth.x ) );",
+		"	vec4 col = texture2D( tColor, vUv, 2.0 * maxblur * abs( focus - depth.x ) );",
 
-			"gl_FragColor = col;",
-			"gl_FragColor.a = 1.0;",
+		"	gl_FragColor = col;",
+		"	gl_FragColor.a = 1.0;",
 
 		"}"
 

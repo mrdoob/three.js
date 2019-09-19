@@ -135,6 +135,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		var parameters = {
 
+			isWebGL2: capabilities.isWebGL2,
+
 			shaderID: shaderID,
 
 			precision: precision,
@@ -293,7 +295,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities );
+			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
 			programs.push( program );
 
 		}
