@@ -159,14 +159,31 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
+		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
 		<p>
-		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
-		must return [page:String resolvedURL].<br /><br />
+		[page:Object regex] — A regular expression.<br />
+		[page:Loader loader] — The loader.
+		<p>
+		Registers a loader with the given regular expression. Can be used to define what loader should be used in
+		order to load specific files. A typical use case is to overwrite the default loader for textures.
+		</p>
+		<code>
+// add handler for TGA textures
+manager.addHandler( /\.tga$/i, new TGALoader() );
+		</code>
 
-		If provided, the callback will be passed each resource URL before a request is sent. The
-		callback may return the original URL, or a new URL to override loading behavior. This
-		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
+		<h3>[method:null getHandler]( [param:String file] )</h3>
+		<p>
+		[page:String file] — The file path.
+		<p>
+		Can be used to retrieve the registered loader for the given file path.
+		</p>
+
+		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.
+		<p>
+		Removes the loader for the given regular expression.
 		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
@@ -175,6 +192,16 @@
 
 		Given a URL, uses the URL modifier callback (if any) and returns a resolved URL. If no
 		URL modifier is set, returns the original URL.
+		</p>
+
+		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
+		<p>
+		[page:Function callback] — URL modifier callback. Called with [page:String url] argument, and
+		must return [page:String resolvedURL].<br /><br />
+
+		If provided, the callback will be passed each resource URL before a request is sent. The
+		callback may return the original URL, or a new URL to override loading behavior. This
+		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
 		</p>
 
 		<br /><br />
@@ -202,29 +229,6 @@
 		[page:String url] — the loaded url<br /><br />
 
 		This should be called by any loader using the manager when the loader errors loading an url.
-		</p>
-
-		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
-		<p>
-		[page:Object regex] — A regular expression.<br />
-		[page:Loader loader] — The loader.
-		<p>
-		Registers a loader with the given regular expression. Can be used to define what loader should be used in
-		order to load specific files. A typical use case is to overwrite the default loader for textures.
-		</p>
-
-		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
-		<p>
-		[page:Object regex] — A regular expression.
-		<p>
-		Removes the loader for the given regular expression.
-		</p>
-
-		<h3>[method:null getHandler]( [param:String file] )</h3>
-		<p>
-		[page:String file] — The file path.
-		<p>
-		Can be used to retrieve the registered loader for the given file path.
 		</p>
 
 		<h2>Source</h2>

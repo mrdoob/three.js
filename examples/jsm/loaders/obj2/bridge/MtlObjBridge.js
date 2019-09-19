@@ -17,7 +17,7 @@ const MtlObjBridge = {
 
 		if ( typeof assetLoader.addMaterials === 'function' ) {
 
-			assetLoader.addMaterials( this.addMaterialsFromMtlLoader( processResult ) );
+			assetLoader.addMaterials( this.addMaterialsFromMtlLoader( processResult ), true );
 
 		}
 

@@ -84,7 +84,7 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 		if ( builder.context.bias ) {
 
-			builder.context.bias.setTexture( this );
+			builder.context.bias.setTexture( this.value );
 
 		}
 

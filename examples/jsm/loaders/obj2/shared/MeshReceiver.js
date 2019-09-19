@@ -20,7 +20,7 @@ import {
 const MeshReceiver = function ( materialHandler ) {
 
 	this.logging = {
-		enabled: true,
+		enabled: false,
 		debug: false
 	};
 
