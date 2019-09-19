@@ -24581,7 +24581,14 @@
 
 					if ( object.isSkinnedMesh ) {
 
-						object.skeleton.update();
+						// update skeleton only once in a frame
+
+						if ( object.skeleton.frame !== info.render.frame ) {
+
+							object.skeleton.update();
+							object.skeleton.frame = info.render.frame;
+
+						}
 
 					}
 
@@ -26759,6 +26766,8 @@
 
 		this.bones = bones.slice( 0 );
 		this.boneMatrices = new Float32Array( this.bones.length * 16 );
+
+		this.frame = - 1;
 
 		// use the supplied bone inverses or calculate the inverses
 
@@ -44553,6 +44562,20 @@
 			}
 
 			return this;
+
+		},
+
+		// Allows you to seek to a specific time in an animation.
+		setTime: function ( timeInSeconds ) {
+
+			this.time = 0; // Zero out time attribute for AnimationMixer object;
+			for ( var i = 0; i < this._actions.length; i ++ ) {
+
+				this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
+
+			}
+
+			return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
 
 		},
 
