@@ -103,9 +103,17 @@
 			这个值不应当为负，并且应当比near属性小。
 		</p>
 
+		<h3>[property:Camera camera]</h3>
+		<p>
+		The camera to use when raycasting against view-dependent objects such as billboarded objects like [page:Sprites]. This field
+		can be set manually or is set when calling "setFromCamera".
+
+		Defaults to null.
+		</p>
+
 		<h3>[property:Object params]</h3>
 		<p>
-			具有以下属性的物体：<code>
+			具有以下属性的对象：<code>
 {
 	Mesh: {},
 	Line: {},
@@ -187,6 +195,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

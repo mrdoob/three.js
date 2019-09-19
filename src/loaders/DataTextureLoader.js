@@ -1,24 +1,25 @@
 import { LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping } from '../constants.js';
 import { FileLoader } from './FileLoader.js';
 import { DataTexture } from '../textures/DataTexture.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 /**
  * @author Nikos M. / https://github.com/foo123/
  *
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
+ *
+ * Sub classes have to implement the parse() method which will be used in load().
  */
 
 function DataTextureLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-
-	// override in sub classes
-	this._parser = null;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( DataTextureLoader.prototype, {
+DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: DataTextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -31,7 +32,7 @@ Object.assign( DataTextureLoader.prototype, {
 		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
-			var texData = scope._parser( buffer );
+			var texData = scope.parse( buffer );
 
 			if ( ! texData ) return;
 
@@ -86,13 +87,6 @@ Object.assign( DataTextureLoader.prototype, {
 
 
 		return texture;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

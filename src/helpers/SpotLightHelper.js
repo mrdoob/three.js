@@ -11,7 +11,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-var _vector;
+var _vector = new Vector3();
 
 function SpotLightHelper( light, color ) {
 
@@ -69,8 +69,6 @@ SpotLightHelper.prototype.dispose = function () {
 };
 
 SpotLightHelper.prototype.update = function () {
-
-	if ( _vector === undefined ) _vector = new Vector3();
 
 	this.light.updateMatrixWorld();
 

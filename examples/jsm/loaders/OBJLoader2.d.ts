@@ -1,46 +1,43 @@
 import {
-  LoadingManager,
-  Group,
-  Object3D
+	Loader,
+	LoadingManager,
+	Object3D,
 } from '../../../src/Three';
 
+import { OBJLoader2Parser } from './obj2/worker/parallel/OBJLoader2Parser';
 import { MaterialHandler } from './obj2/shared/MaterialHandler';
 import { MeshReceiver} from './obj2/shared/MeshReceiver';
 
-export class OBJLoader2 {
+export class OBJLoader2 extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  logging: {
-    enabled: boolean;
-    debug: boolean;
-  };
+  parser: OBJLoader2Parser;
   modelName: string;
   instanceNo: number;
   path: string;
   resourcePath: string;
-  useIndices: boolean;
-  disregardNormals: boolean;
-  materialPerSmoothingGroup: boolean;
-  useOAsMesh: boolean;
-  baseObject3d: Group;
-  callbacks: {
-    onParseProgress: Function;
-    genericErrorHandler: Function;
-  };
+  baseObject3d: Object3D;
   materialHandler: MaterialHandler;
   meshReceiver: MeshReceiver;
 
-  addMaterials(materials: object): void;
-  load(url: string, onLoad: (group: Group) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void, onMeshAlter?: (meshData: object) => void): void;
-  parse(content: ArrayBuffer | string): void;
   setLogging(enabled: boolean, debug: boolean): this;
+  setMaterialPerSmoothingGroup(materialPerSmoothingGroup: boolean): this;
+  setUseOAsMesh(useOAsMesh: boolean): this;
+  setUseIndices(useIndices: boolean): this;
+  setDisregardNormals(disregardNormals: boolean): this;
+
   setModelName(modelName: string): this;
   setPath(path: string): this;
   setResourcePath(path: string): this;
   setBaseObject3d(baseObject3d: Object3D): this;
-  setUseIndices(useIndices: boolean): this;
-  setDisregardNormals(disregardNormals: boolean): this;
-  setMaterialPerSmoothingGroup(materialPerSmoothingGroup: boolean): this;
-  setUseOAsMesh(useOAsMesh: boolean): this;
-  setGenericErrorHandler(genericErrorHandler: Function): void;
+  addMaterials(materials: object): this;
+
+  setCallbackOnAssetAvailable(onAssetAvailable: Function): this;
+  setCallbackOnProgress(onProgress: Function): this;
+  setCallbackOnError(onError: Function): this;
+  setCallbackOnLoad(onLoad: Function): this;
+  setCallbackOnMeshAlter(onMeshAlter: Function): this;
+  setCallbackOnLoadMaterials(onLoadMaterials: Function): this;
+
+  load(url: string, onLoad: (object3d: Object3D) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void, onMeshAlter?: (meshData: object) => void): void;
+  parse(content: ArrayBuffer | string): Object3D;
 }

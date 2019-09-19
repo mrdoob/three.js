@@ -25,6 +25,7 @@ import emissivemap_pars_fragment from './ShaderChunk/emissivemap_pars_fragment.g
 import encodings_fragment from './ShaderChunk/encodings_fragment.glsl.js';
 import encodings_pars_fragment from './ShaderChunk/encodings_pars_fragment.glsl.js';
 import envmap_fragment from './ShaderChunk/envmap_fragment.glsl.js';
+import envmap_common_pars_fragment from './ShaderChunk/envmap_common_pars_fragment.glsl.js';
 import envmap_pars_fragment from './ShaderChunk/envmap_pars_fragment.glsl.js';
 import envmap_pars_vertex from './ShaderChunk/envmap_pars_vertex.glsl.js';
 import envmap_vertex from './ShaderChunk/envmap_vertex.glsl.js';
@@ -150,6 +151,7 @@ export var ShaderChunk = {
 	encodings_fragment: encodings_fragment,
 	encodings_pars_fragment: encodings_pars_fragment,
 	envmap_fragment: envmap_fragment,
+	envmap_common_pars_fragment: envmap_common_pars_fragment,
 	envmap_pars_fragment: envmap_pars_fragment,
 	envmap_pars_vertex: envmap_pars_vertex,
 	envmap_physical_pars_fragment: envmap_physical_pars_fragment,

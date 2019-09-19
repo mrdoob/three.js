@@ -4,12 +4,11 @@
 
 THREE.NRRDLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
-
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.NRRDLoader.prototype = {
+THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.NRRDLoader,
 
@@ -25,13 +24,6 @@ THREE.NRRDLoader.prototype = {
 			onLoad( scope.parse( data ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -62,7 +54,7 @@ THREE.NRRDLoader.prototype = {
 
 			switch ( type ) {
 
-			// 1 byte data types
+				// 1 byte data types
 				case 'uchar':
 					break;
 				case 'schar':
@@ -600,4 +592,4 @@ THREE.NRRDLoader.prototype = {
 		}
 	}
 
-};
+} );

@@ -35,6 +35,7 @@ export let ShaderChunk: {
 	encodings_pars_fragment: string;
 	encodings_fragment: string;
 	envmap_fragment: string;
+	envmap_common_pars_fragment: string
 	envmap_pars_fragment: string;
 	envmap_pars_vertex: string;
 	envmap_vertex: string;
@@ -48,6 +49,7 @@ export let ShaderChunk: {
 	lightmap_pars_fragment: string;
 	lights_lambert_vertex: string;
 	lights_pars_begin: string;
+	envmap_physical_pars_fragment: string;
 	lights_pars_map: string;
 	lights_phong_fragment: string;
 	lights_phong_pars_fragment: string;

@@ -2,7 +2,8 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { _Math } from '../math/Math.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-var _eyeRight, _eyeLeft;
+var _eyeRight = new Matrix4();
+var _eyeLeft = new Matrix4();
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -39,13 +40,6 @@ function StereoCamera() {
 Object.assign( StereoCamera.prototype, {
 
 	update: function ( camera ) {
-
-		if ( _eyeRight === undefined ) {
-
-			_eyeRight = new Matrix4();
-			_eyeLeft = new Matrix4();
-
-		}
 
 		var cache = this._cache;
 

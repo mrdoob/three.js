@@ -7,9 +7,9 @@ import {
 	Bone,
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	ImageLoader,
+	Loader,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
@@ -94,7 +94,7 @@ var AWDLoader = ( function () {
 
 	var AWDLoader = function ( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 		this.trunk = new Object3D();
 
@@ -120,7 +120,7 @@ var AWDLoader = ( function () {
 
 	};
 
-	AWDLoader.prototype = {
+	AWDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: AWDLoader,
 
@@ -139,13 +139,6 @@ var AWDLoader = ( function () {
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
 
 		},
 
@@ -1233,7 +1226,7 @@ var AWDLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return AWDLoader;
 

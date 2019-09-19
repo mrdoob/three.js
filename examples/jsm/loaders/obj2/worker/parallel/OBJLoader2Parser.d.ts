@@ -4,6 +4,7 @@ export class OBJLoader2Parser {
     onProgress: Function;
     onAssetAvailable: Function;
     onError: Function;
+    onLoad: Function;
   };
   contentRef: Uint8Array;
   legacyMode: boolean;
@@ -55,27 +56,17 @@ export class OBJLoader2Parser {
     debug: boolean;
   };
 
-  resetRawMesh(): void;
-  setMaterialPerSmoothingGroup(materialPerSmoothingGroup: boolean): void;
-  setUseOAsMesh(useOAsMesh: boolean): void;
-  setUseIndices(useIndices: boolean): void;
-  setDisregardNormals(disregardNormals: boolean): void;
-  setMaterials(materials: object): void;
-  setCallbackOnAssetAvailable(onAssetAvailable: Function): void;
-  setCallbackOnProgress(onProgress: Function): void;
-  setCallbackOnError(onError: Function): void;
-  setLogging(enabled: boolean, debug: boolean): void;
-  configure(): void;
-  parse(arrayBuffer: Uint8Array): void;
-  parseText(text: string): void;
-  processLine(buffer: string[], bufferPointer: number, slashesCount: number): void;
-  pushSmoothingGroup(smoothingGroup: object): void;
-  checkFaceType(faceType: number): void;
-  checkSubGroup(): void;
-  buildFace(faceIndexV: string, faceIndexU: string, faceIndexN: string): void;
-  createRawMeshReport(inputObjectCount: number): void;
-  finalizeRawMesh(): object;
-  processCompletedMesh(): boolean;
-  buildMesh(result: object): void;
-  finalizeParsing(): void;
+  setMaterialPerSmoothingGroup(materialPerSmoothingGroup: boolean): this;
+  setUseOAsMesh(useOAsMesh: boolean): this;
+  setUseIndices(useIndices: boolean): this;
+  setDisregardNormals(disregardNormals: boolean): this;
+
+  setCallbackOnAssetAvailable(onAssetAvailable: Function): this;
+  setCallbackOnProgress(onProgress: Function): this;
+  setCallbackOnError(onError: Function): this;
+  setCallbackOnLoad(onLoad: Function): this;
+  setLogging(enabled: boolean, debug: boolean): this;
+  setMaterials(materials: Object): void;
+  execute(arrayBuffer: Uint8Array): void;
+  executeLegacy(text: string): void;
 }

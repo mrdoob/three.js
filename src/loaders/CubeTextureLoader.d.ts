@@ -1,13 +1,10 @@
+import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 import { CubeTexture } from './../textures/CubeTexture';
 
-export class CubeTextureLoader {
+export class CubeTextureLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-
-	manager: LoadingManager;
-	crossOrigin: string;
-	path?: string;
 
 	load(
 		urls: Array<string>,
@@ -15,7 +12,5 @@ export class CubeTextureLoader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): CubeTexture;
-	setCrossOrigin( crossOrigin: string ): this;
-	setPath( path: string ): this;
 
 }

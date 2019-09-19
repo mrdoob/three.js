@@ -1,5 +1,6 @@
 import {
   BufferGeometry,
+  Loader,
   LoadingManager
 } from '../../../src/Three';
 
@@ -13,13 +14,9 @@ export interface PDB {
 }
 
 
-export class PDBLoader {
+export class PDBLoader extends Loader {
   constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
 
   load(url: string, onLoad: (pdb: PDB) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
-
   parse(text: string) : PDB;
 }

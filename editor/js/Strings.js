@@ -41,6 +41,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': 'Cylinder',
 			'menubar/add/ring': 'Ring',
 			'menubar/add/sphere': 'Sphere',
+			'menubar/add/dodecahedron': 'Dodecahedron',
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/octahedron': 'Octahedron',
 			'menubar/add/tetrahedron': 'Tetrahedron',
@@ -148,6 +149,9 @@ var Strings = function ( config ) {
 			'sidebar/geometry/geometry/vertices': 'Vertices',
 			'sidebar/geometry/geometry/faces': 'Faces',
 
+			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
+
 			'sidebar/geometry/icosahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/icosahedron_geometry/detail': 'Detail',
 
@@ -221,11 +225,12 @@ var Strings = function ( config ) {
 			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
 			'sidebar/material/metalness': 'Metalness',
+			'sidebar/material/sheen': 'Sheen',
 			'sidebar/material/emissive': 'Emissive',
 			'sidebar/material/specular': 'Specular',
 			'sidebar/material/shininess': 'Shininess',
-			'sidebar/material/clearcoat': 'ClearCoat',
-			'sidebar/material/clearcoatroughness': 'ClearCoat Roughness',
+			'sidebar/material/clearcoat': 'Clearcoat',
+			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
 			'sidebar/material/vertexcolors/no': 'No',
 			'sidebar/material/vertexcolors/face': 'Face',
@@ -236,7 +241,7 @@ var Strings = function ( config ) {
 			'sidebar/material/alphamap': 'Alpha Map',
 			'sidebar/material/bumpmap': 'Bump Map',
 			'sidebar/material/normalmap': 'Normal Map',
-			'sidebar/material/clearcoatnormalmap': 'ClearCoat Normal Map',
+			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
 			'sidebar/material/displacemap': 'Displace Map',
 			'sidebar/material/roughmap': 'Rough. Map',
 			'sidebar/material/metalmap': 'Metal. Map',
@@ -337,6 +342,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': '圆柱体',
 			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
+			'menubar/add/dodecahedron': 'Dodecahedron',
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/octahedron': '八面体',
 			'menubar/add/tetrahedron': '四面体',
@@ -434,6 +440,9 @@ var Strings = function ( config ) {
 			'sidebar/geometry/geometry/vertices': '顶点',
 			'sidebar/geometry/geometry/faces': '面',
 
+			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
+			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
+
 			'sidebar/geometry/icosahedron_geometry/radius': '半径',
 			'sidebar/geometry/icosahedron_geometry/detail': '面片分段',
 
@@ -508,7 +517,7 @@ var Strings = function ( config ) {
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
-			'sidebar/material/clearcoatnormalmap': 'ClearCoat Normal Map',
+			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
 			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',

@@ -255,7 +255,6 @@ THREE.Ocean.prototype.generateSeedPhaseTexture = function () {
 	this.pingPhaseTexture.wrapS = THREE.ClampToEdgeWrapping;
 	this.pingPhaseTexture.wrapT = THREE.ClampToEdgeWrapping;
 	this.pingPhaseTexture.type = THREE.FloatType;
-	this.pingPhaseTexture.needsUpdate = true;
 
 };
 

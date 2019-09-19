@@ -20,7 +20,9 @@ import { _Math } from '../math/Math.js';
  */
 
 var _geometryId = 0; // Geometry uses even numbers as Id
-var _m1, _obj, _offset;
+var _m1 = new Matrix4();
+var _obj = new Object3D();
+var _offset = new Vector3();
 
 function Geometry() {
 
@@ -112,8 +114,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// rotate geometry around world x-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationX( angle );
 
 		this.applyMatrix( _m1 );
@@ -125,8 +125,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	rotateY: function ( angle ) {
 
 		// rotate geometry around world y-axis
-
-		if ( _m1 === undefined ) _m1 = new Matrix4();
 
 		_m1.makeRotationY( angle );
 
@@ -140,8 +138,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// rotate geometry around world z-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationZ( angle );
 
 		this.applyMatrix( _m1 );
@@ -153,8 +149,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	translate: function ( x, y, z ) {
 
 		// translate geometry
-
-		if ( _m1 === undefined ) _m1 = new Matrix4();
 
 		_m1.makeTranslation( x, y, z );
 
@@ -168,8 +162,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// scale geometry
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeScale( x, y, z );
 
 		this.applyMatrix( _m1 );
@@ -179,8 +171,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	lookAt: function ( vector ) {
-
-		if ( _obj === undefined ) _obj = new Object3D();
 
 		_obj.lookAt( vector );
 
@@ -326,8 +316,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	center: function () {
-
-		if ( _offset === undefined ) _offset = new Vector3();
 
 		this.computeBoundingBox();
 

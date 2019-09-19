@@ -5,19 +5,19 @@
 import {
 	AnimationClip,
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	Vector3
 } from "../../../build/three.module.js";
 
 var MD2Loader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-MD2Loader.prototype = {
+MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: MD2Loader,
 
@@ -33,13 +33,6 @@ MD2Loader.prototype = {
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -393,6 +386,6 @@ MD2Loader.prototype = {
 
 	} )()
 
-};
+} );
 
 export { MD2Loader };

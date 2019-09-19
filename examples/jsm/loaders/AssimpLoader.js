@@ -7,8 +7,8 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
-	DefaultLoadingManager,
 	FileLoader,
+	Loader,
 	LoaderUtils,
 	Matrix4,
 	Mesh,
@@ -24,21 +24,19 @@ import {
 
 var AssimpLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-AssimpLoader.prototype = {
+AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: AssimpLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new FileLoader( this.manager );
 		loader.setPath( scope.path );
@@ -49,27 +47,6 @@ AssimpLoader.prototype = {
 			onLoad( scope.parse( buffer, path ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -2294,6 +2271,6 @@ AssimpLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { AssimpLoader };

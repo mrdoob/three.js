@@ -11,7 +11,9 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 
-var _v1, _v2, _v3;
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+var _v3 = new Vector3();
 
 function DirectionalLightHelper( light, size, color ) {
 
@@ -64,14 +66,6 @@ DirectionalLightHelper.prototype.dispose = function () {
 };
 
 DirectionalLightHelper.prototype.update = function () {
-
-	if ( _v3 === undefined ) {
-
-		_v1 = new Vector3();
-		_v2 = new Vector3();
-		_v3 = new Vector3();
-
-	}
 
 	_v1.setFromMatrixPosition( this.light.matrixWorld );
 	_v2.setFromMatrixPosition( this.light.target.matrixWorld );

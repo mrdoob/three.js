@@ -1,4 +1,5 @@
 import {
+	Loader,
 	LoadingManager,
 	Material,
 	Object3D
@@ -18,15 +19,9 @@ export interface LWOLoaderParameters {
 
 }
 
-export class LWOLoader {
+export class LWOLoader extends Loader {
 	constructor(manager?: LoadingManager, parameters?: LWOLoaderParameters);
-	crossOrigin: string;
-	path: string;
-	resourcePath: string;
 
 	load(url: string, onLoad: (lwo: LWO) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-	setPath(path: string): this;
-	setResourcePath(path: string): this;
-	setCrossOrigin(value: string): this;
 	parse(data: ArrayBuffer, path: string, modelName: string): LWO;
 }

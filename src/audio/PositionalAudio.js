@@ -7,8 +7,10 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
-var _position, _quaternion, _scale;
-var _orientation;
+var _position = new Vector3();
+var _quaternion = new Quaternion();
+var _scale = new Vector3();
+var _orientation = new Vector3();
 
 function PositionalAudio( listener ) {
 
@@ -99,15 +101,6 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 	updateMatrixWorld: function ( force ) {
 
 		Object3D.prototype.updateMatrixWorld.call( this, force );
-
-		if ( _position === undefined ) {
-
-			_position = new Vector3();
-			_quaternion = new Quaternion();
-			_scale = new Vector3();
-			_orientation = new Vector3();
-
-		}
 
 		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 

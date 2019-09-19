@@ -140,10 +140,11 @@
 
 			function initCar() {
 
-				DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				var dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
 				var loader = new GLTFLoader();
-				loader.setDRACOLoader( new DRACOLoader() );
+				loader.setDRACOLoader( dracoLoader );
 
 				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
 

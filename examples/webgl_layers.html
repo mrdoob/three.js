@@ -93,26 +93,48 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var layers = { red: true, green: true, blue: true };
+				var layers = {
+
+					'toggle red': function() {
+
+						camera.layers.toggle( 0 );
+
+					},
+
+					'toggle green': function() {
+
+						camera.layers.toggle( 1 );
+
+					},
+
+					'toggle blue': function() {
+
+						camera.layers.toggle( 2 );
+
+					},
+
+					'enable all': function() {
+
+						camera.layers.enableAll();
+
+					},
+
+					'disable all': function() {
+
+						camera.layers.disableAll();
+
+					}
+
+				};
 
 				//
 				// Init gui
 				var gui = new GUI();
-				gui.add( layers, 'red' ).onChange( function () {
-
-					camera.layers.toggle( 0 );
-
-				} );
-				gui.add( layers, 'green' ).onChange( function () {
-
-					camera.layers.toggle( 1 );
-
-				} );
-				gui.add( layers, 'blue' ).onChange( function () {
-
-					camera.layers.toggle( 2 );
-
-				} );
+				gui.add( layers, 'toggle red' );
+				gui.add( layers, 'toggle green' );
+				gui.add( layers, 'toggle blue' );
+				gui.add( layers, 'enable all' );
+				gui.add( layers, 'disable all' );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
