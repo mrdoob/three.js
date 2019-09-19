@@ -275,9 +275,10 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			} else if ( next === MAT_TRANSPARENCY ) {
 
 				var opacity = this.readWord( data );
-				material.opacity = opacity*0.01;
+				material.opacity = opacity * 0.01;
 				this.debugMessage( '  Opacity : ' + opacity );
-                		material.transparent = opacity<100 ? true : false;
+				material.transparent = opacity < 100 ? true : false;
+
 			} else if ( next === MAT_TEXMAP ) {
 
 				this.debugMessage( '   ColorMap' );
