@@ -165,6 +165,10 @@
 		Registers a loader with the given regular expression. Can be used to define what loader should be used in
 		order to load specific files. A typical use case is to overwrite the default loader for textures.
 		</p>
+		<code>
+// add handler for TGA textures
+manager.addHandler( /\.tga$/i, new TGALoader() );
+		</code>
 
 		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
 		<p>
