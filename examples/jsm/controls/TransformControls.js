@@ -562,15 +562,27 @@ var TransformControls = function ( camera, domElement ) {
 
 	function getPointer( event ) {
 
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+		if ( document.pointerLockElement ) {
 
-		var rect = domElement.getBoundingClientRect();
+			return {
+				x: 0,
+				y: 0,
+				button: event.button
+			};
 
-		return {
-			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
-			button: event.button
-		};
+		} else {
+
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+
+			var rect = domElement.getBoundingClientRect();
+
+			return {
+				x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
+				y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+				button: event.button
+			};
+
+		}
 
 	}
 
