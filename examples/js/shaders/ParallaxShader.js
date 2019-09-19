@@ -6,11 +6,11 @@
 THREE.ParallaxShader = {
 	// Ordered from fastest to best quality.
 	modes: {
-		none:  'NO_PARALLAX',
-		basic: 'USE_BASIC_PARALLAX',
-		steep: 'USE_STEEP_PARALLAX',
-		occlusion: 'USE_OCLUSION_PARALLAX', // a.k.a. POM
-		relief: 'USE_RELIEF_PARALLAX'
+		none:  "NO_PARALLAX",
+		basic: "USE_BASIC_PARALLAX",
+		steep: "USE_STEEP_PARALLAX",
+		occlusion: "USE_OCLUSION_PARALLAX", // a.k.a. POM
+		relief: "USE_RELIEF_PARALLAX"
 	},
 
 	uniforms: {
