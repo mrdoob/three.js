@@ -1015,27 +1015,6 @@ function WebGLRenderer( parameters ) {
 					_gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
 					_gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
 
-				} else if ( name === 'instanceNormalMatrix' ) {
-
-					var attribute = attributes.get( object.instanceNormalMatrix );
-
-					// TODO Attribute may not be available on context restore
-
-					if ( attribute === undefined ) continue;
-
-					var buffer = attribute.buffer;
-					var type = attribute.type;
-
-					state.enableAttributeAndDivisor( programAttribute + 0, 1 );
-					state.enableAttributeAndDivisor( programAttribute + 1, 1 );
-					state.enableAttributeAndDivisor( programAttribute + 2, 1 );
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
-
-					_gl.vertexAttribPointer( programAttribute + 0, 3, type, false, 36, 0 );
-					_gl.vertexAttribPointer( programAttribute + 1, 3, type, false, 36, 12 );
-					_gl.vertexAttribPointer( programAttribute + 2, 3, type, false, 36, 24 );
-
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
 					var value = materialDefaultAttributeValues[ name ];

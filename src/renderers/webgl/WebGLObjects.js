@@ -32,7 +32,6 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 		if ( object.isInstancedMesh ) {
 
 			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
-			attributes.update( object.instanceNormalMatrix, gl.ARRAY_BUFFER );
 
 		}
 

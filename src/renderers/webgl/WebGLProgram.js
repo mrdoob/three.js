@@ -509,7 +509,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			'#ifdef USE_INSTANCING',
 
 			' attribute mat4 instanceMatrix;',
-			' attribute mat3 instanceNormalMatrix;',
 
 			'#endif',
 

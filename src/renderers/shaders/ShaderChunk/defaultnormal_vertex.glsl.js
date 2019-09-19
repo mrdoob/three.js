@@ -3,7 +3,7 @@ vec3 transformedNormal = objectNormal;
 
 #ifdef USE_INSTANCING
 
-	transformedNormal = instanceNormalMatrix * transformedNormal;
+	transformedNormal = mat3( instanceMatrix ) * transformedNormal;
 
 #endif
 
