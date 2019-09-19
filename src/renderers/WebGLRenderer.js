@@ -891,25 +891,9 @@ function WebGLRenderer( parameters ) {
 
 	function setupVertexAttributes( object, geometry, material, program ) {
 
-		if ( object.isInstancedMesh ) {
+		if ( capabilities.isWebGL2 === false && ( object.isInstancedMesh || geometry.isInstancedBufferGeometry ) ) {
 
-			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
-
-				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-				return;
-
-			}
-
-		} else if ( geometry && geometry.isInstancedBufferGeometry && ! capabilities.isWebGL2 ) {
-
-			// TODO Remove
-
-			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
-
-				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-				return;
-
-			}
+			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) return;
 
 		}
 
