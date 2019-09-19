@@ -24,7 +24,7 @@ ReflectNode.prototype.nodeType = "Reflect";
 
 ReflectNode.prototype.getUnique = function ( builder ) {
 
-	return !builder.context.viewNormal;
+	return ! builder.context.viewNormal;
 
 };
 
