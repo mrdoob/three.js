@@ -16,16 +16,24 @@ const OBJLoader2Parser = function () {
 	let scope = this;
 	this.callbacks = {
 		onProgress: function ( text ) {
-			scope._onProgress( text )
+
+			scope._onProgress( text );
+
 		},
 		onAssetAvailable: function ( payload ) {
-			scope._onAssetAvailable( payload )
+
+			scope._onAssetAvailable( payload );
+
 		},
 		onError: function ( errorMessage ) {
-			scope._onError( errorMessage )
+
+			scope._onError( errorMessage );
+
 		},
 		onLoad: function ( object3d, message ) {
-			scope._onLoad( object3d, message )
+
+			scope._onLoad( object3d, message );
+
 		},
 	};
 	this.contentRef = null;

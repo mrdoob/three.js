@@ -21,6 +21,7 @@ import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
  * @constructor
  */
 const OBJLoader2 = function ( manager ) {
+
 	Loader.call( this, manager );
 
 	this.parser = new OBJLoader2Parser();
@@ -35,9 +36,12 @@ const OBJLoader2 = function ( manager ) {
 	// as OBJLoader2 is no longer derived from OBJLoader2Parser, we need to override the default onAssetAvailable callback
 	let scope = this;
 	let defaultOnAssetAvailable = function ( payload ) {
-		scope._onAssetAvailable( payload )
+
+		scope._onAssetAvailable( payload );
+
 	};
 	this.parser.setCallbackOnAssetAvailable( defaultOnAssetAvailable );
+
 };
 
 OBJLoader2.OBJLOADER2_VERSION = '3.1.0';
@@ -124,7 +128,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 */
 	setBaseObject3d: function ( baseObject3d ) {
 
-		this.baseObject3d = (baseObject3d === undefined || baseObject3d === null) ? this.baseObject3d : baseObject3d;
+		this.baseObject3d = ( baseObject3d === undefined || baseObject3d === null ) ? this.baseObject3d : baseObject3d;
 		return this;
 
 	},
@@ -224,19 +228,18 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 	load: function ( url, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
 		let scope = this;
-		if ( onLoad === null || onLoad === undefined || !(onLoad instanceof Function) ) {
+		if ( onLoad === null || onLoad === undefined || ! ( onLoad instanceof Function ) ) {
 
 			let errorMessage = 'onLoad is not a function! Aborting...';
 			scope.parser.callbacks.onError( errorMessage );
-			throw errorMessage
+			throw errorMessage;
 
-		}
-		else {
+		} else {
 
 			this.parser.setCallbackOnLoad( onLoad );
 
 		}
-		if ( onError === null || onError === undefined || !(onError instanceof Function) ) {
+		if ( onError === null || onError === undefined || ! ( onError instanceof Function ) ) {
 
 			onError = function ( event ) {
 
@@ -251,7 +254,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			};
 
 		}
-		if ( !url ) {
+		if ( ! url ) {
 
 			onError( 'An invalid url was provided. Unable to continue!' );
 
@@ -266,19 +269,19 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			if ( urlPartsPath !== undefined && urlPartsPath !== null ) this.path = urlPartsPath;
 
 		}
-		if ( onFileLoadProgress === null || onFileLoadProgress === undefined || !(onFileLoadProgress instanceof Function) ) {
+		if ( onFileLoadProgress === null || onFileLoadProgress === undefined || ! ( onFileLoadProgress instanceof Function ) ) {
 
 			let numericalValueRef = 0;
 			let numericalValue = 0;
 			onFileLoadProgress = function ( event ) {
 
-				if ( !event.lengthComputable ) return;
+				if ( ! event.lengthComputable ) return;
 
 				numericalValue = event.loaded / event.total;
 				if ( numericalValue > numericalValueRef ) {
 
 					numericalValueRef = numericalValue;
-					let output = 'Download of "' + url + '": ' + (numericalValue * 100).toFixed( 2 ) + '%';
+					let output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
 					scope.parser.callbacks.onProgress( 'progressLoad', output, numericalValue );
 
 				}
@@ -331,7 +334,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 			if ( this.parser.logging.enabled ) console.info( 'Parsing arrayBuffer...' );
 			this.parser.execute( content );
 
-		} else if ( typeof (content) === 'string' || content instanceof String ) {
+		} else if ( typeof ( content ) === 'string' || content instanceof String ) {
 
 			if ( this.parser.logging.enabled ) console.info( 'Parsing text...' );
 			this.parser.executeLegacy( content );
