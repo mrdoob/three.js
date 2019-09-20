@@ -265,12 +265,13 @@ function WebGLLights() {
 					matrix42.getInverse( matrix4 );
 
 					var near = light.shadow.camera.near,
-					top = near * Math.tan( light.angle ),
-					height = 2 * top,
-					width = light.aspect * height,
-					left = - 0.5 * width,
-					far = light.distance || light.shadow.camera.far;
-					uniforms.spotProjectionMatrix.makePerspective(left, left + width, top, top - height, near, far)
+						top = near * Math.tan( light.angle ),
+						height = 2 * top,
+						width = light.aspect * height,
+						left = - 0.5 * width,
+						far = light.distance || light.shadow.camera.far;
+						
+					uniforms.spotProjectionMatrix.makePerspective( left, left + width, top, top - height, near, far )
 						.multiply( matrix42 )
 						.multiply( camera.matrixWorld );
 						
