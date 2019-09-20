@@ -270,11 +270,11 @@ function WebGLLights() {
 						width = light.aspect * height,
 						left = - 0.5 * width,
 						far = light.distance || light.shadow.camera.far;
-						
+
 					uniforms.spotProjectionMatrix.makePerspective( left, left + width, top, top - height, near, far )
 						.multiply( matrix42 )
 						.multiply( camera.matrixWorld );
-						
+
 				}
 
 				uniforms.shadow = light.castShadow;
