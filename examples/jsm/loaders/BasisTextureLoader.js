@@ -79,17 +79,17 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 		var config = this.workerConfig;
 
-    config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
+		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
 		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
 		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
 		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
-      || !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
-    if (config.astcSupported) {
+		if (config.astcSupported) {
 
-      config.format = BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4;
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4;
 
-    } else if ( config.dxtSupported ) {
+		} else if ( config.dxtSupported ) {
 
 			config.format = this.useAlpha ? BasisTextureLoader.BASIS_FORMAT.cTFBC3 : BasisTextureLoader.BASIS_FORMAT.cTFBC1;
 
@@ -97,7 +97,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 			config.format = this.useAlpha ? BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA : BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGB;
 
-    } else if ( config.etcSupported ) {
+		} else if ( config.etcSupported ) {
 
 			config.format = BasisTextureLoader.BASIS_FORMAT.cTFETC1;
 
@@ -162,25 +162,25 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 				var texture;
 
 				switch(config.format) {
-          case BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
-            texture = new CompressedTexture( mipmaps, width, height, RGBA_ASTC_4x4_Format );
-            break;
-          case BasisTextureLoader.BASIS_FORMAT.cTFBC1:
-          case BasisTextureLoader.BASIS_FORMAT.cTFBC3:
-            texture = new CompressedTexture( mipmaps, width, height, BasisTextureLoader.DXT_FORMAT_MAP[ config.format ], UnsignedByteType );
-            break;
-          case BasisTextureLoader.BASIS_FORMAT.cTFETC1:
-            texture = new CompressedTexture( mipmaps, width, height, RGB_ETC1_Format );
-            break;
-          case BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGB:
-            texture = new CompressedTexture( mipmaps, width, height, RGB_PVRTC_4BPPV1_Format );
-            break;
-          case BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA:
-            texture = new CompressedTexture( mipmaps, width, height, RGBA_PVRTC_4BPPV1_Format );
-            break;
-          default:
-              throw new Error( 'THREE.BasisTextureLoader: No supported format available.' );
-        }
+					case BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
+						texture = new CompressedTexture( mipmaps, width, height, RGBA_ASTC_4x4_Format );
+						break;
+					case BasisTextureLoader.BASIS_FORMAT.cTFBC1:
+					case BasisTextureLoader.BASIS_FORMAT.cTFBC3:
+						texture = new CompressedTexture( mipmaps, width, height, BasisTextureLoader.DXT_FORMAT_MAP[ config.format ], UnsignedByteType );
+						break;
+					case BasisTextureLoader.BASIS_FORMAT.cTFETC1:
+						texture = new CompressedTexture( mipmaps, width, height, RGB_ETC1_Format );
+						break;
+					case BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGB:
+						texture = new CompressedTexture( mipmaps, width, height, RGB_PVRTC_4BPPV1_Format );
+						break;
+					case BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA:
+						texture = new CompressedTexture( mipmaps, width, height, RGBA_PVRTC_4BPPV1_Format );
+						break;
+					default:
+							throw new Error( 'THREE.BasisTextureLoader: No supported format available.' );
+				}
 
 				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 				texture.magFilter = LinearFilter;
@@ -337,16 +337,16 @@ BasisTextureLoader.BASIS_FORMAT = {
 	cTFBC4: 4,
 	cTFBC5: 5,
 	cTFBC7_M6_OPAQUE_ONLY: 6,
-  cTFBC7_M5: 7,
-  cTFPVRTC1_4_RGB: 8,
-  cTFPVRTC1_4_RGBA: 9,
-  cTFASTC_4x4: 10,
-  cTFATC_RGB: 11,
-  cTFATC_RGBA_INTERPOLATED_ALPHA: 12,
-  cTFRGBA32: 13,
-  cTFRGB565: 14,
-  cTFBGR565: 15,
-  cTFRGBA4444: 16,
+	cTFBC7_M5: 7,
+	cTFPVRTC1_4_RGB: 8,
+	cTFPVRTC1_4_RGBA: 9,
+	cTFASTC_4x4: 10,
+	cTFATC_RGB: 11,
+	cTFATC_RGBA_INTERPOLATED_ALPHA: 12,
+	cTFRGBA32: 13,
+	cTFRGB565: 14,
+	cTFBGR565: 15,
+	cTFRGBA4444: 16,
 };
 
 // DXT formats, from:
@@ -421,14 +421,14 @@ BasisTextureLoader.BasisWorker = function () {
 	function init( wasmBinary ) {
 
 		var m;
-    transcoderPending = new Promise( ( resolve ) => {
+		transcoderPending = new Promise( ( resolve ) => {
 
-      m = { wasmBinary, onRuntimeInitialized: resolve };
+			m = { wasmBinary, onRuntimeInitialized: resolve };
 			BASIS(m);
 
 		} ).then( () => {
 
-      var { BasisFile, initializeBasis } = m;
+			var { BasisFile, initializeBasis } = m;
 
 			_BasisFile = BasisFile;
 
@@ -445,7 +445,7 @@ BasisTextureLoader.BasisWorker = function () {
 		var width = basisFile.getImageWidth( 0, 0 );
 		var height = basisFile.getImageHeight( 0, 0 );
 		var levels = basisFile.getNumLevels( 0 );
-    var hasAlpha = basisFile.getHasAlpha();
+		var hasAlpha = basisFile.getHasAlpha();
 
 		function cleanup() {
 
