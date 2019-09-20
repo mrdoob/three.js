@@ -254,6 +254,7 @@ function WebGLLights() {
 				uniforms.decay = light.decay;
 
 				if ( light.shape === RectangleSpotLight ) {
+
 					// construct a world-matrix from light-position, -target and z-rotation
 					matrix4.lookAt( light.position, light.target.position, light.up );
 					matrix4.multiply( matrix42.makeRotationZ( light.rotation.z ) );
@@ -272,6 +273,7 @@ function WebGLLights() {
 					uniforms.spotProjectionMatrix.makePerspective(left, left + width, top, top - height, near, far)
 						.multiply( matrix42 )
 						.multiply( camera.matrixWorld );
+						
 				}
 
 				uniforms.shadow = light.castShadow;
