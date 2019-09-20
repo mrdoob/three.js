@@ -1,6 +1,7 @@
 import { Light } from './Light.js';
 import { SpotLightShadow } from './SpotLightShadow.js';
 import { Object3D } from '../core/Object3D.js';
+import { CircleSpotLight } from '../constants.js';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -35,6 +36,8 @@ function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 	} );
 
 	this.distance = ( distance !== undefined ) ? distance : 0;
+	this.shape = CircleSpotLight;
+	this.aspect = 1;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
 	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
@@ -54,6 +57,8 @@ SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 		Light.prototype.copy.call( this, source );
 
 		this.distance = source.distance;
+		this.shape = source.shape;
+		this.aspect = source.aspect;
 		this.angle = source.angle;
 		this.penumbra = source.penumbra;
 		this.decay = source.decay;
