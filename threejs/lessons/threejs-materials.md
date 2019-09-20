@@ -178,12 +178,12 @@ across and `metalness` from 0 to 1 down.
 <div data-diagram="MeshStandardMaterial" style="min-height: 400px"></div>
 
 The `MeshPhysicalMaterial` is same as the `MeshStandardMaterial` but it
-adds a `clearcoat` parameter that goes from 0 to 1 for how much to
+adds a `clearCoat` parameter that goes from 0 to 1 for how much to
 apply a clearcoat gloss layer and a `clearCoatRoughness` parameter
 that specifies how rough the gloss layer is.
 
 Here's the same grid of `roughness` by `metalness` as above but with
-`clearcoat` and `clearCoatRoughness` settings.
+`clearCoat` and `clearCoatRoughness` settings.
 
 <div data-diagram="MeshPhysicalMaterial" style="min-height: 400px"></div>
 
@@ -304,8 +304,8 @@ switch from using one to using the other.
 </div>
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r108/three.min.js"></script>
-<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r105/three.min.js"></script>
+<script src="../resources/threejs/r105/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-materials.js"></script>
 

@@ -92,7 +92,7 @@ So now we just need to start changing the `main` we pasted into
 The first thing we need to do is include THREE.js into our worker.
 
 ```js
-importScripts('https://threejsfundamentals.org/threejs/resources/threejs/r108/three.min.js');
+importScripts('https://threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js');
 ```
 
 Then instead of looking up the canvas from the DOM we'll receive it from the
@@ -290,7 +290,7 @@ HTML file.
 
 /* global importScripts, init, state */
 
-importScripts('resources/threejs/r108/three.min.js');
+importScripts('resources/threejs/r105/three.min.js');
 +importScripts('shared-cubes.js');
 
 function size(data) {
@@ -318,7 +318,7 @@ note we include `shared-cubes.js` which is all our three.js code
 Similarly we need to include `shared-cubes.js` in the main page
 
 ```html
-<script src="resources/threejs/r108/three.min.js"></script>
+<script src="resources/threejs/r105/three.min.js"></script>
 +<script src="shared-cubes.js"></script>
 ```
 We can remove the HTML and CSS we added previously
@@ -610,7 +610,7 @@ of the DOM events they use. Maybe we could pass in our own
 object that has the same API surface as a DOM element. 
 We only need to support the features the OrbitControls need.
 
-Digging through the [OrbitControls source code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r108/js/controls/OrbitControls.js)
+Digging through the [OrbitControls source code](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r105/js/controls/OrbitControls.js)
 it looks like we need to handle the following events.
 
 * contextmenu
@@ -728,8 +728,8 @@ We also need to actually add the `OrbitControls` to the top of
 the script
 
 ```js
-importScripts('resources/threejs/r108/three.js');
-+importScripts('resources/threejs/r108/js/controls/OrbitControls.js');
+importScripts('resources/threejs/r105/three.js');
++importScripts('resources/threejs/r105/js/controls/OrbitControls.js');
 *importScripts('shared-orbitcontrols.js');
 ```
 

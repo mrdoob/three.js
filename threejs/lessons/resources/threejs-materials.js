@@ -225,8 +225,8 @@
     MeshPhysicalMaterial: {
       create(props) {
         const settings = {
-          clearcoat: .5,
-          clearcoatRoughness: 0,
+          clearCoat: .5,
+          clearCoatRoughness: 0,
         };
 
         function addElem(parent, type, style = {}) {
@@ -279,8 +279,8 @@
         }
 
         const {elem} = props.renderInfo;
-        addRange(elem, settings, 'clearcoat', 0, 1);
-        addRange(elem, settings, 'clearcoatRoughness', 0, 1);
+        addRange(elem, settings, 'clearCoat', 0, 1);
+        addRange(elem, settings, 'clearCoatRoughness', 0, 1);
         const area = addElem(elem, 'div', {
           width: '100%',
           height: '400px',
@@ -288,8 +288,8 @@
 
         return makeStandardPhysicalMaterialGrid(area, true, (meshes) => {
           meshes.forEach(row => row.forEach(mesh => {
-            mesh.material.clearcoat = settings.clearcoat;
-            mesh.material.clearcoatRoughness = settings.clearcoatRoughness;
+            mesh.material.clearCoat = settings.clearCoat;
+            mesh.material.clearCoatRoughness = settings.clearCoatRoughness;
           }));
         });
       },

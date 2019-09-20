@@ -30,8 +30,8 @@ First we'll add in the `OrbitControls` so there is something that could change
 that we can render in response to.
 
 ```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r105/three.min.js"></script>
++<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
 ```
 
 and set them up
@@ -179,8 +179,8 @@ below slides.
 Let's also add a simple dat.GUI GUI and make its changes render on demand.
 
 ```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r105/three.min.js"></script>
+<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
 +<script src="../3rdparty/dat.gui.min.js"></script>
 ```
 
