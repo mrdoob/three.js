@@ -100,6 +100,15 @@ var OrbitControls = function ( object, domElement ) {
 	// public methods
 	//
 
+	this.rotateLeft = rotateLeft;
+	this.rotateUp = rotateUp;
+	this.panLeft = panLeft;
+	this.panUp = panUp;
+	this.pan = pan;
+	this.dollyIn = dollyIn;
+	this.dollyOut = dollyOut;
+
+
 	this.getPolarAngle = function () {
 
 		return spherical.phi;
