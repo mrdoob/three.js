@@ -139,6 +139,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			precision: precision,
 			isWebGL2: capabilities.isWebGL2,
 			supportsVertexTextures: capabilities.vertexTextures,
+			parallelShaderCompile: capabilities.parallelShaderCompile,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),

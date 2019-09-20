@@ -721,7 +721,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	}
 
-	var parallelShaderExt = capabilities.parallelShaderCompile;
+	var parallelShaderExt = parameters.parallelShaderCompile;
 
 	this.prefixVertex = prefixVertex;
 	this.prefixFragment = prefixFragment;
