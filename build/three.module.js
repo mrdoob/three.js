@@ -17621,7 +17621,7 @@ function generateEnvMapBlendingDefine( parameters, material ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities ) {
+function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
 
 	var gl = renderer.getContext();
 
@@ -17637,7 +17637,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 
 	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
-	var customExtensions = capabilities.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
+	var customExtensions = parameters.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
 
 	var customDefines = generateDefines( defines );
 
@@ -17731,7 +17731,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 			'uniform mat4 modelMatrix;',
 			'uniform vec3 cameraPosition;',
 
@@ -17864,9 +17864,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && ( capabilities.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
-			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( capabilities.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
+			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
 
 			'uniform vec3 cameraPosition;',
 
@@ -17910,7 +17910,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters,
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	if ( capabilities.isWebGL2 && ! material.isRawShaderMaterial ) {
+	if ( parameters.isWebGL2 && ! material.isRawShaderMaterial ) {
 
 		var isGLSL3ShaderMaterial = false;
 
@@ -18251,6 +18251,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			shaderID: shaderID,
 
 			precision: precision,
+			isWebGL2: capabilities.isWebGL2,
 			supportsVertexTextures: capabilities.vertexTextures,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
@@ -18403,7 +18404,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters, capabilities );
+			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
 			programs.push( program );
 
 		}
@@ -24570,7 +24571,14 @@ function WebGLRenderer( parameters ) {
 
 				if ( object.isSkinnedMesh ) {
 
-					object.skeleton.update();
+					// update skeleton only once in a frame
+
+					if ( object.skeleton.frame !== info.render.frame ) {
+
+						object.skeleton.update();
+						object.skeleton.frame = info.render.frame;
+
+					}
 
 				}
 
@@ -26748,6 +26756,8 @@ function Skeleton( bones, boneInverses ) {
 
 	this.bones = bones.slice( 0 );
 	this.boneMatrices = new Float32Array( this.bones.length * 16 );
+
+	this.frame = - 1;
 
 	// use the supplied bone inverses or calculate the inverses
 
@@ -44542,6 +44552,20 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		}
 
 		return this;
+
+	},
+
+	// Allows you to seek to a specific time in an animation.
+	setTime: function ( timeInSeconds ) {
+
+		this.time = 0; // Zero out time attribute for AnimationMixer object;
+		for ( var i = 0; i < this._actions.length; i ++ ) {
+
+			this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
+
+		}
+
+		return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
 
 	},
 

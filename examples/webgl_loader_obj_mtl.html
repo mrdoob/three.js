@@ -71,6 +71,9 @@
 				var manager = new THREE.LoadingManager();
 				manager.addHandler( /\.dds$/i, new DDSLoader() );
 
+				// comment in the following line and import TGALoader if your asset uses TGA textures
+				// manager.addHandler( /\.tga$/i, new TGALoader() );
+
 				new MTLLoader( manager )
 					.setPath( 'models/obj/male02/' )
 					.load( 'male02_dds.mtl', function ( materials ) {

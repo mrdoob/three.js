@@ -209,7 +209,7 @@ FunctionNode.prototype.parse = function ( src, includes, extensions, keywords ) 
 
 			}
 
-			this.isInterface = this.src.indexOf('{') === -1;
+			this.isInterface = this.src.indexOf( '{' ) === - 1;
 
 		} else {
 

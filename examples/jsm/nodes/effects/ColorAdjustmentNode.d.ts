@@ -5,26 +5,27 @@ import { FunctionNode } from '../core/FunctionNode';
 import { Node } from '../core/Node';
 
 export class ColorAdjustmentNode extends TempNode {
-  constructor(rgb: Node, adjustment?: FloatNode, method?: string);
 
-  rgb: Node;
-  adjustment: FloatNode | undefined;
-  method: string;
-  nodeType: string;
+	constructor( rgb: Node, adjustment?: FloatNode, method?: string );
 
-  generate(builder: NodeBuilder, output: string): string;
-  copy(source: ColorAdjustmentNode): this;
+	rgb: Node;
+	adjustment: FloatNode | undefined;
+	method: string;
+	nodeType: string;
 
-  static Nodes: {
-    hue: FunctionNode;
-    saturation: FunctionNode;
-    vibrance: FunctionNode;
-  }
+	generate( builder: NodeBuilder, output: string ): string;
+	copy( source: ColorAdjustmentNode ): this;
 
-  static SATURATION: string;
-  static HUE: string;
-  static VIBRANCE: string;
-  static BRIGHTNESS: string;
-  static CONTRAST: string;
+	static Nodes: {
+		hue: FunctionNode;
+		saturation: FunctionNode;
+		vibrance: FunctionNode;
+	}
+
+	static SATURATION: string;
+	static HUE: string;
+	static VIBRANCE: string;
+	static BRIGHTNESS: string;
+	static CONTRAST: string;
 
 }
