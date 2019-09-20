@@ -11,13 +11,11 @@ import {
 	LinearMipmapLinearFilter,
 	Loader,
 	RGBA_ASTC_4x4_Format,
+	RGBA_PVRTC_4BPPV1_Format,
 	RGB_ETC1_Format,
 	RGB_PVRTC_4BPPV1_Format,
-	RGBA_PVRTC_4BPPV1_Format,
 	UnsignedByteType
 } from "../../../build/three.module.js";
-
-/* global Module, createBasisModule */
 
 /**
  * Loader for Basis Universal GPU Texture Codec.
@@ -35,7 +33,6 @@ var BasisTextureLoader = function ( manager ) {
 
 	Loader.call( this, manager );
 
-	this.useAlpha = true;
 	this.transcoderPath = '';
 	this.transcoderBinary = null;
 	this.transcoderPending = null;
@@ -46,7 +43,6 @@ var BasisTextureLoader = function ( manager ) {
 	this.workerSourceURL = '';
 	this.workerConfig = {
 		format: null,
-		useAlpha: true,
 		astcSupported: false,
 		etcSupported: false,
 		dxtSupported: false,
@@ -91,11 +87,11 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 		} else if ( config.dxtSupported ) {
 
-			config.format = this.useAlpha ? BasisTextureLoader.BASIS_FORMAT.cTFBC3 : BasisTextureLoader.BASIS_FORMAT.cTFBC1;
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFBC3;
 
 		} else if ( config.pvrtcSupported ) {
 
-			config.format = this.useAlpha ? BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA : BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGB;
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA;
 
 		} else if ( config.etcSupported ) {
 
@@ -157,11 +153,11 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 				var config = this.workerConfig;
 
-				var { width, height, hasAlpha, mipmaps } = message;
+				var { width, height, hasAlpha, mipmaps, format } = message;
 
 				var texture;
 
-				switch(config.format) {
+				switch(format) {
 					case BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
 						texture = new CompressedTexture( mipmaps, width, height, RGBA_ASTC_4x4_Format );
 						break;
@@ -179,7 +175,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 						texture = new CompressedTexture( mipmaps, width, height, RGBA_PVRTC_4BPPV1_Format );
 						break;
 					default:
-							throw new Error( 'THREE.BasisTextureLoader: No supported format available.' );
+						throw new Error( 'THREE.BasisTextureLoader: No supported format available.' );
 				}
 
 				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
@@ -363,10 +359,6 @@ BasisTextureLoader.DXT_FORMAT_MAP[ BasisTextureLoader.BASIS_FORMAT.cTFBC1 ] =
 BasisTextureLoader.DXT_FORMAT_MAP[ BasisTextureLoader.BASIS_FORMAT.cTFBC3 ] =
 	BasisTextureLoader.DXT_FORMAT.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
-// ASTC formats, from:
-// https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/
-BasisTextureLoader.COMPRESSED_RGBA_ASTC_4x4_KHR = 0x93B0;
-
 /* WEB WORKER */
 
 BasisTextureLoader.BasisWorker = function () {
@@ -391,7 +383,7 @@ BasisTextureLoader.BasisWorker = function () {
 
 					try {
 
-						var { width, height, hasAlpha, mipmaps } = transcode( message.buffer );
+						var { width, height, hasAlpha, mipmaps, format } = transcode( message.buffer );
 
 						var buffers = [];
 
@@ -401,7 +393,7 @@ BasisTextureLoader.BasisWorker = function () {
 
 						}
 
-						self.postMessage( { type: 'transcode', id: message.id, width, height, hasAlpha, mipmaps }, buffers );
+						self.postMessage( { type: 'transcode', id: message.id, width, height, hasAlpha, mipmaps, format }, buffers );
 
 					} catch ( error ) {
 
@@ -420,15 +412,15 @@ BasisTextureLoader.BasisWorker = function () {
 
 	function init( wasmBinary ) {
 
-		var m;
+		var BasisModule;
 		transcoderPending = new Promise( ( resolve ) => {
 
-			m = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS(m);
+			BasisModule = { wasmBinary, onRuntimeInitialized: resolve };
+			BASIS(BasisModule);
 
 		} ).then( () => {
 
-			var { BasisFile, initializeBasis } = m;
+			var { BasisFile, initializeBasis } = BasisModule;
 
 			_BasisFile = BasisFile;
 
@@ -454,6 +446,16 @@ BasisTextureLoader.BasisWorker = function () {
 
 		}
 
+		if ( !hasAlpha ) {
+			switch(config.format) {
+				case 9: // Hardcoded: BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA
+					config.format = 8; // Hardcoded: BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGB;
+					break;
+				default:
+					break;
+			}
+		}
+
 		if ( ! width || ! height || ! levels ) {
 
 			cleanup();
@@ -465,12 +467,6 @@ BasisTextureLoader.BasisWorker = function () {
 
 			cleanup();
 			throw new Error( 'THREE.BasisTextureLoader: .startTranscoding failed' );
-
-		}
-
-		if ( basisFile.getHasAlpha() ) {
-
-			console.warn( 'THREE.BasisTextureLoader: Alpha not yet implemented.' );
 
 		}
 
@@ -487,7 +483,7 @@ BasisTextureLoader.BasisWorker = function () {
 				0,
 				mip,
 				config.format,
-				config.useAlpha,
+				hasAlpha,
 				0
 			);
 
@@ -504,10 +500,9 @@ BasisTextureLoader.BasisWorker = function () {
 
 		cleanup();
 
-		return { width, height, hasAlpha, mipmaps };
+		return { width, height, hasAlpha, mipmaps, format: config.format };
 
 	}
 
 };
-
 export { BasisTextureLoader };

@@ -19,7 +19,6 @@ Both are dependencies of `THREE.BasisTextureLoader`:
 ```js
 var basisLoader = new THREE.BasisTextureLoader();
 basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
-basisLoader.useAlpha = false;
 basisLoader.detectSupport( renderer );
 basisLoader.load( 'diffuse.basis', function ( texture ) {
 
