@@ -16371,6 +16371,8 @@
 		this.generateMipmaps = false;
 		this.flipY = false;
 
+		this.needsUpdate = true;
+
 	}
 
 	DataTexture2DArray.prototype = Object.create( Texture.prototype );
@@ -16402,6 +16404,9 @@
 
 		this.generateMipmaps = false;
 		this.flipY = false;
+
+		this.needsUpdate = true;
+
 
 	}
 
