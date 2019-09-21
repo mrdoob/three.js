@@ -8,6 +8,7 @@ import { WebGLProgram } from './WebGLProgram.js';
 function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	var programs = [];
+	var parameterNames;
 
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
@@ -27,19 +28,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		SpriteMaterial: 'sprite'
 	};
 
-	var parameterNames = [
-		"precision", "supportsVertexTextures", "map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
-		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
-		"roughnessMap", "metalnessMap", "gradientMap",
-		"alphaMap", "combine", "vertexColors", "vertexTangents", "fog", "useFog", "fogExp2",
-		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
-		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
-		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
-		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
-		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
-		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
-		"sheen"
-	];
 
 
 	function allocateBones( object ) {
@@ -249,6 +237,16 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 				array.push( material.defines[ name ] );
 
 			}
+
+		}
+
+		if ( parameterNames === undefined ) {
+
+			parameterNames = Object.keys( parameters ).filter( function ( key ) {
+
+				return key !== "shaderID";
+
+			} );
 
 		}
 
