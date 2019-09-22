@@ -171,6 +171,49 @@ Sidebar.Project = function ( editor ) {
 
 	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
 
+	var materialbrowserpanel = new UI.Panel();
+
+	var headerRow = new UI.Row();
+	headerRow.add( new UI.Text( strings.getKey( 'sidebar/project/materialbrowser' ) ) );
+	
+	materialbrowserpanel.add( headerRow );
+
+	var listbox = new UI.Listbox(  );
+	signals.materialAdded.add( function () {
+
+		var materials = Object.values( editor.materials );
+		listbox.setItems( materials );
+
+	} );
+	materialbrowserpanel.add( listbox );
+
+	var buttonsRow = new UI.Row(  );
+	buttonsRow.setPadding( '10px 0px' );
+	materialbrowserpanel.add( buttonsRow );
+
+	var addButton = new UI.Button(  ).setLabel( 'Add' ).setMarginRight( '5px' );
+	addButton.onClick( function ( ) {
+
+		editor.addMaterial( new THREE.MeshStandardMaterial({ color: 0xffffff }) );
+
+	} );
+	buttonsRow.add( addButton );
+
+	var assignMaterial = new UI.Button(  ).setLabel( 'Assign' ).setMargin( '0px 5px' );
+	assignMaterial.onClick( function ( ) {
+		
+		if ( typeof editor.selected !== 'undefined' ) {
+			var material = editor.getMaterialById( parseInt( listbox.getValue( ) ) );
+			if ( typeof material !== 'undefined' ) {
+				editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+			}
+		}
+
+	} );
+	buttonsRow.add( assignMaterial );
+
+	container.add( materialbrowserpanel );
+
 	return container;
 
 };

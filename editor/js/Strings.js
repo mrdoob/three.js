@@ -274,6 +274,7 @@ var Strings = function ( config ) {
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
+			'sidebar/project/materialbrowser': 'MATERIAL BROWSER',
 			'sidebar/project/title': 'Title',
 			'sidebar/project/editable': 'Editable',
 			'sidebar/project/vr': 'VR',
