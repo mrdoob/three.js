@@ -19,7 +19,13 @@ Sidebar.Project = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
+	container.setPadding( '0' );
 	container.setPaddingTop( '20px' );
+
+	var projectsettings = new UI.Panel();
+	projectsettings.setBorderTop( '0' );
+
+	container.add( projectsettings );
 
 	// Title
 
@@ -33,7 +39,7 @@ Sidebar.Project = function ( editor ) {
 	titleRow.add( new UI.Text( strings.getKey( 'sidebar/project/title' ) ).setWidth( '90px' ) );
 	titleRow.add( title );
 
-	container.add( titleRow );
+	projectsettings.add( titleRow );
 
 	// Editable
 
@@ -47,7 +53,7 @@ Sidebar.Project = function ( editor ) {
 	editableRow.add( new UI.Text( strings.getKey( 'sidebar/project/editable' ) ).setWidth( '90px' ) );
 	editableRow.add( editable );
 
-	container.add( editableRow );
+	projectsettings.add( editableRow );
 
 	// VR
 
@@ -61,7 +67,7 @@ Sidebar.Project = function ( editor ) {
 	vrRow.add( new UI.Text( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
 	vrRow.add( vr );
 
-	container.add( vrRow );
+	projectsettings.add( vrRow );
 
 	// Renderer
 
@@ -89,7 +95,7 @@ Sidebar.Project = function ( editor ) {
 	rendererTypeRow.add( new UI.Text( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 	rendererTypeRow.add( rendererType );
 
-	container.add( rendererTypeRow );
+	projectsettings.add( rendererTypeRow );
 
 	if ( config.getKey( 'project/renderer' ) !== undefined ) {
 
@@ -119,7 +125,7 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
-	container.add( rendererPropertiesRow );
+	projectsettings.add( rendererPropertiesRow );
 
 	//
 
