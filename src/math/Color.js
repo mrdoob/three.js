@@ -588,6 +588,6 @@ Object.assign( Color.prototype, {
 
 } );
 
-Color.NAMES = ColorKeywords;
+Color.NAMES = _colorKeywords;
 
 export { Color };
