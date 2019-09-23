@@ -222,6 +222,19 @@ Sidebar.Project = function ( editor ) {
 
 	container.add( materials );
 
+	// events
+
+	signals.objectSelected.add( function ( object ) {
+
+		if ( object !== null ) {
+
+			var index = Object.values( editor.materials ).indexOf( object.material );
+			listbox.selectIndex( index );
+
+		}
+
+	} );
+
 	return container;
 
 };
