@@ -201,7 +201,7 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 var includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
 
-function parseIncludes( string ) {
+function resolveIncludes( string ) {
 
 	return string.replace( includePattern, includeReplacer );
 
@@ -217,7 +217,7 @@ function includeReplacer( match, include ) {
 
 	}
 
-	return parseIncludes( string );
+	return resolveIncludes( string );
 
 }
 
@@ -651,11 +651,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	}
 
-	vertexShader = parseIncludes( vertexShader );
+	vertexShader = resolveIncludes( vertexShader );
 	vertexShader = replaceLightNums( vertexShader, parameters );
 	vertexShader = replaceClippingPlaneNums( vertexShader, parameters );
 
-	fragmentShader = parseIncludes( fragmentShader );
+	fragmentShader = resolveIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 	fragmentShader = replaceClippingPlaneNums( fragmentShader, parameters );
 
