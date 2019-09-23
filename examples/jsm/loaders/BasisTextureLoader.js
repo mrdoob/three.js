@@ -81,7 +81,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
 			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
-		if (config.astcSupported) {
+		if ( config.astcSupported ) {
 
 			config.format = BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4;
 
@@ -157,7 +157,8 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 				var texture;
 
-				switch(format) {
+				switch ( format ) {
+
 					case BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
 						texture = new CompressedTexture( mipmaps, width, height, RGBA_ASTC_4x4_Format );
 						break;
@@ -176,6 +177,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 						break;
 					default:
 						throw new Error( 'THREE.BasisTextureLoader: No supported format available.' );
+
 				}
 
 				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
@@ -416,7 +418,7 @@ BasisTextureLoader.BasisWorker = function () {
 		transcoderPending = new Promise( ( resolve ) => {
 
 			BasisModule = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS(BasisModule);
+			BASIS( BasisModule );
 
 		} ).then( () => {
 
@@ -446,14 +448,18 @@ BasisTextureLoader.BasisWorker = function () {
 
 		}
 
-		if ( !hasAlpha ) {
-			switch(config.format) {
+		if ( ! hasAlpha ) {
+
+			switch ( config.format ) {
+
 				case 9: // Hardcoded: BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGBA
 					config.format = 8; // Hardcoded: BasisTextureLoader.BASIS_FORMAT.cTFPVRTC1_4_RGB;
 					break;
 				default:
 					break;
+
 			}
+
 		}
 
 		if ( ! width || ! height || ! levels ) {
@@ -505,4 +511,5 @@ BasisTextureLoader.BasisWorker = function () {
 	}
 
 };
+
 export { BasisTextureLoader };

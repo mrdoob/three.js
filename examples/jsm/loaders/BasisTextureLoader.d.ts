@@ -8,15 +8,13 @@ import {
 export class BasisTextureLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-	useAlpha: boolean;
 	transcoderBinary: ArrayBuffer | null;
 	transcoderPath: string;
 	transcoderPending: Promise<void> | null;
 
 	workerConfig: {
 		format: number;
-		useAlpha: boolean,
-		astcSupported: boolean,
+		astcSupported: boolean;
 		etcSupported: boolean;
 		dxtSupported: boolean;
 		pvrtcSupported: boolean;
