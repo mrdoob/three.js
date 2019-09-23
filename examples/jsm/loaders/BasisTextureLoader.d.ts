@@ -14,6 +14,7 @@ export class BasisTextureLoader extends Loader {
 
 	workerConfig: {
 		format: number;
+		astcSupported: boolean;
 		etcSupported: boolean;
 		dxtSupported: boolean;
 		pvrtcSupported: boolean;
