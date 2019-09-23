@@ -12,6 +12,7 @@ Sidebar.Properties = function ( editor ) {
 	container.addTab( 'object', strings.getKey( 'sidebar/properties/object' ), new Sidebar.Object( editor ) );
 	container.addTab( 'geometry', strings.getKey( 'sidebar/properties/geometry' ), new Sidebar.Geometry( editor ) );
 	container.addTab( 'material', strings.getKey( 'sidebar/properties/material' ), new Sidebar.Material( editor ) );
+	container.select( 'object' );
 
 	return container;
 
