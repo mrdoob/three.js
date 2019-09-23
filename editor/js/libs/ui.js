@@ -1159,7 +1159,7 @@ UI.Listbox = function ( ) {
 };
 
 UI.Listbox.prototype = Object.create( UI.Element.prototype );
-UI.Listbox.prototype.constructor = UI.ListboxItem;
+UI.Listbox.prototype.constructor = UI.Listbox;
 
 UI.Listbox.prototype.setItems = function ( items ) {
 
@@ -1169,7 +1169,7 @@ UI.Listbox.prototype.setItems = function ( items ) {
 
 	}
 
-	this.render( );
+	this.render();
 
 };
 
@@ -1217,11 +1217,11 @@ UI.Listbox.prototype.selectIndex = function ( index ) {
 
 	}
 
-	this.selectIndex = index;
+	this.selectedIndex = index;
 
 };
 
-UI.Listbox.prototype.getValue = function ( index ) {
+UI.Listbox.prototype.getValue = function () {
 
 	return this.selectedValue;
 
@@ -1233,7 +1233,7 @@ UI.Listbox.prototype.setValue = function ( value ) {
 
 		var element = this.listitems[ i ];
 
-		if ( element.getId( ) === value ) {
+		if ( element.getId() === value ) {
 
 			element.addClass( 'active' );
 
