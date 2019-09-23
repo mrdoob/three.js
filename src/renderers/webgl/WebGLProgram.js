@@ -197,25 +197,27 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 }
 
+// Resolve Includes
+
+var includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
+
 function parseIncludes( string ) {
 
-	var pattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
+	return string.replace( includePattern, includeReplacer );
 
-	function replace( match, include ) {
+}
 
-		var replace = ShaderChunk[ include ];
+function includeReplacer( match, include ) {
 
-		if ( replace === undefined ) {
+	var string = ShaderChunk[ include ];
 
-			throw new Error( 'Can not resolve #include <' + include + '>' );
+	if ( string === undefined ) {
 
-		}
-
-		return parseIncludes( replace );
+		throw new Error( 'Can not resolve #include <' + include + '>' );
 
 	}
 
-	return string.replace( pattern, replace );
+	return parseIncludes( string );
 
 }
 
