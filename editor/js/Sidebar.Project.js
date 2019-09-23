@@ -174,11 +174,11 @@ Sidebar.Project = function ( editor ) {
 	var materialbrowserpanel = new UI.Panel();
 
 	var headerRow = new UI.Row();
-	headerRow.add( new UI.Text( strings.getKey( 'sidebar/project/materialbrowser' ) ) );
-	
+	headerRow.add( new UI.Text( strings.getKey( 'sidebar/project/materials' ) ) );
+
 	materialbrowserpanel.add( headerRow );
 
-	var listbox = new UI.Listbox(  );
+	var listbox = new UI.Listbox();
 	signals.materialAdded.add( function () {
 
 		var materials = Object.values( editor.materials );
@@ -187,26 +187,33 @@ Sidebar.Project = function ( editor ) {
 	} );
 	materialbrowserpanel.add( listbox );
 
-	var buttonsRow = new UI.Row(  );
+	var buttonsRow = new UI.Row();
 	buttonsRow.setPadding( '10px 0px' );
 	materialbrowserpanel.add( buttonsRow );
 
-	var addButton = new UI.Button(  ).setLabel( 'Add' ).setMarginRight( '5px' );
-	addButton.onClick( function ( ) {
+	/*
+	var addButton = new UI.Button().setLabel( 'Add' ).setMarginRight( '5px' );
+	addButton.onClick( function () {
 
-		editor.addMaterial( new THREE.MeshStandardMaterial({ color: 0xffffff }) );
+		editor.addMaterial( new THREE.MeshStandardMaterial() );
 
 	} );
 	buttonsRow.add( addButton );
+	*/
 
-	var assignMaterial = new UI.Button(  ).setLabel( 'Assign' ).setMargin( '0px 5px' );
+	var assignMaterial = new UI.Button().setLabel( 'Assign' ).setMargin( '0px 5px' );
 	assignMaterial.onClick( function ( ) {
-		
+
 		if ( typeof editor.selected !== 'undefined' ) {
+
 			var material = editor.getMaterialById( parseInt( listbox.getValue( ) ) );
+
 			if ( typeof material !== 'undefined' ) {
+
 				editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+
 			}
+
 		}
 
 	} );

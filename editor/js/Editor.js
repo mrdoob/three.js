@@ -247,16 +247,18 @@ Editor.prototype = {
 
 	},
 
-	getMaterialById ( id ) {
+	getMaterialById: function ( id ) {
 
 		var material;
 		var materials = Object.values( this.materials );
 
-		for( var i = 0; i < materials.length; i ++ ) {
-			
-			if ( materials[i].id === id ) {
-				material = materials[i];
+		for ( var i = 0; i < materials.length; i ++ ) {
+
+			if ( materials[ i ].id === id ) {
+
+				material = materials[ i ];
 				break;
+
 			}
 
 		}

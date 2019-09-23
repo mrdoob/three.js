@@ -274,13 +274,13 @@ var Strings = function ( config ) {
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
-			'sidebar/project/materialbrowser': 'MATERIAL BROWSER',
 			'sidebar/project/title': 'Title',
 			'sidebar/project/editable': 'Editable',
 			'sidebar/project/vr': 'VR',
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/materials': 'Materials',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -556,6 +556,7 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
+			'sidebar/project/materials': 'Materials',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
