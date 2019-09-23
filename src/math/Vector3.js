@@ -526,11 +526,13 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	projectOnVector: function ( vector ) {
+	projectOnVector: function ( v ) {
 
-		var scalar = vector.dot( this ) / vector.lengthSq();
+		// v cannot be the zero v
 
-		return this.copy( vector ).multiplyScalar( scalar );
+		var scalar = v.dot( this ) / v.lengthSq();
+
+		return this.copy( v ).multiplyScalar( scalar );
 
 	},
 
@@ -552,6 +554,8 @@ Object.assign( Vector3.prototype, {
 	},
 
 	angleTo: function ( v ) {
+
+		// assumes this and v are not the zero vector
 
 		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
 
