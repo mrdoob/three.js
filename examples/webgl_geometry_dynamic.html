@@ -21,20 +21,13 @@
 			left click: forward, right click: backward
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
 			var camera, controls, scene, renderer, stats;
 
@@ -52,7 +45,7 @@
 
 				clock = new THREE.Clock();
 
-				controls = new THREE.FirstPersonControls( camera );
+				controls = new FirstPersonControls( camera );
 
 				controls.movementSpeed = 500;
 				controls.lookSpeed = 0.1;

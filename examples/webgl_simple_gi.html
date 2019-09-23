@@ -12,10 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			// HACK:
 
@@ -187,7 +188,7 @@
 
 				new SimpleGI( renderer, scene );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

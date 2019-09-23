@@ -3,8 +3,17 @@
  */
 /* global QUnit */
 
-import * as GLTFExporter from '../../../../examples/js/exporters/GLTFExporter';
-import * as GLTFLoader from '../../../../examples/js/loaders/GLTFLoader';
+import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
+import { GLTFLoader } from '../../../../examples/jsm/loaders/GLTFLoader';
+
+import { AnimationClip } from '../../../../src/animation/AnimationClip';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry';
+import { Mesh } from '../../../../src/objects/Mesh';
+import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial';
+import { Object3D } from '../../../../src/core/Object3D';
+import { Scene } from '../../../../src/scenes/Scene';
+import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack';
 
 export default QUnit.module( 'Loaders', () => {
 
@@ -12,7 +21,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		QUnit.test( 'constructor', ( assert ) => {
 
-			assert.ok( new THREE.GLTFLoader(), 'Can instantiate a loader.' );
+			assert.ok( new GLTFLoader(), 'Can instantiate a loader.' );
 
 		} );
 
@@ -20,19 +29,19 @@ export default QUnit.module( 'Loaders', () => {
 
 			var done = assert.async();
 
-			var geometry = new THREE.BufferGeometry();
+			var geometry = new BufferGeometry();
 			var array = new Float32Array( [
 				- 1, - 1, - 1,
 				1, 1, 1,
 				4, 4, 4
 			] );
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( array, 3 ) );
+			geometry.addAttribute( 'position', new BufferAttribute( array, 3 ) );
 
-			var meshIn = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color: 0xFF0000 } ) );
+			var meshIn = new Mesh( geometry, new MeshStandardMaterial( { color: 0xFF0000 } ) );
 			meshIn.name = 'test_mesh';
 
-			var exporter = new THREE.GLTFExporter();
-			var loader = new THREE.GLTFLoader();
+			var exporter = new GLTFExporter();
+			var loader = new GLTFLoader();
 
 			exporter.parse( meshIn, function ( binary ) {
 
@@ -51,7 +60,7 @@ export default QUnit.module( 'Loaders', () => {
 
 				}, undefined, function ( e ) {
 
-					console.error(e);
+					console.error( e );
 
 				} );
 
@@ -63,23 +72,23 @@ export default QUnit.module( 'Loaders', () => {
 
 			var done = assert.async();
 
-			var node1 = new THREE.Object3D();
+			var node1 = new Object3D();
 			node1.name = 'node1';
 
-			var node2 = new THREE.Object3D();
+			var node2 = new Object3D();
 			node2.name = 'node2';
 
-			var scene = new THREE.Scene();
+			var scene = new Scene();
 			scene.add( node1, node2 );
 
-			var clip = new THREE.AnimationClip( 'clip', undefined, [
+			var clip = new AnimationClip( 'clip', undefined, [
 
-				new THREE.VectorKeyframeTrack( 'node1.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] )
+				new VectorKeyframeTrack( 'node1.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] )
 
 			] );
 
-			var exporter = new THREE.GLTFExporter();
-			var loader = new THREE.GLTFLoader();
+			var exporter = new GLTFExporter();
+			var loader = new GLTFLoader();
 
 			exporter.parse( scene, function ( binary ) {
 
@@ -95,7 +104,7 @@ export default QUnit.module( 'Loaders', () => {
 
 				}, undefined, function ( e ) {
 
-					console.error(e);
+					console.error( e );
 
 				} );
 

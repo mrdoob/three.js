@@ -13,12 +13,10 @@
 	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
-<script src="../build/three.js"></script>
-<script src="js/loaders/KTXLoader.js"></script>
+<script type="module">
+	import * as THREE from '../build/three.module.js';
 
-<script src="js/WebGL.js"></script>
-
-<script>
+	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
 
 	/*
 	This is how compressed textures are supposed to be used:
@@ -34,12 +32,6 @@
 	ETC1 - opaque textures
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
-
-	if ( WEBGL.isWebGLAvailable() === false ) {
-
-		document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-	}
 
 	var camera, scene, renderer;
 	var meshes = [];
@@ -70,7 +62,7 @@
 		var material1, material2;
 
 		// TODO: add cubemap support
-		var loader = new THREE.KTXLoader();
+		var loader = new KTXLoader();
 
 		if ( formats.pvrtc ) {
 

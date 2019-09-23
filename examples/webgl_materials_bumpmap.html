@@ -13,19 +13,13 @@
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var statsEnabled = true;
 
@@ -95,7 +89,7 @@
 					bumpScale: 12
 				} );
 
-				loader = new THREE.GLTFLoader();
+				loader = new GLTFLoader();
 				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );

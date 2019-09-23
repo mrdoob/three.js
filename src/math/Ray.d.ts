@@ -44,18 +44,18 @@ export class Ray {
 	equals( ray: Ray ): boolean;
 
 	/**
-   * @deprecated Use {@link Ray#intersectsBox .intersectsBox()} instead.
-   */
+	 * @deprecated Use {@link Ray#intersectsBox .intersectsBox()} instead.
+	 */
 	isIntersectionBox( b: any ): any;
 
 	/**
-   * @deprecated Use {@link Ray#intersectsPlane .intersectsPlane()} instead.
-   */
+	 * @deprecated Use {@link Ray#intersectsPlane .intersectsPlane()} instead.
+	 */
 	isIntersectionPlane( p: any ): any;
 
 	/**
-   * @deprecated Use {@link Ray#intersectsSphere .intersectsSphere()} instead.
-   */
+	 * @deprecated Use {@link Ray#intersectsSphere .intersectsSphere()} instead.
+	 */
 	isIntersectionSphere( s: any ): any;
 
 }

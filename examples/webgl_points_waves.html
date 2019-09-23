@@ -12,11 +12,6 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particles waves example
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<script type="x-shader/x-vertex" id="vertexshader">
 
 			attribute float scale;
@@ -47,13 +42,11 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
 

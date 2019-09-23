@@ -12,19 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - stereo. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/effects/StereoEffect.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { StereoEffect } from './jsm/effects/StereoEffect.js';
 
 			var container, camera, scene, renderer, effect;
 
@@ -81,7 +73,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.StereoEffect( renderer );
+				effect = new StereoEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				//

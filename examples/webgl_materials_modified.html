@@ -13,20 +13,14 @@
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var camera, scene, renderer, stats;
 
@@ -64,7 +58,7 @@
 
 				};
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					var mesh = new THREE.Mesh( gltf.scene.children[ 0 ].geometry, material );
@@ -79,7 +73,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 

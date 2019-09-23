@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -82,6 +83,8 @@ function WebVRManager( renderer ) {
 
 			animation.start();
 
+			scope.dispatchEvent( { type: 'sessionstart' } );
+
 		} else {
 
 			if ( scope.enabled ) {
@@ -91,6 +94,8 @@ function WebVRManager( renderer ) {
 			}
 
 			animation.stop();
+
+			scope.dispatchEvent( { type: 'sessionend' } );
 
 		}
 
@@ -111,6 +116,7 @@ function WebVRManager( renderer ) {
 			if ( gamepad && ( gamepad.id === 'Daydream Controller' ||
 				gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ||
 				gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) ||
+				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
 				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
 
 				if ( j === id ) return gamepad;
@@ -415,5 +421,7 @@ function WebVRManager( renderer ) {
 	};
 
 }
+
+Object.assign( WebVRManager.prototype, EventDispatcher.prototype );
 
 export { WebVRManager };

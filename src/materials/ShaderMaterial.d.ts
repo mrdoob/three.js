@@ -25,6 +25,12 @@ export interface ShaderMaterialParameters extends MaterialParameters {
 	skinning?: boolean;
 	morphTargets?: boolean;
 	morphNormals?: boolean;
+	extensions?: {
+		derivatives?: boolean;
+		fragDepth?: boolean;
+		drawBuffers?: boolean;
+		shaderTextureLOD?: boolean;
+	};
 }
 
 export class ShaderMaterial extends Material {
@@ -44,8 +50,8 @@ export class ShaderMaterial extends Material {
 	morphTargets: boolean;
 	morphNormals: boolean;
 	/**
-   * @deprecated Use {@link ShaderMaterial#extensions.derivatives extensions.derivatives} instead.
-   */
+	 * @deprecated Use {@link ShaderMaterial#extensions.derivatives extensions.derivatives} instead.
+	 */
 	derivatives: any;
 	extensions: {
 		derivatives: boolean;

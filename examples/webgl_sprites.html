@@ -8,9 +8,13 @@
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - sprites
+		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 			var cameraOrtho, sceneOrtho;

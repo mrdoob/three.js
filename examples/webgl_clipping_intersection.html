@@ -8,11 +8,13 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer;
 
@@ -45,7 +47,7 @@
 
 				camera.position.set( - 1.5, 2.5, 3.0 );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use only if there is no animation loop
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
@@ -55,7 +57,7 @@
 				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
 
-				// var helper = new THREE.CameraHelper( light.shadow.camera );
+				// var helper = new CameraHelper( light.shadow.camera );
 				// scene.add( helper );
 
 				//
@@ -92,7 +94,7 @@
 
 				// gui
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 

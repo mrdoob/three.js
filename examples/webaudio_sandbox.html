@@ -56,19 +56,13 @@
 			navigate with WASD / arrows / mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
 			var camera, controls, scene, renderer, light;
 
@@ -198,7 +192,7 @@
 
 				};
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				var soundControls = new SoundControls();
 				var generatorControls = new GeneratorControls();
 				var volumeFolder = gui.addFolder( 'sound volume' );
@@ -253,7 +247,7 @@
 
 				//
 
-				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+				controls = new FirstPersonControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 70;
 				controls.lookSpeed = 0.05;

@@ -13,18 +13,11 @@
 			leaf texture by <a href="http://opengameart.org/node/10505">lauris71</a>, explosion texture by <a href="http://opengameart.org/node/7728">bart</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/DDSLoader.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 
 			var camera, scene, renderer;
 			var meshes = [];
@@ -49,7 +42,7 @@
 				DXT5 - RGBA - transparent textures with full alpha range
 				*/
 
-				var loader = new THREE.DDSLoader();
+				var loader = new DDSLoader();
 
 				var map1 = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
 				map1.minFilter = map1.magFilter = THREE.LinearFilter;

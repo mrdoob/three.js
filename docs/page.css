@@ -2,18 +2,14 @@
 	--color-blue: #049EF4;
 	--text-color: #444;
 
-	--font-size: 14px;
-	--line-height: 24px;
-	--font-size-sanserif: 1.128rem;
-	--line-height-sanserif: 1.74rem;
+	--font-size: 16px;
+	--line-height: 26px;
 
 	--border-style: 1px solid #E8E8E8;
-	--header-height: 48px;
 	--panel-width: 300px;
-	--panel-padding: 1.143rem;
-	--page-padding: 1.75rem;
+	--page-padding: 24px;
 	--max-width: 760px;
-	--icon-size: 1.428rem;
+	--icon-size: 20px;
 }
 
 @font-face {
@@ -60,31 +56,29 @@ a {
 }
 
 h1 {
-	color: var(--color-blue);
-	font-size: 2.8rem;
-	line-height: 3.4rem;
+	font-size: 40px;
+	line-height: 48px;
 	font-weight: normal;
-	margin-top: 1rem;
-	margin-bottom: -0.4rem;
 	margin-left: -2px;
+	margin-top: 16px;
+	margin-bottom: -8px;
 }
 
 h2 {
-	color: var(--color-blue);
-	font-size: 2rem;
-	line-height: 2.6rem;
+	font-size: 28px;
+	line-height: 36px;
 	font-weight: normal;
-	margin-top: 2rem;
-	margin-bottom: -0.4rem;
+	margin-left: -1px;
+	margin-top: 28px;
+	margin-bottom: -8px;
 }
 
 h3 {
-	color: var(--color-blue);
-	font-size: 1.32rem;
-	line-height: 2rem;
+	font-size: 20px;
+	line-height: 28px;
 	font-weight: normal;
-	margin-top: 1.8rem;
-	margin-bottom: 1rem;
+	margin-top: 24px;
+	margin-bottom: -8px;
 }
 
 p,
@@ -92,14 +86,12 @@ div,
 table,
 ol,
 ul {
-	font-size: var(--font-size-sanserif);
-	line-height: var(--line-height-sanserif);
-	margin-top: .8rem;
-	margin-bottom: .8rem;
+	margin-top: 16px;
+	margin-bottom: 16px;
 }
 
 p {
-	padding-right: 1rem;
+	padding-right: 16px;
 }
 
 ul, ol {
@@ -108,23 +100,33 @@ ul, ol {
 }
 ul li,
 ol li {
-	padding-left: 0.25rem;
-	margin-bottom: 0.25rem;
+	padding-left: 4px;
+	margin-bottom: 4px;
 }
 
 li ul,
 li ol {
-	margin-top: 0.25rem;
+	margin-top: 4px;
 }
 
-pre,
 code {
-	margin: 1.2rem calc(-1 * var(--page-padding));
+	font-size: calc(var(--font-size) - 1px);
+	line-height: calc(var(--line-height) - 1px);
+	margin: 16px calc(-1 * var(--page-padding));
 }
 
 ol code,
 ul code {
-	margin: 1.2rem 0;
+	margin: 16px 0;
+}
+
+code.inline {
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+	padding: 0px 5px;
+	background: #F5F5F5;
+	margin: 0;
 }
 
 table {
@@ -140,7 +142,7 @@ table th,
 table td {
 	text-align: left;
 	vertical-align: top;
-	padding: .6rem .4rem;
+	padding: 8px 6px;
 	border-bottom: var(--border-style);
 }
 
@@ -154,17 +156,10 @@ table td:first-child {
 
 code:not(.inline) {
 	display: block;
-	padding: 1.25rem var(--page-padding);
+	padding: calc(var(--page-padding) - 6px) var(--page-padding);
 	white-space: pre-wrap;
 	overflow: auto;
 	box-sizing: border-box;
-}
-
-code.inline {
-	display: inline-block;
-	vertical-align: middle;
-	border-radius: 4px;
-	padding: 2px 5px;
 }
 
 iframe {
@@ -187,11 +182,11 @@ strong {
 /* TODO: Duplicate styles in main.css. Needed here cause button is inside the iframe */
 #button {
 	position: fixed;
-	bottom: 1rem;
-	right: 1rem;
+	bottom: 16px;
+	right: 16px;
 
-	padding: 0.75rem;
-	border-radius: 2rem;
+	padding: 12px;
+	border-radius: 50%;
 	margin-bottom: 0px;
 
 	background-color: #FFF;
@@ -206,7 +201,7 @@ strong {
 	}
 	#button img {
 		display: block;
-		width: calc(1.125 * var(--icon-size));
+		width: var(--icon-size);
 	}
 
 a.permalink {
@@ -230,8 +225,22 @@ a.param:hover {
 		--panel-width: 360px;
 		--font-size: 18px;
 		--line-height: 28px;
-		--header-height: 56px;
-		--max-width: 1160px;
+		--max-width: 880px;
+		--page-padding: 28px;
+		--icon-size: 24px;
+	}
+	h1 {
+		font-size: 42px;
+		line-height: 50px;
+	}
+	h2 {
+		font-size: 32px;
+		line-height: 40px;
+	}
+
+	h3 {
+		font-size: 24px;
+		line-height: 32px;
 	}
 }
 
@@ -239,23 +248,28 @@ a.param:hover {
 
 @media all and ( max-width: 640px ) {
 	:root {
-		--page-padding: var(--panel-padding);
+		--page-padding: 16px;
+		--icon-size: 24px;
 	}
-
 	body {
 		padding: var(--page-padding);
 	}
 
 	h1 {
-		font-size: 2rem;
-		line-height: 2.6rem;
-		padding-right: 2rem;
+		font-size: 28px;
+		line-height: 36px;
+		padding-right: 20px;
 		margin-top: 0;
 	}
 
 	h2 {
-		font-size: 1.6rem;
-		line-height: 2.2rem;
-		margin-top: 1.6rem;
+		font-size: 24px;
+		line-height: 32px;
+		margin-top: 24px;
+	}
+
+	h3 {
+		font-size: 20px;
+		line-height: 28px;
 	}
 }

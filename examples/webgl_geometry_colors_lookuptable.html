@@ -24,18 +24,14 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/math/Lut.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script>
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Lut } from './jsm/math/Lut.js';
 
 			var container;
 
@@ -57,7 +53,7 @@
 
 				uiScene = new THREE.Scene();
 
-				lut = new THREE.Lut();
+				lut = new Lut();
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
@@ -98,10 +94,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				var controls = new THREE.OrbitControls( perpCamera, renderer.domElement );
+				var controls = new OrbitControls( perpCamera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( params, 'colorMap', [ 'rainbow', 'cooltowarm', 'blackbody', 'grayscale' ] ).onChange( function () {
 

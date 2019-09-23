@@ -11,11 +11,6 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<script type="x-shader/x-vertex" id="vertexshader">
 
 			attribute float size;
@@ -40,7 +35,7 @@
 		<script type="x-shader/x-fragment" id="fragmentshader">
 
 			uniform vec3 color;
-			uniform sampler2D texture;
+			uniform sampler2D pointTexture;
 
 			varying vec3 vColor;
 
@@ -48,7 +43,7 @@
 
 				gl_FragColor = vec4( color * vColor, 1.0 );
 
-				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+				gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
 
 				if ( gl_FragColor.a < ALPHATEST ) discard;
 
@@ -56,14 +51,11 @@
 
 		</script>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var renderer, scene, camera, stats;
 
@@ -120,7 +112,7 @@
 
 					uniforms: {
 						color: { value: new THREE.Color( 0xffffff ) },
-						texture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
+						pointTexture: { value: new THREE.TextureLoader().load( "textures/sprites/disc.png" ) }
 					},
 					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,

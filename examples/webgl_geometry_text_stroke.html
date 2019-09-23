@@ -20,11 +20,12 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple text from json fonts
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/SVGLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
 			var camera, scene, renderer;
 
@@ -99,7 +100,7 @@
 
 					shapes.push.apply( shapes, holeShapes );
 
-					var style = THREE.SVGLoader.getStrokeStyle( 5, color.getStyle() );
+					var style = SVGLoader.getStrokeStyle( 5, color.getStyle() );
 
 					var strokeText = new THREE.Group();
 
@@ -109,7 +110,7 @@
 
 						var points = shape.getPoints();
 
-						var geometry = THREE.SVGLoader.pointsToStroke( points, style );
+						var geometry = SVGLoader.pointsToStroke( points, style );
 
 						geometry.translate( xMid, 0, 0 );
 
@@ -127,7 +128,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 

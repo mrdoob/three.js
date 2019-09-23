@@ -5,10 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-
 	</head>
 	<body>
 
@@ -17,13 +13,9 @@
 			replace parts of an existing texture with all data of another texture
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer, clock, dataTexture, diffuseMap;
 

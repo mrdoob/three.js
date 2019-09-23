@@ -19,6 +19,8 @@ function DataTexture2DArray( data, width, height, depth ) {
 	this.generateMipmaps = false;
 	this.flipY = false;
 
+	this.needsUpdate = true;
+
 }
 
 DataTexture2DArray.prototype = Object.create( Texture.prototype );

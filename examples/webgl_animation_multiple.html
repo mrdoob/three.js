@@ -14,18 +14,12 @@
 			Soldier model from <a href="https://www.mixamo.com" target="_blank" rel="noopener">https://www.mixamo.com</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/utils/SkeletonUtils.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { SkeletonUtils } from './jsm/utils/SkeletonUtils.js';
 
 			//////////////////////////////
 			// Global objects
@@ -33,7 +27,8 @@
 			var worldScene = null; // THREE.Scene where it all will be rendered
 			var renderer = null;
 			var camera = null;
-			var mixers = []; // All the AnimationMixer objects for all the animations in the scene
+			var clock = null;
+			var mixers = []; // All the THREE.AnimationMixer objects for all the animations in the scene
 			//////////////////////////////
 
 
@@ -118,7 +113,7 @@
 
 					var m = MODELS[ i ];
 
-					loadGltfModel( m, function ( model ) {
+					loadGltfModel( m, function () {
 
 						++ numLoadedModels;
 
@@ -150,24 +145,20 @@
 
 					if ( model ) {
 
-						var clonedScene = THREE.SkeletonUtils.clone( model.scene );
+						var clonedScene = SkeletonUtils.clone( model.scene );
 
 						if ( clonedScene ) {
 
-							// Scene is cloned properly, let's find one mesh and launch animation for it
+							// THREE.Scene is cloned properly, let's find one mesh and launch animation for it
 							var clonedMesh = clonedScene.getObjectByName( u.meshName );
 
 							if ( clonedMesh ) {
 
 								var mixer = startAnimation( clonedMesh, model.animations, u.animationName );
 
-								if ( mixer ) {
-
-									// Save the animation mixer in the list, will need it in the animation loop
-									mixers.push( mixer );
-									numSuccess ++;
-
-								}
+								// Save the animation mixer in the list, will need it in the animation loop
+								mixers.push( mixer );
+								numSuccess ++;
 
 							}
 
@@ -262,7 +253,7 @@
 			 */
 			function loadGltfModel( model, onLoaded ) {
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				var modelName = "models/gltf/" + model.name + ".glb";
 
 				loader.load( modelName, function ( gltf ) {
@@ -286,7 +277,7 @@
 
 					console.log( "Done loading model", model.name );
 
-					onLoaded( model );
+					onLoaded();
 
 				} );
 
@@ -338,7 +329,7 @@
 			}
 
 			/**
-			 * Initialize ThreeJS Scene
+			 * Initialize ThreeJS THREE.Scene
 			 */
 			function initScene() {
 

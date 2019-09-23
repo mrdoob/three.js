@@ -508,6 +508,7 @@ var BufferGeometryUtils = {
 
 		// initialize the arrays
 		for ( var i = 0, l = attributeNames.length; i < l; i ++ ) {
+
 			var name = attributeNames[ i ];
 
 			attrArrays[ name ] = [];
@@ -597,19 +598,9 @@ var BufferGeometryUtils = {
 
 			var name = attributeNames[ i ];
 			var oldAttribute = geometry.getAttribute( name );
-			var attribute;
 
 			var buffer = new oldAttribute.array.constructor( attrArrays[ name ] );
-			if ( oldAttribute.isInterleavedBufferAttribute ) {
-
-				attribute = new BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.itemSize );
-
-			} else {
-
-				attribute = geometry.getAttribute( name ).clone();
-				attribute.setArray( buffer );
-
-			}
+			var attribute = new BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.normalized );
 
 			result.addAttribute( name, attribute );
 
@@ -618,8 +609,10 @@ var BufferGeometryUtils = {
 
 				for ( var j = 0; j < morphAttrsArrays[ name ].length; j ++ ) {
 
-					var morphAttribute = geometry.morphAttributes[ name ][ j ].clone();
-					morphAttribute.setArray( new morphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] ) );
+					var oldMorphAttribute = geometry.morphAttributes[ name ][ j ];
+
+					var buffer = new oldMorphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] );
+					var morphAttribute = new BufferAttribute( buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized );
 					result.morphAttributes[ name ][ j ] = morphAttribute;
 
 				}
@@ -628,23 +621,7 @@ var BufferGeometryUtils = {
 
 		}
 
-		// Generate an index buffer typed array
-		var cons = Uint8Array;
-		if ( newIndices.length >= Math.pow( 2, 8 ) ) cons = Uint16Array;
-		if ( newIndices.length >= Math.pow( 2, 16 ) ) cons = Uint32Array;
-
-		var newIndexBuffer = new cons( newIndices );
-		var newIndices = null;
-		if ( indices === null ) {
-
-			newIndices = new BufferAttribute( newIndexBuffer, 1 );
-
-		} else {
-
-			newIndices = geometry.getIndex().clone();
-			newIndices.setArray( newIndexBuffer );
-
-		}
+		// indices
 
 		result.setIndex( newIndices );
 

@@ -1,22 +1,19 @@
-// r105
+// r108
 
-const staticAssets = [
+const assets = [
 	'./',
 
 	'../files/favicon.ico',
 
 	'../build/three.js',
-	'../examples/js/libs/system.min.js',
 
-	'../examples/js/controls/EditorControls.js',
 	'../examples/js/controls/TransformControls.js',
 
+	'../examples/js/libs/chevrotain.min.js',
 	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/inflate.min.js',
 
 	'../examples/js/loaders/AMFLoader.js',
-	'../examples/js/loaders/AWDLoader.js',
-	'../examples/js/loaders/BabylonLoader.js',
 	'../examples/js/loaders/ColladaLoader.js',
 	'../examples/js/loaders/DRACOLoader.js',
 	'../examples/js/loaders/FBXLoader.js',
@@ -26,7 +23,6 @@ const staticAssets = [
 	'../examples/js/loaders/MD2Loader.js',
 	'../examples/js/loaders/OBJLoader.js',
 	'../examples/js/loaders/MTLLoader.js',
-	'../examples/js/loaders/PlayCanvasLoader.js',
 	'../examples/js/loaders/PLYLoader.js',
 	'../examples/js/loaders/STLLoader.js',
 	'../examples/js/loaders/SVGLoader.js',
@@ -34,9 +30,6 @@ const staticAssets = [
 	'../examples/js/loaders/TDSLoader.js',
 	'../examples/js/loaders/VRMLLoader.js',
 	'../examples/js/loaders/VTKLoader.js',
-	'../examples/js/loaders/ctm/lzma.js',
-	'../examples/js/loaders/ctm/ctm.js',
-	'../examples/js/loaders/ctm/CTMLoader.js',
 
 	'../examples/js/exporters/ColladaExporter.js',
 	'../examples/js/exporters/GLTFExporter.js',
@@ -48,6 +41,9 @@ const staticAssets = [
 	'../examples/js/renderers/SoftwareRenderer.js',
 	'../examples/js/renderers/SVGRenderer.js',
 
+	'./manifest.json',
+	'./images/icon.png',
+
 	'./js/libs/codemirror/codemirror.css',
 	'./js/libs/codemirror/theme/monokai.css',
 
@@ -55,6 +51,7 @@ const staticAssets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
+	'./js/libs/system.min.js',
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
 	'./js/libs/glslprep.min.js',
@@ -97,6 +94,7 @@ const staticAssets = [
 	'./css/dark.css',
 	'./css/light.css',
 
+	'./js/EditorControls.js',
 	'./js/Storage.js',
 
 	'./js/Editor.js',
@@ -127,6 +125,7 @@ const staticAssets = [
 	'./js/Sidebar.Geometry.BoxGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
+	'./js/Sidebar.Geometry.DodecahedronGeometry.js',
 	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
 	'./js/Sidebar.Geometry.OctahedronGeometry.js',
@@ -168,9 +167,10 @@ const staticAssets = [
 	'./js/commands/RemoveScriptCommand.js',
 	'./js/commands/SetScriptValueCommand.js',
 	'./js/commands/SetMaterialCommand.js',
-	'./js/commands/SetMaterialValueCommand.js',
 	'./js/commands/SetMaterialColorCommand.js',
 	'./js/commands/SetMaterialMapCommand.js',
+	'./js/commands/SetMaterialValueCommand.js',
+	'./js/commands/SetMaterialVectorCommand.js',
 	'./js/commands/SetSceneCommand.js',
 
 	//
@@ -183,10 +183,19 @@ const staticAssets = [
 
 ];
 
-self.addEventListener( 'install', async function ( event ) {
+self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( 'threejs-editor' );
-	cache.addAll( staticAssets );
+
+	assets.forEach( function ( asset ) {
+
+		cache.add( asset ).catch( function () {
+
+			console.error( '[SW] Cound\'t cache:', asset );
+
+		} );
+
+	} );
 
 } );
 
@@ -200,6 +209,14 @@ self.addEventListener( 'fetch', async function ( event ) {
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
-	return cachedResponse || fetch( request );
+
+	if ( cachedResponse === undefined ) {
+
+		console.error( '[SW] Not cached:', request.url );
+		return fetch( request );
+
+	}
+
+	return cachedResponse;
 
 }

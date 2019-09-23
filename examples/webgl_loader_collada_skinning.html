@@ -14,19 +14,14 @@
 			Dancing Stormtrooper by <a href="https://sketchfab.com/strykerdoesgames" target="_blank" rel="noopener">StrykerDoesAnimation</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, stats, clock, controls;
 			var camera, scene, renderer, mixer;
@@ -47,7 +42,7 @@
 
 				// collada
 
-				var loader = new THREE.ColladaLoader();
+				var loader = new ColladaLoader();
 				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
 
 					var animations = collada.animations;
@@ -64,7 +59,7 @@
 					} );
 
 					mixer = new THREE.AnimationMixer( avatar );
-					var action = mixer.clipAction( animations[ 0 ] ).play();
+					mixer.clipAction( animations[ 0 ] ).play();
 
 					scene.add( avatar );
 
@@ -93,7 +88,7 @@
 
 				//
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.screenSpacePanning = true;
 				controls.minDistance = 5;
 				controls.maxDistance = 40;

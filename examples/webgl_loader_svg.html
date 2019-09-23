@@ -19,13 +19,15 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - SVGLoader
 		</div>
 
-		<script type="text/javascript" src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/SVGLoader.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { SVGLoader } from './jsm/loaders/SVGLoader.js';
 
 			var renderer, stats, scene, camera, gui, guiData;
 
@@ -52,7 +54,7 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.screenSpacePanning = true;
 
 				//
@@ -82,7 +84,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI( { width: 350 } );
+				gui = new GUI( { width: 350 } );
 
 				gui.add( guiData, 'currentURL', {
 
@@ -132,7 +134,7 @@
 
 				//
 
-				var loader = new THREE.SVGLoader();
+				var loader = new SVGLoader();
 
 				loader.load( url, function ( data ) {
 
@@ -192,7 +194,7 @@
 
 								var subPath = path.subPaths[ j ];
 
-								var geometry = THREE.SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
+								var geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
 
 								if ( geometry ) {
 

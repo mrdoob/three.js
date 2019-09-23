@@ -29,13 +29,13 @@
 
 THREE.PLYLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	this.propertyNameMapping = {};
 
 };
 
-THREE.PLYLoader.prototype = {
+THREE.PLYLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.PLYLoader,
 
@@ -51,13 +51,6 @@ THREE.PLYLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -502,4 +495,4 @@ THREE.PLYLoader.prototype = {
 
 	}
 
-};
+} );

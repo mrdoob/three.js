@@ -17,19 +17,19 @@ export class Fog implements IFog {
 	name: string;
 
 	/**
-   * Fog color.
-   */
+	 * Fog color.
+	 */
 	color: Color;
 
 	/**
-   * The minimum distance to start applying fog. Objects that are less than 'near' units from the active camera won't be affected by fog.
-   */
+	 * The minimum distance to start applying fog. Objects that are less than 'near' units from the active camera won't be affected by fog.
+	 */
 	near: number;
 
 	/**
-   * The maximum distance at which fog stops being calculated and applied. Objects that are more than 'far' units away from the active camera won't be affected by fog.
-   * Default is 1000.
-   */
+	 * The maximum distance at which fog stops being calculated and applied. Objects that are more than 'far' units away from the active camera won't be affected by fog.
+	 * Default is 1000.
+	 */
 	far: number;
 
 	clone(): this;

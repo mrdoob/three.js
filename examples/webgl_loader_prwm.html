@@ -6,12 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			.models {
-				position: absolute;
-				top: 10px;
-				left: 12px;
-				font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif;
-			}
 			.notes {
 				position:absolute;
 				left: 12px;
@@ -22,7 +16,7 @@
 	</head>
 	<body>
 
-		<div class="models">
+		<div id="info">
 			<strong>Models</strong>:
 			<a class="model" href="models/prwm/faceted-nefertiti.*.prwm">Faceted Nefertiti</a>,
 			<a class="model" href="models/prwm/smooth-suzanne.*.prwm">Smooth Suzanne</a>,
@@ -34,10 +28,11 @@
 			See your console for stats.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PRWMLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { PRWMLoader } from './jsm/loaders/PRWMLoader.js';
 
 			var container;
 
@@ -55,7 +50,7 @@
 
 			function init() {
 
-				document.getElementById( 'endianness' ).innerHTML = THREE.PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
+				document.getElementById( 'endianness' ).innerHTML = PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -75,7 +70,7 @@
 
 				// model
 
-				var loader = new THREE.PRWMLoader();
+				var loader = new PRWMLoader();
 				var material = new THREE.MeshPhongMaterial( {} );
 				var busy = false;
 				var mesh = null;
@@ -138,7 +133,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

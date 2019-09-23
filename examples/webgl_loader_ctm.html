@@ -16,16 +16,13 @@
 			<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/ctm/lzma.js"></script>
-		<script src="js/loaders/ctm/ctm.js"></script>
-		<script src="js/loaders/ctm/CTMLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { CTMLoader } from './jsm/loaders/ctm/CTMLoader.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -82,7 +79,7 @@
 				light.castShadow = true;
 				light.shadow.mapWidth = 1024;
 				light.shadow.mapHeight = 1024;
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
+				// scene.add( new CameraHelper( light.shadow.camera ) );
 
 				scene.add( light );
 
@@ -128,11 +125,12 @@
 
 				}
 
-				var loader = new THREE.CTMLoader();
+				var loader = new CTMLoader();
+				loader.setWorkerPath( "js/loaders/ctm/CTMWorker.js" );
 
 				loader.load( "models/ctm/ben.ctm", function ( geometry ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/UV_Grid_Sm.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: textureLoader.load( "textures/uv_grid_opengl.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, - 200, 0, 0, 0 );
 					checkTime();
 

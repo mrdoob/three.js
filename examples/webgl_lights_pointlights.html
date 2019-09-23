@@ -13,20 +13,13 @@
 			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var camera, scene, renderer,
 				light1, light2, light3, light4,
@@ -46,7 +39,7 @@
 
 				//model
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
 
 					object = obj;

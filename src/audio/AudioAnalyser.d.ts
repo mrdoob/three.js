@@ -9,8 +9,8 @@ export class AudioAnalyser {
 	getAverageFrequency(): number;
 
 	/**
-   * @deprecated Use {@link AudioAnalyser#getFrequencyData .getFrequencyData()} instead.
-   */
+	 * @deprecated Use {@link AudioAnalyser#getFrequencyData .getFrequencyData()} instead.
+	 */
 	getData( file: any ): any;
 
 }

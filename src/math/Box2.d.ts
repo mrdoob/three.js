@@ -32,12 +32,12 @@ export class Box2 {
 	translate( offset: Vector2 ): Box2;
 	equals( box: Box2 ): boolean;
 	/**
-   * @deprecated Use {@link Box2#isEmpty .isEmpty()} instead.
-   */
+	 * @deprecated Use {@link Box2#isEmpty .isEmpty()} instead.
+	 */
 	empty(): any;
 	/**
-   * @deprecated Use {@link Box2#intersectsBox .intersectsBox()} instead.
-   */
+	 * @deprecated Use {@link Box2#intersectsBox .intersectsBox()} instead.
+	 */
 	isIntersectionBox( b: any ): any;
 
 }

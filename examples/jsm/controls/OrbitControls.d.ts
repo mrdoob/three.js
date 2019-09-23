@@ -1,7 +1,8 @@
-import { Camera, MOUSE, Object3D, Vector3 } from '../../../src/Three';
+import { Camera, MOUSE, Object3D, TOUCH, Vector3 } from '../../../src/Three';
 
 export class OrbitControls {
-	constructor(object: Camera, domElement?: HTMLElement);
+
+	constructor( object: Camera, domElement?: HTMLElement );
 
 	object: Camera;
 	domElement: HTMLElement | HTMLDocument;
@@ -45,22 +46,11 @@ export class OrbitControls {
 	enableKeys: boolean;
 	keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number; };
 	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE; };
+	touches: { ONE: TOUCH; TWO: TOUCH };
 
-	rotateLeft(angle?: number): void;
+	update(): boolean;
 
-	rotateUp(angle?: number): void;
-
-	panLeft(distance?: number): void;
-
-	panUp(distance?: number): void;
-
-	pan(deltaX: number, deltaY: number): void;
-
-	dollyIn(dollyScale: number): void;
-
-	dollyOut(dollyScale: number): void;
-
-	update(): void;
+	saveState(): void;
 
 	reset(): void;
 
@@ -71,11 +61,18 @@ export class OrbitControls {
 	getAzimuthalAngle(): number;
 
 	// EventDispatcher mixins
-	addEventListener(type: string, listener: (event: any) => void): void;
+	addEventListener( type: string, listener: ( event: any ) => void ): void;
 
-	hasEventListener(type: string, listener: (event: any) => void): boolean;
+	hasEventListener( type: string, listener: ( event: any ) => void ): boolean;
 
-	removeEventListener(type: string, listener: (event: any) => void): void;
+	removeEventListener( type: string, listener: ( event: any ) => void ): void;
 
-	dispatchEvent(event: { type: string; target: any; }): void;
+	dispatchEvent( event: { type: string; target: any; } ): void;
+
+}
+
+export class MapControls extends OrbitControls {
+
+	constructor( object: Camera, domElement?: HTMLElement );
+
 }

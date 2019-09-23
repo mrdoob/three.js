@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>three.js css3d - orthographic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -19,13 +20,12 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - orthographic</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/renderers/CSS3DRenderer.js"></script>
-
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var camera, scene, renderer;
 
@@ -85,13 +85,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer2 = new THREE.CSS3DRenderer();
+				renderer2 = new CSS3DRenderer();
 				renderer2.setSize( window.innerWidth, window.innerHeight );
 				renderer2.domElement.style.position = 'absolute';
 				renderer2.domElement.style.top = 0;
 				document.body.appendChild( renderer2.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer2.domElement );
+				var controls = new OrbitControls( camera, renderer2.domElement );
 
 				function createPlane( width, height, cssColor, pos, rot ) {
 
@@ -101,7 +101,7 @@
 					element.style.opacity = 0.75;
 					element.style.background = cssColor;
 
-					var object = new THREE.CSS3DObject( element );
+					var object = new CSS3DObject( element );
 					object.position.copy( pos );
 					object.rotation.copy( rot );
 					scene2.add( object );

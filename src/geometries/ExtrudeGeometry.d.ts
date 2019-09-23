@@ -1,4 +1,4 @@
-import { CurvePath } from './../extras/core/CurvePath';
+import { Curve } from './../extras/core/Curve';
 import { UVGenerator } from './ExtrudeGeometry';
 import { Vector2 } from './../math/Vector2';
 import { Vector3 } from './../math/Vector3';
@@ -15,7 +15,7 @@ export interface ExtrudeGeometryOptions {
 	bevelSize?: number;
 	bevelOffset?: number;
 	bevelSegments?: number;
-	extrudePath?: CurvePath<Vector3>;
+	extrudePath?: Curve<Vector3>;
 	UVGenerator?: UVGenerator;
 }
 

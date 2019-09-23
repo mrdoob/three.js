@@ -7,7 +7,7 @@ import { NormalMapTypes } from '../constants';
 export interface MeshMatcapMaterialParameters extends MaterialParameters {
 
 	color?: Color | string | number;
-	matMap?: Texture;
+	matcap?: Texture;
 	map?: Texture;
 	bumpMap?: Texture;
 	bumpScale?: number;
@@ -28,7 +28,7 @@ export class MeshMatcapMaterial extends Material {
 	constructor( parameters?: MeshMatcapMaterialParameters );
 
 	color: Color;
-	matMap: Texture | null;
+	matcap: Texture | null;
 	map: Texture | null;
 	bumpMap: Texture | null;
 	bumpScale: number;
