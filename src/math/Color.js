@@ -261,7 +261,7 @@ Object.assign( Color.prototype, {
 
 		if ( style && style.length > 0 ) {
 
-			return this.setStyleName( style );
+			return this.setColorName( style );
 
 		}
 
@@ -269,7 +269,7 @@ Object.assign( Color.prototype, {
 
 	},
 
-	setStyleName: function ( style ) {
+	setColorName: function ( style ) {
 
 		// color keywords
 		var hex = _colorKeywords[ style ];

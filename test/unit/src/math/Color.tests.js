@@ -144,12 +144,17 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.g == 0xAB / 255, "Green: " + a.g );
 			assert.ok( a.b == 0xC1 / 255, "Blue: " + a.b );
 
+			a.setStyle( "aliceblue" );
+			assert.ok( a.r == 0xF0 / 255, "Red: " + a.r );
+			assert.ok( a.g == 0xF8 / 255, "Green: " + a.g );
+			assert.ok( a.b == 0xFF / 255, "Blue: " + a.b );
+
 		} );
 
-		QUnit.test( "setStyleName", ( assert ) => {
+		QUnit.test( "setColorName", ( assert ) => {
 
 			var c = new Color();
-			var res = c.setStyleName( "aliceblue" );
+			var res = c.setColorName( "aliceblue" );
 
 			assert.ok( c.getHex() == 0xF0F8FF, "Hex: " + c.getHex() );
 			assert.ok( c == res, "Returns Self" );
