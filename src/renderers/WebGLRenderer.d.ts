@@ -31,7 +31,7 @@ export interface WebGLRendererParameters {
 	/**
 	 * A Canvas where the renderer draws its output.
 	 */
-	canvas?: HTMLCanvasElement;
+	canvas?: HTMLCanvasElement | OffscreenCanvas;
 
 	/**
 	 * A WebGL Rendering Context.
