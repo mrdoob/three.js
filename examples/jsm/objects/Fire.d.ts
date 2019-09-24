@@ -34,7 +34,7 @@ export interface FireOptions {
 	massConservation?: boolean;
 }
 
-export class Fire extends Mesh {
+export class Fire extends Mesh<ShaderMaterial> {
 
 	constructor( geometry: BufferGeometry, options: FireOptions );
 	clock: Clock;
