@@ -269,6 +269,11 @@ function convert( path, exampleDependencies, ignoreList ) {
 	var classNames = [];
 	var coreDependencies = {};
 
+	// strip warning
+
+	contents = contents.replace( /^\s*console\.warn\(.*?\);\n/, '' );
+
+
 	// imports
 
 	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
