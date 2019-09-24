@@ -1,4 +1,4 @@
-console.warn( "THREE example script 'js/controls/OrbitControls.js' is no longer maintained or updated. Use the ES module version instead: 'jsm/controls/OrbitControls.js'." );
+console.warn( 'THREE example script "js/controls/OrbitControls.js" is deprecated and will soon be removed. Use the ES module version instead: "jsm/controls/OrbitControls.js".' );
 
 /**
  * @author qiao / https://github.com/qiao
