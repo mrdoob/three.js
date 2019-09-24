@@ -175,6 +175,6 @@ export * from './renderers/webgl/WebGLUniforms';
 //export * from './renderers/webgl/WebGLUtils';
 export * from './renderers/webvr/WebVRManager';
 export * from './constants';
-export * from './Three.Legacy';
+export * from './_legacy/Legacy';
 
 export as namespace THREE;
