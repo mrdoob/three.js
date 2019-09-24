@@ -28,8 +28,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		SpriteMaterial: 'sprite'
 	};
 
-
-
 	function allocateBones( object ) {
 
 		var skeleton = object.skeleton;
@@ -122,10 +120,14 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		var parameters = {
 
+			isWebGL2: capabilities.isWebGL2,
+
 			shaderID: shaderID,
 
 			precision: precision,
-			isWebGL2: capabilities.isWebGL2,
+
+			instancing: object.isInstancedMesh === true,
+
 			supportsVertexTextures: capabilities.vertexTextures,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,

@@ -1,13 +1,12 @@
 // r108
 
-const staticAssets = [
+const assets = [
 	'./',
 
 	'../files/favicon.ico',
 
 	'../build/three.js',
 
-	'../examples/js/controls/EditorControls.js',
 	'../examples/js/controls/TransformControls.js',
 
 	'../examples/js/libs/chevrotain.min.js',
@@ -41,6 +40,9 @@ const staticAssets = [
 	'../examples/js/renderers/RaytracingRenderer.js',
 	'../examples/js/renderers/SoftwareRenderer.js',
 	'../examples/js/renderers/SVGRenderer.js',
+
+	'./manifest.json',
+	'./images/icon.png',
 
 	'./js/libs/codemirror/codemirror.css',
 	'./js/libs/codemirror/theme/monokai.css',
@@ -92,6 +94,7 @@ const staticAssets = [
 	'./css/dark.css',
 	'./css/light.css',
 
+	'./js/EditorControls.js',
 	'./js/Storage.js',
 
 	'./js/Editor.js',
@@ -122,6 +125,7 @@ const staticAssets = [
 	'./js/Sidebar.Geometry.BoxGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
+	'./js/Sidebar.Geometry.DodecahedronGeometry.js',
 	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
 	'./js/Sidebar.Geometry.OctahedronGeometry.js',
@@ -179,10 +183,19 @@ const staticAssets = [
 
 ];
 
-self.addEventListener( 'install', async function ( event ) {
+self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( 'threejs-editor' );
-	cache.addAll( staticAssets );
+
+	assets.forEach( function ( asset ) {
+
+		cache.add( asset ).catch( function () {
+
+			console.error( '[SW] Cound\'t cache:', asset );
+
+		} );
+
+	} );
 
 } );
 
@@ -196,6 +209,14 @@ self.addEventListener( 'fetch', async function ( event ) {
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
-	return cachedResponse || fetch( request );
+
+	if ( cachedResponse === undefined ) {
+
+		console.error( '[SW] Not cached:', request.url );
+		return fetch( request );
+
+	}
+
+	return cachedResponse;
 
 }

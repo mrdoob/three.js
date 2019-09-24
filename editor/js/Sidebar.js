@@ -24,6 +24,7 @@ var Sidebar = function ( editor ) {
 	container.addTab( 'scene', strings.getKey( 'sidebar/scene' ), scene );
 	container.addTab( 'project', strings.getKey( 'sidebar/project' ), new Sidebar.Project( editor ) );
 	container.addTab( 'settings', strings.getKey( 'sidebar/settings' ), settings );
+	container.select( 'scene' );
 
 	return container;
 

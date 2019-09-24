@@ -22,6 +22,7 @@
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
 			<label><input id="option_forceindices" name="visible" type="checkbox">Force indices</label>
 			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
+			<label><input id="option_maxsize" name="maxSize" type="number" value="4096" min="2" max="8192" step="1"> Max texture size</label>
 		</div>
 
 		<script type="module">
@@ -41,7 +42,8 @@
 					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
 					binary: document.getElementById( 'option_binary' ).checked,
 					forceIndices: document.getElementById( 'option_forceindices' ).checked,
-					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked
+					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked,
+					maxTextureSize: Number( document.getElementById( 'option_maxsize' ).value ) || Infinity // To prevent NaN value
 				};
 				gltfExporter.parse( input, function ( result ) {
 

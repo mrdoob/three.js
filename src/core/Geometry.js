@@ -189,6 +189,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var indices = geometry.index !== null ? geometry.index.array : undefined;
 		var attributes = geometry.attributes;
 
+		if ( attributes.position === undefined ) {
+
+			console.error( 'THREE.Geometry.fromBufferGeometry(): Position attribute required for conversion.' );
+			return this;
+
+		}
+
 		var positions = attributes.position.array;
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
 		var colors = attributes.color !== undefined ? attributes.color.array : undefined;

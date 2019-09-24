@@ -269,8 +269,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * DDS Texture Extension
 	 *
-	 * Specification:
-	 * https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds
 	 *
 	 */
 	function GLTFTextureDDSExtension( ddsLoader ) {
@@ -287,9 +286,9 @@ THREE.GLTFLoader = ( function () {
 	}
 
 	/**
-	 * Lights Extension
+	 * Punctual Lights Extension
 	 *
-	 * Specification: PENDING
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
 	 */
 	function GLTFLightsExtension( json ) {
 
@@ -356,9 +355,9 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	/**
-	 * Unlit Materials Extension (pending)
+	 * Unlit Materials Extension
 	 *
-	 * PR: https://github.com/KhronosGroup/glTF/pull/1163
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
 	 */
 	function GLTFMaterialsUnlitExtension() {
 
@@ -473,7 +472,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * DRACO Mesh Compression Extension
 	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_draco_mesh_compression
 	 */
 	function GLTFDracoMeshCompressionExtension( json, dracoLoader ) {
 
@@ -551,7 +550,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Texture Transform Extension
 	 *
-	 * Specification:
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
 	 */
 	function GLTFTextureTransformExtension() {
 
