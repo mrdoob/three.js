@@ -867,7 +867,7 @@ function WebGLRenderer( parameters ) {
 
 			renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
 
-		} else if ( geometry && geometry.isInstancedBufferGeometry ) {
+		} else if ( geometry.isInstancedBufferGeometry ) {
 
 			renderer.renderInstances( geometry, drawStart, drawCount, geometry.maxInstancedCount );
 
