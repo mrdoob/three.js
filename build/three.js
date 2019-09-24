@@ -14054,7 +14054,7 @@
 
 	var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\n#define cubeUV_textureSize (1024.0)\nint getFaceFromDirection(vec3 direction) {\n\tvec3 absDirection = abs(direction);\n\tint face = -1;\n\tif( absDirection.x > absDirection.z ) {\n\t\tif(absDirection.x > absDirection.y )\n\t\t\tface = direction.x > 0.0 ? 0 : 3;\n\t\telse\n\t\t\tface = direction.y > 0.0 ? 1 : 4;\n\t}\n\telse {\n\t\tif(absDirection.z > absDirection.y )\n\t\t\tface = direction.z > 0.0 ? 2 : 5;\n\t\telse\n\t\t\tface = direction.y > 0.0 ? 1 : 4;\n\t}\n\treturn face;\n}\n#define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)\n#define cubeUV_rangeClamp (exp2((6.0 - 1.0) * 2.0))\nvec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {\n\tfloat scale = exp2(cubeUV_maxLods1 - roughnessLevel);\n\tfloat dxRoughness = dFdx(roughness);\n\tfloat dyRoughness = dFdy(roughness);\n\tvec3 dx = dFdx( vec * scale * dxRoughness );\n\tvec3 dy = dFdy( vec * scale * dyRoughness );\n\tfloat d = max( dot( dx, dx ), dot( dy, dy ) );\n\td = clamp(d, 1.0, cubeUV_rangeClamp);\n\tfloat mipLevel = 0.5 * log2(d);\n\treturn vec2(floor(mipLevel), fract(mipLevel));\n}\n#define cubeUV_maxLods2 (log2(cubeUV_textureSize*0.25) - 2.0)\n#define cubeUV_rcpTextureSize (1.0 / cubeUV_textureSize)\nvec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {\n\tmipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;\n\tfloat a = 16.0 * cubeUV_rcpTextureSize;\n\tvec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );\n\tvec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;\n\tfloat powScale = exp2_packed.x * exp2_packed.y;\n\tfloat scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;\n\tfloat mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;\n\tbool bRes = mipLevel == 0.0;\n\tscale =  bRes && (scale < a) ? a : scale;\n\tvec3 r;\n\tvec2 offset;\n\tint face = getFaceFromDirection(direction);\n\tfloat rcpPowScale = 1.0 / powScale;\n\tif( face == 0) {\n\t\tr = vec3(direction.x, -direction.z, direction.y);\n\t\toffset = vec2(0.0+mipOffset,0.75 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\n\t}\n\telse if( face == 1) {\n\t\tr = vec3(direction.y, direction.x, direction.z);\n\t\toffset = vec2(scale+mipOffset, 0.75 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\n\t}\n\telse if( face == 2) {\n\t\tr = vec3(direction.z, direction.x, direction.y);\n\t\toffset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\n\t}\n\telse if( face == 3) {\n\t\tr = vec3(direction.x, direction.z, direction.y);\n\t\toffset = vec2(0.0+mipOffset,0.5 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\n\t}\n\telse if( face == 4) {\n\t\tr = vec3(direction.y, direction.x, -direction.z);\n\t\toffset = vec2(scale+mipOffset, 0.5 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\n\t}\n\telse {\n\t\tr = vec3(direction.z, -direction.x, direction.y);\n\t\toffset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\n\t}\n\tr = normalize(r);\n\tfloat texelOffset = 0.5 * cubeUV_rcpTextureSize;\n\tvec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;\n\tvec2 base = offset + vec2( texelOffset );\n\treturn base + s * ( scale - 2.0 * texelOffset );\n}\n#define cubeUV_maxLods3 (log2(cubeUV_textureSize*0.25) - 3.0)\nvec4 textureCubeUV( sampler2D envMap, vec3 reflectedDirection, float roughness ) {\n\tfloat roughnessVal = roughness* cubeUV_maxLods3;\n\tfloat r1 = floor(roughnessVal);\n\tfloat r2 = r1 + 1.0;\n\tfloat t = fract(roughnessVal);\n\tvec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);\n\tfloat s = mipInfo.y;\n\tfloat level0 = mipInfo.x;\n\tfloat level1 = level0 + 1.0;\n\tlevel1 = level1 > 5.0 ? 5.0 : level1;\n\tlevel0 += min( floor( s + 0.5 ), 5.0 );\n\tvec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);\n\tvec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));\n\tvec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);\n\tvec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));\n\tvec4 result = mix(color10, color20, t);\n\treturn vec4(result.rgb, 1.0);\n}\n#endif";
 
-	var defaultnormal_vertex = "vec3 transformedNormal = normalMatrix * objectNormal;\n#ifdef FLIP_SIDED\n\ttransformedNormal = - transformedNormal;\n#endif\n#ifdef USE_TANGENT\n\tvec3 transformedTangent = normalMatrix * objectTangent;\n\t#ifdef FLIP_SIDED\n\t\ttransformedTangent = - transformedTangent;\n\t#endif\n#endif";
+	var defaultnormal_vertex = "vec3 transformedNormal = objectNormal;\n#ifdef USE_INSTANCING\n\ttransformedNormal = mat3( instanceMatrix ) * transformedNormal;\n#endif\ntransformedNormal = normalMatrix * transformedNormal;\n#ifdef FLIP_SIDED\n\ttransformedNormal = - transformedNormal;\n#endif\n#ifdef USE_TANGENT\n\tvec3 transformedTangent = normalMatrix * objectTangent;\n\t#ifdef FLIP_SIDED\n\t\ttransformedTangent = - transformedTangent;\n\t#endif\n#endif";
 
 	var displacementmap_pars_vertex = "#ifdef USE_DISPLACEMENTMAP\n\tuniform sampler2D displacementMap;\n\tuniform float displacementScale;\n\tuniform float displacementBias;\n#endif";
 
@@ -14154,7 +14154,7 @@
 
 	var premultiplied_alpha_fragment = "#ifdef PREMULTIPLIED_ALPHA\n\tgl_FragColor.rgb *= gl_FragColor.a;\n#endif";
 
-	var project_vertex = "vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );\ngl_Position = projectionMatrix * mvPosition;";
+	var project_vertex = "vec4 mvPosition = vec4( transformed, 1.0 );\n#ifdef USE_INSTANCING\n\tmvPosition = instanceMatrix * mvPosition;\n#endif\nmvPosition = modelViewMatrix * mvPosition;\ngl_Position = projectionMatrix * mvPosition;";
 
 	var dithering_fragment = "#ifdef DITHERING\n\tgl_FragColor.rgb = dithering( gl_FragColor.rgb );\n#endif";
 
@@ -14200,7 +14200,7 @@
 
 	var uv2_vertex = "#if defined( USE_LIGHTMAP ) || defined( USE_AOMAP )\n\tvUv2 = uv2;\n#endif";
 
-	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )\n\tvec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );\n#endif";
+	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )\n\tvec4 worldPosition = vec4( transformed, 1.0 );\n\t#ifdef USE_INSTANCING\n\t\tworldPosition = instanceMatrix * worldPosition;\n\t#endif\n\tworldPosition = modelMatrix * worldPosition;\n#endif";
 
 	var background_frag = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\tgl_FragColor = mapTexelToLinear( texColor );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
@@ -15428,7 +15428,9 @@
 
 		}
 
-		function renderInstances( geometry, start, count ) {
+		function renderInstances( geometry, start, count, primcount ) {
+
+			if ( primcount === 0 ) { return; }
 
 			var extension, methodName;
 
@@ -15451,9 +15453,9 @@
 
 			}
 
-			extension[ methodName ]( mode, start, count, geometry.maxInstancedCount );
+			extension[ methodName ]( mode, start, count, primcount );
 
-			info.update( count, mode, geometry.maxInstancedCount );
+			info.update( count, mode, primcount );
 
 		}
 
@@ -16049,7 +16051,9 @@
 
 		}
 
-		function renderInstances( geometry, start, count ) {
+		function renderInstances( geometry, start, count, primcount ) {
+
+			if ( primcount === 0 ) { return; }
 
 			var extension, methodName;
 
@@ -16072,9 +16076,9 @@
 
 			}
 
-			extension[ methodName ]( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+			extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
 
-			info.update( count, mode, geometry.maxInstancedCount );
+			info.update( count, mode, primcount );
 
 		}
 
@@ -16281,7 +16285,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLObjects( geometries, info ) {
+	function WebGLObjects( gl, geometries, attributes, info ) {
 
 		var updateList = {};
 
@@ -16305,6 +16309,12 @@
 				geometries.update( buffergeometry );
 
 				updateList[ buffergeometry.id ] = frame;
+
+			}
+
+			if ( object.isInstancedMesh ) {
+
+				attributes.update( object.instanceMatrix, 34962 );
 
 			}
 
@@ -17720,6 +17730,7 @@
 
 				customDefines,
 
+				parameters.instancing ? '#define USE_INSTANCING' : '',
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
@@ -17787,6 +17798,12 @@
 					'uniform mat4 projectionMatrix;',
 					'uniform mat4 viewMatrix;',
 					'uniform mat3 normalMatrix;' ].join( '\n' ),
+
+				'#ifdef USE_INSTANCING',
+
+				' attribute mat4 instanceMatrix;',
+
+				'#endif',
 
 				'attribute vec3 position;',
 				'attribute vec3 normal;',
@@ -18175,7 +18192,8 @@
 		};
 
 		var parameterNames = [
-			"precision", "supportsVertexTextures", "map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
+			"precision", "supportsVertexTextures", "instancing",
+			"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
 			"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 			"roughnessMap", "metalnessMap", "gradientMap",
 			"alphaMap", "combine", "vertexColors", "vertexTangents", "fog", "useFog", "fogExp2",
@@ -18281,10 +18299,14 @@
 
 			var parameters = {
 
+				isWebGL2: capabilities.isWebGL2,
+
 				shaderID: shaderID,
 
 				precision: precision,
-				isWebGL2: capabilities.isWebGL2,
+
+				instancing: object.isInstancedMesh === true,
+
 				supportsVertexTextures: capabilities.vertexTextures,
 				outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 				map: !! material.map,
@@ -23540,7 +23562,7 @@
 
 			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
 
-			if ( ! capabilities.isWebGL2 ) {
+			if ( capabilities.isWebGL2 === false ) {
 
 				extensions.get( 'WEBGL_depth_texture' );
 				extensions.get( 'OES_texture_float' );
@@ -23565,7 +23587,7 @@
 			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 			attributes = new WebGLAttributes( _gl );
 			geometries = new WebGLGeometries( _gl, attributes, info );
-			objects = new WebGLObjects( geometries, info );
+			objects = new WebGLObjects( _gl, geometries, attributes, info );
 			morphtargets = new WebGLMorphtargets( _gl );
 			programCache = new WebGLPrograms( _this, extensions, capabilities );
 			renderLists = new WebGLRenderLists();
@@ -24047,7 +24069,7 @@
 
 			if ( updateBuffers ) {
 
-				setupVertexAttributes( material, program, geometry );
+				setupVertexAttributes( object, geometry, material, program );
 
 				if ( index !== null ) {
 
@@ -24113,7 +24135,6 @@
 
 				}
 
-
 			} else if ( object.isLine ) {
 
 				var lineWidth = material.linewidth;
@@ -24146,13 +24167,13 @@
 
 			}
 
-			if ( geometry && geometry.isInstancedBufferGeometry ) {
+			if ( object.isInstancedMesh ) {
 
-				if ( geometry.maxInstancedCount > 0 ) {
+				renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
 
-					renderer.renderInstances( geometry, drawStart, drawCount );
+			} else if ( geometry.isInstancedBufferGeometry ) {
 
-				}
+				renderer.renderInstances( geometry, drawStart, drawCount, geometry.maxInstancedCount );
 
 			} else {
 
@@ -24162,16 +24183,11 @@
 
 		};
 
-		function setupVertexAttributes( material, program, geometry ) {
+		function setupVertexAttributes( object, geometry, material, program ) {
 
-			if ( geometry && geometry.isInstancedBufferGeometry && ! capabilities.isWebGL2 ) {
+			if ( capabilities.isWebGL2 === false && ( object.isInstancedMesh || geometry.isInstancedBufferGeometry ) ) {
 
-				if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
-
-					console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-					return;
-
-				}
+				if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) { return; }
 
 			}
 
@@ -24253,6 +24269,29 @@
 							_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 						}
+
+					} else if ( name === 'instanceMatrix' ) {
+
+						var attribute = attributes.get( object.instanceMatrix );
+
+						// TODO Attribute may not be available on context restore
+
+						if ( attribute === undefined ) { continue; }
+
+						var buffer = attribute.buffer;
+						var type = attribute.type;
+
+						state.enableAttributeAndDivisor( programAttribute + 0, 1 );
+						state.enableAttributeAndDivisor( programAttribute + 1, 1 );
+						state.enableAttributeAndDivisor( programAttribute + 2, 1 );
+						state.enableAttributeAndDivisor( programAttribute + 3, 1 );
+
+						_gl.bindBuffer( 34962, buffer );
+
+						_gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
+						_gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
+						_gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
+						_gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
 
 					} else if ( materialDefaultAttributeValues !== undefined ) {
 
@@ -26962,6 +27001,36 @@
 		constructor: Bone,
 
 		isBone: true
+
+	} );
+
+	/**
+	 * @author mrdoob / http://mrdoob.com/
+	 */
+
+	function InstancedMesh( geometry, material, count ) {
+
+		Mesh.call( this, geometry, material );
+
+		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
+
+	}
+
+	InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
+
+		constructor: InstancedMesh,
+
+		isInstancedMesh: true,
+
+		raycast: function () {},
+
+		setMatrixAt: function ( index, matrix ) {
+
+			matrix.toArray( this.instanceMatrix.array, index * 16 );
+
+		},
+
+		updateMorphTargets: function () {}
 
 	} );
 
@@ -49244,6 +49313,7 @@
 	exports.InstancedBufferAttribute = InstancedBufferAttribute;
 	exports.InstancedBufferGeometry = InstancedBufferGeometry;
 	exports.InstancedInterleavedBuffer = InstancedInterleavedBuffer;
+	exports.InstancedMesh = InstancedMesh;
 	exports.Int16Attribute = Int16Attribute;
 	exports.Int16BufferAttribute = Int16BufferAttribute;
 	exports.Int32Attribute = Int32Attribute;
