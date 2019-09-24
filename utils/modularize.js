@@ -271,7 +271,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// strip warning
 
-	contents = contents.replace( /^\s*console\.warn\(.*?\);\n/, '' );
+	contents = contents.replace( /^\s*console\.warn\(.*?\);\s*/, '' );
 
 
 	// imports
