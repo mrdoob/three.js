@@ -114,7 +114,7 @@ MaterialHandler.prototype = {
 
 			} else {
 
-				if ( this.logging.enabled) {
+				if ( this.logging.enabled ) {
 
 					console.info( 'Requested material "' + materialNameOrg + '" is not available!' );
 
@@ -255,7 +255,9 @@ MaterialHandler.prototype = {
 	 * Removes all materials
 	 */
 	clearMaterials: function () {
+
 		this.materials = {};
+
 	}
 
 };

@@ -72,25 +72,25 @@ var FilmShader = {
 
 		"void main() {",
 
-			// sample the source
+		// sample the source
 		"	vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
 
-			// make some noise
+		// make some noise
 		"	float dx = rand( vUv + time );",
 
-			// add noise
+		// add noise
 		"	vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );",
 
-			// get us a sine and cosine
+		// get us a sine and cosine
 		"	vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
 
-			// add scanlines
+		// add scanlines
 		"	cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
 
-			// interpolate between source and result by intensity
+		// interpolate between source and result by intensity
 		"	cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
 
-			// convert to grayscale if desired
+		// convert to grayscale if desired
 		"	if( grayscale ) {",
 
 		"		cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",

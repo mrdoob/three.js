@@ -197,51 +197,57 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 }
 
-function parseIncludes( string ) {
+// Resolve Includes
 
-	var pattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
+var includePattern = /^[ \t]*#include +<([\w\d./]+)>/gm;
 
-	function replace( match, include ) {
+function resolveIncludes( string ) {
 
-		var replace = ShaderChunk[ include ];
+	return string.replace( includePattern, includeReplacer );
 
-		if ( replace === undefined ) {
+}
 
-			throw new Error( 'Can not resolve #include <' + include + '>' );
+function includeReplacer( match, include ) {
 
-		}
+	var string = ShaderChunk[ include ];
 
-		return parseIncludes( replace );
+	if ( string === undefined ) {
+
+		throw new Error( 'Can not resolve #include <' + include + '>' );
 
 	}
 
-	return string.replace( pattern, replace );
+	return resolveIncludes( string );
 
 }
+
+// Unroll Loops
+
+var loopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
 
 function unrollLoops( string ) {
 
-	var pattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+	return string.replace( loopPattern, loopReplacer );
 
-	function replace( match, start, end, snippet ) {
+}
 
-		var unroll = '';
+function loopReplacer( match, start, end, snippet ) {
 
-		for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
+	var string = '';
 
-			unroll += snippet
-				.replace( /\[ i \]/g, '[ ' + i + ' ]' )
-				.replace( /UNROLLED_LOOP_INDEX/g, i );
+	for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
 
-		}
-
-		return unroll;
+		string += snippet
+			.replace( /\[ i \]/g, '[ ' + i + ' ]' )
+			.replace( /UNROLLED_LOOP_INDEX/g, i );
 
 	}
 
-	return string.replace( pattern, replace );
+	return string;
 
 }
+
+//
 
 function generatePrecision( parameters ) {
 
@@ -656,11 +662,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	}
 
-	vertexShader = parseIncludes( vertexShader );
+	vertexShader = resolveIncludes( vertexShader );
 	vertexShader = replaceLightNums( vertexShader, parameters );
 	vertexShader = replaceClippingPlaneNums( vertexShader, parameters );
 
-	fragmentShader = parseIncludes( fragmentShader );
+	fragmentShader = resolveIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 	fragmentShader = replaceClippingPlaneNums( fragmentShader, parameters );
 

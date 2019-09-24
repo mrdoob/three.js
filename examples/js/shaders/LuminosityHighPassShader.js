@@ -31,7 +31,7 @@ THREE.LuminosityHighPassShader = {
 
 		"}"
 
-	].join("\n"),
+	].join( "\n" ),
 
 	fragmentShader: [
 
@@ -59,6 +59,6 @@ THREE.LuminosityHighPassShader = {
 
 		"}"
 
-	].join("\n")
+	].join( "\n" )
 
 };

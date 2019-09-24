@@ -47,6 +47,7 @@ export interface MaterialParameters {
 	flatShading?: boolean;
 	side?: Side;
 	shadowSide?: Side;
+	toneMapped?: boolean;
 	transparent?: boolean;
 	vertexColors?: Colors;
 	vertexTangents?: boolean;
@@ -260,6 +261,12 @@ export class Material extends EventDispatcher {
 	 * Default is THREE.FrontSide. Other options are THREE.BackSide and THREE.DoubleSide.
 	 */
 	side: Side;
+
+	/**
+	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
+	 * Default is true.
+	 */
+	toneMapped: boolean;
 
 	/**
 	 * Defines whether this material is transparent. This has an effect on rendering as transparent objects need special treatment and are rendered after non-transparent objects.

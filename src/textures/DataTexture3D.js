@@ -27,6 +27,9 @@ function DataTexture3D( data, width, height, depth ) {
 	this.generateMipmaps = false;
 	this.flipY = false;
 
+	this.needsUpdate = true;
+
+
 }
 
 DataTexture3D.prototype = Object.create( Texture.prototype );

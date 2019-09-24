@@ -33,11 +33,11 @@ StandardNode.prototype.build = function ( builder ) {
 
 	var code;
 
-	builder.define('STANDARD');
+	builder.define( 'STANDARD' );
 
 	var useClearcoat = this.clearcoat || this.clearcoatRoughness || this.clearCoatNormal;
 
-	if( useClearcoat ){
+	if ( useClearcoat ) {
 
 		builder.define( 'CLEARCOAT' );
 
@@ -129,13 +129,13 @@ StandardNode.prototype.build = function ( builder ) {
 
 	} else {
 
-		var specularRoughness = new ExpressionNode('material.specularRoughness', 'f' );
-		var clearcoatRoughness = new ExpressionNode('material.clearcoatRoughness', 'f' );
+		var specularRoughness = new ExpressionNode( 'material.specularRoughness', 'f' );
+		var clearcoatRoughness = new ExpressionNode( 'material.clearcoatRoughness', 'f' );
 
 		var contextEnvironment = {
 			roughness: specularRoughness,
 			bias: new SpecularMIPLevelNode( specularRoughness ),
-			viewNormal: new ExpressionNode('normal', 'v3'),
+			viewNormal: new ExpressionNode( 'normal', 'v3' ),
 			gamma: true
 		};
 
@@ -146,7 +146,7 @@ StandardNode.prototype.build = function ( builder ) {
 		var contextClearcoatEnvironment = {
 			roughness: clearcoatRoughness,
 			bias: new SpecularMIPLevelNode( clearcoatRoughness ),
-			viewNormal: new ExpressionNode('clearcoatNormal', 'v3'),
+			viewNormal: new ExpressionNode( 'clearcoatNormal', 'v3' ),
 			gamma: true
 		};
 

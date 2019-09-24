@@ -142,7 +142,7 @@ THREE.TerrainShader = {
 		"	vec3 totalDiffuseLight = vec3( 0.0 );",
 		"	vec3 totalSpecularLight = vec3( 0.0 );",
 
-			// point lights
+		// point lights
 
 		"	#if NUM_POINT_LIGHTS > 0",
 
@@ -168,7 +168,7 @@ THREE.TerrainShader = {
 
 		"	#endif",
 
-			// directional lights
+		// directional lights
 
 		"	#if NUM_DIR_LIGHTS > 0",
 
@@ -192,7 +192,7 @@ THREE.TerrainShader = {
 
 		"	#endif",
 
-			// hemisphere lights
+		// hemisphere lights
 
 		"	#if NUM_HEMI_LIGHTS > 0",
 
@@ -203,14 +203,14 @@ THREE.TerrainShader = {
 
 		"			vec3 lVector = hemisphereLightDirection[ i ];",
 
-					// diffuse
+		// diffuse
 
 		"			float dotProduct = dot( normal, lVector );",
 		"			float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
 
 		"			totalDiffuseLight += mix( hemisphereLights[ i ].groundColor, hemisphereLights[ i ].skyColor, hemiDiffuseWeight );",
 
-					// specular (sky light)
+		// specular (sky light)
 
 		"			float hemiSpecularWeight = 0.0;",
 
@@ -218,7 +218,7 @@ THREE.TerrainShader = {
 		"			float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
 		"			hemiSpecularWeight += specularTex.r * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
 
-					// specular (ground light)
+		// specular (ground light)
 
 		"			vec3 lVectorGround = -lVector;",
 
@@ -236,7 +236,7 @@ THREE.TerrainShader = {
 
 		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
-			THREE.ShaderChunk[ "fog_fragment" ],
+		THREE.ShaderChunk[ "fog_fragment" ],
 
 		"}"
 
@@ -272,20 +272,20 @@ THREE.TerrainShader = {
 
 		"	vNormal = normalize( normalMatrix * normal );",
 
-			// tangent and binormal vectors
+		// tangent and binormal vectors
 
 		"	vTangent = normalize( normalMatrix * tangent.xyz );",
 
 		"	vBinormal = cross( vNormal, vTangent ) * tangent.w;",
 		"	vBinormal = normalize( vBinormal );",
 
-			// texture coordinates
+		// texture coordinates
 
 		"	vUv = uv;",
 
 		"	vec2 uvBase = uv * uRepeatBase;",
 
-			// displacement mapping
+		// displacement mapping
 
 		"	#ifdef VERTEX_TEXTURES",
 
@@ -310,8 +310,8 @@ THREE.TerrainShader = {
 		"	vec3 normalTex = texture2D( tNormal, uvBase ).xyz * 2.0 - 1.0;",
 		"	vNormal = normalMatrix * normalTex;",
 
-			THREE.ShaderChunk[ "shadowmap_vertex" ],
-			THREE.ShaderChunk[ "fog_vertex" ],
+		THREE.ShaderChunk[ "shadowmap_vertex" ],
+		THREE.ShaderChunk[ "fog_vertex" ],
 
 		"}"
 
