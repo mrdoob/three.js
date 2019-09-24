@@ -441,6 +441,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			customDefines,
 
+			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
 			'#define GAMMA_FACTOR ' + gammaFactorDefine,
@@ -510,6 +511,12 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 				'uniform mat3 normalMatrix;',
 
 			].join( '\n' ),
+
+			'#ifdef USE_INSTANCING',
+
+			' attribute mat4 instanceMatrix;',
+
+			'#endif',
 
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
