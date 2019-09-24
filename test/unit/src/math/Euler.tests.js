@@ -425,16 +425,21 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "_onChangeCallback", ( assert ) => {
 
+			var b = false;
+			var a = new Euler( 11, 12, 13, "XYZ" );
 			var f = function () {
 
-				var b = true;
+				b = true;
+				assert.ok( a === this, "Passed!" );
 
 			};
 
-			var a = new Euler( 11, 12, 13, "XYZ" );
 			a._onChangeCallback = f;
 			assert.ok( a._onChangeCallback === f, "Passed!" );
 
+
+			a._onChangeCallback();
+			assert.ok( b, "Passed!" );
 
 		} );
 
