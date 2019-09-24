@@ -865,21 +865,11 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isInstancedMesh ) {
 
-			// HACK
-
-			geometry.maxInstancedCount = object.instanceMatrix.count;
-
-			renderer.renderInstances( geometry, drawStart, drawCount );
+			renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
 
 		} else if ( geometry && geometry.isInstancedBufferGeometry ) {
 
-			// TODO: Remove all this?
-
-			if ( geometry.maxInstancedCount > 0 ) {
-
-				renderer.renderInstances( geometry, drawStart, drawCount );
-
-			}
+			renderer.renderInstances( geometry, drawStart, drawCount, geometry.maxInstancedCount );
 
 		} else {
 
