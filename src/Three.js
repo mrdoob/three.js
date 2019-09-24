@@ -159,7 +159,7 @@ export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
-export * from './Three.Legacy.js';
+export * from './_legacy/Legacy.js';
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
