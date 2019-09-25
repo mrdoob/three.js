@@ -1197,7 +1197,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( capabilities.multiview ) {
+		if ( camera.isArrayCamera && multiview.isAvailable() ) {
 
 			multiview.attachCamera( camera );
 
@@ -1257,7 +1257,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( capabilities.multiview ) {
+		if ( camera.isArrayCamera && multiview.isAvailable() ) {
 
 			multiview.detachCamera( camera );
 
@@ -1416,9 +1416,9 @@ function WebGLRenderer( parameters ) {
 
 				_currentArrayCamera = camera;
 
-				if ( capabilities.multiview ) {
+				if ( multiview.isAvailable() ) {
 
-					renderObject(	object, scene, camera, geometry, material, group );
+					renderObject( object, scene, camera, geometry, material, group );
 
 				} else {
 
