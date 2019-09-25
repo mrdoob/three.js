@@ -48,20 +48,6 @@ export class OrbitControls {
 	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE; };
 	touches: { ONE: TOUCH; TWO: TOUCH };
 
-	rotateLeft( angle?: number ): void;
-
-	rotateUp( angle?: number ): void;
-
-	panLeft( distance?: number ): void;
-
-	panUp( distance?: number ): void;
-
-	pan( deltaX: number, deltaY: number ): void;
-
-	dollyIn( dollyScale: number ): void;
-
-	dollyOut( dollyScale: number ): void;
-
 	update(): boolean;
 
 	saveState(): void;
