@@ -1616,9 +1616,10 @@ function WebGLRenderer( parameters ) {
 
 		// store the light setup it was created for
 
+		materialProperties.needsLights = materialNeedsLights( material );
 		materialProperties.lightsStateVersion = lightsStateVersion;
 
-		if ( materialNeedsLights( material ) ) {
+		if ( materialProperties.needsLights ) {
 
 			// wire up the material to this renderer's lighting state
 
@@ -1684,7 +1685,7 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( materialNeedsLights( material ) && materialProperties.lightsStateVersion !== lights.state.version ) {
+			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
 				material.needsUpdate = true;
 
@@ -1868,7 +1869,7 @@ function WebGLRenderer( parameters ) {
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
-			if ( materialNeedsLights( material ) ) {
+			if ( materialProperties.needsLights ) {
 
 				// the current material requires lighting info
 
