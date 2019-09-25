@@ -17544,15 +17544,15 @@
 
 		if ( parameters.precision === "highp" ) {
 
-			precisionstring += "\n#define HIGH_PRECISION;";
+			precisionstring += "\n#define HIGH_PRECISION";
 
 		} else if ( parameters.precision === "mediump" ) {
 
-			precisionstring += "\n#define MEDIUM_PRECISION;";
+			precisionstring += "\n#define MEDIUM_PRECISION";
 
 		} else if ( parameters.precision === "lowp" ) {
 
-			precisionstring += "\n#define LOW_PRECISION;";
+			precisionstring += "\n#define LOW_PRECISION";
 
 		}
 
