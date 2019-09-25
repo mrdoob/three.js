@@ -22292,7 +22292,6 @@ function WebGLMultiview( renderer, gl ) {
 
 	var DEFAULT_NUMVIEWS = 2;
 
-	var capabilities = renderer.capabilities;
 	var extensions = renderer.extensions;
 	var properties = renderer.properties;
 
@@ -22321,9 +22320,7 @@ function WebGLMultiview( renderer, gl ) {
 				mat4 = [];
 				mat3 = [];
 
-				var maxViews = capabilities.maxMultiviewViews;
-
-				for ( var i = 0; i < maxViews; i ++ ) {
+				for ( var i = 0; i < maxNumViews; i ++ ) {
 
 					mat4[ i ] = new Matrix4();
 					mat3[ i ] = new Matrix3();
