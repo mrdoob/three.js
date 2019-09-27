@@ -45,17 +45,14 @@
     <canvas id="c"></canvas>
     <div id="ui"></div>
   </body>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   const fov = 40;
   const aspect = 2;  // the canvas default
@@ -114,9 +111,9 @@ function main() {
   objects.push(moonMesh);
 
   // Turns both axes and grid visible on/off
-  // dat.GUI requires a property that returns a bool
+  // GUI requires a property that returns a bool
   // to decide to make a checkbox so we make a setter
-  // can getter for `visible` which we can tell dat.GUI
+  // can getter for `visible` which we can tell GUI
   // to look at.
   class AxisGridHelper {
     constructor(node, units = 10) {

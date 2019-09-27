@@ -532,8 +532,4 @@ though there are creative solutions. We'll explore one in
 [another article](threejs-optimize-lots-of-objects-animated.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r108/three.min.js"></script>
-<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
-<script src="../../3rdparty/dat.gui.min.js"></script>
-<script src="resources/threejs-lesson-utils.js"></script>
-<script src="resources/threejs-lots-of-objects.js"></script>
+<script type="module" src="resources/threejs-lots-of-objects.js"></script>

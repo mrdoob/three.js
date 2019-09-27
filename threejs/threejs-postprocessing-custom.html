@@ -19,16 +19,13 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {CopyShader} from './resources/threejs/r108/examples/jsm/shaders/CopyShader.js';
+import {EffectComposer} from './resources/threejs/r108/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r108/examples/jsm/postprocessing/RenderPass.js';
+import {ShaderPass} from './resources/threejs/r108/examples/jsm/postprocessing/ShaderPass.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -73,8 +70,8 @@ function main() {
     makeInstance(geometry, 0xaa8844,  2),
   ];
 
-  const composer = new THREE.EffectComposer(renderer);
-  composer.addPass(new THREE.RenderPass(scene, camera));
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
 
   const colorShader = {
     uniforms: {
@@ -101,7 +98,7 @@ function main() {
     `,
   };
 
-  const colorPass = new THREE.ShaderPass(colorShader);
+  const colorPass = new ShaderPass(colorShader);
   colorPass.renderToScreen = true;
   composer.addPass(colorPass);
 
@@ -116,7 +113,7 @@ function main() {
     return needResize;
   }
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
   gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
   gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');

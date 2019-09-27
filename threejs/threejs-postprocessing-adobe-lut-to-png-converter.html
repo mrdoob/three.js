@@ -30,17 +30,16 @@
     <p><button type="button">Save...</button></p>
     <div id="cube"><canvas id="c"></canvas></div>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
 <script src="resources/lut-reader.js"></script>
 <script src="resources/drag-and-drop.js"></script>
-<script>
-'use strict';
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {CopyShader} from './resources/threejs/r108/examples/jsm/shaders/CopyShader.js';
+import {EffectComposer} from './resources/threejs/r108/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r108/examples/jsm/postprocessing/RenderPass.js';
+import {ShaderPass} from './resources/threejs/r108/examples/jsm/postprocessing/ShaderPass.js';
 
-/* global THREE, dragAndDrop, lutParser */
+/* global dragAndDrop, lutParser */
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -160,17 +159,17 @@ function main() {
     `,
   };
 
-  const effectLUT = new THREE.ShaderPass(lutShader);
+  const effectLUT = new ShaderPass(lutShader);
   effectLUT.renderToScreen = true;
 
-  const renderBG = new THREE.RenderPass(sceneBG, cameraBG);
+  const renderBG = new RenderPass(sceneBG, cameraBG);
 
   const rtParameters = {
     minFilter: THREE.NearestFilter,
     magFilter: THREE.NearestFilter,
     format: THREE.RGBFormat,
   };
-  const composer = new THREE.EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
 
   composer.addPass(renderBG);
   composer.addPass(effectLUT);

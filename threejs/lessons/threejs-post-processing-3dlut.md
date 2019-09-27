@@ -491,5 +491,5 @@ The sample below is just a modification of the code above. We only draw the back
 
 One thing completely skipped is how the shader itself works. Hopefully we can cover a little more GLSL in the future. For now, if you're curious, you can follow the links in the [post processing article](threejs-post-processing.html) as well as maybe [take a look at this video](https://www.youtube.com/watch?v=rfQ8rKGTVlg#t=24m30s).
 
-<script src="resources/threejs-post-processing-3dlut.js"></script>
+<script type="module" src="resources/threejs-post-processing-3dlut.js"></script>
 

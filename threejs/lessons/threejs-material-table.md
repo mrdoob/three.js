@@ -7,7 +7,7 @@ is a table showing which material support which features.
 
 <div>
 <div id="material-table" class="threejs_center"></div>
-<script src="resources/threejs-material-table.js"></script>
+<script type="module" src="resources/threejs-material-table.js"></script>
 <link rel="stylesheet" href="resources/threejs-material-table.css">
 </div>
 

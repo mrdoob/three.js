@@ -1,6 +1,6 @@
-'use strict';
-
-/* global THREE, dat, threejsLessonUtils */
+import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import {threejsLessonUtils} from './threejs-lesson-utils.js';
+import {GUI} from '../../../3rdparty/dat.gui.module.js';
 
 {
   class DegRadHelper {
@@ -97,7 +97,7 @@
         camera.position.set(1, 1.5, 1.5);
         camera.lookAt(0, 0, 0);
 
-        const gui = new dat.GUI({autoPlace: false});
+        const gui = new GUI({autoPlace: false});
         renderInfo.elem.appendChild(gui.domElement);
         gui.add(new DegRadHelper(lonHelper.rotation, 'y'), 'value', -180, 180).name('lonHelper x rotation');
         gui.add(new DegRadHelper(latHelper.rotation, 'x'), 'value', -90, 90).name('latHelper y rotation');

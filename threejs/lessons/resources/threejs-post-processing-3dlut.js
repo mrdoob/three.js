@@ -1,7 +1,3 @@
-'use strict';
-
-/* global */
-
 {
     class Waiter {
       constructor() {

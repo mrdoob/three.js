@@ -1,6 +1,5 @@
-'use strict';
-
-/* global THREE, threejsLessonUtils */
+import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
   function addShape(color, geometry) {

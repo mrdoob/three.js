@@ -19,18 +19,15 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/vr/WebVR.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {WEBVR} from './resources/threejs/r108/examples/jsm/vr/WebVR.js';
 
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
   renderer.vr.enabled = true;
-  document.body.appendChild(THREE.WEBVR.createButton(renderer));
+  document.body.appendChild(WEBVR.createButton(renderer));
 
   const fov = 75;
   const aspect = 2;  // the canvas default

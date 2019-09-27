@@ -20,14 +20,11 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -40,7 +37,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0, 10, 20);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
   controls.update();
 
@@ -112,7 +109,7 @@ function main() {
   }
 
   {
-    const gltfLoader = new THREE.GLTFLoader();
+    const gltfLoader = new GLTFLoader();
     gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
       const root = gltf.scene;
       scene.add(root);

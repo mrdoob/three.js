@@ -20,14 +20,11 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/LoaderSupport.js"></script>
-<script src="resources/threejs/r108/js/loaders/OBJLoader2.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {LoaderSupport} from './resources/threejs/r108/examples/jsm/loaders/LoaderSupport.js';
+import {OBJLoader2} from './resources/threejs/r108/examples/jsm/loaders/OBJLoader2.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -40,7 +37,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0, 10, 20);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
   controls.update();
 
@@ -112,7 +109,7 @@ function main() {
   }
 
   {
-    const objLoader = new THREE.OBJLoader2();
+    const objLoader = new OBJLoader2();
     objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
       const root = event.detail.loaderRootNode;
       root.updateMatrixWorld();

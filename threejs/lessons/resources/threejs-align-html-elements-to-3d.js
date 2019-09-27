@@ -1,6 +1,5 @@
-'use strict';
+import {GUI} from '../../../3rdparty/dat.gui.module.js';
 
-/* global dat */
 {
   function outlineText(ctx, msg, x, y) {
     ctx.strokeText(msg, x, y);
@@ -119,7 +118,7 @@
           rotation: 0.3,
         };
 
-        const gui = new dat.GUI({autoPlace: false});
+        const gui = new GUI({autoPlace: false});
         gui.add(new DegRadHelper(settings, 'rotation'), 'value', -180, 180).name('rotation').onChange(render);
         gui.domElement.style.position = 'absolute';
         gui.domElement.style.top = '0';

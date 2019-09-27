@@ -1,6 +1,6 @@
-'use strict';
-
-/* global THREE, threejsLessonUtils */
+import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from '../../resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
   function makeCheckerTexture(repeats) {
@@ -39,7 +39,7 @@
 
     return function(renderInfo) {
       const {scene, camera, elem} = renderInfo;
-      const controls = new THREE.OrbitControls(camera, elem);
+      const controls = new OrbitControls(camera, elem);
       controls.enableDamping = true;
       controls.enablePanning = false;
       controls.enableKeys = false;

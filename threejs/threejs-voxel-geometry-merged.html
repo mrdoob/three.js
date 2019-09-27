@@ -19,13 +19,10 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r108/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -40,7 +37,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(cellSize / 2, 60, cellSize);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(cellSize / 2, 60, cellSize / 2);
   controls.update();
 
@@ -70,7 +67,7 @@ function main() {
     }
   }
 
-  const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
         geometries, false);
   const material = new THREE.MeshPhongMaterial({color: 'green'});
   const mesh = new THREE.Mesh(mergedGeometry, material);

@@ -1,8 +1,7 @@
-'use strict';
+import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import {TrackballControls} from '../../resources/threejs/r108/examples/jsm/controls/TrackballControls.js';
 
-/* global THREE */
-
-window.threejsLessonUtils = {
+export const threejsLessonUtils = {
   init() {
     if (this.renderer) {
       return;
@@ -144,7 +143,7 @@ window.threejsLessonUtils = {
       targetFOVDeg = camera.fov;
 
       if (settings.trackball !== false) {
-        const controls = new THREE.TrackballControls(camera, elem);
+        const controls = new TrackballControls(camera, elem);
         controls.noZoom = true;
         controls.noPan = true;
         resizeFunctions.push(controls.handleResize.bind(controls));
@@ -152,7 +151,7 @@ window.threejsLessonUtils = {
       }
 
       // add the lights as children of the camera.
-      // this is because TrackbacllControls move the camera.
+      // this is because TrackballControls move the camera.
       // We really want to rotate the object itself but there's no
       // controls for that so we fake it by putting all the lights
       // on the camera so they move with it.

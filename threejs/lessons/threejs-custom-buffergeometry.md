@@ -461,9 +461,6 @@ make your own geometry and how to dynamically update the contents of a
 depends on your needs.
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r108/three.min.js"></script>
-<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
-<script src="resources/threejs-lesson-utils.js"></script>
-<script src="resources/threejs-custom-buffergeometry.js"></script>
+<script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
 
 

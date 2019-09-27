@@ -1213,10 +1213,6 @@ I hope this has given you some ideas where to start and how
 to generate some what efficient geometry.
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r108/three.min.js"></script>
-<script src="../resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
-<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
-<script src="resources/threejs-lesson-utils.js"></script>
-<script src="resources/threejs-voxel-geometry.js"></script>
+<script type="module" src="resources/threejs-voxel-geometry.js"></script>
 
 

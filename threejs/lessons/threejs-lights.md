@@ -574,7 +574,4 @@ possible to achieve your goals.
 Next up let's go over [dealing with cameras](threejs-cameras.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r108/three.min.js"></script>
-<script src="../resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs-lesson-utils.js"></script>
-<script src="resources/threejs-lights.js"></script>
+<script type="module" src="resources/threejs-lights.js"></script>

@@ -20,13 +20,10 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -68,13 +65,13 @@ function main() {
     camera.updateProjectionMatrix();
   }
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
   const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
   gui.add(minMaxGUIHelper, 'min', 0.00001, 50, 0.00001).name('near').onChange(updateCamera);
   gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far').onChange(updateCamera);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
   controls.update();
 

@@ -57,14 +57,11 @@
       <div id="labels"></div>
     </div>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r108/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -77,7 +74,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.z = 2.5;
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.enablePan = false;
   controls.minDistance = 1.2;
@@ -156,7 +153,7 @@ function main() {
     minArea: 20,
     maxVisibleDot: -0.2,
   };
-  const gui = new dat.GUI({width: 300});
+  const gui = new GUI({width: 300});
   gui.add(settings, 'minArea', 0, 50).onChange(requestRenderIfNotRequested);
   gui.add(settings, 'maxVisibleDot', -1, 1, 0.01).onChange(requestRenderIfNotRequested);
 

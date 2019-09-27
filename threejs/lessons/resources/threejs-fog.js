@@ -1,6 +1,6 @@
-'use strict';
-
-/* global THREE, threejsLessonUtils */
+import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import {GLTFLoader} from '../../resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
+import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
   function fogExample(scene, fog) {
@@ -15,8 +15,9 @@
 
   function houseScene(props, fogInHouse) {
     const {scene, camera} = props;
+    scene.background = new THREE.Color('#FFF');
     camera.far = 200;
-    const loader = new THREE.GLTFLoader();
+    const loader = new GLTFLoader();
     const settings = {
       shininess: 0,
       roughness: 1,

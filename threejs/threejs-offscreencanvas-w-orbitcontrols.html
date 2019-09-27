@@ -22,11 +22,10 @@
   <body>
     <canvas id="c" tabindex="1"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
 <script src="shared-orbitcontrols.js"></script>
-<script>
-'use strict';
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 
 /* global init */
 

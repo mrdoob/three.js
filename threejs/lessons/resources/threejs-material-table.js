@@ -1,5 +1,3 @@
-'use strict';
-
 const materials = [
   {
     name: 'MeshBasicMaterial',

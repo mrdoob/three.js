@@ -21,20 +21,10 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/shaders/SSAOShader.js"></script>
-<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/MaskPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/SSAOPass.js"></script>
-<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -56,7 +46,7 @@ function main() {
   const camSpeed = 0.2;
 
   if (useOrbitCamera) {
-    const controls = new THREE.OrbitControls(camera);
+    const controls = new OrbitControls(camera);
     controls.target.set(0, 100.01, 0.2);
     controls.update();
   }
@@ -97,7 +87,7 @@ function main() {
     scene.add(dirLightHeper);
   }
 
-  const loader = new THREE.GLTFLoader();
+  const loader = new GLTFLoader();
   const camRadius = 600;
   const camHeight = 160;
   const camTarget = [0, 30, 0];

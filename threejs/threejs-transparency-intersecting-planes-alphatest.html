@@ -19,13 +19,10 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -38,7 +35,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0.5, 1, 0.5);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 0, 0);
   controls.update();
 
@@ -106,7 +103,7 @@ function main() {
     }
   }
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.add(new AllMaterialPropertyGUIHelper('alphaTest', scene), 'value', 0, 1)
       .name('alphaTest')
       .onChange(requestRenderIfNotRequested);

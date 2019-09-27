@@ -785,5 +785,4 @@ elements with your 3D. A few things I might change.
 Next up let's make it so you can [pick and highlight a country](threejs-indexed-textures.html).
 
 <link rel="stylesheet" href="resources/threejs-align-html-elements-to-3d.css">
-<script src="/3rdparty/dat.gui.min.js"></script>
-<script src="resources/threejs-align-html-elements-to-3d.js"></script>
+<script type="module" src="resources/threejs-align-html-elements-to-3d.js"></script>

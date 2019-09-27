@@ -304,9 +304,6 @@ switch from using one to using the other.
 </div>
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r108/three.min.js"></script>
-<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
-<script src="resources/threejs-lesson-utils.js"></script>
-<script src="resources/threejs-materials.js"></script>
+<script type="module" src="resources/threejs-materials.js"></script>
 
 

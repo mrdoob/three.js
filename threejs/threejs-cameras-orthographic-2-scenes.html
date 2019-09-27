@@ -36,13 +36,10 @@
        <div id="view2" tabindex="2"></div>
     </div>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -82,13 +79,13 @@ function main() {
     }
   }
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
   const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
   gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near');
   gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far');
 
-  const controls = new THREE.OrbitControls(camera, view1Elem);
+  const controls = new OrbitControls(camera, view1Elem);
   controls.target.set(0, 5, 0);
   controls.update();
 
@@ -101,7 +98,7 @@ function main() {
   camera2.position.set(16, 28, 40);
   camera2.lookAt(0, 5, 0);
 
-  const controls2 = new THREE.OrbitControls(camera2, view2Elem);
+  const controls2 = new OrbitControls(camera2, view2Elem);
   controls2.target.set(0, 5, 0);
   controls2.update();
 

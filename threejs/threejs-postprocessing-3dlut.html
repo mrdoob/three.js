@@ -19,20 +19,17 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
-<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
-<script src="../3rdparty/dat.gui.min.js"></script>
 <script src="resources/lut-reader.js"></script>
 <script src="resources/drag-and-drop.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
+import {CopyShader} from './resources/threejs/r108/examples/jsm/shaders/CopyShader.js';
+import {EffectComposer} from './resources/threejs/r108/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r108/examples/jsm/postprocessing/RenderPass.js';
+import {ShaderPass} from './resources/threejs/r108/examples/jsm/postprocessing/ShaderPass.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -45,7 +42,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0, 10, 20);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
   controls.update();
 
@@ -137,7 +134,6 @@ function main() {
     };
   }();
 
-
   lutTextures.forEach((info) => {
     // if not size set get it from the filename
     if (!info.size) {
@@ -166,7 +162,7 @@ function main() {
   const lutSettings = {
     lut: lutNameIndexMap.custom,
   };
-  const gui = new dat.GUI({ width: 300 });
+  const gui = new GUI({ width: 300 });
   gui.add(lutSettings, 'lut', lutNameIndexMap);
 
   const scene = new THREE.Scene();
@@ -215,7 +211,7 @@ function main() {
   }
 
   {
-    const gltfLoader = new THREE.GLTFLoader();
+    const gltfLoader = new GLTFLoader();
     gltfLoader.load('resources/models/3dbustchallange_submission/scene.gltf', (gltf) => {
       const root = gltf.scene;
       scene.add(root);
@@ -299,21 +295,21 @@ function main() {
     fragmentShader: lutShader.fragmentShader.replace('#define FILTER_LUT', '//'),
   };
 
-  const effectLUT = new THREE.ShaderPass(lutShader);
+  const effectLUT = new ShaderPass(lutShader);
   effectLUT.renderToScreen = true;
-  const effectLUTNearest = new THREE.ShaderPass(lutNearestShader);
+  const effectLUTNearest = new ShaderPass(lutNearestShader);
   effectLUTNearest.renderToScreen = true;
 
-  const renderModel = new THREE.RenderPass(scene, camera);
+  const renderModel = new RenderPass(scene, camera);
   renderModel.clear = false;  // so we don't clear out the background
-  const renderBG = new THREE.RenderPass(sceneBG, cameraBG);
+  const renderBG = new RenderPass(sceneBG, cameraBG);
 
   const rtParameters = {
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
     format: THREE.RGBFormat,
   };
-  const composer = new THREE.EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
 
   composer.addPass(renderBG);
   composer.addPass(renderModel);

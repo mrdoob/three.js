@@ -19,19 +19,16 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r108/js/shaders/ConvolutionShader.js"></script>
-<script src="resources/threejs/r108/js/shaders/FilmShader.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/BloomPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/FilmPass.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {CopyShader} from './resources/threejs/r108/examples/jsm/shaders/CopyShader.js';
+import {ConvolutionShader} from './resources/threejs/r108/examples/jsm/shaders/ConvolutionShader.js';
+import {FilmShader} from './resources/threejs/r108/examples/jsm/shaders/FilmShader.js';
+import {EffectComposer} from './resources/threejs/r108/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r108/examples/jsm/postprocessing/RenderPass.js';
+import {ShaderPass} from './resources/threejs/r108/examples/jsm/postprocessing/ShaderPass.js';
+import {BloomPass} from './resources/threejs/r108/examples/jsm/postprocessing/BloomPass.js';
+import {FilmPass} from './resources/threejs/r108/examples/jsm/postprocessing/FilmPass.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -76,10 +73,10 @@ function main() {
     makeInstance(geometry, 0xaa8844,  2),
   ];
 
-  const composer = new THREE.EffectComposer(renderer);
-  composer.addPass(new THREE.RenderPass(scene, camera));
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
 
-  const bloomPass = new THREE.BloomPass(
+  const bloomPass = new BloomPass(
       1,    // strength
       25,   // kernel size
       4,    // sigma ?
@@ -87,7 +84,7 @@ function main() {
   );
   composer.addPass(bloomPass);
 
-  const filmPass = new THREE.FilmPass(
+  const filmPass = new FilmPass(
       0.35,   // noise intensity
       0.025,  // scanline intensity
       648,    // scanline count

@@ -43,12 +43,9 @@
       and finding a undiscovered tomb full of mummies and treasure.
     </p>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/TrackballControls.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {TrackballControls} from './resources/threejs/r108/examples/jsm/controls/TrackballControls.js';
 
 function main() {
   const canvas = document.createElement('canvas');
@@ -74,7 +71,7 @@ function main() {
     camera.lookAt(0, 0, 0);
     scene.add(camera);
 
-    const controls = new THREE.TrackballControls(camera, elem);
+    const controls = new TrackballControls(camera, elem);
     controls.noZoom = true;
     controls.noPan = true;
 

@@ -46,7 +46,7 @@ function fixSourceLinks(url, source) {
   const prefix = getPrefix(url);
 
   function addPrefix(url) {
-    return url.indexOf('://') < 0 && url[0] !== '?' ? (prefix + url) : url;
+    return url.indexOf('://') < 0 && !url.startsWith('data:') && url[0] !== '?' ? (prefix + url).replace(/\/.\//g, '/') : url;
   }
   function makeLinkFDedQuotes(match, fn, q1, url, q2) {
     return fn + q1 + addPrefix(url) + q2;

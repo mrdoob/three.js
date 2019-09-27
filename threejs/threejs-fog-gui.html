@@ -19,17 +19,14 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="../3rdparty/dat.gui.min.js"></script>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script>
-'use strict';
-
-/* global THREE, dat */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   const fov = 75;
   const aspect = 2;  // the canvas default

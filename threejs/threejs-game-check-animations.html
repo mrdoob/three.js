@@ -73,14 +73,11 @@
       </div>
     </div>
   </body>
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
-<script src="resources/threejs/r108/js/utils/SkeletonUtils.js"></script>
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
+import {SkeletonUtils} from './resources/threejs/r108/examples/jsm/utils/SkeletonUtils.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -93,7 +90,7 @@ function main() {
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(0, 20, 40);
 
-  const controls = new THREE.OrbitControls(camera, canvas);
+  const controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 5, 0);
   controls.update();
 
@@ -130,7 +127,7 @@ function main() {
     knight: { url: 'resources/models/knight/KnightCharacter.gltf' },
   };
   {
-    const gltfLoader = new THREE.GLTFLoader(manager);
+    const gltfLoader = new GLTFLoader(manager);
     for (const model of Object.values(models)) {
       gltfLoader.load(model.url, (gltf) => {
         model.gltf = gltf;
@@ -158,7 +155,7 @@ function main() {
     prepModelsAndAnimations();
 
     Object.values(models).forEach((model, ndx) => {
-      const clonedScene = THREE.SkeletonUtils.clone(model.gltf.scene);
+      const clonedScene = SkeletonUtils.clone(model.gltf.scene);
       const root = new THREE.Object3D();
       root.add(clonedScene);
       scene.add(root);

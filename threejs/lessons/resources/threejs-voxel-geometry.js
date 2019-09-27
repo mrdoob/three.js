@@ -1,6 +1,6 @@
-'use strict';
-
-/* global THREE, threejsLessonUtils */
+import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import {BufferGeometryUtils} from '../../resources/threejs/r108/examples/jsm/utils/BufferGeometryUtils.js';
+import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
   const darkMatcher = window.matchMedia('(prefers-color-scheme: dark)');
@@ -31,7 +31,7 @@
             }
           }
         }
-        const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries, false);
+        const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
         const material = new THREE.MeshBasicMaterial({
           color: colors.wire,
           wireframe: true,
