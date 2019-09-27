@@ -17,12 +17,6 @@ Sidebar.Material = function ( editor ) {
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
-	// New / Copy / Paste
-
-	var copiedMaterial;
-
-	var managerRow = new UI.Row();
-
 	// Current material slot
 
 	var materialSlotRow = new UI.Row();
@@ -34,43 +28,6 @@ Sidebar.Material = function ( editor ) {
 	materialSlotRow.add( materialSlotSelect );
 
 	container.add( materialSlotRow );
-
-	managerRow.add( new UI.Text( '' ).setWidth( '90px' ) );
-
-	managerRow.add( new UI.Button( strings.getKey( 'sidebar/material/new' ) ).onClick( function () {
-
-		var material = new THREE[ materialClass.getValue() ]();
-		editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
-		update();
-
-	} ) );
-
-	managerRow.add( new UI.Button( strings.getKey( 'sidebar/material/copy' ) ).setMarginLeft( '4px' ).onClick( function () {
-
-		copiedMaterial = currentObject.material;
-
-		if ( Array.isArray( copiedMaterial ) ) {
-
-			if ( copiedMaterial.length === 0 ) return;
-
-			copiedMaterial = copiedMaterial[ currentMaterialSlot ];
-
-		}
-
-	} ) );
-
-	managerRow.add( new UI.Button( strings.getKey( 'sidebar/material/paste' ) ).setMarginLeft( '4px' ).onClick( function () {
-
-		if ( copiedMaterial === undefined ) return;
-
-		editor.execute( new SetMaterialCommand( editor, currentObject, copiedMaterial, currentMaterialSlot ), 'Pasted Material: ' + materialClass.getValue() );
-		refreshUI();
-		update();
-
-	} ) );
-
-	container.add( managerRow );
-
 
 	// type
 
@@ -655,9 +612,9 @@ Sidebar.Material = function ( editor ) {
 				var sheen = sheenEnabled ? new THREE.Color(materialSheen.getHexValue()) : null;
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'sheen', sheen, currentMaterialSlot ) );
-				
+
 			}
-			
+
 			if ( material.sheen !== undefined && material.sheen !== null && material.sheen.getHex() !== materialSheen.getHexValue() ) {
 
 				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'sheen', materialSheen.getHexValue(), currentMaterialSlot ) );
@@ -1297,9 +1254,9 @@ Sidebar.Material = function ( editor ) {
 			materialMetalness.setValue( material.metalness );
 
 		}
-		
+
 		if ( material.sheen !== undefined && material.sheen !== null ) {
-			
+
 			materialSheenEnabled.setValue( true );
 			materialSheen.setHexValue( material.sheen.getHexString() );
 

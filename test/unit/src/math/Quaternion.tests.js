@@ -733,13 +733,14 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "_onChangeCallback", ( assert ) => {
 
 			var b = false;
+			var a = new Quaternion( 11, 12, 13, 1 );
 			var f = function () {
 
 				b = true;
+				assert.ok( a === this, "Passed!" );
 
 			};
 
-			var a = new Quaternion( 11, 12, 13, 1 );
 			a._onChangeCallback = f;
 			assert.ok( a._onChangeCallback === f, "Passed!" );
 

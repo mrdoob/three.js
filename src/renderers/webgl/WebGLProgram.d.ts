@@ -13,8 +13,7 @@ export class WebGLProgram {
 		code: string,
 		material: ShaderMaterial,
 		shader: WebGLShader,
-		parameters: WebGLRendererParameters,
-		capabilities: WebGLCapabilities
+		parameters: WebGLRendererParameters
 	);
 
 	id: number;
