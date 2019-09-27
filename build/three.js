@@ -22307,7 +22307,7 @@
 		var properties = renderer.properties;
 
 		var renderTarget, currentRenderTarget;
-		var mat3, mat4, renderSize;
+		var mat3, mat4, cameraArray, renderSize;
 
 		var available;
 		var maxNumViews = 0;
@@ -22330,6 +22330,7 @@
 					renderSize = new Vector2();
 					mat4 = [];
 					mat3 = [];
+					cameraArray = [];
 
 					for ( var i = 0; i < maxNumViews; i ++ ) {
 
@@ -22346,9 +22347,19 @@
 
 		}
 
+		function getCameraArray( camera ) {
+
+			if ( camera.isArrayCamera ) { return camera.cameras; }
+
+			cameraArray[ 0 ] = camera;
+
+			return cameraArray;
+
+		}
+
 		function updateCameraProjectionMatricesUniform( camera, uniforms ) {
 
-			var cameras = camera.cameras;
+			var cameras = getCameraArray( camera );
 
 			for ( var i = 0; i < cameras.length; i ++ ) {
 
@@ -22362,7 +22373,7 @@
 
 		function updateCameraViewMatricesUniform( camera, uniforms ) {
 
-			var cameras = camera.cameras;
+			var cameras = getCameraArray( camera );
 
 			for ( var i = 0; i < cameras.length; i ++ ) {
 
@@ -22376,7 +22387,7 @@
 
 		function updateObjectMatricesUniforms( object, camera, uniforms ) {
 
-			var cameras = camera.cameras;
+			var cameras = getCameraArray( camera );
 
 			for ( var i = 0; i < cameras.length; i ++ ) {
 
@@ -22391,6 +22402,8 @@
 		}
 
 		function isMultiviewCompatible( camera ) {
+
+			if ( camera.isArrayCamera === undefined ) { return true; }
 
 			var cameras = camera.cameras;
 
@@ -22419,16 +22432,25 @@
 
 			}
 
-			var viewport = camera.cameras[ 0 ].viewport;
+			if ( camera.isArrayCamera ) {
 
-			renderTarget.setSize( viewport.z, viewport.w );
-			renderTarget.setNumViews( camera.cameras.length );
+				var viewport = camera.cameras[ 0 ].viewport;
+
+				renderTarget.setSize( viewport.z, viewport.w );
+				renderTarget.setNumViews( camera.cameras.length );
+
+			} else {
+
+				renderTarget.setSize( renderSize.x, renderSize.y );
+				renderTarget.setNumViews( DEFAULT_NUMVIEWS );
+
+			}
 
 		}
 
 		function attachCamera( camera ) {
 
-			if ( ! isMultiviewCompatible( camera ) ) { return; }
+			if ( isMultiviewCompatible( camera ) === false ) { return; }
 
 			currentRenderTarget = renderer.getRenderTarget();
 			resizeRenderTarget( camera );
@@ -22456,17 +22478,26 @@
 			var viewWidth = srcRenderTarget.width;
 			var viewHeight = srcRenderTarget.height;
 
-			for ( var i = 0; i < numViews; i ++ ) {
+			if ( camera.isArrayCamera ) {
 
-				var viewport = camera.cameras[ i ].viewport;
+				for ( var i = 0; i < numViews; i ++ ) {
 
-				var x1 = viewport.x;
-				var y1 = viewport.y;
-				var x2 = x1 + viewport.z;
-				var y2 = y1 + viewport.w;
+					var viewport = camera.cameras[ i ].viewport;
 
-				gl.bindFramebuffer( 36008, srcFramebuffers[ i ] );
-				gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, 16384, 9728 );
+					var x1 = viewport.x;
+					var y1 = viewport.y;
+					var x2 = x1 + viewport.z;
+					var y2 = y1 + viewport.w;
+
+					gl.bindFramebuffer( 36008, srcFramebuffers[ i ] );
+					gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, 16384, 9728 );
+
+				}
+
+			} else {
+
+				gl.bindFramebuffer( 36008, srcFramebuffers[ 0 ] );
+				gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, 0, 0, renderSize.x, renderSize.y, 16384, 9728 );
 
 			}
 
@@ -24468,7 +24499,7 @@
 
 			}
 
-			if ( camera.isArrayCamera && multiview.isAvailable() ) {
+			if ( vr.enabled && multiview.isAvailable() ) {
 
 				multiview.attachCamera( camera );
 
@@ -24528,13 +24559,13 @@
 
 			state.setPolygonOffset( false );
 
-			if ( camera.isArrayCamera && multiview.isAvailable() ) {
-
-				multiview.detachCamera( camera );
-
-			}
-
 			if ( vr.enabled ) {
+
+				if ( multiview.isAvailable() ) {
+
+					multiview.detachCamera( camera );
+
+				}
 
 				vr.submitFrame();
 
@@ -24687,7 +24718,7 @@
 
 					_currentArrayCamera = camera;
 
-					if ( multiview.isAvailable() ) {
+					if ( vr.enabled && multiview.isAvailable() ) {
 
 						renderObject( object, scene, camera, geometry, material, group );
 
