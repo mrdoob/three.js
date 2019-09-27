@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	BackSide 
+} from '../../../../build/three.module.js';
+
 import { TempNode } from '../core/TempNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -81,11 +85,19 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 
+		var scale = this.scale.build( builder, 'v2' );
+
+		if ( builder.material.side === BackSide ) {
+
+			scale = '-' + scale;
+
+		}
+
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
 			this.normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
 			this.uv.build( builder, 'v2' ) + ', ' +
-			this.scale.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
+			scale + ' )', this.getType( builder ), output );
 
 	} else {
 
