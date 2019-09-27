@@ -27,7 +27,7 @@ export interface MeshBasicMaterialParameters extends MaterialParameters {
 
 export class MeshBasicMaterial extends Material {
 
-	constructor(parameters?: MeshBasicMaterialParameters);
+	constructor( parameters?: MeshBasicMaterialParameters );
 
 	color: Color;
 	map: Texture | null;
@@ -46,6 +46,6 @@ export class MeshBasicMaterial extends Material {
 	skinning: boolean;
 	morphTargets: boolean;
 
-	setValues(parameters: MeshBasicMaterialParameters): void;
+	setValues( parameters: MeshBasicMaterialParameters ): void;
 
 }
