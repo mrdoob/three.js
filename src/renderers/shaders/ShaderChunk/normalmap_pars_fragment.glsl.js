@@ -40,7 +40,9 @@ export default /* glsl */`
 
 			// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
 
-			if ( dot( cross( S, T ), N ) < 0.0 ) mapN.xy *= - 1.0;
+			bool frontFacing = dot( cross( S, T ), N ) > 0.0;
+
+			mapN.xy *= ( float( frontFacing ) * 2.0 - 1.0 );
 
 		#else
 
