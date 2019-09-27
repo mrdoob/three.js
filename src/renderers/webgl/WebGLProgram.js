@@ -718,14 +718,14 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 				].join( '\n' ),
 				[
 					'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
-					'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
-					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
 					'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+					'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
 
 					'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
-					'#define normalMatrix normalMatrices[VIEW_ID]',
+					'#define projectionMatrix projectionMatrices[VIEW_ID]',
 					'#define viewMatrix viewMatrices[VIEW_ID]',
-					'#define projectionMatrix projectionMatrices[VIEW_ID]'
+					'#define normalMatrix normalMatrices[VIEW_ID]'
 				].join( '\n' )
 			);
 
