@@ -1197,7 +1197,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( camera.isArrayCamera && multiview.isAvailable() ) {
+		if ( vr.enabled && multiview.isAvailable() ) {
 
 			multiview.attachCamera( camera );
 
@@ -1257,13 +1257,13 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( camera.isArrayCamera && multiview.isAvailable() ) {
-
-			multiview.detachCamera( camera );
-
-		}
-
 		if ( vr.enabled ) {
+
+			if ( multiview.isAvailable() ) {
+
+				multiview.detachCamera( camera );
+
+			}
 
 			vr.submitFrame();
 
@@ -1416,7 +1416,7 @@ function WebGLRenderer( parameters ) {
 
 				_currentArrayCamera = camera;
 
-				if ( multiview.isAvailable() ) {
+				if ( vr.enabled && multiview.isAvailable() ) {
 
 					renderObject( object, scene, camera, geometry, material, group );
 
