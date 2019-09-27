@@ -237,10 +237,10 @@ it for skinned animated characters. Fortunately there's a utility function,
 the utils.
 
 ```html
-<script src="resources/threejs/r105/three.min.js"></script>
-<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r105/js/loaders/GLTFLoader.js"></script>
-+<script src="resources/threejs/r105/js/utils/SkeletonUtils.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
++<script src="resources/threejs/r108/js/utils/SkeletonUtils.js"></script>
 ```
 
 Then we can clone the models we just loaded
@@ -1683,10 +1683,10 @@ While we're at it lets make it so we can turn them on/off using dat.GUI like
 we've used else where
 
 ```html
-<script src="resources/threejs/r105/three.min.js"></script>
-<script src="resources/threejs/r105/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r105/js/loaders/GLTFLoader.js"></script>
-<script src="resources/threejs/r105/js/utils/SkeletonUtils.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
+<script src="resources/threejs/r108/js/utils/SkeletonUtils.js"></script>
 +<script src="../3rdparty/dat.gui.min.js"></script>
 ```
 

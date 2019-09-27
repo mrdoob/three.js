@@ -429,7 +429,7 @@ them into a single mesh.
 We also need to include the `BufferGeometryUtils`
 
 ```html
-<script src="resources/threejs/r105/js/utils/BufferGeometryUtils.js"></script>
+<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
 ```
 
 And now, at least on my machine, I get 60 frames per second
@@ -532,8 +532,8 @@ though there are creative solutions. We'll explore one in
 [another article](threejs-optimize-lots-of-objects-animated.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r105/three.min.js"></script>
-<script src="../resources/threejs/r105/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r108/three.min.js"></script>
+<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
 <script src="../../3rdparty/dat.gui.min.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-lots-of-objects.js"></script>

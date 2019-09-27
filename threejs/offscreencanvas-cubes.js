@@ -2,7 +2,7 @@
 
 /* global importScripts, THREE */
 
-importScripts('resources/threejs/r105/three.min.js');
+importScripts('resources/threejs/r108/three.min.js');
 
 const state = {
   width: 300,   // canvas default

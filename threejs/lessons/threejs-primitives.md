@@ -349,8 +349,8 @@ Next up let's go over [how three's scene graph works and how
 to use it](threejs-scenegraph.html).
 
 <canvas id="c"></canvas>
-<script src="../resources/threejs/r105/three.min.js"></script>
-<script src="../resources/threejs/r105/js/controls/TrackballControls.js"></script>
+<script src="../resources/threejs/r108/three.min.js"></script>
+<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
 <script src="resources/threejs-lesson-utils.js"></script>
 <script src="resources/threejs-primitives.js"></script>
 <link rel="stylesheet" href="resources/threejs-primitives.css">

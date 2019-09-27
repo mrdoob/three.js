@@ -69,8 +69,8 @@ The first thing we need to do is include the VR support after
 including three.js
 
 ```html
-<script src="resources/threejs/r105/three.min.js"></script>
-+<script src="resources/threejs/r105/js/vr/WebVR.js"></script>
+<script src="resources/threejs/r108/three.min.js"></script>
++<script src="resources/threejs/r108/js/vr/WebVR.js"></script>
 ```
 
 Then we need to enable three.js's WebVR support and add its
@@ -81,7 +81,7 @@ function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
 +  renderer.vr.enabled = true;
-+  document.body.appendChild(WEBVR.createButton(renderer));
++  document.body.appendChild(THREE.WEBVR.createButton(renderer));
 ```
 
 We need to not try to resize when in VR mode as the VR device
@@ -357,7 +357,7 @@ function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
 -  renderer.vr.enabled = true;
--  document.body.appendChild(WEBVR.createButton(renderer));
+-  document.body.appendChild(THREE.WEBVR.createButton(renderer));
 
   const fov = 75;
   const aspect = 2;  // the canvas default
@@ -369,7 +369,7 @@ function main() {
 +  const allowvr = params.get('allowvr') === 'true';
 +  if (allowvr) {
 +    renderer.vr.enabled = true;
-+    document.body.appendChild(WEBVR.createButton(renderer));
++    document.body.appendChild(THREE.WEBVR.createButton(renderer));
 +    document.querySelector('#vr').style.display = 'none';
 +  } else {
 +    // no VR, add some controls
