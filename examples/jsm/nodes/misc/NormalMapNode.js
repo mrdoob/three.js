@@ -25,7 +25,7 @@ NormalMapNode.Nodes = ( function () {
 		// Per-Pixel Tangent Space Normal Mapping
 		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 
-		`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
+`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
 
 	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -47,14 +47,8 @@ NormalMapNode.Nodes = ( function () {
 	#ifdef DOUBLE_SIDED
 
 		// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-		// http://hacksoflife.blogspot.com/2009/11/per-pixel-tangent-space-normal-mapping.html?showComment=1522254677437#c5087545147696715943
-		vec3 NfromST = cross( S, T );
-		if( dot( NfromST, N ) < 0.0 ) {
 
-			S *= -1.0;
-			T *= -1.0;
-
-		}
+		if ( dot( cross( S, T ), N ) < 0.0 ) mapN.xy *= - 1.0;
 
 	#else
 
