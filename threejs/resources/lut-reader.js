@@ -1,53 +1,49 @@
-'use strict';
-
-(function() {
-
-  function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
-    const strs = [];
-    let quoteType;
-    let escape;
-    let s = [];
-    for (let i = 0; i < str.length; ++i) {
-      const c = str[i];
-      if (escape) {
-        escape = false;
-        s.push(c);
-      } else {
-        if (quoteType) {  // we're inside quotes
-          if (c === quoteType) {
-            quoteType = undefined;
+function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
+  const strs = [];
+  let quoteType;
+  let escape;
+  let s = [];
+  for (let i = 0; i < str.length; ++i) {
+    const c = str[i];
+    if (escape) {
+      escape = false;
+      s.push(c);
+    } else {
+      if (quoteType) {  // we're inside quotes
+        if (c === quoteType) {
+          quoteType = undefined;
+          strs.push(s.join(''));
+          s = [];
+        } else if (c === '\\') {
+          escape = true;
+        } else {
+          s.push(c);
+        }
+      } else {  // we're not in quotes
+        if (splits.indexOf(c) >= 0) {
+          if (s.length) {
             strs.push(s.join(''));
             s = [];
-          } else if (c === '\\') {
-            escape = true;
-          } else {
-            s.push(c);
           }
-        } else {  // we're not in quotes
-          if (splits.indexOf(c) >= 0) {
-            if (s.length) {
-              strs.push(s.join(''));
-              s = [];
-            }
-          } else if (c === '"' || c === '\'') {
-            if (s.length) {  // its in th middle of a word
-              s.push(c);
-            } else {
-              quoteType = c;
-            }
-          } else {
+        } else if (c === '"' || c === '\'') {
+          if (s.length) {  // its in th middle of a word
             s.push(c);
+          } else {
+            quoteType = c;
           }
+        } else {
+          s.push(c);
         }
       }
     }
-    if (s.length || strs.length === 0) {
-      strs.push(s.join(''));
-    }
-    return strs;
   }
+  if (s.length || strs.length === 0) {
+    strs.push(s.join(''));
+  }
+  return strs;
+}
 
-function parse(str) {
+export function parse(str) {
   const data = [];
   const lut = {
     name: 'unknonw',
@@ -128,7 +124,7 @@ function lut1Dto3D(lut) {
   return Object.assign({}, lut, {data});
 }
 
-function lutTo2D3Drgb8(lut) {
+export function lutTo2D3Drgb8(lut) {
   if (lut.type === '1D') {
     lut = lut1Dto3D(lut);
   }
@@ -146,10 +142,3 @@ function lutTo2D3Drgb8(lut) {
   }
   return Object.assign({}, lut, {data});
 }
-
-window.lutParser = {
-  parse,
-  lutTo2D3Drgb8,
-};
-
-}());

@@ -19,11 +19,8 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="shared-cubes.js"></script>
 <script type="module">
-import * as THREE from './resources/threejs/r108/build/three.module.js';
-
-/* global state, init */
+import {state, init} from './shared-cubes.js';
 
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();

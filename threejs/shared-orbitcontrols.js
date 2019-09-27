@@ -1,8 +1,7 @@
-'use strict';
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 
-/* global THREE */
-
-function init(data) {   /* eslint-disable-line no-unused-vars */
+export function init(data) {   /* eslint-disable-line no-unused-vars */
   const {canvas, inputElement} = data;
   const renderer = new THREE.WebGLRenderer({canvas});
 
@@ -13,7 +12,7 @@ function init(data) {   /* eslint-disable-line no-unused-vars */
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.z = 4;
 
-  const controls = new THREE.OrbitControls(camera, inputElement);
+  const controls = new OrbitControls(camera, inputElement);
   controls.target.set(0, 0, 0);
   controls.update();
 

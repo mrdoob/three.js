@@ -1,8 +1,6 @@
-'use strict';
+import * as THREE from 'resources/threejs/r108/build/three.module.js';
 
-/* global THREE */
-
-const state = {
+export const state = {
   width: 300,   // canvas default
   height: 150,  // canvas default
 };

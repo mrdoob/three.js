@@ -1,5 +1,5 @@
 // Licensed under a BSD license. See license.html for license
-'use strict';
+'use strict';  // eslint-disable-line
 
 /* global jQuery */
 

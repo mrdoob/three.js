@@ -19,11 +19,8 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="shared-picking.js"></script>
 <script type="module">
-import * as THREE from './resources/threejs/r108/build/three.module.js';
-
-/* global state, init, pickPosition */
+import {state, init, pickPosition} from './shared-picking.js';
 
 let sendMouse;
 

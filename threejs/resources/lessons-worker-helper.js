@@ -31,7 +31,7 @@
 
 /* global */
 
-'use strict';
+'use strict';  // eslint-disable-line
 
 (function() {
 

@@ -30,16 +30,13 @@
     <p><button type="button">Save...</button></p>
     <div id="cube"><canvas id="c"></canvas></div>
   </body>
-<script src="resources/lut-reader.js"></script>
-<script src="resources/drag-and-drop.js"></script>
 <script type="module">
+import * as lutParser from './resources/lut-reader.js';
+import * as dragAndDrop from './resource/drag-and-drop.js';
 import * as THREE from './resources/threejs/r108/build/three.module.js';
-import {CopyShader} from './resources/threejs/r108/examples/jsm/shaders/CopyShader.js';
 import {EffectComposer} from './resources/threejs/r108/examples/jsm/postprocessing/EffectComposer.js';
 import {RenderPass} from './resources/threejs/r108/examples/jsm/postprocessing/RenderPass.js';
 import {ShaderPass} from './resources/threejs/r108/examples/jsm/postprocessing/ShaderPass.js';
-
-/* global dragAndDrop, lutParser */
 
 function main() {
   const canvas = document.querySelector('#c');

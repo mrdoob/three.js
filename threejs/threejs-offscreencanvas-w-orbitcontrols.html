@@ -22,12 +22,8 @@
   <body>
     <canvas id="c" tabindex="1"></canvas>
   </body>
-<script src="shared-orbitcontrols.js"></script>
 <script type="module">
-import * as THREE from './resources/threejs/r108/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
-
-/* global init */
+import {init} from './shared-orbitcontrols.js';
 
 const mouseEventHandler = makeSendPropertiesHandler([
   'ctrlKey',

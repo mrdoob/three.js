@@ -94,5 +94,16 @@ module.exports = {
     "space-before-function-paren": [2, "never"],
     "keyword-spacing": [1, {"before": true, "after": true, "overrides": {}} ],
   },
+  "overrides": [
+    {
+      "files": [
+        "Gruntfile.js",
+        "fix.js",
+      ],
+      "parserOptions": {
+        "sourceType": "script",
+      },
+    }
+  ]  
 };
 
