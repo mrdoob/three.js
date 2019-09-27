@@ -2,5 +2,9 @@
   "eslint.validate": [
         "javascript",
         "html"
+  ],
+  "cSpell.words": [
+    "rdparty",
+    "threejs"
   ]
 }
