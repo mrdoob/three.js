@@ -1,6 +1,4 @@
-'use strict';
-
-/* global THREE */
+import * as THREE from './resources/threejs/r108/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
