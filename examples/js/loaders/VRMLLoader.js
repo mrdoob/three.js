@@ -1228,7 +1228,7 @@ THREE.VRMLLoader = ( function () {
 			function buildIndexedFaceSetNode( node ) {
 
 				var color, coord, normal, texCoord;
-				var ccw = true, solid = true, creaseAngle;
+				var ccw = true, solid = true, creaseAngle = 0;
 				var colorIndex, coordIndex, normalIndex, texCoordIndex;
 				var colorPerVertex = true, normalPerVertex = true;
 
@@ -2161,13 +2161,21 @@ THREE.VRMLLoader = ( function () {
 
 			function weightedNormal( normals, vector, creaseAngle ) {
 
-				var normal = vector.clone();
+				var normal = new THREE.Vector3();
 
-				for ( var i = 0, l = normals.length; i < l; i ++ ) {
+				if ( creaseAngle === 0 ) {
 
-					if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+					normal.copy( vector );
 
-						normal.add( normals[ i ] );
+				} else {
+
+					for ( var i = 0, l = normals.length; i < l; i ++ ) {
+
+						if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+
+							normal.add( normals[ i ] );
+
+						}
 
 					}
 
