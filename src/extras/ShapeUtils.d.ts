@@ -5,6 +5,6 @@ interface Vec2 {
 
 export namespace ShapeUtils {
 	export function area( contour: Vec2[] ): number;
-	export function triangulateShape( contour: Vec2[], holes: Vec2[] ): number[][];
+	export function triangulateShape( contour: Vec2[], holes: Vec2[][] ): number[][];
 	export function isClockWise( pts: Vec2[] ): boolean;
 }
