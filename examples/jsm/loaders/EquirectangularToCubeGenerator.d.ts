@@ -2,30 +2,13 @@ import {
 	PixelFormat,
 	Texture,
 	TextureDataType,
-	TextureFilter,
-	WebGLRenderer,
-	WebGLRenderTargetCube
+	WebGLRenderer
 } from '../../../src/Three';
-
-export interface CubemapGeneratorOptions {
-	resolution?: number;
-	generateMipmaps?: boolean;
-	magFilter?: TextureFilter;
-	minFilter?: TextureFilter;
-}
 
 export interface EquirectangularToCubeGeneratorOptions {
 	resolution?: number;
 	format?: PixelFormat;
 	type?: TextureDataType;
-}
-
-export class CubemapGenerator {
-
-	constructor( renderer: WebGLRenderer );
-
-	fromEquirectangular( texture: Texture, options?: CubemapGeneratorOptions ): WebGLRenderTargetCube;
-
 }
 
 export class EquirectangularToCubeGenerator {
