@@ -153,7 +153,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 				var config = this.workerConfig;
 
-				var { width, height, hasAlpha, mipmaps, format } = message;
+				var { width, height, mipmaps, format } = message;
 
 				var texture;
 
