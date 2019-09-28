@@ -1,7 +1,6 @@
 import { WebGLRenderer, WebGLRendererParameters } from './../WebGLRenderer';
 import { ShaderMaterial } from './../../materials/ShaderMaterial';
 import { WebGLShader } from './WebGLShader';
-import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLExtensions } from './WebGLExtensions';
 import { WebGLUniforms } from './WebGLUniforms';
 
