@@ -557,7 +557,11 @@ Object.assign( Vector3.prototype, {
 
 		// assumes this and v are not the zero vector
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+
+		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() does not accept zero vectors.' );
+
+		var theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 
