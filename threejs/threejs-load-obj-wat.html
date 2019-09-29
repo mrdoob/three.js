@@ -84,8 +84,7 @@ function main() {
 
   {
     const objLoader = new OBJLoader2();
-    objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
-      const root = event.detail.loaderRootNode;
+    objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
       scene.add(root);
     });
   }

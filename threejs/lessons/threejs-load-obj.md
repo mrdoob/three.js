@@ -43,10 +43,9 @@ the hemispherical lighting example so I ended up with one
 related to adjusting the lights. I also removed the cube and sphere
 that were being added to the scene.
 
-From that the first thing we need to do is include the `OBJLoader2` loader in our scene. The `OBJLoader2` also needs the `LoaderSupport.js` file so let's add both.
+From that the first thing we need to do is include the `OBJLoader2` loader in our script.
 
 ```js
-import {LoaderSupport} from './resources/threejs/r108/examples/jsm/loaders/LoaderSupport.js';
 import {OBJLoader2} from './resources/threejs/r108/examples/jsm/loaders/OBJLoader2.js';
 ```
 
@@ -57,8 +56,7 @@ the loaded model to our scene.
 ```js
 {
   const objLoader = new OBJLoader2();
-  objLoader.load('resources/models/windmill/windmill.obj', (event) => {
-    const root = event.detail.loaderRootNode;
+  objLoader.load('resources/models/windmill/windmill.obj', (root) => {
     scene.add(root);
   });
 }
@@ -69,7 +67,7 @@ If we run that what happens?
 {{{example url="../threejs-load-obj-no-materials.html" }}}
 
 Well it's close but we're getting errors about materials since we haven't
-given the scene any matrials and .OBJ files don't have material
+given the scene any materials and .OBJ files don't have material
 parameters. 
 
 The .OBJ loader can be passed an
@@ -130,7 +128,7 @@ and then chosing **Write Files to Current Directory**
 
 <div class="threejs_center"><img style="width: 828px;" src="resources/images/windmill-overwrite.jpg"></div>
 
-This ends up writing the files in the same folder asthe .blend file 
+This ends up writing the files in the same folder as the .blend file 
 in a sub folder called **textures**.
 
 <div class="threejs_center"><img style="width: 758px;" src="resources/images/windmill-exported-texture-files.png"></div>
@@ -142,25 +140,27 @@ file to.
 
 Now that we have the textures available we can load the .MTL file.
 
-First we need to include the `MTLLoader`
+First we need to include the `MTLLoader` and the `MtlObjBridge`;
 
 ```js
 import * as THREE from './resources/three/r108/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
-import {LoaderSupport} from './resources/threejs/r108/examples/jsm/loaders/LoaderSupport.js';
 import {OBJLoader2} from './resources/threejs/r108/examples/jsm/loaders/OBJLoader2.js';
 +import {MTLLoader} from './resources/threejs/r108/examples/jsm/loaders/MTLLoader.js';
++import {MtlObjBridge} from './resources/threejs/r108/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
-Then we first load the .MTL file. When it's finished loading we set the just loaded materials on to the `OBJLoader2` itself and then load the .OBJ file.
+Then we first load the .MTL file. When it's finished loading we add
+the just loaded materials on to the `OBJLoader2` itself via the `MtlObjBridge`
+and then load the .OBJ file.
 
 ```js
 {
-+  const objLoader = new OBJLoader2();
-+  objLoader.loadMtl('resources/models/windmill/windmill.mtl', null, (materials) => {
-+    objLoader.setMaterials(materials);
-    objLoader.load('resources/models/windmill/windmill.obj', (event) => {
-      const root = event.detail.loaderRootNode;
++  const mtlLoader = new MTLLoader();
++  mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
++    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
++    objLoader.addMaterials(materials);
+    objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       scene.add(root);
     });
 +  });
@@ -183,7 +183,9 @@ head I can think of 3 ways to fix this.
 
 1. Loop over all the materials after loading them and set them all to double sided.
 
-        objLoader.loadMtl('resources/models/windmill/windmill.mtl', null, (materials) => {
+        const mtlLoader = new MTLLoader();
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
+          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
           for (const material of Object.values(materials)) {
             material.side = THREE.DoubleSide;
           }
@@ -200,8 +202,9 @@ head I can think of 3 ways to fix this.
    out the blades use the material called `"Material"`so we could set
    that one specifically 
 
-        const objLoader = new OBJLoader2();
-        objLoader.loadMtl('resources/models/windmill/windmill.mtl', null, (materials) => {
+        const mtlLoader = new MTLLoader();
+        mtlLoader.load('resources/models/windmill/windmill.mtl', (mtlParseResult) => {
+          const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
           materials.Material.side = THREE.DoubleSide;
           ...
 
@@ -296,8 +299,7 @@ First off we can ask THREE.js to compute a box that contains the scene
 we just loaded and ask for its size and center
 
 ```js
-objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
-  const root = event.detail.loaderRootNode;
+objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
   scene.add(root);
 
 +  const box = new THREE.Box3().setFromObject(root);
@@ -329,7 +331,7 @@ altitude so we'll just have to pick something.
 As we went over in [the article on cameras](threejs-cameras.html) the camera defines a frustum.
 That frustum is defined by the field of view (`fov`) and the `near` and `far` settings. We
 want to know given whatever field of view the camera currently has, how far away does the camera
-need to be so the box containing the scene fits inside the frustum assiming the frustum
+need to be so the box containing the scene fits inside the frustum assuming the frustum
 extended forever. In other words let's assume `near` is 0.00000001 and `far` is infinity.
 
 Since we know the size of the box and we know the field of view we have this triangle
@@ -341,7 +343,7 @@ front of it. We just computed the box that contains the the windmill. We need to
 compute how far way the camera should be from the box so that the box appears
 inside the frustum.
 
-Using basic *right triangle* trigonametry and [SOHCAHTOA](https://www.google.com/search?q=SOHCAHTOA), 
+Using basic *right triangle* trigonometry and [SOHCAHTOA](https://www.google.com/search?q=SOHCAHTOA), 
 given we know the field of view for the frustum and we know the size of the box we can compute the *distance*.
 
 <div class="threejs_center"><img style="width: 600px;" src="resources/images/field-of-view-camera.svg"></div>
@@ -390,8 +392,7 @@ larger size.
 ```js
 {
   const objLoader = new OBJLoader2();
-  objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
-    const root = event.detail.loaderRootNode;
+  objLoader.load('resources/models/windmill_2/windmill.obj', (root) => {
     scene.add(root);
 +    // compute the box that contains all the stuff
 +    // from root and below
@@ -430,7 +431,7 @@ the windmill.
 Let's change it to move sideways from the center of the box to in whatever direction
 the camera is from the center. All we need to do to do that is zero out the `y` component
 of the vector from the box to the camera. Then, when we normalize that vector it will
-become a vector parallel to the XZ plane. In otherwords parallel to the ground.
+become a vector parallel to the XZ plane. In other words parallel to the ground.
 
 ```js
 -// compute a unit vector that points in the direction the camera is now
@@ -486,7 +487,7 @@ some textures but looking at the files I quickly see an issue.
 
 There are TARGA (.tga) files and they are giant!
 
-THREE.js actually has a TGA loader but it's argubly wrong to use it for most use cases.
+THREE.js actually has a TGA loader but it's arguably wrong to use it for most use cases.
 If you're making a viewer where you want to allow users to view random 3D files they
 find on the net then maybe, just maybe, you might want to load TGA files. ([*](#loading-scenes))
 
@@ -553,11 +554,12 @@ and then set them on the `OBJLoader2`
 
 ```js
 {
-+  const objLoader = new OBJLoader2();
-+  objLoader.loadMtl('resources/models/windmill_2/windmill-fixed.mtl', null, (materials) => {
-+    objLoader.setMaterials(materials);
-    objLoader.load('resources/models/windmill/windmill.obj', (event) => {
-      const root = event.detail.loaderRootNode;
++  const mtlLoader = new MTLLoader();
++  mtlLoader.load('resources/models/windmill_2/windmill-fixed.mtl', (mtlParseResult) => {
++    const objLoader = new OBJLoader2();
++    const materials =  MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult);
++    objLoader.addMaterials(materials);
+    objLoader.load('resources/models/windmill/windmill.obj', (root) => {
       root.updateMatrixWorld();
       scene.add(root);
       // compute the box that contains all the stuff
