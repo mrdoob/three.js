@@ -266,7 +266,6 @@ First let's change `addBoxes` to just make and return the merged geometry.
   
   ...
 
-
 -  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
@@ -724,5 +723,4 @@ other comparisons most cubes would be about 1/2 their maximum height which would
 not make a good visualization. Feel free to change the `amountGreaterThan` from
 `Math.max(a - b, 0)` to something like `(a - b)` "raw difference" or `a / (a +
 b)` "percent" and you'll see what I mean.
-
 

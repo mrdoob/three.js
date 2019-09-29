@@ -463,4 +463,3 @@ depends on your needs.
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
 
-

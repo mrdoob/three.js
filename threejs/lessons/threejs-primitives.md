@@ -352,4 +352,3 @@ to use it](threejs-scenegraph.html).
 <link rel="stylesheet" href="resources/threejs-primitives.css">
 <script type="module" src="resources/threejs-primitives.js"></script>
 
-

@@ -24,4 +24,3 @@ export the table called `level1` to a json file called `level1.json`
 Then run a simple server like above and open `make-geo-picking-texture-ogc.html` in your browser.
 
 
-

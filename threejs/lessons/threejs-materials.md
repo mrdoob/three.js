@@ -306,4 +306,3 @@ switch from using one to using the other.
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-materials.js"></script>
 
-

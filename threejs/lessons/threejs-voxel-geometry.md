@@ -1068,7 +1068,6 @@ in the adjacent cell might need new geometry. This means
 we need to check the cell for the voxel we just edited
 as well as in all 6 directions from that cell.
 
-
 ```js
 const neighborOffsets = [
   [ 0,  0,  0], // self
@@ -1214,5 +1213,4 @@ to generate some what efficient geometry.
 
 <canvas id="c"></canvas>
 <script type="module" src="resources/threejs-voxel-geometry.js"></script>
-
 

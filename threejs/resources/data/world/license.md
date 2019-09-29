@@ -8,4 +8,3 @@ The licence of that data is [CC-BY-SA](http://creativecommons.org/licenses/by-sa
 
 Which means this data is also [CC-BY-SA](http://creativecommons.org/licenses/by-sa/3.0/).
 
-

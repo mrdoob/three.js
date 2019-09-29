@@ -129,7 +129,6 @@ The shadow is a `MeshBasicMaterial` because it doesn't need lighting.
 We make each sphere a different hue and then save off the base, the sphere mesh,
 the shadow mesh and the initial y position of each sphere.
 
-
 ```js
 const numSpheres = 15;
 for (let i = 0; i < numSpheres; ++i) {
@@ -434,7 +433,6 @@ from our [article about lights](threejs-lights.html).
 
 {{{example url="../threejs-shadows-spot-light-with-camera-gui.html" }}}
 
-
 <!--
 You can notice, just like the last example if we set the angle high
 then the shadow map, the texture is spread over a very large area and
@@ -447,7 +445,6 @@ also blur the result
 
 {{{example url="../threejs-shadows-spot-light-with-shadow-radius" }}}
 -->
-
 
 
 And finally there's shadows with a `PointLight`. Since a `PointLight`

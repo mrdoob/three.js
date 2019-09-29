@@ -247,7 +247,6 @@ function addSolidGeometry(x, y, geometry) {
 
 Если бы мы этого не делали, текст был бы оторван от центра.
 
-
 {{{example url="../threejs-primitives-text.html" }}}
 
 Обратите внимание, что то что слева не вращается вокруг своего центра, 
