@@ -260,9 +260,9 @@ We can then make people with labels
 What's left is to add some `OrbitControls` so we can move
 the camera.
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
@@ -275,7 +275,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 2;
 +camera.position.set(0, 2, 5);
 
-+const controls = new THREE.OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, canvas);
 +controls.target.set(0, 2, 0);
 +controls.update();
 ```

@@ -45,9 +45,9 @@ that were being added to the scene.
 
 From that the first thing we need to do is include the `OBJLoader2` loader in our scene. The `OBJLoader2` also needs the `LoaderSupport.js` file so let's add both.
 
-```html
-<script src="resources/threejs/r108/js/loaders/LoaderSupport.js"></script>
-<script src="resources/threejs/r108/js/loaders/OBJLoader2.js"></script>
+```js
+import {LoaderSupport} from './resources/threejs/r108/examples/jsm/loaders/LoaderSupport.js';
+import {OBJLoader2} from './resources/threejs/r108/examples/jsm/loaders/OBJLoader2.js';
 ```
 
 Then to load the .OBJ file we create an instance of `OBJLoader2`,
@@ -56,7 +56,7 @@ the loaded model to our scene.
 
 ```js
 {
-  const objLoader = new THREE.OBJLoader2();
+  const objLoader = new OBJLoader2();
   objLoader.load('resources/models/windmill/windmill.obj', (event) => {
     const root = event.detail.loaderRootNode;
     scene.add(root);
@@ -144,19 +144,19 @@ Now that we have the textures available we can load the .MTL file.
 
 First we need to include the `MTLLoader`
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/LoaderSupport.js"></script>
-<script src="resources/threejs/r108/js/loaders/OBJLoader2.js"></script>
-+<script src="resources/threejs/r108/js/loaders/MTLLoader.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {LoaderSupport} from './resources/threejs/r108/examples/jsm/loaders/LoaderSupport.js';
+import {OBJLoader2} from './resources/threejs/r108/examples/jsm/loaders/OBJLoader2.js';
++import {MTLLoader} from './resources/threejs/r108/examples/jsm/loaders/MTLLoader.js';
 ```
 
 Then we first load the .MTL file. When it's finished loading we set the just loaded materials on to the `OBJLoader2` itself and then load the .OBJ file.
 
 ```js
 {
-+  const objLoader = new THREE.OBJLoader2();
++  const objLoader = new OBJLoader2();
 +  objLoader.loadMtl('resources/models/windmill/windmill.mtl', null, (materials) => {
 +    objLoader.setMaterials(materials);
     objLoader.load('resources/models/windmill/windmill.obj', (event) => {
@@ -200,7 +200,7 @@ head I can think of 3 ways to fix this.
    out the blades use the material called `"Material"`so we could set
    that one specifically 
 
-        const objLoader = new THREE.OBJLoader2();
+        const objLoader = new OBJLoader2();
         objLoader.loadMtl('resources/models/windmill/windmill.mtl', null, (materials) => {
           materials.Material.side = THREE.DoubleSide;
           ...
@@ -389,7 +389,7 @@ larger size.
 
 ```js
 {
-  const objLoader = new THREE.OBJLoader2();
+  const objLoader = new OBJLoader2();
   objLoader.load('resources/models/windmill_2/windmill.obj', (event) => {
     const root = event.detail.loaderRootNode;
     scene.add(root);
@@ -553,7 +553,7 @@ and then set them on the `OBJLoader2`
 
 ```js
 {
-+  const objLoader = new THREE.OBJLoader2();
++  const objLoader = new OBJLoader2();
 +  objLoader.loadMtl('resources/models/windmill_2/windmill-fixed.mtl', null, (materials) => {
 +    objLoader.setMaterials(materials);
     objLoader.load('resources/models/windmill/windmill.obj', (event) => {

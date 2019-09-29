@@ -63,14 +63,14 @@ article on responsivness](threejs-responsive.html).
 To that first we create an `EffectComposer`.
 
 ```js
-const composer = new THREE.EffectComposer(renderer);
+const composer = new EffectComposer(renderer);
 ```
 
 Then as the first pass we add a `RenderPass` that will render our scene with our
 camera into the first render target.
 
 ```js
-composer.addPass(new THREE.RenderPass(scene, camera));
+composer.addPass(new RenderPass(scene, camera));
 ```
 
 Next we add a `BloomPass`. A `BloomPass` renders its input to a generally
@@ -78,7 +78,7 @@ smaller render target and blurs the result. It then adds that blurred result on
 top of the original input. This makes the scene *bloom*
 
 ```js
-const bloomPass = new THREE.BloomPass(
+const bloomPass = new BloomPass(
     1,    // strength
     25,   // kernel size
     4,    // sigma ?
@@ -90,7 +90,7 @@ composer.addPass(bloomPass);
 Finally we had a `FilmPass` that draws noise and scanlines on top of its input.
 
 ```js
-const filmPass = new THREE.FilmPass(
+const filmPass = new FilmPass(
     0.35,   // noise intensity
     0.025,  // scanline intensity
     648,    // scanline count
@@ -104,24 +104,17 @@ Since the `filmPass` is the last pass we set its `renderToScreen` property to
 true to tell it to render to the canvas. Without setting this it would instead
 render to the next render target.
 
-To use these classes we need to include a bunch of scripts.
+To use these classes we need to import a bunch of scripts.
 
-```html
-<script src="resources/threejs/r108/js/shaders/CopyShader.js"></script>
-<script src="resources/threejs/r108/js/shaders/ConvolutionShader.js"></script>
-<script src="resources/threejs/r108/js/shaders/FilmShader.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/EffectComposer.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/RenderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/ShaderPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/BloomPass.js"></script>
-<script src="resources/threejs/r108/js/postprocessing/FilmPass.js"></script>
+```js
+import {EffectComposer} from './resources/threejs/r108/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r108/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from './resources/threejs/r108/examples/jsm/postprocessing/BloomPass.js';
+import {FilmPass} from './resources/threejs/r108/examples/jsm/postprocessing/FilmPass.js';
 ```
 
-For pretty much any post processing `EffectComposer.js`, `RenderPass.js`,
-`ShaderPass.js`, and `CopyShader.js` are required. The rest depend on which
-effects you plan to use. Usually if you miss one you'll get an error in [the
-JavaScript console](threejs-debugging-javascript.html) telling you which one
-you're missing.
+For pretty much any post processing `EffectComposer.js`, and `RenderPass.js`
+are required.
 
 The last things we need to do are to use `EffectComposer.render` instead of
 `WebGLRenderer.render` *and* to tell the `EffectComposer` to match the size of
@@ -198,14 +191,14 @@ So which makes it pretty clear how to set them.
 
 Let's make a quick GUI to set those values
 
-```html
-<script src="../3rdparty/dat.gui.min.js"></script>
+```js
+import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
 and
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 {
   const folder = gui.addFolder('BloomPass');
   folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('stength');
@@ -300,7 +293,7 @@ gl_FragColor = vec4(
 Adding some simple GUI to set the 3 values of the color
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
 gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
 gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');

@@ -38,7 +38,6 @@ DOM元素。假设你知道如何使用 `<script>`标签来
   <body>
      ...
   </body>
-  <script src="script1.js"></script>
   <script>
     // inline javascript
   </script>

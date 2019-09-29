@@ -97,7 +97,7 @@ the root scene object from [the gLTF article](threejs-load-gltf.html)
 
 ```js
   {
-    const gltfLoader = new THREE.GLTFLoader();
+    const gltfLoader = new GLTFLoader();
     gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
       const root = gltf.scene;
       scene.add(root);

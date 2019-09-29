@@ -317,9 +317,9 @@ note we include `shared-cubes.js` which is all our three.js code
 
 Similarly we need to include `shared-cubes.js` in the main page
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="shared-cubes.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {init, state} from './shared-cubes.js';
 ```
 We can remove the HTML and CSS we added previously
 
@@ -741,7 +741,7 @@ function init(data) {
 +  const {canvas, inputElement} = data;
   const renderer = new THREE.WebGLRenderer({canvas});
 
-+  const controls = new THREE.OrbitControls(camera, inputElement);
++  const controls = new OrbitControls(camera, inputElement);
 +  controls.target.set(0, 0, 0);
 +  controls.update();
 ```

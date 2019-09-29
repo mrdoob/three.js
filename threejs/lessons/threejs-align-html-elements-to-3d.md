@@ -34,13 +34,13 @@ with an example from [the article on responsive pages](threejs-responsive.html)
 
 We'll add some `OrbitControls` like we did in [the article on lighting](threejs-lights.html).
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
-const controls = new THREE.OrbitControls(camera, canvas);
+const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 0, 0);
 controls.update();
 ```
@@ -723,11 +723,10 @@ for (const countryInfo of countryInfos) {
 Finally, since I'm not sure what good values are for these settings lets
 add a GUI so we can play with them
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-+<script src="../3rdparty/dat.gui.min.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
++import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
 ```js
@@ -735,7 +734,7 @@ add a GUI so we can play with them
 +  minArea: 20,
 +  maxVisibleDot: -0.2,
 +};
-+const gui = new dat.GUI({width: 300});
++const gui = new GUI({width: 300});
 +gui.add(settings, 'minArea', 0, 50).onChange(requestRenderIfNotRequested);
 +gui.add(settings, 'maxVisibleDot', -1, 1, 0.01).onChange(requestRenderIfNotRequested);
 

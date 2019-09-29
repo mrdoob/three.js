@@ -350,7 +350,7 @@ We'll also use the `MinMaxGUIHelper` we created in the [camera article](threejs-
 to adjust `near` and `far`.
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 +{

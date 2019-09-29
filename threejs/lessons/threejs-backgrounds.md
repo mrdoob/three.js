@@ -179,8 +179,8 @@ function render(time) {
 
 Let's add some controls in so we can rotate the camera.
 
-```html
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
@@ -193,7 +193,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 2;
 +camera.position.z = 3;
 
-+const controls = new THREE.OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, canvas);
 +controls.target.set(0, 0, 0);
 +controls.update();
 ```

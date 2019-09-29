@@ -340,8 +340,8 @@ const pickHelper = new ControllerPickHelper(scene);
 +      object: selectedObject,
 +      parent: selectedObject.parent,
 +    });
-+    THREE.SceneUtils.detach(selectedObject, selectedObject.parent, scene);
-+    THREE.SceneUtils.attach(selectedObject, scene, controller);
++    SceneUtils.detach(selectedObject, selectedObject.parent, scene);
++    SceneUtils.attach(selectedObject, scene, controller);
 +  }
 +});
 +
@@ -350,8 +350,8 @@ const pickHelper = new ControllerPickHelper(scene);
 +  const selection = controllerToSelection.get(controller);
 +  if (selection) {
 +    controllerToSelection.delete(controller);
-+    THREE.SceneUtils.detach(selection.object, controller, scene);
-+    THREE.SceneUtils.attach(selection.object, scene, selection.parent);
++    SceneUtils.detach(selection.object, controller, scene);
++    SceneUtils.attach(selection.object, scene, selection.parent);
 +  }
 +});
 ```
@@ -366,10 +366,10 @@ scene.
 
 We need to include them.
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/vr/WebVR.js"></script>
-+<script src="resources/threejs/r108/js/utils/SceneUtils.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {WEBVR} from './resources/threejs/r108/examples/jsm/vr/WebVR.js';
++import {SceneUtils} from './resources/threejs/r108/examples/jsm/utils/SceneUtils.js';
 ```
 
 And with that we should be able to move the objects around with a 6DOF

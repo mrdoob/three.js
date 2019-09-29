@@ -444,8 +444,8 @@ No change to the visuals but the code is even more generic.
 
 Adding interactively, for example a `TrackballControls` is just as easy. First we add the script for the control.
 
-```html
-<script src="resources/threejs/r108/js/controls/TrackballControls.js"></script>
+```js
+import {TrackballControls} from './resources/threejs/r108/examples/jsm/controls/TrackballControls.js';
 ```
 
 And then we can add a `TrackballControls` to each scene passing in the element associated with that scene.
@@ -464,7 +464,7 @@ And then we can add a `TrackballControls` to each scene passing in the element a
   camera.lookAt(0, 0, 0);
 +  scene.add(camera);
 
-+  const controls = new THREE.TrackballControls(camera, elem);
++  const controls = new TrackballControls(camera, elem);
 +  controls.noZoom = true;
 +  controls.noPan = true;
 

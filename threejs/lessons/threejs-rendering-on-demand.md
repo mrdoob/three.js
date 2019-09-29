@@ -29,9 +29,9 @@ and modify it to render on demand.
 First we'll add in the `OrbitControls` so there is something that could change
 that we can render in response to.
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 and set them up
@@ -44,7 +44,7 @@ const far = 5;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.z = 2;
 
-+const controls = new THREE.OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, canvas);
 +controls.target.set(0, 0, 0);
 +controls.update();
 ```
@@ -178,10 +178,10 @@ below slides.
 
 Let's also add a simple dat.GUI GUI and make its changes render on demand.
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-+<script src="../3rdparty/dat.gui.min.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
++import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
 Let's allow setting the color and x scale of each cube. To be able to set the
@@ -191,7 +191,7 @@ lights](threejs-lights.html).
 First we need to create a GUI
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 ```
 
 and then for each cube we'll create a folder and add 2 controls, one for

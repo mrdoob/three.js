@@ -380,7 +380,7 @@ And with that let's take an example from [the article on loading gltf files](thr
 and make it load and free files.
 
 ```js
-const gltfLoader = new THREE.GLTFLoader();
+const gltfLoader = new GLTFLoader();
 function loadGLTF(url) {
   return new Promise((resolve, reject) => {
     gltfLoader.load(url, resolve, undefined, reject);

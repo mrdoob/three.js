@@ -471,8 +471,8 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
 Например, добавление `TrackballControls` в интерактивном режиме так же просто. 
 Сначала мы добавляем скрипт для контролов.
 
-```html
-<script src="../resources/threejs/r108/js/controls/TrackballControls.js"></script>
+```js
+import {TrackballControls} from './resources/threejs/r108/examples/jsm/controls/TrackballControls.js';
 ```
 
 И затем мы можем добавить `TrackballControls` к каждой сцене, передавая элемент, связанный с этой сценой.
@@ -491,7 +491,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
   camera.lookAt(0, 0, 0);
 +  scene.add(camera);
 
-+  const controls = new THREE.TrackballControls(camera, elem);
++  const controls = new TrackballControls(camera, elem);
 +  controls.noZoom = true;
 +  controls.noPan = true;
 

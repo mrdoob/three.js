@@ -38,7 +38,6 @@ at the bottom of the page.
   <body>
      ...
   </body>
-  <script src="script1.js"></script>
   <script>
     // inline javascript
   </script>

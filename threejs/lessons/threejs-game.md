@@ -77,7 +77,7 @@ const models = {
   knight: { url: 'resources/models/knight/KnightCharacter.gltf' },
 };
 {
-  const gltfLoader = new THREE.GLTFLoader(manager);
+  const gltfLoader = new GLTFLoader(manager);
   for (const model of Object.values(models)) {
     gltfLoader.load(model.url, (gltf) => {
       model.gltf = gltf;
@@ -236,11 +236,11 @@ it for skinned animated characters. Fortunately there's a utility function,
 `SkeletonUtils.clone` we can use to do this. So, first we need to include
 the utils.
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
-+<script src="resources/threejs/r108/js/utils/SkeletonUtils.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
++import {SkeletonUtils} from './resources/threejs/r108/examples/jsm/utils/SkeletonUtils.js';
 ```
 
 Then we can clone the models we just loaded
@@ -254,7 +254,7 @@ function init() {
   prepModelsAndAnimations();
 
 +  Object.values(models).forEach((model, ndx) => {
-+    const clonedScene = THREE.SkeletonUtils.clone(model.gltf.scene);
++    const clonedScene = SkeletonUtils.clone(model.gltf.scene);
 +    const root = new THREE.Object3D();
 +    root.add(clonedScene);
 +    scene.add(root);
@@ -287,7 +287,7 @@ function init() {
   prepModelsAndAnimations();
 
   Object.values(models).forEach((model, ndx) => {
-    const clonedScene = THREE.SkeletonUtils.clone(model.gltf.scene);
+    const clonedScene = SkeletonUtils.clone(model.gltf.scene);
     const root = new THREE.Object3D();
     root.add(clonedScene);
     scene.add(root);
@@ -350,7 +350,7 @@ function init() {
   prepModelsAndAnimations();
 
   Object.values(models).forEach((model, ndx) => {
-    const clonedScene = THREE.SkeletonUtils.clone(model.gltf.scene);
+    const clonedScene = SkeletonUtils.clone(model.gltf.scene);
     const root = new THREE.Object3D();
     root.add(clonedScene);
     scene.add(root);
@@ -633,7 +633,7 @@ class SkinInstance extends Component {
   constructor(gameObject, model) {
     super(gameObject);
     this.model = model;
-    this.animRoot = THREE.SkeletonUtils.clone(this.model.gltf.scene);
+    this.animRoot = SkeletonUtils.clone(this.model.gltf.scene);
     this.mixer = new THREE.AnimationMixer(this.animRoot);
     gameObject.transform.add(this.animRoot);
     this.actions = {};
@@ -1682,16 +1682,16 @@ class Animal extends Component {
 While we're at it lets make it so we can turn them on/off using dat.GUI like
 we've used else where
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
-<script src="resources/threejs/r108/js/utils/SkeletonUtils.js"></script>
-+<script src="../3rdparty/dat.gui.min.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
+import {SkeletonUtils} from './resources/threejs/r108/examples/jsm/utils/SkeletonUtils.js';
++import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
 ```js
-+const gui = new dat.GUI();
++const gui = new GUI();
 +gui.add(globals, 'debug').onChange(showHideDebugInfo);
 +showHideDebugInfo();
 

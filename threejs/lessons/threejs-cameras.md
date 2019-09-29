@@ -77,7 +77,7 @@ function updateCamera() {
   camera.updateProjectionMatrix();
 }
 
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
 const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
@@ -153,8 +153,8 @@ And we'll set our existing `OrbitControls` to respond to the first
 view element only.
 
 ```js
--const controls = new THREE.OrbitControls(camera, canvas);
-+const controls = new THREE.OrbitControls(camera, view1Elem);
+-const controls = new OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, view1Elem);
 ```
 
 Let's make a second `PerspectiveCamera` and a second `OrbitControls`.
@@ -171,7 +171,7 @@ const camera2 = new THREE.PerspectiveCamera(
 camera2.position.set(40, 10, 30);
 camera2.lookAt(0, 5, 0);
 
-const controls2 = new THREE.OrbitControls(camera2, view2Elem);
+const controls2 = new OrbitControls(camera2, view2Elem);
 controls2.target.set(0, 5, 0);
 controls2.update();
 ```
@@ -277,7 +277,7 @@ in the `render` function.
 -  camera.updateProjectionMatrix();
 -}
 
-const gui = new dat.GUI();
+const gui = new GUI();
 -gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
 +gui.add(camera, 'fov', 1, 180);
 const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
@@ -425,7 +425,7 @@ to make it easy to adjust how many units are actually shown by the camera.
 Let's add a GUI setting for `zoom`
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 +gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 ```
 

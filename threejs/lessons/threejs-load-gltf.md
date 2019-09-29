@@ -72,7 +72,7 @@ for loading .OBJ and replaced it with code for loading .GLTF
 The old .OBJ code was
 
 ```js
-const objLoader = new THREE.OBJLoader2();
+const objLoader = new OBJLoader2();
 objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materials) => {
   materials.Material.side = THREE.DoubleSide;
   objLoader.setMaterials(materials);
@@ -88,7 +88,7 @@ The new .GLTF code is
 
 ```js
 {
-  const gltfLoader = new THREE.GLTFLoader();
+  const gltfLoader = new GLTFLoader();
   const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
   gltfLoader.load(url, (gltf) => {
     const root = gltf.scene;
@@ -102,10 +102,10 @@ I kept the auto framing code as before
 We also need to include the `GLTFLoader` and we can get rid of the `OBJLoader2`.
 
 ```html
--<script src="resources/threejs/r108/js/loaders/LoaderSupport.js"></script>
--<script src="resources/threejs/r108/js/loaders/OBJLoader2.js"></script>
--<script src="resources/threejs/r108/js/loaders/MTLLoader.js"></script>
-+<script src="resources/threejs/r108/js/loaders/GLTFLoader.js"></script>
+-import {LoaderSupport} from './resources/threejs/r108/examples/jsm/loaders/LoaderSupport.js';
+-import {OBJLoader2} from './resources/threejs/r108/examples/jsm/loaders/OBJLoader2.js';
+-import {MTLLoader} from './resources/threejs/r108/examples/jsm/loaders/MTLLoader.js';
++import {GLTFLoader} from './resources/threejs/r108/examples/jsm/loaders/GLTFLoader.js';
 ```
 
 And running that we get
@@ -140,7 +140,7 @@ function dumpObject(obj, lines = [], isLast = true, prefix = '') {
 And I just called it right after loading the scene.
 
 ```js
-const gltfLoader = new THREE.GLTFLoader();
+const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
   const root = gltf.scene;
   scene.add(root);
@@ -212,7 +212,7 @@ and saved the result.
 ```js
 +let cars;
 {
-  const gltfLoader = new THREE.GLTFLoader();
+  const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
     const root = gltf.scene;
     scene.add(root);
@@ -276,7 +276,7 @@ the new `Object3D` a `cars` array.
 -let cars;
 +const cars = [];
 {
-  const gltfLoader = new THREE.GLTFLoader();
+  const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
     const root = gltf.scene;
     scene.add(root);
@@ -681,7 +681,7 @@ Then, after loading, we need to turn on shadows on all the objects.
 
 ```js
 {
-  const gltfLoader = new THREE.GLTFLoader();
+  const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) => {
     const root = gltf.scene;
     scene.add(root);

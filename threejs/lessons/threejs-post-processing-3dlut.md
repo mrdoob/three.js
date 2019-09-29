@@ -205,7 +205,7 @@ lutTextures.forEach((info, ndx) => {
 const lutSettings = {
   lut: lutNameIndexMap.identity,
 };
-const gui = new dat.GUI({ width: 300 });
+const gui = new GUI({ width: 300 });
 gui.add(lutSettings, 'lut', lutNameIndexMap);
 ```
 
@@ -422,9 +422,9 @@ I also write a quick drag and drop library. Let's use both to make it so you can
 
 First we need the 2 libraries
 
-```html
-<script src="resources/lut-reader.js"></script>
-<script src="resources/drag-and-drop.js"></script>
+```js
+import * as lutParser from './resources/lut-reader.js';
+import * as dragAndDrop from './resources/drag-and-drop.js';
 ```
 
 Then we can use them like this
@@ -465,7 +465,7 @@ and we need to make the GUI update to include the new file(s)
 const lutSettings = {
   lut: lutNameIndexMap.thermal,
 };
-const gui = new dat.GUI({ width: 300 });
+const gui = new GUI({ width: 300 });
 gui.addFolder('Choose LUT or Drag&Drop LUT File(s)');
 
 let lutGUI;

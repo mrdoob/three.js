@@ -76,7 +76,7 @@ function updateCamera() {
   camera.updateProjectionMatrix();
 }
 
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
 const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
 gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near').onChange(updateCamera);
@@ -152,8 +152,8 @@ const view2Elem = document.querySelector('#view2');
 только за первый элемент представления.
 
 ```js
--const controls = new THREE.OrbitControls(camera, canvas);
-+const controls = new THREE.OrbitControls(camera, view1Elem);
+-const controls = new OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, view1Elem);
 ```
 
 Создадим вторую `PerspectiveCamera` и вторую `OrbitControls`.
@@ -170,7 +170,7 @@ const camera2 = new THREE.PerspectiveCamera(
 camera2.position.set(40, 10, 30);
 camera2.lookAt(0, 5, 0);
 
-const controls2 = new THREE.OrbitControls(camera2, view2Elem);
+const controls2 = new OrbitControls(camera2, view2Elem);
 controls2.target.set(0, 5, 0);
 controls2.update();
 ```
@@ -274,7 +274,7 @@ function setScissorForElement(elem) {
 -  camera.updateProjectionMatrix();
 -}
 
-const gui = new dat.GUI();
+const gui = new GUI();
 -gui.add(camera, 'fov', 1, 180).onChange(updateCamera);
 +gui.add(camera, 'fov', 1, 180);
 const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
@@ -423,7 +423,7 @@ camera.zoom = 0.2;
 Давайте добавим настройки GUI для `zoom`
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 +gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 ```
 

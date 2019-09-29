@@ -528,8 +528,8 @@ const material = new THREE.MeshBasicMaterial({
 
 Then we'll use [dat.GUI](https://github.com/dataarts/dat.gui) again to provide a simple interface.
 
-```html
-<script src="../3rdparty/dat.gui.min.js"></script>
+```js
+import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
 As we did in previous dat.GUI examples we'll use a simple class to
@@ -583,7 +583,7 @@ function updateTexture() {
   texture.needsUpdate = true;
 }
 
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.add(new StringToNumberHelper(texture, 'wrapS'), 'value', wrapModes)
   .name('texture.wrapS')
   .onChange(updateTexture);

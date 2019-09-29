@@ -28,16 +28,16 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 дополнительные функции three.js, поэтому сначала нам нужно 
 включить их в нашу страницу.
 
-```html
-<script src="../resources/threejs/r108/three.min.js"></script>
-+<script src="../resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 Теперь мы можем использовать их. Мы передаем в `OrbitControls` камеру для 
 управления и элемент DOM для получения входных событий
 
 ```js
-const controls = new THREE.OrbitControls(camera, canvas);
+const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
 ```
@@ -157,7 +157,7 @@ class ColorGUIHelper {
 И вот наш код настройки dat.GUI
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 ```
@@ -201,7 +201,7 @@ scene.add(light);
 Давайте также обновим код dat.GUI для редактирования обоих цветов.
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 -gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 +gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
 +gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
@@ -240,7 +240,7 @@ scene.add(light.target);
 добавляя ее в наш графический интерфейс.
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 gui.add(light.target.position, 'x', -10, 10);
@@ -292,7 +292,7 @@ function makeXYZGUI(gui, vector3, name, onChangeFn) {
 +}
 +updateLight();
 
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 
@@ -355,7 +355,7 @@ function updateLight{
 Давайте настроим графический интерфейс, чтобы мы могли регулировать расстояние.
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 +gui.add(light, 'distance', 0, 40).onChange(updateLight);
@@ -468,9 +468,16 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 
 Для использования `RectAreaLight` нам нужно включить некоторые дополнительные возможности three.js
 
-```html
-<script src="../resources/threejs/r108/three.min.js"></script>
-+<script src="../resources/threejs/r108/js/lights/RectAreaLightUniformsLib.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r108/examples/jsm/lights/RectAreaLightUniformsLib.js';
+```
+
+```js
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
++  RectAreaLightUniformsLib.init();
 ```
 
 Если вы забудете RectAreaLightUniformsLib, индикатор все равно будет работать, 
@@ -499,7 +506,7 @@ scene.add(helper);
 свет и регулировать его `width` и `height`
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 10, 0.01);
 gui.add(light, 'width', 0, 20).onChange(updateLight);
@@ -550,7 +557,7 @@ light.distance = Infinity;
 и мы добавим графический интерфейс, чтобы мы могли изменить `power` и `decay`
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'decay', 0, 4, 0.01);
 gui.add(light, 'power', 0, 2000);

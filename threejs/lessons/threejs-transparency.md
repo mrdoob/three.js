@@ -369,7 +369,7 @@ class AllMaterialPropertyGUIHelper {
 Then we'll add the gui
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.add(new AllMaterialPropertyGUIHelper('alphaTest', scene), 'value', 0, 1)
     .name('alphaTest')
     .onChange(requestRenderIfNotRequested);
@@ -380,10 +380,10 @@ gui.add(new AllMaterialPropertyGUIHelper('transparent', scene), 'value')
 
 and of course we need to include dat.gui
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-+<script src="../3rdparty/dat.gui.min.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
++import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
 and here's the results

@@ -28,16 +28,16 @@ or *orbit* the camera around some point. The `OrbitControls` are
 an optional feature of three.js so first we need to include them
 in our page
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 Then we can use them. We pass the `OrbitControls` a camera to
 control and the DOM element to use to get input events
 
 ```js
-const controls = new THREE.OrbitControls(camera, canvas);
+const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
 ```
@@ -155,7 +155,7 @@ class ColorGUIHelper {
 And here's our code setting up dat.GUI
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 ```
@@ -201,7 +201,7 @@ scene.add(light);
 Let's also update the dat.GUI code to edit both colors
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 -gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 +gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
 +gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
@@ -241,7 +241,7 @@ Let's make it so we can move the target by adding it to
 our GUI.
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 gui.add(light.target.position, 'x', -10, 10);
@@ -293,7 +293,7 @@ and the target's position like this
 +}
 +updateLight();
 
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 
@@ -358,7 +358,7 @@ units away from the light.
 Let's setup the GUI so we can adjust the distance.
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 2, 0.01);
 +gui.add(light, 'distance', 0, 40).onChange(updateLight);
@@ -475,9 +475,18 @@ The `RectAreaLight` only works with the `MeshStandardMaterial` and the
 
 To use the `RectAreaLight` we need to include some extra three.js optional data
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/lights/RectAreaLightUniformsLib.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r108/examples/jsm/lights/RectAreaLightUniformsLib.js';
+```
+
+and we need to call `RectAreaLightUniformsLib.init`
+
+```js
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
++  RectAreaLightUniformsLib.init();
 ```
 
 If you forget the data the light will still work but it will look funny so
@@ -508,7 +517,7 @@ Let's also adjust the GUI. We'll make it so we can rotate the light and adjust
 its `width` and `height`
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'intensity', 0, 10, 0.01);
 gui.add(light, 'width', 0, 20).onChange(updateLight);
@@ -559,7 +568,7 @@ light.distance = Infinity;
 and we'll add gui so we can change the `power` and `decay`
 
 ```js
-const gui = new dat.GUI();
+const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
 gui.add(light, 'decay', 0, 4, 0.01);
 gui.add(light, 'power', 0, 2000);

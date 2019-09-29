@@ -267,7 +267,7 @@ First let's change `addBoxes` to just make and return the merged geometry.
   ...
 
 
--  const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: THREE.VertexColors,
@@ -275,7 +275,7 @@ First let's change `addBoxes` to just make and return the merged geometry.
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return THREE.BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeBufferGeometries(
 +     geometries, false);
 }
 ```
@@ -377,11 +377,11 @@ because the original webgl globe uses
 
 We need to include the library
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
-<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
-+<script src="resources/threejs/r108/js/libs/tween.min.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r108/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
++import {TWEEN} from './resources/threejs/r108/examples/jsm/libs/tween.min.js';
 ```
 
 And then create a `Tween` to animate the influences.

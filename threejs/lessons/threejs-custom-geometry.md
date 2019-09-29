@@ -447,9 +447,9 @@ A few minor changes to make it easier to view.
 
 * include the `OrbitControls`
 
-```html
-<script src="resources/threejs/r108/three.min.js"></script>
-+<script src="resources/threejs/r108/js/controls/OrbitControls.js"></script>
+```js
+import * as THREE from './resources/three/r108/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
@@ -462,7 +462,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 5;
 +camera.position.set(20, 20, 20);
 
-+const controls = new THREE.OrbitControls(camera, canvas);
++const controls = new OrbitControls(camera, canvas);
 +controls.target.set(0, 0, 0);
 +controls.update();
 ```

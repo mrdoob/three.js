@@ -407,7 +407,7 @@ function addBoxes(file) {
     });
   });
 
-+  const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({color:'red'});
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -423,13 +423,13 @@ box and since we are going to use `applyMatrix` to move the vertices of each box
 geometry we might as well do it once instead of twice.
 
 At the end we pass an array of all the geometries to
-`THREE.BufferGeometryUtils.mergeBufferGeometries` which will combined all of
+`BufferGeometryUtils.mergeBufferGeometries` which will combined all of
 them into a single mesh.
 
 We also need to include the `BufferGeometryUtils`
 
-```html
-<script src="resources/threejs/r108/js/utils/BufferGeometryUtils.js"></script>
+```js
+import {BufferGeometryUtils} from './resources/threejs/r108/examples/jsm/utils/BufferGeometryUtils.js';
 ```
 
 And now, at least on my machine, I get 60 frames per second
@@ -504,8 +504,8 @@ It then adds that as an attribute by calling `geometry.addAttribute`.
 
 Lastly we need to tell three.js to use the vertex colors. 
 
-```
-const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries(
+```js
+const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({
