@@ -1,6 +1,4 @@
-import * as THREE from 'resources/threejs/r108/build/three.module.js';
-
-export const state = {
+const state = {
   width: 300,   // canvas default
   height: 150,  // canvas default
 };

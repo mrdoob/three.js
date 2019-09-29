@@ -19,8 +19,12 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script type="module">
-import {state, init} from './shared-cubes.js';
+<script src="resources/threejs/r108/build/three.min.js"></script>
+<script src="shared-cubes.js"></script>
+<script>
+'use strict';  // eslint-disable-line
+
+/* globals state, init */
 
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();

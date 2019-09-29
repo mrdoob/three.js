@@ -1,13 +1,11 @@
-import * as THREE from './resources/threejs/r108/build/three.module.js';
-
-export const state = {
+const state = {
   width: 300,   // canvas default
   height: 150,  // canvas default
 };
 
-export const pickPosition = {x: 0, y: 0};
+const pickPosition = {x: 0, y: 0};
 
-export function init(data) {  // eslint-disable-line no-unused-vars
+function init(data) {  // eslint-disable-line no-unused-vars
   const {canvas} = data;
   const renderer = new THREE.WebGLRenderer({canvas});
 

@@ -19,8 +19,13 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script type="module">
-import {state, init, pickPosition} from './shared-picking.js';
+<script src="resources/threejs/r108/build/three.min.js"></script>
+<script src="resources/threejs/r108/examples/js/controls/OrbitControls.js"></script>
+<script src="shared-picking.js"></script>
+<script>
+'use strict';  // eslint-disable-line
+
+/* global state, init, pickPosition */
 
 let sendMouse;
 

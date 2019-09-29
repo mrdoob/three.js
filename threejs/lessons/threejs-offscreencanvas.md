@@ -10,6 +10,10 @@ to a web worker so as not to slow down the responsiveness of the browser. It
 also means data is loaded and parsed in the worker so possibly less jank while
 the page loads.
 
+One big issue with offscreen canvas is, at least in Chrome, es6 modules are not yet
+supported on web workers, so, unlike all the other examples on this site that use
+es6 modules these examples will use class scripts.
+
 Getting *started* using it is pretty straight forward. Let's port the 3 spinning cube
 example from [the article on responsiveness](threejs-responsive.html).
 
@@ -92,7 +96,7 @@ So now we just need to start changing the `main` we pasted into
 The first thing we need to do is include THREE.js into our worker.
 
 ```js
-importScripts('https://threejsfundamentals.org/threejs/resources/threejs/r108/three.min.js');
+importScripts('resources/threejs/r108/build/three.min.js');
 ```
 
 Then instead of looking up the canvas from the DOM we'll receive it from the
@@ -290,7 +294,7 @@ HTML file.
 
 /* global importScripts, init, state */
 
-importScripts('resources/threejs/r108/three.min.js');
+importScripts('resources/threejs/r108/build/three.min.js');
 +importScripts('shared-cubes.js');
 
 function size(data) {
@@ -315,11 +319,11 @@ self.onmessage = function(e) {
 
 note we include `shared-cubes.js` which is all our three.js code
 
-Similarly we need to include `shared-cubes.js` in the main page
+Similarly we need to include three.js and  `shared-cubes.js` in the main page
 
-```js
-import * as THREE from './resources/three/r108/build/three.module.js';
-import {init, state} from './shared-cubes.js';
+```html
+<script src="resources/threejs/r108/build/three.min.js"></script>
+<script src="shared-cubes.js"><script>
 ```
 We can remove the HTML and CSS we added previously
 
@@ -728,8 +732,8 @@ We also need to actually add the `OrbitControls` to the top of
 the script
 
 ```js
-importScripts('resources/threejs/r108/three.js');
-+importScripts('resources/threejs/r108/js/controls/OrbitControls.js');
+importScripts('resources/threejs/r108/build/three.min/js');
++importScripts('resources/threejs/r108/examples/js/controls/OrbitControls.js');
 *importScripts('shared-orbitcontrols.js');
 ```
 
