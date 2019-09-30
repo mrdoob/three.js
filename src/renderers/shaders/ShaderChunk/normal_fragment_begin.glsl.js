@@ -10,7 +10,7 @@ vec3 faceNormal = normalize( cross( fdx, fdy ) );
 
 	// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
 
-	float faceDirection = dot (vViewPosition, faceNormal) > 0. ? 1. : -1.;
+	float faceDirection = dot (vNormal, faceNormal) > 0. ? 1. : -1.;
 	//float faceDirection = gl_FrontFacing ? 1. : -1.;
 
 #elif defined( FLIP_SIDED )
