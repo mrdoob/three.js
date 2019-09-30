@@ -43,6 +43,11 @@ Once you've done that type
 
     http-server path/to/folder/where/you/unzipped/files
 
+Or if you're like me
+
+    cd path/to/folder/where/you/unzipped/files
+    http-server
+
 It should print something like
 
 {{{image url="resources/http-server-response.png" }}}
