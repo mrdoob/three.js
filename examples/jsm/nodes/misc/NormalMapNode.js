@@ -48,18 +48,6 @@ NormalMapNode.Nodes = ( function () {
 
 	mapN.xy *= normalScale;
 
-	#ifdef DOUBLE_SIDED
-
-		// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-
-		if ( dot( cross( S, T ), N ) < 0.0 ) mapN.xy *= - 1.0;
-
-	#else
-
-		mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
-	#endif
-
 	mat3 tsn = mat3( S, T, N );
 	return normalize( tsn * mapN );
 
@@ -97,7 +85,7 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 			this.normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
 			this.uv.build( builder, 'v2' ) + ', ' +
-			scale + ' )', this.getType( builder ), output );
+			scale + ' * faceDirection )', this.getType( builder ), output );
 
 	} else {
 
