@@ -35,8 +35,6 @@ export default /* glsl */`
 
 		float fDet = dot( vSigmaX, R1 );
 
-		fDet *= faceDirection;
-
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
 		return normalize( abs( fDet ) * surf_norm - vGrad );
 
