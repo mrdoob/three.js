@@ -2180,7 +2180,6 @@ var GLTFLoader = ( function () {
 				Material.prototype.copy.call( pointsMaterial, material );
 				pointsMaterial.color.copy( material.color );
 				pointsMaterial.map = material.map;
-				pointsMaterial.lights = false; // PointsMaterial doesn't support lights yet
 				pointsMaterial.sizeAttenuation = false; // glTF spec says points should be 1px
 
 				this.cache.add( cacheKey, pointsMaterial );
@@ -2200,7 +2199,6 @@ var GLTFLoader = ( function () {
 				lineMaterial = new LineBasicMaterial();
 				Material.prototype.copy.call( lineMaterial, material );
 				lineMaterial.color.copy( material.color );
-				lineMaterial.lights = false; // LineBasicMaterial doesn't support lights yet
 
 				this.cache.add( cacheKey, lineMaterial );
 

@@ -2116,7 +2116,6 @@ THREE.GLTFLoader = ( function () {
 				THREE.Material.prototype.copy.call( pointsMaterial, material );
 				pointsMaterial.color.copy( material.color );
 				pointsMaterial.map = material.map;
-				pointsMaterial.lights = false; // PointsMaterial doesn't support lights yet
 				pointsMaterial.sizeAttenuation = false; // glTF spec says points should be 1px
 
 				this.cache.add( cacheKey, pointsMaterial );
@@ -2136,7 +2135,6 @@ THREE.GLTFLoader = ( function () {
 				lineMaterial = new THREE.LineBasicMaterial();
 				THREE.Material.prototype.copy.call( lineMaterial, material );
 				lineMaterial.color.copy( material.color );
-				lineMaterial.lights = false; // LineBasicMaterial doesn't support lights yet
 
 				this.cache.add( cacheKey, lineMaterial );
 
