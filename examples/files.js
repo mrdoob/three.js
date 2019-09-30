@@ -47,7 +47,7 @@ var files = {
 		"webgl_geometry_text_shapes",
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
-		"webgl_instancing",
+		"webgl_instancing_suzanne",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
 		"webgl_interactive_cubes_gpu",
