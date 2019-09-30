@@ -35,7 +35,7 @@ export default /* glsl */`
 
 #elif defined( USE_BUMPMAP )
 
-	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );
+	normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() * faceDirection );
 
 #endif
 `;
