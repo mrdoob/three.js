@@ -617,4 +617,4 @@ roughness
 
 <canvas id="c"></canvas>
 <script type="module" src="../resources/threejs-textures.js"></script>
-<link rel="stylesheet" href="resources/threejs-textures.css">
+<link rel="stylesheet" href="../resources/threejs-textures.css">

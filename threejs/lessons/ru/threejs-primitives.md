@@ -331,4 +331,4 @@ function addLineGeometry(x, y, geometry) {
 
 <canvas id="c"></canvas>
 <script type="module" src="../resources/threejs-primitives.js"></script>
-<link rel="stylesheet" href="resources/threejs-primitives.css">
+<link rel="stylesheet" href="../resources/threejs-primitives.css">

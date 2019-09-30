@@ -591,4 +591,4 @@ function render(time) {
 А пока давайте перейдем к [теням](threejs-shadows.html).
 
 <canvas id="c"></canvas>
-<script type="module" src="resources/threejs-cameras.js"></script>
+<script type="module" src="../resources/threejs-cameras.js"></script>
