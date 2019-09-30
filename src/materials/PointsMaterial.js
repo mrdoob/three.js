@@ -32,8 +32,6 @@ function PointsMaterial( parameters ) {
 
 	this.morphTargets = false;
 
-	this.lights = false;
-
 	this.setValues( parameters );
 
 }

@@ -25,7 +25,6 @@ function SpriteMaterial( parameters ) {
 
 	this.sizeAttenuation = true;
 
-	this.lights = false;
 	this.transparent = true;
 
 	this.setValues( parameters );
