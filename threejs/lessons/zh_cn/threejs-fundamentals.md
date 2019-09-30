@@ -34,10 +34,8 @@ Three.js经常会和WebGL混淆，
 Three.js将会使用这个canvas标签所以我们要先获取它然后传给three.js。
 
 ```html
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');

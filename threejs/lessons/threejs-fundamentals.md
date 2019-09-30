@@ -40,10 +40,8 @@ Three.js will draw into that canvas so we need to look it up
 and pass it to three.js.
 
 ```html
-<script>
-'use strict';
-
-/* global THREE */
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -51,6 +49,13 @@ function main() {
   ...
 </script>
 ```
+
+It's important you put `type="module"` in the script tag. This enables
+us to use the `import` keyword to load three.js. There are other ways
+to load three.js but as of r106 using modules is the recommended way.
+Modules have the advantage that they can easily import other modules
+they need. That saves us from having to manually load extra scripts
+they are dependent on.
 
 Note there are some esoteric details here. If you don't pass a canvas
 into three.js it will create one for you but then you have to add it
@@ -318,3 +323,75 @@ across the canvas is so extreme.
 I hope this short intro helps to get things started. [Next up we'll cover
 making our code responsive so it is adaptable to multiple situations](threejs-responsive.html).
 
+<div class="threejs_bottombar">
+<h3>es6 modules, three.js, and folder structure</h3>
+<p>As of version r106 the preferred way to use three.js is via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a>.</p>
+<p>
+es6 modules can be loaded via the `import` keyword in a script
+or inline via a <code>&lt;script type="module"&gt;</code> tag. Here's an example of
+both
+</p>
+<pre class=prettyprint>
+&lt;script type="module"&gt;
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+
+...
+
+&lt;/script&gt;
+</pre>
+<p>
+Paths must be absolute or relative. Relative paths always start with <code>./</code> or <code>../</code>
+which is different than other tags like <code>&lt;img&gt;</code> and <code>&lt;a&gt;</code>.
+</p>
+<p>
+References to the same script will only be loaded once as long as their absolute paths
+are exactly the same. For three.js this means it's required that you put all the examples
+libraries in the correct folder structure
+</p>
+<pre class="dos">
+someFolder
+ |
+ ├-build
+ | |
+ | +-three.module.js
+ |
+ +-examples
+   |
+   +-jsm
+     |
+     +-controls
+     | |
+     | +-OrbitControls.js
+     | +-TrackballControls.js
+     | +-...
+     |
+     +-loaders
+     | |
+     | +-GLTFLoader.js
+     | +-...
+     |
+     ...
+</pre>
+<p>
+The reason this folder structure is required is because the scripts in the
+examples like <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code>OrbitControls.js</code></a>
+have hard coded relative paths like
+</p>
+<pre class="prettyprint">
+import * as THREE from '../../../build/three.module.js';
+</pre>
+<p>
+Using the same structure assures then when you import both three and one of the example
+libraries they'll both reference the same three.module.js file.
+</p>
+<pre class="prettyprint">
+import * as THREE from './someFolder/build/three.module.js';
+import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+</pre>
+<p>This includes when using a CDN. Be sure your path to <code>three.modules.js</code> ends with
+<code>/build/three.modules.js</code>. For example</p>
+<pre class="prettyprint">
+import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+</pre>
+</div>
