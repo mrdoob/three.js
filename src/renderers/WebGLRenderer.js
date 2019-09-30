@@ -2254,7 +2254,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -2262,7 +2261,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
@@ -2315,7 +2313,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -2323,7 +2320,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
@@ -2359,12 +2355,6 @@ function WebGLRenderer( parameters ) {
 			uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
 			uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
 
-			if ( material.side === BackSide ) {
-
-				uniforms.clearcoatNormalScale.value.negate();
-
-			}
-
 		}
 
 		uniforms.transparency.value = material.transparency;
@@ -2383,7 +2373,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -2391,7 +2380,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
@@ -2439,7 +2427,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
 
 		}
 
@@ -2447,7 +2434,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 		}
 
