@@ -11,6 +11,8 @@ function InstancedMesh( geometry, material, count ) {
 
 	this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
 
+	this.count = count;
+
 }
 
 InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
