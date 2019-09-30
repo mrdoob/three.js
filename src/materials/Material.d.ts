@@ -34,7 +34,6 @@ export interface MaterialParameters {
 	depthTest?: boolean;
 	depthWrite?: boolean;
 	fog?: boolean;
-	lights?: boolean;
 	name?: string;
 	opacity?: number;
 	overdraw?: number;
@@ -194,11 +193,6 @@ export class Material extends EventDispatcher {
 	 * You should not change this, as it used internally for optimisation.
 	 */
 	isMaterial: boolean;
-
-	/**
-	 * Whether the material is affected by lights. Default is true.
-	 */
-	lights: boolean;
 
 	/**
 	 * Material name. Default is an empty string.
