@@ -1982,7 +1982,15 @@ function WebGLRenderer( parameters ) {
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 
-		} else if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
+			if ( material.isShaderMaterial ) {
+
+				material.uniformsNeedUpdate = false;
+
+			}
+
+		}
+
+		if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 			material.uniformsNeedUpdate = false;
