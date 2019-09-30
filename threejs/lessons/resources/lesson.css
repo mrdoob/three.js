@@ -42,7 +42,7 @@ pre.prettyprint {
 pre.prettyprint li {
     white-space: pre;
 }
-pre.prettyprint code {
+pre.prettyprint code, .dos {
     color: #CCC;
     font-family: "Lucida Console", Monaco, monospace;
     display: block;
@@ -388,7 +388,7 @@ pre.prettyprint ul.modifiedlines li.lineadded {
 }
 
 
-pre.prettyprint, code.prettyprint {
+pre.prettyprint, code.prettyprint, .dos {
     color: #FFF;
     background: #222;
     border: 1px solid #000;
@@ -403,6 +403,10 @@ pre.prettyprint, code.prettyprint {
     white-space: pre;        /* was nowrap, prevent line wrapping */
     line-height: 1.5em;
     width: calc(100% - 80px);
+}
+
+.dos {
+  line-height: 1;
 }
 
 pre.prettyprint.lighttheme, code.prettyprint.lighttheme {
@@ -515,7 +519,7 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   a {
     color: #56d3fd;
   }
-  pre.prettyprint, code.prettyprint {
+  pre.prettyprint, code.prettyprint, .dos {
     box-shadow: 10px 10px 0px #292929;
   }
   code {
