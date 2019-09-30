@@ -6,6 +6,8 @@ import { MaxEquation, MinEquation, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, R
 
 function WebGLUtils( gl, extensions, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	function convert( p ) {
 
 		var extension;
@@ -36,7 +38,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === HalfFloatType ) {
 
-			if ( capabilities.isWebGL2 ) return gl.HALF_FLOAT;
+			if ( isWebGL2 ) return gl.HALF_FLOAT;
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
@@ -128,7 +130,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === MinEquation || p === MaxEquation ) {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				if ( p === MinEquation ) return gl.MIN;
 				if ( p === MaxEquation ) return gl.MAX;
@@ -148,7 +150,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === UnsignedInt248Type ) {
 
-			if ( capabilities.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
+			if ( isWebGL2 ) return gl.UNSIGNED_INT_24_8;
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
