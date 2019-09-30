@@ -2167,9 +2167,11 @@ Object.assign( Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		// assumes this and v are not the zero vector
+		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' );
+
+		var theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 
@@ -8306,7 +8308,6 @@ function Material() {
 	this.type = 'Material';
 
 	this.fog = true;
-	this.lights = true;
 
 	this.blending = NormalBlending;
 	this.side = FrontSide;
@@ -8630,7 +8631,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.name = source.name;
 
 		this.fog = source.fog;
-		this.lights = source.lights;
 
 		this.blending = source.blending;
 		this.side = source.side;
@@ -8778,8 +8778,6 @@ function MeshBasicMaterial( parameters ) {
 
 	this.skinning = false;
 	this.morphTargets = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -19306,7 +19304,6 @@ function MeshDepthMaterial( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -19386,7 +19383,6 @@ function MeshDistanceMaterial( parameters ) {
 	this.displacementBias = 0;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -23046,6 +23042,8 @@ function WebXRManager( renderer, gl ) {
 
 	var session = null;
 
+	// var framebufferScaleFactor = 1.0;
+
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
 
@@ -23133,7 +23131,9 @@ function WebXRManager( renderer, gl ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {
+	this.setFramebufferScaleFactor = function ( /* value */ ) {
+
+		// framebufferScaleFactor = value;
 
 	};
 
@@ -23160,6 +23160,7 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
+			// eslint-disable-next-line no-undef
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
@@ -24925,9 +24926,10 @@ function WebGLRenderer( parameters ) {
 
 		// store the light setup it was created for
 
+		materialProperties.needsLights = materialNeedsLights( material );
 		materialProperties.lightsStateVersion = lightsStateVersion;
 
-		if ( material.lights ) {
+		if ( materialProperties.needsLights ) {
 
 			// wire up the material to this renderer's lighting state
 
@@ -24993,7 +24995,7 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.lights && materialProperties.lightsStateVersion !== lights.state.version ) {
+			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
 				material.needsUpdate = true;
 
@@ -25177,7 +25179,7 @@ function WebGLRenderer( parameters ) {
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
-			if ( material.lights ) {
+			if ( materialProperties.needsLights ) {
 
 				// the current material requires lighting info
 
@@ -25784,6 +25786,14 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function materialNeedsLights( material ) {
+
+		return material.isMeshLambertMaterial || material.isMeshPhongMaterial ||
+			material.isMeshStandardMaterial || material.isShadowMaterial ||
+			( material.isShaderMaterial && material.lights === true );
+
+	}
+
 	//
 	this.setFramebuffer = function ( value ) {
 
@@ -26327,7 +26337,6 @@ function SpriteMaterial( parameters ) {
 
 	this.sizeAttenuation = true;
 
-	this.lights = false;
 	this.transparent = true;
 
 	this.setValues( parameters );
@@ -27067,8 +27076,6 @@ function LineBasicMaterial( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
-	this.lights = false;
-
 	this.setValues( parameters );
 
 }
@@ -27453,8 +27460,6 @@ function PointsMaterial( parameters ) {
 	this.sizeAttenuation = true;
 
 	this.morphTargets = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -32861,7 +32866,6 @@ function MeshNormalMaterial( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -33087,8 +33091,6 @@ function MeshMatcapMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
