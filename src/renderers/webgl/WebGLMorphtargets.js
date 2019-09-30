@@ -98,7 +98,7 @@ function WebGLMorphtargets( gl ) {
 
 		}
 
-		var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : Math.max(0, 1 - morphInfluencesSum);
+		var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
 
 		program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
 		program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
