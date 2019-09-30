@@ -36,20 +36,6 @@ export default /* glsl */`
 
 		mapN.xy *= normalScale;
 
-		#ifdef DOUBLE_SIDED
-
-			// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-
-			bool frontFacing = dot( cross( S, T ), N ) > 0.0;
-
-			mapN.xy *= ( float( frontFacing ) * 2.0 - 1.0 );
-
-		#else
-
-			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
-		#endif
-
 		mat3 tsn = mat3( S, T, N );
 		return normalize( tsn * mapN );
 
