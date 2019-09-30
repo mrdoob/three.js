@@ -46,20 +46,6 @@ DOM元素。假设你知道如何使用 `<script>`标签来
 
 or [use the `defer` property](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script).
 
-## 不需要`type="text/javascript"`
-
-最新的
-
-    <script>...</script>
-
-过时的
-
-    <script type="text/javascript"></script>
-
-## 始终使用`strict`模式
-
-将`'use strict';`放在JavaScript文件的顶部。可以帮助减少很多bug。
-
 ## 了解闭包如何工作
 
 ```js

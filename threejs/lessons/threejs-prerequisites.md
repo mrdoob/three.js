@@ -5,8 +5,9 @@ TOC: Prerequisites
 These articles are meant to help you learn how to use three.js.
 They assume you know how to program in JavaScript. They assume
 you know what the DOM is, how to write HTML as well as create DOM elements
-in JavaScript. They assume you know how to use `<script>` tags to
-include external JavaScript files as well as inline scripts.
+in JavaScript. They assume you know how to use
+[es6 modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) 
+oth via import and via `<script type="module">` tags.
 They assume you know some CSS and that you know what
 [CSS selectors are](https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors). 
 They also assume you know ES5, ES6 and maybe some ES7.
@@ -14,6 +15,26 @@ They assume you know that the browser runs JavaScript only via events and callba
 They assume you know what a closure is.
 
 Here's some brief refreshers and notes
+
+## es6 modules
+
+es6 modules can be loaded via the `import` keyword in a script
+or inline via a `<script type="module">` tag. Here's an example of
+both
+
+```html
+<script type="module">
+import * as THREE from './resources/threejs/r108/build/three.module.js';
+
+...
+
+</script>
+```
+
+Paths must be absolute or relative. Relative paths always start with `./` or `../`
+which is different than other tags like `<img>` and `<a>` and css references.
+
+More details are mentioned at the bottom of [this article](threejs-fundamentals.html).
 
 ## `document.querySelector` and `document.querySelectorAll`
 
@@ -46,20 +67,6 @@ at the bottom of the page.
 
 or [use the `defer` property](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script).
 
-## You don't need `type="text/javascript"`
-
-modern
-
-    <script>...</script>
-
-outdated
-
-    <script type="text/javascript"></script>
-
-## Always use `strict` mode
-
-Put `'use strict';` at the top of every JavaScript file. It will help prevent lots of bugs.
-
 ## Know how closures work
 
 ```js
@@ -77,7 +84,7 @@ console.log(g());  // prints 456
 ```
 
 In the code above the function `a` creates a new function every time it's called. That
-funciton *closes* over the variable `foo`. Here's [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures).
+function *closes* over the variable `foo`. Here's [more info](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures).
 
 ## Understand how `this` works
 
@@ -87,7 +94,7 @@ like
 
     somefunction(a, b, c);
 
-`this` will be `null` (when in strict mode) where as when you call a function via the dot operator `.` like this
+`this` will be `null` (when in strict mode or in a module) where as when you call a function via the dot operator `.` like this
 
     someobject.somefunction(a, b, c);
 
@@ -100,7 +107,7 @@ The parts where people get confused is with callbacks.
 
 doesn't work as someone inexperienced might expect because when
 `loader.load` calls the callback it's not calling it with the dot `.` operator
-so by default `this` will be null (unless the loader explicitly sets it to someting).
+so by default `this` will be null (unless the loader explicitly sets it to something).
 If you want `this` to be `someobject` when the callback happens you need to 
 tell JavaScript that by binding it to the function.
 
@@ -219,14 +226,20 @@ This is especially useful with callbacks and promises.
 
 ```js
 loader.load((texture) => {
-  // use textrue
+  // use texture
 });
 ```
 
-Arrow functions bind `this`. They are a shortcut for
+Arrow functions bind `this`. 
 
 ```js
-(function(args) {/* code */}).bind(this))
+const foo = (args) => {/* code */};
+```
+
+is a shortcut for
+
+```js
+const foo = (function(args) {/* code */}).bind(this));
 ```
 
 ### Promises as well as async/await
@@ -286,9 +299,16 @@ someElement.style.width = `${aWidth + bWidth}px`;
 
 While you're welcome to format your code any way you chose there is at least one
 convention you should be aware of. Variables, function names, method names, in
-JavaScript are all lowercasedCamelCase. Constructors, the names of classes are
+JavaScript are all lowerCasedCamelCase. Constructors, the names of classes are
 CapitalizedCamelCase. If you follow this rule you code will match most other
-JavaScript.
+JavaScript. Many [linters](https://eslint.org), programs that check for obvious errors in your code,
+will point out errors if you use the wrong case since by following the convention
+above they know these are wrong
+
+```js
+const v = new vector(); // clearly an error if all classes start with a capital letter
+const v = Vector();     // clearly an error if all functions start with a lowercase latter. 
+```
 
 # Consider using Visual Studio Code
 
