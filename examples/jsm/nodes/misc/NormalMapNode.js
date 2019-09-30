@@ -75,12 +75,6 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 
 		var scale = this.scale.build( builder, 'v2' );
 
-		if ( builder.material.side === BackSide ) {
-
-			scale = '-' + scale;
-
-		}
-
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
 			this.normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
