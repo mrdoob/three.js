@@ -188,7 +188,7 @@ export class WebGLRenderer implements Renderer {
 
 	shadowMap: WebGLShadowMap;
 
-	pixelRation: number;
+	pixelRatio: number;
 
 	capabilities: WebGLCapabilities;
 	properties: WebGLProperties;
