@@ -24187,7 +24187,7 @@
 
 			if ( object.isInstancedMesh ) {
 
-				renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
+				renderer.renderInstances( geometry, drawStart, drawCount, object.count );
 
 			} else if ( geometry.isInstancedBufferGeometry ) {
 
@@ -27031,6 +27031,8 @@
 		Mesh.call( this, geometry, material );
 
 		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
+
+		this.count = count;
 
 	}
 
