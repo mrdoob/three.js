@@ -3,7 +3,7 @@ Description: Your first Three.js lesson starting with the fundamentals
 TOC: Fundamentals
 
 This is the first article in a series of articles about three.js.
-[Three.js](http://threejs.org) is a 3D library that tries to make
+[Three.js](https://threejs.org) is a 3D library that tries to make
 it as easy as possible to get 3D content on a webpage.
 
 Three.js is often confused with WebGL since more often than
@@ -19,7 +19,7 @@ most part they will use ES6 style. [See here for a
 terse list of things you're expected to already know](threejs-prerequisites.html).
 Most browsers that support three.js are auto-updated so most users should
 be able to run this code. If you'd like to make this code run
-on really old browsers look into a transpiler like [Babel](http://babel.io).
+on really old browsers look into a transpiler like [Babel](https://babel.io).
 Of course users running really old browsers probably have machines
 that can't run three.js.
 
