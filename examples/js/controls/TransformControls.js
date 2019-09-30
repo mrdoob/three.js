@@ -4,9 +4,16 @@
 
 THREE.TransformControls = function ( camera, domElement ) {
 
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
 	THREE.Object3D.call( this );
 
-	domElement = ( domElement !== undefined ) ? domElement : document;
+	domElement = domElement;
 
 	this.visible = false;
 

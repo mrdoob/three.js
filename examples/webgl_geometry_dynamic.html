@@ -45,11 +45,6 @@
 
 				clock = new THREE.Clock();
 
-				controls = new FirstPersonControls( camera );
-
-				controls.movementSpeed = 500;
-				controls.lookSpeed = 0.1;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xaaccff );
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
@@ -80,6 +75,11 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 500;
+				controls.lookSpeed = 0.1;
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
