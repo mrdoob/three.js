@@ -476,8 +476,8 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 				0,
 				mip,
 				config.format,
-				hasAlpha,
-				0
+				0,
+				hasAlpha
 			);
 
 			if ( ! status ) {
