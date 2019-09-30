@@ -4,15 +4,9 @@ export default /* glsl */`
 
 	normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
 
-	#ifdef FLIP_SIDED
+	#ifdef defined( DOUBLE_SIDED ) || defined( FLIP_SIDED ) 
 
-		normal = - normal;
-
-	#endif
-
-	#ifdef DOUBLE_SIDED
-
-		normal = normal * faceDirection;
+		normal *= faceDirection;
 
 	#endif
 
