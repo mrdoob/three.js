@@ -7,7 +7,7 @@ The first article was [about three.js fundamentals](threejs-fundamentals.html).
 If you haven't read that yet you might want to start there.
 
 Before we go any further we need to talk about setting up your
-computer to do developement. In particular, for security reasons,
+computer to do development. In particular, for security reasons,
 WebGL cannot use images from your hard drive directly. That means
 in order to do development you need to use a web server. Fortunately
 development web servers are super easy to setup and use.
