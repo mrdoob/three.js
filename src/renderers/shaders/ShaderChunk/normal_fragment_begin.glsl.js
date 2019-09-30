@@ -33,7 +33,7 @@ vec3 faceNormal = normalize( cross( fdx, fdy ) );
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		normal *= faceDirection;
 
 	#endif
 
@@ -44,8 +44,8 @@ vec3 faceNormal = normalize( cross( fdx, fdy ) );
 
 		#ifdef DOUBLE_SIDED
 
-			tangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-			bitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+			tangent *= faceDirection;
+			bitangent *= faceDirection;
 
 		#endif
 
