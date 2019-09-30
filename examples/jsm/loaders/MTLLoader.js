@@ -19,15 +19,13 @@ import {
 
 var MTLLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-MTLLoader.prototype = {
+MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: MTLLoader,
-
-	crossOrigin: 'anonymous',
 
 	/**
 	 * Loads and parses a MTL asset from a URL.
@@ -46,7 +44,7 @@ MTLLoader.prototype = {
 
 		var scope = this;
 
-		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
@@ -55,58 +53,6 @@ MTLLoader.prototype = {
 			onLoad( scope.parse( text, path ) );
 
 		}, onProgress, onError );
-
-	},
-
-	/**
-	 * Set base path for resolving references.
-	 * If set this path will be prepended to each loaded and found reference.
-	 *
-	 * @see setResourcePath
-	 * @param {String} path
-	 * @return {MTLLoader}
-	 *
-	 * @example
-	 *     mtlLoader.setPath( 'assets/obj/' );
-	 *     mtlLoader.load( 'my.mtl', ... );
-	 */
-	setPath: function ( path ) {
-
-		this.path = path;
-		return this;
-
-	},
-
-	/**
-	 * Set base path for additional resources like textures.
-	 *
-	 * @see setPath
-	 * @param {String} path
-	 * @return {MTLLoader}
-	 *
-	 * @example
-	 *     mtlLoader.setPath( 'assets/obj/' );
-	 *     mtlLoader.setResourcePath( 'assets/textures/' );
-	 *     mtlLoader.load( 'my.mtl', ... );
-	 */
-	setResourcePath: function ( path ) {
-
-		this.resourcePath = path;
-		return this;
-
-	},
-
-	setTexturePath: function ( path ) {
-
-		console.warn( 'THREE.MTLLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( path );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -187,7 +133,7 @@ MTLLoader.prototype = {
 
 	}
 
-};
+} );
 
 /**
  * Create a new THREE-MTLLoader.MaterialCreator
@@ -577,8 +523,8 @@ MTLLoader.MaterialCreator.prototype = {
 	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
 
 		var texture;
-		var loader = Loader.Handlers.get( url );
 		var manager = ( this.manager !== undefined ) ? this.manager : DefaultLoadingManager;
+		var loader = manager.getHandler( url );
 
 		if ( loader === null ) {
 

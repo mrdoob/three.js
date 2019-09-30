@@ -14,21 +14,21 @@ THREE.LegacyJSONLoader = ( function () {
 
 		}
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.withCredentials = false;
 
 	}
 
-	Object.assign( LegacyJSONLoader.prototype, {
+	LegacyJSONLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
-		crossOrigin: 'anonymous',
+		constructor: LegacyJSONLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( this.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : this.path;
+			var path = ( this.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : this.path;
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( this.path );
@@ -62,27 +62,6 @@ THREE.LegacyJSONLoader = ( function () {
 
 		},
 
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
-
-		},
-
 		parse: ( function () {
 
 			var _BlendingMode = {
@@ -98,13 +77,13 @@ THREE.LegacyJSONLoader = ( function () {
 			var _textureLoader = new THREE.TextureLoader();
 			var _materialLoader = new THREE.MaterialLoader();
 
-			function initMaterials( materials, texturePath, crossOrigin ) {
+			function initMaterials( materials, texturePath, crossOrigin, manager ) {
 
 				var array = [];
 
 				for ( var i = 0; i < materials.length; ++ i ) {
 
-					array[ i ] = createMaterial( materials[ i ], texturePath, crossOrigin );
+					array[ i ] = createMaterial( materials[ i ], texturePath, crossOrigin, manager );
 
 				}
 
@@ -112,7 +91,7 @@ THREE.LegacyJSONLoader = ( function () {
 
 			}
 
-			function createMaterial( m, texturePath, crossOrigin ) {
+			function createMaterial( m, texturePath, crossOrigin, manager ) {
 
 				// convert from old material format
 
@@ -144,7 +123,7 @@ THREE.LegacyJSONLoader = ( function () {
 							break;
 						case 'colorAmbient':
 						case 'mapAmbient':
-							console.warn( 'THREE.Loader.createMaterial:', name, 'is no longer supported.' );
+							console.warn( 'THREE.LegacyJSONLoader.createMaterial:', name, 'is no longer supported.' );
 							break;
 						case 'colorDiffuse':
 							json.color = _color.fromArray( value ).getHex();
@@ -164,7 +143,7 @@ THREE.LegacyJSONLoader = ( function () {
 							if ( value.toLowerCase() === 'standard' ) json.type = 'MeshStandardMaterial';
 							break;
 						case 'mapDiffuse':
-							json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy, textures, texturePath, crossOrigin );
+							json.map = loadTexture( value, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapDiffuseRepeat':
 						case 'mapDiffuseOffset':
@@ -172,7 +151,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapDiffuseAnisotropy':
 							break;
 						case 'mapEmissive':
-							json.emissiveMap = loadTexture( value, m.mapEmissiveRepeat, m.mapEmissiveOffset, m.mapEmissiveWrap, m.mapEmissiveAnisotropy, textures, texturePath, crossOrigin );
+							json.emissiveMap = loadTexture( value, m.mapEmissiveRepeat, m.mapEmissiveOffset, m.mapEmissiveWrap, m.mapEmissiveAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapEmissiveRepeat':
 						case 'mapEmissiveOffset':
@@ -180,7 +159,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapEmissiveAnisotropy':
 							break;
 						case 'mapLight':
-							json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy, textures, texturePath, crossOrigin );
+							json.lightMap = loadTexture( value, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapLightRepeat':
 						case 'mapLightOffset':
@@ -188,7 +167,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapLightAnisotropy':
 							break;
 						case 'mapAO':
-							json.aoMap = loadTexture( value, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy, textures, texturePath, crossOrigin );
+							json.aoMap = loadTexture( value, m.mapAORepeat, m.mapAOOffset, m.mapAOWrap, m.mapAOAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapAORepeat':
 						case 'mapAOOffset':
@@ -196,7 +175,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapAOAnisotropy':
 							break;
 						case 'mapBump':
-							json.bumpMap = loadTexture( value, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy, textures, texturePath, crossOrigin );
+							json.bumpMap = loadTexture( value, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapBumpScale':
 							json.bumpScale = value;
@@ -207,7 +186,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapBumpAnisotropy':
 							break;
 						case 'mapNormal':
-							json.normalMap = loadTexture( value, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy, textures, texturePath, crossOrigin );
+							json.normalMap = loadTexture( value, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapNormalFactor':
 							json.normalScale = value;
@@ -218,7 +197,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapNormalAnisotropy':
 							break;
 						case 'mapSpecular':
-							json.specularMap = loadTexture( value, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy, textures, texturePath, crossOrigin );
+							json.specularMap = loadTexture( value, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapSpecularRepeat':
 						case 'mapSpecularOffset':
@@ -226,7 +205,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapSpecularAnisotropy':
 							break;
 						case 'mapMetalness':
-							json.metalnessMap = loadTexture( value, m.mapMetalnessRepeat, m.mapMetalnessOffset, m.mapMetalnessWrap, m.mapMetalnessAnisotropy, textures, texturePath, crossOrigin );
+							json.metalnessMap = loadTexture( value, m.mapMetalnessRepeat, m.mapMetalnessOffset, m.mapMetalnessWrap, m.mapMetalnessAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapMetalnessRepeat':
 						case 'mapMetalnessOffset':
@@ -234,7 +213,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapMetalnessAnisotropy':
 							break;
 						case 'mapRoughness':
-							json.roughnessMap = loadTexture( value, m.mapRoughnessRepeat, m.mapRoughnessOffset, m.mapRoughnessWrap, m.mapRoughnessAnisotropy, textures, texturePath, crossOrigin );
+							json.roughnessMap = loadTexture( value, m.mapRoughnessRepeat, m.mapRoughnessOffset, m.mapRoughnessWrap, m.mapRoughnessAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapRoughnessRepeat':
 						case 'mapRoughnessOffset':
@@ -242,7 +221,7 @@ THREE.LegacyJSONLoader = ( function () {
 						case 'mapRoughnessAnisotropy':
 							break;
 						case 'mapAlpha':
-							json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy, textures, texturePath, crossOrigin );
+							json.alphaMap = loadTexture( value, m.mapAlphaRepeat, m.mapAlphaOffset, m.mapAlphaWrap, m.mapAlphaAnisotropy, textures, texturePath, crossOrigin, manager );
 							break;
 						case 'mapAlphaRepeat':
 						case 'mapAlphaOffset':
@@ -256,7 +235,7 @@ THREE.LegacyJSONLoader = ( function () {
 							json.side = THREE.DoubleSide;
 							break;
 						case 'transparency':
-							console.warn( 'THREE.Loader.createMaterial: transparency has been renamed to opacity' );
+							console.warn( 'THREE.LegacyJSONLoader.createMaterial: transparency has been renamed to opacity' );
 							json.opacity = value;
 							break;
 						case 'depthTest':
@@ -274,7 +253,7 @@ THREE.LegacyJSONLoader = ( function () {
 							if ( value === 'face' ) json.vertexColors = THREE.FaceColors;
 							break;
 						default:
-							console.error( 'THREE.Loader.createMaterial: Unsupported', name, value );
+							console.error( 'THREE.LegacyJSONLoader.createMaterial: Unsupported', name, value );
 							break;
 
 					}
@@ -292,10 +271,10 @@ THREE.LegacyJSONLoader = ( function () {
 
 			}
 
-			function loadTexture( path, repeat, offset, wrap, anisotropy, textures, texturePath, crossOrigin ) {
+			function loadTexture( path, repeat, offset, wrap, anisotropy, textures, texturePath, crossOrigin, manager ) {
 
 				var fullPath = texturePath + path;
-				var loader = THREE.Loader.Handlers.get( fullPath );
+				var loader = manager.getHandler( fullPath );
 
 				var texture;
 
@@ -825,7 +804,7 @@ THREE.LegacyJSONLoader = ( function () {
 
 				} else {
 
-					var materials = initMaterials( json.materials, this.resourcePath || path, this.crossOrigin );
+					var materials = initMaterials( json.materials, this.resourcePath || path, this.crossOrigin, this.manager );
 
 					return { geometry: geometry, materials: materials };
 

@@ -1,16 +1,14 @@
 import {
-  Texture,
-  LoadingManager
+	Texture,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
+export class TGALoader extends Loader {
 
-export class TGALoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
+	constructor( manager?: LoadingManager );
 
-  load(url: string, onLoad: (texture: Texture) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
+	load( url: string, onLoad: ( texture: Texture ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( data: ArrayBuffer ) : Texture;
 
-  parse(data: ArrayBuffer) : Texture;
 }

@@ -20,7 +20,7 @@ import {
 const MeshReceiver = function ( materialHandler ) {
 
 	this.logging = {
-		enabled: true,
+		enabled: false,
 		debug: false
 	};
 
@@ -79,42 +79,46 @@ MeshReceiver.prototype = {
 	buildMeshes: function ( meshPayload ) {
 
 		let meshName = meshPayload.params.meshName;
+		let buffers = meshPayload.buffers;
 
 		let bufferGeometry = new BufferGeometry();
-		bufferGeometry.addAttribute( 'position', new BufferAttribute( new Float32Array( meshPayload.buffers.vertices ), 3 ) );
-		if ( meshPayload.buffers.indices !== null ) {
+		if ( buffers.vertices !== undefined && buffers.vertices !== null ) {
 
-			bufferGeometry.setIndex( new BufferAttribute( new Uint32Array( meshPayload.buffers.indices ), 1 ) );
-
-		}
-		let haveVertexColors = meshPayload.buffers.colors !== null;
-		if ( haveVertexColors ) {
-
-			bufferGeometry.addAttribute( 'color', new BufferAttribute( new Float32Array( meshPayload.buffers.colors ), 3 ) );
+			bufferGeometry.addAttribute( 'position', new BufferAttribute( new Float32Array( buffers.vertices ), 3 ) );
 
 		}
-		if ( meshPayload.buffers.normals !== null ) {
+		if ( buffers.indices !== undefined && buffers.indices !== null ) {
 
-			bufferGeometry.addAttribute( 'normal', new BufferAttribute( new Float32Array( meshPayload.buffers.normals ), 3 ) );
+			bufferGeometry.setIndex( new BufferAttribute( new Uint32Array( buffers.indices ), 1 ) );
+
+		}
+		if ( buffers.colors !== undefined && buffers.colors !== null ) {
+
+			bufferGeometry.addAttribute( 'color', new BufferAttribute( new Float32Array( buffers.colors ), 3 ) );
+
+		}
+		if ( buffers.normals !== undefined && buffers.normals !== null ) {
+
+			bufferGeometry.addAttribute( 'normal', new BufferAttribute( new Float32Array( buffers.normals ), 3 ) );
 
 		} else {
 
 			bufferGeometry.computeVertexNormals();
 
 		}
-		if ( meshPayload.buffers.uvs !== null ) {
+		if ( buffers.uvs !== undefined && buffers.uvs !== null ) {
 
-			bufferGeometry.addAttribute( 'uv', new BufferAttribute( new Float32Array( meshPayload.buffers.uvs ), 2 ) );
-
-		}
-		if ( meshPayload.buffers.skinIndex !== null ) {
-
-			bufferGeometry.addAttribute( 'skinIndex', new BufferAttribute( new Uint16Array( meshPayload.buffers.skinIndex ), 4 ) );
+			bufferGeometry.addAttribute( 'uv', new BufferAttribute( new Float32Array( buffers.uvs ), 2 ) );
 
 		}
-		if ( meshPayload.buffers.skinWeight !== null ) {
+		if ( buffers.skinIndex !== undefined && buffers.skinIndex !== null ) {
 
-			bufferGeometry.addAttribute( 'skinWeight', new BufferAttribute( new Float32Array( meshPayload.buffers.skinWeight ), 4 ) );
+			bufferGeometry.addAttribute( 'skinIndex', new BufferAttribute( new Uint16Array( buffers.skinIndex ), 4 ) );
+
+		}
+		if ( buffers.skinWeight !== undefined && buffers.skinWeight !== null ) {
+
+			bufferGeometry.addAttribute( 'skinWeight', new BufferAttribute( new Float32Array( buffers.skinWeight ), 4 ) );
 
 		}
 

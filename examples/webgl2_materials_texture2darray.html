@@ -99,11 +99,8 @@
 						var array = zip.files[ 'head256x256x109' ].asUint8Array();
 
 						var texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
-
 						texture.format = THREE.RedFormat;
 						texture.type = THREE.UnsignedByteType;
-
-						texture.needsUpdate = true;
 
 						var material = new THREE.ShaderMaterial( {
 							uniforms: {

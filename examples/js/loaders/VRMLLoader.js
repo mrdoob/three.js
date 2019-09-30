@@ -18,21 +18,19 @@ THREE.VRMLLoader = ( function () {
 
 	function VRMLLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 	}
 
-	VRMLLoader.prototype = {
+	VRMLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: VRMLLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( scope.path );
@@ -41,27 +39,6 @@ THREE.VRMLLoader = ( function () {
 				onLoad( scope.parse( text, path ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -1251,7 +1228,7 @@ THREE.VRMLLoader = ( function () {
 			function buildIndexedFaceSetNode( node ) {
 
 				var color, coord, normal, texCoord;
-				var ccw = true, solid = true, creaseAngle;
+				var ccw = true, solid = true, creaseAngle = 0;
 				var colorIndex, coordIndex, normalIndex, texCoordIndex;
 				var colorPerVertex = true, normalPerVertex = true;
 
@@ -2184,13 +2161,21 @@ THREE.VRMLLoader = ( function () {
 
 			function weightedNormal( normals, vector, creaseAngle ) {
 
-				var normal = vector.clone();
+				var normal = new THREE.Vector3();
 
-				for ( var i = 0, l = normals.length; i < l; i ++ ) {
+				if ( creaseAngle === 0 ) {
 
-					if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+					normal.copy( vector );
 
-						normal.add( normals[ i ] );
+				} else {
+
+					for ( var i = 0, l = normals.length; i < l; i ++ ) {
+
+						if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+
+							normal.add( normals[ i ] );
+
+						}
 
 					}
 
@@ -2353,7 +2338,7 @@ THREE.VRMLLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	function VRMLLexer( tokens ) {
 

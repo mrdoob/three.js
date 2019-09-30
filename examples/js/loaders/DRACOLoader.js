@@ -4,10 +4,7 @@
 
 THREE.DRACOLoader = function ( manager ) {
 
-	this.manager = manager || THREE.DefaultLoadingManager;
-
-	this.path = '';
-	this.crossOrigin = 'anonymous';
+	THREE.Loader.call( this, manager );
 
 	this.decoderPath = '';
 	this.decoderConfig = {};
@@ -34,25 +31,9 @@ THREE.DRACOLoader = function ( manager ) {
 
 };
 
-THREE.DRACOLoader.prototype = {
+THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.DRACOLoader,
-
-	setPath: function ( path ) {
-
-		this.path = path;
-
-		return this;
-
-	},
-
-	setCrossOrigin: function ( crossOrigin ) {
-
-		this.crossOrigin = crossOrigin;
-
-		return this;
-
-	},
 
 	setDecoderPath: function ( path ) {
 
@@ -116,7 +97,8 @@ THREE.DRACOLoader.prototype = {
 
 			var taskConfig = {
 				attributeIDs: this.defaultAttributeIDs,
-				attributeTypes: this.defaultAttributeTypes
+				attributeTypes: this.defaultAttributeTypes,
+				useUniqueIDs: false
 			};
 
 			this.decodeGeometry( buffer, taskConfig )
@@ -132,7 +114,8 @@ THREE.DRACOLoader.prototype = {
 
 		var taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
-			attributeTypes: attributeTypes || this.defaultAttributeTypes
+			attributeTypes: attributeTypes || this.defaultAttributeTypes,
+			useUniqueIDs: !! attributeIDs
 		};
 
 		this.decodeGeometry( buffer, taskConfig ).then( callback );
@@ -208,7 +191,7 @@ THREE.DRACOLoader.prototype = {
 
 		}
 
-		for ( var i = 0; i < geometryData.attributes.length; i++ ) {
+		for ( var i = 0; i < geometryData.attributes.length; i ++ ) {
 
 			var attribute = geometryData.attributes[ i ];
 			var name = attribute.name;
@@ -367,7 +350,8 @@ THREE.DRACOLoader.prototype = {
 		return this;
 
 	}
-};
+
+} );
 
 /* WEB WORKER */
 
@@ -384,7 +368,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 			case 'init':
 				decoderConfig = message.decoderConfig;
-				decoderPending = new Promise( function ( resolve, reject ) {
+				decoderPending = new Promise( function ( resolve/*, reject*/ ) {
 
 					decoderConfig.onModuleLoaded = function ( draco ) {
 
@@ -472,15 +456,32 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 		var geometry = { index: null, attributes: [] };
 
-		var numPoints = dracoGeometry.num_points();
-		var numAttributes = dracoGeometry.num_attributes();
-
-		// Add attributes of user specified unique id.
-		for (var attributeName in attributeIDs) {
+		// Gather all vertex attributes.
+		for ( var attributeName in attributeIDs ) {
 
 			var attributeType = self[ attributeTypes[ attributeName ] ];
-			var attributeId = attributeIDs[ attributeName ];
-			var attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeId );
+
+			var attribute;
+			var attributeID;
+
+			// A Draco file may be created with default vertex attributes, whose attribute IDs
+			// are mapped 1:1 from their semantic name (POSITION, NORMAL, ...). Alternatively,
+			// a Draco file may contain a custom set of attributes, identified by known unique
+			// IDs. glTF files always do the latter, and `.drc` files typically do the former.
+			if ( taskConfig.useUniqueIDs ) {
+
+				attributeID = attributeIDs[ attributeName ];
+				attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeID );
+
+			} else {
+
+				attributeID = decoder.GetAttributeId( dracoGeometry, draco[ attributeIDs[ attributeName ] ] );
+
+				if ( attributeID === - 1 ) continue;
+
+				attribute = decoder.GetAttribute( dracoGeometry, attributeID );
+
+			}
 
 			geometry.attributes.push( decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
 
@@ -517,9 +518,9 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 		return geometry;
 
-	};
+	}
 
-	function decodeAttribute ( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) {
+	function decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) {
 
 		var numComponents = attribute.num_components();
 		var numPoints = dracoGeometry.num_points();
@@ -538,7 +539,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 			case Int8Array:
 				dracoArray = new draco.DracoInt8Array();
-				decoder.GetAttributeInt8ForAllPoints( dracoGeometry, attribute, dracoArray  );
+				decoder.GetAttributeInt8ForAllPoints( dracoGeometry, attribute, dracoArray );
 				array = new Int8Array( numValues );
 				break;
 
@@ -577,7 +578,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 		}
 
-		for ( var i = 0; i < numValues; i++ ) {
+		for ( var i = 0; i < numValues; i ++ ) {
 
 			array[ i ] = dracoArray.GetValue( i );
 
@@ -591,7 +592,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 			itemSize: numComponents
 		};
 
-	};
+	}
 
 };
 

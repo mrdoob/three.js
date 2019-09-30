@@ -171,7 +171,7 @@ TextureCubeUVNode.prototype.generate = function ( builder, output ) {
 
 		var textureCubeUV = builder.include( TextureCubeUVNode.Nodes.textureCubeUV );
 
-		var biasNode = this.bias || builder.context.bias;
+		var biasNode = this.bias || builder.context.roughness;
 
 		return builder.format( textureCubeUV + '( ' + this.uv.build( builder, 'v3' ) + ', ' +
 			biasNode.build( builder, 'f' ) + ', ' +

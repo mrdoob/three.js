@@ -102,6 +102,7 @@ GLTFExporter.prototype = {
 			onlyVisible: true,
 			truncateDrawRange: true,
 			embedImages: true,
+			maxTextureSize: Infinity,
 			animations: [],
 			forceIndices: false,
 			forcePowerOfTwoTextures: false,
@@ -775,10 +776,10 @@ GLTFExporter.prototype = {
 
 				var canvas = cachedCanvas = cachedCanvas || document.createElement( 'canvas' );
 
-				canvas.width = image.width;
-				canvas.height = image.height;
+				canvas.width = Math.min( image.width, options.maxTextureSize );
+				canvas.height = Math.min( image.height, options.maxTextureSize );
 
-				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( image ) ) {
+				if ( options.forcePowerOfTwoTextures && ! isPowerOfTwo( canvas ) ) {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
@@ -925,7 +926,7 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isShaderMaterial && !material.isGLTFSpecularGlossinessMaterial ) {
+			if ( material.isShaderMaterial && ! material.isGLTFSpecularGlossinessMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;

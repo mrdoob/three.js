@@ -23,7 +23,6 @@
 		<h2>例子</h2>
 
 		<p>
-			[example:webgl_loader_babylon WebGL / loader / babylon]<br />
 			[example:webgl_loader_fbx WebGL / loader / fbx]<br />
 			[example:webgl_loader_obj WebGL / loader / obj]<br />
 			[example:webgl_materials_reflectivity WebGL / materials / reflectivity]<br />
@@ -158,21 +157,48 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
+		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
 		<p>
-		[page:Function callback] —
-            设置URL修饰符成功时回调。使用url参数进行回调，并且必须返回 [page:String resolvedURL] 。<br /><br />
+		[page:Object regex] — A regular expression.<br />
+		[page:Loader loader] — The loader.
+		<p>
+		Registers a loader with the given regular expression. Can be used to define what loader should be used in
+		order to load specific files. A typical use case is to overwrite the default loader for textures.
+		</p>
+		<code>
+// add handler for TGA textures
+manager.addHandler( /\.tga$/i, new TGALoader() );
+		</code>
 
-            如果设置了回调，则在发送请求之前将向每个资源URL传递回调。回调可以返回最初的URL，也可以返回新URL以覆盖加载行为。
-            此行为可用于从.ZIP、拖拽API和数据URI中加载资源文件。
+		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.
+		<p>
+		Removes the loader for the given regular expression.
+		</p>
+
+		<h3>[method:null getHandler]( [param:String file] )</h3>
+		<p>
+		[page:String file] — The file path.
+		<p>
+		Can be used to retrieve the registered loader for the given file path.
 		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 
-            给定URL，使用URL修饰符回调（如果有）并返回已解析的URL。如果未设置URL修饰符，则返回原始URL。
+		给定URL，使用URL修饰符回调（如果有）并返回已解析的URL。如果未设置URL修饰符，则返回原始URL。
 		</p>
+
+		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
+		<p>
+		[page:Function callback] — 设置URL修饰符成功时回调。使用url参数进行回调，并且必须返回 [page:String resolvedURL] 。<br /><br />
+
+		如果设置了回调，则在发送请求之前将向每个资源URL传递回调。回调可以返回最初的URL，也可以返回新URL以覆盖加载行为。
+		此行为可用于从.ZIP、拖拽API和数据URI中加载资源文件。
+		</p>
+
 
 		<br /><br />
 		<p>
@@ -184,14 +210,14 @@
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 
-           任何使用管理器的加载器都会调用此方法， 当加载器需要开始加载URL时。
+		任何使用管理器的加载器都会调用此方法， 当加载器需要开始加载URL时。
 		</p>
 
 		<h3>[method:null itemEnd]( [param:String url] )</h3>
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 
-            任何使用管理器的加载器都会调用此方法， 当加载器需要加载URL结束时。
+		任何使用管理器的加载器都会调用此方法， 当加载器需要加载URL结束时。
 		</p>
 
 
@@ -199,7 +225,7 @@
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 
-            任何使用管理器的加载器都会调用此方法， 当加载器出现加载错误时。
+		任何使用管理器的加载器都会调用此方法， 当加载器出现加载错误时。
 		</p>
 
 		<h2>源</h2>

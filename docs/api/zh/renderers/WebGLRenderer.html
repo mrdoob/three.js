@@ -54,6 +54,8 @@
 		默认是*true*.<br />
 
 		[page:Boolean logarithmicDepthBuffer] -  是否使用对数深度缓存。如果要在单个场景中处理巨大的比例差异，就有必要使用。
+		Note that this setting uses gl_FragDepth if available which disables the [link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
+		optimization and can cause a decrease in performance.
 		默认是*false*。 示例：[example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer]
 		</p>
 
@@ -165,6 +167,7 @@
 					<li>triangles</li>
 					<li>points</li>
 					<li>lines</li>
+					<li>frame</li>
 				</ul>
 			</li>
 			<li>programs
@@ -227,7 +230,7 @@
 
 		<h3>[property:Integer shadowMap.type]</h3>
 		<p>定义阴影贴图类型 (未过滤, 关闭部分过滤, 关闭部分双线性过滤)</p>
-		<p>可选值有THREE.BasicShadowMap, THREE.PCFShadowMap (默认)和 THREE.PCFSoftShadowMap。 详见[page:Renderer Renderer constants]</p>
+		<p>可选值有THREE.BasicShadowMap, THREE.PCFShadowMap (默认), THREE.PCFSoftShadowMap 和 THREE.VSMShadowMap。详见[page:Renderer Renderer constants]</p>
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>

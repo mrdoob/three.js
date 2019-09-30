@@ -1,25 +1,24 @@
 import {
-  BufferGeometry,
-  LoadingManager
+	BufferGeometry,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
 export interface PDB {
-  geometryAtoms: BufferGeometry;
-  geometryBonds: BufferGeometry;
-  json: {
-    atoms: any[][],
-    bonds: number[][]
-  }
+	geometryAtoms: BufferGeometry;
+	geometryBonds: BufferGeometry;
+	json: {
+		atoms: any[][],
+		bonds: number[][]
+	}
 }
 
 
-export class PDBLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
+export class PDBLoader extends Loader {
 
-  load(url: string, onLoad: (pdb: PDB) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
+	constructor( manager?: LoadingManager );
 
-  parse(text: string) : PDB;
+	load( url: string, onLoad: ( pdb: PDB ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( text: string ) : PDB;
+
 }

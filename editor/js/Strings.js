@@ -41,6 +41,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': 'Cylinder',
 			'menubar/add/ring': 'Ring',
 			'menubar/add/sphere': 'Sphere',
+			'menubar/add/dodecahedron': 'Dodecahedron',
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/octahedron': 'Octahedron',
 			'menubar/add/tetrahedron': 'Tetrahedron',
@@ -148,6 +149,9 @@ var Strings = function ( config ) {
 			'sidebar/geometry/geometry/vertices': 'Vertices',
 			'sidebar/geometry/geometry/faces': 'Faces',
 
+			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
+
 			'sidebar/geometry/icosahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/icosahedron_geometry/detail': 'Detail',
 
@@ -221,6 +225,7 @@ var Strings = function ( config ) {
 			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
 			'sidebar/material/metalness': 'Metalness',
+			'sidebar/material/sheen': 'Sheen',
 			'sidebar/material/emissive': 'Emissive',
 			'sidebar/material/specular': 'Specular',
 			'sidebar/material/shininess': 'Shininess',
@@ -275,6 +280,7 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/materials': 'Materials',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -337,6 +343,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': '圆柱体',
 			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
+			'menubar/add/dodecahedron': 'Dodecahedron',
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/octahedron': '八面体',
 			'menubar/add/tetrahedron': '四面体',
@@ -433,6 +440,9 @@ var Strings = function ( config ) {
 
 			'sidebar/geometry/geometry/vertices': '顶点',
 			'sidebar/geometry/geometry/faces': '面',
+
+			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
+			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
 
 			'sidebar/geometry/icosahedron_geometry/radius': '半径',
 			'sidebar/geometry/icosahedron_geometry/detail': '面片分段',
@@ -546,6 +556,7 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
+			'sidebar/project/materials': 'Materials',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',

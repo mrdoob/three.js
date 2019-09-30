@@ -3,9 +3,11 @@ import { TextureNode } from './TextureNode';
 import { UVNode } from '../accessors/UVNode';
 
 export class ScreenNode extends TextureNode {
-  constructor(uv?: UVNode);
 
-  nodeType: string;
+	constructor( uv?: UVNode );
 
-  getTexture(builder: NodeBuilder, output: string): string;
+	nodeType: string;
+
+	getTexture( builder: NodeBuilder, output: string ): string;
+
 }

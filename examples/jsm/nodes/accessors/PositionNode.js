@@ -3,7 +3,6 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
-import { NormalNode } from '../accessors/NormalNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
 function PositionNode( scope ) {

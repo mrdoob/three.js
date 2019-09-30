@@ -22,79 +22,63 @@
 
 		<code>
 		// instantiate the loader
-		var loader = new THREE.OBJLoader2();
+		let loader = new THREE.OBJLoader2();
 
 		// function called on successful load
-		var callbackOnLoad = function ( event ) {
-			scene.add( event.detail.loaderRootNode );
-		};
+		function callbackOnLoad ( object3d ) {
+			scene.add( object3d );
+		}
 
 		// load a resource from provided URL synchronously
-		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null, false );
+		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null );
 		</code>
 
 		[example:webgl_loader_obj2] - Simple example <br>
-		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse, load and run with instructions (sync and async)<br>
+		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse and load, sync or in parallel to main (see [page:OBJLoader2Parallel]))<br>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:LoadingManager manager], [param:LoaderSupport.ConsoleLogger logger] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
 			[page:LoadingManager manager] - The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br>
-			[page:LoaderSupport.ConsoleLogger logger] - logger to be used
 		</p>
 		<p>
-			Use [name] to load OBJ data from files or to parse OBJ data from arraybuffer or text.
+			Creates a new [name]. Use it to load OBJ data from files or to parse OBJ data from arraybuffer or text.
 		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
 
 
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
+
 
 		<h3>[method:Object3D parse]( [param:arraybuffer content]|[param:String content] )</h3>
 		<p>
 			[[page:arraybuffer content]|[page:String content]] OBJ data as Uint8Array or String
 		</p>
 		<p>
-			Parses OBJ data synchronously from arraybuffer or string and returns the [page:Object3D loaderRoorNode].
+			Parses OBJ data synchronously from arraybuffer or string and returns the [page:Object3D baseObject3d].
 		</p>
 
 
-		<h3>[method:Object3D parseAsync]( [param:arraybuffer content], [param:Function onLoad] )</h3>
-		<p>
-			[page:arraybuffer content] - OBJ data as Uint8Array<br>
-			[page:Function onLoad] - Called after worker successfully completed loading<br>
-		</p>
-		<p>
-			Parses OBJ content asynchronously from arraybuffer.
-		</p>
-
-
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError], [param:Function onMeshAlter], [param:boolean useAsync] )</h3>
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError], [param:Function onMeshAlter] )</h3>
 		<p>
 			[page:String url] - A string containing the path/URL of the file to be loaded.<br>
 			[page:Function onLoad] - A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br>
 			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
 			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
 			[page:Function onMeshAlter] - (optional) A function to be called after a new mesh raw data becomes available for alteration.<br>
-			[page:boolean useAsync] - (optional) If true, uses async loading with worker, if false loads data synchronously.
 		</p>
 		<p>
 			Use this convenient method to load a file at the given URL. By default the fileLoader uses an ArrayBuffer.
 		</p>
 
 
-		<h3>[method:null run]( [param:LoaderSupport.PrepData params], [param:LoaderSupport.WorkerSupport workerSupportExternal] )</h3>
-		<p>
-			[page:LoaderSupport.PrepData params] - prepData All parameters and resources required for execution<br>
-			[page:LoaderSupport.WorkerSupport workerSupportExternal] - Use pre-existing WorkerSupport
-		</p>
-		<p>
-			Run the loader according the provided instructions.
-		</p>
-
-
-		<h3>[method:null setLogging]( [param:Boolean enabled], [param:Boolean debug] )</h3>
+		<h3>[method:OBJLoader2 setLogging]( [param:Boolean enabled], [param:Boolean debug] )</h3>
 		<p>
 			[page:Boolean enabled] True or false.<br>
 			[page:Boolean debug] True or false.
@@ -104,70 +88,7 @@
 		</p>
 
 
-		<h3>[method:null setModelName] ( [param:String modelName] )</h3>
-		<p>
-			[page:String modelName]
-		</p>
-		<p>
-			Set the name of the model.
-		</p>
-
-
-		<h3>[method:null setPath] ( [param:String path] )</h3>
-		<p>
-			[page:String path] - URL
-		</p>
-		<p>
-			The URL of the base path.
-		</p>
-
-
-		<h3>[method:null setResourcePath] ( [param:String resourcePath] )</h3>
-		<p>
-			[page:String resourcePath] - URL
-		</p>
-		<p>
-			Allows to specify resourcePath for dependencies of specified resource.
-		</p>
-
-
-		<h3>[method:null setStreamMeshesTo] ( [param:Object3D streamMeshesTo] )</h3>
-		<p>
-			[page:Object3D streamMeshesTo] - Object already attached to scenegraph where new meshes will be attached to
-		</p>
-		<p>
-			Set the node where the loaded objects will be attached directly.
-		</p>
-
-
-		<h3>[method:null setMaterials] ( Array of [param:Material materials] )</h3>
-		<p>
-			Array of [page:Material materials] - Array of [page:Material Materials]
-		</p>
-		<p>
-			Set materials loaded by MTLLoader or any other supplier of an Array of [page:Material Materials].
-		</p>
-
-
-		<h3>[method:null setUseIndices]( [param:Boolean useIndices] )</h3>
-		<p>
-			[page:Boolean useIndices]
-		</p>
-		<p>
-			Instructs loaders to create indexed [page:BufferGeometry].
-		</p>
-
-
-		<h3>[method:null setDisregardNormals]( [param:Boolean disregardNormals] )</h3>
-		<p>
-			[page:Boolean disregardNormals]
-		</p>
-		<p>
-			Tells whether normals should be completely disregarded and regenerated.
-		</p>
-
-
-		<h3>[method:null setMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
+		<h3>[method:OBJLoader2 addMaterialPerSmoothingGroup] ( [param:boolean materialPerSmoothingGroup] )</h3>
 		<p>
 			[page:boolean materialPerSmoothingGroup]
 		</p>
@@ -176,29 +97,102 @@
 		</p>
 
 
-		<h3>[method:null onProgress]( [param:String type], [param:String text], [param:Number numericalValue] )</h3>
+		<h3>[method:OBJLoader2 setUseOAsMesh] ( [param:boolean useOAsMesh] )</h3>
 		<p>
-			[page:String type] - The type of event<br>
-			[page:String text] - Textual description of the event<br>
-			[page:Number numericalValue] - Numerical value describing the progress
+			[page:boolean useOAsMesh]
 		</p>
 		<p>
-			Announce feedback which is give to the registered [page:LoaderSupport.Callbacks].
+			Usually 'o' is meta-information and does not result in creation of new meshes, but mesh creation on occurrence of "o" can be enforced.
 		</p>
 
 
-		<h3>[method:null loadMtl]( [param:String url], [param:Object content], [param:Function callbackOnLoad], [param:String crossOrigin], [param:Object materialOptions]) </h3>
+		<h3>[method:OBJLoader2 setUseIndices]( [param:Boolean useIndices] )</h3>
 		<p>
-			[page:String url] - URL to the file<br>
-			[page:Object content] - The file content as arraybuffer or text<br>
-			[page:Function onLoad] - Callback to be called after successful load<br>
-			[page:Function onProgress] - (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br>
-			[page:Function onError] - (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br>
-			[page:String crossOrigin] - (optional) CORS value<br>
-			[page:Function materialOptions] - (optional) Set material loading options for MTLLoader
+			[page:Boolean useIndices]
 		</p>
 		<p>
-			Utility method for loading an mtl file according resource description. Provide url or content.
+			Instructs loaders to create indexed [page:BufferGeometry].
+		</p>
+
+
+		<h3>[method:OBJLoader2 setDisregardNormals]( [param:Boolean disregardNormals] )</h3>
+		<p>
+			[page:Boolean disregardNormals]
+		</p>
+		<p>
+			Tells whether normals should be completely disregarded and regenerated.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setModelName] ( [param:String modelName] )</h3>
+		<p>
+			[page:String modelName]
+		</p>
+		<p>
+			Set the name of the model.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setBaseObject3d] ( [param:Object3d baseObject3d] )</h3>
+		<p>
+			[page:Object3D baseObject3d - Object already attached to scenegraph where new meshes will be attached to
+		</p>
+		<p>
+			Set the node where the loaded objects will be attached directly.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setMaterials] ( [param:Object materials] )</h3>
+		<p>
+			[page:Object materials] -  materials Object with named [page:Material Materials]
+		</p>
+		<p>
+			Add materials as associated array.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setCallbackOnLoad] ( [param:Function onLoad] )</h3>
+		<p>
+			[page:Function onLoad]
+		</p>
+		<p>
+			Register a function that is called when parsing was completed.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setCallbackOnAssetAvailable] ( [param:Function onAssetAvailable] )</h3>
+		<p>
+			[page:Function onAssetAvailable]
+		</p>
+		<p>
+			Register a function that is called once an asset (mesh/material) becomes available.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setCallbackOnProgress] ( [param:Function onProgress] )</h3>
+		<p>
+			[page:Function onProgress]
+		</p>
+		<p>
+			Register a function that is used to report overall processing progress.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setCallbackOnError] ( [param:Function onError] )</h3>
+		<p>
+			[page:Function onError]
+		</p>
+		<p>
+			Register an error handler function that is called if errors occur. It can decide to just log or to throw an exception.
+		</p>
+
+
+		<h3>[method:OBJLoader2 setCallbackOnMeshAlter] ( [param:Function onMeshAlter] )</h3>
+		<p>
+			[page:Function onMeshAlter]
+		</p>
+		<p>
+			Register a function that is called once a single mesh is available and it could be altered by the supplied function.
 		</p>
 
 

@@ -22,7 +22,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	var PI_2 = Math.PI / 2;
 
-	var vec = new Vector3();
+	var vec = new THREE.Vector3();
 
 	function onMouseMove( event ) {
 

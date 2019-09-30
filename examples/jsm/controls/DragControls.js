@@ -5,7 +5,6 @@
  */
 
 import {
-	Camera,
 	EventDispatcher,
 	Matrix4,
 	Plane,
@@ -15,13 +14,6 @@ import {
 } from "../../../build/three.module.js";
 
 var DragControls = function ( _objects, _camera, _domElement ) {
-
-	if ( _objects instanceof Camera ) {
-
-		console.warn( 'THREE.DragControls: Constructor now expects ( objects, camera, domElement )' );
-		var temp = _objects; _objects = _camera; _camera = temp;
-
-	}
 
 	var _plane = new Plane();
 	var _raycaster = new Raycaster();
@@ -260,35 +252,6 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
-
-	// Backward compatibility
-
-	this.setObjects = function () {
-
-		console.error( 'THREE.DragControls: setObjects() has been removed.' );
-
-	};
-
-	this.on = function ( type, listener ) {
-
-		console.warn( 'THREE.DragControls: on() has been deprecated. Use addEventListener() instead.' );
-		scope.addEventListener( type, listener );
-
-	};
-
-	this.off = function ( type, listener ) {
-
-		console.warn( 'THREE.DragControls: off() has been deprecated. Use removeEventListener() instead.' );
-		scope.removeEventListener( type, listener );
-
-	};
-
-	this.notify = function ( type ) {
-
-		console.error( 'THREE.DragControls: notify() has been deprecated. Use dispatchEvent() instead.' );
-		scope.dispatchEvent( { type: type } );
-
-	};
 
 };
 

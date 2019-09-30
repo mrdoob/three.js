@@ -1,11 +1,13 @@
 import {
-  Object3D
+	Object3D
 } from '../../../../src/Three';
 
 export class GearVRController extends Object3D {
-  constructor(id: number);
+
+	constructor( id: number );
 
 	getTouchpadState(): boolean;
-  getGamepad(): object;
-  update(): void;
+	getGamepad(): object;
+	update(): void;
+
 }
