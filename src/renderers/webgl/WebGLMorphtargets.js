@@ -70,6 +70,8 @@ function WebGLMorphtargets( gl ) {
 
 		// Add morphAttributes
 
+		var morphInfluencesSum = 0;
+
 		for ( var i = 0; i < 8; i ++ ) {
 
 			var influence = influences[ i ];
@@ -85,6 +87,7 @@ function WebGLMorphtargets( gl ) {
 					if ( morphNormals ) geometry.addAttribute( 'morphNormal' + i, morphNormals[ index ] );
 
 					morphInfluences[ i ] = value;
+					morphInfluencesSum += value;
 					continue;
 
 				}
@@ -95,6 +98,9 @@ function WebGLMorphtargets( gl ) {
 
 		}
 
+		var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : Math.max(0, 1 - morphInfluencesSum);
+
+		program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
 		program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
 
 	}
