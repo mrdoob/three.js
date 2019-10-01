@@ -82,7 +82,7 @@
    * tag to an error message with the correct links for WebGL.
    * @param {HTMLCanvasElement} canvas. The canvas element to
    *     create a context from.
-   * @param {WebGLContextCreationAttirbutes} opt_attribs Any
+   * @param {WebGLContextCreationAttributes} opt_attribs Any
    *     creation attributes you want to pass in.
    * @return {WebGLRenderingContext} The created context.
    * @memberOf module:webgl-utils
@@ -119,19 +119,31 @@
   const origConsole = {};
 
   function setupConsole() {
+    const style = document.createElement('style');
+    style.innerText = `
+    .console {
+      font-family: monospace;
+      font-size: medium;
+      max-height: 50%;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: auto;
+      background: rgba(221, 221, 221, 0.9);
+    }
+    .console .console-line {
+      white-space: pre;
+    }
+    .console .log .warn {
+      color: black;
+    }
+    .console .error {
+      color: red;
+    }
+    `;
     const parent = document.createElement('div');
     parent.className = 'console';
-    Object.assign(parent.style, {
-      fontFamily: 'monospace',
-      fontSize: 'medium',
-      maxHeight: '50%',
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      width: '100%',
-      overflow: 'auto',
-      background: 'rgba(221, 221, 221, 0.9)',
-    });
     const toggle = document.createElement('div');
     let show = false;
     Object.assign(toggle.style, {
@@ -155,27 +167,27 @@
     const lines = [];
     let added = false;
 
-    function addLine(type, str, color, prefix) {
+    function addLine(type, str, prefix) {
       const div = document.createElement('div');
-      div.textContent = prefix + str;
-      div.className = type;
-      div.style.color = color;
+      div.textContent = (prefix + str) || ' ';
+      div.className = `console-line ${type}`;
       parent.appendChild(div);
       lines.push(div);
       if (!added) {
         added = true;
+        document.body.appendChild(style);
         document.body.appendChild(parent);
         document.body.appendChild(toggle);
       }
       // scrollIntoView only works in Chrome
       // In Firefox and Safari scrollIntoView inside an iframe moves
-      // that element into the view. It should argably only move that
+      // that element into the view. It should arguably only move that
       // element inside the iframe itself, otherwise that's giving
       // any random iframe control to bring itself into view against
       // the parent's wishes.
       //
       // note that even if we used a solution (which is to manually set
-      // scrollTop) there's a UI issue that if the user manaully scrolls
+      // scrollTop) there's a UI issue that if the user manually scrolls
       // we want to stop scrolling automatically and if they move back
       // to the bottom we want to pick up scrolling automatically.
       // Kind of a PITA so TBD
@@ -183,26 +195,26 @@
       // div.scrollIntoView();
     }
 
-    function addLines(type, str, color, prefix) {
+    function addLines(type, str, prefix) {
       while (lines.length > maxLines) {
         const div = lines.shift();
         div.parentNode.removeChild(div);
       }
-      addLine(type, str, color, prefix);
+      addLine(type, str, prefix);
     }
 
-    function wrapFunc(obj, funcName, color, prefix) {
+    function wrapFunc(obj, funcName, prefix) {
       const oldFn = obj[funcName];
       origConsole[funcName] = oldFn.bind(obj);
       return function(...args) {
-        addLines(funcName, [...args].join(' '), color, prefix);
+        addLines(funcName, [...args].join(' '), prefix);
         oldFn.apply(obj, arguments);
       };
     }
 
-    window.console.log = wrapFunc(window.console, 'log', 'black', '');
-    window.console.warn = wrapFunc(window.console, 'warn', 'black', '⚠');
-    window.console.error = wrapFunc(window.console, 'error', 'red', '❌');
+    window.console.log = wrapFunc(window.console, 'log', '');
+    window.console.warn = wrapFunc(window.console, 'warn', '⚠');
+    window.console.error = wrapFunc(window.console, 'error', '❌');
   }
 
   function reportJSError(url, lineNo, colNo, msg) {
@@ -395,7 +407,7 @@
   };
 
   /**
-   * Get's the iframe in the parent document
+   * Gets the iframe in the parent document
    * that is displaying the specified window .
    * @param {Window} window window to check.
    * @return {HTMLIFrameElement?) the iframe element if window is in an iframe
