@@ -69,9 +69,10 @@ function WebVRManager( renderer ) {
 
 		if ( isPresenting() ) {
 
-			var eyeParameters = device.getEyeParameters( 'left' );
-			renderWidth = 2 * eyeParameters.renderWidth * framebufferScaleFactor;
-			renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
+			var eyeParametersL = device.getEyeParameters( 'left' );
+			var eyeParametersR = device.getEyeParameters( 'right' );
+			renderWidth = (eyeParametersL.renderWidth + eyeParametersR.renderWidth) * framebufferScaleFactor;
+			renderHeight = Math.max(eyeParametersL.renderHeight, eyeParametersR.renderHeight) * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( currentSize );
