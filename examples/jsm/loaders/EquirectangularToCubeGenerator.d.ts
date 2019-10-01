@@ -23,6 +23,7 @@ export interface EquirectangularToCubeGeneratorOptions {
 export class CubemapGenerator {
 
 	constructor( renderer: WebGLRenderer );
+	renderer: WebGLRenderer;
 
 	fromEquirectangular( texture: Texture, options?: CubemapGeneratorOptions ): WebGLRenderTargetCube;
 
