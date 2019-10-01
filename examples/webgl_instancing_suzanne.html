@@ -18,7 +18,7 @@
 			var camera, scene, renderer, stats;
 
 			var mesh;
-			var amount = 10;
+			var amount = parseInt( window.location.search.substr( 1 ) ) || 10;
 			var count = Math.pow( amount, 3 );
 			var dummy = new THREE.Object3D();
 
@@ -28,7 +28,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
-				camera.position.set( 9, 9, 9 );
+				camera.position.set( amount * 0.9, amount * 0.9, amount * 0.9 );
 				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
@@ -102,6 +102,7 @@
 					mesh.rotation.y = Math.sin( time / 2 );
 
 					var i = 0;
+					var offset = amount / 2;
 
 					for ( var x = 0; x < amount; x ++ ) {
 
@@ -109,7 +110,7 @@
 
 							for ( var z = 0; z < amount; z ++ ) {
 
-								dummy.position.set( 5 - x, 5 - y, 5 - z );
+								dummy.position.set( offset - x, offset - y, offset - z );
 								dummy.rotation.y = ( Math.sin( x / 4 + time ) + Math.sin( y / 4 + time ) + Math.sin( z / 4 + time ) );
 								dummy.rotation.z = dummy.rotation.y * 2;
 
