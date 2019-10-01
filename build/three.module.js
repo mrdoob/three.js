@@ -7914,20 +7914,28 @@ Object.assign( Color.prototype, {
 
 		if ( style && style.length > 0 ) {
 
-			// color keywords
-			var hex = _colorKeywords[ style ];
+			return this.setColorName( style );
 
-			if ( hex !== undefined ) {
+		}
 
-				// red
-				this.setHex( hex );
+		return this;
 
-			} else {
+	},
 
-				// unknown color
-				console.warn( 'THREE.Color: Unknown color ' + style );
+	setColorName: function ( style ) {
 
-			}
+		// color keywords
+		var hex = _colorKeywords[ style ];
+
+		if ( hex !== undefined ) {
+
+			// red
+			this.setHex( hex );
+
+		} else {
+
+			// unknown color
+			console.warn( 'THREE.Color: Unknown color ' + style );
 
 		}
 
@@ -8232,6 +8240,8 @@ Object.assign( Color.prototype, {
 	}
 
 } );
+
+Color.NAMES = _colorKeywords;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -15397,6 +15407,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var mode;
 
 	function setMode( value ) {
@@ -15419,7 +15431,7 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var extension, methodName;
 
-		if ( capabilities.isWebGL2 ) {
+		if ( isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawArraysInstanced';
@@ -16004,6 +16016,8 @@ function WebGLGeometries( gl, attributes, info ) {
 
 function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var mode;
 
 	function setMode( value ) {
@@ -16035,7 +16049,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var extension, methodName;
 
-		if ( capabilities.isWebGL2 ) {
+		if ( isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawElementsInstanced';
@@ -19852,6 +19866,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 function WebGLState( gl, extensions, utils, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	function ColorBuffer() {
 
 		var locked = false;
@@ -20283,9 +20299,9 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-			var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
+			var extension = isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+			extension[ isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
@@ -20839,6 +20855,12 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+	var maxTextures = capabilities.maxTextures;
+	var maxCubemapSize = capabilities.maxCubemapSize;
+	var maxTextureSize = capabilities.maxTextureSize;
+	var maxSamples = capabilities.maxSamples;
+
 	var _videoTextures = new WeakMap();
 	var _canvas;
 
@@ -20927,7 +20949,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( capabilities.isWebGL2 ) return false;
+		if ( isWebGL2 ) return false;
 
 		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
 			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
@@ -20954,7 +20976,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getInternalFormat( glFormat, glType ) {
 
-		if ( ! capabilities.isWebGL2 ) return glFormat;
+		if ( isWebGL2 === false ) return glFormat;
 
 		var internalFormat = glFormat;
 
@@ -21126,9 +21148,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var textureUnit = textureUnits;
 
-		if ( textureUnit >= capabilities.maxTextures ) {
+		if ( textureUnit >= maxTextures ) {
 
-			console.warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
+			console.warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + maxTextures );
 
 		}
 
@@ -21228,7 +21250,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( ! isCompressed && ! isDataTexture ) {
 
-					cubeImage[ i ] = resizeImage( texture.image[ i ], false, true, capabilities.maxCubemapSize );
+					cubeImage[ i ] = resizeImage( texture.image[ i ], false, true, maxCubemapSize );
 
 				} else {
 
@@ -21239,7 +21261,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			var image = cubeImage[ 0 ],
-				supportsMips = isPowerOfTwo( image ) || capabilities.isWebGL2,
+				supportsMips = isPowerOfTwo( image ) || isWebGL2,
 				glFormat = utils.convert( texture.format ),
 				glType = utils.convert( texture.type ),
 				glInternalFormat = getInternalFormat( glFormat, glType );
@@ -21399,7 +21421,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( extension ) {
 
 			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === HalfFloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
+			if ( texture.type === HalfFloatType && ( isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -21445,9 +21467,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( 3317, texture.unpackAlignment );
 
 		var needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
-		var image = resizeImage( texture.image, needsPowerOfTwo, false, capabilities.maxTextureSize );
+		var image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
 
-		var supportsMips = isPowerOfTwo( image ) || capabilities.isWebGL2,
+		var supportsMips = isPowerOfTwo( image ) || isWebGL2,
 			glFormat = utils.convert( texture.format ),
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( glFormat, glType );
@@ -21464,10 +21486,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.type === FloatType ) {
 
-				if ( ! capabilities.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
+				if ( isWebGL2 === false ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 				glInternalFormat = 36012;
 
-			} else if ( capabilities.isWebGL2 ) {
+			} else if ( isWebGL2 ) {
 
 				// WebGL 2.0 requires signed internalformat for glTexImage2D
 				glInternalFormat = 33189;
@@ -21794,7 +21816,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 		var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 		var isMultiview = ( renderTarget.isWebGLMultiviewRenderTarget === true );
-		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		// Setup framebuffer
 
@@ -21814,7 +21836,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( isMultisample ) {
 
-				if ( capabilities.isWebGL2 ) {
+				if ( isWebGL2 ) {
 
 					renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
 					renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
@@ -21942,7 +21964,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var texture = renderTarget.texture;
-		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
@@ -21961,7 +21983,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.isWebGLMultisampleRenderTarget ) {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				var renderTargetProperties = properties.get( renderTarget );
 
@@ -21989,8 +22011,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getRenderTargetSamples( renderTarget ) {
 
-		return ( capabilities.isWebGL2 && renderTarget.isWebGLMultisampleRenderTarget ) ?
-			Math.min( capabilities.maxSamples, renderTarget.samples ) : 0;
+		return ( isWebGL2 && renderTarget.isWebGLMultisampleRenderTarget ) ?
+			Math.min( maxSamples, renderTarget.samples ) : 0;
 
 	}
 
@@ -22092,6 +22114,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 function WebGLUtils( gl, extensions, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	function convert( p ) {
 
 		var extension;
@@ -22122,7 +22146,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === HalfFloatType ) {
 
-			if ( capabilities.isWebGL2 ) return 5131;
+			if ( isWebGL2 ) return 5131;
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
@@ -22214,7 +22238,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === MinEquation || p === MaxEquation ) {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				if ( p === MinEquation ) return 32775;
 				if ( p === MaxEquation ) return 32776;
@@ -22234,7 +22258,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === UnsignedInt248Type ) {
 
-			if ( capabilities.isWebGL2 ) return 34042;
+			if ( isWebGL2 ) return 34042;
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
@@ -25293,6 +25317,12 @@ function WebGLRenderer( parameters ) {
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
 
+			if ( material.isShaderMaterial ) {
+
+				material.uniformsNeedUpdate = false;
+
+			}
+
 		}
 
 		if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
@@ -27029,6 +27059,8 @@ function InstancedMesh( geometry, material, count ) {
 	this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
 
 	this.count = count;
+
+	this.type = 'InstancedMesh';
 
 }
 
