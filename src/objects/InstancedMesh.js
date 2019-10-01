@@ -13,8 +13,6 @@ function InstancedMesh( geometry, material, count ) {
 
 	this.count = count;
 
-	this.type = 'InstancedMesh';
-
 }
 
 InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {

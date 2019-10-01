@@ -16,7 +16,6 @@ export class InstancedMesh extends Mesh {
 	count: number;
 	instanceMatrix: BufferAttribute;
 	isInstancedMesh: true;
-	type: 'InstancedMesh';
 
 	setMatrixAt( index: number, matrix: Matrix4 ): void;
 
