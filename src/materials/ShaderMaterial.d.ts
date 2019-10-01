@@ -1,4 +1,3 @@
-import { ShaderMaterialParameters } from './ShaderMaterial';
 import { IUniform } from '../renderers/shaders/UniformsLib';
 import { MaterialParameters, Material } from './Material';
 

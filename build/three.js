@@ -97,7 +97,7 @@
 
 	}
 
-	var REVISION = '109dev';
+	var REVISION = '109';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	var CullFaceNone = 0;
@@ -2173,9 +2173,11 @@
 
 		angleTo: function ( v ) {
 
-			// assumes this and v are not the zero vector
+			var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
-			var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+			if ( denominator === 0 ) { console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' ); }
+
+			var theta = this.dot( v ) / denominator;
 
 			// clamp, to handle numerical problems
 
@@ -8312,7 +8314,6 @@
 		this.type = 'Material';
 
 		this.fog = true;
-		this.lights = true;
 
 		this.blending = NormalBlending;
 		this.side = FrontSide;
@@ -8636,7 +8637,6 @@
 			this.name = source.name;
 
 			this.fog = source.fog;
-			this.lights = source.lights;
 
 			this.blending = source.blending;
 			this.side = source.side;
@@ -8784,8 +8784,6 @@
 
 		this.skinning = false;
 		this.morphTargets = false;
-
-		this.lights = false;
 
 		this.setValues( parameters );
 
@@ -19319,7 +19317,6 @@
 		this.wireframeLinewidth = 1;
 
 		this.fog = false;
-		this.lights = false;
 
 		this.setValues( parameters );
 
@@ -19399,7 +19396,6 @@
 		this.displacementBias = 0;
 
 		this.fog = false;
-		this.lights = false;
 
 		this.setValues( parameters );
 
@@ -23059,6 +23055,8 @@
 
 		var session = null;
 
+		// var framebufferScaleFactor = 1.0;
+
 		var referenceSpace = null;
 		var referenceSpaceType = 'local-floor';
 
@@ -23146,7 +23144,9 @@
 
 		}
 
-		this.setFramebufferScaleFactor = function ( value ) {
+		this.setFramebufferScaleFactor = function ( /* value */ ) {
+
+			// framebufferScaleFactor = value;
 
 		};
 
@@ -23173,6 +23173,7 @@
 				session.addEventListener( 'selectend', onSessionEvent );
 				session.addEventListener( 'end', onSessionEnd );
 
+				// eslint-disable-next-line no-undef
 				session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
 				session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
@@ -24187,7 +24188,7 @@
 
 			if ( object.isInstancedMesh ) {
 
-				renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
+				renderer.renderInstances( geometry, drawStart, drawCount, object.count );
 
 			} else if ( geometry.isInstancedBufferGeometry ) {
 
@@ -24938,9 +24939,10 @@
 
 			// store the light setup it was created for
 
+			materialProperties.needsLights = materialNeedsLights( material );
 			materialProperties.lightsStateVersion = lightsStateVersion;
 
-			if ( material.lights ) {
+			if ( materialProperties.needsLights ) {
 
 				// wire up the material to this renderer's lighting state
 
@@ -25006,7 +25008,7 @@
 
 					material.needsUpdate = true;
 
-				} else if ( material.lights && materialProperties.lightsStateVersion !== lights.state.version ) {
+				} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
 					material.needsUpdate = true;
 
@@ -25190,7 +25192,7 @@
 				p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 				p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
-				if ( material.lights ) {
+				if ( materialProperties.needsLights ) {
 
 					// the current material requires lighting info
 
@@ -25797,6 +25799,14 @@
 
 		}
 
+		function materialNeedsLights( material ) {
+
+			return material.isMeshLambertMaterial || material.isMeshPhongMaterial ||
+				material.isMeshStandardMaterial || material.isShadowMaterial ||
+				( material.isShaderMaterial && material.lights === true );
+
+		}
+
 		//
 		this.setFramebuffer = function ( value ) {
 
@@ -26340,7 +26350,6 @@
 
 		this.sizeAttenuation = true;
 
-		this.lights = false;
 		this.transparent = true;
 
 		this.setValues( parameters );
@@ -27032,6 +27041,8 @@
 
 		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
 
+		this.count = count;
+
 	}
 
 	InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
@@ -27077,8 +27088,6 @@
 		this.linewidth = 1;
 		this.linecap = 'round';
 		this.linejoin = 'round';
-
-		this.lights = false;
 
 		this.setValues( parameters );
 
@@ -27464,8 +27473,6 @@
 		this.sizeAttenuation = true;
 
 		this.morphTargets = false;
-
-		this.lights = false;
 
 		this.setValues( parameters );
 
@@ -32872,7 +32879,6 @@
 		this.wireframeLinewidth = 1;
 
 		this.fog = false;
-		this.lights = false;
 
 		this.skinning = false;
 		this.morphTargets = false;
@@ -33098,8 +33104,6 @@
 		this.skinning = false;
 		this.morphTargets = false;
 		this.morphNormals = false;
-
-		this.lights = false;
 
 		this.setValues( parameters );
 

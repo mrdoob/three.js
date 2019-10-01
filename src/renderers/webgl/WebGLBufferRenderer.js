@@ -4,6 +4,8 @@
 
 function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var mode;
 
 	function setMode( value ) {
@@ -26,7 +28,7 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var extension, methodName;
 
-		if ( capabilities.isWebGL2 ) {
+		if ( isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawArraysInstanced';

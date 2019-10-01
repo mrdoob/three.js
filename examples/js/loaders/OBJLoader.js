@@ -682,7 +682,6 @@ THREE.OBJLoader = ( function () {
 							var materialLine = new THREE.LineBasicMaterial();
 							THREE.Material.prototype.copy.call( materialLine, material );
 							materialLine.color.copy( material.color );
-							materialLine.lights = false;
 							material = materialLine;
 
 						} else if ( isPoints && material && ! ( material instanceof THREE.PointsMaterial ) ) {
@@ -691,7 +690,6 @@ THREE.OBJLoader = ( function () {
 							THREE.Material.prototype.copy.call( materialPoints, material );
 							materialPoints.color.copy( material.color );
 							materialPoints.map = material.map;
-							materialPoints.lights = false;
 							material = materialPoints;
 
 						}

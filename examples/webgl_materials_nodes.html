@@ -724,6 +724,18 @@
 
 						}, false );
 
+						addGui( 'side', {
+							DoubleSided: THREE.DoubleSide,
+							FrontSided: THREE.FrontSide,
+							BackSided: THREE.BackSide
+						}, function ( val ) {
+
+							defaultSide = Number( val );
+
+							updateMaterial();
+
+						} );
+
 						break;
 
 					case 'physical':
