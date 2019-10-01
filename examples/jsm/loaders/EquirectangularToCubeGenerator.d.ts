@@ -2,7 +2,8 @@ import {
 	PixelFormat,
 	Texture,
 	TextureDataType,
-	WebGLRenderer
+	WebGLRenderer,
+	WebGLRenderTargetCube
 } from '../../../src/Three';
 
 export interface EquirectangularToCubeGeneratorOptions {
