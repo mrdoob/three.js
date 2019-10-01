@@ -69,6 +69,13 @@ export class Color {
 	setStyle( style: string ): Color;
 
 	/**
+	 * Sets this color from a color name.
+	 * Faster than {@link Color#setStyle .setStyle()} method if you don't need the other CSS-style formats.
+	 * @param style Color name in X11 format.
+	 */
+	setColorName( style: string ): Color;
+
+	/**
 	 * Clones this color.
 	 */
 	clone(): this;
@@ -182,5 +189,10 @@ export class Color {
 	 * @return The provided array-like.
 	 */
 	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
+	/**
+	 * List of X11 color names.
+	 */
+	static NAMES: Record<string, number>;
 
 }
