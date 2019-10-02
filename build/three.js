@@ -14256,7 +14256,7 @@
 
 	var normal_frag = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif\n#include <packing>\n#include <uv_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\t#include <logdepthbuf_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\tgl_FragColor = vec4( packNormalToRGB( normal ), opacity );\n}";
 
-	var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n\t#ifdef USE_TANGENT\n\t\tvTangent = normalize( transformedTangent );\n\t\tvBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );\n\t#endif\n#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}";
+	var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n\t#ifdef USE_TANGENT\n\t\tvTangent = normalize( transformedTangent );\n\t\tvBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );\n\t#endif\n#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}";
 
 	var points_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_particle_fragment>\n\t#include <color_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}";
 
@@ -17587,13 +17587,13 @@
 
 	}
 
-	function generateEnvMapTypeDefine( parameters, material ) {
+	function generateEnvMapTypeDefine( parameters ) {
 
 		var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 
 		if ( parameters.envMap ) {
 
-			switch ( material.envMap.mapping ) {
+			switch ( parameters.envMapMode ) {
 
 				case CubeReflectionMapping:
 				case CubeRefractionMapping:
@@ -17622,13 +17622,13 @@
 
 	}
 
-	function generateEnvMapModeDefine( parameters, material ) {
+	function generateEnvMapModeDefine( parameters ) {
 
 		var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 
 		if ( parameters.envMap ) {
 
-			switch ( material.envMap.mapping ) {
+			switch ( parameters.envMapMode ) {
 
 				case CubeRefractionMapping:
 				case EquirectangularRefractionMapping:
@@ -17680,8 +17680,8 @@
 		var vertexShader = shader.vertexShader;
 		var fragmentShader = shader.fragmentShader;
 		var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-		var envMapTypeDefine = generateEnvMapTypeDefine( parameters, material );
-		var envMapModeDefine = generateEnvMapModeDefine( parameters, material );
+		var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+		var envMapModeDefine = generateEnvMapModeDefine( parameters );
 		var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters, material );
 
 
@@ -18198,6 +18198,13 @@
 
 		var programs = [];
 
+		var isWebGL2 = capabilities.isWebGL2;
+		var logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
+		var floatVertexTextures = capabilities.floatVertexTextures;
+		var precision = capabilities.precision;
+		var maxVertexUniforms = capabilities.maxVertexUniforms;
+		var vertexTextures = capabilities.vertexTextures;
+
 		var shaderIDs = {
 			MeshDepthMaterial: 'depth',
 			MeshDistanceMaterial: 'distanceRGBA',
@@ -18237,7 +18244,7 @@
 			var skeleton = object.skeleton;
 			var bones = skeleton.bones;
 
-			if ( capabilities.floatVertexTextures ) {
+			if ( floatVertexTextures ) {
 
 				return 1024;
 
@@ -18250,7 +18257,7 @@
 				//  - limit here is ANGLE's 254 max uniform vectors
 				//    (up to 54 should be safe)
 
-				var nVertexUniforms = capabilities.maxVertexUniforms;
+				var nVertexUniforms = maxVertexUniforms;
 				var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
 				var maxBones = Math.min( nVertexMatrices, bones.length );
@@ -18306,7 +18313,6 @@
 			// (not to blow over maxLights budget)
 
 			var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
-			var precision = capabilities.precision;
 
 			if ( material.precision !== null ) {
 
@@ -18324,7 +18330,7 @@
 
 			var parameters = {
 
-				isWebGL2: capabilities.isWebGL2,
+				isWebGL2: isWebGL2,
 
 				shaderID: shaderID,
 
@@ -18332,7 +18338,7 @@
 
 				instancing: object.isInstancedMesh === true,
 
-				supportsVertexTextures: capabilities.vertexTextures,
+				supportsVertexTextures: vertexTextures,
 				outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 				map: !! material.map,
 				mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
@@ -18374,11 +18380,11 @@
 				flatShading: material.flatShading,
 
 				sizeAttenuation: material.sizeAttenuation,
-				logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
+				logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 				skinning: material.skinning && maxBones > 0,
 				maxBones: maxBones,
-				useVertexTexture: capabilities.floatVertexTextures,
+				useVertexTexture: floatVertexTextures,
 
 				morphTargets: material.morphTargets,
 				morphNormals: material.morphNormals,
@@ -35418,8 +35424,6 @@
 
 					var response = this.response;
 
-					Cache.add( url, response );
-
 					var callbacks = loading[ url ];
 
 					delete loading[ url ];
@@ -35430,6 +35434,10 @@
 						// e.g. 'file://' or 'data://'. Handle as success.
 
 						if ( this.status === 0 ) { console.warn( 'THREE.FileLoader: HTTP Status 0 received.' ); }
+
+						// Add to cache only on HTTP success, so that we do not cache
+						// error response bodies as proper responses to requests.
+						Cache.add( url, response );
 
 						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
