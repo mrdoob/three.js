@@ -9,6 +9,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	var programs = [];
 
+	var isWebGL2 = capabilities.isWebGL2;
+	var logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
+	var floatVertexTextures = capabilities.floatVertexTextures;
+	var precision = capabilities.precision;
+	var maxVertexUniforms = capabilities.maxVertexUniforms;
+	var vertexTextures = capabilities.vertexTextures;
+
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
 		MeshDistanceMaterial: 'distanceRGBA',
@@ -48,7 +55,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		var skeleton = object.skeleton;
 		var bones = skeleton.bones;
 
-		if ( capabilities.floatVertexTextures ) {
+		if ( floatVertexTextures ) {
 
 			return 1024;
 
@@ -61,7 +68,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			//  - limit here is ANGLE's 254 max uniform vectors
 			//    (up to 54 should be safe)
 
-			var nVertexUniforms = capabilities.maxVertexUniforms;
+			var nVertexUniforms = maxVertexUniforms;
 			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
 			var maxBones = Math.min( nVertexMatrices, bones.length );
@@ -117,7 +124,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		// (not to blow over maxLights budget)
 
 		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
-		var precision = capabilities.precision;
 
 		if ( material.precision !== null ) {
 
@@ -135,7 +141,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		var parameters = {
 
-			isWebGL2: capabilities.isWebGL2,
+			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
 
@@ -143,7 +149,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			instancing: object.isInstancedMesh === true,
 
-			supportsVertexTextures: capabilities.vertexTextures,
+			supportsVertexTextures: vertexTextures,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
@@ -185,11 +191,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			flatShading: material.flatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
+			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: material.skinning && maxBones > 0,
 			maxBones: maxBones,
-			useVertexTexture: capabilities.floatVertexTextures,
+			useVertexTexture: floatVertexTextures,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
