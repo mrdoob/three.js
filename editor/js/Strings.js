@@ -343,7 +343,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': '圆柱体',
 			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
-			'menubar/add/dodecahedron': 'Dodecahedron',
+			'menubar/add/dodecahedron': '十二面体',
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/octahedron': '八面体',
 			'menubar/add/tetrahedron': '四面体',
