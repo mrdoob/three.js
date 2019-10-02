@@ -233,16 +233,8 @@ var WEBVR = {
 		} else {
 
 			var message = document.createElement( 'a' );
-
-			if ( window.isSecureContext === false ) {
-
-				message.innerHTML = 'WEBXR NEEDS HTTPS';
-
-			} else {
-
-				message.innerHTML = 'WEBXR NOT AVAILABLE';
-
-			}
+			message.href = 'https://webvr.info';
+			message.innerHTML = 'WEBVR NOT SUPPORTED';
 
 			message.style.left = 'calc(50% - 90px)';
 			message.style.width = '180px';
