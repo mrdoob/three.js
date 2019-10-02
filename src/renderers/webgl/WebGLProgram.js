@@ -293,13 +293,13 @@ function generateShadowMapTypeDefine( parameters ) {
 
 }
 
-function generateEnvMapTypeDefine( parameters, material ) {
+function generateEnvMapTypeDefine( parameters ) {
 
 	var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.envMap.mapping ) {
+		switch ( parameters.envMapMode ) {
 
 			case CubeReflectionMapping:
 			case CubeRefractionMapping:
@@ -328,13 +328,13 @@ function generateEnvMapTypeDefine( parameters, material ) {
 
 }
 
-function generateEnvMapModeDefine( parameters, material ) {
+function generateEnvMapModeDefine( parameters ) {
 
 	var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.envMap.mapping ) {
+		switch ( parameters.envMapMode ) {
 
 			case CubeRefractionMapping:
 			case EquirectangularRefractionMapping:
@@ -386,8 +386,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
 	var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-	var envMapTypeDefine = generateEnvMapTypeDefine( parameters, material );
-	var envMapModeDefine = generateEnvMapModeDefine( parameters, material );
+	var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+	var envMapModeDefine = generateEnvMapModeDefine( parameters );
 	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters, material );
 
 
