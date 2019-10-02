@@ -231,8 +231,16 @@ THREE.WEBVR = {
 		} else {
 
 			var message = document.createElement( 'a' );
-			message.href = 'https://webvr.info';
-			message.innerHTML = 'WEBVR NOT SUPPORTED';
+
+			if ( window.isSecureContext === false ) {
+
+				message.innerHTML = 'WEBXR NEEDS HTTPS';
+
+			} else {
+
+				message.innerHTML = 'WEBXR NOT AVAILABLE';
+
+			}
 
 			message.style.left = 'calc(50% - 90px)';
 			message.style.width = '180px';
