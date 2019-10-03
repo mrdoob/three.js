@@ -19,9 +19,11 @@ import {
 	LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter
 } from '../constants.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
+import { InstancedMesh } from '../objects/InstancedMesh.js';
 import { Sprite } from '../objects/Sprite.js';
 import { Points } from '../objects/Points.js';
 import { Line } from '../objects/Line.js';
@@ -845,7 +847,17 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
+				break;
+
+			case 'InstancedMesh':
+
+				var geometry = getGeometry( data.geometry );
+				var material = getMaterial( data.material );
+				var count = data.count;
+				var instanceMatrix = data.instanceMatrix;
+
+				object = new InstancedMesh( geometry, material, count );
+				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 
 				break;
 
@@ -935,6 +947,8 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 		if ( data.layers !== undefined ) object.layers.mask = data.layers;
+
+		if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
 
 		if ( data.children !== undefined ) {
 
