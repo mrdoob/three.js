@@ -58,7 +58,7 @@
 				geometry.rotateX( - Math.PI / 2 );
 
 				var position = geometry.attributes.position;
-				position.dynamic = true;
+				position.usage = THREE.DynamicDrawUsage;
 
 				for ( var i = 0; i < position.count; i ++ ) {
 
