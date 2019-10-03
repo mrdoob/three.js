@@ -1985,7 +1985,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( material.isShaderMaterial ) {
 
-				material.uniformsNeedUpdate = false;
+				material.uniformsNeedUpdate = false; // #15581
 
 			}
 
