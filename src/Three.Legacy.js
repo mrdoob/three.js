@@ -1199,14 +1199,9 @@ Object.assign( BufferAttribute.prototype, {
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
 	},
-	setArray: function ( array ) {
+	setArray: function ( /* array */ ) {
 
-		console.warn( 'THREE.BufferAttribute: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
-
-		this.count = array !== undefined ? array.length / this.itemSize : 0;
-		this.array = array;
-
-		return this;
+		console.error( 'THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
 
 	}
 } );
@@ -1297,14 +1292,9 @@ Object.assign( InterleavedBuffer.prototype, {
 		return this;
 
 	},
-	setArray: function ( array ) {
+	setArray: function ( /* array */ ) {
 
-		console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
-
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
-
-		return this;
+		console.error( 'THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
 
 	}
 } );
