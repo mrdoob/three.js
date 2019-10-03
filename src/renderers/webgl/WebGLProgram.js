@@ -377,6 +377,93 @@ function generateEnvMapBlendingDefine( parameters ) {
 
 }
 
+function generateStandardDefines( renderer, parameters, extensions, material ) {
+
+	var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
+	var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+	var envMapModeDefine = generateEnvMapModeDefine( parameters );
+	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
+	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
+
+	var defines = [
+
+		parameters.instancing ? '#define USE_INSTANCING' : '',
+		parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
+
+		parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest + ( parameters.alphaTest % 1 ? '' : '.0' ) : '', // add '.0' if integer
+
+		'#define GAMMA_FACTOR ' + gammaFactorDefine,
+
+		'#define MAX_BONES ' + parameters.maxBones,
+		( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
+		( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
+
+		parameters.map ? '#define USE_MAP' : '',
+		parameters.matcap ? '#define USE_MATCAP' : '',
+		parameters.envMap ? '#define USE_ENVMAP' : '',
+		parameters.envMap ? '#define ' + envMapTypeDefine : '',
+		parameters.envMap ? '#define ' + envMapModeDefine : '',
+		parameters.envMap ? '#define ' + envMapBlendingDefine : '',
+		parameters.lightMap ? '#define USE_LIGHTMAP' : '',
+		parameters.aoMap ? '#define USE_AOMAP' : '',
+		parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
+		parameters.bumpMap ? '#define USE_BUMPMAP' : '',
+		parameters.normalMap ? '#define USE_NORMALMAP' : '',
+		( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
+		( parameters.normalMap && parameters.tangentSpaceNormalMap ) ? '#define TANGENTSPACE_NORMALMAP' : '',
+
+		parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
+		parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
+		parameters.specularMap ? '#define USE_SPECULARMAP' : '',
+		parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
+		parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
+		parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
+
+		parameters.sheen ? '#define USE_SHEEN' : '',
+
+		parameters.vertexTangents ? '#define USE_TANGENT' : '',
+		parameters.vertexColors ? '#define USE_COLOR' : '',
+		parameters.vertexUvs ? '#define USE_UV' : '',
+
+		parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
+
+		parameters.flatShading ? '#define FLAT_SHADED' : '',
+
+		parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
+		parameters.flipSided ? '#define FLIP_SIDED' : '',
+
+		parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
+		parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
+
+		parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
+
+		parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
+
+		parameters.skinning ? '#define USE_SKINNING' : '',
+		parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
+
+		parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
+		parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
+
+		parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
+
+		parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+		parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+
+		( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
+
+		( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
+
+		parameters.dithering ? '#define DITHERING' : '',
+
+		parameters.depthPacking ? '#define DEPTH_PACKING ' + material.depthPacking : '',
+
+	].filter( filterEmptyLine ).join( '\n' );
+
+	return defines;
+
+}
+
 function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
 
 	var gl = renderer.getContext();
@@ -385,17 +472,11 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
-	var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-	var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
-	var envMapModeDefine = generateEnvMapModeDefine( parameters );
-	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
-
-
-	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
 	var customExtensions = parameters.isWebGL2 ? '' : generateExtensions( material.extensions, parameters, extensions );
 
 	var customDefines = generateDefines( defines );
+	var standardDefines = generateStandardDefines( renderer, parameters, extensions, material );
 
 	var program = gl.createProgram();
 
@@ -441,76 +522,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			customDefines,
 
-			parameters.instancing ? '#define USE_INSTANCING' : '',
-			parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
-
-			parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest + ( parameters.alphaTest % 1 ? '' : '.0' ) : '', // add '.0' if integer
-
-			'#define GAMMA_FACTOR ' + gammaFactorDefine,
-
-			'#define MAX_BONES ' + parameters.maxBones,
-			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
-			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
-
-			parameters.map ? '#define USE_MAP' : '',
-			parameters.matcap ? '#define USE_MATCAP' : '',
-			parameters.envMap ? '#define USE_ENVMAP' : '',
-			parameters.envMap ? '#define ' + envMapModeDefine : '',
-			parameters.envMap ? '#define ' + envMapModeDefine : '',
-			parameters.envMap ? '#define ' + envMapBlendingDefine : '',
-			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
-			parameters.aoMap ? '#define USE_AOMAP' : '',
-			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
-			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
-			parameters.normalMap ? '#define USE_NORMALMAP' : '',
-			( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
-			( parameters.normalMap && parameters.tangentSpaceNormalMap ) ? '#define TANGENTSPACE_NORMALMAP' : '',
-
-			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
-			parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
-			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
-			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
-			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
-			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
-
-			parameters.sheen ? '#define USE_SHEEN' : '',
-
-			parameters.vertexTangents ? '#define USE_TANGENT' : '',
-			parameters.vertexColors ? '#define USE_COLOR' : '',
-			parameters.vertexUvs ? '#define USE_UV' : '',
-
-			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
-
-			parameters.flatShading ? '#define FLAT_SHADED' : '',
-
-			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
-			parameters.flipSided ? '#define FLIP_SIDED' : '',
-
-			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
-			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-
-			parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
-
-			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
-
-			parameters.skinning ? '#define USE_SKINNING' : '',
-			parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
-
-			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
-			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
-
-			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
-
-			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
-
-			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
-
-			( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
-
-			parameters.dithering ? '#define DITHERING' : '',
-
-			parameters.depthPacking ? '#define DEPTH_PACKING ' + material.depthPacking : '',
+			standardDefines,
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -587,75 +599,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			customDefines,
 
-			parameters.instancing ? '#define USE_INSTANCING' : '',
-			parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
-
-			parameters.alphaTest ? '#define ALPHATEST ' + parameters.alphaTest + ( parameters.alphaTest % 1 ? '' : '.0' ) : '', // add '.0' if integer
-
-			'#define GAMMA_FACTOR ' + gammaFactorDefine,
-
-			'#define MAX_BONES ' + parameters.maxBones,
-			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
-			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
-
-			parameters.map ? '#define USE_MAP' : '',
-			parameters.matcap ? '#define USE_MATCAP' : '',
-			parameters.envMap ? '#define USE_ENVMAP' : '',
-			parameters.envMap ? '#define ' + envMapTypeDefine : '',
-			parameters.envMap ? '#define ' + envMapModeDefine : '',
-			parameters.envMap ? '#define ' + envMapBlendingDefine : '',
-			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
-			parameters.aoMap ? '#define USE_AOMAP' : '',
-			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
-			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
-			parameters.normalMap ? '#define USE_NORMALMAP' : '',
-			( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
-			( parameters.normalMap && parameters.tangentSpaceNormalMap ) ? '#define TANGENTSPACE_NORMALMAP' : '',
-			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
-			parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
-			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
-			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
-			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
-			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
-
-			parameters.sheen ? '#define USE_SHEEN' : '',
-
-			parameters.vertexTangents ? '#define USE_TANGENT' : '',
-			parameters.vertexColors ? '#define USE_COLOR' : '',
-			parameters.vertexUvs ? '#define USE_UV' : '',
-
-			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
-
-			parameters.flatShading ? '#define FLAT_SHADED' : '',
-
-			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
-			parameters.flipSided ? '#define FLIP_SIDED' : '',
-
-			parameters.shadowMapEnabled ? '#define USE_SHADOWMAP' : '',
-			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
-
-			parameters.premultipliedAlpha ? '#define PREMULTIPLIED_ALPHA' : '',
-
-			parameters.physicallyCorrectLights ? '#define PHYSICALLY_CORRECT_LIGHTS' : '',
-
-			parameters.skinning ? '#define USE_SKINNING' : '',
-			parameters.useVertexTexture ? '#define BONE_TEXTURE' : '',
-
-			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
-			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
-
-			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
-
-			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
-			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
-
-			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
-
-			( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
-
-			parameters.dithering ? '#define DITHERING' : '',
-
-			parameters.depthPacking ? '#define DEPTH_PACKING ' + material.depthPacking : '',
+			standardDefines,
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
