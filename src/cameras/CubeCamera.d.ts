@@ -1,4 +1,5 @@
 import { WebGLRenderTargetCube } from './../renderers/WebGLRenderTargetCube';
+import { WebGLRenderTargetOptions } from './../renderers/WebGLRenderTarget';
 import { Scene } from './../scenes/Scene';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import { Object3D } from './../core/Object3D';
