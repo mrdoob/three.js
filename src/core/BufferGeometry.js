@@ -657,8 +657,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 					if ( this.morphTargetsRelative ) {
 
-						_box.boundingBox.expandByVector( _boxMorphTargets.min );
-						_box.boundingBox.expandByVector( _boxMorphTargets.max );
+						_box.expandByVector( _boxMorphTargets.min );
+						_box.expandByVector( _boxMorphTargets.max );
 
 					} else {
 
