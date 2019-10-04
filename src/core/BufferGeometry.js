@@ -978,6 +978,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
+		geometry2.morphTargetsRelative = this.morphTargetsRelative;
+
 		// groups
 
 		var groups = this.groups;
