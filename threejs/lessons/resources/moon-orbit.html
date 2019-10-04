@@ -23,6 +23,11 @@ p {
   z-index: 2;
   background-color: transparent;
 }
+@media (prefers-color-scheme: dark) {
+  canvas {
+    background: #444;
+  }
+}
 </style>
 </head>
 <body>
@@ -107,12 +112,15 @@ function main() {
       const point = [mat.e, mat.f];
       const old = history[curHistory];
       if (old) {
-        orbitCtx.fillStyle = 'white';
+        orbitCtx.save();
+        orbitCtx.globalCompositeOperation = 'destination-out';
+        orbitCtx.fillStyle = 'rgba(255,255,255,1)';
         drawTrail(orbitCtx, old, 2);
+        orbitCtx.restore();
       }
       history[curHistory] = point;
       curHistory = (curHistory + 1) % maxHistory;
-      orbitCtx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+      orbitCtx.fillStyle = 'rgba(255, 0, 0, 1)';
       drawTrail(orbitCtx, point, 1);
     }
     node.children.forEach(drawNode);
