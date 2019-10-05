@@ -22,6 +22,8 @@ function Audio( listener ) {
 	this.buffer = null;
 	this.detune = 0;
 	this.loop = false;
+	this.loopStart = 0;
+	this.loopEnd = 0;
 	this.startTime = 0;
 	this.offset = 0;
 	this.duration = undefined;
@@ -108,6 +110,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		source.buffer = this.buffer;
 		source.loop = this.loop;
+		source.loopStart = this.loopStart;
+		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
 		this.startTime = this.context.currentTime;
 		source.start( this.startTime, this.offset, this.duration );
@@ -333,6 +337,22 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			this.source.loop = this.loop;
 
 		}
+
+		return this;
+
+	},
+
+	setLoopStart: function ( value ) {
+
+		this.loopStart = value;
+
+		return this;
+
+	},
+
+	setLoopEnd: function ( value ) {
+
+		this.loopEnd = value;
 
 		return this;
 

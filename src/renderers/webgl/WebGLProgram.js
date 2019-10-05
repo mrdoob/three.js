@@ -349,13 +349,13 @@ function generateEnvMapModeDefine( parameters ) {
 
 }
 
-function generateEnvMapBlendingDefine( parameters, material ) {
+function generateEnvMapBlendingDefine( parameters ) {
 
 	var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.combine ) {
+		switch ( parameters.combine ) {
 
 			case MultiplyOperation:
 				envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
@@ -388,7 +388,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
 	var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
 	var envMapModeDefine = generateEnvMapModeDefine( parameters );
-	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters, material );
+	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
 
 
 	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
@@ -401,8 +401,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var prefixVertex, prefixFragment;
 
-	var renderTarget = renderer.getRenderTarget();
-	var numMultiviewViews = renderTarget && renderTarget.isWebGLMultiviewRenderTarget ? renderTarget.numViews : 0;
+	var numMultiviewViews = parameters.numMultiviewViews;
 
 	if ( material.isRawShaderMaterial ) {
 

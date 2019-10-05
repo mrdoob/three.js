@@ -180,7 +180,7 @@
 				geometry.addAttribute( 'position', positions.clone() );
 				geometry.addAttribute( 'initialPosition', positions.clone() );
 
-				geometry.attributes.position.setDynamic( true );
+				geometry.attributes.position.setUsage( THREE.DynamicDrawUsage );
 
 				var clones = [
 

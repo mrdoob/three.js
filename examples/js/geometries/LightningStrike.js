@@ -430,11 +430,11 @@ THREE.LightningStrike.prototype.createMesh = function () {
 
 	if ( ! this.isStatic ) {
 
-		this.index.dynamic = true;
-		this.positionAttribute.dynamic = true;
+		this.index.usage = THREE.DynamicDrawUsage;
+		this.positionAttribute.usage = THREE.DynamicDrawUsage;
 		if ( this.generateUVs ) {
 
-			this.uvsAttribute.dynamic = true;
+			this.uvsAttribute.usage = THREE.DynamicDrawUsage;
 
 		}
 

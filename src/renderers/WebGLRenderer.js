@@ -1985,7 +1985,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( material.isShaderMaterial ) {
 
-				material.uniformsNeedUpdate = false;
+				material.uniformsNeedUpdate = false; // #15581
 
 			}
 
@@ -2493,7 +2493,7 @@ function WebGLRenderer( parameters ) {
 	//
 	this.setFramebuffer = function ( value ) {
 
-		if ( _framebuffer !== value ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
+		if ( _framebuffer !== value && _currentRenderTarget === null ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
 
 		_framebuffer = value;
 

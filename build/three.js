@@ -266,6 +266,16 @@
 	var GreaterEqualStencilFunc = 518;
 	var AlwaysStencilFunc = 519;
 
+	var StaticDrawUsage = 35044;
+	var DynamicDrawUsage = 35048;
+	var StreamDrawUsage = 35040;
+	var StaticReadUsage = 35045;
+	var DynamicReadUsage = 35049;
+	var StreamReadUsage = 35041;
+	var StaticCopyUsage = 35046;
+	var DynamicCopyUsage = 35050;
+	var StreamCopyUsage = 35042;
+
 	/**
 	 * https://github.com/mrdoob/eventdispatcher.js/
 	 */
@@ -8858,7 +8868,7 @@
 		this.count = array !== undefined ? array.length / itemSize : 0;
 		this.normalized = normalized === true;
 
-		this.dynamic = false;
+		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
 
 		this.version = 0;
@@ -8881,9 +8891,9 @@
 
 		onUploadCallback: function () {},
 
-		setDynamic: function ( value ) {
+		setUsage: function ( value ) {
 
-			this.dynamic = value;
+			this.usage = value;
 
 			return this;
 
@@ -8897,7 +8907,7 @@
 			this.count = source.count;
 			this.normalized = source.normalized;
 
-			this.dynamic = source.dynamic;
+			this.usage = source.usage;
 
 			return this;
 
@@ -14120,7 +14130,7 @@
 
 	var lights_fragment_end = "#if defined( RE_IndirectDiffuse )\n\tRE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );\n#endif\n#if defined( RE_IndirectSpecular )\n\tRE_IndirectSpecular( radiance, iblIrradiance, clearcoatRadiance, geometry, material, reflectedLight );\n#endif";
 
-	var logdepthbuf_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tgl_FragDepthEXT = vIsPerspective == 1.0 ? log2( vFragDepth ) * logDepthBufFC * 0.5 : gl_FragCoord.z;\n#endif";
+	var logdepthbuf_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tgl_FragDepthEXT = vIsPerspective == 0.0 ? gl_FragCoord.z : log2( vFragDepth ) * logDepthBufFC * 0.5;\n#endif";
 
 	var logdepthbuf_pars_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tuniform float logDepthBufFC;\n\tvarying float vFragDepth;\n\tvarying float vIsPerspective;\n#endif";
 
@@ -14940,7 +14950,7 @@
 		function createBuffer( attribute, bufferType ) {
 
 			var array = attribute.array;
-			var usage = attribute.dynamic ? 35048 : 35044;
+			var usage = attribute.usage;
 
 			var buffer = gl.createBuffer();
 
@@ -15001,19 +15011,11 @@
 
 			gl.bindBuffer( bufferType, buffer );
 
-			if ( attribute.dynamic === false ) {
-
-				gl.bufferData( bufferType, array, 35044 );
-
-			} else if ( updateRange.count === - 1 ) {
+			if ( updateRange.count === - 1 ) {
 
 				// Not using update ranges
 
 				gl.bufferSubData( bufferType, 0, array );
-
-			} else if ( updateRange.count === 0 ) {
-
-				console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 			} else {
 
@@ -17643,13 +17645,13 @@
 
 	}
 
-	function generateEnvMapBlendingDefine( parameters, material ) {
+	function generateEnvMapBlendingDefine( parameters ) {
 
 		var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
 
 		if ( parameters.envMap ) {
 
-			switch ( material.combine ) {
+			switch ( parameters.combine ) {
 
 				case MultiplyOperation:
 					envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
@@ -17682,7 +17684,7 @@
 		var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
 		var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
 		var envMapModeDefine = generateEnvMapModeDefine( parameters );
-		var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters, material );
+		var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
 
 
 		var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
@@ -17695,8 +17697,7 @@
 
 		var prefixVertex, prefixFragment;
 
-		var renderTarget = renderer.getRenderTarget();
-		var numMultiviewViews = renderTarget && renderTarget.isWebGLMultiviewRenderTarget ? renderTarget.numViews : 0;
+		var numMultiviewViews = parameters.numMultiviewViews;
 
 		if ( material.isRawShaderMaterial ) {
 
@@ -18224,7 +18225,7 @@
 		};
 
 		var parameterNames = [
-			"precision", "supportsVertexTextures", "instancing",
+			"precision", "supportsVertexTextures", "instancing", "numMultiviewViews",
 			"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
 			"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 			"roughnessMap", "metalnessMap", "gradientMap",
@@ -18327,6 +18328,7 @@
 			}
 
 			var currentRenderTarget = renderer.getRenderTarget();
+			var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
 			var parameters = {
 
@@ -18339,6 +18341,7 @@
 				instancing: object.isInstancedMesh === true,
 
 				supportsVertexTextures: vertexTextures,
+				numMultiviewViews: numMultiviewViews,
 				outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 				map: !! material.map,
 				mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
@@ -25338,7 +25341,7 @@
 
 				if ( material.isShaderMaterial ) {
 
-					material.uniformsNeedUpdate = false;
+					material.uniformsNeedUpdate = false; // #15581
 
 				}
 
@@ -25846,7 +25849,7 @@
 		//
 		this.setFramebuffer = function ( value ) {
 
-			if ( _framebuffer !== value ) { _gl.bindFramebuffer( 36160, value ); }
+			if ( _framebuffer !== value && _currentRenderTarget === null ) { _gl.bindFramebuffer( 36160, value ); }
 
 			_framebuffer = value;
 
@@ -26143,7 +26146,7 @@
 		this.stride = stride;
 		this.count = array !== undefined ? array.length / stride : 0;
 
-		this.dynamic = false;
+		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
 
 		this.version = 0;
@@ -26166,9 +26169,9 @@
 
 		onUploadCallback: function () {},
 
-		setDynamic: function ( value ) {
+		setUsage: function ( value ) {
 
-			this.dynamic = value;
+			this.usage = value;
 
 			return this;
 
@@ -26179,7 +26182,7 @@
 			this.array = new source.array.constructor( source.array );
 			this.count = source.count;
 			this.stride = source.stride;
-			this.dynamic = source.dynamic;
+			this.usage = source.usage;
 
 			return this;
 
@@ -41587,6 +41590,8 @@
 		this.buffer = null;
 		this.detune = 0;
 		this.loop = false;
+		this.loopStart = 0;
+		this.loopEnd = 0;
 		this.startTime = 0;
 		this.offset = 0;
 		this.duration = undefined;
@@ -41673,6 +41678,8 @@
 
 			source.buffer = this.buffer;
 			source.loop = this.loop;
+			source.loopStart = this.loopStart;
+			source.loopEnd = this.loopEnd;
 			source.onended = this.onEnded.bind( this );
 			this.startTime = this.context.currentTime;
 			source.start( this.startTime, this.offset, this.duration );
@@ -41898,6 +41905,22 @@
 				this.source.loop = this.loop;
 
 			}
+
+			return this;
+
+		},
+
+		setLoopStart: function ( value ) {
+
+			this.loopStart = value;
+
+			return this;
+
+		},
+
+		setLoopEnd: function ( value ) {
+
+			this.loopEnd = value;
 
 			return this;
 
@@ -48369,28 +48392,42 @@
 				return this.array.length;
 
 			}
+		},
+		dynamic: {
+			get: function () {
+
+				console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+				return this.usage === DynamicDrawUsage;
+
+			},
+			set: function ( value ) {
+
+				console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+				this.setUsage( value );
+
+			}
 		}
 
 	} );
 
 	Object.assign( BufferAttribute.prototype, {
+		setDynamic: function ( value ) {
 
+			console.warn( 'THREE.BufferAttribute: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+			this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+			return this;
+
+		},
 		copyIndicesArray: function ( /* indices */ ) {
 
 			console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
 		},
-		setArray: function ( array ) {
+		setArray: function ( /* array */ ) {
 
-			console.warn( 'THREE.BufferAttribute: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
-
-			this.count = array !== undefined ? array.length / this.itemSize : 0;
-			this.array = array;
-
-			return this;
+			console.error( 'THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
 
 		}
-
 	} );
 
 	Object.assign( BufferGeometry.prototype, {
@@ -48452,19 +48489,38 @@
 
 	} );
 
-	Object.assign( InterleavedBuffer.prototype, {
+	Object.defineProperties( InterleavedBuffer.prototype, {
 
-		setArray: function ( array ) {
+		dynamic: {
+			get: function () {
 
-			console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+				console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+				return this.usage === DynamicDrawUsage;
 
-			this.count = array !== undefined ? array.length / this.stride : 0;
-			this.array = array;
+			},
+			set: function ( value ) {
 
-			return this;
+				console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+				this.setUsage( value );
 
+			}
 		}
 
+	} );
+
+	Object.assign( InterleavedBuffer.prototype, {
+		setDynamic: function ( value ) {
+
+			console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+			this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+			return this;
+
+		},
+		setArray: function ( /* array */ ) {
+
+			console.error( 'THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+		}
 	} );
 
 	//
@@ -49319,6 +49375,9 @@
 	exports.DstAlphaFactor = DstAlphaFactor;
 	exports.DstColorFactor = DstColorFactor;
 	exports.DynamicBufferAttribute = DynamicBufferAttribute;
+	exports.DynamicCopyUsage = DynamicCopyUsage;
+	exports.DynamicDrawUsage = DynamicDrawUsage;
+	exports.DynamicReadUsage = DynamicReadUsage;
 	exports.EdgesGeometry = EdgesGeometry;
 	exports.EdgesHelper = EdgesHelper;
 	exports.EllipseCurve = EllipseCurve;
@@ -49590,7 +49649,13 @@
 	exports.SrcAlphaFactor = SrcAlphaFactor;
 	exports.SrcAlphaSaturateFactor = SrcAlphaSaturateFactor;
 	exports.SrcColorFactor = SrcColorFactor;
+	exports.StaticCopyUsage = StaticCopyUsage;
+	exports.StaticDrawUsage = StaticDrawUsage;
+	exports.StaticReadUsage = StaticReadUsage;
 	exports.StereoCamera = StereoCamera;
+	exports.StreamCopyUsage = StreamCopyUsage;
+	exports.StreamDrawUsage = StreamDrawUsage;
+	exports.StreamReadUsage = StreamReadUsage;
 	exports.StringKeyframeTrack = StringKeyframeTrack;
 	exports.SubtractEquation = SubtractEquation;
 	exports.SubtractiveBlending = SubtractiveBlending;

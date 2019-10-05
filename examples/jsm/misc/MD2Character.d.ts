@@ -1,8 +1,16 @@
 import {
 	Object3D,
 	Mesh,
-	Texture
+	Texture,
+	AnimationMixer
 } from '../../../src/Three';
+
+export interface MD2PartsConfig {
+	baseUrl: string,
+	body: string,
+	skins: string[],
+	weapons: [string, string][],
+}
 
 export class MD2Character {
 
@@ -14,7 +22,13 @@ export class MD2Character {
 	meshWeapon: Mesh | null;
 	skinsBody: Texture[];
 	skinsWeapon: Texture[];
+	weapons: Mesh[];
+	activeAnimation: string | null;
+	mixer: AnimationMixer | null;
+	loadCounter: number;
 
+	onLoadComplete(): void;
+	loadParts( config: MD2PartsConfig ): void;
 	setPlaybackRate( rate: number ): void;
 	setWireframe( wireframeEnabled: boolean ): void;
 	setSkin( index: number ): void;

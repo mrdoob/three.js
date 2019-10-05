@@ -147,7 +147,7 @@
 			}
 
 			offsetAttribute = new THREE.InstancedBufferAttribute( new Float32Array( offsets ), 3 );
-			orientationAttribute = new THREE.InstancedBufferAttribute( new Float32Array( orientations ), 4 ).setDynamic( true );
+			orientationAttribute = new THREE.InstancedBufferAttribute( new Float32Array( orientations ), 4 ).setUsage( THREE.DynamicDrawUsage );
 
 			geometry.addAttribute( 'offset', offsetAttribute );
 			geometry.addAttribute( 'orientation', orientationAttribute );

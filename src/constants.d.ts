@@ -275,3 +275,15 @@ export const GreaterStencilFunc: StencilFunc;
 export const NotEqualStencilFunc: StencilFunc;
 export const GreaterEqualStencilFunc: StencilFunc;
 export const AlwaysStencilFunc: StencilFunc;
+
+// usage types
+export enum Usage {}
+export const StaticDrawUsage: Usage;
+export const DynamicDrawUsage: Usage;
+export const StreamDrawUsage: Usage;
+export const StaticReadUsage: Usage;
+export const DynamicReadUsage: Usage;
+export const StreamReadUsage: Usage;
+export const StaticCopyUsage: Usage;
+export const DynamicCopyUsage: Usage;
+export const StreamCopyUsage: Usage;
