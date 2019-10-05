@@ -401,6 +401,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var prefixVertex, prefixFragment;
 
+	var numMultiviewViews = parameters.numMultiviewViews;
+
 	if ( material.isRawShaderMaterial ) {
 
 		prefixVertex = [
@@ -694,14 +696,14 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 		// Multiview
 
-		if ( parameters.numMultiviewViews > 0 ) {
+		if ( numMultiviewViews > 0 ) {
 
 			prefixVertex = prefixVertex.replace(
 				'#version 300 es\n',
 				[
 					'#version 300 es\n',
 					'#extension GL_OVR_multiview2 : require',
-					'layout(num_views = ' + parameters.numMultiviewViews + ') in;',
+					'layout(num_views = ' + numMultiviewViews + ') in;',
 					'#define VIEW_ID gl_ViewID_OVR'
 				].join( '\n' )
 			);
@@ -714,10 +716,10 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 					'uniform mat3 normalMatrix;'
 				].join( '\n' ),
 				[
-					'uniform mat4 modelViewMatrices[' + parameters.numMultiviewViews + '];',
-					'uniform mat4 projectionMatrices[' + parameters.numMultiviewViews + '];',
-					'uniform mat4 viewMatrices[' + parameters.numMultiviewViews + '];',
-					'uniform mat3 normalMatrices[' + parameters.numMultiviewViews + '];',
+					'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+					'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
 
 					'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
 					'#define projectionMatrix projectionMatrices[VIEW_ID]',
@@ -738,7 +740,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			prefixFragment = prefixFragment.replace(
 				'uniform mat4 viewMatrix;',
 				[
-					'uniform mat4 viewMatrices[' + parameters.numMultiviewViews + '];',
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
 					'#define viewMatrix viewMatrices[VIEW_ID]'
 				].join( '\n' )
 			);
@@ -887,7 +889,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	this.program = program;
 	this.vertexShader = glVertexShader;
 	this.fragmentShader = glFragmentShader;
-	this.numMultiviewViews = parameters.numMultiviewViews;
+	this.numMultiviewViews = numMultiviewViews;
 
 	return this;
 
