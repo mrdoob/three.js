@@ -102,23 +102,23 @@ THREE.AssimpJSONLoader.prototype = Object.assign( Object.create( THREE.Loader.pr
 			}
 
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			if ( normals.length > 0 ) {
 
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 			}
 
 			if ( uvs.length > 0 ) {
 
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 			}
 
 			if ( colors.length > 0 ) {
 
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 			}
 

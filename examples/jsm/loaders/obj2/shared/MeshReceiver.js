@@ -84,7 +84,7 @@ MeshReceiver.prototype = {
 		let bufferGeometry = new BufferGeometry();
 		if ( buffers.vertices !== undefined && buffers.vertices !== null ) {
 
-			bufferGeometry.addAttribute( 'position', new BufferAttribute( new Float32Array( buffers.vertices ), 3 ) );
+			bufferGeometry.setAttribute( 'position', new BufferAttribute( new Float32Array( buffers.vertices ), 3 ) );
 
 		}
 		if ( buffers.indices !== undefined && buffers.indices !== null ) {
@@ -94,12 +94,12 @@ MeshReceiver.prototype = {
 		}
 		if ( buffers.colors !== undefined && buffers.colors !== null ) {
 
-			bufferGeometry.addAttribute( 'color', new BufferAttribute( new Float32Array( buffers.colors ), 3 ) );
+			bufferGeometry.setAttribute( 'color', new BufferAttribute( new Float32Array( buffers.colors ), 3 ) );
 
 		}
 		if ( buffers.normals !== undefined && buffers.normals !== null ) {
 
-			bufferGeometry.addAttribute( 'normal', new BufferAttribute( new Float32Array( buffers.normals ), 3 ) );
+			bufferGeometry.setAttribute( 'normal', new BufferAttribute( new Float32Array( buffers.normals ), 3 ) );
 
 		} else {
 
@@ -108,17 +108,17 @@ MeshReceiver.prototype = {
 		}
 		if ( buffers.uvs !== undefined && buffers.uvs !== null ) {
 
-			bufferGeometry.addAttribute( 'uv', new BufferAttribute( new Float32Array( buffers.uvs ), 2 ) );
+			bufferGeometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( buffers.uvs ), 2 ) );
 
 		}
 		if ( buffers.skinIndex !== undefined && buffers.skinIndex !== null ) {
 
-			bufferGeometry.addAttribute( 'skinIndex', new BufferAttribute( new Uint16Array( buffers.skinIndex ), 4 ) );
+			bufferGeometry.setAttribute( 'skinIndex', new BufferAttribute( new Uint16Array( buffers.skinIndex ), 4 ) );
 
 		}
 		if ( buffers.skinWeight !== undefined && buffers.skinWeight !== null ) {
 
-			bufferGeometry.addAttribute( 'skinWeight', new BufferAttribute( new Float32Array( buffers.skinWeight ), 4 ) );
+			bufferGeometry.setAttribute( 'skinWeight', new BufferAttribute( new Float32Array( buffers.skinWeight ), 4 ) );
 
 		}
 

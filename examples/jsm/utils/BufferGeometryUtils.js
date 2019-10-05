@@ -40,7 +40,7 @@ var BufferGeometryUtils = {
 
 		if ( attributes.tangent === undefined ) {
 
-			geometry.addAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
+			geometry.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
 
 		}
 
@@ -308,7 +308,7 @@ var BufferGeometryUtils = {
 
 			if ( ! mergedAttribute ) return null;
 
-			mergedGeometry.addAttribute( name, mergedAttribute );
+			mergedGeometry.setAttribute( name, mergedAttribute );
 
 		}
 
@@ -602,7 +602,7 @@ var BufferGeometryUtils = {
 			var buffer = new oldAttribute.array.constructor( attrArrays[ name ] );
 			var attribute = new BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.normalized );
 
-			result.addAttribute( name, attribute );
+			result.setAttribute( name, attribute );
 
 			// Update the attribute arrays
 			if ( name in morphAttrsArrays ) {

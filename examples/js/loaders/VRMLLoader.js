@@ -1465,13 +1465,13 @@ THREE.VRMLLoader = ( function () {
 				var geometry = new THREE.BufferGeometry();
 				positionAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new THREE.Float32BufferAttribute( coord, 3 ) );
 
-				geometry.addAttribute( 'position', positionAttribute );
-				geometry.addAttribute( 'normal', normalAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'normal', normalAttribute );
 
 				// optional attributes
 
-				if ( colorAttribute ) geometry.addAttribute( 'color', colorAttribute );
-				if ( uvAttribute ) geometry.addAttribute( 'uv', uvAttribute );
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
+				if ( uvAttribute ) geometry.setAttribute( 'uv', uvAttribute );
 
 				// "solid" influences the material so let's store it for later use
 
@@ -1592,9 +1592,9 @@ THREE.VRMLLoader = ( function () {
 				var geometry = new THREE.BufferGeometry();
 
 				var positionAttribute = toNonIndexedAttribute( expandedLineIndex, new THREE.Float32BufferAttribute( coord, 3 ) );
-				geometry.addAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
 
-				if ( colorAttribute ) geometry.addAttribute( 'color', colorAttribute );
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
 
 				geometry._type = 'line';
 
@@ -1648,8 +1648,8 @@ THREE.VRMLLoader = ( function () {
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( coord, 3 ) );
-				if ( color ) geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( coord, 3 ) );
+				if ( color ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
 
 				geometry._type = 'points';
 
@@ -2309,7 +2309,7 @@ THREE.VRMLLoader = ( function () {
 
 				}
 
-				geometry.addAttribute( 'color', colorAttribute );
+				geometry.setAttribute( 'color', colorAttribute );
 
 			}
 

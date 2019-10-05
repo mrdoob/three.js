@@ -554,7 +554,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
 			// groups
 

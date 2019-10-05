@@ -315,8 +315,8 @@
 					0, 0, 1,
 				] );
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
 				object.position.set( 140, - 40, - 250 );
 				object.setDrawMode( THREE.TriangleStripDrawMode );
@@ -341,7 +341,7 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
 				object.position.set( - 50, 0, - 200 );
 				scene1.add( object );
@@ -364,7 +364,7 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 				object = new THREE.LineLoop( geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ) );
 				object.position.set( 0, 0, - 200 );
 
@@ -398,8 +398,8 @@
 					0, 0, 1,
 				] );
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				geometry.setDrawRange( 0, numElements );
 
 				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
@@ -422,7 +422,7 @@
 				}
 
 				var pointsGeo = new THREE.BufferGeometry();
-				pointsGeo.addAttribute( 'position', new THREE.BufferAttribute( pointsArray, 3 ) );
+				pointsGeo.setAttribute( 'position', new THREE.BufferAttribute( pointsArray, 3 ) );
 
 				var pointsMaterial = new THREE.PointsMaterial( { color: 0xffff00, size: 5 } );
 				var points = new THREE.Points( pointsGeo, pointsMaterial );

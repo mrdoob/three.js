@@ -1226,9 +1226,9 @@ SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance )
 	}
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	return geometry;
 

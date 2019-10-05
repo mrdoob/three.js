@@ -566,7 +566,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var geometry = new BufferGeometry();
 			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
-			geometry.addAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
 			// groups
 

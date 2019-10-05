@@ -57,7 +57,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
 			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
-			geometry.addAttribute( key, bufferAttribute );
+			geometry.setAttribute( key, bufferAttribute );
 
 		}
 

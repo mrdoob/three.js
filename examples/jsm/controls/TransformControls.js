@@ -769,7 +769,7 @@ var TransformControlsGizmo = function () {
 	var scaleHandleGeometry = new BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
 	var lineGeometry = new BufferGeometry( );
-	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
+	lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
 
@@ -782,7 +782,7 @@ var TransformControlsGizmo = function () {
 
 		}
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 		return geometry;
 
@@ -794,7 +794,7 @@ var TransformControlsGizmo = function () {
 
 		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
 		return geometry;
 

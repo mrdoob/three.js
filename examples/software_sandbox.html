@@ -56,7 +56,7 @@
 
 				}
 
-				torusGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				torusGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				torus = new THREE.Mesh( torusGeometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, vertexColors: THREE.VertexColors } ) );
 				scene.add( torus );
@@ -74,7 +74,7 @@
 
 				}
 
-				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				boxGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				cube = new THREE.Mesh( boxGeometry, new THREE.MeshBasicMaterial( { color: 0x00ff00, vertexColors: THREE.VertexColors } ) );
 				scene.position.set( 100, 0, 0 );
@@ -125,8 +125,8 @@
 
 				}
 
-				lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				lineGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				lineGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				lineGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				var material = new THREE.LineBasicMaterial( { opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 				var line = new THREE.Line( lineGeometry, material );

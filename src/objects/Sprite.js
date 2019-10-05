@@ -51,8 +51,8 @@ function Sprite( material ) {
 		var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
 		_geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-		_geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-		_geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+		_geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+		_geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	}
 

@@ -905,11 +905,11 @@ THREE.MMDLoader = ( function () {
 
 			var geometry = new THREE.BufferGeometry();
 
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-			geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-			geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-			geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+			geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+			geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 			geometry.setIndex( indices );
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {

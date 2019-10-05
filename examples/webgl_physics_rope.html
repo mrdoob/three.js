@@ -253,7 +253,7 @@
 			}
 
 			ropeGeometry.setIndex( new THREE.BufferAttribute( new Uint16Array( ropeIndices ), 1 ) );
-			ropeGeometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ropePositions ), 3 ) );
+			ropeGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( ropePositions ), 3 ) );
 			ropeGeometry.computeBoundingSphere();
 			rope = new THREE.LineSegments( ropeGeometry, ropeMaterial );
 			rope.castShadow = true;

@@ -75,29 +75,6 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	addAttribute: function ( name, attribute ) {
-
-		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
-
-			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
-
-			return this.addAttribute( name, new BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
-
-		}
-
-		if ( name === 'index' ) {
-
-			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
-			this.setIndex( attribute );
-
-			return this;
-
-		}
-
-		return this.setAttribute( name, attribute );
-
-	},
-
 	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
@@ -112,7 +89,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	removeAttribute: function ( name ) {
+	deleteAttribute: function ( name ) {
 
 		delete this.attributes[ name ];
 
@@ -290,14 +267,14 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			var positions = new Float32BufferAttribute( geometry.vertices.length * 3, 3 );
 			var colors = new Float32BufferAttribute( geometry.colors.length * 3, 3 );
 
-			this.addAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
-			this.addAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
+			this.setAttribute( 'position', positions.copyVector3sArray( geometry.vertices ) );
+			this.setAttribute( 'color', colors.copyColorsArray( geometry.colors ) );
 
 			if ( geometry.lineDistances && geometry.lineDistances.length === geometry.vertices.length ) {
 
 				var lineDistances = new Float32BufferAttribute( geometry.lineDistances.length, 1 );
 
-				this.addAttribute( 'lineDistance', lineDistances.copyArray( geometry.lineDistances ) );
+				this.setAttribute( 'lineDistance', lineDistances.copyArray( geometry.lineDistances ) );
 
 			}
 
@@ -338,7 +315,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		this.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+		this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 		return this;
 
@@ -482,33 +459,33 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	fromDirectGeometry: function ( geometry ) {
 
 		var positions = new Float32Array( geometry.vertices.length * 3 );
-		this.addAttribute( 'position', new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
+		this.setAttribute( 'position', new BufferAttribute( positions, 3 ).copyVector3sArray( geometry.vertices ) );
 
 		if ( geometry.normals.length > 0 ) {
 
 			var normals = new Float32Array( geometry.normals.length * 3 );
-			this.addAttribute( 'normal', new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
+			this.setAttribute( 'normal', new BufferAttribute( normals, 3 ).copyVector3sArray( geometry.normals ) );
 
 		}
 
 		if ( geometry.colors.length > 0 ) {
 
 			var colors = new Float32Array( geometry.colors.length * 3 );
-			this.addAttribute( 'color', new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
+			this.setAttribute( 'color', new BufferAttribute( colors, 3 ).copyColorsArray( geometry.colors ) );
 
 		}
 
 		if ( geometry.uvs.length > 0 ) {
 
 			var uvs = new Float32Array( geometry.uvs.length * 2 );
-			this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
+			this.setAttribute( 'uv', new BufferAttribute( uvs, 2 ).copyVector2sArray( geometry.uvs ) );
 
 		}
 
 		if ( geometry.uvs2.length > 0 ) {
 
 			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
-			this.addAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
+			this.setAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
 
 		}
 
@@ -543,14 +520,14 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		if ( geometry.skinIndices.length > 0 ) {
 
 			var skinIndices = new Float32BufferAttribute( geometry.skinIndices.length * 4, 4 );
-			this.addAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
+			this.setAttribute( 'skinIndex', skinIndices.copyVector4sArray( geometry.skinIndices ) );
 
 		}
 
 		if ( geometry.skinWeights.length > 0 ) {
 
 			var skinWeights = new Float32BufferAttribute( geometry.skinWeights.length * 4, 4 );
-			this.addAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
+			this.setAttribute( 'skinWeight', skinWeights.copyVector4sArray( geometry.skinWeights ) );
 
 		}
 
@@ -716,7 +693,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			if ( attributes.normal === undefined ) {
 
-				this.addAttribute( 'normal', new BufferAttribute( new Float32Array( positions.length ), 3 ) );
+				this.setAttribute( 'normal', new BufferAttribute( new Float32Array( positions.length ), 3 ) );
 
 			} else {
 
@@ -924,7 +901,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var newAttribute = convertBufferAttribute( attribute, indices );
 
-			geometry2.addAttribute( name, newAttribute );
+			geometry2.setAttribute( name, newAttribute );
 
 		}
 
@@ -1144,7 +1121,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		for ( name in attributes ) {
 
 			var attribute = attributes[ name ];
-			this.addAttribute( name, attribute.clone() );
+			this.setAttribute( name, attribute.clone() );
 
 		}
 

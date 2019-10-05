@@ -151,8 +151,8 @@ export default QUnit.module( 'Exporters', () => {
 			var positions = new Float32Array( ( numElements ) * 3 );
 			var colors = new Float32Array( ( numElements ) * 3 );
 
-			geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 			geometry.setDrawRange( 0, 0 );
 
 			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: VertexColors } ) );
@@ -187,7 +187,7 @@ export default QUnit.module( 'Exporters', () => {
 
 			var geometry = new BufferGeometry();
 			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
-			geometry.addAttribute( 'position',	position );
+			geometry.setAttribute( 'position',	position );
 			geometry.morphAttributes.position = [ position, position, position, position ];
 
 			var mesh = new Mesh( geometry );
@@ -314,7 +314,7 @@ export default QUnit.module( 'Exporters', () => {
 
 			var geometry = new BufferGeometry();
 			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
-			geometry.addAttribute( 'position',	position );
+			geometry.setAttribute( 'position',	position );
 			geometry.morphAttributes.position = [ position, position ];
 
 			var mesh = new Mesh( geometry );

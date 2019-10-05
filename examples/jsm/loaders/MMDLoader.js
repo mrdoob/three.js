@@ -941,11 +941,11 @@ var MMDLoader = ( function () {
 
 			var geometry = new BufferGeometry();
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-			geometry.addAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
-			geometry.addAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+			geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
+			geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
 			geometry.setIndex( indices );
 
 			for ( var i = 0, il = groups.length; i < il; i ++ ) {

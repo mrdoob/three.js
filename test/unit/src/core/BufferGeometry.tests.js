@@ -57,7 +57,7 @@ function getBBForVertices( vertices ) {
 
 	var geometry = new BufferGeometry();
 
-	geometry.addAttribute( "position", new BufferAttribute( new Float32Array( vertices ), 3 ) );
+	geometry.setAttribute( "position", new BufferAttribute( new Float32Array( vertices ), 3 ) );
 	geometry.computeBoundingBox();
 
 	return geometry.boundingBox;
@@ -68,7 +68,7 @@ function getBSForVertices( vertices ) {
 
 	var geometry = new BufferGeometry();
 
-	geometry.addAttribute( "position", new BufferAttribute( new Float32Array( vertices ), 3 ) );
+	geometry.setAttribute( "position", new BufferAttribute( new Float32Array( vertices ), 3 ) );
 	geometry.computeBoundingSphere();
 
 	return geometry.boundingSphere;
@@ -79,7 +79,7 @@ function getNormalsForVertices( vertices, assert ) {
 
 	var geometry = new BufferGeometry();
 
-	geometry.addAttribute( "position", new BufferAttribute( new Float32Array( vertices ), 3 ) );
+	geometry.setAttribute( "position", new BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 	geometry.computeVertexNormals();
 
@@ -170,18 +170,18 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "add / delete Attribute", ( assert ) => {
+		QUnit.test( "set / delete Attribute", ( assert ) => {
 
 			var geometry = new BufferGeometry();
 			var attributeName = "position";
 
 			assert.ok( geometry.attributes[ attributeName ] === undefined, 'no attribute defined' );
 
-			geometry.addAttribute( attributeName, new BufferAttribute( new Float32Array( [ 1, 2, 3 ], 1 ) ) );
+			geometry.setAttribute( attributeName, new BufferAttribute( new Float32Array( [ 1, 2, 3 ], 1 ) ) );
 
 			assert.ok( geometry.attributes[ attributeName ] !== undefined, 'attribute is defined' );
 
-			geometry.removeAttribute( attributeName );
+			geometry.deleteAttribute( attributeName );
 
 			assert.ok( geometry.attributes[ attributeName ] === undefined, 'no attribute defined' );
 
@@ -234,7 +234,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "applyMatrix", ( assert ) => {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( "position", new BufferAttribute( new Float32Array( 6 ), 3 ) );
+			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( 6 ), 3 ) );
 
 			var matrix = new Matrix4().set(
 				1, 0, 0, 1.5,
@@ -255,7 +255,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "rotateX/Y/Z", ( assert ) => {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( "position", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
+			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 
 			var pos = geometry.attributes.position.array;
 
@@ -282,7 +282,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "translate", ( assert ) => {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( "position", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
+			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 
 			var pos = geometry.attributes.position.array;
 
@@ -296,7 +296,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "scale", ( assert ) => {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( "position", new BufferAttribute( new Float32Array( [ - 1, - 1, - 1, 2, 2, 2 ] ), 3 ) );
+			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( [ - 1, - 1, - 1, 2, 2, 2 ] ), 3 ) );
 
 			var pos = geometry.attributes.position.array;
 
@@ -319,7 +319,7 @@ export default QUnit.module( 'Core', () => {
 				- 1.0, 1.0, 1.0,
 				- 1.0, - 1.0, 1.0
 			] );
-			a.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			a.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 			var sqrt = Math.sqrt( 2 );
 			var expected = new Float32Array( [
@@ -341,7 +341,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "center", ( assert ) => {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( "position", new BufferAttribute( new Float32Array( [
+			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( [
 				- 1, - 1, - 1,
 				1, 1, 1,
 				4, 4, 4
@@ -731,7 +731,7 @@ export default QUnit.module( 'Core', () => {
 			] ), 1 );
 
 			var a = new BufferGeometry();
-			a.addAttribute( "position", position );
+			a.setAttribute( "position", position );
 			a.computeVertexNormals();
 			assert.ok(
 				bufferAttributeEquals( normal, a.getAttribute( "normal" ) ),
@@ -747,7 +747,7 @@ export default QUnit.module( 'Core', () => {
 
 			// indexed geometry
 			var a = new BufferGeometry();
-			a.addAttribute( "position", position );
+			a.setAttribute( "position", position );
 			a.setIndex( index );
 			a.computeVertexNormals();
 			assert.ok( bufferAttributeEquals( normal, a.getAttribute( "normal" ) ), "Indexed geometry: computed normals are correct" );
@@ -757,10 +757,10 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "merge", ( assert ) => {
 
 			var geometry1 = new BufferGeometry();
-			geometry1.addAttribute( "attrName", new BufferAttribute( new Float32Array( [ 1, 2, 3, 0, 0, 0 ] ), 3 ) );
+			geometry1.setAttribute( "attrName", new BufferAttribute( new Float32Array( [ 1, 2, 3, 0, 0, 0 ] ), 3 ) );
 
 			var geometry2 = new BufferGeometry();
-			geometry2.addAttribute( "attrName", new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 3 ) );
+			geometry2.setAttribute( "attrName", new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 3 ) );
 
 			var attr = geometry1.attributes.attrName.array;
 
@@ -796,7 +796,7 @@ export default QUnit.module( 'Core', () => {
 				0.5, - 0.5, 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5, - 0.5
 			] );
 
-			geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 			geometry.setIndex( index );
 
 			var nonIndexed = geometry.toNonIndexed();
@@ -813,7 +813,7 @@ export default QUnit.module( 'Core', () => {
 			var a = new BufferGeometry();
 			a.name = "JSONQUnit.test";
 			// a.parameters = { "placeholder": 0 };
-			a.addAttribute( "attribute1", attribute1 );
+			a.setAttribute( "attribute1", attribute1 );
 			a.setIndex( index );
 			a.addGroup( 0, 1, 2 );
 			a.boundingSphere = new Sphere( new Vector3( x, y, z ), 0.5 );
@@ -878,8 +878,8 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "clone", ( assert ) => {
 
 			var a = new BufferGeometry();
-			a.addAttribute( "attribute1", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
-			a.addAttribute( "attribute2", new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
+			a.setAttribute( "attribute1", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
+			a.setAttribute( "attribute2", new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
 			a.addGroup( 0, 1, 2 );
 			a.computeBoundingBox();
 			a.computeBoundingSphere();
@@ -915,8 +915,8 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( "copy", ( assert ) => {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( "attrName", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
-			geometry.addAttribute( "attrName2", new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
+			geometry.setAttribute( "attrName", new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
+			geometry.setAttribute( "attrName2", new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
 
 			var copy = new BufferGeometry().copy( geometry );
 
