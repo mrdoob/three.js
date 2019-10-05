@@ -341,21 +341,21 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		return this;
 
 	},
-	
+
 	setLoopStart: function ( value ) {
-	
+
 		this.loopStart = value;
-		
+
 		return this;
-		
+
 	},
-	
+
 	setLoopEnd: function ( value ) {
-		
+
 		this.loopEnd = value;
-		
+
 		return this;
-		
+
 	},
 
 	getVolume: function () {
