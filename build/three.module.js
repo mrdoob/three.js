@@ -17684,8 +17684,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var prefixVertex, prefixFragment;
 
-	var renderTarget = renderer.getRenderTarget();
-	var numMultiviewViews = renderTarget && renderTarget.isWebGLMultiviewRenderTarget ? renderTarget.numViews : 0;
+	var numMultiviewViews = parameters.numMultiviewViews;
 
 	if ( material.isRawShaderMaterial ) {
 
@@ -18213,7 +18212,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	};
 
 	var parameterNames = [
-		"precision", "supportsVertexTextures", "instancing",
+		"precision", "supportsVertexTextures", "instancing", "numMultiviewViews",
 		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap", "gradientMap",
@@ -18316,6 +18315,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
+		var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
 		var parameters = {
 
@@ -18328,6 +18328,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			instancing: object.isInstancedMesh === true,
 
 			supportsVertexTextures: vertexTextures,
+			numMultiviewViews: numMultiviewViews,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
@@ -41576,6 +41577,8 @@ function Audio( listener ) {
 	this.buffer = null;
 	this.detune = 0;
 	this.loop = false;
+	this.loopStart = 0;
+	this.loopEnd = 0;
 	this.startTime = 0;
 	this.offset = 0;
 	this.duration = undefined;
@@ -41662,6 +41665,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		source.buffer = this.buffer;
 		source.loop = this.loop;
+		source.loopStart = this.loopStart;
+		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
 		this.startTime = this.context.currentTime;
 		source.start( this.startTime, this.offset, this.duration );
@@ -41887,6 +41892,22 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			this.source.loop = this.loop;
 
 		}
+
+		return this;
+
+	},
+
+	setLoopStart: function ( value ) {
+
+		this.loopStart = value;
+
+		return this;
+
+	},
+
+	setLoopEnd: function ( value ) {
+
+		this.loopEnd = value;
 
 		return this;
 
