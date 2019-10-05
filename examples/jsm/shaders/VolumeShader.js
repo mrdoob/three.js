@@ -72,8 +72,8 @@ var VolumeRenderShader1 = {
 		"		void main() {",
 		// Prepare transforms to map to "camera view". See also:
 		// https://threejs.org/docs/#api/renderers/webgl/WebGLProgram
-		"				mat4 viewtransformf = viewMatrix;",
-		"				mat4 viewtransformi = inversemat(viewMatrix);",
+		"				mat4 viewtransformf = modelViewMatrix;",
+		"				mat4 viewtransformi = inversemat(modelViewMatrix);",
 
 		// Project local vertex coordinate to camera position. Then do a step
 		// backward (in cam coords) to the near clipping plane, and project back. Do

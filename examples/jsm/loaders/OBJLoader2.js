@@ -4,7 +4,6 @@
  */
 
 import {
-	LoadingManager,
 	FileLoader,
 	Object3D,
 	Loader

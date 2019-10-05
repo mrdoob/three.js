@@ -28,7 +28,7 @@
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Multisampled Renderbuffers<br />
-			Left scene is multi-sampled, right scene is rendered without anti-aliasing.
+			Left: WebGLMultisampleRenderTarget, Right: WebGLRenderTarget.
 		</div>
 		<div id="container">
 		</div>
@@ -102,7 +102,9 @@
 				//
 
 				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2', { antialias: false } );
+				canvas.style.imageRendering = 'pixelated'; // disable browser interpolation
+
+				var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;

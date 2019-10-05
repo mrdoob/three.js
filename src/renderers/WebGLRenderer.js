@@ -867,7 +867,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isInstancedMesh ) {
 
-			renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
+			renderer.renderInstances( geometry, drawStart, drawCount, object.count );
 
 		} else if ( geometry.isInstancedBufferGeometry ) {
 
@@ -1199,7 +1199,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( camera.isArrayCamera && multiview.isAvailable() ) {
+		if ( vr.enabled && multiview.isAvailable() ) {
 
 			multiview.attachCamera( camera );
 
@@ -1259,13 +1259,13 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( camera.isArrayCamera && multiview.isAvailable() ) {
-
-			multiview.detachCamera( camera );
-
-		}
-
 		if ( vr.enabled ) {
+
+			if ( multiview.isAvailable() ) {
+
+				multiview.detachCamera( camera );
+
+			}
 
 			vr.submitFrame();
 
@@ -1418,7 +1418,7 @@ function WebGLRenderer( parameters ) {
 
 				_currentArrayCamera = camera;
 
-				if ( multiview.isAvailable() ) {
+				if ( vr.enabled && multiview.isAvailable() ) {
 
 					renderObject( object, scene, camera, geometry, material, group );
 
@@ -1629,9 +1629,10 @@ function WebGLRenderer( parameters ) {
 
 		// store the light setup it was created for
 
+		materialProperties.needsLights = materialNeedsLights( material );
 		materialProperties.lightsStateVersion = lightsStateVersion;
 
-		if ( material.lights ) {
+		if ( materialProperties.needsLights ) {
 
 			// wire up the material to this renderer's lighting state
 
@@ -1697,7 +1698,7 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.lights && materialProperties.lightsStateVersion !== lights.state.version ) {
+			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
 				material.needsUpdate = true;
 
@@ -1884,7 +1885,7 @@ function WebGLRenderer( parameters ) {
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
-			if ( material.lights ) {
+			if ( materialProperties.needsLights ) {
 
 				// the current material requires lighting info
 
@@ -1997,6 +1998,12 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+
+			if ( material.isShaderMaterial ) {
+
+				material.uniformsNeedUpdate = false; // #15581
+
+			}
 
 		}
 
@@ -2491,10 +2498,18 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function materialNeedsLights( material ) {
+
+		return material.isMeshLambertMaterial || material.isMeshPhongMaterial ||
+			material.isMeshStandardMaterial || material.isShadowMaterial ||
+			( material.isShaderMaterial && material.lights === true );
+
+	}
+
 	//
 	this.setFramebuffer = function ( value ) {
 
-		if ( _framebuffer !== value ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
+		if ( _framebuffer !== value && _currentRenderTarget === null ) _gl.bindFramebuffer( _gl.FRAMEBUFFER, value );
 
 		_framebuffer = value;
 

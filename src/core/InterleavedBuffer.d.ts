@@ -1,4 +1,5 @@
 import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
+import { Usage } from '../constants';
 
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js">src/core/InterleavedBuffer.js</a>
@@ -9,14 +10,14 @@ export class InterleavedBuffer {
 
 	array: ArrayLike<number>;
 	stride: number;
-	dynamic: boolean;
+	usage: Usage;
 	updateRange: { offset: number; count: number };
 	version: number;
 	length: number;
 	count: number;
 	needsUpdate: boolean;
 
-	setDynamic( dynamic: boolean ): InterleavedBuffer;
+	setUsage( usage: Usage ): InterleavedBuffer;
 	clone(): this;
 	copy( source: InterleavedBuffer ): this;
 	copyAt(

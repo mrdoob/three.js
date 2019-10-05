@@ -301,6 +301,7 @@ var list = {
 			"Objects": {
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
+				"InstancedMesh": "api/en/objects/InstancedMesh",
 				"Line": "api/en/objects/Line",
 				"LineLoop": "api/en/objects/LineLoop",
 				"LineSegments": "api/en/objects/LineSegments",
@@ -744,6 +745,7 @@ var list = {
 			"物体": {
 				"Bone": "api/zh/objects/Bone",
 				"Group": "api/zh/objects/Group",
+				"InstancedMesh": "api/zh/objects/InstancedMesh",
 				"Line": "api/zh/objects/Line",
 				"LineLoop": "api/zh/objects/LineLoop",
 				"LineSegments": "api/zh/objects/LineSegments",

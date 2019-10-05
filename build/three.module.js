@@ -91,7 +91,7 @@ if ( Object.assign === undefined ) {
 
 }
 
-var REVISION = '109dev';
+var REVISION = '110dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -259,6 +259,16 @@ var GreaterStencilFunc = 516;
 var NotEqualStencilFunc = 517;
 var GreaterEqualStencilFunc = 518;
 var AlwaysStencilFunc = 519;
+
+var StaticDrawUsage = 35044;
+var DynamicDrawUsage = 35048;
+var StreamDrawUsage = 35040;
+var StaticReadUsage = 35045;
+var DynamicReadUsage = 35049;
+var StreamReadUsage = 35041;
+var StaticCopyUsage = 35046;
+var DynamicCopyUsage = 35050;
+var StreamCopyUsage = 35042;
 
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
@@ -2167,9 +2177,11 @@ Object.assign( Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		// assumes this and v are not the zero vector
+		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' );
+
+		var theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 
@@ -7912,20 +7924,28 @@ Object.assign( Color.prototype, {
 
 		if ( style && style.length > 0 ) {
 
-			// color keywords
-			var hex = _colorKeywords[ style ];
+			return this.setColorName( style );
 
-			if ( hex !== undefined ) {
+		}
 
-				// red
-				this.setHex( hex );
+		return this;
 
-			} else {
+	},
 
-				// unknown color
-				console.warn( 'THREE.Color: Unknown color ' + style );
+	setColorName: function ( style ) {
 
-			}
+		// color keywords
+		var hex = _colorKeywords[ style ];
+
+		if ( hex !== undefined ) {
+
+			// red
+			this.setHex( hex );
+
+		} else {
+
+			// unknown color
+			console.warn( 'THREE.Color: Unknown color ' + style );
 
 		}
 
@@ -8231,6 +8251,8 @@ Object.assign( Color.prototype, {
 
 } );
 
+Color.NAMES = _colorKeywords;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -8306,7 +8328,6 @@ function Material() {
 	this.type = 'Material';
 
 	this.fog = true;
-	this.lights = true;
 
 	this.blending = NormalBlending;
 	this.side = FrontSide;
@@ -8630,7 +8651,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.name = source.name;
 
 		this.fog = source.fog;
-		this.lights = source.lights;
 
 		this.blending = source.blending;
 		this.side = source.side;
@@ -8779,8 +8799,6 @@ function MeshBasicMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 
-	this.lights = false;
-
 	this.setValues( parameters );
 
 }
@@ -8844,7 +8862,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.count = array !== undefined ? array.length / itemSize : 0;
 	this.normalized = normalized === true;
 
-	this.dynamic = false;
+	this.usage = StaticDrawUsage;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
@@ -8867,9 +8885,9 @@ Object.assign( BufferAttribute.prototype, {
 
 	onUploadCallback: function () {},
 
-	setDynamic: function ( value ) {
+	setUsage: function ( value ) {
 
-		this.dynamic = value;
+		this.usage = value;
 
 		return this;
 
@@ -8883,7 +8901,7 @@ Object.assign( BufferAttribute.prototype, {
 		this.count = source.count;
 		this.normalized = source.normalized;
 
-		this.dynamic = source.dynamic;
+		this.usage = source.usage;
 
 		return this;
 
@@ -14036,7 +14054,7 @@ var color_pars_vertex = "#ifdef USE_COLOR\n\tvarying vec3 vColor;\n#endif";
 
 var color_vertex = "#ifdef USE_COLOR\n\tvColor.xyz = color.xyz;\n#endif";
 
-var common = "#define PI 3.14159265359\n#define PI2 6.28318530718\n#define PI_HALF 1.5707963267949\n#define RECIPROCAL_PI 0.31830988618\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement(a) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract(sin(sn) * c);\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\nstruct GeometricContext {\n\tvec3 position;\n\tvec3 normal;\n\tvec3 viewDir;\n#ifdef CLEARCOAT\n\tvec3 clearcoatNormal;\n#endif\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\tfloat distance = dot( planeNormal, point - pointOnPlane );\n\treturn - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\treturn sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\treturn lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\nmat3 transposeMat3( const in mat3 m ) {\n\tmat3 tmp;\n\ttmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );\n\ttmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );\n\ttmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );\n\treturn tmp;\n}\nfloat linearToRelativeLuminance( const in vec3 color ) {\n\tvec3 weights = vec3( 0.2126, 0.7152, 0.0722 );\n\treturn dot( weights, color.rgb );\n}\nbool isPerspectiveMatrix( mat4 projectionMatrix ) {\n  return projectionMatrix[ 2 ][ 3 ] == - 1.0;\n}";
+var common = "#define PI 3.14159265359\n#define PI2 6.28318530718\n#define PI_HALF 1.5707963267949\n#define RECIPROCAL_PI 0.31830988618\n#define RECIPROCAL_PI2 0.15915494\n#define LOG2 1.442695\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement(a) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract(sin(sn) * c);\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\nstruct GeometricContext {\n\tvec3 position;\n\tvec3 normal;\n\tvec3 viewDir;\n#ifdef CLEARCOAT\n\tvec3 clearcoatNormal;\n#endif\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\tfloat distance = dot( planeNormal, point - pointOnPlane );\n\treturn - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\treturn sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\treturn lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\nmat3 transposeMat3( const in mat3 m ) {\n\tmat3 tmp;\n\ttmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );\n\ttmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );\n\ttmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );\n\treturn tmp;\n}\nfloat linearToRelativeLuminance( const in vec3 color ) {\n\tvec3 weights = vec3( 0.2126, 0.7152, 0.0722 );\n\treturn dot( weights, color.rgb );\n}\nbool isPerspectiveMatrix( mat4 m ) {\n  return m[ 2 ][ 3 ] == - 1.0;\n}";
 
 var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\n#define cubeUV_textureSize (1024.0)\nint getFaceFromDirection(vec3 direction) {\n\tvec3 absDirection = abs(direction);\n\tint face = -1;\n\tif( absDirection.x > absDirection.z ) {\n\t\tif(absDirection.x > absDirection.y )\n\t\t\tface = direction.x > 0.0 ? 0 : 3;\n\t\telse\n\t\t\tface = direction.y > 0.0 ? 1 : 4;\n\t}\n\telse {\n\t\tif(absDirection.z > absDirection.y )\n\t\t\tface = direction.z > 0.0 ? 2 : 5;\n\t\telse\n\t\t\tface = direction.y > 0.0 ? 1 : 4;\n\t}\n\treturn face;\n}\n#define cubeUV_maxLods1  (log2(cubeUV_textureSize*0.25) - 1.0)\n#define cubeUV_rangeClamp (exp2((6.0 - 1.0) * 2.0))\nvec2 MipLevelInfo( vec3 vec, float roughnessLevel, float roughness ) {\n\tfloat scale = exp2(cubeUV_maxLods1 - roughnessLevel);\n\tfloat dxRoughness = dFdx(roughness);\n\tfloat dyRoughness = dFdy(roughness);\n\tvec3 dx = dFdx( vec * scale * dxRoughness );\n\tvec3 dy = dFdy( vec * scale * dyRoughness );\n\tfloat d = max( dot( dx, dx ), dot( dy, dy ) );\n\td = clamp(d, 1.0, cubeUV_rangeClamp);\n\tfloat mipLevel = 0.5 * log2(d);\n\treturn vec2(floor(mipLevel), fract(mipLevel));\n}\n#define cubeUV_maxLods2 (log2(cubeUV_textureSize*0.25) - 2.0)\n#define cubeUV_rcpTextureSize (1.0 / cubeUV_textureSize)\nvec2 getCubeUV(vec3 direction, float roughnessLevel, float mipLevel) {\n\tmipLevel = roughnessLevel > cubeUV_maxLods2 - 3.0 ? 0.0 : mipLevel;\n\tfloat a = 16.0 * cubeUV_rcpTextureSize;\n\tvec2 exp2_packed = exp2( vec2( roughnessLevel, mipLevel ) );\n\tvec2 rcp_exp2_packed = vec2( 1.0 ) / exp2_packed;\n\tfloat powScale = exp2_packed.x * exp2_packed.y;\n\tfloat scale = rcp_exp2_packed.x * rcp_exp2_packed.y * 0.25;\n\tfloat mipOffset = 0.75*(1.0 - rcp_exp2_packed.y) * rcp_exp2_packed.x;\n\tbool bRes = mipLevel == 0.0;\n\tscale =  bRes && (scale < a) ? a : scale;\n\tvec3 r;\n\tvec2 offset;\n\tint face = getFaceFromDirection(direction);\n\tfloat rcpPowScale = 1.0 / powScale;\n\tif( face == 0) {\n\t\tr = vec3(direction.x, -direction.z, direction.y);\n\t\toffset = vec2(0.0+mipOffset,0.75 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\n\t}\n\telse if( face == 1) {\n\t\tr = vec3(direction.y, direction.x, direction.z);\n\t\toffset = vec2(scale+mipOffset, 0.75 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\n\t}\n\telse if( face == 2) {\n\t\tr = vec3(direction.z, direction.x, direction.y);\n\t\toffset = vec2(2.0*scale+mipOffset, 0.75 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? a : offset.y;\n\t}\n\telse if( face == 3) {\n\t\tr = vec3(direction.x, direction.z, direction.y);\n\t\toffset = vec2(0.0+mipOffset,0.5 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\n\t}\n\telse if( face == 4) {\n\t\tr = vec3(direction.y, direction.x, -direction.z);\n\t\toffset = vec2(scale+mipOffset, 0.5 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\n\t}\n\telse {\n\t\tr = vec3(direction.z, -direction.x, direction.y);\n\t\toffset = vec2(2.0*scale+mipOffset, 0.5 * rcpPowScale);\n\t\toffset.y = bRes && (offset.y < 2.0*a) ? 0.0 : offset.y;\n\t}\n\tr = normalize(r);\n\tfloat texelOffset = 0.5 * cubeUV_rcpTextureSize;\n\tvec2 s = ( r.yz / abs( r.x ) + vec2( 1.0 ) ) * 0.5;\n\tvec2 base = offset + vec2( texelOffset );\n\treturn base + s * ( scale - 2.0 * texelOffset );\n}\n#define cubeUV_maxLods3 (log2(cubeUV_textureSize*0.25) - 3.0)\nvec4 textureCubeUV( sampler2D envMap, vec3 reflectedDirection, float roughness ) {\n\tfloat roughnessVal = roughness* cubeUV_maxLods3;\n\tfloat r1 = floor(roughnessVal);\n\tfloat r2 = r1 + 1.0;\n\tfloat t = fract(roughnessVal);\n\tvec2 mipInfo = MipLevelInfo(reflectedDirection, r1, roughness);\n\tfloat s = mipInfo.y;\n\tfloat level0 = mipInfo.x;\n\tfloat level1 = level0 + 1.0;\n\tlevel1 = level1 > 5.0 ? 5.0 : level1;\n\tlevel0 += min( floor( s + 0.5 ), 5.0 );\n\tvec2 uv_10 = getCubeUV(reflectedDirection, r1, level0);\n\tvec4 color10 = envMapTexelToLinear(texture2D(envMap, uv_10));\n\tvec2 uv_20 = getCubeUV(reflectedDirection, r2, level0);\n\tvec4 color20 = envMapTexelToLinear(texture2D(envMap, uv_20));\n\tvec4 result = mix(color10, color20, t);\n\treturn vec4(result.rgb, 1.0);\n}\n#endif";
 
@@ -14098,7 +14116,7 @@ var lights_fragment_maps = "#if defined( RE_IndirectDiffuse )\n\t#ifdef USE_LIGH
 
 var lights_fragment_end = "#if defined( RE_IndirectDiffuse )\n\tRE_IndirectDiffuse( irradiance, geometry, material, reflectedLight );\n#endif\n#if defined( RE_IndirectSpecular )\n\tRE_IndirectSpecular( radiance, iblIrradiance, clearcoatRadiance, geometry, material, reflectedLight );\n#endif";
 
-var logdepthbuf_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tgl_FragDepthEXT = vIsPerspective == 1.0 ? log2( vFragDepth ) * logDepthBufFC * 0.5 : gl_FragCoord.z;\n#endif";
+var logdepthbuf_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tgl_FragDepthEXT = vIsPerspective == 0.0 ? gl_FragCoord.z : log2( vFragDepth ) * logDepthBufFC * 0.5;\n#endif";
 
 var logdepthbuf_pars_fragment = "#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )\n\tuniform float logDepthBufFC;\n\tvarying float vFragDepth;\n\tvarying float vIsPerspective;\n#endif";
 
@@ -14128,7 +14146,7 @@ var normal_fragment_begin = "#ifdef FLAT_SHADED\n\tvec3 fdx = vec3( dFdx( vViewP
 
 var normal_fragment_maps = "#ifdef OBJECTSPACE_NORMALMAP\n\tnormal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( TANGENTSPACE_NORMALMAP )\n\t#ifdef USE_TANGENT\n\t\tmat3 vTBN = mat3( tangent, bitangent, normal );\n\t\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t\tmapN.xy = normalScale * mapN.xy;\n\t\tnormal = normalize( vTBN * mapN );\n\t#else\n\t\tnormal = perturbNormal2Arb( -vViewPosition, normal, normalScale, normalMap );\n\t#endif\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n#endif";
 
-var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n#endif\n#ifdef OBJECTSPACE_NORMALMAP\n\tuniform mat3 normalMatrix;\n#endif\n#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec2 normalScale, in sampler2D normalMap ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t\tmapN.xy *= normalScale;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvec3 NfromST = cross( S, T );\n\t\t\tif( dot( NfromST, N ) > 0.0 ) {\n\t\t\t\tS *= -1.0;\n\t\t\t\tT *= -1.0;\n\t\t\t}\n\t\t#else\n\t\t\tmapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t#endif\n\t\tmat3 tsn = mat3( S, T, N );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif";
+var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n#endif\n#ifdef OBJECTSPACE_NORMALMAP\n\tuniform mat3 normalMatrix;\n#endif\n#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec2 normalScale, in sampler2D normalMap ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t\tmapN.xy *= normalScale;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tbool frontFacing = dot( cross( S, T ), N ) > 0.0;\n\t\t\tmapN.xy *= ( float( frontFacing ) * 2.0 - 1.0 );\n\t\t#else\n\t\t\tmapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t#endif\n\t\tmat3 tsn = mat3( S, T, N );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif";
 
 var clearcoat_normal_fragment_begin = "#ifdef CLEARCOAT\n\tvec3 clearcoatNormal = geometryNormal;\n#endif";
 
@@ -14234,7 +14252,7 @@ var meshphysical_vert = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifndef 
 
 var normal_frag = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif\n#include <packing>\n#include <uv_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\t#include <logdepthbuf_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\tgl_FragColor = vec4( packNormalToRGB( normal ), opacity );\n}";
 
-var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n\t#ifdef USE_TANGENT\n\t\tvTangent = normalize( transformedTangent );\n\t\tvBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );\n\t#endif\n#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}";
+var normal_vert = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvarying vec3 vViewPosition;\n#endif\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n\t#ifdef USE_TANGENT\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\t#endif\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n#ifndef FLAT_SHADED\n\tvNormal = normalize( transformedNormal );\n\t#ifdef USE_TANGENT\n\t\tvTangent = normalize( transformedTangent );\n\t\tvBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );\n\t#endif\n#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}";
 
 var points_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_particle_fragment>\n\t#include <color_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <premultiplied_alpha_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}";
 
@@ -14919,7 +14937,7 @@ function WebGLAttributes( gl ) {
 	function createBuffer( attribute, bufferType ) {
 
 		var array = attribute.array;
-		var usage = attribute.dynamic ? 35048 : 35044;
+		var usage = attribute.usage;
 
 		var buffer = gl.createBuffer();
 
@@ -14980,19 +14998,11 @@ function WebGLAttributes( gl ) {
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( attribute.dynamic === false ) {
-
-			gl.bufferData( bufferType, array, 35044 );
-
-		} else if ( updateRange.count === - 1 ) {
+		if ( updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
 			gl.bufferSubData( bufferType, 0, array );
-
-		} else if ( updateRange.count === 0 ) {
-
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
 
 		} else {
 
@@ -15399,6 +15409,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var mode;
 
 	function setMode( value ) {
@@ -15421,7 +15433,7 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var extension, methodName;
 
-		if ( capabilities.isWebGL2 ) {
+		if ( isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawArraysInstanced';
@@ -16006,6 +16018,8 @@ function WebGLGeometries( gl, attributes, info ) {
 
 function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var mode;
 
 	function setMode( value ) {
@@ -16037,7 +16051,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var extension, methodName;
 
-		if ( capabilities.isWebGL2 ) {
+		if ( isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawElementsInstanced';
@@ -16362,7 +16376,7 @@ function DataTexture2DArray( data, width, height, depth ) {
 
 	Texture.call( this, null );
 
-	this.image = { data: data, width: width, height: height, depth: depth };
+	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;
@@ -16396,7 +16410,7 @@ function DataTexture3D( data, width, height, depth ) {
 
 	Texture.call( this, null );
 
-	this.image = { data: data, width: width, height: height, depth: depth };
+	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;
@@ -17562,13 +17576,13 @@ function generateShadowMapTypeDefine( parameters ) {
 
 }
 
-function generateEnvMapTypeDefine( parameters, material ) {
+function generateEnvMapTypeDefine( parameters ) {
 
 	var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.envMap.mapping ) {
+		switch ( parameters.envMapMode ) {
 
 			case CubeReflectionMapping:
 			case CubeRefractionMapping:
@@ -17597,13 +17611,13 @@ function generateEnvMapTypeDefine( parameters, material ) {
 
 }
 
-function generateEnvMapModeDefine( parameters, material ) {
+function generateEnvMapModeDefine( parameters ) {
 
 	var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.envMap.mapping ) {
+		switch ( parameters.envMapMode ) {
 
 			case CubeRefractionMapping:
 			case EquirectangularRefractionMapping:
@@ -17618,13 +17632,13 @@ function generateEnvMapModeDefine( parameters, material ) {
 
 }
 
-function generateEnvMapBlendingDefine( parameters, material ) {
+function generateEnvMapBlendingDefine( parameters ) {
 
 	var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.combine ) {
+		switch ( parameters.combine ) {
 
 			case MultiplyOperation:
 				envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
@@ -17655,9 +17669,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
 	var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-	var envMapTypeDefine = generateEnvMapTypeDefine( parameters, material );
-	var envMapModeDefine = generateEnvMapModeDefine( parameters, material );
-	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters, material );
+	var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+	var envMapModeDefine = generateEnvMapModeDefine( parameters );
+	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
 
 
 	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
@@ -17670,8 +17684,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var prefixVertex, prefixFragment;
 
-	var renderTarget = renderer.getRenderTarget();
-	var numMultiviewViews = renderTarget && renderTarget.isWebGLMultiviewRenderTarget ? renderTarget.numViews : 0;
+	var numMultiviewViews = parameters.numMultiviewViews;
 
 	if ( material.isRawShaderMaterial ) {
 
@@ -17758,28 +17771,13 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+
 			'uniform mat4 modelMatrix;',
+			'uniform mat4 modelViewMatrix;',
+			'uniform mat4 projectionMatrix;',
+			'uniform mat4 viewMatrix;',
+			'uniform mat3 normalMatrix;',
 			'uniform vec3 cameraPosition;',
-
-			numMultiviewViews > 0 ? [
-				'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
-				'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
-				'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
-				'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
-
-				'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
-				'#define normalMatrix normalMatrices[VIEW_ID]',
-				'#define viewMatrix viewMatrices[VIEW_ID]',
-				'#define projectionMatrix projectionMatrices[VIEW_ID]'
-
-			].join( '\n' ) : [
-
-				'uniform mat4 modelViewMatrix;',
-				'uniform mat4 projectionMatrix;',
-				'uniform mat4 viewMatrix;',
-				'uniform mat3 normalMatrix;',
-
-			].join( '\n' ),
 
 			'#ifdef USE_INSTANCING',
 
@@ -17900,14 +17898,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
 
+			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
-
-			numMultiviewViews > 0 ? [
-
-				'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
-				'#define viewMatrix viewMatrices[VIEW_ID]'
-
-			].join( '\n' ) : 'uniform mat4 viewMatrix;',
 
 			( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
 			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
@@ -17960,17 +17952,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 		}
 
 		// GLSL 3.0 conversion
+
 		prefixVertex = [
 			'#version 300 es\n',
-
-			numMultiviewViews > 0 ? [
-
-				'#extension GL_OVR_multiview2 : require',
-				'layout(num_views = ' + numMultiviewViews + ') in;',
-				'#define VIEW_ID gl_ViewID_OVR'
-
-			].join( '\n' ) : '',
-
 			'#define attribute in',
 			'#define varying out',
 			'#define texture2D texture'
@@ -17978,12 +17962,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 		prefixFragment = [
 			'#version 300 es\n',
-			numMultiviewViews > 0 ? [
-
-				'#extension GL_OVR_multiview2 : require',
-				'#define VIEW_ID gl_ViewID_OVR'
-
-			].join( '\n' ) : '',
 			'#define varying in',
 			isGLSL3ShaderMaterial ? '' : 'out highp vec4 pc_fragColor;',
 			isGLSL3ShaderMaterial ? '' : '#define gl_FragColor pc_fragColor',
@@ -17998,6 +17976,59 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'#define texture2DProjGradEXT textureProjGrad',
 			'#define textureCubeGradEXT textureGrad'
 		].join( '\n' ) + '\n' + prefixFragment;
+
+		// Multiview
+
+		if ( numMultiviewViews > 0 ) {
+
+			prefixVertex = prefixVertex.replace(
+				'#version 300 es\n',
+				[
+					'#version 300 es\n',
+					'#extension GL_OVR_multiview2 : require',
+					'layout(num_views = ' + numMultiviewViews + ') in;',
+					'#define VIEW_ID gl_ViewID_OVR'
+				].join( '\n' )
+			);
+
+			prefixVertex = prefixVertex.replace(
+				[
+					'uniform mat4 modelViewMatrix;',
+					'uniform mat4 projectionMatrix;',
+					'uniform mat4 viewMatrix;',
+					'uniform mat3 normalMatrix;'
+				].join( '\n' ),
+				[
+					'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+					'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
+
+					'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
+					'#define projectionMatrix projectionMatrices[VIEW_ID]',
+					'#define viewMatrix viewMatrices[VIEW_ID]',
+					'#define normalMatrix normalMatrices[VIEW_ID]'
+				].join( '\n' )
+			);
+
+			prefixFragment = prefixFragment.replace(
+				'#version 300 es\n',
+				[
+					'#version 300 es\n',
+					'#extension GL_OVR_multiview2 : require',
+					'#define VIEW_ID gl_ViewID_OVR'
+				].join( '\n' )
+			);
+
+			prefixFragment = prefixFragment.replace(
+				'uniform mat4 viewMatrix;',
+				[
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+					'#define viewMatrix viewMatrices[VIEW_ID]'
+				].join( '\n' )
+			);
+
+		}
 
 	}
 
@@ -18155,6 +18186,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	var programs = [];
 
+	var isWebGL2 = capabilities.isWebGL2;
+	var logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
+	var floatVertexTextures = capabilities.floatVertexTextures;
+	var precision = capabilities.precision;
+	var maxVertexUniforms = capabilities.maxVertexUniforms;
+	var vertexTextures = capabilities.vertexTextures;
+
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
 		MeshDistanceMaterial: 'distanceRGBA',
@@ -18174,7 +18212,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	};
 
 	var parameterNames = [
-		"precision", "supportsVertexTextures", "instancing",
+		"precision", "supportsVertexTextures", "instancing", "numMultiviewViews",
 		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap", "gradientMap",
@@ -18194,7 +18232,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		var skeleton = object.skeleton;
 		var bones = skeleton.bones;
 
-		if ( capabilities.floatVertexTextures ) {
+		if ( floatVertexTextures ) {
 
 			return 1024;
 
@@ -18207,7 +18245,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			//  - limit here is ANGLE's 254 max uniform vectors
 			//    (up to 54 should be safe)
 
-			var nVertexUniforms = capabilities.maxVertexUniforms;
+			var nVertexUniforms = maxVertexUniforms;
 			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
 			var maxBones = Math.min( nVertexMatrices, bones.length );
@@ -18263,7 +18301,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		// (not to blow over maxLights budget)
 
 		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
-		var precision = capabilities.precision;
 
 		if ( material.precision !== null ) {
 
@@ -18278,10 +18315,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
+		var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
 		var parameters = {
 
-			isWebGL2: capabilities.isWebGL2,
+			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
 
@@ -18289,7 +18327,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			instancing: object.isInstancedMesh === true,
 
-			supportsVertexTextures: capabilities.vertexTextures,
+			supportsVertexTextures: vertexTextures,
+			numMultiviewViews: numMultiviewViews,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
@@ -18331,11 +18370,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			flatShading: material.flatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
+			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: material.skinning && maxBones > 0,
 			maxBones: maxBones,
-			useVertexTexture: capabilities.floatVertexTextures,
+			useVertexTexture: floatVertexTextures,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -19288,7 +19327,6 @@ function MeshDepthMaterial( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -19368,7 +19406,6 @@ function MeshDistanceMaterial( parameters ) {
 	this.displacementBias = 0;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -19838,6 +19875,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 function WebGLState( gl, extensions, utils, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	function ColorBuffer() {
 
 		var locked = false;
@@ -20269,9 +20308,9 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-			var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
+			var extension = isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+			extension[ isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
@@ -20825,6 +20864,12 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+	var maxTextures = capabilities.maxTextures;
+	var maxCubemapSize = capabilities.maxCubemapSize;
+	var maxTextureSize = capabilities.maxTextureSize;
+	var maxSamples = capabilities.maxSamples;
+
 	var _videoTextures = new WeakMap();
 	var _canvas;
 
@@ -20913,7 +20958,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( capabilities.isWebGL2 ) return false;
+		if ( isWebGL2 ) return false;
 
 		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
 			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
@@ -20940,7 +20985,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getInternalFormat( glFormat, glType ) {
 
-		if ( ! capabilities.isWebGL2 ) return glFormat;
+		if ( isWebGL2 === false ) return glFormat;
 
 		var internalFormat = glFormat;
 
@@ -21112,9 +21157,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var textureUnit = textureUnits;
 
-		if ( textureUnit >= capabilities.maxTextures ) {
+		if ( textureUnit >= maxTextures ) {
 
-			console.warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
+			console.warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + maxTextures );
 
 		}
 
@@ -21214,7 +21259,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( ! isCompressed && ! isDataTexture ) {
 
-					cubeImage[ i ] = resizeImage( texture.image[ i ], false, true, capabilities.maxCubemapSize );
+					cubeImage[ i ] = resizeImage( texture.image[ i ], false, true, maxCubemapSize );
 
 				} else {
 
@@ -21225,7 +21270,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			var image = cubeImage[ 0 ],
-				supportsMips = isPowerOfTwo( image ) || capabilities.isWebGL2,
+				supportsMips = isPowerOfTwo( image ) || isWebGL2,
 				glFormat = utils.convert( texture.format ),
 				glType = utils.convert( texture.type ),
 				glInternalFormat = getInternalFormat( glFormat, glType );
@@ -21385,7 +21430,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( extension ) {
 
 			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === HalfFloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
+			if ( texture.type === HalfFloatType && ( isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -21431,9 +21476,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( 3317, texture.unpackAlignment );
 
 		var needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
-		var image = resizeImage( texture.image, needsPowerOfTwo, false, capabilities.maxTextureSize );
+		var image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
 
-		var supportsMips = isPowerOfTwo( image ) || capabilities.isWebGL2,
+		var supportsMips = isPowerOfTwo( image ) || isWebGL2,
 			glFormat = utils.convert( texture.format ),
 			glType = utils.convert( texture.type ),
 			glInternalFormat = getInternalFormat( glFormat, glType );
@@ -21450,10 +21495,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.type === FloatType ) {
 
-				if ( ! capabilities.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
+				if ( isWebGL2 === false ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 				glInternalFormat = 36012;
 
-			} else if ( capabilities.isWebGL2 ) {
+			} else if ( isWebGL2 ) {
 
 				// WebGL 2.0 requires signed internalformat for glTexImage2D
 				glInternalFormat = 33189;
@@ -21780,7 +21825,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
 		var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 		var isMultiview = ( renderTarget.isWebGLMultiviewRenderTarget === true );
-		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		// Setup framebuffer
 
@@ -21800,7 +21845,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( isMultisample ) {
 
-				if ( capabilities.isWebGL2 ) {
+				if ( isWebGL2 ) {
 
 					renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
 					renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
@@ -21928,7 +21973,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var texture = renderTarget.texture;
-		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
@@ -21947,7 +21992,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.isWebGLMultisampleRenderTarget ) {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				var renderTargetProperties = properties.get( renderTarget );
 
@@ -21975,8 +22020,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getRenderTargetSamples( renderTarget ) {
 
-		return ( capabilities.isWebGL2 && renderTarget.isWebGLMultisampleRenderTarget ) ?
-			Math.min( capabilities.maxSamples, renderTarget.samples ) : 0;
+		return ( isWebGL2 && renderTarget.isWebGLMultisampleRenderTarget ) ?
+			Math.min( maxSamples, renderTarget.samples ) : 0;
 
 	}
 
@@ -22078,6 +22123,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 function WebGLUtils( gl, extensions, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	function convert( p ) {
 
 		var extension;
@@ -22108,7 +22155,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === HalfFloatType ) {
 
-			if ( capabilities.isWebGL2 ) return 5131;
+			if ( isWebGL2 ) return 5131;
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
@@ -22200,7 +22247,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === MinEquation || p === MaxEquation ) {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				if ( p === MinEquation ) return 32775;
 				if ( p === MaxEquation ) return 32776;
@@ -22220,7 +22267,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === UnsignedInt248Type ) {
 
-			if ( capabilities.isWebGL2 ) return 34042;
+			if ( isWebGL2 ) return 34042;
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
@@ -22296,7 +22343,7 @@ function WebGLMultiview( renderer, gl ) {
 	var properties = renderer.properties;
 
 	var renderTarget, currentRenderTarget;
-	var mat3, mat4, renderSize;
+	var mat3, mat4, cameraArray, renderSize;
 
 	var available;
 	var maxNumViews = 0;
@@ -22319,6 +22366,7 @@ function WebGLMultiview( renderer, gl ) {
 				renderSize = new Vector2();
 				mat4 = [];
 				mat3 = [];
+				cameraArray = [];
 
 				for ( var i = 0; i < maxNumViews; i ++ ) {
 
@@ -22335,9 +22383,19 @@ function WebGLMultiview( renderer, gl ) {
 
 	}
 
+	function getCameraArray( camera ) {
+
+		if ( camera.isArrayCamera ) return camera.cameras;
+
+		cameraArray[ 0 ] = camera;
+
+		return cameraArray;
+
+	}
+
 	function updateCameraProjectionMatricesUniform( camera, uniforms ) {
 
-		var cameras = camera.cameras;
+		var cameras = getCameraArray( camera );
 
 		for ( var i = 0; i < cameras.length; i ++ ) {
 
@@ -22351,7 +22409,7 @@ function WebGLMultiview( renderer, gl ) {
 
 	function updateCameraViewMatricesUniform( camera, uniforms ) {
 
-		var cameras = camera.cameras;
+		var cameras = getCameraArray( camera );
 
 		for ( var i = 0; i < cameras.length; i ++ ) {
 
@@ -22365,7 +22423,7 @@ function WebGLMultiview( renderer, gl ) {
 
 	function updateObjectMatricesUniforms( object, camera, uniforms ) {
 
-		var cameras = camera.cameras;
+		var cameras = getCameraArray( camera );
 
 		for ( var i = 0; i < cameras.length; i ++ ) {
 
@@ -22380,6 +22438,8 @@ function WebGLMultiview( renderer, gl ) {
 	}
 
 	function isMultiviewCompatible( camera ) {
+
+		if ( camera.isArrayCamera === undefined ) return true;
 
 		var cameras = camera.cameras;
 
@@ -22408,16 +22468,25 @@ function WebGLMultiview( renderer, gl ) {
 
 		}
 
-		var viewport = camera.cameras[ 0 ].viewport;
+		if ( camera.isArrayCamera ) {
 
-		renderTarget.setSize( viewport.z, viewport.w );
-		renderTarget.setNumViews( camera.cameras.length );
+			var viewport = camera.cameras[ 0 ].viewport;
+
+			renderTarget.setSize( viewport.z, viewport.w );
+			renderTarget.setNumViews( camera.cameras.length );
+
+		} else {
+
+			renderTarget.setSize( renderSize.x, renderSize.y );
+			renderTarget.setNumViews( DEFAULT_NUMVIEWS );
+
+		}
 
 	}
 
 	function attachCamera( camera ) {
 
-		if ( ! isMultiviewCompatible( camera ) ) return;
+		if ( isMultiviewCompatible( camera ) === false ) return;
 
 		currentRenderTarget = renderer.getRenderTarget();
 		resizeRenderTarget( camera );
@@ -22445,17 +22514,26 @@ function WebGLMultiview( renderer, gl ) {
 		var viewWidth = srcRenderTarget.width;
 		var viewHeight = srcRenderTarget.height;
 
-		for ( var i = 0; i < numViews; i ++ ) {
+		if ( camera.isArrayCamera ) {
 
-			var viewport = camera.cameras[ i ].viewport;
+			for ( var i = 0; i < numViews; i ++ ) {
 
-			var x1 = viewport.x;
-			var y1 = viewport.y;
-			var x2 = x1 + viewport.z;
-			var y2 = y1 + viewport.w;
+				var viewport = camera.cameras[ i ].viewport;
 
-			gl.bindFramebuffer( 36008, srcFramebuffers[ i ] );
-			gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, 16384, 9728 );
+				var x1 = viewport.x;
+				var y1 = viewport.y;
+				var x2 = x1 + viewport.z;
+				var y2 = y1 + viewport.w;
+
+				gl.bindFramebuffer( 36008, srcFramebuffers[ i ] );
+				gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, 16384, 9728 );
+
+			}
+
+		} else {
+
+			gl.bindFramebuffer( 36008, srcFramebuffers[ 0 ] );
+			gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, 0, 0, renderSize.x, renderSize.y, 16384, 9728 );
 
 		}
 
@@ -22997,6 +23075,8 @@ function WebXRManager( renderer, gl ) {
 
 	var session = null;
 
+	// var framebufferScaleFactor = 1.0;
+
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
 
@@ -23084,7 +23164,9 @@ function WebXRManager( renderer, gl ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {
+	this.setFramebufferScaleFactor = function ( /* value */ ) {
+
+		// framebufferScaleFactor = value;
 
 	};
 
@@ -23111,6 +23193,7 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
+			// eslint-disable-next-line no-undef
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
@@ -24125,7 +24208,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isInstancedMesh ) {
 
-			renderer.renderInstances( geometry, drawStart, drawCount, object.instanceMatrix.count );
+			renderer.renderInstances( geometry, drawStart, drawCount, object.count );
 
 		} else if ( geometry.isInstancedBufferGeometry ) {
 
@@ -24457,7 +24540,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( camera.isArrayCamera && multiview.isAvailable() ) {
+		if ( vr.enabled && multiview.isAvailable() ) {
 
 			multiview.attachCamera( camera );
 
@@ -24517,13 +24600,13 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( camera.isArrayCamera && multiview.isAvailable() ) {
-
-			multiview.detachCamera( camera );
-
-		}
-
 		if ( vr.enabled ) {
+
+			if ( multiview.isAvailable() ) {
+
+				multiview.detachCamera( camera );
+
+			}
 
 			vr.submitFrame();
 
@@ -24676,7 +24759,7 @@ function WebGLRenderer( parameters ) {
 
 				_currentArrayCamera = camera;
 
-				if ( multiview.isAvailable() ) {
+				if ( vr.enabled && multiview.isAvailable() ) {
 
 					renderObject( object, scene, camera, geometry, material, group );
 
@@ -24876,9 +24959,10 @@ function WebGLRenderer( parameters ) {
 
 		// store the light setup it was created for
 
+		materialProperties.needsLights = materialNeedsLights( material );
 		materialProperties.lightsStateVersion = lightsStateVersion;
 
-		if ( material.lights ) {
+		if ( materialProperties.needsLights ) {
 
 			// wire up the material to this renderer's lighting state
 
@@ -24944,7 +25028,7 @@ function WebGLRenderer( parameters ) {
 
 				material.needsUpdate = true;
 
-			} else if ( material.lights && materialProperties.lightsStateVersion !== lights.state.version ) {
+			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
 				material.needsUpdate = true;
 
@@ -25128,7 +25212,7 @@ function WebGLRenderer( parameters ) {
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
 
-			if ( material.lights ) {
+			if ( materialProperties.needsLights ) {
 
 				// the current material requires lighting info
 
@@ -25241,6 +25325,12 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+
+			if ( material.isShaderMaterial ) {
+
+				material.uniformsNeedUpdate = false; // #15581
+
+			}
 
 		}
 
@@ -25735,10 +25825,18 @@ function WebGLRenderer( parameters ) {
 
 	}
 
+	function materialNeedsLights( material ) {
+
+		return material.isMeshLambertMaterial || material.isMeshPhongMaterial ||
+			material.isMeshStandardMaterial || material.isShadowMaterial ||
+			( material.isShaderMaterial && material.lights === true );
+
+	}
+
 	//
 	this.setFramebuffer = function ( value ) {
 
-		if ( _framebuffer !== value ) _gl.bindFramebuffer( 36160, value );
+		if ( _framebuffer !== value && _currentRenderTarget === null ) _gl.bindFramebuffer( 36160, value );
 
 		_framebuffer = value;
 
@@ -26035,7 +26133,7 @@ function InterleavedBuffer( array, stride ) {
 	this.stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
 
-	this.dynamic = false;
+	this.usage = StaticDrawUsage;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
@@ -26058,9 +26156,9 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	onUploadCallback: function () {},
 
-	setDynamic: function ( value ) {
+	setUsage: function ( value ) {
 
-		this.dynamic = value;
+		this.usage = value;
 
 		return this;
 
@@ -26071,7 +26169,7 @@ Object.assign( InterleavedBuffer.prototype, {
 		this.array = new source.array.constructor( source.array );
 		this.count = source.count;
 		this.stride = source.stride;
-		this.dynamic = source.dynamic;
+		this.usage = source.usage;
 
 		return this;
 
@@ -26278,7 +26376,6 @@ function SpriteMaterial( parameters ) {
 
 	this.sizeAttenuation = true;
 
-	this.lights = false;
 	this.transparent = true;
 
 	this.setValues( parameters );
@@ -26970,6 +27067,8 @@ function InstancedMesh( geometry, material, count ) {
 
 	this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
 
+	this.count = count;
+
 }
 
 InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
@@ -27015,8 +27114,6 @@ function LineBasicMaterial( parameters ) {
 	this.linewidth = 1;
 	this.linecap = 'round';
 	this.linejoin = 'round';
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -27402,8 +27499,6 @@ function PointsMaterial( parameters ) {
 	this.sizeAttenuation = true;
 
 	this.morphTargets = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -32810,7 +32905,6 @@ function MeshNormalMaterial( parameters ) {
 	this.wireframeLinewidth = 1;
 
 	this.fog = false;
-	this.lights = false;
 
 	this.skinning = false;
 	this.morphTargets = false;
@@ -33036,8 +33130,6 @@ function MeshMatcapMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -35322,8 +35414,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var response = this.response;
 
-				Cache.add( url, response );
-
 				var callbacks = loading[ url ];
 
 				delete loading[ url ];
@@ -35334,6 +35424,10 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					// e.g. 'file://' or 'data://'. Handle as success.
 
 					if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
+
+					// Add to cache only on HTTP success, so that we do not cache
+					// error response bodies as proper responses to requests.
+					Cache.add( url, response );
 
 					for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
 
@@ -41483,6 +41577,8 @@ function Audio( listener ) {
 	this.buffer = null;
 	this.detune = 0;
 	this.loop = false;
+	this.loopStart = 0;
+	this.loopEnd = 0;
 	this.startTime = 0;
 	this.offset = 0;
 	this.duration = undefined;
@@ -41569,6 +41665,8 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		source.buffer = this.buffer;
 		source.loop = this.loop;
+		source.loopStart = this.loopStart;
+		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
 		this.startTime = this.context.currentTime;
 		source.start( this.startTime, this.offset, this.duration );
@@ -41794,6 +41892,22 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			this.source.loop = this.loop;
 
 		}
+
+		return this;
+
+	},
+
+	setLoopStart: function ( value ) {
+
+		this.loopStart = value;
+
+		return this;
+
+	},
+
+	setLoopEnd: function ( value ) {
+
+		this.loopEnd = value;
 
 		return this;
 
@@ -48267,28 +48381,42 @@ Object.defineProperties( BufferAttribute.prototype, {
 			return this.array.length;
 
 		}
+	},
+	dynamic: {
+		get: function () {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			this.setUsage( value );
+
+		}
 	}
 
 } );
 
 Object.assign( BufferAttribute.prototype, {
+	setDynamic: function ( value ) {
 
+		console.warn( 'THREE.BufferAttribute: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
 	copyIndicesArray: function ( /* indices */ ) {
 
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
 	},
-	setArray: function ( array ) {
+	setArray: function ( /* array */ ) {
 
-		console.warn( 'THREE.BufferAttribute: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
-
-		this.count = array !== undefined ? array.length / this.itemSize : 0;
-		this.array = array;
-
-		return this;
+		console.error( 'THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
 
 	}
-
 } );
 
 Object.assign( BufferGeometry.prototype, {
@@ -48350,19 +48478,38 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 } );
 
-Object.assign( InterleavedBuffer.prototype, {
+Object.defineProperties( InterleavedBuffer.prototype, {
 
-	setArray: function ( array ) {
+	dynamic: {
+		get: function () {
 
-		console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
 
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
+		},
+		set: function ( value ) {
 
-		return this;
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			this.setUsage( value );
 
+		}
 	}
 
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
+	setDynamic: function ( value ) {
+
+		console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
+	setArray: function ( /* array */ ) {
+
+		console.error( 'THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+	}
 } );
 
 //
@@ -49117,4 +49264,4 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, ClosedSplineCurve3, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeBufferGeometry, ConeGeometry, CubeCamera, BoxGeometry as CubeGeometry, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DirectionalLightShadow, DiscreteInterpolant, DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeBufferGeometry, ExtrudeGeometry, Face3, Face4, FaceColors, FaceNormalsHelper, FileLoader, FlatShading, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FrontFaceDirectionCCW, FrontFaceDirectionCW, FrontSide, Frustum, GammaEncoding, Geometry, GeometryUtils, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, LightProbeHelper, LightShadow, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LogLuvEncoding, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, _Math as Math, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, ParametricBufferGeometry, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PositionalAudioHelper, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDEncoding, RGBEEncoding, RGBEFormat, RGBFormat, RGBM16Encoding, RGBM7Encoding, RGB_ETC1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RectAreaLightHelper, RedFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingBufferGeometry, RingGeometry, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SphericalReflectionMapping, Spline, SplineCurve, SplineCurve3, SpotLight, SpotLightHelper, SpotLightShadow, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StereoCamera, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronBufferGeometry, TetrahedronGeometry, TextBufferGeometry, TextGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusGeometry, TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uncharted2ToneMapping, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VertexNormalsHelper, VideoTexture, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, sRGBEncoding };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, AxisHelper, BackSide, BasicDepthPacking, BasicShadowMap, BinaryTextureLoader, Bone, BooleanKeyframeTrack, BoundingBoxHelper, Box2, Box3, Box3Helper, BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasRenderer, CanvasTexture, CatmullRomCurve3, CineonToneMapping, CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, ClosedSplineCurve3, Color, ColorKeyframeTrack, CompressedTexture, CompressedTextureLoader, ConeBufferGeometry, ConeGeometry, CubeCamera, BoxGeometry as CubeGeometry, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubeUVRefractionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CylinderBufferGeometry, CylinderGeometry, Cylindrical, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DirectionalLightShadow, DiscreteInterpolant, DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicBufferAttribute, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EdgesHelper, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeBufferGeometry, ExtrudeGeometry, Face3, Face4, FaceColors, FaceNormalsHelper, FileLoader, FlatShading, Float32Attribute, Float32BufferAttribute, Float64Attribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FrontFaceDirectionCCW, FrontFaceDirectionCW, FrontSide, Frustum, GammaEncoding, Geometry, GeometryUtils, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16Attribute, Int16BufferAttribute, Int32Attribute, Int32BufferAttribute, Int8Attribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, JSONLoader, KeepStencilOp, KeyframeTrack, LOD, LatheBufferGeometry, LatheGeometry, Layers, LensFlare, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, LightProbeHelper, LightShadow, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LinePieces, LineSegments, LineStrip, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LogLuvEncoding, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, _Math as Math, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshFaceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiMaterial, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColors, NoToneMapping, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, ParametricBufferGeometry, ParametricGeometry, Particle, ParticleBasicMaterial, ParticleSystem, ParticleSystemMaterial, Path, PerspectiveCamera, Plane, PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointCloud, PointCloudMaterial, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PositionalAudioHelper, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDEncoding, RGBEEncoding, RGBEFormat, RGBFormat, RGBM16Encoding, RGBM7Encoding, RGB_ETC1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RectAreaLightHelper, RedFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingBufferGeometry, RingGeometry, Scene, SceneUtils, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Sphere, SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SphericalReflectionMapping, Spline, SplineCurve, SplineCurve3, SpotLight, SpotLightHelper, SpotLightShadow, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronBufferGeometry, TetrahedronGeometry, TextBufferGeometry, TextGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusGeometry, TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeBufferGeometry, TubeGeometry, UVMapping, Uint16Attribute, Uint16BufferAttribute, Uint32Attribute, Uint32BufferAttribute, Uint8Attribute, Uint8BufferAttribute, Uint8ClampedAttribute, Uint8ClampedBufferAttribute, Uncharted2ToneMapping, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShort565Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, Vertex, VertexColors, VertexNormalsHelper, VideoTexture, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderTargetCube, WebGLRenderer, WebGLUtils, WireframeGeometry, WireframeHelper, WrapAroundEnding, XHRLoader, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, sRGBEncoding };

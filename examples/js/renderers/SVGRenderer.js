@@ -122,13 +122,13 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getSvgColor( color, opacity ) {
+	function getSvgColor( color, opacity, asStroke ) {
 
 		var arg = Math.floor( color.r * 255 ) + ',' + Math.floor( color.g * 255 ) + ',' + Math.floor( color.b * 255 );
 
 		if ( opacity === undefined || opacity === 1 ) return 'rgb(' + arg + ')';
 
-		return 'rgb(' + arg + '); fill-opacity: ' + opacity;
+		return 'rgb(' + arg + ');' + ( asStroke ? 'stroke-opacity' : 'fill-opacity' ) + ':' + opacity;
 
 	}
 
@@ -389,7 +389,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.isLineBasicMaterial ) {
 
-			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity, true ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
 			if ( material.isLineDashedMaterial ) {
 
@@ -449,7 +449,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			style = 'fill:none;stroke:' + getSvgColor( _color, material.opacity ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+			style = 'fill:none;stroke:' + getSvgColor( _color, material.opacity, true ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 		} else {
 

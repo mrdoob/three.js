@@ -39,14 +39,10 @@ export default /* glsl */`
 		#ifdef DOUBLE_SIDED
 
 			// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-			// http://hacksoflife.blogspot.com/2009/11/per-pixel-tangent-space-normal-mapping.html?showComment=1522254677437#c5087545147696715943
-			vec3 NfromST = cross( S, T );
-			if( dot( NfromST, N ) > 0.0 ) {
 
-				S *= -1.0;
-				T *= -1.0;
+			bool frontFacing = dot( cross( S, T ), N ) > 0.0;
 
-			}
+			mapN.xy *= ( float( frontFacing ) * 2.0 - 1.0 );
 
 		#else
 
