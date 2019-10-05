@@ -5,6 +5,8 @@ import { WebGLProgram } from './WebGLProgram';
  */
 export class WebGLInfo {
 
+	constructor( gl: WebGLRenderingContext );
+
 	autoReset: boolean;
 	memory: {
 		geometries: number;
@@ -18,6 +20,7 @@ export class WebGLInfo {
 		points: number;
 		triangles: number;
 	};
+	update( count: any, mode: any, instanceCount: any ): void;
 	reset(): void;
 
 }
