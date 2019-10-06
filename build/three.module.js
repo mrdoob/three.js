@@ -22750,7 +22750,7 @@ function WebVRManager( renderer ) {
 
 		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
-		for ( var i = 0, j = 0, l = gamepads.length; i < l; i ++ ) {
+		for ( var i = 0, l = gamepads.length; i < l; i ++ ) {
 
 			var gamepad = gamepads[ i ];
 
@@ -22760,9 +22760,10 @@ function WebVRManager( renderer ) {
 				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
 				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
 
-				if ( j === id ) return gamepad;
+				var hand = gamepad.hand;
 
-				j ++;
+				if ( id === 0 && ( hand === '' || hand === 'right' ) ) return gamepad;
+				if ( id === 1 && ( hand === 'left' ) ) return gamepad;
 
 			}
 
@@ -23083,7 +23084,7 @@ function WebXRManager( renderer, gl ) {
 	var pose = null;
 
 	var controllers = [];
-	var inputSources = [];
+	var sortedInputSources = [];
 
 	function isPresenting() {
 
@@ -23133,7 +23134,7 @@ function WebXRManager( renderer, gl ) {
 
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
-			if ( inputSources[ i ] === event.inputSource ) {
+			if ( sortedInputSources[ i ] === event.inputSource ) {
 
 				controllers[ i ].dispatchEvent( { type: event.type } );
 
@@ -23200,25 +23201,41 @@ function WebXRManager( renderer, gl ) {
 
 			//
 
-			inputSources = session.inputSources;
+			session.addEventListener( 'inputsourceschange', updateInputSources );
 
-			session.addEventListener( 'inputsourceschange', function () {
-
-				inputSources = session.inputSources;
-				console.log( inputSources );
-
-				for ( var i = 0; i < controllers.length; i ++ ) {
-
-					var controller = controllers[ i ];
-					controller.userData.inputSource = inputSources[ i ];
-
-				}
-
-			} );
+			updateInputSources();
 
 		}
 
 	};
+
+	function updateInputSources() {
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			sortedInputSources[ i ] = findInputSource( i );
+
+		}
+
+	}
+
+	function findInputSource( id ) {
+
+		var inputSources = session.inputSources;
+
+		for ( var i = 0; i < inputSources.length; i ++ ) {
+
+			var inputSource = inputSources[ i ];
+			var handedness = inputSource.handedness;
+
+			if ( id === 0 && ( handedness === 'none' || handedness === 'right' ) ) return inputSource;
+			if ( id === 1 && ( handedness === 'left' ) ) return inputSource;
+
+		}
+
+	}
+
+	//
 
 	function updateCamera( camera, parent ) {
 
@@ -23317,7 +23334,7 @@ function WebXRManager( renderer, gl ) {
 
 			var controller = controllers[ i ];
 
-			var inputSource = inputSources[ i ];
+			var inputSource = sortedInputSources[ i ];
 
 			if ( inputSource ) {
 
