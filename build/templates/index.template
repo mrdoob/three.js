@@ -35,8 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <html lang="{{langInfo.langCode}}">
 <head>
 <meta charset="utf-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Three.js tutorials and solutions" />
+<meta name="keywords" content="webgl graphics three.js" />
+<meta name="thumbnail" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg" />
+
 <meta property="og:title" content="{{title}}" />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg" />
@@ -55,6 +59,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <title>{{title}}</title>
 
 <link rel="alternate" type="application/atom+xml" title="threejs fundamentals" href="https://threejsfundamentals.org/atom.xml" />
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"ItemList",
+  "itemListElement":
+  {{{langInfo.carousel}}}
+}
+</script>
+
 
 <link href="/threejs/lessons/resources/threejsfundamentals-icon.png" rel="shortcut icon" type="image/png">
 <link rel="apple-touch-icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">

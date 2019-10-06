@@ -36,6 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="{{description}}" />
+<meta name="keywords" content="webgl graphics three.js" />
+<meta name="thumbnail" content="{{screenshot}}" />
+
 <meta property="og:title" content="{{title}}" />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="{{screenshot}}" />
@@ -51,6 +56,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <meta name="twitter:description" content="{{description}}" />
 <meta name="twitter:image:src" content="{{screenshot}}" />
 
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {
+      "@type":"WebSite",
+      "@id":"https://threejsfundamentals.org/#website",
+      "url":"https://threejsfundamentals.org/",
+      "name":"ThreejsFundamentals"
+    },
+    {
+      "@type":"ImageObject",
+      "@id":"{{url}}#primaryimage",
+      "url":"{{screenshot}}",
+      "width":{{screenshotSize.width}},
+      "height":{{screenshotSize.height}}
+    },
+    {
+      "@type":"WebPage",
+      "@id":"{{url}}#webpage",
+      "url":"{{url}}",
+      "inLanguage":"{{langInfo.langCode}}",
+      "name":"{{title}}",
+      "keywords":"webgl graphics three.js programming",
+      "isPartOf":{
+        "@id":"https://threejsfundamentals.org/#website"
+      },
+      "primaryImageOfPage":{
+        "@id":"{{url}}#primaryimage"
+      }
+    }
+  ]
+}
+</script>
 
 <title>{{title}}</title>
 <link href="/threejs/lessons/resources/threejsfundamentals-icon.png" rel="shortcut icon" type="image/png">

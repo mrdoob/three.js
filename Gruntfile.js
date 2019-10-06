@@ -130,6 +130,31 @@ module.exports = function(grunt) {
     siteName: 'ThreeJSFundamentals',
     siteThumbnail: 'threejsfundamentals.jpg',  // in rootFolder/lessons/resources
     templatePath: 'build/templates',
+    thumbnailOptions: {
+      thumbnailBackground: 'threejsfundamentals-background.jpg',
+      text: [
+        {
+          font: 'bold 100px sans-serif',
+          verticalSpacing: 100,
+          offset: [100, 120],
+          textAlign: 'left',
+          shadowOffset: [15, 15],
+          strokeWidth: 15,
+          textWrapWidth: 1000,
+        },
+        {
+          font: 'bold 60px sans-serif',
+          text: 'threejsfundamentals.org',
+          verticalSpacing: 100,
+          offset: [-100, -90],
+          textAlign: 'right',
+          shadowOffset: [8, 8],
+          strokeWidth: 15,
+          textWrapWidth: 1000,
+          color: 'hsl(340, 100%, 70%)',
+        },
+      ],
+    },
   };
 
   // just the hackiest way to get this working.
