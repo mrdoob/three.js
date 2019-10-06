@@ -38,4 +38,5 @@ export class WebGLLights {
 
 	get( light: any ): any;
 	setup( lights: any, shadows: any, camera: any ): void;
+
 }
