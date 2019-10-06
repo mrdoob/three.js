@@ -16,4 +16,5 @@ export class WebGLIndexedBufferRenderer {
 		count: number,
 		primcount: number
 	): void;
+
 }
