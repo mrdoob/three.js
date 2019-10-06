@@ -14,8 +14,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
-
 			var camera, scene, renderer;
 			var cube, sphere, torus, material;
 
@@ -50,14 +48,12 @@
 				// background
 
 				var options = {
-					resolution: 1024,
-
 					generateMipmaps: true,
 					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter
 				};
 
-				scene.background = new CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+				scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
