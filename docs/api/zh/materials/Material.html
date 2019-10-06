@@ -291,6 +291,9 @@ Defines whether this material is tone mapped according to the renderer's [page:W
 <h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 <p> 在编译shader程序之前立即执行的可选回调。此函数使用shader源码作为参数。用于修改内置材质。
 </p>
+<p>
+Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+</p>
 
 <h3>[method:null setValues]( [param:object values] )</h3>
 <p> values -- 具有参数的容器。
