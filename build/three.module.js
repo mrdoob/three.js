@@ -19458,13 +19458,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		_viewport = new Vector4(),
 
-		_MorphingFlag = 1,
-		_SkinningFlag = 2,
-
-		_NumberOfMaterialVariants = ( _MorphingFlag | _SkinningFlag ) + 1,
-
-		_depthMaterials = new Array( _NumberOfMaterialVariants ),
-		_distanceMaterials = new Array( _NumberOfMaterialVariants ),
+		_depthMaterials = [],
+		_distanceMaterials = [],
 
 		_materialCache = {};
 
@@ -19502,35 +19497,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	);
 
 	var fullScreenMesh = new Mesh( fullScreenTri, shadowMaterialVertical );
-
-	// init
-
-	for ( var i = 0; i !== _NumberOfMaterialVariants; ++ i ) {
-
-		var useMorphing = ( i & _MorphingFlag ) !== 0;
-		var useSkinning = ( i & _SkinningFlag ) !== 0;
-
-		var depthMaterial = new MeshDepthMaterial( {
-
-			depthPacking: RGBADepthPacking,
-
-			morphTargets: useMorphing,
-			skinning: useSkinning
-
-		} );
-
-		_depthMaterials[ i ] = depthMaterial;
-
-		var distanceMaterial = new MeshDistanceMaterial( {
-
-			morphTargets: useMorphing,
-			skinning: useSkinning
-
-		} );
-
-		_distanceMaterials[ i ] = distanceMaterial;
-
-	}
 
 	var scope = this;
 
@@ -19694,33 +19660,81 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
+	function getDepthMaterialVariant( useMorphing, useSkinning ) {
+
+		var index = useMorphing << 0 | useSkinning << 1;
+
+		var material = _depthMaterials[ index ];
+
+		if ( material === undefined ) {
+
+			material = new MeshDepthMaterial( {
+
+				depthPacking: RGBADepthPacking,
+
+				morphTargets: useMorphing,
+				skinning: useSkinning
+
+			} );
+
+			_depthMaterials[ index ] = material;
+
+		}
+
+		return material;
+
+	}
+
+	function getDistanceMaterialVariant( useMorphing, useSkinning ) {
+
+		var index = useMorphing << 0 | useSkinning << 1;
+
+		var material = _distanceMaterials[ index ];
+
+		if ( material === undefined ) {
+
+			material = new MeshDistanceMaterial( {
+
+				morphTargets: useMorphing,
+				skinning: useSkinning
+
+			} );
+
+			_distanceMaterials[ index ] = material;
+
+		}
+
+		return material;
+
+	}
+
 	function getDepthMaterial( object, material, light, shadowCameraNear, shadowCameraFar, type ) {
 
 		var geometry = object.geometry;
 
 		var result = null;
 
-		var materialVariants = _depthMaterials;
+		var getMaterialVariant = getDepthMaterialVariant;
 		var customMaterial = object.customDepthMaterial;
 
-		if ( light.isPointLight ) {
+		if ( light.isPointLight === true ) {
 
-			materialVariants = _distanceMaterials;
+			getMaterialVariant = getDistanceMaterialVariant;
 			customMaterial = object.customDistanceMaterial;
 
 		}
 
-		if ( ! customMaterial ) {
+		if ( customMaterial === undefined ) {
 
 			var useMorphing = false;
 
-			if ( material.morphTargets ) {
+			if ( material.morphTargets === true ) {
 
-				if ( geometry && geometry.isBufferGeometry ) {
+				if ( geometry.isBufferGeometry === true ) {
 
 					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
 
-				} else if ( geometry && geometry.isGeometry ) {
+				} else if ( geometry.isGeometry === true ) {
 
 					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
 
@@ -19728,20 +19742,23 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			if ( object.isSkinnedMesh && material.skinning === false ) {
+			var useSkinning = false;
 
-				console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
+			if ( object.isSkinnedMesh === true ) {
+
+				if ( material.skinning === true ) {
+
+					useSkinning = true;
+
+				} else {
+
+					console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
+
+				}
 
 			}
 
-			var useSkinning = object.isSkinnedMesh && material.skinning;
-
-			var variantIndex = 0;
-
-			if ( useMorphing ) variantIndex |= _MorphingFlag;
-			if ( useSkinning ) variantIndex |= _SkinningFlag;
-
-			result = materialVariants[ variantIndex ];
+			result = getMaterialVariant( useMorphing, useSkinning );
 
 		} else {
 
@@ -19785,11 +19802,11 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		if ( type === VSMShadowMap ) {
 
-			result.side = ( material.shadowSide != null ) ? material.shadowSide : material.side;
+			result.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
 
 		} else {
 
-			result.side = ( material.shadowSide != null ) ? material.shadowSide : shadowSide[ material.side ];
+			result.side = ( material.shadowSide !== null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		}
 
@@ -19800,7 +19817,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
 
-		if ( light.isPointLight && result.isMeshDistanceMaterial ) {
+		if ( light.isPointLight === true && result.isMeshDistanceMaterial === true ) {
 
 			result.referencePosition.setFromMatrixPosition( light.matrixWorld );
 			result.nearDistance = shadowCameraNear;
