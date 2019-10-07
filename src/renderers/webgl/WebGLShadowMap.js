@@ -286,14 +286,14 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		var getMaterialVariant = getDepthMaterialVariant;
 		var customMaterial = object.customDepthMaterial;
 
-		if ( light.isPointLight ) {
+		if ( light.isPointLight === true ) {
 
 			getMaterialVariant = getDistanceMaterialVariant;
 			customMaterial = object.customDistanceMaterial;
 
 		}
 
-		if ( ! customMaterial ) {
+		if ( customMaterial === undefined ) {
 
 			var useMorphing = false;
 
@@ -371,11 +371,11 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		if ( type === VSMShadowMap ) {
 
-			result.side = ( material.shadowSide != null ) ? material.shadowSide : material.side;
+			result.side = ( material.shadowSide !== null ) ? material.shadowSide : material.side;
 
 		} else {
 
-			result.side = ( material.shadowSide != null ) ? material.shadowSide : shadowSide[ material.side ];
+			result.side = ( material.shadowSide !== null ) ? material.shadowSide : shadowSide[ material.side ];
 
 		}
 
@@ -386,7 +386,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 		result.wireframeLinewidth = material.wireframeLinewidth;
 		result.linewidth = material.linewidth;
 
-		if ( light.isPointLight && result.isMeshDistanceMaterial ) {
+		if ( light.isPointLight === true && result.isMeshDistanceMaterial === true ) {
 
 			result.referencePosition.setFromMatrixPosition( light.matrixWorld );
 			result.nearDistance = shadowCameraNear;
