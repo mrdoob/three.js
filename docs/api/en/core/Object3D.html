@@ -438,21 +438,19 @@
 		</p>
 
 		<h3>[method:null updateMatrix]()</h3>
-		<p>Updates the local transform matrix.</p>
+		<p>Updates the local transform.</p>
 
 		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
-		force - immediately updates global transform of the object and its children.<br /><br />
-
-		Updates the local transform matrix and signals to update global transform matrix of the object and its children.
+		Updates the global transform of the object and its ancestors.
 		</p>
 
 		<h3>[method:null updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
 		<p>
-		updateParents - recursively updates local and global transform matrices of its parents.<br />
-		updateChildren - recursively updates local and global transform matrices of its children.<br /><br />
+		updateParents - recursively updates global transform of ancestors.<br />
+		updateChildren - recursively updates global transform of descendants.<br /><br />
 
-		Immediately updates the local and global transform matrices of the object.
+		Updates the global transform of the object.
 		</p>
 
 		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
