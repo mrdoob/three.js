@@ -311,13 +311,21 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			if ( object.isSkinnedMesh === true && material.skinning === false ) {
+			var useSkinning = false;
 
-				console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
+			if ( object.isSkinnedMesh === true ) {
+
+				if ( material.skinning === true ) {
+
+					useSkinning = true;
+
+				} else {
+
+					console.warn( 'THREE.WebGLShadowMap: THREE.SkinnedMesh with material.skinning set to false:', object );
+
+				}
 
 			}
-
-			var useSkinning = object.isSkinnedMesh === true && material.skinning === true;
 
 			result = getMaterialVariant( useMorphing, useSkinning );
 
