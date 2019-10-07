@@ -1,3 +1,4 @@
+
 body {
   margin: 0;
   font-family: Georgia, serif;
@@ -171,10 +172,10 @@ div[data-diagram] {
 }
 .checkerboard {
   background-color: #404040;
-  background-image: 
-     linear-gradient(45deg, #808080 25%, transparent 25%), 
-     linear-gradient(-45deg, #808080 25%, transparent 25%), 
-     linear-gradient(45deg, transparent 75%, #808080 75%), 
+  background-image:
+     linear-gradient(45deg, #808080 25%, transparent 25%),
+     linear-gradient(-45deg, #808080 25%, transparent 25%),
+     linear-gradient(45deg, transparent 75%, #808080 75%),
      linear-gradient(-45deg, transparent 75%, #808080 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
@@ -501,7 +502,7 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
     }
     .threejs_example_container>div {
         max-width: 95%;
-    }    
+    }
     .threejs_diagram_container iframe {
       max-width: 95%;
     }
@@ -512,6 +513,9 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
 
 
 @media (prefers-color-scheme: dark) {
+  html {
+    scrollbar-color: hsl(0, 0%, 35%) hsl(0, 0%, 13%);
+  }
   body {
     background: #333;
     color: #CCC;
