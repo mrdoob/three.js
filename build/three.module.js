@@ -48407,10 +48407,10 @@ Object.defineProperties( BufferAttribute.prototype, {
 			return this.usage === DynamicDrawUsage;
 
 		},
-		set: function ( value ) {
+		set: function ( /* value */ ) {
 
 			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
-			this.setUsage( value );
+			this.setUsage( DynamicDrawUsage );
 
 		}
 	}
