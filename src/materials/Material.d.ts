@@ -36,7 +36,6 @@ export interface MaterialParameters {
 	fog?: boolean;
 	name?: string;
 	opacity?: number;
-	overdraw?: number;
 	polygonOffset?: boolean;
 	polygonOffsetFactor?: number;
 	polygonOffsetUnits?: number;
@@ -209,11 +208,6 @@ export class Material extends EventDispatcher {
 	 * Opacity. Default is 1.
 	 */
 	opacity: number;
-
-	/**
-	 * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
-	 */
-	overdraw: number;
 
 	/**
 	 * Whether to use polygon offset. Default is false. This corresponds to the POLYGON_OFFSET_FILL WebGL feature.
