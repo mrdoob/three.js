@@ -19673,9 +19673,9 @@
 
 		}
 
-		function getDepthMaterialVariant( useMorphing, useSkinning ) {
+		function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing ) {
 
-			var index = useMorphing << 0 | useSkinning << 1;
+			var index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
 
 			var material = _depthMaterials[ index ];
 
@@ -19698,9 +19698,9 @@
 
 		}
 
-		function getDistanceMaterialVariant( useMorphing, useSkinning ) {
+		function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing ) {
 
-			var index = useMorphing << 0 | useSkinning << 1;
+			var index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
 
 			var material = _distanceMaterials[ index ];
 
@@ -19771,7 +19771,9 @@
 
 				}
 
-				result = getMaterialVariant( useMorphing, useSkinning );
+				var useInstancing = object.isInstancedMesh === true;
+
+				result = getMaterialVariant( useMorphing, useSkinning, useInstancing );
 
 			} else {
 
@@ -23700,7 +23702,7 @@
 
 		// vr
 
-		var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+		var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'isSessionSupported' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
 		this.vr = vr;
 
@@ -32357,6 +32359,7 @@
 
 
 	var Geometries = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		WireframeGeometry: WireframeGeometry,
 		ParametricGeometry: ParametricGeometry,
 		ParametricBufferGeometry: ParametricBufferGeometry,
@@ -33270,6 +33273,7 @@
 
 
 	var Materials = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		ShadowMaterial: ShadowMaterial,
 		SpriteMaterial: SpriteMaterial,
 		RawShaderMaterial: RawShaderMaterial,
@@ -37504,6 +37508,7 @@
 
 
 	var Curves = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		ArcCurve: ArcCurve,
 		CatmullRomCurve3: CatmullRomCurve3,
 		CubicBezierCurve: CubicBezierCurve,

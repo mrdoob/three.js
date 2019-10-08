@@ -19660,9 +19660,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDepthMaterialVariant( useMorphing, useSkinning ) {
+	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing ) {
 
-		var index = useMorphing << 0 | useSkinning << 1;
+		var index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
 
 		var material = _depthMaterials[ index ];
 
@@ -19685,9 +19685,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDistanceMaterialVariant( useMorphing, useSkinning ) {
+	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing ) {
 
-		var index = useMorphing << 0 | useSkinning << 1;
+		var index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
 
 		var material = _distanceMaterials[ index ];
 
@@ -19758,7 +19758,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			}
 
-			result = getMaterialVariant( useMorphing, useSkinning );
+			var useInstancing = object.isInstancedMesh === true;
+
+			result = getMaterialVariant( useMorphing, useSkinning, useInstancing );
 
 		} else {
 
@@ -23687,7 +23689,7 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'supportsSession' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'isSessionSupported' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
 	this.vr = vr;
 
@@ -32344,6 +32346,7 @@ CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
 
 var Geometries = /*#__PURE__*/Object.freeze({
+	__proto__: null,
 	WireframeGeometry: WireframeGeometry,
 	ParametricGeometry: ParametricGeometry,
 	ParametricBufferGeometry: ParametricBufferGeometry,
@@ -33257,6 +33260,7 @@ LineDashedMaterial.prototype.copy = function ( source ) {
 
 
 var Materials = /*#__PURE__*/Object.freeze({
+	__proto__: null,
 	ShadowMaterial: ShadowMaterial,
 	SpriteMaterial: SpriteMaterial,
 	RawShaderMaterial: RawShaderMaterial,
@@ -37491,6 +37495,7 @@ SplineCurve.prototype.fromJSON = function ( json ) {
 
 
 var Curves = /*#__PURE__*/Object.freeze({
+	__proto__: null,
 	ArcCurve: ArcCurve,
 	CatmullRomCurve3: CatmullRomCurve3,
 	CubicBezierCurve: CubicBezierCurve,
