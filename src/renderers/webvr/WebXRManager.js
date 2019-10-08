@@ -135,6 +135,12 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
+			if ( gl.makeXRCompatible !== undefined ) {
+
+				gl.makeXRCompatible();
+
+			}
+
 			// eslint-disable-next-line no-undef
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
