@@ -177,11 +177,17 @@ THREE.WEBVR = {
 			stylizeElement( button );
 
 			navigator.xr.isSessionSupported( 'immersive-vr' ).then( funciton ( supported ) {
+
 				if ( supported ) {
+
 					showEnterXR();
+
 				} else {
+
 					showXRNotFound();
+
 				}
+
 			} );
 
 			return button;
