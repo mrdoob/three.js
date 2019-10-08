@@ -1,7 +1,6 @@
-import {
-	WebGLRenderTargetOptions,
-	WebGLRenderTarget,
-} from './WebGLRenderTarget';
+import { WebGLRenderTargetOptions, WebGLRenderTarget } from './WebGLRenderTarget';
+import { WebGLRenderer } from './WebGLRenderer';
+import { Texture } from './../textures/Texture';
 
 export class WebGLRenderTargetCube extends WebGLRenderTarget {
 
@@ -10,5 +9,7 @@ export class WebGLRenderTargetCube extends WebGLRenderTarget {
 		height: number,
 		options?: WebGLRenderTargetOptions
 	);
+
+	fromEquirectangularTexture( renderer: WebGLRenderer, texture: Texture ): this;
 
 }
