@@ -178,7 +178,7 @@ var WEBVR = {
 
 			stylizeElement( button );
 
-			navigator.xr.isSessionSupported( 'immersive-vr' ).then( funciton ( supported ) {
+			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
 
 				if ( supported ) {
 
