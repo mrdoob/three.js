@@ -152,17 +152,19 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialMetalnessRow );
 
+	/*
 	// sheen
 
 	var materialSheenRow = new UI.Row();
 	var materialSheenEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialSheen = new UI.Color().setHexValue(0x000000).onChange( update );
+	var materialSheen = new UI.Color().setHexValue( 0x000000 ).onChange( update );
 
 	materialSheenRow.add( new UI.Text( strings.getKey( 'sidebar/material/sheen' ) ).setWidth( '90px' ) )
 	materialSheenRow.add( materialSheenEnabled );
 	materialSheenRow.add( materialSheen );
 
 	container.add( materialSheenRow );
+	*/
 
 	// emissive
 
@@ -605,6 +607,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			/*
 			if ( material.sheen !== undefined ) {
 
 				var sheenEnabled = materialSheenEnabled.getValue() === true;
@@ -620,6 +623,7 @@ Sidebar.Material = function ( editor ) {
 				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'sheen', materialSheen.getHexValue(), currentMaterialSlot ) );
 
 			}
+			*/
 
 			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
 
@@ -1142,7 +1146,7 @@ Sidebar.Material = function ( editor ) {
 			'roughness': materialRoughnessRow,
 			'metalness': materialMetalnessRow,
 			'emissive': materialEmissiveRow,
-			'sheen': materialSheenRow,
+			// 'sheen': materialSheenRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
 			'clearcoat': materialClearcoatRow,
@@ -1255,12 +1259,14 @@ Sidebar.Material = function ( editor ) {
 
 		}
 
+		/*
 		if ( material.sheen !== undefined && material.sheen !== null ) {
 
 			materialSheenEnabled.setValue( true );
 			materialSheen.setHexValue( material.sheen.getHexString() );
 
 		}
+		*/
 
 		if ( material.emissive !== undefined ) {
 
