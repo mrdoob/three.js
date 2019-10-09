@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>四维矩阵（[name]）</h1>
+
+		<p class="desc">
+			表示为一个 4x4 [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].<br /><br />
+
+			在3D计算机图形学中，4x4矩阵最常用的用法是作为一个变换矩阵[link:https://en.wikipedia.org/wiki/Transformation_matrix Transformation Matrix]。
+			有关WebGL中使用的变换矩阵的介绍，请参阅本教程[link:http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices this tutorial]。<br /><br />
+
+			这使得表示三维空间中的一个点的向量[page:Vector3]通过乘以矩阵来进行转换，如平移、旋转、剪切、缩放、反射、正交或透视投影等。这就是把矩阵<em>应用</em>到向量上。<br /><br />
+
+			任何3D物体[page:Object3D]都有三个关联的矩阵：
+			<ul>
+				<li>
+					[page:Object3D.matrix]: 存储物体的本地变换。 这是对象相对于其父对象的变换。
+				</li>
+				<li>
+					[page:Object3D.matrixWorld]: 对象的全局或世界变换。如果对象没有父对象，那么这与存储在矩阵[page:Object3D.matrix matrix]中的本地变换相同。
+				</li>
+				<li>
+					[page:Object3D.modelViewMatrix]: 表示对象相坐标相对于摄像机空间坐标转换，
+					一个对象的 modelViewMatrix 是物体世界变换矩阵乘以摄像机相对于世界空间变换矩阵的逆矩阵。
+				</li>
+			</ul>
+
+			摄像机[page:Camera Cameras] 有两个额外的四维矩阵:
+			<ul>
+				<li>
+					[page:Camera.matrixWorldInverse]: 视矩阵 - 摄像机世界坐标变换的逆矩阵。
+				</li>
+				<li>
+					[page:Camera.projectionMatrix]: 表示将场景中的信息投影到裁剪空间。
+				</li>
+			</ul>
+			注意：物体的正规矩阵 [page:Object3D.normalMatrix] 并不是一个4维矩阵，而是一个三维矩阵[page:Matrix3]。
+		</p>
+
+		<h2>注意行优先列优先的顺序。</h2>
+		<p>
+				设置[page:set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+				而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在数组当中。<br /><br />
+
+				这意味着
+		<code>
+var m = new THREE.Matrix4();
+
+m.set( 11, 12, 13, 14,
+       21, 22, 23, 24,
+       31, 32, 33, 34,
+       41, 42, 43, 44 );
+
+		</code>
+		元素数组[page:.elements elements]将存储为:
+		<code>
+m.elements = [ 11, 21, 31, 41,
+               12, 22, 32, 42,
+               13, 23, 33, 43,
+               14, 24, 34, 44 ];
+		</code>
+		在内部，所有的计算都是使用列优先顺序进行的。然而，由于实际的排序在数学上没有什么不同，
+		而且大多数人习惯于以行优先顺序考虑矩阵，所以three.js文档以行为主的顺序显示矩阵。
+		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
+		</p>
+
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]()</h3>
+
+		<p>
+			创建并初始化一个4X4的单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+	</p>
+
+		<h2>属性（Properties）</h2>
+
+		<h3>[property:Array elements]</h3>
+		<p>
+		矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
+		</p>
+
+		<h3>[property:Boolean isMatrix4]</h3>
+		<p>
+			用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
+
+			不应该改变该值，因为它在内部用于优化。
+		</p>
+
+
+
+
+		<h2>方法（Methods）</h2>
+
+		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
+
+		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
+		</p>
+
+
+		<h3>[method:Matrix4 clone]()</h3>
+		<p>创建一个新的矩阵，元素[page:.elements elements]与该矩阵相同。</p>
+
+		<h3>[method:this compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
+		<p>
+		设置将该对象由位置[page:Vector3 position]，四元数[page:Quaternion quaternion] 和 缩放[page:Vector3 scale]
+		组合变换的矩阵。内部先调用[page:.makeRotationFromQuaternion makeRotationFromQuaternion]( [page:Quaternion quaternion] )
+		再调用缩放[page:.scale scale]( [page:Vector3 scale] )最后是平移[page:.setPosition setPosition]( [page:Vector3 position] )。
+		</p>
+
+		<h3>[method:this copy]( [param:Matrix4 m] )</h3>
+		<p>将矩阵[page:Matrix3 m]的元素[page:.elements elements]复制到当前矩阵中。</p>
+
+		<h3>[method:this copyPosition]( [param:Matrix4 m] )</h3>
+		<p>
+		将给定矩阵[param:Matrix4 m] 的平移分量拷贝到当前矩阵中。
+		</p>
+
+		<h3>[method:null decompose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
+		<p>
+			将矩阵分解到给定的平移[page:Vector3 position] ,旋转 [page:Quaternion quaternion]，缩放[page:Vector3 scale]分量中。
+		</p>
+
+		<h3>[method:Float determinant]()</h3>
+		<p>
+				计算并返回矩阵的行列式[link:https://en.wikipedia.org/wiki/Determinant determinant] 。<br /><br />
+
+		基于这个的方法概述[link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here]。
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Matrix4 m] )</h3>
+		<p>如果矩阵[page:Matrix3 m] 与当前矩阵所有对应元素相同则返回true。</p>
+
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+			将矩阵的基向量[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]提取到指定的3个轴向量中。
+			如果矩阵如下：
+		<code>
+a, b, c, d,
+e, f, g, h,
+i, j, k, l,
+m, n, o, p
+		</code>
+		然后x轴y轴z轴被设为：
+		<code>
+xAxis = (a, e, i)
+yAxis = (b, f, j)
+zAxis = (c, g, k)
+		</code>
+		</p>
+
+		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
+		<p>
+		将给定矩阵[page:Matrix4 m]的旋转分量提取到该矩阵的旋转分量中。
+		</p>
+
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+			[page:Array array] - 用来存储设置元素数据的数组<br />
+			[page:Integer offset] - (可选参数) 数组的偏移量，默认值为 0。<br /><br />
+
+			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
+			</p>
+
+		<h3>[method:this getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
+		<p>
+			[page:Matrix3 m] - 取逆的矩阵。<br />
+			[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
+
+			使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
+			将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
+			参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
+				</p>
+
+
+		<h3>[method:Float getMaxScaleOnAxis]()</h3>
+		<p>获取3个轴方向的最大缩放值。</p>
+
+		<h3>[method:this identity]()</h3>
+		<p>将当前矩阵重置为单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix]。</p>
+
+		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
+		<p>
+			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 center]，由向量 [param:Vector3 up] 定向。
+<!--			Constructs a rotation matrix, looking from [page:Vector3 eye] towards [page:Vector3 center]
+			oriented by the [page:Vector3 up] vector.-->
+		</p>
+
+		<h3>[method:this makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>
+		<p>
+		[page:Vector3 axis] — 旋转轴，需要被归一化。<br />
+		[page:Float theta] — 旋转量（弧度）。<br /><br />
+
+		设置当前矩阵为围绕轴 [page:Vector3 axis] 旋转量为 [page:Float theta]弧度。<br />
+
+		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 here]的讨论。
+		</p>
+
+		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+			通过给定的三个向量设置该矩阵为基矩阵[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]：
+		<code>
+xAxis.x, yAxis.x, zAxis.x, 0,
+xAxis.y, yAxis.y, zAxis.y, 0,
+xAxis.z, yAxis.z, zAxis.z, 0,
+0,       0,       0,       1
+		</code>
+		</p>
+
+		<h3>[method:this makePerspective]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
+		<p>
+			创建一个透视投影矩阵[link:https://en.wikipedia.org/wiki/3D_projection#Perspective_projection perspective projection]。
+			在引擎内部由[page:PerspectiveCamera.updateProjectionMatrix]()使用。
+		</p>
+
+		<h3>[method:this makeOrthographic]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
+		<p>
+			创建一个正交投影矩阵[link:https://en.wikipedia.org/wiki/Orthographic_projection orthographic projection]。
+			在引擎内部由[page:OrthographicCamera.updateProjectionMatrix]()使用。
+		</p>
+
+		<h3>[method:this makeRotationFromEuler]( [param:Euler euler] )</h3>
+		<p>
+		将传入的欧拉角转换为该矩阵的旋转分量(左上角的3x3矩阵)。
+		矩阵的其余部分被设为单位矩阵。根据欧拉角[page:Euler euler]的旋转顺序[page:Euler.order order]，总共有六种可能的结果。
+		详细信息，请参阅本页[link:https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix this page]。
+		</p>
+
+		<h3>[method:this makeRotationFromQuaternion]( [param:Quaternion q] )</h3>
+		<p>
+		将这个矩阵的旋转分量设置为四元数[page:Quaternion q]指定的旋转，如下链接所诉[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here]。
+		矩阵的其余部分被设为单位矩阵。因此，给定四元数[page:Quaternion q] = w + xi + yj + zk，得到的矩阵为:
+		<code>
+1-2y²-2z²    2xy-2zw    2xz+2yw    0
+2xy+2zw      1-2x²-2z²  2yz-2xw    0
+2xz-2yw      2yz+2xw    1-2x²-2y²  0
+0            0          0          1
+		</code>
+		</p>
+
+		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] — Rotation angle in radians.<br /><br />
+
+		把该矩阵设置为绕x轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
+		结果如下：
+		<code>
+1 0      0        0
+0 cos(&theta;) -sin(&theta;)  0
+0 sin(&theta;) cos(&theta;)   0
+0 0      0        1
+		</code>
+		</p>
+
+		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] — Rotation angle in radians.<br /><br />
+
+		把该矩阵设置为绕Y轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
+		结果如下：
+		<code>
+cos(&theta;)  0 sin(&theta;) 0
+0       1 0      0
+-sin(&theta;) 0 cos(&theta;) 0
+0       0 0      1
+		</code>
+		</p>
+
+		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] — Rotation angle in radians.<br /><br />
+
+		把该矩阵设置为绕z轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
+		结果如下：
+		<code>
+cos(&theta;) -sin(&theta;) 0 0
+sin(&theta;) cos(&theta;)  0 0
+0      0       1 0
+0      0       0 1
+		</code>
+		</p>
+
+		<h3>[method:this makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			[page:Float x] - 在X轴方向的缩放比。<br />
+			[page:Float y] - 在Y轴方向的缩放比。<br />
+			[page:Float z] - 在Z轴方向的缩放比。<br /><br />
+
+			将这个矩阵设置为缩放变换:
+			<code>
+x, 0, 0, 0,
+0, y, 0, 0,
+0, 0, z, 0,
+0, 0, 0, 1
+			</code>
+		</p>
+
+		<h3>[method:this makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+		[page:Float x] - 在X轴上剪切的量。<br />
+		[page:Float y] - 在Y轴上剪切的量。<br />
+		[page:Float z] - 在Z轴上剪切的量。<br /><br />
+
+		将此矩阵设置为剪切变换:
+<code>
+1, y, z, 0,
+x, 1, z, 0,
+x, y, 1, 0,
+0, 0, 0, 1
+</code>
+		</p>
+
+		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			[page:Float x] - 在X轴上的平移量。<br />
+			[page:Float y] - 在Y轴上的平移量。<br />
+			[page:Float z] - 在Z轴上的平移量。<br /><br />
+
+		设置该矩阵为平移变换：
+		<code>
+1, 0, 0, x,
+0, 1, 0, y,
+0, 0, 1, z,
+0, 0, 0, 1
+		</code>
+		</p>
+
+		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
+		<p>将当前矩阵乘以矩阵[page:Matrix4 m]。</p>
+
+		<h3>[method:this multiplyMatrices]( [param:Matrix4 a], [param:Matrix4 b] )</h3>
+		<p>设置当前矩阵为矩阵[page:Matrix4 a] x 矩阵[page:Matrix4 b]。</p>
+
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
+		<p>当前矩阵所有的元素乘以该缩放值*s*</p>
+
+		<h3>[method:this premultiply]( [param:Matrix4 m] )</h3>
+		<p>将矩阵[page:Matrix4 m]乘以当前矩阵。</p>
+
+		<h3>[method:this scale]( [param:Vector3 v] )</h3>
+		<p>将该矩阵的列向量乘以对应向量[page:Vector3 v]的分量。</p>
+
+		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n14], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n24], [param:Float n31], [param:Float n32], [param:Float n33], [param:Float n34], [param:Float n41], [param:Float n42], [param:Float n43], [param:Float n44] )</h3>
+		<p>
+			以行优先的格式将传入的数值设置给该矩阵中的元素[page:.elements elements]。
+		</p>
+
+		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
+		<p>
+			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
+<code>
+a, b, c, d,
+e, f, g, h,
+i, j, k, l,
+m, n, o, p
+</code>
+变成:
+<code>
+a, b, c, v.x,
+e, f, g, v.y,
+i, j, k, v.z,
+m, n, o, p
+</code>
+		</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - (可选参数) 存储矩阵元素的数组，如果未指定会创建一个新的数组。<br />
+		[page:Integer offset] -  (可选参数) 存放矩阵元素数组的偏移量。<br /><br />
+
+		使用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]格式将此矩阵的元素写入数组中。
+		</p>
+
+		<h3>[method:this transpose]()</h3>
+		<p>将该矩阵转置[link:https://en.wikipedia.org/wiki/Transpose Transposes]。</p>
+
+		<h2>源码（Source）</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

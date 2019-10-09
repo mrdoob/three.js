@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr; [page:CurvePath] &rarr;
+
+		<h1>路径（[name]）</h1>
+
+		<p class="desc">
+		该类定义了二维路径，提供了一些类似2D Canvas API的方法来创建或者构造二维路径。
+		</p>
+
+		<h2>示例</h2>
+
+		<code>
+			var path = new THREE.Path();
+
+			path.lineTo( 0, 0.8 );
+			path.quadraticCurveTo( 0, 1, 0.2, 1 );
+			path.lineTo( 1, 1 );
+
+			var points = path.getPoints();
+
+			var geometry = new THREE.BufferGeometry().setFromPoints( points );
+			var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+
+			var line = new THREE.Line( geometry, material );
+			scene.add( line );
+		</code>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Array points] )</h3>
+		<p>
+		points -- （可选）[page:Vector2 Vector2s]数组。<br /><br />
+
+		从传入的点中创建一条Path。第一个点定义了偏移量，
+		接下来的点作为[page:LineCurve LineCurves]被添加到[page:CurvePath.curves curves]数组中。<br /><br />
+
+		倘若没有点被指定，一条空路径将会被创建，[page:.currentPoint]将被设置为原点。
+		</p>
+
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:CurvePath]。</p>
+
+		<h3>[property:array currentPoint]</h3>
+		<p>路径当前的偏移量，任何新被加入的[page:Curve]将会从这里开始。</p>
+
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:CurvePath]。</p>
+
+		<h3>[method:null absarc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise] )</h3>
+		<p>
+			x, y -- 弧线的绝对中心。<br />
+			radius -- 弧线的半径。<br />
+			startAngle -- 起始角，以弧度来表示。<br />
+			endAngle -- 终止角，以弧度来表示。<br />
+			clockwise -- 以顺时针方向创建（扫过）弧线。默认值为*false*。<br /><br />
+
+			添加一条绝对定位的[page:EllipseCurve EllipseCurve]到路径中。
+		</p>
+
+		<h3>[method:null absellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise], [param:Float rotation] )</h3>
+		<p>
+			x, y -- 椭圆的绝对中心。<br />
+			xRadius -- 椭圆x轴方向的半径。<br />
+			yRadius -- 椭圆y轴方向的半径。<br />
+			startAngle -- 起始角，以弧度来表示。<br />
+			endAngle -- 终止角，以弧度来表示。<br />
+			clockwise -- 以顺时针方向创建（扫过）椭圆。默认值为*false*。<br />
+			rotation -- 椭圆从X轴正方向逆时针的旋转角度（可选），以弧度表示，默认值为*0*。<br /><br />
+
+			添加一条绝对定位的[page:EllipseCurve EllipseCurve]到路径中。
+		</p>
+
+		<h3>[method:null arc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise] )</h3>
+		<p>
+			x, y -- 弧线的中心来自上次调用后的偏移量。<br />
+			radius -- 弧线的半径。<br />
+			startAngle -- 起始角，以弧度来表示。<br />
+			endAngle -- 终止角，以弧度来表示。<br />
+			clockwise -- 以顺时针方向创建（扫过）弧线。默认值为*false*。<br /><br />
+
+		添加一条[page:EllipseCurve EllipseCurve]到路径中，位置相对于[page:.currentPoint]。
+		</p>
+
+
+		<h3>[method:null bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<p>从[page:.currentPoint]创建一条贝塞尔曲线，以(cp1X, cp1Y)和(cp2X, cp2Y)作为控制点，并将[page:.currentPoint]更新到x,y。</p>
+
+		<h3>[method:null ellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Float clockwise], [param:Float rotation] )</h3>
+		<p>
+			x, y -- 椭圆的中心来自上次调用后的偏移量。The center of the ellipse offset from the last call.<br />
+			xRadius -- 椭圆x轴方向的半径。<br />
+			yRadius -- 椭圆y轴方向的半径。<br />
+			startAngle -- 起始角，以弧度来表示。<br />
+			endAngle -- 终止角，以弧度来表示。<br />
+			clockwise -- 以顺时针方向创建（扫过）椭圆。默认值为*false*。<br />
+			rotation -- 椭圆从X轴正方向逆时针的旋转角度（可选），以弧度表示，默认值为*0*。<br /><br />
+
+			添加一条[page:EllipseCurve EllipseCurve]到路径中，位置相对于[page:.currentPoint]。
+		</p>
+
+		<h3>[method:null lineTo]( [param:Float x], [param:Float y] )</h3>
+		<p>在当前路径上，从[page:.currentPoint]连接一条直线到x,y。</p>
+
+
+		<h3>[method:null moveTo]( [param:Float x], [param:Float y] )</h3>
+		<p>将[page:.currentPoint]移动到x, y。</p>
+
+
+		<h3>[method:null quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<p>从[page:.currentPoint]创建一条二次曲线，以(cpX,cpY)作为控制点，并将[page:.currentPoint]更新到x,y。</p>
+
+		<h3>[method:null setFromPoints]( [param:Array vector2s] )</h3>
+		<p>
+			points -- [page:Vector2 Vector2]数组。<br /><br />
+
+			点将被作为[page:LineCurve LineCurves]加入到[page:CurvePath.curves curves]数组中。
+		</p>
+
+		<h3>[method:null splineThru] ( [param:Array points] ) </h3>
+		<p>
+			points -[page:Vector2 Vector2]数组。<br /><br />
+
+			连接一条新的[page:SplineCurve]到路径上。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

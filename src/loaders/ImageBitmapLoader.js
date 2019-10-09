@@ -3,7 +3,7 @@
  */
 
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 
 function ImageBitmapLoader( manager ) {
@@ -20,12 +20,13 @@ function ImageBitmapLoader( manager ) {
 
 	}
 
-	this.manager = manager !== undefined ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
+
 	this.options = undefined;
 
 }
 
-ImageBitmapLoader.prototype = {
+ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: ImageBitmapLoader,
 
@@ -71,7 +72,16 @@ ImageBitmapLoader.prototype = {
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, scope.options );
+			if ( scope.options === undefined ) {
+
+				// Workaround for FireFox. It causes an error if you pass options.
+				return createImageBitmap( blob );
+
+			} else {
+
+				return createImageBitmap( blob, scope.options );
+
+			}
 
 		} ).then( function ( imageBitmap ) {
 
@@ -85,26 +95,15 @@ ImageBitmapLoader.prototype = {
 
 			if ( onError ) onError( e );
 
-			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
 		} );
 
-	},
-
-	setCrossOrigin: function ( /* value */ ) {
-
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
+		scope.manager.itemStart( url );
 
 	}
 
-};
+} );
 
 export { ImageBitmapLoader };

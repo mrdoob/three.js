@@ -5,11 +5,11 @@
 
 THREE.PDBLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.PDBLoader.prototype = {
+THREE.PDBLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.PDBLoader,
 
@@ -18,6 +18,7 @@ THREE.PDBLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -206,4 +207,4 @@ THREE.PDBLoader.prototype = {
 
 	}
 
-};
+} );

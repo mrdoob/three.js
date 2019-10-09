@@ -4,34 +4,39 @@
 		<title>three.js webgl - materials - anisotropic texture filtering</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #fff;
-				margin: 0px;
-				padding: 0px;
-				overflow: hidden;
+				color: #444;
+			}
+			a {
+				color: #08f;
 			}
 
-			#info {
+			.lbl {
+				color: #fff;
+				font-size: 16px;
+				font-weight: bold;
 				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
+				bottom: 0px;
+				z-index: 100;
+				text-shadow: #000 1px 1px 1px;
+				background-color: rgba(0,0,0,0.85);
+				padding: 1em;
 			}
 
-			.lbl { color:#fff; font-size:16px; font-weight:bold; position: absolute; bottom:0px; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
-			#lbl_left { text-align:left; left:0px }
-			#lbl_right { text-align:left; right:0px }
+			#lbl_left {
+				text-align:left;
+				left:0px;
+			}
+
+			#lbl_right {
+				text-align:left;
+				right:0px
+			}
 
 			.g { color:#aaa }
 			.c { color:#fa0 }
-
-			a { color:red }
 		</style>
 	</head>
 
@@ -48,19 +53,16 @@
 		anisotropy: <span class="c" id="val_right"></span><br/>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container, stats;
 
 			var camera, scene1, scene2, renderer;
 
@@ -132,7 +134,7 @@
 				} else {
 
 					document.getElementById( "val_left" ).innerHTML = "not supported";
-					document.getElementById( "val_right" ).innerHTML =  "not supported";
+					document.getElementById( "val_right" ).innerHTML = "not supported";
 
 				}
 
@@ -170,7 +172,7 @@
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -197,10 +199,10 @@
 				renderer.clear();
 				renderer.setScissorTest( true );
 
-				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
+				renderer.setScissor( 0, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene1, camera );
 
-				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
+				renderer.setScissor( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene2, camera );
 
 				renderer.setScissorTest( false );

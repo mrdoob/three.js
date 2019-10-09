@@ -5,6 +5,8 @@
 
 Sidebar.History = function ( editor ) {
 
+	var strings = editor.strings;
+
 	var signals = editor.signals;
 
 	var config = editor.config;
@@ -13,11 +15,11 @@ Sidebar.History = function ( editor ) {
 
 	var container = new UI.Panel();
 
-	container.add( new UI.Text( 'HISTORY' ) );
+	container.add( new UI.Text( strings.getKey( 'sidebar/history/history' ) ) );
 
 	//
 
-	var persistent = new UI.THREE.Boolean( config.getKey( 'settings/history' ), 'persistent' );
+	var persistent = new UI.THREE.Boolean( config.getKey( 'settings/history' ), strings.getKey( 'sidebar/history/persistent' ) );
 	persistent.setPosition( 'absolute' ).setRight( '8px' );
 	persistent.onChange( function () {
 

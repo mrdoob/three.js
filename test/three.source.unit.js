@@ -161,7 +161,6 @@ import './unit/src/loaders/DataTextureLoader.tests';
 import './unit/src/loaders/FileLoader.tests';
 import './unit/src/loaders/FontLoader.tests';
 import './unit/src/loaders/ImageLoader.tests';
-import './unit/src/loaders/JSONLoader.tests';
 import './unit/src/loaders/Loader.tests';
 import './unit/src/loaders/LoaderUtils.tests';
 import './unit/src/loaders/LoadingManager.tests';
@@ -234,7 +233,6 @@ import './unit/src/objects/Sprite.tests';
 
 
 //src/renderers
-import './unit/src/renderers/WebGL2Renderer.tests';
 import './unit/src/renderers/WebGLRenderer.tests';
 import './unit/src/renderers/WebGLRenderTarget.tests';
 import './unit/src/renderers/WebGLRenderTargetCube.tests';

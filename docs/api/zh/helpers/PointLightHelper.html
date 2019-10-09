@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			创建一个虚拟的球形网格 [page:Mesh] 的辅助对象来模拟
+			点光源 [page:PointLight].
+		 </p>
+
+
+		<h2>例子</h2>
+
+		[example:webgl_helpers WebGL /  helpers]
+
+		<code>
+		var pointLight = new THREE.PointLight( 0xff0000, 1, 100 );
+		pointLight.position.set( 10, 10, 10 );
+		scene.add( pointLight );
+
+		var sphereSize = 1;
+		var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize );
+		scene.add( pointLightHelper );
+		</code>
+
+
+
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:PointLight light], [param:Float sphereSize], [param:Hex color] )</h3>
+		<p>
+		[page:PointLight light] -- 要模拟的光源. <br /><br />
+
+		[page:Float sphereSize] -- (可选的) 球形辅助对象的尺寸. 默认为 *1*.<br /><br />
+
+		[page:Hex color] -- (可选的) 如果没有赋值辅助对象将使用光源的颜色.
+		</p>
+
+		<h2>属性</h2>
+		<p>请到基类 [page:Mesh] 页面查看公共属性.</p>
+
+		<h3>[property:PointLight light]</h3>
+		<p>被模拟的点光源 [page:PointLight] .</p>
+
+		<h3>[property:object matrix]</h3>
+		<p>请参考点光源的世界矩阵 [page:Object3D.matrixWorld matrixWorld].</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			请查看 [page:Object3D.matrixAutoUpdate]. 这里设置为 *false* 表示辅助对象
+			使用点光源的 [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:hex color]</h3>
+		<p>
+			构造函数中传入的颜色值. 默认为 *undefined*. 如果改变该值,
+			辅助对象的颜色将在下一次 [page:.update update] 被调用时更新.
+		</p>
+
+		<h2>方法</h2>
+		<p>请到基类 [page:Mesh] 页面查看公共方法.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>销毁该点光源辅助对象.</p>
+
+
+		<h3>[method:null update]()</h3>
+		<p>更新辅助对象，与 [page:.light] 属性的位置保持一致.</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

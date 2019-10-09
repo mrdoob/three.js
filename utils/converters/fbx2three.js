@@ -28,9 +28,13 @@ global.window = {
 	innerWidth: 1024,
 	innerHeight: 768,
 	URL: {
+
 		createObjectURL: function () {
+
 			throw new Error( 'fbx2three: Images in binary format not yet supported.' );
+
 		}
+
 	}
 };
 
@@ -40,7 +44,7 @@ THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
 	if ( this.path !== undefined ) url = this.path + url;
 
 	// If image isn't found, try to ignore it.
-	if ( !fs.existsSync( url ) ) {
+	if ( ! fs.existsSync( url ) ) {
 
 		onLoad( new Buffer( '' ) );
 		return;
@@ -54,7 +58,7 @@ THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
 // Convert image buffer to data URL.
 THREE.ImageUtils.getDataURL = function ( image ) {
 
-	if ( !( image instanceof Buffer ) ) {
+	if ( ! ( image instanceof Buffer ) ) {
 
 		throw new Error( 'fbx2three: Image should be loaded as Buffer.' );
 

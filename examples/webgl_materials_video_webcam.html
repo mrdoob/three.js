@@ -4,47 +4,21 @@
 		<title>three.js webgl - materials - video - webcam</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color:#0078ff;
-			}
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 5px; width: 100%;
-				z-index:100;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video webcam input
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - video webcam input
 		</div>
-
-		<script src="../build/three.js"></script>
-		<script src="../examples/js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
 
 		<video id="video" autoplay style="display:none"></video>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer, video;
 
@@ -59,10 +33,8 @@
 				scene = new THREE.Scene();
 
 				video = document.getElementById( 'video' );
+
 				var texture = new THREE.VideoTexture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
 
 				var geometry = new THREE.PlaneBufferGeometry( 16, 9 );
 				geometry.scale( 0.5, 0.5, 0.5 );
@@ -88,7 +60,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 
@@ -100,14 +72,14 @@
 
 					var constraints = { video: { width: 1280, height: 720, facingMode: 'user' } };
 
-					navigator.mediaDevices.getUserMedia( constraints ).then( function( stream ) {
+					navigator.mediaDevices.getUserMedia( constraints ).then( function ( stream ) {
 
-							// apply the stream to the video element used in the texture
+						// apply the stream to the video element used in the texture
 
-							video.src = window.URL.createObjectURL( stream );
-							video.play();
+						video.srcObject = stream;
+						video.play();
 
-					} ).catch( function( error ) {
+					} ).catch( function ( error ) {
 
 						console.error( 'Unable to access the camera/webcam.', error );
 
@@ -119,23 +91,23 @@
 
 				}
 
-			 }
+			}
 
-			 function onWindowResize() {
+			function onWindowResize() {
 
 				 camera.aspect = window.innerWidth / window.innerHeight;
 				 camera.updateProjectionMatrix();
 
 				 renderer.setSize( window.innerWidth, window.innerHeight );
 
-			 }
+			}
 
-			 function animate() {
+			function animate() {
 
 				 requestAnimationFrame( animate );
 				 renderer.render( scene, camera );
 
-			 }
+			}
 
 		</script>
 

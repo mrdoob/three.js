@@ -4,15 +4,16 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newRotation THREE.Euler
  * @param optionalOldRotation THREE.Euler
  * @constructor
  */
 
-var SetRotationCommand = function ( object, newRotation, optionalOldRotation ) {
+var SetRotationCommand = function ( editor, object, newRotation, optionalOldRotation ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetRotationCommand';
 	this.name = 'Set Rotation';

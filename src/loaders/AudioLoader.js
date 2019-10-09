@@ -1,6 +1,6 @@
 import { AudioContext } from '../audio/AudioContext.js';
 import { FileLoader } from './FileLoader.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 /**
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
@@ -8,16 +8,19 @@ import { DefaultLoadingManager } from './LoadingManager.js';
 
 function AudioLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( AudioLoader.prototype, {
+AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: AudioLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
 			// Create a copy of the buffer. The `decodeAudioData` method

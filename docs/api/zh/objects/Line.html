@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>线（[name]）</h1>
+
+		<p class="desc">
+			一条连续的线。<br /><br />
+
+			它几乎和[page:LineSegments]是一样的，唯一的区别是它在渲染时使用的是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]，
+			而不是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]。
+		</p>
+
+
+		<h2>示例</h2>
+
+		<code>var material = new THREE.LineBasicMaterial({
+			color: 0x0000ff
+		});
+
+		var geometry = new THREE.Geometry();
+		geometry.vertices.push(
+			new THREE.Vector3( -10, 0, 0 ),
+			new THREE.Vector3( 0, 10, 0 ),
+			new THREE.Vector3( 10, 0, 0 )
+		);
+
+		var line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+
+		<p>
+		[page:Geometry geometry] —— 表示线段的顶点，默认值是一个新的[page:BufferGeometry]。<br />
+		[page:Material material] —— 线的材质，默认值是一个新的具有随机颜色的[page:LineBasicMaterial]。<br />
+		</p>
+
+		<p>如果没有指定材质，一个随机颜色的线的材质将会被创建，并应用到该物体上。</p>
+
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
+
+		<h3>[property:Boolean isLine]</h3>
+		<p>
+			用于检查这个类或者其派生类是否为线，默认值为*true*。
+			
+			<br /><br />
+			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
+		</p>
+
+
+		<h3>[property:Geometry geometry]</h3>
+		<p>表示线段的顶点。</p>
+
+		<h3>[property:Material material]</h3>
+		<p>线的材质。</p>
+
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类 [page:Object3D]。</p>
+
+		<h3>[method:Line computeLineDistances]()</h3>
+		<p>
+			计算[page:LineDashedMaterial]所需的距离的值的数组。
+			对于几何体中的每一个顶点，这个方法计算出了当前点到线的起始点的累积长度。
+		</p>
+
+		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+			在一条投射出去的[page:Ray]（射线）和这条线之间产生交互。
+			[page:Raycaster.intersectObject]将会调用这个方法。
+		</p>
+
+		<h3>[method:Line clone]()</h3>
+		<p>
+			返回这条线及其子集的一个克隆对象。
+		</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

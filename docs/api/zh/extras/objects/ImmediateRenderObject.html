@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>即时渲染对象([name])</h1>
+
+		<p class="desc">即时渲染对象的基类。</p>
+
+
+		<h2>构造函数(Constructor)</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+			这会创建一个新的 [name]。
+		</p>
+
+
+		<h2>方法(Methods)</h2>
+
+
+		<h3>[method:null render]([param:Function renderCallback])</h3>
+		<p>
+		renderCallback -- 生成对象的渲染函数。
+		</p>
+		<p>
+		需要重写此函数以开始创建对象，并在完成时调用renderCallback。
+		</p>
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

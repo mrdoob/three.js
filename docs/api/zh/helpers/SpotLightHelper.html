@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">用于模拟聚光灯 [page:SpotLight] 的锥形辅助对象.</p>
+
+		<h2>例子</h2>
+		<iframe src='../examples/webgl_lights_spotlight.html'></iframe>
+		<a target="THREE_Examples" href="../examples/#webgl_lights_spotlight">View in Examples</a><br />
+		<h2>其他例子</h2>
+
+		<div>[example:webgl_lights_spotlights lights / spotlights ]</div>
+
+		<h2>代码示例</h2>
+		<code>
+		var spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 10, 10, 10 );
+		scene.add( spotLight );
+
+		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		scene.add( spotLightHelper );
+		</code>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:SpotLight light], [param:Hex color] )</h3>
+		<p>
+			[page:SpotLight light] -- 被模拟的聚光灯 [page:SpotLight] . <br /><br/>
+
+			[page:Hex color] -- (可选的) 如果没有赋值辅助对象将使用光源的颜色.
+		</p>
+
+
+		<h2>属性</h2>
+		<p>请到基类 [page:Object3D] 页面查看公共属性.</p>
+
+		<h3>[property:LineSegments cone]</h3>
+		<p>用于模拟光源的 [page:LineSegments] 类型对象.</p>
+
+		<h3>[property:SpotLight light]</h3>
+		<p>被模拟的聚光灯 [page:SpotLight] .</p>
+
+		<h3>[property:object matrix]</h3>
+		<p>请参考聚光灯的世界矩阵 [page:Object3D.matrixWorld matrixWorld].</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			请查看 [page:Object3D.matrixAutoUpdate]. 这里设置为 *false* 表示辅助对象
+			使用聚光灯的 [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:hex color]</h3>
+		<p>
+			构造函数中传入的颜色值. 默认为 *undefined*. 如果改变该值,
+			辅助对象的颜色将在下一次 [page:.update update] 被调用时更新.
+		</p>
+
+		<h2>方法</h2>
+		<p>请到基类 [page:Object3D] 页面查看公共属性.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>销毁该聚光灯辅助对象.</p>
+
+		<h3>[method:null update]()</h3>
+		<p>更新聚光灯辅助对象.</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

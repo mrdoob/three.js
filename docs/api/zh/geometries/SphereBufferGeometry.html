@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>球缓冲几何体（[name]）</h1>
+
+		<p class="desc">这是[page:SphereGeometry]中的[page:BufferGeometry]接口。</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#SphereBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>示例</h2>
+
+		<code>var geometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		var sphere = new THREE.Mesh( geometry, material );
+		scene.add( sphere );
+		</code>
+
+		<h2>构造器</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer widthSegments], [param:Integer heightSegments], [param:Float phiStart], [param:Float phiLength], [param:Float thetaStart], [param:Float thetaLength])</h3>
+
+		<p>
+			radius — 球体半径，默认为1。<br />
+			widthSegments — 水平分段数（沿着经线分段），最小值为3，默认值为8。<br />
+			heightSegments — 垂直分段数（沿着纬线分段），最小值为2，默认值为6。<br />
+			phiStart — 指定水平（经线）起始角度，默认值为0。。<br />
+			phiLength — 指定水平（经线）扫描角度的大小，默认值为 Math.PI * 2。<br />
+			thetaStart — 指定垂直（纬线）起始角度，默认值为0。<br />
+			thetaLength — 指定垂直（纬线）扫描角度大小，默认值为 Math.PI。<br />
+		</p>
+
+		<p>
+			该几何体是通过扫描并计算围绕着Y轴（水平扫描）和X轴（垂直扫描）的顶点来创建的。
+			因此，不完整的球体（类似<em>球形切片</em>）可以通过为phiStart，phiLength，thetaStart和thetaLength设置不同的值来创建，
+			以定义我们开始（或结束）计算这些顶点的起点（或终点）。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
+
+		<h3>.parameters</h3>
+		<p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
+
+		<h2>源代码</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/SphereGeometry.js src/geometries/SphereGeometry.js]
+	</body>
+</html>

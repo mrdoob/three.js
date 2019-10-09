@@ -4,29 +4,21 @@
 		<title> three.js webgl - ShadowMesh </title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: rgb(0, 0, 0);
-				margin: 0;
-				padding: 0;
-				overflow: hidden;
-			}
-
-			#lightButton {
-				position: absolute;
-				right: 20px;
-				top: 20px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shadow mesh<br />
+			<input id="lightButton" type="button" value="Switch to PointLight">
+		</div>
 
 		<div id="container"></div>
-		<input id="lightButton" type="button" value="Switch to PointLight" onclick="lightButtonHandler()">
 
-		<script src="../build/three.js"></script>
-		<script src="js/objects/ShadowMesh.js"></script>
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { ShadowMesh } from './jsm/objects/ShadowMesh.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -47,7 +39,6 @@
 			var lightSphere, lightHolder;
 			var pyramid, pyramidShadow;
 			var sphere, sphereShadow;
-			var box, boxShadow;
 			var cube, cubeShadow;
 			var cylinder, cylinderShadow;
 			var torus, torusShadow;
@@ -70,7 +61,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.getElementById( "container" ).appendChild( renderer.domElement );
-				window.addEventListener( 'resize' , onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 				camera.position.set( 0, 2.5, 10 );
 				scene.add( camera );
@@ -129,7 +120,7 @@
 				cube.position.z = - 1;
 				scene.add( cube );
 
-				cubeShadow = new THREE.ShadowMesh( cube );
+				cubeShadow = new ShadowMesh( cube );
 				scene.add( cubeShadow );
 
 				// BLUE CYLINDER and CYLINDER's SHADOW
@@ -139,7 +130,7 @@
 				cylinder.position.z = - 2.5;
 				scene.add( cylinder );
 
-				cylinderShadow = new THREE.ShadowMesh( cylinder );
+				cylinderShadow = new ShadowMesh( cylinder );
 				scene.add( cylinderShadow );
 
 				// MAGENTA TORUS and TORUS' SHADOW
@@ -149,7 +140,7 @@
 				torus.position.z = - 6;
 				scene.add( torus );
 
-				torusShadow = new THREE.ShadowMesh( torus );
+				torusShadow = new ShadowMesh( torus );
 				scene.add( torusShadow );
 
 				// WHITE SPHERE and SPHERE'S SHADOW
@@ -159,7 +150,7 @@
 				sphere.position.set( 4, 0.5, 2 );
 				scene.add( sphere );
 
-				sphereShadow = new THREE.ShadowMesh( sphere );
+				sphereShadow = new ShadowMesh( sphere );
 				scene.add( sphereShadow );
 
 				// YELLOW PYRAMID and PYRAMID'S SHADOW
@@ -169,8 +160,10 @@
 				pyramid.position.set( - 4, 1, 2 );
 				scene.add( pyramid );
 
-				pyramidShadow = new THREE.ShadowMesh( pyramid );
+				pyramidShadow = new ShadowMesh( pyramid );
 				scene.add( pyramidShadow );
+
+				document.getElementById( 'lightButton' ).addEventListener( 'click', lightButtonHandler );
 
 			}
 
@@ -215,7 +208,6 @@
 
 				renderer.render( scene, camera );
 
-
 			}
 
 			function onWindowResize() {
@@ -232,7 +224,7 @@
 
 			function lightButtonHandler() {
 
-				useDirectionalLight = !useDirectionalLight;
+				useDirectionalLight = ! useDirectionalLight;
 
 				if ( useDirectionalLight ) {
 
@@ -254,7 +246,7 @@
 					lightSphere.visible = false;
 					lightHolder.visible = false;
 
-					document.getElementById( 'lightButton' ).value = "Switch to PointLight" ;
+					document.getElementById( 'lightButton' ).value = "Switch to PointLight";
 
 				} else {
 
@@ -280,7 +272,7 @@
 					lightSphere.visible = true;
 					lightHolder.visible = true;
 
-					document.getElementById( 'lightButton' ).value = "Switch to DirectionalLight" ;
+					document.getElementById( 'lightButton' ).value = "Switch to THREE.DirectionalLight";
 
 				}
 

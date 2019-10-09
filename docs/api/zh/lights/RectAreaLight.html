@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>平面光光源（[name]）</h1>
+
+		<p class="desc">
+			平面光光源从一个矩形平面上均匀地发射光线。这种光源可以用来模拟像明亮的窗户或者条状灯光光源。<br /><br />
+
+			注意事项:
+			<ul>
+				<li>不支持阴影。</li>
+				<li>只支持 [page:MeshStandardMaterial MeshStandardMaterial] 和 [page:MeshPhysicalMaterial MeshPhysicalMaterial] 两种材质。</li>
+				<li>你必须在你的场景中加入 [link:https://threejs.org/examples/js/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] ，并调用*init()*。</li>
+			</ul>
+		</p>
+
+
+
+		<h2>示例</h2>
+
+		<p>
+			[example:webgl_lights_rectarealight WebGL / rectarealight ]
+
+			<code>
+var width = 10;
+var height = 10;
+var intensity = 1;
+var rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+rectLight.position.set( 5, 5, 0 );
+rectLight.lookAt( 0, 0, 0 );
+scene.add( rectLight )
+
+rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+scene.add( rectLightHelper );
+
+			</code>
+		</p>
+
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float width], [param:Float height] )</h3>
+		<p>
+			[page:Integer color] -  (可选参数) 十六进制数字表示的光照颜色。缺省值为 0xffffff (白色)<br />
+			[page:Float intensity] - (可选参数) 光源强度／亮度 。缺省值为 1。<br />
+			[page:Float width] - (可选参数) 光源宽度。缺省值为 10。<br />
+			[page:Float height] - (可选参数) 光源高度。缺省值为 10。<br /><br />
+
+			创建一个新的平行光。
+		</p>
+
+		<h2>属性（Properties）</h2>
+		<p>
+			公共属性请查看基类[page:Light Light]。
+		</p>
+
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<p>
+			用来校验这个类或者它的派生类是不是平面光光源。缺省值是 *true*。<br /><br />
+
+			不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
+		</p>
+
+		<h2>方法（Methods）</h2>
+		<p>
+			公共方法请查看基类 [page:Light Light]。
+		</p>
+
+
+		<h3>[method:RectAreaLight copy]( [param:RectAreaLight source] )</h3>
+		<p>
+			将所有属性的值从源 [page:RectAreaLight source] 复制到此平面光光源对象。
+		</p>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

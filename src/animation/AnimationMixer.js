@@ -176,8 +176,8 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		this._actionsByClip = {};
 		// inside:
 		// {
-		// 		knownActions: Array< AnimationAction >	- used as prototypes
-		// 		actionByRoot: AnimationAction			- lookup
+		// 	knownActions: Array< AnimationAction > - used as prototypes
+		// 	actionByRoot: AnimationAction - lookup
 		// }
 
 
@@ -428,9 +428,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		delete bindingByName[ trackName ];
 
-		remove_empty_map: {
-
-			for ( var _ in bindingByName ) break remove_empty_map; // eslint-disable-line no-unused-vars
+		if ( Object.keys( bindingByName ).length === 0 ) {
 
 			delete bindingsByRoot[ rootUuid ];
 
@@ -652,6 +650,20 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		}
 
 		return this;
+
+	},
+
+	// Allows you to seek to a specific time in an animation.
+	setTime: function ( timeInSeconds ) {
+
+		this.time = 0; // Zero out time attribute for AnimationMixer object;
+		for ( var i = 0; i < this._actions.length; i ++ ) {
+
+			this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
+
+		}
+
+		return this.update( timeInSeconds ); // Update used to set exact time. Returns "this" AnimationMixer object.
 
 	},
 

@@ -6,4 +6,3 @@ var performance;
 var createImageBitmap;
 var WebGL2RenderingContext;
 var XRWebGLLayer;
-var XRDevice;

@@ -1,50 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<title>three.js webgl - Fast subsurface scattering in Blinn-Phong shading demo</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-	  body {
-			color: #fff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-
-			background-color: #000;
-			margin: 0px;
-			overflow: hidden;
-	  }
-
-	  #info {
-			position: absolute;
-			top: 0px; width: 100%;
-			padding: 5px;
-	  }
-	</style>
+		<title>three.js webgl - Fast subsurface scattering in Blinn-Phong shading demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
   </head>
   <body>
 
 	<div id="container"></div>
 	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
 		<br/>Fast subsurface scattering in Blinn-Phong shading demo<br/>
-		[Thanks for the art support from <a href="https://github.com/shaochun">Shaochun Lin</a>]
+		[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
 	</div>
-	<script src="../build/three.js"></script>
-	<script src="js/controls/OrbitControls.js"></script>
 
-	<script src="js/Detector.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
-	<script src="js/loaders/FBXLoader.js"></script>
-	<script src="js/ShaderTranslucent.js"></script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
 
-	<script>
+		import Stats from './jsm/libs/stats.module.js';
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { TranslucentShader } from './jsm/shaders/TranslucentShader.js';
+		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 		var container, stats;
-		var camera, scene, renderer, controls;
+		var camera, scene, renderer;
 		var model;
 
 		init();
@@ -72,15 +53,15 @@
 			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
 			scene.add( pointLight1 );
 			pointLight1.position.x = 0;
-			pointLight1.position.y = -50;
+			pointLight1.position.y = - 50;
 			pointLight1.position.z = 350;
 
 			var pointLight2 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
 			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
 			scene.add( pointLight2 );
-			pointLight2.position.x = -100;
+			pointLight2.position.x = - 100;
 			pointLight2.position.y = 20;
-			pointLight2.position.z = -260;
+			pointLight2.position.z = - 260;
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -95,7 +76,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			controls = new THREE.OrbitControls( camera );
+			var controls = new OrbitControls( camera, container );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -110,7 +91,7 @@
 			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-			var shader = new THREE.TranslucentShader();
+			var shader = TranslucentShader;
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;
@@ -136,7 +117,7 @@
 
 			// LOADER
 
-			var loader = new THREE.FBXLoader();
+			var loader = new FBXLoader();
 			loader.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
 
 				model = object.children[ 0 ];
@@ -147,44 +128,59 @@
 
 			} );
 
-			initGUI(uniforms);
+			initGUI( uniforms );
+
 		}
 
-		function initGUI(uniforms) {
-			var gui = new dat.GUI();
+		function initGUI( uniforms ) {
 
-			var ThicknessControls = function() {
-				this.distoration =  uniforms['thicknessDistortion'].value;
-				this.ambient =  uniforms['thicknessAmbient'].value;
-				this.attenuation =  uniforms['thicknessAttenuation'].value;
-				this.power =  uniforms['thicknessPower'].value;
-				this.scale =  uniforms['thicknessScale'].value;
+			var gui = new GUI();
+
+			var ThicknessControls = function () {
+
+				this.distoration = uniforms[ 'thicknessDistortion' ].value;
+				this.ambient = uniforms[ 'thicknessAmbient' ].value;
+				this.attenuation = uniforms[ 'thicknessAttenuation' ].value;
+				this.power = uniforms[ 'thicknessPower' ].value;
+				this.scale = uniforms[ 'thicknessScale' ].value;
+
 			};
 
 			var thicknessControls = new ThicknessControls();
 			var thicknessFolder = gui.addFolder( 'Thickness Control' );
 
-			thicknessFolder.add(thicknessControls, 'distoration' ).min(0.01).max(1).step(0.01).onChange(function() {
-				uniforms['thicknessDistortion'].value = thicknessControls.distoration;
-			});
+			thicknessFolder.add( thicknessControls, 'distoration' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
 
-			thicknessFolder.add(thicknessControls, 'ambient' ).min(0.01).max(5.0).step(0.05).onChange(function() {
-				uniforms['thicknessAmbient'].value = thicknessControls.ambient;
-			});
+				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distoration;
 
-			thicknessFolder.add(thicknessControls, 'attenuation' ).min(0.01).max(5.0).step(0.05).onChange(function() {
-				uniforms['thicknessAttenuation'].value = thicknessControls.attenuation;
-			});
+			} );
 
-			thicknessFolder.add(thicknessControls, 'power' ).min(0.01).max(16.0).step(0.1).onChange(function() {
-				uniforms['thicknessPower'].value = thicknessControls.power;
-			});
+			thicknessFolder.add( thicknessControls, 'ambient' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
 
-			thicknessFolder.add(thicknessControls, 'scale' ).min(0.01).max(50.0).step(0.1).onChange(function() {
-				uniforms['thicknessScale'].value = thicknessControls.scale;
-			});
+				uniforms[ 'thicknessAmbient' ].value = thicknessControls.ambient;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'attenuation' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+
+				uniforms[ 'thicknessAttenuation' ].value = thicknessControls.attenuation;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'power' ).min( 0.01 ).max( 16.0 ).step( 0.1 ).onChange( function () {
+
+				uniforms[ 'thicknessPower' ].value = thicknessControls.power;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'scale' ).min( 0.01 ).max( 50.0 ).step( 0.1 ).onChange( function () {
+
+				uniforms[ 'thicknessScale' ].value = thicknessControls.scale;
+
+			} );
 
 			thicknessFolder.open();
+
 		}
 
 		function onWindowResize() {

@@ -4,11 +4,11 @@
 
 THREE.MD2Loader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.MD2Loader.prototype = {
+THREE.MD2Loader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.MD2Loader,
 
@@ -17,6 +17,7 @@ THREE.MD2Loader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
@@ -376,4 +377,4 @@ THREE.MD2Loader.prototype = {
 
 	} )()
 
-};
+} );

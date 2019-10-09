@@ -1,4 +1,4 @@
-/*
+/**
  * @author zz85 / https://github.com/zz85
  *
  * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
@@ -159,11 +159,13 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 	if ( strResolution == "low" ) {
 
 		switch ( iScale ) {
+
 			case 1 : fLetterSpacing = - 1; break;
 			case 2 :
 			case 3 : fLetterSpacing = - 2.1; break;
 			case 4 : fLetterSpacing = - 3.1; break;
 			case 5 : fLetterSpacing = - 4.15; break;
+
 		}
 
 	}
@@ -171,11 +173,13 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 	if ( strResolution == "medium" ) {
 
 		switch ( iScale ) {
+
 			case 1 : fLetterSpacing = 0; break;
 			case 2 : fLetterSpacing = - 1; break;
 			case 3 : fLetterSpacing = - 1.04; break;
 			case 4 :
 			case 5 : fLetterSpacing = - 2.1; break;
+
 		}
 
 	}
@@ -183,11 +187,13 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 	if ( strResolution == "high" ) {
 
 		switch ( iScale ) {
+
 			case 1 :
 			case 2 : fLetterSpacing = 0; break;
 			case 3 :
 			case 4 :
 			case 5 : fLetterSpacing = - 1; break;
+
 		}
 
 	}

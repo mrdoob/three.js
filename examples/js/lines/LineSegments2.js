@@ -54,7 +54,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 	}() ),
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 

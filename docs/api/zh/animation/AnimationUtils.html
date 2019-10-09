@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+            一个提供各种动画辅助方法的对象，内部使用。
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		<h3>[method:Array arraySlice]( array, from, to )</h3>
+		<p>
+		和Array.prototype.slice作用一样, 但也适用于类型化数组.
+		</p>
+
+		<h3>[method:Array convertArray]( array, type, forceClone )</h3>
+		<p>
+            将数组转换为某种特定类型。
+		</p>
+
+		<h3>[method:Array flattenJSON]( jsonKeys, times, values, valuePropertyName  )</h3>
+		<p>
+            用于解析AOS关键帧格式。
+		</p>
+
+		<h3>[method:Array getKeyframeOrder]( times )</h3>
+		<p>
+            返回一个数组，时间和值可以根据此数组排序。
+		</p>
+
+		<h3>[method:Number insertKeyframe]( [param:KeyframeTrack track], [param:Number time] )</h3>
+		<p></p>
+
+		<h3>[method:Boolean isTypedArray]( object )</h3>
+		<p>
+            如果该对象是类型化数组，返回*true*
+
+		</p>
+
+		<h3>[method:AnimationClip mergeMorphTargetTracks]( [param:AnimationClip clip], [param:Object3D root] )</h3>
+		<p></p>
+
+		<h3>[method:Array sortedArray]( values, stride, order )</h3>
+		<p>
+            将[page:AnimationUtils.getKeyframeOrder getKeyframeOrder]方法返回的数组排序。
+
+		</p>
+
+
+		<h2>源码</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

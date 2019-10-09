@@ -4,40 +4,12 @@
 		<title>three.js webgl - shader [Monjori]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/Detector.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -91,9 +63,9 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var container;
 
@@ -115,7 +87,7 @@
 				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
 				uniforms = {
-					time: { value: 1.0 }
+					"time": { value: 1.0 }
 				};
 
 				var material = new THREE.ShaderMaterial( {
@@ -139,7 +111,7 @@
 
 			}
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -151,7 +123,7 @@
 
 				requestAnimationFrame( animate );
 
-				uniforms.time.value = timestamp / 1000;
+				uniforms[ "time" ].value = timestamp / 1000;
 
 				renderer.render( scene, camera );
 

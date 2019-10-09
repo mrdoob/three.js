@@ -10,14 +10,14 @@
 
 THREE.BVHLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	this.animateBonePositions = true;
 	this.animateBoneRotations = true;
 
 };
 
-THREE.BVHLoader.prototype = {
+THREE.BVHLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.BVHLoader,
 
@@ -26,6 +26,7 @@ THREE.BVHLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			onLoad( scope.parse( text ) );
@@ -403,4 +404,4 @@ THREE.BVHLoader.prototype = {
 
 	}
 
-};
+} );

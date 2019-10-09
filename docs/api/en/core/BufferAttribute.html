@@ -35,12 +35,12 @@
 		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
 		<br /><br />
 
-		[page:Boolean normalized] -- (optional) Indicates how the underlying data in the buffer maps
-		to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance of
-		UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
+		[page:Boolean normalized] -- (optional) Applies to integer data only. Indicates how the underlying data
+		in the buffer maps to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance
+		of UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
 		 data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map
 		 from -32767 - +32767  to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
-		 will be converted to floats which contain the exact value, i.e. 32767 becomes 32767.0f.
+		 will be converted to floats unmodified, i.e. 32767 becomes 32767.0f.
 		</p>
 
 		<h2>Properties</h2>
@@ -56,16 +56,6 @@
 
 		If the buffer is storing a 3-component vector (such as a position, normal, or color),
 		then this will count the number of such vectors stored.
-		</p>
-
-		<h3>[property:Boolean dynamic]</h3>
-		<p>
-			Whether the buffer is dynamic or not. Default is *false*.<br />
-
-			If false, the GPU is informed that contents of the buffer are likely to be used often and not change often.
-			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.STATIC_DRAW] flag.<br />
-			if true, the GPU is informed that contents of the buffer are likely to be used often and change often.
-			This corresponds to the  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData gl.DYNAMIC_DRAW] flag.
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
@@ -111,14 +101,23 @@
 			related to color).
 		</p>
 
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			Default is *THREE.StaticDrawUsage*.
+		</p>
+
 		<h3>[property:Integer version]</h3>
 		<p>A version number, incremented every time the [page:BufferAttribute.needsUpdate needsUpdate] property is set to true.</p>
-
 
 		<h2>Methods</h2>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>Return a copy of this bufferAttribute.</p>
+
+		<h3>[method:BufferAttribute copy]( [param:BufferAttribute bufferAttribute] )</h3>
+		<p>Copies another BufferAttribute to this BufferAttribute.</p>
 
 		<h3>[method:BufferAttribute copyArray]( array ) </h3>
 		<p>Copy the array given here (which can be a normal array or TypedArray) into
@@ -175,15 +174,8 @@
 		being a [page:TypedArray].
 		</p>
 
-		<h3>[method:BufferAttribute setArray] ( [param:TypedArray array] ) </h3>
-		<p>
-		[page:BufferAttribute.array array] to the TypedArray passed in here.<br /><br />
-
-		After setting the array, [page:BufferAttribute.needsUpdate needsUpdate] should be set to true.
-		</p>
-
-		<h3>[method:BufferAttribute setDynamic] ( [param:Boolean value] ) </h3>
-		<p>Set [page:BufferAttribute.dynamic dynamic] to value.</p>
+		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:BufferAttribute.usage usage] to value.</p>
 
 		<h3>[method:BufferAttribute setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>Sets the x component of the vector at the given index.</p>
@@ -210,6 +202,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

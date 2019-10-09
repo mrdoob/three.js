@@ -4,30 +4,30 @@
 		<title>three.js webgl - interactive lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
+			}
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 			var camera, scene, raycaster, renderer, parentTransform, sphereInter;
 
 			var mouse = new THREE.Vector2();
 			var radius = 100, theta = 0;
-
-			var currentIntersected;
 
 			init();
 			animate();
@@ -128,7 +128,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -185,31 +185,14 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( parentTransform.children, true);
+				var intersects = raycaster.intersectObjects( parentTransform.children, true );
 
 				if ( intersects.length > 0 ) {
-
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
-
-					currentIntersected = intersects[ 0 ].object;
-					currentIntersected.material.linewidth = 5;
 
 					sphereInter.visible = true;
 					sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
-
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
-
-					currentIntersected = undefined;
 
 					sphereInter.visible = false;
 

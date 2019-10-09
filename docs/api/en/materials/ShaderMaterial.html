@@ -96,7 +96,6 @@
 			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
 			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
 			[example:webgl_materials_skin webgl / materials / skin]<br />
-			[example:webgl_materials_texture_hdr webgl / materials / texture / hdr]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
 			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
@@ -360,9 +359,6 @@ this.extensions = {
 			You should not change this, as it used internally for optimisation.
 		</p>
 
-
-
-
 		<h3>[property:Boolean lights]</h3>
 		<p>
 		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader. Default is false.
@@ -379,13 +375,12 @@ this.extensions = {
 
 		<h3>[property:Boolean morphTargets]</h3>
 		<p>
-		Defines whether the material uses morphTargets; true morphTarget attributes to this shader
+		When set to true, morph target attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 		<h3>[property:boolean morphNormals]</h3>
 		<p>
-			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
-			to the shader. Default is *false*.
+		When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 
@@ -444,7 +439,7 @@ this.extensions = {
 		<h3>[property:Float wireframeLinewidth]</h3>
 		<p>Controls wireframe thickness. Default is 1.<br /><br />
 
-		Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile)
+		Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
 		with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
 		always be 1 regardless of the set value.
 		</p>
@@ -465,6 +460,8 @@ this.extensions = {
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

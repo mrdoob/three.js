@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:MeshStandardMaterial] &rarr;
+
+		<h1>物理网格材质([name])</h1>
+
+		<p class="desc"> [page:MeshStandardMaterial]的扩展，能够更好地控制反射率。<br /><br />
+			请注意，为了获得最佳效果，您在使用此材质时应始终指定环境贴图。
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>例子(Examples)</h2>
+		[example:webgl_materials_variations_physical materials / variations / physical]<br />
+		[example:webgl_materials_reflectivity materials / reflectivity]
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Float clearcoat]</h3>
+		<p>
+			Clearcoat级别，从*0.0*到*1.0*。默认值为*0.0*。
+		</p>
+
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p> clearcoat看起来的粗糙程度，从*0.0*到*1.0*。默认值为*0.0*。</p>
+
+		<h3>[property:Boolean isMeshPhysicalMaterial]</h3>
+		<p> 用于检查此类或派生类是否为Lambert网格材质。默认值为 *true*。<br /><br />
+
+			因为其通常用在内部优化，所以不应该更改该属性值。
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p> 如下形式的对象:
+			<code>
+				{
+
+					'STANDARD': ''
+					'PHYSICAL': '',
+			
+				};
+			</code>
+			[page:WebGLRenderer]使用它来选择shaders。
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p> 反射度，从*0.0*到*1.0*。默认值为*0.5*。<br />
+			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial]为*1.0*时，此属性无效。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material] 和[page:MeshStandardMaterial]。</p>
+
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

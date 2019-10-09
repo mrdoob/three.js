@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="list.js"></script>
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>如何使用WebGL 2（[name]）</h1>
+
+	<p>
+		从R95版本起，three.js便开始支持使用WebGL 2环境来进行渲染。默认情况下，当创建一个*WebGLRenderer*实例时，
+		three.js总是使用WebGL 1环境。如果你希望来使用WebGL 2环境，请参阅以下的工作流程。
+	</p>
+
+	<h2>工作流程</h2>
+
+	<p>
+		由于WebGL 2并不被所有支持WebGL 1的设备所支持，因此检查各种设备上WebGL 2的可用性是非常重要的。
+		要对其可用性进行检查，请将[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/WebGL.js WebGL.js]包含到你的项目中。
+	</p>
+
+	<code>
+import { WEBGL } from 'three/examples/jsm/WebGL.js';
+	</code>
+
+	<p>
+		接下来，使用和下列代码相似的代码来进行可用性检查。
+	</p>
+
+	<code>
+
+if ( WEBGL.isWebGL2Available() === false ) {
+
+	document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+
+}
+	</code>
+
+	<p>
+		现在，你就可以将由*WebGLRenderer*所构造的renderer，应用到HTML5 Canvas元素和对应的WebGL 2绘图环境上了。
+		最终，three.js将在内部使用所给定的绘图环境来渲染，并自动将内置的材质的着色器代码转化为GLSL ES 3.00。
+	</p>
+
+	<p>
+		由于你是手动创建WebGL 2渲染上下文，因此还必须传入所有必需的上下文属性。
+		请注意：在上下文被创建后，将无法修改这些属性，因此将它们传递给WebGLRenderer将不会产生任何影响。
+	</p>
+
+	<code>
+var canvas = document.createElement( 'canvas' );
+var context = canvas.getContext( 'webgl2', { alpha: false } );
+var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+	</code>
+
+	<p>
+		有时候，写一些自定义着色器也是非常必要的。请使用下列的代码模板作为你自己来进行实现的基础。
+		首先是GLSL ES 3.00代码。
+	</p>
+
+	<code>
+&lt;script id="vs" type="x-shader/x-vertex"&gt;
+#version 300 es
+
+void main() {
+
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+}
+&lt;/script&gt;
+&lt;script id="fs" type="x-shader/x-fragment"&gt;
+#version 300 es
+
+precision highp float;
+precision highp int;
+out vec4 out_FragColor;
+
+void main() {
+
+	out_FragColor = vec4( 1.0 );
+
+}
+&lt;/script&gt;
+	</code>
+	<p>
+		然后是使用JavaScript来创建的对应的材质。
+	</p>
+	<code>
+var material = new THREE.ShaderMaterial( {
+	vertexShader: document.getElementById( 'vs' ).textContent.trim(),
+	fragmentShader: document.getElementById( 'fs' ).textContent.trim()
+} );
+	</code>
+
+	<h2>接下来</h2>
+
+	<p>
+		请参阅官方示例，来看一看WebGL 2各种特性的运行。<br /><br />
+
+		[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]<br />
+		[example:webgl2_materials_texture2darray WebGL2 / materials / texture2darray]<br />
+		[example:webgl2_multisampled_renderbuffers WebGL2 / multisampled renderbuffers]
+	</p>
+
+	<h2>支持的特性</h2>
+
+	<p>
+		当前，three.js引擎仅支持所有现有的WebGL 2特性的一个子集。
+		下列列表展现了在最新版本three.js中，已可用的特性的概览。
+		<ul>
+			<li>3D Textures</li>
+			<li>2D Texture Arrays</li>
+			<li>Multisampled Renderbuffers</li>
+			<li>Non-power of two (POT) textures work just the same as POT textures now. No resizing is required for best quality.</li>
+		</ul>
+
+	</p>
+
+</body>
+
+</html>

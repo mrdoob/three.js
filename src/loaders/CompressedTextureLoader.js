@@ -1,24 +1,25 @@
 import { LinearFilter } from '../constants.js';
 import { FileLoader } from './FileLoader.js';
 import { CompressedTexture } from '../textures/CompressedTexture.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  *
  * Abstract Base class to block based textures loader (dds, pvr, ...)
+ *
+ * Sub classes have to implement the parse() method which will be used in load().
  */
 
 function CompressedTextureLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-
-	// override in sub classes
-	this._parser = null;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( CompressedTextureLoader.prototype, {
+CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: CompressedTextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -37,7 +38,7 @@ Object.assign( CompressedTextureLoader.prototype, {
 
 			loader.load( url[ i ], function ( buffer ) {
 
-				var texDatas = scope._parser( buffer, true );
+				var texDatas = scope.parse( buffer, true );
 
 				images[ i ] = {
 					width: texDatas.width,
@@ -80,7 +81,7 @@ Object.assign( CompressedTextureLoader.prototype, {
 
 			loader.load( url, function ( buffer ) {
 
-				var texDatas = scope._parser( buffer, true );
+				var texDatas = scope.parse( buffer, true );
 
 				if ( texDatas.isCubemap ) {
 
@@ -125,13 +126,6 @@ Object.assign( CompressedTextureLoader.prototype, {
 		}
 
 		return texture;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

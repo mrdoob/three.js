@@ -13,23 +13,22 @@
 
 THREE.AssimpJSONLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AssimpJSONLoader.prototype = {
+THREE.AssimpJSONLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AssimpJSONLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = THREE.LoaderUtils.extractUrlBase( url );
+		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
 			var json = JSON.parse( text );
@@ -47,7 +46,7 @@ THREE.AssimpJSONLoader.prototype = {
 					onError( 'THREE.AssimpJSONLoader: Not an assimp2json scene.' );
 					return;
 
-				// check major format version
+					// check major format version
 
 				} else if ( metadata.version < 100 && metadata.version >= 200 ) {
 
@@ -61,13 +60,6 @@ THREE.AssimpJSONLoader.prototype = {
 			onLoad( scope.parse( json, path ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -154,12 +146,13 @@ THREE.AssimpJSONLoader.prototype = {
 
 						// prop.semantic gives the type of the texture
 						// 1: diffuse
-						// 2: specular mao
+						// 2: specular map
+						// 4: emissive map
 						// 5: height map (bumps)
 						// 6: normal map
-						// more values (i.e. emissive, environment) are known by assimp and may be relevant
+						// more values (i.e. environment, etc) are known by assimp and may be relevant
 
-						if ( semantic === 1 || semantic === 2 || semantic === 5 || semantic === 6 ) {
+						if ( semantic === 1 || semantic === 2 || semantic === 4 || semantic === 5 || semantic === 6 ) {
 
 							var keyname;
 
@@ -170,6 +163,9 @@ THREE.AssimpJSONLoader.prototype = {
 									break;
 								case 2:
 									keyname = 'specularMap';
+									break;
+								case 4:
+									keyname = 'emissiveMap';
 									break;
 								case 5:
 									keyname = 'bumpMap';
@@ -263,7 +259,7 @@ THREE.AssimpJSONLoader.prototype = {
 		}
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
-		textureLoader.setPath( path ).setCrossOrigin( this.crossOrigin );
+		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		var meshes = parseList( json.meshes, parseMesh );
 		var materials = parseList( json.materials, parseMaterial );
@@ -271,4 +267,4 @@ THREE.AssimpJSONLoader.prototype = {
 
 	}
 
-};
+} );

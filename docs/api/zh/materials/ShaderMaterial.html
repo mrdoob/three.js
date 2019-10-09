@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>着色器材质([name])</h1>
+
+		<p class="desc"> 使用自定义shader渲染的材质。
+			shader是一个用[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL]编写的小程序 ，在GPU上运行。
+			您可能需要使用自定义shader，如果你要：
+		<ul>
+			<li>要实现内置 [page:Material materials] 之外的效果。</li>
+			<li>将许多对象组合成单个[page:Geometry]或[page:BufferGeometry]以提高性能。</li>
+		</ul>
+		使用*ShaderMaterial*时需要注意以下注意事项：
+		<ul>
+			<li>*ShaderMaterial* 只有使用 [page:WebGLRenderer] 才可以绘制正常，
+				因为 [link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertexShader]
+				和 [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragmentShader]
+				属性中GLSL代码必须使用WebGL来编译并运行在GPU中。
+			</li>
+			<li> 从 THREE r72开始，不再支持在ShaderMaterial中直接分配属性。
+				必须使用 [page:BufferGeometry]实例 (而不是 [page:Geometry] 实例)，使用[page:BufferAttribute]实例来定义自定义属性。
+			</li>
+			<li> 从 THREE r77开始，[page:WebGLRenderTarget] 或 [page:WebGLRenderTargetCube] 实例不再被用作uniforms。
+				必须使用它们的[page:Texture texture] 属性。
+			</li>
+			<li> 内置attributes和uniforms与代码一起传递到shaders。
+				如果您不希望[page:WebGLProgram]向shader代码添加任何内容，则可以使用[page:RawShaderMaterial]而不是此类。
+			</li>
+			<li> 您可以使用指令#pragma unroll_loop，以便通过shader预处理器在GLSL中展开for循环。
+				该指令必须放在循环的正上方。循环格式必须与定义的标准相对应。
+				<ul>
+					<li> 循环必须标准化[link:https://en.wikipedia.org/wiki/Normalized_loop normalized]。
+					</li>
+					<li>
+						循环变量必须是*i*。
+					</li>
+					<li>
+						循环必须使用某种空格格式。
+					</li>
+				</ul>
+				<code>
+		#pragma unroll_loop
+		for ( int i = 0; i < 10; i ++ ) {
+
+			// ...
+
+		}
+				</code>
+			</li>
+		</ul>
+		</p>
+
+		<h2>例子(Examples)</h2>
+
+		<p>
+			[example:webgl_animation_cloth webgl / animation / cloth ]<br />
+			[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
+			[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
+			[example:webgl_custom_attributes webgl / custom / attributes]<br />
+			[example:webgl_custom_attributes_lines webgl / custom / attributes / lines]<br />
+			[example:webgl_custom_attributes_points webgl / custom / attributes / points]<br />
+			[example:webgl_custom_attributes_points2 webgl / custom / attributes / points2]<br />
+			[example:webgl_custom_attributes_points3 webgl / custom / attributes / points3]<br />
+			[example:webgl_depth_texture webgl / depth / texture]<br />
+			[example:webgl_gpgpu_birds webgl / gpgpu / birds]<br />
+			[example:webgl_gpgpu_protoplanet webgl / gpgpu / protoplanet]<br />
+			[example:webgl_gpgpu_water webgl / gpgpu / water]<br />
+			[example:webgl_hdr webgl / hdr]<br />
+			[example:webgl_interactive_points webgl / interactive / points]<br />
+			[example:webgl_kinect webgl / kinect]<br />
+			[example:webgl_lights_hemisphere webgl / lights / hemisphere]<br />
+			[example:webgl_marchingcubes webgl / marchingcubes]<br />
+			[example:webgl_materials_bumpmap_skin webgl / materials / bumpmap / skin]<br />
+			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
+			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
+			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
+			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
+			[example:webgl_materials_skin webgl / materials / skin]<br />
+			[example:webgl_materials_texture_hdr webgl / materials / texture / hdr]<br />
+			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
+			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
+			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
+			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
+			[example:webgl_postprocessing_godrays webgl / postprocessing / godrays]
+
+		</p>
+
+		<code>
+		var material = new THREE.ShaderMaterial( {
+
+			uniforms: {
+
+				time: { value: 1.0 },
+				resolution: { value: new THREE.Vector2() }
+
+			},
+
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+		} );
+		</code>
+
+		<h2>顶点着色器和片元着色器(Vertex shaders and fragment shaders)</h2>
+
+		<div>
+			<p>您可以为每种材质指定两种不同类型的shaders：:</p>
+			<ul>
+				<li> 顶点着色器首先运行; 它接收*attributes*，
+					计算/操纵每个单独顶点的位置，并将其他数据（*varying*s）传递给片元着色器。
+				</li>
+				<li>
+					片元（或像素）着色器后运行; 它设置渲染到屏幕的每个单独的“片元”（像素）的颜色。
+				</li>
+			</ul>
+			<p>shader中有三种类型的变量: uniforms, attributes, 和 varyings:</p>
+			<ul>
+				<li>*Uniforms*是所有顶点都具有相同的值的变量。
+					比如灯光，雾，和阴影贴图就是被储存在uniforms中的数据。
+					uniforms可以通过顶点着色器和片元着色器来访问。
+				</li>
+				<li> *Attributes* 与每个顶点关联的变量。例如，顶点位置，法线和顶点颜色都是存储在attributes中的数据。attributes <em>只</em>
+					可以在顶点着色器中访问。
+				</li>
+				<li> *Varyings* 是从顶点着色器传递到片元着色器的变量。对于每一个片元，每一个varying的值将是相邻顶点值的平滑插值。
+				</li>
+			</ul>
+			<p> 注意：在shader <em>内部</em>，uniforms和attributes就像常量；你只能使用JavaScript代码通过缓冲区来修改它们的值。
+			</p>
+		</div>
+
+
+	<h2>内置attributes 和 uniforms(Built-in attributes and uniforms)</h2>
+
+	<div>
+			<p>
+				[page:WebGLRenderer]默认情况下为shader提供了许多attributes和uniforms；
+				这些变量定义在shader程序编译时被自动添加到*片元着色器*和*顶点着色器*代码的前面，你不需要自己声明它们。
+				这些变量的描述请参见[page:WebGLProgram]。
+			</p>
+			<p>
+				这些uniforms或attributes（例如，那些和照明，雾等相关的）要求属性设置在材质上，
+				以便 [page:WebGLRenderer]来拷贝合适的值到GPU中。
+				如果你想在自己的shader中使用这些功能，请确保设置这些标志。
+			</p>
+			<p>
+				如果你不希望[page:WebGLProgram] 向你的shader代码中添加任何东西，
+				你可以使用[page:RawShaderMaterial] 而不是这个类。
+			</p>
+		</div>
+
+
+		<h2>自定义 attributes 和 uniforms(Custom attributes and uniforms)</h2>
+
+		<div>
+			<p>
+				自定义attributes和uniforms必须在GLSL着色器代码中声明（在 *vertexShader* 和/或 *fragmentShader* 中)。
+				自定义uniforms必须定义为 *ShaderMaterial* 的  *uniforms* 属性，
+				而任何自定义attribtes必须通过[page:BufferAttribute]实例来定义。
+				注意 *varying*s 只需要在shader代码中声明（而不必在材质中）。
+			</p>
+			<p> 要声明一个自定义属性，更多细节请参考[page:BufferGeometry]页面，
+				以及 [page:BufferAttribute] 页面关于*BufferAttribute* 接口。
+			</p>
+			<p>
+				当创建attributes时，您创建的用来保存属性数据的每个类型化数组（typed array）必须是您的数据类型大小的倍数。
+				比如，如果你的属性是一个[page:Vector3 THREE.Vector3]类型，并且在你的缓存几何模型[page:BufferGeometry]中有3000个顶点，
+				那么你的类型化数组的长度必须是3000 * 3，或者9000（一个顶点一个值）。每个数据类型的尺寸如下表所示：
+			</p>
+
+			<table>
+				<caption><a id="attribute-sizes">属性尺寸</a></caption>
+				<thead>
+					<tr>
+						<th>GLSL 类型</th>
+						<th>JavaScript 类型</th>
+						<th>尺寸</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>float</td>
+						<td>[page:Number]</td>
+						<td>1</td>
+					</tr>
+					<tr>
+						<td>vec2</td>
+						<td>[page:Vector2 THREE.Vector2]</td>
+						<td>2</td>
+					</tr>
+					<tr>
+						<td>vec3</td>
+						<td>[page:Vector3 THREE.Vector3]</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>vec3</td>
+						<td>[page:Color THREE.Color]</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>vec4</td>
+						<td>[page:Vector4 THREE.Vector4]</td>
+						<td>4</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p>
+				请注意，属性缓冲区 <em>不会</em> 在其值更改时自动刷新。要更新自定义属性，
+				需要在模型的[page:BufferAttribute]中设置*needsUpdate*为true。
+				（查看[page:BufferGeometry]了解细节）。
+			</p>
+
+			<p>
+				要声明一个自定义的[page:Uniform]，使用*uniforms*属性：
+			<code>
+			uniforms: {
+				time: { value: 1.0 },
+				resolution: { value: new THREE.Vector2() }
+			}
+			</code>
+			</p>
+
+			<p>
+				在[page:Object3D.onBeforeRender]中，建议根据[page:Object3D object]和[page:Camera camera]来更新自定义[page:Uniform]的值。
+				因为 [page:Material] 可以被[page:Mesh meshes]，[page:Scene]的[page:Matrix4 matrixWorld]以及[page:Camera]共享，
+				会在[page:WebGLRenderer.render]中更新，并会对拥有私有[page:Camera cameras]的[page:Scene scene]的渲染造成影响。
+			</p>
+
+		</div>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。
+		</p>
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Boolean clipping]</h3>
+		<p> 定义此材质是否支持剪裁; 如果渲染器传递clippingPlanes uniform，则为true。默认值为false。
+		</p>
+
+		<h3>[property:Object defaultAttributeValues]</h3>
+		<p> 当渲染的几何体不包含这些属性但材质包含这些属性时，这些默认值将传递给shaders。这可以避免在缓冲区数据丢失时出错。
+
+			<code>
+this.defaultAttributeValues = {
+	'color': [ 1, 1, 1 ],
+	'uv': [ 0, 0 ],
+	'uv2': [ 0, 0 ]
+};
+			</code>
+
+		</p>
+
+
+		<h3>[property:Object defines]</h3>
+		<p> 使用 #define 指令在GLSL代码为顶点着色器和片段着色器定义自定义常量；每个键/值对产生一行定义语句：
+		<code>
+		defines: {
+			FOO: 15,
+			BAR: true
+		}
+		</code>
+		这将在GLSL代码中产生如下定义语句：
+		<code>
+		#define FOO 15
+		#define BAR true
+		</code>
+		</p>
+
+		<h3>[property:Object extensions]</h3>
+		<p> 一个有如下属性的对象：
+		<code>
+this.extensions = {
+	derivatives: false, // set to use derivatives
+	fragDepth: false, // set to use fragment depth values
+	drawBuffers: false, // set to use draw buffers
+	shaderTextureLOD: false // set to use shader texture LOD
+};
+		</code>
+		</p>
+
+
+		<h3>[property:Boolean fog]</h3>
+		<p> 定义材质颜色是否受全局雾设置的影响; 如果将fog uniforms传递给shader，则为true。默认值为false。
+		</p>
+
+
+		<h3>[property:String fragmentShader]</h3>
+		<p>
+			片元着色器的GLSL代码。这是shader程序的实际代码。在上面的例子中，
+			*vertexShader*  和 *fragmentShader* 代码是从DOM（HTML文档）中获取的；
+			它也可以作为一个字符串直接传递或者通过AJAX加载。
+		</p>
+
+		<h3>[property:String index0AttributeName]</h3>
+		<p> 如果设置，则调用[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
+			将通用顶点索引绑定到属性变量。默认值未定义。
+
+		</p>
+
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p> 用于检查此类或派生类是否为着色器材质。默认值为 *true*。<br /><br />
+			因为其通常用在内部优化，所以不应该更改该属性值。
+		</p>
+
+
+
+
+		<h3>[property:Boolean lights]</h3>
+		<p> 材质是否受到光照的影响。默认值为 *false*。如果传递与光照相关的uniform数据到这个材质，则为true。默认是false。
+		</p>
+
+		<h3>[property:Float linewidth]</h3>
+		<p>控制线框宽度。默认值为1。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+		</p>
+
+
+		<h3>[property:Boolean morphTargets]</h3>
+		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
+		</p>
+
+		<h3>[property:boolean morphNormals]</h3>
+		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
+		</p>
+
+
+		<h3>[property:WebGLProgram program]</h3>
+		<p> 与此材质相关联的编译后的shader程序，由[page:WebGLRenderer]生成。您应该不需要访问此属性。
+		</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
+		</p>
+
+
+		<h3>[property:Boolean skinning]</h3>
+		<p> 定义材质是否使用蒙皮; 如果将蒙皮属性传递给shader，则为true。默认值为false。
+		</p>
+
+		<h3>[property:Object uniforms]</h3>
+		<p> 如下形式的对象：
+			<code>
+{ "uniform1": { value: 1.0 }, "uniform2": { value: 2 } }
+			</code>
+			指定要传递给shader代码的uniforms；键为uniform的名称，值(value)是如下形式：
+		<code>
+		{ value: 1.0 }
+		</code>
+			这里 *value* 是uniform的值。名称必须匹配 uniform 的name，和GLSL代码中的定义一样。
+			注意，uniforms逐帧被刷新，所以更新uniform值将立即更新GLSL代码中的相应值。
+		</p>
+
+
+		<h3>[property:Number vertexColors]</h3>
+		<p> 通过定义*colors*属性的生成方式来定义顶点是如何着色的。
+			可选值为[page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] 和
+			[page:Materials THREE.VertexColors]。 缺省为 THREE.NoColors。
+		</p>
+
+		<h3>[property:String vertexShader]</h3>
+		<p> 顶点着色器的GLSL代码。这是shader程序的实际代码。
+			在上面的例子中，*vertexShader* 和 *fragmentShader* 代码是从DOM（HTML文档）中获取的；
+			它也可以作为一个字符串直接传递或者通过AJAX加载。
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p> 将几何体渲染为线框(通过GL_LINES而不是GL_TRIANGLES)。默认值为*false*（即渲染为平面多边形）。
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>控制线框宽度。默认值为1。<br /><br />
+			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
+		</p>
+
+
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material]。</p>
+
+		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
+		<p> 创建该材质的一个浅拷贝。需要注意的是，vertexShader和fragmentShader使用<em>引用拷贝</em>；
+			*attributes*的定义也是如此;
+			这意味着，克隆的材质将共享相同的编译[page:WebGLProgram]；
+			但是，*uniforms* 是 <em>值拷贝</em>，这样对不同的材质我们可以有不同的uniforms变量。
+		</p>
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

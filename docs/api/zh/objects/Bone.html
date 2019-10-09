@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>骨骼（[name]）</h1>
+
+		<p class="desc">
+			骨骼是[page:Skeleton]（骨架）的一部分。骨架是由[page:SkinnedMesh]（蒙皮网格）依次来使用的。
+			骨骼几乎和空白[page:Object3D]相同。
+		</p>
+
+		<h3>示例</h3>
+
+		<code>
+		var root = new THREE.Bone();
+		var child = new THREE.Bone();
+
+		root.add( child );
+		child.position.y = 5;
+		</code>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( )</h3>
+		<p>
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
+
+		<h3>[property:Boolean isBone]</h3>
+		<p>
+			用于检查这个类或其派生类是否为骨骼。默认值为*true*。<br /><br />
+			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
+		</p>
+
+
+		<h3>[property:String type]</h3>
+		<p>设置为“Bone”，这可以用于在一个场景中找到所有的Bones。</p>
+
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Object3D]。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

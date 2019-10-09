@@ -4,43 +4,20 @@
 		<title>three.js webgl - dashed lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/geometries/hilbert3D.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			var renderer, scene, camera, stats;
 			var objects = [];
@@ -62,7 +39,7 @@
 				var subdivisions = 6;
 				var recursion = 1;
 
-				var points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+				var points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
 				var spline = new THREE.CatmullRomCurve3( points );
 
 				var samples = spline.getPoints( points.length * subdivisions );
@@ -76,7 +53,7 @@
 
 				var geometryCube = cube( 50 );
 
-				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ) );
+				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
 				lineSegments.computeLineDistances();
 
 				objects.push( lineSegments );
@@ -106,41 +83,41 @@
 				var position = [];
 
 				position.push(
-					-h, -h, -h,
-					-h, h, -h,
+					- h, - h, - h,
+					- h, h, - h,
 
-					-h, h, -h,
-					h, h, -h,
+					- h, h, - h,
+					h, h, - h,
 
-					h, h, -h,
-					h, -h, -h,
+					h, h, - h,
+					h, - h, - h,
 
-					h, -h, -h,
-					-h, -h, -h,
+					h, - h, - h,
+					- h, - h, - h,
 
-					-h, -h, h,
-					-h, h, h,
+					- h, - h, h,
+					- h, h, h,
 
-					-h, h, h,
+					- h, h, h,
 					h, h, h,
 
 					h, h, h,
-					h, -h, h,
+					h, - h, h,
 
-					h, -h, h,
-					-h, -h, h,
+					h, - h, h,
+					- h, - h, h,
 
-					-h, -h, -h,
-					-h, -h, h,
+					- h, - h, - h,
+					- h, - h, h,
 
-					-h, h, -h,
-					-h, h, h,
+					- h, h, - h,
+					- h, h, h,
 
-					h, h, -h,
+					h, h, - h,
 					h, h, h,
 
-					h, -h, -h,
-					h, -h, h
+					h, - h, - h,
+					h, - h, h
 				 );
 
 				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
@@ -171,7 +148,7 @@
 
 				var time = Date.now() * 0.001;
 
-				scene.traverse( function( object ) {
+				scene.traverse( function ( object ) {
 
 					if ( object.isLine ) {
 

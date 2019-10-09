@@ -20,9 +20,9 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 	constructor: THREE.MaskPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
-		var context = renderer.context;
+		var context = renderer.getContext();
 		var state = renderer.state;
 
 		// don't update color or depth
@@ -55,11 +55,17 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		state.buffers.stencil.setOp( context.REPLACE, context.REPLACE, context.REPLACE );
 		state.buffers.stencil.setFunc( context.ALWAYS, writeValue, 0xffffffff );
 		state.buffers.stencil.setClear( clearValue );
+		state.buffers.stencil.setLocked( true );
 
 		// draw into the stencil buffer
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+		renderer.setRenderTarget( readBuffer );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
+
+		renderer.setRenderTarget( writeBuffer );
+		if ( this.clear ) renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// unlock color and depth buffer for subsequent rendering
 
@@ -68,8 +74,10 @@ THREE.MaskPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		// only render where stencil is set to 1
 
-		state.buffers.stencil.setFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
+		state.buffers.stencil.setLocked( false );
+		state.buffers.stencil.setFunc( context.EQUAL, 1, 0xffffffff ); // draw if == 1
 		state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.KEEP );
+		state.buffers.stencil.setLocked( true );
 
 	}
 
@@ -88,8 +96,9 @@ THREE.ClearMaskPass.prototype = Object.create( THREE.Pass.prototype );
 
 Object.assign( THREE.ClearMaskPass.prototype, {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render: function ( renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
 
+		renderer.state.buffers.stencil.setLocked( false );
 		renderer.state.buffers.stencil.setTest( false );
 
 	}
