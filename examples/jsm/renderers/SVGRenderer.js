@@ -10,7 +10,6 @@ import {
 	Matrix3,
 	Matrix4,
 	Object3D,
-	REVISION,
 	Vector3,
 	VertexColors
 } from "../../../build/three.module.js";
@@ -31,8 +30,6 @@ SVGObject.prototype = Object.create( Object3D.prototype );
 SVGObject.prototype.constructor = SVGObject;
 
 var SVGRenderer = function () {
-
-	console.log( 'THREE.SVGRenderer', REVISION );
 
 	var _this = this,
 		_renderData, _elements, _lights,

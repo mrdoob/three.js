@@ -80,8 +80,6 @@ self.onmessage = function ( e ) {
 
 THREE.RaytracingRendererWorker = function () {
 
-	console.log( 'THREE.RaytracingRendererWorker', THREE.REVISION );
-
 	var maxRecursionDepth = 3;
 
 	var canvasWidth, canvasHeight;
