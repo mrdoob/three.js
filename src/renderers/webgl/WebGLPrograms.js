@@ -179,7 +179,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			gradientMap: !! material.gradientMap,
 
-			sheen: !! material.sheen,
+			sheen: material.sheen && ( material.sheen.r > 0 || material.sheen.g > 0 || material.sheen.b > 0 ),
 
 			combine: material.combine,
 

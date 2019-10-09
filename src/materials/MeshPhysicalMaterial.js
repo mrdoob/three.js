@@ -35,7 +35,7 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearcoat = 0.0;
 	this.clearcoatRoughness = 0.0;
 
-	this.sheen = null; // null will disable sheen bsdf
+	this.sheen = new Color( 0x000000 );
 
 	this.clearcoatNormalScale = new Vector2( 1, 1 );
 	this.clearcoatNormalMap = null;
@@ -67,8 +67,7 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 	this.clearcoat = source.clearcoat;
 	this.clearcoatRoughness = source.clearcoatRoughness;
 
-	if ( source.sheen ) this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
-	else this.sheen = null;
+	this.sheen.copy( source.sheen );
 
 	this.clearcoatNormalMap = source.clearcoatNormalMap;
 	this.clearcoatNormalScale.copy( source.clearcoatNormalScale );

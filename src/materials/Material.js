@@ -169,12 +169,12 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
-		if ( this.sheen && this.sheen.isColor ) data.sheen = this.sheen.getHex();
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
 		if ( this.emissiveIntensity && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
+
 		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;
 
@@ -184,6 +184,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
 
 		}
+
+		if ( this.sheen && this.sheen.isColor ) data.sheen = this.sheen.getHex();
 
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
