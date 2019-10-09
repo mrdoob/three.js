@@ -54,15 +54,17 @@
 		<h2>用法</h2>
 
 		<code>
-		var geometry = new THREE.Geometry();
+		var geometry = new THREE.BufferGeometry();
 
-		geometry.vertices.push(
-			new THREE.Vector3( -10,  10, 0 ),
-			new THREE.Vector3( -10, -10, 0 ),
-			new THREE.Vector3(  10, -10, 0 ),
-			...
-		);
-		geometry.faces.push( new THREE.Face3( 0, 1, 2 ), ... );
+		var vertices = [];
+
+		vertices.push( -10,  10, 0 );
+		vertices.push( -10, -10, 0 );
+		vertices.push(  10, -10, 0 );
+
+		// ...
+
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
