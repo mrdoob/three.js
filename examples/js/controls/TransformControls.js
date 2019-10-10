@@ -13,8 +13,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	THREE.Object3D.call( this );
 
-	domElement = domElement;
-
 	this.visible = false;
 
 	var _gizmo = new THREE.TransformControlsGizmo();

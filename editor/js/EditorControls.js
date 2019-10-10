@@ -7,8 +7,6 @@
 
 THREE.EditorControls = function ( object, domElement ) {
 
-	domElement = domElement;
-
 	// API
 
 	this.enabled = true;
