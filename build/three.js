@@ -14276,7 +14276,7 @@
 
 	var shadow_vert = "#include <fog_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
-	var sprite_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}";
+	var sprite_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}";
 
 	var sprite_vert = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
 
@@ -14598,6 +14598,7 @@
 			center: { value: new Vector2( 0.5, 0.5 ) },
 			rotation: { value: 0.0 },
 			map: { value: null },
+			alphaMap: { value: null },
 			uvTransform: { value: new Matrix3() }
 
 		}
@@ -25595,17 +25596,44 @@
 			uniforms.diffuse.value.copy( material.color );
 			uniforms.opacity.value = material.opacity;
 			uniforms.rotation.value = material.rotation;
-			uniforms.map.value = material.map;
 
-			if ( material.map !== null ) {
+			if ( material.map ) {
 
-				if ( material.map.matrixAutoUpdate === true ) {
+				uniforms.map.value = material.map;
 
-					material.map.updateMatrix();
+			}
+
+			if ( material.alphaMap ) {
+
+				uniforms.alphaMap.value = material.alphaMap;
+
+			}
+
+			// uv repeat and offset setting priorities
+			// 1. color map
+			// 2. alpha map
+
+			var uvScaleMap;
+
+			if ( material.map ) {
+
+				uvScaleMap = material.map;
+
+			} else if ( material.alphaMap ) {
+
+				uvScaleMap = material.alphaMap;
+
+			}
+
+			if ( uvScaleMap !== undefined ) {
+
+				if ( uvScaleMap.matrixAutoUpdate === true ) {
+
+					uvScaleMap.updateMatrix();
 
 				}
 
-				uniforms.uvTransform.value.copy( material.map.matrix );
+				uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 			}
 
@@ -26408,6 +26436,7 @@
 	 * parameters = {
 	 *  color: <hex>,
 	 *  map: new THREE.Texture( <Image> ),
+	 *  alphaMap: new THREE.Texture( <Image> ),
 	 *  rotation: <float>,
 	 *  sizeAttenuation: <bool>
 	 * }
@@ -26420,7 +26449,10 @@
 		this.type = 'SpriteMaterial';
 
 		this.color = new Color( 0xffffff );
+
 		this.map = null;
+
+		this.alphaMap = null;
 
 		this.rotation = 0;
 
@@ -26441,7 +26473,10 @@
 		Material.prototype.copy.call( this, source );
 
 		this.color.copy( source.color );
+
 		this.map = source.map;
+
+		this.alphaMap = source.alphaMap;
 
 		this.rotation = source.rotation;
 
