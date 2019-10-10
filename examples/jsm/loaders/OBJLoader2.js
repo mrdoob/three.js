@@ -43,7 +43,7 @@ const OBJLoader2 = function ( manager ) {
 
 };
 
-OBJLoader2.OBJLOADER2_VERSION = '3.1.0';
+OBJLoader2.OBJLOADER2_VERSION = '3.1.1';
 console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
 
@@ -136,11 +136,12 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 	 * Add materials as associated array.
 	 *
 	 * @param {Object} materials Object with named {@link Material}
+	 * @param overrideExisting boolean Override existing material
 	 * @return {OBJLoader2}
 	 */
-	addMaterials: function ( materials ) {
+	addMaterials: function ( materials, overrideExisting ) {
 
-		this.materialHandler.addMaterials( materials );
+		this.materialHandler.addMaterials( materials, overrideExisting );
 		return this;
 
 	},
