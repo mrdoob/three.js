@@ -173,11 +173,11 @@ function WebGLMultiview( renderer, gl ) {
 
 		renderer.setRenderTarget( currentRenderTarget );
 
-		flush( camera );
+		flush( camera, currentRenderTarget && currentRenderTarget.depthTexture ? gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT : gl.COLOR_BUFFER_BIT );
 
 	}
 
-	function flush( camera ) {
+	function flush( camera, blitMask ) {
 
 		var srcRenderTarget = renderTarget;
 		var numViews = srcRenderTarget.numViews;
@@ -199,14 +199,14 @@ function WebGLMultiview( renderer, gl ) {
 				var y2 = y1 + viewport.w;
 
 				gl.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffers[ i ] );
-				gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+				gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, x1, y1, x2, y2, blitMask, gl.NEAREST );
 
 			}
 
 		} else {
 
 			gl.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffers[ 0 ] );
-			gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, 0, 0, renderSize.x, renderSize.y, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+			gl.blitFramebuffer( 0, 0, viewWidth, viewHeight, 0, 0, renderSize.x, renderSize.y, blitMask, gl.NEAREST );
 
 		}
 

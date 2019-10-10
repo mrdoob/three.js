@@ -1233,6 +1233,12 @@ function WebGLRenderer( parameters ) {
 
 		//
 
+		if ( vr.enabled && multiview.isAvailable() ) {
+
+			multiview.detachCamera( camera );
+
+		}
+
 		scene.onAfterRender( _this, scene, camera );
 
 		//
@@ -1258,12 +1264,6 @@ function WebGLRenderer( parameters ) {
 		state.setPolygonOffset( false );
 
 		if ( vr.enabled ) {
-
-			if ( multiview.isAvailable() ) {
-
-				multiview.detachCamera( camera );
-
-			}
 
 			vr.submitFrame();
 
