@@ -50,10 +50,6 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
-				controls = new FirstPersonControls( camera );
-				controls.movementSpeed = 150;
-				controls.lookSpeed = 0.1;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xefd1b5 );
 				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
@@ -84,6 +80,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 150;
+				controls.lookSpeed = 0.1;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

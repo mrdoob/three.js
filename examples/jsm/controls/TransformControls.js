@@ -27,9 +27,14 @@ import {
 
 var TransformControls = function ( camera, domElement ) {
 
-	Object3D.call( this );
+	if ( domElement === undefined ) {
 
-	domElement = ( domElement !== undefined ) ? domElement : document;
+		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
+	Object3D.call( this );
 
 	this.visible = false;
 
