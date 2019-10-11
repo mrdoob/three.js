@@ -75,6 +75,22 @@ var EffectComposer = function ( renderer, renderTarget ) {
 
 	this.clock = new Clock();
 
+	// for VR
+
+	var rendererSize = new Vector2();
+	var scope = this;
+
+	function onSessionStateChange() {
+
+		renderer.getDrawingBufferSize( rendererSize );
+		scope.setPixelRatio( renderer.getPixelRatio() );
+		scope.setSize( rendererSize.x, rendererSize.y );
+
+	}
+
+	renderer.vr.addEventListener( 'sessionstart', onSessionStateChange );
+	renderer.vr.addEventListener( 'sessionend', onSessionStateChange );
+
 };
 
 Object.assign( EffectComposer.prototype, {
@@ -130,6 +146,14 @@ Object.assign( EffectComposer.prototype, {
 
 		var maskActive = false;
 
+		var currentVREnabled = this.renderer.vr.enabled;
+
+		if ( this.renderer.vr.enabled === true ) {
+
+			this.renderer.vr.enabled = false;
+
+		}
+
 		var pass, i, il = this.passes.length;
 
 		for ( i = 0; i < il; i ++ ) {
@@ -179,6 +203,8 @@ Object.assign( EffectComposer.prototype, {
 		}
 
 		this.renderer.setRenderTarget( currentRenderTarget );
+
+		this.renderer.vr.enabled = currentVREnabled;
 
 	},
 
