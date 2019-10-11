@@ -1859,7 +1859,7 @@ class CoroutineRunner {
 ```
 
 It does things similar to `SafeArray` to make sure that it's safe to add or remove
-coroutines will other coroutines are running. It also handles nested coroutines.
+coroutines while other coroutines are running. It also handles nested coroutines.
 
 To make a coroutine you make a [JavaScript generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*).
 A generator function has preceded by the keyword `function*` (the asterisk is important!)
