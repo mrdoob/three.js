@@ -106,7 +106,7 @@ function WebXRManager( renderer, gl ) {
 		currentPixelRatio = renderer.getPixelRatio();
 		renderer.getSize( currentSize );
 
-		renderer.setDrawingBufferSize( session.baseLayer.framebufferWidth, session.baseLayer.framebufferHeight, 1 );
+		renderer.setDrawingBufferSize( session.renderState.baseLayer.framebufferWidth, session.renderState.baseLayer.framebufferHeight, 1 );
 
 		animation.setContext( session );
 		animation.start();
