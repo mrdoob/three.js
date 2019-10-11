@@ -10,25 +10,25 @@ export interface MeshPhongMaterialParameters extends MaterialParameters {
 	specular?: Color | string | number;
 	shininess?: number;
 	opacity?: number;
-	map?: Texture;
-	lightMap?: Texture;
+	map?: Texture | null;
+	lightMap?: Texture | null;
 	lightMapIntensity?: number;
-	aoMap?: Texture;
+	aoMap?: Texture | null;
 	aoMapIntensity?: number;
 	emissive?: Color | string | number;
 	emissiveIntensity?: number;
-	emissiveMap?: Texture;
-	bumpMap?: Texture;
+	emissiveMap?: Texture | null;
+	bumpMap?: Texture | null;
 	bumpScale?: number;
-	normalMap?: Texture;
+	normalMap?: Texture | null;
 	normalMapType?: NormalMapTypes;
 	normalScale?: Vector2;
-	displacementMap?: Texture;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
-	specularMap?: Texture;
-	alphaMap?: Texture;
-	envMap?: Texture;
+	specularMap?: Texture | null;
+	alphaMap?: Texture | null;
+	envMap?: Texture | null;
 	combine?: Combine;
 	reflectivity?: number;
 	refractionRatio?: number;
@@ -78,8 +78,8 @@ export class MeshPhongMaterial extends Material {
 	morphTargets: boolean;
 	morphNormals: boolean;
 	/**
-   * @deprecated Use {@link MeshStandardMaterial THREE.MeshStandardMaterial} instead.
-   */
+	 * @deprecated Use {@link MeshStandardMaterial THREE.MeshStandardMaterial} instead.
+	 */
 	metal: boolean;
 
 	setValues( parameters: MeshPhongMaterialParameters ): void;

@@ -13,26 +13,20 @@
 			by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/tween.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 
 			var camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
 
-			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var controls = new OrbitControls( camera, renderer.domElement );
 
 			var scene = new THREE.Scene();
 
@@ -106,9 +100,6 @@
 				newObj.penumbra = 0.2;
 				newObj.decay = 2;
 				newObj.distance = 50;
-
-				newObj.shadow.mapSize.width = 1024;
-				newObj.shadow.mapSize.height = 1024;
 
 				return newObj;
 

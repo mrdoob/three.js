@@ -14,27 +14,25 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ClearPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/CubeTexturePass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
+			import { CubeTexturePass } from './jsm/postprocessing/CubeTexturePass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var scene, renderer, composer;
 			var clearPass, texturePass, renderPass;
 			var cameraP, cubeTexturePassP;
-			//var cameraO, cubeTexturePassO;
 			var gui, stats;
 
 			var params = {
@@ -50,11 +48,6 @@
 				cubeTexturePassOpacity: 1.0,
 
 				renderPass: true
-
-				//autoRotate: true,
-
-				//camera: 'perspective'
-
 			};
 
 			init();
@@ -66,7 +59,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( params, "clearPass" );
 				gui.add( params, "clearColor", [ 'black', 'white', 'blue', 'green', 'red' ] );
@@ -79,10 +72,6 @@
 				gui.add( params, "cubeTexturePassOpacity", 0, 1 );
 
 				gui.add( params, "renderPass" );
-
-				//gui.add( params, "autoRotate" );
-
-				//gui.add( params, 'camera', [ 'perspective', 'orthographic' ] );
 
 				gui.open();
 
@@ -109,14 +98,6 @@
 
 				cameraP = new THREE.PerspectiveCamera( 65, aspect, 1, 10 );
 				cameraP.position.z = 7;
-
-				//	cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
-				//	cameraO.position.z = 7;
-
-				//	var fov = THREE.Math.degToRad( cameraP.fov );
-				//	var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
-				//	var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
-				//	cameraO.zoom = height / _height;
 
 				scene = new THREE.Scene();
 
@@ -163,12 +144,12 @@
 
 				};
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				clearPass = new THREE.ClearPass( params.clearColor, params.clearAlpha );
+				clearPass = new ClearPass( params.clearColor, params.clearAlpha );
 				composer.addPass( clearPass );
 
-				texturePass = new THREE.TexturePass();
+				texturePass = new TexturePass();
 				composer.addPass( texturePass );
 
 				var textureLoader = new THREE.TextureLoader();
@@ -178,25 +159,24 @@
 
 				} );
 
-				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
+				cubeTexturePassP = new CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
 					cubeTexturePassP.envMap = ldrCubeMap;
-					console.log( "loaded envmap" );
 
 				} );
 
-				renderPass = new THREE.RenderPass( scene, cameraP );
+				renderPass = new RenderPass( scene, cameraP );
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
-				var controls = new THREE.OrbitControls( cameraP, renderer.domElement );
+				var controls = new OrbitControls( cameraP, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -210,12 +190,6 @@
 
 				cameraP.aspect = aspect;
 				cameraP.updateProjectionMatrix();
-
-				/*cameraO.left = - height * aspect;
-				cameraO.right = height * aspect;
-				cameraO.top = height;
-				cameraO.bottom = - height;
-				cameraO.updateProjectionMatrix();*/
 
 				renderer.setSize( width, height );
 				composer.setSize( width, height );

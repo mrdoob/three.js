@@ -1,19 +1,20 @@
 import {
-  Camera
+	Camera
 } from '../../../src/Three';
 
 export class FlyControls {
-  constructor(object: Camera, domElement?: HTMLElement);
 
-  object: Camera;
-  domElement: HTMLElement | HTMLDocument;
+	constructor( object: Camera, domElement?: HTMLElement );
 
-  movementSpeed: number;
-  rollSpeed: number;
-  dragToLook: boolean;
-  autoForward: boolean;
+	object: Camera;
+	domElement: HTMLElement | HTMLDocument;
 
-  update(delta: number): void;
-  dispose(): void;
+	movementSpeed: number;
+	rollSpeed: number;
+	dragToLook: boolean;
+	autoForward: boolean;
+
+	update( delta: number ): void;
+	dispose(): void;
 
 }

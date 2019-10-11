@@ -1,13 +1,13 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
-export interface VignetteShader {
-  uniforms: {
-    tDiffuse: Uniform;
-    offset: Uniform;
-    darkness: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
-}
+export const VignetteShader: {
+	uniforms: {
+		tDiffuse: Uniform;
+		offset: Uniform;
+		darkness: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
+};

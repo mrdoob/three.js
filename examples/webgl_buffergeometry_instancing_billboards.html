@@ -25,10 +25,6 @@
 		<div id="notSupported" style="display:none">Sorry, your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script src="../build/three.js"></script>
-	<script src="js/WebGL.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-
 	<script id="vshader" type="x-shader/x-vertex">
 		precision highp float;
 		uniform mat4 modelViewMatrix;
@@ -86,20 +82,17 @@
 		}
 	</script>
 
-	<script>
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
 		var container, stats;
 
 		var camera, scene, renderer;
 		var geometry, material, mesh;
 
 		function init() {
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				return false;
-
-			}
 
 			renderer = new THREE.WebGLRenderer();
 
@@ -166,7 +159,7 @@
 
 		}
 
-		function onWindowResize( event ) {
+		function onWindowResize() {
 
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();

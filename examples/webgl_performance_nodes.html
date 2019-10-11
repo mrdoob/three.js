@@ -8,9 +8,6 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a><span class="white"> - NodeMaterial Performance</span><br />
 			<br>
@@ -37,7 +34,14 @@
 
 		<script type="module">
 
-			import './js/nodes/THREE.Nodes.js';
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import {
+				StandardNodeMaterial,
+				MeshStandardNodeMaterial
+			} from './jsm/nodes/Nodes.js';
 
 			var container, stats;
 
@@ -116,7 +120,7 @@
 
 				time = performance.now();
 
-				createScene( THREE.StandardNodeMaterial );
+				createScene( StandardNodeMaterial );
 
 				render();
 
@@ -128,7 +132,7 @@
 
 				time = performance.now();
 
-				createScene( THREE.MeshStandardNodeMaterial );
+				createScene( MeshStandardNodeMaterial );
 
 				render();
 

@@ -20,14 +20,14 @@
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/LDrawLoader.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
 
 			var container, progressBarDiv;
 
@@ -89,7 +89,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -99,48 +99,11 @@
 					separateObjects: false,
 					displayLines: true,
 					conditionalLines: true,
-					smoothNormals: true
+					smoothNormals: true,
+					constructionStep: 0,
+					noConstructionSteps: "No steps."
 				};
 
-				gui = new dat.GUI();
-
-				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
-
-					reloadObject( true );
-
-				} );
-
-				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function ( value ) {
-
-					envMapActivated = value;
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function ( value ) {
-
-					reloadObject( false );
-
-				} );
-
-				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( function ( value ) {
-
-					updateLineSegments();
-
-				} );
-
-				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( function ( value ) {
-
-					updateLineSegments();
-
-				} );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				progressBarDiv = document.createElement( 'div' );
@@ -160,7 +123,7 @@
 
 			}
 
-			function updateLineSegments() {
+			function updateObjectsVisibility() {
 
 				model.traverse( c => {
 
@@ -175,6 +138,12 @@
 							c.visible = guiData.displayLines;
 
 						}
+
+					}
+					else if ( c.isGroup ) {
+
+						// Hide objects with construction step > gui setting
+						c.visible = c.userData.constructionStep <= guiData.constructionStep;
 
 					}
 
@@ -195,7 +164,7 @@
 				updateProgressBar( 0 );
 				showProgressBar();
 
-				var lDrawLoader = new THREE.LDrawLoader();
+				var lDrawLoader = new LDrawLoader();
 				lDrawLoader.separateObjects = guiData.separateObjects;
 				lDrawLoader.smoothNormals = guiData.smoothNormals;
 				lDrawLoader
@@ -248,7 +217,9 @@
 
 						}
 
-						updateLineSegments();
+						guiData.constructionStep = model.userData.numConstructionSteps - 1;
+
+						updateObjectsVisibility();
 
 						// Adjust camera and light
 
@@ -264,6 +235,8 @@
 
 						}
 
+						createGUI();
+
 						hideProgressBar();
 
 					}, onProgress, onError );
@@ -276,6 +249,59 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function createGUI() {
+
+				if ( gui ) {
+
+					gui.destroy();
+				}
+
+				gui = new GUI();
+
+				gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+
+					reloadObject( true );
+
+				} );
+
+				gui.add( guiData, 'separateObjects' ).name( 'Separate Objects' ).onChange( function ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				if ( guiData.separateObjects ) {
+
+					if ( model.userData.numConstructionSteps > 1  ) {
+
+						gui.add( guiData, 'constructionStep', 0, model.userData.numConstructionSteps - 1 ).step( 1 ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+					else {
+
+						gui.add( guiData, 'noConstructionSteps' ).name( 'Construction step' ).onChange( updateObjectsVisibility );
+
+					}
+				}
+
+				gui.add( guiData, 'envMapActivated' ).name( 'Env. map' ).onChange( function changeEnvMap ( value ) {
+
+					envMapActivated = value;
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals ( value ) {
+
+					reloadObject( false );
+
+				} );
+
+				gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( updateObjectsVisibility );
+				gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
 
 			}
 

@@ -12,20 +12,6 @@
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/SSAOShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/SSAOPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/math/SimplexNoise.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
 
@@ -35,13 +21,15 @@
 			</div>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -106,22 +94,22 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
+				var ssaoPass = new SSAOPass( scene, camera, width, height );
 				ssaoPass.kernelRadius = 16;
 				composer.addPass( ssaoPass );
 
 				// Init gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( ssaoPass, 'output', {
-					'Default': THREE.SSAOPass.OUTPUT.Default,
-					'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
-					'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
-					'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
-					'Depth': THREE.SSAOPass.OUTPUT.Depth,
-					'Normal': THREE.SSAOPass.OUTPUT.Normal
+					'Default': SSAOPass.OUTPUT.Default,
+					'SSAO Only': SSAOPass.OUTPUT.SSAO,
+					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
+					'Beauty': SSAOPass.OUTPUT.Beauty,
+					'Depth': SSAOPass.OUTPUT.Depth,
+					'Normal': SSAOPass.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
 					ssaoPass.output = parseInt( value );

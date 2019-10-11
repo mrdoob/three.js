@@ -22,8 +22,8 @@ var UnpackDepthRGBAShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -41,8 +41,8 @@ var UnpackDepthRGBAShader = {
 
 		"void main() {",
 
-			"float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );",
-			"gl_FragColor = vec4( vec3( depth ), opacity );",
+		"	float depth = 1.0 - unpackRGBAToDepth( texture2D( tDiffuse, vUv ) );",
+		"	gl_FragColor = vec4( vec3( depth ), opacity );",
 
 		"}"
 

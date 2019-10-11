@@ -1,9 +1,13 @@
 export class WebGLObjects {
 
-	constructor( gl: WebGLRenderingContext, properties: any, info: any );
+	constructor(
+		gl: WebGLRenderingContext,
+		geometries: any,
+		attributes: any,
+		info: any
+	);
 
-	getAttributeBuffer( attribute: any ): any;
-	getWireframeAttribute( geometry: any ): any;
-	update( object: any ): void;
+	update( object: any ): any;
+	dispose(): void;
 
 }

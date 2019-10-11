@@ -186,9 +186,11 @@ var Reflector = function ( geometry, options ) {
 
 		// Restore viewport
 
-		if ( camera.isArrayCamera ) {
+		var viewport = camera.viewport;
 
-			renderer.state.viewport( camera.viewport );
+		if ( viewport !== undefined ) {
+
+			renderer.state.viewport( viewport );
 
 		}
 

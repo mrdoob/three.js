@@ -286,6 +286,12 @@ THREE.OBJLoader = ( function () {
 
 				this.addVertex( ia, ib, ic );
 
+				if ( this.colors.length > 0 ) {
+
+					this.addColor( ia, ib, ic );
+
+				}
+
 				if ( ua !== undefined && ua !== '' ) {
 
 					var uvLen = this.uvs.length;
@@ -306,12 +312,6 @@ THREE.OBJLoader = ( function () {
 					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
-
-				}
-
-				if ( this.colors.length > 0 ) {
-
-					this.addColor( ia, ib, ic );
 
 				}
 
@@ -364,13 +364,13 @@ THREE.OBJLoader = ( function () {
 
 	function OBJLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		this.materials = null;
 
 	}
 
-	OBJLoader.prototype = {
+	OBJLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: OBJLoader,
 
@@ -385,14 +385,6 @@ THREE.OBJLoader = ( function () {
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-			return this;
 
 		},
 
@@ -459,7 +451,7 @@ THREE.OBJLoader = ( function () {
 								parseFloat( data[ 2 ] ),
 								parseFloat( data[ 3 ] )
 							);
-							if ( data.length === 8 ) {
+							if ( data.length >= 7 ) {
 
 								state.colors.push(
 									parseFloat( data[ 4 ] ),
@@ -690,7 +682,6 @@ THREE.OBJLoader = ( function () {
 							var materialLine = new THREE.LineBasicMaterial();
 							THREE.Material.prototype.copy.call( materialLine, material );
 							materialLine.color.copy( material.color );
-							materialLine.lights = false;
 							material = materialLine;
 
 						} else if ( isPoints && material && ! ( material instanceof THREE.PointsMaterial ) ) {
@@ -699,7 +690,6 @@ THREE.OBJLoader = ( function () {
 							THREE.Material.prototype.copy.call( materialPoints, material );
 							materialPoints.color.copy( material.color );
 							materialPoints.map = material.map;
-							materialPoints.lights = false;
 							material = materialPoints;
 
 						}
@@ -790,7 +780,7 @@ THREE.OBJLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return OBJLoader;
 

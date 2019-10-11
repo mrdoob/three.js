@@ -1,14 +1,14 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
-export interface NormalMapShader {
-  uniforms: {
-    heightMap: Uniform;
-    resolution: Uniform;
-    scale: Uniform;
-    height: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
-}
+export const NormalMapShader: {
+	uniforms: {
+		heightMap: Uniform;
+		resolution: Uniform;
+		scale: Uniform;
+		height: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
+};

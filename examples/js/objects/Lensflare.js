@@ -23,14 +23,12 @@ THREE.Lensflare = function () {
 	tempMap.magFilter = THREE.NearestFilter;
 	tempMap.wrapS = THREE.ClampToEdgeWrapping;
 	tempMap.wrapT = THREE.ClampToEdgeWrapping;
-	tempMap.needsUpdate = true;
 
 	var occlusionMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, THREE.RGBFormat );
 	occlusionMap.minFilter = THREE.NearestFilter;
 	occlusionMap.magFilter = THREE.NearestFilter;
 	occlusionMap.wrapS = THREE.ClampToEdgeWrapping;
 	occlusionMap.wrapT = THREE.ClampToEdgeWrapping;
-	occlusionMap.needsUpdate = true;
 
 	// material
 

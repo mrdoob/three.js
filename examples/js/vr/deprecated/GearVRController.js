@@ -101,7 +101,7 @@ THREE.GearVRController = function () {
 
 			}
 
-		// app button not available, reserved for use by the browser
+			// app button not available, reserved for use by the browser
 
 		} else {
 

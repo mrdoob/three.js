@@ -22,14 +22,16 @@
 			model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var container, stats;
-			var camera, scene, projector, renderer;
+			var camera, scene, renderer;
 			var mesh, mixer;
 
 			init();
@@ -56,11 +58,11 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
-				light.position.set( -1, -1, -1 ).normalize();
+				light.position.set( - 1, - 1, - 1 ).normalize();
 				scene.add( light );
 
-				var loader = new THREE.GLTFLoader();
-				loader.load( "models/gltf/Horse.glb", function( gltf ) {
+				var loader = new GLTFLoader();
+				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
 
 					mesh = gltf.scene.children[ 0 ];
 					mesh.scale.set( 1.5, 1.5, 1.5 );
@@ -81,7 +83,7 @@
 				renderer.gammaOutput = true;
 				renderer.gammaFactor = 2.2;
 
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				//
 

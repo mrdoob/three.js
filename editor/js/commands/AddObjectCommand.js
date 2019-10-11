@@ -4,13 +4,14 @@
  */
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
 
-var AddObjectCommand = function ( object ) {
+var AddObjectCommand = function ( editor, object ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'AddObjectCommand';
 

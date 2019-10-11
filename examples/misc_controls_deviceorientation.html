@@ -13,10 +13,11 @@
 			photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/DeviceOrientationControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
 
 			var camera, scene, renderer, controls;
 
@@ -27,7 +28,7 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 
-				controls = new THREE.DeviceOrientationControls( camera );
+				controls = new DeviceOrientationControls( camera );
 
 				scene = new THREE.Scene();
 

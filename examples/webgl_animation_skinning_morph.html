@@ -34,21 +34,14 @@
 			modifications by <a href="https://donmccurdy.com/" target="_blank" rel="noopener">Don McCurdy</a>. CC0.<br />
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var container, stats, clock, gui, mixer, actions, activeAction, previousAction;
 			var camera, scene, renderer, model, face;
@@ -96,15 +89,15 @@
 
 				// model
 
-				var loader = new THREE.GLTFLoader();
-				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function( gltf ) {
+				var loader = new GLTFLoader();
+				loader.load( 'models/gltf/RobotExpressive/RobotExpressive.glb', function ( gltf ) {
 
 					model = gltf.scene;
 					scene.add( model );
 
 					createGUI( model, gltf.animations );
 
-				}, undefined, function( e ) {
+				}, undefined, function ( e ) {
 
 					console.error( e );
 
@@ -130,13 +123,13 @@
 				var states = [ 'Idle', 'Walking', 'Running', 'Dance', 'Death', 'Sitting', 'Standing' ];
 				var emotes = [ 'Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp' ];
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				mixer = new THREE.AnimationMixer( model );
 
 				actions = {};
 
-				for ( var i = 0; i < animations.length; i++ ) {
+				for ( var i = 0; i < animations.length; i ++ ) {
 
 					var clip = animations[ i ];
 					var action = mixer.clipAction( clip );
@@ -144,8 +137,8 @@
 
 					if ( emotes.indexOf( clip.name ) >= 0 || states.indexOf( clip.name ) >= 4 ) {
 
-							action.clampWhenFinished = true;
-							action.loop = THREE.LoopOnce;
+						action.clampWhenFinished = true;
+						action.loop = THREE.LoopOnce;
 
 					}
 
@@ -157,7 +150,7 @@
 
 				var clipCtrl = statesFolder.add( api, 'state' ).options( states );
 
-				clipCtrl.onChange( function() {
+				clipCtrl.onChange( function () {
 
 					fadeToAction( api.state, 0.5 );
 
@@ -171,7 +164,7 @@
 
 				function createEmoteCallback( name ) {
 
-					api[ name ] = function() {
+					api[ name ] = function () {
 
 						fadeToAction( name, 0.2 );
 
@@ -191,7 +184,7 @@
 
 				}
 
-				for ( var i = 0; i < emotes.length; i++ ) {
+				for ( var i = 0; i < emotes.length; i ++ ) {
 
 					createEmoteCallback( emotes[ i ] );
 
@@ -204,15 +197,15 @@
 				face = model.getObjectByName( 'Head_2' );
 
 				var expressions = Object.keys( face.morphTargetDictionary );
-				var expressionFolder = gui.addFolder('Expressions');
+				var expressionFolder = gui.addFolder( 'Expressions' );
 
-				for ( var i = 0; i < expressions.length; i++ ) {
+				for ( var i = 0; i < expressions.length; i ++ ) {
 
 					expressionFolder.add( face.morphTargetInfluences, i, 0, 1, 0.01 ).name( expressions[ i ] );
 
 				}
 
-				activeAction = actions['Walking'];
+				activeAction = actions[ 'Walking' ];
 				activeAction.play();
 
 				expressionFolder.open();

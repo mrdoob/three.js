@@ -12,15 +12,13 @@ import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { setProjectionFromUnion } from './WebVRUtils.js';
 
-function WebXRManager( renderer ) {
+function WebXRManager( renderer, gl ) {
 
 	var scope = this;
 
-	var gl = renderer.context;
-
 	var session = null;
 
-	var framebufferScaleFactor = 1.0;
+	// var framebufferScaleFactor = 1.0;
 
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
@@ -28,7 +26,7 @@ function WebXRManager( renderer ) {
 	var pose = null;
 
 	var controllers = [];
-	var inputSources = [];
+	var sortedInputSources = [];
 
 	var currentSize = new Vector2(), currentPixelRatio;
 
@@ -80,7 +78,7 @@ function WebXRManager( renderer ) {
 
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
-			if ( inputSources[ i ] === event.inputSource ) {
+			if ( sortedInputSources[ i ] === event.inputSource ) {
 
 				controllers[ i ].dispatchEvent( { type: event.type } );
 
@@ -117,9 +115,9 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {
+	this.setFramebufferScaleFactor = function ( /* value */ ) {
 
-		framebufferScaleFactor = value;
+		// framebufferScaleFactor = value;
 
 	};
 
@@ -146,31 +144,48 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'selectend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
+			// eslint-disable-next-line no-undef
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
 			//
 
-			inputSources = session.inputSources;
+			session.addEventListener( 'inputsourceschange', updateInputSources );
 
-			session.addEventListener( 'inputsourceschange', function () {
-
-				inputSources = session.inputSources;
-				console.log( inputSources );
-
-				for ( var i = 0; i < controllers.length; i ++ ) {
-
-					var controller = controllers[ i ];
-					controller.userData.inputSource = inputSources[ i ];
-
-				}
-
-			} );
+			updateInputSources();
 
 		}
 
 	};
+
+	function updateInputSources() {
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			sortedInputSources[ i ] = findInputSource( i );
+
+		}
+
+	}
+
+	function findInputSource( id ) {
+
+		var inputSources = session.inputSources;
+
+		for ( var i = 0; i < inputSources.length; i ++ ) {
+
+			var inputSource = inputSources[ i ];
+			var handedness = inputSource.handedness;
+
+			if ( id === 0 && ( handedness === 'none' || handedness === 'right' ) ) return inputSource;
+			if ( id === 1 && ( handedness === 'left' ) ) return inputSource;
+
+		}
+
+	}
+
+	//
 
 	function updateCamera( camera, parent ) {
 
@@ -269,7 +284,7 @@ function WebXRManager( renderer ) {
 
 			var controller = controllers[ i ];
 
-			var inputSource = inputSources[ i ];
+			var inputSource = sortedInputSources[ i ];
 
 			if ( inputSource ) {
 

@@ -6,8 +6,6 @@ Sidebar.Geometry.RingGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var signals = editor.signals;
-
 	var container = new UI.Row();
 
 	var geometry = object.geometry;
@@ -77,7 +75,7 @@ Sidebar.Geometry.RingGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
 			innerRadius.getValue(),
 			outerRadius.getValue(),
 			thetaSegments.getValue(),

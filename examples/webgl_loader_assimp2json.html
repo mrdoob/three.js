@@ -14,20 +14,13 @@
 			<a href="http://www.assimp.org/" target="_blank" rel="noopener">Assimp</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/AssimpJSONLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AssimpJSONLoader } from './jsm/loaders/AssimpJSONLoader.js';
 
 			/*
 
@@ -71,7 +64,7 @@
 
 				// load jeep model
 
-				var loader = new THREE.AssimpJSONLoader();
+				var loader = new AssimpJSONLoader();
 
 				loader.load( 'models/assimp/jeep/jeep.assimp.json', function ( object ) {
 

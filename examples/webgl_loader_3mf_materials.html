@@ -17,21 +17,14 @@
 			<a href="http://3mf.io" target="_blank" rel="noopener">3MF</a> file with materials
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/3MFLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
 		<script src="js/libs/jszip.min.js"></script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ThreeMFLoader } from './jsm/loaders/3MFLoader.js';
 
 			var camera, scene, renderer;
 
@@ -42,8 +35,6 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 500 );
-
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 				camera.position.set( - 50, 40, 50 );
@@ -67,11 +58,11 @@
 				dirLight.shadow.mapSize.set( 1024, 1024 );
 				scene.add( dirLight );
 
-				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
+				// scene.add( new CameraHelper( dirLight.shadow.camera ) );
 
 				//
 
-				var loader = new THREE.ThreeMFLoader();
+				var loader = new ThreeMFLoader();
 				loader.load( './models/3mf/truck.3mf', function ( object ) {
 
 					object.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) ); 	// z-up conversion
@@ -109,7 +100,7 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 50;
 				controls.maxDistance = 200;

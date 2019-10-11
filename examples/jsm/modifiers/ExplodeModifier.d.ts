@@ -1,8 +1,10 @@
 import {
-  Geometry
+	Geometry
 } from '../../../src/Three';
 
 export class ExplodeModifier {
-  constructor();
-  modify(geometry: Geometry): void;
+
+	constructor();
+	modify( geometry: Geometry ): void;
+
 }

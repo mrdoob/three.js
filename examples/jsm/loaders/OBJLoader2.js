@@ -4,233 +4,215 @@
  */
 
 import {
-	DefaultLoadingManager,
 	FileLoader,
-	Group
+	Object3D,
+	Loader
 } from "../../../build/three.module.js";
 
-import { Parser } from "./worker/independent/OBJLoader2Parser.js";
-import { MeshReceiver } from "./shared/MeshReceiver.js";
-import { MaterialHandler } from "./shared/MaterialHandler.js";
+import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
+import { MeshReceiver } from "./obj2/shared/MeshReceiver.js";
+import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
 
 /**
- * Use this class to load OBJ data from files or to parse OBJ data from an arraybuffer
- * @class
+ * Creates a new OBJLoader2. Use it to load OBJ data from files or to parse OBJ data from arraybuffer or text.
  *
- * @param {DefaultLoadingManager} [manager] The loadingManager for the loader to use. Default is {@link DefaultLoadingManager}
+ * @param {LoadingManager} [manager] The loadingManager for the loader to use. Default is {@link LoadingManager}
+ * @constructor
  */
 const OBJLoader2 = function ( manager ) {
-	this.manager = ( manager !== undefined && manager !== null ) ? manager : DefaultLoadingManager;
-	this.logging = {
-		enabled: true,
-		debug: false
-	};
+
+	Loader.call( this, manager );
+
+	this.parser = new OBJLoader2Parser();
 
 	this.modelName = '';
 	this.instanceNo = 0;
-	this.path = undefined;
-	this.resourcePath = undefined;
-	this.useIndices = false;
-	this.disregardNormals = false;
-	this.materialPerSmoothingGroup = false;
-	this.useOAsMesh = false;
-	this.baseObject3d = new Group();
-
-	this.callbacks = {
-		onParseProgress: undefined,
-		genericErrorHandler: undefined
-	};
+	this.baseObject3d = new Object3D();
 
 	this.materialHandler = new MaterialHandler();
 	this.meshReceiver = new MeshReceiver( this.materialHandler );
+
+	// as OBJLoader2 is no longer derived from OBJLoader2Parser, we need to override the default onAssetAvailable callback
+	let scope = this;
+	let defaultOnAssetAvailable = function ( payload ) {
+
+		scope._onAssetAvailable( payload );
+
+	};
+	this.parser.setCallbackOnAssetAvailable( defaultOnAssetAvailable );
+
 };
-OBJLoader2.OBJLOADER2_VERSION = '3.0.0-beta';
+
+OBJLoader2.OBJLOADER2_VERSION = '3.1.1';
 console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
 
-OBJLoader2.prototype = {
+OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: OBJLoader2,
 
 	/**
-	 * Enable or disable logging in general (except warn and error), plus enable or disable debug logging.
-	 *
-	 * @param {boolean} enabled True or false.
-	 * @param {boolean} debug True or false.
+	 * See {@link OBJLoader2Parser.setLogging}
+	 * @return {OBJLoader2}
 	 */
 	setLogging: function ( enabled, debug ) {
-		this.logging.enabled = enabled === true;
-		this.logging.debug = debug === true;
+
+		this.parser.setLogging( enabled, debug );
 		return this;
+
+	},
+
+	/**
+	 * See {@link OBJLoader2Parser.setMaterialPerSmoothingGroup}
+	 * @return {OBJLoader2}
+	 */
+	setMaterialPerSmoothingGroup: function ( materialPerSmoothingGroup ) {
+
+		this.parser.setMaterialPerSmoothingGroup( materialPerSmoothingGroup );
+		return this;
+
+	},
+
+	/**
+	 * See {@link OBJLoader2Parser.setUseOAsMesh}
+	 * @return {OBJLoader2}
+	 */
+	setUseOAsMesh: function ( useOAsMesh ) {
+
+		this.parser.setUseOAsMesh( useOAsMesh );
+		return this;
+
+	},
+
+	/**
+	 * See {@link OBJLoader2Parser.setUseIndices}
+	 * @return {OBJLoader2}
+	 */
+	setUseIndices: function ( useIndices ) {
+
+		this.parser.setUseIndices( useIndices );
+		return this;
+
+	},
+
+	/**
+	 * See {@link OBJLoader2Parser.setDisregardNormals}
+	 * @return {OBJLoader2}
+	 */
+	setDisregardNormals: function ( disregardNormals ) {
+
+		this.parser.setDisregardNormals( disregardNormals );
+		return this;
+
 	},
 
 	/**
 	 * Set the name of the model.
 	 *
 	 * @param {string} modelName
+	 * @return {OBJLoader2}
 	 */
 	setModelName: function ( modelName ) {
+
 		this.modelName = modelName ? modelName : this.modelName;
 		return this;
-	},
 
-	/**
-	 * The URL of the base path.
-	 *
-	 * @param {string} path URL
-	 */
-	setPath: function ( path ) {
-		this.path = path ? path : this.path;
-		return this;
-	},
-
-
-	/**
-	 * Allow to specify resourcePath for dependencies of specified resource.
-	 * @param {string} resourcePath
-	 */
-	setResourcePath: function ( resourcePath ) {
-		this.resourcePath = resourcePath ? resourcePath : this.resourcePath;
 	},
 
 	/**
 	 * Set the node where the loaded objects will be attached directly.
 	 *
 	 * @param {Object3D} baseObject3d Object already attached to scenegraph where new meshes will be attached to
+	 * @return {OBJLoader2}
 	 */
 	setBaseObject3d: function ( baseObject3d ) {
+
 		this.baseObject3d = ( baseObject3d === undefined || baseObject3d === null ) ? this.baseObject3d : baseObject3d;
 		return this;
+
 	},
 
 	/**
 	 * Add materials as associated array.
 	 *
-	 * @param materials Object with named {@link Material}
+	 * @param {Object} materials Object with named {@link Material}
+	 * @param overrideExisting boolean Override existing material
+	 * @return {OBJLoader2}
 	 */
-	addMaterials: function ( materials ) {
-		this.materialHandler.addMaterials( materials );
-	},
+	addMaterials: function ( materials, overrideExisting ) {
 
-	/**
-	 * Instructs loaders to create indexed {@link BufferGeometry}.
-	 *
-	 * @param {boolean} useIndices=false
-	 */
-	setUseIndices: function ( useIndices ) {
-		this.useIndices = useIndices === true;
+		this.materialHandler.addMaterials( materials, overrideExisting );
 		return this;
+
 	},
 
 	/**
-	 * Tells whether normals should be completely disregarded and regenerated.
-	 *
-	 * @param {boolean} disregardNormals=false
+	 * See {@link OBJLoader2Parser.setCallbackOnAssetAvailable}
+	 * @return {OBJLoader2}
 	 */
-	setDisregardNormals: function ( disregardNormals ) {
-		this.disregardNormals = disregardNormals === true;
+	setCallbackOnAssetAvailable: function ( onAssetAvailable ) {
+
+		this.parser.setCallbackOnAssetAvailable( onAssetAvailable );
 		return this;
+
 	},
 
 	/**
-	 * Tells whether a material shall be created per smoothing group.
-	 *
-	 * @param {boolean} materialPerSmoothingGroup=false
+	 * See {@link OBJLoader2Parser.setCallbackOnProgress}
+	 * @return {OBJLoader2}
 	 */
-	setMaterialPerSmoothingGroup: function ( materialPerSmoothingGroup ) {
-		this.materialPerSmoothingGroup = materialPerSmoothingGroup === true;
+	setCallbackOnProgress: function ( onProgress ) {
+
+		this.parser.setCallbackOnProgress( onProgress );
 		return this;
+
 	},
 
 	/**
-	 * Usually 'o' is meta-information and does not result in creation of new meshes, but mesh creation on occurrence of "o" can be enforced.
-	 *
-	 * @param {boolean} useOAsMesh=false
+	 * See {@link OBJLoader2Parser.setCallbackOnError}
+	 * @return {OBJLoader2}
 	 */
-	setUseOAsMesh: function ( useOAsMesh ) {
-		this.useOAsMesh = useOAsMesh === true;
+	setCallbackOnError: function ( onError ) {
+
+		this.parser.setCallbackOnError( onError );
 		return this;
+
 	},
 
 	/**
-	 * Register an generic error handler that is called if available instead of throwing an exception
-	 * @param {Function} genericErrorHandler
+	 * See {@link OBJLoader2Parser.setCallbackOnLoad}
+	 * @return {OBJLoader2}
 	 */
-	setGenericErrorHandler: function ( genericErrorHandler ) {
-		if ( genericErrorHandler !== undefined && genericErrorHandler !== null ) {
+	setCallbackOnLoad: function ( onLoad ) {
 
-			this.callbacks.genericErrorHandler = genericErrorHandler;
+		this.parser.setCallbackOnLoad( onLoad );
+		return this;
 
-		}
 	},
 
 	/**
+	 * Register a function that is called once a single mesh is available and it could be altered by the supplied function.
 	 *
-	 * @private
-	 *
-	 * @param {Function} [onParseProgress]
 	 * @param {Function} [onMeshAlter]
+	 * @return {OBJLoader2}
+	 */
+	setCallbackOnMeshAlter: function ( onMeshAlter ) {
+
+		this.meshReceiver._setCallbacks( this.parser.callbacks.onProgress, onMeshAlter );
+		return this;
+
+	},
+
+	/**
+	 * Register a function that is called once all materials have been loaded and they could be altered by the supplied function.
+	 *
 	 * @param {Function} [onLoadMaterials]
-	 * @private
+	 * @return {OBJLoader2}
 	 */
-	_setCallbacks: function ( onParseProgress, onMeshAlter, onLoadMaterials ) {
-		if ( onParseProgress !== undefined && onParseProgress !== null ) {
+	setCallbackOnLoadMaterials: function ( onLoadMaterials ) {
 
-			this.callbacks.onParseProgress = onParseProgress;
-
-		}
-		this.meshReceiver._setCallbacks( onParseProgress, onMeshAlter );
 		this.materialHandler._setCallbacks( onLoadMaterials );
-	},
-
-	/**
-	 * Announce feedback which is give to the registered callbacks.
-	 * @private
-	 *
-	 * @param {string} type The type of event
-	 * @param {string} text Textual description of the event
-	 * @param {number} numericalValue Numerical value describing the progress
-	 */
-	_onProgress: function ( type, text, numericalValue ) {
-		let message = text ? text : '';
-		let event = {
-			detail: {
-				type: type,
-				modelName: this.modelName,
-				instanceNo: this.instanceNo,
-				text: message,
-				numericalValue: numericalValue
-			}
-		};
-		if ( this.callbacks.onParseProgress ) {
-
-			this.callbacks.onParseProgress( event );
-
-		}
-		if ( this.logging.enabled && this.logging.debug ) {
-
-			console.log( message );
-
-		}
-	},
-
-	/**
-	 * Announce error feedback which is given to the generic error handler to the registered callbacks.
-	 * @private
-	 *
-	 * @param {String} errorMessage The event containing the error
-	 */
-	_onError: function ( errorMessage ) {
-		if ( this.callbacks.genericErrorHandler ) {
-
-			this.callbacks.genericErrorHandler( errorMessage );
-
-		}
-		if ( this.logging.enabled && this.logging.debug ) {
-
-			console.log( errorMessage );
-
-		}
+		return this;
 
 	},
 
@@ -241,21 +223,33 @@ OBJLoader2.prototype = {
 	 * @param {function} onLoad A function to be called after loading is successfully completed. The function receives loaded Object3D as an argument.
 	 * @param {function} [onFileLoadProgress] A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains total and Integer bytes.
 	 * @param {function} [onError] A function to be called if an error occurs during loading. The function receives the error as an argument.
-	 * @param {function} [onMeshAlter] Called after worker successfully delivered a single mesh
+	 * @param {function} [onMeshAlter] Called after every single mesh is made available by the parser
 	 */
 	load: function ( url, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
+
 		let scope = this;
-		if ( onError === null || onError === undefined ) {
+		if ( onLoad === null || onLoad === undefined || ! ( onLoad instanceof Function ) ) {
+
+			let errorMessage = 'onLoad is not a function! Aborting...';
+			scope.parser.callbacks.onError( errorMessage );
+			throw errorMessage;
+
+		} else {
+
+			this.parser.setCallbackOnLoad( onLoad );
+
+		}
+		if ( onError === null || onError === undefined || ! ( onError instanceof Function ) ) {
 
 			onError = function ( event ) {
 
 				let errorMessage = event;
 				if ( event.currentTarget && event.currentTarget.statusText !== null ) {
 
-					 errorMessage = 'Error occurred while downloading!\nurl: ' + event.currentTarget.responseURL + '\nstatus: ' + event.currentTarget.statusText;
+					errorMessage = 'Error occurred while downloading!\nurl: ' + event.currentTarget.responseURL + '\nstatus: ' + event.currentTarget.statusText;
 
 				}
-				scope._onError( errorMessage );
+				scope.parser.callbacks.onError( errorMessage );
 
 			};
 
@@ -275,109 +269,111 @@ OBJLoader2.prototype = {
 			if ( urlPartsPath !== undefined && urlPartsPath !== null ) this.path = urlPartsPath;
 
 		}
-		if ( onFileLoadProgress === null || onFileLoadProgress === undefined ) {
+		if ( onFileLoadProgress === null || onFileLoadProgress === undefined || ! ( onFileLoadProgress instanceof Function ) ) {
 
 			let numericalValueRef = 0;
 			let numericalValue = 0;
 			onFileLoadProgress = function ( event ) {
+
 				if ( ! event.lengthComputable ) return;
 
 				numericalValue = event.loaded / event.total;
 				if ( numericalValue > numericalValueRef ) {
 
 					numericalValueRef = numericalValue;
-					let output = 'Download of "' + url + '": ' + (numericalValue * 100).toFixed( 2 ) + '%';
-					scope._onProgress( 'progressLoad', output, numericalValue );
+					let output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
+					scope.parser.callbacks.onProgress( 'progressLoad', output, numericalValue );
 
 				}
+
 			};
 
 		}
-		this._setCallbacks( null, onMeshAlter, null );
+
+		this.setCallbackOnMeshAlter( onMeshAlter );
 		let fileLoaderOnLoad = function ( content ) {
-			onLoad( scope.parse( content ) );
+
+			scope.parser.callbacks.onLoad( scope.parse( content ), "OBJLoader2#load: Parsing completed" );
+
 		};
 		let fileLoader = new FileLoader( this.manager );
 		fileLoader.setPath( this.path || this.resourcePath );
 		fileLoader.setResponseType( 'arraybuffer' );
 		fileLoader.load( filename, fileLoaderOnLoad, onFileLoadProgress, onError );
+
 	},
 
 	/**
-	 * Parses OBJ data synchronously from arraybuffer or string.
+	 * Parses OBJ data synchronously from arraybuffer or string and returns the {@link Object3D}.
 	 *
 	 * @param {arraybuffer|string} content OBJ data as Uint8Array or String
+	 * @return {Object3D}
 	 */
 	parse: function ( content ) {
+
 		// fast-fail in case of illegal data
 		if ( content === null || content === undefined ) {
 
 			throw 'Provided content is not a valid ArrayBuffer or String. Unable to continue parsing';
 
 		}
-		if ( this.logging.enabled ) {
+		if ( this.parser.logging.enabled ) {
 
 			console.time( 'OBJLoader parse: ' + this.modelName );
 
 		}
-		let parser = new Parser();
-		parser.setLogging( this.logging.enabled, this.logging.debug );
-		parser.setMaterialPerSmoothingGroup( this.materialPerSmoothingGroup );
-		parser.setUseOAsMesh( this.useOAsMesh );
-		parser.setUseIndices( this.useIndices );
-		parser.setDisregardNormals( this.disregardNormals );
-		// sync code works directly on the material references
-		parser.setMaterials( this.materialHandler.getMaterials() );
 
-		let scope = this;
-		let onMeshLoaded = function ( payload ) {
+		// Create default materials beforehand, but do not override previously set materials (e.g. during init)
+		this.materialHandler.createDefaultMaterials( false );
 
-			if ( payload.cmd !== 'data' ) return;
+		// code works directly on the material references, parser clear its materials before updating
+		this.parser.setMaterials( this.materialHandler.getMaterials() );
 
-			if ( payload.type === 'mesh' ) {
-
-				let meshes = scope.meshReceiver.buildMeshes( payload );
-				for ( let mesh of meshes ) {
-					scope.baseObject3d.add( mesh );
-				}
-
-			} else if ( payload.type === 'material' ) {
-
-				scope.materialHandler.addPayloadMaterials( payload );
-
-			}
-		};
-		let onProgressScoped = function ( text, numericalValue ) {
-			scope._onProgress( 'progressParse', text, numericalValue );
-		};
-		let onErrorScoped = function ( message ) {
-			scope._onError( message );
-		};
-		parser.setCallbackOnAssetAvailable( onMeshLoaded );
-		parser.setCallbackOnProgress( onProgressScoped );
-		parser.setCallbackOnError( onErrorScoped );
 		if ( content instanceof ArrayBuffer || content instanceof Uint8Array ) {
 
-			if ( this.logging.enabled ) console.info( 'Parsing arrayBuffer...' );
-			parser.parse( content );
+			if ( this.parser.logging.enabled ) console.info( 'Parsing arrayBuffer...' );
+			this.parser.execute( content );
 
-		} else if ( typeof( content ) === 'string' || content instanceof String ) {
+		} else if ( typeof ( content ) === 'string' || content instanceof String ) {
 
-			if ( this.logging.enabled ) console.info( 'Parsing text...' );
-			parser.parseText( content );
+			if ( this.parser.logging.enabled ) console.info( 'Parsing text...' );
+			this.parser.executeLegacy( content );
 
 		} else {
 
-			scope._onError( 'Provided content was neither of type String nor Uint8Array! Aborting...' );
+			this.parser.callbacks.onError( 'Provided content was neither of type String nor Uint8Array! Aborting...' );
 
 		}
-		if ( this.logging.enabled ) {
+		if ( this.parser.logging.enabled ) {
 
 			console.timeEnd( 'OBJLoader parse: ' + this.modelName );
 
 		}
 		return this.baseObject3d;
+
+	},
+
+	_onAssetAvailable: function ( payload ) {
+
+		if ( payload.cmd !== 'assetAvailable' ) return;
+
+		if ( payload.type === 'mesh' ) {
+
+			let meshes = this.meshReceiver.buildMeshes( payload );
+			for ( let mesh of meshes ) {
+
+				this.baseObject3d.add( mesh );
+
+			}
+
+		} else if ( payload.type === 'material' ) {
+
+			this.materialHandler.addPayloadMaterials( payload );
+
+		}
+
 	}
-};
+
+} );
 
 export { OBJLoader2 };

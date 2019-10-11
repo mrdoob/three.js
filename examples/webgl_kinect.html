@@ -8,12 +8,6 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script src='js/libs/dat.gui.min.js'></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
-
 		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/kinect.webm">
 			<source src="textures/kinect.mp4">
@@ -74,25 +68,20 @@
 
 		</script>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var container;
 
 			var scene, camera, renderer;
 			var geometry, mesh, material;
 			var mouse, center;
-			var stats;
 
-			if ( WEBGL.isWebGLAvailable() ) {
-
-				init();
-				animate();
-
-			} else {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			init();
+			animate();
 
 			function init() {
 
@@ -103,9 +92,6 @@
 				info.id = 'info';
 				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
-
-				stats = new Stats();
-				// container.appendChild( stats.dom );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 500 );
@@ -161,7 +147,7 @@
 					mesh = new THREE.Points( geometry, material );
 					scene.add( mesh );
 
-					var gui = new dat.GUI();
+					var gui = new GUI();
 					gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
 					gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
 					gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
@@ -209,7 +195,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 

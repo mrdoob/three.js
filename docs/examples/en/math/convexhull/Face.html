@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Represents a section bounded by a specific amount of half-edges. The current implmentation assumes that a face always consist of three edges.
+		</p>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Vector3 normal]</h3>
+		<p>
+			The normal vector of the face. Default is a [page:Vector3] at (0, 0, 0).
+		</p>
+
+		<h3>[property:Vector3 midpoint]</h3>
+		<p>
+			The midpoint or centroid of the face. Default is a [page:Vector3] at (0, 0, 0).
+		</p>
+
+		<h3>[property:Float area]</h3>
+		<p>
+			The area of the face. Default is 0.
+		</p>
+
+		<h3>[property:Float constant]</h3>
+		<p>
+			Signed distance from face to the origin. Default is 0.
+		</p>
+
+		<h3>[property:VertexNode outside]</h3>
+		<p>
+			Reference to a vertex in a vertex list this face can see. Default is null.
+		</p>
+
+		<h3>[property:Integer mark]</h3>
+		<p>
+			Marks if a face is visible or deleted. Default is 'Visible'.
+		</p>
+
+		<h3>[property:HalfEdge edge]</h3>
+		<p>
+			Reference to the base edge of a face. To retrieve all edges, you can use the 'next' reference of the current edge. Default is null.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Face create]( [param:VertexNode a], [param:VertexNode b], [param:VertexNode c] )</h3>
+		[page:VertexNode a] - First vertex of the face.<br /><br />
+		[page:VertexNode b] - Second vertex of the face.<br /><br />
+		[page:VertexNode c] - Third vertex of the face.<br /><br />
+
+		<p>Creates a face.</p>
+
+		<h3>[method:HalfEdge getEdge]( [param:Integer i] )</h3>
+		[page:Integer i] - The index of the edge.<br /><br />
+
+		<p>Returns an edge by the given index.</p>
+
+		<h3>[method:Face compute] ()</h3>
+
+		<p>Computes all properties of the face.</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		[page:Vector3 point] - Any point in 3D space.<br /><br />
+
+		<p>Returns the signed distance from a given point to the plane representation of this face.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/math/ConvexHull.js examples/js/math/ConvexHull.js]
+		</p>
+	</body>
+</html>

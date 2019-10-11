@@ -7,16 +7,22 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/renderers/RaytracingRenderer.js"></script>
-		<div id="info"></div>
-		<script>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raytracing renderer (using <span id="workers"></span>
+			<button id="removeWorker">-</button><button id="addWorker">+</button> web workers) <br/>
+			<button id="rearrange">Rearrange</button><button id="render">Render</button>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { RaytracingRenderer } from './jsm/renderers/RaytracingRenderer.js';
 
 			var hash = location.hash ? location.hash.substring( 1 ) : '3';
 
 			var WORKERS = + hash || navigator.hardwareConcurrency || 3;
-
-			var container, info;
 
 			var camera, scene, renderer;
 			var group;
@@ -225,7 +231,17 @@
 
 			function init() {
 
-				info = document.getElementById( 'info' );
+				var buttonRearrange = document.getElementById( 'rearrange' );
+				buttonRearrange.addEventListener( 'click', rearrange );
+
+				var buttonRender = document.getElementById( 'render' );
+				buttonRender.addEventListener( 'click', render );
+
+				var buttonRemoveWorker = document.getElementById( 'removeWorker' );
+				buttonRemoveWorker.addEventListener( 'click', removeWorker );
+
+				var buttonAddWorker = document.getElementById( 'addWorker' );
+				buttonAddWorker.addEventListener( 'click', addWorker );
 
 				updateWorkers();
 
@@ -235,7 +251,7 @@
 
 				//
 
-				renderer = new THREE.RaytracingRenderer( {
+				renderer = new RaytracingRenderer( {
 					workers: WORKERS,
 					workerPath: 'js/renderers/RaytracingWorker.js',
 					randomize: true,
@@ -253,6 +269,18 @@
 
 			}
 
+			function addWorker() {
+
+				updateWorkers( 1 );
+
+			}
+
+			function removeWorker() {
+
+				updateWorkers( - 1 );
+
+			}
+
 			function updateWorkers( x ) {
 
 				if ( x ) {
@@ -262,8 +290,8 @@
 
 				}
 
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raytracing renderer (using ' + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
-				'<br/><button onclick="rearrange()">Rearrange</button><button onclick="render()">Render</button>';
+				var labelWorkers = document.getElementById( 'workers' );
+				labelWorkers.textContent = WORKERS;
 
 			}
 

@@ -1,12 +1,12 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
-export interface BleachBypassShader {
-  uniforms: {
-    tDiffuse: Uniform;
-    opacity: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
-}
+export const BleachBypassShader: {
+	uniforms: {
+		tDiffuse: Uniform;
+		opacity: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
+};

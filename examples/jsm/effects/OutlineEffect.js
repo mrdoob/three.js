@@ -132,7 +132,7 @@ var OutlineEffect = function ( renderer, parameters ) {
 
 	var vertexShaderChunk2 = [
 
-		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( PHYSICAL )",
+		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( STANDARD )",
 		"	#ifndef USE_ENVMAP",
 		"		vec3 objectNormal = normalize( normal );",
 		"	#endif",

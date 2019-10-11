@@ -1,15 +1,15 @@
 import {
-  LoadingManager
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
 import { Collada } from './ColladaLoader';
 
-export class KMZLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
+export class KMZLoader extends Loader {
 
-  load(url: string, onLoad: (kmz: Collada) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setPath(value: string): this;
-  parse(data: ArrayBuffer): Collada;
+	constructor( manager?: LoadingManager );
+
+	load( url: string, onLoad: ( kmz: Collada ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+	parse( data: ArrayBuffer ): Collada;
+
 }

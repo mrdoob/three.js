@@ -20,11 +20,12 @@
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - mirror
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/objects/Reflector.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Reflector } from './jsm/objects/Reflector.js';
 
 			// scene size
 			var WIDTH = window.innerWidth;
@@ -62,7 +63,7 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 40, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
@@ -75,7 +76,7 @@
 				// reflectors/mirrors
 
 				var geometry = new THREE.CircleBufferGeometry( 40, 64 );
-				var groundMirror = new THREE.Reflector( geometry, {
+				var groundMirror = new Reflector( geometry, {
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
@@ -87,7 +88,7 @@
 				scene.add( groundMirror );
 
 				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var verticalMirror = new THREE.Reflector( geometry, {
+				var verticalMirror = new Reflector( geometry, {
 					clipBias: 0.003,
 					textureWidth: WIDTH * window.devicePixelRatio,
 					textureHeight: HEIGHT * window.devicePixelRatio,
