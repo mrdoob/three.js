@@ -40,7 +40,7 @@ const OBJLoader2Parallel = function ( manager ) {
 
 };
 
-OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.0';
+OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.1';
 console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION );
 
 
@@ -92,7 +92,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 		let codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
 		if ( codeBuilderInstructions.isSupportsJsmWorker() ) {
 
-			codeBuilderInstructions.setJsmWorkerFile( '../../src/loaders/worker/parallel/jsm/OBJLoader2Worker.js' );
+			codeBuilderInstructions.setJsmWorkerFile( '../examples/loaders/jsm/obj2/worker/parallel/jsm/OBJLoader2Worker.js' );
 
 		}
 		if ( codeBuilderInstructions.isSupportsStandardWorker() ) {
@@ -189,8 +189,8 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 						disregardNormals: this.parser.disregardNormals,
 						materialPerSmoothingGroup: this.parser.materialPerSmoothingGroup,
 						useOAsMesh: this.parser.useOAsMesh,
+						materials: this.materialHandler.getMaterialsJSON()
 					},
-					materials: this.materialHandler.getMaterialsJSON(),
 					data: {
 						input: content,
 						options: null

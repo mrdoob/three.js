@@ -49,9 +49,8 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
-			ObjectManipulator.applyProperties( parser, payload.params );
-			ObjectManipulator.applyProperties( parser, payload.materials );
-			ObjectManipulator.applyProperties( parser, callbacks );
+			ObjectManipulator.applyProperties( parser, payload.params, false );
+			ObjectManipulator.applyProperties( parser, callbacks, false );
 
 			let arraybuffer;
 			if ( payload.params && payload.params.index !== undefined && payload.params.index !== null ) {
