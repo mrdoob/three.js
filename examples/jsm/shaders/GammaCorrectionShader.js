@@ -21,8 +21,8 @@ var GammaCorrectionShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -36,9 +36,9 @@ var GammaCorrectionShader = {
 
 		"void main() {",
 
-			"vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
+		"	vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
 
-			"gl_FragColor = LinearToGamma( tex, float( GAMMA_FACTOR ) );",
+		"	gl_FragColor = LinearToGamma( tex, float( GAMMA_FACTOR ) );",
 
 		"}"
 

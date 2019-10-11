@@ -4,78 +4,35 @@
 		<title>three.js webgl - loaders - PRWM loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				padding:0;
-				margin:0;
-				background:#000000;
-			}
-
-			.models {
-				position:absolute;
-				top:10px;
-				left:12px;
-				z-index:2;
-				font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif;
-				font-size:13px;
-			}
-
 			.notes {
 				position:absolute;
-				left:12px;
-				bottom:10px;
-				z-index:2;
+				left: 12px;
+				bottom: 10px;
 				font-family: "Arial", "Helvetica Neue", "Helvetica", sans-serif;
-				font-size:13px;
-				text-align:left;
-				color:#FFFFFF;
-				max-width:300px;
-			}
-
-			.notes a, .notes a:visited {
-				color:#FFFFFF;
-			}
-
-			.models strong {
-				color:#FFFFFF;
-				text-transform: uppercase;
-			}
-
-			.models a, .models a:visited {
-				color:#FFFFFF;
-				margin-left:12px;
-				text-decoration: none;
-			}
-
-			.models a:hover, .models a:focus {
-				text-decoration: underline;
 			}
 		</style>
 	</head>
-
 	<body>
 
-
-		<div class="models">
-			<strong>Models</strong>
-			<a class="model" href="models/prwm/faceted-nefertiti.*.prwm">Faceted Nefertiti</a>
-			<a class="model" href="models/prwm/smooth-suzanne.*.prwm">Smooth Suzanne</a>
+		<div id="info">
+			<strong>Models</strong>:
+			<a class="model" href="models/prwm/faceted-nefertiti.*.prwm">Faceted Nefertiti</a>,
+			<a class="model" href="models/prwm/smooth-suzanne.*.prwm">Smooth Suzanne</a>,
 			<a class="model" href="models/prwm/vive-controller.*.prwm">Vive Controller</a>
 		</div>
 		<div class="notes">
-			The parsing of PRWM file is especially fast when the endianness of the file is the same as the endianness
-			of the client platform. The loader will automatically replace the <strong>*</strong> in the model url
-			by either <strong>le</strong> or <strong>be</strong> depending on the client platform's endianness to
-			download the most appropriate file.<br><br>
-			This platform endianness is <strong id="endianness"></strong>.<br><br>
-			See your console for stats.<br><br>
-			<a href="https://github.com/kchapelier/PRWM" target="_blank" rel="noopener noreferrer">Specifications and implementations</a>
+			The parsing of PRWM file is especially fast when the endianness of the file is the same as the endianness of the client platform. The loader will automatically replace the <strong>*</strong> in the model url by either <strong>le</strong> or <strong>be</strong> depending on the client platform's endianness to download the most appropriate file. <a href="https://github.com/kchapelier/PRWM" target="_blank" rel="noopener noreferrer">Specifications and implementations</a><br><br>
+			This platform endianness is <strong id="endianness"></strong>.<br>
+			See your console for stats.
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PRWMLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { PRWMLoader } from './jsm/loaders/PRWMLoader.js';
 
 			var container;
 
@@ -93,7 +50,7 @@
 
 			function init() {
 
-				document.getElementById( 'endianness' ).innerHTML = THREE.PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
+				document.getElementById( 'endianness' ).innerHTML = PRWMLoader.isBigEndianPlatform() ? 'big-endian' : 'little-endian';
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -113,7 +70,7 @@
 
 				// model
 
-				var loader = new THREE.PRWMLoader();
+				var loader = new PRWMLoader();
 				var material = new THREE.MeshPhongMaterial( {} );
 				var busy = false;
 				var mesh = null;
@@ -176,7 +133,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

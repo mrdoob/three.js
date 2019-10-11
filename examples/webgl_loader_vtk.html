@@ -4,51 +4,24 @@
 		<title>three.js webgl - loaders - vtk loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
 		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		vtk formats loader test<br />
-		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank" rel="noopener">The GeorgiaTech Lagre Geometric Model Archive</a>,
+		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank" rel="noopener">The GeorgiaTech Lagre Geometric Model Archive</a>
 		</div>
 
-		<script src='js/libs/inflate.min.js'></script>
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/VTKLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
 			var container, stats;
 
@@ -76,7 +49,7 @@
 
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
 
-				var loader = new THREE.VTKLoader();
+				var loader = new VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
 
 					geometry.center();
@@ -89,7 +62,7 @@
 
 				} );
 
-				var loader1 = new THREE.VTKLoader();
+				var loader1 = new VTKLoader();
 				loader1.load( 'models/vtk/cube_ascii.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -106,7 +79,7 @@
 
 				} );
 
-				var loader2 = new THREE.VTKLoader();
+				var loader2 = new VTKLoader();
 				loader2.load( 'models/vtk/cube_binary.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -123,7 +96,7 @@
 
 				} );
 
-				var loader3 = new THREE.VTKLoader();
+				var loader3 = new VTKLoader();
 				loader3.load( 'models/vtk/cube_no_compression.vtp', function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -152,7 +125,7 @@
 
 				// controls
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;

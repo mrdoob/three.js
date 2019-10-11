@@ -4,7 +4,7 @@ import { Texture } from './../textures/Texture';
 
 export interface MeshDepthMaterialParameters extends MaterialParameters {
 	depthPacking?: DepthPackingStrategies;
-	displacementMap?: Texture;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
 	wireframe?: boolean;
@@ -12,7 +12,8 @@ export interface MeshDepthMaterialParameters extends MaterialParameters {
 }
 
 export class MeshDepthMaterial extends Material {
-	constructor(parameters?: MeshDepthMaterialParameters);
+
+	constructor( parameters?: MeshDepthMaterialParameters );
 
 	depthPacking: DepthPackingStrategies;
 	displacementMap: Texture | null;
@@ -21,5 +22,6 @@ export class MeshDepthMaterial extends Material {
 	wireframe: boolean;
 	wireframeLinewidth: number;
 
-	setValues(parameters: MeshDepthMaterialParameters): void;
+	setValues( parameters: MeshDepthMaterialParameters ): void;
+
 }

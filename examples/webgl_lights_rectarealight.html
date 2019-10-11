@@ -4,55 +4,24 @@
 		<title>three.js webgl - lights - rect area light</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-			}
-
-			a {
-				color: #ff0080;
-				text-decoration: none;
-			}
-
-			a:hover {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Demo of RectAreaLight - by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a><br />
-			Click and drag to move OrbitControls.<br />
-			<br />
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - THREE.RectAreaLight<br/>
+			by <a href="http://github.com/abelnation" target="_blank" rel="noopener">abelnation</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/lights/RectAreaLightUniformsLib.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			var renderer, scene, camera;
 
@@ -102,6 +71,8 @@
 				var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
+				RectAreaLightUniformsLib.init();
+
 				rectLight = new THREE.RectAreaLight( 0xffffff, 1, 10, 10 );
 				rectLight.position.set( 5, 5, 0 );
 				scene.add( rectLight );
@@ -143,13 +114,13 @@
 				mshStdKnot.receiveShadow = true;
 				scene.add( mshStdKnot );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.copy( mshStdBox.position );
 				controls.update();
 
 				// GUI
 
-				var gui = new dat.GUI( { width: 300 } );
+				var gui = new GUI( { width: 300 } );
 				gui.open();
 
 				param = {

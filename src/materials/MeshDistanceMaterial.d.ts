@@ -6,13 +6,14 @@ export interface MeshDistanceMaterialParameters extends MaterialParameters {
 	referencePosition?: Vector3;
 	nearDistance?: number;
 	farDistance?: number;
-	displacementMap?: Texture;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
 }
 
 export class MeshDistanceMaterial extends Material {
-	constructor(parameters?: MeshDistanceMaterialParameters);
+
+	constructor( parameters?: MeshDistanceMaterialParameters );
 
 	referencePosition: Vector3;
 	nearDistance: number;
@@ -21,5 +22,6 @@ export class MeshDistanceMaterial extends Material {
 	displacementScale: number;
 	displacementBias: number;
 
-	setValues(parameters: MeshDistanceMaterialParameters): void;
+	setValues( parameters: MeshDistanceMaterialParameters ): void;
+
 }

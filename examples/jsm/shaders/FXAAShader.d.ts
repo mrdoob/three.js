@@ -1,12 +1,12 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
-export interface FXAAShader {
-  uniforms: {
-    tDiffuse: Uniform;
-    resolution: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
-}
+export const FXAAShader: {
+	uniforms: {
+		tDiffuse: Uniform;
+		resolution: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
+};

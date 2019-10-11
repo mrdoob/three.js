@@ -235,9 +235,9 @@
 		<h3>[method:this lerp]( [param:Vector2 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector2 v] - 朝着进行插值的[page:Vector2]。<br />
-		alpha - 插值因数，其范围在[0, 1]闭区间。<br /><br />
+		[page:Float alpha] - 插值因数，其范围通常在[0, 1]闭区间。<br /><br />
 
-		在该向量与传入的向量[page:Vector2 v]之间的线性插值，alpha是沿着线的距离长度。
+		在该向量与传入的向量[page:Vector2 v]之间的线性插值，alpha是沿着线的长度的百分比
 		—— alpha = 0 时表示的是当前向量，alpha = 1 时表示的是所传入的向量[page:Vector2 v]。
 		</p>
 
@@ -245,10 +245,10 @@
 		<p>
 		[page:Vector2 v1] - 起始的[page:Vector2]。<br />
 		[page:Vector2 v2] - 朝着进行插值的[page:Vector2]。<br />
-		[page:Float alpha] - 插值因数，其范围在[0, 1]闭区间。<br /><br />
+		[page:Float alpha] - 插值因数，其范围通常在[0, 1]闭区间。<br /><br />
 
 		将此向量设置为在[page:Vector2 v1]和[page:Vector2 v2]之间进行线性插值的向量，
-		其中alpha为两个向量之间连线的距离长度。
+		其中alpha为两个向量之间连线的长度的百分比
 		—— alpha = 0 时表示的是[page:Vector2 v1]，alpha = 1 时表示的是[page:Vector2 v2]。
 		</p>
 
@@ -343,6 +343,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

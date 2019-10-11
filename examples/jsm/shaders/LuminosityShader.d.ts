@@ -1,11 +1,11 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
-export interface LuminosityShader {
-  uniforms: {
-    tDiffuse: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
-}
+export const LuminosityShader: {
+	uniforms: {
+		tDiffuse: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
+};

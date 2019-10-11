@@ -4,20 +4,18 @@
 		<title>three.js webvr - lorenz attractor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<style>
-			body {
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebXR Device API (For Chrome M76+), expires 10/16/2019 -->
+		<meta http-equiv="origin-trial" content="AtWCPo0cZgy0zJDSYftemy7eZvmcwR5qy/4osFkMkLZ0ar6OYyKfbu93pjpxiOVzcWNIVxgoWoK8YtxCXeFSqgIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3MTE4Mzk5OX0=">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script src="js/vr/WebVR.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var camera, scene, renderer;
 			var attractor, light;

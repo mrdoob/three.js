@@ -4,29 +4,7 @@
 		<title>three.js webgl - postprocessing manual ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				margin: 0px;
-				text-align:center;
-				overflow: hidden;
-			}
-
-			a { color: #88f; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
@@ -37,20 +15,17 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SSAARenderPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { SSAARenderPass } from './jsm/postprocessing/SSAARenderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			var scene, renderer, composer, copyPass;
 			var cameraP, ssaaRenderPassP;
@@ -77,7 +52,7 @@
 
 				if ( gui ) gui.destroy();
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( params, "unbiased" );
 				gui.add( params, "renderToScreen" );
@@ -176,13 +151,13 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
-				ssaaRenderPassP = new THREE.SSAARenderPass( scene, cameraP );
+				ssaaRenderPassP = new SSAARenderPass( scene, cameraP );
 				composer.addPass( ssaaRenderPassP );
-				ssaaRenderPassO = new THREE.SSAARenderPass( scene, cameraO );
+				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
 				composer.addPass( ssaaRenderPassO );
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				copyPass = new ShaderPass( CopyShader );
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -8,6 +8,18 @@ THREE.SelectionBox = ( function () {
 	var frustum = new THREE.Frustum();
 	var center = new THREE.Vector3();
 
+	var tmpPoint = new THREE.Vector3();
+
+	var vecNear = new THREE.Vector3();
+	var vecTopLeft = new THREE.Vector3();
+	var vecTopRight = new THREE.Vector3();
+	var vecDownRight = new THREE.Vector3();
+	var vecDownLeft = new THREE.Vector3();
+
+	var vectemp1 = new THREE.Vector3();
+	var vectemp2 = new THREE.Vector3();
+	var vectemp3 = new THREE.Vector3();
+
 	function SelectionBox( camera, scene, deep ) {
 
 		this.camera = camera;
@@ -40,25 +52,26 @@ THREE.SelectionBox = ( function () {
 		this.camera.updateProjectionMatrix();
 		this.camera.updateMatrixWorld();
 
-		var tmpPoint = startPoint.clone();
+		tmpPoint.copy( startPoint );
 		tmpPoint.x = Math.min( startPoint.x, endPoint.x );
 		tmpPoint.y = Math.max( startPoint.y, endPoint.y );
 		endPoint.x = Math.max( startPoint.x, endPoint.x );
 		endPoint.y = Math.min( startPoint.y, endPoint.y );
 
-		var vecNear = this.camera.position.clone();
-		var vecTopLeft = tmpPoint.clone();
-		var vecTopRight = new THREE.Vector3( endPoint.x, tmpPoint.y, 0 );
-		var vecDownRight = endPoint.clone();
-		var vecDownLeft = new THREE.Vector3( tmpPoint.x, endPoint.y, 0 );
+		vecNear.copy( this.camera.position );
+		vecTopLeft.copy( tmpPoint );
+		vecTopRight.set( endPoint.x, tmpPoint.y, 0 );
+		vecDownRight.copy( endPoint );
+		vecDownLeft.set( tmpPoint.x, endPoint.y, 0 );
+
 		vecTopLeft.unproject( this.camera );
 		vecTopRight.unproject( this.camera );
 		vecDownRight.unproject( this.camera );
 		vecDownLeft.unproject( this.camera );
 
-		var vectemp1 = vecTopLeft.clone().sub( vecNear );
-		var vectemp2 = vecTopRight.clone().sub( vecNear );
-		var vectemp3 = vecDownRight.clone().sub( vecNear );
+		vectemp1.copy( vecTopLeft ).sub( vecNear );
+		vectemp2.copy( vecTopRight ).sub( vecNear );
+		vectemp3.copy( vecDownRight ).sub( vecNear );
 		vectemp1.normalize();
 		vectemp2.normalize();
 		vectemp3.normalize();

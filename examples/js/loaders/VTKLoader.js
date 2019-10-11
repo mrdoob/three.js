@@ -11,11 +11,13 @@
 
 THREE.VTKLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
+THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+
+	constructor: THREE.VTKLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -29,13 +31,6 @@ Object.assign( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype, {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 

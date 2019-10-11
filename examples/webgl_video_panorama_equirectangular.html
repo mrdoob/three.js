@@ -4,47 +4,23 @@
 		<title>three.js webgl - equirectangular video panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color: #ffffff; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video panorama
+		</div>
 
 		<div id="container"></div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
 
 		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
 			<source src="textures/pano.webm">
 			<source src="textures/pano.mp4">
 		</video>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 

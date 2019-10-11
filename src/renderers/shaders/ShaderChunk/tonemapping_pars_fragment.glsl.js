@@ -1,6 +1,7 @@
 export default /* glsl */`
 #ifndef saturate
-	#define saturate(a) clamp( a, 0.0, 1.0 )
+// <common> may have defined saturate() already
+#define saturate(a) clamp( a, 0.0, 1.0 )
 #endif
 
 uniform float toneMappingExposure;

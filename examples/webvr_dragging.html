@@ -4,25 +4,22 @@
 		<title>three.js webvr - dragging</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #f00;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebXR Device API (For Chrome M76+), expires 10/16/2019 -->
+		<meta http-equiv="origin-trial" content="AtWCPo0cZgy0zJDSYftemy7eZvmcwR5qy/4osFkMkLZ0ar6OYyKfbu93pjpxiOVzcWNIVxgoWoK8YtxCXeFSqgIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3MTE4Mzk5OX0=">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - dragging
+		</div>
 
-		<script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -40,14 +37,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - dragging';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x808080 );

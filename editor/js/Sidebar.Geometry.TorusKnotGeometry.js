@@ -6,8 +6,6 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var signals = editor.signals;
-
 	var container = new UI.Row();
 
 	var geometry = object.geometry;
@@ -78,7 +76,7 @@ Sidebar.Geometry.TorusKnotGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
 			radius.getValue(),
 			tube.getValue(),
 			tubularSegments.getValue(),

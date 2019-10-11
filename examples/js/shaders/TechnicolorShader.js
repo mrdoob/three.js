@@ -21,8 +21,8 @@ THREE.TechnicolorShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -35,10 +35,10 @@ THREE.TechnicolorShader = {
 
 		"void main() {",
 
-			"vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
-			"vec4 newTex = vec4(tex.r, (tex.g + tex.b) * .5, (tex.g + tex.b) * .5, 1.0);",
+		"	vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
+		"	vec4 newTex = vec4(tex.r, (tex.g + tex.b) * .5, (tex.g + tex.b) * .5, 1.0);",
 
-			"gl_FragColor = newTex;",
+		"	gl_FragColor = newTex;",
 
 		"}"
 

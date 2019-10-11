@@ -28,22 +28,22 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	LoaderUtils
 } from "../../../build/three.module.js";
 
 
 var PLYLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	this.propertyNameMapping = {};
 
 };
 
-PLYLoader.prototype = {
+PLYLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: PLYLoader,
 
@@ -59,13 +59,6 @@ PLYLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -510,6 +503,6 @@ PLYLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { PLYLoader };

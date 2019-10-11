@@ -4,41 +4,12 @@
 		<title>three.js webgl - materials - shaders [custom]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #050505;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
 
@@ -85,7 +56,7 @@
 
 			uniform float time;
 
-			uniform sampler2D texture;
+			uniform sampler2D colorTexture;
 
 			varying vec2 vUv;
 
@@ -102,7 +73,7 @@
 				uv /= 10.0;
 				uv += time * 0.05;
 
-				vec3 color = texture2D( texture, uv ).rgb;
+				vec3 color = texture2D( colorTexture, uv ).rgb;
 
 				gl_FragColor = vec4( color * r * 1.5, 1.0 );
 
@@ -160,13 +131,11 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -196,10 +165,10 @@
 
 				uniforms2 = {
 					"time": { value: 1.0 },
-					"texture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+					"colorTexture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2[ "texture" ].value.wrapS = uniforms2[ "texture" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms2[ "colorTexture" ].value.wrapS = uniforms2[ "colorTexture" ].value.wrapT = THREE.RepeatWrapping;
 
 				var params = [
 					[ 'fragment_shader1', uniforms1 ],

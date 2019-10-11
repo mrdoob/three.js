@@ -1,9 +1,11 @@
 export class WebGLAttributes {
-	constructor(gl: WebGLRenderingContext | WebGL2RenderingContext);
 
-	get(attribute: any): any;
+	constructor( gl: WebGLRenderingContext | WebGL2RenderingContext );
 
-	remove(attribute: any): void;
+	get( attribute: any ): any;
 
-	update(attribute: any, bufferType: Array<any>): void;
+	remove( attribute: any ): void;
+
+	update( attribute: any, bufferType: Array<any> ): void;
+
 }

@@ -4,46 +4,14 @@
 		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a { color:#00ff78; }
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-			}
-			.dg.ac {
-				z-index: 1 !important; /* FIX DAT.GUI */
+				background-color: #aaa;
 			}
 		</style>
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/SSAOShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/SSAOPass.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/math/SimplexNoise.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
-
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
 
@@ -53,13 +21,15 @@
 			</div>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			}
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -124,22 +94,22 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
-				var ssaoPass = new THREE.SSAOPass( scene, camera, width, height );
+				var ssaoPass = new SSAOPass( scene, camera, width, height );
 				ssaoPass.kernelRadius = 16;
 				composer.addPass( ssaoPass );
 
 				// Init gui
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				gui.add( ssaoPass, 'output', {
-					'Default': THREE.SSAOPass.OUTPUT.Default,
-					'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
-					'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
-					'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
-					'Depth': THREE.SSAOPass.OUTPUT.Depth,
-					'Normal': THREE.SSAOPass.OUTPUT.Normal
+					'Default': SSAOPass.OUTPUT.Default,
+					'SSAO Only': SSAOPass.OUTPUT.SSAO,
+					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
+					'Beauty': SSAOPass.OUTPUT.Beauty,
+					'Depth': SSAOPass.OUTPUT.Depth,
+					'Normal': SSAOPass.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
 					ssaoPass.output = parseInt( value );

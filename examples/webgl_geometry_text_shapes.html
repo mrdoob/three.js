@@ -1,33 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - Simple text from json</title>
+		<title>three.js webgl - simple text from json</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Simple text from json fonts.
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - simple text from json fonts
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer;
 
@@ -127,7 +124,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 

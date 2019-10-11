@@ -14,10 +14,6 @@ History = function ( editor ) {
 	this.historyDisabled = false;
 	this.config = editor.config;
 
-	//Set editor-reference in Command
-
-	Command( editor );
-
 	// signals
 
 	var scope = this;

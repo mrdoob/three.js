@@ -4,28 +4,9 @@
 		<title>three.js webgl - loaders - NRRD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 5;
-				display:block;
-			}
-			.dg {
-				z-index: 10 !important;
-			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
-			#inset  {
+			#inset {
 				width: 150px;
 				height: 150px;
 				background-color: transparent; /* or transparent; will show through only if renderer alpha: true */
@@ -47,27 +28,16 @@
 		</div>
 		<div id="inset"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Volume.js"></script>
-		<script src="js/VolumeSlice.js"></script>
-		<script src="js/loaders/NRRDLoader.js"></script>
-		<script src="js/loaders/VTKLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/gunzip.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
+			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
 
 			var container,
 				stats,
@@ -101,7 +71,7 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var loader = new THREE.NRRDLoader();
+				var loader = new NRRDLoader();
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
 
 					var geometry,
@@ -173,7 +143,7 @@
 
 				var vtkmaterial = new THREE.MeshLambertMaterial( { wireframe: false, morphTargets: false, side: THREE.DoubleSide, color: 0xff0000 } );
 
-				var vtkloader = new THREE.VTKLoader();
+				var vtkloader = new VTKLoader();
 				vtkloader.load( "models/vtk/liver.vtk", function ( geometry ) {
 
 					geometry.computeVertexNormals();
@@ -201,7 +171,7 @@
 				document.body.appendChild( container );
 				container.appendChild( renderer.domElement );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;
 				controls.panSpeed = 2;
@@ -213,7 +183,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				setupInset();
 

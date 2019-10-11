@@ -1,12 +1,12 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
-export interface SobelOperatorShader {
-  uniforms: {
-    tDiffuse: Uniform;
-    resolution: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
-}
+export const SobelOperatorShader: {
+	uniforms: {
+		tDiffuse: Uniform;
+		resolution: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
+};

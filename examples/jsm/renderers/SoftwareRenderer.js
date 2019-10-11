@@ -13,7 +13,6 @@ import {
 	MeshBasicMaterial,
 	MeshLambertMaterial,
 	MeshPhongMaterial,
-	REVISION,
 	SpriteMaterial,
 	Vector2,
 	Vector3,
@@ -26,8 +25,6 @@ import { RenderableLine } from "../renderers/Projector.js";
 import { RenderableSprite } from "../renderers/Projector.js";
 
 var SoftwareRenderer = function ( parameters ) {
-
-	console.log( 'THREE.SoftwareRenderer', REVISION );
 
 	parameters = parameters || {};
 

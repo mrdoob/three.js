@@ -5,6 +5,9 @@ import { _Math } from './Math.js';
  * @author bhouston / http://clara.io
  */
 
+var _startP = new Vector3();
+var _startEnd = new Vector3();
+
 function Line3( start, end ) {
 
 	this.start = ( start !== undefined ) ? start : new Vector3();
@@ -89,32 +92,25 @@ Object.assign( Line3.prototype, {
 
 	},
 
-	closestPointToPointParameter: function () {
+	closestPointToPointParameter: function ( point, clampToLine ) {
 
-		var startP = new Vector3();
-		var startEnd = new Vector3();
+		_startP.subVectors( point, this.start );
+		_startEnd.subVectors( this.end, this.start );
 
-		return function closestPointToPointParameter( point, clampToLine ) {
+		var startEnd2 = _startEnd.dot( _startEnd );
+		var startEnd_startP = _startEnd.dot( _startP );
 
-			startP.subVectors( point, this.start );
-			startEnd.subVectors( this.end, this.start );
+		var t = startEnd_startP / startEnd2;
 
-			var startEnd2 = startEnd.dot( startEnd );
-			var startEnd_startP = startEnd.dot( startP );
+		if ( clampToLine ) {
 
-			var t = startEnd_startP / startEnd2;
+			t = _Math.clamp( t, 0, 1 );
 
-			if ( clampToLine ) {
+		}
 
-				t = _Math.clamp( t, 0, 1 );
+		return t;
 
-			}
-
-			return t;
-
-		};
-
-	}(),
+	},
 
 	closestPointToPoint: function ( point, clampToLine, target ) {
 

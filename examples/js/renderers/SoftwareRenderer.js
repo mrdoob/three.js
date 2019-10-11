@@ -7,8 +7,6 @@
 
 THREE.SoftwareRenderer = function ( parameters ) {
 
-	console.log( 'THREE.SoftwareRenderer', THREE.REVISION );
-
 	parameters = parameters || {};
 
 	var canvas = parameters.canvas !== undefined
