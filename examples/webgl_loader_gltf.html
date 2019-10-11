@@ -24,7 +24,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
@@ -49,10 +48,14 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
-						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
-						cubeGenerator.update( renderer );
+						var options = {
+							minFilter: texture.minFilter,
+							magFilter: texture.magFilter
+						};
 
-						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
+						scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
+
+						var pmremGenerator = new PMREMGenerator( scene.background.texture );
 						pmremGenerator.update( renderer );
 
 						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
@@ -81,8 +84,6 @@
 
 						pmremGenerator.dispose();
 						pmremCubeUVPacker.dispose();
-
-						scene.background = cubeGenerator.renderTarget;
 
 					} );
 
