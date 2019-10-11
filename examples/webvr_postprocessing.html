@@ -19,17 +19,18 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/DotScreenShader.js"></script>
-		<script src="js/shaders/RGBShiftShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { DotScreenShader } from './jsm/shaders/DotScreenShader.js';
+			import { RGBShiftShader } from './jsm/shaders/RGBShiftShader.js';
 
-		<script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+
+			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var camera, scene, renderer, composer;
 			var object, light;
@@ -80,15 +81,15 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
+				composer = new EffectComposer( renderer );
 
 				renderer.setRenderTarget( composer.readBuffer );
 
-				var effect = new THREE.ShaderPass( THREE.DotScreenShader );
+				var effect = new ShaderPass( DotScreenShader );
 				effect.uniforms[ 'scale' ].value = 4;
 				composer.addPass( effect );
 
-				var effect = new THREE.ShaderPass( THREE.RGBShiftShader );
+				effect = new ShaderPass( RGBShiftShader );
 				effect.uniforms[ 'amount' ].value = 0.0015;
 				effect.renderToScreen = true;
 				composer.addPass( effect );
