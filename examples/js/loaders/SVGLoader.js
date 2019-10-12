@@ -801,13 +801,13 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			function clamp( v ) {
 
-				return Math.max( 0, Math.min( 1, v ) );
+				return Math.max( 0, Math.min( 1, parseFloat( v ) ) );
 
 			}
 
 			function positive( v ) {
 
-				return Math.max( 0, v );
+				return Math.max( 0, parseFloat( v ) );
 
 			}
 
