@@ -3,7 +3,7 @@ import { Group } from '../../objects/Group';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera';
 import { ArrayCamera } from '../../cameras/ArrayCamera';
 import { Matrix4 } from '../../math/Matrix4';
-import { Layers } from './Layers';
+import { Layers } from '../../core/Layers';
 
 export class WebVRManager {
 
