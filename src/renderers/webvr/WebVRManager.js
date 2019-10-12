@@ -45,15 +45,13 @@ function WebVRManager( renderer ) {
 
 	var cameraL = new PerspectiveCamera();
 	cameraL.viewport = new Vector4();
-	cameraL.layers.enable( 1 );
+	cameraL.layers.enableAll();
 
 	var cameraR = new PerspectiveCamera();
 	cameraR.viewport = new Vector4();
-	cameraR.layers.enable( 2 );
+	cameraR.layers.enableAll();
 
 	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
-	cameraVR.layers.enable( 1 );
-	cameraVR.layers.enable( 2 );
 
 	//
 
@@ -325,6 +323,8 @@ function WebVRManager( renderer ) {
 
 		cameraL.matrixWorldInverse.fromArray( frameData.leftViewMatrix );
 		cameraR.matrixWorldInverse.fromArray( frameData.rightViewMatrix );
+
+		cameraVR.layers.mask = camera.layers.mask;
 
 		// TODO (mrdoob) Double check this code
 
