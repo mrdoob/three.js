@@ -46,10 +46,12 @@ function WebVRManager( renderer ) {
 	var cameraL = new PerspectiveCamera();
 	cameraL.viewport = new Vector4();
 	cameraL.layers.enableAll();
+	this.leftLayers = cameraL.layers;
 
 	var cameraR = new PerspectiveCamera();
 	cameraR.viewport = new Vector4();
 	cameraR.layers.enableAll();
+	this.rightLayers = cameraR.layers;
 
 	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
 

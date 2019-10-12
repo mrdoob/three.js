@@ -8,6 +8,8 @@ export class WebVRManager {
 
 	constructor( renderer: any );
 
+	leftLayers: Layers;
+	rightLayers: Layers;
 	enabled: boolean;
 	getController( id: number ): Group;
 	getDevice(): VRDisplay | null;
