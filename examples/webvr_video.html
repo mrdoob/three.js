@@ -43,7 +43,8 @@
 				} );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.layers.enable( 1 ); // render left view when no stereo available
+				camera.layers.enable( 1 );
+				camera.layers.enable( 2 );
 
 				// video
 
@@ -117,6 +118,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
+				renderer.vr.leftLayers.set( 2 );
+				renderer.vr.rightLayers.set( 1 );
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
