@@ -29,6 +29,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
+				renderer.vr.leftLayers.disable( 2 );
+				renderer.vr.rightLayers.disable( 1 );
 				document.body.appendChild( renderer.domElement );
 
 				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
@@ -39,6 +41,7 @@
 
 				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.layers.enable( 1 );
+				camera.layers.enable( 2 );
 
 				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 				geometry.scale( 1, 1, - 1 );
