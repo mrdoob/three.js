@@ -1363,7 +1363,7 @@ GLTFExporter.prototype = {
 						// Clones attribute not to override
 						var relativeAttribute = attribute.clone();
 
-						if ( !geometry.morphTargetsRelative ) {
+						if ( ! geometry.morphTargetsRelative ) {
 
 							for ( var j = 0, jl = attribute.count; j < jl; j ++ ) {
 
