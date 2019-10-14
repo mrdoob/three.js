@@ -2181,17 +2181,43 @@ function WebGLRenderer( parameters ) {
 		uniforms.size.value = material.size * _pixelRatio;
 		uniforms.scale.value = _height * 0.5;
 
-		uniforms.map.value = material.map;
+		if ( material.map ) {
 
-		if ( material.map !== null ) {
+			uniforms.map.value = material.map;
 
-			if ( material.map.matrixAutoUpdate === true ) {
+		}
 
-				material.map.updateMatrix();
+		if ( material.alphaMap ) {
+
+			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		// uv repeat and offset setting priorities
+		// 1. color map
+		// 2. alpha map
+
+		var uvScaleMap;
+
+		if ( material.map ) {
+
+			uvScaleMap = material.map;
+
+		} else if ( material.alphaMap ) {
+
+			uvScaleMap = material.alphaMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			if ( uvScaleMap.matrixAutoUpdate === true ) {
+
+				uvScaleMap.updateMatrix();
 
 			}
 
-			uniforms.uvTransform.value.copy( material.map.matrix );
+			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 

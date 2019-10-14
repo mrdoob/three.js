@@ -182,6 +182,7 @@ var UniformsLib = {
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
+		alphaMap: { value: null },
 		uvTransform: { value: new Matrix3() }
 
 	},
