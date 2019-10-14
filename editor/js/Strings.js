@@ -284,9 +284,6 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
-			'sidebar/settings/theme': 'Theme',
-			'sidebar/settings/theme/light': 'light',
-			'sidebar/settings/theme/dark': 'dark',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -560,9 +557,6 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/theme': '主题',
-			'sidebar/settings/theme/light': '浅色',
-			'sidebar/settings/theme/dark': '深色',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
