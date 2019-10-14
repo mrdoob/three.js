@@ -605,7 +605,7 @@ var Loader = function ( editor ) {
 						var scene = result.scene;
 
 						editor.addAnimation( scene, result.animations );
-						editor.execute( new AddObjectCommand( scene ) );
+						editor.execute( new AddObjectCommand( editor, scene ) );
 
 					} );
 
