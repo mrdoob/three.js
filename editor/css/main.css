@@ -1,3 +1,7 @@
+:root {
+	color-scheme: light dark;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -217,10 +221,6 @@ textarea, input { outline: none; } /* osx */
 }
 
 /*  */
-
-:root {
-	color-scheme: light dark;
-}
 
 button {
 	color: #555;
@@ -543,7 +543,7 @@ select {
 
 /* DARK MODE */
 
-@media (prefers-color-scheme: dark) {
+@media ( prefers-color-scheme: dark ) {
 
 	button {
 		color: #aaa;
