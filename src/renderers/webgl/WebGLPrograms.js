@@ -117,7 +117,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	}
 
-	this.getParameters = function ( material, lights, shadows, fog, nClipPlanes, nClipIntersection, object ) {
+	this.getParameters = function ( material, lights, shadows, fog, nClipPlanes, nClipIntersection, object, camera ) {
 
 		var shaderID = shaderIDs[ material.type ];
 
@@ -150,6 +150,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			precision: precision,
 
 			instancing: object.isInstancedMesh === true,
+
+			orthographic: camera.isOrthographicCamera, 
 
 			supportsVertexTextures: vertexTextures,
 			numMultiviewViews: numMultiviewViews,

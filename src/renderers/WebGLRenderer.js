@@ -1059,13 +1059,13 @@ function WebGLRenderer( parameters ) {
 
 					for ( var i = 0; i < object.material.length; i ++ ) {
 
-						initMaterial( object.material[ i ], scene.fog, object );
+						initMaterial( object.material[ i ], scene.fog, object, camera );
 
 					}
 
 				} else {
 
-					initMaterial( object.material, scene.fog, object );
+					initMaterial( object.material, scene.fog, object, camera );
 
 				}
 
@@ -1485,7 +1485,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function initMaterial( material, fog, object ) {
+	function initMaterial( material, fog, object, camera ) {
 
 		var materialProperties = properties.get( material );
 
@@ -1495,7 +1495,7 @@ function WebGLRenderer( parameters ) {
 		var lightsStateVersion = lights.state.version;
 
 		var parameters = programCache.getParameters(
-			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
+			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object, camera );
 
 		var code = programCache.getProgramCode( material, parameters );
 
@@ -1701,7 +1701,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			initMaterial( material, fog, object );
+			initMaterial( material, fog, object, camera );
 			material.needsUpdate = false;
 
 		}

@@ -449,6 +449,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
 			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
+			parameters.orthographic ? '#define ORTHO ' : '',
+
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
 			parameters.envMap ? '#define ' + envMapModeDefine : '',
@@ -570,6 +572,8 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			( parameters.useFog && parameters.fog ) ? '#define USE_FOG' : '',
 			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
+
+			parameters.orthographic ? '#define ORTHO ' : '',
 
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',

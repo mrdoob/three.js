@@ -15,7 +15,8 @@ export class WebGLPrograms {
 		lights: any,
 		fog: any,
 		nClipPlanes: number,
-		object: any
+		object: any,
+		camera: any,
 	): any;
 	getProgramCode( material: ShaderMaterial, parameters: any ): string;
 	acquireProgram(
