@@ -165,7 +165,7 @@ class VoxelWorld {
                   positions.push(pos[0] + x, pos[1] + y, pos[2] + z);
                   normals.push(...dir);
                   uvs.push(
-                        (uvVoxel +     uv[0]) * tileSize / tileTextureWidth,
+                        (uvVoxel +   uv[0]) * tileSize / tileTextureWidth,
                     1 - (uvRow + 1 - uv[1]) * tileSize / tileTextureHeight);
                 }
                 indices.push(

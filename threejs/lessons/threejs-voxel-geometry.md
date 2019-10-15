@@ -684,7 +684,7 @@ class VoxelWorld {
                   positions.push(pos[0] + x, pos[1] + y, pos[2] + z);
                   normals.push(...dir);
 +                  uvs.push(
-+                        (uvRow +     uv[0]) * tileSize / tileTextureWidth,
++                        (uvVoxel +   uv[0]) * tileSize / tileTextureWidth,
 +                    1 - (uvRow + 1 - uv[1]) * tileSize / tileTextureHeight);
                 }
                 indices.push(
@@ -1188,7 +1188,7 @@ Do we want remove cells if all voxels in that cell are 0?
 That would probably be reasonable change if we wanted to ship this.
 
 Thinking about how this works it's clear the absolute
-worst case is a checking board of on and off voxels. I don't
+worst case is a checkerboard of on and off voxels. I don't
 know off the top of my head what other strategies to use
 if things get too slow. Maybe getting too slow would just
 encourage the user not to make giant checkerboard areas.
