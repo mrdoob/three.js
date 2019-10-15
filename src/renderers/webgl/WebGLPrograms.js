@@ -150,8 +150,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			precision: precision,
 
 			instancing: object.isInstancedMesh === true,
-
-			orthographic: camera.isOrthographicCamera, 
+			orthographic: camera.isOrthographicCamera === true, 
 
 			supportsVertexTextures: vertexTextures,
 			numMultiviewViews: numMultiviewViews,
