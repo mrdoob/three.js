@@ -91,8 +91,6 @@ const assets = [
 	//
 
 	'./css/main.css',
-	'./css/dark.css',
-	'./css/light.css',
 
 	'./js/EditorControls.js',
 	'./js/Storage.js',

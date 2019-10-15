@@ -293,7 +293,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': 'Grid',
 
-			'sidebar/history/history': 'HISTORY',
+			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
 
 			'toolbar/translate': 'Translate',
@@ -566,7 +566,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': '网格',
 
-			'sidebar/history/history': '历史记录',
+			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',

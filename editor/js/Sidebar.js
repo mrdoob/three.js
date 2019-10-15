@@ -16,13 +16,15 @@ var Sidebar = function ( editor ) {
 		new Sidebar.Script( editor )
 	);
 
+	var project = new Sidebar.Project( editor );
+
 	var settings = new UI.Span().add(
 		new Sidebar.Settings( editor ),
 		new Sidebar.History( editor )
 	);
 
 	container.addTab( 'scene', strings.getKey( 'sidebar/scene' ), scene );
-	container.addTab( 'project', strings.getKey( 'sidebar/project' ), new Sidebar.Project( editor ) );
+	container.addTab( 'project', strings.getKey( 'sidebar/project' ), project );
 	container.addTab( 'settings', strings.getKey( 'sidebar/settings' ), settings );
 	container.select( 'scene' );
 
