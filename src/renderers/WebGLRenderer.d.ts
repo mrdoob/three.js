@@ -399,13 +399,23 @@ export class WebGLRenderer implements Renderer {
 
 	/**
 	 * Copies a region of the currently bound framebuffer into the selected mipmap level of the selected texture.
-	 * This region is defined by the size of the texture's mip level and starts at the input position.
-	 * 
+	 * This region is defined by the size of the destination texture's mip level, offset by the input position.
+	 *
 	 * @param position Specifies the pixel offset from which to copy out of the framebuffer.
 	 * @param texture Specifies the destination texture.
 	 * @param level Specifies the destination mipmap level of the texture.
 	 */
-	copyFramebufferToTexture( position: Vector2, texture: Texture, level: number ): void;
+	copyFramebufferToTexture( position: Vector2, texture: Texture, level?: number ): void;
+
+	/**
+	 * Copies srcTexture to the specified level of dstTexture, offset by the input position.
+	 *
+	 * @param position Specifies the pixel offset into the dstTexture where the copy will occur.
+	 * @param srcTexture Specifies the source texture.
+	 * @param dstTexture Specifies the destination texture.
+	 * @param level Specifies the destination mipmap level of the texture.
+	 */
+	copyTextureToTexture( position: Vector2, srcTexture: Texture, dstTexture: Texture, level?: number ): void;
 
 	/**
 	 * @deprecated

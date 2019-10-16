@@ -2719,7 +2719,7 @@ function WebGLRenderer( parameters ) {
 
 	this.copyFramebufferToTexture = function ( position, texture, level ) {
 
-		level = level || 0;
+		if ( level === undefined ) level = 0;
 
 		var levelScale = Math.pow( 2, - level );
 		var width = Math.floor( texture.image.width * levelScale );
