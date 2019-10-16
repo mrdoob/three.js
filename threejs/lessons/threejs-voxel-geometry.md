@@ -172,7 +172,7 @@ class VoxelWorld {
 +          const voxel = this.getVoxel(voxelX, voxelY, voxelZ);
 +          if (voxel) {
 +            for (const {dir} of VoxelWorld.faces) {
-+              const neighbor = getVoxel(
++              const neighbor = this.getVoxel(
 +                  voxelX + dir[0],
 +                  voxelY + dir[1],
 +                  voxelZ + dir[2]);
@@ -236,7 +236,7 @@ class VoxelWorld {
           if (voxel) {
 -            for (const {dir} of VoxelWorld.faces) {
 +            for (const {dir, corners} of VoxelWorld.faces) {
-              const neighbor = getVoxel(
+              const neighbor = this.getVoxel(
                   voxelX + dir[0],
                   voxelY + dir[1],
                   voxelZ + dir[2]);
@@ -324,7 +324,7 @@ VoxelWorld.faces = [
 ```
 
 The code above would make basic geometry data for us. We just need to supply
-the `getVoxel` function. Let's start with just one hardcoded cell.
+the `getVoxel` function. Let's start with just one hard coded cell.
 
 ```js
 class VoxelWorld {
