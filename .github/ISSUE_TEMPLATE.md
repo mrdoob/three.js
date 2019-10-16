@@ -11,8 +11,8 @@ Always include a code snippet, screenshots, and any relevant models or textures 
 
 Please also include a live example if possible. You can start from these templates:
 
-* [jsfiddle](https://jsfiddle.net/yn8azeg1/) (latest release branch)
-* [jsfiddle](https://jsfiddle.net/kLwhx875/) (dev branch)
+* [jsfiddle](https://jsfiddle.net/yjr2n3gt/) (latest release branch)
+* [jsfiddle](https://jsfiddle.net/x84yuLnd/) (dev branch)
 
 ##### Three.js version
 
