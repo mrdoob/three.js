@@ -2719,7 +2719,7 @@ function WebGLRenderer( parameters ) {
 
 	this.copyFramebufferToTexture = function ( position, texture, level ) {
 
-		var levelScale = Math.pow( 2, -1.0 * level );
+		var levelScale = Math.pow( 2, - level );
 		var width = texture.image.width * levelScale;
 		var height = texture.image.height * levelScale;
 		var glFormat = utils.convert( texture.format );

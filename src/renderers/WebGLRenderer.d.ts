@@ -397,6 +397,14 @@ export class WebGLRenderer implements Renderer {
 		activeCubeFaceIndex?: number
 	): void;
 
+	/**
+	 * Copies a region of the currently bound framebuffer into the selected mipmap level of the selected texture.
+	 * This region is defined by the size of the texture's mip level and starts at the input position.
+	 * 
+	 * @param position Specifies the pixel offset from which to copy out of the framebuffer.
+	 * @param texture Specifies the destination texture.
+	 * @param level Specifies the destination mipmap level of the texture.
+	 */
 	copyFramebufferToTexture( position: Vector2, texture: Texture, level: number ): void;
 
 	/**
