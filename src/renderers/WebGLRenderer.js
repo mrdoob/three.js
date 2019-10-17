@@ -1239,8 +1239,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		scene.onAfterRender( _this, scene, camera );
-
 		//
 
 		if ( _currentRenderTarget !== null ) {
@@ -1254,6 +1252,8 @@ function WebGLRenderer( parameters ) {
 			textures.updateMultisampleRenderTarget( _currentRenderTarget );
 
 		}
+
+		scene.onAfterRender( _this, scene, camera );
 
 		// Ensure depth buffer writing is enabled so it can be cleared on next render
 
