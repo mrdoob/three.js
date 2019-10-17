@@ -377,7 +377,7 @@ function generateEnvMapBlendingDefine( parameters ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+function WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters ) {
 
 	var gl = renderer.getContext();
 
@@ -884,7 +884,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	this.name = shader.name;
 	this.id = programIdCount ++;
-	this.code = code;
+	this.cacheKey = cacheKey;
 	this.usedTimes = 1;
 	this.program = program;
 	this.vertexShader = glVertexShader;
