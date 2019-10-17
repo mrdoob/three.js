@@ -390,7 +390,7 @@ function main() {
     event.preventDefault();
     lastTouch = event.touches[0];
   }, {passive: false});
-  canvas.addEventListener('touchsmove', (event) => {
+  canvas.addEventListener('touchmove', (event) => {
     lastTouch = event.touches[0];
   });
   canvas.addEventListener('touchend', () => {

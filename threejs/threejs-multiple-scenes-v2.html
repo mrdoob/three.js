@@ -119,7 +119,7 @@ function main() {
     return needResize;
   }
 
-  function rendenerSceneInfo(sceneInfo) {
+  function renderSceneInfo(sceneInfo) {
     const {scene, camera, elem} = sceneInfo;
 
     // get the viewport relative position opf this element
@@ -160,8 +160,8 @@ function main() {
     sceneInfo1.mesh.rotation.y = time * .1;
     sceneInfo2.mesh.rotation.y = time * .1;
 
-    rendenerSceneInfo(sceneInfo1);
-    rendenerSceneInfo(sceneInfo2);
+    renderSceneInfo(sceneInfo1);
+    renderSceneInfo(sceneInfo2);
 
     requestAnimationFrame(render);
   }
