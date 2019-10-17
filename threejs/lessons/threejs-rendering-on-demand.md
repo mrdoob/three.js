@@ -209,7 +209,7 @@ function makeInstance(geometry, color, x) {
 +  const folder = gui.addFolder(`Cube${x}`);
 +  folder.addColor(new ColorGUIHelper(material, 'color'), 'value')
 +      .name('color')
-+      .onChange(rendrequestRenderIfNotRequesteder);
++      .onChange(requestRenderIfNotRequested);
 +  folder.add(cube.scale, 'x', .1, 1.5)
 +      .name('scale x')
 +      .onChange(requestRenderIfNotRequested);

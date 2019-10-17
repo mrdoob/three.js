@@ -272,7 +272,7 @@ whereas the one on the right is.
 
 The other exceptions are the 2 line based examples for `EdgesGeometry`
 and `WireframeGeometry`. Instead of calling `addSolidGeometry` they call
-`addLineGeomtry` which looks like this
+`addLineGeometry` which looks like this
 
 ```js
 function addLineGeometry(x, y, geometry) {
@@ -320,7 +320,7 @@ It's now not so clear that the one on the right with 5000 triangles
 is entirely better than the one in the middle with only 480.
 If you're only drawing a few spheres, like say a single globe for
 a map of the earth, then a single 10000 triangle sphere is not a bad
-choice. If on the otherhand you're trying to draw 1000 spheres
+choice. If on the other hand you're trying to draw 1000 spheres
 then 1000 spheres times 10000 triangles each is 10 million triangles.
 To animate smoothly you need the browser to draw at 60 frames per
 second so you'd be asking the browser to draw 600 million triangles
@@ -343,7 +343,7 @@ is similar.
 So, choose whatever is appropriate for your situation. The less
 subdivisions you choose the more likely things will run smoothly and the less
 memory they'll take. You'll have to decide for yourself what the correct
-tradeoff is for your particular siutation.
+tradeoff is for your particular situation.
 
 Next up let's go over [how three's scene graph works and how
 to use it](threejs-scenegraph.html).

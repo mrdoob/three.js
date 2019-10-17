@@ -181,7 +181,7 @@ What it does help with is making the darks not too dark.
 ## `HemisphereLight`
 
 Let's switch the code to a `HemisphereLight`. A `HemisphereLight`
-takes a sky color and a ground color and just multplies the
+takes a sky color and a ground color and just multiplies the
 material's color between those 2 colors—the sky color if the
 surface of the object is pointing up and the ground color if
 the surface of the object is pointing down.
@@ -212,7 +212,7 @@ The result:
 
 {{{example url="../threejs-lights-hemisphere.html" }}}
 
-Notice again there is almost no defintion, everything looks kind
+Notice again there is almost no definition, everything looks kind
 of flat. The `HemisphereLight` used in combination with another light
 can help give a nice kind of influence of the color of the sky
 and ground. In that way it's best used in combination with some
@@ -352,7 +352,7 @@ be any shape you want, just add a mesh to the light itself.
 A `PointLight` has the added property of [`distance`](PointLight.distance).
 If the `distance` is 0 then the `PointLight` shines to
 infinity. If the `distance` is greater than 0 then the light shines
-its full intensity at the light and fades to no influnce at `distance`
+its full intensity at the light and fades to no influence at `distance`
 units away from the light.
 
 Let's setup the GUI so we can adjust the distance.

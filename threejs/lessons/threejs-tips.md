@@ -372,7 +372,7 @@ This is the solution used on [the front page of this site](/).
 In your webpage just insert an iframe, for example
 
 ```html
-<iframe id="background" src="threejs-repsonsive.html">
+<iframe id="background" src="threejs-responsive.html">
 <div>
   Your content goes here.
 </div>

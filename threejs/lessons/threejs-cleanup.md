@@ -376,7 +376,7 @@ class ResourceTracker {
 }
 ```
 
-And with that let's take an example from [the article on loading gltf files](threejs-load-glft.html)
+And with that let's take an example from [the article on loading gltf files](threejs-load-gltf.html)
 and make it load and free files.
 
 ```js

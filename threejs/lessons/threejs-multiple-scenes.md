@@ -21,7 +21,7 @@ the 9th context the oldest one will be lost.
    and that model uses 20 meg of textures your 10 meg model will
    have to be loaded twice and your textures will also be loaded
    twice. Nothing can be shared across contexts. This also
-   means things have to be intialized twice, shaders compiled twice,
+   means things have to be initialized twice, shaders compiled twice,
    etc. It gets worse as there are more canvases.
 
 So what's the solution?
@@ -78,7 +78,7 @@ Then we can setup the CSS maybe something like this
 }
 ```
 
-We set the canvsas to fill the screen and we set its `z-index` to
+We set the canvas to fill the screen and we set its `z-index` to
 -1 to make it appear behind other elements. We also need to specify some kind of width and height for our virtual canvas elements since there is nothing inside to give them any size.
 
 Now we'll make 2 scenes each with a light and a camera.
@@ -144,7 +144,7 @@ to only render to part of the canvas by turning on the *scissor*
 test with `Renderer.setScissorTest` and then setting both the scissor and the viewport with `Renderer.setViewport` and `Renderer.setScissor`.
 
 ```js
-function rendenerSceneInfo(sceneInfo) {
+function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 
   // get the viewport relative position opf this element
@@ -188,8 +188,8 @@ function render(time) {
   sceneInfo1.mesh.rotation.y = time * .1;
   sceneInfo2.mesh.rotation.y = time * .1;
 
-  rendenerSceneInfo(sceneInfo1);
-  rendenerSceneInfo(sceneInfo2);
+  renderSceneInfo(sceneInfo1);
+  renderSceneInfo(sceneInfo2);
 
   requestAnimationFrame(render);
 }

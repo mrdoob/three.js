@@ -246,7 +246,7 @@ completely in the render target. The issue here is the size we're using to
 calculate if the object fits in the camera's view is not taking into account
 that the very edges of the object will end up dipping outside area we
 calculated. We could compute how to make 100% of the box fit but that would
-waste space as well so instead we just *fugde* it.
+waste space as well so instead we just *fudge* it.
 
 Then we render to the render target and remove the object from
 the scene. 

@@ -75,7 +75,7 @@ the surface. Light is added to that color.
 
 Let's also put a single point light in the center of the scene. We'll go into more
 details about point lights later but for now the simple version is a point light
-represents light that eminates from a single point.
+represents light that emanates from a single point.
 
 ```js
 {
@@ -87,7 +87,7 @@ represents light that eminates from a single point.
 ```
 
 To make it easy to see we're going to put the camera directly above the origin
-looking down. The easist way to do that is to use the `lookAt` function. The `lookAt`
+looking down. The easiest way to do that is to use the `lookAt` function. The `lookAt`
 function will orient the camera from its position to "look at" the position
 we pass to `lookAt`. Before we do that though we need to tell the camera
 which way the top of the camera is facing or rather which way is "up" for the
@@ -360,7 +360,7 @@ Otherwise the grid might overwrite the axes.
 
 Turn on the `solarSystem` and you'll see how the earth is exactly 10
 units out from the center just like we set above. You can see how the
-earth is in the *local space* of the `solarSystem`. Similary if you
+earth is in the *local space* of the `solarSystem`. Similarly if you
 turn on the `earthOrbit` you'll see how the moon is exactly 2 units
 from the center of the *local space* of the `earthOrbit`.
 

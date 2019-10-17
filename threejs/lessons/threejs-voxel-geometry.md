@@ -69,7 +69,7 @@ is 65536 boxes!
 Using [the technique of merging the geometry](threejs-rendering-on-demand.html)
 will fix the issue for this example but what if instead of just making
 a single layer we filled in everything below the ground with voxel. 
-In otherwords change the loop filling in the voxels to this
+In other words change the loop filling in the voxels to this
 
 ```js
 for (let y = 0; y < cellSize; ++y) {
@@ -376,7 +376,7 @@ class VoxelWorld {
     const cellX = Math.floor(x / cellSize);
     const cellY = Math.floor(y / cellSize);
     const cellZ = Math.floor(z / cellSize);
-    if (cellX !== 0 || cellY !== 0 || celllZ !== 0) {
+    if (cellX !== 0 || cellY !== 0 || cellZ !== 0) {
       return null
     }
     return this.cell;

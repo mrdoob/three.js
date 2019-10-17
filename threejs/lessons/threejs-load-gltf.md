@@ -48,7 +48,7 @@ graphics. 3D formats can be divided into 3 or 4 basic types.
 
      This again is different from other formats except maybe App formats. The data
      in a glTF file is mean to be rendered, not edited. Data that's not important to
-     rendering has generally been removed. Polygons have been convered to triangles.
+     rendering has generally been removed. Polygons have been converted to triangles.
      Materials have known values that are supposed to work everywhere.
 
 gLTF was specifically designed so you should be able to download a glTF file and

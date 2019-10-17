@@ -234,7 +234,7 @@ cubes.forEach((cubeInfo, ndx) => {
 +    // hide the label
 +    elem.style.display = 'none';
 +  } else {
-+    // unhide the label
++    // un-hide the label
 +    elem.style.display = '';
 
     // convert the normalized position to CSS coordinates

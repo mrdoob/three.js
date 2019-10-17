@@ -109,7 +109,7 @@ Anything inside the defined frustum will be be drawn. Anything outside
 will not.
 
 The camera defaults to looking down the -Z axis with +Y up. We'll put our cube
-at the origin so we need to move the camera back a litte from the origin
+at the origin so we need to move the camera back a little from the origin
 in order to see anything.
 
 ```js

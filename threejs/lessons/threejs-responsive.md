@@ -166,7 +166,7 @@ function render(time) {
   ...
 ```
 
-Since the apsect is only going to change if the canvas's display size
+Since the aspect is only going to change if the canvas's display size
 changed we only set the camera's aspect if `resizeRendererToDisplaySize`
 returns `true`.
 
@@ -232,7 +232,7 @@ and pass that to three.js
 
      renderer.setPixelRatio(window.devicePixelRatio);
 
-After that any calls to `renderer.setSize` will magicially
+After that any calls to `renderer.setSize` will magically
 use the size you request multiplied by whatever pixel ratio
 you passed in. **This is strongly NOT RECOMMENDED**. See below
 

@@ -114,7 +114,7 @@ help us with events so both cameras can easily have their own `OrbitControls`.
 </body>
 ```
 
-And the CSS that will make those 2 views show up side by side overlayed on top of
+And the CSS that will make those 2 views show up side by side overlaid on top of
 the canvas
 
 ```css
@@ -397,7 +397,7 @@ maybe we'll go over later. For now, just be aware you should take care
 to choose appropriate `near` and `far` values for your needs.
 
 The 2nd most common camera is the `OrthographicCamera`. Rather than
-specify a frustum it specfies a box with the settings `left`, `right`
+specify a frustum it specifies a box with the settings `left`, `right`
 `top`, `bottom`, `near`, and `far`. Because it's projecting a box
 there is no perspective.
 
@@ -430,7 +430,7 @@ const gui = new GUI();
 ```
 
 The call to `listen` tells dat.GUI to watch for changes. This is here because
-the `OrbitControls` can also control zoom. For example the scrollwheel on
+the `OrbitControls` can also control zoom. For example the scroll wheel on
 a mouse will zoom via the `OrbitControls`.
 
 Last we just need to change the part that renders the left
@@ -470,7 +470,7 @@ something like
 ```js
 camera.left = -canvas.width / 2;
 camera.right = canvas.width / 2;
-camera.top = canvas.heigth / 2;
+camera.top = canvas.height / 2;
 camera.bottom = -canvas.height / 2;
 camera.near = -1;
 camera.far = 1;

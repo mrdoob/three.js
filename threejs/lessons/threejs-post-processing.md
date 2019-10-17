@@ -58,7 +58,7 @@ target. Usually you need to set this to true on the last pass you add to your
 `EffectComposer`.
 
 Let's put together a basic example. We'll start with the example from [the
-article on responsivness](threejs-responsive.html).
+article on responsiveness](threejs-responsive.html).
 
 To that first we create an `EffectComposer`.
 
@@ -170,7 +170,7 @@ I found this line:
 this.copyUniforms[ "opacity" ].value = strength;
 ```
 
-So we can set the strengh by setting
+So we can set the strength by setting
 
 ```js
 bloomPass.copyUniforms.opacity.value = someValue;
@@ -201,7 +201,7 @@ and
 const gui = new GUI();
 {
   const folder = gui.addFolder('BloomPass');
-  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('stength');
+  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
   folder.open();
 }
 {

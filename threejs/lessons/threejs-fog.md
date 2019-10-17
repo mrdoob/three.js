@@ -18,7 +18,7 @@ from the camera. Anything closer than `near` is unaffected by fog.
 Anything further than `far` is completely the fog color. Parts between
 `near` and `far` fade from their material color to the fog color.
 
-There's also `FogExp2` which grows expotentially with distance from the camera.
+There's also `FogExp2` which grows exponentially with distance from the camera.
 
 To use either type of fog you create one and and assign it to the scene as in
 
@@ -85,7 +85,7 @@ scene.background = new THREE.Color('#F00');  // red
 
 Here is one of our previous examples with fog added. The only addition
 is right after setting up the scene we add the fog and set the scene's
-backgound color
+background color
 
 ```js
 const scene = new THREE.Scene();
@@ -181,7 +181,7 @@ we get use to easily get such a string, we just have to prepend a '#' to the fro
 // We use this class to pass to dat.gui
 // so when it manipulates near or far
 // near is never > far and far is never < near
-+// Also when dat.gui maniplates color we'll
++// Also when dat.gui manipulates color we'll
 +// update both the fog and background colors.
 class FogGUIHelper {
 *  constructor(fog, backgroundColor) {
@@ -212,7 +212,7 @@ class FogGUIHelper {
 }
 ```
 
-We then call `gui.addColor` to add a color UI for our helper's virutal property.
+We then call `gui.addColor` to add a color UI for our helper's virtual property.
 
 ```js
 {
@@ -232,7 +232,7 @@ We then call `gui.addColor` to add a color UI for our helper's virutal property.
 {{{example url="../threejs-fog-gui.html" }}}
 
 You can see setting `near` to like 1.9 and `far` to 2.0 gives
-a very sharp transition between unfogged and completely fogged.
+a very sharp transition between un-fogged and completely fogged.
 where as `near` = 1.1 and `far` = 2.9 should just about be
 the smoothest given our cubes are spinning 2 units away from the camera.
 

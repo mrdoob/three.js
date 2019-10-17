@@ -8,7 +8,7 @@ how to use `Geometry`. This article is about `BufferGeometry`.
 less memory but can be harder to setup.
 
 In [the article on Geometry](threejs-custom-geometry.html) we went over that to use a `Geometry` you supply an
-array of `Vector3` vertices (postions). You then make `Face3` objects specifying
+array of `Vector3` vertices (positions). You then make `Face3` objects specifying
 by index the 3 vertices that make each triangle of the shape you're making. To
 each `Face3` you can specify either a face normal or normals for each individual
 vertex of the face. You can also specify a face color or individual vertex
@@ -20,7 +20,7 @@ of the face.
 
 `BufferGeometry` on the other hand uses *named* `BufferAttribute`s.
 Each `BufferAttribute` represents an array of one type of data: positions,
-normals, colors, and uv. Togther, the added `BufferAttribute`s represent
+normals, colors, and uv. Together, the added `BufferAttribute`s represent
 *parallel arrays* of all the data for each vertex.
 
 <div class="threejs_center"><img src="resources/threejs-attributes.svg" style="width: 700px"></div>
@@ -44,7 +44,7 @@ The truth is when you use `Geometry` three.js transforms it into this format.
 That is where the extra memory and time comes from when using `Geometry`. Extra
 memory for all the `Vector3`s, `Vector2`s, `Face3`s and array objects and then
 extra time to translate all of that data into parallel arrays in the form of
-`BufferAttribute`s like above. Somtimes that makes using `Geometry` easier.
+`BufferAttribute`s like above. Sometimes that makes using `Geometry` easier.
 With `BufferGeometry` it is up to us to supply the data already turned into this format.
 
 As a simple example let's make a cube using `BufferGeometry`. A cube is interesting
@@ -144,7 +144,7 @@ and add it to the `BufferGeometry`.
       new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 ```
 
-Note that the names are sigificant. You must name your attributes the names
+Note that the names are significant. You must name your attributes the names
 that match what three.js expects (unless you are creating a custom shader).
 In this case `position`, `normal`, and `uv`. If you want vertex colors then
 name your attribute `color`.

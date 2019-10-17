@@ -124,7 +124,7 @@ export those files to by picking **File->External Data->Unpack All Into Files**
 
 <div class="threejs_center"><img style="width: 828px;" src="resources/images/windmill-export-textures.jpg"></div>
 
-and then chosing **Write Files to Current Directory**
+and then choosing **Write Files to Current Directory**
 
 <div class="threejs_center"><img style="width: 828px;" src="resources/images/windmill-overwrite.jpg"></div>
 
@@ -634,7 +634,7 @@ Loading models often runs into these kinds of issues. Common issues include:
 
 * Needing to know the size
 
-  Above we made the camera try to frame the scene but that's not always the approriate thing to do. Generally the most approriate thing
+  Above we made the camera try to frame the scene but that's not always the appropriate thing to do. Generally the most appropriate thing
   to do is to make your own models or download the models, load them up in some 3D software and look at their scale and adjust if need be.
 
 * Orientation Wrong
@@ -655,7 +655,7 @@ Loading models often runs into these kinds of issues. Common issues include:
 
 * Textures too large
 
-  Most 3D models are made for either architecture, movies and commericals, or
+  Most 3D models are made for either architecture, movies and commercials, or
   games. For architecture and movies no one really cares about the size
   of the textures since. For games people care because games have limited
   memory but most games run locally. Webpages though you want to load
@@ -668,7 +668,7 @@ Loading models often runs into these kinds of issues. Common issues include:
   textures take memory so a 50k JPG that expands to 4096x4096 will download
   fast but still take a ton of memory.
 
-The last thing I wanted to show is spinning the windmills. Unfortunately, .OBJ files have no hirerarchy. That means all parts of each
+The last thing I wanted to show is spinning the windmills. Unfortunately, .OBJ files have no hierarchy. That means all parts of each
 windmill are basically considered 1 single mesh. You can't spin the blades of the mill as they aren't separated from the rest of the building.
 
 This is one of the main reasons why .OBJ is not really a good format. If I was to guess, the reason it's more common than other formats

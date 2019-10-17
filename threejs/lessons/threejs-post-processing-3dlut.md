@@ -281,7 +281,7 @@ Let's set the size to 16 and then click save the file which gives us this file.
 
 <div class="threejs_center"><img src="resources/images/identity-lut-s16.png"></div>
 
-We also need to capture an image of the thing we want to apply the LUT to, in this case the scene we created above before applying any effects. Note that normally we could right click on the scene above and pick "Save As..." but the `OrbitControls` might be preventing right clicking depnding on your OS. In my case I used my OSes screen capture feature to get a screenshot.
+We also need to capture an image of the thing we want to apply the LUT to, in this case the scene we created above before applying any effects. Note that normally we could right click on the scene above and pick "Save As..." but the `OrbitControls` might be preventing right clicking depending on your OS. In my case I used my OSes screen capture feature to get a screenshot.
 
 <div class="threejs_center"><img src="resources/images/3dlut-screen-capture.jpg" style="width: 600px"></div>
 

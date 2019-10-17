@@ -149,7 +149,7 @@ const sceneInfo2 = setupScene2();
 `Renderer.setViewport` и `Renderer.setScissor`.
 
 ```js
-function rendenerSceneInfo(sceneInfo) {
+function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 
   // получаем относительную позицию окна просмотра этого элемента
@@ -193,8 +193,8 @@ function render(time) {
   sceneInfo1.mesh.rotation.y = time * .1;
   sceneInfo2.mesh.rotation.y = time * .1;
 
-  rendenerSceneInfo(sceneInfo1);
-  rendenerSceneInfo(sceneInfo2);
+  renderSceneInfo(sceneInfo1);
+  renderSceneInfo(sceneInfo2);
 
   requestAnimationFrame(render);
 }

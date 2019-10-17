@@ -208,7 +208,7 @@ canvas.addEventListener('touchstart', (event) => {
   event.preventDefault();
   lastTouch = event.touches[0];
 }, {passive: false});
-canvas.addEventListener('touchsmove', (event) => {
+canvas.addEventListener('touchmove', (event) => {
   lastTouch = event.touches[0];
 });
 canvas.addEventListener('touchend', () => {
@@ -671,7 +671,7 @@ canvas.addEventListener('touchstart', (event) => {
   lastTouch = event.touches[0];
 +  recordStartTimeAndPosition(event.touches[0]);
 }, {passive: false});
-canvas.addEventListener('touchsmove', (event) => {
+canvas.addEventListener('touchmove', (event) => {
   lastTouch = event.touches[0];
 });
 ```

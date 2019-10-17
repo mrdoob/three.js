@@ -2,7 +2,7 @@ Title: Three.js Render Targets
 Description: How to render to a texture.
 TOC: Render Targets
 
-A render target in three.js is basicaly a texture you can render to.
+A render target in three.js is basically a texture you can render to.
 After you render to it you can use that texture like any other texture.
 
 Let's make a simple example. We'll start with an example from [the article on responsiveness](threejs-responsive.html).
@@ -140,7 +140,7 @@ A few notes about using `WebGLRenderTarget`.
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
             camera.updateProjectionMatrix();
 
-        +    renderTaret.setSize(canvas.width, canvas.height);
+        +    renderTarget.setSize(canvas.width, canvas.height);
         +    rtCamera.aspect = camera.aspect;
         +    rtCamera.updateProjectionMatrix();
           }

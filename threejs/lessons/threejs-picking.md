@@ -122,7 +122,7 @@ class PickHelper {
 
 You can see we create a `RayCaster` and then we can call the `pick` function to cast a ray through the scene. If the ray hits something we change the color of the first thing it hits.
 
-Of course we could call this function only when the user pressed the mouse *down* which is probaby usually what you want but for this example we'll pick every frame whatever is under the mouse. To do this we first need to track where the mouse
+Of course we could call this function only when the user pressed the mouse *down* which is probably usually what you want but for this example we'll pick every frame whatever is under the mouse. To do this we first need to track where the mouse
 is
 
 ```js
@@ -159,7 +159,7 @@ window.addEventListener('mouseout', clearPickPosition);
 window.addEventListener('mouseleave', clearPickPosition);
 ```
 
-Notice we're recording a normalized mouse position. Reguardless of the size of the canvas we need a value that goes from -1 on the left to +1 on the right. Similarly we need a value that goes from -1 on the bottom to +1 on the top.
+Notice we're recording a normalized mouse position. Regardless of the size of the canvas we need a value that goes from -1 on the left to +1 on the right. Similarly we need a value that goes from -1 on the bottom to +1 on the top.
 
 While we're at it lets support mobile as well
 

@@ -166,7 +166,7 @@ for (let i = 0; i < numSpheres; ++i) {
 }
 ```
 
-We setup 2 lights. One is a `HemisphereLight` with the itensity set to 2 to really
+We setup 2 lights. One is a `HemisphereLight` with the intensity set to 2 to really
 brighten things up.
 
 ```js
@@ -179,7 +179,7 @@ brighten things up.
 }
 ```
 
-The other is a `DirectionalLight` so the spheres get some defintion
+The other is a `DirectionalLight` so the spheres get some definition
 
 ```js
 {
@@ -244,7 +244,7 @@ appears to also use this kind of shadow for the main character.
 So, moving on to shadow maps, there are 3 lights which can cast shadows. The `DirectionalLight`,
 the `PointLight`, and the `SpotLight`.
 
-Let's start with the `DirectionaLight` with the helper example from [the lights article](threejs-lights.html).
+Let's start with the `DirectionalLight` with the helper example from [the lights article](threejs-lights.html).
 
 The first thing we need to do is turn on shadows in the renderer.
 
@@ -448,7 +448,7 @@ also blur the result
 
 
 And finally there's shadows with a `PointLight`. Since a `PointLight`
-shines in all directions the only relevent settings are `near` and `far`.
+shines in all directions the only relevant settings are `near` and `far`.
 Otherwise the `PointLight` shadow is effectively 6 `SpotLight` shadows
 each one pointing to the face of a cube around the light. This means
 `PointLight` shadows are much slower since the entire scene must be

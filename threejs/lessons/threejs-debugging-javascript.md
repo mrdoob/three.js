@@ -46,7 +46,7 @@ Similarly with Safari you can
 [use your computer to debug webpages running on Safari on iPhones and iPads](https://www.google.com/search?q=safari+remote+debugging+ios).
 
 I'm most familiar with Chrome so this guide will be using Chrome
-as an example when refering to tools but most browsers have similar
+as an example when referring to tools but most browsers have similar
 features so it should be easy to apply anything here to all browsers.
 
 ## Turn off the cache
@@ -351,7 +351,7 @@ there is no debug info but if we use this url:
 
 there is debug info.
 
-Multiple paramters can be passed in by separating with '&' as in `somepage.html?someparam=somevalue&someotherparam=someothervalue`. 
+Multiple parameters can be passed in by separating with '&' as in `somepage.html?someparam=somevalue&someotherparam=someothervalue`. 
 Using parameters like this we can pass in all kinds of options. Maybe `speed=0.01` to slow down our app for making it easier to understand something or `showHelpers=true` for whether or not to add helpers
 that show the lights, shadow, or camera frustum seen in other lessons.
 
