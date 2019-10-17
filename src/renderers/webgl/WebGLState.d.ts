@@ -78,6 +78,7 @@ export class WebGLState {
 	setScissorTest( scissorTest: boolean ): void;
 	activeTexture( webglSlot: number ): void;
 	bindTexture( webglType: number, webglTexture: any ): void;
+	unbindTexture(): void;
 	// Same interface as https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/compressedTexImage2D
 	compressedTexImage2D(
 		target: number,

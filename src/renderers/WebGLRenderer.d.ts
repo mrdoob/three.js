@@ -418,6 +418,13 @@ export class WebGLRenderer implements Renderer {
 	copyTextureToTexture( position: Vector2, srcTexture: Texture, dstTexture: Texture, level?: number ): void;
 
 	/**
+	 * Initializes the given texture. Can be used to preload a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).
+	 *
+	 * @param texture The texture to Initialize.
+	 */
+	initTexture( texture: Texture ): void;
+
+	/**
 	 * @deprecated
 	 */
 	gammaFactor: number;
