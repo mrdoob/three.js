@@ -20,6 +20,6 @@ export class ShapePath {
 		aY: number
 	): void;
 	splineThru( pts: Vector2[] ): void;
-	toShapes( isCCW: boolean, noHoles: any ): Shape[];
+	toShapes( isCCW: boolean, noHoles?: boolean ): Shape[];
 
 }
