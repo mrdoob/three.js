@@ -326,6 +326,41 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
       },
       nonBuffer: false,
     },
+    Points: {
+      create() {
+        const radius = 7;
+        const widthSegments = 12;
+        const heightSegments = 8;
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const material = new THREE.PointsMaterial({
+            color: 'red',
+            size: 0.2,
+        });
+        const points = new THREE.Points(geometry, material);
+        return {
+          showLines: false,
+          mesh: points,
+        };
+      },
+    },
+    PointsUniformSize: {
+      create() {
+        const radius = 7;
+        const widthSegments = 12;
+        const heightSegments = 8;
+        const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+        const material = new THREE.PointsMaterial({
+            color: 'red',
+            size: 3 * window.devicePixelRatio,
+            sizeAttenuation: false,
+        });
+        const points = new THREE.Points(geometry, material);
+        return {
+          showLines: false,
+          mesh: points,
+        };
+      },
+    },
     SphereBufferGeometryLow: {
       create() {
         const radius = 7;
@@ -493,31 +528,36 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
       const root = new THREE.Object3D();
 
-      const boxGeometry = geometryInfo.geometry || geometryInfo.lineGeometry;
-      boxGeometry.computeBoundingBox();
-      const centerOffset = new THREE.Vector3();
-      boxGeometry.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
+      if (geometry.mesh) {
+        root.add(geometry.mesh);
+      } else {
+        const boxGeometry = geometryInfo.geometry || geometryInfo.lineGeometry;
+        boxGeometry.computeBoundingBox();
+        const centerOffset = new THREE.Vector3();
+        boxGeometry.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
 
-      if (geometryInfo.geometry) {
-        const material = new THREE.MeshPhongMaterial({
-          flatShading: info.flatShading === false ? false : true,
-          side: THREE.DoubleSide,
-        });
-        material.color.setHSL(Math.random(), .5, .5);
-        const mesh = new THREE.Mesh(geometryInfo.geometry, material);
-        mesh.position.copy(centerOffset);
-        root.add(mesh);
-      }
-      if (info.showLines !== false) {
-        const lineMesh = new THREE.LineSegments(
-          geometryInfo.lineGeometry || geometryInfo.geometry,
-          new THREE.LineBasicMaterial({
-            color: geometryInfo.geometry ? 0xffffff : colors.lines,
-            transparent: true,
-            opacity: 0.5,
-          }));
-        lineMesh.position.copy(centerOffset);
-        root.add(lineMesh);
+        if (geometryInfo.geometry) {
+          const material = new THREE.MeshPhongMaterial({
+            flatShading: info.flatShading === false ? false : true,
+            side: THREE.DoubleSide,
+          });
+          material.color.setHSL(Math.random(), .5, .5);
+          const mesh = new THREE.Mesh(geometryInfo.geometry, material);
+          mesh.position.copy(centerOffset);
+          root.add(mesh);
+        }
+ 
+        if (info.showLines !== false) {
+          const lineMesh = new THREE.LineSegments(
+            geometryInfo.lineGeometry || geometryInfo.geometry,
+            new THREE.LineBasicMaterial({
+              color: geometryInfo.geometry ? 0xffffff : colors.lines,
+              transparent: true,
+              opacity: 0.5,
+            }));
+          lineMesh.position.copy(centerOffset);
+          root.add(lineMesh);
+        }
       }
 
       threejsLessonUtils.addDiagram(elem, {create: () => root});

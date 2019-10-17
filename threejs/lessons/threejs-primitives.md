@@ -291,6 +291,46 @@ and it's best to [look in the documentation](https://threejs.org/docs/) for all 
 repeat them here. You can also click the links above next to each shape
 to take you directly to the docs for that shape.
 
+There is one other pair of classes that doesn't really fit the patterns above. Those are
+the `PointsMaterial` and the `Points` class. `Points` is like `LineSegments` above in that it takes a
+a `Geometry` or `BufferGeometry` but draws points at each vertex instead of lines.
+To use it you also need to pass it a `PointsMaterial` which
+take a [`size`](PointsMaterial.size) for how large to make the points.
+
+```js
+const radius = 7;
+const widthSegments = 12;
+const heightSegments = 8;
+const geometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments);
+const material = new THREE.PointsMaterial({
+    color: 'red',
+    size: 0.2,     // in world units
+});
+const points = new THREE.Points(geometry, material);
+scene.add(points);
+```
+
+<div class="spread">
+<div data-diagram="Points"></div>
+</div>
+
+You can turn off [`sizeAttenuation`](PointsMaterial.sizeAttenuation) by setting it to false if you want the points to
+be the same size regardless of their distance from the camera.
+
+```js
+const material = new THREE.PointsMaterial({
+    color: 'red',
++    sizeAttenuation: false,
++    size: 3,       // in pixels
+-    size: 0.2,     // in world units
+});
+...
+```
+
+<div class="spread">
+<div data-diagram="PointsUniformSize"></div>
+</div>
+
 One other thing that's important to cover is that almost all shapes
 have various settings for how much to subdivide them. A good example
 might be the sphere geometries. Spheres take parameters for
@@ -344,6 +384,12 @@ So, choose whatever is appropriate for your situation. The less
 subdivisions you choose the more likely things will run smoothly and the less
 memory they'll take. You'll have to decide for yourself what the correct
 tradeoff is for your particular situation.
+
+If none of the shapes above fit your use case you can load
+geometry for example from a [.obj file](threejs-load-obj.html)
+or a [.gltf file](threejs-load-gltf.html). 
+You can also create your own [custom Geometry](threejs-custom-geometry.html) 
+or [custom BufferGeometry](threejs-custom-buffergeometry.html).
 
 Next up let's go over [how three's scene graph works and how
 to use it](threejs-scenegraph.html).
