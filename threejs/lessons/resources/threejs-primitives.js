@@ -546,7 +546,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
           mesh.position.copy(centerOffset);
           root.add(mesh);
         }
- 
+
         if (info.showLines !== false) {
           const lineMesh = new THREE.LineSegments(
             geometryInfo.lineGeometry || geometryInfo.geometry,
