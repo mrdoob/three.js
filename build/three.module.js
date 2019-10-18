@@ -14128,9 +14128,9 @@ var map_fragment = "#ifdef USE_MAP\n\tvec4 texelColor = texture2D( map, vUv );\n
 
 var map_pars_fragment = "#ifdef USE_MAP\n\tuniform sampler2D map;\n#endif";
 
-var map_particle_fragment = "#ifdef USE_MAP\n\tvec2 uv = ( uvTransform * vec3( gl_PointCoord.x, 1.0 - gl_PointCoord.y, 1 ) ).xy;\n\tvec4 mapTexel = texture2D( map, uv );\n\tdiffuseColor *= mapTexelToLinear( mapTexel );\n#endif";
+var map_particle_fragment = "#if defined( USE_MAP ) || defined( USE_ALPHAMAP )\n\tvec2 uv = ( uvTransform * vec3( gl_PointCoord.x, 1.0 - gl_PointCoord.y, 1 ) ).xy;\n#endif\n#ifdef USE_MAP\n\tvec4 mapTexel = texture2D( map, uv );\n\tdiffuseColor *= mapTexelToLinear( mapTexel );\n#endif\n#ifdef USE_ALPHAMAP\n\tdiffuseColor.a *= texture2D( alphaMap, uv ).g;\n#endif";
 
-var map_particle_pars_fragment = "#ifdef USE_MAP\n\tuniform mat3 uvTransform;\n\tuniform sampler2D map;\n#endif";
+var map_particle_pars_fragment = "#if defined( USE_MAP ) || defined( USE_ALPHAMAP )\n\tuniform mat3 uvTransform;\n#endif\n#ifdef USE_MAP\n\tuniform sampler2D map;\n#endif\n#ifdef USE_ALPHAMAP\n\tuniform sampler2D alphaMap;\n#endif";
 
 var metalnessmap_fragment = "float metalnessFactor = metalness;\n#ifdef USE_METALNESSMAP\n\tvec4 texelMetalness = texture2D( metalnessMap, vUv );\n\tmetalnessFactor *= texelMetalness.b;\n#endif";
 
@@ -14573,6 +14573,7 @@ var UniformsLib = {
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
+		alphaMap: { value: null },
 		uvTransform: { value: new Matrix3() }
 
 	},
@@ -20734,6 +20735,21 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	}
 
+	function unbindTexture() {
+
+		var boundTexture = currentBoundTextures[ currentTextureSlot ];
+
+		if ( boundTexture !== undefined && boundTexture.type !== undefined ) {
+
+			gl.bindTexture( boundTexture.type, null );
+
+			boundTexture.type = undefined;
+			boundTexture.texture = undefined;
+
+		}
+
+	}
+
 	function compressedTexImage2D() {
 
 		try {
@@ -20866,6 +20882,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		activeTexture: activeTexture,
 		bindTexture: bindTexture,
+		unbindTexture: unbindTexture,
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
@@ -25562,17 +25579,43 @@ function WebGLRenderer( parameters ) {
 		uniforms.size.value = material.size * _pixelRatio;
 		uniforms.scale.value = _height * 0.5;
 
-		uniforms.map.value = material.map;
+		if ( material.map ) {
 
-		if ( material.map !== null ) {
+			uniforms.map.value = material.map;
 
-			if ( material.map.matrixAutoUpdate === true ) {
+		}
 
-				material.map.updateMatrix();
+		if ( material.alphaMap ) {
+
+			uniforms.alphaMap.value = material.alphaMap;
+
+		}
+
+		// uv repeat and offset setting priorities
+		// 1. color map
+		// 2. alpha map
+
+		var uvScaleMap;
+
+		if ( material.map ) {
+
+			uvScaleMap = material.map;
+
+		} else if ( material.alphaMap ) {
+
+			uvScaleMap = material.alphaMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			if ( uvScaleMap.matrixAutoUpdate === true ) {
+
+				uvScaleMap.updateMatrix();
 
 			}
 
-			uniforms.uvTransform.value.copy( material.map.matrix );
+			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 
@@ -26074,13 +26117,18 @@ function WebGLRenderer( parameters ) {
 
 	this.copyFramebufferToTexture = function ( position, texture, level ) {
 
-		var width = texture.image.width;
-		var height = texture.image.height;
+		if ( level === undefined ) level = 0;
+
+		var levelScale = Math.pow( 2, - level );
+		var width = Math.floor( texture.image.width * levelScale );
+		var height = Math.floor( texture.image.height * levelScale );
 		var glFormat = utils.convert( texture.format );
 
 		textures.setTexture2D( texture, 0 );
 
-		_gl.copyTexImage2D( 3553, level || 0, glFormat, position.x, position.y, width, height, 0 );
+		_gl.copyTexImage2D( 3553, level, glFormat, position.x, position.y, width, height, 0 );
+
+		state.unbindTexture();
 
 	};
 
@@ -26102,6 +26150,16 @@ function WebGLRenderer( parameters ) {
 			_gl.texSubImage2D( 3553, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
 
 		}
+
+		state.unbindTexture();
+
+	};
+
+	this.initTexture = function ( texture ) {
+
+		textures.setTexture2D( texture, 0 );
+
+		state.unbindTexture();
 
 	};
 
@@ -27549,6 +27607,7 @@ LineLoop.prototype = Object.assign( Object.create( Line.prototype ), {
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
+ *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  size: <float>,
  *  sizeAttenuation: <bool>
@@ -27566,6 +27625,8 @@ function PointsMaterial( parameters ) {
 	this.color = new Color( 0xffffff );
 
 	this.map = null;
+
+	this.alphaMap = null;
 
 	this.size = 1;
 	this.sizeAttenuation = true;
@@ -27588,6 +27649,8 @@ PointsMaterial.prototype.copy = function ( source ) {
 	this.color.copy( source.color );
 
 	this.map = source.map;
+
+	this.alphaMap = source.alphaMap;
 
 	this.size = source.size;
 	this.sizeAttenuation = source.sizeAttenuation;
@@ -28098,6 +28161,16 @@ function ParametricGeometry( func, slices, stacks ) {
 ParametricGeometry.prototype = Object.create( Geometry.prototype );
 ParametricGeometry.prototype.constructor = ParametricGeometry;
 
+ParametricGeometry.prototype.toJSON = function () {
+
+	var data = Geometry.prototype.toJSON.call( this );
+
+	data.func = this.parameters.func.toString();
+
+	return data;
+
+};
+
 // ParametricBufferGeometry
 
 function ParametricBufferGeometry( func, slices, stacks ) {
@@ -28223,6 +28296,16 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
+
+ParametricBufferGeometry.prototype.toJSON = function () {
+
+	var data = BufferGeometry.prototype.toJSON.call( this );
+
+	data.func = this.parameters.func.toString();
+
+	return data;
+
+};
 
 /**
  * @author clockworkgeek / https://github.com/clockworkgeek
@@ -32381,7 +32464,6 @@ CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
 
 var Geometries = /*#__PURE__*/Object.freeze({
-	__proto__: null,
 	WireframeGeometry: WireframeGeometry,
 	ParametricGeometry: ParametricGeometry,
 	ParametricBufferGeometry: ParametricBufferGeometry,
@@ -33295,7 +33377,6 @@ LineDashedMaterial.prototype.copy = function ( source ) {
 
 
 var Materials = /*#__PURE__*/Object.freeze({
-	__proto__: null,
 	ShadowMaterial: ShadowMaterial,
 	SpriteMaterial: SpriteMaterial,
 	RawShaderMaterial: RawShaderMaterial,
@@ -37530,7 +37611,6 @@ SplineCurve.prototype.fromJSON = function ( json ) {
 
 
 var Curves = /*#__PURE__*/Object.freeze({
-	__proto__: null,
 	ArcCurve: ArcCurve,
 	CatmullRomCurve3: CatmullRomCurve3,
 	CubicBezierCurve: CubicBezierCurve,
@@ -39707,6 +39787,19 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						geometry = new Geometries[ data.type ](
 							geometryShapes,
 							data.options
+						);
+
+						break;
+
+					case 'ParametricGeometry':
+					case 'ParametricBufferGeometry':
+
+						var func = new Function( 'return ' + data.func )();
+
+						geometry = new Geometries[ data.type ](
+							func,
+							data.slices,
+							data.stacks
 						);
 
 						break;
@@ -45111,7 +45204,7 @@ Object.assign( Raycaster.prototype, {
  * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
  *
  * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
- * The azimuthal angle (theta) is measured from the positive z-axiz.
+ * The azimuthal angle (theta) is measured from the positive z-axis.
  */
 
 function Spherical( radius, phi, theta ) {
