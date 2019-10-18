@@ -78,8 +78,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					} )
 				);
 
-				boxMesh.geometry.removeAttribute( 'normal' );
-				boxMesh.geometry.removeAttribute( 'uv' );
+				boxMesh.geometry.deleteAttribute( 'normal' );
+				boxMesh.geometry.deleteAttribute( 'uv' );
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -137,7 +137,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					} )
 				);
 
-				planeMesh.geometry.removeAttribute( 'normal' );
+				planeMesh.geometry.deleteAttribute( 'normal' );
 
 				// enable code injection for non-built-in material
 				Object.defineProperty( planeMesh.material, 'map', {

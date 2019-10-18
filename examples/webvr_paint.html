@@ -147,15 +147,15 @@
 
 				var positions = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
 				positions.usage = THREE.DynamicDrawUsage;
-				geometry.addAttribute( 'position', positions );
+				geometry.setAttribute( 'position', positions );
 
 				var normals = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
 				normals.usage = THREE.DynamicDrawUsage;
-				geometry.addAttribute( 'normal', normals );
+				geometry.setAttribute( 'normal', normals );
 
 				var colors = new THREE.BufferAttribute( new Float32Array( 1000000 * 3 ), 3 );
 				colors.usage = THREE.DynamicDrawUsage;
-				geometry.addAttribute( 'color', colors );
+				geometry.setAttribute( 'color', colors );
 
 				geometry.drawRange.count = 0;
 

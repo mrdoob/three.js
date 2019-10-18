@@ -175,7 +175,7 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 		function addObject( vertex, extruding ) {
 
 			var geometry = new THREE.BufferGeometry();
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertex, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertex, 3 ) );
 
 			var segments = new THREE.LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;

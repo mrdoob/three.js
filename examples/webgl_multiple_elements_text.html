@@ -147,8 +147,8 @@
 
 					}
 
-					geometry0.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-					geometry1.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices.slice(), 3 ) );
+					geometry0.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+					geometry1.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices.slice(), 3 ) );
 
 					var index = Math.floor( colors.length * Math.random() );
 

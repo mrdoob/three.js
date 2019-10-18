@@ -116,23 +116,23 @@ AssimpJSONLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 			if ( normals.length > 0 ) {
 
-				geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			}
 
 			if ( uvs.length > 0 ) {
 
-				geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 			}
 
 			if ( colors.length > 0 ) {
 
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 			}
 

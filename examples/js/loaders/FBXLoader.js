@@ -1592,19 +1592,19 @@ THREE.FBXLoader = ( function () {
 
 			preTransform.applyToBufferAttribute( positionAttribute );
 
-			geo.addAttribute( 'position', positionAttribute );
+			geo.setAttribute( 'position', positionAttribute );
 
 			if ( buffers.colors.length > 0 ) {
 
-				geo.addAttribute( 'color', new THREE.Float32BufferAttribute( buffers.colors, 3 ) );
+				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( buffers.colors, 3 ) );
 
 			}
 
 			if ( skeleton ) {
 
-				geo.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
+				geo.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
 
-				geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
+				geo.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
 
 				// used later to bind the skeleton to the model
 				geo.FBX_Deformer = skeleton;
@@ -1618,7 +1618,7 @@ THREE.FBXLoader = ( function () {
 				var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
 				normalMatrix.applyToBufferAttribute( normalAttribute );
 
-				geo.addAttribute( 'normal', normalAttribute );
+				geo.setAttribute( 'normal', normalAttribute );
 
 			}
 
@@ -1634,7 +1634,7 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				geo.addAttribute( name, new THREE.Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
+				geo.setAttribute( name, new THREE.Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
 
 			} );
 
@@ -2306,7 +2306,7 @@ THREE.FBXLoader = ( function () {
 			} );
 
 			var geometry = new THREE.BufferGeometry();
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 			return geometry;
 

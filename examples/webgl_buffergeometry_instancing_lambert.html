@@ -238,9 +238,9 @@
 
 			}
 
-			geometry.addAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
-			geometry.addAttribute( 'instanceColor', new THREE.InstancedBufferAttribute( colors, 3 ) );
-			geometry.addAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
+			geometry.setAttribute( 'instanceOffset', new THREE.InstancedBufferAttribute( offsets, 3 ) );
+			geometry.setAttribute( 'instanceColor', new THREE.InstancedBufferAttribute( colors, 3 ) );
+			geometry.setAttribute( 'instanceScale', new THREE.InstancedBufferAttribute( scales, 1 ) );
 
 
 			// material
