@@ -4,7 +4,7 @@ vec3 diffuse = vec3( 1.0 );
 GeometricContext geometry;
 geometry.position = mvPosition.xyz;
 geometry.normal = normalize( transformedNormal );
-geometry.viewDir = normalize( -mvPosition.xyz );
+geometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( -mvPosition.xyz );
 
 GeometricContext backGeometry;
 backGeometry.position = geometry.position;

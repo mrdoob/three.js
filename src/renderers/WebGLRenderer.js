@@ -1785,6 +1785,16 @@ function WebGLRenderer( parameters ) {
 				material.isMeshLambertMaterial ||
 				material.isMeshBasicMaterial ||
 				material.isMeshStandardMaterial ||
+				material.isShaderMaterial ) {
+
+				p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
+
+			}
+
+			if ( material.isMeshPhongMaterial ||
+				material.isMeshLambertMaterial ||
+				material.isMeshBasicMaterial ||
+				material.isMeshStandardMaterial ||
 				material.isShaderMaterial ||
 				material.skinning ) {
 
