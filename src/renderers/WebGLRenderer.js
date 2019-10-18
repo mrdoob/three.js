@@ -2730,6 +2730,8 @@ function WebGLRenderer( parameters ) {
 
 		_gl.copyTexImage2D( _gl.TEXTURE_2D, level, glFormat, position.x, position.y, width, height, 0 );
 
+		state.unbindTexture();
+
 	};
 
 	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level ) {
@@ -2750,6 +2752,16 @@ function WebGLRenderer( parameters ) {
 			_gl.texSubImage2D( _gl.TEXTURE_2D, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
 
 		}
+
+		state.unbindTexture();
+
+	};
+
+	this.initTexture = function ( texture ) {
+
+		textures.setTexture2D( texture, 0 );
+
+		state.unbindTexture();
 
 	};
 

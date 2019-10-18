@@ -46,7 +46,7 @@
 		[page:String powerPreference] - 提示用户代理怎样的配置更适用于当前WebGL环境。 可能是*"high-performance"*, *"low-power"* 或 *"default"*。默认是*"default"*.
 		详见[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec]<br />
 
-		
+
 		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
 		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
 
@@ -351,6 +351,9 @@
 
 		<h3>[method:Object getSize]()</h3>
 		<p>返回包含渲染器输出canvas的宽度和高度(单位像素)的对象。</p>
+
+		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
+		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
 
 		<h3>[method:null resetGLState]( )</h3>
 		<p>将GL状态重置为默认值。WebGL环境丢失时会内部调用</p>
