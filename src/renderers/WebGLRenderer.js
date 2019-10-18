@@ -1753,6 +1753,8 @@ function WebGLRenderer( parameters ) {
 
 				_currentCamera = camera;
 
+				p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
+
 				// lighting uniforms depend on the camera so enforce an update
 				// now, in case this material supports lights - or later, when
 				// the next material that does gets activated:
