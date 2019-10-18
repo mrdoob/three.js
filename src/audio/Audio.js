@@ -32,6 +32,9 @@ function Audio( listener ) {
 	this.hasPlaybackControl = true;
 	this.sourceType = 'empty';
 
+	this._timeAtStart = 0;
+	this._timeAtPause = 0;
+
 	this.filters = [];
 
 }
@@ -108,13 +111,14 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var source = this.context.createBufferSource();
 
+		this._timeAtStart = this.startTime + this.context.currentTime;
+
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.loopStart = this.loopStart;
 		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
-		this.startTime = this.context.currentTime;
-		source.start( this.startTime, this.offset, this.duration );
+		source.start( this._timeAtStart, this.offset + this._timeAtPause, this.duration );
 
 		this.isPlaying = true;
 
@@ -138,9 +142,11 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
+			this._timeAtPause = ( this.context.currentTime - this._timeAtStart ) * this.playbackRate;
+
 			this.source.stop();
 			this.source.onended = null;
-			this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+
 			this.isPlaying = false;
 
 		}
@@ -158,9 +164,10 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this._timeAtPause = 0;
+
 		this.source.stop();
 		this.source.onended = null;
-		this.offset = 0;
 		this.isPlaying = false;
 
 		return this;
