@@ -170,18 +170,18 @@
 manager.addHandler( /\.tga$/i, new TGALoader() );
 		</code>
 
-		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
-		<p>
-		[page:Object regex] — A regular expression.
-		<p>
-		Removes the loader for the given regular expression.
-		</p>
-
 		<h3>[method:null getHandler]( [param:String file] )</h3>
 		<p>
 		[page:String file] — The file path.
 		<p>
 		Can be used to retrieve the registered loader for the given file path.
+		</p>
+
+		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.
+		<p>
+		Removes the loader for the given regular expression.
 		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
@@ -219,7 +219,6 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 
 		任何使用管理器的加载器都会调用此方法， 当加载器需要加载URL结束时。
 		</p>
-
 
 		<h3>[method:null itemError]( [param:String url] )</h3>
 		<p>
