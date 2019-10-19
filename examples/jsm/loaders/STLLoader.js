@@ -58,9 +58,9 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	LoaderUtils,
 	Vector3
 } from "../../../build/three.module.js";
@@ -68,11 +68,11 @@ import {
 
 var STLLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-STLLoader.prototype = {
+STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: STLLoader,
 
@@ -100,13 +100,6 @@ STLLoader.prototype = {
 			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -257,12 +250,12 @@ STLLoader.prototype = {
 
 			}
 
-			geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			if ( hasColors ) {
 
-				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 				geometry.hasColors = true;
 				geometry.alpha = alpha;
 
@@ -351,8 +344,8 @@ STLLoader.prototype = {
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			if ( groupCount > 0 ) {
 
@@ -409,6 +402,6 @@ STLLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { STLLoader };

@@ -7,8 +7,6 @@ Sidebar.Geometry.TetrahedronGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var signals = editor.signals;
-
 	var container = new UI.Row();
 
 	var geometry = object.geometry;
@@ -43,8 +41,6 @@ Sidebar.Geometry.TetrahedronGeometry = function ( editor, object ) {
 			radius.getValue(),
 			detail.getValue()
 		) ) );
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

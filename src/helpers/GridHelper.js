@@ -37,8 +37,8 @@ function GridHelper( size, divisions, color1, color2 ) {
 	}
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 	var material = new LineBasicMaterial( { vertexColors: VertexColors } );
 

@@ -11,7 +11,6 @@ import {
 	Color,
 	ConeBufferGeometry,
 	CylinderBufferGeometry,
-	DefaultLoadingManager,
 	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
@@ -19,6 +18,7 @@ import {
 	Group,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	LoaderUtils,
 	Mesh,
 	MeshBasicMaterial,
@@ -52,21 +52,19 @@ var VRMLLoader = ( function () {
 
 	function VRMLLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	VRMLLoader.prototype = {
+	VRMLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: VRMLLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new FileLoader( this.manager );
 			loader.setPath( scope.path );
@@ -75,27 +73,6 @@ var VRMLLoader = ( function () {
 				onLoad( scope.parse( text, path ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -1285,7 +1262,7 @@ var VRMLLoader = ( function () {
 			function buildIndexedFaceSetNode( node ) {
 
 				var color, coord, normal, texCoord;
-				var ccw = true, solid = true, creaseAngle;
+				var ccw = true, solid = true, creaseAngle = 0;
 				var colorIndex, coordIndex, normalIndex, texCoordIndex;
 				var colorPerVertex = true, normalPerVertex = true;
 
@@ -1522,13 +1499,13 @@ var VRMLLoader = ( function () {
 				var geometry = new BufferGeometry();
 				positionAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new Float32BufferAttribute( coord, 3 ) );
 
-				geometry.addAttribute( 'position', positionAttribute );
-				geometry.addAttribute( 'normal', normalAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'normal', normalAttribute );
 
 				// optional attributes
 
-				if ( colorAttribute ) geometry.addAttribute( 'color', colorAttribute );
-				if ( uvAttribute ) geometry.addAttribute( 'uv', uvAttribute );
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
+				if ( uvAttribute ) geometry.setAttribute( 'uv', uvAttribute );
 
 				// "solid" influences the material so let's store it for later use
 
@@ -1649,9 +1626,9 @@ var VRMLLoader = ( function () {
 				var geometry = new BufferGeometry();
 
 				var positionAttribute = toNonIndexedAttribute( expandedLineIndex, new Float32BufferAttribute( coord, 3 ) );
-				geometry.addAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
 
-				if ( colorAttribute ) geometry.addAttribute( 'color', colorAttribute );
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
 
 				geometry._type = 'line';
 
@@ -1705,8 +1682,8 @@ var VRMLLoader = ( function () {
 
 				var geometry = new BufferGeometry();
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( coord, 3 ) );
-				if ( color ) geometry.addAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+				geometry.setAttribute( 'position', new Float32BufferAttribute( coord, 3 ) );
+				if ( color ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
 
 				geometry._type = 'points';
 
@@ -2218,13 +2195,21 @@ var VRMLLoader = ( function () {
 
 			function weightedNormal( normals, vector, creaseAngle ) {
 
-				var normal = vector.clone();
+				var normal = new Vector3();
 
-				for ( var i = 0, l = normals.length; i < l; i ++ ) {
+				if ( creaseAngle === 0 ) {
 
-					if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+					normal.copy( vector );
 
-						normal.add( normals[ i ] );
+				} else {
+
+					for ( var i = 0, l = normals.length; i < l; i ++ ) {
+
+						if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+
+							normal.add( normals[ i ] );
+
+						}
 
 					}
 
@@ -2358,7 +2343,7 @@ var VRMLLoader = ( function () {
 
 				}
 
-				geometry.addAttribute( 'color', colorAttribute );
+				geometry.setAttribute( 'color', colorAttribute );
 
 			}
 
@@ -2387,7 +2372,7 @@ var VRMLLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	function VRMLLexer( tokens ) {
 

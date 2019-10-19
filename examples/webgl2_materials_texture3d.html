@@ -44,7 +44,7 @@
 
 			// Create renderer
 			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( 'webgl2' );
+			var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
 			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -91,7 +91,6 @@
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
-				texture.needsUpdate = true;
 
 				// Colormap textures
 				cmtextures = {

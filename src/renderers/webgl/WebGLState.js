@@ -7,6 +7,8 @@ import { Vector4 } from '../../math/Vector4.js';
 
 function WebGLState( gl, extensions, utils, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	function ColorBuffer() {
 
 		var locked = false;
@@ -438,9 +440,9 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-			var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
+			var extension = isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
 
-			extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+			extension[ isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
@@ -685,7 +687,8 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		stencilBuffer.setTest( stencilWrite );
 		if ( stencilWrite ) {
 
-			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilMask );
+			stencilBuffer.setMask( material.stencilWriteMask );
+			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
 			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
 
 		}
@@ -842,6 +845,21 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	}
 
+	function unbindTexture() {
+
+		var boundTexture = currentBoundTextures[ currentTextureSlot ];
+
+		if ( boundTexture !== undefined && boundTexture.type !== undefined ) {
+
+			gl.bindTexture( boundTexture.type, null );
+
+			boundTexture.type = undefined;
+			boundTexture.texture = undefined;
+
+		}
+
+	}
+
 	function compressedTexImage2D() {
 
 		try {
@@ -974,6 +992,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		activeTexture: activeTexture,
 		bindTexture: bindTexture,
+		unbindTexture: unbindTexture,
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,

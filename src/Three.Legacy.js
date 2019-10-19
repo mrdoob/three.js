@@ -5,7 +5,11 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { FlatShading } from './constants.js';
+import {
+	FlatShading,
+	StaticDrawUsage,
+	DynamicDrawUsage
+} from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -19,6 +23,7 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
+import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
@@ -423,6 +428,22 @@ Object.assign( Loader.prototype, {
 	}
 
 } );
+
+Loader.Handlers = {
+
+	add: function ( /* regex, loader */ ) {
+
+		console.error( 'THREE.Loader: Handlers.add() has been removed. Use LoadingManager.addHandler() instead.' );
+
+	},
+
+	get: function ( /* file */ ) {
+
+		console.error( 'THREE.Loader: Handlers.get() has been removed. Use LoadingManager.getHandler() instead.' );
+
+	}
+
+};
 
 export function XHRLoader( manager ) {
 
@@ -1148,12 +1169,41 @@ Object.defineProperties( BufferAttribute.prototype, {
 
 		}
 	},
+	dynamic: {
+		get: function () {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
+
+		},
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			this.setUsage( DynamicDrawUsage );
+
+		}
+	}
+
+} );
+
+Object.assign( BufferAttribute.prototype, {
+	setDynamic: function ( value ) {
+
+		console.warn( 'THREE.BufferAttribute: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
 	copyIndicesArray: function ( /* indices */ ) {
 
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
-	}
+	},
+	setArray: function ( /* array */ ) {
 
+		console.error( 'THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+	}
 } );
 
 Object.assign( BufferGeometry.prototype, {
@@ -1162,6 +1212,30 @@ Object.assign( BufferGeometry.prototype, {
 
 		console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
 		this.setIndex( index );
+
+	},
+	addAttribute: function ( name, attribute ) {
+
+		console.warn( 'THREE.BufferGeometry: .addAttribute() has been renamed to .setAttribute().' );
+
+		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
+
+			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+
+			return this.setAttribute( name, new BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
+
+		}
+
+		if ( name === 'index' ) {
+
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
+			this.setIndex( attribute );
+
+			return this;
+
+		}
+
+		return this.setAttribute( name, attribute );
 
 	},
 	addDrawCall: function ( start, count, indexOffset ) {
@@ -1190,8 +1264,14 @@ Object.assign( BufferGeometry.prototype, {
 
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 
-	}
+	},
+	removeAttribute: function ( name ) {
 
+		console.warn( 'THREE.BufferGeometry: .removeAttribute() has been renamed to .deleteAttribute().' );
+
+		return this.deleteAttribute( name );
+
+	}
 } );
 
 Object.defineProperties( BufferGeometry.prototype, {
@@ -1213,6 +1293,40 @@ Object.defineProperties( BufferGeometry.prototype, {
 		}
 	}
 
+} );
+
+Object.defineProperties( InterleavedBuffer.prototype, {
+
+	dynamic: {
+		get: function () {
+
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			this.setUsage( value );
+
+		}
+	}
+
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
+	setDynamic: function ( value ) {
+
+		console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
+	setArray: function ( /* array */ ) {
+
+		console.error( 'THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+	}
 } );
 
 //
@@ -1310,6 +1424,21 @@ Object.defineProperties( Material.prototype, {
 
 			console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
 			this.flatShading = ( value === FlatShading );
+
+		}
+	},
+
+	stencilMask: {
+		get: function () {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			return this.stencilFuncMask;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.' + this.type + ': .stencilMask has been removed. Use .stencilFuncMask instead.' );
+			this.stencilFuncMask = value;
 
 		}
 	}

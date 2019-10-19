@@ -16,12 +16,13 @@
 
 THREE.ThreeMFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
+
 	this.availableExtensions = [];
 
 };
 
-THREE.ThreeMFLoader.prototype = {
+THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.ThreeMFLoader,
 
@@ -36,13 +37,6 @@ THREE.ThreeMFLoader.prototype = {
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -560,7 +554,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
 			// groups
 
@@ -926,4 +920,4 @@ THREE.ThreeMFLoader.prototype = {
 
 	}
 
-};
+} );

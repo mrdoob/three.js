@@ -27,9 +27,14 @@ import {
 
 var TransformControls = function ( camera, domElement ) {
 
-	Object3D.call( this );
+	if ( domElement === undefined ) {
 
-	domElement = ( domElement !== undefined ) ? domElement : document;
+		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
+	Object3D.call( this );
 
 	this.visible = false;
 
@@ -562,15 +567,27 @@ var TransformControls = function ( camera, domElement ) {
 
 	function getPointer( event ) {
 
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+		if ( document.pointerLockElement ) {
 
-		var rect = domElement.getBoundingClientRect();
+			return {
+				x: 0,
+				y: 0,
+				button: event.button
+			};
 
-		return {
-			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
-			button: event.button
-		};
+		} else {
+
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+
+			var rect = domElement.getBoundingClientRect();
+
+			return {
+				x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
+				y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+				button: event.button
+			};
+
+		}
 
 	}
 
@@ -757,7 +774,7 @@ var TransformControlsGizmo = function () {
 	var scaleHandleGeometry = new BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
 	var lineGeometry = new BufferGeometry( );
-	lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
+	lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
 
@@ -770,7 +787,7 @@ var TransformControlsGizmo = function () {
 
 		}
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 		return geometry;
 
@@ -782,7 +799,7 @@ var TransformControlsGizmo = function () {
 
 		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
 		return geometry;
 

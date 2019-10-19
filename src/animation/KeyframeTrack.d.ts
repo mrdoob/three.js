@@ -13,8 +13,8 @@ export class KeyframeTrack {
 	);
 
 	name: string;
-	times: any[];
-	values: any[];
+	times: Float32Array;
+	values: Float32Array;
 
 	ValueTypeName: string;
 	TimeBufferType: Float32Array;

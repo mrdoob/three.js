@@ -11,13 +11,7 @@
 		<h1>Draw Mode Constants</h1>
 
 		<p class="desc">
-			These are valid values for [page:Mesh.drawMode], and control how the list of vertices is interpeted once sent to the GPU.<br /><br />
-
-			Note that these only work when [page:Mesh.geometry] is a [page:BufferGeometry]. Changing this
-			when [page:Mesh.geometry] is a [page:Geometry] will have no effect.<br /><br />
-
-
-
+			These are valid values for [page:Mesh.drawMode], and control how the list of vertices is interpeted once sent to the GPU.
 		</p>
 
 		<h2>Draw Modes</h2>
@@ -26,7 +20,7 @@
 			THREE.TrianglesDrawMode
 		</code>
 		<p>
-			This is the default, and results in every three consecutive vertices (v0, v1, v2), (v2, v3, v5), ...
+			This is the default, and results in every three consecutive vertices (v0, v1, v2), (v3, v4, v5), ...
 			being interpreted as a separate triangle. <br />
 			If the number of vertices is not a multiple of 3, excess vertices are ignored.
 		</p>
@@ -56,15 +50,17 @@
 		<h2>Usage</h2>
 
 		<code>
-		var geometry = new THREE.Geometry();
+		var geometry = new THREE.BufferGeometry();
 
-		geometry.vertices.push(
-			new THREE.Vector3( -10,  10, 0 ),
-			new THREE.Vector3( -10, -10, 0 ),
-			new THREE.Vector3(  10, -10, 0 ),
-			...
-		);
-		geometry.faces.push( new THREE.Face3( 0, 1, 2 ), ... );
+		var vertices = [];
+
+		vertices.push( -10,  10, 0 );
+		vertices.push( -10, -10, 0 );
+		vertices.push(  10, -10, 0 );
+
+		// ...
+
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
@@ -73,8 +69,6 @@
 
 		scene.add( mesh );
 		</code>
-
-
 
 		<h2>Source</h2>
 

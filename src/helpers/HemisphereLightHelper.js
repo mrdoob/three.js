@@ -38,7 +38,7 @@ function HemisphereLightHelper( light, size, color ) {
 	var position = geometry.getAttribute( 'position' );
 	var colors = new Float32Array( position.count * 3 );
 
-	geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
 	this.add( new Mesh( geometry, this.material ) );
 

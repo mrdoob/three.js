@@ -21,15 +21,4 @@ export class Loader {
 	setPath( path: string ): this;
 	setResourcePath( resourcePath: string ): this;
 
-	static Handlers: LoaderHandler;
-
-}
-
-// LoaderHandler
-
-export interface LoaderHandler {
-	handlers: ( RegExp | Loader )[];
-
-	add( regex: RegExp, loader: Loader ): void;
-	get( file: string ): Loader | null;
 }

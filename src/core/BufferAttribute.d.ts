@@ -1,3 +1,7 @@
+import {
+	Usage
+} from '../constants';
+
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js">src/core/BufferAttribute.js</a>
  */
@@ -8,7 +12,7 @@ export class BufferAttribute {
 	name: string;
 	array: ArrayLike<number>;
 	itemSize: number;
-	dynamic: boolean;
+	usage: Usage;
 	updateRange: { offset: number; count: number };
 	version: number;
 	normalized: boolean;
@@ -16,8 +20,7 @@ export class BufferAttribute {
 	count: number;
 	onUpload: Function;
 
-	setArray( array?: ArrayBufferView ): void;
-	setDynamic( dynamic: boolean ): BufferAttribute;
+	setUsage( usage: Usage ): BufferAttribute;
 	clone(): this;
 	copy( source: BufferAttribute ): this;
 	copyAt(
@@ -148,7 +151,7 @@ export class Float64Attribute extends BufferAttribute {
 export class Int8BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -158,7 +161,7 @@ export class Int8BufferAttribute extends BufferAttribute {
 export class Uint8BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -168,7 +171,7 @@ export class Uint8BufferAttribute extends BufferAttribute {
 export class Uint8ClampedBufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -178,7 +181,7 @@ export class Uint8ClampedBufferAttribute extends BufferAttribute {
 export class Int16BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -188,7 +191,7 @@ export class Int16BufferAttribute extends BufferAttribute {
 export class Uint16BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -198,7 +201,7 @@ export class Uint16BufferAttribute extends BufferAttribute {
 export class Int32BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -208,7 +211,7 @@ export class Int32BufferAttribute extends BufferAttribute {
 export class Uint32BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -218,7 +221,7 @@ export class Uint32BufferAttribute extends BufferAttribute {
 export class Float32BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);
@@ -228,7 +231,7 @@ export class Float32BufferAttribute extends BufferAttribute {
 export class Float64BufferAttribute extends BufferAttribute {
 
 	constructor(
-		array: Iterable<number> | ArrayLike<number> | ArrayBuffer,
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
 		itemSize: number,
 		normalized?: boolean
 	);

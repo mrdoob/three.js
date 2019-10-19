@@ -108,7 +108,12 @@
 Whether rendering this material has any effect on the stencil buffer. Default is *false*.
 </p>
 
-<h3>[property:Boolean stencilFunc]</h3>
+<h3>[property:Integer stencilWriteMask]</h3>
+<p>
+The bit mask to use when writing to the stencil buffer. Default is *0xFF*.
+</p>
+
+<h3>[property:Integer stencilFunc]</h3>
 <p>
 The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
 </p>
@@ -118,9 +123,9 @@ The stencil comparison function to use. Default is [page:Materials AlwaysStencil
 The value to use when performing stencil comparisons or stencil operations. Default is *0*.
 </p>
 
-<h3>[property:Boolean stencilMask]</h3>
+<h3>[property:Integer stencilFuncMask]</h3>
 <p>
-The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+The bit mask to use when comparing against the stencil buffer. Default is *0xFF*.
 </p>
 
 <h3>[property:Integer stencilFail]</h3>
@@ -128,12 +133,12 @@ The bit mask to use when comparing against or writing to the stencil buffer. Def
 Which stencil operation to perform when the comparison function returns false. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
 </p>
 
-<h3>[property:Boolean stencilZFail]</h3>
+<h3>[property:Integer stencilZFail]</h3>
 <p>
 Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
 </p>
 
-<h3>[property:Boolean stencilZPass]</h3>
+<h3>[property:Integer stencilZPass]</h3>
 <p>
 Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is [page:Materials KeepStencilOp]. See the stencil operations [page:Materials constants] for all possible values.
 </p>
@@ -153,9 +158,6 @@ Which stencil operation to perform when the comparison function returns true and
 
     因为其通常用在内部优化，所以不应该更改该属性值。
 </p>
-
-<h3>[property:Boolean lights]</h3>
-<p>材质是否受到光照的影响。默认为*true*。</p>
 
 <h3>[property:String name]</h3>
 <p>对象的可选名称（不必是唯一的）。默认值为空字符串。</p>
@@ -288,6 +290,9 @@ Defines whether this material is tone mapped according to the renderer's [page:W
 
 <h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 <p> 在编译shader程序之前立即执行的可选回调。此函数使用shader源码作为参数。用于修改内置材质。
+</p>
+<p>
+Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 </p>
 
 <h3>[method:null setValues]( [param:object values] )</h3>

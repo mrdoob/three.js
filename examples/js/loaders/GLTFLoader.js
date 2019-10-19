@@ -10,17 +10,16 @@ THREE.GLTFLoader = ( function () {
 
 	function GLTFLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
+
 		this.dracoLoader = null;
 		this.ddsLoader = null;
 
 	}
 
-	GLTFLoader.prototype = {
+	GLTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: GLTFLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -28,11 +27,11 @@ THREE.GLTFLoader = ( function () {
 
 			var resourcePath;
 
-			if ( this.resourcePath !== undefined ) {
+			if ( this.resourcePath !== '' ) {
 
 				resourcePath = this.resourcePath;
 
-			} else if ( this.path !== undefined ) {
+			} else if ( this.path !== '' ) {
 
 				resourcePath = this.path;
 
@@ -94,27 +93,6 @@ THREE.GLTFLoader = ( function () {
 				}
 
 			}, onProgress, _onError );
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
 
 		},
 
@@ -203,11 +181,11 @@ THREE.GLTFLoader = ( function () {
 							break;
 
 						case EXTENSIONS.MSFT_TEXTURE_DDS:
-							extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ] = new GLTFTextureDDSExtension( this.ddsLoader );
+							extensions[ extensionName ] = new GLTFTextureDDSExtension( this.ddsLoader );
 							break;
 
 						case EXTENSIONS.KHR_TEXTURE_TRANSFORM:
-							extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] = new GLTFTextureTransformExtension();
+							extensions[ extensionName ] = new GLTFTextureTransformExtension();
 							break;
 
 						default:
@@ -236,7 +214,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	/* GLTFREGISTRY */
 
@@ -291,8 +269,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * DDS Texture Extension
 	 *
-	 * Specification:
-	 * https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/MSFT_texture_dds
 	 *
 	 */
 	function GLTFTextureDDSExtension( ddsLoader ) {
@@ -309,9 +286,9 @@ THREE.GLTFLoader = ( function () {
 	}
 
 	/**
-	 * Lights Extension
+	 * Punctual Lights Extension
 	 *
-	 * Specification: PENDING
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
 	 */
 	function GLTFLightsExtension( json ) {
 
@@ -378,9 +355,9 @@ THREE.GLTFLoader = ( function () {
 	};
 
 	/**
-	 * Unlit Materials Extension (pending)
+	 * Unlit Materials Extension
 	 *
-	 * PR: https://github.com/KhronosGroup/glTF/pull/1163
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
 	 */
 	function GLTFMaterialsUnlitExtension() {
 
@@ -495,7 +472,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * DRACO Mesh Compression Extension
 	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/pull/874
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_draco_mesh_compression
 	 */
 	function GLTFDracoMeshCompressionExtension( json, dracoLoader ) {
 
@@ -573,7 +550,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Texture Transform Extension
 	 *
-	 * Specification:
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
 	 */
 	function GLTFTextureTransformExtension() {
 
@@ -726,7 +703,7 @@ THREE.GLTFLoader = ( function () {
 				materialParams.vertexShader = shader.vertexShader;
 				materialParams.fragmentShader = fragmentShader;
 				materialParams.uniforms = uniforms;
-				materialParams.defines = { 'STANDARD': '' }
+				materialParams.defines = { 'STANDARD': '' };
 
 				materialParams.color = new THREE.Color( 1.0, 1.0, 1.0 );
 				materialParams.opacity = 1.0;
@@ -1187,11 +1164,11 @@ THREE.GLTFLoader = ( function () {
 
 		// Invalid URL
 		if ( typeof url !== 'string' || url === '' ) return '';
-		
+
 		// Host Relative URL
 		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
 
-			path = path.replace( /(^https?:\/\/[^\/]+).*/i , '$1' );
+			path = path.replace( /(^https?:\/\/[^\/]+).*/i, '$1' );
 
 		}
 
@@ -1899,7 +1876,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, (byteOffset % byteStride) / elementBytes, normalized );
+				bufferAttribute = new THREE.InterleavedBufferAttribute( ib, itemSize, ( byteOffset % byteStride ) / elementBytes, normalized );
 
 			} else {
 
@@ -1932,7 +1909,7 @@ THREE.GLTFLoader = ( function () {
 				if ( bufferView !== null ) {
 
 					// Avoid modifying the original ArrayBuffer, if the bufferView wasn't initialized with zeroes.
-					bufferAttribute.setArray( bufferAttribute.array.slice() );
+					bufferAttribute = new THREE.BufferAttribute( bufferAttribute.array.slice(), bufferAttribute.itemSize, bufferAttribute.normalized );
 
 				}
 
@@ -2008,7 +1985,7 @@ THREE.GLTFLoader = ( function () {
 
 			// Load Texture resource.
 
-			var loader = THREE.Loader.Handlers.get( sourceURI );
+			var loader = options.manager.getHandler( sourceURI );
 
 			if ( ! loader ) {
 
@@ -2139,7 +2116,6 @@ THREE.GLTFLoader = ( function () {
 				THREE.Material.prototype.copy.call( pointsMaterial, material );
 				pointsMaterial.color.copy( material.color );
 				pointsMaterial.map = material.map;
-				pointsMaterial.lights = false; // PointsMaterial doesn't support lights yet
 				pointsMaterial.sizeAttenuation = false; // glTF spec says points should be 1px
 
 				this.cache.add( cacheKey, pointsMaterial );
@@ -2159,7 +2135,6 @@ THREE.GLTFLoader = ( function () {
 				lineMaterial = new THREE.LineBasicMaterial();
 				THREE.Material.prototype.copy.call( lineMaterial, material );
 				lineMaterial.color.copy( material.color );
-				lineMaterial.lights = false; // LineBasicMaterial doesn't support lights yet
 
 				this.cache.add( cacheKey, lineMaterial );
 
@@ -2210,7 +2185,7 @@ THREE.GLTFLoader = ( function () {
 		if ( material.aoMap && geometry.attributes.uv2 === undefined && geometry.attributes.uv !== undefined ) {
 
 			console.log( 'THREE.GLTFLoader: Duplicating UVs to support aoMap.' );
-			geometry.addAttribute( 'uv2', new THREE.BufferAttribute( geometry.attributes.uv.array, 2 ) );
+			geometry.setAttribute( 'uv2', new THREE.BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 		}
 
@@ -2404,7 +2379,7 @@ THREE.GLTFLoader = ( function () {
 			return parser.getDependency( 'accessor', accessorIndex )
 				.then( function ( accessor ) {
 
-					geometry.addAttribute( attributeName, accessor );
+					geometry.setAttribute( attributeName, accessor );
 
 				} );
 

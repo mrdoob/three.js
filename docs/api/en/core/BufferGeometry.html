@@ -38,7 +38,7 @@
 		] );
 
 		// itemSize = 3 because there are 3 values (components) per vertex
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
@@ -65,7 +65,7 @@
 		<h3>[property:Object attributes]</h3>
 		<p>
 		This hashmap has as id the name of the attribute to be set and as value the [page:BufferAttribute buffer] to set it to.
-		Rather than accessing this property directly, use [page:.addAttribute] and [page:.getAttribute] to access attributes of this geometry.
+		Rather than accessing this property directly, use [page:.setAttribute] and [page:.getAttribute] to access attributes of this geometry.
 		</p>
 
 		<h3>[property:Box3 boundingBox]</h3>
@@ -165,9 +165,9 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:BufferGeometry addAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<h3>[method:BufferGeometry setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
-		Adds an attribute to this geometry. Use this rather than the attributes property,
+		Sets an attribute to this geometry. Use this rather than the attributes property,
 		because an internal hashmap of [page:.attributes] is maintained to speed up iterating over
 		attributes.
 		</p>
@@ -249,8 +249,8 @@
 		This will correct lighting on the geometry surfaces.
 		</p>
 
-		<h3>[method:BufferAttribute removeAttribute]( [param:String name] )</h3>
-		<p>Removes the [page:BufferAttribute attribute] with the specified name.</p>
+		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
+		<p>Deletes the [page:BufferAttribute attribute] with the specified name.</p>
 
 		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>
 		<p>

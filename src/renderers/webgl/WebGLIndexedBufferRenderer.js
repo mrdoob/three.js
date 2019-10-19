@@ -4,6 +4,8 @@
 
 function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var mode;
 
 	function setMode( value ) {
@@ -29,11 +31,13 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
-	function renderInstances( geometry, start, count ) {
+	function renderInstances( geometry, start, count, primcount ) {
+
+		if ( primcount === 0 ) return;
 
 		var extension, methodName;
 
-		if ( capabilities.isWebGL2 ) {
+		if ( isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawElementsInstanced';
@@ -52,9 +56,9 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		}
 
-		extension[ methodName ]( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+		extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
 
-		info.update( count, mode, geometry.maxInstancedCount );
+		info.update( count, mode, primcount );
 
 	}
 

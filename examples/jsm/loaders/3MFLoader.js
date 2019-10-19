@@ -17,9 +17,9 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Group,
+	Loader,
 	LoaderUtils,
 	Matrix4,
 	Mesh,
@@ -28,12 +28,13 @@ import {
 
 var ThreeMFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
+
 	this.availableExtensions = [];
 
 };
 
-ThreeMFLoader.prototype = {
+ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: ThreeMFLoader,
 
@@ -48,13 +49,6 @@ ThreeMFLoader.prototype = {
 			onLoad( scope.parse( buffer ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -572,7 +566,7 @@ ThreeMFLoader.prototype = {
 
 			var geometry = new BufferGeometry();
 			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
-			geometry.addAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
 			// groups
 
@@ -938,6 +932,6 @@ ThreeMFLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { ThreeMFLoader };

@@ -10,12 +10,12 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
@@ -468,11 +468,11 @@ var LDrawLoader = ( function () {
 
 		}
 
-		bufferGeometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+		bufferGeometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 		if ( elementSize === 3 ) {
 
-			bufferGeometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			bufferGeometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 		}
 
@@ -526,9 +526,9 @@ var LDrawLoader = ( function () {
 
 			}
 
-			bufferGeometry.addAttribute( 'control0', new BufferAttribute( controlArray0, 3, false ) );
-			bufferGeometry.addAttribute( 'control1', new BufferAttribute( controlArray1, 3, false ) );
-			bufferGeometry.addAttribute( 'direction', new BufferAttribute( directionArray, 3, false ) );
+			bufferGeometry.setAttribute( 'control0', new BufferAttribute( controlArray0, 3, false ) );
+			bufferGeometry.setAttribute( 'control1', new BufferAttribute( controlArray1, 3, false ) );
+			bufferGeometry.setAttribute( 'direction', new BufferAttribute( directionArray, 3, false ) );
 
 		}
 
@@ -540,15 +540,13 @@ var LDrawLoader = ( function () {
 
 	function LDrawLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 		// This is a stack of 'parse scopes' with one level per subobject loaded file.
 		// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
 		// When searching for a material code, the stack is read from top of the stack to bottom
 		// Each material library is an object map keyed by colour codes.
 		this.parseScopesStack = null;
-
-		this.path = '';
 
 		// Array of THREE.Material
 		this.materials = [];
@@ -594,7 +592,7 @@ var LDrawLoader = ( function () {
 	LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE = 5;
 	LDrawLoader.FILE_LOCATION_NOT_FOUND = 6;
 
-	LDrawLoader.prototype = {
+	LDrawLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: LDrawLoader,
 
@@ -623,14 +621,6 @@ var LDrawLoader = ( function () {
 			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
 			this.processObject( text, onLoad, null, path );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-			return this;
 
 		},
 
@@ -1965,7 +1955,7 @@ var LDrawLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return LDrawLoader;
 

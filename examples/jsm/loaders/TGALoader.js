@@ -5,18 +5,18 @@
  */
 
 import {
-	DefaultLoadingManager,
 	FileLoader,
+	Loader,
 	Texture
 } from "../../../build/three.module.js";
 
 var TGALoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-TGALoader.prototype = {
+TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: TGALoader,
 
@@ -66,7 +66,7 @@ TGALoader.prototype = {
 					}
 					break;
 
-				// check colormap type
+					// check colormap type
 
 				case TGA_TYPE_RGB:
 				case TGA_TYPE_GREY:
@@ -79,12 +79,12 @@ TGALoader.prototype = {
 					}
 					break;
 
-				// What the need of a file without data ?
+					// What the need of a file without data ?
 
 				case TGA_TYPE_NO_DATA:
 					console.error( 'THREE.TGALoader: No data.' );
 
-				// Invalid type ?
+					// Invalid type ?
 
 				default:
 					console.error( 'THREE.TGALoader: Invalid type "%s".', header.image_type );
@@ -477,7 +477,7 @@ TGALoader.prototype = {
 				flags: content[ offset ++ ]
 			};
 
-			// check tga if it is valid format
+		// check tga if it is valid format
 
 		tgaCheckHeader( header );
 
@@ -544,15 +544,8 @@ TGALoader.prototype = {
 
 		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
 
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
 	}
 
-};
+} );
 
 export { TGALoader };

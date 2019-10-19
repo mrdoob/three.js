@@ -9,7 +9,6 @@ import { TextureCubeUVNode } from './TextureCubeUVNode.js';
 import { ReflectNode } from '../accessors/ReflectNode.js';
 import { NormalNode } from '../accessors/NormalNode.js';
 import { ColorSpaceNode } from '../utils/ColorSpaceNode.js';
-import { SpecularMIPLevelNode } from '../utils/SpecularMIPLevelNode.js';
 
 function TextureCubeNode( value, textureSize, uv, bias ) {
 
@@ -85,7 +84,7 @@ TextureCubeNode.prototype.generate = function ( builder, output ) {
 
 		if ( builder.context.bias ) {
 
-			builder.context.bias.setTexture( this );
+			builder.context.bias.setTexture( this.value );
 
 		}
 

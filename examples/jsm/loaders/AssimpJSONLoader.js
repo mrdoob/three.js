@@ -13,9 +13,9 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	LoaderUtils,
 	Matrix4,
 	Mesh,
@@ -27,21 +27,19 @@ import {
 
 var AssimpJSONLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-AssimpJSONLoader.prototype = {
+AssimpJSONLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: AssimpJSONLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new FileLoader( this.manager );
 		loader.setPath( scope.path );
@@ -76,27 +74,6 @@ AssimpJSONLoader.prototype = {
 			onLoad( scope.parse( json, path ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -139,23 +116,23 @@ AssimpJSONLoader.prototype = {
 			}
 
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 			if ( normals.length > 0 ) {
 
-				geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			}
 
 			if ( uvs.length > 0 ) {
 
-				geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 			}
 
 			if ( colors.length > 0 ) {
 
-				geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 			}
 
@@ -304,6 +281,6 @@ AssimpJSONLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { AssimpJSONLoader };

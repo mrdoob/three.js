@@ -21,24 +21,23 @@
 				color: #ffffff;
 			}
 
-				#overlay > div {
-					text-align: center;
-				}
+			#overlay > div {
+				text-align: center;
+			}
 
-				#overlay > div > button {
-					height: 20px;
-					width: 100px;
-					background: transparent;
-					color: #ffffff;
-					outline: 1px solid #ffffff;
-					border: 0px;
-					cursor: pointer;
-				}
+			#overlay > div > button {
+				height: 20px;
+				background: transparent;
+				color: #ffffff;
+				outline: 1px solid #ffffff;
+				border: 0px;
+				cursor: pointer;
+			}
 
-				#overlay > div > p {
-					color: #777777;
-					font-size: 12px;
-				}
+			#overlay > div > p {
+				color: #777777;
+				font-size: 12px;
+			}
 		</style>
 	</head>
 <body>
@@ -60,9 +59,13 @@
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		var scene, camera, renderer;
+		var scene, camera, renderer, clock;
 
 		var objects = [];
+
+		var speed = 2.5;
+		var height = 3;
+		var offset = 0.5;
 
 		var startButton = document.getElementById( 'startButton' );
 		startButton.addEventListener( 'click', init );
@@ -75,6 +78,8 @@
 			var container = document.getElementById( 'container' );
 
 			scene = new THREE.Scene();
+
+			clock = new THREE.Clock();
 
 			//
 
@@ -195,14 +200,9 @@
 
 		}
 
-		var speed = 1.7;
-		var height = 3;
-		var offset = 0.5;
-		var time = 0;
-
 		function render() {
 
-			time += 0.02;
+			var time = clock.getElapsedTime();
 
 			for ( var i = 0; i < objects.length; i ++ ) {
 

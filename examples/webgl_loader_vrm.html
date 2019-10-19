@@ -62,7 +62,6 @@
 									THREE.Material.prototype.copy.call( material, object.material[ i ] );
 									material.color.copy( object.material[ i ].color );
 									material.map = object.material[ i ].map;
-									material.lights = false;
 									material.skinning = object.material[ i ].skinning;
 									material.morphTargets = object.material[ i ].morphTargets;
 									material.morphNormals = object.material[ i ].morphNormals;
@@ -76,7 +75,6 @@
 								THREE.Material.prototype.copy.call( material, object.material );
 								material.color.copy( object.material.color );
 								material.map = object.material.map;
-								material.lights = false;
 								material.skinning = object.material.skinning;
 								material.morphTargets = object.material.morphTargets;
 								material.morphNormals = object.material.morphNormals;

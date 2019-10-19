@@ -5,7 +5,6 @@
 import {
 	Matrix4,
 	Object3D,
-	REVISION,
 	Vector3
 } from "../../../build/three.module.js";
 
@@ -34,8 +33,6 @@ CSS2DObject.prototype.constructor = CSS2DObject;
 //
 
 var CSS2DRenderer = function () {
-
-	console.log( 'THREE.CSS2DRenderer', REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
