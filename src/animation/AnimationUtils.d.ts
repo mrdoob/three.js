@@ -1,3 +1,5 @@
+import { AnimationClip } from './AnimationClip';
+
 export namespace AnimationUtils {
 	export function arraySlice( array: any, from: number, to: number ): any;
 	export function convertArray( array: any, type: any, forceClone: boolean ): any;
@@ -14,4 +16,11 @@ export namespace AnimationUtils {
 		values: any[],
 		valuePropertyName: string
 	): void;
+	export function subclip(
+		sourceClip: AnimationClip,
+		name: string,
+		startFrame: number,
+		endFrame: number,
+		fps?: number
+	): AnimationClip;
 }
