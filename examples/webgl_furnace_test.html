@@ -9,6 +9,9 @@
 			body {
 				color: #444;
 			}
+			a {
+				color: #44f;
+			}
 		</style>
 
 	</head>
@@ -17,8 +20,7 @@
 		<div id="container">
 			<div id="info">
 				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a><br/><br/>
-				There are 11 fully metal spheres with full white specular color and increasing roughness values rendered here. A metal object, no matter how rough, fully reflects all energy. If uniformly lit, the spheres should be indistinguishable from the environment. If spheres are visible, then some energy has been lost or gained after reflection.<br />
+				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
 			</div>
 		</div>
 
@@ -30,7 +32,7 @@
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var scene, camera, renderer, envMap, radianceMap;
-			var right = 6;
+			var right = 8;
 
 			function init() {
 
@@ -47,6 +49,26 @@
 
 				window.addEventListener( 'resize', onResize, false );
 
+				document.body.addEventListener( 'mouseover', function () {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.color.setHex( 0xaaaaff );
+
+					} );
+
+				} );
+
+				document.body.addEventListener( 'mouseout', function () {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
+
+					} );
+
+				} );
+
 				// scene
 
 				scene = new THREE.Scene();
@@ -62,22 +84,25 @@
 
 				var geometry = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
 
-				var count = 10;
+				for ( var x = 0; x <= 10; x ++ ) {
 
-				for ( var x = 0; x <= count; x ++ ) {
+					for ( var y = 0; y <= 10; y ++ ) {
 
-					var material = new THREE.MeshPhysicalMaterial( {
-						roughness: x / count,
-						metalness: 1,
-						color: 0xffffff,
-						envMap: radianceMap,
-						envMapIntensity: 1,
-						reflectivity: 1,
-					} );
+						var material = new THREE.MeshPhysicalMaterial( {
+							roughness: x / 10,
+							metalness: y / 10,
+							color: 0xffffff,
+							envMap: radianceMap,
+							envMapIntensity: 1,
+							reflectivity: 1
+						} );
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = x - ( Math.floor( count / 2 ) );
-					scene.add( mesh );
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = x - 5;
+						mesh.position.y = 5 - y;
+						scene.add( mesh );
+
+					}
 
 				}
 
@@ -85,22 +110,15 @@
 
 			function createEnvironment() {
 
-				var color = new THREE.Color( 0xcccccc );
-				var sky = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), new THREE.MeshBasicMaterial( {
-					color: color,
-					side: THREE.DoubleSide,
-				} ) );
-				sky.scale.setScalar( 100 );
-
 				var envScene = new THREE.Scene();
-				envScene.add( sky );
-				envScene.background = color;
+				envScene.background = new THREE.Color( 0xcccccc );
+
 				var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
 				cubeCamera.update( renderer, envScene );
 
 				envMap = cubeCamera.renderTarget.texture;
 
-				scene.background = color;
+				scene.background = envScene.background;
 
 			}
 
@@ -110,13 +128,17 @@
 
 					var pmremGenerator = new PMREMGenerator( envMap );
 					pmremGenerator.update( renderer );
+
 					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
 					pmremCubeUVPacker.update( renderer );
+
 					var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 
 					pmremGenerator.dispose();
 					pmremCubeUVPacker.dispose();
+
 					radianceMap = cubeRenderTarget.texture;
+
 					resolve();
 
 				} );
@@ -130,7 +152,12 @@
 				camera.bottom = - camera.top;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				render();
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
 
 			}
 
@@ -145,7 +172,7 @@
 				.then( createEnvironment )
 				.then( getRadiance )
 				.then( createObjects )
-				.then( render );
+				.then( animate );
 
 		</script>
 	</body>
