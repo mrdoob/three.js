@@ -1888,19 +1888,32 @@ Object.defineProperties( WebVRManager.prototype, {
 
 //
 
-Audio.prototype.load = function ( file ) {
+Object.defineProperties( Audio.prototype, {
 
-	console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-	var scope = this;
-	var audioLoader = new AudioLoader();
-	audioLoader.load( file, function ( buffer ) {
+	load: {
+		value: function ( file ) {
 
-		scope.setBuffer( buffer );
+			console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+			var scope = this;
+			var audioLoader = new AudioLoader();
+			audioLoader.load( file, function ( buffer ) {
 
-	} );
-	return this;
+				scope.setBuffer( buffer );
 
-};
+			} );
+			return this;
+
+		}
+	},
+	startTime: {
+		set: function () {
+
+			console.warn( 'THREE.Audio: .startTime is now .play( delay ).' );
+
+		}
+	}
+
+} );
 
 AudioAnalyser.prototype.getData = function () {
 

@@ -15,7 +15,6 @@ export class Audio extends Object3D {
 	buffer: null | Audio;
 	detune: number;
 	loop: boolean;
-	startTime: number;
 	offset: number;
 	duration: number | undefined;
 	playbackRate: number;
@@ -30,7 +29,7 @@ export class Audio extends Object3D {
 	setMediaElementSource( mediaElement: HTMLMediaElement ): this;
 	setMediaStreamSource( mediaStream: MediaStream ): this;
 	setBuffer( audioBuffer: AudioBuffer ): this;
-	play(): this;
+	play( delay?: number ): this;
 	onEnded(): void;
 	pause(): this;
 	stop(): this;
