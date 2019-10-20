@@ -2,7 +2,7 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-function WebGLInfo( gl ) {
+function WebGLInfo() {
 
 	var memory = {
 		geometries: 0,

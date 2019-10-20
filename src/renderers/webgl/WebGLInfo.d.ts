@@ -5,7 +5,7 @@ import { WebGLProgram } from './WebGLProgram';
  */
 export class WebGLInfo {
 
-	constructor( gl: WebGLRenderingContext );
+	constructor();
 
 	autoReset: boolean;
 	memory: {
