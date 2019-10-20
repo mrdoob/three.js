@@ -2,7 +2,7 @@
  * @author thespite / http://www.twitter.com/thespite
  */
 
-import { MaxEquation, MinEquation, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, SrcAlphaSaturateFactor, OneMinusDstColorFactor, DstColorFactor, OneMinusDstAlphaFactor, DstAlphaFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, OneMinusSrcColorFactor, SrcColorFactor, OneFactor, ZeroFactor, ReverseSubtractEquation, SubtractEquation, AddEquation, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RedFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType } from '../../constants.js';
+import { RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGB_ETC1_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RedFormat, RGBAFormat, RGBFormat, AlphaFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType } from '../../constants.js';
 
 function WebGLUtils( gl, extensions, capabilities ) {
 
@@ -42,23 +42,6 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		if ( p === DepthFormat ) return gl.DEPTH_COMPONENT;
 		if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
 		if ( p === RedFormat ) return gl.RED;
-
-		if ( p === AddEquation ) return gl.FUNC_ADD;
-		if ( p === SubtractEquation ) return gl.FUNC_SUBTRACT;
-		if ( p === ReverseSubtractEquation ) return gl.FUNC_REVERSE_SUBTRACT;
-
-		if ( p === ZeroFactor ) return gl.ZERO;
-		if ( p === OneFactor ) return gl.ONE;
-		if ( p === SrcColorFactor ) return gl.SRC_COLOR;
-		if ( p === OneMinusSrcColorFactor ) return gl.ONE_MINUS_SRC_COLOR;
-		if ( p === SrcAlphaFactor ) return gl.SRC_ALPHA;
-		if ( p === OneMinusSrcAlphaFactor ) return gl.ONE_MINUS_SRC_ALPHA;
-		if ( p === DstAlphaFactor ) return gl.DST_ALPHA;
-		if ( p === OneMinusDstAlphaFactor ) return gl.ONE_MINUS_DST_ALPHA;
-
-		if ( p === DstColorFactor ) return gl.DST_COLOR;
-		if ( p === OneMinusDstColorFactor ) return gl.ONE_MINUS_DST_COLOR;
-		if ( p === SrcAlphaSaturateFactor ) return gl.SRC_ALPHA_SATURATE;
 
 		if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
 			p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
@@ -111,26 +94,6 @@ function WebGLUtils( gl, extensions, capabilities ) {
 			if ( extension !== null ) {
 
 				return p;
-
-			}
-
-		}
-
-		if ( p === MinEquation || p === MaxEquation ) {
-
-			if ( isWebGL2 ) {
-
-				if ( p === MinEquation ) return gl.MIN;
-				if ( p === MaxEquation ) return gl.MAX;
-
-			}
-
-			extension = extensions.get( 'EXT_blend_minmax' );
-
-			if ( extension !== null ) {
-
-				if ( p === MinEquation ) return extension.MIN_EXT;
-				if ( p === MaxEquation ) return extension.MAX_EXT;
 
 			}
 
