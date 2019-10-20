@@ -92,9 +92,9 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	play: function ( startTime ) {
+	play: function ( delay ) {
 
-		if ( startTime === undefined ) startTime = 0;
+		if ( delay === undefined ) delay = 0;
 
 		if ( this.isPlaying === true ) {
 
@@ -110,7 +110,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		this._startedAt = this.context.currentTime + startTime;
+		this._startedAt = this.context.currentTime + delay;
 
 		var source = this.context.createBufferSource();
 		source.buffer = this.buffer;
