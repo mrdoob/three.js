@@ -58,7 +58,7 @@ PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype
 
 	isPointLightShadow: true,
 
-	updateMatrices: function ( light, viewportIndex ) {
+	updateMatrices: function ( light, viewportIndex = 0 ) {
 
 		var camera = this.camera,
 			shadowMatrix = this.matrix,
