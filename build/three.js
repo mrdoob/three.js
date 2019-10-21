@@ -32454,7 +32454,6 @@
 
 
 	var Geometries = /*#__PURE__*/Object.freeze({
-		__proto__: null,
 		WireframeGeometry: WireframeGeometry,
 		ParametricGeometry: ParametricGeometry,
 		ParametricBufferGeometry: ParametricBufferGeometry,
@@ -32840,7 +32839,7 @@
 	 *  alphaMap: new THREE.Texture( <Image> ),
 	 *
 	 *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
-	 *  combine: THREE.Multiply,
+	 *  combine: THREE.MultiplyOperation,
 	 *  reflectivity: <float>,
 	 *  refractionRatio: <float>,
 	 *
@@ -33368,7 +33367,6 @@
 
 
 	var Materials = /*#__PURE__*/Object.freeze({
-		__proto__: null,
 		ShadowMaterial: ShadowMaterial,
 		SpriteMaterial: SpriteMaterial,
 		RawShaderMaterial: RawShaderMaterial,
@@ -33548,6 +33546,79 @@
 				} while ( key !== undefined );
 
 			}
+
+		},
+
+		subclip: function ( sourceClip, name, startFrame, endFrame, fps ) {
+
+			fps = fps || 30;
+
+			var clip = sourceClip.clone();
+
+			clip.name = name;
+
+			var tracks = [];
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				var track = clip.tracks[ i ];
+				var valueSize = track.getValueSize();
+
+				var times = [];
+				var values = [];
+
+				for ( var j = 0; j < track.times.length; ++ j ) {
+
+					var frame = track.times[ j ] * fps;
+
+					if ( frame < startFrame || frame >= endFrame ) { continue; }
+
+					times.push( track.times[ j ] );
+
+					for ( var k = 0; k < valueSize; ++ k ) {
+
+						values.push( track.values[ j * valueSize + k ] );
+
+					}
+
+				}
+
+				if ( times.length === 0 ) { continue; }
+
+				track.times = AnimationUtils.convertArray( times, track.times.constructor );
+				track.values = AnimationUtils.convertArray( values, track.values.constructor );
+
+				tracks.push( track );
+
+			}
+
+			clip.tracks = tracks;
+
+			// find minimum .times value across all tracks in the trimmed clip
+
+			var minStartTime = Infinity;
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				if ( minStartTime > clip.tracks[ i ].times[ 0 ] ) {
+
+					minStartTime = clip.tracks[ i ].times[ 0 ];
+
+				}
+
+			}
+
+			// shift all tracks such that clip begins at t=0
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				clip.tracks[ i ].shift( - 1 * minStartTime );
+
+			}
+
+			clip.resetDuration();
+
+			return clip;
 
 		}
 
@@ -35147,7 +35218,6 @@
 
 		},
 
-
 		clone: function () {
 
 			var tracks = [];
@@ -35924,7 +35994,7 @@
 				texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
 
 				texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
-				texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearMipmapLinearFilter;
+				texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
 
 				texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
@@ -35942,6 +36012,7 @@
 				if ( texData.mipmaps !== undefined ) {
 
 					texture.mipmaps = texData.mipmaps;
+					texture.minFilter = LinearMipmapLinearFilter; // presumably...
 
 				}
 
@@ -37603,7 +37674,6 @@
 
 
 	var Curves = /*#__PURE__*/Object.freeze({
-		__proto__: null,
 		ArcCurve: ArcCurve,
 		CatmullRomCurve3: CatmullRomCurve3,
 		CubicBezierCurve: CubicBezierCurve,
