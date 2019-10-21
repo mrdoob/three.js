@@ -16084,7 +16084,7 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	function WebGLInfo() {
+	function WebGLInfo( gl ) {
 
 		var memory = {
 			geometries: 0,
@@ -19888,7 +19888,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLState( gl, extensions, utils, capabilities ) {
+	function WebGLState( gl, extensions, capabilities ) {
 
 		var isWebGL2 = capabilities.isWebGL2;
 
@@ -20208,8 +20208,6 @@
 
 		var enabledCapabilities = {};
 
-		var compressedTextureFormats = null;
-
 		var currentProgram = null;
 
 		var currentBlendingEnabled = null;
@@ -20369,33 +20367,6 @@
 
 		}
 
-		function getCompressedTextureFormats() {
-
-			if ( compressedTextureFormats === null ) {
-
-				compressedTextureFormats = [];
-
-				if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
-				     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-				     extensions.get( 'WEBGL_compressed_texture_etc1' ) ||
-				     extensions.get( 'WEBGL_compressed_texture_astc' ) ) {
-
-					var formats = gl.getParameter( 34467 );
-
-					for ( var i = 0; i < formats.length; i ++ ) {
-
-						compressedTextureFormats.push( formats[ i ] );
-
-					}
-
-				}
-
-			}
-
-			return compressedTextureFormats;
-
-		}
-
 		function useProgram( program ) {
 
 			if ( currentProgram !== program ) {
@@ -20411,6 +20382,26 @@
 			return false;
 
 		}
+
+		var equationToGL = {};
+		equationToGL[ AddEquation ] = 32774;
+		equationToGL[ SubtractEquation ] = 32778;
+		equationToGL[ ReverseSubtractEquation ] = 32779;
+		equationToGL[ MinEquation ] = isWebGL2 ? 32775 : extensions.get( 'EXT_blend_minmax' ).MIN_EXT;
+		equationToGL[ MaxEquation ] = isWebGL2 ? 32776 : extensions.get( 'EXT_blend_minmax' ).MAX_EXT;
+
+		var factorToGL = {};
+		factorToGL[ ZeroFactor ] = 0;
+		factorToGL[ OneFactor ] = 1;
+		factorToGL[ SrcColorFactor ] = 768;
+		factorToGL[ SrcAlphaFactor ] = 770;
+		factorToGL[ SrcAlphaSaturateFactor ] = 776;
+		factorToGL[ DstColorFactor ] = 774;
+		factorToGL[ DstAlphaFactor ] = 772;
+		factorToGL[ OneMinusSrcColorFactor ] = 769;
+		factorToGL[ OneMinusSrcAlphaFactor ] = 771;
+		factorToGL[ OneMinusDstColorFactor ] = 775;
+		factorToGL[ OneMinusDstAlphaFactor ] = 773;
 
 		function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
@@ -20523,7 +20514,7 @@
 
 			if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-				gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+				gl.blendEquationSeparate( equationToGL[ blendEquation ], equationToGL[ blendEquationAlpha ] );
 
 				currentBlendEquation = blendEquation;
 				currentBlendEquationAlpha = blendEquationAlpha;
@@ -20532,7 +20523,7 @@
 
 			if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-				gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+				gl.blendFuncSeparate( factorToGL[ blendSrc ], factorToGL[ blendDst ], factorToGL[ blendSrcAlpha ], factorToGL[ blendDstAlpha ] );
 
 				currentBlendSrc = blendSrc;
 				currentBlendDst = blendDst;
@@ -20826,8 +20817,6 @@
 
 			enabledCapabilities = {};
 
-			compressedTextureFormats = null;
-
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 
@@ -20858,7 +20847,6 @@
 			disableUnusedAttributes: disableUnusedAttributes,
 			enable: enable,
 			disable: disable,
-			getCompressedTextureFormats: getCompressedTextureFormats,
 
 			useProgram: useProgram,
 
@@ -21322,7 +21310,7 @@
 
 							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+								if ( glFormat !== null ) {
 
 									state.compressedTexImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -21410,23 +21398,34 @@
 
 		}
 
-		function setTextureParameters( textureType, texture, supportsMips ) {
+		var wrappingToGL = {};
+		wrappingToGL[ RepeatWrapping ] = 10497;
+		wrappingToGL[ ClampToEdgeWrapping ] = 33071;
+		wrappingToGL[ MirroredRepeatWrapping ] = 33648;
 
-			var extension;
+		var filterToGL = {};
+		filterToGL[ NearestFilter ] = 9728;
+		filterToGL[ NearestMipmapNearestFilter ] = 9984;
+		filterToGL[ NearestMipmapLinearFilter ] = 9986;
+		filterToGL[ LinearFilter ] = 9729;
+		filterToGL[ LinearMipmapNearestFilter ] = 9985;
+		filterToGL[ LinearMipmapLinearFilter ] = 9987;
+
+		function setTextureParameters( textureType, texture, supportsMips ) {
 
 			if ( supportsMips ) {
 
-				_gl.texParameteri( textureType, 10242, utils.convert( texture.wrapS ) );
-				_gl.texParameteri( textureType, 10243, utils.convert( texture.wrapT ) );
+				_gl.texParameteri( textureType, 10242, wrappingToGL[ texture.wrapS ] );
+				_gl.texParameteri( textureType, 10243, wrappingToGL[ texture.wrapT ] );
 
 				if ( textureType === 32879 || textureType === 35866 ) {
 
-					_gl.texParameteri( textureType, 32882, utils.convert( texture.wrapR ) );
+					_gl.texParameteri( textureType, 32882, wrappingToGL[ texture.wrapR ] );
 
 				}
 
-				_gl.texParameteri( textureType, 10240, utils.convert( texture.magFilter ) );
-				_gl.texParameteri( textureType, 10241, utils.convert( texture.minFilter ) );
+				_gl.texParameteri( textureType, 10240, filterToGL[ texture.magFilter ] );
+				_gl.texParameteri( textureType, 10241, filterToGL[ texture.minFilter ] );
 
 			} else {
 
@@ -21456,7 +21455,7 @@
 
 			}
 
-			extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+			var extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 			if ( extension ) {
 
@@ -21607,7 +21606,7 @@
 
 					if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-						if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+						if ( glFormat !== null ) {
 
 							state.compressedTexImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -22160,18 +22159,6 @@
 
 			var extension;
 
-			if ( p === RepeatWrapping ) { return 10497; }
-			if ( p === ClampToEdgeWrapping ) { return 33071; }
-			if ( p === MirroredRepeatWrapping ) { return 33648; }
-
-			if ( p === NearestFilter ) { return 9728; }
-			if ( p === NearestMipmapNearestFilter ) { return 9984; }
-			if ( p === NearestMipmapLinearFilter ) { return 9986; }
-
-			if ( p === LinearFilter ) { return 9729; }
-			if ( p === LinearMipmapNearestFilter ) { return 9985; }
-			if ( p === LinearMipmapLinearFilter ) { return 9987; }
-
 			if ( p === UnsignedByteType ) { return 5121; }
 			if ( p === UnsignedShort4444Type ) { return 32819; }
 			if ( p === UnsignedShort5551Type ) { return 32820; }
@@ -22190,7 +22177,15 @@
 
 				extension = extensions.get( 'OES_texture_half_float' );
 
-				if ( extension !== null ) { return extension.HALF_FLOAT_OES; }
+				if ( extension !== null ) {
+
+					return extension.HALF_FLOAT_OES;
+
+				} else {
+
+					return null;
+
+				}
 
 			}
 
@@ -22203,23 +22198,6 @@
 			if ( p === DepthStencilFormat ) { return 34041; }
 			if ( p === RedFormat ) { return 6403; }
 
-			if ( p === AddEquation ) { return 32774; }
-			if ( p === SubtractEquation ) { return 32778; }
-			if ( p === ReverseSubtractEquation ) { return 32779; }
-
-			if ( p === ZeroFactor ) { return 0; }
-			if ( p === OneFactor ) { return 1; }
-			if ( p === SrcColorFactor ) { return 768; }
-			if ( p === OneMinusSrcColorFactor ) { return 769; }
-			if ( p === SrcAlphaFactor ) { return 770; }
-			if ( p === OneMinusSrcAlphaFactor ) { return 771; }
-			if ( p === DstAlphaFactor ) { return 772; }
-			if ( p === OneMinusDstAlphaFactor ) { return 773; }
-
-			if ( p === DstColorFactor ) { return 774; }
-			if ( p === OneMinusDstColorFactor ) { return 775; }
-			if ( p === SrcAlphaSaturateFactor ) { return 776; }
-
 			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
 				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
@@ -22231,6 +22209,10 @@
 					if ( p === RGBA_S3TC_DXT1_Format ) { return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT; }
 					if ( p === RGBA_S3TC_DXT3_Format ) { return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT; }
 					if ( p === RGBA_S3TC_DXT5_Format ) { return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT; }
+
+				} else {
+
+					return null;
 
 				}
 
@@ -22248,6 +22230,10 @@
 					if ( p === RGBA_PVRTC_4BPPV1_Format ) { return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG; }
 					if ( p === RGBA_PVRTC_2BPPV1_Format ) { return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG; }
 
+				} else {
+
+					return null;
+
 				}
 
 			}
@@ -22256,7 +22242,15 @@
 
 				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
-				if ( extension !== null ) { return extension.COMPRESSED_RGB_ETC1_WEBGL; }
+				if ( extension !== null ) {
+
+					return extension.COMPRESSED_RGB_ETC1_WEBGL;
+
+				} else {
+
+					return null;
+
+				}
 
 			}
 
@@ -22270,27 +22264,13 @@
 
 				if ( extension !== null ) {
 
+					// TODO Complete?
+
 					return p;
 
-				}
+				} else {
 
-			}
-
-			if ( p === MinEquation || p === MaxEquation ) {
-
-				if ( isWebGL2 ) {
-
-					if ( p === MinEquation ) { return 32775; }
-					if ( p === MaxEquation ) { return 32776; }
-
-				}
-
-				extension = extensions.get( 'EXT_blend_minmax' );
-
-				if ( extension !== null ) {
-
-					if ( p === MinEquation ) { return extension.MIN_EXT; }
-					if ( p === MaxEquation ) { return extension.MAX_EXT; }
+					return null;
 
 				}
 
@@ -22302,11 +22282,17 @@
 
 				extension = extensions.get( 'WEBGL_depth_texture' );
 
-				if ( extension !== null ) { return extension.UNSIGNED_INT_24_8_WEBGL; }
+				if ( extension !== null ) {
+
+					return extension.UNSIGNED_INT_24_8_WEBGL;
+
+				} else {
+
+					return null;
+
+				}
 
 			}
-
-			return 0;
 
 		}
 
@@ -23665,11 +23651,11 @@
 
 			utils = new WebGLUtils( _gl, extensions, capabilities );
 
-			state = new WebGLState( _gl, extensions, utils, capabilities );
+			state = new WebGLState( _gl, extensions, capabilities );
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
 			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
-			info = new WebGLInfo();
+			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
 			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 			attributes = new WebGLAttributes( _gl );
@@ -32457,6 +32443,7 @@
 
 
 	var Geometries = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		WireframeGeometry: WireframeGeometry,
 		ParametricGeometry: ParametricGeometry,
 		ParametricBufferGeometry: ParametricBufferGeometry,
@@ -33370,6 +33357,7 @@
 
 
 	var Materials = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		ShadowMaterial: ShadowMaterial,
 		SpriteMaterial: SpriteMaterial,
 		RawShaderMaterial: RawShaderMaterial,
@@ -37677,6 +37665,7 @@
 
 
 	var Curves = /*#__PURE__*/Object.freeze({
+		__proto__: null,
 		ArcCurve: ArcCurve,
 		CatmullRomCurve3: CatmullRomCurve3,
 		CubicBezierCurve: CubicBezierCurve,
@@ -41813,13 +41802,15 @@
 		this.loop = false;
 		this.loopStart = 0;
 		this.loopEnd = 0;
-		this.startTime = 0;
 		this.offset = 0;
 		this.duration = undefined;
 		this.playbackRate = 1;
 		this.isPlaying = false;
 		this.hasPlaybackControl = true;
 		this.sourceType = 'empty';
+
+		this._startedAt = 0;
+		this._pausedAt = 0;
 
 		this.filters = [];
 
@@ -41879,7 +41870,9 @@
 
 		},
 
-		play: function () {
+		play: function ( delay ) {
+
+			if ( delay === undefined ) { delay = 0; }
 
 			if ( this.isPlaying === true ) {
 
@@ -41895,15 +41888,15 @@
 
 			}
 
-			var source = this.context.createBufferSource();
+			this._startedAt = this.context.currentTime + delay;
 
+			var source = this.context.createBufferSource();
 			source.buffer = this.buffer;
 			source.loop = this.loop;
 			source.loopStart = this.loopStart;
 			source.loopEnd = this.loopEnd;
 			source.onended = this.onEnded.bind( this );
-			this.startTime = this.context.currentTime;
-			source.start( this.startTime, this.offset, this.duration );
+			source.start( this._startedAt, this._pausedAt + this.offset, this.duration );
 
 			this.isPlaying = true;
 
@@ -41927,9 +41920,11 @@
 
 			if ( this.isPlaying === true ) {
 
+				this._pausedAt = ( this.context.currentTime - this._startedAt ) * this.playbackRate;
+
 				this.source.stop();
 				this.source.onended = null;
-				this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+
 				this.isPlaying = false;
 
 			}
@@ -41947,9 +41942,10 @@
 
 			}
 
+			this._pausedAt = 0;
+
 			this.source.stop();
 			this.source.onended = null;
-			this.offset = 0;
 			this.isPlaying = false;
 
 			return this;
@@ -49363,19 +49359,32 @@
 
 	//
 
-	Audio.prototype.load = function ( file ) {
+	Object.defineProperties( Audio.prototype, {
 
-		console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-		var scope = this;
-		var audioLoader = new AudioLoader();
-		audioLoader.load( file, function ( buffer ) {
+		load: {
+			value: function ( file ) {
 
-			scope.setBuffer( buffer );
+				console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+				var scope = this;
+				var audioLoader = new AudioLoader();
+				audioLoader.load( file, function ( buffer ) {
 
-		} );
-		return this;
+					scope.setBuffer( buffer );
 
-	};
+				} );
+				return this;
+
+			}
+		},
+		startTime: {
+			set: function () {
+
+				console.warn( 'THREE.Audio: .startTime is now .play( delay ).' );
+
+			}
+		}
+
+	} );
 
 	AudioAnalyser.prototype.getData = function () {
 
