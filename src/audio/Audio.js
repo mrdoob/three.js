@@ -24,13 +24,15 @@ function Audio( listener ) {
 	this.loop = false;
 	this.loopStart = 0;
 	this.loopEnd = 0;
-	this.startTime = 0;
 	this.offset = 0;
 	this.duration = undefined;
 	this.playbackRate = 1;
 	this.isPlaying = false;
 	this.hasPlaybackControl = true;
 	this.sourceType = 'empty';
+
+	this._startedAt = 0;
+	this._pausedAt = 0;
 
 	this.filters = [];
 
@@ -90,7 +92,9 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	play: function () {
+	play: function ( delay ) {
+
+		if ( delay === undefined ) delay = 0;
 
 		if ( this.isPlaying === true ) {
 
@@ -106,15 +110,15 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		var source = this.context.createBufferSource();
+		this._startedAt = this.context.currentTime + delay;
 
+		var source = this.context.createBufferSource();
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.loopStart = this.loopStart;
 		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
-		this.startTime = this.context.currentTime;
-		source.start( this.startTime, this.offset, this.duration );
+		source.start( this._startedAt, this._pausedAt + this.offset, this.duration );
 
 		this.isPlaying = true;
 
@@ -138,9 +142,11 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
+			this._pausedAt = ( this.context.currentTime - this._startedAt ) * this.playbackRate;
+
 			this.source.stop();
 			this.source.onended = null;
-			this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+
 			this.isPlaying = false;
 
 		}
@@ -158,9 +164,10 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this._pausedAt = 0;
+
 		this.source.stop();
 		this.source.onended = null;
-		this.offset = 0;
 		this.isPlaying = false;
 
 		return this;
