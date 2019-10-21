@@ -470,6 +470,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
+			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -595,6 +596,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
+			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
