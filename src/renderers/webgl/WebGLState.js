@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, DoubleSide, BackSide } from '../../constants.js';
+import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
 function WebGLState( gl, extensions, utils, capabilities ) {
@@ -529,6 +529,28 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	}
 
+	var equationToGL = {
+		[ AddEquation ]: gl.FUNC_ADD,
+		[ SubtractEquation ]: gl.FUNC_SUBTRACT,
+		[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT,
+		[ MinEquation ]: isWebGL2 ? gl.MIN : extensions.get( 'EXT_blend_minmax' ).MIN_EXT,
+		[ MaxEquation ]: isWebGL2 ? gl.MAX : extensions.get( 'EXT_blend_minmax' ).MAX_EXT
+	};
+
+	var factorToGL = {
+		[ ZeroFactor ]: gl.ZERO,
+		[ OneFactor ]: gl.ONE,
+		[ SrcColorFactor ]: gl.SRC_COLOR,
+		[ SrcAlphaFactor ]: gl.SRC_ALPHA,
+		[ SrcAlphaSaturateFactor ]: gl.SRC_ALPHA_SATURATE,
+		[ DstColorFactor ]: gl.DST_COLOR,
+		[ DstAlphaFactor ]: gl.DST_ALPHA,
+		[ OneMinusSrcColorFactor ]: gl.ONE_MINUS_SRC_COLOR,
+		[ OneMinusSrcAlphaFactor ]: gl.ONE_MINUS_SRC_ALPHA,
+		[ OneMinusDstColorFactor ]: gl.ONE_MINUS_DST_COLOR,
+		[ OneMinusDstAlphaFactor ]: gl.ONE_MINUS_DST_ALPHA
+	};
+
 	function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
 		if ( blending === NoBlending ) {
@@ -640,7 +662,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-			gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+			gl.blendEquationSeparate( equationToGL[ blendEquation ], equationToGL[ blendEquationAlpha ] );
 
 			currentBlendEquation = blendEquation;
 			currentBlendEquationAlpha = blendEquationAlpha;
@@ -649,7 +671,7 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-			gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+			gl.blendFuncSeparate( factorToGL[ blendSrc ], factorToGL[ blendDst ], factorToGL[ blendSrcAlpha ], factorToGL[ blendDstAlpha ] );
 
 			currentBlendSrc = blendSrc;
 			currentBlendDst = blendDst;
