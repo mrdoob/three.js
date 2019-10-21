@@ -37985,11 +37985,15 @@
 
 			}
 
+			return this;
+
 		},
 
 		moveTo: function ( x, y ) {
 
 			this.currentPoint.set( x, y ); // TODO consider referencing vectors instead of copying?
+
+			return this;
 
 		},
 
@@ -37999,6 +38003,8 @@
 			this.curves.push( curve );
 
 			this.currentPoint.set( x, y );
+
+			return this;
 
 		},
 
@@ -38013,6 +38019,8 @@
 			this.curves.push( curve );
 
 			this.currentPoint.set( aX, aY );
+
+			return this;
 
 		},
 
@@ -38029,6 +38037,8 @@
 
 			this.currentPoint.set( aX, aY );
 
+			return this;
+
 		},
 
 		splineThru: function ( pts /*Array of Vector*/ ) {
@@ -38040,6 +38050,8 @@
 
 			this.currentPoint.copy( pts[ pts.length - 1 ] );
 
+			return this;
+
 		},
 
 		arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
@@ -38050,11 +38062,15 @@
 			this.absarc( aX + x0, aY + y0, aRadius,
 				aStartAngle, aEndAngle, aClockwise );
 
+			return this;
+
 		},
 
 		absarc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 			this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+			return this;
 
 		},
 
@@ -38064,6 +38080,8 @@
 			var y0 = this.currentPoint.y;
 
 			this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+
+			return this;
 
 		},
 
@@ -38088,6 +38106,8 @@
 
 			var lastPoint = curve.getPoint( 1 );
 			this.currentPoint.copy( lastPoint );
+
+			return this;
 
 		},
 
@@ -40595,11 +40615,15 @@
 			this.subPaths.push( this.currentPath );
 			this.currentPath.moveTo( x, y );
 
+			return this;
+
 		},
 
 		lineTo: function ( x, y ) {
 
 			this.currentPath.lineTo( x, y );
+
+			return this;
 
 		},
 
@@ -40607,17 +40631,23 @@
 
 			this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
 
+			return this;
+
 		},
 
 		bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 			this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
 
+			return this;
+
 		},
 
 		splineThru: function ( pts ) {
 
 			this.currentPath.splineThru( pts );
+
+			return this;
 
 		},
 
@@ -47765,7 +47795,7 @@
 		fromPoints: function ( points ) {
 
 			console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
-			this.setFromPoints( points );
+			return this.setFromPoints( points );
 
 		}
 
