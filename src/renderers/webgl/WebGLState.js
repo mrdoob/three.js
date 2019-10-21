@@ -503,10 +503,26 @@ function WebGLState( gl, extensions, capabilities ) {
 	var equationToGL = {
 		[ AddEquation ]: gl.FUNC_ADD,
 		[ SubtractEquation ]: gl.FUNC_SUBTRACT,
-		[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT,
-		[ MinEquation ]: isWebGL2 ? gl.MIN : extensions.get( 'EXT_blend_minmax' ).MIN_EXT,
-		[ MaxEquation ]: isWebGL2 ? gl.MAX : extensions.get( 'EXT_blend_minmax' ).MAX_EXT
+		[ ReverseSubtractEquation ]: gl.FUNC_REVERSE_SUBTRACT
 	};
+
+	if ( isWebGL2 ) {
+
+		equationToGL[ MinEquation ] = gl.MIN;
+		equationToGL[ MaxEquation ] = gl.MAX;
+
+	} else {
+
+		var extension = extensions.get( 'EXT_blend_minmax' );
+
+		if ( extension !== null ) {
+
+			equationToGL[ MinEquation ] = extension.MIN_EXT;
+			equationToGL[ MaxEquation ] = extension.MIN_EXT;
+
+		}
+
+	}
 
 	var factorToGL = {
 		[ ZeroFactor ]: gl.ZERO,
