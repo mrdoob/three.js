@@ -5,7 +5,7 @@
 import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDepth, LessDepth, AlwaysDepth, NeverDepth, CullFaceFront, CullFaceBack, CullFaceNone, DoubleSide, BackSide, CustomBlending, MultiplyBlending, SubtractiveBlending, AdditiveBlending, NoBlending, NormalBlending, AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation, ZeroFactor, OneFactor, SrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, DstColorFactor, DstAlphaFactor, OneMinusSrcColorFactor, OneMinusSrcAlphaFactor, OneMinusDstColorFactor, OneMinusDstAlphaFactor } from '../../constants.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-function WebGLState( gl, extensions, utils, capabilities ) {
+function WebGLState( gl, extensions, capabilities ) {
 
 	var isWebGL2 = capabilities.isWebGL2;
 
@@ -325,8 +325,6 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 	var enabledCapabilities = {};
 
-	var compressedTextureFormats = null;
-
 	var currentProgram = null;
 
 	var currentBlendingEnabled = null;
@@ -483,33 +481,6 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 			enabledCapabilities[ id ] = false;
 
 		}
-
-	}
-
-	function getCompressedTextureFormats() {
-
-		if ( compressedTextureFormats === null ) {
-
-			compressedTextureFormats = [];
-
-			if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_etc1' ) ||
-			     extensions.get( 'WEBGL_compressed_texture_astc' ) ) {
-
-				var formats = gl.getParameter( gl.COMPRESSED_TEXTURE_FORMATS );
-
-				for ( var i = 0; i < formats.length; i ++ ) {
-
-					compressedTextureFormats.push( formats[ i ] );
-
-				}
-
-			}
-
-		}
-
-		return compressedTextureFormats;
 
 	}
 
@@ -965,8 +936,6 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 
 		enabledCapabilities = {};
 
-		compressedTextureFormats = null;
-
 		currentTextureSlot = null;
 		currentBoundTextures = {};
 
@@ -997,7 +966,6 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 		disableUnusedAttributes: disableUnusedAttributes,
 		enable: enable,
 		disable: disable,
-		getCompressedTextureFormats: getCompressedTextureFormats,
 
 		useProgram: useProgram,
 
@@ -1027,6 +995,5 @@ function WebGLState( gl, extensions, utils, capabilities ) {
 	};
 
 }
-
 
 export { WebGLState };

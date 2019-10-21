@@ -434,7 +434,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-							if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+							if ( glFormat !== null ) {
 
 								state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -733,7 +733,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+					if ( glFormat !== null ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 

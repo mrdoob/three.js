@@ -30,7 +30,15 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 			extension = extensions.get( 'OES_texture_half_float' );
 
-			if ( extension !== null ) return extension.HALF_FLOAT_OES;
+			if ( extension !== null ) {
+
+				return extension.HALF_FLOAT_OES;
+
+			} else {
+
+				return null;
+
+			}
 
 		}
 
@@ -55,6 +63,10 @@ function WebGLUtils( gl, extensions, capabilities ) {
 				if ( p === RGBA_S3TC_DXT3_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT;
 				if ( p === RGBA_S3TC_DXT5_Format ) return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
+			} else {
+
+				return null;
+
 			}
 
 		}
@@ -71,6 +83,10 @@ function WebGLUtils( gl, extensions, capabilities ) {
 				if ( p === RGBA_PVRTC_4BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 				if ( p === RGBA_PVRTC_2BPPV1_Format ) return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
 
+			} else {
+
+				return null;
+
 			}
 
 		}
@@ -79,7 +95,15 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
-			if ( extension !== null ) return extension.COMPRESSED_RGB_ETC1_WEBGL;
+			if ( extension !== null ) {
+
+				return extension.COMPRESSED_RGB_ETC1_WEBGL;
+
+			} else {
+
+				return null;
+
+			}
 
 		}
 
@@ -93,7 +117,13 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 			if ( extension !== null ) {
 
+				// TODO Complete?
+
 				return p;
+
+			} else {
+
+				return null;
 
 			}
 
@@ -105,11 +135,17 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 			extension = extensions.get( 'WEBGL_depth_texture' );
 
-			if ( extension !== null ) return extension.UNSIGNED_INT_24_8_WEBGL;
+			if ( extension !== null ) {
+
+				return extension.UNSIGNED_INT_24_8_WEBGL;
+
+			} else {
+
+				return null;
+
+			}
 
 		}
-
-		return 0;
 
 	}
 
