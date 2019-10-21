@@ -20387,8 +20387,24 @@
 		equationToGL[ AddEquation ] = 32774;
 		equationToGL[ SubtractEquation ] = 32778;
 		equationToGL[ ReverseSubtractEquation ] = 32779;
-		equationToGL[ MinEquation ] = isWebGL2 ? 32775 : extensions.get( 'EXT_blend_minmax' ).MIN_EXT;
-		equationToGL[ MaxEquation ] = isWebGL2 ? 32776 : extensions.get( 'EXT_blend_minmax' ).MAX_EXT;
+
+		if ( isWebGL2 ) {
+
+			equationToGL[ MinEquation ] = 32775;
+			equationToGL[ MaxEquation ] = 32776;
+
+		} else {
+
+			var extension = extensions.get( 'EXT_blend_minmax' );
+
+			if ( extension !== null ) {
+
+				equationToGL[ MinEquation ] = extension.MIN_EXT;
+				equationToGL[ MaxEquation ] = extension.MIN_EXT;
+
+			}
+
+		}
 
 		var factorToGL = {};
 		factorToGL[ ZeroFactor ] = 0;
