@@ -5,4 +5,6 @@ export class PointLightShadow extends LightShadow {
 
 	camera: PerspectiveCamera;
 
+	updateMatrices( light: Light, viewportIndex: number ): void;
+
 }

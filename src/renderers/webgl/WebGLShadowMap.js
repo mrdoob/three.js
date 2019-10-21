@@ -181,7 +181,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				_state.viewport( _viewport );
 
-				shadow.updateMatrices( light, camera, vp );
+				shadow.updateMatrices( light, vp );
 
 				_frustum = shadow.getFrustum();
 
