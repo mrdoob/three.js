@@ -44,6 +44,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	var EPS = 0.000001;
 
 	var lastPosition = new THREE.Vector3();
+	var lastZoom = 1;
 
 	var _state = STATE.NONE,
 		_keyState = STATE.NONE,
@@ -70,6 +71,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
 	this.up0 = this.object.up.clone();
+	this.zoom0 = this.object.zoom;
 
 	// events
 
@@ -201,7 +203,21 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
-			_eye.multiplyScalar( factor );
+
+			if ( _this.object.isPerspectiveCamera ) {
+
+				_eye.multiplyScalar( factor );
+
+			} else if ( _this.object.isOrthographicCamera ) {
+
+				_this.object.zoom *= factor;
+				_this.object.updateProjectionMatrix();
+
+			} else {
+
+				console.warn( 'THREE.TrackballControls: Unsupported camera type' );
+
+			}
 
 		} else {
 
@@ -209,7 +225,20 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			if ( factor !== 1.0 && factor > 0.0 ) {
 
-				_eye.multiplyScalar( factor );
+				if ( _this.object.isPerspectiveCamera ) {
+
+					_eye.multiplyScalar( factor );
+
+				} else if ( _this.object.isOrthographicCamera ) {
+
+					_this.object.zoom /= factor;
+					_this.object.updateProjectionMatrix();
+
+				} else {
+
+					console.warn( 'THREE.TrackballControls: Unsupported camera type' );
+
+				}
 
 			}
 
@@ -238,6 +267,16 @@ THREE.TrackballControls = function ( object, domElement ) {
 			mouseChange.copy( _panEnd ).sub( _panStart );
 
 			if ( mouseChange.lengthSq() ) {
+
+				if ( _this.object.isOrthographicCamera ) {
+
+					var scale_x = ( _this.object.right - _this.object.left ) / _this.object.zoom / _this.domElement.clientWidth;
+					var scale_y = ( _this.object.top - _this.object.bottom ) / _this.object.zoom / _this.domElement.clientWidth;
+
+					mouseChange.x *= scale_x;
+					mouseChange.y *= scale_y;
+
+				}
 
 				mouseChange.multiplyScalar( _eye.length() * _this.panSpeed );
 
@@ -309,15 +348,36 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_this.object.position.addVectors( _this.target, _eye );
 
-		_this.checkDistances();
+		if ( _this.object.isPerspectiveCamera ) {
 
-		_this.object.lookAt( _this.target );
+			_this.checkDistances();
 
-		if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
+			_this.object.lookAt( _this.target );
 
-			_this.dispatchEvent( changeEvent );
+			if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
 
-			lastPosition.copy( _this.object.position );
+				_this.dispatchEvent( changeEvent );
+
+				lastPosition.copy( _this.object.position );
+
+			}
+
+		} else if ( _this.object.isOrthographicCamera ) {
+
+			_this.object.lookAt( _this.target );
+
+			if ( lastPosition.distanceToSquared( _this.object.position ) > EPS || lastZoom !== _this.object.zoom ) {
+
+				_this.dispatchEvent( changeEvent );
+
+				lastPosition.copy( _this.object.position );
+				lastZoom = _this.object.zoom;
+
+			}
+
+		} else {
+
+			console.warn( 'THREE.TrackballControls: Unsupported camera type' );
 
 		}
 
@@ -331,6 +391,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_this.target.copy( _this.target0 );
 		_this.object.position.copy( _this.position0 );
 		_this.object.up.copy( _this.up0 );
+		_this.object.zoom = _this.zoom0;
+
+		_this.object.updateProjectionMatrix();
 
 		_eye.subVectors( _this.object.position, _this.target );
 
@@ -339,6 +402,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_this.dispatchEvent( changeEvent );
 
 		lastPosition.copy( _this.object.position );
+		lastZoom = _this.object.zoom;
 
 	};
 

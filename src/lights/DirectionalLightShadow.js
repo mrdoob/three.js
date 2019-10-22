@@ -5,7 +5,7 @@ import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-function DirectionalLightShadow( ) {
+function DirectionalLightShadow() {
 
 	LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
@@ -13,7 +13,15 @@ function DirectionalLightShadow( ) {
 
 DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
 
-	constructor: DirectionalLightShadow
+	constructor: DirectionalLightShadow,
+
+	isDirectionalLightShadow: true,
+
+	updateMatrices: function ( light, viewCamera, viewportIndex ) {
+
+		LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+
+	}
 
 } );
 

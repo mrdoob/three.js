@@ -7,7 +7,8 @@ import { Matrix4 } from '../math/Matrix4.js';
  * @author ikerr / http://verold.com
  */
 
-var _offsetMatrix, _identityMatrix;
+var _offsetMatrix = new Matrix4();
+var _identityMatrix = new Matrix4();
 
 function Skeleton( bones, boneInverses ) {
 
@@ -17,6 +18,8 @@ function Skeleton( bones, boneInverses ) {
 
 	this.bones = bones.slice( 0 );
 	this.boneMatrices = new Float32Array( this.bones.length * 16 );
+
+	this.frame = - 1;
 
 	// use the supplied bone inverses or calculate the inverses
 
@@ -116,13 +119,6 @@ Object.assign( Skeleton.prototype, {
 	},
 
 	update: function () {
-
-		if ( _identityMatrix === undefined ) {
-
-			_offsetMatrix = new Matrix4();
-			_identityMatrix = new Matrix4();
-
-		}
 
 		var bones = this.bones;
 		var boneInverses = this.boneInverses;

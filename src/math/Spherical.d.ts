@@ -8,10 +8,11 @@ export class Spherical {
 	phi: number;
 	theta: number;
 
-	set( radius: number, phi: number, theta: number ): Spherical;
+	set( radius: number, phi: number, theta: number ): this;
 	clone(): this;
 	copy( other: Spherical ): this;
 	makeSafe(): void;
-	setFromVector3( vec3: Vector3 ): Spherical;
+	setFromVector3( v: Vector3 ): this;
+	setFromCartesianCoords( x: number, y: number, z: number ): this;
 
 }

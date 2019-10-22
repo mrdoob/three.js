@@ -1,17 +1,16 @@
 import {
-  Points,
-  LoadingManager
+	Points,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
 
-export class PCDLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  littleEndian: boolean;
-  path: string;
+export class PCDLoader extends Loader {
 
-  load(url: string, onLoad: (points: Points) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
+	constructor( manager?: LoadingManager );
+	littleEndian: boolean;
 
-  parse(data: ArrayBuffer | string, url: string) : Points;
+	load( url: string, onLoad: ( points: Points ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( data: ArrayBuffer | string, url: string ) : Points;
+
 }

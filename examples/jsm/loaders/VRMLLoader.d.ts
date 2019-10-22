@@ -1,19 +1,14 @@
 import {
-  Scene,
-  LoadingManager
+	Scene,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
-export class VRMLLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
-  resourcePath: string;
-  crossOrigin: string;
+export class VRMLLoader extends Loader {
 
-  load(url: string, onLoad: (scene: Scene) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
-  setResourcePath(path: string) : this;
-  setCrossOrigin(path: string) : this;
+	constructor( manager?: LoadingManager );
 
-  parse(data: string, path: string) : Scene;
+	load( url: string, onLoad: ( scene: Scene ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( data: string, path: string ) : Scene;
+
 }

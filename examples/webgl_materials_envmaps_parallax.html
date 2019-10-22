@@ -38,17 +38,10 @@
 			#endif
 			`;
 
-			var envmapParsReplace = `
-			#define BOX_PROJECTED_ENV_MAP
+			var envmapPhysicalParsReplace = `
+			#if defined( USE_ENVMAP )
 
-			#if defined( USE_ENVMAP ) || defined( PHYSICAL )
-
-				uniform float reflectivity;
-				uniform float envMapIntensity;
-
-			#endif
-
-			#ifdef USE_ENVMAP
+				#define BOX_PROJECTED_ENV_MAP
 
 				#ifdef BOX_PROJECTED_ENV_MAP
 
@@ -75,40 +68,9 @@
 
 				#endif
 
-				#if ! defined( PHYSICAL ) && ( defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) )
-
-					varying vec3 vWorldPosition;
-
-				#endif
-
-				#ifdef ENVMAP_TYPE_CUBE
-
-					uniform samplerCube envMap;
-
-				#else
-
-					uniform sampler2D envMap;
-
-				#endif
-
-				uniform float flipEnvMap;
-				uniform int maxMipLevel;
-
-				#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( PHYSICAL )
-
+				#ifdef ENVMAP_MODE_REFRACTION
 					uniform float refractionRatio;
-
-				#else
-
-					varying vec3 vReflect;
-
 				#endif
-
-			#endif
-			`;
-
-			var envmapPhysicalParsReplace = `
-			#if defined( USE_ENVMAP ) && defined( PHYSICAL )
 
 				vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {
 					vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
@@ -347,11 +309,6 @@
 					shader.vertexShader = shader.vertexShader.replace(
 						'#include <worldpos_vertex>',
 						worldposReplace
-					);
-
-					shader.fragmentShader = shader.fragmentShader.replace(
-						'#include <envmap_pars_fragment>',
-						envmapParsReplace
 					);
 
 					shader.fragmentShader = shader.fragmentShader.replace(

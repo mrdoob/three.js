@@ -10,9 +10,9 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	LoaderUtils,
 	Points,
 	PointsMaterial,
@@ -21,13 +21,14 @@ import {
 
 var PCDLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
+
 	this.littleEndian = true;
 
 };
 
 
-PCDLoader.prototype = {
+PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: PCDLoader,
 
@@ -59,13 +60,6 @@ PCDLoader.prototype = {
 			}
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -316,6 +310,6 @@ PCDLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { PCDLoader };

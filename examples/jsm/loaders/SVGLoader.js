@@ -7,9 +7,9 @@
 import {
 	BufferGeometry,
 	Color,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
+	Loader,
 	Matrix3,
 	Path,
 	ShapePath,
@@ -19,11 +19,11 @@ import {
 
 var SVGLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-SVGLoader.prototype = {
+SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: SVGLoader,
 
@@ -38,13 +38,6 @@ SVGLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -821,13 +814,13 @@ SVGLoader.prototype = {
 
 			function clamp( v ) {
 
-				return Math.max( 0, Math.min( 1, v ) );
+				return Math.max( 0, Math.min( 1, parseFloat( v ) ) );
 
 			}
 
 			function positive( v ) {
 
-				return Math.max( 0, v );
+				return Math.max( 0, parseFloat( v ) );
 
 			}
 
@@ -1185,7 +1178,7 @@ SVGLoader.prototype = {
 
 	}
 
-};
+} );
 
 SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 

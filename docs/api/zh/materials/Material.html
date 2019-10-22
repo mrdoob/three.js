@@ -108,6 +108,11 @@
 Whether rendering this material has any effect on the stencil buffer. Default is *false*.
 </p>
 
+<h3>[property:Boolean stencilWriteMask]</h3>
+<p>
+The bit mask to use when writing to the stencil buffer. Default is *0xFF*.
+</p>
+
 <h3>[property:Boolean stencilFunc]</h3>
 <p>
 The stencil comparison function to use. Default is [page:Materials AlwaysStencilFunc]. See stencil function [page:Materials constants] for all possible values.
@@ -118,9 +123,9 @@ The stencil comparison function to use. Default is [page:Materials AlwaysStencil
 The value to use when performing stencil comparisons or stencil operations. Default is *0*.
 </p>
 
-<h3>[property:Boolean stencilMask]</h3>
+<h3>[property:Boolean stencilFuncMask]</h3>
 <p>
-The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+The bit mask to use when comparing against the stencil buffer. Default is *0xFF*.
 </p>
 
 <h3>[property:Integer stencilFail]</h3>
@@ -153,9 +158,6 @@ Which stencil operation to perform when the comparison function returns true and
 
     因为其通常用在内部优化，所以不应该更改该属性值。
 </p>
-
-<h3>[property:Boolean lights]</h3>
-<p>材质是否受到光照的影响。默认为*true*。</p>
 
 <h3>[property:String name]</h3>
 <p>对象的可选名称（不必是唯一的）。默认值为空字符串。</p>
@@ -232,6 +234,11 @@ Which stencil operation to perform when the comparison function returns true and
     默认为[page:Materials THREE.FrontSide]。其他选项有[page:Materials THREE.BackSide]和[page:Materials THREE.DoubleSide]。
 </p>
 
+<h3>[property:Boolean toneMapped]</h3>
+<p>
+Defines whether this material is tone mapped according to the renderer's [page:WebGLRenderer.toneMapping toneMapping] setting. Default is *true*.
+</p>
+
 <h3>[property:Boolean transparent]</h3>
 <p>
     定义此材质是否透明。这对渲染有影响，因为透明对象需要特殊处理，并在非透明对象之后渲染。
@@ -284,6 +291,9 @@ Which stencil operation to perform when the comparison function returns true and
 <h3>[method:null onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
 <p> 在编译shader程序之前立即执行的可选回调。此函数使用shader源码作为参数。用于修改内置材质。
 </p>
+<p>
+Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+</p>
 
 <h3>[method:null setValues]( [param:object values] )</h3>
 <p> values -- 具有参数的容器。
@@ -298,6 +308,8 @@ Which stencil operation to perform when the comparison function returns true and
 
 <h2>源码(Source)</h2>
 
-[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 </body>
 </html>

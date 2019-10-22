@@ -12,6 +12,7 @@ export * from './scenes/Fog';
 export * from './scenes/Scene';
 export * from './objects/Sprite';
 export * from './objects/LOD';
+export * from './objects/InstancedMesh';
 export * from './objects/SkinnedMesh';
 export * from './objects/Skeleton';
 export * from './objects/Bone';

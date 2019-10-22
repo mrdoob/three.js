@@ -34,10 +34,8 @@ export interface MaterialParameters {
 	depthTest?: boolean;
 	depthWrite?: boolean;
 	fog?: boolean;
-	lights?: boolean;
 	name?: string;
 	opacity?: number;
-	overdraw?: number;
 	polygonOffset?: boolean;
 	polygonOffsetFactor?: number;
 	polygonOffsetUnits?: number;
@@ -47,6 +45,7 @@ export interface MaterialParameters {
 	flatShading?: boolean;
 	side?: Side;
 	shadowSide?: Side;
+	toneMapped?: boolean;
 	transparent?: boolean;
 	vertexColors?: Colors;
 	vertexTangents?: boolean;
@@ -195,11 +194,6 @@ export class Material extends EventDispatcher {
 	isMaterial: boolean;
 
 	/**
-	 * Whether the material is affected by lights. Default is true.
-	 */
-	lights: boolean;
-
-	/**
 	 * Material name. Default is an empty string.
 	 */
 	name: string;
@@ -214,11 +208,6 @@ export class Material extends EventDispatcher {
 	 * Opacity. Default is 1.
 	 */
 	opacity: number;
-
-	/**
-	 * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
-	 */
-	overdraw: number;
 
 	/**
 	 * Whether to use polygon offset. Default is false. This corresponds to the POLYGON_OFFSET_FILL WebGL feature.
@@ -260,6 +249,12 @@ export class Material extends EventDispatcher {
 	 * Default is THREE.FrontSide. Other options are THREE.BackSide and THREE.DoubleSide.
 	 */
 	side: Side;
+
+	/**
+	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
+	 * Default is true.
+	 */
+	toneMapped: boolean;
 
 	/**
 	 * Defines whether this material is transparent. This has an effect on rendering as transparent objects need special treatment and are rendered after non-transparent objects.

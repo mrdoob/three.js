@@ -5,8 +5,17 @@ import { Vector3 } from './Vector3.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _v0, _v1, _v2, _v3;
-var _vab, _vac, _vbc, _vap, _vbp, _vcp;
+var _v0 = new Vector3();
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+var _v3 = new Vector3();
+
+var _vab = new Vector3();
+var _vac = new Vector3();
+var _vbc = new Vector3();
+var _vap = new Vector3();
+var _vbp = new Vector3();
+var _vcp = new Vector3();
 
 function Triangle( a, b, c ) {
 
@@ -19,8 +28,6 @@ function Triangle( a, b, c ) {
 Object.assign( Triangle, {
 
 	getNormal: function ( a, b, c, target ) {
-
-		if ( _v0 === undefined ) _v0 = new Vector3();
 
 		if ( target === undefined ) {
 
@@ -47,14 +54,6 @@ Object.assign( Triangle, {
 	// static/instance method to calculate barycentric coordinates
 	// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 	getBarycoord: function ( point, a, b, c, target ) {
-
-		if ( _v2 === undefined ) {
-
-			_v0 = new Vector3();
-			_v1 = new Vector3();
-			_v2 = new Vector3();
-
-		}
 
 		_v0.subVectors( c, a );
 		_v1.subVectors( b, a );
@@ -95,8 +94,6 @@ Object.assign( Triangle, {
 
 	containsPoint: function ( point, a, b, c ) {
 
-		if ( _v3 === undefined ) _v3 = new Vector3();
-
 		Triangle.getBarycoord( point, a, b, c, _v3 );
 
 		return ( _v3.x >= 0 ) && ( _v3.y >= 0 ) && ( ( _v3.x + _v3.y ) <= 1 );
@@ -104,8 +101,6 @@ Object.assign( Triangle, {
 	},
 
 	getUV: function ( point, p1, p2, p3, uv1, uv2, uv3, target ) {
-
-		if ( _v3 === undefined ) _v3 = new Vector3();
 
 		this.getBarycoord( point, p1, p2, p3, _v3 );
 
@@ -119,13 +114,6 @@ Object.assign( Triangle, {
 	},
 
 	isFrontFacing: function ( a, b, c, direction ) {
-
-		if ( _v1 === undefined ) {
-
-			_v0 = new Vector3();
-			_v1 = new Vector3();
-
-		}
 
 		_v0.subVectors( c, b );
 		_v1.subVectors( a, b );
@@ -176,13 +164,6 @@ Object.assign( Triangle.prototype, {
 	},
 
 	getArea: function () {
-
-		if ( _v1 === undefined ) {
-
-			_v0 = new Vector3();
-			_v1 = new Vector3();
-
-		}
 
 		_v0.subVectors( this.c, this.b );
 		_v1.subVectors( this.a, this.b );
@@ -254,17 +235,6 @@ Object.assign( Triangle.prototype, {
 	},
 
 	closestPointToPoint: function ( p, target ) {
-
-		if ( _vab === undefined ) {
-
-			_vab = new Vector3();
-			_vac = new Vector3();
-			_vbc = new Vector3();
-			_vap = new Vector3();
-			_vbp = new Vector3();
-			_vcp = new Vector3();
-
-		}
 
 		if ( target === undefined ) {
 

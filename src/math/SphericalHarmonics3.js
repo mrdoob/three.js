@@ -177,13 +177,15 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 	},
 
-	fromArray: function ( array ) {
+	fromArray: function ( array, offset ) {
+
+		if ( offset === undefined ) offset = 0;
 
 		var coefficients = this.coefficients;
 
 		for ( var i = 0; i < 9; i ++ ) {
 
-			coefficients[ i ].fromArray( array, i * 3 );
+			coefficients[ i ].fromArray( array, offset + ( i * 3 ) );
 
 		}
 
@@ -191,14 +193,16 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 	},
 
-	toArray: function () {
+	toArray: function ( array, offset ) {
 
-		var array = [];
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
 		var coefficients = this.coefficients;
 
 		for ( var i = 0; i < 9; i ++ ) {
 
-			coefficients[ i ].toArray( array, i * 3 );
+			coefficients[ i ].toArray( array, offset + ( i * 3 ) );
 
 		}
 
