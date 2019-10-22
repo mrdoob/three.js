@@ -1,29 +1,4 @@
-import { Geometry } from './../core/Geometry';
-import { Material } from './../materials/Material';
 import { Loader } from './Loader';
-/**
- * A loader for loading objects in JSON format.
- */
-export class JSONLoader extends Loader {
-
-	constructor( manager?: LoadingManager );
-
-	manager: LoadingManager;
-	withCredentials: boolean;
-
-	load(
-		url: string,
-		onLoad?: ( geometry: Geometry, materials: Material[] ) => void,
-		onProgress?: ( event: ProgressEvent ) => void,
-		onError?: ( event: ErrorEvent ) => void
-	): void;
-	setTexturePath( value: string ): void;
-	parse(
-		json: any,
-		texturePath?: string
-	): { geometry: Geometry; materials?: Material[] };
-
-}
 
 export const DefaultLoadingManager: LoadingManager;
 
@@ -64,7 +39,7 @@ export class LoadingManager {
 	 * This behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
 	 * @param callback URL modifier callback. Called with url argument, and must return resolvedURL.
 	 */
-	setURLModifier( callback?: ( url: string ) => string ): void;
+	setURLModifier( callback?: ( url: string ) => string ): this;
 
 	/**
 	 * Given a URL, uses the URL modifier callback (if any) and returns a resolved URL.
@@ -76,5 +51,11 @@ export class LoadingManager {
 	itemStart( url: string ): void;
 	itemEnd( url: string ): void;
 	itemError( url: string ): void;
+
+	// handlers
+
+	addHandler( regex: RegExp, loader: Loader ): this;
+	removeHandler( regex: RegExp ): this;
+	getHandler( file: string ): Loader | null;
 
 }

@@ -1,16 +1,15 @@
 import {
-  BufferGeometry,
-  LoadingManager
+	BufferGeometry,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
 
-export class STLLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
+export class STLLoader extends Loader {
 
-  load(url: string, onLoad: (geometry: BufferGeometry) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
+	constructor( manager?: LoadingManager );
 
-  parse(data: ArrayBuffer | string) : BufferGeometry;
+	load( url: string, onLoad: ( geometry: BufferGeometry ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( data: ArrayBuffer | string ) : BufferGeometry;
+
 }

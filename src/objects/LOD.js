@@ -7,6 +7,9 @@ import { Object3D } from '../core/Object3D.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+
 function LOD() {
 
 	Object3D.call( this );
@@ -92,66 +95,53 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	raycast: ( function () {
+	raycast: function ( raycaster, intersects ) {
 
-		var matrixPosition = new Vector3();
+		_v1.setFromMatrixPosition( this.matrixWorld );
 
-		return function raycast( raycaster, intersects ) {
+		var distance = raycaster.ray.origin.distanceTo( _v1 );
 
-			matrixPosition.setFromMatrixPosition( this.matrixWorld );
+		this.getObjectForDistance( distance ).raycast( raycaster, intersects );
 
-			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+	},
 
-			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+	update: function ( camera ) {
 
-		};
+		var levels = this.levels;
 
-	}() ),
+		if ( levels.length > 1 ) {
 
-	update: function () {
+			_v1.setFromMatrixPosition( camera.matrixWorld );
+			_v2.setFromMatrixPosition( this.matrixWorld );
 
-		var v1 = new Vector3();
-		var v2 = new Vector3();
+			var distance = _v1.distanceTo( _v2 );
 
-		return function update( camera ) {
+			levels[ 0 ].object.visible = true;
 
-			var levels = this.levels;
+			for ( var i = 1, l = levels.length; i < l; i ++ ) {
 
-			if ( levels.length > 1 ) {
+				if ( distance >= levels[ i ].distance ) {
 
-				v1.setFromMatrixPosition( camera.matrixWorld );
-				v2.setFromMatrixPosition( this.matrixWorld );
+					levels[ i - 1 ].object.visible = false;
+					levels[ i ].object.visible = true;
 
-				var distance = v1.distanceTo( v2 );
+				} else {
 
-				levels[ 0 ].object.visible = true;
-
-				for ( var i = 1, l = levels.length; i < l; i ++ ) {
-
-					if ( distance >= levels[ i ].distance ) {
-
-						levels[ i - 1 ].object.visible = false;
-						levels[ i ].object.visible = true;
-
-					} else {
-
-						break;
-
-					}
-
-				}
-
-				for ( ; i < l; i ++ ) {
-
-					levels[ i ].object.visible = false;
+					break;
 
 				}
 
 			}
 
-		};
+			for ( ; i < l; i ++ ) {
 
-	}(),
+				levels[ i ].object.visible = false;
+
+			}
+
+		}
+
+	},
 
 	toJSON: function ( meta ) {
 

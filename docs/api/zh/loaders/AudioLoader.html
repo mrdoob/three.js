@@ -8,6 +8,8 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -62,23 +64,18 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( [param:String context], [param:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:String context] — 加载器使用的[page:String AudioContext]。 默认为[page:String window.AudioContext].<br />
 		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]。默认为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
 		创建一个新的[name].
 		</p>
 
 		<h2>属性</h2>
-
-		<h3>[property:LoadingManager manager]</h3>
-		<p>
-			加载器正在使用的[page:LoadingManager loadingManager]。默认为[page:DefaultLoadingManager].
-		</p>
-
+		<p>共有属性请参见其基类[page:Loader]。</p>
 
 		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -94,6 +91,8 @@
 
 		<h2>源</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

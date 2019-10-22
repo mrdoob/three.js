@@ -9,6 +9,7 @@
 	</head>
 	<body>
 		[page:Loader] &rarr;
+
 		<h1>[name]</h1>
 
 		<p class="desc">
@@ -81,7 +82,11 @@
 		Creates a new [name].
 		</p>
 
+		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
+
 		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -101,14 +106,6 @@
 		<p>
 		Detects hardware support for available compressed texture formats, to determine
 		the output format for the transcoder. Must be called before loading a texture.
-		</p>
-
-		<h3>[method:this setCrossOrigin]( [param:String crossOrigin] )</h3>
-		<p>
-		[page:String crossOrigin] — Options are '', 'anonymous', or 'use-credentials'. Default is 'anonymous'.
-		</p>
-		<p>
-		Sets options for CORS requests.
 		</p>
 
 		<h3>[method:this setTranscoderPath]( [param:String path] )</h3>
@@ -136,6 +133,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/BasisTextureLoader.js examples/js/loaders/BasisTextureLoader.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/BasisTextureLoader.js examples/js/loaders/BasisTextureLoader.js]
+		</p>
 	</body>
 </html>

@@ -34,7 +34,6 @@ export interface MaterialParameters {
 	depthTest?: boolean;
 	depthWrite?: boolean;
 	fog?: boolean;
-	lights?: boolean;
 	name?: string;
 	opacity?: number;
 	overdraw?: number;
@@ -47,6 +46,7 @@ export interface MaterialParameters {
 	flatShading?: boolean;
 	side?: Side;
 	shadowSide?: Side;
+	toneMapped?: boolean;
 	transparent?: boolean;
 	vertexColors?: Colors;
 	vertexTangents?: boolean;
@@ -195,11 +195,6 @@ export class Material extends EventDispatcher {
 	isMaterial: boolean;
 
 	/**
-	 * Whether the material is affected by lights. Default is true.
-	 */
-	lights: boolean;
-
-	/**
 	 * Material name. Default is an empty string.
 	 */
 	name: string;
@@ -260,6 +255,12 @@ export class Material extends EventDispatcher {
 	 * Default is THREE.FrontSide. Other options are THREE.BackSide and THREE.DoubleSide.
 	 */
 	side: Side;
+
+	/**
+	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
+	 * Default is true.
+	 */
+	toneMapped: boolean;
 
 	/**
 	 * Defines whether this material is transparent. This has an effect on rendering as transparent objects need special treatment and are rendered after non-transparent objects.
@@ -332,10 +333,5 @@ export class Material extends EventDispatcher {
 	 * @param meta Object containing metadata such as textures or images for the material.
 	 */
 	toJSON( meta?: any ): any;
-
-	/**
-	 * Call .dispatchEvent ( { type: 'update' }) on the material.
-	 */
-	update(): void;
 
 }

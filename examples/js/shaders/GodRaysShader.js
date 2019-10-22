@@ -141,16 +141,16 @@ THREE.GodRaysGenerateShader = {
 
 		"for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {",
 
-			// Accumulate samples, making sure we dont walk past the light source.
+		// Accumulate samples, making sure we dont walk past the light source.
 
-			// The check for uv.y < 1 would not be necessary with "border" UV wrap
-			// mode, with a black border color. I don't think this is currently
-			// exposed by three.js. As a result there might be artifacts when the
-			// sun is to the left, right or bottom of screen as these cases are
-			// not specifically handled.
+		// The check for uv.y < 1 would not be necessary with "border" UV wrap
+		// mode, with a black border color. I don't think this is currently
+		// exposed by three.js. As a result there might be artifacts when the
+		// sun is to the left, right or bottom of screen as these cases are
+		// not specifically handled.
 
-			"col += ( i <= iters && uv.y < 1.0 ? texture2D( tInput, uv ).r : 0.0 );",
-			"uv += stepv;",
+		"	col += ( i <= iters && uv.y < 1.0 ? texture2D( tInput, uv ).r : 0.0 );",
+		"	uv += stepv;",
 
 		"}",
 		*/

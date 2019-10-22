@@ -522,15 +522,13 @@ THREE.LDrawLoader = ( function () {
 
 	function LDrawLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 		// This is a stack of 'parse scopes' with one level per subobject loaded file.
 		// Each level contains a material lib and also other runtime variables passed between parent and child subobjects
 		// When searching for a material code, the stack is read from top of the stack to bottom
 		// Each material library is an object map keyed by colour codes.
 		this.parseScopesStack = null;
-
-		this.path = '';
 
 		// Array of THREE.Material
 		this.materials = [];
@@ -576,7 +574,7 @@ THREE.LDrawLoader = ( function () {
 	LDrawLoader.FILE_LOCATION_TRY_ABSOLUTE = 5;
 	LDrawLoader.FILE_LOCATION_NOT_FOUND = 6;
 
-	LDrawLoader.prototype = {
+	LDrawLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: LDrawLoader,
 
@@ -605,14 +603,6 @@ THREE.LDrawLoader = ( function () {
 			// Async parse.  This function calls onParse with the parsed THREE.Object3D as parameter
 
 			this.processObject( text, onLoad, null, path );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-			return this;
 
 		},
 
@@ -1947,7 +1937,7 @@ THREE.LDrawLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return LDrawLoader;
 

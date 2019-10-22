@@ -42,14 +42,12 @@ var Lensflare = function () {
 	tempMap.magFilter = NearestFilter;
 	tempMap.wrapS = ClampToEdgeWrapping;
 	tempMap.wrapT = ClampToEdgeWrapping;
-	tempMap.needsUpdate = true;
 
 	var occlusionMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
 	occlusionMap.minFilter = NearestFilter;
 	occlusionMap.magFilter = NearestFilter;
 	occlusionMap.wrapS = ClampToEdgeWrapping;
 	occlusionMap.wrapT = ClampToEdgeWrapping;
-	occlusionMap.needsUpdate = true;
 
 	// material
 

@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if defined( DITHERING )
+#ifdef DITHERING
 
 	// based on https://www.shadertoy.com/view/MslGR8
 	vec3 dithering( vec3 color ) {

@@ -422,12 +422,11 @@
 
 				var sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,
+					transparency: .96,
 					depthWrite: false,
-					opacity: 0.15,
-					color: 0,
-					metalness: 1,
+					color: 'white',
+					metalness: 0,
 					roughness: 0,
-					reflectivity: 0,
 					envMap: textureCube
 				} );
 

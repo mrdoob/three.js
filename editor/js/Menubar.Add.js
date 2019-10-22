@@ -85,6 +85,22 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Dodecahedron
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/dodecahedron' ) );
+	option.onClick( function () {
+
+		var geometry = new THREE.DodecahedronBufferGeometry( 1, 0 );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
+		mesh.name = 'Dodecahedron';
+
+		editor.execute( new AddObjectCommand( editor, mesh ) );
+
+	} );
+	options.add( option );
+
 	// Icosahedron
 
 	var option = new UI.Row();
@@ -162,7 +178,7 @@ Menubar.Add = function ( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option )
+	options.add( option );
 
 	// Ring
 

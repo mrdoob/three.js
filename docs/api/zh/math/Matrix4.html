@@ -51,7 +51,7 @@
 
 				这意味着
 		<code>
-var m = new Matrix4();
+var m = new THREE.Matrix4();
 
 m.set( 11, 12, 13, 14,
        21, 22, 23, 24,
@@ -356,6 +356,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
 			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
 <code>
@@ -386,6 +387,8 @@ m, n, o, p
 
 		<h2>源码（Source）</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

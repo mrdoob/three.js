@@ -10,6 +10,10 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+var _normalMatrix = new Matrix3();
+
 function FaceNormalsHelper( object, size, hex, linewidth ) {
 
 	// FaceNormalsHelper only supports THREE.Geometry
@@ -58,61 +62,53 @@ function FaceNormalsHelper( object, size, hex, linewidth ) {
 FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
 FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
 
-FaceNormalsHelper.prototype.update = ( function () {
+FaceNormalsHelper.prototype.update = function () {
 
-	var v1 = new Vector3();
-	var v2 = new Vector3();
-	var normalMatrix = new Matrix3();
+	this.object.updateMatrixWorld( true );
 
-	return function update() {
+	_normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
-		this.object.updateMatrixWorld( true );
+	var matrixWorld = this.object.matrixWorld;
 
-		normalMatrix.getNormalMatrix( this.object.matrixWorld );
+	var position = this.geometry.attributes.position;
 
-		var matrixWorld = this.object.matrixWorld;
+	//
 
-		var position = this.geometry.attributes.position;
+	var objGeometry = this.object.geometry;
 
-		//
+	var vertices = objGeometry.vertices;
 
-		var objGeometry = this.object.geometry;
+	var faces = objGeometry.faces;
 
-		var vertices = objGeometry.vertices;
+	var idx = 0;
 
-		var faces = objGeometry.faces;
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		var idx = 0;
+		var face = faces[ i ];
 
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+		var normal = face.normal;
 
-			var face = faces[ i ];
+		_v1.copy( vertices[ face.a ] )
+			.add( vertices[ face.b ] )
+			.add( vertices[ face.c ] )
+			.divideScalar( 3 )
+			.applyMatrix4( matrixWorld );
 
-			var normal = face.normal;
+		_v2.copy( normal ).applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
 
-			v1.copy( vertices[ face.a ] )
-				.add( vertices[ face.b ] )
-				.add( vertices[ face.c ] )
-				.divideScalar( 3 )
-				.applyMatrix4( matrixWorld );
+		position.setXYZ( idx, _v1.x, _v1.y, _v1.z );
 
-			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( this.size ).add( v1 );
+		idx = idx + 1;
 
-			position.setXYZ( idx, v1.x, v1.y, v1.z );
+		position.setXYZ( idx, _v2.x, _v2.y, _v2.z );
 
-			idx = idx + 1;
+		idx = idx + 1;
 
-			position.setXYZ( idx, v2.x, v2.y, v2.z );
+	}
 
-			idx = idx + 1;
+	position.needsUpdate = true;
 
-		}
-
-		position.needsUpdate = true;
-
-	};
-
-}() );
+};
 
 
 export { FaceNormalsHelper };

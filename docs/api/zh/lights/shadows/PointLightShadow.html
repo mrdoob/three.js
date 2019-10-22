@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			该类在内部由[page:PointLight PointLights]所使用，以用于计算阴影。
+		</p>
+
+
+		<h2>示例</h2>
+		<p>
+			<code>
+//Create a WebGLRenderer and turn on shadows in the renderer
+var renderer = new THREE.WebGLRenderer();
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+//Create a PointLight and turn on shadows for the light
+var light = new THREE.PointLight( 0xffffff, 1, 100 );
+light.position.set( 0, 10, 0 );
+light.castShadow = true;            // default false
+scene.add( light );
+
+//Set up shadow properties for the light
+light.shadow.mapSize.width = 512;  // default
+light.shadow.mapSize.height = 512; // default
+light.shadow.camera.near = 0.5;       // default
+light.shadow.camera.far = 500      // default
+
+//Create a sphere that cast shadows (but does not receive them)
+var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+sphere.castShadow = true; //default is false
+sphere.receiveShadow = false; //default
+scene.add( sphere );
+
+//Create a plane that receives shadows (but does not cast them)
+var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
+var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
+scene.add( plane );
+
+//Create a helper for the shadow camera (optional)
+var helper = new THREE.CameraHelper( light.shadow.camera );
+scene.add( helper );
+			</code>
+		</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( )</h3>
+		<p>
+			创建一个新的[name]。该方法不是直接调用的 —— 其在内部由[page:PointLight]调用。
+		</p>
+
+		<h2>属性</h2>
+		<p>
+			共有属性请参见其基类[page:LightShadow LightShadow]。
+		</p>
+
+		<h2>方法</h2>
+		<p>
+			共有方法请参见其基类[page:LightShadow LightShadow]。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
+	</body>
+</html>

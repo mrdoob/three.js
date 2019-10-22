@@ -78,7 +78,7 @@
 				scene = new THREE.Scene();
 
 				var aspect = window.innerWidth / window.innerHeight;
-				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 1000, 2500 );
+				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 500, 3000 );
 				cameraPerspective.position.z = 1500;
 				scene.add( cameraPerspective );
 
@@ -90,13 +90,13 @@
 
 				controlsPerspective = new OrbitControls( cameraPerspective, renderer.domElement );
 				controlsPerspective.minDistance = 1000;
-				controlsPerspective.maxDistance = 2500;
+				controlsPerspective.maxDistance = 2400;
 				controlsPerspective.enablePan = false;
 				controlsPerspective.enableDamping = true;
 
 				controlsOrtho = new OrbitControls( cameraOrtho, renderer.domElement );
 				controlsOrtho.minZoom = 0.5;
-				controlsOrtho.maxZoom = 2;
+				controlsOrtho.maxZoom = 1.5;
 				controlsOrtho.enablePan = false;
 				controlsOrtho.enableDamping = true;
 
@@ -272,10 +272,17 @@
 
 				switch ( params.camera ) {
 
-					case 'perspective': camera = cameraPerspective; break;
-					case 'ortho': camera = cameraOrtho; break;
+					case 'perspective':
+						camera = cameraPerspective;
+						break;
+					case 'ortho':
+						camera = cameraOrtho;
+						break;
 
 				}
+
+				controlsPerspective.update();
+				controlsOrtho.update(); // must update both controls for damping to complete
 
 				renderer.render( scene, camera );
 

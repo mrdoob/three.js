@@ -42,11 +42,7 @@ var RectAreaLightUniformsLib = {
 		// data textures
 
 		var ltc_1 = new DataTexture( new Float32Array( LTC_MAT_1 ), 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-
 		var ltc_2 = new DataTexture( new Float32Array( LTC_MAT_2 ), 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-
-		ltc_1.needsUpdate = true;
-		ltc_2.needsUpdate = true;
 
 		UniformsLib.LTC_1 = ltc_1;
 		UniformsLib.LTC_2 = ltc_2;
