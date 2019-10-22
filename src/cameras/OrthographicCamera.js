@@ -33,6 +33,25 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	isOrthographicCamera: true,
 
+	set: function ( left, right, top, bottom, near, far, zoom, view ) {
+
+		this.zoom = zoom;
+		this.view = view;
+
+		this.left = left;
+		this.right = right;
+		this.top = top;
+		this.bottom = bottom;
+
+		this.near = near;
+		this.far = far;
+
+		this.updateProjectionMatrix();
+
+		return this;
+
+	},
+
 	copy: function ( source, recursive ) {
 
 		Camera.prototype.copy.call( this, source, recursive );

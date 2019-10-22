@@ -38,6 +38,27 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	isPerspectiveCamera: true,
 
+	set: function ( fov, aspect, near, far, zoom, view, focus, filmGauge, filmOffset ) {
+
+		this.fov = fov;
+		this.zoom = zoom;
+
+		this.near = near;
+		this.far = far;
+		this.focus = focus;
+
+		this.aspect = aspect;
+		this.view = view;
+
+		this.filmGauge = filmGauge;
+		this.filmOffset = filmOffset;
+
+		this.updateProjectionMatrix();
+
+		return this;
+
+	},
+
 	copy: function ( source, recursive ) {
 
 		Camera.prototype.copy.call( this, source, recursive );

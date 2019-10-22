@@ -54,6 +54,7 @@ export class PerspectiveCamera extends Camera {
 	filmGauge: number;
 	filmOffset: number;
 
+	set( fov: number, aspect: number, near: number, far: number, zoom: number, view: object, focus: number, filmGauge: number, filmOffset: number ): this;
 	setFocalLength( focalLength: number ): void;
 	getFocalLength(): number;
 	getEffectiveFOV(): number;

@@ -73,6 +73,7 @@ export class OrthographicCamera extends Camera {
 	 */
 	far: number;
 
+	set( left: number, right: number, top: number, bottom: number, near: number, far: number, zoom: number, view: object ): this;
 	/**
 	 * Updates the camera projection matrix. Must be called after change of parameters.
 	 */
