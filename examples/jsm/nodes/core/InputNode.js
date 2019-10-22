@@ -38,6 +38,8 @@ InputNode.prototype.copy = function ( source ) {
 
 	if ( source.readonly !== undefined ) this.readonly = source.readonly;
 
+	return this;
+
 };
 
 InputNode.prototype.createJSONNode = function ( meta ) {

@@ -20,12 +20,9 @@ var files = [
 
 	{ path: 'controls/DragControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/DeviceOrientationControls.js', dependencies: [], ignoreList: [] },
-	{ path: 'controls/EditorControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/FirstPersonControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/FlyControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/OrbitControls.js', dependencies: [], ignoreList: [] },
-	{ path: 'controls/MapControls.js', dependencies: [], ignoreList: [] },
-	{ path: 'controls/OrthographicTrackballControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/PointerLockControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
@@ -45,7 +42,7 @@ var files = [
 	{ path: 'exporters/ColladaExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/DRACOExporter.js', dependencies: [], ignoreList: [ 'Geometry' ] },
 	{ path: 'exporters/GLTFExporter.js', dependencies: [], ignoreList: [ 'AnimationClip', 'Camera', 'Geometry', 'Material', 'Mesh', 'Object3D', 'RGBFormat', 'Scenes', 'ShaderMaterial', 'VertexColors' ] },
-	{ path: 'exporters/MMDExporter.js', dependencies: [], ignoreList: [] },
+	{ path: 'exporters/MMDExporter.js', dependencies: [ { name: 'MMDParser', path: 'libs/mmdparser.module.js' } ], ignoreList: [] },
 	{ path: 'exporters/OBJExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/PLYExporter.js', dependencies: [], ignoreList: [] },
 	{ path: 'exporters/STLExporter.js', dependencies: [], ignoreList: [] },
@@ -54,7 +51,7 @@ var files = [
 	{ path: 'geometries/BoxLineGeometry.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/ConvexGeometry.js', dependencies: [ { name: 'ConvexHull', path: 'math/ConvexHull.js' } ], ignoreList: [] },
 	{ path: 'geometries/DecalGeometry.js', dependencies: [], ignoreList: [] },
-	{ path: 'geometries/LightningStrike.js', dependencies: [ { name: 'SimplexNoise', path: 'math/SimplexNoise.js' } ], ignoreList: [] },
+	{ path: 'geometries/LightningStrike.js', dependencies: [ { name: 'SimplexNoise', path: 'math/SimplexNoise.js' } ], ignoreList: [ 'Mesh' ] },
 	{ path: 'geometries/ParametricGeometries.js', dependencies: [], ignoreList: [] },
 	{ path: 'geometries/TeapotBufferGeometry.js', dependencies: [], ignoreList: [] },
 
@@ -72,15 +69,12 @@ var files = [
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
-	{ path: 'loaders/ctm/CTMLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/deprecated/LegacyGLTFLoader.js', dependencies: [], ignoreList: [ 'AnimationMixer' ] },
 	{ path: 'loaders/deprecated/LegacyJSONLoader.js', dependencies: [], ignoreList: [ 'ObjectLoader' ] },
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/AWDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpJSONLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/BabylonLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BasisTextureLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
 	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
@@ -88,7 +82,7 @@ var files = [
 	{ path: 'loaders/DRACOLoader.js', dependencies: [], ignoreList: [ 'LoadingManager' ] },
 	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/EquirectangularToCubeGenerator.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' }, { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
+	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ] },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },
@@ -103,7 +97,6 @@ var files = [
 	{ path: 'loaders/OBJLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PCDLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PDBLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/PlayCanvasLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PLYLoader.js', dependencies: [], ignoreList: [ 'Mesh' ] },
 	{ path: 'loaders/PRWMLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/PVRLoader.js', dependencies: [], ignoreList: [] },
@@ -143,7 +136,7 @@ var files = [
 
 	{ path: 'objects/Fire.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Lensflare.js', dependencies: [], ignoreList: [] },
-	{ path: 'objects/LightningStorm.js', dependencies: [ { name: 'LightningStrike', path: 'geometries/LightningStrike.js' } ], ignoreList: [] },
+	{ path: 'objects/LightningStorm.js', dependencies: [ { name: 'LightningStrike', path: 'geometries/LightningStrike.js' } ], ignoreList: [ 'Material' ] },
 	{ path: 'objects/MarchingCubes.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Reflector.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Refractor.js', dependencies: [], ignoreList: [] },
@@ -255,6 +248,9 @@ var files = [
 	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
 	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
 	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
+	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
+
+	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];
 
 for ( var i = 0; i < files.length; i ++ ) {

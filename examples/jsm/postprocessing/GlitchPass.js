@@ -115,9 +115,7 @@ GlitchPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-		var texture = new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
-		texture.needsUpdate = true;
-		return texture;
+		return new DataTexture( data_arr, dt_size, dt_size, RGBFormat, FloatType );
 
 	}
 

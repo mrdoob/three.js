@@ -147,6 +147,8 @@ Node.prototype = {
 
 		if ( source.userData !== undefined ) this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
+		return this;
+
 	},
 
 	createJSONNode: function ( meta ) {

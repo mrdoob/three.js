@@ -152,6 +152,8 @@ VelocityNode.prototype.copy = function ( source ) {
 
 	this.setParams( source.params );
 
+	return this;
+
 };
 
 VelocityNode.prototype.toJSON = function ( meta ) {

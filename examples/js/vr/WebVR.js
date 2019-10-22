@@ -5,7 +5,7 @@
  * Based on @tojiro's vr-samples-utils.js
  */
 
-var WEBVR = {
+THREE.WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
@@ -25,8 +25,17 @@ var WEBVR = {
 
 			button.textContent = 'ENTER VR';
 
-			button.onmouseenter = function () { button.style.opacity = '1.0'; };
-			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+			button.onmouseenter = function () {
+
+				button.style.opacity = '1.0';
+
+			};
+
+			button.onmouseleave = function () {
+
+				button.style.opacity = '0.5';
+
+			};
 
 			button.onclick = function () {
 
@@ -38,7 +47,7 @@ var WEBVR = {
 
 		}
 
-		function showEnterXR( device ) {
+		function showEnterXR( /*device*/ ) {
 
 			var currentSession = null;
 
@@ -53,7 +62,7 @@ var WEBVR = {
 
 			}
 
-			function onSessionEnded( event ) {
+			function onSessionEnded( /*event*/ ) {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
@@ -74,14 +83,31 @@ var WEBVR = {
 
 			button.textContent = 'ENTER XR';
 
-			button.onmouseenter = function () { button.style.opacity = '1.0'; };
-			button.onmouseleave = function () { button.style.opacity = '0.5'; };
+			button.onmouseenter = function () {
+
+				button.style.opacity = '1.0';
+
+			};
+
+			button.onmouseleave = function () {
+
+				button.style.opacity = '0.5';
+
+			};
 
 			button.onclick = function () {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-vr' ).then( onSessionStarted );
+					// WebXR's requestReferenceSpace only works if the corresponding feature
+					// was requested at session creation time. For simplicity, just ask for
+					// the interesting ones as optional features, but be aware that the
+					// requestReferenceSpace call will fail if it turns out to be unavailable.
+					// ('local' is always available for immersive sessions and doesn't need to
+					// be requested separately.)
+
+					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
 				} else {
 
@@ -143,14 +169,26 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'supportsSession' in navigator.xr ) {
+		if ( 'xr' in navigator && 'isSessionSupported' in navigator.xr ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
 
 			stylizeElement( button );
 
-			navigator.xr.supportsSession( 'immersive-vr' ).then( showEnterXR ).catch( showXRNotFound );
+			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
+
+				if ( supported ) {
+
+					showEnterXR();
+
+				} else {
+
+					showXRNotFound();
+
+				}
+
+			} );
 
 			return button;
 
@@ -167,7 +205,7 @@ var WEBVR = {
 
 			}, false );
 
-			window.addEventListener( 'vrdisplaydisconnect', function ( event ) {
+			window.addEventListener( 'vrdisplaydisconnect', function ( /*event*/ ) {
 
 				showVRNotFound();
 
@@ -218,27 +256,6 @@ var WEBVR = {
 
 		}
 
-	},
-
-	// DEPRECATED
-
-	checkAvailability: function () {
-		console.warn( 'WEBVR.checkAvailability has been deprecated.' );
-		return new Promise( function () {} );
-	},
-
-	getMessageContainer: function () {
-		console.warn( 'WEBVR.getMessageContainer has been deprecated.' );
-		return document.createElement( 'div' );
-	},
-
-	getButton: function () {
-		console.warn( 'WEBVR.getButton has been deprecated.' );
-		return document.createElement( 'div' );
-	},
-
-	getVRDisplay: function () {
-		console.warn( 'WEBVR.getVRDisplay has been deprecated.' );
 	}
 
 };

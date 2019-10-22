@@ -144,6 +144,8 @@ BumpMapNode.prototype.copy = function ( source ) {
 	this.value = source.value;
 	this.scale = source.scale;
 
+	return this;
+
 };
 
 BumpMapNode.prototype.toJSON = function ( meta ) {

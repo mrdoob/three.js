@@ -25,9 +25,9 @@ var BrightnessContrastShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
+		"	vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -43,15 +43,15 @@ var BrightnessContrastShader = {
 
 		"void main() {",
 
-			"gl_FragColor = texture2D( tDiffuse, vUv );",
+		"	gl_FragColor = texture2D( tDiffuse, vUv );",
 
-			"gl_FragColor.rgb += brightness;",
+		"	gl_FragColor.rgb += brightness;",
 
-			"if (contrast > 0.0) {",
-				"gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;",
-			"} else {",
-				"gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;",
-			"}",
+		"	if (contrast > 0.0) {",
+		"		gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;",
+		"	} else {",
+		"		gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;",
+		"	}",
 
 		"}"
 

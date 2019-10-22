@@ -3,7 +3,6 @@
  */
 
 import { TempNode } from '../core/TempNode.js';
-import { NormalNode } from '../accessors/NormalNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
 function PositionNode( scope ) {
@@ -114,6 +113,8 @@ PositionNode.prototype.copy = function ( source ) {
 
 	this.scope = source.scope;
 
+	return this;
+
 };
 
 PositionNode.prototype.toJSON = function ( meta ) {
@@ -146,7 +147,7 @@ NodeLib.addKeyword( 'worldPosition', function () {
 
 NodeLib.addKeyword( 'viewPosition', function () {
 
-	return new PositionNode( NormalNode.VIEW );
+	return new PositionNode( PositionNode.VIEW );
 
 } );
 

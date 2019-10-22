@@ -4,6 +4,7 @@
 /* global QUnit */
 
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
+import { DynamicDrawUsage } from '../../../../src/constants';
 
 export default QUnit.module( 'Core', () => {
 
@@ -20,7 +21,7 @@ export default QUnit.module( 'Core', () => {
 			}
 
 			assert.ok( copiedInstance.stride === instance.stride, "stride was copied" );
-			assert.ok( copiedInstance.dynamic === true, "dynamic was copied" );
+			assert.ok( copiedInstance.usage === DynamicDrawUsage, "usage was copied" );
 
 		}
 
@@ -49,37 +50,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "setArray", ( assert ) => {
+		QUnit.test( "setUsage", ( assert ) => {
 
-			var f32a = new Float32Array( [ 1, 2, 3, 4 ] );
-			var f32b = new Float32Array( [] );
-			var a = new InterleavedBuffer( f32a, 2, false );
+			var instance = new InterleavedBuffer();
+			instance.setUsage( DynamicDrawUsage );
 
-			a.setArray( f32a );
-
-			assert.strictEqual( a.count, 2, "Check item count for non-empty array" );
-			assert.strictEqual( a.array, f32a, "Check array itself" );
-
-			a.setArray( f32b );
-
-			assert.strictEqual( a.count, 0, "Check item count for empty array" );
-			assert.strictEqual( a.array, f32b, "Check array itself" );
-
-			assert.throws(
-				function () {
-
-					a.setArray( [ 1, 2, 3, 4 ] );
-
-				},
-				/array should be a Typed Array/,
-				"Calling setArray with a non-typed array throws Error"
-			);
-
-		} );
-
-		QUnit.todo( "setDynamic", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.strictEqual( instance.usage, DynamicDrawUsage, "Usage was set" );
 
 		} );
 
@@ -87,7 +63,7 @@ export default QUnit.module( 'Core', () => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InterleavedBuffer( array, 3 );
-			instance.setDynamic( true );
+			instance.setUsage( DynamicDrawUsage );
 
 			checkInstanceAgainstCopy( instance, instance.copy( instance ), assert );
 
@@ -120,7 +96,7 @@ export default QUnit.module( 'Core', () => {
 
 			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			var instance = new InterleavedBuffer( array, 3 );
-			instance.setDynamic( true );
+			instance.setUsage( DynamicDrawUsage );
 
 			checkInstanceAgainstCopy( instance, instance.clone(), assert );
 

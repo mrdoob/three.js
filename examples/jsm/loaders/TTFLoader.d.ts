@@ -1,16 +1,15 @@
 import {
-  BufferGeometry,
-  LoadingManager
+	BufferGeometry,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
-export class TTFLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
-  reversed: boolean;
+export class TTFLoader extends Loader {
 
-  load(url: string, onLoad: (json: object) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setPath(path: string): this;
+	constructor( manager?: LoadingManager );
+	reversed: boolean;
 
-  parse(arraybuffer: ArrayBuffer): object;
+	load( url: string, onLoad: ( json: object ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+	parse( arraybuffer: ArrayBuffer ): object;
+
 }

@@ -7,7 +7,6 @@
 import {
 	Matrix4,
 	Object3D,
-	REVISION,
 	Vector3
 } from "../../../build/three.module.js";
 
@@ -45,8 +44,6 @@ CSS3DSprite.prototype.constructor = CSS3DSprite;
 //
 
 var CSS3DRenderer = function () {
-
-	console.log( 'THREE.CSS3DRenderer', REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;

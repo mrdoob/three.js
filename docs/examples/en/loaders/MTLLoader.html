@@ -8,6 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:Loader] &rarr;
 
 		<h1>[name]</h1>
 
@@ -27,10 +28,10 @@
 		</p>
 
 		<h2>Properties</h2>
-
+		<p>See the base [page:Loader] class for common properties.</p>
 
 		<h2>Methods</h2>
-
+		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -42,35 +43,6 @@
 		<p>
 			Begin loading from url and return the loaded material.
 		</p>
-
-
-		<h3>[method:MTLLoader setPath]( [param:String path] )</h3>
-		<p>
-			[page:String path] — required<br />
-		</p>
-		<p>
-			 Set base path for MTL file.
-		</p>
-
-
-		<h3>[method:MTLLoader setResourcePath]( [param:String path] )</h3>
-		<p>
-			[page:String path] — required<br />
-		</p>
-		<p>
-			Set base path for additional resources like textures. If set, this path will be used as the base path.
-		</p>
-
-
-		<h3>[method:MTLLoader setCrossOrigin]( [param:String value] )</h3>
-		<p>
-			[page:String value] — required<br />
-		</p>
-		<p>
-			If set, assigns the [link:https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes crossOrigin]
-		 attribute of the image to the value of *crossOrigin*, prior to starting the load. Default is *"anonymous"*.
-		</p>
-
 
 		<h3>[method:MTLLoader setMaterialOptions]( [param:Object options] )</h3>
 		<p>
@@ -100,6 +72,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/[name].js examples/js/loaders/[name].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/[name].js examples/js/loaders/[name].js]
+		</p>
 	</body>
 </html>

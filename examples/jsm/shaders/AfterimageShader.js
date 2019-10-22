@@ -24,8 +24,8 @@ var AfterimageShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -39,21 +39,21 @@ var AfterimageShader = {
 		"uniform sampler2D tNew;",
 
 		"varying vec2 vUv;",
-		
+
 		"vec4 when_gt( vec4 x, float y ) {",
 
-			"return max( sign( x - y ), 0.0 );",
+		"	return max( sign( x - y ), 0.0 );",
 
 		"}",
 
 		"void main() {",
 
-			"vec4 texelOld = texture2D( tOld, vUv );",
-			"vec4 texelNew = texture2D( tNew, vUv );",
-			
-			"texelOld *= damp * when_gt( texelOld, 0.1 );",
+		"	vec4 texelOld = texture2D( tOld, vUv );",
+		"	vec4 texelNew = texture2D( tNew, vUv );",
 
-			"gl_FragColor = max(texelNew, texelOld);",
+		"	texelOld *= damp * when_gt( texelOld, 0.1 );",
+
+		"	gl_FragColor = max(texelNew, texelOld);",
 
 		"}"
 

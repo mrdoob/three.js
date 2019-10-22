@@ -10,6 +10,8 @@ import {
 	DepthModes,
 	Side,
 	Colors,
+	StencilFunc,
+	StencilOp
 } from '../constants';
 
 // Materials //////////////////////////////////////////////////////////////////////////////////
@@ -32,10 +34,8 @@ export interface MaterialParameters {
 	depthTest?: boolean;
 	depthWrite?: boolean;
 	fog?: boolean;
-	lights?: boolean;
 	name?: string;
 	opacity?: number;
-	overdraw?: number;
 	polygonOffset?: boolean;
 	polygonOffsetFactor?: number;
 	polygonOffsetUnits?: number;
@@ -45,10 +45,18 @@ export interface MaterialParameters {
 	flatShading?: boolean;
 	side?: Side;
 	shadowSide?: Side;
+	toneMapped?: boolean;
 	transparent?: boolean;
 	vertexColors?: Colors;
 	vertexTangents?: boolean;
 	visible?: boolean;
+	stencilWrite?: boolean;
+	stencilFunc?: StencilFunc;
+	stencilRef?: number;
+	stencilMask?: number;
+	stencilFail?: StencilOp;
+	stencilZFail?: StencilOp;
+	stencilZPass?: StencilOp;
 }
 
 /**
@@ -145,15 +153,45 @@ export class Material extends EventDispatcher {
 	id: number;
 
 	/**
+   * Whether rendering this material has any effect on the stencil buffer. Default is *false*.
+   */
+	stencilWrite: boolean;
+
+	/**
+   * The stencil comparison function to use. Default is {@link AlwaysStencilFunc}. See stencil operation constants for all possible values.
+   */
+	stencilFunc: StencilFunc;
+
+	/**
+   * The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+   */
+	stencilRef: number;
+
+	/**
+   * The bit mask to use when comparing against or writing to the stencil buffer. Default is *0xFF*.
+   */
+	stencilMask: number;
+
+	/**
+   * Which stencil operation to perform when the comparison function returns false. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+   */
+	stencilFail: StencilOp;
+
+	/**
+   * Which stencil operation to perform when the comparison function returns true but the depth test fails. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+   */
+	stencilZFail: StencilOp;
+
+	/**
+   * Which stencil operation to perform when the comparison function returns true and the depth test passes. Default is {@link KeepStencilOp}. See the stencil operation constants for all possible values.
+   */
+	stencilZPass: StencilOp;
+
+	/**
 	 * Used to check whether this or derived classes are materials. Default is true.
 	 * You should not change this, as it used internally for optimisation.
 	 */
 	isMaterial: boolean;
-
-	/**
-	 * Whether the material is affected by lights. Default is true.
-	 */
-	lights: boolean;
 
 	/**
 	 * Material name. Default is an empty string.
@@ -170,11 +208,6 @@ export class Material extends EventDispatcher {
 	 * Opacity. Default is 1.
 	 */
 	opacity: number;
-
-	/**
-	 * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
-	 */
-	overdraw: number;
 
 	/**
 	 * Whether to use polygon offset. Default is false. This corresponds to the POLYGON_OFFSET_FILL WebGL feature.
@@ -216,6 +249,12 @@ export class Material extends EventDispatcher {
 	 * Default is THREE.FrontSide. Other options are THREE.BackSide and THREE.DoubleSide.
 	 */
 	side: Side;
+
+	/**
+	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
+	 * Default is true.
+	 */
+	toneMapped: boolean;
 
 	/**
 	 * Defines whether this material is transparent. This has an effect on rendering as transparent objects need special treatment and are rendered after non-transparent objects.
@@ -288,10 +327,5 @@ export class Material extends EventDispatcher {
 	 * @param meta Object containing metadata such as textures or images for the material.
 	 */
 	toJSON( meta?: any ): any;
-
-	/**
-	 * Call .dispatchEvent ( { type: 'update' }) on the material.
-	 */
-	update(): void;
 
 }

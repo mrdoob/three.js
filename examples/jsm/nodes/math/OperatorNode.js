@@ -63,6 +63,8 @@ OperatorNode.prototype.copy = function ( source ) {
 	this.b = source.b;
 	this.op = source.op;
 
+	return this;
+
 };
 
 OperatorNode.prototype.toJSON = function ( meta ) {

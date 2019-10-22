@@ -52,6 +52,8 @@ NodePass.prototype.copy = function ( source ) {
 
 	this.input = source.input;
 
+	return this;
+
 };
 
 NodePass.prototype.toJSON = function ( meta ) {

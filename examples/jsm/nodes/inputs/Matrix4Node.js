@@ -50,6 +50,8 @@ Matrix4Node.prototype.copy = function ( source ) {
 
 	this.scope.value.fromArray( source.elements );
 
+	return this;
+
 };
 
 Matrix4Node.prototype.toJSON = function ( meta ) {

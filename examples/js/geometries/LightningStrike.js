@@ -419,22 +419,22 @@ THREE.LightningStrike.prototype.createMesh = function () {
 	this.setIndex( new THREE.Uint32BufferAttribute( this.indices, 1 ) );
 
 	this.positionAttribute = new THREE.Float32BufferAttribute( this.vertices, 3 );
-	this.addAttribute( 'position', this.positionAttribute );
+	this.setAttribute( 'position', this.positionAttribute );
 
 	if ( this.generateUVs ) {
 
 		this.uvsAttribute = new THREE.Float32BufferAttribute( new Float32Array( this.uvs ), 2 );
-		this.addAttribute( 'uv', this.uvsAttribute );
+		this.setAttribute( 'uv', this.uvsAttribute );
 
 	}
 
 	if ( ! this.isStatic ) {
 
-		this.index.dynamic = true;
-		this.positionAttribute.dynamic = true;
+		this.index.usage = THREE.DynamicDrawUsage;
+		this.positionAttribute.usage = THREE.DynamicDrawUsage;
 		if ( this.generateUVs ) {
 
-			this.uvsAttribute.dynamic = true;
+			this.uvsAttribute.usage = THREE.DynamicDrawUsage;
 
 		}
 
@@ -532,7 +532,7 @@ THREE.LightningStrike.prototype.fillMesh = function ( time ) {
 
 };
 
-THREE.LightningStrike.prototype.addNewSubray = function ( rayParameters ) {
+THREE.LightningStrike.prototype.addNewSubray = function ( /*rayParameters*/ ) {
 
 	return this.subrays[ this.numSubrays ++ ];
 
@@ -784,7 +784,7 @@ THREE.LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, 
 
 };
 
-THREE.LightningStrike.prototype.createPrismFaces = function ( vertex, index ) {
+THREE.LightningStrike.prototype.createPrismFaces = function ( vertex/*, index*/ ) {
 
 	var indices = this.indices;
 	var vertex = this.currentVertex - 6;
@@ -831,7 +831,7 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 		var childSubraySeed = random1() * ( currentCycle + 1 );
 
 		var isActive = phase % period <= dutyCycle * period;
-		
+
 		var probability = 0;
 
 		if ( isActive ) {

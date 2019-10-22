@@ -202,6 +202,8 @@ SpriteNode.prototype.copy = function ( source ) {
 
 	if ( source.alpha ) this.alpha = source.alpha;
 
+	return this;
+
 };
 
 SpriteNode.prototype.toJSON = function ( meta ) {

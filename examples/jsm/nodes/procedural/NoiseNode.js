@@ -48,6 +48,8 @@ NoiseNode.prototype.copy = function ( source ) {
 
 	this.uv = source.uv;
 
+	return this;
+
 };
 
 NoiseNode.prototype.toJSON = function ( meta ) {

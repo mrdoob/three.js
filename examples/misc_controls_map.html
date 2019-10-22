@@ -28,7 +28,7 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { MapControls } from './jsm/controls/MapControls.js';
+			import { MapControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, controls, scene, renderer;
 
@@ -57,7 +57,7 @@
 				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
 				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-				controls.dampingFactor = 0.25;
+				controls.dampingFactor = 0.05;
 
 				controls.screenSpacePanning = false;
 

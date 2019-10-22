@@ -33,6 +33,8 @@ Vector4Node.prototype.copy = function ( source ) {
 
 	this.value.copy( source );
 
+	return this;
+
 };
 
 Vector4Node.prototype.toJSON = function ( meta ) {

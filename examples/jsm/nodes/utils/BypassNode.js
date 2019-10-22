@@ -62,6 +62,8 @@ BypassNode.prototype.copy = function ( source ) {
 	this.code = source.code;
 	this.value = source.value;
 
+	return this;
+
 };
 
 BypassNode.prototype.toJSON = function ( meta ) {

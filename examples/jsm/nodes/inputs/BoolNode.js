@@ -28,6 +28,8 @@ BoolNode.prototype.copy = function ( source ) {
 
 	this.value = source.value;
 
+	return this;
+
 };
 
 BoolNode.prototype.toJSON = function ( meta ) {

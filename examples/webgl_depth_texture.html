@@ -71,7 +71,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, stats;
+			var camera, scene, renderer, controls, stats;
 			var target;
 			var postScene, postCamera;
 			var supportsExtension = true;
@@ -102,10 +102,9 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 50 );
 				camera.position.z = 4;
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
-				controls.dampingFactor = 0.25;
-				controls.rotateSpeed = 0.35;
+				controls.dampingFactor = 0.05;
 
 				// Create a multi render target with Float buffers
 				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
@@ -207,6 +206,8 @@
 				// render post FX
 				renderer.setRenderTarget( null );
 				renderer.render( postScene, postCamera );
+
+				controls.update(); // required because damping is enabled
 
 				stats.update();
 

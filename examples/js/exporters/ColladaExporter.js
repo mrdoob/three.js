@@ -220,7 +220,9 @@ THREE.ColladaExporter.prototype = {
 						bufferGeometry.groups :
 						[ { start: 0, count: indexCount, materialIndex: 0 } ];
 
-				var gnode = `<geometry id="${ meshid }" name="${ g.name }"><mesh>`;
+
+				var gname = g.name ? ` name="${ g.name }"` : '';
+				var gnode = `<geometry id="${ meshid }"${ gname }><mesh>`;
 
 				// define the geometry node and the vertices for the geometry
 				var posName = `${ meshid }-position`;
@@ -485,7 +487,7 @@ THREE.ColladaExporter.prototype = {
 
 					(
 						m.side === THREE.DoubleSide ?
-							`<extra><technique><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
+							`<extra><technique profile="THREEJS"><double_sided sid="double_sided" type="int">1</double_sided></technique></extra>` :
 							''
 					) +
 
@@ -493,7 +495,10 @@ THREE.ColladaExporter.prototype = {
 
 					'</effect>';
 
-				libraryMaterials.push( `<material id="${ matid }" name="${ m.name }"><instance_effect url="#${ matid }-effect" /></material>` );
+				var materialName = m.name ? ` name="${ m.name }"` : '';
+				var materialNode = `<material id="${ matid }"${ materialName }><instance_effect url="#${ matid }-effect" /></material>`;
+
+				libraryMaterials.push( materialNode );
 				libraryEffects.push( effectnode );
 				materialMap.set( m, matid );
 

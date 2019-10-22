@@ -43,6 +43,8 @@ VarNode.prototype.copy = function ( source ) {
 	this.type = source.type;
 	this.value = source.value;
 
+	return this;
+
 };
 
 VarNode.prototype.toJSON = function ( meta ) {

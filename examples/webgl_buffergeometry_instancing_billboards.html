@@ -129,7 +129,7 @@
 
 			}
 
-			geometry.addAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3 ) );
+			geometry.setAttribute( 'translate', new THREE.InstancedBufferAttribute( translateArray, 3 ) );
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {

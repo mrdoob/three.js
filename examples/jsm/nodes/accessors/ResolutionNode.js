@@ -43,6 +43,8 @@ ResolutionNode.prototype.copy = function ( source ) {
 
 	this.renderer = source.renderer;
 
+	return this;
+
 };
 
 ResolutionNode.prototype.toJSON = function ( meta ) {

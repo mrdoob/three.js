@@ -8,19 +8,20 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>CSS 3D渲染器（[name]）</h1>
 
-		<p class="desc">[name] can be used to apply hierarchical 3D transformations to DOM elements
-			via the CSS3 [link:https://www.w3schools.com/cssref/css3_pr_transform.asp transform] property.
-			This renderer is particular interesting if you want to apply 3D effects to a website without
-			canvas based rendering. It can also be used in order to combine DOM elements with WebGL
-			content.<br /><br />
-			There are, however, some important limitations:
+		<p class="desc">
+			[name]用于通过CSS3的[link:https://www.w3schools.com/cssref/css3_pr_transform.asp transform]属性，
+			将层级的3D变换应用到DOM元素上。
+			如果你希望不借助基于canvas的渲染来在你的网站上应用3D变换，那么这一渲染器十分有趣。
+			同时，它也可以将DOM元素与WebGL的内容相结合。
+			<br /><br />
+			然而，这一渲染器也有一些十分重要的限制：
 			<ul>
-				<li>It's not possible to use the material system of *three.js*.</li>
-				<li>It's also not possible to use geometries.</li>
+				<li>它不可能使用*three.js*中的材质系统。</li>
+				<li>同时也不可能使用几何体。</li>
 			</ul>
-			So [name] is just focused on ordinary DOM elements. These elements are wrapped into special objects (*CSS3DObject* or *CSS3DSprite*) and then added to the scene graph.
+			因此，[name]仅仅关注普通的DOM元素，这些元素被包含到了特殊的对象中（*CSS3DObject*或者*CSS3DSprite*），然后被加入到场景图中。
 		</p>
 
 		<script>
@@ -39,7 +40,7 @@
 
 		</script>
 
-		<h2>Examples</h2>
+		<h2>示例</h2>
 
 		<p>
 			[example:css3d_molecules molecules]<br />
@@ -49,29 +50,31 @@
 			[example:css3d_sprites sprites]<br />
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]()</h3>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Object getSize]()</h3>
 		<p>
-			Returns an object containing the width and height of the renderer.
+			返回一个包含有渲染器宽和高的对象。
 		</p>
 
 		<h3>[method:null render]( [param:Scene scene], [param:PerspectiveCamera camera] )</h3>
 		<p>
-			Renders a [page:Scene scene] using a [page:PerspectiveCamera perspective camera].<br />
+			使用[page:PerspectiveCamera perspective camera]渲染[page:Scene scene]。<br />
 		</p>
 
 		<h3>[method:null setSize]([param:Number width], [param:Number height])</h3>
 		<p>
-			Resizes the renderer to (width, height).
+			将渲染器尺寸重新调整为(width, height)。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/CSS3DRenderer.js examples/js/renderers/CSS3DRenderer.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/CSS3DRenderer.js examples/js/renderers/CSS3DRenderer.js]
+		</p>
 	</body>
 </html>

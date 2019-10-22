@@ -113,6 +113,8 @@ ColorAdjustmentNode.prototype.copy = function ( source ) {
 	this.adjustment = source.adjustment;
 	this.method = source.method;
 
+	return this;
+
 };
 
 ColorAdjustmentNode.prototype.toJSON = function ( meta ) {

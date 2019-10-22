@@ -41,6 +41,8 @@ RawNode.prototype.copy = function ( source ) {
 
 	this.value = source.value;
 
+	return this;
+
 };
 
 RawNode.prototype.toJSON = function ( meta ) {

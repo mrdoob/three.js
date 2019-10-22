@@ -37,8 +37,6 @@ AttributeNode.prototype.generate = function ( builder, output ) {
 	var attribute = builder.getAttribute( this.name, type ),
 		name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
 
-	console.log( attribute );
-
 	return builder.format( name, this.getType( builder ), output );
 
 };
@@ -48,6 +46,8 @@ AttributeNode.prototype.copy = function ( source ) {
 	Node.prototype.copy.call( this, source );
 
 	this.type = source.type;
+
+	return this;
 
 };
 

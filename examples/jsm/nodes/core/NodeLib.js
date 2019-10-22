@@ -39,9 +39,9 @@ var NodeLib = {
 
 	},
 
-	getKeyword: function ( name, material ) {
+	getKeyword: function ( name, builder ) {
 
-		return this.keywords[ name ].callback.call( this, material );
+		return this.keywords[ name ].callback.call( this, builder );
 
 	},
 
@@ -53,13 +53,13 @@ var NodeLib = {
 
 	contains: function ( name ) {
 
-		return this.nodes[ name ] != undefined;
+		return this.nodes[ name ] !== undefined;
 
 	},
 
 	containsKeyword: function ( name ) {
 
-		return this.keywords[ name ] != undefined;
+		return this.keywords[ name ] !== undefined;
 
 	}
 

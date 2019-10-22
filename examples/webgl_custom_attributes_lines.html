@@ -113,10 +113,10 @@
 				var count = geometry.attributes.position.count;
 
 				var displacement = new THREE.Float32BufferAttribute( count * 3, 3 );
-				geometry.addAttribute( 'displacement', displacement );
+				geometry.setAttribute( 'displacement', displacement );
 
 				var customColor = new THREE.Float32BufferAttribute( count * 3, 3 );
-				geometry.addAttribute( 'customColor', customColor );
+				geometry.setAttribute( 'customColor', customColor );
 
 				var color = new THREE.Color( 0xffffff );
 

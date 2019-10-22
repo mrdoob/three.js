@@ -41,7 +41,7 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 
 	if ( bias === undefined && builder.context.bias ) {
 
-		bias = new builder.context.bias( this ).build( builder, 'f' );
+		bias = builder.context.bias.setTexture( this ).build( builder, 'f' );
 
 	}
 
@@ -61,7 +61,7 @@ CubeTextureNode.prototype.generate = function ( builder, output ) {
 	builder.addContext( context );
 
 	this.colorSpace = this.colorSpace || new ColorSpaceNode( new ExpressionNode( '', outputType ) );
-	this.colorSpace.fromEncoding( builder.getTextureEncodingFromMap( this.value ) );
+	this.colorSpace.fromDecoding( builder.getTextureEncodingFromMap( this.value ) );
 	this.colorSpace.input.parse( code );
 
 	code = this.colorSpace.build( builder, outputType );
@@ -83,6 +83,8 @@ CubeTextureNode.prototype.copy = function ( source ) {
 	this.uv = source.uv;
 
 	if ( source.bias ) this.bias = source.bias;
+
+	return this;
 
 };
 

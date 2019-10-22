@@ -243,6 +243,8 @@ MathNode.prototype.copy = function ( source ) {
 	this.c = source.c;
 	this.method = source.method;
 
+	return this;
+
 };
 
 MathNode.prototype.toJSON = function ( meta ) {

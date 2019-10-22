@@ -135,6 +135,8 @@ RTTNode.prototype.copy = function ( source ) {
 
 	this.saveTo = source.saveTo;
 
+	return this;
+
 };
 
 RTTNode.prototype.toJSON = function ( meta ) {

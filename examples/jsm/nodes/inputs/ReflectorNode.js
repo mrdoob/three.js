@@ -67,6 +67,8 @@ ReflectorNode.prototype.copy = function ( source ) {
 
 	this.scope.mirror = source.mirror;
 
+	return this;
+
 };
 
 ReflectorNode.prototype.toJSON = function ( meta ) {

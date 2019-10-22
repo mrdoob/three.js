@@ -372,6 +372,8 @@ PhongNode.prototype.copy = function ( source ) {
 	if ( source.environment ) this.environment = source.environment;
 	if ( source.environmentAlpha ) this.environmentAlpha = source.environmentAlpha;
 
+	return this;
+
 };
 
 PhongNode.prototype.toJSON = function ( meta ) {
