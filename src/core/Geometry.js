@@ -9,6 +9,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from './Object3D.js';
 import { _Math } from '../math/Math.js';
+import { InterleavedBufferAttribute } from './InterleavedBufferAttribute.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -187,20 +188,76 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		var scope = this;
 
 		var indices = geometry.index !== null ? geometry.index.array : undefined;
-		var attributes = geometry.attributes;
+		var attributes = geometry.attributes; // incorrect when it's interleavedBufferAttributes
+
+		var positions = [];
+		var normals = [];
+		var colors = [];
+		var uvs = [];
+		var uvs2 = [];
 
 		if ( attributes.position === undefined ) {
 
 			console.error( 'THREE.Geometry.fromBufferGeometry(): Position attribute required for conversion.' );
 			return this;
 
-		}
+		} else if ( attributes.position instanceof InterleavedBufferAttribute ) {
 
-		var positions = attributes.position.array;
-		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
-		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
-		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
-		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+			var data = attributes.position.array;
+			var stride = attributes.position.data.stride;
+
+			var positionAttribute = attributes.position;
+			var normalAttribute = attributes.normal;
+			var colorAttribute = attributes.color;
+			var uvsAttribute = attributes.uvs;
+			var uvs2Attribute = attributes.uvs2;
+
+			for ( var i = 0; i < data.length; i ++ ) {
+
+				var currentIdx = i % stride;
+
+				if ( positionAttribute.offset <= currentIdx && currentIdx < positionAttribute.offset + positionAttribute.itemSize ) {
+
+					positions.push( data[ i ] );
+
+				} else if ( normalAttribute !== undefined &&
+						normalAttribute.offset <= currentIdx && currentIdx < normalAttribute.offset + normalAttribute.itemSize ) {
+
+					normals.push( data[ i ] );
+
+				} else if ( colorAttribute !== undefined &&
+						colorAttribute.offset <= currentIdx && currentIdx < colorAttribute.offset + colorAttribute.itemSize ) {
+
+					colors.push( data[ i ] );
+
+				} else if ( uvsAttribute !== undefined &&
+						uvsAttribute.offset <= currentIdx && currentIdx < uvsAttribute.offset + uvsAttribute.itemSize ) {
+
+					uvs.push( data[ i ] );
+
+				} else if ( uvs2Attribute !== undefined &&
+						uvs2Attribute.offset <= currentIdx && currentIdx < uvs2Attribute.offset + uvs2Attribute.itemSize ) {
+
+					uvs2.push( data[ i ] );
+
+				}
+
+			}
+
+			normals = normals.length !== 0 ? normals : undefined;
+			colors = colors.length !== 0 ? colors : undefined;
+			uvs = uvs.length !== 0 ? uvs : undefined;
+			uvs2 = uvs2.length !== 0 ? uvs2 : undefined;
+
+		} else {
+
+			positions = attributes.position.array;
+			normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
+			colors = attributes.color !== undefined ? attributes.color.array : undefined;
+			uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
+			uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+
+		}
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
