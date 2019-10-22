@@ -4,29 +4,7 @@
 		<title>three.js webgl - animation - basic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #f00;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -34,13 +12,11 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - basic use
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import Stats from './jsm/libs/stats.module.js';
 
 			var stats, clock;
 			var scene, camera, renderer, mixer;
@@ -80,7 +56,7 @@
 				var scaleKF = new THREE.VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
 
 				// ROTATION
-				// Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
+				// Rotation should be performed using quaternions, using a THREE.QuaternionKeyframeTrack
 				// Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
 
 				// set up rotation about x axis
@@ -100,7 +76,7 @@
 				// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
 				var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
 
-				// setup the AnimationMixer
+				// setup the THREE.AnimationMixer
 				mixer = new THREE.AnimationMixer( mesh );
 
 				// create a ClipAction and set it to play

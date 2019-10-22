@@ -4,35 +4,25 @@
 		<title>three.js webvr - ball shooter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-09-11 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-09-11" content="AqhFUYKxq/d+E8CDT0fuYRCg8TvlTP52x0Jv7I9t27sLhR30LmcahBRfSwzP89ukjs2+ia99VrrLoRyaFAwJVA0AAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUzNjYyNDAwMH0=">
-		<!-- Origin Trial Token, feature = WebXR Device API (For Chrome M69+), origin = https://threejs.org, expires = 2018-10-27 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Device API (For Chrome M69+)" data-expires="2018-10-27" content="An4ZYOGvf6kVHNxqZxS02TPAvpZESkmBhcVCM/byViDDuEB2XKvCF43aCJjrAU/R8H3WDlv+1bDGTL/XxstHGgoAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU02OSIsImV4cGlyeSI6MTU0MDY1NTAyMn0=">
-		<!-- Origin Trial Token, feature = WebXR Gamepad Support, origin = https://threejs.org, expires = 2018-10-24 -->
-		<meta http-equiv="origin-trial" data-feature="WebXR Gamepad Support" data-expires="2018-10-24" content="Agrr6lZhlwzv5jmv/mpLZA37DIiVcg3HvX8bH8EWB+OBruV3sUJuzDfYz6qs/je+LcH41DkrmPn4k9RaUaqpQAAAAABYeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkdhbWVwYWRTdXBwb3J0IiwiZXhwaXJ5IjoxNTQwMzg4NjI0fQ==">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #101010;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			a {
-				color: #48f;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebXR Device API (For Chrome M76+), expires 10/16/2019 -->
+		<meta http-equiv="origin-trial" content="AtWCPo0cZgy0zJDSYftemy7eZvmcwR5qy/4osFkMkLZ0ar6OYyKfbu93pjpxiOVzcWNIVxgoWoK8YtxCXeFSqgIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3MTE4Mzk5OX0=">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/vr/WebVR.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter
+		</div>
 
-		<script src="js/geometries/BoxLineGeometry.js"></script>
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
-		<script>
+		<script type="module">
 
-			var container;
+			import * as THREE from '../build/three.module.js';
+
+			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
+			import { WEBVR } from './jsm/vr/WebVR.js';
+
 			var camera, scene, renderer;
 			var controller1, controller2;
 
@@ -43,21 +33,12 @@
 			var normal = new THREE.Vector3();
 			var relativeVelocity = new THREE.Vector3();
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webvr - ball shooter';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
@@ -65,7 +46,7 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 
 				room = new THREE.LineSegments(
-					new THREE.BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
 					new THREE.LineBasicMaterial( { color: 0x808080 } )
 				);
 				room.geometry.translate( 0, 3, 0 );
@@ -100,7 +81,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.vr.enabled = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				//
 
@@ -133,8 +114,8 @@
 				// helpers
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
 
 				var material = new THREE.LineBasicMaterial( { vertexColors: true, blending: THREE.AdditiveBlending } );
 
@@ -163,9 +144,9 @@
 					var object = room.children[ count ++ ];
 
 					object.position.copy( controller.position );
-					object.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02;
-					object.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02;
-					object.userData.velocity.z = ( Math.random() * 0.02 - 0.1 );
+					object.userData.velocity.x = ( Math.random() - 0.5 ) * 3;
+					object.userData.velocity.y = ( Math.random() - 0.5 ) * 3;
+					object.userData.velocity.z = ( Math.random() - 9 );
 					object.userData.velocity.applyQuaternion( controller.quaternion );
 
 					if ( count === room.children.length ) count = 0;
@@ -189,13 +170,17 @@
 
 				//
 
+				var delta = clock.getDelta() * 0.8; // slow down simulation
+
 				var range = 3 - radius;
 
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var object = room.children[ i ];
 
-					object.position.add( object.userData.velocity );
+					object.position.x += object.userData.velocity.x * delta;
+					object.position.y += object.userData.velocity.y * delta;
+					object.position.z += object.userData.velocity.z * delta;
 
 					// keep objects inside room
 
@@ -251,7 +236,7 @@
 
 					}
 
-					object.userData.velocity.y -= 0.00098;
+					object.userData.velocity.y -= 9.8 * delta;
 
 				}
 

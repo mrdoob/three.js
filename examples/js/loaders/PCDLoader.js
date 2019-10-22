@@ -10,13 +10,14 @@
 
 THREE.PCDLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
+
 	this.littleEndian = true;
 
 };
 
 
-THREE.PCDLoader.prototype = {
+THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.PCDLoader,
 
@@ -25,6 +26,7 @@ THREE.PCDLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
@@ -161,7 +163,7 @@ THREE.PCDLoader.prototype = {
 
 		}
 
-		var textData = THREE.LoaderUtils.decodeText( data );
+		var textData = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
 
 		// parse header (always ascii format)
 
@@ -197,11 +199,11 @@ THREE.PCDLoader.prototype = {
 
 				if ( offset.rgb !== undefined ) {
 
-					var c = new Float32Array( [ parseFloat( line[ offset.rgb ] ) ] );
-					var dataview = new DataView( c.buffer, 0 );
-					color.push( dataview.getUint8( 0 ) / 255.0 );
-					color.push( dataview.getUint8( 1 ) / 255.0 );
-					color.push( dataview.getUint8( 2 ) / 255.0 );
+					var rgb = parseFloat( line[ offset.rgb ] );
+					var r = ( rgb >> 16 ) & 0x0000ff;
+					var g = ( rgb >> 8 ) & 0x0000ff;
+					var b = ( rgb >> 0 ) & 0x0000ff;
+					color.push( r / 255, g / 255, b / 255 );
 
 				}
 
@@ -243,9 +245,9 @@ THREE.PCDLoader.prototype = {
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( row + offset.rgb + 0 ) / 255.0 );
-					color.push( dataview.getUint8( row + offset.rgb + 1 ) / 255.0 );
 					color.push( dataview.getUint8( row + offset.rgb + 2 ) / 255.0 );
+					color.push( dataview.getUint8( row + offset.rgb + 1 ) / 255.0 );
+					color.push( dataview.getUint8( row + offset.rgb + 0 ) / 255.0 );
 
 				}
 
@@ -265,9 +267,9 @@ THREE.PCDLoader.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
-		if ( position.length > 0 ) geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-		if ( normal.length > 0 ) geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normal, 3 ) );
-		if ( color.length > 0 ) geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
+		if ( position.length > 0 ) geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normal, 3 ) );
+		if ( color.length > 0 ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
 
 		geometry.computeBoundingSphere();
 
@@ -277,7 +279,7 @@ THREE.PCDLoader.prototype = {
 
 		if ( color.length > 0 ) {
 
-			material.vertexColors = true;
+			material.vertexColors = THREE.VertexColors;
 
 		} else {
 
@@ -297,4 +299,4 @@ THREE.PCDLoader.prototype = {
 
 	}
 
-};
+} );

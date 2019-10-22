@@ -19,11 +19,14 @@ import { _Math } from '../math/Math.js';
  * @author bhouston / http://clara.io
  */
 
-var geometryId = 0; // Geometry uses even numbers as Id
+var _geometryId = 0; // Geometry uses even numbers as Id
+var _m1 = new Matrix4();
+var _obj = new Object3D();
+var _offset = new Vector3();
 
 function Geometry() {
 
-	Object.defineProperty( this, 'id', { value: geometryId += 2 } );
+	Object.defineProperty( this, 'id', { value: _geometryId += 2 } );
 
 	this.uuid = _Math.generateUUID();
 
@@ -107,111 +110,77 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	rotateX: function () {
+	rotateX: function ( angle ) {
 
 		// rotate geometry around world x-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationX( angle );
 
-		return function rotateX( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationX( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	rotateY: function () {
+	rotateY: function ( angle ) {
 
 		// rotate geometry around world y-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationY( angle );
 
-		return function rotateY( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationY( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	rotateZ: function () {
+	rotateZ: function ( angle ) {
 
 		// rotate geometry around world z-axis
 
-		var m1 = new Matrix4();
+		_m1.makeRotationZ( angle );
 
-		return function rotateZ( angle ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeRotationZ( angle );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	translate: function () {
+	translate: function ( x, y, z ) {
 
 		// translate geometry
 
-		var m1 = new Matrix4();
+		_m1.makeTranslation( x, y, z );
 
-		return function translate( x, y, z ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeTranslation( x, y, z );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
-
-		};
-
-	}(),
-
-	scale: function () {
+	scale: function ( x, y, z ) {
 
 		// scale geometry
 
-		var m1 = new Matrix4();
+		_m1.makeScale( x, y, z );
 
-		return function scale( x, y, z ) {
+		this.applyMatrix( _m1 );
 
-			m1.makeScale( x, y, z );
+		return this;
 
-			this.applyMatrix( m1 );
+	},
 
-			return this;
+	lookAt: function ( vector ) {
 
-		};
+		_obj.lookAt( vector );
 
-	}(),
+		_obj.updateMatrix();
 
-	lookAt: function () {
+		this.applyMatrix( _obj.matrix );
 
-		var obj = new Object3D();
+		return this;
 
-		return function lookAt( vector ) {
-
-			obj.lookAt( vector );
-
-			obj.updateMatrix();
-
-			this.applyMatrix( obj.matrix );
-
-		};
-
-	}(),
+	},
 
 	fromBufferGeometry: function ( geometry ) {
 
@@ -219,6 +188,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var indices = geometry.index !== null ? geometry.index.array : undefined;
 		var attributes = geometry.attributes;
+
+		if ( attributes.position === undefined ) {
+
+			console.error( 'THREE.Geometry.fromBufferGeometry(): Position attribute required for conversion.' );
+			return this;
+
+		}
 
 		var positions = attributes.position.array;
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
@@ -228,35 +204,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
-		var tempNormals = [];
-		var tempUVs = [];
-		var tempUVs2 = [];
+		for ( var i = 0; i < positions.length; i += 3 ) {
 
-		for ( var i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
-
-			scope.vertices.push( new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] ) );
-
-			if ( normals !== undefined ) {
-
-				tempNormals.push( new Vector3( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] ) );
-
-			}
+			scope.vertices.push( new Vector3().fromArray( positions, i ) );
 
 			if ( colors !== undefined ) {
 
-				scope.colors.push( new Color( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] ) );
-
-			}
-
-			if ( uvs !== undefined ) {
-
-				tempUVs.push( new Vector2( uvs[ j ], uvs[ j + 1 ] ) );
-
-			}
-
-			if ( uvs2 !== undefined ) {
-
-				tempUVs2.push( new Vector2( uvs2[ j ], uvs2[ j + 1 ] ) );
+				scope.colors.push( new Color().fromArray( colors, i ) );
 
 			}
 
@@ -264,8 +218,16 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		function addFace( a, b, c, materialIndex ) {
 
-			var vertexNormals = normals !== undefined ? [ tempNormals[ a ].clone(), tempNormals[ b ].clone(), tempNormals[ c ].clone() ] : [];
-			var vertexColors = colors !== undefined ? [ scope.colors[ a ].clone(), scope.colors[ b ].clone(), scope.colors[ c ].clone() ] : [];
+			var vertexColors = ( colors === undefined ) ? [] : [
+				scope.colors[ a ].clone(),
+				scope.colors[ b ].clone(),
+				scope.colors[ c ].clone() ];
+
+			var vertexNormals = ( normals === undefined ) ? [] : [
+				new Vector3().fromArray( normals, a * 3 ),
+				new Vector3().fromArray( normals, b * 3 ),
+				new Vector3().fromArray( normals, c * 3 )
+			];
 
 			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
@@ -273,13 +235,21 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( uvs !== undefined ) {
 
-				scope.faceVertexUvs[ 0 ].push( [ tempUVs[ a ].clone(), tempUVs[ b ].clone(), tempUVs[ c ].clone() ] );
+				scope.faceVertexUvs[ 0 ].push( [
+					new Vector2().fromArray( uvs, a * 2 ),
+					new Vector2().fromArray( uvs, b * 2 ),
+					new Vector2().fromArray( uvs, c * 2 )
+				] );
 
 			}
 
 			if ( uvs2 !== undefined ) {
 
-				scope.faceVertexUvs[ 1 ].push( [ tempUVs2[ a ].clone(), tempUVs2[ b ].clone(), tempUVs2[ c ].clone() ] );
+				scope.faceVertexUvs[ 1 ].push( [
+					new Vector2().fromArray( uvs2, a * 2 ),
+					new Vector2().fromArray( uvs2, b * 2 ),
+					new Vector2().fromArray( uvs2, c * 2 )
+				] );
 
 			}
 
@@ -354,21 +324,15 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	center: function () {
 
-		var offset = new Vector3();
+		this.computeBoundingBox();
 
-		return function center() {
+		this.boundingBox.getCenter( _offset ).negate();
 
-			this.computeBoundingBox();
+		this.translate( _offset.x, _offset.y, _offset.z );
 
-			this.boundingBox.getCenter( offset ).negate();
+		return this;
 
-			this.translate( offset.x, offset.y, offset.z );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	normalize: function () {
 
@@ -701,8 +665,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			vertices2 = geometry.vertices,
 			faces1 = this.faces,
 			faces2 = geometry.faces,
-			uvs1 = this.faceVertexUvs[ 0 ],
-			uvs2 = geometry.faceVertexUvs[ 0 ],
 			colors1 = this.colors,
 			colors2 = geometry.colors;
 
@@ -784,23 +746,25 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// uvs
 
-		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+		for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
-			var uv = uvs2[ i ], uvCopy = [];
+			var faceVertexUvs2 = geometry.faceVertexUvs[ i ];
 
-			if ( uv === undefined ) {
+			if ( this.faceVertexUvs[ i ] === undefined ) this.faceVertexUvs[ i ] = [];
 
-				continue;
+			for ( var j = 0, jl = faceVertexUvs2.length; j < jl; j ++ ) {
+
+				var uvs2 = faceVertexUvs2[ j ], uvsCopy = [];
+
+				for ( var k = 0, kl = uvs2.length; k < kl; k ++ ) {
+
+					uvsCopy.push( uvs2[ k ].clone() );
+
+				}
+
+				this.faceVertexUvs[ i ].push( uvsCopy );
 
 			}
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( uv[ j ].clone() );
-
-			}
-
-			uvs1.push( uvCopy );
 
 		}
 

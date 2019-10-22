@@ -3,9 +3,7 @@
  * See https://github.com/kchapelier/PRWM for more informations about this file format
  */
 
-( function ( THREE ) {
-
-	'use strict';
+THREE.PRWMLoader = ( function () {
 
 	var bigEndianPlatform = null;
 
@@ -224,21 +222,22 @@
 
 	// Define the public interface
 
-	THREE.PRWMLoader = function PRWMLoader( manager ) {
+	function PRWMLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
-	};
+	}
 
-	THREE.PRWMLoader.prototype = {
+	PRWMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
-		constructor: THREE.PRWMLoader,
+		constructor: PRWMLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
 			var loader = new THREE.FileLoader( scope.manager );
+			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
@@ -253,8 +252,6 @@
 
 		parse: function ( arrayBuffer ) {
 
-			console.time( 'PRWMLoader' );
-
 			var data = decodePrwm( arrayBuffer ),
 				attributesKey = Object.keys( data.attributes ),
 				bufferGeometry = new THREE.BufferGeometry(),
@@ -264,7 +261,7 @@
 			for ( i = 0; i < attributesKey.length; i ++ ) {
 
 				attribute = data.attributes[ attributesKey[ i ] ];
-				bufferGeometry.addAttribute( attributesKey[ i ], new THREE.BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
+				bufferGeometry.setAttribute( attributesKey[ i ], new THREE.BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
 
 			}
 
@@ -274,18 +271,18 @@
 
 			}
 
-			console.timeEnd( 'PRWMLoader' );
-
 			return bufferGeometry;
 
 		}
 
-	};
+	} );
 
-	THREE.PRWMLoader.isBigEndianPlatform = function () {
+	PRWMLoader.isBigEndianPlatform = function () {
 
 		return isBigEndianPlatform();
 
 	};
 
-} )( THREE );
+	return PRWMLoader;
+
+} )();

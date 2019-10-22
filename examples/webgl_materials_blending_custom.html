@@ -76,12 +76,9 @@
 			<div class="lbl" id="lbl_dst">Destination</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<script type="module">
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
 
@@ -179,7 +176,7 @@
 				materialBg = new THREE.MeshBasicMaterial( { map: mapBg1 } );
 
 				var meshBg = new THREE.Mesh( new THREE.PlaneBufferGeometry( 4000, 2000 ), materialBg );
-				meshBg.position.set( 0, 0, -1 );
+				meshBg.position.set( 0, 0, - 1 );
 				scene.add( meshBg );
 
 				// FOREGROUND IMAGES
@@ -205,13 +202,35 @@
 				}
 
 				// FOREGROUND OBJECTS
-				var src = [ 'ZeroFactor', 'OneFactor', 'SrcColorFactor', 'OneMinusSrcColorFactor', 'SrcAlphaFactor', 'OneMinusSrcAlphaFactor', 'DstAlphaFactor', 'OneMinusDstAlphaFactor', 'DstColorFactor', 'OneMinusDstColorFactor', 'SrcAlphaSaturateFactor' ];
-				var dst = [ 'ZeroFactor', 'OneFactor', 'SrcColorFactor', 'OneMinusSrcColorFactor', 'SrcAlphaFactor', 'OneMinusSrcAlphaFactor', 'DstAlphaFactor', 'OneMinusDstAlphaFactor', 'DstColorFactor', 'OneMinusDstColorFactor' ];
+				var src = [
+					{ name: 'Zero', constant: THREE.ZeroFactor },
+					{ name: 'One', constant: THREE.OneFactor },
+					{ name: 'SrcColor', constant: THREE.SrcColorFactor },
+					{ name: 'OneMinusSrcColor', constant: THREE.OneMinusSrcColorFactor },
+					{ name: 'SrcAlpha', constant: THREE.SrcAlphaFactor },
+					{ name: 'OneMinusSrcAlpha', constant: THREE.OneMinusSrcAlphaFactor },
+					{ name: 'DstAlpha', constant: THREE.DstAlphaFactor },
+					{ name: 'OneMinusDstAlpha', constant: THREE.OneMinusDstAlphaFactor },
+					{ name: 'DstColor', constant: THREE.DstColorFactor },
+					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor },
+					{ name: 'SrcAlphaSaturate', constant: THREE.SrcAlphaSaturateFactor }
+				];
+
+				var dst = [
+					{ name: 'Zero', constant: THREE.ZeroFactor },
+					{ name: 'One', constant: THREE.OneFactor },
+					{ name: 'SrcColor', constant: THREE.SrcColorFactor },
+					{ name: 'OneMinusSrcColor', constant: THREE.OneMinusSrcColorFactor },
+					{ name: 'SrcAlpha', constant: THREE.SrcAlphaFactor },
+					{ name: 'OneMinusSrcAlpha', constant: THREE.OneMinusSrcAlphaFactor },
+					{ name: 'DstAlpha', constant: THREE.DstAlphaFactor },
+					{ name: 'OneMinusDstAlpha', constant: THREE.OneMinusDstAlphaFactor },
+					{ name: 'DstColor', constant: THREE.DstColorFactor },
+					{ name: 'OneMinusDstColor', constant: THREE.OneMinusDstColorFactor }
+				];
 
 				var geo1 = new THREE.PlaneBufferGeometry( 100, 100 );
 				var geo2 = new THREE.PlaneBufferGeometry( 100, 25 );
-
-				var blending = 'CustomBlending';
 
 				for ( var i = 0; i < dst.length; i ++ ) {
 
@@ -224,9 +243,9 @@
 						var material = new THREE.MeshBasicMaterial( { map: currentMaps[ currentIndex ] } );
 						material.transparent = true;
 
-						material.blending = THREE[ blending ];
-						material.blendSrc = THREE[ blendSrc ];
-						material.blendDst = THREE[ blendDst ];
+						material.blending = THREE.CustomBlending;
+						material.blendSrc = blendSrc.constant;
+						material.blendDst = blendDst.constant;
 						material.blendEquation = THREE.AddEquation;
 
 						var x = ( j - src.length / 2 ) * 110;
@@ -234,7 +253,7 @@
 						var y = ( i - dst.length / 2 ) * 110 + 50;
 
 						var mesh = new THREE.Mesh( geo1, material );
-						mesh.position.set( x, -y, z );
+						mesh.position.set( x, - y, z );
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
 						scene.add( mesh );
@@ -253,8 +272,8 @@
 					var z = 0;
 					var y = ( 0 - dst.length / 2 ) * 110 + 50;
 
-					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.replace( 'Factor', '' ), 'rgba( 0, 150, 0, 1 )' ) );
-					mesh.position.set( x, - (y - 70), z );
+					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.name, 'rgba( 0, 150, 0, 1 )' ) );
+					mesh.position.set( x, - ( y - 70 ), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );
@@ -269,8 +288,8 @@
 					var z = 0;
 					var y = ( i - dst.length / 2 ) * 110 + 165;
 
-					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.replace( 'Factor', '' ), 'rgba( 150, 0, 0, 1 )' ) );
-					mesh.position.set( x, - (y - 120), z );
+					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.name, 'rgba( 150, 0, 0, 1 )' ) );
+					mesh.position.set( x, - ( y - 120 ), z );
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );
@@ -359,14 +378,18 @@
 
 					el.style.backgroundColor = 'darkorange';
 
-				});
+				} );
 
 			}
 
 			function addBgHandler( id, map ) {
 
 				var el = document.getElementById( id );
-				el.addEventListener( 'click', function () { materialBg.map = map; }	);
+				el.addEventListener( 'click', function () {
+
+					materialBg.map = map;
+
+				}	);
 
 			}
 
@@ -394,7 +417,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -431,8 +454,8 @@
 				requestAnimationFrame( animate );
 
 				var time = Date.now() * 0.00025;
-				var ox = ( time * -0.01 * materialBg.map.repeat.x ) % 1;
-				var oy = ( time * -0.01 * materialBg.map.repeat.y ) % 1;
+				var ox = ( time * - 0.01 * materialBg.map.repeat.x ) % 1;
+				var oy = ( time * - 0.01 * materialBg.map.repeat.y ) % 1;
 
 				materialBg.map.offset.set( ox, oy );
 

@@ -4,51 +4,25 @@
 		<title>three.js - webgl sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl sandbox.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sandbox</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/BasicShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
+			import { BasicShader } from './jsm/shaders/BasicShader.js';
 
 			var statsEnabled = true;
 
 			var container, stats;
 
 			var camera, scene, renderer;
-
-			var mesh, zmesh, lightMesh, geometry;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -72,7 +46,7 @@
 				var light = new THREE.PointLight( 0xffffff );
 				scene.add( light );
 
-				var shader = THREE.BasicShader;
+				var shader = BasicShader;
 				var uniforms = shader.uniforms;
 				var vertexShader = shader.vertexShader;
 				var fragmentShader = shader.fragmentShader;
@@ -123,7 +97,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias : true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -172,9 +146,9 @@
 					y = x == 0 ? y + 1 : y;
 					p = Math.floor( x ^ y );
 
-					image.data[ i ] = ~~ p * r;
-					image.data[ i + 1 ] = ~~ p * g;
-					image.data[ i + 2 ] = ~~ p * b;
+					image.data[ i ] = ~ ~ p * r;
+					image.data[ i + 1 ] = ~ ~ p * g;
+					image.data[ i + 2 ] = ~ ~ p * b;
 					image.data[ i + 3 ] = 255;
 
 				}
@@ -185,7 +159,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;

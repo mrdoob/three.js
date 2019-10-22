@@ -26,11 +26,14 @@ function WebGLRenderTarget( width, height, options ) {
 
 	options = options || {};
 
-	if ( options.minFilter === undefined ) options.minFilter = LinearFilter;
-
 	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
-	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : true;
+	this.texture.image = {};
+	this.texture.image.width = width;
+	this.texture.image.height = height;
+
+	this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+	this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
@@ -50,6 +53,9 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 
 			this.width = width;
 			this.height = height;
+
+			this.texture.image.width = width;
+			this.texture.image.height = height;
 
 			this.dispose();
 

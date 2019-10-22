@@ -4,13 +4,14 @@
  */
 
 /**
+ * @param editor Editor
  * @param scene containing children to import
  * @constructor
  */
 
-var SetSceneCommand = function ( scene ) {
+var SetSceneCommand = function ( editor, scene ) {
 
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetSceneCommand';
 	this.name = 'Set Scene';
@@ -19,14 +20,14 @@ var SetSceneCommand = function ( scene ) {
 
 	if ( scene !== undefined ) {
 
-		this.cmdArray.push( new SetUuidCommand( this.editor.scene, scene.uuid ) );
-		this.cmdArray.push( new SetValueCommand( this.editor.scene, 'name', scene.name ) );
-		this.cmdArray.push( new SetValueCommand( this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
+		this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
+		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );
+		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
 
 		while ( scene.children.length > 0 ) {
 
 			var child = scene.children.pop();
-			this.cmdArray.push( new AddObjectCommand( child ) );
+			this.cmdArray.push( new AddObjectCommand( this.editor, child ) );
 
 		}
 

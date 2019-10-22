@@ -13,21 +13,19 @@
 
 THREE.AssimpJSONLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AssimpJSONLoader.prototype = {
+THREE.AssimpJSONLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AssimpJSONLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( scope.path );
@@ -62,27 +60,6 @@ THREE.AssimpJSONLoader.prototype = {
 			onLoad( scope.parse( json, path ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -125,23 +102,23 @@ THREE.AssimpJSONLoader.prototype = {
 			}
 
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			if ( normals.length > 0 ) {
 
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 			}
 
 			if ( uvs.length > 0 ) {
 
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 			}
 
 			if ( colors.length > 0 ) {
 
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 			}
 
@@ -169,12 +146,13 @@ THREE.AssimpJSONLoader.prototype = {
 
 						// prop.semantic gives the type of the texture
 						// 1: diffuse
-						// 2: specular mao
+						// 2: specular map
+						// 4: emissive map
 						// 5: height map (bumps)
 						// 6: normal map
-						// more values (i.e. emissive, environment) are known by assimp and may be relevant
+						// more values (i.e. environment, etc) are known by assimp and may be relevant
 
-						if ( semantic === 1 || semantic === 2 || semantic === 5 || semantic === 6 ) {
+						if ( semantic === 1 || semantic === 2 || semantic === 4 || semantic === 5 || semantic === 6 ) {
 
 							var keyname;
 
@@ -185,6 +163,9 @@ THREE.AssimpJSONLoader.prototype = {
 									break;
 								case 2:
 									keyname = 'specularMap';
+									break;
+								case 4:
+									keyname = 'emissiveMap';
 									break;
 								case 5:
 									keyname = 'bumpMap';
@@ -286,4 +267,4 @@ THREE.AssimpJSONLoader.prototype = {
 
 	}
 
-};
+} );

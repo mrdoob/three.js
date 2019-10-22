@@ -4,28 +4,27 @@
 		<title>three.js - raytracing renderer with web workers</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				color: #ffffff;
-				margin: 0px;
-				padding: 0px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/renderers/RaytracingRenderer.js"></script>
 
-		<script>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raytracing renderer (using <span id="workers"></span>
+			<button id="removeWorker">-</button><button id="addWorker">+</button> web workers) <br/>
+			<button id="rearrange">Rearrange</button><button id="render">Render</button>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { RaytracingRenderer } from './jsm/renderers/RaytracingRenderer.js';
 
 			var hash = location.hash ? location.hash.substring( 1 ) : '3';
 
 			var WORKERS = + hash || navigator.hardwareConcurrency || 3;
 
-			var container, info;
-
-			var camera, controls, scene, renderer;
+			var camera, scene, renderer;
 			var group;
 
 			init();
@@ -139,9 +138,9 @@
 
 				// geometries
 
-				var sphereGeometry = new THREE.SphereGeometry( 100, 16, 8 );
-				var planeGeometry = new THREE.BoxGeometry( 600, 5, 600 );
-				var boxGeometry = new THREE.BoxGeometry( 100, 100, 100 );
+				var sphereGeometry = new THREE.SphereBufferGeometry( 100, 16, 8 );
+				var planeGeometry = new THREE.BoxBufferGeometry( 600, 5, 600 );
+				var boxGeometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 
 				// Sphere
 
@@ -232,16 +231,17 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				var buttonRearrange = document.getElementById( 'rearrange' );
+				buttonRearrange.addEventListener( 'click', rearrange );
 
-				info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.zIndex = '100';
-				info.style.textAlign = 'center';
-				container.appendChild( info );
+				var buttonRender = document.getElementById( 'render' );
+				buttonRender.addEventListener( 'click', render );
+
+				var buttonRemoveWorker = document.getElementById( 'removeWorker' );
+				buttonRemoveWorker.addEventListener( 'click', removeWorker );
+
+				var buttonAddWorker = document.getElementById( 'addWorker' );
+				buttonAddWorker.addEventListener( 'click', addWorker );
 
 				updateWorkers();
 
@@ -251,26 +251,33 @@
 
 				//
 
-				renderer = new THREE.RaytracingRenderer( {
+				renderer = new RaytracingRenderer( {
 					workers: WORKERS,
 					workerPath: 'js/renderers/RaytracingWorker.js',
 					randomize: true,
 					blockSize: 64
 				} );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.domElement.style.position = "absolute";
-				renderer.domElement.style.top = "0px";
-				renderer.domElement.style.left = "0px";
-
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 
-				window.addEventListener( 'resize', function( e ) {
+				window.addEventListener( 'resize', function () {
 
 					renderer.setSize( innerWidth, innerHeight );
 
 				} );
+
+			}
+
+			function addWorker() {
+
+				updateWorkers( 1 );
+
+			}
+
+			function removeWorker() {
+
+				updateWorkers( - 1 );
 
 			}
 
@@ -283,24 +290,22 @@
 
 				}
 
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js<a/> - raytracing renderer (using '  + WORKERS + ' <button onclick="updateWorkers(-1)">-</button><button onclick="updateWorkers(1)">+</button> web workers)' +
-				'<br/><button onclick="rearrange()">Rearrange</button><button onclick="render()">Render</button>';
-
+				var labelWorkers = document.getElementById( 'workers' );
+				labelWorkers.textContent = WORKERS;
 
 			}
 
 			function rearrange() {
 
-				group.children.forEach( function( o ) {
+				group.children.forEach( function ( o ) {
 
-					o.position.y += ( Math.random() - 0.5 ) * 100;
+ 					o.position.y += ( Math.random() - 0.5 ) * 100;
 					o.position.x += ( Math.random() - 0.5 ) * 400;
 					o.position.z += ( Math.random() - 0.5 ) * 400;
 
 				} );
 
-			}
-
+ 			}
 
 			function render() {
 

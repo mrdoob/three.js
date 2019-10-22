@@ -6,42 +6,42 @@ Sidebar.Settings = function ( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
+	var strings = editor.strings;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 	container.setPaddingBottom( '20px' );
 
-	// class
+	// language
 
 	var options = {
-		'css/light.css': 'light',
-		'css/dark.css': 'dark'
+		en: 'English',
+		zh: '中文'
 	};
 
-	var themeRow = new UI.Row();
-	var theme = new UI.Select().setWidth( '150px' );
-	theme.setOptions( options );
+	var languageRow = new UI.Row();
+	var language = new UI.Select().setWidth( '150px' );
+	language.setOptions( options );
 
-	if ( config.getKey( 'theme' ) !== undefined ) {
+	if ( config.getKey( 'language' ) !== undefined ) {
 
-		theme.setValue( config.getKey( 'theme' ) );
+		language.setValue( config.getKey( 'language' ) );
 
 	}
 
-	theme.onChange( function () {
+	language.onChange( function () {
 
 		var value = this.getValue();
 
-		editor.setTheme( value );
-		editor.config.setKey( 'theme', value );
+		editor.config.setKey( 'language', value );
 
 	} );
 
-	themeRow.add( new UI.Text( 'Theme' ).setWidth( '90px' ) );
-	themeRow.add( theme );
+	languageRow.add( new UI.Text( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
+	languageRow.add( language );
 
-	container.add( themeRow );
+	container.add( languageRow );
 
 	container.add( new Sidebar.Settings.Shortcuts( editor ) );
 	container.add( new Sidebar.Settings.Viewport( editor ) );

@@ -2,16 +2,7 @@
  * @author adrs2002 / https://github.com/adrs2002
  */
 
-
-( function ( global, factory ) {
-
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-		typeof define === 'function' && define.amd ? define( factory ) :
-			( global.THREE = global.THREE || {}, global.THREE.XLoader = factory() );
-
-}( this, ( function () {
-
-	'use strict';
+THREE.XLoader = ( function () {
 
 	var classCallCheck = function ( instance, Constructor ) {
 
@@ -210,13 +201,13 @@
 
 		function XLoader( manager ) {
 
+			THREE.Loader.call( this, manager );
+
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
-			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
 			this.texloader = new THREE.TextureLoader( this.manager );
 			this.url = "";
-			this.baseDir = "";
 			this._putMatLength = 0;
 			this._nowMat = null;
 			this._nowFrameName = "";
@@ -277,20 +268,13 @@
 
 				this._setArgOption( _arg );
 				var loader = new THREE.FileLoader( this.manager );
+				loader.setPath( this.path );
 				loader.setResponseType( 'arraybuffer' );
 				loader.load( this.url, function ( response ) {
 
-					_this._parse( response, onLoad );
+					_this.parse( response, onLoad );
 
 				}, onProgress, onError );
-
-			}
-		}, {
-			key: 'fromResponsedData',
-			value: function fromResponsedData( _data, _arg, onLoad ) {
-
-				this._setArgOption( _arg );
-				this._parse( _data, onLoad );
 
 			}
 		}, {
@@ -414,8 +398,8 @@
 
 			}
 		}, {
-			key: 'ensureBinary',
-			value: function ensureBinary( buf ) {
+			key: '_ensureBinary',
+			value: function _ensureBinary( buf ) {
 
 				if ( typeof buf === "string" ) {
 
@@ -435,8 +419,8 @@
 
 			}
 		}, {
-			key: 'ensureString',
-			value: function ensureString( buf ) {
+			key: '_ensureString',
+			value: function _ensureString( buf ) {
 
 				if ( typeof buf !== "string" ) {
 
@@ -450,11 +434,11 @@
 
 			}
 		}, {
-			key: '_parse',
+			key: 'parse',
 			value: function _parse( data, onLoad ) {
 
-				var binData = this.ensureBinary( data );
-				this._data = this.ensureString( data );
+				var binData = this._ensureBinary( data );
+				this._data = this._ensureString( data );
 				this.onLoad = onLoad;
 				return this._isBinary( binData ) ? this._parseBinary( binData ) : this._parseASCII();
 
@@ -470,17 +454,30 @@
 			key: '_parseASCII',
 			value: function _parseASCII() {
 
-				if ( this.url.lastIndexOf( "/" ) > 0 ) {
+				var path;
 
-					this.baseDir = this.url.substr( 0, this.url.lastIndexOf( "/" ) + 1 );
+				if ( this.resourcePath !== '' ) {
+
+					path = this.resourcePath;
+
+				} else if ( this.path !== '' ) {
+
+					path = this.path;
+
+				} else {
+
+					path = THREE.LoaderUtils.extractUrlBase( this.url );
 
 				}
+
+				this.texloader.setPath( path ).setCrossOrigin( this.crossOrigin );
+
 				var endRead = 16;
 				this.Hierarchies.children = [];
 				this._hierarchieParse( this.Hierarchies, endRead );
 				this._changeRoot();
 				this._currentObject = this.Hierarchies.children.shift();
-				this.mainloop();
+				this._mainloop();
 
 			}
 		}, {
@@ -565,17 +562,17 @@
 
 			}
 		}, {
-			key: 'mainloop',
-			value: function mainloop() {
+			key: '_mainloop',
+			value: function _mainloop() {
 
 				var _this2 = this;
 
-				this.mainProc();
+				this._mainProc();
 				if ( this._currentObject.parent || this._currentObject.children.length > 0 || ! this._currentObject.worked ) {
 
 					setTimeout( function () {
 
-						_this2.mainloop();
+						_this2._mainloop();
 
 					}, 1 );
 
@@ -594,8 +591,8 @@
 
 			}
 		}, {
-			key: 'mainProc',
-			value: function mainProc() {
+			key: '_mainProc',
+			value: function _mainProc() {
 
 				var breakFlag = false;
 				while ( true ) {
@@ -975,11 +972,11 @@
 
 				//
 
-				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-				bufferGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bufferGeometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-				bufferGeometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+				bufferGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+				bufferGeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bufferGeometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+				bufferGeometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
 				this._computeGroups( bufferGeometry, data.materialIndices );
 
@@ -1180,21 +1177,21 @@
 						switch ( localObject.type ) {
 
 							case "TextureFilename":
-								_nowMat.map = this.texloader.load( this.baseDir + fileName );
+								_nowMat.map = this.texloader.load( fileName );
 								break;
 							case "BumpMapFilename":
-								_nowMat.bumpMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.bumpMap = this.texloader.load( fileName );
 								_nowMat.bumpScale = 0.05;
 								break;
 							case "NormalMapFilename":
-								_nowMat.normalMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.normalMap = this.texloader.load( fileName );
 								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
 								break;
 							case "EmissiveMapFilename":
-								_nowMat.emissiveMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.emissiveMap = this.texloader.load( fileName );
 								break;
 							case "LightMapFilename":
-								_nowMat.lightMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.lightMap = this.texloader.load( fileName );
 								break;
 
 						}
@@ -1375,9 +1372,9 @@
 					}
 
 					var bufferGeometry = this._buildGeometry();
-					bufferGeometry.bones = putBones;
 					mesh = new THREE.SkinnedMesh( bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
-					mesh.skeleton.boneInverses = offsetList;
+
+					this._initSkeleton( mesh, putBones, offsetList );
 
 				} else {
 
@@ -1410,6 +1407,50 @@
 				this.Meshes.push( mesh );
 
 			}
+		}, {
+			key: '_initSkeleton',
+			value: function _initSkeleton( mesh, boneList, boneInverses ) {
+
+				var bones = [], bone, gbone;
+				var i, il;
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					bone = new THREE.Bone();
+					bones.push( bone );
+
+					bone.name = gbone.name;
+					bone.position.fromArray( gbone.pos );
+					bone.quaternion.fromArray( gbone.rotq );
+					if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+				}
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+						bones[ gbone.parent ].add( bones[ i ] );
+
+					} else {
+
+						mesh.add( bones[ i ] );
+
+					}
+
+				}
+
+				mesh.updateMatrixWorld( true );
+
+				var skeleton = new THREE.Skeleton( bones, boneInverses );
+				mesh.bind( skeleton, mesh.matrixWorld );
+
+			}
+
 		}, {
 			key: '_readAnimationKey',
 			value: function _readAnimationKey() {
@@ -1489,7 +1530,7 @@
 			}
 		}, {
 			key: 'assignAnimation',
-			value: function assignAnimation( _model, _animation, _isBind ) {
+			value: function assignAnimation( _model, _animation ) {
 
 				var model = _model;
 				var animation = _animation;
@@ -1602,4 +1643,4 @@
 
 	return XLoader;
 
-} ) ) );
+} )();

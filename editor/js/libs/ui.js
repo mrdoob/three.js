@@ -74,9 +74,31 @@ UI.Element.prototype = {
 
 	},
 
+	getId: function ( id ) {
+
+		return this.dom.id;
+
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;
+
+		return this;
+
+	},
+
+	addClass: function ( name ) {
+
+		this.dom.classList.add( name );
+
+		return this;
+
+	},
+
+	removeClass: function ( name ) {
+
+		this.dom.classList.remove( name );
 
 		return this;
 
@@ -115,8 +137,8 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
+	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
@@ -625,6 +647,56 @@ UI.Number = function ( number ) {
 
 	}
 
+	function onTouchStart( event ) {
+
+		if ( event.touches.length === 1 ) {
+
+			distance = 0;
+
+			onMouseDownValue = scope.value;
+
+			prevPointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+			document.addEventListener( 'touchmove', onTouchMove, false );
+			document.addEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+	}
+
+	function onTouchMove( event ) {
+
+		var currentValue = scope.value;
+
+		pointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
+
+		var value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+		value = Math.min( scope.max, Math.max( scope.min, value ) );
+
+		if ( currentValue !== value ) {
+
+			scope.setValue( value );
+			dom.dispatchEvent( changeEvent );
+
+		}
+
+		prevPointer = [ event.touches[ 0 ].pageX, event.touches[ 0 ].pageY ];
+
+	}
+
+	function onTouchEnd( event ) {
+
+		if ( event.touches.length === 0 ) {
+
+			document.removeEventListener( 'touchmove', onTouchMove, false );
+			document.removeEventListener( 'touchend', onTouchEnd, false );
+
+		}
+
+	}
+
 	function onChange( event ) {
 
 		scope.setValue( dom.value );
@@ -648,6 +720,7 @@ UI.Number = function ( number ) {
 	onBlur();
 
 	dom.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'touchstart', onTouchStart, false );
 	dom.addEventListener( 'change', onChange, false );
 	dom.addEventListener( 'focus', onFocus, false );
 	dom.addEventListener( 'blur', onBlur, false );
@@ -863,9 +936,9 @@ UI.Integer.prototype.setValue = function ( value ) {
 };
 
 UI.Integer.prototype.setStep = function ( step ) {
-	
-	this.step = parseInt( step ); 
-	
+
+	this.step = parseInt( step );
+
 	return this;
 
 };
@@ -946,59 +1019,268 @@ UI.Button.prototype.setLabel = function ( value ) {
 };
 
 
-// Modal
+// TabbedPanel
 
-UI.Modal = function ( value ) {
+UI.TabbedPanel = function ( ) {
 
-	var scope = this;
+	UI.Element.call( this );
 
 	var dom = document.createElement( 'div' );
 
-	dom.style.position = 'absolute';
-	dom.style.width = '100%';
-	dom.style.height = '100%';
-	dom.style.backgroundColor = 'rgba(0,0,0,0.5)';
-	dom.style.display = 'none';
-	dom.style.alignItems = 'center';
-	dom.style.justifyContent = 'center';
-	dom.addEventListener( 'click', function ( event ) {
+	this.dom = dom;
 
-		scope.hide();
+	this.setClass( 'TabbedPanel' );
+
+	this.tabs = [];
+	this.panels = [];
+
+	this.tabsDiv = new UI.Div();
+	this.tabsDiv.setClass( 'Tabs' );
+
+	this.panelsDiv = new UI.Div();
+	this.panelsDiv.setClass( 'Panels' );
+
+	this.add( this.tabsDiv );
+	this.add( this.panelsDiv );
+
+	this.selected = '';
+
+	return this;
+
+};
+
+UI.TabbedPanel.prototype = Object.create( UI.Element.prototype );
+UI.TabbedPanel.prototype.constructor = UI.TabbedPanel;
+
+UI.TabbedPanel.prototype.select = function ( id ) {
+
+	var tab;
+	var panel;
+	var scope = this;
+
+	// Deselect current selection
+	if ( this.selected && this.selected.length ) {
+
+		tab = this.tabs.find( function ( item ) { return item.dom.id === scope.selected } );
+		panel = this.panels.find( function ( item ) { return item.dom.id === scope.selected } );
+
+		if ( tab ) {
+
+			tab.removeClass( 'selected' );
+
+		}
+
+		if ( panel ) {
+
+			panel.setDisplay( 'none' );
+
+		}
+
+	}
+
+	tab = this.tabs.find( function ( item ) { return item.dom.id === id } );
+	panel = this.panels.find( function ( item ) { return item.dom.id === id } );
+
+	if ( tab ) {
+
+		tab.addClass( 'selected' );
+
+	}
+
+	if ( panel ) {
+
+		panel.setDisplay( '' );
+
+	}
+
+	this.selected = id;
+
+	return this;
+
+};
+
+UI.TabbedPanel.prototype.addTab = function ( id, label, items ) {
+
+	var tab = new UI.TabbedPanel.Tab( label, this );
+	tab.setId( id );
+	this.tabs.push( tab );
+	this.tabsDiv.add( tab );
+
+	var panel = new UI.Div();
+	panel.setId( id );
+	panel.add( items );
+	panel.setDisplay( 'none' );
+	this.panels.push( panel );
+	this.panelsDiv.add( panel );
+
+	this.select( id );
+
+};
+
+UI.TabbedPanel.Tab = function ( text, parent ) {
+
+	UI.Text.call( this, text );
+	this.parent = parent;
+
+	this.setClass( 'Tab' );
+
+	var scope = this;
+
+	this.dom.addEventListener( 'click', function ( event ) {
+
+		scope.parent.select( scope.dom.id );
 
 	} );
 
+	return this;
+
+};
+
+UI.TabbedPanel.Tab.prototype = Object.create( UI.Text.prototype );
+UI.TabbedPanel.Tab.prototype.constructor = UI.TabbedPanel.Tab;
+
+// Listbox
+UI.Listbox = function ( ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'Listbox';
+	dom.tabIndex = 0;
+
+	this.dom = dom;
+	this.items = [];
+	this.listitems = [];
+	this.selectedIndex = 0;
+	this.selectedValue = null;
+
+	return this;
+
+};
+
+UI.Listbox.prototype = Object.create( UI.Element.prototype );
+UI.Listbox.prototype.constructor = UI.Listbox;
+
+UI.Listbox.prototype.setItems = function ( items ) {
+
+	if ( Array.isArray( items ) ) {
+
+		this.items = items;
+
+	}
+
+	this.render();
+
+};
+
+UI.Listbox.prototype.render = function ( ) {
+
+	while ( this.listitems.length ) {
+
+		var item = this.listitems[ 0 ];
+
+		item.dom.remove();
+
+		this.listitems.splice( 0, 1 );
+
+	}
+
+	for ( var i = 0; i < this.items.length; i ++ ) {
+
+		var item = this.items[ i ];
+
+		var listitem = new UI.Listbox.ListboxItem( this );
+		listitem.setId( item.id || `Listbox-${i}` );
+		listitem.setTextContent( item.name || item.type );
+		this.add( listitem );
+
+	}
+
+};
+
+// Assuming user passes valid list items
+UI.Listbox.prototype.add = function () {
+
+	var items = Array.from( arguments );
+
+	this.listitems = this.listitems.concat( items );
+
+	UI.Element.prototype.add.apply( this, items );
+
+};
+
+UI.Listbox.prototype.selectIndex = function ( index ) {
+
+	if ( index >= 0 && index < this.items.length ) {
+
+		this.setValue( this.listitems[ index ].getId() );
+
+	}
+
+	this.selectedIndex = index;
+
+};
+
+UI.Listbox.prototype.getValue = function () {
+
+	return this.selectedValue;
+
+};
+
+UI.Listbox.prototype.setValue = function ( value ) {
+
+	for ( var i = 0; i < this.listitems.length; i ++ ) {
+
+		var element = this.listitems[ i ];
+
+		if ( element.getId() === value ) {
+
+			element.addClass( 'active' );
+
+		} else {
+
+			element.removeClass( 'active' );
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
+	this.dom.dispatchEvent( changeEvent );
+
+};
+
+// Listbox Item
+UI.Listbox.ListboxItem = function ( parent ) {
+
+	UI.Element.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'ListboxItem';
+
+	this.parent = parent;
 	this.dom = dom;
 
-	this.container = new UI.Panel();
-	this.container.dom.style.width = '200px';
-	this.container.dom.style.padding = '20px';
-	this.container.dom.style.backgroundColor = '#ffffff';
-	this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
+	var scope = this;
 
-	this.add( this.container );
+	function onClick() {
 
-	return this;
+		if ( scope.parent ) {
 
-};
+			scope.parent.setValue( scope.getId( ) );
 
-UI.Modal.prototype = Object.create( UI.Element.prototype );
-UI.Modal.prototype.constructor = UI.Modal;
+		}
 
-UI.Modal.prototype.show = function ( content ) {
+	}
 
-	this.container.clear();
-	this.container.add( content );
-
-	this.dom.style.display = 'flex';
+	dom.addEventListener( 'click', onClick, false );
 
 	return this;
 
 };
 
-UI.Modal.prototype.hide = function () {
-
-	this.dom.style.display = 'none';
-
-	return this;
-
-};
+UI.Listbox.ListboxItem.prototype = Object.create( UI.Element.prototype );
+UI.Listbox.ListboxItem.prototype.constructor = UI.Listbox.ListboxItem;

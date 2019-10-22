@@ -17,7 +17,7 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 		geometry.computeVertexNormals();
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		if ( geometry.isBufferGeometry ) {
 
 			geometry.attributes.normal.needsUpdate = true;
 

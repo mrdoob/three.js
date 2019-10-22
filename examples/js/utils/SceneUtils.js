@@ -20,18 +20,17 @@ THREE.SceneUtils = {
 
 	detach: function ( child, parent, scene ) {
 
-		child.applyMatrix( parent.matrixWorld );
-		parent.remove( child );
-		scene.add( child );
+		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
+
+		scene.attach( child );
 
 	},
 
 	attach: function ( child, scene, parent ) {
 
-		child.applyMatrix( new THREE.Matrix4().getInverse( parent.matrixWorld ) );
+		console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
 
-		scene.remove( child );
-		parent.add( child );
+		parent.attach( child );
 
 	}
 

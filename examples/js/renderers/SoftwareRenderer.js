@@ -7,8 +7,6 @@
 
 THREE.SoftwareRenderer = function ( parameters ) {
 
-	console.log( 'THREE.SoftwareRenderer', THREE.REVISION );
-
 	parameters = parameters || {};
 
 	var canvas = parameters.canvas !== undefined
@@ -540,7 +538,7 @@ THREE.SoftwareRenderer = function ( parameters ) {
 
 				} else {
 
-					if ( material.vertexColors === THREE.FaceColors ) {
+					if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
 
 						string = [
 							'var colorOffset = offset * 4;',

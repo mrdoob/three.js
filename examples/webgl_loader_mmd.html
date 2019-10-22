@@ -4,23 +4,15 @@
 		<title>three.js webgl - loaders - MMD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #fff;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
+			a {
+				color: #08f;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
 	</head>
 
@@ -33,40 +25,36 @@
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/libs/mmdparser.min.js"></script>
 		<script src="js/libs/ammo.js"></script>
 
-		<script src="js/loaders/TGALoader.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
-		<script src="js/effects/OutlineEffect.js"></script>
-		<script src="js/animation/CCDIKSolver.js"></script>
-		<script src="js/animation/MMDPhysics.js"></script>
-		<script src="js/animation/MMDAnimationHelper.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
 			var container, stats;
 
 			var mesh, camera, scene, renderer, effect;
 			var helper, ikHelper, physicsHelper;
 
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			var clock = new THREE.Clock();
 
-			init();
-			animate();
+			Ammo().then( function ( AmmoLib ) {
+
+				Ammo = AmmoLib;
+
+				init();
+				animate();
+
+			} );
+
 
 			function init() {
 
@@ -99,7 +87,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				// STATS
 
@@ -117,19 +105,17 @@
 
 					}
 
-				};
+				}
 
-				function onError( xhr ) {
-				};
 
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
-				helper = new THREE.MMDAnimationHelper( {
+				helper = new MMDAnimationHelper( {
 					afterglow: 2.0
 				} );
 
-				var loader = new THREE.MMDLoader();
+				var loader = new MMDLoader();
 
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
@@ -152,9 +138,9 @@
 
 					initGui();
 
-				}, onProgress, onError );
+				}, onProgress, null );
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -191,10 +177,12 @@
 						'show rigid bodies': false
 					};
 
-					var gui = new dat.GUI();
+					var gui = new GUI();
 
 					gui.add( api, 'animation' ).onChange( function () {
+
 						helper.enable( 'animation', api[ 'animation' ] );
+
 					} );
 
 					gui.add( api, 'gradient mapping' ).onChange( function () {
@@ -215,23 +203,33 @@
 					} );
 
 					gui.add( api, 'ik' ).onChange( function () {
+
 						helper.enable( 'ik', api[ 'ik' ] );
+
 					} );
 
 					gui.add( api, 'outline' ).onChange( function () {
+
 						effect.enabled = api[ 'outline' ];
+
 					} );
 
 					gui.add( api, 'physics' ).onChange( function () {
+
 						helper.enable( 'physics', api[ 'physics' ] );
+
 					} );
 
 					gui.add( api, 'show IK bones' ).onChange( function () {
+
 						ikHelper.visible = api[ 'show IK bones' ];
+
 					} );
 
 					gui.add( api, 'show rigid bodies' ).onChange( function () {
+
 						if ( physicsHelper !== undefined ) physicsHelper.visible = api[ 'show rigid bodies' ];
+
 					} );
 
 				}
@@ -239,9 +237,6 @@
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

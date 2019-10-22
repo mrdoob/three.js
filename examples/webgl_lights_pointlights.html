@@ -4,26 +4,7 @@
 		<title>three.js webgl - lights - point lights</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #ff0080;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
@@ -32,20 +13,17 @@
 			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank" rel="noopener">David OReilly</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 
 			var camera, scene, renderer,
-			light1, light2, light3, light4,
-			object, stats;
+				light1, light2, light3, light4,
+				object, stats;
 
 			var clock = new THREE.Clock();
 
@@ -61,7 +39,7 @@
 
 				//model
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
 
 					object = obj;
@@ -130,7 +108,7 @@
 				var time = Date.now() * 0.0005;
 				var delta = clock.getDelta();
 
-				if( object ) object.rotation.y -= 0.5 * delta;
+				if ( object ) object.rotation.y -= 0.5 * delta;
 
 				light1.position.x = Math.sin( time * 0.7 ) * 30;
 				light1.position.y = Math.cos( time * 0.5 ) * 40;
