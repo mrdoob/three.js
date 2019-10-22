@@ -1,4 +1,5 @@
 import { Vector3 } from './Vector3.js';
+import { Plane } from './Plane.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -196,7 +197,7 @@ Object.assign( Triangle.prototype, {
 		if ( target === undefined ) {
 
 			console.warn( 'THREE.Triangle: .getPlane() target is now required' );
-			target = new Vector3();
+			target = new Plane();
 
 		}
 
