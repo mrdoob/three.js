@@ -8661,6 +8661,7 @@
 			this.blending = source.blending;
 			this.side = source.side;
 			this.flatShading = source.flatShading;
+			this.vertexTangents = source.vertexTangents;
 			this.vertexColors = source.vertexColors;
 
 			this.opacity = source.opacity;
@@ -8677,7 +8678,6 @@
 			this.depthTest = source.depthTest;
 			this.depthWrite = source.depthWrite;
 
-			this.stencilWrite = source.stencilWrite;
 			this.stencilWriteMask = source.stencilWriteMask;
 			this.stencilFunc = source.stencilFunc;
 			this.stencilRef = source.stencilRef;
@@ -8685,6 +8685,26 @@
 			this.stencilFail = source.stencilFail;
 			this.stencilZFail = source.stencilZFail;
 			this.stencilZPass = source.stencilZPass;
+			this.stencilWrite = source.stencilWrite;
+
+			var srcPlanes = source.clippingPlanes,
+				dstPlanes = null;
+
+			if ( srcPlanes !== null ) {
+
+				var n = srcPlanes.length;
+				dstPlanes = new Array( n );
+
+				for ( var i = 0; i !== n; ++ i )
+					{ dstPlanes[ i ] = srcPlanes[ i ].clone(); }
+
+			}
+
+			this.clippingPlanes = dstPlanes;
+			this.clipIntersection = source.clipIntersection;
+			this.clipShadows = source.clipShadows;
+
+			this.shadowSide = source.shadowSide;
 
 			this.colorWrite = source.colorWrite;
 
@@ -8704,26 +8724,6 @@
 			this.toneMapped = source.toneMapped;
 
 			this.userData = JSON.parse( JSON.stringify( source.userData ) );
-
-			this.clipShadows = source.clipShadows;
-			this.clipIntersection = source.clipIntersection;
-
-			var srcPlanes = source.clippingPlanes,
-				dstPlanes = null;
-
-			if ( srcPlanes !== null ) {
-
-				var n = srcPlanes.length;
-				dstPlanes = new Array( n );
-
-				for ( var i = 0; i !== n; ++ i )
-					{ dstPlanes[ i ] = srcPlanes[ i ].clone(); }
-
-			}
-
-			this.clippingPlanes = dstPlanes;
-
-			this.shadowSide = source.shadowSide;
 
 			return this;
 
@@ -17655,7 +17655,7 @@
 
 	}
 
-	function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+	function WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters ) {
 
 		var gl = renderer.getContext();
 
@@ -18162,7 +18162,7 @@
 
 		this.name = shader.name;
 		this.id = programIdCount ++;
-		this.code = code;
+		this.cacheKey = cacheKey;
 		this.usedTimes = 1;
 		this.program = program;
 		this.vertexShader = glVertexShader;
@@ -18412,7 +18412,7 @@
 
 		};
 
-		this.getProgramCode = function ( material, parameters ) {
+		this.getProgramCacheKey = function ( material, parameters ) {
 
 			var array = [];
 
@@ -18454,18 +18454,18 @@
 
 		};
 
-		this.acquireProgram = function ( material, shader, parameters, code ) {
+		this.acquireProgram = function ( material, shader, parameters, cacheKey ) {
 
 			var program;
 
 			// Check if code has been already compiled
 			for ( var p = 0, pl = programs.length; p < pl; p ++ ) {
 
-				var programInfo = programs[ p ];
+				var preexistingProgram = programs[ p ];
 
-				if ( programInfo.code === code ) {
+				if ( preexistingProgram.cacheKey === cacheKey ) {
 
-					program = programInfo;
+					program = preexistingProgram;
 					++ program.usedTimes;
 
 					break;
@@ -18476,7 +18476,7 @@
 
 			if ( program === undefined ) {
 
-				program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
+				program = new WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters );
 				programs.push( program );
 
 			}
@@ -24890,7 +24890,7 @@
 			var parameters = programCache.getParameters(
 				material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
-			var code = programCache.getProgramCode( material, parameters );
+			var programCacheKey = programCache.getProgramCacheKey( material, parameters );
 
 			var program = materialProperties.program;
 			var programChange = true;
@@ -24900,7 +24900,7 @@
 				// new material
 				material.addEventListener( 'dispose', onMaterialDispose );
 
-			} else if ( program.code !== code ) {
+			} else if ( program.cacheKey !== programCacheKey ) {
 
 				// changed glsl or parameters
 				releaseMaterialProgramReference( material );
@@ -24949,10 +24949,10 @@
 
 				material.onBeforeCompile( materialProperties.shader, _this );
 
-				// Computing code again as onBeforeCompile may have changed the shaders
-				code = programCache.getProgramCode( material, parameters );
+				// Computing cache key again as onBeforeCompile may have changed the shaders
+				programCacheKey = programCache.getProgramCacheKey( material, parameters );
 
-				program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
+				program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 				materialProperties.program = program;
 				material.program = program;
