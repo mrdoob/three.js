@@ -15,7 +15,7 @@ THREE.CSS3DObject = function ( element ) {
 
 		this.traverse( function( object ) {
 
-			if ( object.element !== null && object.element.parentNode !== null ) {
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
 				object.element.parentNode.removeChild( object.element );
 	
