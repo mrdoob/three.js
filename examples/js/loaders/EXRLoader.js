@@ -85,13 +85,6 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 	constructor: THREE.EXRLoader,
 
-	setDataType: function ( value ) {
-
-		this.type = value;
-		return this;
-
-	},
-
 	parse: function ( buffer ) {
 
 		const USHORT_RANGE = ( 1 << 16 );
@@ -1230,6 +1223,47 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
 			type: this.type
 		};
+
+	},
+
+	setDataType: function ( value ) {
+
+		this.type = value;
+		return this;
+
+	},
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		function onLoadCallback( texture, texData ) {
+
+			switch ( texture.type ) {
+
+				case THREE.FloatType:
+
+					texture.encoding = THREE.LinearEncoding;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = false;
+					break;
+
+				case THREE.HalfFloatType:
+
+					texture.encoding = THREE.LinearEncoding;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = false;
+					break;
+
+			}
+
+			if ( onLoad ) onLoad( texture, texData );
+
+		}
+
+		return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
 
 	}
 
