@@ -52,14 +52,6 @@ THREE.Wireframe.prototype = Object.assign( Object.create( THREE.Mesh.prototype )
 
 		};
 
-	}() ),
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	}() )
 
 } );
