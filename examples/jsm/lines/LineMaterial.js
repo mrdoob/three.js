@@ -389,9 +389,13 @@ LineMaterial.prototype.copy = function ( source ) {
 
 	this.linewidth = source.linewidth;
 
-	this.resolution = source.resolution;
+	this.dashScale = source.dashScale;
 
-	// todo
+	this.dashSize = source.dashSize;
+
+	this.gapSize = source.gapSize;
+
+	this.resolution = source.resolution;
 
 	return this;
 

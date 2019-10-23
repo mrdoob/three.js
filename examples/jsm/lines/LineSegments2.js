@@ -61,15 +61,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		};
 
-	}() ),
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	}() )
 
 } );
 
