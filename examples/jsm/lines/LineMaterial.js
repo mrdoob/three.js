@@ -381,25 +381,5 @@ LineMaterial.prototype.constructor = LineMaterial;
 
 LineMaterial.prototype.isLineMaterial = true;
 
-LineMaterial.prototype.copy = function ( source ) {
-
-	ShaderMaterial.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.linewidth = source.linewidth;
-
-	this.dashScale = source.dashScale;
-
-	this.dashSize = source.dashSize;
-
-	this.gapSize = source.gapSize;
-
-	this.resolution = source.resolution;
-
-	return this;
-
-};
-
 
 export { LineMaterial };

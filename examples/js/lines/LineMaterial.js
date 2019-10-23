@@ -373,23 +373,3 @@ THREE.LineMaterial.prototype.constructor = THREE.LineMaterial;
 
 THREE.LineMaterial.prototype.isLineMaterial = true;
 
-THREE.LineMaterial.prototype.copy = function ( source ) {
-
-	THREE.ShaderMaterial.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.linewidth = source.linewidth;
-
-	this.dashScale = source.dashScale;
-
-	this.dashSize = source.dashSize;
-
-	this.gapSize = source.gapSize;
-
-	this.resolution = source.resolution;
-
-	return this;
-
-};
-
