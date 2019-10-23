@@ -5838,6 +5838,14 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) object.drawMode = this.drawMode;
 
+		if ( this.isInstancedMesh ) {
+
+			object.type = 'InstancedMesh';
+			object.count = this.count;
+			object.instanceMatrix = this.instanceMatrix.toJSON();
+
+		}
+
 		//
 
 		function serialize( library, element ) {
@@ -40323,7 +40331,17 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
+				break;
+
+			case 'InstancedMesh':
+
+				var geometry = getGeometry( data.geometry );
+				var material = getMaterial( data.material );
+				var count = data.count;
+				var instanceMatrix = data.instanceMatrix;
+
+				object = new InstancedMesh( geometry, material, count );
+				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 
 				break;
 
@@ -40413,6 +40431,8 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( data.renderOrder !== undefined ) object.renderOrder = data.renderOrder;
 		if ( data.userData !== undefined ) object.userData = data.userData;
 		if ( data.layers !== undefined ) object.layers.mask = data.layers;
+
+		if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
 
 		if ( data.children !== undefined ) {
 
