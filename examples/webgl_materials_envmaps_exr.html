@@ -77,10 +77,13 @@
 					.setDataType( THREE.FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						texture.minFilter = THREE.NearestFilter;
-						texture.encoding = THREE.LinearEncoding;
+						var options = {
+							generateMipmaps: false,
+							minFilter: THREE.LinearFilter,
+							magFilter: THREE.LinearFilter
+						};
 
-						exrBackground = new THREE.WebGLRenderTargetCube( 512, 512 ).fromEquirectangularTexture( renderer, texture );
+						exrBackground = new THREE.WebGLRenderTargetCube( 512, 512, options ).fromEquirectangularTexture( renderer, texture );
 
 						var pmremGenerator = new PMREMGenerator( exrBackground.texture );
 						pmremGenerator.update( renderer );
