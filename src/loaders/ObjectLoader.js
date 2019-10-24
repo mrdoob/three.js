@@ -410,19 +410,6 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						break;
 
-					case 'ParametricGeometry':
-					case 'ParametricBufferGeometry':
-
-						var func = new Function( 'return ' + data.func )();
-
-						geometry = new Geometries[ data.type ](
-							func,
-							data.slices,
-							data.stacks
-						);
-
-						break;
-
 					case 'BufferGeometry':
 					case 'InstancedBufferGeometry':
 
