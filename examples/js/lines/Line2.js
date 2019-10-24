@@ -18,14 +18,6 @@ THREE.Line2.prototype = Object.assign( Object.create( THREE.LineSegments2.protot
 
 	constructor: THREE.Line2,
 
-	isLine2: true,
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	isLine2: true
 
 } );

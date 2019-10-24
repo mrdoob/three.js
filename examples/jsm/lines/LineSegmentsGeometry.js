@@ -250,20 +250,6 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 		// todo
 
-	},
-
-	clone: function () {
-
-		// todo
-
-	},
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
 	}
 
 } );

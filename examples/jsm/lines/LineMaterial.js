@@ -381,21 +381,5 @@ LineMaterial.prototype.constructor = LineMaterial;
 
 LineMaterial.prototype.isLineMaterial = true;
 
-LineMaterial.prototype.copy = function ( source ) {
-
-	ShaderMaterial.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.linewidth = source.linewidth;
-
-	this.resolution = source.resolution;
-
-	// todo
-
-	return this;
-
-};
-
 
 export { LineMaterial };
