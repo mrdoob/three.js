@@ -7,7 +7,7 @@ export default /* glsl */`
 		
 		if ( isOrthographic ) {
 
-			cameraToFrag = normalize( vec3( -viewMatrix[ 0 ][ 2 ], -viewMatrix[ 1 ][ 2 ], -viewMatrix[ 2 ][ 2 ] ) );
+			cameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );
 
 		}  else {
 
