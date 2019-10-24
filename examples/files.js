@@ -378,11 +378,6 @@ var files = {
 	"raytracing": [
 		"raytracing_sandbox"
 	],
-	"software": [
-		"software_geometry_earth",
-		"software_lines_splines",
-		"software_sandbox"
-	],
 	"svg": [
 		"svg_lines",
 		"svg_sandbox"
