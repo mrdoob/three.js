@@ -683,6 +683,14 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) object.drawMode = this.drawMode;
 
+		if ( this.isInstancedMesh ) {
+
+			object.type = 'InstancedMesh';
+			object.count = this.count;
+			object.instanceMatrix = this.instanceMatrix.toJSON();
+
+		}
+
 		//
 
 		function serialize( library, element ) {

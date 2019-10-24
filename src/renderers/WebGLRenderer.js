@@ -274,7 +274,7 @@ function WebGLRenderer( parameters ) {
 
 		utils = new WebGLUtils( _gl, extensions, capabilities );
 
-		state = new WebGLState( _gl, extensions, utils, capabilities );
+		state = new WebGLState( _gl, extensions, capabilities );
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
@@ -1497,7 +1497,7 @@ function WebGLRenderer( parameters ) {
 		var parameters = programCache.getParameters(
 			material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
-		var code = programCache.getProgramCode( material, parameters );
+		var programCacheKey = programCache.getProgramCacheKey( material, parameters );
 
 		var program = materialProperties.program;
 		var programChange = true;
@@ -1507,7 +1507,7 @@ function WebGLRenderer( parameters ) {
 			// new material
 			material.addEventListener( 'dispose', onMaterialDispose );
 
-		} else if ( program.code !== code ) {
+		} else if ( program.cacheKey !== programCacheKey ) {
 
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
@@ -1556,10 +1556,10 @@ function WebGLRenderer( parameters ) {
 
 			material.onBeforeCompile( materialProperties.shader, _this );
 
-			// Computing code again as onBeforeCompile may have changed the shaders
-			code = programCache.getProgramCode( material, parameters );
+			// Computing cache key again as onBeforeCompile may have changed the shaders
+			programCacheKey = programCache.getProgramCacheKey( material, parameters );
 
-			program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
+			program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 			materialProperties.program = program;
 			material.program = program;

@@ -115,6 +115,7 @@ export const LinearToneMapping: ToneMapping;
 export const ReinhardToneMapping: ToneMapping;
 export const Uncharted2ToneMapping: ToneMapping;
 export const CineonToneMapping: ToneMapping;
+export const ACESFilmicToneMapping: ToneMapping;
 
 // Mapping modes
 export enum Mapping {}

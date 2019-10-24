@@ -5844,6 +5844,14 @@
 
 			if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) { object.drawMode = this.drawMode; }
 
+			if ( this.isInstancedMesh ) {
+
+				object.type = 'InstancedMesh';
+				object.count = this.count;
+				object.instanceMatrix = this.instanceMatrix.toJSON();
+
+			}
+
 			//
 
 			function serialize( library, element ) {
@@ -7341,6 +7349,232 @@
 
 	/**
 	 * @author bhouston / http://clara.io
+	 */
+
+	var _vector1 = new Vector3();
+	var _vector2 = new Vector3();
+	var _normalMatrix = new Matrix3();
+
+	function Plane( normal, constant ) {
+
+		// normal is assumed to be normalized
+
+		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
+		this.constant = ( constant !== undefined ) ? constant : 0;
+
+	}
+
+	Object.assign( Plane.prototype, {
+
+		isPlane: true,
+
+		set: function ( normal, constant ) {
+
+			this.normal.copy( normal );
+			this.constant = constant;
+
+			return this;
+
+		},
+
+		setComponents: function ( x, y, z, w ) {
+
+			this.normal.set( x, y, z );
+			this.constant = w;
+
+			return this;
+
+		},
+
+		setFromNormalAndCoplanarPoint: function ( normal, point ) {
+
+			this.normal.copy( normal );
+			this.constant = - point.dot( this.normal );
+
+			return this;
+
+		},
+
+		setFromCoplanarPoints: function ( a, b, c ) {
+
+			var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
+
+			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+
+			this.setFromNormalAndCoplanarPoint( normal, a );
+
+			return this;
+
+		},
+
+		clone: function () {
+
+			return new this.constructor().copy( this );
+
+		},
+
+		copy: function ( plane ) {
+
+			this.normal.copy( plane.normal );
+			this.constant = plane.constant;
+
+			return this;
+
+		},
+
+		normalize: function () {
+
+			// Note: will lead to a divide by zero if the plane is invalid.
+
+			var inverseNormalLength = 1.0 / this.normal.length();
+			this.normal.multiplyScalar( inverseNormalLength );
+			this.constant *= inverseNormalLength;
+
+			return this;
+
+		},
+
+		negate: function () {
+
+			this.constant *= - 1;
+			this.normal.negate();
+
+			return this;
+
+		},
+
+		distanceToPoint: function ( point ) {
+
+			return this.normal.dot( point ) + this.constant;
+
+		},
+
+		distanceToSphere: function ( sphere ) {
+
+			return this.distanceToPoint( sphere.center ) - sphere.radius;
+
+		},
+
+		projectPoint: function ( point, target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Plane: .projectPoint() target is now required' );
+				target = new Vector3();
+
+			}
+
+			return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+
+		},
+
+		intersectLine: function ( line, target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Plane: .intersectLine() target is now required' );
+				target = new Vector3();
+
+			}
+
+			var direction = line.delta( _vector1 );
+
+			var denominator = this.normal.dot( direction );
+
+			if ( denominator === 0 ) {
+
+				// line is coplanar, return origin
+				if ( this.distanceToPoint( line.start ) === 0 ) {
+
+					return target.copy( line.start );
+
+				}
+
+				// Unsure if this is the correct method to handle this case.
+				return undefined;
+
+			}
+
+			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+
+			if ( t < 0 || t > 1 ) {
+
+				return undefined;
+
+			}
+
+			return target.copy( direction ).multiplyScalar( t ).add( line.start );
+
+		},
+
+		intersectsLine: function ( line ) {
+
+			// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
+			var startSign = this.distanceToPoint( line.start );
+			var endSign = this.distanceToPoint( line.end );
+
+			return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+		},
+
+		intersectsBox: function ( box ) {
+
+			return box.intersectsPlane( this );
+
+		},
+
+		intersectsSphere: function ( sphere ) {
+
+			return sphere.intersectsPlane( this );
+
+		},
+
+		coplanarPoint: function ( target ) {
+
+			if ( target === undefined ) {
+
+				console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
+				target = new Vector3();
+
+			}
+
+			return target.copy( this.normal ).multiplyScalar( - this.constant );
+
+		},
+
+		applyMatrix4: function ( matrix, optionalNormalMatrix ) {
+
+			var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
+
+			var referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
+
+			var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
+
+			this.constant = - referencePoint.dot( normal );
+
+			return this;
+
+		},
+
+		translate: function ( offset ) {
+
+			this.constant -= offset.dot( this.normal );
+
+			return this;
+
+		},
+
+		equals: function ( plane ) {
+
+			return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
+
+		}
+
+	} );
+
+	/**
+	 * @author bhouston / http://clara.io
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -7535,7 +7769,7 @@
 			if ( target === undefined ) {
 
 				console.warn( 'THREE.Triangle: .getPlane() target is now required' );
-				target = new Vector3();
+				target = new Plane();
 
 			}
 
@@ -8661,6 +8895,7 @@
 			this.blending = source.blending;
 			this.side = source.side;
 			this.flatShading = source.flatShading;
+			this.vertexTangents = source.vertexTangents;
 			this.vertexColors = source.vertexColors;
 
 			this.opacity = source.opacity;
@@ -8677,7 +8912,6 @@
 			this.depthTest = source.depthTest;
 			this.depthWrite = source.depthWrite;
 
-			this.stencilWrite = source.stencilWrite;
 			this.stencilWriteMask = source.stencilWriteMask;
 			this.stencilFunc = source.stencilFunc;
 			this.stencilRef = source.stencilRef;
@@ -8685,6 +8919,26 @@
 			this.stencilFail = source.stencilFail;
 			this.stencilZFail = source.stencilZFail;
 			this.stencilZPass = source.stencilZPass;
+			this.stencilWrite = source.stencilWrite;
+
+			var srcPlanes = source.clippingPlanes,
+				dstPlanes = null;
+
+			if ( srcPlanes !== null ) {
+
+				var n = srcPlanes.length;
+				dstPlanes = new Array( n );
+
+				for ( var i = 0; i !== n; ++ i )
+					{ dstPlanes[ i ] = srcPlanes[ i ].clone(); }
+
+			}
+
+			this.clippingPlanes = dstPlanes;
+			this.clipIntersection = source.clipIntersection;
+			this.clipShadows = source.clipShadows;
+
+			this.shadowSide = source.shadowSide;
 
 			this.colorWrite = source.colorWrite;
 
@@ -8704,26 +8958,6 @@
 			this.toneMapped = source.toneMapped;
 
 			this.userData = JSON.parse( JSON.stringify( source.userData ) );
-
-			this.clipShadows = source.clipShadows;
-			this.clipIntersection = source.clipIntersection;
-
-			var srcPlanes = source.clippingPlanes,
-				dstPlanes = null;
-
-			if ( srcPlanes !== null ) {
-
-				var n = srcPlanes.length;
-				dstPlanes = new Array( n );
-
-				for ( var i = 0; i !== n; ++ i )
-					{ dstPlanes[ i ] = srcPlanes[ i ].clone(); }
-
-			}
-
-			this.clippingPlanes = dstPlanes;
-
-			this.shadowSide = source.shadowSide;
 
 			return this;
 
@@ -13615,232 +13849,6 @@
 	DataTexture.prototype.isDataTexture = true;
 
 	/**
-	 * @author bhouston / http://clara.io
-	 */
-
-	var _vector1 = new Vector3();
-	var _vector2 = new Vector3();
-	var _normalMatrix = new Matrix3();
-
-	function Plane( normal, constant ) {
-
-		// normal is assumed to be normalized
-
-		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
-		this.constant = ( constant !== undefined ) ? constant : 0;
-
-	}
-
-	Object.assign( Plane.prototype, {
-
-		isPlane: true,
-
-		set: function ( normal, constant ) {
-
-			this.normal.copy( normal );
-			this.constant = constant;
-
-			return this;
-
-		},
-
-		setComponents: function ( x, y, z, w ) {
-
-			this.normal.set( x, y, z );
-			this.constant = w;
-
-			return this;
-
-		},
-
-		setFromNormalAndCoplanarPoint: function ( normal, point ) {
-
-			this.normal.copy( normal );
-			this.constant = - point.dot( this.normal );
-
-			return this;
-
-		},
-
-		setFromCoplanarPoints: function ( a, b, c ) {
-
-			var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
-
-			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
-
-			this.setFromNormalAndCoplanarPoint( normal, a );
-
-			return this;
-
-		},
-
-		clone: function () {
-
-			return new this.constructor().copy( this );
-
-		},
-
-		copy: function ( plane ) {
-
-			this.normal.copy( plane.normal );
-			this.constant = plane.constant;
-
-			return this;
-
-		},
-
-		normalize: function () {
-
-			// Note: will lead to a divide by zero if the plane is invalid.
-
-			var inverseNormalLength = 1.0 / this.normal.length();
-			this.normal.multiplyScalar( inverseNormalLength );
-			this.constant *= inverseNormalLength;
-
-			return this;
-
-		},
-
-		negate: function () {
-
-			this.constant *= - 1;
-			this.normal.negate();
-
-			return this;
-
-		},
-
-		distanceToPoint: function ( point ) {
-
-			return this.normal.dot( point ) + this.constant;
-
-		},
-
-		distanceToSphere: function ( sphere ) {
-
-			return this.distanceToPoint( sphere.center ) - sphere.radius;
-
-		},
-
-		projectPoint: function ( point, target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.Plane: .projectPoint() target is now required' );
-				target = new Vector3();
-
-			}
-
-			return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
-
-		},
-
-		intersectLine: function ( line, target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.Plane: .intersectLine() target is now required' );
-				target = new Vector3();
-
-			}
-
-			var direction = line.delta( _vector1 );
-
-			var denominator = this.normal.dot( direction );
-
-			if ( denominator === 0 ) {
-
-				// line is coplanar, return origin
-				if ( this.distanceToPoint( line.start ) === 0 ) {
-
-					return target.copy( line.start );
-
-				}
-
-				// Unsure if this is the correct method to handle this case.
-				return undefined;
-
-			}
-
-			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
-
-			if ( t < 0 || t > 1 ) {
-
-				return undefined;
-
-			}
-
-			return target.copy( direction ).multiplyScalar( t ).add( line.start );
-
-		},
-
-		intersectsLine: function ( line ) {
-
-			// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
-
-			var startSign = this.distanceToPoint( line.start );
-			var endSign = this.distanceToPoint( line.end );
-
-			return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
-
-		},
-
-		intersectsBox: function ( box ) {
-
-			return box.intersectsPlane( this );
-
-		},
-
-		intersectsSphere: function ( sphere ) {
-
-			return sphere.intersectsPlane( this );
-
-		},
-
-		coplanarPoint: function ( target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
-				target = new Vector3();
-
-			}
-
-			return target.copy( this.normal ).multiplyScalar( - this.constant );
-
-		},
-
-		applyMatrix4: function ( matrix, optionalNormalMatrix ) {
-
-			var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
-
-			var referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
-
-			var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
-
-			this.constant = - referencePoint.dot( normal );
-
-			return this;
-
-		},
-
-		translate: function ( offset ) {
-
-			this.constant -= offset.dot( this.normal );
-
-			return this;
-
-		},
-
-		equals: function ( plane ) {
-
-			return plane.normal.equals( this.normal ) && ( plane.constant === this.constant );
-
-		}
-
-	} );
-
-	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author bhouston / http://clara.io
@@ -14183,9 +14191,9 @@
 
 	var tonemapping_pars_fragment = "#ifndef saturate\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#endif\nuniform float toneMappingExposure;\nuniform float toneMappingWhitePoint;\nvec3 LinearToneMapping( vec3 color ) {\n\treturn toneMappingExposure * color;\n}\nvec3 ReinhardToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\n}\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\nvec3 Uncharted2ToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );\n}\nvec3 OptimizedCineonToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\n}\nvec3 ACESFilmicToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( ( color * ( 2.51 * color + 0.03 ) ) / ( color * ( 2.43 * color + 0.59 ) + 0.14 ) );\n}";
 
-	var uv_pars_fragment = "#ifdef USE_UV\n\tvarying vec2 vUv;\n#endif";
+	var uv_pars_fragment = "#if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )\n\tvarying vec2 vUv;\n#endif";
 
-	var uv_pars_vertex = "#ifdef USE_UV\n\tvarying vec2 vUv;\n\tuniform mat3 uvTransform;\n#endif";
+	var uv_pars_vertex = "#ifdef USE_UV\n\t#ifdef UVS_VERTEX_ONLY\n\t\tvec2 vUv;\n\t#else\n\t\tvarying vec2 vUv;\n\t#endif\n\tuniform mat3 uvTransform;\n#endif";
 
 	var uv_vertex = "#ifdef USE_UV\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n#endif";
 
@@ -15491,7 +15499,7 @@
 			if ( precision === 'highp' ) {
 
 				if ( gl.getShaderPrecisionFormat( 35633, 36338 ).precision > 0 &&
-				     gl.getShaderPrecisionFormat( 35632, 36338 ).precision > 0 ) {
+					gl.getShaderPrecisionFormat( 35632, 36338 ).precision > 0 ) {
 
 					return 'highp';
 
@@ -15504,7 +15512,7 @@
 			if ( precision === 'mediump' ) {
 
 				if ( gl.getShaderPrecisionFormat( 35633, 36337 ).precision > 0 &&
-				     gl.getShaderPrecisionFormat( 35632, 36337 ).precision > 0 ) {
+					gl.getShaderPrecisionFormat( 35632, 36337 ).precision > 0 ) {
 
 					return 'mediump';
 
@@ -15516,7 +15524,10 @@
 
 		}
 
-		var isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+		/* eslint-disable no-undef */
+		var isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext ) ||
+			( typeof WebGL2ComputeRenderingContext !== 'undefined' && gl instanceof WebGL2ComputeRenderingContext );
+		/* eslint-enable no-undef */
 
 		var precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 		var maxPrecision = getMaxPrecision( precision );
@@ -17652,7 +17663,7 @@
 
 	}
 
-	function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+	function WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters ) {
 
 		var gl = renderer.getContext();
 
@@ -17745,6 +17756,7 @@
 				parameters.vertexTangents ? '#define USE_TANGENT' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 				parameters.vertexUvs ? '#define USE_UV' : '',
+				parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 				parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -17870,6 +17882,7 @@
 				parameters.vertexTangents ? '#define USE_TANGENT' : '',
 				parameters.vertexColors ? '#define USE_COLOR' : '',
 				parameters.vertexUvs ? '#define USE_UV' : '',
+				parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 				parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
@@ -18159,7 +18172,7 @@
 
 		this.name = shader.name;
 		this.id = programIdCount ++;
-		this.code = code;
+		this.cacheKey = cacheKey;
 		this.usedTimes = 1;
 		this.program = program;
 		this.vertexShader = glVertexShader;
@@ -18208,7 +18221,7 @@
 			"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
 			"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 			"roughnessMap", "metalnessMap", "gradientMap",
-			"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "fog", "useFog", "fogExp2",
+			"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "uvsVertexOnly", "fog", "useFog", "fogExp2",
 			"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 			"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 			"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
@@ -18354,7 +18367,8 @@
 
 				vertexTangents: ( material.normalMap && material.vertexTangents ),
 				vertexColors: material.vertexColors,
-				vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap,
+				vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || !! material.displacementMap,
+				uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap ) && !! material.displacementMap,
 
 				fog: !! fog,
 				useFog: material.fog,
@@ -18409,7 +18423,7 @@
 
 		};
 
-		this.getProgramCode = function ( material, parameters ) {
+		this.getProgramCacheKey = function ( material, parameters ) {
 
 			var array = [];
 
@@ -18451,18 +18465,18 @@
 
 		};
 
-		this.acquireProgram = function ( material, shader, parameters, code ) {
+		this.acquireProgram = function ( material, shader, parameters, cacheKey ) {
 
 			var program;
 
 			// Check if code has been already compiled
 			for ( var p = 0, pl = programs.length; p < pl; p ++ ) {
 
-				var programInfo = programs[ p ];
+				var preexistingProgram = programs[ p ];
 
-				if ( programInfo.code === code ) {
+				if ( preexistingProgram.cacheKey === cacheKey ) {
 
-					program = programInfo;
+					program = preexistingProgram;
 					++ program.usedTimes;
 
 					break;
@@ -18473,7 +18487,7 @@
 
 			if ( program === undefined ) {
 
-				program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
+				program = new WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters );
 				programs.push( program );
 
 			}
@@ -19604,7 +19618,7 @@
 
 					_state.viewport( _viewport );
 
-					shadow.updateMatrices( light, camera, vp );
+					shadow.updateMatrices( light, vp );
 
 					_frustum = shadow.getFrustum();
 
@@ -19885,7 +19899,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLState( gl, extensions, utils, capabilities ) {
+	function WebGLState( gl, extensions, capabilities ) {
 
 		var isWebGL2 = capabilities.isWebGL2;
 
@@ -20205,8 +20219,6 @@
 
 		var enabledCapabilities = {};
 
-		var compressedTextureFormats = null;
-
 		var currentProgram = null;
 
 		var currentBlendingEnabled = null;
@@ -20366,33 +20378,6 @@
 
 		}
 
-		function getCompressedTextureFormats() {
-
-			if ( compressedTextureFormats === null ) {
-
-				compressedTextureFormats = [];
-
-				if ( extensions.get( 'WEBGL_compressed_texture_pvrtc' ) ||
-				     extensions.get( 'WEBGL_compressed_texture_s3tc' ) ||
-				     extensions.get( 'WEBGL_compressed_texture_etc1' ) ||
-				     extensions.get( 'WEBGL_compressed_texture_astc' ) ) {
-
-					var formats = gl.getParameter( 34467 );
-
-					for ( var i = 0; i < formats.length; i ++ ) {
-
-						compressedTextureFormats.push( formats[ i ] );
-
-					}
-
-				}
-
-			}
-
-			return compressedTextureFormats;
-
-		}
-
 		function useProgram( program ) {
 
 			if ( currentProgram !== program ) {
@@ -20408,6 +20393,42 @@
 			return false;
 
 		}
+
+		var equationToGL = {};
+		equationToGL[ AddEquation ] = 32774;
+		equationToGL[ SubtractEquation ] = 32778;
+		equationToGL[ ReverseSubtractEquation ] = 32779;
+
+		if ( isWebGL2 ) {
+
+			equationToGL[ MinEquation ] = 32775;
+			equationToGL[ MaxEquation ] = 32776;
+
+		} else {
+
+			var extension = extensions.get( 'EXT_blend_minmax' );
+
+			if ( extension !== null ) {
+
+				equationToGL[ MinEquation ] = extension.MIN_EXT;
+				equationToGL[ MaxEquation ] = extension.MIN_EXT;
+
+			}
+
+		}
+
+		var factorToGL = {};
+		factorToGL[ ZeroFactor ] = 0;
+		factorToGL[ OneFactor ] = 1;
+		factorToGL[ SrcColorFactor ] = 768;
+		factorToGL[ SrcAlphaFactor ] = 770;
+		factorToGL[ SrcAlphaSaturateFactor ] = 776;
+		factorToGL[ DstColorFactor ] = 774;
+		factorToGL[ DstAlphaFactor ] = 772;
+		factorToGL[ OneMinusSrcColorFactor ] = 769;
+		factorToGL[ OneMinusSrcAlphaFactor ] = 771;
+		factorToGL[ OneMinusDstColorFactor ] = 775;
+		factorToGL[ OneMinusDstAlphaFactor ] = 773;
 
 		function setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
@@ -20520,7 +20541,7 @@
 
 			if ( blendEquation !== currentBlendEquation || blendEquationAlpha !== currentBlendEquationAlpha ) {
 
-				gl.blendEquationSeparate( utils.convert( blendEquation ), utils.convert( blendEquationAlpha ) );
+				gl.blendEquationSeparate( equationToGL[ blendEquation ], equationToGL[ blendEquationAlpha ] );
 
 				currentBlendEquation = blendEquation;
 				currentBlendEquationAlpha = blendEquationAlpha;
@@ -20529,7 +20550,7 @@
 
 			if ( blendSrc !== currentBlendSrc || blendDst !== currentBlendDst || blendSrcAlpha !== currentBlendSrcAlpha || blendDstAlpha !== currentBlendDstAlpha ) {
 
-				gl.blendFuncSeparate( utils.convert( blendSrc ), utils.convert( blendDst ), utils.convert( blendSrcAlpha ), utils.convert( blendDstAlpha ) );
+				gl.blendFuncSeparate( factorToGL[ blendSrc ], factorToGL[ blendDst ], factorToGL[ blendSrcAlpha ], factorToGL[ blendDstAlpha ] );
 
 				currentBlendSrc = blendSrc;
 				currentBlendDst = blendDst;
@@ -20823,8 +20844,6 @@
 
 			enabledCapabilities = {};
 
-			compressedTextureFormats = null;
-
 			currentTextureSlot = null;
 			currentBoundTextures = {};
 
@@ -20855,7 +20874,6 @@
 			disableUnusedAttributes: disableUnusedAttributes,
 			enable: enable,
 			disable: disable,
-			getCompressedTextureFormats: getCompressedTextureFormats,
 
 			useProgram: useProgram,
 
@@ -21319,7 +21337,7 @@
 
 							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+								if ( glFormat !== null ) {
 
 									state.compressedTexImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -21407,23 +21425,34 @@
 
 		}
 
-		function setTextureParameters( textureType, texture, supportsMips ) {
+		var wrappingToGL = {};
+		wrappingToGL[ RepeatWrapping ] = 10497;
+		wrappingToGL[ ClampToEdgeWrapping ] = 33071;
+		wrappingToGL[ MirroredRepeatWrapping ] = 33648;
 
-			var extension;
+		var filterToGL = {};
+		filterToGL[ NearestFilter ] = 9728;
+		filterToGL[ NearestMipmapNearestFilter ] = 9984;
+		filterToGL[ NearestMipmapLinearFilter ] = 9986;
+		filterToGL[ LinearFilter ] = 9729;
+		filterToGL[ LinearMipmapNearestFilter ] = 9985;
+		filterToGL[ LinearMipmapLinearFilter ] = 9987;
+
+		function setTextureParameters( textureType, texture, supportsMips ) {
 
 			if ( supportsMips ) {
 
-				_gl.texParameteri( textureType, 10242, utils.convert( texture.wrapS ) );
-				_gl.texParameteri( textureType, 10243, utils.convert( texture.wrapT ) );
+				_gl.texParameteri( textureType, 10242, wrappingToGL[ texture.wrapS ] );
+				_gl.texParameteri( textureType, 10243, wrappingToGL[ texture.wrapT ] );
 
 				if ( textureType === 32879 || textureType === 35866 ) {
 
-					_gl.texParameteri( textureType, 32882, utils.convert( texture.wrapR ) );
+					_gl.texParameteri( textureType, 32882, wrappingToGL[ texture.wrapR ] );
 
 				}
 
-				_gl.texParameteri( textureType, 10240, utils.convert( texture.magFilter ) );
-				_gl.texParameteri( textureType, 10241, utils.convert( texture.minFilter ) );
+				_gl.texParameteri( textureType, 10240, filterToGL[ texture.magFilter ] );
+				_gl.texParameteri( textureType, 10241, filterToGL[ texture.minFilter ] );
 
 			} else {
 
@@ -21453,7 +21482,7 @@
 
 			}
 
-			extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+			var extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 			if ( extension ) {
 
@@ -21604,7 +21633,7 @@
 
 					if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-						if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+						if ( glFormat !== null ) {
 
 							state.compressedTexImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -22157,18 +22186,6 @@
 
 			var extension;
 
-			if ( p === RepeatWrapping ) { return 10497; }
-			if ( p === ClampToEdgeWrapping ) { return 33071; }
-			if ( p === MirroredRepeatWrapping ) { return 33648; }
-
-			if ( p === NearestFilter ) { return 9728; }
-			if ( p === NearestMipmapNearestFilter ) { return 9984; }
-			if ( p === NearestMipmapLinearFilter ) { return 9986; }
-
-			if ( p === LinearFilter ) { return 9729; }
-			if ( p === LinearMipmapNearestFilter ) { return 9985; }
-			if ( p === LinearMipmapLinearFilter ) { return 9987; }
-
 			if ( p === UnsignedByteType ) { return 5121; }
 			if ( p === UnsignedShort4444Type ) { return 32819; }
 			if ( p === UnsignedShort5551Type ) { return 32820; }
@@ -22187,7 +22204,15 @@
 
 				extension = extensions.get( 'OES_texture_half_float' );
 
-				if ( extension !== null ) { return extension.HALF_FLOAT_OES; }
+				if ( extension !== null ) {
+
+					return extension.HALF_FLOAT_OES;
+
+				} else {
+
+					return null;
+
+				}
 
 			}
 
@@ -22200,23 +22225,6 @@
 			if ( p === DepthStencilFormat ) { return 34041; }
 			if ( p === RedFormat ) { return 6403; }
 
-			if ( p === AddEquation ) { return 32774; }
-			if ( p === SubtractEquation ) { return 32778; }
-			if ( p === ReverseSubtractEquation ) { return 32779; }
-
-			if ( p === ZeroFactor ) { return 0; }
-			if ( p === OneFactor ) { return 1; }
-			if ( p === SrcColorFactor ) { return 768; }
-			if ( p === OneMinusSrcColorFactor ) { return 769; }
-			if ( p === SrcAlphaFactor ) { return 770; }
-			if ( p === OneMinusSrcAlphaFactor ) { return 771; }
-			if ( p === DstAlphaFactor ) { return 772; }
-			if ( p === OneMinusDstAlphaFactor ) { return 773; }
-
-			if ( p === DstColorFactor ) { return 774; }
-			if ( p === OneMinusDstColorFactor ) { return 775; }
-			if ( p === SrcAlphaSaturateFactor ) { return 776; }
-
 			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
 				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
@@ -22228,6 +22236,10 @@
 					if ( p === RGBA_S3TC_DXT1_Format ) { return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT; }
 					if ( p === RGBA_S3TC_DXT3_Format ) { return extension.COMPRESSED_RGBA_S3TC_DXT3_EXT; }
 					if ( p === RGBA_S3TC_DXT5_Format ) { return extension.COMPRESSED_RGBA_S3TC_DXT5_EXT; }
+
+				} else {
+
+					return null;
 
 				}
 
@@ -22245,6 +22257,10 @@
 					if ( p === RGBA_PVRTC_4BPPV1_Format ) { return extension.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG; }
 					if ( p === RGBA_PVRTC_2BPPV1_Format ) { return extension.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG; }
 
+				} else {
+
+					return null;
+
 				}
 
 			}
@@ -22253,7 +22269,15 @@
 
 				extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
-				if ( extension !== null ) { return extension.COMPRESSED_RGB_ETC1_WEBGL; }
+				if ( extension !== null ) {
+
+					return extension.COMPRESSED_RGB_ETC1_WEBGL;
+
+				} else {
+
+					return null;
+
+				}
 
 			}
 
@@ -22267,27 +22291,13 @@
 
 				if ( extension !== null ) {
 
+					// TODO Complete?
+
 					return p;
 
-				}
+				} else {
 
-			}
-
-			if ( p === MinEquation || p === MaxEquation ) {
-
-				if ( isWebGL2 ) {
-
-					if ( p === MinEquation ) { return 32775; }
-					if ( p === MaxEquation ) { return 32776; }
-
-				}
-
-				extension = extensions.get( 'EXT_blend_minmax' );
-
-				if ( extension !== null ) {
-
-					if ( p === MinEquation ) { return extension.MIN_EXT; }
-					if ( p === MaxEquation ) { return extension.MAX_EXT; }
+					return null;
 
 				}
 
@@ -22299,11 +22309,17 @@
 
 				extension = extensions.get( 'WEBGL_depth_texture' );
 
-				if ( extension !== null ) { return extension.UNSIGNED_INT_24_8_WEBGL; }
+				if ( extension !== null ) {
+
+					return extension.UNSIGNED_INT_24_8_WEBGL;
+
+				} else {
+
+					return null;
+
+				}
 
 			}
-
-			return 0;
 
 		}
 
@@ -23662,7 +23678,7 @@
 
 			utils = new WebGLUtils( _gl, extensions, capabilities );
 
-			state = new WebGLState( _gl, extensions, utils, capabilities );
+			state = new WebGLState( _gl, extensions, capabilities );
 			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
 			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
@@ -24885,7 +24901,7 @@
 			var parameters = programCache.getParameters(
 				material, lights.state, shadowsArray, fog, _clipping.numPlanes, _clipping.numIntersection, object );
 
-			var code = programCache.getProgramCode( material, parameters );
+			var programCacheKey = programCache.getProgramCacheKey( material, parameters );
 
 			var program = materialProperties.program;
 			var programChange = true;
@@ -24895,7 +24911,7 @@
 				// new material
 				material.addEventListener( 'dispose', onMaterialDispose );
 
-			} else if ( program.code !== code ) {
+			} else if ( program.cacheKey !== programCacheKey ) {
 
 				// changed glsl or parameters
 				releaseMaterialProgramReference( material );
@@ -24944,10 +24960,10 @@
 
 				material.onBeforeCompile( materialProperties.shader, _this );
 
-				// Computing code again as onBeforeCompile may have changed the shaders
-				code = programCache.getProgramCode( material, parameters );
+				// Computing cache key again as onBeforeCompile may have changed the shaders
+				programCacheKey = programCache.getProgramCacheKey( material, parameters );
 
-				program = programCache.acquireProgram( material, materialProperties.shader, parameters, code );
+				program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 				materialProperties.program = program;
 				material.program = program;
@@ -32454,7 +32470,6 @@
 
 
 	var Geometries = /*#__PURE__*/Object.freeze({
-		__proto__: null,
 		WireframeGeometry: WireframeGeometry,
 		ParametricGeometry: ParametricGeometry,
 		ParametricBufferGeometry: ParametricBufferGeometry,
@@ -32840,7 +32855,7 @@
 	 *  alphaMap: new THREE.Texture( <Image> ),
 	 *
 	 *  envMap: new THREE.CubeTexture( [posx, negx, posy, negy, posz, negz] ),
-	 *  combine: THREE.Multiply,
+	 *  combine: THREE.MultiplyOperation,
 	 *  reflectivity: <float>,
 	 *  refractionRatio: <float>,
 	 *
@@ -33368,7 +33383,6 @@
 
 
 	var Materials = /*#__PURE__*/Object.freeze({
-		__proto__: null,
 		ShadowMaterial: ShadowMaterial,
 		SpriteMaterial: SpriteMaterial,
 		RawShaderMaterial: RawShaderMaterial,
@@ -33548,6 +33562,79 @@
 				} while ( key !== undefined );
 
 			}
+
+		},
+
+		subclip: function ( sourceClip, name, startFrame, endFrame, fps ) {
+
+			fps = fps || 30;
+
+			var clip = sourceClip.clone();
+
+			clip.name = name;
+
+			var tracks = [];
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				var track = clip.tracks[ i ];
+				var valueSize = track.getValueSize();
+
+				var times = [];
+				var values = [];
+
+				for ( var j = 0; j < track.times.length; ++ j ) {
+
+					var frame = track.times[ j ] * fps;
+
+					if ( frame < startFrame || frame >= endFrame ) { continue; }
+
+					times.push( track.times[ j ] );
+
+					for ( var k = 0; k < valueSize; ++ k ) {
+
+						values.push( track.values[ j * valueSize + k ] );
+
+					}
+
+				}
+
+				if ( times.length === 0 ) { continue; }
+
+				track.times = AnimationUtils.convertArray( times, track.times.constructor );
+				track.values = AnimationUtils.convertArray( values, track.values.constructor );
+
+				tracks.push( track );
+
+			}
+
+			clip.tracks = tracks;
+
+			// find minimum .times value across all tracks in the trimmed clip
+
+			var minStartTime = Infinity;
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				if ( minStartTime > clip.tracks[ i ].times[ 0 ] ) {
+
+					minStartTime = clip.tracks[ i ].times[ 0 ];
+
+				}
+
+			}
+
+			// shift all tracks such that clip begins at t=0
+
+			for ( var i = 0; i < clip.tracks.length; ++ i ) {
+
+				clip.tracks[ i ].shift( - 1 * minStartTime );
+
+			}
+
+			clip.resetDuration();
+
+			return clip;
 
 		}
 
@@ -35147,7 +35234,6 @@
 
 		},
 
-
 		clone: function () {
 
 			var tracks = [];
@@ -35924,7 +36010,7 @@
 				texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
 
 				texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
-				texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearMipmapLinearFilter;
+				texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
 
 				texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
@@ -35942,6 +36028,7 @@
 				if ( texData.mipmaps !== undefined ) {
 
 					texture.mipmaps = texData.mipmaps;
+					texture.minFilter = LinearMipmapLinearFilter; // presumably...
 
 				}
 
@@ -37603,7 +37690,6 @@
 
 
 	var Curves = /*#__PURE__*/Object.freeze({
-		__proto__: null,
 		ArcCurve: ArcCurve,
 		CatmullRomCurve3: CatmullRomCurve3,
 		CubicBezierCurve: CubicBezierCurve,
@@ -37907,11 +37993,15 @@
 
 			}
 
+			return this;
+
 		},
 
 		moveTo: function ( x, y ) {
 
 			this.currentPoint.set( x, y ); // TODO consider referencing vectors instead of copying?
+
+			return this;
 
 		},
 
@@ -37921,6 +38011,8 @@
 			this.curves.push( curve );
 
 			this.currentPoint.set( x, y );
+
+			return this;
 
 		},
 
@@ -37935,6 +38027,8 @@
 			this.curves.push( curve );
 
 			this.currentPoint.set( aX, aY );
+
+			return this;
 
 		},
 
@@ -37951,6 +38045,8 @@
 
 			this.currentPoint.set( aX, aY );
 
+			return this;
+
 		},
 
 		splineThru: function ( pts /*Array of Vector*/ ) {
@@ -37962,6 +38058,8 @@
 
 			this.currentPoint.copy( pts[ pts.length - 1 ] );
 
+			return this;
+
 		},
 
 		arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
@@ -37972,11 +38070,15 @@
 			this.absarc( aX + x0, aY + y0, aRadius,
 				aStartAngle, aEndAngle, aClockwise );
 
+			return this;
+
 		},
 
 		absarc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 			this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+			return this;
 
 		},
 
@@ -37986,6 +38088,8 @@
 			var y0 = this.currentPoint.y;
 
 			this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+
+			return this;
 
 		},
 
@@ -38010,6 +38114,8 @@
 
 			var lastPoint = curve.getPoint( 1 );
 			this.currentPoint.copy( lastPoint );
+
+			return this;
 
 		},
 
@@ -38393,7 +38499,7 @@
 
 		isSpotLightShadow: true,
 
-		updateMatrices: function ( light, viewCamera, viewportIndex ) {
+		updateMatrices: function ( light ) {
 
 			var camera = this.camera;
 
@@ -38410,7 +38516,7 @@
 
 			}
 
-			LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+			LightShadow.prototype.updateMatrices.call( this, light );
 
 		}
 
@@ -38536,7 +38642,9 @@
 
 		isPointLightShadow: true,
 
-		updateMatrices: function ( light, viewCamera, viewportIndex ) {
+		updateMatrices: function ( light, viewportIndex ) {
+
+			if ( viewportIndex === undefined ) { viewportIndex = 0; }
 
 			var camera = this.camera,
 				shadowMatrix = this.matrix,
@@ -38776,9 +38884,9 @@
 
 		isDirectionalLightShadow: true,
 
-		updateMatrices: function ( light, viewCamera, viewportIndex ) {
+		updateMatrices: function ( light ) {
 
-			LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+			LightShadow.prototype.updateMatrices.call( this, light );
 
 		}
 
@@ -40234,7 +40342,17 @@
 
 					}
 
-					if ( data.drawMode !== undefined ) { object.setDrawMode( data.drawMode ); }
+					break;
+
+				case 'InstancedMesh':
+
+					var geometry = getGeometry( data.geometry );
+					var material = getMaterial( data.material );
+					var count = data.count;
+					var instanceMatrix = data.instanceMatrix;
+
+					object = new InstancedMesh( geometry, material, count );
+					object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 
 					break;
 
@@ -40324,6 +40442,8 @@
 			if ( data.renderOrder !== undefined ) { object.renderOrder = data.renderOrder; }
 			if ( data.userData !== undefined ) { object.userData = data.userData; }
 			if ( data.layers !== undefined ) { object.layers.mask = data.layers; }
+
+			if ( data.drawMode !== undefined ) { object.setDrawMode( data.drawMode ); }
 
 			if ( data.children !== undefined ) {
 
@@ -40517,11 +40637,15 @@
 			this.subPaths.push( this.currentPath );
 			this.currentPath.moveTo( x, y );
 
+			return this;
+
 		},
 
 		lineTo: function ( x, y ) {
 
 			this.currentPath.lineTo( x, y );
+
+			return this;
 
 		},
 
@@ -40529,17 +40653,23 @@
 
 			this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
 
+			return this;
+
 		},
 
 		bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 			this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
 
+			return this;
+
 		},
 
 		splineThru: function ( pts ) {
 
 			this.currentPath.splineThru( pts );
+
+			return this;
 
 		},
 
@@ -41740,13 +41870,15 @@
 		this.loop = false;
 		this.loopStart = 0;
 		this.loopEnd = 0;
-		this.startTime = 0;
 		this.offset = 0;
 		this.duration = undefined;
 		this.playbackRate = 1;
 		this.isPlaying = false;
 		this.hasPlaybackControl = true;
 		this.sourceType = 'empty';
+
+		this._startedAt = 0;
+		this._pausedAt = 0;
 
 		this.filters = [];
 
@@ -41806,7 +41938,9 @@
 
 		},
 
-		play: function () {
+		play: function ( delay ) {
+
+			if ( delay === undefined ) { delay = 0; }
 
 			if ( this.isPlaying === true ) {
 
@@ -41822,15 +41956,15 @@
 
 			}
 
-			var source = this.context.createBufferSource();
+			this._startedAt = this.context.currentTime + delay;
 
+			var source = this.context.createBufferSource();
 			source.buffer = this.buffer;
 			source.loop = this.loop;
 			source.loopStart = this.loopStart;
 			source.loopEnd = this.loopEnd;
 			source.onended = this.onEnded.bind( this );
-			this.startTime = this.context.currentTime;
-			source.start( this.startTime, this.offset, this.duration );
+			source.start( this._startedAt, this._pausedAt + this.offset, this.duration );
 
 			this.isPlaying = true;
 
@@ -41854,9 +41988,11 @@
 
 			if ( this.isPlaying === true ) {
 
+				this._pausedAt = ( this.context.currentTime - this._startedAt ) * this.playbackRate;
+
 				this.source.stop();
 				this.source.onended = null;
-				this.offset += ( this.context.currentTime - this.startTime ) * this.playbackRate;
+
 				this.isPlaying = false;
 
 			}
@@ -41874,9 +42010,10 @@
 
 			}
 
+			this._pausedAt = 0;
+
 			this.source.stop();
 			this.source.onended = null;
-			this.offset = 0;
 			this.isPlaying = false;
 
 			return this;
@@ -47680,7 +47817,7 @@
 		fromPoints: function ( points ) {
 
 			console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
-			this.setFromPoints( points );
+			return this.setFromPoints( points );
 
 		}
 
@@ -49290,19 +49427,32 @@
 
 	//
 
-	Audio.prototype.load = function ( file ) {
+	Object.defineProperties( Audio.prototype, {
 
-		console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-		var scope = this;
-		var audioLoader = new AudioLoader();
-		audioLoader.load( file, function ( buffer ) {
+		load: {
+			value: function ( file ) {
 
-			scope.setBuffer( buffer );
+				console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+				var scope = this;
+				var audioLoader = new AudioLoader();
+				audioLoader.load( file, function ( buffer ) {
 
-		} );
-		return this;
+					scope.setBuffer( buffer );
 
-	};
+				} );
+				return this;
+
+			}
+		},
+		startTime: {
+			set: function () {
+
+				console.warn( 'THREE.Audio: .startTime is now .play( delay ).' );
+
+			}
+		}
+
+	} );
 
 	AudioAnalyser.prototype.getData = function () {
 

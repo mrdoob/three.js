@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipmapLinearFilter, NearestMipmapNearestFilter } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
 import { _Math } from '../../math/Math.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
@@ -434,7 +434,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-							if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+							if ( glFormat !== null ) {
 
 								state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -522,23 +522,37 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function setTextureParameters( textureType, texture, supportsMips ) {
+	var wrappingToGL = {
+		[ RepeatWrapping ]: _gl.REPEAT,
+		[ ClampToEdgeWrapping ]: _gl.CLAMP_TO_EDGE,
+		[ MirroredRepeatWrapping ]: _gl.MIRRORED_REPEAT
+	};
 
-		var extension;
+	var filterToGL = {
+		[ NearestFilter ]: _gl.NEAREST,
+		[ NearestMipmapNearestFilter ]: _gl.NEAREST_MIPMAP_NEAREST,
+		[ NearestMipmapLinearFilter ]: _gl.NEAREST_MIPMAP_LINEAR,
+
+		[ LinearFilter ]: _gl.LINEAR,
+		[ LinearMipmapNearestFilter ]: _gl.LINEAR_MIPMAP_NEAREST,
+		[ LinearMipmapLinearFilter ]: _gl.LINEAR_MIPMAP_LINEAR
+	};
+
+	function setTextureParameters( textureType, texture, supportsMips ) {
 
 		if ( supportsMips ) {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
 
 			if ( textureType === _gl.TEXTURE_3D || textureType === _gl.TEXTURE_2D_ARRAY ) {
 
-				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, utils.convert( texture.wrapR ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
 
 			}
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, utils.convert( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, utils.convert( texture.minFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterToGL[ texture.magFilter ] );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterToGL[ texture.minFilter ] );
 
 		} else {
 
@@ -568,7 +582,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+		var extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 		if ( extension ) {
 
@@ -719,7 +733,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+					if ( glFormat !== null ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 

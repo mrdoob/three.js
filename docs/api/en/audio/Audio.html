@@ -85,14 +85,11 @@
 		<h3>[property:Number playbackRate]</h3>
 		<p>Speed of playback. Default is *1*.</p>
 
-		<h3>[property:Number startTime]</h3>
-		<p>The time at which the sound should begin to play. Same as the *when* paramter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</p>
-
 		<h3>[property:Number offset]</h3>
-		<p>An offset to the time within the audio buffer that playback should begin. Same as the *offset* paramter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</p>
+		<p>An offset to the time within the audio buffer that playback should begin. Same as the *offset* parameter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</p>
 
 		<h3>[property:Number duration]</h3>
-		<p>Overrides the duration of the audio. Same as the *duration* paramter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *undefined* to play the whole buffer.</p>
+		<p>Overrides the duration of the audio. Same as the *duration* parameter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *undefined* to play the whole buffer.</p>
 
 		<h3>[property:String source]</h3>
 		<p>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode] created
@@ -150,7 +147,7 @@
 		Return the current volume.
 		</p>
 
-		<h3>[method:Audio play]()</h3>
+		<h3>[method:Audio play]( delay )</h3>
 		<p>
 		If [page:Audio.hasPlaybackControl hasPlaybackControl] is true, starts playback.
 		</p>
@@ -162,7 +159,7 @@
 
 		<h3>[method:null onEnded]()</h3>
 		<p>
-		Called automatically when playback finished. Sets If [page:Audio.isPlaying isPlaying] to false.
+		Called automatically when playback finished.
 		</p>
 
 		<h3>[method:Audio setBuffer]( audioBuffer )</h3>
@@ -229,8 +226,7 @@
 
 		<h3>[method:Audio stop]()</h3>
 		<p>
-		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, stops playback,
-		resets [page:Audio.startTime startTime] to *0* and sets [page:Audio.isPlaying isPlaying] to false.
+		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, stops playback.
 		</p>
 
 		<h2>Source</h2>

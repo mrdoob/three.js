@@ -377,7 +377,7 @@ function generateEnvMapBlendingDefine( parameters ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+function WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters ) {
 
 	var gl = renderer.getContext();
 
@@ -470,6 +470,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
+			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -595,6 +596,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
+			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
@@ -884,7 +886,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	this.name = shader.name;
 	this.id = programIdCount ++;
-	this.code = code;
+	this.cacheKey = cacheKey;
 	this.usedTimes = 1;
 	this.program = program;
 	this.vertexShader = glVertexShader;
