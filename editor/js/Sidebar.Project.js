@@ -12,7 +12,6 @@ Sidebar.Project = function ( editor ) {
 
 		'WebGLRenderer': THREE.WebGLRenderer,
 		'SVGRenderer': THREE.SVGRenderer,
-		'SoftwareRenderer': THREE.SoftwareRenderer,
 		'RaytracingRenderer': THREE.RaytracingRenderer
 
 	};
