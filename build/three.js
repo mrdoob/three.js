@@ -28167,16 +28167,6 @@
 	ParametricGeometry.prototype = Object.create( Geometry.prototype );
 	ParametricGeometry.prototype.constructor = ParametricGeometry;
 
-	ParametricGeometry.prototype.toJSON = function () {
-
-		var data = Geometry.prototype.toJSON.call( this );
-
-		data.func = this.parameters.func.toString();
-
-		return data;
-
-	};
-
 	// ParametricBufferGeometry
 
 	function ParametricBufferGeometry( func, slices, stacks ) {
@@ -28302,16 +28292,6 @@
 
 	ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
-
-	ParametricBufferGeometry.prototype.toJSON = function () {
-
-		var data = BufferGeometry.prototype.toJSON.call( this );
-
-		data.func = this.parameters.func.toString();
-
-		return data;
-
-	};
 
 	/**
 	 * @author clockworkgeek / https://github.com/clockworkgeek
@@ -39888,19 +39868,6 @@
 							geometry = new Geometries[ data.type ](
 								geometryShapes,
 								data.options
-							);
-
-							break;
-
-						case 'ParametricGeometry':
-						case 'ParametricBufferGeometry':
-
-							var func = new Function( 'return ' + data.func )();
-
-							geometry = new Geometries[ data.type ](
-								func,
-								data.slices,
-								data.stacks
 							);
 
 							break;
