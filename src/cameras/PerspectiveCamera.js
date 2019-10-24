@@ -40,18 +40,17 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	set: function ( fov, aspect, near, far, zoom, view, focus, filmGauge, filmOffset ) {
 
-		this.fov = fov;
-		this.zoom = zoom;
+		if ( fov !== undefined ) this.fov = fov;
+		if ( aspect !== undefined ) this.aspect = aspect;
+		if ( near !== undefined ) this.near = near;
+		if ( far !== undefined ) this.far = far;
 
-		this.near = near;
-		this.far = far;
-		this.focus = focus;
+		if ( zoom !== undefined ) this.zoom = zoom;
+		if ( view !== undefined ) this.view = view;
 
-		this.aspect = aspect;
-		this.view = view;
-
-		this.filmGauge = filmGauge;
-		this.filmOffset = filmOffset;
+		if ( focus !== undefined ) this.focus = focus;
+		if ( filmGauge !== undefined ) this.filmGauge = filmGauge;
+		if ( filmOffset !== undefined ) this.filmOffset = filmOffset;
 
 		this.updateProjectionMatrix();
 

@@ -35,16 +35,16 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	set: function ( left, right, top, bottom, near, far, zoom, view ) {
 
-		this.zoom = zoom;
-		this.view = view;
+		if ( left !== undefined ) this.left = left;
+		if ( right !== undefined ) this.right = right;
+		if ( top !== undefined ) this.top = top;
+		if ( bottom !== undefined ) this.bottom = bottom;
 
-		this.left = left;
-		this.right = right;
-		this.top = top;
-		this.bottom = bottom;
+		if ( near !== undefined ) this.near = near;
+		if ( far !== undefined ) this.far = far;
 
-		this.near = near;
-		this.far = far;
+		if ( zoom !== undefined ) this.zoom = zoom;
+		if ( view !== undefined ) this.view = view;
 
 		this.updateProjectionMatrix();
 
