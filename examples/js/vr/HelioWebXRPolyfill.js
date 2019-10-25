@@ -4,6 +4,10 @@
 
 if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
+	if ('isSessionSupported' in navigator.xr) {
+        return;
+    }
+
 	console.log( "Helio WebXR Polyfill (Lumin 0.97.0)" );
 
 	const isHelio96 = navigator.userAgent.includes( "Chrome/73" );
