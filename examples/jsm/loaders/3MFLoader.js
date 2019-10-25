@@ -121,7 +121,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					printTicketPartNames.push( file );
 
-				} else if ( file.match( /^3D\/Texture\/.*/ ) ) {
+				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 					texturesPartNames.push( file );
 
@@ -214,17 +214,27 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseRelsXml( relsFileText ) {
 
-			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
-			var relsNode = relsXmlData.querySelector( 'Relationship' );
-			var target = relsNode.getAttribute( 'Target' );
-			var id = relsNode.getAttribute( 'Id' );
-			var type = relsNode.getAttribute( 'Type' );
+			var relationships = [];
 
-			return {
-				target: target,
-				id: id,
-				type: type
-			};
+			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
+
+			var relsNodes = relsXmlData.querySelectorAll( 'Relationship' );
+
+			for ( var i = 0; i < relsNodes.length; i ++ ) {
+
+				var relsNode = relsNodes[ i ];
+
+				var relationship = {
+					target: relsNode.getAttribute( 'Target' ), //required
+					id: relsNode.getAttribute( 'Id' ), //required
+					type: relsNode.getAttribute( 'Type' ) //required
+				};
+
+				relationships.push( relationship );
+
+			}
+
+			return relationships;
 
 		}
 
@@ -1165,15 +1175,20 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var modelsKeys = Object.keys( modelsData );
 			var textureData = {};
 
-			// evaluate model relationship to a texture
+			// evaluate model relationships to textures
 
 			if ( modelRels ) {
 
-				var textureKey = modelRels.target.substring( 1 );
+				for ( var i = 0, l = modelRels.length; i < l; i ++ ) {
 
-				if ( data3mf.texture[ textureKey ] ) {
+					var modelRel = modelRels[ i ];
+					var textureKey = modelRel.target.substring( 1 );
 
-					textureData[ modelRels.target ] = data3mf.texture[ textureKey ];
+					if ( data3mf.texture[ textureKey ] ) {
+
+						textureData[ modelRel.target ] = data3mf.texture[ textureKey ];
+
+					}
 
 				}
 
@@ -1202,10 +1217,12 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function build( objects, refs, data3mf ) {
+		function build( objects, data3mf ) {
 
 			var group = new Group();
-			var buildData = data3mf.model[ refs[ 'target' ].substring( 1 ) ][ 'build' ];
+
+			var relationship = data3mf[ 'rels' ][ 0 ];
+			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {
 
@@ -1233,7 +1250,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var data3mf = loadDocument( data );
 		var objects = buildObjects( data3mf );
 
-		return build( objects, data3mf[ 'rels' ], data3mf );
+		return build( objects, data3mf );
 
 	},
 
