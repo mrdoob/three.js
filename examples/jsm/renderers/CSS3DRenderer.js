@@ -285,6 +285,11 @@ var CSS3DRenderer = function () {
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.perspective = fov + 'px';
 
+			} else {
+
+				domElement.style.WebkitPerspective = '';
+				domElement.style.perspective = '';
+
 			}
 
 			cache.camera.fov = fov;
