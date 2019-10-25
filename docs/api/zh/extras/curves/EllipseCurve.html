@@ -46,12 +46,10 @@ var ellipse = new THREE.Line( geometry, material );
 			[page:Float aY] – 椭圆的中心的Y坐标，默认值为*0*。<br/>
 			[page:Float xRadius] – X轴向上椭圆的半径，默认值为*1*。<br/>
 			[page:Float yRadius] – Y轴向上椭圆的半径，默认值为*1*。<br/>
-			[page:Radians aStartAngle] – 以弧度来表示，从正右侧算起曲线开始的角度，默认值为*0*。<br/>
-			[page:Radians aEndAngle] – 以弧度来表示，从正右侧算起曲线终止的角度，默认值为*2 x Math.PI*。<br/>
+			[page:Radians aStartAngle] – 以弧度来表示，从正X轴算起曲线开始的角度，默认值为*0*。<br/>
+			[page:Radians aEndAngle] – 以弧度来表示，从正X轴算起曲线终止的角度，默认值为*2 x Math.PI*。<br/>
 			[page:Boolean aClockwise] – 椭圆是否按照顺时针方向来绘制，默认值为*false*。<br/>
 			[page:Radians aRotation]  – 以弧度表示，椭圆从X轴正方向逆时针的旋转角度（可选），默认值为*0*。<br/><br/>
-
-			<em>请注意：</em> 当使用顺时针的时候，最好将起始角度角度设为(Math.PI * 2)，并向着更小的数字运行。
 		</p>
 
 		<h2>属性</h2>
