@@ -242,7 +242,7 @@ THREE.CarControls = ( function ( ) {
 			frontLeftWheelRoot.rotation[ this.wheelTurnAxis ] = wheelOrientation;
 			frontRightWheelRoot.rotation[ this.wheelTurnAxis ] = wheelOrientation;
 
-			steeringWheel.rotation[ this.steeringWheelTurnAxis ] = -wheelOrientation * 6;
+			steeringWheel.rotation[ this.steeringWheelTurnAxis ] = - wheelOrientation * 6;
 
 		},
 

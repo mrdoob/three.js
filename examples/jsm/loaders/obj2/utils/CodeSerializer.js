@@ -21,8 +21,8 @@ const CodeSerializer = {
 			part = serializationTarget[ name ];
 			if ( typeof ( part ) === 'string' || part instanceof String ) {
 
-				part = part.replace( '\n', '\\n' );
-				part = part.replace( '\r', '\\r' );
+				part = part.replace( /\n/g, '\\n' );
+				part = part.replace( /\r/g, '\\r' );
 				objectString += '\t' + name + ': "' + part + '",\n';
 
 			} else if ( part instanceof Array ) {
@@ -31,7 +31,7 @@ const CodeSerializer = {
 
 			} else if ( typeof part === 'object' ) {
 
-				console.log( 'Omitting object "' + name + '" and replace it with empty object.');
+				console.log( 'Omitting object "' + name + '" and replace it with empty object.' );
 				objectString += '\t' + name + ': {},\n';
 
 			} else {
@@ -75,7 +75,7 @@ const CodeSerializer = {
 
 			if ( name === 'constructor' ) {
 
-				if ( !funcInstructions.isRemoveCode() ) {
+				if ( ! funcInstructions.isRemoveCode() ) {
 
 					constructorString = fullObjectName + ' = ' + funcInstructions.getCode() + ';\n\n';
 
@@ -89,7 +89,7 @@ const CodeSerializer = {
 					funcInstructions = funcTemp;
 
 				}
-				if ( !funcInstructions.isRemoveCode() ) {
+				if ( ! funcInstructions.isRemoveCode() ) {
 
 					if ( isExtended ) {
 
@@ -136,7 +136,7 @@ const CodeSerializer = {
 
 				} else if ( typeof objectPart === 'object' ) {
 
-					console.log( 'Omitting object "' + funcInstructions.getName() + '" and replace it with empty object.');
+					console.log( 'Omitting object "' + funcInstructions.getName() + '" and replace it with empty object.' );
 					funcInstructions.setCode( "{}" );
 
 				} else {
@@ -257,7 +257,7 @@ CodeSerializationInstruction.prototype = {
 	 * Returns the serialized function code
 	 * @return {String}
 	 */
-	getCode: function() {
+	getCode: function () {
 
 		return this.code;
 

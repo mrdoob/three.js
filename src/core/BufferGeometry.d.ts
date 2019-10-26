@@ -37,23 +37,22 @@ export class BufferGeometry extends EventDispatcher {
 	attributes: {
 		[name: string]: BufferAttribute | InterleavedBufferAttribute;
 	};
-	morphAttributes: any;
+	morphAttributes: {
+		[name: string]: ( BufferAttribute | InterleavedBufferAttribute )[];
+	};
 	groups: { start: number; count: number; materialIndex?: number }[];
 	boundingBox: Box3;
 	boundingSphere: Sphere;
 	drawRange: { start: number; count: number };
 	userData: {[key: string]: any};
+	isBufferGeometry: boolean;
 
 	getIndex(): BufferAttribute;
 	setIndex( index: BufferAttribute | number[] ): void;
 
-	addAttribute(
-		name: string,
-		attribute: BufferAttribute | InterleavedBufferAttribute
-	): BufferGeometry;
-
+	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;
-	removeAttribute( name: string ): BufferGeometry;
+	deleteAttribute( name: string ): BufferGeometry;
 
 	addGroup( start: number, count: number, materialIndex?: number ): void;
 	clearGroups(): void;
@@ -138,6 +137,19 @@ export class BufferGeometry extends EventDispatcher {
 	 * @deprecated Use {@link BufferGeometry#clearGroups .clearGroups()} instead.
 	 */
 	clearDrawCalls(): void;
+
+	/**
+	 * @deprecated Use {@link BufferGeometry#setAttribute .setAttribute()} instead.
+	 */
+	addAttribute(
+		name: string,
+		attribute: BufferAttribute | InterleavedBufferAttribute
+	): BufferGeometry;
+
+	/**
+	 * @deprecated Use {@link BufferGeometry#deleteAttribute .deleteAttribute()} instead.
+	 */
+	removeAttribute( name: string ): BufferGeometry;
 
 	addAttribute( name: any, array: any, itemSize: any ): any;
 

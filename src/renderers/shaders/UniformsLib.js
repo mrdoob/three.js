@@ -182,6 +182,7 @@ var UniformsLib = {
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
+		alphaMap: { value: null },
 		uvTransform: { value: new Matrix3() }
 
 	},
@@ -193,6 +194,7 @@ var UniformsLib = {
 		center: { value: new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },
 		map: { value: null },
+		alphaMap: { value: null },
 		uvTransform: { value: new Matrix3() }
 
 	}

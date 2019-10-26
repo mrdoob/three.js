@@ -10,18 +10,21 @@
  * - Object Resources (Meshes and Components)
  * - Material Resources (Base Materials)
  *
- * 3MF Materials and Properties Extension (e.g. textures) are not yet supported.
+ * 3MF Materials and Properties Extension are only partially supported.
  *
+ * - Texture 2D
+ * - Texture 2D Groups
  */
 
 THREE.ThreeMFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
+
 	this.availableExtensions = [];
 
 };
 
-THREE.ThreeMFLoader.prototype = {
+THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.ThreeMFLoader,
 
@@ -39,16 +42,11 @@ THREE.ThreeMFLoader.prototype = {
 
 	},
 
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
 	parse: function ( data ) {
 
 		var scope = this;
+		var textureLoader = new THREE.TextureLoader( this.manager );
+		var textureMap = {};
 
 		function loadDocument( data ) {
 
@@ -56,12 +54,14 @@ THREE.ThreeMFLoader.prototype = {
 			var file = null;
 
 			var relsName;
+			var modelRelsName;
 			var modelPartNames = [];
 			var printTicketPartNames = [];
 			var texturesPartNames = [];
 			var otherPartNames = [];
 
 			var rels;
+			var modelRels;
 			var modelParts = {};
 			var printTicketParts = {};
 			var texturesParts = {};
@@ -88,6 +88,10 @@ THREE.ThreeMFLoader.prototype = {
 
 					relsName = file;
 
+				} else if ( file.match( /3D\/_rels\/.*\.model\.rels$/ ) ) {
+
+					modelRelsName = file;
+
 				} else if ( file.match( /^3D\/.*\.model$/ ) ) {
 
 					modelPartNames.push( file );
@@ -96,7 +100,7 @@ THREE.ThreeMFLoader.prototype = {
 
 					printTicketPartNames.push( file );
 
-				} else if ( file.match( /^3D\/Textures\/.*/ ) ) {
+				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 					texturesPartNames.push( file );
 
@@ -108,9 +112,23 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
+			//
+
 			var relsView = new Uint8Array( zip.file( relsName ).asArrayBuffer() );
 			var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 			rels = parseRelsXml( relsFileText );
+
+			//
+
+			if ( modelRelsName ) {
+
+				var relsView = new Uint8Array( zip.file( modelRelsName ).asArrayBuffer() );
+				var relsFileText = THREE.LoaderUtils.decodeText( relsView );
+				modelRels = parseRelsXml( relsFileText );
+
+			}
+
+			//
 
 			for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
@@ -153,15 +171,18 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
+			//
+
 			for ( var i = 0; i < texturesPartNames.length; i ++ ) {
 
 				var texturesPartName = texturesPartNames[ i ];
-				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asBinary();
+				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asArrayBuffer();
 
 			}
 
 			return {
 				rels: rels,
+				modelRels: modelRels,
 				model: modelParts,
 				printTicket: printTicketParts,
 				texture: texturesParts,
@@ -172,17 +193,27 @@ THREE.ThreeMFLoader.prototype = {
 
 		function parseRelsXml( relsFileText ) {
 
-			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
-			var relsNode = relsXmlData.querySelector( 'Relationship' );
-			var target = relsNode.getAttribute( 'Target' );
-			var id = relsNode.getAttribute( 'Id' );
-			var type = relsNode.getAttribute( 'Type' );
+			var relationships = [];
 
-			return {
-				target: target,
-				id: id,
-				type: type
-			};
+			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
+
+			var relsNodes = relsXmlData.querySelectorAll( 'Relationship' );
+
+			for ( var i = 0; i < relsNodes.length; i ++ ) {
+
+				var relsNode = relsNodes[ i ];
+
+				var relationship = {
+					target: relsNode.getAttribute( 'Target' ), //required
+					id: relsNode.getAttribute( 'Id' ), //required
+					type: relsNode.getAttribute( 'Type' ) //required
+				};
+
+				relationships.push( relationship );
+
+			}
+
+			return relationships;
 
 		}
 
@@ -238,6 +269,49 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
+		function parseTexture2DNode( texture2DNode ) {
+
+			var texture2dData = {
+				id: texture2DNode.getAttribute( 'id' ), // required
+				path: texture2DNode.getAttribute( 'path' ), // required
+				contenttype: texture2DNode.getAttribute( 'contenttype' ), // required
+				tilestyleu: texture2DNode.getAttribute( 'tilestyleu' ),
+				tilestylev: texture2DNode.getAttribute( 'tilestylev' ),
+				filter: texture2DNode.getAttribute( 'filter' ),
+			};
+
+			return texture2dData;
+
+		}
+
+		function parseTextures2DGroupNodes( texture2DGroupNode ) {
+
+			var texture2DGroupData = {
+				id: texture2DGroupNode.getAttribute( 'id' ), // required
+				texid: texture2DGroupNode.getAttribute( 'texid' ), // required
+				displaypropertiesid: texture2DGroupNode.getAttribute( 'displaypropertiesid' )
+			};
+
+			var tex2coordNodes = texture2DGroupNode.querySelectorAll( 'tex2coord' );
+
+			var uvs = [];
+
+			for ( var i = 0; i < tex2coordNodes.length; i ++ ) {
+
+				var tex2coordNode = tex2coordNodes[ i ];
+				var u = tex2coordNode.getAttribute( 'u' );
+				var v = tex2coordNode.getAttribute( 'v' );
+
+				uvs.push( parseFloat( u ), parseFloat( v ) );
+
+			}
+
+			texture2DGroupData[ 'uvs' ] = new Float32Array( uvs );
+
+			return texture2DGroupData;
+
+		}
+
 		function parseBasematerialNode( basematerialNode ) {
 
 			var basematerialData = {};
@@ -267,13 +341,7 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
-			meshData[ 'vertices' ] = new Float32Array( vertices.length );
-
-			for ( var i = 0; i < vertices.length; i ++ ) {
-
-				meshData[ 'vertices' ][ i ] = vertices[ i ];
-
-			}
+			meshData[ 'vertices' ] = new Float32Array( vertices );
 
 			var triangleProperties = [];
 			var triangles = [];
@@ -327,13 +395,7 @@ THREE.ThreeMFLoader.prototype = {
 			}
 
 			meshData[ 'triangleProperties' ] = triangleProperties;
-			meshData[ 'triangles' ] = new Uint32Array( triangles.length );
-
-			for ( var i = 0; i < triangles.length; i ++ ) {
-
-				meshData[ 'triangles' ][ i ] = triangles[ i ];
-
-			}
+			meshData[ 'triangles' ] = new Uint32Array( triangles );
 
 			return meshData;
 
@@ -481,6 +543,34 @@ THREE.ThreeMFLoader.prototype = {
 
 			}
 
+			//
+
+			resourcesData[ 'texture2d' ] = {};
+			var textures2DNodes = resourcesNode.querySelectorAll( 'texture2d' );
+
+			for ( var i = 0; i < textures2DNodes.length; i ++ ) {
+
+				var textures2DNode = textures2DNodes[ i ];
+				var texture2DData = parseTexture2DNode( textures2DNode );
+				resourcesData[ 'texture2d' ][ texture2DData[ 'id' ] ] = texture2DData;
+
+			}
+
+			//
+
+			resourcesData[ 'texture2dgroup' ] = {};
+			var textures2DGroupNodes = resourcesNode.querySelectorAll( 'texture2dgroup' );
+
+			for ( var i = 0; i < textures2DGroupNodes.length; i ++ ) {
+
+				var textures2DGroupNode = textures2DGroupNodes[ i ];
+				var textures2DGroupData = parseTextures2DGroupNodes( textures2DGroupNode );
+				resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
+
+			}
+
+			//
+
 			resourcesData[ 'object' ] = {};
 			var objectNodes = resourcesNode.querySelectorAll( 'object' );
 
@@ -554,15 +644,7 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function buildMesh( meshData, objects, modelData, objectData ) {
-
-			// geometry
-
-			var geometry = new THREE.BufferGeometry();
-			geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
-
-			// groups
+		function buildGroups( geometry, modelData, meshData ) {
 
 			var basematerialsData = modelData[ 'resources' ][ 'basematerials' ];
 			var triangleProperties = meshData[ 'triangleProperties' ];
@@ -584,7 +666,7 @@ THREE.ThreeMFLoader.prototype = {
 
 					if ( currentMaterialIndex === triangleProperty.p1 ) {
 
-						count += 3; // primitves per triangle
+						count += 3; // primitives per triangle
 
 					} else {
 
@@ -602,20 +684,215 @@ THREE.ThreeMFLoader.prototype = {
 
 			if ( geometry.groups.length > 0 ) mergeGroups( geometry );
 
-			geometry.computeBoundingSphere();
+		}
+
+		function buildGeometry( modelData, meshData, objectData ) {
+
+			var geometry = new THREE.BufferGeometry();
+			geometry.setIndex( new THREE.BufferAttribute( meshData[ 'triangles' ], 1 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( meshData[ 'vertices' ], 3 ) );
+
+			//
+
+			var texture2dgroups = modelData.resources.texture2dgroup;
+
+			if ( texture2dgroups ) {
+
+				var textureCoordinates = [];
+
+				var triangleProperties = meshData[ 'triangleProperties' ];
+				var texture2dgroupObjectLevel;
+
+				// check reference to texture coordinates on object level
+
+				var texid;
+				var pid = objectData.pid;
+
+				if ( pid && texture2dgroups[ pid ] ) texture2dgroupObjectLevel = texture2dgroups[ pid ];
+
+				// process all triangles
+
+				for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
+
+					var texture2dgroup = texture2dgroupObjectLevel;
+					var triangleProperty = triangleProperties[ i ];
+					pid = triangleProperty.pid;
+
+					// overwrite existing resource reference if necessary
+
+					if ( pid && texture2dgroups[ pid ] ) texture2dgroup = texture2dgroups[ pid ];
+
+					if ( texture2dgroup ) {
+
+						texid = texture2dgroup.texid; // the loader only supports a single texture for a single geometry right now (and not per face)
+						var uvs = texture2dgroup.uvs;
+
+						textureCoordinates.push( uvs[ ( triangleProperty.p1 * 2 ) + 0 ] );
+						textureCoordinates.push( uvs[ ( triangleProperty.p1 * 2 ) + 1 ] );
+
+						textureCoordinates.push( uvs[ ( triangleProperty.p2 * 2 ) + 0 ] );
+						textureCoordinates.push( uvs[ ( triangleProperty.p2 * 2 ) + 1 ] );
+
+						textureCoordinates.push( uvs[ ( triangleProperty.p3 * 2 ) + 0 ] );
+						textureCoordinates.push( uvs[ ( triangleProperty.p3 * 2 ) + 1 ] );
+
+					}
+
+				}
+
+				if ( textureCoordinates.length > 0 ) {
+
+					// uvs are defined on face level so the same vertex can have multiple uv coordinates
+
+					geometry = geometry.toNonIndexed();
+					geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( textureCoordinates, 2 ) );
+					geometry.__texid = texid; // save the relationship between texture coordinates and texture
+
+					return geometry;
+
+				}
+
+			}
+
+			return geometry;
+
+		}
+
+		function buildTexture( geometry, modelData, textureData ) {
+
+			var texid = geometry.__texid;
+
+			if ( texid !== undefined ) {
+
+				delete geometry.__texid;
+
+				if ( textureMap[ texid ] !== undefined ) {
+
+					return textureMap[ texid ];
+
+				} else {
+
+					var texture2ds = modelData.resources.texture2d;
+					var texture2d = texture2ds[ texid ];
+
+					if ( texture2d ) {
+
+						var data = textureData[ texture2d.path ];
+						var type = texture2d.contenttype;
+
+						var blob = new Blob( [ data ], { type: type } );
+						var sourceURI = URL.createObjectURL( blob );
+
+						var texture = textureLoader.load( sourceURI, function () {
+
+							URL.revokeObjectURL( sourceURI );
+
+						} );
+
+						texture.encoding = THREE.sRGBEncoding;
+
+						// texture parameters
+
+						switch ( texture2d.tilestyleu ) {
+
+							case 'wrap':
+								texture.wrapS = THREE.RepeatWrapping;
+								break;
+
+							case 'mirror':
+								texture.wrapS = THREE.MirroredRepeatWrapping;
+								break;
+
+							case 'none':
+							case 'clamp':
+								texture.wrapS = THREE.ClampToEdgeWrapping;
+								break;
+
+							default:
+								texture.wrapS = THREE.RepeatWrapping;
+
+						}
+
+						switch ( texture2d.tilestylev ) {
+
+							case 'wrap':
+								texture.wrapT = THREE.RepeatWrapping;
+								break;
+
+							case 'mirror':
+								texture.wrapT = THREE.MirroredRepeatWrapping;
+								break;
+
+							case 'none':
+							case 'clamp':
+								texture.wrapT = THREE.ClampToEdgeWrapping;
+								break;
+
+							default:
+								texture.wrapT = THREE.RepeatWrapping;
+
+						}
+
+						switch ( texture2d.filter ) {
+
+							case 'auto':
+								texture.magFilter = THREE.LinearFilter;
+								texture.minFilter = THREE.LinearMipmapLinearFilter;
+								break;
+
+							case 'linear':
+								texture.magFilter = THREE.LinearFilter;
+								texture.minFilter = THREE.LinearFilter;
+								break;
+
+							case 'nearest':
+								texture.magFilter = THREE.NearestFilter;
+								texture.minFilter = THREE.NearestFilter;
+								break;
+
+							default:
+								texture.magFilter = THREE.LinearFilter;
+								texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+						}
+
+						textureMap[ texid ] = texture;
+
+						return texture;
+
+					}
+
+				}
+
+			}
+
+			return null;
+
+		}
+
+		function buildMesh( meshData, objects, modelData, textureData, objectData ) {
+
+			var geometry = buildGeometry( modelData, meshData, objectData );
+			var texture = buildTexture( geometry, modelData, textureData );
+
+			// groups
+
+			buildGroups( geometry, modelData, meshData );
 
 			// material
 
-			var material;
+			var material = null;
 
 			// add material if an object-level definition is present
+
+			var basematerialsData = modelData[ 'resources' ][ 'basematerials' ];
 
 			if ( basematerialsData && ( basematerialsData.id === objectData.pid ) ) {
 
 				var materialIndex = objectData.pindex;
 				var basematerialData = basematerialsData.basematerials[ materialIndex ];
 
-				material = getBuild( basematerialData, objects, modelData, objectData, buildBasematerial );
+				material = getBuild( basematerialData, objects, modelData, textureData, objectData, buildBasematerial );
 
 			}
 
@@ -630,8 +907,7 @@ THREE.ThreeMFLoader.prototype = {
 
 					var group = groups[ i ];
 					var basematerialData = basematerialsData.basematerials[ group.materialIndex ];
-
-					material.push( getBuild( basematerialData, objects, modelData, objectData, buildBasematerial ) );
+					material.push( getBuild( basematerialData, objects, modelData, textureData, objectData, buildBasematerial ) );
 
 				}
 
@@ -639,7 +915,19 @@ THREE.ThreeMFLoader.prototype = {
 
 			// default material
 
-			if ( material === undefined ) material = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
+			if ( material === null ) {
+
+				if ( texture === null ) {
+
+					material = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
+
+				} else {
+
+					material = new THREE.MeshPhongMaterial( { map: texture, flatShading: true } );
+
+				}
+
+			}
 
 			return new THREE.Mesh( geometry, material );
 
@@ -761,11 +1049,11 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function getBuild( data, objects, modelData, objectData, builder ) {
+		function getBuild( data, objects, modelData, textureData, objectData, builder ) {
 
 			if ( data.build !== undefined ) return data.build;
 
-			data.build = builder( data, objects, modelData, objectData );
+			data.build = builder( data, objects, modelData, textureData, objectData );
 
 			return data.build;
 
@@ -797,7 +1085,7 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function buildComposite( compositeData, objects, modelData ) {
+		function buildComposite( compositeData, objects, modelData, textureData ) {
 
 			var composite = new THREE.Group();
 
@@ -808,7 +1096,7 @@ THREE.ThreeMFLoader.prototype = {
 
 				if ( build === undefined ) {
 
-					buildObject( component.objectId, objects, modelData );
+					buildObject( component.objectId, objects, modelData, textureData );
 					build = objects[ component.objectId ];
 
 				}
@@ -833,7 +1121,7 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function buildObject( objectId, objects, modelData ) {
+		function buildObject( objectId, objects, modelData, textureData ) {
 
 			var objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
 
@@ -846,13 +1134,13 @@ THREE.ThreeMFLoader.prototype = {
 
 				applyExtensions( extensions, meshData, modelXml );
 
-				objects[ objectData.id ] = getBuild( meshData, objects, modelData, objectData, buildMesh );
+				objects[ objectData.id ] = getBuild( meshData, objects, modelData, textureData, objectData, buildMesh );
 
 			} else {
 
 				var compositeData = objectData[ 'components' ];
 
-				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, objectData, buildComposite );
+				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
 
 			}
 
@@ -861,8 +1149,31 @@ THREE.ThreeMFLoader.prototype = {
 		function buildObjects( data3mf ) {
 
 			var modelsData = data3mf.model;
+			var modelRels = data3mf.modelRels;
 			var objects = {};
 			var modelsKeys = Object.keys( modelsData );
+			var textureData = {};
+
+			// evaluate model relationships to textures
+
+			if ( modelRels ) {
+
+				for ( var i = 0, l = modelRels.length; i < l; i ++ ) {
+
+					var modelRel = modelRels[ i ];
+					var textureKey = modelRel.target.substring( 1 );
+
+					if ( data3mf.texture[ textureKey ] ) {
+
+						textureData[ modelRel.target ] = data3mf.texture[ textureKey ];
+
+					}
+
+				}
+
+			}
+
+			// start build
 
 			for ( var i = 0; i < modelsKeys.length; i ++ ) {
 
@@ -875,7 +1186,7 @@ THREE.ThreeMFLoader.prototype = {
 
 					var objectId = objectIds[ j ];
 
-					buildObject( objectId, objects, modelData );
+					buildObject( objectId, objects, modelData, textureData );
 
 				}
 
@@ -885,10 +1196,12 @@ THREE.ThreeMFLoader.prototype = {
 
 		}
 
-		function build( objects, refs, data3mf ) {
+		function build( objects, data3mf ) {
 
 			var group = new THREE.Group();
-			var buildData = data3mf.model[ refs[ 'target' ].substring( 1 ) ][ 'build' ];
+
+			var relationship = data3mf[ 'rels' ][ 0 ];
+			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {
 
@@ -916,7 +1229,7 @@ THREE.ThreeMFLoader.prototype = {
 		var data3mf = loadDocument( data );
 		var objects = buildObjects( data3mf );
 
-		return build( objects, data3mf[ 'rels' ], data3mf );
+		return build( objects, data3mf );
 
 	},
 
@@ -926,4 +1239,4 @@ THREE.ThreeMFLoader.prototype = {
 
 	}
 
-};
+} );

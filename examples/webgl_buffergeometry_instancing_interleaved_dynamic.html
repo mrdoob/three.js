@@ -139,10 +139,10 @@
 
 			// Use vertexBuffer, starting at offset 0, 3 items in position attribute
 			var positions = new THREE.InterleavedBufferAttribute( vertexBuffer, 3, 0 );
-			geometry.addAttribute( 'position', positions );
+			geometry.setAttribute( 'position', positions );
 			// Use vertexBuffer, starting at offset 4, 2 items in uv attribute
 			var uvs = new THREE.InterleavedBufferAttribute( vertexBuffer, 2, 4 );
-			geometry.addAttribute( 'uv', uvs );
+			geometry.setAttribute( 'uv', uvs );
 
 			var indices = new Uint16Array( [
 				0, 1, 2,
@@ -162,7 +162,7 @@
 			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 			// per instance data
-			instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setDynamic( true );
+			instanceBuffer = new THREE.InstancedInterleavedBuffer( new Float32Array( instances * 8 ), 8, 1 ).setUsage( THREE.DynamicDrawUsage );
 			var offsets = new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 );
 
 			var vector = new THREE.Vector4();
@@ -177,7 +177,7 @@
 
 			}
 
-			geometry.addAttribute( 'offset', offsets ); // per mesh translation
+			geometry.setAttribute( 'offset', offsets ); // per mesh translation
 
 			orientations = new THREE.InterleavedBufferAttribute( instanceBuffer, 4, 4 );
 
@@ -190,7 +190,7 @@
 
 			}
 
-			geometry.addAttribute( 'orientation', orientations ); // per mesh orientation
+			geometry.setAttribute( 'orientation', orientations ); // per mesh orientation
 
 			// material
 			var texture = new THREE.TextureLoader().load( 'textures/crate.gif' );

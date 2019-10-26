@@ -144,7 +144,7 @@
 						colors.push( 1, 1, 1 );
 
 					}
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 					mesh.geometry = geometry;
 					updateColors();

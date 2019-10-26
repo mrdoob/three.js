@@ -138,9 +138,9 @@
 				normalAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
 				colorAttribute.normalized = true;
 
-				geometry.addAttribute( 'position', positionAttribute );
-				geometry.addAttribute( 'normal', normalAttribute );
-				geometry.addAttribute( 'color', colorAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'normal', normalAttribute );
+				geometry.setAttribute( 'color', colorAttribute );
 
 				geometry.computeBoundingSphere();
 

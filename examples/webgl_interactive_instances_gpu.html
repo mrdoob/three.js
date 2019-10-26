@@ -747,7 +747,7 @@
 
 			}
 
-			mgeo.addAttribute( 'position', vertices );
+			mgeo.setAttribute( 'position', vertices );
 
 			var colCount = posLen / 3;
 			var colors = new THREE.BufferAttribute(
@@ -768,7 +768,7 @@
 				}
 
 			}
-			mgeo.addAttribute( 'color', colors );
+			mgeo.setAttribute( 'color', colors );
 
 			var col = new THREE.Color();
 			var pickingColors = new THREE.BufferAttribute(
@@ -784,7 +784,7 @@
 				}
 
 			}
-			mgeo.addAttribute( 'pickingColor', pickingColors );
+			mgeo.setAttribute( 'pickingColor', pickingColors );
 
 			// mesh
 
@@ -821,7 +821,7 @@
 			geometryList.push( igeo );
 
 			var vertices = geo.attributes.position.clone();
-			igeo.addAttribute( 'position', vertices );
+			igeo.setAttribute( 'position', vertices );
 
 			// var matrices = new THREE.InstancedBufferAttribute(
 			// 	new Float32Array( instanceCount * 16 ), 16
@@ -854,11 +854,11 @@
 				mcol3.setXYZ( i, me[ 12 ], me[ 13 ], me[ 14 ] );
 
 			}
-			// igeo.addAttribute( 'matrix', matrices );
-			igeo.addAttribute( 'mcol0', mcol0 );
-			igeo.addAttribute( 'mcol1', mcol1 );
-			igeo.addAttribute( 'mcol2', mcol2 );
-			igeo.addAttribute( 'mcol3', mcol3 );
+			// igeo.setAttribute( 'matrix', matrices );
+			igeo.setAttribute( 'mcol0', mcol0 );
+			igeo.setAttribute( 'mcol1', mcol1 );
+			igeo.setAttribute( 'mcol2', mcol2 );
+			igeo.setAttribute( 'mcol3', mcol3 );
 
 			var randCol = function () {
 
@@ -873,7 +873,7 @@
 				colors.setXYZ( i, randCol(), randCol(), randCol() );
 
 			}
-			igeo.addAttribute( 'color', colors );
+			igeo.setAttribute( 'color', colors );
 
 			var col = new THREE.Color();
 			var pickingColors = new THREE.InstancedBufferAttribute(
@@ -885,7 +885,7 @@
 				pickingColors.setXYZ( i, col.r, col.g, col.b );
 
 			}
-			igeo.addAttribute( 'pickingColor', pickingColors );
+			igeo.setAttribute( 'pickingColor', pickingColors );
 
 			// mesh
 

@@ -33,6 +33,7 @@ export enum ShadowMapType {}
 export const BasicShadowMap: ShadowMapType;
 export const PCFShadowMap: ShadowMapType;
 export const PCFSoftShadowMap: ShadowMapType;
+export const VSMShadowMap: ShadowMapType;
 
 // MATERIAL CONSTANTS
 
@@ -114,6 +115,7 @@ export const LinearToneMapping: ToneMapping;
 export const ReinhardToneMapping: ToneMapping;
 export const Uncharted2ToneMapping: ToneMapping;
 export const CineonToneMapping: ToneMapping;
+export const ACESFilmicToneMapping: ToneMapping;
 
 // Mapping modes
 export enum Mapping {}
@@ -274,3 +276,15 @@ export const GreaterStencilFunc: StencilFunc;
 export const NotEqualStencilFunc: StencilFunc;
 export const GreaterEqualStencilFunc: StencilFunc;
 export const AlwaysStencilFunc: StencilFunc;
+
+// usage types
+export enum Usage {}
+export const StaticDrawUsage: Usage;
+export const DynamicDrawUsage: Usage;
+export const StreamDrawUsage: Usage;
+export const StaticReadUsage: Usage;
+export const DynamicReadUsage: Usage;
+export const StreamReadUsage: Usage;
+export const StaticCopyUsage: Usage;
+export const DynamicCopyUsage: Usage;
+export const StreamCopyUsage: Usage;

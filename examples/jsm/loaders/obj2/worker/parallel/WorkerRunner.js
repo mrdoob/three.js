@@ -49,9 +49,8 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
-			ObjectManipulator.applyProperties( parser, payload.params );
-			ObjectManipulator.applyProperties( parser, payload.materials );
-			ObjectManipulator.applyProperties( parser, callbacks );
+			ObjectManipulator.applyProperties( parser, payload.params, false );
+			ObjectManipulator.applyProperties( parser, callbacks, false );
 
 			let arraybuffer;
 			if ( payload.params && payload.params.index !== undefined && payload.params.index !== null ) {
@@ -64,15 +63,15 @@ DefaultWorkerPayloadHandler.prototype = {
 
 			}
 
-			let parseFunctionName = 'parse';
-			if ( typeof parser.getParseFunctionName === 'function' ) parseFunctionName = parser.getParseFunctionName();
+			let executeFunctionName = 'execute';
+			if ( typeof parser.getParseFunctionName === 'function' ) executeFunctionName = parser.getParseFunctionName();
 			if ( payload.usesMeshDisassembler ) {
 
 				// TODO: Allow to plug and use generic MeshDisassembler
 
 			} else {
 
-				parser[ parseFunctionName ]( arraybuffer, payload.data.options );
+				parser[ executeFunctionName ]( arraybuffer, payload.data.options );
 
 			}
 			if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );

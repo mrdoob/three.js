@@ -62,7 +62,9 @@
 
 				//
 
-				var loader = new ThreeMFLoader();
+				var manager = new THREE.LoadingManager();
+
+				var loader = new ThreeMFLoader( manager );
 				loader.load( './models/3mf/truck.3mf', function ( object ) {
 
 					object.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) ); 	// z-up conversion
@@ -75,9 +77,15 @@
 
 					scene.add( object );
 
+				} );
+
+				//
+
+				manager.onLoad = function () {
+
 					render();
 
-				} );
+				};
 
 				//
 

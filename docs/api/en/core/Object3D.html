@@ -192,7 +192,7 @@
 			Set to ( 0, 1, 0 ) by default.
 		</p>
 
-		<h3>[property:Vector3 DefaultMatrixAutoUpdate]</h3>
+		<h3>[property:Boolean DefaultMatrixAutoUpdate]</h3>
 		<p>
 			The default setting for [page:.matrixAutoUpdate matrixAutoUpdate] for newly created Object3Ds.<br />
 
@@ -438,11 +438,18 @@
 		</p>
 
 		<h3>[method:null updateMatrix]()</h3>
-		<p>Update the local transform.</p>
+		<p>Updates the local transform.</p>
 
 		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
-		<p>Update the global transform of the object and its children.</p>
+		<p>Updates the global transform of the object and its descendants.</p>
 
+		<h3>[method:null updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+		<p>
+		updateParents - recursively updates global transform of ancestors.<br />
+		updateChildren - recursively updates global transform of descendants.<br /><br />
+
+		Updates the global transform of the object.
+		</p>
 
 		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
 		<p>
@@ -453,6 +460,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

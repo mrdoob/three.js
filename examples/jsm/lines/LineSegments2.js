@@ -54,22 +54,14 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			var instanceDistanceBuffer = new InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-			geometry.addAttribute( 'instanceDistanceStart', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-			geometry.addAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+			geometry.setAttribute( 'instanceDistanceStart', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
+			geometry.setAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
 			return this;
 
 		};
 
-	}() ),
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	}() )
 
 } );
 

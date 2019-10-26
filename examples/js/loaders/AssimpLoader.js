@@ -4,21 +4,19 @@
 
 THREE.AssimpLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AssimpLoader.prototype = {
+THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AssimpLoader,
-
-	crossOrigin: 'anonymous',
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( scope.path === undefined ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
+		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( scope.path );
@@ -29,27 +27,6 @@ THREE.AssimpLoader.prototype = {
 			onLoad( scope.parse( buffer, path ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -695,19 +672,19 @@ THREE.AssimpLoader.prototype = {
 				else
 					mat = new THREE.MeshLambertMaterial();
 				geometry.setIndex( new THREE.BufferAttribute( new Uint32Array( this.mIndexArray ), 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( this.mVertexBuffer, 3 ) );
 				if ( this.mNormalBuffer && this.mNormalBuffer.length > 0 )
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
+					geometry.setAttribute( 'normal', new THREE.BufferAttribute( this.mNormalBuffer, 3 ) );
 				if ( this.mColorBuffer && this.mColorBuffer.length > 0 )
-					geometry.addAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
+					geometry.setAttribute( 'color', new THREE.BufferAttribute( this.mColorBuffer, 4 ) );
 				if ( this.mTexCoordsBuffers[ 0 ] && this.mTexCoordsBuffers[ 0 ].length > 0 )
-					geometry.addAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
+					geometry.setAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 0 ] ), 2 ) );
 				if ( this.mTexCoordsBuffers[ 1 ] && this.mTexCoordsBuffers[ 1 ].length > 0 )
-					geometry.addAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
+					geometry.setAttribute( 'uv1', new THREE.BufferAttribute( new Float32Array( this.mTexCoordsBuffers[ 1 ] ), 2 ) );
 				if ( this.mTangentBuffer && this.mTangentBuffer.length > 0 )
-					geometry.addAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
+					geometry.setAttribute( 'tangents', new THREE.BufferAttribute( this.mTangentBuffer, 3 ) );
 				if ( this.mBitangentBuffer && this.mBitangentBuffer.length > 0 )
-					geometry.addAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
+					geometry.setAttribute( 'bitangents', new THREE.BufferAttribute( this.mBitangentBuffer, 3 ) );
 				if ( this.mBones.length > 0 ) {
 
 					var weights = [];
@@ -760,8 +737,8 @@ THREE.AssimpLoader.prototype = {
 
 					}
 
-					geometry.addAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
-					geometry.addAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( _weights ), BONESPERVERT ) );
+					geometry.setAttribute( 'skinIndex', new THREE.BufferAttribute( new Float32Array( _bones ), BONESPERVERT ) );
 
 				}
 
@@ -2274,4 +2251,4 @@ THREE.AssimpLoader.prototype = {
 
 	}
 
-};
+} );

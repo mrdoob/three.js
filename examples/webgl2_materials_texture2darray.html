@@ -99,11 +99,8 @@
 						var array = zip.files[ 'head256x256x109' ].asUint8Array();
 
 						var texture = new THREE.DataTexture2DArray( array, 256, 256, 109 );
-
 						texture.format = THREE.RedFormat;
 						texture.type = THREE.UnsignedByteType;
-
-						texture.needsUpdate = true;
 
 						var material = new THREE.ShaderMaterial( {
 							uniforms: {
@@ -126,9 +123,9 @@
 				// 2D Texture array is available on WebGL 2.0
 
 				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2' );
+				var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas, context: context } );
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

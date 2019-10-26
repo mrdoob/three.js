@@ -227,7 +227,7 @@ NodeBuilder.prototype = {
 
 			this.addVaryCode( 'varying vec3 vWNormal;' );
 
-			this.addVertexFinalCode( 'vWNormal = ( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz;' );
+			this.addVertexFinalCode( 'vWNormal = inverseTransformDirection( transformedNormal, viewMatrix ).xyz;' );
 
 		}
 
@@ -446,6 +446,12 @@ NodeBuilder.prototype = {
 	define: function ( name, value ) {
 
 		this.defines[ name ] = value === undefined ? 1 : value;
+
+	},
+
+	require: function ( name ) {
+
+		this.requires[ name ] = true;
 
 	},
 

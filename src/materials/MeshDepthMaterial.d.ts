@@ -4,7 +4,7 @@ import { Texture } from './../textures/Texture';
 
 export interface MeshDepthMaterialParameters extends MaterialParameters {
 	depthPacking?: DepthPackingStrategies;
-	displacementMap?: Texture;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
 	wireframe?: boolean;

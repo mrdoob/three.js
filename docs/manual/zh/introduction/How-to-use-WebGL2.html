@@ -46,9 +46,14 @@ if ( WEBGL.isWebGL2Available() === false ) {
 		最终，three.js将在内部使用所给定的绘图环境来渲染，并自动将内置的材质的着色器代码转化为GLSL ES 3.00。
 	</p>
 
+	<p>
+		由于你是手动创建WebGL 2渲染上下文，因此还必须传入所有必需的上下文属性。
+		请注意：在上下文被创建后，将无法修改这些属性，因此将它们传递给WebGLRenderer将不会产生任何影响。
+	</p>
+
 	<code>
 var canvas = document.createElement( 'canvas' );
-var context = canvas.getContext( 'webgl2' );
+var context = canvas.getContext( 'webgl2', { alpha: false } );
 var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 	</code>
 
@@ -97,7 +102,7 @@ var material = new THREE.ShaderMaterial( {
 		请参阅官方示例，来看一看WebGL 2各种特性的运行。<br /><br />
 
 		[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]<br />
-		[example:webgl2_materials_texture3d_volume WebGL2 / materials / texture3d / volume]<br />
+		[example:webgl2_materials_texture2darray WebGL2 / materials / texture2darray]<br />
 		[example:webgl2_multisampled_renderbuffers WebGL2 / multisampled renderbuffers]
 	</p>
 
@@ -108,7 +113,9 @@ var material = new THREE.ShaderMaterial( {
 		下列列表展现了在最新版本three.js中，已可用的特性的概览。
 		<ul>
 			<li>3D Textures</li>
+			<li>2D Texture Arrays</li>
 			<li>Multisampled Renderbuffers</li>
+			<li>Non-power of two (POT) textures work just the same as POT textures now. No resizing is required for best quality.</li>
 		</ul>
 
 	</p>
