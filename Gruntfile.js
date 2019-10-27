@@ -199,7 +199,7 @@ module.exports = function(grunt) {
     const lessonInfo = JSON.parse(fs.readFileSync('package.json', {encoding: 'utf8'}));
     const oldVersion = lessonInfo.threejsfundamentals.threeVersion;
     const oldVersionStr = `r${oldVersion}`;
-    const threePath = path.join(__dirname, '..', 'three.js');
+    const threePath = path.dirname(path.dirname(require.resolve('three')));
     const threeInfo = JSON.parse(fs.readFileSync(path.join(threePath, 'package.json'), {encoding: 'utf8'}));
     const newVersion = semver.minor(threeInfo.version);
     const newVersionStr = `r${newVersion}`;
@@ -208,11 +208,11 @@ module.exports = function(grunt) {
       copy: {
         threejs: {
           files: [
-            { expand: true, cwd: `${threePath}/build/`, src: 'three.js', dest: `${basePath}/`, },
-            { expand: true, cwd: `${threePath}/build/`, src: 'three.min.js', dest: `${basePath}/`, },
-            { expand: true, cwd: `${threePath}/build/`, src: 'three.module.js', dest: `${basePath}/`, },
-            { expand: true, cwd: `${threePath}/examples/js/`, src: '**', dest: `${basePath}/js/`, },
-            { expand: true, cwd: `${threePath}/examples/jsm/`, src: '**', dest: `${basePath}/jsm/`, },
+            { expand: true, cwd: `${threePath}/build/`, src: 'three.js', dest: `${basePath}/build/`, },
+            { expand: true, cwd: `${threePath}/build/`, src: 'three.min.js', dest: `${basePath}/build/`, },
+            { expand: true, cwd: `${threePath}/build/`, src: 'three.module.js', dest: `${basePath}/build/`, },
+            { expand: true, cwd: `${threePath}/examples/js/`, src: '**', dest: `${basePath}/examples/js/`, },
+            { expand: true, cwd: `${threePath}/examples/jsm/`, src: '**', dest: `${basePath}/examples/jsm/`, },
           ],
         },
       },
