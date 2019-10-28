@@ -68,8 +68,27 @@ var DeviceOrientationControls = function ( object ) {
 
 		onScreenOrientationChangeEvent(); // run once on load
 
-		window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
-		window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+		if ( typeof DeviceMotionEvent.requestPermission === 'function' ) {
+
+			// iOS 13+
+			DeviceOrientationEvent.requestPermission().then( response => {
+
+				if ( response == 'granted' ) {
+
+					window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+					window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+				}
+
+			} ).catch( console.error );
+
+		} else {
+
+			// non iOS 13+
+			window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+			window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
+
+		}
 
 		scope.enabled = true;
 
