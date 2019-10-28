@@ -68,10 +68,10 @@ var DeviceOrientationControls = function ( object ) {
 
 		onScreenOrientationChangeEvent(); // run once on load
 
-		if ( typeof DeviceMotionEvent.requestPermission === 'function' ) {
+		if ( typeof window.DeviceMotionEvent.requestPermission === 'function' ) {
 
 			// iOS 13+
-			DeviceOrientationEvent.requestPermission().then( response => {
+			window.DeviceOrientationEvent.requestPermission().then( response => {
 
 				if ( response == 'granted' ) {
 
