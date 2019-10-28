@@ -12,10 +12,10 @@
 
 		<p class="desc">
 
-            其功能时处理并跟踪已加载和待处理的数据。如果未手动设置加强管理器，则会为加载器创建和使用默认全局实例加载器管理器
-            - 请参阅 [page:DefaultLoadingManager].<br /><br />
+			其功能时处理并跟踪已加载和待处理的数据。如果未手动设置加强管理器，则会为加载器创建和使用默认全局实例加载器管理器
+			- 请参阅 [page:DefaultLoadingManager].<br /><br />
 
-            一般来说，默认的加载管理器已足够使用了，但有时候也需要设置单独的加载器 - 例如，如果你想为对象和纹理显示单独的加载条。
+			一般来说，默认的加载管理器已足够使用了，但有时候也需要设置单独的加载器 - 例如，如果你想为对象和纹理显示单独的加载条。
 
 		</p>
 
@@ -71,8 +71,8 @@
 
 		<p>
 
-            除了观察进度流程之外，还可以使用LoadingManager在加载期间覆写资源URL。当某资源来自拖拽事件、
-            WebSockets、WebRTC或其他API时，此方法可以有所帮助。下面显示了如何使用Blob URL加载内存模型的示例。
+			除了观察进度流程之外，还可以使用LoadingManager在加载期间覆写资源URL。当某资源来自拖拽事件、
+			WebSockets、WebRTC或其他API时，此方法可以有所帮助。下面显示了如何使用Blob URL加载内存模型的示例。
 		</p>
 
 		<code>
@@ -131,27 +131,27 @@
 
 		<h3>[property:Function onLoad]</h3>
 		<p>
-            所有的项加载完成后将调用此函数。默认情况下，此方法时未定义的，除非在构造函数中进行传递。
+			所有的项加载完成后将调用此函数。默认情况下，此方法时未定义的，除非在构造函数中进行传递。
 		</p>
 
 		<h3>[property:Function onProgress]</h3>
 		<p>
-		    此方法加载每一个项，加载完成时进行调用。
-            有如下参数:<br />
+			此方法加载每一个项，加载完成时进行调用。
+			有如下参数:<br />
 		[page:String url] — 被加载的项的url。<br />
 		[page:Integer itemsLoaded] — 目前已加载项的个数。<br />
 		[page:Iteger itemsTotal] — 总共所需要加载项的个数。<br /><br />
 
-            默认情况下，此方法时未定义的，除非在构造函数中进行传递。
+			默认情况下，此方法时未定义的，除非在构造函数中进行传递。
 		</p>
 
 		<h3>[property:Function onError]</h3>
 		<p>
-            此方法将在任意项加载错误时，进行调用。
-            有如下参数:<br />
+			此方法将在任意项加载错误时，进行调用。
+			有如下参数:<br />
 			[page:String url] — 所加载出错误的项的url<br /><br />
 
-            默认情况下，此方法时未定义的，除非在构造函数中进行传递。
+			默认情况下，此方法时未定义的，除非在构造函数中进行传递。
 		</p>
 
 
@@ -170,18 +170,18 @@
 manager.addHandler( /\.tga$/i, new TGALoader() );
 		</code>
 
-		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
-		<p>
-		[page:Object regex] — A regular expression.
-		<p>
-		Removes the loader for the given regular expression.
-		</p>
-
 		<h3>[method:null getHandler]( [param:String file] )</h3>
 		<p>
 		[page:String file] — The file path.
 		<p>
 		Can be used to retrieve the registered loader for the given file path.
+		</p>
+
+		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — A regular expression.
+		<p>
+		Removes the loader for the given regular expression.
 		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
@@ -219,7 +219,6 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 
 		任何使用管理器的加载器都会调用此方法， 当加载器需要加载URL结束时。
 		</p>
-
 
 		<h3>[method:null itemError]( [param:String url] )</h3>
 		<p>

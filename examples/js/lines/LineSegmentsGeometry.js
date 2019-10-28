@@ -239,20 +239,6 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 		// todo
 
-	},
-
-	clone: function () {
-
-		// todo
-
-	},
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
 	}
 
 } );

@@ -296,6 +296,15 @@ var color = new THREE.Color( 1, 0, 0 );
 		注意，对于X11颜色名称，多个单词(如暗橙色)变成字符串“darkorange”(全部是小写字母)。
 		</p>
 
+		<h3>[method:Color setColorName]( [param:String style] ) </h3>
+		<p>
+		[page:String style] — color name ( from [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] ).<br /><br />
+
+		Sets this color from a color name. Faster than [page:.setStyle] method if you don't need the other CSS-style formats.<br/><br/>
+
+		For convenience, the list of names is exposed in Color.NAMES as a hash: <code>Color.NAMES.aliceblue // returns 0xF0F8FF</code>
+		</p>
+
 		<h3>[method:Color sub]( [param:Color color] ) </h3>
 		<p>
 		从该颜色的RGB分量中减去传入颜色的RGB分量。如果分量结果是负，则该分量为零。

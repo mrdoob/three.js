@@ -4,6 +4,8 @@
 
 if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
+	if ( 'isSessionSupported' in navigator.xr ) return;
+
 	console.log( "Helio WebXR Polyfill (Lumin 0.97.0)" );
 
 	const isHelio96 = navigator.userAgent.includes( "Chrome/73" );
@@ -15,7 +17,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
     "supportsSessionMode" in navigator.xr
 	) {
 
-		navigator.xr.supportsSession = function ( sessionType ) {
+		navigator.xr.supportsSession = function ( /*sessionType*/ ) {
 
 			// Force using immersive-ar
 			return navigator.xr.supportsSessionMode( 'immersive-ar' );
@@ -28,7 +30,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 		const tempRequestSession = navigator.xr.requestSession.bind( navigator.xr );
 
-		navigator.xr.requestSession = function ( sessionType ) {
+		navigator.xr.requestSession = function ( /*sessionType*/ ) {
 
 			return new Promise( function ( resolve, reject ) {
 
