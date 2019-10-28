@@ -1150,7 +1150,7 @@ var OrbitControls = function ( object, domElement ) {
 
 	// make sure element can receive keys.
 
-	if ( scope.domElement.tabIndex === -1 ) {
+	if ( scope.domElement.tabIndex === - 1 ) {
 
 		scope.domElement.tabIndex = 0;
 
