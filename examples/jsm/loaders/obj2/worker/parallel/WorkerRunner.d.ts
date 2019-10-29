@@ -1,13 +1,17 @@
-import { OBJLoader2Parser } from './OBJLoader2Parser';
+export namespace ObjectManipulator {
+
+	export function applyProperties(objToAlter: object, params: object, forceCreation: boolean): void;
+
+}
 
 export class DefaultWorkerPayloadHandler {
 
-	constructor( parser: OBJLoader2Parser );
+	constructor( parser: object );
 	logging: {
 		enabled: boolean;
 		debug: boolean;
 	};
-	parser: OBJLoader2Parser;
+	parser: object;
 
 	handlePayload( payload: object ): void;
 
@@ -16,11 +20,6 @@ export class DefaultWorkerPayloadHandler {
 export class WorkerRunner {
 
 	constructor( payloadHandler: object );
-	logging: {
-		enabled: boolean;
-		debug: boolean;
-	};
-	resourceDescriptors: OBJLoader2Parser;
 	payloadHandler: object;
 
 	processMessage( payload: object ): void;
