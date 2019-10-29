@@ -6,8 +6,7 @@ export default /* glsl */`
 
 	#ifdef USE_TANGENT
 
-		mat3 vClearcoatTBN = mat3( tangent, bitangent, clearcoatNormal );
-		clearcoatNormal = normalize( vClearcoatTBN * clearcoatMapN );
+		clearcoatNormal = normalize( vTBN * clearcoatMapN );
 
 	#else
 

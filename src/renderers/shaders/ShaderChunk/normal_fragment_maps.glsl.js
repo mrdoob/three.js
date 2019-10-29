@@ -25,7 +25,6 @@ export default /* glsl */`
 
 	#ifdef USE_TANGENT
 
-		mat3 vTBN = mat3( tangent, bitangent, normal );
 		normal = normalize( vTBN * mapN );
 
 	#else
