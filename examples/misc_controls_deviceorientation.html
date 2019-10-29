@@ -30,7 +30,10 @@
 			} else {
 
 				deviceBtn.addEventListener( 'click', () => {
+
+					document.body.removeChild( deviceBtn );
 					controls.connect();
+
 				} );
 
 			}
