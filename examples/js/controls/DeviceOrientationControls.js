@@ -61,7 +61,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 		onScreenOrientationChangeEvent(); // run once on load
 
-		if ( typeof window.DeviceMotionEvent.requestPermission === 'function' ) {
+		if ( window.DeviceOrientationEvent !== undefined && typeof window.DeviceOrientationEvent.requestPermission === 'function' ) {
 
 			// iOS 13+
 			window.DeviceOrientationEvent.requestPermission().then( response => {
