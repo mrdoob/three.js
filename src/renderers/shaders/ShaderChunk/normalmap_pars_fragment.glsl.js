@@ -17,7 +17,7 @@ export default /* glsl */`
 	// Per-Pixel Tangent Space Normal Mapping
 	// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 
-	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec2 normalScale, in sampler2D normalMap ) {
+	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN ) {
 
 		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -31,10 +31,6 @@ export default /* glsl */`
 		vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );
 		vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
 		vec3 N = normalize( surf_norm );
-
-		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-
-		mapN.xy *= normalScale;
 
 		#ifdef DOUBLE_SIDED
 
