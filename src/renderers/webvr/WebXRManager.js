@@ -27,9 +27,11 @@ function WebXRManager( renderer, gl ) {
 	var controllers = [];
 	var sortedInputSources = [];
 
+	var firstAnimationFrame = false, inImmersive = false;
+
 	function isPresenting() {
 
-		return session !== null && referenceSpace !== null;
+		return session !== null && inImmersive === true;
 
 	}
 
@@ -91,7 +93,12 @@ function WebXRManager( renderer, gl ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
-		scope.dispatchEvent( { type: 'sessionend' } );
+		if ( inImmersive ) {
+
+			inImmersive = false;
+			scope.dispatchEvent( { type: 'immersiveend' } );
+
+		}
 
 	}
 
@@ -99,10 +106,10 @@ function WebXRManager( renderer, gl ) {
 
 		referenceSpace = value;
 
+		firstAnimationFrame = true;
+
 		animation.setContext( session );
 		animation.start();
-
-		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
@@ -264,6 +271,14 @@ function WebXRManager( renderer, gl ) {
 					cameraVR.matrix.copy( camera.matrix );
 
 				}
+
+			}
+
+			if ( firstAnimationFrame ) {
+
+				firstAnimationFrame = false;
+				inImmersive = true;
+				scope.dispatchEvent( { type: 'immersivestart' } );
 
 			}
 
