@@ -119,7 +119,7 @@ THREE.LightProbeGenerator = {
 	},
 
 	fromRenderTargetCube: function ( renderer, renderTargetCube ) {
-		
+
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		var norm, lengthSq, weight, totalWeight = 0;
 
