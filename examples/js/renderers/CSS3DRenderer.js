@@ -18,7 +18,7 @@ THREE.CSS3DObject = function ( element ) {
 			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
 				object.element.parentNode.removeChild( object.element );
-	
+
 			}
 
 		} );
@@ -282,6 +282,11 @@ THREE.CSS3DRenderer = function () {
 
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.perspective = fov + 'px';
+
+			} else {
+
+				domElement.style.WebkitPerspective = '';
+				domElement.style.perspective = '';
 
 			}
 

@@ -24,7 +24,7 @@ var CSS3DObject = function ( element ) {
 			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
 				object.element.parentNode.removeChild( object.element );
-	
+
 			}
 
 		} );
