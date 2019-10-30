@@ -16,10 +16,10 @@ import { OBJLoader2 } from "./OBJLoader2.js";
 
 // Imports only related to worker (when standard workers (modules aren't supported) are used)
 import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
-import { ObjectManipulator } from "./obj2/utils/ObjectManipulator.js";
 import {
 	WorkerRunner,
-	DefaultWorkerPayloadHandler
+	DefaultWorkerPayloadHandler,
+	ObjectManipulator
 } from "./obj2/worker/parallel/WorkerRunner.js";
 
 
@@ -40,7 +40,7 @@ const OBJLoader2Parallel = function ( manager ) {
 
 };
 
-OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.1';
+OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.2';
 console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION );
 
 
