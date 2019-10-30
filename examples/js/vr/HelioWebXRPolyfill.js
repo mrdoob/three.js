@@ -2,9 +2,7 @@
  * @author mvilledieu / http://github.com/mvilledieu
  */
 
-if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
-
-	if ( 'isSessionSupported' in navigator.xr ) return;
+if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator && 'isSessionSupported' in navigator.xr === false) {
 
 	console.log( "Helio WebXR Polyfill (Lumin 0.97.0)" );
 
@@ -14,7 +12,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 	if (
 		"supportsSession" in navigator.xr === false &&
-    "supportsSessionMode" in navigator.xr
+	"supportsSessionMode" in navigator.xr
 	) {
 
 		navigator.xr.supportsSession = function ( /*sessionType*/ ) {
