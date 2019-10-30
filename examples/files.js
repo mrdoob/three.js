@@ -61,6 +61,7 @@ var files = {
 		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lightprobe",
+		"webgl_lightprobe_cubecamera",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
@@ -78,7 +79,6 @@ var files = {
 		"webgl_loader_3mf_materials",
 		"webgl_loader_amf",
 		"webgl_loader_assimp",
-		"webgl_loader_assimp2json",
 		"webgl_loader_bvh",
 		"webgl_loader_collada",
 		"webgl_loader_collada_kinematics",
@@ -378,11 +378,6 @@ var files = {
 	],
 	"raytracing": [
 		"raytracing_sandbox"
-	],
-	"software": [
-		"software_geometry_earth",
-		"software_lines_splines",
-		"software_sandbox"
 	],
 	"svg": [
 		"svg_lines",

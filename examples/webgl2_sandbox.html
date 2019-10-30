@@ -63,7 +63,7 @@
 				}
 
 				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2' );
+				var context = canvas.getContext( 'webgl2', { alpha: false, antialias: true } );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.setPixelRatio( window.devicePixelRatio );

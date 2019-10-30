@@ -15,7 +15,7 @@ Sidebar.History = function ( editor ) {
 
 	var container = new UI.Panel();
 
-	container.add( new UI.Text( strings.getKey( 'sidebar/history/history' ) ) );
+	container.add( new UI.Text( strings.getKey( 'sidebar/history' ).toUpperCase() ) );
 
 	//
 

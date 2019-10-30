@@ -11,15 +11,15 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-            WebGL Render 用[link:https://en.wikipedia.org/wiki/WebGL WebGL]渲染出你精心制作的场景。
+			WebGL Render 用[link:https://en.wikipedia.org/wiki/WebGL WebGL]渲染出你精心制作的场景。
 		</p>
 
 		<h2>构造器</h2>
 
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
-        [page:Object parameters] - (可选) 该对象的属性定义了渲染器的行为。也可以完全不传参数。在所有情况下，当缺少参数时，它将采用合理的默认值。
-            以下是合法参数：<br /><br />
+		[page:Object parameters] - (可选) 该对象的属性定义了渲染器的行为。也可以完全不传参数。在所有情况下，当缺少参数时，它将采用合理的默认值。
+			以下是合法参数：<br /><br />
 
 		[page:DOMElement canvas] - 一个供渲染器绘制其输出的[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
 		它和下面的[page:WebGLRenderer.domElement domElement]属性对应。
@@ -29,7 +29,7 @@
 		[page:WebGLRenderingContext context] - 可用于将渲染器附加到已有的渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])中。默认值是null<br />
 
 		[page:String precision] - 着色器精度. 可以是 *"highp"*, *"mediump"* 或者 *"lowp"*.
-	    如果设备支持，默认为*"highp"* . 点击[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices here] 查看"应该避免的事"<br />
+		如果设备支持，默认为*"highp"* . 点击[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices here] 查看"应该避免的事"<br />
 
 		[page:Boolean alpha] - canvas是否包含alpha (透明度)。默认为 *false*<br />
 
@@ -46,7 +46,7 @@
 		[page:String powerPreference] - 提示用户代理怎样的配置更适用于当前WebGL环境。 可能是*"high-performance"*, *"low-power"* 或 *"default"*。默认是*"default"*.
 		详见[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec]<br />
 
-		
+
 		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
 		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
 
@@ -96,7 +96,7 @@
 
 		<h3>[property:Object capabilities]</h3>
 		<p>
-            一个包含当前渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])的功能细节的对象。<br />
+			一个包含当前渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])的功能细节的对象。<br />
 
 		- [page:Boolean floatFragmentTextures]: 环境是否支持[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float]扩展。
 			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月，超过95％的支持WebGL的设备支持此功能<br />
@@ -121,9 +121,9 @@
 
 		<h3>[property:Array clippingPlanes]</h3>
 		<p>
-            用户自定义的剪裁平面，在世界空间中被指定为THREE.Plane对象。
-            这些平面全局使用。空间中与该平面点积为负的点将被切掉。
-            默认值是[]
+			用户自定义的剪裁平面，在世界空间中被指定为THREE.Plane对象。
+			这些平面全局使用。空间中与该平面点积为负的点将被切掉。
+			默认值是[]
 		</p>
 
 		<h3>[property:DOMElement domElement]</h3>
@@ -186,8 +186,8 @@
 
 		<h3>[property:Integer maxMorphTargets]</h3>
 		<p>
-        默认是8。 一个着色器中允许的最大MorphTargets数。
-        切记标准材质只允许8个MorphTargets。
+		默认是8。 一个着色器中允许的最大MorphTargets数。
+		切记标准材质只允许8个MorphTargets。
 		</p>
 
 		<h3>[property:Integer maxMorphNormals]</h3>
@@ -209,12 +209,12 @@
 
 		<h3>[property:WebGLRenderLists renderLists]</h3>
 		<p>
-        在内部用于处理场景渲染对象的排序。
+		在内部用于处理场景渲染对象的排序。
 		</p>
 
 		<h3>[property:WebGLShadowMap shadowMap]</h3>
 		<p>
-        如果使用，它包含阴影贴图的引用。
+		如果使用，它包含阴影贴图的引用。
 		</p>
 
 		<h3>[property:Boolean shadowMap.enabled]</h3>
@@ -234,15 +234,15 @@
 
 		<h3>[property:Boolean sortObjects]</h3>
 		<p>
-        定义渲染器是否应对对象进行排序。默认是*true*.<br /><br />
+		定义渲染器是否应对对象进行排序。默认是*true*.<br /><br />
 
-        说明: 排序用于尝试正确渲染出具有一定透明度的对象。根据定义，排序可能不总是有用。根据应用的需求，可能需要关闭排序并使其他方法来处理透明度的渲染，例如，
-        手动确定每个对象的显然顺序。
+		说明: 排序用于尝试正确渲染出具有一定透明度的对象。根据定义，排序可能不总是有用。根据应用的需求，可能需要关闭排序并使其他方法来处理透明度的渲染，例如，
+		手动确定每个对象的显然顺序。
 		</p>
 
 		<h3>[property:Object state]</h3>
 		<p>
-        包含设置[page:WebGLRenderer.context]状态的各种属性的函数。
+		包含设置[page:WebGLRenderer.context]状态的各种属性的函数。
 		</p>
 
 		<h3>[property:Constant toneMapping]</h3>
@@ -302,8 +302,8 @@
 
 		<h3>[method:Object extensions.get]( [param:String extensionName] )</h3>
 		<p>
-        用于检查是否支持各种扩展，并返回一个对象，其中包含扩展的详细信息。
-        该方法检查以下扩展：<br /><br />
+		用于检查是否支持各种扩展，并返回一个对象，其中包含扩展的详细信息。
+		该方法检查以下扩展：<br /><br />
 
 		- *WEBGL_depth_texture*<br />
 		- *EXT_texture_filter_anisotropic*<br />
@@ -314,7 +314,7 @@
 
 		<h3>[method:null forceContextLoss]( )</h3>
 		<p>
-        模拟WebGL环境的丢失。需要支持
+		模拟WebGL环境的丢失。需要支持
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context]扩展才能用。
 		根据[link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
 		</p>
@@ -351,6 +351,9 @@
 
 		<h3>[method:Object getSize]()</h3>
 		<p>返回包含渲染器输出canvas的宽度和高度(单位像素)的对象。</p>
+
+		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
+		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
 
 		<h3>[method:null resetGLState]( )</h3>
 		<p>将GL状态重置为默认值。WebGL环境丢失时会内部调用</p>
@@ -406,13 +409,13 @@
 
 		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
 		<p>
-        将剪裁区域设为(x, y)到(x + width, y + height)
+		将剪裁区域设为(x, y)到(x + width, y + height)
 		Sets the scissor area from
 		</p>
 
 		<h3>[method:null setScissorTest]( [param:Boolean boolean] )</h3>
 		<p>
-        启用或禁用剪裁检测. 若启用，则只有在所定义的裁剪区域内的像素才会受之后的渲染器影响。
+		启用或禁用剪裁检测. 若启用，则只有在所定义的裁剪区域内的像素才会受之后的渲染器影响。
 		</p>
 
 		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>

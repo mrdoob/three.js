@@ -43,9 +43,13 @@
 
 		<h3>[property:Integer drawMode]</h3>
 		<p>
-		Determines how the mesh triangles are constructed from the vertices.
-		See the draw mode [page:DrawModes constants] for all possible values.
-		Default is [page:DrawModes TrianglesDrawMode].
+			Determines how the mesh triangles are constructed from the vertices.
+			See the draw mode [page:DrawModes constants] for all possible values.
+			Default is [page:DrawModes TrianglesDrawMode].
+		</p>
+		<p>
+			A sensible usage of this property is only possible when [page:Mesh.geometry] is of type [page:BufferGeometry BufferGeometry]
+			since the engine always assumes *THREE.TrianglesDrawMode* for [page:Geometry Geometry].
 		</p>
 
 

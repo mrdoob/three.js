@@ -12,12 +12,6 @@
 
 		<p class="desc">
 			这些是[page:Mesh.drawMode]的有效值，控制着顶点列表一旦被发送到GPU中将如何被解释。
-			请注意，只有当[page:Mesh.geometry]是一个[page:BufferGeometry]的时候，这些值才会生效。当[page:Mesh.geometry]是一个
-			[page:Geometry]的时候，改变这个值不会有任何效果。
-<br /><br />
-
-
-
 		</p>
 
 
@@ -27,7 +21,7 @@
 			THREE.TrianglesDrawMode
 		</code>
 		<p>
-			这是默认值，这将使得每三个连续顶点(v0, v1, v2)，(v2, v3, v5)，……被解释为一个单独的三角形。
+			这是默认值，这将使得每三个连续顶点(v0, v1, v2)，(v3, v4, v5)，……被解释为一个单独的三角形。
 			<br />
 			如果顶点的数量不是3的倍数，那么将会忽略多余的顶点。
 		</p>
@@ -54,16 +48,18 @@
 		<h2>用法</h2>
 
 		<code>
-		var geometry = new THREE.Geometry();
+		var geometry = new THREE.BufferGeometry();
 
-		geometry.vertices.push(
-			new THREE.Vector3( -10,  10, 0 ),
-			new THREE.Vector3( -10, -10, 0 ),
-			new THREE.Vector3(  10, -10, 0 ),
-			...
-		);
-		geometry.faces.push( new THREE.Face3( 0, 1, 2 ), ... );
-
+		var vertices = [];
+	
+		vertices.push( -10,  10, 0 );
+		vertices.push( -10, -10, 0 );
+		vertices.push(  10, -10, 0 );
+	
+		// ...
+	
+		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
 		var mesh = new THREE.Mesh( geometry, material );

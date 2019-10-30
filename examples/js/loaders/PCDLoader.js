@@ -54,6 +54,60 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	parse: function ( data, url ) {
 
+		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
+
+		function decompressLZF( inData, outLength ) {
+
+			var inLength = inData.length;
+			var outData = new Uint8Array( outLength );
+			var inPtr = 0;
+			var outPtr = 0;
+			var ctrl;
+			var len;
+			var ref;
+			do {
+
+				ctrl = inData[ inPtr ++ ];
+				if ( ctrl < ( 1 << 5 ) ) {
+
+					ctrl ++;
+					if ( outPtr + ctrl > outLength ) throw new Error( 'Output buffer is not large enough' );
+					if ( inPtr + ctrl > inLength ) throw new Error( 'Invalid compressed data' );
+					do {
+
+						outData[ outPtr ++ ] = inData[ inPtr ++ ];
+
+					} while ( -- ctrl );
+
+				} else {
+
+					len = ctrl >> 5;
+					ref = outPtr - ( ( ctrl & 0x1f ) << 8 ) - 1;
+					if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
+					if ( len === 7 ) {
+
+						len += inData[ inPtr ++ ];
+						if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
+
+					}
+					ref -= inData[ inPtr ++ ];
+					if ( outPtr + len + 2 > outLength ) throw new Error( 'Output buffer is not large enough' );
+					if ( ref < 0 ) throw new Error( 'Invalid compressed data' );
+					if ( ref >= outPtr ) throw new Error( 'Invalid compressed data' );
+					do {
+
+						outData[ outPtr ++ ] = outData[ ref ++ ];
+
+					} while ( -- len + 2 );
+
+				}
+
+			} while ( inPtr < inLength );
+
+			return outData;
+
+		}
+
 		function parseHeader( data ) {
 
 			var PCDheader = {};
@@ -219,14 +273,53 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-		// binary
+		// binary-compressed
+
+		// normally data in PCD files are organized as array of structures: XYZRGBXYZRGB
+		// binary compressed PCD files organize their data as structure of arrays: XXYYZZRGBRGB
+		// that requires a totally different parsing approach compared to non-compressed data
 
 		if ( PCDheader.data === 'binary_compressed' ) {
 
-			console.error( 'THREE.PCDLoader: binary_compressed files are not supported' );
-			return;
+			var sizes = new Uint32Array( data.slice( PCDheader.headerLen, PCDheader.headerLen + 8 ) );
+			var compressedSize = sizes[ 0 ];
+			var decompressedSize = sizes[ 1 ];
+			var decompressed = decompressLZF( new Uint8Array( data, PCDheader.headerLen + 8, compressedSize ), decompressedSize );
+			var dataview = new DataView( decompressed.buffer );
+
+			var offset = PCDheader.offset;
+
+			for ( var i = 0; i < PCDheader.points; i ++ ) {
+
+				if ( offset.x !== undefined ) {
+
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+
+				}
+
+				if ( offset.rgb !== undefined ) {
+
+					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 2 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
+					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 1 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
+					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 0 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
+
+				}
+
+				if ( offset.normal_x !== undefined ) {
+
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ 4 ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ 5 ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ 6 ] * i, this.littleEndian ) );
+
+				}
+
+			}
 
 		}
+
+		// binary
 
 		if ( PCDheader.data === 'binary' ) {
 
@@ -267,9 +360,9 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var geometry = new THREE.BufferGeometry();
 
-		if ( position.length > 0 ) geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-		if ( normal.length > 0 ) geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normal, 3 ) );
-		if ( color.length > 0 ) geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
+		if ( position.length > 0 ) geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normal, 3 ) );
+		if ( color.length > 0 ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
 
 		geometry.computeBoundingSphere();
 
@@ -287,7 +380,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-		// build mesh
+		// build point cloud
 
 		var mesh = new THREE.Points( geometry, material );
 		var name = url.split( '' ).reverse().join( '' );

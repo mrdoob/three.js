@@ -10,20 +10,31 @@
  * - Object Resources (Meshes and Components)
  * - Material Resources (Base Materials)
  *
- * 3MF Materials and Properties Extension (e.g. textures) are not yet supported.
+ * 3MF Materials and Properties Extension are only partially supported.
  *
+ * - Texture 2D
+ * - Texture 2D Groups
  */
 
 import {
 	BufferAttribute,
 	BufferGeometry,
+	ClampToEdgeWrapping,
 	FileLoader,
+	Float32BufferAttribute,
 	Group,
+	LinearFilter,
+	LinearMipmapLinearFilter,
 	Loader,
 	LoaderUtils,
 	Matrix4,
 	Mesh,
-	MeshPhongMaterial
+	MeshPhongMaterial,
+	MirroredRepeatWrapping,
+	NearestFilter,
+	RepeatWrapping,
+	TextureLoader,
+	sRGBEncoding
 } from "../../../build/three.module.js";
 
 var ThreeMFLoader = function ( manager ) {
@@ -55,6 +66,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	parse: function ( data ) {
 
 		var scope = this;
+		var textureLoader = new TextureLoader( this.manager );
 
 		function loadDocument( data ) {
 
@@ -62,12 +74,14 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var file = null;
 
 			var relsName;
+			var modelRelsName;
 			var modelPartNames = [];
 			var printTicketPartNames = [];
 			var texturesPartNames = [];
 			var otherPartNames = [];
 
 			var rels;
+			var modelRels;
 			var modelParts = {};
 			var printTicketParts = {};
 			var texturesParts = {};
@@ -94,6 +108,10 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					relsName = file;
 
+				} else if ( file.match( /3D\/_rels\/.*\.model\.rels$/ ) ) {
+
+					modelRelsName = file;
+
 				} else if ( file.match( /^3D\/.*\.model$/ ) ) {
 
 					modelPartNames.push( file );
@@ -102,7 +120,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					printTicketPartNames.push( file );
 
-				} else if ( file.match( /^3D\/Textures\/.*/ ) ) {
+				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 					texturesPartNames.push( file );
 
@@ -114,9 +132,23 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
+			//
+
 			var relsView = new Uint8Array( zip.file( relsName ).asArrayBuffer() );
 			var relsFileText = LoaderUtils.decodeText( relsView );
 			rels = parseRelsXml( relsFileText );
+
+			//
+
+			if ( modelRelsName ) {
+
+				var relsView = new Uint8Array( zip.file( modelRelsName ).asArrayBuffer() );
+				var relsFileText = LoaderUtils.decodeText( relsView );
+				modelRels = parseRelsXml( relsFileText );
+
+			}
+
+			//
 
 			for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
@@ -159,15 +191,18 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
+			//
+
 			for ( var i = 0; i < texturesPartNames.length; i ++ ) {
 
 				var texturesPartName = texturesPartNames[ i ];
-				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asBinary();
+				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asArrayBuffer();
 
 			}
 
 			return {
 				rels: rels,
+				modelRels: modelRels,
 				model: modelParts,
 				printTicket: printTicketParts,
 				texture: texturesParts,
@@ -178,17 +213,27 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseRelsXml( relsFileText ) {
 
-			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
-			var relsNode = relsXmlData.querySelector( 'Relationship' );
-			var target = relsNode.getAttribute( 'Target' );
-			var id = relsNode.getAttribute( 'Id' );
-			var type = relsNode.getAttribute( 'Type' );
+			var relationships = [];
 
-			return {
-				target: target,
-				id: id,
-				type: type
-			};
+			var relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
+
+			var relsNodes = relsXmlData.querySelectorAll( 'Relationship' );
+
+			for ( var i = 0; i < relsNodes.length; i ++ ) {
+
+				var relsNode = relsNodes[ i ];
+
+				var relationship = {
+					target: relsNode.getAttribute( 'Target' ), //required
+					id: relsNode.getAttribute( 'Id' ), //required
+					type: relsNode.getAttribute( 'Type' ) //required
+				};
+
+				relationships.push( relationship );
+
+			}
+
+			return relationships;
 
 		}
 
@@ -244,6 +289,49 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function parseTexture2DNode( texture2DNode ) {
+
+			var texture2dData = {
+				id: texture2DNode.getAttribute( 'id' ), // required
+				path: texture2DNode.getAttribute( 'path' ), // required
+				contenttype: texture2DNode.getAttribute( 'contenttype' ), // required
+				tilestyleu: texture2DNode.getAttribute( 'tilestyleu' ),
+				tilestylev: texture2DNode.getAttribute( 'tilestylev' ),
+				filter: texture2DNode.getAttribute( 'filter' ),
+			};
+
+			return texture2dData;
+
+		}
+
+		function parseTextures2DGroupNodes( texture2DGroupNode ) {
+
+			var texture2DGroupData = {
+				id: texture2DGroupNode.getAttribute( 'id' ), // required
+				texid: texture2DGroupNode.getAttribute( 'texid' ), // required
+				displaypropertiesid: texture2DGroupNode.getAttribute( 'displaypropertiesid' )
+			};
+
+			var tex2coordNodes = texture2DGroupNode.querySelectorAll( 'tex2coord' );
+
+			var uvs = [];
+
+			for ( var i = 0; i < tex2coordNodes.length; i ++ ) {
+
+				var tex2coordNode = tex2coordNodes[ i ];
+				var u = tex2coordNode.getAttribute( 'u' );
+				var v = tex2coordNode.getAttribute( 'v' );
+
+				uvs.push( parseFloat( u ), parseFloat( v ) );
+
+			}
+
+			texture2DGroupData[ 'uvs' ] = new Float32Array( uvs );
+
+			return texture2DGroupData;
+
+		}
+
 		function parseBasematerialNode( basematerialNode ) {
 
 			var basematerialData = {};
@@ -273,13 +361,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			meshData[ 'vertices' ] = new Float32Array( vertices.length );
-
-			for ( var i = 0; i < vertices.length; i ++ ) {
-
-				meshData[ 'vertices' ][ i ] = vertices[ i ];
-
-			}
+			meshData[ 'vertices' ] = new Float32Array( vertices );
 
 			var triangleProperties = [];
 			var triangles = [];
@@ -296,9 +378,15 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var p3 = triangleNode.getAttribute( 'p3' );
 				var pid = triangleNode.getAttribute( 'pid' );
 
-				triangles.push( parseInt( v1, 10 ), parseInt( v2, 10 ), parseInt( v3, 10 ) );
-
 				var triangleProperty = {};
+
+				triangleProperty[ 'v1' ] = parseInt( v1, 10 );
+				triangleProperty[ 'v2' ] = parseInt( v2, 10 );
+				triangleProperty[ 'v3' ] = parseInt( v3, 10 );
+
+				triangles.push( triangleProperty[ 'v1' ], triangleProperty[ 'v2' ], triangleProperty[ 'v3' ] );
+
+				// optional
 
 				if ( p1 ) {
 
@@ -333,13 +421,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 			meshData[ 'triangleProperties' ] = triangleProperties;
-			meshData[ 'triangles' ] = new Uint32Array( triangles.length );
-
-			for ( var i = 0; i < triangles.length; i ++ ) {
-
-				meshData[ 'triangles' ][ i ] = triangles[ i ];
-
-			}
+			meshData[ 'triangles' ] = new Uint32Array( triangles );
 
 			return meshData;
 
@@ -479,13 +561,45 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		function parseResourcesNode( resourcesNode ) {
 
 			var resourcesData = {};
-			var basematerialsNode = resourcesNode.querySelector( 'basematerials' );
 
-			if ( basematerialsNode ) {
+			resourcesData[ 'basematerials' ] = {};
+			var basematerialsNodes = resourcesNode.querySelectorAll( 'basematerials' );
 
-				resourcesData[ 'basematerials' ] = parseBasematerialsNode( basematerialsNode );
+			for ( var i = 0; i < basematerialsNodes.length; i ++ ) {
+
+				var basematerialsNode = basematerialsNodes[ i ];
+				var basematerialsData = parseBasematerialsNode( basematerialsNode );
+				resourcesData[ 'basematerials' ][ basematerialsData[ 'id' ] ] = basematerialsData;
 
 			}
+
+			//
+
+			resourcesData[ 'texture2d' ] = {};
+			var textures2DNodes = resourcesNode.querySelectorAll( 'texture2d' );
+
+			for ( var i = 0; i < textures2DNodes.length; i ++ ) {
+
+				var textures2DNode = textures2DNodes[ i ];
+				var texture2DData = parseTexture2DNode( textures2DNode );
+				resourcesData[ 'texture2d' ][ texture2DData[ 'id' ] ] = texture2DData;
+
+			}
+
+			//
+
+			resourcesData[ 'texture2dgroup' ] = {};
+			var textures2DGroupNodes = resourcesNode.querySelectorAll( 'texture2dgroup' );
+
+			for ( var i = 0; i < textures2DGroupNodes.length; i ++ ) {
+
+				var textures2DGroupNode = textures2DGroupNodes[ i ];
+				var textures2DGroupData = parseTextures2DGroupNodes( textures2DGroupNode );
+				resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
+
+			}
+
+			//
 
 			resourcesData[ 'object' ] = {};
 			var objectNodes = resourcesNode.querySelectorAll( 'object' );
@@ -560,172 +674,349 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function buildMesh( meshData, objects, modelData, objectData ) {
+		function buildTexture( texture2dgroup, objects, modelData, textureData ) {
 
-			// geometry
+			var texid = texture2dgroup.texid;
+			var texture2ds = modelData.resources.texture2d;
+			var texture2d = texture2ds[ texid ];
 
-			var geometry = new BufferGeometry();
-			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
-			geometry.addAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
+			if ( texture2d ) {
 
-			// groups
+				var data = textureData[ texture2d.path ];
+				var type = texture2d.contenttype;
 
-			var basematerialsData = modelData[ 'resources' ][ 'basematerials' ];
-			var triangleProperties = meshData[ 'triangleProperties' ];
+				var blob = new Blob( [ data ], { type: type } );
+				var sourceURI = URL.createObjectURL( blob );
 
-			var start = 0;
-			var count = 0;
-			var currentMaterialIndex = - 1;
+				var texture = textureLoader.load( sourceURI, function () {
+
+					URL.revokeObjectURL( sourceURI );
+
+				} );
+
+				texture.encoding = sRGBEncoding;
+
+				// texture parameters
+
+				switch ( texture2d.tilestyleu ) {
+
+					case 'wrap':
+						texture.wrapS = RepeatWrapping;
+						break;
+
+					case 'mirror':
+						texture.wrapS = MirroredRepeatWrapping;
+						break;
+
+					case 'none':
+					case 'clamp':
+						texture.wrapS = ClampToEdgeWrapping;
+						break;
+
+					default:
+						texture.wrapS = RepeatWrapping;
+
+				}
+
+				switch ( texture2d.tilestylev ) {
+
+					case 'wrap':
+						texture.wrapT = RepeatWrapping;
+						break;
+
+					case 'mirror':
+						texture.wrapT = MirroredRepeatWrapping;
+						break;
+
+					case 'none':
+					case 'clamp':
+						texture.wrapT = ClampToEdgeWrapping;
+						break;
+
+					default:
+						texture.wrapT = RepeatWrapping;
+
+				}
+
+				switch ( texture2d.filter ) {
+
+					case 'auto':
+						texture.magFilter = LinearFilter;
+						texture.minFilter = LinearMipmapLinearFilter;
+						break;
+
+					case 'linear':
+						texture.magFilter = LinearFilter;
+						texture.minFilter = LinearFilter;
+						break;
+
+					case 'nearest':
+						texture.magFilter = NearestFilter;
+						texture.minFilter = NearestFilter;
+						break;
+
+					default:
+						texture.magFilter = LinearFilter;
+						texture.minFilter = LinearMipmapLinearFilter;
+
+				}
+
+				return texture;
+
+			} else {
+
+				return null;
+
+			}
+
+		}
+
+		function buildBasematerialsMeshes( basematerials, triangleProperties, modelData, meshData, textureData, objectData ) {
+
+			var objectPindex = objectData.pindex;
+
+			var materialMap = {};
 
 			for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
 
 				var triangleProperty = triangleProperties[ i ];
-				var pid = triangleProperty.pid;
+				var pindex = ( triangleProperty.p1 !== undefined ) ? triangleProperty.p1 : objectPindex;
 
-				// only proceed if the triangle refers to a basematerials definition
+				if ( materialMap[ pindex ] === undefined ) materialMap[ pindex ] = [];
 
-				if ( basematerialsData && ( basematerialsData.id === pid ) ) {
+				materialMap[ pindex ].push( triangleProperty );
 
-					if ( currentMaterialIndex === - 1 ) currentMaterialIndex = triangleProperty.p1;
+			}
 
-					if ( currentMaterialIndex === triangleProperty.p1 ) {
+			//
 
-						count += 3; // primitves per triangle
+			var keys = Object.keys( materialMap );
+			var meshes = [];
 
-					} else {
+			for ( var i = 0, l = keys.length; i < l; i ++ ) {
 
-						geometry.addGroup( start, count, currentMaterialIndex );
+				var materialIndex = keys[ i ];
+				var trianglePropertiesProps = materialMap[ materialIndex ];
+				var basematerialData = basematerials.basematerials[ materialIndex ];
+				var material = getBuild( basematerialData, objects, modelData, textureData, objectData, buildBasematerial );
 
-						start += count;
-						count = 3;
-						currentMaterialIndex = triangleProperty.p1;
+				//
 
-					}
+				var geometry = new BufferGeometry();
+
+				var positionData = [];
+
+				var vertices = meshData.vertices;
+
+				for ( var j = 0, jl = trianglePropertiesProps.length; j < jl; j ++ ) {
+
+					var triangleProperty = trianglePropertiesProps[ j ];
+
+					positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 0 ] );
+					positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 1 ] );
+					positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 2 ] );
+
+					positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 0 ] );
+					positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 1 ] );
+					positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 2 ] );
+
+					positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 0 ] );
+					positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 1 ] );
+					positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 2 ] );
+
 
 				}
 
-			}
+				geometry.setAttribute( 'position', new Float32BufferAttribute( positionData, 3 ) );
 
-			if ( geometry.groups.length > 0 ) mergeGroups( geometry );
+				//
 
-			geometry.computeBoundingSphere();
-
-			// material
-
-			var material;
-
-			// add material if an object-level definition is present
-
-			if ( basematerialsData && ( basematerialsData.id === objectData.pid ) ) {
-
-				var materialIndex = objectData.pindex;
-				var basematerialData = basematerialsData.basematerials[ materialIndex ];
-
-				material = getBuild( basematerialData, objects, modelData, objectData, buildBasematerial );
+				var mesh = new Mesh( geometry, material );
+				meshes.push( mesh );
 
 			}
 
-			// add/overwrite material if definitions on triangles are present
-
-			if ( geometry.groups.length > 0 ) {
-
-				var groups = geometry.groups;
-				material = [];
-
-				for ( var i = 0, l = groups.length; i < l; i ++ ) {
-
-					var group = groups[ i ];
-					var basematerialData = basematerialsData.basematerials[ group.materialIndex ];
-
-					material.push( getBuild( basematerialData, objects, modelData, objectData, buildBasematerial ) );
-
-				}
-
-			}
-
-			// default material
-
-			if ( material === undefined ) material = new MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
-
-			return new Mesh( geometry, material );
+			return meshes;
 
 		}
 
-		function mergeGroups( geometry ) {
+		function buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData, objectData ) {
 
-			// sort by material index
+			// geometry
 
-			var groups = geometry.groups.sort( function ( a, b ) {
+			var geometry = new BufferGeometry();
 
-				if ( a.materialIndex !== b.materialIndex ) return a.materialIndex - b.materialIndex;
+			var positionData = [];
+			var uvData = [];
 
-				return a.start - b.start;
+			var vertices = meshData.vertices;
+			var uvs = texture2dgroup.uvs;
 
-			} );
+			for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
 
-			// reorganize index buffer
+				var triangleProperty = triangleProperties[ i ];
 
-			var index = geometry.index;
+				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 2 ] );
 
-			var itemSize = index.itemSize;
-			var srcArray = index.array;
+				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 2 ] );
 
-			var targetOffset = 0;
+				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 2 ] );
 
-			var targetArray = new srcArray.constructor( srcArray.length );
+				//
 
-			for ( var i = 0; i < groups.length; i ++ ) {
+				uvData.push( uvs[ ( triangleProperty.p1 * 2 ) + 0 ] );
+				uvData.push( uvs[ ( triangleProperty.p1 * 2 ) + 1 ] );
 
-				var group = groups[ i ];
+				uvData.push( uvs[ ( triangleProperty.p2 * 2 ) + 0 ] );
+				uvData.push( uvs[ ( triangleProperty.p2 * 2 ) + 1 ] );
 
-				var groupLength = group.count * itemSize;
-				var groupStart = group.start * itemSize;
-
-				var sub = srcArray.subarray( groupStart, groupStart + groupLength );
-
-				targetArray.set( sub, targetOffset );
-
-				targetOffset += groupLength;
-
-			}
-
-			srcArray.set( targetArray );
-
-			// update groups
-
-			var start = 0;
-
-			for ( i = 0; i < groups.length; i ++ ) {
-
-				group = groups[ i ];
-
-				group.start = start;
-				start += group.count;
+				uvData.push( uvs[ ( triangleProperty.p3 * 2 ) + 0 ] );
+				uvData.push( uvs[ ( triangleProperty.p3 * 2 ) + 1 ] );
 
 			}
 
-			// merge groups
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positionData, 3 ) );
+			geometry.setAttribute( 'uv', new Float32BufferAttribute( uvData, 2 ) );
 
-			var lastGroup = groups[ 0 ];
+			// material
 
-			geometry.groups = [ lastGroup ];
+			var texture = getBuild( texture2dgroup, objects, modelData, textureData, objectData, buildTexture );
 
-			for ( i = 1; i < groups.length; i ++ ) {
+			var material = new MeshPhongMaterial( { map: texture, flatShading: true } );
 
-				group = groups[ i ];
+			// mesh
 
-				if ( lastGroup.materialIndex === group.materialIndex ) {
+			var mesh = new Mesh( geometry, material );
 
-					lastGroup.count += group.count;
+			return mesh;
 
-				} else {
+		}
 
-					lastGroup = group;
-					geometry.groups.push( lastGroup );
+		function buildDefaultMesh( meshData ) {
+
+			var geometry = new BufferGeometry();
+			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
+
+			var material = new MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
+
+			var mesh = new Mesh( geometry, material );
+
+			return mesh;
+
+		}
+
+		function buildMeshes( resourceMap, modelData, meshData, textureData, objectData ) {
+
+			var keys = Object.keys( resourceMap );
+			var meshes = [];
+
+			for ( var i = 0; i < keys.length; i ++ ) {
+
+				var resourceId = keys[ i ];
+				var triangleProperties = resourceMap[ resourceId ];
+				var resourceType = getResourceType( resourceId, modelData );
+
+				switch ( resourceType ) {
+
+					case 'material':
+						var basematerials = modelData.resources.basematerials[ resourceId ];
+						var newMeshes = buildBasematerialsMeshes( basematerials, triangleProperties, modelData, meshData, textureData, objectData );
+
+						for ( var i = 0, l = newMeshes.length; i < l; i ++ ) {
+
+							meshes.push( newMeshes[ i ] );
+
+						}
+						break;
+
+					case 'texture':
+						var texture2dgroup = modelData.resources.texture2dgroup[ resourceId ];
+						meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData ) );
+						break;
+
+					case 'default':
+						meshes.push( buildDefaultMesh( meshData ) );
+						break;
+
+					default:
+						console.error( 'THREE.3MFLoader: Unsupported resource type.' );
 
 				}
 
 			}
+
+			return meshes;
+
+		}
+
+		function getResourceType( pid, modelData ) {
+
+			if ( modelData.resources.texture2dgroup[ pid ] !== undefined ) {
+
+				return 'texture';
+
+			} else if ( modelData.resources.basematerials[ pid ] !== undefined ) {
+
+				return 'material';
+
+			} else if ( pid === 'default' ) {
+
+				return 'default';
+
+			} else {
+
+				return undefined;
+
+			}
+
+		}
+
+		function analyzeObject( modelData, meshData, objectData ) {
+
+			var resourceMap = {};
+
+			var triangleProperties = meshData[ 'triangleProperties' ];
+
+			var objectPid = objectData.pid;
+
+			for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
+
+				var triangleProperty = triangleProperties[ i ];
+				var pid = ( triangleProperty.pid !== undefined ) ? triangleProperty.pid : objectPid;
+
+				if ( pid === undefined ) pid = 'default';
+
+				if ( resourceMap[ pid ] === undefined ) resourceMap[ pid ] = [];
+
+				resourceMap[ pid ].push( triangleProperty );
+
+			}
+
+			return resourceMap;
+
+		}
+
+		function buildGroup( meshData, objects, modelData, textureData, objectData ) {
+
+			var group = new Group();
+
+			var resourceMap = analyzeObject( modelData, meshData, objectData );
+			var meshes = buildMeshes( resourceMap, modelData, meshData, textureData, objectData );
+
+			for ( var i = 0, l = meshes.length; i < l; i ++ ) {
+
+				group.add( meshes[ i ] );
+
+			}
+
+			return group;
 
 		}
 
@@ -767,11 +1058,11 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function getBuild( data, objects, modelData, objectData, builder ) {
+		function getBuild( data, objects, modelData, textureData, objectData, builder ) {
 
 			if ( data.build !== undefined ) return data.build;
 
-			data.build = builder( data, objects, modelData, objectData );
+			data.build = builder( data, objects, modelData, textureData, objectData );
 
 			return data.build;
 
@@ -803,7 +1094,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function buildComposite( compositeData, objects, modelData ) {
+		function buildComposite( compositeData, objects, modelData, textureData ) {
 
 			var composite = new Group();
 
@@ -814,7 +1105,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( build === undefined ) {
 
-					buildObject( component.objectId, objects, modelData );
+					buildObject( component.objectId, objects, modelData, textureData );
 					build = objects[ component.objectId ];
 
 				}
@@ -839,7 +1130,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function buildObject( objectId, objects, modelData ) {
+		function buildObject( objectId, objects, modelData, textureData ) {
 
 			var objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
 
@@ -852,13 +1143,13 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				applyExtensions( extensions, meshData, modelXml );
 
-				objects[ objectData.id ] = getBuild( meshData, objects, modelData, objectData, buildMesh );
+				objects[ objectData.id ] = getBuild( meshData, objects, modelData, textureData, objectData, buildGroup );
 
 			} else {
 
 				var compositeData = objectData[ 'components' ];
 
-				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, objectData, buildComposite );
+				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
 
 			}
 
@@ -867,8 +1158,31 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		function buildObjects( data3mf ) {
 
 			var modelsData = data3mf.model;
+			var modelRels = data3mf.modelRels;
 			var objects = {};
 			var modelsKeys = Object.keys( modelsData );
+			var textureData = {};
+
+			// evaluate model relationships to textures
+
+			if ( modelRels ) {
+
+				for ( var i = 0, l = modelRels.length; i < l; i ++ ) {
+
+					var modelRel = modelRels[ i ];
+					var textureKey = modelRel.target.substring( 1 );
+
+					if ( data3mf.texture[ textureKey ] ) {
+
+						textureData[ modelRel.target ] = data3mf.texture[ textureKey ];
+
+					}
+
+				}
+
+			}
+
+			// start build
 
 			for ( var i = 0; i < modelsKeys.length; i ++ ) {
 
@@ -881,7 +1195,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					var objectId = objectIds[ j ];
 
-					buildObject( objectId, objects, modelData );
+					buildObject( objectId, objects, modelData, textureData );
 
 				}
 
@@ -891,10 +1205,12 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function build( objects, refs, data3mf ) {
+		function build( objects, data3mf ) {
 
 			var group = new Group();
-			var buildData = data3mf.model[ refs[ 'target' ].substring( 1 ) ][ 'build' ];
+
+			var relationship = data3mf[ 'rels' ][ 0 ];
+			var buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( var i = 0; i < buildData.length; i ++ ) {
 
@@ -922,7 +1238,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var data3mf = loadDocument( data );
 		var objects = buildObjects( data3mf );
 
-		return build( objects, data3mf[ 'rels' ], data3mf );
+		return build( objects, data3mf );
 
 	},
 

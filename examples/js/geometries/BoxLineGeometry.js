@@ -59,7 +59,7 @@ THREE.BoxLineGeometry = function ( width, height, depth, widthSegments, heightSe
 
 	}
 
-	this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 };
 

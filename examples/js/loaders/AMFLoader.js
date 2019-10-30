@@ -456,11 +456,11 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( volume.triangles );
-					newGeometry.addAttribute( 'position', vertices.clone() );
+					newGeometry.setAttribute( 'position', vertices.clone() );
 
 					if ( normals ) {
 
-						newGeometry.addAttribute( 'normal', normals.clone() );
+						newGeometry.setAttribute( 'normal', normals.clone() );
 
 					}
 

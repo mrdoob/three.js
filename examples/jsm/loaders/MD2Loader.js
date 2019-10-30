@@ -309,9 +309,9 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 			// animation
 

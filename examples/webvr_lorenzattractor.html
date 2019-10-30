@@ -95,7 +95,7 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 				var colors = new Float32Array( 3 * shown );
 
@@ -105,7 +105,7 @@
 
 				}
 
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 

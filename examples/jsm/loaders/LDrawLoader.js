@@ -468,11 +468,11 @@ var LDrawLoader = ( function () {
 
 		}
 
-		bufferGeometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+		bufferGeometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 		if ( elementSize === 3 ) {
 
-			bufferGeometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			bufferGeometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 		}
 
@@ -526,9 +526,9 @@ var LDrawLoader = ( function () {
 
 			}
 
-			bufferGeometry.addAttribute( 'control0', new BufferAttribute( controlArray0, 3, false ) );
-			bufferGeometry.addAttribute( 'control1', new BufferAttribute( controlArray1, 3, false ) );
-			bufferGeometry.addAttribute( 'direction', new BufferAttribute( directionArray, 3, false ) );
+			bufferGeometry.setAttribute( 'control0', new BufferAttribute( controlArray0, 3, false ) );
+			bufferGeometry.setAttribute( 'control1', new BufferAttribute( controlArray1, 3, false ) );
+			bufferGeometry.setAttribute( 'direction', new BufferAttribute( directionArray, 3, false ) );
 
 		}
 

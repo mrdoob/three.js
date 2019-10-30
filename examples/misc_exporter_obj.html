@@ -245,7 +245,7 @@
 				vertices.push( 50, - 50, 0 );
 				vertices.push( 50, 50, 0 );
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 				geometry.computeVertexNormals();
 
 				return geometry;

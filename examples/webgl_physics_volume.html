@@ -183,7 +183,7 @@
 
 				// Ony consider the position values when merging the vertices
 				var posOnlyBufGeometry = new THREE.BufferGeometry();
-				posOnlyBufGeometry.addAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
+				posOnlyBufGeometry.setAttribute( 'position', bufGeometry.getAttribute( 'position' ) );
 				posOnlyBufGeometry.setIndex( bufGeometry.getIndex() );
 
 				// Merge the vertices so the triangle soup is converted to indexed triangles

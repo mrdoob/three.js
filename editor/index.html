@@ -26,7 +26,6 @@
 		</script>
 
 		<link rel="stylesheet" href="css/main.css">
-		<link rel="stylesheet" id="theme" href="css/light.css">
 
 		<script src="../build/three.js"></script>
 
@@ -61,7 +60,6 @@
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/RaytracingRenderer.js"></script>
-		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
@@ -217,8 +215,6 @@
 			document.body.appendChild( menubar.dom );
 
 			//
-
-			editor.setTheme( editor.config.getKey( 'theme' ) );
 
 			editor.storage.init( function () {
 

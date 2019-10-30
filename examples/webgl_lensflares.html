@@ -43,14 +43,6 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 250;
 
-				controls = new FlyControls( camera );
-
-				controls.movementSpeed = 2500;
-				controls.domElement = container;
-				controls.rollSpeed = Math.PI / 6;
-				controls.autoForward = false;
-				controls.dragToLook = false;
-
 				// scene
 
 				scene = new THREE.Scene();
@@ -129,6 +121,16 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+
+				//
+
+				controls = new FlyControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 2500;
+				controls.domElement = container;
+				controls.rollSpeed = Math.PI / 6;
+				controls.autoForward = false;
+				controls.dragToLook = false;
 
 				// stats
 

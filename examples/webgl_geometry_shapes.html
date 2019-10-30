@@ -184,50 +184,49 @@
 
 				// Triangle
 
-				var triangleShape = new THREE.Shape();
-				triangleShape.moveTo( 80, 20 );
-				triangleShape.lineTo( 40, 80 );
-				triangleShape.lineTo( 120, 80 );
-				triangleShape.lineTo( 80, 20 ); // close path
+				var triangleShape = new THREE.Shape()
+					.moveTo( 80, 20 )
+					.lineTo( 40, 80 )
+					.lineTo( 120, 80 )
+					.lineTo( 80, 20 ); // close path
 
 
 				// Heart
 
 				var x = 0, y = 0;
 
-				var heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
-
-				heartShape.moveTo( x + 25, y + 25 );
-				heartShape.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y );
-				heartShape.bezierCurveTo( x - 30, y, x - 30, y + 35, x - 30, y + 35 );
-				heartShape.bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 );
-				heartShape.bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 );
-				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
-				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
+				var heartShape = new THREE.Shape() // From http://blog.burlock.org/html5/130-paths
+					.moveTo( x + 25, y + 25 )
+					.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y )
+					.bezierCurveTo( x - 30, y, x - 30, y + 35, x - 30, y + 35 )
+					.bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 )
+					.bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 )
+					.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y )
+					.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
 
 				// Square
 
 				var sqLength = 80;
 
-				var squareShape = new THREE.Shape();
-				squareShape.moveTo( 0, 0 );
-				squareShape.lineTo( 0, sqLength );
-				squareShape.lineTo( sqLength, sqLength );
-				squareShape.lineTo( sqLength, 0 );
-				squareShape.lineTo( 0, 0 );
+				var squareShape = new THREE.Shape()
+					.moveTo( 0, 0 )
+					.lineTo( 0, sqLength )
+					.lineTo( sqLength, sqLength )
+					.lineTo( sqLength, 0 )
+					.lineTo( 0, 0 );
 
 
 				// Rectangle
 
 				var rectLength = 120, rectWidth = 40;
 
-				var rectShape = new THREE.Shape();
-				rectShape.moveTo( 0, 0 );
-				rectShape.lineTo( 0, rectWidth );
-				rectShape.lineTo( rectLength, rectWidth );
-				rectShape.lineTo( rectLength, 0 );
-				rectShape.lineTo( 0, 0 );
+				var rectShape = new THREE.Shape()
+					.moveTo( 0, 0 )
+					.lineTo( 0, rectWidth )
+					.lineTo( rectLength, rectWidth )
+					.lineTo( rectLength, 0 )
+					.lineTo( 0, 0 );
 
 
 				// Rounded rectangle
@@ -251,76 +250,74 @@
 
 				// Track
 
-				var trackShape = new THREE.Shape();
-
-				trackShape.moveTo( 40, 40 );
-				trackShape.lineTo( 40, 160 );
-				trackShape.absarc( 60, 160, 20, Math.PI, 0, true );
-				trackShape.lineTo( 80, 40 );
-				trackShape.absarc( 60, 40, 20, 2 * Math.PI, Math.PI, true );
+				var trackShape = new THREE.Shape()
+					.moveTo( 40, 40 )
+					.lineTo( 40, 160 )
+					.absarc( 60, 160, 20, Math.PI, 0, true )
+					.lineTo( 80, 40 )
+					.absarc( 60, 40, 20, 2 * Math.PI, Math.PI, true );
 
 
 				// Circle
 
 				var circleRadius = 40;
-				var circleShape = new THREE.Shape();
-				circleShape.moveTo( 0, circleRadius );
-				circleShape.quadraticCurveTo( circleRadius, circleRadius, circleRadius, 0 );
-				circleShape.quadraticCurveTo( circleRadius, - circleRadius, 0, - circleRadius );
-				circleShape.quadraticCurveTo( - circleRadius, - circleRadius, - circleRadius, 0 );
-				circleShape.quadraticCurveTo( - circleRadius, circleRadius, 0, circleRadius );
+				var circleShape = new THREE.Shape()
+					.moveTo( 0, circleRadius )
+					.quadraticCurveTo( circleRadius, circleRadius, circleRadius, 0 )
+					.quadraticCurveTo( circleRadius, - circleRadius, 0, - circleRadius )
+					.quadraticCurveTo( - circleRadius, - circleRadius, - circleRadius, 0 )
+					.quadraticCurveTo( - circleRadius, circleRadius, 0, circleRadius );
 
 
 				// Fish
 
 				var x = y = 0;
 
-				var fishShape = new THREE.Shape();
-
-				fishShape.moveTo( x, y );
-				fishShape.quadraticCurveTo( x + 50, y - 80, x + 90, y - 10 );
-				fishShape.quadraticCurveTo( x + 100, y - 10, x + 115, y - 40 );
-				fishShape.quadraticCurveTo( x + 115, y, x + 115, y + 40 );
-				fishShape.quadraticCurveTo( x + 100, y + 10, x + 90, y + 10 );
-				fishShape.quadraticCurveTo( x + 50, y + 80, x, y );
+				var fishShape = new THREE.Shape()
+					.moveTo( x, y )
+					.quadraticCurveTo( x + 50, y - 80, x + 90, y - 10 )
+					.quadraticCurveTo( x + 100, y - 10, x + 115, y - 40 )
+					.quadraticCurveTo( x + 115, y, x + 115, y + 40 )
+					.quadraticCurveTo( x + 100, y + 10, x + 90, y + 10 )
+					.quadraticCurveTo( x + 50, y + 80, x, y );
 
 
 				// Arc circle
 
-				var arcShape = new THREE.Shape();
-				arcShape.moveTo( 50, 10 );
-				arcShape.absarc( 10, 10, 40, 0, Math.PI * 2, false );
+				var arcShape = new THREE.Shape()
+					.moveTo( 50, 10 )
+					.absarc( 10, 10, 40, 0, Math.PI * 2, false );
 
-				var holePath = new THREE.Path();
-				holePath.moveTo( 20, 10 );
-				holePath.absarc( 10, 10, 10, 0, Math.PI * 2, true );
+				var holePath = new THREE.Path()
+					.moveTo( 20, 10 )
+					.absarc( 10, 10, 10, 0, Math.PI * 2, true )
+
 				arcShape.holes.push( holePath );
 
 
 				// Smiley
 
-				var smileyShape = new THREE.Shape();
-				smileyShape.moveTo( 80, 40 );
-				smileyShape.absarc( 40, 40, 40, 0, Math.PI * 2, false );
+				var smileyShape = new THREE.Shape()
+					.moveTo( 80, 40 )
+					.absarc( 40, 40, 40, 0, Math.PI * 2, false );
 
-				var smileyEye1Path = new THREE.Path();
-				smileyEye1Path.moveTo( 35, 20 );
-				smileyEye1Path.absellipse( 25, 20, 10, 10, 0, Math.PI * 2, true );
+				var smileyEye1Path = new THREE.Path()
+					.moveTo( 35, 20 )
+					.absellipse( 25, 20, 10, 10, 0, Math.PI * 2, true );
+
+				var smileyEye2Path = new THREE.Path()
+					.moveTo( 65, 20 )
+					.absarc( 55, 20, 10, 0, Math.PI * 2, true );
+
+				var smileyMouthPath = new THREE.Path()
+					.moveTo( 20, 40 )
+					.quadraticCurveTo( 40, 60, 60, 40 )
+					.bezierCurveTo( 70, 45, 70, 50, 60, 60 )
+					.quadraticCurveTo( 40, 80, 20, 60 )
+					.quadraticCurveTo( 5, 50, 20, 40 );
 
 				smileyShape.holes.push( smileyEye1Path );
-
-				var smileyEye2Path = new THREE.Path();
-				smileyEye2Path.moveTo( 65, 20 );
-				smileyEye2Path.absarc( 55, 20, 10, 0, Math.PI * 2, true );
 				smileyShape.holes.push( smileyEye2Path );
-
-				var smileyMouthPath = new THREE.Path();
-				smileyMouthPath.moveTo( 20, 40 );
-				smileyMouthPath.quadraticCurveTo( 40, 60, 60, 40 );
-				smileyMouthPath.bezierCurveTo( 70, 45, 70, 50, 60, 60 );
-				smileyMouthPath.quadraticCurveTo( 40, 80, 20, 60 );
-				smileyMouthPath.quadraticCurveTo( 5, 50, 20, 40 );
-
 				smileyShape.holes.push( smileyMouthPath );
 
 
@@ -332,9 +329,9 @@
 				splinepts.push( new THREE.Vector2( - 30, 70 ) );
 				splinepts.push( new THREE.Vector2( 0, 0 ) );
 
-				var splineShape = new THREE.Shape();
-				splineShape.moveTo( 0, 0 );
-				splineShape.splineThru( splinepts );
+				var splineShape = new THREE.Shape()
+					.moveTo( 0, 0 )
+					.splineThru( splinepts );
 
 				var extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 

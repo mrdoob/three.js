@@ -7,5 +7,5 @@ export interface WEBVROptions {
 }
 
 export namespace WEBVR {
-	export function createButton( renderer: WebGLRenderer, options: WEBVROptions );
+	export function createButton( renderer: WebGLRenderer, options?: WEBVROptions ): HTMLElement;
 }

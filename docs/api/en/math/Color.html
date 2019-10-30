@@ -126,7 +126,7 @@ var color = new THREE.Color( 1, 0, 0 );
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
 		Converts this color from gamma space to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
 		</p>
-		
+
 		<h3>[method:Color convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
 		<p>
 		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
@@ -300,6 +300,15 @@ var color = new THREE.Color( 1, 0, 0 );
 		but the alpha-channel coordinate will be discarded.<br /><br />
 
 		Note that for X11 color names, multiple words such as Dark Orange become the string 'darkorange' (all lowercase).
+		</p>
+
+		<h3>[method:Color setColorName]( [param:String style] ) </h3>
+		<p>
+		[page:String style] — color name ( from [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] ).<br /><br />
+
+		Sets this color from a color name. Faster than [page:.setStyle] method if you don't need the other CSS-style formats.<br/><br/>
+
+		For convenience, the list of names is exposed in Color.NAMES as a hash: <code>Color.NAMES.aliceblue // returns 0xF0F8FF</code>
 		</p>
 
 		<h3>[method:Color sub]( [param:Color color] ) </h3>

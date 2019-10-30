@@ -3,7 +3,39 @@
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
-import { ObjectManipulator } from "../../utils/ObjectManipulator.js";
+const ObjectManipulator = {
+
+	/**
+	 * Applies values from parameter object via set functions or via direct assignment.
+	 *
+	 * @param {Object} objToAlter The objToAlter instance
+	 * @param {Object} params The parameter object
+	 */
+	applyProperties: function (objToAlter, params, forceCreation) {
+
+		// fast-fail
+		if (objToAlter === undefined || objToAlter === null || params === undefined || params === null) return;
+
+		let property, funcName, values;
+		for (property in params) {
+
+			funcName = 'set' + property.substring(0, 1).toLocaleUpperCase() + property.substring(1);
+			values = params[property];
+
+			if (typeof objToAlter[funcName] === 'function') {
+
+				objToAlter[funcName](values);
+
+			} else if (objToAlter.hasOwnProperty(property) || forceCreation) {
+
+				objToAlter[property] = values;
+
+			}
+
+		}
+
+	}
+};
 
 const DefaultWorkerPayloadHandler = function ( parser ) {
 
@@ -49,21 +81,10 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
-			ObjectManipulator.applyProperties( parser, payload.params );
-			ObjectManipulator.applyProperties( parser, payload.materials );
-			ObjectManipulator.applyProperties( parser, callbacks );
+			ObjectManipulator.applyProperties( parser, payload.params, false );
+			ObjectManipulator.applyProperties( parser, callbacks, false );
 
-			let arraybuffer;
-			if ( payload.params && payload.params.index !== undefined && payload.params.index !== null ) {
-
-				arraybuffer = this.resourceDescriptors[ payload.params.index ].content;
-
-			} else {
-
-				arraybuffer = payload.data.input;
-
-			}
-
+			let arraybuffer = payload.data.input;
 			let executeFunctionName = 'execute';
 			if ( typeof parser.getParseFunctionName === 'function' ) executeFunctionName = parser.getParseFunctionName();
 			if ( payload.usesMeshDisassembler ) {
@@ -98,7 +119,6 @@ DefaultWorkerPayloadHandler.prototype = {
  */
 const WorkerRunner = function ( payloadHandler ) {
 
-	this.resourceDescriptors = [];
 	this.payloadHandler = payloadHandler;
 
 	let scope = this;
@@ -122,16 +142,6 @@ WorkerRunner.prototype = {
 	 */
 	processMessage: function ( payload ) {
 
-		if ( payload.data.resourceDescriptors && this.resourceDescriptors.length === 0 ) {
-
-			for ( let name in payload.data.resourceDescriptors ) {
-
-				this.resourceDescriptors.push( payload.data.resourceDescriptors[ name ] );
-
-			}
-
-		}
-
 		this.payloadHandler.handlePayload( payload );
 
 	}
@@ -140,5 +150,6 @@ WorkerRunner.prototype = {
 
 export {
 	WorkerRunner,
-	DefaultWorkerPayloadHandler
+	DefaultWorkerPayloadHandler,
+	ObjectManipulator
 };
