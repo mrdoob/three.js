@@ -19,7 +19,7 @@ var CSS3DObject = function ( element ) {
 
 	this.addEventListener( 'removed', function () {
 
-		this.traverse( function( object ) {
+		this.traverse( function ( object ) {
 
 			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
