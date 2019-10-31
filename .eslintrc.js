@@ -44,6 +44,7 @@ module.exports = {
     "no-proto": 2,
     "no-return-assign": 2,
     "no-script-url": 2,
+    "no-self-assign": 0,
     "no-sequences": 2,
     "no-shadow-restricted-names": 2,
     "no-spaced-func": 2,
