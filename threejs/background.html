@@ -47,7 +47,7 @@ function main() {
   const showHelpers = false;
 
   if (useOrbitCamera) {
-    const controls = new OrbitControls(camera);
+    const controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 0, 0);
     controls.update();
   }

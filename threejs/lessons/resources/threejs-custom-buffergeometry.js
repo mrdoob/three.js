@@ -82,10 +82,10 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const positionNumComponents = 3;
         const uvNumComponents = 2;
         const geometry = new THREE.BufferGeometry();
-        geometry.addAttribute(
+        geometry.setAttribute(
             'position',
             new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
-        geometry.addAttribute(
+        geometry.setAttribute(
             'uv',
             new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 

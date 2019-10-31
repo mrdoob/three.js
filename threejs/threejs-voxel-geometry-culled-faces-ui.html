@@ -402,13 +402,13 @@ function main() {
       const normalNumComponents = 3;
       const uvNumComponents = 2;
 
-      geometry.addAttribute(
+      geometry.setAttribute(
           'position',
           new THREE.BufferAttribute(new Float32Array(0), positionNumComponents));
-      geometry.addAttribute(
+      geometry.setAttribute(
           'normal',
           new THREE.BufferAttribute(new Float32Array(0), normalNumComponents));
-      geometry.addAttribute(
+      geometry.setAttribute(
           'uv',
           new THREE.BufferAttribute(new Float32Array(0), uvNumComponents));
 

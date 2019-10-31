@@ -491,7 +491,7 @@ data.forEach((row, latNdx) => {
 +
 +    const normalized = true;
 +    const colorAttrib = new THREE.BufferAttribute(colors, itemSize, normalized);
-+    geometry.addAttribute('color', colorAttrib);
++    geometry.setAttribute('color', colorAttrib);
 
     geometries.push(geometry);
   });
@@ -500,7 +500,7 @@ data.forEach((row, latNdx) => {
 
 The code above looks up the number or vertices needed by getting the `position`
 attribute from the geometry. We then create a `Uint8Array` to put the colors in.
-It then adds that as an attribute by calling `geometry.addAttribute`.
+It then adds that as an attribute by calling `geometry.setAttribute`.
 
 Lastly we need to tell three.js to use the vertex colors. 
 

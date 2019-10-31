@@ -154,7 +154,7 @@ function main() {
 
         const normalized = true;
         const colorAttrib = new THREE.BufferAttribute(colors, itemSize, normalized);
-        geometry.addAttribute('color', colorAttrib);
+        geometry.setAttribute('color', colorAttrib);
 
         geometries.push(geometry);
       });

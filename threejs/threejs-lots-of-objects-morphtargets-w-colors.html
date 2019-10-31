@@ -217,7 +217,7 @@ function main() {
 
         const normalized = true;
         const colorAttrib = new THREE.BufferAttribute(colors, itemSize, normalized);
-        geometry.addAttribute('color', colorAttrib);
+        geometry.setAttribute('color', colorAttrib);
 
         geometries.push(geometry);
       });
@@ -374,7 +374,7 @@ function main() {
     mesh.onBeforeRender = function(renderer, scene, camera, geometry) {
       // remove all the color attributes
       for (const {name} of colorAttributes) {
-        geometry.removeAttribute(name);
+        geometry.deleteAttribute(name);
       }
 
       for (let i = 0; i < colorAttributes.length; ++i) {
@@ -386,7 +386,7 @@ function main() {
         // where 2 is the index of the data set
         const ndx = parseInt(attrib.name);
         const name = `morphColor${i}`;
-        geometry.addAttribute(name, colorAttributes[ndx].attribute);
+        geometry.setAttribute(name, colorAttributes[ndx].attribute);
       }
     };
 

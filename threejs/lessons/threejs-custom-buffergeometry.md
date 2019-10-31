@@ -133,13 +133,13 @@ and add it to the `BufferGeometry`.
   const positionNumComponents = 3;
   const normalNumComponents = 3;
   const uvNumComponents = 2;
-  geometry.addAttribute(
+  geometry.setAttribute(
       'position',
       new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
-  geometry.addAttribute(
+  geometry.setAttribute(
       'normal',
       new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
-  geometry.addAttribute(
+  geometry.setAttribute(
       'uv',
       new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 ```
@@ -223,13 +223,13 @@ So now we have 24 unique vertices. Then we specify 36 indices
 for the 36 vertices we need drawn to make 12 triangles by calling `BufferGeometry.setIndex` with an array of indices.
 
 ```js
-geometry.addAttribute(
+geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(positions, positionNumComponents));
-geometry.addAttribute(
+geometry.setAttribute(
     'normal',
     new THREE.BufferAttribute(normals, normalNumComponents));
-geometry.addAttribute(
+geometry.setAttribute(
     'uv',
     new THREE.BufferAttribute(uvs, uvNumComponents));
 
@@ -303,15 +303,15 @@ for (const vertex of vertices) {
 +  uvNdx += uvNumComponents;
 }
 
-geometry.addAttribute(
+geometry.setAttribute(
     'position',
 -    new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
 +    new THREE.BufferAttribute(positions, positionNumComponents));
-geometry.addAttribute(
+geometry.setAttribute(
     'normal',
 -    new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
 +    new THREE.BufferAttribute(normals, normalNumComponents));
-geometry.addAttribute(
+geometry.setAttribute(
     'uv',
 -    new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 +    new THREE.BufferAttribute(uvs, uvNumComponents));
@@ -417,11 +417,11 @@ const positionNumComponents = 3;
 const normalNumComponents = 3;
 
 +const positionAttribute = new THREE.BufferAttribute(positions, positionNumComponents);
-+positionAttribute.dynamic = true;
-geometry.addAttribute(
++positionAttribute.setUsage(THREE.DynamicDrawUsage);
+geometry.setAttribute(
     'position',
 +    positionAttribute);
-geometry.addAttribute(
+geometry.setAttribute(
     'normal',
     new THREE.BufferAttribute(normals, normalNumComponents));
 geometry.setIndex(indices);

@@ -106,11 +106,11 @@ function main() {
   const normalNumComponents = 3;
 
   const positionAttribute = new THREE.BufferAttribute(positions, positionNumComponents);
-  positionAttribute.dynamic = true;
-  geometry.addAttribute(
+  positionAttribute.setUsage(THREE.DynamicDrawUsage);
+  geometry.setAttribute(
       'position',
       positionAttribute);
-  geometry.addAttribute(
+  geometry.setAttribute(
       'normal',
       new THREE.BufferAttribute(normals, normalNumComponents));
   geometry.setIndex(indices);

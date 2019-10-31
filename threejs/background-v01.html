@@ -46,7 +46,7 @@ function main() {
   const camSpeed = 0.2;
 
   if (useOrbitCamera) {
-    const controls = new OrbitControls(camera);
+    const controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 100.01, 0.2);
     controls.update();
   }

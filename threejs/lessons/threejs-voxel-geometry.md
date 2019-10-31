@@ -508,10 +508,10 @@ const material = new THREE.MeshLambertMaterial({color: 'green'});
 
 const positionNumComponents = 3;
 const normalNumComponents = 3;
-geometry.addAttribute(
+geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
-geometry.addAttribute(
+geometry.setAttribute(
     'normal',
     new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
 geometry.setIndex(indices);
@@ -750,13 +750,13 @@ const geometry = new THREE.BufferGeometry();
 const positionNumComponents = 3;
 const normalNumComponents = 3;
 +const uvNumComponents = 2;
-geometry.addAttribute(
+geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
-geometry.addAttribute(
+geometry.setAttribute(
     'normal',
     new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
-+geometry.addAttribute(
++geometry.setAttribute(
 +    'uv',
 +    new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 geometry.setIndex(indices);
@@ -1129,13 +1129,13 @@ function updateCellGeometry(x, y, z) {
     const normalNumComponents = 3;
     const uvNumComponents = 2;
 
-    geometry.addAttribute(
+    geometry.setAttribute(
         'position',
         new THREE.BufferAttribute(new Float32Array(0), positionNumComponents));
-    geometry.addAttribute(
+    geometry.setAttribute(
         'normal',
         new THREE.BufferAttribute(new Float32Array(0), normalNumComponents));
-    geometry.addAttribute(
+    geometry.setAttribute(
         'uv',
         new THREE.BufferAttribute(new Float32Array(0), uvNumComponents));
 

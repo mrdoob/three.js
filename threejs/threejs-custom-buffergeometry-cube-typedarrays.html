@@ -97,13 +97,13 @@ function main() {
   }
 
   const geometry = new THREE.BufferGeometry();
-  geometry.addAttribute(
+  geometry.setAttribute(
       'position',
       new THREE.BufferAttribute(positions, positionNumComponents));
-  geometry.addAttribute(
+  geometry.setAttribute(
       'normal',
       new THREE.BufferAttribute(normals, normalNumComponents));
-  geometry.addAttribute(
+  geometry.setAttribute(
       'uv',
       new THREE.BufferAttribute(uvs, uvNumComponents));
 

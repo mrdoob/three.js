@@ -686,7 +686,7 @@ scene.add(mesh);
 +mesh.onBeforeRender = function(renderer, scene, camera, geometry) {
 +  // remove all the color attributes
 +  for (const {name} of colorAttributes) {
-+    geometry.removeAttribute(name);
++    geometry.deleteAttribute(name);
 +  }
 +
 +  for (let i = 0; i < colorAttributes.length; ++i) {
@@ -698,7 +698,7 @@ scene.add(mesh);
 +    // where 2 is the index of the data set
 +    const ndx = parseInt(attrib.name);
 +    const name = `morphColor${i}`;
-+    geometry.addAttribute(name, colorAttributes[ndx].attribute);
++    geometry.setAttribute(name, colorAttributes[ndx].attribute);
 +  }
 +};
 ```
