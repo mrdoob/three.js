@@ -135,7 +135,6 @@
 
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
-				controls.addEventListener( 'change', render );
 
 				//
 
@@ -484,8 +483,6 @@
 
 					}
 
-					render();
-
 				} );
 
 
@@ -499,8 +496,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
 
 			}
 
