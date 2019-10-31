@@ -29,8 +29,8 @@ an optional feature of three.js so first we need to include them
 in our page
 
 ```js
-import * as THREE from './resources/three/r108/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r110/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r110/examples/jsm/controls/OrbitControls.js';
 ```
 
 Then we can use them. We pass the `OrbitControls` a camera to
@@ -476,8 +476,8 @@ The `RectAreaLight` only works with the `MeshStandardMaterial` and the
 To use the `RectAreaLight` we need to include some extra three.js optional data
 
 ```js
-import * as THREE from './resources/three/r108/build/three.module.js';
-+import {RectAreaLightUniformsLib} from './resources/threejs/r108/examples/jsm/lights/RectAreaLightUniformsLib.js';
+import * as THREE from './resources/three/r110/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r110/examples/jsm/lights/RectAreaLightUniformsLib.js';
 ```
 
 and we need to call `RectAreaLightUniformsLib.init`

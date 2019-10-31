@@ -448,8 +448,8 @@ A few minor changes to make it easier to view.
 * include the `OrbitControls`
 
 ```js
-import * as THREE from './resources/three/r108/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r110/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r110/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js

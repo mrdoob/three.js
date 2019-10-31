@@ -69,8 +69,8 @@ The first thing we need to do is include the VR support after
 including three.js
 
 ```js
-import * as THREE from './resources/three/r108/build/three.module.js';
-+import {WEBVR} from './resources/threejs/r108/examples/jsm/vr/WebVR.js';
+import * as THREE from './resources/three/r110/build/three.module.js';
++import {WEBVR} from './resources/threejs/r110/examples/jsm/vr/WebVR.js';
 ```
 
 Then we need to enable three.js's WebVR support and add its

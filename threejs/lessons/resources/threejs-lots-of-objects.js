@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r108/build/three.module.js';
+import * as THREE from '../../resources/threejs/r110/build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 import {GUI} from '../../../3rdparty/dat.gui.module.js';
 

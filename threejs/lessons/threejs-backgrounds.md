@@ -180,7 +180,7 @@ function render(time) {
 Let's add some controls in so we can rotate the camera.
 
 ```js
-import {OrbitControls} from './resources/threejs/r108/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './resources/threejs/r110/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js

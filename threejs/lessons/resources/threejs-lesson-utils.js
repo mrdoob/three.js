@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r108/build/three.module.js';
-import {TrackballControls} from '../../resources/threejs/r108/examples/jsm/controls/TrackballControls.js';
+import * as THREE from '../../resources/threejs/r110/build/three.module.js';
+import {TrackballControls} from '../../resources/threejs/r110/examples/jsm/controls/TrackballControls.js';
 
 export const threejsLessonUtils = {
   init() {
