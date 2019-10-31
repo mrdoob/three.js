@@ -34,12 +34,12 @@ var TrackballControls = function ( object, domElement ) {
 	this.zoomSpeed = 1.2;
 	this.panSpeed = 0.3;
 
-	this.noRotate = false;
-	this.noZoom = false;
-	this.noPan = false;
+	this.enableRotate = true;
+	this.enableZoom = true;
+	this.enablePan = true;
 
-	this.staticMoving = false;
-	this.dynamicDampingFactor = 0.2;
+	this.enableDamping = true;
+	this.dampingFactor = 0.2;
 
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
@@ -178,9 +178,9 @@ var TrackballControls = function ( object, domElement ) {
 				_lastAxis.copy( axis );
 				_lastAngle = angle;
 
-			} else if ( ! _this.staticMoving && _lastAngle ) {
+			} else if ( _this.enableDamping === true && _lastAngle ) {
 
-				_lastAngle *= Math.sqrt( 1.0 - _this.dynamicDampingFactor );
+				_lastAngle *= Math.sqrt( 1.0 - _this.dampingFactor );
 				_eye.copy( _this.object.position ).sub( _this.target );
 				quaternion.setFromAxisAngle( _lastAxis, _lastAngle );
 				_eye.applyQuaternion( quaternion );
@@ -242,13 +242,13 @@ var TrackballControls = function ( object, domElement ) {
 
 			}
 
-			if ( _this.staticMoving ) {
+			if ( _this.enableDamping === false ) {
 
 				_zoomStart.copy( _zoomEnd );
 
 			} else {
 
-				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
+				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dampingFactor;
 
 			}
 
@@ -286,13 +286,13 @@ var TrackballControls = function ( object, domElement ) {
 				_this.object.position.add( pan );
 				_this.target.add( pan );
 
-				if ( _this.staticMoving ) {
+				if ( _this.enableDamping === false ) {
 
 					_panStart.copy( _panEnd );
 
 				} else {
 
-					_panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( _this.dynamicDampingFactor ) );
+					_panStart.add( mouseChange.subVectors( _panEnd, _panStart ).multiplyScalar( _this.dampingFactor ) );
 
 				}
 
@@ -304,7 +304,7 @@ var TrackballControls = function ( object, domElement ) {
 
 	this.checkDistances = function () {
 
-		if ( ! _this.noZoom || ! _this.noPan ) {
+		if ( _this.enableZoom || _this.enablePan ) {
 
 			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
 
@@ -328,19 +328,19 @@ var TrackballControls = function ( object, domElement ) {
 
 		_eye.subVectors( _this.object.position, _this.target );
 
-		if ( ! _this.noRotate ) {
+		if ( _this.enableRotate === true ) {
 
 			_this.rotateCamera();
 
 		}
 
-		if ( ! _this.noZoom ) {
+		if ( _this.enableZoom === true ) {
 
 			_this.zoomCamera();
 
 		}
 
-		if ( ! _this.noPan ) {
+		if ( _this.enablePan === true ) {
 
 			_this.panCamera();
 
@@ -418,15 +418,15 @@ var TrackballControls = function ( object, domElement ) {
 
 			return;
 
-		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && ! _this.noRotate ) {
+		} else if ( event.keyCode === _this.keys[ STATE.ROTATE ] && _this.enableRotate === true ) {
 
 			_keyState = STATE.ROTATE;
 
-		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && ! _this.noZoom ) {
+		} else if ( event.keyCode === _this.keys[ STATE.ZOOM ] && _this.enableZoom === true ) {
 
 			_keyState = STATE.ZOOM;
 
-		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && ! _this.noPan ) {
+		} else if ( event.keyCode === _this.keys[ STATE.PAN ] && _this.enablePan === true ) {
 
 			_keyState = STATE.PAN;
 
@@ -476,17 +476,17 @@ var TrackballControls = function ( object, domElement ) {
 
 		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
 
-		if ( state === STATE.ROTATE && ! _this.noRotate ) {
+		if ( state === STATE.ROTATE && _this.enableRotate === true ) {
 
 			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 			_movePrev.copy( _moveCurr );
 
-		} else if ( state === STATE.ZOOM && ! _this.noZoom ) {
+		} else if ( state === STATE.ZOOM && _this.enableZoom === true ) {
 
 			_zoomStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 			_zoomEnd.copy( _zoomStart );
 
-		} else if ( state === STATE.PAN && ! _this.noPan ) {
+		} else if ( state === STATE.PAN && _this.enablePan === true ) {
 
 			_panStart.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 			_panEnd.copy( _panStart );
@@ -509,16 +509,16 @@ var TrackballControls = function ( object, domElement ) {
 
 		var state = ( _keyState !== STATE.NONE ) ? _keyState : _state;
 
-		if ( state === STATE.ROTATE && ! _this.noRotate ) {
+		if ( state === STATE.ROTATE && _this.enableRotate === true ) {
 
 			_movePrev.copy( _moveCurr );
 			_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 
-		} else if ( state === STATE.ZOOM && ! _this.noZoom ) {
+		} else if ( state === STATE.ZOOM && _this.enableZoom === true ) {
 
 			_zoomEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
-		} else if ( state === STATE.PAN && ! _this.noPan ) {
+		} else if ( state === STATE.PAN && _this.enablePan === true ) {
 
 			_panEnd.copy( getMouseOnScreen( event.pageX, event.pageY ) );
 
@@ -545,7 +545,7 @@ var TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
-		if ( _this.noZoom === true ) return;
+		if ( _this.enableZoom === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -702,5 +702,99 @@ var TrackballControls = function ( object, domElement ) {
 
 TrackballControls.prototype = Object.create( EventDispatcher.prototype );
 TrackballControls.prototype.constructor = TrackballControls;
+
+Object.defineProperties( TrackballControls.prototype, {
+
+	noZoom: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+			return ! this.enableZoom;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+			this.enableZoom = ! value;
+
+		}
+
+	},
+
+	noRotate: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+			return ! this.enableRotate;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+			this.enableRotate = ! value;
+
+		}
+
+	},
+
+	noPan: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .noPan has been deprecated. Use .enablePan instead.' );
+			return ! this.enablePan;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .noPan has been deprecated. Use .enablePan instead.' );
+			this.enablePan = ! value;
+
+		}
+
+	},
+
+	staticMoving: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+			return ! this.enableDamping;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+			this.enableDamping = ! value;
+
+		}
+
+	},
+
+	dynamicDampingFactor: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+			return this.dampingFactor;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+			this.dampingFactor = value;
+
+		}
+
+	}
+
+} );
 
 export { TrackballControls };
