@@ -4,6 +4,7 @@
 
 Menubar.Examples = function ( editor ) {
 
+	var signals = editor.signals;
 	var strings = editor.strings;
 
 	var container = new UI.Panel();
@@ -43,6 +44,7 @@ Menubar.Examples = function ( editor ) {
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
+					signals.stopPlayer.dispatch();
 					loader.load( 'examples/' + item.file, function ( text ) {
 
 						editor.clear();

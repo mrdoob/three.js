@@ -180,6 +180,7 @@ var APP = {
 
 			prevTime = performance.now();
 
+			if ( renderer === undefined ) return;
 			document.addEventListener( 'keydown', onDocumentKeyDown );
 			document.addEventListener( 'keyup', onDocumentKeyUp );
 			document.addEventListener( 'mousedown', onDocumentMouseDown );
@@ -197,6 +198,7 @@ var APP = {
 
 		this.stop = function () {
 
+			if ( renderer === undefined ) return;
 			document.removeEventListener( 'keydown', onDocumentKeyDown );
 			document.removeEventListener( 'keyup', onDocumentKeyUp );
 			document.removeEventListener( 'mousedown', onDocumentMouseDown );
@@ -214,6 +216,7 @@ var APP = {
 
 		this.dispose = function () {
 
+			if ( renderer === undefined ) return;
 			while ( dom.children.length ) {
 
 				dom.removeChild( dom.firstChild );
