@@ -993,7 +993,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// material
 
-			var material = new MeshPhongMaterial( { vertexColors: VertexColors } );
+			var material = new MeshPhongMaterial( { vertexColors: VertexColors, flatShading: true } );
 
 			// mesh
 
