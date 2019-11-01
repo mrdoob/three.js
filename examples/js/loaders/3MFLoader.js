@@ -284,7 +284,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function parseTextures2DGroupNodes( texture2DGroupNode ) {
+		function parseTextures2DGroupNode( texture2DGroupNode ) {
 
 			var texture2DGroupData = {
 				id: texture2DGroupNode.getAttribute( 'id' ), // required
@@ -312,7 +312,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function parseColorGroupNodes( colorGroupNode ) {
+		function parseColorGroupNode( colorGroupNode ) {
 
 			var colorGroupData = {
 				id: colorGroupNode.getAttribute( 'id' ), // required
@@ -604,7 +604,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			for ( var i = 0; i < colorGroupNodes.length; i ++ ) {
 
 				var colorGroupNode = colorGroupNodes[ i ];
-				var colorGroupData = parseColorGroupNodes( colorGroupNode );
+				var colorGroupData = parseColorGroupNode( colorGroupNode );
 				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
 
 			}
@@ -617,7 +617,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			for ( var i = 0; i < textures2DGroupNodes.length; i ++ ) {
 
 				var textures2DGroupNode = textures2DGroupNodes[ i ];
-				var textures2DGroupData = parseTextures2DGroupNodes( textures2DGroupNode );
+				var textures2DGroupData = parseTextures2DGroupNode( textures2DGroupNode );
 				resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
 
 			}
