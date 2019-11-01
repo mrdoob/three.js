@@ -970,7 +970,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			// material
 
-			var material = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors } );
+			var material = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors, flatShading: true } );
 
 			// mesh
 
