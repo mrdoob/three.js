@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - batchMap shader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="info">
+	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - batchMap shader depend on
+	MeshPhongMaterial<br/>
+	<label>Use batchId attribute and batchMap works like vertex color.</label>
+	<canvas id="batchMap" style="width: 128px;height: 128px"></canvas>
+</div>
+<script type="module">
+
+	import * as THREE from '../build/three.module.js';
+	import Stats from './jsm/libs/stats.module.js';
+	import {BatchPhongShader} from "./jsm/shaders/BatchPhongShader.js";
+	import {OrbitControls} from "./jsm/controls/OrbitControls.js";
+	import {GUI} from "./jsm/libs/dat.gui.module.js";
+
+	var camera, scene, controls, renderer, stats, gui;
+
+	var canvas, context, imageData, planeGeometry, batchMap;
+	var offscreenCanvas, offscreenContext, offscreenImageData;
+	var normalCanvas, normalContext, normalImageData;
+
+	// batchMapSize need to be 2^x,bigger than 16384 will get error.
+	// when batchId value bigger than that ,can draw the color to the next line ,and need +1 to batchMapHeight value
+
+	var batchMapSize = 128;
+	var batchMapHeight = 1;
+	var planeWidth = 5;
+
+	var config = {};
+	config.useOffscreenCanvas = true;
+	config.autoUpdateBatchMap = false;
+
+	// batchMap shader
+
+	function BatchPhongMaterial(parameters) {
+
+		THREE.MeshPhongMaterial.call(this);
+
+		this.defines = {USE_BATCHMAP: ""};
+
+		this.type = 'BatchMeshPhongMaterial';
+		this.uniforms = BatchPhongShader.uniforms;
+
+		this.vertexShader = BatchPhongShader.vertexShader;
+		this.fragmentShader = BatchPhongShader.fragmentShader;
+
+		this.setBatchMap = function (texture) {
+			this.uniforms.batchMap.value = texture;
+			this.uniforms.batchWidth.value = texture.image.width;
+		};
+
+		this.setValues(parameters);
+	}
+
+	BatchPhongMaterial.prototype = Object.create(THREE.MeshPhongMaterial.prototype);
+
+	init();
+	animate();
+
+	function init() {
+
+		var container = document.createElement('div');
+		document.body.appendChild(container);
+
+		//
+
+		camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+
+		scene = new THREE.Scene();
+		scene.background = new THREE.Color(0x242a34);
+
+		//
+
+		scene.add(new THREE.AmbientLight(0x333344));
+
+		var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+		directionalLight.position.set(500, 0, 500);
+
+		scene.add(directionalLight);
+
+		// basic geometry
+
+		planeGeometry = new THREE.PlaneBufferGeometry(planeWidth, planeWidth);
+
+		//canvas used to draw batchMap, OffscreenCanvas can draw faster than normal canvas,but support not very well
+		//https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas
+
+		canvas = offscreenCanvas = new OffscreenCanvas(batchMapSize, batchMapHeight);
+		offscreenCanvas.width = batchMapSize;
+		offscreenCanvas.height = batchMapHeight;
+		context = offscreenContext = offscreenCanvas.getContext("2d");
+		imageData = offscreenImageData = offscreenContext.createImageData(batchMapSize, batchMapHeight);
+		// Offscreen image draw to canvas
+		// let batchMapCanvas = document.getElementById("batchMap");
+		// batchMapCanvas.width = batchMapSize;
+		// batchMapCanvas.height = batchMapHeight;
+		// let batchMapContext = batchMapCanvas.getContext("bitmaprenderer");
+
+		normalCanvas = document.getElementById("batchMap");
+		normalCanvas.width = batchMapSize;
+		normalCanvas.height = batchMapHeight;
+		normalContext = normalCanvas.getContext("2d");
+		normalImageData = normalContext.createImageData(batchMapSize, batchMapHeight);
+
+		// init batchMap
+
+		batchMap = new THREE.Texture();
+		batchMap.format = THREE.RGBAFormat;
+		batchMap.onUpdate = function () {
+			// check the bathMap
+			var image = batchMap.image;
+			// batchMapContext.transferFromImageBitmap(image);
+		};
+
+		// init mesh
+
+		batchMap.image = drawBatchImage([
+			[255, 0, 0, 255], //batchMap color will blend with materialColor
+			[0, 255, 0, 255],
+			[0, 0, 255, 255],
+			[0, 0, 0, 0], // a=0 discard
+			[255, 255, 255, 255] // support map transparent
+		]);
+		batchMap.needsUpdate = true;
+		var bufferGeometry = createGeometry(5);
+		var batchPhongMaterial = new BatchPhongMaterial();
+		batchPhongMaterial.setBatchMap(batchMap);
+
+		// if need enable alpha ,set the flow option. this will make threejs sort the meshes , probably draw from far to near, do not use this if not necessary
+
+		batchPhongMaterial.transparent = true;
+
+		var mesh = new THREE.Mesh(bufferGeometry, batchPhongMaterial);
+		scene.add(mesh);
+
+		let backGroud = new THREE.Mesh(planeGeometry, new THREE.MeshPhongMaterial({color: new THREE.Color(1, 1, 0)}));
+		backGroud.position.set(20, 0, -5);
+		backGroud.scale.set(5, 5, 0);
+		scene.add(backGroud);
+
+		//
+
+		renderer = new THREE.WebGLRenderer({antialias: true});
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		container.appendChild(renderer.domElement);
+		renderer.autoClear = false;
+
+		//
+
+		stats = new Stats();
+		container.appendChild(stats.dom);
+
+		//
+
+		gui = new GUI();
+		gui.add(config, "autoUpdateBatchMap");
+		gui.add(config, "useOffscreenCanvas").onChange(function () {
+			if (config.useOffscreenCanvas) {
+				canvas = offscreenCanvas;
+				context = offscreenContext;
+				imageData = offscreenImageData;
+			} else {
+				canvas = normalCanvas;
+				context = normalContext;
+				imageData = normalImageData;
+			}
+		});
+
+		//
+
+		controls = new OrbitControls(camera, container);
+		camera.position.set(20, 0, 50);
+		controls.target.set(20, 0, 0);
+
+		//
+
+		document.addEventListener('click', onDocumentMouseClick, false);
+		window.addEventListener('resize', onWindowResize, false);
+	}
+
+	// canvas draw function,color's length should equal 4 which value between [0,255]
+
+	function drawBatchImage(colors, offset) {
+		if (!offset) offset = 0;
+		for (let i = 0; i < colors.length; i++) {
+			const color = colors[i];
+			let dataOffset = (i + offset) * 4;
+			for (let j = 0; j < color.length; j++) {
+				imageData.data[dataOffset + j] = color[j]
+			}
+		}
+
+		context.putImageData(imageData, 0, 0);
+
+		if (config.useOffscreenCanvas)
+			return canvas.transferToImageBitmap();
+		else {
+			let image = new Image();
+			image.src = canvas.toDataURL();
+			image.width = canvas.width;
+			image.height = canvas.height;
+			return image;
+		}
+	}
+
+	/**
+	 * _ _ _ _ _ +y
+	 * |
+	 * |
+	 * |
+	 * +x
+	 */
+
+	function drawPix(imageDate, x, y, r, g, b, a) {
+		var offset = (imageDate.width * x + y) * 4;
+		imageDate.data[offset] = r;
+		imageDate.data[offset + 1] = g;
+		imageDate.data[offset + 2] = b;
+		imageDate.data[offset + 3] = a;
+	}
+
+	// create batch geometry for batchMap
+
+	function createGeometry(number) {
+		let pointCount = planeGeometry.attributes.position.count;
+		let positionArray = new Float32Array(pointCount * number * 3);
+		let normalArray = new Float32Array(pointCount * number * 3);
+		let uvArray = new Float32Array(pointCount * number * 2);
+		let batchIdArray = new Float32Array(pointCount * number);
+		let indexArray = new Uint16Array(planeGeometry.index.count * number);
+
+		let bufferGeometry = new THREE.BufferGeometry();
+		bufferGeometry.addAttribute("position", new THREE.BufferAttribute(positionArray, 3));
+		bufferGeometry.addAttribute("normal", new THREE.BufferAttribute(normalArray, 3));
+		bufferGeometry.addAttribute("uv", new THREE.BufferAttribute(uvArray, 2));
+		bufferGeometry.addAttribute("batchId", new THREE.BufferAttribute(batchIdArray, 1));
+		bufferGeometry.setIndex(new THREE.BufferAttribute(indexArray, 1));
+
+		for (let i = 0; i < number; i++) {
+			for (let j = 0; j < pointCount; j++) {
+				positionArray[(i * pointCount + j) * 3] = planeGeometry.attributes.position.array[j * 3] + planeWidth * 2 * i;
+				positionArray[(i * pointCount + j) * 3 + 1] = planeGeometry.attributes.position.array[j * 3 + 1];
+				positionArray[(i * pointCount + j) * 3 + 2] = planeGeometry.attributes.position.array[j * 3 + 2];
+
+				normalArray[(i * pointCount + j) * 3] = planeGeometry.attributes.normal.array[j * 3];
+				normalArray[(i * pointCount + j) * 3 + 1] = planeGeometry.attributes.normal.array[j * 3 + 1];
+				normalArray[(i * pointCount + j) * 3 + 2] = planeGeometry.attributes.normal.array[j * 3 + 2];
+
+				uvArray[(i * pointCount + j) * 2] = planeGeometry.attributes.uv.array[j * 2];
+				uvArray[(i * pointCount + j) * 2 + 1] = planeGeometry.attributes.uv.array[j * 2 + 1];
+
+				// each plane use the same batchId
+
+				batchIdArray[i * pointCount + j] = i;
+			}
+			for (let j = 0; j < planeGeometry.index.count; j++) {
+				indexArray[i * planeGeometry.index.count + j] = planeGeometry.index.array[j] + pointCount * i;
+			}
+		}
+
+		return bufferGeometry;
+	}
+
+	//
+
+	function onWindowResize() {
+
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+	}
+
+	//
+
+	function onDocumentMouseClick(event) {
+		batchMap.image = drawBatchImage([
+			[Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255],
+			[255, 0, 0, Math.random() * 255],
+			[255, 0, 0, 255],
+			[255, 255, 255, 255],
+			[255, 255, 255, 100],
+		]);
+		batchMap.needsUpdate = true;
+	}
+
+	function animate() {
+
+		requestAnimationFrame(animate);
+
+		render();
+
+		stats.update();
+
+	}
+
+	function render() {
+
+		renderer.clear();
+
+		if (config.autoUpdateBatchMap) {
+			batchMap.image = drawBatchImage([
+				[Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255],
+				[Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255],
+				[Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255],
+				[Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255],
+				[Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() * 255],
+			]);
+			batchMap.needsUpdate = true;
+		}
+
+		renderer.render(scene, camera);
+
+	}
+
+</script>
+</body>
+</html>

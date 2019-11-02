@@ -180,6 +180,7 @@ var files = [
 
 	{ path: 'shaders/AfterimageShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BasicShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/BatchPhongShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BleachBypassShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BlendShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BokehShader.js', dependencies: [], ignoreList: [] },
