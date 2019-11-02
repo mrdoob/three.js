@@ -239,10 +239,10 @@
 		let indexArray = new Uint16Array(planeGeometry.index.count * number);
 
 		let bufferGeometry = new THREE.BufferGeometry();
-		bufferGeometry.addAttribute("position", new THREE.BufferAttribute(positionArray, 3));
-		bufferGeometry.addAttribute("normal", new THREE.BufferAttribute(normalArray, 3));
-		bufferGeometry.addAttribute("uv", new THREE.BufferAttribute(uvArray, 2));
-		bufferGeometry.addAttribute("batchId", new THREE.BufferAttribute(batchIdArray, 1));
+		bufferGeometry.setAttribute("position", new THREE.BufferAttribute(positionArray, 3));
+		bufferGeometry.setAttribute("normal", new THREE.BufferAttribute(normalArray, 3));
+		bufferGeometry.setAttribute("uv", new THREE.BufferAttribute(uvArray, 2));
+		bufferGeometry.setAttribute("batchId", new THREE.BufferAttribute(batchIdArray, 1));
 		bufferGeometry.setIndex(new THREE.BufferAttribute(indexArray, 1));
 
 		for (let i = 0; i < number; i++) {
