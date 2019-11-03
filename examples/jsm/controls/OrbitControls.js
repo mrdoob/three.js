@@ -38,6 +38,9 @@ var OrbitControls = function ( object, domElement ) {
 	// "target" sets the location of focus, where the object orbits around
 	this.target = new Vector3();
 
+	// Set to true to enable trackball behavior
+	this.trackball = false;
+
 	// How far you can dolly in and out ( PerspectiveCamera only )
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
@@ -78,6 +81,7 @@ var OrbitControls = function ( object, domElement ) {
 
 	// Set to true to automatically rotate around the target
 	// If auto-rotate is enabled, you must call controls.update() in your animation loop
+	// auto-rotate is not supported for trackball behavior
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
@@ -96,6 +100,7 @@ var OrbitControls = function ( object, domElement ) {
 	// for reset
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
+	this.quaternion0 = this.object.quaternion.clone();
 	this.zoom0 = this.object.zoom;
 
 	//
@@ -118,6 +123,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		scope.target0.copy( scope.target );
 		scope.position0.copy( scope.object.position );
+		scope.quaternion0.copy( scope.object.quaternion );
 		scope.zoom0 = scope.object.zoom;
 
 	};
@@ -126,6 +132,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		scope.target.copy( scope.target0 );
 		scope.object.position.copy( scope.position0 );
+		scope.object.quaternion.copy( scope.quaternion0 );
 		scope.object.zoom = scope.zoom0;
 
 		scope.object.updateProjectionMatrix();
@@ -149,49 +156,94 @@ var OrbitControls = function ( object, domElement ) {
 		var lastPosition = new Vector3();
 		var lastQuaternion = new Quaternion();
 
+		var q = new Quaternion();
+		var vec = new Vector3();
+
 		return function update() {
 
 			var position = scope.object.position;
 
 			offset.copy( position ).sub( scope.target );
 
-			// rotate offset to "y-axis-is-up" space
-			offset.applyQuaternion( quat );
+			if ( scope.trackball ) {
 
-			// angle from z-axis around y-axis
-			spherical.setFromVector3( offset );
+				// rotate around screen-space y-axis
 
-			if ( scope.autoRotate && state === STATE.NONE ) {
+				if ( sphericalDelta.theta ) {
 
-				rotateLeft( getAutoRotationAngle() );
+					vec.set( 0, 1, 0 ).applyQuaternion( scope.object.quaternion );
 
-			}
+					var factor = ( scope.enableDamping ) ? scope.dampingFactor : 1;
 
-			if ( scope.enableDamping ) {
+					q.setFromAxisAngle( vec, sphericalDelta.theta * factor );
 
-				spherical.theta += sphericalDelta.theta * scope.dampingFactor;
-				spherical.phi += sphericalDelta.phi * scope.dampingFactor;
+					scope.object.quaternion.premultiply( q );
+					offset.applyQuaternion( q );
+
+				}
+
+				// rotate around screen-space x-axis
+
+				if ( sphericalDelta.phi ) {
+
+					vec.set( 1, 0, 0 ).applyQuaternion( scope.object.quaternion );
+
+					var factor = ( scope.enableDamping ) ? scope.dampingFactor : 1;
+
+					q.setFromAxisAngle( vec, sphericalDelta.phi * factor );
+
+					scope.object.quaternion.premultiply( q );
+					offset.applyQuaternion( q );
+
+				}
+
+				offset.multiplyScalar( scale );
+				offset.clampLength( scope.minDistance, scope.maxDistance );
 
 			} else {
 
-				spherical.theta += sphericalDelta.theta;
-				spherical.phi += sphericalDelta.phi;
+				// rotate offset to "y-axis-is-up" space
+				offset.applyQuaternion( quat );
+
+				if ( scope.autoRotate && state === STATE.NONE ) {
+
+					rotateLeft( getAutoRotationAngle() );
+
+				}
+
+				spherical.setFromVector3( offset );
+
+				if ( scope.enableDamping ) {
+
+					spherical.theta += sphericalDelta.theta * scope.dampingFactor;
+					spherical.phi += sphericalDelta.phi * scope.dampingFactor;
+
+				} else {
+
+					spherical.theta += sphericalDelta.theta;
+					spherical.phi += sphericalDelta.phi;
+
+				}
+
+				// restrict theta to be between desired limits
+				spherical.theta = Math.max( scope.minAzimuthAngle, Math.min( scope.maxAzimuthAngle, spherical.theta ) );
+
+				// restrict phi to be between desired limits
+				spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
+
+				spherical.makeSafe();
+
+				spherical.radius *= scale;
+
+				// restrict radius to be between desired limits
+				spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
+
+				offset.setFromSpherical( spherical );
+
+				// rotate offset back to "camera-up-vector-is-up" space
+				offset.applyQuaternion( quatInverse );
 
 			}
-
-			// restrict theta to be between desired limits
-			spherical.theta = Math.max( scope.minAzimuthAngle, Math.min( scope.maxAzimuthAngle, spherical.theta ) );
-
-			// restrict phi to be between desired limits
-			spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
-
-			spherical.makeSafe();
-
-
-			spherical.radius *= scale;
-
-			// restrict radius to be between desired limits
-			spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
 			// move target to panned location
 
@@ -205,14 +257,13 @@ var OrbitControls = function ( object, domElement ) {
 
 			}
 
-			offset.setFromSpherical( spherical );
-
-			// rotate offset back to "camera-up-vector-is-up" space
-			offset.applyQuaternion( quatInverse );
-
 			position.copy( scope.target ).add( offset );
 
-			scope.object.lookAt( scope.target );
+			if ( scope.trackball === false ) {
+
+				scope.object.lookAt( scope.target );
+
+			}
 
 			if ( scope.enableDamping === true ) {
 
@@ -1158,7 +1209,9 @@ var OrbitControls = function ( object, domElement ) {
 
 	// force an update at start
 
+	this.object.lookAt( scope.target );
 	this.update();
+	this.saveState();
 
 };
 
@@ -1189,4 +1242,20 @@ var MapControls = function ( object, domElement ) {
 MapControls.prototype = Object.create( EventDispatcher.prototype );
 MapControls.prototype.constructor = MapControls;
 
-export { OrbitControls, MapControls };
+//
+
+var TrackballControls = function ( object, domElement ) {
+
+	OrbitControls.call( this, object, domElement );
+
+	this.trackball = true;
+	this.screenSpacePanning = true;
+	this.autoRotate = false;
+
+};
+
+TrackballControls.prototype = Object.create( EventDispatcher.prototype );
+TrackballControls.prototype.constructor = TrackballControls;
+
+
+export { OrbitControls, MapControls, TrackballControls };
