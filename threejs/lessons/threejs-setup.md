@@ -31,32 +31,32 @@ To stop serving pick stop or quit Servez.
 If you prefer the command line (I do), another way is to use [node.js](https://nodejs.org).
 Download it, install it, then open a command prompt / console / terminal window. If you're on Windows the installer will add a special "Node Command Prompt" so use that.
 
-Then install the [`http-server`](https://github.com/indexzero/http-server) by typing
+Then install the [`servez`](https://github.com/greggman/servez-cli) by typing
 
-    npm -g install http-server
+    npm -g install servez
 
 If you're on OSX use
 
-    sudo npm -g install http-server
+    sudo npm -g install servez
 
 Once you've done that type
 
-    http-server path/to/folder/where/you/unzipped/files
+    servez path/to/folder/where/you/unzipped/files
 
 Or if you're like me
 
     cd path/to/folder/where/you/unzipped/files
-    http-server
+    servez
 
 It should print something like
 
-{{{image url="resources/http-server-response.png" }}}
+{{{image url="resources/servez-response.png" }}}
 
 Then in your browser go to [`http://localhost:8080/`](http://localhost:8080/).
 
-If you don't specify a path then http-server will serve the current folder.
+If you don't specify a path then servez will serve the current folder.
 
 If either of those options are not to your liking
-[there are many other simple servers to choose from](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-http-server-or-simplehttpserver).
+[there are many other simple servers to choose from](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver).
 
 Now that you have a server setup we can move on to [textures](threejs-textures.html).

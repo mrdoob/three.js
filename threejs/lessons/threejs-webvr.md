@@ -36,7 +36,7 @@ to itself so ignore anything that starts with `127.`.
 On your VR device, first make sure it's connected to the same WiFi as your
 computer. Then, open your browser and type in `http://<ipaddress:port>`. Which
 port depends on what server you're running. If you're using
-[Servez](https://greggman.github.io/servez) or the http-server from node.js then
+[Servez](https://greggman.github.io/servez) or the servez from node.js then
 the port will likely be 8080.
 
 On my computer as I write this article its IP address is `192.168.100.78` and my

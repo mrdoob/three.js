@@ -31,27 +31,27 @@ web服务很容易设置和使用。
 如果你更喜欢命令行(我就是)，另一种方法是使用[node.js](https://nodejs.org)。
 下载，安装，然后打开一个command prompt / console / terminal窗口。 如果你是在Windows上安装程序会添加一个特别的"Node Command Prompt"所以使用它。
 
-然后安装[`http-server`](https://github.com/indexzero/http-server)通过输入
+然后安装[`servez`](https://github.com/greggman/servez-cli)通过输入
 
-    npm -g install http-server
+    npm -g install servez
 
 如果你是OSX使用
 
-    sudo npm -g install http-server
+    sudo npm -g install servez
 
 一旦你输入完成
 
-    http-server path/to/folder/where/you/unzipped/files
+    servez path/to/folder/where/you/unzipped/files
 
 它会打印像这样的东西
 
-{{{image url="resources/http-server-response.png" }}}
+{{{image url="resources/servez-response.png" }}}
 
 然后在你的浏览器中打开[`http://localhost:8080/`](http://localhost:8080/)。
 
-如果你没有指定路径那么http-server会使用当前的文件夹。
+如果你没有指定路径那么servez会使用当前的文件夹。
 
 如果这些都不是你的选择
-[这里有很多其他的服务可供选择](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-http-server-or-simplehttpserver)。
+[这里有很多其他的服务可供选择](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver)。
 
 现在你有了服务我们可以移步到[纹理](threejs-textures.html).

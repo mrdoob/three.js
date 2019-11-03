@@ -32,27 +32,27 @@ TOC: Настройка
 Загрузите его, установите его, затем откройте окно командной строки / консоли / терминала. 
 Если вы работаете в Windows, установщик добавит специальную "Node Command Prompt", используйте ее.
 
-Затем установите [`http-server`](https://github.com/indexzero/http-server) набрав в консоли
+Затем установите [`servez`](https://github.com/greggman/servez-cli) набрав в консоли
 
-    npm -g install http-server
+    npm -g install servez
 
 Если вы используете OSX
 
-    sudo npm -g install http-server
+    sudo npm -g install servez
 
 Как только вы сделали это, напишите
 
-    http-server path/to/folder/where/you/unzipped/files
+    servez path/to/folder/where/you/unzipped/files
 
 Это должно вывести что-то вроде
 
-{{{image url="resources/http-server-response.png" }}}
+{{{image url="resources/servez-response.png" }}}
 
 Затем в вашем браузере перейдите на [`http://localhost:8080/`](http://localhost:8080/).
 
 Если вы не укажете путь, тогда http-сервер будет хостить(размещать на сервере) текущую папку.
 
 Если какой-либо из этих вариантов вам не по вкусу,
-[есть много других простых серверов на выбор](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-http-server-or-simplehttpserver).
+[есть много других простых серверов на выбор](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver).
 
 Теперь, когда вы настроили сервер, мы можем перейти к [текстурам](threejs-textures.html).
