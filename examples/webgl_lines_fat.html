@@ -31,6 +31,7 @@
 			var matLine, matLineBasic, matLineDashed;
 			var stats;
 			var gui;
+			var mouse, raycaster, raycastPoint;
 
 			// viewport
 			var insetWidth;
@@ -123,6 +124,14 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				onWindowResize();
 
+				mouse = new THREE.Vector2();
+				raycaster = new THREE.Raycaster();
+				raycastPoint = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 20, 10 ) );
+				raycastPoint.material.color.set( 0xff0000 );
+				raycastPoint.scale.setScalar( 0.25 );
+				scene.add( raycastPoint );
+				document.addEventListener( 'mousemove', onMouseMove, false );
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
@@ -145,6 +154,33 @@
 
 			}
 
+			function onMouseMove( e ) {
+
+				e.preventDefault();
+
+				mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+			}
+
+			function doRaycast() {
+
+				camera.updateMatrixWorld();
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( [ line, line1 ] );
+				if ( intersects.length !== 0 ) {
+
+					raycastPoint.position.copy( intersects[ 0 ].point );
+					raycastPoint.visible = true;
+
+				} else {
+					
+					raycastPoint.visible = false;
+
+				}
+
+			}
+
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -159,6 +195,10 @@
 
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
+
+				// perform raycast after the resolution has been updated for the camera
+				// view we care about
+				doRaycast();
 
 				renderer.render( scene, camera );
 
