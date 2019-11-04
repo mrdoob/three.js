@@ -960,31 +960,39 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var triangleProperty = triangleProperties[ i ];
 
-				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 0 ] );
-				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 1 ] );
-				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 2 ] );
+				var v1 = triangleProperty.v1;
+				var v2 = triangleProperty.v2;
+				var v3 = triangleProperty.v3;
 
-				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 0 ] );
-				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 1 ] );
-				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 2 ] );
+				positionData.push( vertices[ ( v1 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( v1 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( v1 * 3 ) + 2 ] );
 
-				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 0 ] );
-				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 1 ] );
-				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 2 ] );
+				positionData.push( vertices[ ( v2 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( v2 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( v2 * 3 ) + 2 ] );
+
+				positionData.push( vertices[ ( v3 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( v3 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( v3 * 3 ) + 2 ] );
 
 				//
 
-				colorData.push( colors[ ( triangleProperty.p1 * 3 ) + 0 ] );
-				colorData.push( colors[ ( triangleProperty.p1 * 3 ) + 1 ] );
-				colorData.push( colors[ ( triangleProperty.p1 * 3 ) + 3 ] );
+				var p1 = triangleProperty.p1;
+				var p2 = triangleProperty.p2;
+				var p3 = triangleProperty.p3;
 
-				colorData.push( colors[ ( triangleProperty.p2 * 3 ) + 0 ] );
-				colorData.push( colors[ ( triangleProperty.p2 * 3 ) + 1 ] );
-				colorData.push( colors[ ( triangleProperty.p2 * 3 ) + 2 ] );
+				colorData.push( colors[ ( p1 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p1 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p1 * 3 ) + 3 ] );
 
-				colorData.push( colors[ ( triangleProperty.p3 * 3 ) + 0 ] );
-				colorData.push( colors[ ( triangleProperty.p3 * 3 ) + 1 ] );
-				colorData.push( colors[ ( triangleProperty.p3 * 3 ) + 2 ] );
+				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 0 ] );
+				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 1 ] );
+				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 2 ] );
+
+				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 0 ] );
+				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 1 ] );
+				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 2 ] );
 
 			}
 
