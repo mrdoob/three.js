@@ -32,6 +32,7 @@ import {
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
+	MeshStandardMaterial,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	RepeatWrapping,
@@ -284,6 +285,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var basematerialNode = basematerialNodes[ i ];
 				var basematerialData = parseBasematerialNode( basematerialNode );
+				basematerialData.index = i; // the order and count of the material nodes form an implicit 0-based index
 				basematerialsData.basematerials.push( basematerialData );
 
 			}
@@ -365,12 +367,41 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function parseMetallicDisplaypropertiesNode( metallicDisplaypropetiesNode ) {
+
+			var metallicDisplaypropertiesData = {
+				id: metallicDisplaypropetiesNode.getAttribute( 'id' ) // required
+			};
+
+			var metallicNodes = metallicDisplaypropetiesNode.querySelectorAll( 'pbmetallic' );
+
+			var metallicData = [];
+
+			for ( var i = 0; i < metallicNodes.length; i ++ ) {
+
+				var metallicNode = metallicNodes[ i ];
+
+				metallicData.push( {
+					name: metallicNode.getAttribute( 'name' ), // required
+					metallicness: parseFloat( metallicNode.getAttribute( 'metallicness' ) ), // required
+					roughness: parseFloat( metallicNode.getAttribute( 'roughness' ) ) // required
+				} );
+
+			}
+
+			metallicDisplaypropertiesData.data = metallicData;
+
+			return metallicDisplaypropertiesData;
+
+		}
+
 		function parseBasematerialNode( basematerialNode ) {
 
 			var basematerialData = {};
 
 			basematerialData[ 'name' ] = basematerialNode.getAttribute( 'name' ); // required
 			basematerialData[ 'displaycolor' ] = basematerialNode.getAttribute( 'displaycolor' ); // required
+			basematerialData[ 'displaypropertiesid' ] = basematerialNode.getAttribute( 'displaypropertiesid' );
 
 			return basematerialData;
 
@@ -629,6 +660,19 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var colorGroupNode = colorGroupNodes[ i ];
 				var colorGroupData = parseColorGroupNode( colorGroupNode );
 				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
+
+			}
+
+			//
+
+			resourcesData[ 'pbmetallicdisplayproperties' ] = {};
+			var pbmetallicdisplaypropertiesNodes = resourcesNode.querySelectorAll( 'pbmetallicdisplayproperties' );
+
+			for ( var i = 0; i < pbmetallicdisplaypropertiesNodes.length; i ++ ) {
+
+				var pbmetallicdisplaypropertiesNode = pbmetallicdisplaypropertiesNodes[ i ];
+				var pbmetallicdisplaypropertiesData = parseMetallicDisplaypropertiesNode( pbmetallicdisplaypropertiesNode );
+				resourcesData[ 'pbmetallicdisplayproperties' ][ pbmetallicdisplaypropertiesData[ 'id' ] ] = pbmetallicdisplaypropertiesData;
 
 			}
 
@@ -1182,9 +1226,29 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function buildBasematerial( materialData ) {
+		function buildBasematerial( materialData, objects, modelData ) {
 
-			var material = new MeshPhongMaterial( { flatShading: true } );
+			var material;
+
+			var displaypropertiesid = materialData.displaypropertiesid;
+			var pbmetallicdisplayproperties = modelData.resources.pbmetallicdisplayproperties;
+
+			if ( displaypropertiesid !== null && pbmetallicdisplayproperties[ displaypropertiesid ] !== undefined ) {
+
+				// metallic display property, use StandardMaterial
+
+				var pbmetallicdisplayproperty = pbmetallicdisplayproperties[ displaypropertiesid ];
+				var metallicData = pbmetallicdisplayproperty.data[ materialData.index ];
+
+				material = new MeshStandardMaterial( { flatShading: true, roughness: metallicData.roughness, metalness: metallicData.metallicness } );
+
+			} else {
+
+				// otherwise use PhongMaterial
+
+				material = new MeshPhongMaterial( { flatShading: true } );
+
+			}
 
 			material.name = materialData.name;
 
