@@ -69,6 +69,7 @@ var OrbitControls = function ( object, domElement ) {
 	// Set to false to disable rotating
 	this.enableRotate = true;
 	this.rotateSpeed = 1.0;
+	this.fixedUp = true; // maintains camera.up constant
 
 	// Set to false to disable panning
 	this.enablePan = true;
@@ -141,11 +142,14 @@ var OrbitControls = function ( object, domElement ) {
 	this.update = function () {
 
 		var offset = new Vector3();
+		var yUp =  new Vector3( 0, 1, 0 );
 
-		// so camera.up is the orbit axis
-		var quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
-		var quatInverse = quat.clone().inverse();
+		var quat = new Quaternion();
+		var quatInverse = new Quaternion();
+		var axisQuat = new Quaternion();
 
+		var lastUp = new Vector3();
+		var lastDir = new Vector3();
 		var lastPosition = new Vector3();
 		var lastQuaternion = new Quaternion();
 
@@ -154,6 +158,21 @@ var OrbitControls = function ( object, domElement ) {
 			var position = scope.object.position;
 
 			offset.copy( position ).sub( scope.target );
+
+			if ( ! scope.fixedUp ) {
+
+				lastDir.copy( offset ).normalize();
+
+			}
+
+			if ( ! scope.object.up.equals( lastUp ) ) {
+
+				quat.setFromUnitVectors( scope.object.up, yUp );
+				quatInverse.copy( quat ).inverse();
+
+				lastUp.copy( scope.object.up );
+
+			}
 
 			// rotate offset to "y-axis-is-up" space
 			offset.applyQuaternion( quat );
@@ -211,6 +230,16 @@ var OrbitControls = function ( object, domElement ) {
 			offset.applyQuaternion( quatInverse );
 
 			position.copy( scope.target ).add( offset );
+
+			if ( ! scope.fixedUp ) {
+
+				offset.normalize();
+				axisQuat.setFromUnitVectors( lastDir, offset );
+
+				// rotate camera.up along with offset
+				scope.object.up.applyQuaternion( axisQuat );
+
+			}
 
 			scope.object.lookAt( scope.target );
 
@@ -1189,4 +1218,118 @@ var MapControls = function ( object, domElement ) {
 MapControls.prototype = Object.create( EventDispatcher.prototype );
 MapControls.prototype.constructor = MapControls;
 
-export { OrbitControls, MapControls };
+// This set of controls performs orbiting, dollying (zooming), and panning.
+// Unlike OrbitControls, it rotates the "up" direction camera.up.
+//
+//    Orbit - left mouse / touch: one-finger move
+//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+
+var TrackballControls = function ( object, domElement ) {
+
+	OrbitControls.call( this, object, domElement );
+
+	this.fixedUp = false;
+	this.enableDamping = true;
+	this.screenSpacePanning = true;
+
+};
+
+TrackballControls.prototype = Object.create( EventDispatcher.prototype );
+TrackballControls.prototype.constructor = TrackballControls;
+
+Object.defineProperties( TrackballControls.prototype, {
+
+	noZoom: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+			return ! this.enableZoom;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .noZoom has been deprecated. Use .enableZoom instead.' );
+			this.enableZoom = ! value;
+
+		}
+
+	},
+
+	noRotate: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+			return ! this.enableRotate;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .noRotate has been deprecated. Use .enableRotate instead.' );
+			this.enableRotate = ! value;
+
+		}
+
+	},
+
+	noPan: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .noPan has been deprecated. Use .enablePan instead.' );
+			return ! this.enablePan;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .noPan has been deprecated. Use .enablePan instead.' );
+			this.enablePan = ! value;
+
+		}
+
+	},
+
+	staticMoving: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+			return ! this.enableDamping;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
+			this.enableDamping = ! value;
+
+		}
+
+	},
+
+	dynamicDampingFactor: {
+
+		get: function () {
+
+			console.warn( 'THREE.TrackballControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+			return this.dampingFactor;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.TrackballControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
+			this.dampingFactor = value;
+
+		}
+
+	}
+
+} );
+
+export { OrbitControls, MapControls, TrackballControls };

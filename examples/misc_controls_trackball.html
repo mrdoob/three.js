@@ -29,7 +29,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { TrackballControls } from './jsm/controls/OrbitControls.js';
 
 			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
@@ -141,8 +141,6 @@
 				orthographicCamera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				controls.handleResize();
 
 			}
 
