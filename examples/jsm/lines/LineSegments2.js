@@ -124,25 +124,23 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				start.applyMatrix4( projectionMatrix );
 				end.applyMatrix4( projectionMatrix );
 
-				// console.log( start.z, end.z )
-				// // segment is behind camera near
-				// if ( start.z > 0 && end.z > 0 ) {
-
-				// 	continue;
-
-				// }
-				// console.log(2 );
-
-				// // segment is in front of camera far
-				// if ( start.z < - 1 && end.z < - 1 ) {
-
-				// 	continue;
-
-				// }
-
-				// ndc space [ - 0.5, 0.5 ]
+				// ndc space [ - 1.0, 1.0 ]
 				start.multiplyScalar( 1 / start.w );
 				end.multiplyScalar( 1 / end.w );
+
+				// segment is behind camera near
+				if ( start.z < - 1 && end.z < - 1 ) {
+
+					continue;
+
+				}
+
+				// segment is in front of camera far
+				if ( start.z > 1 && end.z > 1 ) {
+
+					continue;
+
+				}
 
 				// screen space
 				start.x *= resolution.x / 2;
@@ -159,14 +157,12 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				line.end.z = 0;
 
 				// get closest point on ray to segment
-				var param = line.closestPointToPointParameter( ssOrigin, true );
+				var param = line.closestPointToPointParameter( ssOrigin3, true );
 				line.at( param, closestPoint );
 
 				// check if the intersection point is within clip space
 				var zPos = MathUtils.lerp( start.z, end.z, param );
-				var isInClipSpace = true; //zPos < 0 && zPos > - 1;
-
-				console.log(ssOrigin3 ); //ssOrigin3.distanceTo( closestPoint ), lineWidth)
+				var isInClipSpace = zPos >= -1 && zPos <= 1;
 
 				if ( isInClipSpace && ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5 ) {
 
