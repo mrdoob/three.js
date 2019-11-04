@@ -240,7 +240,7 @@
 		<p>
 		id -- Unique number of the object instance<br /><br />
 
-		Searches through the object's children and returns the first with a matching id.<br />
+		Searches through an object and its children, starting with the object itself, and returns the first with a matching id.<br />
 		Note that ids are assigned in chronological order: 1, 2, 3, ..., incrementing by one for each new object.
 		</p>
 
@@ -248,7 +248,7 @@
 		<p>
 		name -- String to match to the children's Object3D.name property. <br /><br />
 
-		Searches through the object's children and returns the first with a matching name.<br />
+		Searches through an object and its children, starting with the object itself, and returns the first with a matching name.<br />
 		Note that for most objects the name is an empty string by default. You will
 		have to set it manually to make use of this method.
 		</p>
@@ -258,7 +258,7 @@
 		name -- the property name to search for. <br />
 		value -- value of the given property. <br /><br />
 
-		Searches through the object's children and returns the first with a property that matches the value given.
+		Searches through an object and its children, starting with the object itself, and returns the first with a property that matches the value given.
 		</p>
 
 		<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
