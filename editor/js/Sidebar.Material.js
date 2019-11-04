@@ -1160,6 +1160,7 @@ Sidebar.Material = function ( editor ) {
 			'alphaMap': materialAlphaMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
+			'clearcoatNormalMap': materialClearcoatNormalMapRow,
 			'displacementMap': materialDisplacementMapRow,
 			'roughnessMap': materialRoughnessMapRow,
 			'metalnessMap': materialMetalnessMapRow,

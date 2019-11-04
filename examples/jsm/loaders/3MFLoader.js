@@ -14,12 +14,14 @@
  *
  * - Texture 2D
  * - Texture 2D Groups
+ * - Color Groups (Vertex Colors)
  */
 
 import {
 	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
+	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -34,6 +36,7 @@ import {
 	NearestFilter,
 	RepeatWrapping,
 	TextureLoader,
+	VertexColors,
 	sRGBEncoding
 } from "../../../build/three.module.js";
 
@@ -304,7 +307,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function parseTextures2DGroupNodes( texture2DGroupNode ) {
+		function parseTextures2DGroupNode( texture2DGroupNode ) {
 
 			var texture2DGroupData = {
 				id: texture2DGroupNode.getAttribute( 'id' ), // required
@@ -329,6 +332,36 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			texture2DGroupData[ 'uvs' ] = new Float32Array( uvs );
 
 			return texture2DGroupData;
+
+		}
+
+		function parseColorGroupNode( colorGroupNode ) {
+
+			var colorGroupData = {
+				id: colorGroupNode.getAttribute( 'id' ), // required
+				displaypropertiesid: colorGroupNode.getAttribute( 'displaypropertiesid' )
+			};
+
+			var colorNodes = colorGroupNode.querySelectorAll( 'color' );
+
+			var colors = [];
+			var colorObject = new Color();
+
+			for ( var i = 0; i < colorNodes.length; i ++ ) {
+
+				var colorNode = colorNodes[ i ];
+				var color = colorNode.getAttribute( 'color' );
+
+				colorObject.setStyle( color.substring( 0, 7 ) );
+				colorObject.convertSRGBToLinear(); // color is in sRGB
+
+				colors.push( colorObject.r, colorObject.g, colorObject.b );
+
+			}
+
+			colorGroupData[ 'colors' ] = new Float32Array( colors );
+
+			return colorGroupData;
 
 		}
 
@@ -588,13 +621,26 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			//
 
+			resourcesData[ 'colorgroup' ] = {};
+			var colorGroupNodes = resourcesNode.querySelectorAll( 'colorgroup' );
+
+			for ( var i = 0; i < colorGroupNodes.length; i ++ ) {
+
+				var colorGroupNode = colorGroupNodes[ i ];
+				var colorGroupData = parseColorGroupNode( colorGroupNode );
+				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
+
+			}
+
+			//
+
 			resourcesData[ 'texture2dgroup' ] = {};
 			var textures2DGroupNodes = resourcesNode.querySelectorAll( 'texture2dgroup' );
 
 			for ( var i = 0; i < textures2DGroupNodes.length; i ++ ) {
 
 				var textures2DGroupNode = textures2DGroupNodes[ i ];
-				var textures2DGroupData = parseTextures2DGroupNodes( textures2DGroupNode );
+				var textures2DGroupData = parseTextures2DGroupNode( textures2DGroupNode );
 				resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
 
 			}
@@ -898,6 +944,65 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData ) {
+
+			// geometry
+
+			var geometry = new BufferGeometry();
+
+			var positionData = [];
+			var colorData = [];
+
+			var vertices = meshData.vertices;
+			var colors = colorgroup.colors;
+
+			for ( var i = 0, l = triangleProperties.length; i < l; i ++ ) {
+
+				var triangleProperty = triangleProperties[ i ];
+
+				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( triangleProperty.v1 * 3 ) + 2 ] );
+
+				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( triangleProperty.v2 * 3 ) + 2 ] );
+
+				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 0 ] );
+				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 1 ] );
+				positionData.push( vertices[ ( triangleProperty.v3 * 3 ) + 2 ] );
+
+				//
+
+				colorData.push( colors[ ( triangleProperty.p1 * 3 ) + 0 ] );
+				colorData.push( colors[ ( triangleProperty.p1 * 3 ) + 1 ] );
+				colorData.push( colors[ ( triangleProperty.p1 * 3 ) + 3 ] );
+
+				colorData.push( colors[ ( triangleProperty.p2 * 3 ) + 0 ] );
+				colorData.push( colors[ ( triangleProperty.p2 * 3 ) + 1 ] );
+				colorData.push( colors[ ( triangleProperty.p2 * 3 ) + 2 ] );
+
+				colorData.push( colors[ ( triangleProperty.p3 * 3 ) + 0 ] );
+				colorData.push( colors[ ( triangleProperty.p3 * 3 ) + 1 ] );
+				colorData.push( colors[ ( triangleProperty.p3 * 3 ) + 2 ] );
+
+			}
+
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positionData, 3 ) );
+			geometry.setAttribute( 'color', new Float32BufferAttribute( colorData, 3 ) );
+
+			// material
+
+			var material = new MeshPhongMaterial( { vertexColors: VertexColors, flatShading: true } );
+
+			// mesh
+
+			var mesh = new Mesh( geometry, material );
+
+			return mesh;
+
+		}
+
 		function buildDefaultMesh( meshData ) {
 
 			var geometry = new BufferGeometry();
@@ -917,7 +1022,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var keys = Object.keys( resourceMap );
 			var meshes = [];
 
-			for ( var i = 0; i < keys.length; i ++ ) {
+			for ( var i = 0, il = keys.length; i < il; i ++ ) {
 
 				var resourceId = keys[ i ];
 				var triangleProperties = resourceMap[ resourceId ];
@@ -929,9 +1034,9 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						var basematerials = modelData.resources.basematerials[ resourceId ];
 						var newMeshes = buildBasematerialsMeshes( basematerials, triangleProperties, modelData, meshData, textureData, objectData );
 
-						for ( var i = 0, l = newMeshes.length; i < l; i ++ ) {
+						for ( var j = 0, jl = newMeshes.length; j < jl; j ++ ) {
 
-							meshes.push( newMeshes[ i ] );
+							meshes.push( newMeshes[ j ] );
 
 						}
 						break;
@@ -939,6 +1044,11 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					case 'texture':
 						var texture2dgroup = modelData.resources.texture2dgroup[ resourceId ];
 						meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData ) );
+						break;
+
+					case 'vertexColors':
+						var colorgroup = modelData.resources.colorgroup[ resourceId ];
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, textureData ) );
 						break;
 
 					case 'default':
@@ -965,6 +1075,10 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			} else if ( modelData.resources.basematerials[ pid ] !== undefined ) {
 
 				return 'material';
+
+			} else if ( modelData.resources.colorgroup[ pid ] !== undefined ) {
+
+				return 'vertexColors';
 
 			} else if ( pid === 'default' ) {
 
