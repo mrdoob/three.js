@@ -582,10 +582,10 @@ gui.add(new StringToNumberHelper(texture, 'wrapS'), 'value', wrapModes)
 gui.add(new StringToNumberHelper(texture, 'wrapT'), 'value', wrapModes)
   .name('texture.wrapT')
   .onChange(updateTexture);
-gui.add(texture.repeat, 'x', 0, 5).name('texture.repeat.x');
-gui.add(texture.repeat, 'y', 0, 5).name('texture.repeat.y');
-gui.add(texture.offset, 'x', -2, 2).name('texture.offset.x');
-gui.add(texture.offset, 'y', -2, 2).name('texture.offset.y');
+gui.add(texture.repeat, 'x', 0, 5, .01).name('texture.repeat.x');
+gui.add(texture.repeat, 'y', 0, 5, .01).name('texture.repeat.y');
+gui.add(texture.offset, 'x', -2, 2, .01).name('texture.offset.x');
+gui.add(texture.offset, 'y', -2, 2, .01).name('texture.offset.y');
 gui.add(texture.center, 'x', -.5, 1.5, .01).name('texture.center.x');
 gui.add(texture.center, 'y', -.5, 1.5, .01).name('texture.center.y');
 gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
