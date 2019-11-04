@@ -15,6 +15,7 @@
  * - Texture 2D
  * - Texture 2D Groups
  * - Color Groups (Vertex Colors)
+ * - Metallic Display Properties (PBR)
  */
 
 import {
@@ -1028,7 +1029,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				colorData.push( colors[ ( p1 * 3 ) + 0 ] );
 				colorData.push( colors[ ( p1 * 3 ) + 1 ] );
-				colorData.push( colors[ ( p1 * 3 ) + 3 ] );
+				colorData.push( colors[ ( p1 * 3 ) + 2 ] );
 
 				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 0 ] );
 				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 1 ] );
