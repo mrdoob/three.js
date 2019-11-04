@@ -46,6 +46,17 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 	parse: function ( data ) {
 
+		function getZippedFileContentSync(zip, fileName, dataType) {
+			return zip.sync(() => {
+				let data;
+				zip
+					.file(fileName)
+					.async(dataType)
+					.then(_data => (data = _data));
+				return data;
+			});
+		}
+
 		var scope = this;
 		var textureLoader = new THREE.TextureLoader( this.manager );
 
@@ -69,18 +80,17 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			var otherParts = {};
 
 			try {
-
-				zip = new JSZip( data ); // eslint-disable-line no-undef
-
-			} catch ( e ) {
-
-				if ( e instanceof ReferenceError ) {
-
-					console.error( 'THREE.3MFLoader: jszip missing and file is compressed.' );
+				zip = new JSZip(); // eslint-disable-line no-undef
+				zip.sync(() => {
+					JSZip.loadAsync(data).then(_zip => (zip = _zip));
+				});
+			} catch (e) {
+				if (e instanceof ReferenceError) {
+					console.error(
+						"THREE.3MFLoader: JSZip (sync) is missing and file is compressed. See https://www.npmjs.com/package/jszip-sync."
+					);
 					return null;
-
 				}
-
 			}
 
 			for ( file in zip.files ) {
@@ -115,7 +125,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			//
 
-			var relsView = new Uint8Array( zip.file( relsName ).asArrayBuffer() );
+			var relsView = new Uint8Array( getZippedFileContentSync(zip, relsName, "arraybuffer") );
 			var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 			rels = parseRelsXml( relsFileText );
 
@@ -123,7 +133,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			if ( modelRelsName ) {
 
-				var relsView = new Uint8Array( zip.file( modelRelsName ).asArrayBuffer() );
+				var relsView = new Uint8Array( getZippedFileContentSync(zip, modelRelsName, "arraybuffer") );
 				var relsFileText = THREE.LoaderUtils.decodeText( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
@@ -134,7 +144,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 			for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
 				var modelPart = modelPartNames[ i ];
-				var view = new Uint8Array( zip.file( modelPart ).asArrayBuffer() );
+				var view = new Uint8Array( getZippedFileContentSync(zip, modelPart, "arraybuffer") );
 
 				var fileText = THREE.LoaderUtils.decodeText( view );
 				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
