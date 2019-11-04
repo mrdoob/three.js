@@ -1154,7 +1154,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 					} else {
 
-						throw 'EXRLoader._parser: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+						throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
 
 					}
 
@@ -1209,7 +1209,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						} else {
 
-							throw 'EXRLoader._parser: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+							throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
 
 						}
 
@@ -1221,7 +1221,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		} else {
 
-			throw 'EXRLoader._parser: ' + EXRHeader.compression + ' is unsupported';
+			throw 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported';
 
 		}
 
