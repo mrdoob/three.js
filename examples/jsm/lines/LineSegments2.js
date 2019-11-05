@@ -7,6 +7,7 @@ import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Line3,
+	Math as _Math,
 	Matrix4,
 	Mesh,
 	Vector3,
@@ -134,15 +135,10 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				start.multiplyScalar( 1 / start.w );
 				end.multiplyScalar( 1 / end.w );
 
-				// segment is behind camera near
-				if ( start.z < - 1 && end.z < - 1 ) {
-
-					continue;
-
-				}
-
-				// segment is in front of camera far
-				if ( start.z > 1 && end.z > 1 ) {
+				// skip the segment if it's outside the camera near and far planes
+				var isBehindCameraNear = start.z < - 1 && end.z < - 1;
+				var isPastCameraFar = start.z > 1 && end.z > 1;
+				if ( isBehindCameraNear || isPastCameraFar ) {
 
 					continue;
 
@@ -167,10 +163,12 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				line.at( param, closestPoint );
 
 				// check if the intersection point is within clip space
-				var zPos = MathUtils.lerp( start.z, end.z, param );
+				var zPos = _Math.lerp( start.z, end.z, param );
 				var isInClipSpace = zPos >= -1 && zPos <= 1;
 
-				if ( isInClipSpace && ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5 ) {
+				var isInside = ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5;
+
+				if ( isInClipSpace && isInside ) {
 
 					line.start.fromBufferAttribute( instanceStart, i );
 					line.end.fromBufferAttribute( instanceEnd, i );
@@ -179,10 +177,9 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 					line.end.applyMatrix4( matrixWorld );
 
 					var pointOnLine = new Vector3();
-					line.at( param, pointOnLine );
-
 					var point = new Vector3();
-					ray.closestPointToPoint( pointOnLine, point );
+
+					ray.distanceSqToSegment( line.start, line.end, point, pointOnLine );
 
 					intersects.push( {
 
