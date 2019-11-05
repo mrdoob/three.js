@@ -86,7 +86,6 @@ export * from './animation/AnimationUtils';
 export * from './animation/AnimationObjectGroup';
 export * from './animation/AnimationMixer';
 export * from './animation/AnimationClip';
-export * from './animation/AnimationAction';
 export * from './core/Uniform';
 export * from './core/InstancedBufferGeometry';
 export * from './core/BufferGeometry';
