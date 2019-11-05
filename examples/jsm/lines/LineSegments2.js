@@ -98,7 +98,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
 
-			// ndc space [ - 0.5, 0.5 ]
+			// ndc space [ - 1.0, 1.0 ]
 			ray.at( 1, ssOrigin );
 			ssOrigin.w = 1;
 			ssOrigin.applyMatrix4( camera.matrixWorldInverse );
