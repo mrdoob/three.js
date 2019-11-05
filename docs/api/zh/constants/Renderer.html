@@ -46,8 +46,8 @@
 
 		[page:constant BasicShadowMap] 能够给出没有经过过滤的阴影映射 —— 速度最快，但质量最差。<br />
 		[page:constant PCFShadowMap] 为默认值，使用Percentage-Closer Filtering (PCF)算法来过滤阴影映射。<br />
-		[page:constant PCFSoftShadowMap] 使用Percentage-Closer Soft Shadows (PCSS) 算法来过滤阴影映射。<br />
-		[page:constant VSMShadowMap] filters shadow maps using the Variance Shadow Map (VSM) algorithm.
+		[page:constant PCFSoftShadowMap] 使用Percentage-Closer Soft Shadows (PCSS)算法来过滤阴影映射。<br />
+		[page:constant VSMShadowMap] 使用Variance Shadow Map (VSM)算法来过滤阴影映射。当使用VSMShadowMap时，所有阴影接收者也将会投射阴影。
 		</p>
 
 		<h2>色调映射</h2>
@@ -59,9 +59,9 @@
 		THREE.CineonToneMapping
 		</code>
 		<p>
-				这些常量定义了WebGLRenderer中[page:WebGLRenderer.toneMapping toneMapping]的属性。
+		这些常量定义了WebGLRenderer中[page:WebGLRenderer.toneMapping toneMapping]的属性。
 
-				这个属性用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围（HDR）效果。<br /><br />
+		这个属性用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围（HDR）效果。<br /><br />
 
 		[page:constant NoToneMapping] 禁用色调映射。<br />
 		[page:constant LinearToneMapping] 为默认值，线性色调映射。<br /><br />

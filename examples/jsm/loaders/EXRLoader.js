@@ -12,6 +12,8 @@ import {
 	DataTextureLoader,
 	FloatType,
 	HalfFloatType,
+	LinearEncoding,
+	LinearFilter,
 	RGBAFormat,
 	RGBFormat
 } from "../../../build/three.module.js";
@@ -92,13 +94,6 @@ var EXRLoader = function ( manager ) {
 EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype ), {
 
 	constructor: EXRLoader,
-
-	setDataType: function ( value ) {
-
-		this.type = value;
-		return this;
-
-	},
 
 	parse: function ( buffer ) {
 
@@ -1238,6 +1233,47 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			format: EXRHeader.channels.length == 4 ? RGBAFormat : RGBFormat,
 			type: this.type
 		};
+
+	},
+
+	setDataType: function ( value ) {
+
+		this.type = value;
+		return this;
+
+	},
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		function onLoadCallback( texture, texData ) {
+
+			switch ( texture.type ) {
+
+				case FloatType:
+
+					texture.encoding = LinearEncoding;
+					texture.minFilter = LinearFilter;
+					texture.magFilter = LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = false;
+					break;
+
+				case HalfFloatType:
+
+					texture.encoding = LinearEncoding;
+					texture.minFilter = LinearFilter;
+					texture.magFilter = LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = false;
+					break;
+
+			}
+
+			if ( onLoad ) onLoad( texture, texData );
+
+		}
+
+		return DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
 
 	}
 

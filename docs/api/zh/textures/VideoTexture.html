@@ -18,7 +18,7 @@
 		它和其基类[page:Texture Texture]几乎是相同的，除了它总是将[page:Texture.needsUpdate needsUpdate]设置为*true*，以便使得贴图能够在视频播放时进行更新。自动创建[page:Texture.mipmaps mipmaps]也会被禁用。
 		</p>
 
-    <h2>示例</h2>
+	<h2>示例</h2>
 
 		<p>[example:webgl_materials_video materials / video ]</p>
 
@@ -30,7 +30,7 @@ var texture = new THREE.VideoTexture( video );
 texture.minFilter = THREE.LinearFilter;
 texture.magFilter = THREE.LinearFilter;
 texture.format = THREE.RGBFormat;
-    </code>
+		</code>
 
 
 		<h2>构造函数</h2>
@@ -53,11 +53,11 @@ texture.format = THREE.RGBFormat;
 		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
 		其默认值为[page:Textures THREE.LinearMipmapLinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
 
-    	[page:Constant format] -- 在纹理贴图中使用的格式。
-     	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
+		[page:Constant format] -- 在纹理贴图中使用的格式。
+	 	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
 
-    	[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
-     	请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
+		[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
+	 	请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
 
 		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的采样数。
 		默认情况下，这个值为1。设置一个较高的值将会比基本的mipmap产生更清晰的效果，代价是需要使用更多纹理样本。
@@ -69,7 +69,7 @@ texture.format = THREE.RGBFormat;
 
 		<p>
 		共有属性请参见其基类[page:Texture Texture]。
-    </p>
+	</p>
 
 		<h3>[property:boolean needsUpdate]</h3>
 		<p>
@@ -78,11 +78,11 @@ texture.format = THREE.RGBFormat;
 
 		<h2>方法</h2>
 
-    <p>
+	<p>
 		共有方法请参见其基类[page:Texture Texture]。
-    </p>
+	</p>
 
-    <h3>[method:null update]()</h3>
+	<h3>[method:null update]()</h3>
 		<p>
 		在每一次新的一帧可用时，这个方法将被自动调用，
 		并将[property:boolean needsUpdate]设置为*true*。
