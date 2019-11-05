@@ -122,15 +122,10 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 				start.multiplyScalar( 1 / start.w );
 				end.multiplyScalar( 1 / end.w );
 
-				// segment is behind camera near
-				if ( start.z < - 1 && end.z < - 1 ) {
-
-					continue;
-
-				}
-
-				// segment is in front of camera far
-				if ( start.z > 1 && end.z > 1 ) {
+				// skip the segment if it's outside the camera near and far planes
+				var isBehindCameraNear = start.z < - 1 && end.z < - 1;
+				var isPastCameraFar = start.z > 1 && end.z > 1;
+				if ( isBehindCameraNear || isPastCameraFar ) {
 
 					continue;
 
