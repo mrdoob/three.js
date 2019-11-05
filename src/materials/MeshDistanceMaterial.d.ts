@@ -6,6 +6,7 @@ export interface MeshDistanceMaterialParameters extends MaterialParameters {
 	referencePosition?: Vector3;
 	nearDistance?: number;
 	farDistance?: number;
+	alphaMap?: Texture | null;
 	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
