@@ -1,11 +1,19 @@
-import { Matrix4, Vector3, Vector4, Line3, Math as MathUtils, Mesh, InstancedInterleavedBuffer, InterleavedBufferAttribute  } from "../../../build/three.module.js";
-import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
-import { LineMaterial } from "../lines/LineMaterial.js";
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
  */
+
+import {
+	InstancedInterleavedBuffer,
+	InterleavedBufferAttribute,
+	Line3,
+	Matrix4,
+	Mesh,
+	Vector3,
+	Vector4
+} from "../../../build/three.module.js";
+import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
+import { LineMaterial } from "../lines/LineMaterial.js";
 
 var LineSegments2 = function ( geometry, material ) {
 
