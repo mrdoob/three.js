@@ -97,7 +97,7 @@
 
 	}
 
-	var REVISION = '110';
+	var REVISION = '111dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	var CullFaceNone = 0;
@@ -9819,6 +9819,7 @@
 		this.attributes = {};
 
 		this.morphAttributes = {};
+		this.morphTargetsRelative = false;
 
 		this.groups = [];
 
@@ -10355,8 +10356,20 @@
 						var morphAttribute = morphAttributesPosition[ i ];
 						_box$1.setFromBufferAttribute( morphAttribute );
 
-						this.boundingBox.expandByPoint( _box$1.min );
-						this.boundingBox.expandByPoint( _box$1.max );
+						if ( this.morphTargetsRelative ) {
+
+							_vector$4.addVectors( this.boundingBox.min, _box$1.min );
+							this.boundingBox.expandByPoint( _vector$4 );
+
+							_vector$4.addVectors( this.boundingBox.max, _box$1.max );
+							this.boundingBox.expandByPoint( _vector$4 );
+
+						} else {
+
+							this.boundingBox.expandByPoint( _box$1.min );
+							this.boundingBox.expandByPoint( _box$1.max );
+
+						}
 
 					}
 
@@ -10404,8 +10417,20 @@
 						var morphAttribute = morphAttributesPosition[ i ];
 						_boxMorphTargets.setFromBufferAttribute( morphAttribute );
 
-						_box$1.expandByPoint( _boxMorphTargets.min );
-						_box$1.expandByPoint( _boxMorphTargets.max );
+						if ( this.morphTargetsRelative ) {
+
+							_vector$4.addVectors( _box$1.min, _boxMorphTargets.min );
+							_box$1.expandByPoint( _vector$4 );
+
+							_vector$4.addVectors( _box$1.max, _boxMorphTargets.max );
+							_box$1.expandByPoint( _vector$4 );
+
+						} else {
+
+							_box$1.expandByPoint( _boxMorphTargets.min );
+							_box$1.expandByPoint( _boxMorphTargets.max );
+
+						}
 
 					}
 
@@ -10433,10 +10458,18 @@
 					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
 						var morphAttribute = morphAttributesPosition[ i ];
+						var morphTargetsRelative = this.morphTargetsRelative;
 
 						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
 							_vector$4.fromBufferAttribute( morphAttribute, j );
+
+							if ( morphTargetsRelative ) {
+
+								_offset.fromBufferAttribute( position, j );
+								_vector$4.add( _offset );
+
+							}
 
 							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$4 ) );
 
@@ -10710,6 +10743,8 @@
 
 			}
 
+			geometry2.morphTargetsRelative = this.morphTargetsRelative;
+
 			// groups
 
 			var groups = this.groups;
@@ -10814,7 +10849,12 @@
 
 			}
 
-			if ( hasMorphAttributes ) { data.data.morphAttributes = morphAttributes; }
+			if ( hasMorphAttributes ) {
+
+				data.data.morphAttributes = morphAttributes;
+				data.data.morphTargetsRelative = this.morphTargetsRelative;
+
+			}
 
 			var groups = this.groups;
 
@@ -10925,6 +10965,8 @@
 				this.morphAttributes[ name ] = array;
 
 			}
+
+			this.morphTargetsRelative = source.morphTargetsRelative;
 
 			// groups
 
@@ -11150,6 +11192,7 @@
 				var index = geometry.index;
 				var position = geometry.attributes.position;
 				var morphPosition = geometry.morphAttributes.position;
+				var morphTargetsRelative = geometry.morphTargetsRelative;
 				var uv = geometry.attributes.uv;
 				var uv2 = geometry.attributes.uv2;
 				var groups = geometry.groups;
@@ -11178,7 +11221,7 @@
 								b = index.getX( j + 1 );
 								c = index.getX( j + 2 );
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 								if ( intersection ) {
 
@@ -11203,7 +11246,7 @@
 							b = index.getX( i + 1 );
 							c = index.getX( i + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 
@@ -11236,7 +11279,7 @@
 								b = j + 1;
 								c = j + 2;
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 								if ( intersection ) {
 
@@ -11261,7 +11304,7 @@
 							b = i + 1;
 							c = i + 2;
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 
@@ -11365,7 +11408,7 @@
 
 	}
 
-	function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, uv, uv2, a, b, c ) {
+	function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c ) {
 
 		_vA.fromBufferAttribute( position, a );
 		_vB.fromBufferAttribute( position, b );
@@ -11390,9 +11433,19 @@
 				_tempB.fromBufferAttribute( morphAttribute, b );
 				_tempC.fromBufferAttribute( morphAttribute, c );
 
-				_morphA.addScaledVector( _tempA.sub( _vA ), influence );
-				_morphB.addScaledVector( _tempB.sub( _vB ), influence );
-				_morphC.addScaledVector( _tempC.sub( _vC ), influence );
+				if ( morphTargetsRelative ) {
+
+					_morphA.addScaledVector( _tempA, influence );
+					_morphB.addScaledVector( _tempB, influence );
+					_morphC.addScaledVector( _tempC, influence );
+
+				} else {
+
+					_morphA.addScaledVector( _tempA.sub( _vA ), influence );
+					_morphB.addScaledVector( _tempB.sub( _vB ), influence );
+					_morphC.addScaledVector( _tempC.sub( _vC ), influence );
+
+				}
 
 			}
 
@@ -14144,11 +14197,11 @@
 
 	var metalnessmap_pars_fragment = "#ifdef USE_METALNESSMAP\n\tuniform sampler2D metalnessMap;\n#endif";
 
-	var morphnormal_vertex = "#ifdef USE_MORPHNORMALS\n\tobjectNormal += ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];\n\tobjectNormal += ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];\n\tobjectNormal += ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];\n\tobjectNormal += ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];\n#endif";
+	var morphnormal_vertex = "#ifdef USE_MORPHNORMALS\n\tobjectNormal *= morphTargetBaseInfluence;\n\tobjectNormal += morphNormal0 * morphTargetInfluences[ 0 ];\n\tobjectNormal += morphNormal1 * morphTargetInfluences[ 1 ];\n\tobjectNormal += morphNormal2 * morphTargetInfluences[ 2 ];\n\tobjectNormal += morphNormal3 * morphTargetInfluences[ 3 ];\n#endif";
 
-	var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_MORPHNORMALS\n\tuniform float morphTargetInfluences[ 8 ];\n\t#else\n\tuniform float morphTargetInfluences[ 4 ];\n\t#endif\n#endif";
+	var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\tuniform float morphTargetBaseInfluence;\n\t#ifndef USE_MORPHNORMALS\n\tuniform float morphTargetInfluences[ 8 ];\n\t#else\n\tuniform float morphTargetInfluences[ 4 ];\n\t#endif\n#endif";
 
-	var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed += ( morphTarget0 - position ) * morphTargetInfluences[ 0 ];\n\ttransformed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];\n\ttransformed += ( morphTarget2 - position ) * morphTargetInfluences[ 2 ];\n\ttransformed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];\n\t#ifndef USE_MORPHNORMALS\n\ttransformed += ( morphTarget4 - position ) * morphTargetInfluences[ 4 ];\n\ttransformed += ( morphTarget5 - position ) * morphTargetInfluences[ 5 ];\n\ttransformed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];\n\ttransformed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];\n\t#endif\n#endif";
+	var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetBaseInfluence;\n\ttransformed += morphTarget0 * morphTargetInfluences[ 0 ];\n\ttransformed += morphTarget1 * morphTargetInfluences[ 1 ];\n\ttransformed += morphTarget2 * morphTargetInfluences[ 2 ];\n\ttransformed += morphTarget3 * morphTargetInfluences[ 3 ];\n\t#ifndef USE_MORPHNORMALS\n\ttransformed += morphTarget4 * morphTargetInfluences[ 4 ];\n\ttransformed += morphTarget5 * morphTargetInfluences[ 5 ];\n\ttransformed += morphTarget6 * morphTargetInfluences[ 6 ];\n\ttransformed += morphTarget7 * morphTargetInfluences[ 7 ];\n\t#endif\n#endif";
 
 	var normal_fragment_begin = "#ifdef FLAT_SHADED\n\tvec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );\n\tvec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t#endif\n\t#ifdef USE_TANGENT\n\t\tvec3 tangent = normalize( vTangent );\n\t\tvec3 bitangent = normalize( vBitangent );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\ttangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t\tbitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t#endif\n\t#endif\n#endif\nvec3 geometryNormal = normal;";
 
@@ -16250,6 +16303,8 @@
 
 			// Add morphAttributes
 
+			var morphInfluencesSum = 0;
+
 			for ( var i = 0; i < 8; i ++ ) {
 
 				var influence = influences[ i ];
@@ -16265,6 +16320,7 @@
 						if ( morphNormals ) { geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] ); }
 
 						morphInfluences[ i ] = value;
+						morphInfluencesSum += value;
 						continue;
 
 					}
@@ -16275,6 +16331,12 @@
 
 			}
 
+			// GLSL shader uses formula baseinfluence * base + sum(target * influence)
+			// This allows us to switch between absolute morphs and relative morphs without changing shader code
+			// When baseinfluence = 1 - sum(influence), the above is equivalent to sum((target - base) * influence)
+			var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
+
+			program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
 			program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
 
 		}
@@ -23724,7 +23786,7 @@
 
 		// vr
 
-		var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator && 'isSessionSupported' in navigator.xr ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+		var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
 		this.vr = vr;
 
@@ -39488,6 +39550,14 @@
 					geometry.morphAttributes[ key ] = array;
 
 				}
+
+			}
+
+			var morphTargetsRelative = json.data.morphTargetsRelative;
+
+			if ( morphTargetsRelative ) {
+
+				geometry.morphTargetsRelative = true;
 
 			}
 
