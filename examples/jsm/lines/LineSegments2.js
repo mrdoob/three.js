@@ -73,7 +73,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			if ( raycaster.camera === null ) {
 
-				console.error( 'LineSegments2: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
+				console.error( 'LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2.' );
 
 			}
 
@@ -107,8 +107,6 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
 
 			for ( var i = 0, l = instanceStart.count; i < l; i ++ ) {
-
-				// TODO: Maybe have to clip the line based on the camera?
 
 				start.fromBufferAttribute( instanceStart, i );
 				end.fromBufferAttribute( instanceEnd, i );
