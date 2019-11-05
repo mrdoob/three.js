@@ -208,6 +208,8 @@ var BufferGeometryUtils = {
 		var attributes = {};
 		var morphAttributes = {};
 
+		var morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
+
 		var mergedGeometry = new BufferGeometry();
 
 		var offset = 0;
@@ -233,6 +235,8 @@ var BufferGeometryUtils = {
 			}
 
 			// gather morph attributes, exit early if they're different
+
+			if ( morphTargetsRelative !== geometry.morphTargetsRelative ) return null;
 
 			for ( var name in geometry.morphAttributes ) {
 
