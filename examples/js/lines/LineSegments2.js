@@ -1,5 +1,3 @@
-import { Matrix4, Vector3, Line, Math as MathUtils } from "../../../build/three.module.js";
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
@@ -58,19 +56,20 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 	raycast: ( function () {
 
-		var start = new Vector4();
-		var end = new Vector4();
+		var start = new THREE.Vector4();
+		var end = new THREE.Vector4();
 
-		var ssOrigin = new Vector4();
-		var mvMatrix = new Matrix4();
-		var line = new Line();
-		var closestPoint = new Vector3();
+		var ssOrigin = new THREE.Vector4();
+		var ssOrigin3 = new THREE.Vector3();
+		var mvMatrix = new THREE.Matrix4();
+		var line = new THREE.Line3();
+		var closestPoint = new THREE.Vector3();
 
 		return function raycast( raycaster, intersects ) {
 
 			if ( raycaster.camera === null ) {
 
-				console.error( 'THREE.LineSegments2: "Raycaster.camera" needs to be set in order to raycast against sprites.' );
+				console.error( 'LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2.' );
 
 			}
 
@@ -81,29 +80,29 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			var geometry = this.geometry;
 			var material = this.material;
 			var resolution = material.resolution;
-			var lineWidth = material.lineWidth;
+			var lineWidth = material.linewidth;
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
 
 			// ndc space [ - 0.5, 0.5 ]
-			ssOrigin.copy( ray.origin );
+			ray.at( 1, ssOrigin );
 			ssOrigin.w = 1;
 			ssOrigin.applyMatrix4( camera.matrixWorldInverse );
 			ssOrigin.applyMatrix4( projectionMatrix );
 			ssOrigin.multiplyScalar( 1 / ssOrigin.w );
 
 			// screen space
-			ssOrigin.x *= resolution.x;
-			ssOrigin.y *= resolution.y;
+			ssOrigin.x *= resolution.x / 2;
+			ssOrigin.y *= resolution.y / 2;
 			ssOrigin.z = 0;
+
+			ssOrigin3.copy( ssOrigin );
 
 			var matrixWorld = this.matrixWorld;
 			mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
 
 			for ( var i = 0, l = instanceStart.count; i < l; i ++ ) {
-
-				// TODO: Maybe have to clip the line based on the camera?
 
 				start.fromBufferAttribute( instanceStart, i );
 				end.fromBufferAttribute( instanceEnd, i );
@@ -119,30 +118,30 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 				start.applyMatrix4( projectionMatrix );
 				end.applyMatrix4( projectionMatrix );
 
+				// ndc space [ - 1.0, 1.0 ]
+				start.multiplyScalar( 1 / start.w );
+				end.multiplyScalar( 1 / end.w );
+
 				// segment is behind camera near
-				if ( start.z > 0 && end.z > 0 ) {
-
-					continue;
-
-				}
-
-				// segment is in front of camera far
 				if ( start.z < - 1 && end.z < - 1 ) {
 
 					continue;
 
 				}
 
-				// ndc space [ - 0.5, 0.5 ]
-				start.multiplyScalar( 1 / start.w );
-				end.multiplyScalar( 1 / end.w );
+				// segment is in front of camera far
+				if ( start.z > 1 && end.z > 1 ) {
+
+					continue;
+
+				}
 
 				// screen space
-				start.x *= resolution.x;
-				start.y *= resolution.y;
+				start.x *= resolution.x / 2;
+				start.y *= resolution.y / 2;
 
-				end.y *= resolution.y;
-				end.y *= resolution.y;
+				end.x *= resolution.x / 2;
+				end.y *= resolution.y / 2;
 
 				// create 2d segment
 				line.start.copy( start );
@@ -152,14 +151,14 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 				line.end.z = 0;
 
 				// get closest point on ray to segment
-				var param = line.closestPointToPointParameter( ssOrigin, true );
+				var param = line.closestPointToPointParameter( ssOrigin3, true );
 				line.at( param, closestPoint );
 
 				// check if the intersection point is within clip space
 				var zPos = MathUtils.lerp( start.z, end.z, param );
-				var isInClipSpace = zPos < 0 && zPos > - 1;
+				var isInClipSpace = zPos >= -1 && zPos <= 1;
 
-				if ( isInClipSpace && ssOrigin.distanceTo( closestPoint ) < lineWidth * 0.5 ) {
+				if ( isInClipSpace && ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5 ) {
 
 					line.start.fromBufferAttribute( instanceStart, i );
 					line.end.fromBufferAttribute( instanceEnd, i );
@@ -167,10 +166,10 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 					line.start.applyMatrix4( matrixWorld );
 					line.end.applyMatrix4( matrixWorld );
 
-					var pointOnLine = new Vector3();
+					var pointOnLine = new THREE.Vector3();
 					line.at( param, pointOnLine );
 
-					var point = new Vector3();
+					var point = new THREE.Vector3();
 					ray.closestPointToPoint( pointOnLine, point );
 
 					intersects.push( {
