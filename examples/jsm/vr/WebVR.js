@@ -171,7 +171,7 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'isSessionSupported' in navigator.xr ) {
+		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';
