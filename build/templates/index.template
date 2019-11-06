@@ -98,73 +98,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </div>
   </div>
 </div>
+{{{include "build/templates/repobanner.template"}}}
 <iframe class="background" src="/threejs/background.html"></iframe>
-<style>
-#forkongithub a {
-    background: #000;
-    color: #fff;
-    text-decoration: none;
-    font-family: arial,sans-serif;
-    text-align: center;
-    font-weight: bold;
-    padding: 5px 40px;
-    font-size: 0.9rem;
-    line-height: 2rem;
-    position: relative;
-    transition: 0.5s;
-    display: block;
-    width: 300px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    transform: translateX(150px) rotate(45deg) translate(10px,70px);
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
-    pointer-events: auto;
-}
-#forkongithub a:hover {
-    background: #c11;
-    color: #fff;
-}
-#forkongithub a::before,#forkongithub a::after {
-    content: "";
-    width: 100%;
-    display: block;
-    position: absolute;
-    top: 1px;
-    left: 0;
-    height: 1px;
-    background: #fff;
-}
-#forkongithub a::after {
-    bottom: 1px;
-    top: auto;
-}
-
-#forkongithub{
-    z-index: 9999;
-    /* needed for firefox */
-    overflow: hidden;
-    width: 300px;
-    height: 300px;
-    position: absolute;
-    right: 0;
-    top: 0;
-    pointer-events: none;
-}
-@media (max-width: 900px) {
-    #forkongithub a{
-        line-height: 1.2rem;
-    }
-}
-@media (max-width: 410px) {
-    #forkongithub a{
-        font-size: 0.7rem;
-        transform: translateX(150px) rotate(45deg) translate(20px,40px);
-    }
-}
-
-</style>
-<div id="forkongithub"><a href="https://github.com/gfxfundamentals/threejsfundamentals">Fix or Fork me on GitHub</a></div>
 </body>
 <script src="/3rdparty/jquery-3.3.1.slim.min.js"></script>
 <script src="/threejs/lessons/resources/lesson.js"></script>

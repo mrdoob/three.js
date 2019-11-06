@@ -123,6 +123,7 @@ div[data-diagram] {
     background-position: center, center;
     padding: 1em;
     text-align: center;
+    position: relative;
 }
 .threejs_header h1 {
     font-size: 5vw;
