@@ -58,7 +58,7 @@
 				// as soon as that will get solved we will update the code so it will be
 				// transparent for the user and you could use this extension with or without multisampled
 				// contexts
-				var context = canvas.getContext( 'webgl2', { antialias: false } );
+				var context = canvas.getContext( 'webgl2', { antialias: false, xrCompatible: true } );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 
