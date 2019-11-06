@@ -87,6 +87,12 @@ div[data-diagram] {
   border: 1px solid black;
 }
 
+.lesson-comment-notes {
+  padding: 1em;
+  margin: 1em;
+  background: #DDD;
+  color: red;
+}
 
 .threejs_navbar>div,
 .lesson-title,
@@ -555,6 +561,9 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   }
   div.threejs_bottombar code {
     background-color: #348;
+  }
+  .lesson-comment-notes {
+    background: #222;
   }
 }
 
