@@ -774,7 +774,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			}
 
-			var inflate = new Zlib.Inflate( compressed ); // eslint-disable-line no-undef
+			var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 
 			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
 			var tmpBuffer = new Uint8Array( rawBuffer.length );
@@ -1294,13 +1294,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 					for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
 
-						var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+						for ( var x = 0; x < width; x ++ ) {
 
-						if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
+							var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
 
-							for ( var x = 0; x < width; x ++ ) {
+							var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
 
-								var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
+							if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
 
 								switch ( this.type ) {
 
@@ -1316,17 +1316,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 								}
 
-								var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
-
-								byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
-
-							}
-
-						} else if ( EXRHeader.channels[ channelID ].pixelType === 2 ) { // float
-
-							for ( var x = 0; x < width; x ++ ) {
-
-								var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
+							} else if ( EXRHeader.channels[ channelID ].pixelType === 2 ) { // float
 
 								switch ( this.type ) {
 
@@ -1338,20 +1328,19 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 									case THREE.HalfFloatType:
 
 										throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.'
-
 								}
 
-								var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+							} else {
 
-								byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+								throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + ' for ' + EXRHeader.compression + '.';
 
 							}
 
-						} else {
+							var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
 
-							throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + ' for ' + EXRHeader.compression + '.';
+							byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
-						}
+						}	
 
 					}
 
