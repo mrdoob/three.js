@@ -8,8 +8,6 @@
  * implementation, so I have preserved their copyright notices.
  */
 
-// import { Zlib } from "../libs/inflate.module.min.js";
-
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
 // All rights reserved.
