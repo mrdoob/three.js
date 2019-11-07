@@ -1304,12 +1304,12 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 								switch ( this.type ) {
 
-									case FloatType:
+									case THREE.FloatType:
 
 										var val = decodeFloat16( raw[ idx ] );
 										break;
 
-									case HalfFloatType:
+									case THREE.HalfFloatType:
 
 										var val = raw[ idx ];
 										break;
@@ -1330,12 +1330,12 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 								switch ( this.type ) {
 
-									case FloatType:
+									case THREE.FloatType:
 
 										var val = raw[ idx ];
 										break;
 
-									case HalfFloatType:
+									case THREE.HalfFloatType:
 
 										throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.'
 
