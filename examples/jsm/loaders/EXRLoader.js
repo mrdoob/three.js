@@ -17,6 +17,7 @@ import {
 	RGBAFormat,
 	RGBFormat
 } from "../../../build/three.module.js";
+import { Zlib } from "../libs/inflate.module.min.js";
 
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
@@ -772,6 +773,71 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function decompressZIP( inDataView, offset, compressedSize, pixelType ) {
+
+			var raw;
+
+			var compressed = new Uint8Array( inDataView.buffer.slice( offset.value, offset.value + compressedSize ) );
+
+			if ( typeof Zlib === 'undefined' ) {
+
+				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+
+			}
+
+			var inflate = new Zlib.Inflate( compressed ); // eslint-disable-line no-undef
+
+			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
+			var tmpBuffer = new Uint8Array( rawBuffer.length );
+			
+			reconstruct_scalar( rawBuffer ); // reorder pixels
+
+			interleave_scalar( rawBuffer, tmpBuffer ); // interleave pixels
+
+			if ( pixelType == 1 ) {
+
+				raw = new Uint16Array( tmpBuffer.buffer );
+
+			} else if ( pixelType == 2 ) {
+
+				raw = new Float32Array( tmpBuffer.buffer );
+
+			}
+			
+			return raw;
+
+		}
+
+		function reconstruct_scalar( source ) {
+
+			for ( let t = 1; t < source.length; t++ ) {
+
+				var d = source[ t-1 ] + source[ t ] - 128;
+				source[ t ] = d;
+
+			}
+
+		}
+
+		function interleave_scalar( source, out ) {
+
+			var t1 = 0;
+			var t2 = Math.floor( ( source.length + 1 ) / 2 );
+			var s = 0;
+			var stop = source.length - 1;
+
+			while ( true ) {
+
+				if ( s > stop ) break;
+				out[ s++ ] = source[ t1++ ];
+
+				if ( s > stop ) break;
+				out[ s++ ] = source[ t2++ ];
+
+			}
+
+		}
+
 		function parseNullTerminatedString( buffer, offset ) {
 
 			var uintBuffer = new Uint8Array( buffer );
@@ -1077,6 +1143,10 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			scanlineBlockSize = 32;
 
+		} else if ( EXRHeader.compression === 'ZIP_COMPRESSION' ) {
+
+			scanlineBlockSize = 16;
+
 		}
 
 		var numBlocks = dataWindowHeight / scanlineBlockSize;
@@ -1154,7 +1224,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 					} else {
 
-						throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+						throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + ' for ' + EXRHeader.compression + '.';
 
 					}
 
@@ -1209,7 +1279,88 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						} else {
 
-							throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+							throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + ' for ' + EXRHeader.compression + '.';
+
+						}
+
+					}
+
+				}
+
+			}
+
+		} else if ( EXRHeader.compression === 'ZIP_COMPRESSION' || 
+					EXRHeader.compression === 'ZIPS_COMPRESSION' ) {
+
+			for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
+
+				parseUint32( bufferDataView, offset ); // line_no
+				var compressedSize = parseUint32( bufferDataView, offset ); // data_len
+
+				var raw = decompressZIP( bufferDataView, offset, compressedSize, EXRHeader.channels[ 0 ].pixelType );
+
+				offset.value += compressedSize;
+				
+				for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
+
+					for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
+
+						var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+
+						if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
+
+							for ( var x = 0; x < width; x ++ ) {
+
+								var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
+
+								switch ( this.type ) {
+
+									case FloatType:
+
+										var val = decodeFloat16( raw[ idx ] );
+										break;
+
+									case HalfFloatType:
+
+										var val = raw[ idx ];
+										break;
+
+								}
+
+								var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+
+								byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+
+							}
+
+						} else if ( EXRHeader.channels[ channelID ].pixelType === 2 ) { // float
+
+							for ( var x = 0; x < width; x ++ ) {
+
+								var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
+
+								switch ( this.type ) {
+
+									case FloatType:
+
+										var val = raw[ idx ];
+										break;
+
+									case HalfFloatType:
+
+										throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.'
+
+								}
+
+								var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+
+								byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+
+							}
+
+						} else {
+
+							throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + ' for ' + EXRHeader.compression + '.';
 
 						}
 
