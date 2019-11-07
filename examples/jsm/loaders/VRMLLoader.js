@@ -11,6 +11,7 @@ import {
 	Color,
 	ConeBufferGeometry,
 	CylinderBufferGeometry,
+	DataTexture,
 	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
@@ -26,6 +27,8 @@ import {
 	Object3D,
 	Points,
 	PointsMaterial,
+	RGBAFormat,
+	RGBFormat,
 	RepeatWrapping,
 	Scene,
 	SphereBufferGeometry,
@@ -180,6 +183,7 @@ var VRMLLoader = ( function () {
 				//
 
 				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
+				var HexLiteral = createToken( { name: 'HexLiteral', pattern: /0[xX][0-9a-fA-F]+/ } );
 				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
 				var TrueLiteral = createToken( { name: 'TrueLiteral', pattern: /TRUE/ } );
 				var FalseLiteral = createToken( { name: 'FalseLiteral', pattern: /FALSE/ } );
@@ -218,6 +222,7 @@ var VRMLLoader = ( function () {
 					Identifier,
 					RouteIdentifier,
 					StringLiteral,
+					HexLiteral,
 					NumberLiteral,
 					LSquare,
 					RSquare,
@@ -459,6 +464,20 @@ var VRMLLoader = ( function () {
 
 					}
 
+					if ( ctx.HexLiteral ) {
+
+						field.type = 'hex';
+
+						for ( var i = 0, l = ctx.HexLiteral.length; i < l; i ++ ) {
+
+							var hexLiteral = ctx.HexLiteral[ i ];
+
+							field.values.push( hexLiteral.image );
+
+						}
+
+					}
+
 					if ( ctx.TrueLiteral ) {
 
 						field.type = 'boolean';
@@ -612,7 +631,7 @@ var VRMLLoader = ( function () {
 						break;
 
 					case 'Appearance':
-						build = buildApperanceNode( node );
+						build = buildAppearanceNode( node );
 						break;
 
 					case 'Material':
@@ -621,6 +640,10 @@ var VRMLLoader = ( function () {
 
 					case 'ImageTexture':
 						build = buildImageTextureNode( node );
+						break;
+
+					case 'PixelTexture':
+						build = buildPixelTextureNode( node );
 						break;
 
 					case 'TextureTransform':
@@ -692,7 +715,6 @@ var VRMLLoader = ( function () {
 
 					case 'FontStyle':
 					case 'MovieTexture':
-					case 'PixelTexture':
 
 					case 'ColorInterpolator':
 					case 'CoordinateInterpolator':
@@ -1024,7 +1046,7 @@ var VRMLLoader = ( function () {
 
 			}
 
-			function buildApperanceNode( node ) {
+			function buildAppearanceNode( node ) {
 
 				var material = new MeshPhongMaterial();
 				var transformData;
@@ -1068,9 +1090,13 @@ var VRMLLoader = ( function () {
 
 									material.map = getNode( textureNode );
 
+								} else if ( textureNode.name === 'PixelTexture' ) {
+
+									material.map = getNode( textureNode );
+
 								} else {
 
-									// MovieTexture and PixelTexture not supported yet
+									// MovieTexture not supported yet
 
 								}
 
@@ -1095,12 +1121,45 @@ var VRMLLoader = ( function () {
 
 				// only apply texture transform data if a texture was defined
 
-				if ( material.map && transformData ) {
+				if ( material.map ) {
 
-					material.map.center.copy( transformData.center );
-					material.map.rotation = transformData.rotation;
-					material.map.repeat.copy( transformData.scale );
-					material.map.offset.copy( transformData.translation );
+					// respect VRML lighting model
+
+					if ( material.map.__type ) {
+
+						switch ( material.map.__type ) {
+
+							case TEXTURE_TYPE.INTENSITY_ALPHA:
+								material.opacity = 1; // ignore transparency
+								break;
+
+							case TEXTURE_TYPE.RGB:
+								material.color.set( 0xffffff ); // ignore material color
+								break;
+
+							case TEXTURE_TYPE.RGBA:
+								material.color.set( 0xffffff ); // ignore material color
+								material.opacity = 1; // ignore transparency
+								break;
+
+							default:
+
+						}
+
+						delete material.map.__type;
+
+					}
+
+					// apply texture transform
+
+					if ( transformData ) {
+
+						material.map.center.copy( transformData.center );
+						material.map.rotation = transformData.rotation;
+						material.map.repeat.copy( transformData.scale );
+						material.map.offset.copy( transformData.translation );
+
+					}
 
 				}
 
@@ -1155,6 +1214,163 @@ var VRMLLoader = ( function () {
 				}
 
 				return materialData;
+
+			}
+
+			function parseHexColor( hex, textureType, color ) {
+
+				switch ( textureType ) {
+
+					case TEXTURE_TYPE.INTENSITY:
+						// Intensity texture: A one-component image specifies one-byte hexadecimal or integer values representing the intensity of the image
+						var value = parseInt( hex );
+						color.r = value;
+						color.g = value;
+						color.b = value;
+						break;
+
+					case TEXTURE_TYPE.INTENSITY_ALPHA:
+						// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
+						var value = parseInt( "0x" + hex.substring( 2, 4 ) );
+						color.r = value;
+						color.g = value;
+						color.b = value;
+						color.a = parseInt( "0x" + hex.substring( 4, 6 ) );
+						break;
+
+					case TEXTURE_TYPE.RGB:
+						// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
+						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
+						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
+						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
+						break;
+
+					case TEXTURE_TYPE.RGBA:
+						// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
+						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
+						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
+						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
+						color.a = parseInt( "0x" + hex.substring( 8, 10 ) );
+						break;
+
+					default:
+
+				}
+
+			}
+
+			function getTextureType( num_components ) {
+
+				var type;
+
+				switch ( num_components ) {
+
+					case 1:
+						type = TEXTURE_TYPE.INTENSITY;
+						break;
+
+					case 2:
+						type = TEXTURE_TYPE.INTENSITY_ALPHA;
+						break;
+
+					case 3:
+						type = TEXTURE_TYPE.RGB;
+						break;
+
+					case 4:
+						type = TEXTURE_TYPE.RGBA;
+						break;
+
+					default:
+
+				}
+
+				return type;
+
+			}
+
+			function buildPixelTextureNode( node ) {
+
+				var texture;
+				var wrapS = RepeatWrapping;
+				var wrapT = RepeatWrapping;
+
+				var fields = node.fields;
+
+				for ( var i = 0, l = fields.length; i < l; i ++ ) {
+
+					var field = fields[ i ];
+					var fieldName = field.name;
+					var fieldValues = field.values;
+
+					switch ( fieldName ) {
+
+						case 'image':
+							var width = fieldValues[ 0 ];
+							var height = fieldValues[ 1 ];
+							var num_components = fieldValues[ 2 ];
+
+							var useAlpha = ( num_components === 2 || num_components === 4 );
+							var textureType = getTextureType( num_components );
+
+							var size = ( ( useAlpha === true ) ? 4 : 3 ) * ( width * height );
+							var data = new Uint8Array( size );
+
+							var color = { r: 0, g: 0, b: 0, a: 0 };
+
+							for ( var j = 3, k = 0, jl = fieldValues.length; j < jl; j ++, k ++ ) {
+
+								parseHexColor( fieldValues[ j ], textureType, color );
+
+								if ( useAlpha === true ) {
+
+									var stride = k * 4;
+
+									data[ stride + 0 ] = color.r;
+									data[ stride + 1 ] = color.g;
+									data[ stride + 2 ] = color.b;
+									data[ stride + 3 ] = color.a;
+
+								} else {
+
+									var stride = k * 3;
+
+									data[ stride + 0 ] = color.r;
+									data[ stride + 1 ] = color.g;
+									data[ stride + 2 ] = color.b;
+
+								}
+
+							}
+
+							texture = new DataTexture( data, width, height, ( useAlpha === true ) ? RGBAFormat : RGBFormat );
+							texture.__type = textureType; // needed for material modifications
+							break;
+
+						case 'repeatS':
+							if ( fieldValues[ 0 ] === false ) wrapS = ClampToEdgeWrapping;
+							break;
+
+						case 'repeatT':
+							if ( fieldValues[ 0 ] === false ) wrapT = ClampToEdgeWrapping;
+							break;
+
+						default:
+							console.warn( 'THREE.VRMLLoader: Unknown field:', fieldName );
+							break;
+
+					}
+
+				}
+
+				if ( texture ) {
+
+					texture.wrapS = wrapS;
+					texture.wrapT = wrapT;
+
+				}
+
+				return texture;
 
 			}
 
@@ -2416,6 +2632,7 @@ var VRMLLoader = ( function () {
 		var Identifier = tokenVocabulary[ 'Identifier' ];
 		var RouteIdentifier = tokenVocabulary[ 'RouteIdentifier' ];
 		var StringLiteral = tokenVocabulary[ 'StringLiteral' ];
+		var HexLiteral = tokenVocabulary[ 'HexLiteral' ];
 		var NumberLiteral = tokenVocabulary[ 'NumberLiteral' ];
 		var TrueLiteral = tokenVocabulary[ 'TrueLiteral' ];
 		var FalseLiteral = tokenVocabulary[ 'FalseLiteral' ];
@@ -2522,6 +2739,11 @@ var VRMLLoader = ( function () {
 					} },
 					{ ALT: function () {
 
+						$.CONSUME( HexLiteral );
+
+					} },
+					{ ALT: function () {
+
 						$.CONSUME( NumberLiteral );
 
 					} },
@@ -2570,6 +2792,11 @@ var VRMLLoader = ( function () {
 					} },
 					{ ALT: function () {
 
+						$.CONSUME( HexLiteral );
+
+					} },
+					{ ALT: function () {
+
 						$.CONSUME( NumberLiteral );
 
 					} },
@@ -2609,6 +2836,13 @@ var VRMLLoader = ( function () {
 		this.normal = new Vector3();
 
 	}
+
+	var TEXTURE_TYPE = {
+		INTENSITY: 1,
+		INTENSITY_ALPHA: 2,
+		RGB: 3,
+		RGBA: 4
+	};
 
 	return VRMLLoader;
 
