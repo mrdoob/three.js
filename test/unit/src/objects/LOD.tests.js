@@ -3,6 +3,8 @@
  */
 /* global QUnit */
 
+import { Object3D } from '../../../../src/core/Object3D';
+import { Raycaster } from '../../../../src/core/Raycaster';
 import { LOD } from '../../../../src/objects/LOD';
 
 export default QUnit.module( 'Objects', () => {
@@ -10,9 +12,11 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'LOD', () => {
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.test( "Extending", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod = new LOD();
+
+			assert.strictEqual( ( lod instanceof Object3D ), true, "LOD extends from Object3D" );
 
 		} );
 
@@ -31,9 +35,11 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isLOD", ( assert ) => {
+		QUnit.test( "isLOD", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod = new LOD();
+
+			assert.strictEqual( lod.isLOD, true, ".isLOD property is defined." );
 
 		} );
 		QUnit.todo( "copy", ( assert ) => {
@@ -46,14 +52,40 @@ export default QUnit.module( 'Objects', () => {
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.todo( "getObjectForDistance", ( assert ) => {
+		QUnit.test( "getObjectForDistance", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod = new LOD();
+
+			var high = new Object3D();
+			var mid = new Object3D();
+			var low = new Object3D();
+
+			assert.strictEqual( lod.getObjectForDistance( 5 ), null, "Returns null if no LOD levels are defined." );
+
+			lod.addLevel( high, 5 );
+
+			assert.strictEqual( lod.getObjectForDistance( 0 ), high, "Returns always the same object if only one LOD level is defined." );
+			assert.strictEqual( lod.getObjectForDistance( 10 ), high, "Returns always the same object if only one LOD level is defined." );
+
+			lod.addLevel( mid, 25 );
+			lod.addLevel( low, 50 );
+
+			assert.strictEqual( lod.getObjectForDistance( 0 ), high, "Returns the high resolution object." );
+			assert.strictEqual( lod.getObjectForDistance( 10 ), high, "Returns the high resolution object." );
+			assert.strictEqual( lod.getObjectForDistance( 25 ), mid, "Returns the mid resolution object." );
+			assert.strictEqual( lod.getObjectForDistance( 50 ), low, "Returns the low resolution object." );
+			assert.strictEqual( lod.getObjectForDistance( 60 ), low, "Returns the low resolution object." );
 
 		} );
-		QUnit.todo( "raycast", ( assert ) => {
+		QUnit.test( "raycast", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod = new LOD();
+			var raycaster = new Raycaster();
+			var intersections = [];
+
+			lod.raycast( raycaster, intersections );
+
+			assert.strictEqual( intersections.length, 0, "Does not fail if raycasting is used with a LOD object without levels." );
 
 		} );
 		QUnit.todo( "update", ( assert ) => {
