@@ -1096,12 +1096,12 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'texture':
 						var texture2dgroup = modelData.resources.texture2dgroup[ resourceId ];
-						meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData ) );
+						meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, modelData, meshData, textureData, objectData ) );
 						break;
 
 					case 'vertexColors':
 						var colorgroup = modelData.resources.colorgroup[ resourceId ];
-						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, textureData ) );
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData ) );
 						break;
 
 					case 'default':
