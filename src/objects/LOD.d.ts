@@ -10,6 +10,7 @@ export class LOD extends Object3D {
 	type: 'LOD';
 
 	levels: { distance: number; object: Object3D }[];
+	autoUpdate: boolean;
 
 	addLevel( object: Object3D, distance?: number ): this;
 	getObjectForDistance( distance: number ): Object3D | null;
