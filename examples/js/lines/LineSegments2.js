@@ -85,8 +85,12 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
 
-			// ndc space [ - 1.0, 1.0 ]
+			// pick a point 1 unit out along the ray to avoid the ray origin
+			// sitting at the camera origin which will cause "w" to be 0 when
+			// applying the projection matrix.
 			ray.at( 1, ssOrigin );
+
+			// ndc space [ - 1.0, 1.0 ]
 			ssOrigin.w = 1;
 			ssOrigin.applyMatrix4( camera.matrixWorldInverse );
 			ssOrigin.applyMatrix4( projectionMatrix );
