@@ -20,17 +20,22 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		// PROPERTIES
+		QUnit.test( "levels", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod = new LOD();
+			var levels = lod.levels;
+
+			assert.strictEqual( Array.isArray( levels ), true, "LOD.levels is of type array." );
+			assert.strictEqual( levels.length, 0, "LOD.levels is empty by default." );
 
 		} );
 
-		// PROPERTIES
-		QUnit.todo( "levels", ( assert ) => {
+		QUnit.test( "autoUpdate", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod = new LOD();
+
+			assert.strictEqual( lod.autoUpdate, true, "LOD.autoUpdate is of type boolean and true by default." );
 
 		} );
 
@@ -42,9 +47,25 @@ export default QUnit.module( 'Objects', () => {
 			assert.strictEqual( lod.isLOD, true, ".isLOD property is defined." );
 
 		} );
-		QUnit.todo( "copy", ( assert ) => {
+		QUnit.test( "copy", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lod1 = new LOD();
+			var lod2 = new LOD();
+
+			var high = new Object3D();
+			var mid = new Object3D();
+			var low = new Object3D();
+
+			lod1.addLevel( high, 5 );
+			lod1.addLevel( mid, 25 );
+			lod1.addLevel( low, 50 );
+
+			lod1.autoUpdate = false;
+
+			lod2.copy( lod1 );
+
+			assert.strictEqual( lod2.autoUpdate, false, "LOD.autoUpdate is correctly copied." );
+			assert.strictEqual( lod2.levels.length, 3, "LOD.levels has the correct length after the copy." );
 
 		} );
 		QUnit.todo( "addLevel", ( assert ) => {

@@ -47,6 +47,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this.autoUpdate = source.autoUpdate;
+
 		return this;
 
 	},
