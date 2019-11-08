@@ -19,6 +19,8 @@ import {
 	FileLoader,
 	FrontSide,
 	Group,
+	InstancedBufferAttribute,
+	InstancedMesh,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	Interpolant,
@@ -52,6 +54,7 @@ import {
 	Points,
 	PointsMaterial,
 	PropertyBinding,
+	Quaternion,
 	QuaternionKeyframeTrack,
 	RGBAFormat,
 	RGBFormat,
@@ -244,6 +247,10 @@ var GLTFLoader = ( function () {
 							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
 							break;
 
+						case EXTENSIONS.EXT_MESH_INSTANCING:
+							extensions[ extensionName ] = new GLTFMeshInstancingExtension( json );
+							break;
+
 						case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
 							extensions[ extensionName ] = new GLTFDracoMeshCompressionExtension( json, this.dracoLoader );
 							break;
@@ -335,6 +342,7 @@ var GLTFLoader = ( function () {
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
+		EXT_MESH_INSTANCING: 'EXT_mesh_instancing',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
@@ -1037,6 +1045,110 @@ var GLTFLoader = ( function () {
 
 	}
 
+	/**
+	 * Instancing Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/pull/1691
+	 */
+	function GLTFMeshInstancingExtension() {
+
+		this.name = EXTENSIONS.EXT_MESH_INSTANCING;
+
+	}
+
+	GLTFMeshInstancingExtension.prototype.createInstancedMesh = function ( parser, nodeDef, node ) {
+
+		var extensionDef = nodeDef.extensions[ this.name ];
+		var pending = [];
+
+		// If present, extensionDef.mesh overrides nodeDef.mesh.
+		var meshIndex = extensionDef.mesh !== undefined ? extensionDef.mesh : nodeDef.mesh;
+		var meshPromise = parser.getDependency( 'mesh', meshIndex );
+
+		// Load buffers for instance TRS properties. All are optional.
+		var translationPromise = extensionDef.attributes.TRANSLATION !== undefined
+			? parser.getDependency( 'accessor', extensionDef.attributes.TRANSLATION )
+			: null;
+		var rotationPromise = extensionDef.attributes.ROTATION !== undefined
+			? parser.getDependency( 'accessor', extensionDef.attributes.ROTATION )
+			: null;
+		var scalePromise = extensionDef.attributes.SCALE !== undefined
+			? parser.getDependency( 'accessor', extensionDef.attributes.SCALE )
+			: null;
+
+		pending.push( meshPromise, translationPromise, rotationPromise, scalePromise );
+
+		// Load custom instance attributes.
+		var customAttributeNames = [];
+		for ( var attributeName in extensionDef.attributes ) {
+
+			if ( attributeName[ 0 ] === '_' ) {
+
+				customAttributeNames.push( attributeName );
+
+				pending.push( parser.getDependency( 'accessor', extensionDef.attributes[ attributeName ] ) );
+
+			}
+
+		}
+
+		return Promise.all( pending )
+			.then( function ( dependencies ) {
+
+				var mesh = dependencies[ 0 ];
+				var translation = dependencies[ 1 ];
+				var rotation = dependencies[ 2 ];
+				var scale = dependencies[ 3 ];
+
+				var template = translation || rotation || scale || dependencies[ 4 ];
+
+				// Geometry must be cloned here, before we modify it. Material will be cloned if
+				// necessary, when assignFinalMaterial() is called below.
+				var instancedMesh = new InstancedMesh( mesh.geometry.clone(), mesh.material, template.count );
+				var matrix = new Matrix4();
+
+				var t = new Vector3( 0, 0, 0 );
+				var r = new Quaternion( 0, 0, 0, 1 );
+				var s = new Vector3( 1, 1, 1 );
+
+				// Set instance transforms.
+				for ( var i = 0; i < template.count; i ++ ) {
+
+					if ( translation ) t.fromBufferAttribute( translation, i );
+					if ( rotation ) quaternionFromBufferAttribute( r, rotation, i );
+					if ( scale ) s.fromBufferAttribute( scale, i );
+
+					instancedMesh.setMatrixAt( i, matrix.compose( t, r, s ) );
+
+				}
+
+				// Set custom instance attributes.
+				for ( var i = 0; i < customAttributeNames.length; i ++ ) {
+
+					var attributeSource = dependencies[ 4 + i ];
+
+					instancedMesh.setAttribute( customAttributeNames[ i ], new InstancedBufferAttribute(
+
+						attributeSource.array,
+						attributeSource.itemSize,
+						attributeSource.normalized
+
+					) );
+
+				}
+
+				// Copy mesh properties first, then node properties. These may be the same object.
+				Object3D.prototype.copy.call( instancedMesh, mesh );
+				Object3D.prototype.copy.call( instancedMesh, node );
+
+				parser.assignFinalMaterial( instancedMesh );
+
+				return instancedMesh;
+
+			} );
+
+	}
+
 	/*********************************/
 	/********** INTERPOLATION ********/
 	/*********************************/
@@ -1175,7 +1287,7 @@ var GLTFLoader = ( function () {
 		'VEC4': 4,
 		'MAT2': 4,
 		'MAT3': 9,
-		'MAT4': 16
+		'MAT4': 16,
 	};
 
 	var ATTRIBUTES = {
@@ -1454,6 +1566,19 @@ var GLTFLoader = ( function () {
 		}
 
 		return attributesKey;
+
+	}
+
+	function quaternionFromBufferAttribute( quaternion, attribute, index ) {
+
+		return quaternion.set(
+
+			attribute.getX( index ),
+			attribute.getY( index ),
+			attribute.getZ( index ),
+			attribute.getW( index )
+
+		);
 
 	}
 
@@ -2055,6 +2180,7 @@ var GLTFLoader = ( function () {
 		var useVertexColors = geometry.attributes.color !== undefined;
 		var useFlatShading = geometry.attributes.normal === undefined;
 		var useSkinning = mesh.isSkinnedMesh === true;
+		var useInstancing = mesh.isInstancedMesh === true;
 		var useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
 		var useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
 
@@ -2099,12 +2225,13 @@ var GLTFLoader = ( function () {
 		}
 
 		// Clone the material if it will be modified
-		if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
+		if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useInstancing || useMorphTargets ) {
 
 			var cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
 			if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
 			if ( useSkinning ) cacheKey += 'skinning:';
+			if ( useInstancing ) cacheKey += 'instancing:';
 			if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 			if ( useVertexColors ) cacheKey += 'vertex-colors:';
 			if ( useFlatShading ) cacheKey += 'flat-shading:';
@@ -3188,6 +3315,20 @@ var GLTFLoader = ( function () {
 					node.scale.fromArray( nodeDef.scale );
 
 				}
+
+			}
+
+			// Apply instancing last, as it requires asynchronous resources.
+			if ( nodeDef.extensions && nodeDef.extensions[ EXTENSIONS.EXT_MESH_INSTANCING ] !== undefined ) {
+
+				if ( ! node.isMesh && node.children.length > 0 ) {
+
+					console.warn( 'THREE.GLTFLoader: Multi-primitive instanced meshes not yet supported.' );
+					return node;
+
+				}
+
+				return extensions[ EXTENSIONS.EXT_MESH_INSTANCING ].createInstancedMesh( parser, nodeDef, node );
 
 			}
 
