@@ -1150,18 +1150,36 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		var width = EXRHeader.dataWindow.xMax - EXRHeader.dataWindow.xMin + 1;
 		var height = EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1;
-		var numChannels = EXRHeader.channels.length;
+		// Firefox only supports RGBA (half) float textures
+		// var numChannels = EXRHeader.channels.length;
+		var numChannels = 4;
+		var size = width * height * numChannels;
 
+		// Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
 		switch ( this.type ) {
 
 			case THREE.FloatType:
 
-				var byteArray = new Float32Array( width * height * numChannels );
+				var byteArray = new Float32Array( size );
+
+				if ( EXRHeader.channels.length < numChannels ) {
+
+					byteArray.fill( 1, 0, size );
+
+				}
+
 				break;
 
 			case THREE.HalfFloatType:
 
-				var byteArray = new Uint16Array( width * height * numChannels );
+				var byteArray = new Uint16Array( size );
+
+				if ( EXRHeader.channels.length < numChannels ) {
+
+					byteArray.fill( 0x3C00, 0, size ); // Uint16Array holds half float data, 0x3C00 is 1
+
+				}
+
 				break;
 
 			default:
@@ -1232,7 +1250,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 				var tmpBuffer = new Uint16Array( tmpBufferSize );
 				var tmpOffset = { value: 0 };
 
-				decompressPIZ( tmpBuffer, tmpOffset, uInt8Array, bufferDataView, offset, tmpBufferSize, numChannels, EXRHeader.channels, width, scanlineBlockSize );
+				decompressPIZ( tmpBuffer, tmpOffset, uInt8Array, bufferDataView, offset, tmpBufferSize, EXRHeader.channels.length, EXRHeader.channels, width, scanlineBlockSize );
 
 				for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
 
@@ -1359,7 +1377,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			width: width,
 			height: height,
 			data: byteArray,
-			format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
+			format: numChannels == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
 			type: this.type
 		};
 
