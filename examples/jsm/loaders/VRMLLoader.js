@@ -1086,11 +1086,7 @@ var VRMLLoader = ( function () {
 							var textureNode = fieldValues[ 0 ];
 							if ( textureNode !== null ) {
 
-								if ( textureNode.name === 'ImageTexture' ) {
-
-									material.map = getNode( textureNode );
-
-								} else if ( textureNode.name === 'PixelTexture' ) {
+								if ( textureNode.name === 'ImageTexture' || textureNode.name === 'PixelTexture' ) {
 
 									material.map = getNode( textureNode );
 
