@@ -236,6 +236,10 @@ THREE.GLTFLoader = ( function () {
 
 					switch ( extensionName ) {
 
+						case EXTENSIONS.KHR_INSTANCING:
+							extensions[ extensionName ] = new GLTFInstancingExtension( json );
+							break;
+
 						case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
 							extensions[ extensionName ] = new GLTFLightsExtension( json );
 							break;
@@ -329,6 +333,7 @@ THREE.GLTFLoader = ( function () {
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
+		KHR_INSTANCING: 'KHR_instancing',
 		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
@@ -1086,6 +1091,67 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
+	/**
+	 * Instancing Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/pull/1691
+	 */
+	function GLTFInstancingExtension() {
+
+		this.name = EXTENSIONS.KHR_INSTANCING;
+
+	}
+
+	GLTFInstancingExtension.prototype.createInstancedMesh = function ( parser, nodeDef, node ) {
+
+		var extensionDef = nodeDef.extensions[ this.name ];
+		var meshIndex = nodeDef.mesh !== undefined ? nodeDef.mesh : extensionDef.mesh;
+		var meshPromise = parser.getDependency( 'mesh', meshIndex );
+		var transformPromise = parser.getDependency( 'accessor', extensionDef.attributes.TRANSFORM );
+
+		return Promise.all( [
+
+			meshPromise,
+			transformPromise
+
+		] )
+			.then( function ( dependencies ) {
+
+				var mesh = dependencies[ 0 ];
+				var transform = dependencies[ 1 ];
+
+				var instancedMesh = new THREE.InstancedMesh( mesh.geometry, mesh.material, transform.count );
+				var matrix = new THREE.Matrix4();
+
+				for ( var i = 0; i < transform.count; i ++ ) {
+
+					var m = transform.array.slice( i * 12, ( i + 1 ) * 12 );
+
+					matrix.set(
+
+						m[ 0 ], m[ 1 ], m[ 2 ], m[ 3 ],
+						m[ 4 ], m[ 5 ], m[ 6 ], m[ 7 ],
+						m[ 8 ], m[ 9 ], m[ 10 ], m[ 11 ],
+						0, 0, 0, 1
+
+					);
+
+					instancedMesh.setMatrixAt( i, matrix );
+
+				}
+
+				// Copy mesh properties first, then node properties. These may be the same object.
+				THREE.Object3D.prototype.copy.call( instancedMesh, mesh );
+				THREE.Object3D.prototype.copy.call( instancedMesh, node );
+
+				parser.assignFinalMaterial( instancedMesh );
+
+				return instancedMesh;
+
+			} );
+
+	}
+
 	/*********************************/
 	/********** INTERPOLATION ********/
 	/*********************************/
@@ -1224,7 +1290,7 @@ THREE.GLTFLoader = ( function () {
 		'VEC4': 4,
 		'MAT2': 4,
 		'MAT3': 9,
-		'MAT4': 16
+		'MAT4': 16,
 	};
 
 	var ATTRIBUTES = {
@@ -2253,6 +2319,7 @@ THREE.GLTFLoader = ( function () {
 		var useVertexColors = geometry.attributes.color !== undefined;
 		var useFlatShading = geometry.attributes.normal === undefined;
 		var useSkinning = mesh.isSkinnedMesh === true;
+		var useInstancing = mesh.isInstancedMesh === true;
 		var useMorphTargets = Object.keys( geometry.morphAttributes ).length > 0;
 		var useMorphNormals = useMorphTargets && geometry.morphAttributes.normal !== undefined;
 
@@ -2297,12 +2364,13 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		// Clone the material if it will be modified
-		if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useMorphTargets ) {
+		if ( useVertexTangents || useVertexColors || useFlatShading || useSkinning || useInstancing || useMorphTargets ) {
 
 			var cacheKey = 'ClonedMaterial:' + material.uuid + ':';
 
 			if ( material.isGLTFSpecularGlossinessMaterial ) cacheKey += 'specular-glossiness:';
 			if ( useSkinning ) cacheKey += 'skinning:';
+			if ( useInstancing ) cacheKey += 'instancing:';
 			if ( useVertexTangents ) cacheKey += 'vertex-tangents:';
 			if ( useVertexColors ) cacheKey += 'vertex-colors:';
 			if ( useFlatShading ) cacheKey += 'flat-shading:';
@@ -3396,6 +3464,20 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			parser.associations.set( node, { type: 'nodes', index: nodeIndex } );
+
+			// Apply instancing last, as it requires asynchronous resources.
+			if ( nodeDef.extensions && nodeDef.extensions[ EXTENSIONS.KHR_INSTANCING ] !== undefined ) {
+
+				if ( ! node.isMesh && node.children.length > 0 ) {
+
+					console.warn( 'THREE.GLTFLoader: Multi-primitive instanced meshes not yet supported.' );
+					return node;
+
+				}
+
+				return extensions[ EXTENSIONS.KHR_INSTANCING ].createInstancedMesh( parser, nodeDef, node );
+
+			}
 
 			return node;
 

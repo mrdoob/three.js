@@ -32,14 +32,35 @@
 			var clock = new THREE.Clock();
 
 			var scenes = {
-				Boombox: {
-					name: 'BoomBox (PBR)',
-					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
-					author: 'Microsoft',
-					authorURL: 'https://www.microsoft.com/',
-					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
-					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
-					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
+				'ParticleTest': {
+					name: 'ParticleTest',
+					url: './models/gltf/ParticleTest.gltf',
+					author: 'Don McCurdy',
+					authorURL: 'https://www.donmccurdy.com/',
+					cameraPos: new THREE.Vector3( 10, 5, 15 ),
+					objectPosition: new THREE.Vector3( 0, 0, 0 ),
+					extensions: [ 'glTF-Instancing' ],
+					addEnvMap: true,
+				},
+				'Instancing (Simple)': {
+					name: 'Instancing (Simple)',
+					url: './models/gltf/instancing_simple/instancing_simple.gltf',
+					author: 'OTOY',
+					authorURL: 'https://home.otoy.com/',
+					cameraPos: new THREE.Vector3( 20, 10, 30 ),
+					objectPosition: new THREE.Vector3( 0, 3.1, 0 ),
+					extensions: [ 'glTF-Instancing' ],
+					addEnvMap: true,
+					addLights: true,
+					addGround: true
+				},
+				'Instancing (Teapots Galore)': {
+					name: 'Instancing (Teapots Galore)',
+					url: './models/gltf/teapots_galore/teapots_galore.gltf',
+					author: 'OTOY',
+					authorURL: 'https://home.otoy.com/',
+					cameraPos: new THREE.Vector3( 20, 10, 30 ),
+					extensions: [ 'glTF-Instancing' ],
 					addEnvMap: true
 				},
 				'Bot Skinned': {
