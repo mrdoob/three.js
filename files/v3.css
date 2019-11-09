@@ -1,0 +1,106 @@
+:root {
+     --color-blue: #049EF4;
+     --text-color: #444;
+     --secondary-text-color: #9e9e9e;
+     --font-size: 16px;
+     --line-height: 26px;
+     --border-style: 1px solid #E8E8E8;
+     --header-height: 40px;
+     --panel-width: 300px;
+     --panel-padding: 16px;
+     --icon-size: 20px;
+}
+ @font-face {
+     font-family: 'Roboto Mono';
+     src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../files/RobotoMono-Regular.woff2') format('woff2');
+     font-style: normal;
+     font-weight: 400;
+}
+ html, body {
+     height: 100%;
+}
+ html {
+     font-size: calc(var(--font-size) - 1px);
+     line-height: calc(var(--line-height) - 1px);
+}
+ body {
+     font-family: 'Roboto Mono', monospace;
+     margin: 0px;
+     color: var(--text-color);
+     background-color: #ffffff;
+}
+ a {
+     display: inline-block;
+     margin-bottom: 8px;
+     width: calc(50% - 4px);
+     text-decoration: none;
+     color: black;
+}
+ @media screen and (min-width: 50em) {
+     a {
+         width: calc(10% - 6px);
+    }
+}
+ .hidden {
+     display: none !important;
+}
+ a:hover img {
+     transform: scale(1.05);
+}
+ figure {
+     margin: 0;
+     overflow: hidden;
+}
+ figcaption {
+     margin-top: 4px;
+     margin-bottom: 12px;
+}
+ img {
+     border: solid #ccc 1px;
+     max-width: 100%;
+     height: auto;
+     display: block;
+     background: #ccc;
+     border-radius: 8px 8px;
+}
+ #container {
+     position: absolute;
+     left: 0;
+     top: 0;
+     right: 0;
+     bottom: 0;
+     background-color: #fff;
+}
+ #header {
+     position: absolute;
+     left: 16px;
+     top: 8px;
+     right: 16px;
+     height: var(--header-height);
+     background-color: #fff;
+}
+ #filter {
+     border: 1px solid var(--color-blue);
+     color: var(--color-blue);
+     border-radius: 4px;
+     line-height: 32px;
+     padding: 0px 8px;
+     margin-left: 0;
+     font-size: 1.2rem;
+     width: 320px;
+}
+ #content {
+     position: absolute;
+     left: 16px;
+     top: 44px;
+     right: 16px;
+     bottom: 0px;
+     background-color: #fff;
+}
+ #grid {
+     width: 100%;
+     display: flex;
+     flex-wrap: wrap;
+     justify-content: space-between;
+     background-color: #fff;
+}

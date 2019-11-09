@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>three.js examples (Visual)</title>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="shortcut icon" href="../files/favicon.ico" />
+<link rel="stylesheet" type="text/css" href="../files/v3.css">
+<script src="files.js"></script>
+</head>
+<body>
+<script>
+function createLink(file) {
+    var link = document.createElement('a');
+    link.href = file + '.html';
+    link.setAttribute('target', 'new');
+    var fig = document.createElement("figure");
+    link.appendChild(fig);
+    var img = document.createElement("img");
+    img.style.border = '1px #ccc solid';
+    img.setAttribute("src", "thumbs/" + file + ".jpg");
+    img.setAttribute("width", 320);
+    img.setAttribute("height", 200);
+    img.setAttribute("alt", link.textContent);
+    fig.appendChild(img);
+    var caption = document.createElement("figcaption");
+    fig.appendChild(caption);
+    var txt = document.createElement("p");
+    txt.innerHTML = getName(file);
+    caption.appendChild(txt);
+    return link;
+}
+
+function updateFilter() {
+    var v = filter.value;
+    var exp = new RegExp(v, 'gi');
+    for (var key in files) {
+        var section = files[key];
+        for (var i = 0; i < section.length; i++) {
+            filterExample(section[i], exp);
+        }
+    }
+    layoutList();
+}
+
+function filterExample(file, exp) {
+    var link = links[file];
+    var name = getName(file);
+    var res = file.match(exp);
+    var text;
+    if (res && res.length > 0) {
+        link.classList.remove('hidden');
+        for (var i = 0; i < res.length; i++) {
+            text = name.replace(res[i], '<b>' + res[i] + '</b>');
+        }
+    } else {
+        link.classList.add('hidden');
+    }
+}
+
+function layoutList() {
+    for (var key in files) {
+        var collapsed = true;
+        var section = files[key];
+        for (var i = 0; i < section.length; i++) {
+            var file = section[i];
+            if (links[file].classList.contains('hidden') === false) {
+                collapsed = false;
+                break;
+            }
+        }
+        var element = document.querySelector('h1[data-category="' + key + '"]');
+        if (collapsed) {
+            element.classList.add('hidden');
+        } else {
+            element.classList.remove('hidden');
+        }
+    }
+}
+
+function getName(file) {
+    var name = file.split('_');
+    name.shift();
+    return name.join(' / ');
+}
+
+var links = {};
+var container = document.createElement('div');
+container.setAttribute("id", "container");
+document.body.appendChild(container);
+
+var header = document.createElement('div');
+header.setAttribute("id", "header");
+container.appendChild(header);
+
+var filter = document.createElement('input');
+filter.setAttribute("autofocus", "true");
+filter.setAttribute("placeholder", "");
+filter.setAttribute("type", "search");
+filter.setAttribute("id", "filter");
+filter.setAttribute("autocorrect", "off");
+filter.setAttribute("autocapitalize", "off");
+filter.setAttribute("spellcheck", "off");
+filter.addEventListener('input', function() {
+    updateFilter();
+});
+header.appendChild(filter);
+
+var content = document.createElement('div');
+content.setAttribute("id", "content");
+container.appendChild(content);
+
+for (var key in files) {
+    var section = files[key];
+    var section_title = document.createElement('h1');
+    section_title.textContent = key;
+    section_title.setAttribute('data-category', key);
+    content.appendChild(section_title);
+    var grid = document.createElement('div');
+    grid.setAttribute("id", "grid");
+    content.appendChild(grid);
+    for (var i = 0; i < section.length; i++) {
+        var file = section[i];
+        var link = createLink(file);
+        grid.appendChild(link);
+        links[file] = link;
+    }
+}
+</script>
+</body>
+</html>
