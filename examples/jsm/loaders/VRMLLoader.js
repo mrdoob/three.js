@@ -866,11 +866,11 @@ var VRMLLoader = ( function () {
 
 				}
 
+				var radius = 10000;
+
 				// sky
 
 				if ( skyColor ) {
-
-					var radius = 10000;
 
 					var skyGeometry = new SphereBufferGeometry( radius, 32, 16 );
 					var skyMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, depthWrite: false, depthTest: false } );
@@ -2469,89 +2469,82 @@ var VRMLLoader = ( function () {
 			 */
 			function paintFaces( geometry, radius, angles, colors, topDown ) {
 
-				var direction = ( topDown === true ) ? 1 : - 1;
+				// compute threshold values
 
-				var coord = [], A = {}, B = {}, applyColor = false;
+				var thresholds = [];
+				var startAngle = ( topDown === true ) ? 0 : Math.PI;
 
-				for ( var k = 0; k < angles.length; k ++ ) {
+				for ( var i = 0, l = colors.length; i < l; i ++ ) {
 
-					// push the vector at which the color changes
+					var angle = ( i === 0 ) ? 0 : angles[ i - 1 ];
+					angle = ( topDown === true ) ? angle : ( startAngle - angle );
 
-					var vec = {
-						x: direction * ( Math.cos( angles[ k ] ) * radius ),
-						y: direction * ( Math.sin( angles[ k ] ) * radius )
-					};
+					var point = new Vector3();
+					point.setFromSphericalCoords( radius, angle, 0 );
 
-					coord.push( vec );
+					thresholds.push( point );
 
 				}
 
-				var index = geometry.index;
+				// generate vertex colors
+
+				var indices = geometry.index;
 				var positionAttribute = geometry.attributes.position;
 				var colorAttribute = new BufferAttribute( new Float32Array( geometry.attributes.position.count * 3 ), 3 );
 
 				var position = new Vector3();
 				var color = new Color();
 
-				for ( var i = 0; i < index.count; i ++ ) {
+				for ( var i = 0; i < indices.count; i ++ ) {
 
-					var vertexIndex = index.getX( i );
+					var index = indices.getX( i );
+					position.fromBufferAttribute( positionAttribute, index );
 
-					position.fromBufferAttribute( positionAttribute, vertexIndex );
+					var thresholdIndexA, thresholdIndexB;
+					var t = 1;
 
-					for ( var j = 0; j < colors.length; j ++ ) {
+					for ( var j = 1; j < thresholds.length; j ++ ) {
 
-						// linear interpolation between aColor and bColor, calculate proportion
-						// A is previous point (angle)
+						thresholdIndexA = j - 1;
+						thresholdIndexB = j;
 
-						if ( j === 0 ) {
+						var thresholdA = thresholds[ thresholdIndexA ];
+						var thresholdB = thresholds[ thresholdIndexB ];
 
-							A.x = 0;
-							A.y = ( topDown === true ) ? radius : - 1 * radius;
+						if ( topDown === true ) {
+
+							// interpolation for sky color
+
+							if ( position.y <= thresholdA.y && position.y > thresholdB.y ) {
+
+								t = Math.abs( thresholdA.y - position.y ) / Math.abs( thresholdA.y - thresholdB.y );
+
+								break;
+
+							}
 
 						} else {
 
-							A.x = coord[ j - 1 ].x;
-							A.y = coord[ j - 1 ].y;
+							// interpolation for ground color
 
-						}
+							if ( position.y >= thresholdA.y && position.y < thresholdB.y ) {
 
-						// B is current point (angle)
+								t = Math.abs( thresholdA.y - position.y ) / Math.abs( thresholdA.y - thresholdB.y );
 
-						B = coord[ j ];
-
-						if ( B !== undefined ) {
-
-							// p has to be between the points A and B which we interpolate
-
-							applyColor = ( topDown === true ) ? ( position.y <= A.y && position.y > B.y ) : ( position.y >= A.y && position.y < B.y );
-
-							if ( applyColor === true ) {
-
-								var aColor = colors[ j ];
-								var bColor = colors[ j + 1 ];
-
-								// below is simple linear interpolation
-
-								var t = Math.abs( position.y - A.y ) / ( A.y - B.y );
-
-								// to make it faster, you can only calculate this if the y coord changes, the color is the same for points with the same y
-
-								color.copy( aColor ).lerp( bColor, t );
-
-								colorAttribute.setXYZ( vertexIndex, color.r, color.g, color.b );
-
-							} else {
-
-								var colorIndex = ( topDown === true ) ? colors.length - 1 : 0;
-								var c = colors[ colorIndex ];
-								colorAttribute.setXYZ( vertexIndex, c.r, c.g, c.b );
+								break;
 
 							}
 
 						}
 
 					}
+
+					var colorA = colors[ thresholdIndexA ];
+					var colorB = colors[ thresholdIndexB ];
+
+					color.copy( colorA ).lerp( colorB, t );
+
+					colorAttribute.setXYZ( index, color.r, color.g, color.b );
 
 				}
 
