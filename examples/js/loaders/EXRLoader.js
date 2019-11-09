@@ -778,7 +778,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
 			var tmpBuffer = new Uint8Array( rawBuffer.length );
-			
+
 			reconstruct_scalar( rawBuffer ); // reorder pixels
 
 			interleave_scalar( rawBuffer, tmpBuffer ); // interleave pixels
@@ -792,16 +792,16 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 				raw = new Float32Array( tmpBuffer.buffer );
 
 			}
-			
+
 			return raw;
 
 		}
 
 		function reconstruct_scalar( source ) {
 
-			for ( let t = 1; t < source.length; t++ ) {
+			for ( let t = 1; t < source.length; t ++ ) {
 
-				var d = source[ t-1 ] + source[ t ] - 128;
+				var d = source[ t - 1 ] + source[ t ] - 128;
 				source[ t ] = d;
 
 			}
@@ -818,10 +818,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			while ( true ) {
 
 				if ( s > stop ) break;
-				out[ s++ ] = source[ t1++ ];
+				out[ s ++ ] = source[ t1 ++ ];
 
 				if ( s > stop ) break;
-				out[ s++ ] = source[ t2++ ];
+				out[ s ++ ] = source[ t2 ++ ];
 
 			}
 
@@ -1296,7 +1296,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			}
 
-		} else if ( EXRHeader.compression === 'ZIP_COMPRESSION' || 
+		} else if ( EXRHeader.compression === 'ZIP_COMPRESSION' ||
 					EXRHeader.compression === 'ZIPS_COMPRESSION' ) {
 
 			for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
@@ -1307,7 +1307,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 				var raw = decompressZIP( bufferDataView, offset, compressedSize, EXRHeader.channels[ 0 ].pixelType );
 
 				offset.value += compressedSize;
-				
+
 				for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
 
 					for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
@@ -1345,7 +1345,8 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 									case THREE.HalfFloatType:
 
-										throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.'
+										throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.';
+
 								}
 
 							} else {
@@ -1358,7 +1359,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 							byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
-						}	
+						}
 
 					}
 
@@ -1377,7 +1378,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			width: width,
 			height: height,
 			data: byteArray,
-			format: numChannels == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
+			format: numChannels === 4 ? THREE.RGBAFormat : THREE.RGBFormat,
 			type: this.type
 		};
 
