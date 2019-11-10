@@ -769,7 +769,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		function uncompressRaw( info ) {
 
-			return new DataView( info.array.buffer, info.offset.value, info.size ); // 
+			return new DataView( info.array.buffer, info.offset.value, info.size );
 
 		}
 
@@ -1206,38 +1206,45 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		// offsets
 		var dataWindowHeight = EXRHeader.dataWindow.yMax + 1;
-		var scanlineBlockSize = 1; // 1 for NO_COMPRESSION
 		
 		var uncompress;
+		var scanlineBlockSize;
 
-		if ( EXRHeader.compression === 'NO_COMPRESSION' ) {
+		switch ( EXRHeader.compression ) {
 
-			scanlineBlockSize = 1;
-			uncompress = uncompressRaw;
+			case 'NO_COMPRESSION':
 
-		} else if ( EXRHeader.compression === 'RLE_COMPRESSION' ) {
+				scanlineBlockSize = 1;
+				uncompress = uncompressRaw;
+				break;
 
-			scanlineBlockSize = 1;
-			uncompress = uncompressRLE;
+			case 'RLE_COMPRESSION':
 
-		} else if ( EXRHeader.compression === 'ZIPS_COMPRESSION' ) {
+				scanlineBlockSize = 1;
+				uncompress = uncompressRLE;
+				break;
 
-			scanlineBlockSize = 1;
-			uncompress = uncompressZIP;
+			case 'ZIPS_COMPRESSION':
 
-		} else if ( EXRHeader.compression === 'ZIP_COMPRESSION' ) {
+				scanlineBlockSize = 1;
+				uncompress = uncompressZIP;
+				break;
 
-			scanlineBlockSize = 16;
-			uncompress = uncompressZIP;
+			case 'ZIP_COMPRESSION':
+					
+				scanlineBlockSize = 16;
+				uncompress = uncompressZIP;
+				break;
 
-		} else if ( EXRHeader.compression === 'PIZ_COMPRESSION' ) {
+			case 'PIZ_COMPRESSION':
 
-			scanlineBlockSize = 32;
-			uncompress = uncompressPIZ;
+				scanlineBlockSize = 32;
+				uncompress = uncompressPIZ;
+				break;
 
-		} else {
+			default:
 
-			throw 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported';
+				throw 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported';
 
 		}
 
