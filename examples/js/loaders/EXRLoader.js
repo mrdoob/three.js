@@ -1290,7 +1290,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		} else {
 
-			throw 'EXRLoader.parse: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + ' for ' + EXRHeader.compression + '.';
+			throw 'EXRLoader.parse: unsupported pixelType ' + pixelType + ' for ' + EXRHeader.compression + '.';
 
 		}
 
