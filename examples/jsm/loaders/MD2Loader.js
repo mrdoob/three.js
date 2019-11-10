@@ -375,6 +375,7 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			geometry.morphAttributes.position = morphPositions;
 			geometry.morphAttributes.normal = morphNormals;
+			geometry.morphTargetsRelative = false;
 
 			geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
 
