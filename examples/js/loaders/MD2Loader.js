@@ -366,6 +366,7 @@ THREE.MD2Loader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			geometry.morphAttributes.position = morphPositions;
 			geometry.morphAttributes.normal = morphNormals;
+			geometry.morphTargetsRelative = false;
 
 			geometry.animations = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
 
