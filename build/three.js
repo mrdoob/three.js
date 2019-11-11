@@ -20484,7 +20484,7 @@
 			if ( extension !== null ) {
 
 				equationToGL[ MinEquation ] = extension.MIN_EXT;
-				equationToGL[ MaxEquation ] = extension.MIN_EXT;
+				equationToGL[ MaxEquation ] = extension.MAX_EXT;
 
 			}
 
@@ -26847,6 +26847,8 @@
 
 			}
 
+			this.autoUpdate = source.autoUpdate;
+
 			return this;
 
 		},
@@ -26881,27 +26883,39 @@
 
 			var levels = this.levels;
 
-			for ( var i = 1, l = levels.length; i < l; i ++ ) {
+			if ( levels.length > 0 ) {
 
-				if ( distance < levels[ i ].distance ) {
+				for ( var i = 1, l = levels.length; i < l; i ++ ) {
 
-					break;
+					if ( distance < levels[ i ].distance ) {
+
+						break;
+
+					}
 
 				}
 
+				return levels[ i - 1 ].object;
+
 			}
 
-			return levels[ i - 1 ].object;
+			return null;
 
 		},
 
 		raycast: function ( raycaster, intersects ) {
 
-			_v1$4.setFromMatrixPosition( this.matrixWorld );
+			var levels = this.levels;
 
-			var distance = raycaster.ray.origin.distanceTo( _v1$4 );
+			if ( levels.length > 0 ) {
 
-			this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+				_v1$4.setFromMatrixPosition( this.matrixWorld );
+
+				var distance = raycaster.ray.origin.distanceTo( _v1$4 );
+
+				this.getObjectForDistance( distance ).raycast( raycaster, intersects );
+
+			}
 
 		},
 
