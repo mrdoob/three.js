@@ -145,7 +145,7 @@ function hsl(h, s, l) {
 And finally gluing it all together
 
 ```js
-loadFile('resources/data/gpw/gpw-v4-basic-demographic-characteristics-rev10_a000_014_2010_1_deg_asc/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
   .then(drawData);
 ```
@@ -300,7 +300,7 @@ with the texture.
 The last thing we need to do is call our loader
 
 ```
-loadFile('resources/data/gpw/gpw-v4-basic-demographic-characteristics-rev10_a000_014_2010_1_deg_asc/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
 -  .then(drawData)
 +  .then(addBoxes)

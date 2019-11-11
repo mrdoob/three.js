@@ -198,8 +198,8 @@ function main() {
 
   async function loadAll() {
     const fileInfos = [
-      {name: 'men',   hueRange: [0.7, 0.3], url: 'resources/data/gpw/gpw-v4-basic-demographic-characteristics-rev10_a000_014_2010_1_deg_asc/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
-      {name: 'women', hueRange: [0.9, 1.1], url: 'resources/data/gpw/gpw-v4-basic-demographic-characteristics-rev10_a000_014_2010_1_deg_asc/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
+      {name: 'men',   hueRange: [0.7, 0.3], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
+      {name: 'women', hueRange: [0.9, 1.1], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
     ];
 
     await Promise.all(fileInfos.map(loadData));
