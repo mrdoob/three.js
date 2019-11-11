@@ -964,6 +964,8 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( data.type === 'LOD' ) {
 
+			if ( data.autoUpdate !== undefined ) object.autoUpdate = data.autoUpdate;
+
 			var levels = data.levels;
 
 			for ( var l = 0; l < levels.length; l ++ ) {
