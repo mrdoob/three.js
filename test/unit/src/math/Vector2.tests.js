@@ -576,6 +576,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.deepEqual( new Vector2( - 0.1, 0.1 ).round(), new Vector2( 0, 0 ), "round .1" );
 			assert.deepEqual( new Vector2( - 0.5, 0.5 ).round(), new Vector2( 0, 1 ), "round .5" );
 			assert.deepEqual( new Vector2( - 0.9, 0.9 ).round(), new Vector2( - 1, 1 ), "round .9" );
+			assert.deepEqual( new Vector2( - 0.51, 0.51 ).round( 1 ), new Vector2( - 0.5, 0.5 ), "round .51" );
+			assert.deepEqual( new Vector2( - 0.55, 0.55 ).round( 1 ), new Vector2( - 0.5, 0.6 ), "round .55" );
+			assert.deepEqual( new Vector2( - 0.0009, 0.1 ).round( 3 ), new Vector2( - 0.001, 0.1 ), "round 0.0009" );
 
 			assert.deepEqual( new Vector2( - 0.1, 0.1 ).roundToZero(), new Vector2( 0, 0 ), "roundToZero .1" );
 			assert.deepEqual( new Vector2( - 0.5, 0.5 ).roundToZero(), new Vector2( 0, 0 ), "roundToZero .5" );

@@ -512,12 +512,14 @@ Object.assign( Vector4.prototype, {
 
 	},
 
-	round: function () {
+	round: function ( digits ) {
 
-		this.x = Math.round( this.x );
-		this.y = Math.round( this.y );
-		this.z = Math.round( this.z );
-		this.w = Math.round( this.w );
+		var e = Math.pow( 10, digits || 0 );
+
+		this.x = Math.round( this.x * e ) / e;
+		this.y = Math.round( this.y * e ) / e;
+		this.z = Math.round( this.z * e ) / e;
+		this.w = Math.round( this.w * e ) / e;
 
 		return this;
 

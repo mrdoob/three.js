@@ -313,10 +313,12 @@ Object.assign( Vector2.prototype, {
 
 	},
 
-	round: function () {
+	round: function ( digits ) {
 
-		this.x = Math.round( this.x );
-		this.y = Math.round( this.y );
+		var e = Math.pow( 10, digits || 0 );
+
+		this.x = Math.round( this.x * e ) / e;
+		this.y = Math.round( this.y * e ) / e;
 
 		return this;
 

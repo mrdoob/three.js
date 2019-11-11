@@ -286,9 +286,10 @@ export class Vector2 implements Vector {
 	ceil(): this;
 
 	/**
-	 * The components of the vector are rounded to the nearest integer value.
+	 * The components of the vector are rounded.
+	 * @param digits the number of digits to round to after decimal point.
 	 */
-	round(): this;
+	round( digits: number ): this;
 
 	/**
 	 * The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
