@@ -742,16 +742,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			while ( size > 0 ) {
 
-				var l = reader.getInt8( p++ );
+				var l = reader.getInt8( p ++ );
 
 				if ( l < 0 ) {
 
-					var count = -l;
+					var count = - l;
 					size -= count + 1;
 
-					for ( var i = 0; i < count; i++ ) {
+					for ( var i = 0; i < count; i ++ ) {
 
-						out.push( reader.getUint8( p++ ) );
+						out.push( reader.getUint8( p ++ ) );
 
 					}
 
@@ -761,9 +761,9 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 					var count = l;
 					size -= 2;
 
-					var value = reader.getUint8( p++ );
+					var value = reader.getUint8( p ++ );
 
-					for ( var i = 0; i < count+1; i++ ) {
+					for ( var i = 0; i < count + 1; i ++ ) {
 
 						out.push( value );
 
@@ -901,9 +901,9 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			var tmpOffset = 0;
 			var n = info.width * 2;
 
-			for ( var y = 0; y < info.lines; y++ ) {
+			for ( var y = 0; y < info.lines; y ++ ) {
 
-				for ( var c = 0; c < info.channels; c++ ) {
+				for ( var c = 0; c < info.channels; c ++ ) {
 
 					var cd = pizChannelData[ c ];
 					var cp = new Uint8Array( outBuffer.buffer, cd.end * 2 + y * n, n );
@@ -1217,7 +1217,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		// offsets
 		var dataWindowHeight = EXRHeader.dataWindow.yMax + 1;
-		
+
 		var uncompress;
 		var scanlineBlockSize;
 
@@ -1242,7 +1242,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				break;
 
 			case 'ZIP_COMPRESSION':
-					
+
 				scanlineBlockSize = 16;
 				uncompress = uncompressZIP;
 				break;
@@ -1365,21 +1365,21 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		var compressionInfo = {
 
-			array: uInt8Array, 
-			viewer: bufferDataView, 
-			offset: offset, 
+			array: uInt8Array,
+			viewer: bufferDataView,
+			offset: offset,
 			channels: EXRHeader.channels.length,
-			width: width, 
-			lines: scanlineBlockSize, 
+			width: width,
+			lines: scanlineBlockSize,
 			size: 0
 
 		};
 
-		if ( EXRHeader.compression === 'NO_COMPRESSION'  ||
-			EXRHeader.compression === 'ZIP_COMPRESSION'  ||
-			EXRHeader.compression === 'ZIPS_COMPRESSION' || 
-			EXRHeader.compression === 'RLE_COMPRESSION'  ||
-			EXRHeader.compression === 'PIZ_COMPRESSION'  ) {
+		if ( EXRHeader.compression === 'NO_COMPRESSION' ||
+			EXRHeader.compression === 'ZIP_COMPRESSION' ||
+			EXRHeader.compression === 'ZIPS_COMPRESSION' ||
+			EXRHeader.compression === 'RLE_COMPRESSION' ||
+			EXRHeader.compression === 'PIZ_COMPRESSION' ) {
 
 			var size;
 			var viewer;
@@ -1479,4 +1479,5 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 	}
 
 } );
+
 export { EXRLoader };
