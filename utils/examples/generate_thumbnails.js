@@ -141,7 +141,7 @@ if (!fs.existsSync(thumb_dir)) {
 }
 
 // grab everything using list of examples in files.js
-//grab_from_js('../../examples/files.js', thumb_dir);
+grab_from_js('../../examples/files.js', thumb_dir);
 
 // run through the 'troublesome' ones and regrab with appropriate 'tweak'
 (async () => {
