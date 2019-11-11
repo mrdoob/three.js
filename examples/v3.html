@@ -13,20 +13,44 @@ function createLink(file) {
     var link = document.createElement('a');
     link.href = file + '.html';
     link.setAttribute('target', 'new');
-    var fig = document.createElement("figure");
+    var fig = document.createElement('figure');
     link.appendChild(fig);
-    var img = document.createElement("img");
-    img.style.border = '1px #ccc solid';
-    img.setAttribute("src", "thumbs/" + file + ".jpg");
-    img.setAttribute("width", 320);
-    img.setAttribute("height", 200);
-    img.setAttribute("alt", link.textContent);
+
+    var img = document.createElement('img');
+    img.setAttribute('src', 'thumbs/' + file + '.jpg');
+    img.setAttribute('id', 'figimg');
+    img.setAttribute('width', 320);
+    img.setAttribute('height', 200);
+    img.setAttribute('alt', link.textContent);
     fig.appendChild(img);
-    var caption = document.createElement("figcaption");
+
+    var caption = document.createElement('figcaption');
     fig.appendChild(caption);
-    var txt = document.createElement("p");
+
+    var txt = document.createElement('p');
+    txt.style = 'display:inline'
     txt.innerHTML = getName(file);
     caption.appendChild(txt);
+
+    var src_link = createSourceLink(file);
+    caption.appendChild(src_link);
+
+    return link;
+}
+
+function createSourceLink(file) {
+    var link = document.createElement('a');
+    link.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + file + '.html';
+    link.setAttribute('target', 'new');
+
+    var img = document.createElement('img');
+    img.style = 'position: relative; left: 4px; top: 2px;'
+    img.setAttribute('src', '../files/ic_github_black_24dp.svg');
+    img.setAttribute('width', 20);
+    img.setAttribute('height', 20);
+    img.setAttribute('alt', 'View the source code on GitHub');
+    link.appendChild(img);
+
     return link;
 }
 
@@ -85,28 +109,28 @@ function getName(file) {
 
 var links = {};
 var container = document.createElement('div');
-container.setAttribute("id", "container");
+container.setAttribute('id', 'container');
 document.body.appendChild(container);
 
 var header = document.createElement('div');
-header.setAttribute("id", "header");
+header.setAttribute('id', 'header');
 container.appendChild(header);
 
 var filter = document.createElement('input');
-filter.setAttribute("autofocus", "true");
-filter.setAttribute("placeholder", "");
-filter.setAttribute("type", "search");
-filter.setAttribute("id", "filter");
-filter.setAttribute("autocorrect", "off");
-filter.setAttribute("autocapitalize", "off");
-filter.setAttribute("spellcheck", "off");
+filter.setAttribute('autofocus', 'true');
+filter.setAttribute('placeholder', '');
+filter.setAttribute('type', 'search');
+filter.setAttribute('id', 'filter');
+filter.setAttribute('autocorrect', 'off');
+filter.setAttribute('autocapitalize', 'off');
+filter.setAttribute('spellcheck', 'off');
 filter.addEventListener('input', function() {
     updateFilter();
 });
 header.appendChild(filter);
 
 var content = document.createElement('div');
-content.setAttribute("id", "content");
+content.setAttribute('id', 'content');
 container.appendChild(content);
 
 for (var key in files) {
@@ -116,7 +140,7 @@ for (var key in files) {
     section_title.setAttribute('data-category', key);
     content.appendChild(section_title);
     var grid = document.createElement('div');
-    grid.setAttribute("id", "grid");
+    grid.setAttribute('id', 'grid');
     content.appendChild(grid);
     for (var i = 0; i < section.length; i++) {
         var file = section[i];
