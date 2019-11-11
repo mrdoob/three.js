@@ -161,6 +161,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
+		if ( this.autoUpdate === false ) data.object.autoUpdate = false;
+
 		data.object.levels = [];
 
 		var levels = this.levels;
