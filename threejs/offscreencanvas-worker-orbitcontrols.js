@@ -70,7 +70,10 @@ function start(data) {
   const proxy = proxyManager.getProxy(data.canvasId);
   proxy.body = proxy;  // HACK!
   self.window = proxy;
-  self.document = proxy;
+  self.document = {
+    addEventListener: proxy.addEventListener.bind(proxy),
+    removeEventListener: proxy.removeEventListener.bind(proxy),
+  };
   init({
     canvas: data.canvas,
     inputElement: proxy,
