@@ -19,10 +19,11 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { Timer } from './jsm/misc/Timer.js';
 
 			var container;
 
-			var camera, scene, renderer, clock;
+			var camera, scene, renderer, timer;
 
 			var mesh;
 
@@ -41,7 +42,7 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
+				timer = new Timer();
 
 				var light = new THREE.PointLight( 0xff2200, 0.7 );
 				light.position.set( 100, 100, 100 );
@@ -109,8 +110,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				document.addEventListener( 'visibilitychange', onVisibilityChange );
-
 			}
 
 			function onWindowResize() {
@@ -122,30 +121,17 @@
 
 			}
 
-			function onVisibilityChange() {
-
-				if ( document.hidden === true ) {
-
-					clock.stop();
-
-				} else {
-
-					clock.start();
-
-				}
-
-			}
-
 			function animate() {
 
 				requestAnimationFrame( animate );
+				timer.update();
 				render();
 
 			}
 
 			function render() {
 
-				var delta = clock.getDelta();
+				var delta = timer.getDeltaTime();
 
 				if ( mesh !== undefined ) {
 

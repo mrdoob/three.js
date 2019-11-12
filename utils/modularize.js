@@ -124,6 +124,7 @@ var files = [
 	{ path: 'misc/MorphBlendMesh.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/Ocean.js', dependencies: [ { name: 'OceanShaders', path: 'shaders/OceanShaders.js' } ], ignoreList: [] },
 	{ path: 'misc/RollerCoaster.js', dependencies: [], ignoreList: [] },
+	{ path: 'misc/Timer.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/Volume.js', dependencies: [ { name: 'VolumeSlice', path: 'misc/VolumeSlice.js' } ], ignoreList: [] },
 	{ path: 'misc/VolumeSlice.js', dependencies: [], ignoreList: [] },
 
