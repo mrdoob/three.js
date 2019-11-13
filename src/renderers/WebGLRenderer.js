@@ -734,7 +734,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		bindingStates.setup( material, program, geometry, index );
+		bindingStates.setup( object, material, program, geometry, index );
 
 		var attribute;
 		var renderer = bufferRenderer;

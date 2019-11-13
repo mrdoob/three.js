@@ -15,7 +15,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	var defaultState = createBindingState( null );
 	var currentState = defaultState;
 
-	function setup( material, program, geometry, index ) {
+	function setup( object, material, program, geometry, index ) {
 
 		var updateBuffers = false;
 
@@ -60,7 +60,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		if ( updateBuffers ) {
 
-			setupVertexAttributes( material, program, geometry );
+			setupVertexAttributes( object, material, program, geometry );
 
 			if ( index !== null ) {
 
@@ -284,7 +284,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
-	function setupVertexAttributes( material, program, geometry ) {
+	function setupVertexAttributes( object, material, program, geometry ) {
 
 		if ( geometry && geometry.isInstancedBufferGeometry & ! capabilities.isWebGL2 ) {
 
@@ -375,6 +375,29 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 						gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 					}
+
+				} else if ( name === 'instanceMatrix' ) {
+
+					var attribute = attributes.get( object.instanceMatrix );
+
+					// TODO Attribute may not be available on context restore
+
+					if ( attribute === undefined ) continue;
+
+					var buffer = attribute.buffer;
+					var type = attribute.type;
+
+					enableAttributeAndDivisor( programAttribute + 0, 1 );
+					enableAttributeAndDivisor( programAttribute + 1, 1 );
+					enableAttributeAndDivisor( programAttribute + 2, 1 );
+					enableAttributeAndDivisor( programAttribute + 3, 1 );
+
+					gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+
+					gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
+					gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
+					gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
+					gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
