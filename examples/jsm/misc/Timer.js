@@ -14,7 +14,7 @@ var Timer = ( function () {
 		this._deltaTime = 0;
 		this._elapsedTime = 0;
 
-		this._timeScale = 1;
+		this._timescale = 1;
 
 		this._useFixedDeltaTime = false;
 		this._fixedDeltaTime = 16.67; // ms, corresponds to approx. 60 FPS
@@ -81,9 +81,9 @@ var Timer = ( function () {
 
 		},
 
-		getTimeScale: function () {
+		getTimescale: function () {
 
-			return this._timeScale;
+			return this._timescale;
 
 		},
 
@@ -103,9 +103,9 @@ var Timer = ( function () {
 
 		},
 
-		setTimeScale: function ( timeScale ) {
+		setTimescale: function ( timescale ) {
 
-			this._timeScale = timeScale;
+			this._timescale = timescale;
 
 			return this;
 
@@ -126,7 +126,7 @@ var Timer = ( function () {
 
 			}
 
-			this._deltaTime *= this._timeScale;
+			this._deltaTime *= this._timescale;
 
 			this._elapsedTime += this._deltaTime; // _elapsedTime is the accumulation of all previous deltas
 
