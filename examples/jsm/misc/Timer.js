@@ -11,13 +11,13 @@ var Timer = ( function () {
 		this._previousTime = 0;
 		this._currentTime = 0;
 
-		this._deltaTime = 0;
-		this._elapsedTime = 0;
+		this._delta = 0;
+		this._elapsed = 0;
 
 		this._timescale = 1;
 
-		this._useFixedDeltaTime = false;
-		this._fixedDeltaTime = 16.67; // ms, corresponds to approx. 60 FPS
+		this._useFixedDelta = false;
+		this._fixedDelta = 16.67; // ms, corresponds to approx. 60 FPS
 
 		// use Page Visibility API to avoid large time delta values
 
@@ -35,9 +35,9 @@ var Timer = ( function () {
 
 	Object.assign( Timer.prototype, {
 
-		disableFixedDeltaTime: function () {
+		disableFixedDelta: function () {
 
-			this._useFixedDeltaTime = false;
+			this._useFixedDelta = false;
 
 			return this;
 
@@ -55,29 +55,29 @@ var Timer = ( function () {
 
 		},
 
-		enableFixedDeltaTime: function () {
+		enableFixedDelta: function () {
 
-			this._useFixedDeltaTime = true;
+			this._useFixedDelta = true;
 
 			return this;
 
 		},
 
-		getDeltaTime: function () {
+		getDelta: function () {
 
-			return this._deltaTime / 1000;
-
-		},
-
-		getElapsedTime: function () {
-
-			return this._elapsedTime / 1000;
+			return this._delta / 1000;
 
 		},
 
-		getFixedDeltaTime: function () {
+		getElapsed: function () {
 
-			return this._fixedDeltaTime / 1000;
+			return this._elapsed / 1000;
+
+		},
+
+		getFixedDelta: function () {
+
+			return this._fixedDelta / 1000;
 
 		},
 
@@ -95,9 +95,9 @@ var Timer = ( function () {
 
 		},
 
-		setFixedDeltaTime: function ( fixedDeltaTime ) {
+		setFixedDelta: function ( fixedDelta ) {
 
-			this._fixedDeltaTime = fixedDeltaTime * 1000;
+			this._fixedDelta = fixedDelta * 1000;
 
 			return this;
 
@@ -113,22 +113,22 @@ var Timer = ( function () {
 
 		update: function () {
 
-			if ( this._useFixedDeltaTime === true ) {
+			if ( this._useFixedDelta === true ) {
 
-				this._deltaTime = this._fixedDeltaTime;
+				this._delta = this._fixedDelta;
 
 			} else {
 
 				this._previousTime = this._currentTime;
 				this._currentTime = this._now();
 
-				this._deltaTime = this._currentTime - this._previousTime;
+				this._delta = this._currentTime - this._previousTime;
 
 			}
 
-			this._deltaTime *= this._timescale;
+			this._delta *= this._timescale;
 
-			this._elapsedTime += this._deltaTime; // _elapsedTime is the accumulation of all previous deltas
+			this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
 
 			return this;
 
