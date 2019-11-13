@@ -89,7 +89,7 @@ var Timer = ( function () {
 
 		reset: function () {
 
-			this._currentTime = this.now();
+			this._currentTime = this._now();
 
 			return this;
 
@@ -111,12 +111,6 @@ var Timer = ( function () {
 
 		},
 
-		now: function () {
-
-			return ( typeof performance === 'undefined' ? Date : performance ).now();
-
-		},
-
 		update: function () {
 
 			if ( this._useFixedDeltaTime === true ) {
@@ -126,7 +120,7 @@ var Timer = ( function () {
 			} else {
 
 				this._previousTime = this._currentTime;
-				this._currentTime = this.now();
+				this._currentTime = this._now();
 
 				this._deltaTime = this._currentTime - this._previousTime;
 
@@ -138,7 +132,15 @@ var Timer = ( function () {
 
 			return this;
 
-		}
+		},
+
+		// private
+
+		_now: function () {
+
+			return ( typeof performance === 'undefined' ? Date : performance ).now();
+
+		},
 
 	} );
 

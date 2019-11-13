@@ -87,7 +87,7 @@ THREE.Timer = ( function () {
 
 		reset: function () {
 
-			this._currentTime = this.now();
+			this._currentTime = this._now();
 
 			return this;
 
@@ -109,12 +109,6 @@ THREE.Timer = ( function () {
 
 		},
 
-		now: function () {
-
-			return ( typeof performance === 'undefined' ? Date : performance ).now();
-
-		},
-
 		update: function () {
 
 			if ( this._useFixedDeltaTime === true ) {
@@ -124,7 +118,7 @@ THREE.Timer = ( function () {
 			} else {
 
 				this._previousTime = this._currentTime;
-				this._currentTime = this.now();
+				this._currentTime = this._now();
 
 				this._deltaTime = this._currentTime - this._previousTime;
 
@@ -136,7 +130,15 @@ THREE.Timer = ( function () {
 
 			return this;
 
-		}
+		},
+
+		// private
+
+		_now: function () {
+
+			return ( typeof performance === 'undefined' ? Date : performance ).now();
+
+		},
 
 	} );
 
