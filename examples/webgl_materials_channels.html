@@ -4,58 +4,24 @@
 		<title>three.js webgl - materials - channels</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #ffffff;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			#vt { display:none }
-			#vt, #vt a { color:orange; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
-
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span> by <a href="https://Clara.io">Ben Houston</a>.<br />
-			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
-
-			<div id="vt">displacement mapping requires vertex textures</div>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span><br/>
+			by <a href="https://Clara.io">Ben Houston</a>. ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var stats;
 
@@ -90,7 +56,7 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
@@ -112,7 +78,7 @@
 				scene = new THREE.Scene();
 
 				var aspect = window.innerWidth / window.innerHeight;
-				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 1000, 2500 );
+				cameraPerspective = new THREE.PerspectiveCamera( 45, aspect, 500, 3000 );
 				cameraPerspective.position.z = 1500;
 				scene.add( cameraPerspective );
 
@@ -122,15 +88,15 @@
 
 				camera = cameraPerspective;
 
-				controlsPerspective = new THREE.OrbitControls( cameraPerspective, renderer.domElement );
+				controlsPerspective = new OrbitControls( cameraPerspective, renderer.domElement );
 				controlsPerspective.minDistance = 1000;
-				controlsPerspective.maxDistance = 2500;
+				controlsPerspective.maxDistance = 2400;
 				controlsPerspective.enablePan = false;
 				controlsPerspective.enableDamping = true;
 
-				controlsOrtho = new THREE.OrbitControls( cameraOrtho, renderer.domElement );
+				controlsOrtho = new OrbitControls( cameraOrtho, renderer.domElement );
 				controlsOrtho.minZoom = 0.5;
-				controlsOrtho.maxZoom = 2;
+				controlsOrtho.maxZoom = 1.5;
 				controlsOrtho.enablePan = false;
 				controlsOrtho.enableDamping = true;
 
@@ -215,7 +181,7 @@
 
 				//
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
 					var geometry = group.children[ 0 ].geometry;
@@ -306,10 +272,17 @@
 
 				switch ( params.camera ) {
 
-					case 'perspective': camera = cameraPerspective; break;
-					case 'ortho': camera = cameraOrtho; break;
+					case 'perspective':
+						camera = cameraPerspective;
+						break;
+					case 'ortho':
+						camera = cameraOrtho;
+						break;
 
 				}
+
+				controlsPerspective.update();
+				controlsOrtho.update(); // must update both controls for damping to complete
 
 				renderer.render( scene, camera );
 

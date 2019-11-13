@@ -33,7 +33,7 @@ THREE.DotScreenPass.prototype = Object.assign( Object.create( THREE.Pass.prototy
 
 	constructor: THREE.DotScreenPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		this.uniforms[ "tDiffuse" ].value = readBuffer.texture;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );

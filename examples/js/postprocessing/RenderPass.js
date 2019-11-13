@@ -24,7 +24,7 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 	constructor: THREE.RenderPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;

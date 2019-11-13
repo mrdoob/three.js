@@ -15,8 +15,6 @@ import {
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
 
-'use strict';
-
 var SkeletonUtils = {
 
 	retarget: function () {
@@ -585,7 +583,7 @@ var SkeletonUtils = {
 };
 
 
-function parallelTraverse ( a, b, callback ) {
+function parallelTraverse( a, b, callback ) {
 
 	callback( a, b );
 

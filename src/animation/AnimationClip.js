@@ -447,7 +447,6 @@ Object.assign( AnimationClip.prototype, {
 
 	},
 
-
 	clone: function () {
 
 		var tracks = [];

@@ -1,0 +1,21 @@
+#VRML V2.0 utf8
+#PointSet example
+
+Shape {
+	geometry PointSet {
+		coord Coordinate { 
+			point [
+				-1.0 -1.0 0.0,
+				1.0 1.0 0.0,
+				0.0 0.0 0.0,
+			]
+		}
+		color Color {
+			color [
+				1.0 0.0 0.0,
+				0.0 1.0 0.0,
+				0.0 0.0 1.0,
+			]
+		}
+	}
+}

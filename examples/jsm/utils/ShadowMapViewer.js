@@ -37,9 +37,9 @@ import {
 	Scene,
 	ShaderMaterial,
 	Texture,
-	UniformsUtils,
-	UnpackDepthRGBAShader
+	UniformsUtils
 } from "../../../build/three.module.js";
+import { UnpackDepthRGBAShader } from "../shaders/UnpackDepthRGBAShader.js";
 
 var ShadowMapViewer = function ( light ) {
 
@@ -63,7 +63,7 @@ var ShadowMapViewer = function ( light ) {
 	//HUD for shadow map
 	var shader = UnpackDepthRGBAShader;
 
-	var uniforms = new UniformsUtils.clone( shader.uniforms );
+	var uniforms = UniformsUtils.clone( shader.uniforms );
 	var material = new ShaderMaterial( {
 		uniforms: uniforms,
 		vertexShader: shader.vertexShader,
@@ -109,7 +109,7 @@ var ShadowMapViewer = function ( light ) {
 	}
 
 
-	function resetPosition () {
+	function resetPosition() {
 
 		scope.position.set( scope.position.x, scope.position.y );
 
@@ -187,6 +187,7 @@ var ShadowMapViewer = function ( light ) {
 			 camera.updateProjectionMatrix();
 
 			 this.update();
+
 		}
 
 	};

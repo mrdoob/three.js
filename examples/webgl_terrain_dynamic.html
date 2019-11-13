@@ -4,26 +4,14 @@
 		<title>three.js webgl - dynamic procedural terrain</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style type="text/css">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
 			body {
-				background: #000;
-				color: #999;
-				padding: 0;
-				margin: 0;
-				overflow: hidden;
-				font-family: georgia;
-				font-size:1em;
-				text-align: center;
+				color: #333;
 			}
-
-			#info { position: absolute; top: 10px; width: 100%; }
-
-			a { color: #fb0; }
-
-			#footer { position: absolute; bottom: 10px; width: 100%; }
-			.h { color: #fb0 }
-			.c { display: inline; margin-left: 1em }
-
+			a {
+				color: #080;
+			}
 		</style>
 	</head>
 
@@ -35,29 +23,10 @@
 			<a href="https://github.com/ashima/webgl-noise" target="_blank" rel="noopener">3d simplex noise</a><br/>
 			textures by <a href="http://opengameart.org/content/dark-grass">qubodup</a> and
 			<a href="http://opengameart.org/content/backgrounds-topdown-games">davis123</a>
+			<br/>
+			day / night: <strong>n</strong>&nbsp;&nbsp;
+			animate terrain: <strong>m</strong>
 		</div>
-
-		<div id="footer">
-			<div class="c">
-			day / night: <span class="h">n</span>
-			</div>
-
-			<div class="c">
-			animate terrain: <span class="h">m</span>
-			</div>
-		</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-
-		<script src="js/shaders/NormalMapShader.js"></script>
-		<script src="js/ShaderTerrain.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
 
@@ -202,13 +171,16 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { NormalMapShader } from './jsm/shaders/NormalMapShader.js';
+			import { TerrainShader } from './jsm/shaders/TerrainShader.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -256,14 +228,6 @@
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( - 1200, 800, 1200 );
 
-				controls = new THREE.OrbitControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.keys = [ 65, 83, 68 ];
-
 				// SCENE (FINAL)
 
 				scene = new THREE.Scene();
@@ -284,7 +248,7 @@
 
 				// HEIGHT + NORMAL MAPS
 
-				var normalShader = THREE.NormalMapShader;
+				var normalShader = NormalMapShader;
 
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -334,7 +298,7 @@
 
 				// TERRAIN SHADER
 
-				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
+				var terrainShader = TerrainShader;
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
@@ -393,7 +357,7 @@
 
 				var geometryTerrain = new THREE.PlaneBufferGeometry( 6000, 6000, 256, 256 );
 
-				THREE.BufferGeometryUtils.computeTangents( geometryTerrain );
+				BufferGeometryUtils.computeTangents( geometryTerrain );
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ 'terrain' ] );
 				terrain.position.set( 0, - 125, 0 );
@@ -407,6 +371,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
+
+				// CONTROLS
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.keys = [ 65, 83, 68 ];
 
 				// STATS
 

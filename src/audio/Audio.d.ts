@@ -5,7 +5,8 @@ import { AudioContext } from './AudioContext';
 // Extras / Audio /////////////////////////////////////////////////////////////////////
 
 export class Audio extends Object3D {
-	constructor(listener: AudioListener);
+
+	constructor( listener: AudioListener );
 	type: 'Audio';
 
 	context: AudioContext;
@@ -14,8 +15,8 @@ export class Audio extends Object3D {
 	buffer: null | Audio;
 	detune: number;
 	loop: boolean;
-	startTime: number;
 	offset: number;
+	duration: number | undefined;
 	playbackRate: number;
 	isPlaying: boolean;
 	hasPlaybackControl: boolean;
@@ -24,40 +25,46 @@ export class Audio extends Object3D {
 	filters: any[];
 
 	getOutput(): GainNode;
-	setNodeSource(audioNode: AudioBufferSourceNode): this;
-	setMediaElementSource(mediaElement: MediaElementAudioSourceNode): this;
-	setBuffer(audioBuffer: AudioBuffer): this;
-	play(): this;
+	setNodeSource( audioNode: AudioBufferSourceNode ): this;
+	setMediaElementSource( mediaElement: HTMLMediaElement ): this;
+	setMediaStreamSource( mediaStream: MediaStream ): this;
+	setBuffer( audioBuffer: AudioBuffer ): this;
+	play( delay?: number ): this;
 	onEnded(): void;
 	pause(): this;
 	stop(): this;
 	connect(): this;
 	disconnect(): this;
-	setDetune(value: number): this;
+	setDetune( value: number ): this;
 	getDetune(): number;
 	getFilters(): any[];
-	setFilter(value: any[]): this;
+	setFilter( value: any[] ): this;
 	getFilter(): any;
-	setFilter(filter: any): this;
-	setPlaybackRate(value: number): this;
+	setFilter( filter: any ): this;
+	setPlaybackRate( value: number ): this;
 	getPlaybackRate(): number;
 	getLoop(): boolean;
-	setLoop(value: boolean): void;
+	setLoop( value: boolean ): this;
+	setLoopStart( value: number ): this;
+	setLoopEnd( value: number ): this;
 	getVolume(): number;
-	setVolume(value: number): this;
+	setVolume( value: number ): this;
 	/**
 	 * @deprecated Use {@link AudioLoader} instead.
 	 */
-	load(file: string): Audio;
+	load( file: string ): Audio;
+
 }
 
 export class AudioBuffer {
-	constructor(context: any);
+
+	constructor( context: any );
 
 	context: any;
 	ready: boolean;
 	readyCallbacks: Function[];
 
-	load(file: string): AudioBuffer;
-	onReady(callback: Function): void;
+	load( file: string ): AudioBuffer;
+	onReady( callback: Function ): void;
+
 }

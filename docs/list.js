@@ -14,8 +14,6 @@ var list = {
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
-				"Migration guide": "manual/en/introduction/Migration-guide",
-				"Code style guide": "manual/en/introduction/Code-style-guide",
 				"FAQ": "manual/en/introduction/FAQ",
 				"Useful links": "manual/en/introduction/Useful-links"
 			},
@@ -24,6 +22,7 @@ var list = {
 				"How to update things": "manual/en/introduction/How-to-update-things",
 				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
 				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
+				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system"
 			},
@@ -218,8 +217,9 @@ var list = {
 			},
 
 			"Lights / Shadows": {
-				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"LightShadow": "api/en/lights/shadows/LightShadow",
+				"PointLightShadow": "api/en/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/en/lights/shadows/SpotLightShadow"
 			},
 
@@ -301,6 +301,7 @@ var list = {
 			"Objects": {
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
+				"InstancedMesh": "api/en/objects/InstancedMesh",
 				"Line": "api/en/objects/Line",
 				"LineLoop": "api/en/objects/LineLoop",
 				"LineSegments": "api/en/objects/LineSegments",
@@ -348,70 +349,81 @@ var list = {
 		"Examples": {
 
 			"Animations": {
-				"CCDIKSolver": "examples/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/animations/MMDPhysics"
+				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
+				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
+				"MMDPhysics": "examples/en/animations/MMDPhysics"
 			},
 
 			"Controls": {
-				"OrbitControls": "examples/controls/OrbitControls"
+				"DeviceOrientationControls": "examples/en/controls/DeviceOrientationControls",
+				"DragControls": "examples/en/controls/DragControls",
+				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
+				"FlyControls": "examples/en/controls/FlyControls",
+				"OrbitControls": "examples/en/controls/OrbitControls",
+				"PointerLockControls": "examples/en/controls/PointerLockControls",
+				"TrackballControls": "examples/en/controls/TrackballControls",
+				"TransformControls": "examples/en/controls/TransformControls"
 			},
 
 			"Geometries": {
-				"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-				"ConvexGeometry": "examples/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/geometries/DecalGeometry"
+				"ConvexBufferGeometry": "examples/en/geometries/ConvexBufferGeometry",
+				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
+				"DecalGeometry": "examples/en/geometries/DecalGeometry"
 			},
 
 			"Loaders": {
-				"BabylonLoader": "examples/loaders/BabylonLoader",
-				"DRACOLoader": "examples/loaders/DRACOLoader",
-				"GLTFLoader": "examples/loaders/GLTFLoader",
-				"MMDLoader": "examples/loaders/MMDLoader",
-				"MTLLoader": "examples/loaders/MTLLoader",
-				"OBJLoader": "examples/loaders/OBJLoader",
-				"OBJLoader2": "examples/loaders/OBJLoader2",
-				"LoaderSupport": "examples/loaders/LoaderSupport",
-				"PCDLoader": "examples/loaders/PCDLoader",
-				"PDBLoader": "examples/loaders/PDBLoader",
-				"SVGLoader": "examples/loaders/SVGLoader",
-				"TGALoader": "examples/loaders/TGALoader",
-				"PRWMLoader": "examples/loaders/PRWMLoader"
+				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
+				"DRACOLoader": "examples/en/loaders/DRACOLoader",
+				"GLTFLoader": "examples/en/loaders/GLTFLoader",
+				"MMDLoader": "examples/en/loaders/MMDLoader",
+				"MTLLoader": "examples/en/loaders/MTLLoader",
+				"OBJLoader": "examples/en/loaders/OBJLoader",
+				"OBJLoader2": "examples/en/loaders/OBJLoader2",
+				"OBJLoader2Parallel": "examples/en/loaders/OBJLoader2Parallel",
+				"PCDLoader": "examples/en/loaders/PCDLoader",
+				"PDBLoader": "examples/en/loaders/PDBLoader",
+				"PRWMLoader": "examples/en/loaders/PRWMLoader",
+				"SVGLoader": "examples/en/loaders/SVGLoader",
+				"TGALoader": "examples/en/loaders/TGALoader"
 			},
 
 			"Objects": {
-				"Lensflare": "examples/objects/Lensflare",
+				"Lensflare": "examples/en/objects/Lensflare",
+			},
+
+			"Post-Processing": {
+				"EffectComposer": "examples/en/postprocessing/EffectComposer"
 			},
 
 			"Exporters": {
-				"GLTFExporter": "examples/exporters/GLTFExporter",
-				"PLYExporter": "examples/exporters/PLYExporter",
-				"ColladaExporter": "examples/exporters/ColladaExporter"
+				"GLTFExporter": "examples/en/exporters/GLTFExporter",
+				"PLYExporter": "examples/en/exporters/PLYExporter",
+				"ColladaExporter": "examples/en/exporters/ColladaExporter"
 			},
 
 			"Plugins": {
-				"LookupTable": "examples/Lut",
+				"LookupTable": "examples/en/Lut",
 			},
 
-			"QuickHull": {
-				"Face": "examples/quickhull/Face",
-				"HalfEdge": "examples/quickhull/HalfEdge",
-				"QuickHull": "examples/quickhull/QuickHull",
-				"VertexNode": "examples/quickhull/VertexNode",
-				"VertexList": "examples/quickhull/VertexList"
+			"ConvexHull": {
+				"Face": "examples/en/math/convexhull/Face",
+				"HalfEdge": "examples/en/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/en/math/convexhull/ConvexHull",
+				"VertexNode": "examples/en/math/convexhull/VertexNode",
+				"VertexList": "examples/en/math/convexhull/VertexList"
 			},
 
 			"Renderers": {
-				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
-				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
-				"SVGRenderer": "examples/renderers/SVGRenderer"
+				"CSS2DRenderer": "examples/en/renderers/CSS2DRenderer",
+				"CSS3DRenderer": "examples/en/renderers/CSS3DRenderer",
+				"SVGRenderer": "examples/en/renderers/SVGRenderer"
 
 			},
 
 			"Utils": {
-				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils",
-				"SkeletonUtils": "examples/utils/SkeletonUtils"
+				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
+				"SceneUtils": "examples/en/utils/SceneUtils",
+				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			}
 
 		},
@@ -446,8 +458,6 @@ var list = {
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
-				"迁移指南": "manual/zh/introduction/Migration-guide",
-				"代码风格指南": "manual/zh/introduction/Code-style-guide",
 				"常见问题": "manual/zh/introduction/FAQ",
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},
@@ -456,6 +466,7 @@ var list = {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
 				"如何废置对象": "manual/zh/introduction/How-to-dispose-of-objects",
 				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
+				"如何使用后期处理": "manual/zh/introduction/How-to-use-post-processing",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
 			},
@@ -650,8 +661,9 @@ var list = {
 			},
 
 			"灯光 / 阴影": {
-				"DirectionalLightShadow": "api/zh/lights/shadows/DirectionalLightShadow",
 				"LightShadow": "api/zh/lights/shadows/LightShadow",
+				"PointLightShadow": "api/zh/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/zh/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/zh/lights/shadows/SpotLightShadow"
 			},
 
@@ -733,6 +745,7 @@ var list = {
 			"物体": {
 				"Bone": "api/zh/objects/Bone",
 				"Group": "api/zh/objects/Group",
+				"InstancedMesh": "api/zh/objects/InstancedMesh",
 				"Line": "api/zh/objects/Line",
 				"LineLoop": "api/zh/objects/LineLoop",
 				"LineSegments": "api/zh/objects/LineSegments",
@@ -780,67 +793,79 @@ var list = {
 		"示例": {
 
 			"动画": {
-				"CCDIKSolver": "examples/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/animations/MMDPhysics"
+				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
+				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
+				"MMDPhysics": "examples/zh/animations/MMDPhysics"
 			},
 
 			"控制": {
-				"OrbitControls": "examples/controls/OrbitControls"
+				"DeviceOrientationControls": "examples/zh/controls/DeviceOrientationControls",
+				"DragControls": "examples/zh/controls/DragControls",
+				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
+				"FlyControls": "examples/zh/controls/FlyControls",
+				"OrbitControls": "examples/zh/controls/OrbitControls",
+				"PointerLockControls": "examples/zh/controls/PointerLockControls",
+				"TrackballControls": "examples/zh/controls/TrackballControls",
+				"TransformControls": "examples/zh/controls/TransformControls"
 			},
 
 			"几何体": {
-				"ConvexBufferGeometry": "examples/geometries/ConvexBufferGeometry",
-				"ConvexGeometry": "examples/geometries/ConvexGeometry",
-				"DecalGeometry": "examples/geometries/DecalGeometry"
+				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
+				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
+				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
 			},
 
 			"加载器": {
-				"BabylonLoader": "examples/loaders/BabylonLoader",
-				"GLTFLoader": "examples/loaders/GLTFLoader",
-				"MMDLoader": "examples/loaders/MMDLoader",
-				"MTLLoader": "examples/loaders/MTLLoader",
-				"OBJLoader": "examples/loaders/OBJLoader",
-				"OBJLoader2": "examples/loaders/OBJLoader2",
-				"LoaderSupport": "examples/loaders/LoaderSupport",
-				"PCDLoader": "examples/loaders/PCDLoader",
-				"PDBLoader": "examples/loaders/PDBLoader",
-				"SVGLoader": "examples/loaders/SVGLoader",
-				"TGALoader": "examples/loaders/TGALoader",
-				"PRWMLoader": "examples/loaders/PRWMLoader"
+				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
+				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
+				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
+				"MMDLoader": "examples/zh/loaders/MMDLoader",
+				"MTLLoader": "examples/zh/loaders/MTLLoader",
+				"OBJLoader": "examples/zh/loaders/OBJLoader",
+				"OBJLoader2": "examples/zh/loaders/OBJLoader2",
+				"PCDLoader": "examples/zh/loaders/PCDLoader",
+				"PDBLoader": "examples/zh/loaders/PDBLoader",
+				"PRWMLoader": "examples/zh/loaders/PRWMLoader",
+				"SVGLoader": "examples/zh/loaders/SVGLoader",
+				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
 
 			"物体": {
-				"Lensflare": "examples/objects/Lensflare",
+				"Lensflare": "examples/zh/objects/Lensflare",
+			},
+
+			"后期处理": {
+				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
 			},
 
 			"导出器": {
-				"GLTFExporter": "examples/exporters/GLTFExporter",
-				"PLYExporter": "examples/exporters/PLYExporter"
+				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
+				"PLYExporter": "examples/zh/exporters/PLYExporter",
+				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
 			},
 
 			"插件": {
-				"LookupTable": "examples/Lut",
+				"LookupTable": "examples/zh/Lut",
 			},
 
 			"QuickHull": {
-				"Face": "examples/quickhull/Face",
-				"HalfEdge": "examples/quickhull/HalfEdge",
-				"QuickHull": "examples/quickhull/QuickHull",
-				"VertexNode": "examples/quickhull/VertexNode",
-				"VertexList": "examples/quickhull/VertexList"
+				"Face": "examples/zh/math/convexhull/Face",
+				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/zh/math/convexhull/ConvexHull",
+				"VertexNode": "examples/zh/math/convexhull/VertexNode",
+				"VertexList": "examples/zh/math/convexhull/VertexList"
 			},
 
 			"渲染器": {
-				"CSS2DRenderer": "examples/renderers/CSS2DRenderer",
-				"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
-				"SVGRenderer": "examples/renderers/SVGRenderer"
-
+				"CSS2DRenderer": "examples/zh/renderers/CSS2DRenderer",
+				"CSS3DRenderer": "examples/zh/renderers/CSS3DRenderer",
+				"SVGRenderer": "examples/zh/renderers/SVGRenderer"
 			},
 
 			"实用工具": {
-				"BufferGeometryUtils": "examples/utils/BufferGeometryUtils",
-				"SceneUtils": "examples/utils/SceneUtils"
+				"BufferGeometryUtils": "examples/zh/utils/BufferGeometryUtils",
+				"SceneUtils": "examples/zh/utils/SceneUtils",
+				"SkeletonUtils": "examples/zh/utils/SkeletonUtils"
 			}
 
 		},

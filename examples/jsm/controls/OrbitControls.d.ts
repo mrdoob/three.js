@@ -1,70 +1,78 @@
-import { Camera, MOUSE, Object3D, Vector3 } from '../../../src/Three';
+import { Camera, MOUSE, Object3D, TOUCH, Vector3 } from '../../../src/Three';
 
 export class OrbitControls {
-  constructor(object: Camera, domElement?: HTMLElement);
 
-  object: Camera;
-  domElement: HTMLElement | HTMLDocument;
+	constructor( object: Camera, domElement?: HTMLElement );
 
-  // API
-  enabled: boolean;
-  target: Vector3;
+	object: Camera;
+	domElement: HTMLElement | HTMLDocument;
 
-  // deprecated
-  center: Vector3;
+	// API
+	enabled: boolean;
+	target: Vector3;
 
-  enableZoom: boolean;
-  zoomSpeed: number;
-  minDistance: number;
-  maxDistance: number;
-  enableRotate: boolean;
-  rotateSpeed: number;
-  enablePan: boolean;
-  keyPanSpeed: number;
-  autoRotate: boolean;
-  autoRotateSpeed: number;
-  minPolarAngle: number;
-  maxPolarAngle: number;
-  minAzimuthAngle: number;
-  maxAzimuthAngle: number;
-  enableKeys: boolean;
-  keys: {LEFT: number; UP: number; RIGHT: number; BOTTOM: number;};
-  mouseButtons: {ORBIT: MOUSE; ZOOM: MOUSE; PAN: MOUSE;};
-  enableDamping: boolean;
-  dampingFactor: number;
-  screenSpacePanning: boolean;
+	// deprecated
+	center: Vector3;
 
+	minDistance: number;
+	maxDistance: number;
 
-  rotateLeft(angle?: number): void;
+	minZoom: number;
+	maxZoom: number;
 
-  rotateUp(angle?: number): void;
+	minPolarAngle: number;
+	maxPolarAngle: number;
 
-  panLeft(distance?: number): void;
+	minAzimuthAngle: number;
+	maxAzimuthAngle: number;
 
-  panUp(distance?: number): void;
+	enableDamping: boolean;
+	dampingFactor: number;
 
-  pan(deltaX: number, deltaY: number): void;
+	enableZoom: boolean;
+	zoomSpeed: number;
 
-  dollyIn(dollyScale: number): void;
+	enableRotate: boolean;
+	rotateSpeed: number;
 
-  dollyOut(dollyScale: number): void;
+	enablePan: boolean;
+	panSpeed: number;
+	screenSpacePanning: boolean;
+	keyPanSpeed: number;
 
-  update(): void;
+	autoRotate: boolean;
+	autoRotateSpeed: number;
 
-  reset(): void;
+	enableKeys: boolean;
+	keys: { LEFT: number; UP: number; RIGHT: number; BOTTOM: number; };
+	mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE; };
+	touches: { ONE: TOUCH; TWO: TOUCH };
 
-  dispose(): void;
+	update(): boolean;
 
-  getPolarAngle(): number;
+	saveState(): void;
 
-  getAzimuthalAngle(): number;
+	reset(): void;
 
-  // EventDispatcher mixins
-  addEventListener(type: string, listener: (event: any) => void): void;
+	dispose(): void;
 
-  hasEventListener(type: string, listener: (event: any) => void): boolean;
+	getPolarAngle(): number;
 
-  removeEventListener(type: string, listener: (event: any) => void): void;
+	getAzimuthalAngle(): number;
 
-  dispatchEvent(event: {type: string; target: any;}): void;
+	// EventDispatcher mixins
+	addEventListener( type: string, listener: ( event: any ) => void ): void;
+
+	hasEventListener( type: string, listener: ( event: any ) => void ): boolean;
+
+	removeEventListener( type: string, listener: ( event: any ) => void ): void;
+
+	dispatchEvent( event: { type: string; target: any; } ): void;
+
+}
+
+export class MapControls extends OrbitControls {
+
+	constructor( object: Camera, domElement?: HTMLElement );
+
 }

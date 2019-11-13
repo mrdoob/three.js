@@ -1,7 +1,9 @@
 export class Font {
-  constructor(jsondata: any);
 
-  data: string;
+	constructor( jsondata: any );
 
-  generateShapes(text: string, size: number, divisions: number): any[];
+	data: string;
+
+	generateShapes( text: string, size: number, divisions: number ): any[];
+
 }

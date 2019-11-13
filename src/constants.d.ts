@@ -2,9 +2,19 @@ export const REVISION: string;
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 export enum MOUSE {
-  LEFT,
-  MIDDLE,
-  RIGHT,
+	LEFT,
+	MIDDLE,
+	RIGHT,
+	ROTATE,
+	DOLLY,
+	PAN,
+}
+
+export enum TOUCH {
+	ROTATE,
+	PAN,
+	DOLLY_PAN,
+	DOLLY_ROTATE,
 }
 
 // GL STATE CONSTANTS
@@ -23,6 +33,7 @@ export enum ShadowMapType {}
 export const BasicShadowMap: ShadowMapType;
 export const PCFShadowMap: ShadowMapType;
 export const PCFSoftShadowMap: ShadowMapType;
+export const VSMShadowMap: ShadowMapType;
 
 // MATERIAL CONSTANTS
 
@@ -54,7 +65,7 @@ export const CustomBlending: Blending;
 
 // custom blending equations
 // (numbers start from 100 not to clash with other
-//  mappings to OpenGL constants defined in Texture.js)
+// mappings to OpenGL constants defined in Texture.js)
 export enum BlendingEquation {}
 export const AddEquation: BlendingEquation;
 export const SubtractEquation: BlendingEquation;
@@ -104,6 +115,7 @@ export const LinearToneMapping: ToneMapping;
 export const ReinhardToneMapping: ToneMapping;
 export const Uncharted2ToneMapping: ToneMapping;
 export const CineonToneMapping: ToneMapping;
+export const ACESFilmicToneMapping: ToneMapping;
 
 // Mapping modes
 export enum Mapping {}
@@ -125,10 +137,14 @@ export const MirroredRepeatWrapping: Wrapping;
 // Filters
 export enum TextureFilter {}
 export const NearestFilter: TextureFilter;
+export const NearestMipmapNearestFilter: TextureFilter;
 export const NearestMipMapNearestFilter: TextureFilter;
+export const NearestMipmapLinearFilter: TextureFilter;
 export const NearestMipMapLinearFilter: TextureFilter;
 export const LinearFilter: TextureFilter;
+export const LinearMipmapNearestFilter: TextureFilter;
 export const LinearMipMapNearestFilter: TextureFilter;
+export const LinearMipmapLinearFilter: TextureFilter;
 export const LinearMipMapLinearFilter: TextureFilter;
 
 // Data types
@@ -238,3 +254,37 @@ export const RGBADepthPacking: DepthPackingStrategies;
 export enum NormalMapTypes {}
 export const TangentSpaceNormalMap: NormalMapTypes;
 export const ObjectSpaceNormalMap: NormalMapTypes;
+
+// Stencil Op types
+export enum StencilOp {}
+export const ZeroStencilOp: StencilOp;
+export const KeepStencilOp: StencilOp;
+export const ReplaceStencilOp: StencilOp;
+export const IncrementStencilOp: StencilOp;
+export const DecrementStencilOp: StencilOp;
+export const IncrementWrapStencilOp: StencilOp;
+export const DecrementWrapStencilOp: StencilOp;
+export const InvertStencilOp: StencilOp;
+
+// Stencil Func types
+export enum StencilFunc {}
+export const NeverStencilFunc: StencilFunc;
+export const LessStencilFunc: StencilFunc;
+export const EqualStencilFunc: StencilFunc;
+export const LessEqualStencilFunc: StencilFunc;
+export const GreaterStencilFunc: StencilFunc;
+export const NotEqualStencilFunc: StencilFunc;
+export const GreaterEqualStencilFunc: StencilFunc;
+export const AlwaysStencilFunc: StencilFunc;
+
+// usage types
+export enum Usage {}
+export const StaticDrawUsage: Usage;
+export const DynamicDrawUsage: Usage;
+export const StreamDrawUsage: Usage;
+export const StaticReadUsage: Usage;
+export const DynamicReadUsage: Usage;
+export const StreamReadUsage: Usage;
+export const StaticCopyUsage: Usage;
+export const DynamicCopyUsage: Usage;
+export const StreamCopyUsage: Usage;

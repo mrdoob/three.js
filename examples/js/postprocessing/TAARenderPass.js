@@ -12,7 +12,7 @@
  *
  */
 
-THREE.TAARenderPass = function ( scene, camera, params ) {
+THREE.TAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	if ( THREE.SSAARenderPass === undefined ) {
 
@@ -20,7 +20,7 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 	}
 
-	THREE.SSAARenderPass.call( this, scene, camera, params );
+	THREE.SSAARenderPass.call( this, scene, camera, clearColor, clearAlpha );
 
 	this.sampleLevel = 0;
 	this.accumulate = false;

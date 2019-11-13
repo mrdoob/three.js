@@ -4,52 +4,34 @@
 		<title>three.js webgl - exporter - draco</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
+				background-color: #a0a0a0;
 				color: #fff;
-				margin: 0px;
-				overflow: hidden;
 			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
-			}
-			#info a {
-				color: #046;
-				font-weight: bold;
+
+			a {
+				color: #0f0;
 			}
 		</style>
 	</head>
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button onclick="exportFile()">export</button>
-			<button onclick="createGeometry()">geometry</button>
-			<button onclick="createBufferGeometry()">buffer geometry</button>
+			<button id="createGeometry">Geometry</button>
+			<button id="createBufferGeometry">BufferGeometry</button> |
+			<button id="exportFile">Export DRC</button>
 		</div>
 
-		<script src="../build/three.js"></script>
-		
 		<script src="js/libs/draco/draco_encoder.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/exporters/DRACOExporter.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { DRACOExporter } from './jsm/exporters/DRACOExporter.js';
 
 			var scene, camera, renderer, exporter, mesh;
 
@@ -79,6 +61,7 @@
 				mesh.castShadow = true;
 				mesh.position.y = 25;
 				scene.add( mesh );
+
 			}
 
 			function init() {
@@ -90,7 +73,7 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
-				exporter = new THREE.DRACOExporter();
+				exporter = new DRACOExporter();
 
 				//
 
@@ -98,7 +81,7 @@
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				directionalLight.position.set( 0, 200, 100 );
 				directionalLight.castShadow = true;
 				directionalLight.shadow.camera.top = 180;
@@ -109,14 +92,19 @@
 
 				// ground
 
-				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 2000, 2000 ),
+					new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
+				);
 				ground.rotation.x = - Math.PI / 2;
+				ground.position.y = - 75;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
 				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
+				grid.position.y = - 75;
 				scene.add( grid );
 
 				// export mesh
@@ -138,13 +126,22 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 25, 0 );
 				controls.update();
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var createGeometryButton = document.getElementById( 'createGeometry' );
+				createGeometryButton.addEventListener( 'click', createGeometry );
+
+				var createBufferGeometryButton = document.getElementById( 'createBufferGeometry' );
+				createBufferGeometryButton.addEventListener( 'click', createBufferGeometry );
+
+				var exportButton = document.getElementById( 'exportFile' );
+				exportButton.addEventListener( 'click', exportFile );
 
 			}
 

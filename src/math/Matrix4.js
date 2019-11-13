@@ -1,5 +1,13 @@
 import { Vector3 } from './Vector3.js';
 
+var _v1 = new Vector3();
+var _m1 = new Matrix4();
+var _zero = new Vector3( 0, 0, 0 );
+var _one = new Vector3( 1, 1, 1 );
+var _x = new Vector3();
+var _y = new Vector3();
+var _z = new Vector3();
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -119,46 +127,40 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	extractRotation: function () {
+	extractRotation: function ( m ) {
 
-		var v1 = new Vector3();
+		// this method does not support reflection matrices
 
-		return function extractRotation( m ) {
+		var te = this.elements;
+		var me = m.elements;
 
-			// this method does not support reflection matrices
+		var scaleX = 1 / _v1.setFromMatrixColumn( m, 0 ).length();
+		var scaleY = 1 / _v1.setFromMatrixColumn( m, 1 ).length();
+		var scaleZ = 1 / _v1.setFromMatrixColumn( m, 2 ).length();
 
-			var te = this.elements;
-			var me = m.elements;
+		te[ 0 ] = me[ 0 ] * scaleX;
+		te[ 1 ] = me[ 1 ] * scaleX;
+		te[ 2 ] = me[ 2 ] * scaleX;
+		te[ 3 ] = 0;
 
-			var scaleX = 1 / v1.setFromMatrixColumn( m, 0 ).length();
-			var scaleY = 1 / v1.setFromMatrixColumn( m, 1 ).length();
-			var scaleZ = 1 / v1.setFromMatrixColumn( m, 2 ).length();
+		te[ 4 ] = me[ 4 ] * scaleY;
+		te[ 5 ] = me[ 5 ] * scaleY;
+		te[ 6 ] = me[ 6 ] * scaleY;
+		te[ 7 ] = 0;
 
-			te[ 0 ] = me[ 0 ] * scaleX;
-			te[ 1 ] = me[ 1 ] * scaleX;
-			te[ 2 ] = me[ 2 ] * scaleX;
-			te[ 3 ] = 0;
+		te[ 8 ] = me[ 8 ] * scaleZ;
+		te[ 9 ] = me[ 9 ] * scaleZ;
+		te[ 10 ] = me[ 10 ] * scaleZ;
+		te[ 11 ] = 0;
 
-			te[ 4 ] = me[ 4 ] * scaleY;
-			te[ 5 ] = me[ 5 ] * scaleY;
-			te[ 6 ] = me[ 6 ] * scaleY;
-			te[ 7 ] = 0;
+		te[ 12 ] = 0;
+		te[ 13 ] = 0;
+		te[ 14 ] = 0;
+		te[ 15 ] = 1;
 
-			te[ 8 ] = me[ 8 ] * scaleZ;
-			te[ 9 ] = me[ 9 ] * scaleZ;
-			te[ 10 ] = me[ 10 ] * scaleZ;
-			te[ 11 ] = 0;
+		return this;
 
-			te[ 12 ] = 0;
-			te[ 13 ] = 0;
-			te[ 14 ] = 0;
-			te[ 15 ] = 1;
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	makeRotationFromEuler: function ( euler ) {
 
@@ -288,73 +290,58 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	makeRotationFromQuaternion: function () {
+	makeRotationFromQuaternion: function ( q ) {
 
-		var zero = new Vector3( 0, 0, 0 );
-		var one = new Vector3( 1, 1, 1 );
+		return this.compose( _zero, q, _one );
 
-		return function makeRotationFromQuaternion( q ) {
+	},
 
-			return this.compose( zero, q, one );
+	lookAt: function ( eye, target, up ) {
 
-		};
+		var te = this.elements;
 
-	}(),
+		_z.subVectors( eye, target );
 
-	lookAt: function () {
+		if ( _z.lengthSq() === 0 ) {
 
-		var x = new Vector3();
-		var y = new Vector3();
-		var z = new Vector3();
+			// eye and target are in the same position
 
-		return function lookAt( eye, target, up ) {
+			_z.z = 1;
 
-			var te = this.elements;
+		}
 
-			z.subVectors( eye, target );
+		_z.normalize();
+		_x.crossVectors( up, _z );
 
-			if ( z.lengthSq() === 0 ) {
+		if ( _x.lengthSq() === 0 ) {
 
-				// eye and target are in the same position
+			// up and z are parallel
 
-				z.z = 1;
+			if ( Math.abs( up.z ) === 1 ) {
 
-			}
+				_z.x += 0.0001;
 
-			z.normalize();
-			x.crossVectors( up, z );
+			} else {
 
-			if ( x.lengthSq() === 0 ) {
-
-				// up and z are parallel
-
-				if ( Math.abs( up.z ) === 1 ) {
-
-					z.x += 0.0001;
-
-				} else {
-
-					z.z += 0.0001;
-
-				}
-
-				z.normalize();
-				x.crossVectors( up, z );
+				_z.z += 0.0001;
 
 			}
 
-			x.normalize();
-			y.crossVectors( z, x );
+			_z.normalize();
+			_x.crossVectors( up, _z );
 
-			te[ 0 ] = x.x; te[ 4 ] = y.x; te[ 8 ] = z.x;
-			te[ 1 ] = x.y; te[ 5 ] = y.y; te[ 9 ] = z.y;
-			te[ 2 ] = x.z; te[ 6 ] = y.z; te[ 10 ] = z.z;
+		}
 
-			return this;
+		_x.normalize();
+		_y.crossVectors( _z, _x );
 
-		};
+		te[ 0 ] = _x.x; te[ 4 ] = _y.x; te[ 8 ] = _z.x;
+		te[ 1 ] = _x.y; te[ 5 ] = _y.y; te[ 9 ] = _z.y;
+		te[ 2 ] = _x.z; te[ 6 ] = _y.z; te[ 10 ] = _z.z;
 
-	}(),
+		return this;
+
+	},
 
 	multiply: function ( m, n ) {
 
@@ -428,29 +415,23 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	applyToBufferAttribute: function () {
+	applyToBufferAttribute: function ( attribute ) {
 
-		var v1 = new Vector3();
+		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
 
-		return function applyToBufferAttribute( attribute ) {
+			_v1.x = attribute.getX( i );
+			_v1.y = attribute.getY( i );
+			_v1.z = attribute.getZ( i );
 
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+			_v1.applyMatrix4( this );
 
-				v1.x = attribute.getX( i );
-				v1.y = attribute.getY( i );
-				v1.z = attribute.getZ( i );
+			attribute.setXYZ( i, _v1.x, _v1.y, _v1.z );
 
-				v1.applyMatrix4( this );
+		}
 
-				attribute.setXYZ( i, v1.x, v1.y, v1.z );
+		return attribute;
 
-			}
-
-			return attribute;
-
-		};
-
-	}(),
+	},
 
 	determinant: function () {
 
@@ -519,13 +500,23 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	setPosition: function ( v ) {
+	setPosition: function ( x, y, z ) {
 
 		var te = this.elements;
 
-		te[ 12 ] = v.x;
-		te[ 13 ] = v.y;
-		te[ 14 ] = v.z;
+		if ( x.isVector3 ) {
+
+			te[ 12 ] = x.x;
+			te[ 13 ] = x.y;
+			te[ 14 ] = x.z;
+
+		} else {
+
+			te[ 12 ] = x;
+			te[ 13 ] = y;
+			te[ 14 ] = z;
+
+		}
 
 		return this;
 
@@ -774,57 +765,50 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	decompose: function () {
+	decompose: function ( position, quaternion, scale ) {
 
-		var vector = new Vector3();
-		var matrix = new Matrix4();
+		var te = this.elements;
 
-		return function decompose( position, quaternion, scale ) {
+		var sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
+		var sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+		var sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
-			var te = this.elements;
+		// if determine is negative, we need to invert one scale
+		var det = this.determinant();
+		if ( det < 0 ) sx = - sx;
 
-			var sx = vector.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-			var sy = vector.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-			var sz = vector.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		position.x = te[ 12 ];
+		position.y = te[ 13 ];
+		position.z = te[ 14 ];
 
-			// if determine is negative, we need to invert one scale
-			var det = this.determinant();
-			if ( det < 0 ) sx = - sx;
+		// scale the rotation part
+		_m1.copy( this );
 
-			position.x = te[ 12 ];
-			position.y = te[ 13 ];
-			position.z = te[ 14 ];
+		var invSX = 1 / sx;
+		var invSY = 1 / sy;
+		var invSZ = 1 / sz;
 
-			// scale the rotation part
-			matrix.copy( this );
+		_m1.elements[ 0 ] *= invSX;
+		_m1.elements[ 1 ] *= invSX;
+		_m1.elements[ 2 ] *= invSX;
 
-			var invSX = 1 / sx;
-			var invSY = 1 / sy;
-			var invSZ = 1 / sz;
+		_m1.elements[ 4 ] *= invSY;
+		_m1.elements[ 5 ] *= invSY;
+		_m1.elements[ 6 ] *= invSY;
 
-			matrix.elements[ 0 ] *= invSX;
-			matrix.elements[ 1 ] *= invSX;
-			matrix.elements[ 2 ] *= invSX;
+		_m1.elements[ 8 ] *= invSZ;
+		_m1.elements[ 9 ] *= invSZ;
+		_m1.elements[ 10 ] *= invSZ;
 
-			matrix.elements[ 4 ] *= invSY;
-			matrix.elements[ 5 ] *= invSY;
-			matrix.elements[ 6 ] *= invSY;
+		quaternion.setFromRotationMatrix( _m1 );
 
-			matrix.elements[ 8 ] *= invSZ;
-			matrix.elements[ 9 ] *= invSZ;
-			matrix.elements[ 10 ] *= invSZ;
+		scale.x = sx;
+		scale.y = sy;
+		scale.z = sz;
 
-			quaternion.setFromRotationMatrix( matrix );
+		return this;
 
-			scale.x = sx;
-			scale.y = sy;
-			scale.z = sz;
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	makePerspective: function ( left, right, top, bottom, near, far ) {
 

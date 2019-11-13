@@ -9,15 +9,13 @@ THREE.LegacyGLTFLoader = ( function () {
 
 	function LegacyGLTFLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 	}
 
-	LegacyGLTFLoader.prototype = {
+	LegacyGLTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: LegacyGLTFLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -25,11 +23,11 @@ THREE.LegacyGLTFLoader = ( function () {
 
 			var resourcePath;
 
-			if ( this.resourcePath !== undefined ) {
+			if ( this.resourcePath !== '' ) {
 
 				resourcePath = this.resourcePath;
 
-			} else if ( this.path !== undefined ) {
+			} else if ( this.path !== '' ) {
 
 				resourcePath = this.path;
 
@@ -49,26 +47,6 @@ THREE.LegacyGLTFLoader = ( function () {
 				scope.parse( data, resourcePath, onLoad );
 
 			}, onProgress, onError );
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
 
 		},
 
@@ -121,7 +99,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	/* GLTFREGISTRY */
 
@@ -463,10 +441,10 @@ THREE.LegacyGLTFLoader = ( function () {
 	var WEBGL_FILTERS = {
 		9728: THREE.NearestFilter,
 		9729: THREE.LinearFilter,
-		9984: THREE.NearestMipMapNearestFilter,
-		9985: THREE.LinearMipMapNearestFilter,
-		9986: THREE.NearestMipMapLinearFilter,
-		9987: THREE.LinearMipMapLinearFilter
+		9984: THREE.NearestMipmapNearestFilter,
+		9985: THREE.LinearMipmapNearestFilter,
+		9986: THREE.NearestMipmapLinearFilter,
+		9987: THREE.LinearMipmapLinearFilter
 	};
 
 	var WEBGL_WRAPPINGS = {
@@ -1073,7 +1051,6 @@ THREE.LegacyGLTFLoader = ( function () {
 	GLTFParser.prototype.loadTextures = function () {
 
 		var json = this.json;
-		var extensions = this.extensions;
 		var options = this.options;
 
 		return this._withDependencies( [
@@ -1102,7 +1079,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 						}
 
-						var textureLoader = THREE.Loader.Handlers.get( sourceUri );
+						var textureLoader = options.manager.getHandler( sourceUri );
 
 						if ( textureLoader === null ) {
 
@@ -1136,7 +1113,7 @@ THREE.LegacyGLTFLoader = ( function () {
 								var sampler = json.samplers[ texture.sampler ];
 
 								_texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;
-								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipMapLinearFilter;
+								_texture.minFilter = WEBGL_FILTERS[ sampler.minFilter ] || THREE.NearestMipmapLinearFilter;
 								_texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 								_texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 
@@ -1631,35 +1608,35 @@ THREE.LegacyGLTFLoader = ( function () {
 							switch ( attributeId ) {
 
 								case 'POSITION':
-									geometry.addAttribute( 'position', bufferAttribute );
+									geometry.setAttribute( 'position', bufferAttribute );
 									break;
 
 								case 'NORMAL':
-									geometry.addAttribute( 'normal', bufferAttribute );
+									geometry.setAttribute( 'normal', bufferAttribute );
 									break;
 
 								case 'TEXCOORD_0':
 								case 'TEXCOORD0':
 								case 'TEXCOORD':
-									geometry.addAttribute( 'uv', bufferAttribute );
+									geometry.setAttribute( 'uv', bufferAttribute );
 									break;
 
 								case 'TEXCOORD_1':
-									geometry.addAttribute( 'uv2', bufferAttribute );
+									geometry.setAttribute( 'uv2', bufferAttribute );
 									break;
 
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
-									geometry.addAttribute( 'color', bufferAttribute );
+									geometry.setAttribute( 'color', bufferAttribute );
 									break;
 
 								case 'WEIGHT':
-									geometry.addAttribute( 'skinWeight', bufferAttribute );
+									geometry.setAttribute( 'skinWeight', bufferAttribute );
 									break;
 
 								case 'JOINT':
-									geometry.addAttribute( 'skinIndex', bufferAttribute );
+									geometry.setAttribute( 'skinIndex', bufferAttribute );
 									break;
 
 								default:
@@ -1676,7 +1653,7 @@ THREE.LegacyGLTFLoader = ( function () {
 
 										if ( parameters[ attributeName ][ 'semantic' ] === attributeId ) {
 
-											geometry.addAttribute( attributeName, bufferAttribute );
+											geometry.setAttribute( attributeName, bufferAttribute );
 
 										}
 
@@ -1719,13 +1696,13 @@ THREE.LegacyGLTFLoader = ( function () {
 							switch ( attributeId ) {
 
 								case 'POSITION':
-									geometry.addAttribute( 'position', bufferAttribute );
+									geometry.setAttribute( 'position', bufferAttribute );
 									break;
 
 								case 'COLOR_0':
 								case 'COLOR0':
 								case 'COLOR':
-									geometry.addAttribute( 'color', bufferAttribute );
+									geometry.setAttribute( 'color', bufferAttribute );
 									break;
 
 							}

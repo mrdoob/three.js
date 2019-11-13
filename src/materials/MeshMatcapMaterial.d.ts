@@ -7,27 +7,28 @@ import { NormalMapTypes } from '../constants';
 export interface MeshMatcapMaterialParameters extends MaterialParameters {
 
 	color?: Color | string | number;
-	matMap?: Texture;
-	map?: Texture;
-	bumpMap?: Texture;
+	matcap?: Texture | null;
+	map?: Texture | null;
+	bumpMap?: Texture | null;
 	bumpScale?: number;
-	normalMap?: Texture;
+	normalMap?: Texture | null;
 	normalMapType?: NormalMapTypes;
 	normalScale?: Vector2;
-	displacementMap?: Texture;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
-	alphaMap?: Texture;
+	alphaMap?: Texture | null;
 	skinning?: boolean;
 	morphTargets?: boolean;
 	morphNormals?: boolean;
 }
 
 export class MeshMatcapMaterial extends Material {
-	constructor(parameters?: MeshMatcapMaterialParameters);
+
+	constructor( parameters?: MeshMatcapMaterialParameters );
 
 	color: Color;
-	matMap: Texture | null;
+	matcap: Texture | null;
 	map: Texture | null;
 	bumpMap: Texture | null;
 	bumpScale: number;
@@ -42,5 +43,6 @@ export class MeshMatcapMaterial extends Material {
 	morphTargets: boolean;
 	morphNormals: boolean;
 
-	setValues(parameters: MeshMatcapMaterialParameters): void;
+	setValues( parameters: MeshMatcapMaterialParameters ): void;
+
 }

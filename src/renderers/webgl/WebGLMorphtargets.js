@@ -85,6 +85,8 @@ function WebGLMorphtargets( gl ) {
 		var morphTargets = material.morphTargets && geometry.morphAttributes.position;
 		var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
 
+		var morphInfluencesSum = 0;
+
 		for ( var i = 0; i < 8; i ++ ) {
 
 			var influence = workInfluences[ i ];
@@ -95,29 +97,30 @@ function WebGLMorphtargets( gl ) {
 
 				if ( morphTargets && geometry.getAttribute( 'morphTarget' + i ) !== morphTargets[ index ] ) {
 
-					geometry.addAttribute( 'morphTarget' + i, morphTargets[ index ] );
+					geometry.setAttribute( 'morphTarget' + i, morphTargets[ index ] );
 
 				}
 
 				if ( morphNormals && geometry.getAttribute( 'morphNormal' + i ) !== morphNormals[ index ] ) {
 
-					geometry.addAttribute( 'morphNormal' + i, morphNormals[ index ] );
+					geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] );
 
 				}
 
 				morphInfluences[ i ] = value;
+				morphInfluencesSum += value;
 
 			} else {
 
 				if ( morphTargets && geometry.getAttribute( 'morphTarget' + i ) !== undefined ) {
 
-					geometry.removeAttribute( 'morphTarget' + i );
+					geometry.deleteAttribute( 'morphTarget' + i );
 
 				}
 
 				if ( morphNormals && geometry.getAttribute( 'morphNormal' + i ) !== undefined ) {
 
-					geometry.removeAttribute( 'morphNormal' + i );
+					geometry.deleteAttribute( 'morphNormal' + i );
 
 				}
 
@@ -127,6 +130,12 @@ function WebGLMorphtargets( gl ) {
 
 		}
 
+		// GLSL shader uses formula baseinfluence * base + sum(target * influence)
+		// This allows us to switch between absolute morphs and relative morphs without changing shader code
+		// When baseinfluence = 1 - sum(influence), the above is equivalent to sum((target - base) * influence)
+		var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
+
+		program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
 		program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
 
 	}
