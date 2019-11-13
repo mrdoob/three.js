@@ -392,7 +392,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 					enableAttributeAndDivisor( programAttribute + 2, 1 );
 					enableAttributeAndDivisor( programAttribute + 3, 1 );
 
-					gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
 
 					gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
 					gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
