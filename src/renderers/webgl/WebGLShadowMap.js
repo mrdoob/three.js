@@ -427,7 +427,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 						if ( groupMaterial && groupMaterial.visible ) {
 
 							var depthMaterial = getDepthMaterial( object, groupMaterial, light, shadowCamera.near, shadowCamera.far, type );
-
+							object.onBeforeShadow( shadowCamera, geometry, depthMaterial );
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
 						}
@@ -437,7 +437,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				} else if ( material.visible ) {
 
 					var depthMaterial = getDepthMaterial( object, material, light, shadowCamera.near, shadowCamera.far, type );
-
+					object.onBeforeShadow( shadowCamera, geometry, depthMaterial );
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
 				}
