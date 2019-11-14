@@ -1,5 +1,5 @@
 import { Loader } from './Loader';
-import { LoadingManager } from './LoadingManager.js';
+import { LoadingManager } from './LoadingManager';
 
 export class ImageBitmapLoader extends Loader {
 
