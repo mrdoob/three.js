@@ -334,7 +334,8 @@ var files = {
 		"webvr_sculpt",
 		"webvr_video",
 		"webvr_vive_paint",
-		"webvr_vive_sculpt"
+		"webvr_vive_sculpt",
+		"webvr_6dof_panorama"
 	],
 	"physics": [
 		"webgl_physics_cloth",
