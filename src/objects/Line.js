@@ -11,8 +11,11 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _start, _end;
-var _inverseMatrix, _ray, _sphere;
+var _start = new Vector3();
+var _end = new Vector3();
+var _inverseMatrix = new Matrix4();
+var _ray = new Ray();
+var _sphere = new Sphere();
 
 function Line( geometry, material, mode ) {
 
@@ -39,13 +42,6 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	computeLineDistances: function () {
 
-		if ( _end === undefined ) {
-
-			_start = new Vector3();
-			_end = new Vector3();
-
-		}
-
 		var geometry = this.geometry;
 
 		if ( geometry.isBufferGeometry ) {
@@ -67,7 +63,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				}
 
-				geometry.addAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
+				geometry.setAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
 
 			} else {
 
@@ -96,14 +92,6 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	},
 
 	raycast: function ( raycaster, intersects ) {
-
-		if ( _sphere === undefined ) {
-
-			_inverseMatrix = new Matrix4();
-			_ray = new Ray();
-			_sphere = new Sphere();
-
-		}
 
 		var precision = raycaster.linePrecision;
 

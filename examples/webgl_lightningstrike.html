@@ -422,12 +422,11 @@
 
 				var sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,
+					transparency: .96,
 					depthWrite: false,
-					opacity: 0.15,
-					color: 0,
-					metalness: 1,
+					color: 'white',
+					metalness: 0,
 					roughness: 0,
-					reflectivity: 0,
 					envMap: textureCube
 				} );
 
@@ -720,7 +719,7 @@
 				}
 
 				var starGeometry = new THREE.BufferGeometry();
-				starGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( starVertices, 3 ) );
+				starGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( starVertices, 3 ) );
 				var starMesh = new THREE.Mesh( starGeometry, new THREE.MeshBasicMaterial( { color: 0x020900 } ) );
 				starMesh.scale.multiplyScalar( 6 );
 

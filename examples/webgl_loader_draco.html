@@ -24,9 +24,10 @@
 		var container = document.querySelector( '#container' );
 
 		// Configure and create Draco decoder.
-		DRACOLoader.setDecoderPath( 'js/libs/draco/' );
-		DRACOLoader.setDecoderConfig( { type: 'js' } );
 		var dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( 'js/libs/draco/' );
+		dracoLoader.setDecoderConfig( { type: 'js' } );
+
 		init();
 		animate();
 
@@ -71,7 +72,7 @@
 				scene.add( mesh );
 
 				// Release decoder resources.
-				DRACOLoader.releaseDecoderModule();
+				dracoLoader.dispose();
 
 			} );
 

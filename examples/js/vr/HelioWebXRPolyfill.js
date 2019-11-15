@@ -2,20 +2,20 @@
  * @author mvilledieu / http://github.com/mvilledieu
  */
 
-if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
+if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator && 'isSessionSupported' in navigator.xr === false) {
 
 	console.log( "Helio WebXR Polyfill (Lumin 0.97.0)" );
 
-	const isHelio96 = navigator.userAgent.includes("Chrome/73");
+	const isHelio96 = navigator.userAgent.includes( "Chrome/73" );
 
 	// WebXRManager - XR.supportSession() Polyfill - WebVR.js line 147
 
 	if (
 		"supportsSession" in navigator.xr === false &&
-    "supportsSessionMode" in navigator.xr
+	"supportsSessionMode" in navigator.xr
 	) {
 
-		navigator.xr.supportsSession = function ( sessionType ) {
+		navigator.xr.supportsSession = function ( /*sessionType*/ ) {
 
 			// Force using immersive-ar
 			return navigator.xr.supportsSessionMode( 'immersive-ar' );
@@ -28,13 +28,13 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 		const tempRequestSession = navigator.xr.requestSession.bind( navigator.xr );
 
-		navigator.xr.requestSession = function ( sessionType ) {
+		navigator.xr.requestSession = function ( /*sessionType*/ ) {
 
 			return new Promise( function ( resolve, reject ) {
 
-				const sessionType = (isHelio96 ? {
+				const sessionType = ( isHelio96 ? {
 					mode: 'immersive-ar' // Force using immersive-ar
-				} : 'immersive-ar');
+				} : 'immersive-ar' );
 
 				tempRequestSession( sessionType )
 					.then( function ( session ) {
@@ -74,11 +74,11 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 								// WebXRManager - xrFrame.getPose() Polyfill - line 259
 
-								const tempGetPose = (isHelio96 ? null : frame.getPose.bind( frame ));
+								const tempGetPose = ( isHelio96 ? null : frame.getPose.bind( frame ) );
 
 								frame.getPose = function ( targetRaySpace, referenceSpace ) {
 
-									if (isHelio96) {
+									if ( isHelio96 ) {
 
 										const inputPose = frame.getInputPose(
 											targetRaySpace,
@@ -93,7 +93,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 									} else {
 
-										return tempGetPose(targetRaySpace.gripSpace, referenceSpace);
+										return tempGetPose( targetRaySpace.gripSpace, referenceSpace );
 
 									}
 
@@ -113,7 +113,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 							const res = tempGetInputSources();
 
-							res.forEach( function (xrInputSource ) {
+							res.forEach( function ( xrInputSource ) {
 
 								Object.defineProperty( xrInputSource, "targetRaySpace", {
 									get: function () {
@@ -141,7 +141,7 @@ if ( /(Helio)/g.test( navigator.userAgent ) && "xr" in navigator ) {
 
 						// WebXRManager - xrSession.updateRenderState() Polyfill Line 129
 
-						if (isHelio96) {
+						if ( isHelio96 ) {
 
 							session.updateRenderState = function ( { baseLayer } ) {
 

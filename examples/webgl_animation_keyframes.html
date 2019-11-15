@@ -78,10 +78,11 @@
 				path + 'posz' + format, path + 'negz' + format
 			] );
 
-			DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+			var dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
 			var loader = new GLTFLoader();
-			loader.setDRACOLoader( new DRACOLoader() );
+			loader.setDRACOLoader( dracoLoader );
 			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
 
 				var model = gltf.scene;

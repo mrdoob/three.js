@@ -8,12 +8,12 @@ import { Combine } from '../constants';
 export interface MeshBasicMaterialParameters extends MaterialParameters {
 	color?: Color | string | number;
 	opacity?: number;
-	map?: Texture;
-	aoMap?: Texture;
+	map?: Texture | null;
+	aoMap?: Texture | null;
 	aoMapIntensity?: number;
-	specularMap?: Texture;
-	alphaMap?: Texture;
-	envMap?: Texture;
+	specularMap?: Texture | null;
+	alphaMap?: Texture | null;
+	envMap?: Texture | null;
 	combine?: Combine;
 	reflectivity?: number;
 	refractionRatio?: number;

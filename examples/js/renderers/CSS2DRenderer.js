@@ -11,11 +11,15 @@ THREE.CSS2DObject = function ( element ) {
 
 	this.addEventListener( 'removed', function () {
 
-		if ( this.element.parentNode !== null ) {
+		this.traverse( function ( object ) {
 
-			this.element.parentNode.removeChild( this.element );
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
-		}
+				object.element.parentNode.removeChild( object.element );
+
+			}
+
+		} );
 
 	} );
 
@@ -27,8 +31,6 @@ THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 //
 
 THREE.CSS2DRenderer = function () {
-
-	console.log( 'THREE.CSS2DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;

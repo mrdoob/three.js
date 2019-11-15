@@ -19,6 +19,7 @@ import { WebVRManager } from '../renderers/webvr/WebVRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
+import { Texture } from '../textures/Texture';
 
 export interface Renderer {
 	domElement: HTMLCanvasElement;
@@ -31,7 +32,7 @@ export interface WebGLRendererParameters {
 	/**
 	 * A Canvas where the renderer draws its output.
 	 */
-	canvas?: HTMLCanvasElement;
+	canvas?: HTMLCanvasElement | OffscreenCanvas;
 
 	/**
 	 * A WebGL Rendering Context.
@@ -188,7 +189,7 @@ export class WebGLRenderer implements Renderer {
 
 	shadowMap: WebGLShadowMap;
 
-	pixelRation: number;
+	pixelRatio: number;
 
 	capabilities: WebGLCapabilities;
 	properties: WebGLProperties;
@@ -326,7 +327,7 @@ export class WebGLRenderer implements Renderer {
 	 * A build in function that can be used instead of requestAnimationFrame. For WebVR projects this function must be used.
 	 * @param callback The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.
 	 */
-	setAnimationLoop( callback: Function ): void;
+	setAnimationLoop( callback: Function | null ): void;
 
 	/**
 	 * @deprecated Use {@link WebGLRenderer#setAnimationLoop .setAnimationLoop()} instead.
@@ -395,6 +396,33 @@ export class WebGLRenderer implements Renderer {
 		buffer: any,
 		activeCubeFaceIndex?: number
 	): void;
+
+	/**
+	 * Copies a region of the currently bound framebuffer into the selected mipmap level of the selected texture.
+	 * This region is defined by the size of the destination texture's mip level, offset by the input position.
+	 *
+	 * @param position Specifies the pixel offset from which to copy out of the framebuffer.
+	 * @param texture Specifies the destination texture.
+	 * @param level Specifies the destination mipmap level of the texture.
+	 */
+	copyFramebufferToTexture( position: Vector2, texture: Texture, level?: number ): void;
+
+	/**
+	 * Copies srcTexture to the specified level of dstTexture, offset by the input position.
+	 *
+	 * @param position Specifies the pixel offset into the dstTexture where the copy will occur.
+	 * @param srcTexture Specifies the source texture.
+	 * @param dstTexture Specifies the destination texture.
+	 * @param level Specifies the destination mipmap level of the texture.
+	 */
+	copyTextureToTexture( position: Vector2, srcTexture: Texture, dstTexture: Texture, level?: number ): void;
+
+	/**
+	 * Initializes the given texture. Can be used to preload a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).
+	 *
+	 * @param texture The texture to Initialize.
+	 */
+	initTexture( texture: Texture ): void;
 
 	/**
 	 * @deprecated

@@ -40,7 +40,7 @@ var BufferGeometryUtils = {
 
 		if ( attributes.tangent === undefined ) {
 
-			geometry.addAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
+			geometry.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
 
 		}
 
@@ -208,6 +208,8 @@ var BufferGeometryUtils = {
 		var attributes = {};
 		var morphAttributes = {};
 
+		var morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
+
 		var mergedGeometry = new BufferGeometry();
 
 		var offset = 0;
@@ -233,6 +235,8 @@ var BufferGeometryUtils = {
 			}
 
 			// gather morph attributes, exit early if they're different
+
+			if ( morphTargetsRelative !== geometry.morphTargetsRelative ) return null;
 
 			for ( var name in geometry.morphAttributes ) {
 
@@ -308,7 +312,7 @@ var BufferGeometryUtils = {
 
 			if ( ! mergedAttribute ) return null;
 
-			mergedGeometry.addAttribute( name, mergedAttribute );
+			mergedGeometry.setAttribute( name, mergedAttribute );
 
 		}
 
@@ -598,29 +602,21 @@ var BufferGeometryUtils = {
 
 			var name = attributeNames[ i ];
 			var oldAttribute = geometry.getAttribute( name );
-			var attribute;
 
 			var buffer = new oldAttribute.array.constructor( attrArrays[ name ] );
-			if ( oldAttribute.isInterleavedBufferAttribute ) {
+			var attribute = new BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.normalized );
 
-				attribute = new BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.itemSize );
-
-			} else {
-
-				attribute = geometry.getAttribute( name ).clone();
-				attribute.setArray( buffer );
-
-			}
-
-			result.addAttribute( name, attribute );
+			result.setAttribute( name, attribute );
 
 			// Update the attribute arrays
 			if ( name in morphAttrsArrays ) {
 
 				for ( var j = 0; j < morphAttrsArrays[ name ].length; j ++ ) {
 
-					var morphAttribute = geometry.morphAttributes[ name ][ j ].clone();
-					morphAttribute.setArray( new morphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] ) );
+					var oldMorphAttribute = geometry.morphAttributes[ name ][ j ];
+
+					var buffer = new oldMorphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] );
+					var morphAttribute = new BufferAttribute( buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized );
 					result.morphAttributes[ name ][ j ] = morphAttribute;
 
 				}
@@ -629,23 +625,7 @@ var BufferGeometryUtils = {
 
 		}
 
-		// Generate an index buffer typed array
-		var cons = Uint8Array;
-		if ( newIndices.length >= Math.pow( 2, 8 ) ) cons = Uint16Array;
-		if ( newIndices.length >= Math.pow( 2, 16 ) ) cons = Uint32Array;
-
-		var newIndexBuffer = new cons( newIndices );
-		var newIndices = null;
-		if ( indices === null ) {
-
-			newIndices = new BufferAttribute( newIndexBuffer, 1 );
-
-		} else {
-
-			newIndices = geometry.getIndex().clone();
-			newIndices.setArray( newIndexBuffer );
-
-		}
+		// indices
 
 		result.setIndex( newIndices );
 

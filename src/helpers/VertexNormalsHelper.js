@@ -10,7 +10,10 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-var _v1, _v2, _normalMatrix, _keys;
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+var _normalMatrix = new Matrix3();
+var _keys = [ 'a', 'b', 'c' ];
 
 function VertexNormalsHelper( object, size, hex, linewidth ) {
 
@@ -44,7 +47,7 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
 
-	geometry.addAttribute( 'position', positions );
+	geometry.setAttribute( 'position', positions );
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
 
@@ -60,15 +63,6 @@ VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
 VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
 
 VertexNormalsHelper.prototype.update = function () {
-
-	if ( _normalMatrix === undefined ) {
-
-		_v1 = new Vector3();
-		_v2 = new Vector3();
-		_normalMatrix = new Matrix3();
-		_keys = [ 'a', 'b', 'c' ];
-
-	}
 
 	this.object.updateMatrixWorld( true );
 

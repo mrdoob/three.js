@@ -224,13 +224,13 @@ THREE.PRWMLoader = ( function () {
 
 	function PRWMLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
 
 	}
 
-	PRWMLoader.prototype = {
+	PRWMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
-		constructor: THREE.PRWMLoader,
+		constructor: PRWMLoader,
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -250,13 +250,6 @@ THREE.PRWMLoader = ( function () {
 
 		},
 
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
 		parse: function ( arrayBuffer ) {
 
 			var data = decodePrwm( arrayBuffer ),
@@ -268,7 +261,7 @@ THREE.PRWMLoader = ( function () {
 			for ( i = 0; i < attributesKey.length; i ++ ) {
 
 				attribute = data.attributes[ attributesKey[ i ] ];
-				bufferGeometry.addAttribute( attributesKey[ i ], new THREE.BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
+				bufferGeometry.setAttribute( attributesKey[ i ], new THREE.BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
 
 			}
 
@@ -282,7 +275,7 @@ THREE.PRWMLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	PRWMLoader.isBigEndianPlatform = function () {
 

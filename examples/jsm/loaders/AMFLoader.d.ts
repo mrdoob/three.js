@@ -1,14 +1,14 @@
 import {
-  LoadingManager,
-  Group
+	Loader,
+	LoadingManager,
+	Group
 } from '../../../src/Three';
 
-export class AMFLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  path: string;
+export class AMFLoader extends Loader {
 
-  load(url: string, onLoad: (object: Group) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setPath(value: string): this;
-  parse(data: ArrayBuffer): Group;
+	constructor( manager?: LoadingManager );
+
+	load( url: string, onLoad: ( object: Group ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+	parse( data: ArrayBuffer ): Group;
+
 }

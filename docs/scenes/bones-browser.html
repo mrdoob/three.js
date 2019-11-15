@@ -131,8 +131,8 @@
 
 				}
 
-				geometry.addAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
-				geometry.addAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
+				geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
+				geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
 
 				return geometry;
 

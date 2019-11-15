@@ -1,9 +1,12 @@
 import { AnimationMixer } from './AnimationMixer';
 import { AnimationClip } from './AnimationClip';
 import { AnimationActionLoopStyles } from '../constants';
+import { Object3D } from '../core/Object3D';
 // Animation ////////////////////////////////////////////////////////////////////////////////////////
 
 export class AnimationAction {
+
+	constructor( mixer: AnimationMixer, clip: AnimationClip, localRoot?: Object3D );
 
 	loop: AnimationActionLoopStyles;
 	time: number;

@@ -710,9 +710,9 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 	}
 
 	this.setIndex( new BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'uv', new BufferAttribute( uvs, 2 ) );
 
 	this.computeBoundingSphere();
 

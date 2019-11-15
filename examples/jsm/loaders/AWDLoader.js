@@ -7,9 +7,9 @@ import {
 	Bone,
 	BufferAttribute,
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
 	ImageLoader,
+	Loader,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
@@ -94,7 +94,7 @@ var AWDLoader = ( function () {
 
 	var AWDLoader = function ( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 		this.trunk = new Object3D();
 
@@ -120,7 +120,7 @@ var AWDLoader = ( function () {
 
 	};
 
-	AWDLoader.prototype = {
+	AWDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: AWDLoader,
 
@@ -139,13 +139,6 @@ var AWDLoader = ( function () {
 				onLoad( scope.parse( text ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
 
 		},
 
@@ -762,7 +755,7 @@ var AWDLoader = ( function () {
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
 						attrib = new BufferAttribute( buffer, 3 );
 
-						geom.addAttribute( 'position', attrib );
+						geom.setAttribute( 'position', attrib );
 						idx = 0;
 
 						while ( this._ptr < str_end ) {
@@ -800,7 +793,7 @@ var AWDLoader = ( function () {
 						buffer = new Float32Array( ( str_len / 8 ) * 2 );
 						attrib = new BufferAttribute( buffer, 2 );
 
-						geom.addAttribute( 'uv', attrib );
+						geom.setAttribute( 'uv', attrib );
 						idx = 0;
 
 						while ( this._ptr < str_end ) {
@@ -817,7 +810,7 @@ var AWDLoader = ( function () {
 
 						buffer = new Float32Array( ( str_len / 12 ) * 3 );
 						attrib = new BufferAttribute( buffer, 3 );
-						geom.addAttribute( 'normal', attrib );
+						geom.setAttribute( 'normal', attrib );
 						idx = 0;
 
 						while ( this._ptr < str_end ) {
@@ -924,7 +917,7 @@ var AWDLoader = ( function () {
 
 						if ( streamtypes[ streamsParsed ] === 1 ) {
 
-							//geom.addAttribute( 'morphTarget'+frames_parsed, Float32Array, str_len/12, 3 );
+							//geom.setAttribute( 'morphTarget'+frames_parsed, Float32Array, str_len/12, 3 );
 							var buffer = new Float32Array( str_len / 4 );
 							geom.morphTargets.push( {
 								array: buffer
@@ -1233,7 +1226,7 @@ var AWDLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return AWDLoader;
 

@@ -17,7 +17,8 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-var _vector, _camera;
+var _vector = new Vector3();
+var _camera = new Camera();
 
 function CameraHelper( camera ) {
 
@@ -106,8 +107,8 @@ function CameraHelper( camera ) {
 
 	}
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 	LineSegments.call( this, geometry, material );
 
@@ -127,8 +128,6 @@ CameraHelper.prototype = Object.create( LineSegments.prototype );
 CameraHelper.prototype.constructor = CameraHelper;
 
 CameraHelper.prototype.update = function () {
-
-	if ( _camera === undefined ) _camera = new Camera();
 
 	var geometry = this.geometry;
 	var pointMap = this.pointMap;
@@ -182,8 +181,6 @@ CameraHelper.prototype.update = function () {
 };
 
 function setPoint( point, pointMap, geometry, camera, x, y, z ) {
-
-	if ( _vector === undefined ) _vector = new Vector3();
 
 	_vector.set( x, y, z ).unproject( camera );
 

@@ -24,15 +24,7 @@ WireframeGeometry2.prototype = Object.assign( Object.create( LineSegmentsGeometr
 
 	constructor: WireframeGeometry2,
 
-	isWireframeGeometry2: true,
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
-
-	}
+	isWireframeGeometry2: true
 
 } );
 

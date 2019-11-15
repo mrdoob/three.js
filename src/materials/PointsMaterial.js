@@ -9,6 +9,7 @@ import { Color } from '../math/Color.js';
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
+ *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  size: <float>,
  *  sizeAttenuation: <bool>
@@ -27,12 +28,12 @@ function PointsMaterial( parameters ) {
 
 	this.map = null;
 
+	this.alphaMap = null;
+
 	this.size = 1;
 	this.sizeAttenuation = true;
 
 	this.morphTargets = false;
-
-	this.lights = false;
 
 	this.setValues( parameters );
 
@@ -50,6 +51,8 @@ PointsMaterial.prototype.copy = function ( source ) {
 	this.color.copy( source.color );
 
 	this.map = source.map;
+
+	this.alphaMap = source.alphaMap;
 
 	this.size = source.size;
 	this.sizeAttenuation = source.sizeAttenuation;

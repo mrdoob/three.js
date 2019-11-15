@@ -102,7 +102,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	// build geometry
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 }
 

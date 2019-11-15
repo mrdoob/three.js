@@ -75,7 +75,7 @@
 
 				}
 
-				lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
+				lineGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
 
 				parentTransform = new THREE.Object3D();
 				parentTransform.position.x = Math.random() * 40 - 20;

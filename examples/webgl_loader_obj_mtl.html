@@ -68,15 +68,19 @@
 
 				var onError = function () { };
 
-				THREE.Loader.Handlers.add( /\.dds$/i, new DDSLoader() );
+				var manager = new THREE.LoadingManager();
+				manager.addHandler( /\.dds$/i, new DDSLoader() );
 
-				new MTLLoader()
+				// comment in the following line and import TGALoader if your asset uses TGA textures
+				// manager.addHandler( /\.tga$/i, new TGALoader() );
+
+				new MTLLoader( manager )
 					.setPath( 'models/obj/male02/' )
 					.load( 'male02_dds.mtl', function ( materials ) {
 
 						materials.preload();
 
-						new OBJLoader()
+						new OBJLoader( manager )
 							.setMaterials( materials )
 							.setPath( 'models/obj/male02/' )
 							.load( 'male02.obj', function ( object ) {

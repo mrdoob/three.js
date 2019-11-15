@@ -16,9 +16,11 @@
 
 THREE.OrbitControls = function ( object, domElement ) {
 
-	this.object = object;
+	if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
+	if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.object = object;
+	this.domElement = domElement;
 
 	// Set to false to disable this control
 	this.enabled = true;
@@ -256,7 +258,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		window.removeEventListener( 'keydown', onKeyDown, false );
+		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -378,7 +380,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		return function pan( deltaX, deltaY ) {
 
-			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			var element = scope.domElement;
 
 			if ( scope.object.isPerspectiveCamera ) {
 
@@ -460,15 +462,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseDownRotate( event ) {
 
-		//console.log( 'handleMouseDownRotate' );
-
 		rotateStart.set( event.clientX, event.clientY );
 
 	}
 
 	function handleMouseDownDolly( event ) {
-
-		//console.log( 'handleMouseDownDolly' );
 
 		dollyStart.set( event.clientX, event.clientY );
 
@@ -476,21 +474,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseDownPan( event ) {
 
-		//console.log( 'handleMouseDownPan' );
-
 		panStart.set( event.clientX, event.clientY );
 
 	}
 
 	function handleMouseMoveRotate( event ) {
 
-		//console.log( 'handleMouseMoveRotate' );
-
 		rotateEnd.set( event.clientX, event.clientY );
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
@@ -503,8 +497,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleMouseMoveDolly( event ) {
-
-		//console.log( 'handleMouseMoveDolly' );
 
 		dollyEnd.set( event.clientX, event.clientY );
 
@@ -528,8 +520,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseMovePan( event ) {
 
-		//console.log( 'handleMouseMovePan' );
-
 		panEnd.set( event.clientX, event.clientY );
 
 		panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
@@ -544,13 +534,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleMouseUp( /*event*/ ) {
 
-		// console.log( 'handleMouseUp' );
+		// no-op
 
 	}
 
 	function handleMouseWheel( event ) {
-
-		// console.log( 'handleMouseWheel' );
 
 		if ( event.deltaY < 0 ) {
 
@@ -567,8 +555,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleKeyDown( event ) {
-
-		// console.log( 'handleKeyDown' );
 
 		var needsUpdate = false;
 
@@ -610,8 +596,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchStartRotate( event ) {
 
-		//console.log( 'handleTouchStartRotate' );
-
 		if ( event.touches.length == 1 ) {
 
 			rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
@@ -628,8 +612,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchStartPan( event ) {
-
-		//console.log( 'handleTouchStartPan' );
 
 		if ( event.touches.length == 1 ) {
 
@@ -648,8 +630,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchStartDolly( event ) {
 
-		//console.log( 'handleTouchStartDolly' );
-
 		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 		var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 
@@ -661,8 +641,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchStartDollyPan( event ) {
 
-		//console.log( 'handleTouchStartDollyPan' );
-
 		if ( scope.enableZoom ) handleTouchStartDolly( event );
 
 		if ( scope.enablePan ) handleTouchStartPan( event );
@@ -671,8 +649,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchStartDollyRotate( event ) {
 
-		//console.log( 'handleTouchStartDollyRotate' );
-
 		if ( scope.enableZoom ) handleTouchStartDolly( event );
 
 		if ( scope.enableRotate ) handleTouchStartRotate( event );
@@ -680,8 +656,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchMoveRotate( event ) {
-
-		//console.log( 'handleTouchMoveRotate' );
 
 		if ( event.touches.length == 1 ) {
 
@@ -698,7 +672,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
@@ -709,8 +683,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchMovePan( event ) {
-
-		//console.log( 'handleTouchMoveRotate' );
 
 		if ( event.touches.length == 1 ) {
 
@@ -735,8 +707,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchMoveDolly( event ) {
 
-		//console.log( 'handleTouchMoveRotate' );
-
 		var dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
 		var dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
 
@@ -754,8 +724,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchMoveDollyPan( event ) {
 
-		//console.log( 'handleTouchMoveDollyPan' );
-
 		if ( scope.enableZoom ) handleTouchMoveDolly( event );
 
 		if ( scope.enablePan ) handleTouchMovePan( event );
@@ -763,8 +731,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchMoveDollyRotate( event ) {
-
-		//console.log( 'handleTouchMoveDollyPan' );
 
 		if ( scope.enableZoom ) handleTouchMoveDolly( event );
 
@@ -774,7 +740,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function handleTouchEnd( /*event*/ ) {
 
-		//console.log( 'handleTouchEnd' );
+		// no-op
 
 	}
 
@@ -1170,7 +1136,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
+
+	// make sure element can receive keys.
+
+	if ( scope.domElement.tabIndex === - 1 ) {
+
+		scope.domElement.tabIndex = 0;
+
+	}
 
 	// force an update at start
 
@@ -1181,130 +1155,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
 
-Object.defineProperties( THREE.OrbitControls.prototype, {
-
-	center: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .center has been renamed to .target' );
-			return this.target;
-
-		}
-
-	},
-
-	// backward compatibility
-
-	noZoom: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.' );
-			return ! this.enableZoom;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.' );
-			this.enableZoom = ! value;
-
-		}
-
-	},
-
-	noRotate: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.' );
-			return ! this.enableRotate;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.' );
-			this.enableRotate = ! value;
-
-		}
-
-	},
-
-	noPan: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .noPan has been deprecated. Use .enablePan instead.' );
-			return ! this.enablePan;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE.OrbitControls: .noPan has been deprecated. Use .enablePan instead.' );
-			this.enablePan = ! value;
-
-		}
-
-	},
-
-	noKeys: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.' );
-			return ! this.enableKeys;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.' );
-			this.enableKeys = ! value;
-
-		}
-
-	},
-
-	staticMoving: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
-			return ! this.enableDamping;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.' );
-			this.enableDamping = ! value;
-
-		}
-
-	},
-
-	dynamicDampingFactor: {
-
-		get: function () {
-
-			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			return this.dampingFactor;
-
-		},
-
-		set: function ( value ) {
-
-			console.warn( 'THREE.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.' );
-			this.dampingFactor = value;
-
-		}
-
-	}
-
-} );
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).

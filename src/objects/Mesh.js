@@ -17,12 +17,28 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
  * @author jonobr1 / http://jonobr1.com/
  */
 
-var _inverseMatrix, _ray, _sphere;
-var _vA, _vB, _vC;
-var _tempA, _tempB, _tempC;
-var _morphA, _morphB, _morphC;
-var _uvA, _uvB, _uvC;
-var _intersectionPoint, _intersectionPointWorld;
+var _inverseMatrix = new Matrix4();
+var _ray = new Ray();
+var _sphere = new Sphere();
+
+var _vA = new Vector3();
+var _vB = new Vector3();
+var _vC = new Vector3();
+
+var _tempA = new Vector3();
+var _tempB = new Vector3();
+var _tempC = new Vector3();
+
+var _morphA = new Vector3();
+var _morphB = new Vector3();
+var _morphC = new Vector3();
+
+var _uvA = new Vector2();
+var _uvB = new Vector2();
+var _uvC = new Vector2();
+
+var _intersectionPoint = new Vector3();
+var _intersectionPointWorld = new Vector3();
 
 function Mesh( geometry, material ) {
 
@@ -121,33 +137,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: function ( raycaster, intersects ) {
 
-		if ( _intersectionPointWorld === undefined ) {
-
-			_inverseMatrix = new Matrix4();
-			_ray = new Ray();
-			_sphere = new Sphere();
-
-			_vA = new Vector3();
-			_vB = new Vector3();
-			_vC = new Vector3();
-
-			_tempA = new Vector3();
-			_tempB = new Vector3();
-			_tempC = new Vector3();
-
-			_morphA = new Vector3();
-			_morphB = new Vector3();
-			_morphC = new Vector3();
-
-			_uvA = new Vector2();
-			_uvB = new Vector2();
-			_uvC = new Vector2();
-
-			_intersectionPoint = new Vector3();
-			_intersectionPointWorld = new Vector3();
-
-		}
-
 		var geometry = this.geometry;
 		var material = this.material;
 		var matrixWorld = this.matrixWorld;
@@ -176,6 +165,15 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		// check unsupported draw modes
+
+		if ( this.drawMode !== TrianglesDrawMode ) {
+
+			console.warn( 'THREE.Mesh: TriangleStripDrawMode and TriangleFanDrawMode are not supported by .raycast().' );
+			return;
+
+		}
+
 		var intersection;
 
 		if ( geometry.isBufferGeometry ) {
@@ -184,6 +182,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			var index = geometry.index;
 			var position = geometry.attributes.position;
 			var morphPosition = geometry.morphAttributes.position;
+			var morphTargetsRelative = geometry.morphTargetsRelative;
 			var uv = geometry.attributes.uv;
 			var uv2 = geometry.attributes.uv2;
 			var groups = geometry.groups;
@@ -212,7 +211,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = index.getX( j + 1 );
 							c = index.getX( j + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 
@@ -237,7 +236,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 						b = index.getX( i + 1 );
 						c = index.getX( i + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 						if ( intersection ) {
 
@@ -270,7 +269,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 							b = j + 1;
 							c = j + 2;
 
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 							if ( intersection ) {
 
@@ -295,7 +294,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 						b = i + 1;
 						c = i + 2;
 
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 						if ( intersection ) {
 
@@ -399,7 +398,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 }
 
-function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, uv, uv2, a, b, c ) {
+function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c ) {
 
 	_vA.fromBufferAttribute( position, a );
 	_vB.fromBufferAttribute( position, b );
@@ -424,9 +423,19 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 			_tempB.fromBufferAttribute( morphAttribute, b );
 			_tempC.fromBufferAttribute( morphAttribute, c );
 
-			_morphA.addScaledVector( _tempA.sub( _vA ), influence );
-			_morphB.addScaledVector( _tempB.sub( _vB ), influence );
-			_morphC.addScaledVector( _tempC.sub( _vC ), influence );
+			if ( morphTargetsRelative ) {
+
+				_morphA.addScaledVector( _tempA, influence );
+				_morphB.addScaledVector( _tempB, influence );
+				_morphC.addScaledVector( _tempC, influence );
+
+			} else {
+
+				_morphA.addScaledVector( _tempA.sub( _vA ), influence );
+				_morphB.addScaledVector( _tempB.sub( _vB ), influence );
+				_morphC.addScaledVector( _tempC.sub( _vC ), influence );
+
+			}
 
 		}
 
