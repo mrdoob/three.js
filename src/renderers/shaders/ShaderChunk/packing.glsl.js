@@ -39,6 +39,7 @@ vec4 encodeHalfRGBA ( vec2 v ) {
 }
 
 vec2 decodeHalfRGBA( vec4 v ) {
+	v = floor( v * 255.0 + 0.5 ) / 255.0;
 	return vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );
 }
 
