@@ -33,7 +33,7 @@ export class BufferGeometry extends EventDispatcher {
 	uuid: string;
 	name: string;
 	type: string;
-	index: BufferAttribute;
+	index: BufferAttribute | null;
 	attributes: {
 		[name: string]: BufferAttribute | InterleavedBufferAttribute;
 	};
