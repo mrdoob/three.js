@@ -104,6 +104,7 @@ function WebVRManager( renderer ) {
 	//
 
 	var triggers = [];
+	var grips = [];
 
 	function findGamepad( id ) {
 
@@ -174,6 +175,29 @@ function WebVRManager( renderer ) {
 
 						controller.dispatchEvent( { type: 'selectend' } );
 						controller.dispatchEvent( { type: 'select' } );
+
+					}
+
+				}
+
+				// Grip
+
+				buttonId = gamepad.buttons.length > 2 ? 2 : 0;
+
+				if ( grips[ i ] === undefined ) grips[ i ] = false;
+
+				if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+					grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+					if ( grips[ i ] === true ) {
+
+						controller.dispatchEvent( { type: 'squeezestart' } );
+
+					} else {
+
+						controller.dispatchEvent( { type: 'squeezeend' } );
+						controller.dispatchEvent( { type: 'squeeze' } );
 
 					}
 
