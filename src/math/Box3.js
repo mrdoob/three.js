@@ -257,11 +257,13 @@ Object.assign( Box3.prototype, {
 
 			}
 
-			_box.copy( geometry.boundingBox );
-			_box.applyMatrix4( object.matrixWorld );
+			var box = new Box3();
 
-			this.expandByPoint( _box.min );
-			this.expandByPoint( _box.max );
+			box.copy( geometry.boundingBox );
+			box.applyMatrix4( object.matrixWorld );
+
+			this.expandByPoint( box.min );
+			this.expandByPoint( box.max );
 
 		}
 
