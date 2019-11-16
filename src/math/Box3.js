@@ -41,6 +41,8 @@ function Box3( min, max ) {
 
 }
 
+var _box = new Box3();
+
 Object.assign( Box3.prototype, {
 
 	isBox3: true,
@@ -257,13 +259,11 @@ Object.assign( Box3.prototype, {
 
 			}
 
-			var box = new Box3();
+			_box.copy( geometry.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
 
-			box.copy( geometry.boundingBox );
-			box.applyMatrix4( object.matrixWorld );
-
-			this.expandByPoint( box.min );
-			this.expandByPoint( box.max );
+			this.expandByPoint( _box.min );
+			this.expandByPoint( _box.max );
 
 		}
 
