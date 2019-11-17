@@ -31,7 +31,6 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.name = '';
 
-	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
 	this.mipmaps = [];
 
 	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
@@ -68,6 +67,23 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.version = 0;
 	this.onUpdate = null;
+
+	this._image = ( image !== undefined ) ? image : Texture.DEFAULT_IMAGE;
+
+
+	Object.defineProperty( this, 'image', {
+		get: function () {
+
+			return this._image;
+
+		},
+		set: function ( image ) {
+
+			this._image = image;
+			this._image.version = 0;
+
+		}
+	}	);
 
 }
 
@@ -322,7 +338,13 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 	set: function ( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) {
+
+			this.version ++;
+
+			if ( this.image ) this.image.version ++;
+
+		}
 
 	}
 
