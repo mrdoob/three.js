@@ -327,7 +327,7 @@ making our code responsive so it is adaptable to multiple situations](threejs-re
 <h3>es6 modules, three.js, and folder structure</h3>
 <p>As of version r106 the preferred way to use three.js is via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a>.</p>
 <p>
-es6 modules can be loaded via the `import` keyword in a script
+es6 modules can be loaded via the <code>import</code> keyword in a script
 or inline via a <code>&lt;script type="module"&gt;</code> tag. Here's an example of
 both
 </p>
