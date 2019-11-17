@@ -410,8 +410,8 @@ We'll then make 4 triangles from those 5 vertices
 
     // add the texture coordinates for each vertex of each face
     const u0 = x / cellsAcross;
-    const v0 = z / cellsAcross;
-    const u1 = (x + 1) / cellsDeep;
+    const v0 = z / cellsDeep;
+    const u1 = (x + 1) / cellsAcross;
     const v1 = (z + 1) / cellsDeep;
     const um = (u0 + u1) / 2;
     const vm = (v0 + v1) / 2;
