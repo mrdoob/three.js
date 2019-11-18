@@ -22,7 +22,7 @@ vec4 packDepthToRGBA( const in float v ) {
 }
 
 float unpackRGBAToDepth( const in vec4 v ) {
-	return dot( v, UnpackFactors );
+	return dot( floor( v * 255.0 + 0.5 ) / 255.0, UnpackFactors );
 }
 
 vec4 packHalfToRGBA( vec2 v ) {
