@@ -38,7 +38,7 @@ export default /* glsl */`
 
 	vec2 texture2DDistribution( sampler2D shadow, vec2 uv ) {
 
-		return decodeHalfRGBA( texture2D( shadow, uv ) );
+		return unpackHalfToRGBA( texture2D( shadow, uv ) );
 
 	}
 
