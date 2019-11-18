@@ -158,7 +158,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		function gatherSelectedMeshesCallBack( object ) {
 
-			if ( object.isMesh ) {
+			if ( isSelectable(object) ) {
 
 				if ( bVisible ) {
 
@@ -191,7 +191,7 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 
 		function gatherSelectedMeshesCallBack( object ) {
 
-			if ( object.isMesh ) selectedMeshes.push( object );
+			if ( isSelectable(object) ) selectedMeshes.push( object );
 
 		}
 
@@ -579,6 +579,10 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 	}
 
 } );
+
+function isSelectable(object) {
+	return object.isMesh || object.isLine
+}
 
 THREE.OutlinePass.BlurDirectionX = new THREE.Vector2( 1.0, 0.0 );
 THREE.OutlinePass.BlurDirectionY = new THREE.Vector2( 0.0, 1.0 );
