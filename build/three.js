@@ -26961,6 +26961,8 @@
 
 			var data = Object3D.prototype.toJSON.call( this, meta );
 
+			if ( this.autoUpdate === false ) { data.object.autoUpdate = false; }
+
 			data.object.levels = [];
 
 			var levels = this.levels;
@@ -27294,6 +27296,21 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	var _inverseMatrix$1 = new Matrix4();
+	var _ray$1 = new Ray();
+	var _sphere$2 = new Sphere();
+
+	var _vA$2 = new Vector3();
+	var _vB$2 = new Vector3();
+	var _vC$2 = new Vector3();
+
+	var _uvA$2 = new Vector2();
+	var _uvB$2 = new Vector2();
+	var _uvC$2 = new Vector2();
+
+	var _intersectionPoint$1 = new Vector3();
+	var _intersectionPointWorld$1 = new Vector3();
+
 	function InstancedMesh( geometry, material, count ) {
 
 		Mesh.call( this, geometry, material );
@@ -27310,7 +27327,209 @@
 
 		isInstancedMesh: true,
 
-		raycast: function () {},
+		raycast: function ( raycaster, intersects ) {
+
+			var geometry = this.geometry;
+			var material = this.material;
+			var matrixWorld = this.matrixWorld;
+
+			if ( material === undefined ) { return; }
+
+			for ( var instanceID = 0; instanceID < this.count; instanceID ++ ) {
+
+				//Calculate the world matrix for each instance
+
+				var instanceMatrixWorld = new Matrix4();
+
+				var instanceMatrix = this.getMatrixAt( instanceID );
+
+				instanceMatrixWorld.multiplyMatrices( matrixWorld, instanceMatrix );
+
+				// Checking boundingSphere distance to ray
+
+				if ( geometry.boundingSphere === null ) { geometry.computeBoundingSphere(); }
+
+				_sphere$2.copy( geometry.boundingSphere );
+				_sphere$2.applyMatrix4( instanceMatrixWorld );
+
+				if ( raycaster.ray.intersectsSphere( _sphere$2 ) === false ) { continue; }
+
+				//Transform the ray into the local space of the model
+
+				_inverseMatrix$1.getInverse( instanceMatrixWorld );
+				_ray$1.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$1 );
+
+				// Check boundingBox before continuing
+
+				if ( geometry.boundingBox !== null ) {
+
+					if ( _ray$1.intersectsBox( geometry.boundingBox ) === false ) { continue; }
+
+				}
+
+				var intersection;
+
+				if ( geometry.isBufferGeometry ) {
+
+					var a, b, c;
+					var index = geometry.index;
+					var position = geometry.attributes.position;
+					var uv = geometry.attributes.uv;
+					var uv2 = geometry.attributes.uv2;
+					var groups = geometry.groups;
+					var drawRange = geometry.drawRange;
+					var i, j, il, jl;
+					var group, groupMaterial;
+					var start, end;
+
+					if ( index !== null ) {
+
+						// indexed buffer geometry
+
+						if ( Array.isArray( material ) ) {
+
+							for ( i = 0, il = groups.length; i < il; i ++ ) {
+
+								group = groups[ i ];
+								groupMaterial = material[ group.materialIndex ];
+
+								start = Math.max( group.start, drawRange.start );
+								end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
+								for ( j = start, jl = end; j < jl; j += 3 ) {
+
+									a = index.getX( j );
+									b = index.getX( j + 1 );
+									c = index.getX( j + 2 );
+
+									intersection = checkBufferGeometryIntersection$1( this, instanceMatrixWorld, groupMaterial, raycaster, _ray$1, position, uv, uv2, a, b, c );
+
+									if ( intersection ) {
+
+										intersection.faceIndex = Math.floor( j / 3 ); // triangle number in indexed buffer semantics
+										intersection.face.materialIndex = group.materialIndex;
+
+										intersection.instanceID = instanceID;
+
+										intersects.push( intersection );
+
+									}
+
+								}
+
+							}
+
+						} else {
+
+							start = Math.max( 0, drawRange.start );
+							end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+
+							for ( i = start, il = end; i < il; i += 3 ) {
+
+								a = index.getX( i );
+								b = index.getX( i + 1 );
+								c = index.getX( i + 2 );
+
+								intersection = checkBufferGeometryIntersection$1( this, instanceMatrixWorld, material, raycaster, _ray$1, position, uv, uv2, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+
+									intersection.instanceID = instanceID;
+
+									intersects.push( intersection );
+
+								}
+
+							}
+
+						}
+
+					} else if ( position !== undefined ) {
+
+						// non-indexed buffer geometry
+
+						if ( Array.isArray( material ) ) {
+
+							for ( i = 0, il = groups.length; i < il; i ++ ) {
+
+								group = groups[ i ];
+								groupMaterial = material[ group.materialIndex ];
+
+								start = Math.max( group.start, drawRange.start );
+								end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
+								for ( j = start, jl = end; j < jl; j += 3 ) {
+
+									a = j;
+									b = j + 1;
+									c = j + 2;
+
+									intersection = checkBufferGeometryIntersection$1( this, instanceMatrixWorld, groupMaterial, raycaster, _ray$1, position, uv, uv2, a, b, c );
+
+									if ( intersection ) {
+
+										intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
+										intersection.face.materialIndex = group.materialIndex;
+
+										intersection.instanceID = instanceID;
+
+										intersects.push( intersection );
+
+									}
+
+								}
+
+							}
+
+						} else {
+
+							start = Math.max( 0, drawRange.start );
+							end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
+
+							for ( i = start, il = end; i < il; i += 3 ) {
+
+								a = i;
+								b = i + 1;
+								c = i + 2;
+
+								intersection = checkBufferGeometryIntersection$1( this, instanceMatrixWorld, material, raycaster, _ray$1, position, uv, uv2, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+
+									intersection.instanceID = instanceID;
+
+									intersects.push( intersection );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+
+
+
+			}
+
+		},
+
+		getMatrixAt: function ( index ) {
+
+			var matrix = new Matrix4();
+
+			matrix.fromArray( this.instanceMatrix.array, index * 16 );
+
+			return matrix;
+
+		},
 
 		setMatrixAt: function ( index, matrix ) {
 
@@ -27318,9 +27537,83 @@
 
 		},
 
-		updateMorphTargets: function () {}
+		updateMorphTargets: function () {
+
+		}
 
 	} );
+
+	function checkIntersection$1( object, matrixWorld, material, raycaster, ray, pA, pB, pC, point ) {
+
+		var intersect;
+
+		if ( material.side === BackSide ) {
+
+			intersect = ray.intersectTriangle( pC, pB, pA, true, point );
+
+		} else {
+
+			intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
+
+		}
+
+		if ( intersect === null ) { return null; }
+
+		_intersectionPointWorld$1.copy( point );
+		_intersectionPointWorld$1.applyMatrix4( matrixWorld );
+
+		var distance = raycaster.ray.origin.distanceTo( _intersectionPointWorld$1 );
+
+		if ( distance < raycaster.near || distance > raycaster.far ) { return null; }
+
+		return {
+			distance: distance,
+			point: _intersectionPointWorld$1.clone(),
+			object: object
+		};
+
+	}
+
+	function checkBufferGeometryIntersection$1( object, matrixWorld, material, raycaster, ray, position, uv, uv2, a, b, c ) {
+
+		_vA$2.fromBufferAttribute( position, a );
+		_vB$2.fromBufferAttribute( position, b );
+		_vC$2.fromBufferAttribute( position, c );
+
+		var intersection = checkIntersection$1( object, matrixWorld, material, raycaster, ray, _vA$2, _vB$2, _vC$2, _intersectionPoint$1 );
+
+		if ( intersection ) {
+
+			if ( uv ) {
+
+				_uvA$2.fromBufferAttribute( uv, a );
+				_uvB$2.fromBufferAttribute( uv, b );
+				_uvC$2.fromBufferAttribute( uv, c );
+
+				intersection.uv = Triangle.getUV( _intersectionPoint$1, _vA$2, _vB$2, _vC$2, _uvA$2, _uvB$2, _uvC$2, new Vector2() );
+
+			}
+
+			if ( uv2 ) {
+
+				_uvA$2.fromBufferAttribute( uv2, a );
+				_uvB$2.fromBufferAttribute( uv2, b );
+				_uvC$2.fromBufferAttribute( uv2, c );
+
+				intersection.uv2 = Triangle.getUV( _intersectionPoint$1, _vA$2, _vB$2, _vC$2, _uvA$2, _uvB$2, _uvC$2, new Vector2() );
+
+			}
+
+			var face = new Face3( a, b, c );
+			Triangle.getNormal( _vA$2, _vB$2, _vC$2, face.normal );
+
+			intersection.face = face;
+
+		}
+
+		return intersection;
+
+	}
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -27377,9 +27670,9 @@
 
 	var _start = new Vector3();
 	var _end = new Vector3();
-	var _inverseMatrix$1 = new Matrix4();
-	var _ray$1 = new Ray();
-	var _sphere$2 = new Sphere();
+	var _inverseMatrix$2 = new Matrix4();
+	var _ray$2 = new Ray();
+	var _sphere$3 = new Sphere();
 
 	function Line( geometry, material, mode ) {
 
@@ -27466,16 +27759,16 @@
 
 			if ( geometry.boundingSphere === null ) { geometry.computeBoundingSphere(); }
 
-			_sphere$2.copy( geometry.boundingSphere );
-			_sphere$2.applyMatrix4( matrixWorld );
-			_sphere$2.radius += precision;
+			_sphere$3.copy( geometry.boundingSphere );
+			_sphere$3.applyMatrix4( matrixWorld );
+			_sphere$3.radius += precision;
 
-			if ( raycaster.ray.intersectsSphere( _sphere$2 ) === false ) { return; }
+			if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) { return; }
 
 			//
 
-			_inverseMatrix$1.getInverse( matrixWorld );
-			_ray$1.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$1 );
+			_inverseMatrix$2.getInverse( matrixWorld );
+			_ray$2.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$2 );
 
 			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localPrecisionSq = localPrecision * localPrecision;
@@ -27504,7 +27797,7 @@
 						vStart.fromArray( positions, a * 3 );
 						vEnd.fromArray( positions, b * 3 );
 
-						var distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+						var distSq = _ray$2.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
 						if ( distSq > localPrecisionSq ) { continue; }
 
@@ -27536,7 +27829,7 @@
 						vStart.fromArray( positions, 3 * i );
 						vEnd.fromArray( positions, 3 * i + 3 );
 
-						var distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+						var distSq = _ray$2.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
 						if ( distSq > localPrecisionSq ) { continue; }
 
@@ -27570,7 +27863,7 @@
 
 				for ( var i = 0; i < nbVertices - 1; i += step ) {
 
-					var distSq = _ray$1.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
+					var distSq = _ray$2.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
 					if ( distSq > localPrecisionSq ) { continue; }
 
@@ -27768,9 +28061,9 @@
 	 * @author alteredq / http://alteredqualia.com/
 	 */
 
-	var _inverseMatrix$2 = new Matrix4();
-	var _ray$2 = new Ray();
-	var _sphere$3 = new Sphere();
+	var _inverseMatrix$3 = new Matrix4();
+	var _ray$3 = new Ray();
+	var _sphere$4 = new Sphere();
 	var _position$1 = new Vector3();
 
 	function Points( geometry, material ) {
@@ -27802,16 +28095,16 @@
 
 			if ( geometry.boundingSphere === null ) { geometry.computeBoundingSphere(); }
 
-			_sphere$3.copy( geometry.boundingSphere );
-			_sphere$3.applyMatrix4( matrixWorld );
-			_sphere$3.radius += threshold;
+			_sphere$4.copy( geometry.boundingSphere );
+			_sphere$4.applyMatrix4( matrixWorld );
+			_sphere$4.radius += threshold;
 
-			if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) { return; }
+			if ( raycaster.ray.intersectsSphere( _sphere$4 ) === false ) { return; }
 
 			//
 
-			_inverseMatrix$2.getInverse( matrixWorld );
-			_ray$2.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$2 );
+			_inverseMatrix$3.getInverse( matrixWorld );
+			_ray$3.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$3 );
 
 			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 			var localThresholdSq = localThreshold * localThreshold;
@@ -27918,13 +28211,13 @@
 
 	function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
-		var rayPointDistanceSq = _ray$2.distanceSqToPoint( point );
+		var rayPointDistanceSq = _ray$3.distanceSqToPoint( point );
 
 		if ( rayPointDistanceSq < localThresholdSq ) {
 
 			var intersectPoint = new Vector3();
 
-			_ray$2.closestPointToPoint( point, intersectPoint );
+			_ray$3.closestPointToPoint( point, intersectPoint );
 			intersectPoint.applyMatrix4( matrixWorld );
 
 			var distance = raycaster.ray.origin.distanceTo( intersectPoint );
@@ -35496,6 +35789,8 @@
 				var regex = handlers[ i ];
 				var loader = handlers[ i + 1 ];
 
+				if ( regex.global ) { regex.lastIndex = 0; } // see #17920
+
 				if ( regex.test( file ) ) {
 
 					return loader;
@@ -40533,6 +40828,8 @@
 			}
 
 			if ( data.type === 'LOD' ) {
+
+				if ( data.autoUpdate !== undefined ) { object.autoUpdate = data.autoUpdate; }
 
 				var levels = data.levels;
 
