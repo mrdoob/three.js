@@ -36,7 +36,7 @@ void main() {
 
   float std_dev = pow( squared_mean - mean * mean, 0.5 );
 
-  gl_FragColor = encodeHalfRGBA( vec2( mean, std_dev ) );
+  gl_FragColor = packHalfToRGBA( vec2( mean, std_dev ) );
 
 }
 `;
