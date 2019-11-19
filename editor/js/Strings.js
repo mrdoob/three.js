@@ -65,6 +65,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
+			'menubar/examples/Arkanoid': 'Arkanoid',
+			'menubar/examples/Camera': 'Camera',
+			'menubar/examples/Particles': 'Particles',
+			'menubar/examples/Pong': 'Pong',
+			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -364,6 +369,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
+			'menubar/examples/Arkanoid': '打砖块',
+			'menubar/examples/Camera': ' 摄像机',
+			'menubar/examples/Particles': '粒子',
+			'menubar/examples/Pong': '乒乓球',
+			'menubar/examples/Shaders': '着色器',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',

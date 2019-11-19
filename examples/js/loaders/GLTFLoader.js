@@ -2285,12 +2285,13 @@ THREE.GLTFLoader = ( function () {
 			var max = accessor.max;
 
 			box.set(
-				new THREE.Vector3( min[0], min[1], min[2] ),
-				new THREE.Vector3( max[0], max[1], max[2] ) );
+				new THREE.Vector3( min[ 0 ], min[ 1 ], min[ 2 ] ),
+				new THREE.Vector3( max[ 0 ], max[ 1 ], max[ 2 ] ) );
 
 		} else {
 
 			return;
+
 		}
 
 		var targets = primitiveDef.targets;
@@ -2310,9 +2311,9 @@ THREE.GLTFLoader = ( function () {
 					var max = accessor.max;
 
 					// we need to get max of absolute components because target weight is [-1,1]
-					vector.setX( Math.max( Math.abs( min[0] ), Math.abs( max[0] ) ) );
-					vector.setY( Math.max( Math.abs( min[1] ), Math.abs( max[1] ) ) );
-					vector.setZ( Math.max( Math.abs( min[2] ), Math.abs( max[2] ) ) );
+					vector.setX( Math.max( Math.abs( min[ 0 ] ), Math.abs( max[ 0 ] ) ) );
+					vector.setY( Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ) );
+					vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
 
 					box.expandByVector( vector );
 
