@@ -571,7 +571,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					// load array of images e.g CubeTexture
 
-					var images = [];
+					var imageArray = [];
 
 					for ( var j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -579,11 +579,11 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.resourcePath + currentUrl;
 
-						images.push( loadImage( path ) );
+						imageArray.push( loadImage( path ) );
 
 					}
 
-					images[ image.uuid ] = new TextureImage( images );
+					images[ image.uuid ] = new TextureImage( imageArray );
 
 				} else {
 
