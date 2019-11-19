@@ -55,6 +55,12 @@
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
 		</p>
 
+		<h3>[property:TextureImage textureImage]</h3>
+		<p>
+		This property wraps the actual [page:Texture.image image] property into an object so it can be shared across different textures
+		without causing multiple GPU uploads.
+		</p>
+
 		<h3>[property:Boolean isTexture]</h3>
 		<p>
 			Used to check whether this or derived classes are Textures. Default is *true*.<br /><br />

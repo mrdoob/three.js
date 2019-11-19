@@ -1,5 +1,6 @@
 import { Vector2, Vector } from './../math/Vector2';
 import { EventDispatcher } from './../core/EventDispatcher';
+import { TextureImage } from './TextureImage';
 import {
 	Mapping,
 	Wrapping,
@@ -30,7 +31,7 @@ export class Texture extends EventDispatcher {
 	id: number;
 	uuid: string;
 	name: string;
-	sourceFile: string;
+	textureImage: TextureImage;
 	image: any; // HTMLImageElement or ImageData or { width: number, height: number } in some children;
 	mipmaps: ImageData[];
 	mapping: Mapping;

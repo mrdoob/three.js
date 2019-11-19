@@ -16,7 +16,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	var _videoTextures = new WeakMap();
 	var _canvas;
 
-	var _images = new WeakMap(); // maps images to WebglTexture objects
+	var _textureImages = new WeakMap(); // maps instance of TextureImage to WebglTexture objects
 
 	// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
 	// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
@@ -227,8 +227,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		// check if it's necessary to remove the WebGLTexture object
 
-		var image = texture.image;
-		var webglTextures = _images.get( image );
+		var textureImage = texture.textureImage;
+		var webglTextures = _textureImages.get( textureImage );
 
 		if ( webglTextures ) {
 
@@ -247,7 +247,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( Object.keys( webglTextures ).length === 0 ) {
 
-				_images.delete( image );
+				_textureImages.delete( textureImage );
 
 			}
 
@@ -261,8 +261,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var textureProperties = properties.get( texture );
 
-		var image = texture.image;
-		var webglTextures = _images.get( image );
+		var textureImage = texture.textureImage;
+		var webglTextures = _textureImages.get( textureImage );
 
 		_gl.deleteTexture( textureProperties.__webglTexture );
 
@@ -432,7 +432,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			var forceUpload = initTexture( textureProperties, texture );
 
-			if ( texture.image.version !== texture.image.__currentVersion || forceUpload === true ) {
+			if ( texture.textureImage.version !== texture.textureImage.__currentVersion || forceUpload === true ) {
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
@@ -545,7 +545,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				texture.image.__currentVersion = texture.image.version;
+				texture.textureImage.__currentVersion = texture.textureImage.version;
 
 				if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -660,15 +660,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		// create image <-> WebGLTextures mapping if necessary
+		// create TextureImage <-> WebGLTextures mapping if necessary
 
-		var image = texture.image;
-		var webglTextures = _images.get( image );
+		var textureImage = texture.textureImage;
+		var webglTextures = _textureImages.get( textureImage );
 
 		if ( webglTextures === undefined ) {
 
 			webglTextures = {};
-			_images.set( image, webglTextures );
+			_textureImages.set( textureImage, webglTextures );
 
 		}
 
@@ -760,7 +760,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.activeTexture( _gl.TEXTURE0 + slot );
 		state.bindTexture( textureType, textureProperties.__webglTexture );
 
-		if ( texture.image.version !== texture.image.__currentVersion || forceUpload === true ) {
+		if ( texture.textureImage.version !== texture.textureImage.__currentVersion || forceUpload === true ) {
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -932,7 +932,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			texture.image.__currentVersion = texture.image.version;
+			texture.textureImage.__currentVersion = texture.textureImage.version;
 
 			if ( texture.onUpdate ) texture.onUpdate( texture );
 
