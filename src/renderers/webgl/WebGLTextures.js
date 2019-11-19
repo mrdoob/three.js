@@ -16,7 +16,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	var _videoTextures = new WeakMap();
 	var _canvas;
 
-	var _textureImages = new WeakMap(); // maps instance of TextureImage to WebglTexture objects
+	var _textureImages = new WeakMap(); // maps WebglTexture objects to instances of TextureImage
 
 	// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
 	// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
