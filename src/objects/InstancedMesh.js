@@ -38,7 +38,7 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	},
 
 	// updateMorphTargets: function () {
-    //
+	//
 	// }
 
 } );
