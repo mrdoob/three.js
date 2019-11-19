@@ -21,6 +21,10 @@ var _inverseMatrix = new Matrix4();
 var _ray = new Ray();
 var _sphere = new Sphere();
 
+var _matrixWorld = new Matrix4();
+var _instanceMatrix = new Matrix4();
+var _executionTimes = 1;
+
 var _vA = new Vector3();
 var _vB = new Vector3();
 var _vC = new Vector3();
@@ -143,213 +147,244 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( material === undefined ) return;
 
-		// Checking boundingSphere distance to ray
+		//Determine how many times raycast will execute
 
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+		if ( this.isInstancedMesh ) {
 
-		_sphere.copy( geometry.boundingSphere );
-		_sphere.applyMatrix4( matrixWorld );
+			_executionTimes = this.count;
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+		} else {
 
-		//
-
-		_inverseMatrix.getInverse( matrixWorld );
-		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
-
-		// Check boundingBox before continuing
-
-		if ( geometry.boundingBox !== null ) {
-
-			if ( _ray.intersectsBox( geometry.boundingBox ) === false ) return;
+			_executionTimes = 1;
 
 		}
 
-		// check unsupported draw modes
+		for ( var instanceId = 0; instanceId < _executionTimes; instanceId ++ ) {
 
-		if ( this.drawMode !== TrianglesDrawMode ) {
+			//Determine the world matrix for this calculation
 
-			console.warn( 'THREE.Mesh: TriangleStripDrawMode and TriangleFanDrawMode are not supported by .raycast().' );
-			return;
+			if ( this.isInstancedMesh ) {
 
-		}
+				_instanceMatrix = this.getMatrixAt( instanceId );
+				_matrixWorld.multiplyMatrices( matrixWorld, _instanceMatrix );
 
-		var intersection;
+			} else {
 
-		if ( geometry.isBufferGeometry ) {
-
-			var a, b, c;
-			var index = geometry.index;
-			var position = geometry.attributes.position;
-			var morphPosition = geometry.morphAttributes.position;
-			var morphTargetsRelative = geometry.morphTargetsRelative;
-			var uv = geometry.attributes.uv;
-			var uv2 = geometry.attributes.uv2;
-			var groups = geometry.groups;
-			var drawRange = geometry.drawRange;
-			var i, j, il, jl;
-			var group, groupMaterial;
-			var start, end;
-
-			if ( index !== null ) {
-
-				// indexed buffer geometry
-
-				if ( Array.isArray( material ) ) {
-
-					for ( i = 0, il = groups.length; i < il; i ++ ) {
-
-						group = groups[ i ];
-						groupMaterial = material[ group.materialIndex ];
-
-						start = Math.max( group.start, drawRange.start );
-						end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
-
-						for ( j = start, jl = end; j < jl; j += 3 ) {
-
-							a = index.getX( j );
-							b = index.getX( j + 1 );
-							c = index.getX( j + 2 );
-
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-							if ( intersection ) {
-
-								intersection.faceIndex = Math.floor( j / 3 ); // triangle number in indexed buffer semantics
-								intersection.face.materialIndex = group.materialIndex;
-								intersects.push( intersection );
-
-							}
-
-						}
-
-					}
-
-				} else {
-
-					start = Math.max( 0, drawRange.start );
-					end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
-
-					for ( i = start, il = end; i < il; i += 3 ) {
-
-						a = index.getX( i );
-						b = index.getX( i + 1 );
-						c = index.getX( i + 2 );
-
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-						if ( intersection ) {
-
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
-							intersects.push( intersection );
-
-						}
-
-					}
-
-				}
-
-			} else if ( position !== undefined ) {
-
-				// non-indexed buffer geometry
-
-				if ( Array.isArray( material ) ) {
-
-					for ( i = 0, il = groups.length; i < il; i ++ ) {
-
-						group = groups[ i ];
-						groupMaterial = material[ group.materialIndex ];
-
-						start = Math.max( group.start, drawRange.start );
-						end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
-
-						for ( j = start, jl = end; j < jl; j += 3 ) {
-
-							a = j;
-							b = j + 1;
-							c = j + 2;
-
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-							if ( intersection ) {
-
-								intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
-								intersection.face.materialIndex = group.materialIndex;
-								intersects.push( intersection );
-
-							}
-
-						}
-
-					}
-
-				} else {
-
-					start = Math.max( 0, drawRange.start );
-					end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
-
-					for ( i = start, il = end; i < il; i += 3 ) {
-
-						a = i;
-						b = i + 1;
-						c = i + 2;
-
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-						if ( intersection ) {
-
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
-							intersects.push( intersection );
-
-						}
-
-					}
-
-				}
+				_matrixWorld = matrixWorld;
 
 			}
 
-		} else if ( geometry.isGeometry ) {
+			// Checking boundingSphere distance to ray
 
-			var fvA, fvB, fvC;
-			var isMultiMaterial = Array.isArray( material );
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			var vertices = geometry.vertices;
-			var faces = geometry.faces;
-			var uvs;
+			_sphere.copy( geometry.boundingSphere );
+			_sphere.applyMatrix4( _matrixWorld );
 
-			var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
-			if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
+			if ( raycaster.ray.intersectsSphere( _sphere ) === false ) continue;
 
-			for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
+			//Transform the ray into the local space of the model
 
-				var face = faces[ f ];
-				var faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
+			_inverseMatrix.getInverse( _matrixWorld );
+			_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-				if ( faceMaterial === undefined ) continue;
+			// Check boundingBox before continuing
 
-				fvA = vertices[ face.a ];
-				fvB = vertices[ face.b ];
-				fvC = vertices[ face.c ];
+			if ( geometry.boundingBox !== null ) {
 
-				intersection = checkIntersection( this, faceMaterial, raycaster, _ray, fvA, fvB, fvC, _intersectionPoint );
+				if ( _ray.intersectsBox( geometry.boundingBox ) === false ) continue;
 
-				if ( intersection ) {
+			}
 
-					if ( uvs && uvs[ f ] ) {
+			var intersection;
 
-						var uvs_f = uvs[ f ];
-						_uvA.copy( uvs_f[ 0 ] );
-						_uvB.copy( uvs_f[ 1 ] );
-						_uvC.copy( uvs_f[ 2 ] );
+			if ( geometry.isBufferGeometry ) {
 
-						intersection.uv = Triangle.getUV( _intersectionPoint, fvA, fvB, fvC, _uvA, _uvB, _uvC, new Vector2() );
+				var a, b, c;
+				var index = geometry.index;
+				var position = geometry.attributes.position;
+				var morphPosition = geometry.morphAttributes.position;
+				var uv = geometry.attributes.uv;
+				var uv2 = geometry.attributes.uv2;
+				var groups = geometry.groups;
+				var drawRange = geometry.drawRange;
+				var i, j, il, jl;
+				var group, groupMaterial;
+				var start, end;
+
+				if ( index !== null ) {
+
+					// indexed buffer geometry
+
+					if ( Array.isArray( material ) ) {
+
+						for ( i = 0, il = groups.length; i < il; i ++ ) {
+
+							group = groups[ i ];
+							groupMaterial = material[ group.materialIndex ];
+
+							start = Math.max( group.start, drawRange.start );
+							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
+							for ( j = start, jl = end; j < jl; j += 3 ) {
+
+								a = index.getX( j );
+								b = index.getX( j + 1 );
+								c = index.getX( j + 2 );
+
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( j / 3 ); // triangle number in indexed buffer semantics
+									intersection.face.materialIndex = group.materialIndex;
+
+									intersection.instanceId = instanceId;
+
+									intersects.push( intersection );
+
+								}
+
+							}
+
+						}
+
+					} else {
+
+						start = Math.max( 0, drawRange.start );
+						end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+
+						for ( i = start, il = end; i < il; i += 3 ) {
+
+							a = index.getX( i );
+							b = index.getX( i + 1 );
+							c = index.getX( i + 2 );
+
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+
+							if ( intersection ) {
+
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+
+								intersection.instanceId = instanceId;
+
+								intersects.push( intersection );
+
+							}
+
+						}
 
 					}
 
-					intersection.face = face;
-					intersection.faceIndex = f;
-					intersects.push( intersection );
+				} else if ( position !== undefined ) {
+
+					// non-indexed buffer geometry
+
+					if ( Array.isArray( material ) ) {
+
+						for ( i = 0, il = groups.length; i < il; i ++ ) {
+
+							group = groups[ i ];
+							groupMaterial = material[ group.materialIndex ];
+
+							start = Math.max( group.start, drawRange.start );
+							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+
+							for ( j = start, jl = end; j < jl; j += 3 ) {
+
+								a = j;
+								b = j + 1;
+								c = j + 2;
+
+								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+
+								if ( intersection ) {
+
+									intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
+									intersection.face.materialIndex = group.materialIndex;
+
+									intersection.instanceId = instanceId;
+
+									intersects.push( intersection );
+
+								}
+
+							}
+
+						}
+
+					} else {
+
+						start = Math.max( 0, drawRange.start );
+						end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
+
+						for ( i = start, il = end; i < il; i += 3 ) {
+
+							a = i;
+							b = i + 1;
+							c = i + 2;
+
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, uv, uv2, a, b, c );
+
+							if ( intersection ) {
+
+								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+
+								intersection.instanceId = instanceId;
+
+								intersects.push( intersection );
+
+							}
+
+						}
+
+					}
+
+				}
+
+			} else if ( geometry.isGeometry ) {
+
+				var fvA, fvB, fvC;
+				var isMultiMaterial = Array.isArray( material );
+
+				var vertices = geometry.vertices;
+				var faces = geometry.faces;
+				var uvs;
+
+				var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+				if ( faceVertexUvs.length > 0 ) uvs = faceVertexUvs;
+
+				for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
+
+					var face = faces[ f ];
+					var faceMaterial = isMultiMaterial ? material[ face.materialIndex ] : material;
+
+					if ( faceMaterial === undefined ) continue;
+
+					fvA = vertices[ face.a ];
+					fvB = vertices[ face.b ];
+					fvC = vertices[ face.c ];
+
+					intersection = checkIntersection( this, faceMaterial, raycaster, _ray, fvA, fvB, fvC, _intersectionPoint );
+
+					if ( intersection ) {
+
+						if ( uvs && uvs[ f ] ) {
+
+							var uvs_f = uvs[ f ];
+							_uvA.copy( uvs_f[ 0 ] );
+							_uvB.copy( uvs_f[ 1 ] );
+							_uvC.copy( uvs_f[ 2 ] );
+
+							intersection.uv = Triangle.getUV( _intersectionPoint, fvA, fvB, fvC, _uvA, _uvB, _uvC, new Vector2() );
+
+						}
+
+						intersection.face = face;
+						intersection.faceIndex = f;
+						intersects.push( intersection );
+
+					}
 
 				}
 
@@ -384,7 +419,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 	if ( intersect === null ) return null;
 
 	_intersectionPointWorld.copy( point );
-	_intersectionPointWorld.applyMatrix4( object.matrixWorld );
+	_intersectionPointWorld.applyMatrix4( _matrixWorld );
 
 	var distance = raycaster.ray.origin.distanceTo( _intersectionPointWorld );
 
@@ -398,7 +433,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 }
 
-function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c ) {
+function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, uv, uv2, a, b, c ) {
 
 	_vA.fromBufferAttribute( position, a );
 	_vB.fromBufferAttribute( position, b );
@@ -423,19 +458,9 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, posi
 			_tempB.fromBufferAttribute( morphAttribute, b );
 			_tempC.fromBufferAttribute( morphAttribute, c );
 
-			if ( morphTargetsRelative ) {
-
-				_morphA.addScaledVector( _tempA, influence );
-				_morphB.addScaledVector( _tempB, influence );
-				_morphC.addScaledVector( _tempC, influence );
-
-			} else {
-
-				_morphA.addScaledVector( _tempA.sub( _vA ), influence );
-				_morphB.addScaledVector( _tempB.sub( _vB ), influence );
-				_morphC.addScaledVector( _tempC.sub( _vC ), influence );
-
-			}
+			_morphA.addScaledVector( _tempA.sub( _vA ), influence );
+			_morphB.addScaledVector( _tempB.sub( _vB ), influence );
+			_morphC.addScaledVector( _tempC.sub( _vC ), influence );
 
 		}
 

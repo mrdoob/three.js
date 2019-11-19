@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - instancing - morph targets - raycast </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="container"></div>
+<div id="info">
+	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL instancing morphTarget raycast
+	example
+</div>
+
+<script type="module">
+
+	import * as THREE from '../build/three.module.js';
+
+	import Stats from './jsm/libs/stats.module.js';
+	import {OrbitControls} from './jsm/controls/OrbitControls.js';
+
+	var container;
+
+	var camera, scene, renderer, raycaster, controls, stats;
+
+	var mesh, mouse = new THREE.Vector2();
+
+	var object = new THREE.Object3D();
+
+	var amount = parseInt( window.location.search.substr( 1 ) ) || 10;
+
+	var count = Math.pow( amount, 3 );
+
+	var rotationTheta = 0.1;
+	var rotationMatrix = new THREE.Matrix4().makeRotationY( rotationTheta );
+	var instanceMatrix = new THREE.Matrix4();
+	var matrix = new THREE.Matrix4();
+
+	init();
+	animate();
+
+	function init() {
+
+		container = document.getElementById( 'container' );
+
+		scene = new THREE.Scene();
+		scene.background = new THREE.Color( 0x000000 );
+
+		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+		camera.position.set( 25, 25, 25 );
+		camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+		scene.add( camera );
+
+		var light = new THREE.AmbientLight( 0xffffff );
+		scene.add( light );
+
+		var geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+		var material = new THREE.MeshNormalMaterial( { morphTargets: true } );
+
+		// construct 8 blend shapes
+
+		for ( var i = 0; i < 8; i ++ ) {
+
+			var vertices = [];
+
+			for ( var v = 0; v < geometry.vertices.length; v ++ ) {
+
+				vertices.push( geometry.vertices[ v ].clone() );
+
+				if ( v === i ) {
+
+					vertices[ vertices.length - 1 ].x *= 2;
+					vertices[ vertices.length - 1 ].y *= 2;
+					vertices[ vertices.length - 1 ].z *= 2;
+
+				}
+
+			}
+
+			geometry.morphTargets.push( { name: "target" + i, vertices: vertices } );
+
+		}
+
+		geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+		mesh = new THREE.InstancedMesh( geometry, material, count );
+
+		mesh.position.set( 0, 0, 0 );
+
+		var i = 0;
+		var offset = amount / 2;
+
+		for ( var x = 0; x < amount; x ++ ) {
+
+			for ( var y = 0; y < amount; y ++ ) {
+
+				for ( var z = 0; z < amount; z ++ ) {
+
+					object.position.set( ( offset - x ) * 2, ( offset - y ) * 2, ( offset - z ) * 2 );
+
+					object.updateMatrix();
+
+					mesh.setMatrixAt( i ++, object.matrix );
+
+				}
+
+			}
+
+		}
+
+		scene.add( mesh );
+
+		raycaster = new THREE.Raycaster();
+
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
+
+		controls = new OrbitControls( camera, renderer.domElement );
+
+		stats = new Stats();
+		document.body.appendChild( stats.dom );
+
+		window.addEventListener( 'resize', onWindowResize, false );
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+
+	}
+
+	function onMouseMove( event ) {
+
+		event.preventDefault();
+
+		mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+		mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+
+	}
+
+	function animate() {
+
+		requestAnimationFrame( animate );
+		render();
+
+	}
+
+	function updateMorphTargetInfluences() {
+
+		for ( var i = 0; i < mesh.morphTargetInfluences.length; i ++ ) {
+
+			mesh.morphTargetInfluences[ i ] = Math.sin( Date.now() * 0.001 ) + 0.5;
+
+		}
+
+	}
+
+	function render() {
+
+		updateMorphTargetInfluences();
+
+		raycaster.setFromCamera( mouse, camera );
+
+		var intersects = raycaster.intersectObject( mesh );
+
+		if ( intersects.length > 0 ) {
+
+			mesh.getMatrixAt( intersects[ 0 ].instanceId, instanceMatrix );
+			matrix.multiplyMatrices( instanceMatrix, rotationMatrix );
+
+			mesh.setMatrixAt( intersects[ 0 ].instanceId, matrix );
+			mesh.instanceMatrix.needsUpdate = true;
+
+		}
+
+		renderer.render( scene, camera );
+
+		stats.update();
+
+	}
+
+
+</script>
+
+</body>
+</html>
