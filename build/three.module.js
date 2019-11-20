@@ -6091,7 +6091,10 @@ var _points = [
 	new Vector3(),
 	new Vector3()
 ];
+
 var _vector$2 = new Vector3();
+
+var _box = new Box3();
 
 // triangle centered vertices
 
@@ -6121,6 +6124,7 @@ function Box3( min, max ) {
 	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
 }
+
 
 Object.assign( Box3.prototype, {
 
@@ -6321,8 +6325,6 @@ Object.assign( Box3.prototype, {
 
 	expandByObject: function ( object ) {
 
-		var i, l;
-
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
@@ -6332,44 +6334,23 @@ Object.assign( Box3.prototype, {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.isGeometry ) {
+			if ( geometry.boundingBox === null ) {
 
-				var vertices = geometry.vertices;
-
-				for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-					_vector$2.copy( vertices[ i ] );
-					_vector$2.applyMatrix4( object.matrixWorld );
-
-					this.expandByPoint( _vector$2 );
-
-				}
-
-			} else if ( geometry.isBufferGeometry ) {
-
-				var attribute = geometry.attributes.position;
-
-				if ( attribute !== undefined ) {
-
-					for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-						_vector$2.fromBufferAttribute( attribute, i ).applyMatrix4( object.matrixWorld );
-
-						this.expandByPoint( _vector$2 );
-
-					}
-
-				}
+				geometry.computeBoundingBox();
 
 			}
 
-		}
+			_box.copy( geometry.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
 
-		//
+			this.expandByPoint( _box.min );
+			this.expandByPoint( _box.max );
+
+		}
 
 		var children = object.children;
 
-		for ( i = 0, l = children.length; i < l; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			this.expandByObject( children[ i ] );
 
@@ -6659,7 +6640,7 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 
 }
 
-var _box = new Box3();
+var _box$1 = new Box3();
 
 /**
  * @author bhouston / http://clara.io
@@ -6694,7 +6675,7 @@ Object.assign( Sphere.prototype, {
 
 		} else {
 
-			_box.setFromPoints( points ).getCenter( center );
+			_box$1.setFromPoints( points ).getCenter( center );
 
 		}
 
@@ -9796,7 +9777,7 @@ var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 var _m1$2 = new Matrix4();
 var _obj = new Object3D();
 var _offset = new Vector3();
-var _box$1 = new Box3();
+var _box$2 = new Box3();
 var _boxMorphTargets = new Box3();
 var _vector$4 = new Vector3();
 
@@ -10348,20 +10329,20 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 				for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
 					var morphAttribute = morphAttributesPosition[ i ];
-					_box$1.setFromBufferAttribute( morphAttribute );
+					_box$2.setFromBufferAttribute( morphAttribute );
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$4.addVectors( this.boundingBox.min, _box$1.min );
+						_vector$4.addVectors( this.boundingBox.min, _box$2.min );
 						this.boundingBox.expandByPoint( _vector$4 );
 
-						_vector$4.addVectors( this.boundingBox.max, _box$1.max );
+						_vector$4.addVectors( this.boundingBox.max, _box$2.max );
 						this.boundingBox.expandByPoint( _vector$4 );
 
 					} else {
 
-						this.boundingBox.expandByPoint( _box$1.min );
-						this.boundingBox.expandByPoint( _box$1.max );
+						this.boundingBox.expandByPoint( _box$2.min );
+						this.boundingBox.expandByPoint( _box$2.max );
 
 					}
 
@@ -10400,7 +10381,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var center = this.boundingSphere.center;
 
-			_box$1.setFromBufferAttribute( position );
+			_box$2.setFromBufferAttribute( position );
 
 			// process morph attributes if present
 
@@ -10413,16 +10394,16 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$4.addVectors( _box$1.min, _boxMorphTargets.min );
-						_box$1.expandByPoint( _vector$4 );
+						_vector$4.addVectors( _box$2.min, _boxMorphTargets.min );
+						_box$2.expandByPoint( _vector$4 );
 
-						_vector$4.addVectors( _box$1.max, _boxMorphTargets.max );
-						_box$1.expandByPoint( _vector$4 );
+						_vector$4.addVectors( _box$2.max, _boxMorphTargets.max );
+						_box$2.expandByPoint( _vector$4 );
 
 					} else {
 
-						_box$1.expandByPoint( _boxMorphTargets.min );
-						_box$1.expandByPoint( _boxMorphTargets.max );
+						_box$2.expandByPoint( _boxMorphTargets.min );
+						_box$2.expandByPoint( _boxMorphTargets.max );
 
 					}
 
@@ -10430,7 +10411,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			_box$1.getCenter( center );
+			_box$2.getCenter( center );
 
 			// second, try to find a boundingSphere with a radius smaller than the
 			// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
@@ -47306,7 +47287,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
  * @author Mugen87 / http://github.com/Mugen87
  */
 
-var _box$2 = new Box3();
+var _box$3 = new Box3();
 
 function BoxHelper( object, color ) {
 
@@ -47342,14 +47323,14 @@ BoxHelper.prototype.update = function ( object ) {
 
 	if ( this.object !== undefined ) {
 
-		_box$2.setFromObject( this.object );
+		_box$3.setFromObject( this.object );
 
 	}
 
-	if ( _box$2.isEmpty() ) return;
+	if ( _box$3.isEmpty() ) return;
 
-	var min = _box$2.min;
-	var max = _box$2.max;
+	var min = _box$3.min;
+	var max = _box$3.max;
 
 	/*
 	  5____4
