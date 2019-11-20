@@ -8,6 +8,8 @@ import { ShaderChunk } from '../shaders/ShaderChunk.js';
 import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
 
 var programIdCount = 0;
+var maxParallel = 1;
+var currentParallel = 0;
 
 function addLineNumbers( string ) {
 
@@ -753,95 +755,43 @@ function WebGLProgram( renderer, extensions, cacheKey, material, shader, paramet
 
 	}
 
-	var vertexGlsl = prefixVertex + vertexShader;
-	var fragmentGlsl = prefixFragment + fragmentShader;
+	var parallelShaderExt = parameters.parallelShaderCompile;
 
-	// console.log( '*VERTEX*', vertexGlsl );
-	// console.log( '*FRAGMENT*', fragmentGlsl );
+	this.prefixVertex = prefixVertex;
+	this.prefixFragment = prefixFragment;
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+	this.vertexShader = vertexShader;
+	this.fragmentShader = fragmentShader;
 
-	gl.attachShader( program, glVertexShader );
-	gl.attachShader( program, glFragmentShader );
+	this.program = program;
+	this.parameters = parameters;
+	this.parallelShaderExt = parallelShaderExt;
+	this.pending = false;
+	this.numMultiviewViews = numMultiviewViews;
 
-	// Force a particular attribute to index 0.
+	if ( parallelShaderExt !== null && material.parallelCompile ) {
 
-	if ( material.index0AttributeName !== undefined ) {
+		if ( currentParallel < maxParallel ) {
 
-		gl.bindAttribLocation( program, 0, material.index0AttributeName );
+			this.compileAndLink( renderer, material );
+			currentParallel ++;
 
-	} else if ( parameters.morphTargets === true ) {
+		} else {
 
-		// programs with morphTargets displace position out of attribute 0
-		gl.bindAttribLocation( program, 0, 'position' );
-
-	}
-
-	gl.linkProgram( program );
-
-	// check for link errors
-	if ( renderer.debug.checkShaderErrors ) {
-
-		var programLog = gl.getProgramInfoLog( program ).trim();
-		var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-		var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
-
-		var runnable = true;
-		var haveDiagnostics = true;
-
-		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
-
-			runnable = false;
-
-			var vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
-			var fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
-
-			console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
-
-		} else if ( programLog !== '' ) {
-
-			console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
-
-		} else if ( vertexLog === '' || fragmentLog === '' ) {
-
-			haveDiagnostics = false;
+			this.pending = true;
 
 		}
 
-		if ( haveDiagnostics ) {
+		this.ready = false;
 
-			this.diagnostics = {
+	} else {
 
-				runnable: runnable,
-				material: material,
-
-				programLog: programLog,
-
-				vertexShader: {
-
-					log: vertexLog,
-					prefix: prefixVertex
-
-				},
-
-				fragmentShader: {
-
-					log: fragmentLog,
-					prefix: prefixFragment
-
-				}
-
-			};
-
-		}
+		// check for link errors
+		this.compileAndLink( renderer, material );
+		this.checkLink( renderer, material );
+		this.ready = true;
 
 	}
-
-	// clean up
-
-	gl.deleteShader( glVertexShader );
-	gl.deleteShader( glFragmentShader );
 
 	// set up caching for uniform locations
 
@@ -879,6 +829,14 @@ function WebGLProgram( renderer, extensions, cacheKey, material, shader, paramet
 
 	this.destroy = function () {
 
+		if ( ! this.ready && ! this.pending ) {
+
+			// parallel compilation incomplete
+
+			currentParallel --;
+
+		}
+
 		gl.deleteProgram( program );
 		this.program = undefined;
 
@@ -890,13 +848,149 @@ function WebGLProgram( renderer, extensions, cacheKey, material, shader, paramet
 	this.id = programIdCount ++;
 	this.cacheKey = cacheKey;
 	this.usedTimes = 1;
-	this.program = program;
-	this.vertexShader = glVertexShader;
-	this.fragmentShader = glFragmentShader;
-	this.numMultiviewViews = numMultiviewViews;
 
 	return this;
 
 }
+
+Object.assign( WebGLProgram.prototype, {
+
+	compileAndLink: function ( renderer, material ) {
+
+		var gl = renderer.getContext();
+
+		var program = this.program;
+		var vertexGlsl = this.prefixVertex + this.vertexShader;
+		var fragmentGlsl = this.prefixFragment + this.fragmentShader;
+
+		this.startFrame = renderer.info.render.frame;
+
+		// console.log( '*VERTEX*', vertexGlsl );
+		// console.log( '*FRAGMENT*', fragmentGlsl );
+
+		var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
+		var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+
+		gl.attachShader( program, glVertexShader );
+		gl.attachShader( program, glFragmentShader );
+
+		// Force a particular attribute to index 0.
+
+		if ( material.index0AttributeName !== undefined ) {
+
+			gl.bindAttribLocation( program, 0, material.index0AttributeName );
+
+		} else if ( this.parameters.morphTargets === true ) {
+
+			// programs with morphTargets displace position out of attribute 0
+			gl.bindAttribLocation( program, 0, 'position' );
+
+		}
+
+		gl.linkProgram( program );
+
+		this.vertexShader = glVertexShader;
+		this.fragmentShader = glFragmentShader;
+
+	},
+
+	isLinked: function ( renderer, material, sync ) {
+
+		var gl = renderer.getContext();
+
+		if ( this.pending && currentParallel < maxParallel ) {
+
+			this.compileAndLink( renderer, material );
+			this.pending = false;
+			currentParallel ++;
+
+		}
+
+		if ( ( ! this.pending && gl.getProgramParameter( this.program, this.parallelShaderExt.COMPLETION_STATUS_KHR ) == true ) || sync ) {
+
+			this.checkLink( renderer, material );
+			this.ready = true;
+			currentParallel --;
+
+			console.log( 'THREE.WebGLProgram: parallel compile frame count', renderer.info.render.frame - this.startFrame );
+
+		}
+
+		return this.ready;
+
+	},
+
+	checkLink: function ( renderer, material ) {
+
+		// check for link errors
+
+		var gl = renderer.getContext();
+		var program = this.program;
+		var glVertexShader = this.vertexShader;
+		var glFragmentShader = this.fragmentShader;
+
+		if ( renderer.debug.checkShaderErrors ) {
+
+			var programLog = gl.getProgramInfoLog( program ).trim();
+			var vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+			var fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+
+			var runnable = true;
+			var haveDiagnostics = true;
+
+			if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+
+				runnable = false;
+
+				var vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
+				var fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
+
+				console.error( 'THREE.WebGLProgram: shader error: ', gl.getError(), 'gl.VALIDATE_STATUS', gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'gl.getProgramInfoLog', programLog, vertexErrors, fragmentErrors );
+
+			} else if ( programLog !== '' ) {
+
+				console.warn( 'THREE.WebGLProgram: gl.getProgramInfoLog()', programLog );
+
+			} else if ( vertexLog === '' || fragmentLog === '' ) {
+
+				haveDiagnostics = false;
+
+			}
+
+			if ( haveDiagnostics ) {
+
+				this.diagnostics = {
+
+					runnable: runnable,
+					material: material,
+
+					programLog: programLog,
+
+					vertexShader: {
+
+						log: vertexLog,
+						prefix: this.prefixVertex
+
+					},
+
+					fragmentShader: {
+
+						log: fragmentLog,
+						prefix: this.prefixFragment
+
+					}
+
+				};
+
+			}
+
+		}
+
+		gl.deleteShader( glVertexShader );
+		gl.deleteShader( glFragmentShader );
+
+	}
+
+} );
 
 export { WebGLProgram };

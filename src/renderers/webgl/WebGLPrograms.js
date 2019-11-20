@@ -151,6 +151,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			instancing: object.isInstancedMesh === true,
 
+			parallelShaderCompile: capabilities.parallelShaderCompile,
 			supportsVertexTextures: vertexTextures,
 			numMultiviewViews: numMultiviewViews,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),

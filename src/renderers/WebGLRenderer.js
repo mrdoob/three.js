@@ -717,6 +717,8 @@ function WebGLRenderer( parameters ) {
 
 		var program = setProgram( camera, fog, material, object );
 
+		if ( ! program.ready ) return;
+
 		var updateBuffers = false;
 
 		if ( _currentGeometryProgram.geometry !== geometry.id ||
@@ -1059,13 +1061,13 @@ function WebGLRenderer( parameters ) {
 
 					for ( var i = 0; i < object.material.length; i ++ ) {
 
-						initMaterial( object.material[ i ], scene.fog, object );
+						initMaterial( object.material[ i ], scene.fog, object, true );
 
 					}
 
 				} else {
 
-					initMaterial( object.material, scene.fog, object );
+					initMaterial( object.material, scene.fog, object, true );
 
 				}
 
@@ -1468,6 +1470,8 @@ function WebGLRenderer( parameters ) {
 
 			var program = setProgram( camera, scene.fog, material, object );
 
+			if ( ! program.ready ) return;
+
 			_currentGeometryProgram.geometry = null;
 			_currentGeometryProgram.program = null;
 			_currentGeometryProgram.wireframe = false;
@@ -1485,7 +1489,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	function initMaterial( material, fog, object ) {
+	function initMaterial( material, fog, object, sync ) {
 
 		var materialProperties = properties.get( material );
 
@@ -1512,13 +1516,13 @@ function WebGLRenderer( parameters ) {
 			// changed glsl or parameters
 			releaseMaterialProgramReference( material );
 
-		} else if ( materialProperties.lightsStateVersion !== lightsStateVersion ) {
+		} else if ( program.ready && materialProperties.lightsStateVersion !== lightsStateVersion ) {
 
 			materialProperties.lightsStateVersion = lightsStateVersion;
 
 			programChange = false;
 
-		} else if ( parameters.shaderID !== undefined ) {
+		} else if ( program.ready && parameters.shaderID !== undefined ) {
 
 			// same glsl and uniform list
 			return;
@@ -1565,6 +1569,15 @@ function WebGLRenderer( parameters ) {
 			material.program = program;
 
 		}
+
+		if ( ! program.ready && ! program.isLinked( _this, material, sync ) ) {
+
+			materialProperties.retry = true;
+			return;
+
+		}
+
+		materialProperties.retry = false;
 
 		var programAttributes = program.getAttributes();
 
@@ -1699,9 +1712,9 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.needsUpdate ) {
+		if ( material.needsUpdate || materialProperties.retry ) {
 
-			initMaterial( material, fog, object );
+			initMaterial( material, fog, object, false );
 			material.needsUpdate = false;
 
 		}
@@ -1710,8 +1723,11 @@ function WebGLRenderer( parameters ) {
 		var refreshMaterial = false;
 		var refreshLights = false;
 
-		var program = materialProperties.program,
-			p_uniforms = program.getUniforms(),
+		var program = materialProperties.program;
+
+		if ( ! program.ready ) return false;
+
+		var	p_uniforms = program.getUniforms(),
 			m_uniforms = materialProperties.shader.uniforms;
 
 		if ( state.useProgram( program.program ) ) {

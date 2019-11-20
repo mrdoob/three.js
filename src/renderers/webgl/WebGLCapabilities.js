@@ -88,6 +88,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	var floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 	var maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
+	var parallelShaderCompile = extensions.get( 'KHR_parallel_shader_compile' );
 
 	return {
 
@@ -113,7 +114,9 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		floatFragmentTextures: floatFragmentTextures,
 		floatVertexTextures: floatVertexTextures,
 
-		maxSamples: maxSamples
+		maxSamples: maxSamples,
+
+		parallelShaderCompile: parallelShaderCompile
 
 	};
 
