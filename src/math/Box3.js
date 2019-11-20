@@ -41,6 +41,8 @@ function Box3( min, max ) {
 
 }
 
+var _box = new Box3();
+
 Object.assign( Box3.prototype, {
 
 	isBox3: true,
@@ -251,36 +253,17 @@ Object.assign( Box3.prototype, {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.isGeometry ) {
+			if ( geometry.boundingBox === null ) {
 
-				var vertices = geometry.vertices;
-
-				for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-					_vector.copy( vertices[ i ] );
-					_vector.applyMatrix4( object.matrixWorld );
-
-					this.expandByPoint( _vector );
-
-				}
-
-			} else if ( geometry.isBufferGeometry ) {
-
-				var attribute = geometry.attributes.position;
-
-				if ( attribute !== undefined ) {
-
-					for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-						_vector.fromBufferAttribute( attribute, i ).applyMatrix4( object.matrixWorld );
-
-						this.expandByPoint( _vector );
-
-					}
-
-				}
+				geometry.computeBoundingBox();
 
 			}
+
+			_box.copy( geometry.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
+
+			this.expandByPoint( _box.min );
+			this.expandByPoint( _box.max );
 
 		}
 
