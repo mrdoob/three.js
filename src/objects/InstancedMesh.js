@@ -5,6 +5,13 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Mesh } from './Mesh.js';
 import { Matrix4 } from '../math/Matrix4.js';
 
+var _instanceLocalMatrix = new Matrix4();
+var _instanceWorldMatrix = new Matrix4();
+
+var _instanceIntersects = [];
+
+var _agentMesh = new Mesh();
+
 function InstancedMesh( geometry, material, count ) {
 
 	Mesh.call( this, geometry, material );
@@ -23,11 +30,51 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	getMatrixAt: function ( index, matrix ) {
 
-		var matrix = matrix || new Matrix4();
-
 		matrix.fromArray( this.instanceMatrix.array, index * 16 );
 
-		return matrix;
+	},
+
+	raycast: function ( raycaster, intersects ) {
+
+		var matrixWorld = this.matrixWorld;
+		var raycastTimes = this.count;
+
+		_agentMesh.geometry = this.geometry;
+		_agentMesh.material = this.material;
+
+		if ( _agentMesh.material === undefined ) return;
+
+		for ( var instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
+
+			//Calculate the world matrix for each instance
+
+			this.getMatrixAt( instanceId, _instanceLocalMatrix );
+
+			_instanceWorldMatrix.multiplyMatrices( matrixWorld, _instanceLocalMatrix );
+
+
+			//The agent mesh represents this single instance
+
+			_agentMesh.matrix = _instanceWorldMatrix;
+
+			_agentMesh.matrixWorld.copy( _instanceWorldMatrix );
+
+			_agentMesh.raycast( raycaster, _instanceIntersects );
+
+			//Process the result of raycast
+
+			if ( _instanceIntersects.length > 0 ) {
+
+				_instanceIntersects[ 0 ].instanceId = instanceId;
+				_instanceIntersects[ 0 ].object = this;
+
+				intersects.push( _instanceIntersects[ 0 ] );
+
+				_instanceIntersects = [];
+
+			}
+
+		}
 
 	},
 
@@ -37,9 +84,9 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	// updateMorphTargets: function () {
-	//
-	// }
+	updateMorphTargets: function () {
+
+	}
 
 } );
 

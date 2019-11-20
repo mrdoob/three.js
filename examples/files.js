@@ -49,7 +49,6 @@ var files = {
 		"webgl_helpers",
 		"webgl_instancing_suzanne",
 		"webgl_instancing_raycast",
-		"webgl_instancing_morphtargets_raycast",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
 		"webgl_interactive_cubes_gpu",
