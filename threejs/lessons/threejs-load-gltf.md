@@ -291,7 +291,7 @@ the new `Object3D` a `cars` array.
 +
 +    root.updateMatrixWorld();
 +    for (const car of loadedCars.children.slice()) {
-+      const fix = fixes.find(fix => car.name.startsWith+(fix.prefix));
++      const fix = fixes.find(fix => car.name.startsWith(fix.prefix));
 +      const obj = new THREE.Object3D();
 +      car.getWorldPosition(obj.position);
 +      car.position.set(0, 0, 0);
