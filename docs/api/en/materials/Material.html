@@ -186,8 +186,7 @@
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		Specifies that the material needs to be recompiled.<br />
-		This property is automatically set to *true* when instancing a new material.
+		Specifies that the material needs to be recompiled.
 		</p>
 
 		<h3>[property:Float opacity]</h3>
@@ -294,6 +293,11 @@
 		<p>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this material instance.
 		This gets automatically assigned, so this shouldn't be edited.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+		This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
 		</p>
 
 		<h3>[property:Integer vertexColors]</h3>
