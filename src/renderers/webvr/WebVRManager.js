@@ -181,23 +181,27 @@ function WebVRManager( renderer ) {
 				}
 
 				// Grip
-
-				buttonId = gamepad.buttons.length > 2 ? 2 : 0;
+				buttonId = 2;
 
 				if ( grips[ i ] === undefined ) grips[ i ] = false;
 
-				if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+				// Skip if the grip button doesn't exist on this controller
+				if ( gamepad.buttons[ buttonId ] !== undefined ) {
 
-					grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+					if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
 
-					if ( grips[ i ] === true ) {
+						grips[ i ] = gamepad.buttons[ buttonId ].pressed;
 
-						controller.dispatchEvent( { type: 'squeezestart' } );
+						if ( grips[ i ] === true ) {
 
-					} else {
+							controller.dispatchEvent( { type: 'squeezestart' } );
 
-						controller.dispatchEvent( { type: 'squeezeend' } );
-						controller.dispatchEvent( { type: 'squeeze' } );
+						} else {
+
+							controller.dispatchEvent( { type: 'squeezeend' } );
+							controller.dispatchEvent( { type: 'squeeze' } );
+
+						}
 
 					}
 
