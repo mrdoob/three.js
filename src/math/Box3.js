@@ -10,7 +10,10 @@ var _points = [
 	new Vector3(),
 	new Vector3()
 ];
+
 var _vector = new Vector3();
+
+var _box = new Box3();
 
 // triangle centered vertices
 
@@ -41,7 +44,6 @@ function Box3( min, max ) {
 
 }
 
-var _box = new Box3();
 
 Object.assign( Box3.prototype, {
 
@@ -242,8 +244,6 @@ Object.assign( Box3.prototype, {
 
 	expandByObject: function ( object ) {
 
-		var i, l;
-
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
@@ -267,11 +267,9 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		//
-
 		var children = object.children;
 
-		for ( i = 0, l = children.length; i < l; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			this.expandByObject( children[ i ] );
 
