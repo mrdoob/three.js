@@ -10,7 +10,7 @@ var _instanceWorldMatrix = new Matrix4();
 
 var _instanceIntersects = [];
 
-var _agentMesh = new Mesh();
+var _mesh = new Mesh();
 
 function InstancedMesh( geometry, material, count ) {
 
@@ -39,10 +39,10 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		var matrixWorld = this.matrixWorld;
 		var raycastTimes = this.count;
 
-		_agentMesh.geometry = this.geometry;
-		_agentMesh.material = this.material;
+		_mesh.geometry = this.geometry;
+		_mesh.material = this.material;
 
-		if ( _agentMesh.material === undefined ) return;
+		if ( _mesh.material === undefined ) return;
 
 		for ( var instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
 
@@ -55,11 +55,10 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			//The agent mesh represents this single instance
 
-			_agentMesh.matrix = _instanceWorldMatrix;
+			_mesh.matrixWorld = _instanceWorldMatrix;
 
-			_agentMesh.matrixWorld.copy( _instanceWorldMatrix );
+			_mesh.raycast( raycaster, _instanceIntersects );
 
-			_agentMesh.raycast( raycaster, _instanceIntersects );
 
 			//Process the result of raycast
 
