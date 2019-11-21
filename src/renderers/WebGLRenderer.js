@@ -1675,7 +1675,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.needsUpdate === false ) {
+		if ( material.version === materialProperties.__version ) {
 
 			if ( materialProperties.program === undefined ) {
 
@@ -1699,10 +1699,10 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.needsUpdate ) {
+		if ( material.version !== materialProperties.__version ) {
 
 			initMaterial( material, fog, object );
-			material.needsUpdate = false;
+			materialProperties.__version = material.version;
 
 		}
 
