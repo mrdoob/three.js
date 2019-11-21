@@ -140,6 +140,13 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
+		if( this.isCompressedTexture ){
+
+			console.warn( 'THREE.Texture: Unable to serialize Texture. Serializing CompressedTextures is not supported.' );
+			return {};
+
+		}
+
 		var output = {
 
 			metadata: {
