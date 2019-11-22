@@ -105,7 +105,23 @@ THREE.PMREMGenerator = ( function () {
 			equirectangular.generateMipmaps = false;
 
 			var cubeUVRenderTarget = _allocateTargets( equirectangular );
-			_equirectangularToCubeUV( equirectangular, cubeUVRenderTarget );
+			_textureToCubeUV( equirectangular, cubeUVRenderTarget );
+			_applyPMREM( cubeUVRenderTarget );
+			_cleanup();
+
+			return cubeUVRenderTarget;
+
+		},
+
+		/**
+		 * Generates a PMREM from an cubemap texture, which can be either LDR
+		 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
+		 * as this matches best with the 256 x 256 cubemap output.
+		 */
+		fromCubemap: function ( cubemap ) {
+
+			var cubeUVRenderTarget = _allocateTargets( cubemap );
+			_textureToCubeUV( cubemap, cubeUVRenderTarget );
 			_applyPMREM( cubeUVRenderTarget );
 			_cleanup();
 
@@ -219,43 +235,41 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function _sceneToCubeUV(
-		scene, near, far,
-		cubeUVRenderTarget ) {
+	function _sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
-	  var fov = 90;
-	  var aspect = 1;
-	  var cubeCamera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	  var upSign = [ 1, 1, 1, 1, - 1, 1 ];
-	  var forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
+		var fov = 90;
+		var aspect = 1;
+		var cubeCamera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+		var upSign = [ 1, 1, 1, 1, - 1, 1 ];
+		var forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
 
-	  var gammaOutput = _renderer.gammaOutput;
-	  var toneMapping = _renderer.toneMapping;
-	  var toneMappingExposure = _renderer.toneMappingExposure;
+		var gammaOutput = _renderer.gammaOutput;
+		var toneMapping = _renderer.toneMapping;
+		var toneMappingExposure = _renderer.toneMappingExposure;
 
-	  _renderer.toneMapping = THREE.LinearToneMapping;
-	  _renderer.toneMappingExposure = 1.0;
-	  _renderer.gammaOutput = false;
-	  scene.scale.z *= - 1;
+		_renderer.toneMapping = THREE.LinearToneMapping;
+		_renderer.toneMappingExposure = 1.0;
+		_renderer.gammaOutput = false;
+		scene.scale.z *= - 1;
 
-	  _renderer.setRenderTarget( cubeUVRenderTarget );
-	  for ( var i = 0; i < 6; i ++ ) {
+		_renderer.setRenderTarget( cubeUVRenderTarget );
+		for ( var i = 0; i < 6; i ++ ) {
 
 			var col = i % 3;
 			if ( col == 0 ) {
 
-		  cubeCamera.up.set( 0, upSign[ i ], 0 );
-		  cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
+				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
 
 			} else if ( col == 1 ) {
 
-		  cubeCamera.up.set( 0, 0, upSign[ i ] );
-		  cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
+				cubeCamera.up.set( 0, 0, upSign[ i ] );
+				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
 
 			} else {
 
-		  cubeCamera.up.set( 0, upSign[ i ], 0 );
-		  cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
+				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
 			_setViewport(
@@ -264,40 +278,42 @@ THREE.PMREMGenerator = ( function () {
 
 		}
 
-	  _renderer.toneMapping = toneMapping;
-	  _renderer.toneMappingExposure = toneMappingExposure;
-	  _renderer.gammaOutput = gammaOutput;
-	  scene.scale.z *= - 1;
+		_renderer.toneMapping = toneMapping;
+		_renderer.toneMappingExposure = toneMappingExposure;
+		_renderer.gammaOutput = gammaOutput;
+		scene.scale.z *= - 1;
 
 	}
 
-	function _equirectangularToCubeUV(
-		equirectangular, cubeUVRenderTarget ) {
+	function _textureToCubeUV( texture, cubeUVRenderTarget ) {
 
-	  var scene = new THREE.Scene();
-	  var equirectMaterial = _getEquirectShader();
-	  scene.add( new THREE.Mesh( _lodPlanes[ 0 ], equirectMaterial ) );
-	  var uniforms = equirectMaterial.uniforms;
+		var scene = new THREE.Scene();
+		var material = texture.isCubeTexture ? _getCubemapShader() : _getEquirectShader();
+		scene.add( new THREE.Mesh( _lodPlanes[ 0 ], material ) );
+		var uniforms = material.uniforms;
 
-	  uniforms[ 'envMap' ].value = equirectangular;
-	  uniforms[ 'texelSize' ].value.set(
-		  1.0 / equirectangular.image.width, 1.0 / equirectangular.image.height );
-	  uniforms[ 'inputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
-	  uniforms[ 'outputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
+		uniforms[ 'envMap' ].value = texture;
+		if ( ! texture.isCubeTexture ) {
 
-	  _renderer.setRenderTarget( cubeUVRenderTarget );
-	  _setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
-	  _renderer.render( scene, _flatCamera );
+			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
+
+		}
+		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
+		uniforms[ 'outputEncoding' ].value = ENCODINGS[ texture.encoding ];
+
+		_renderer.setRenderTarget( cubeUVRenderTarget );
+		_setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+		_renderer.render( scene, _flatCamera );
 
 	}
 
 	function _createRenderTarget( params ) {
 
-	  var cubeUVRenderTarget =
-		  new THREE.WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
-	  cubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
-	  cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
-	  return cubeUVRenderTarget;
+		var cubeUVRenderTarget =
+		new THREE.WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
+		cubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
+		cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
+		return cubeUVRenderTarget;
 
 	}
 
@@ -335,34 +351,29 @@ THREE.PMREMGenerator = ( function () {
    * the poles) to approximate the orthogonally-separable blur. It is least
    * accurate at the poles, but still does a decent job.
    */
-	function _blur(
-		cubeUVRenderTarget, lodIn, lodOut,
-		sigma, poleAxis ) {
+	function _blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
 		_halfBlur(
-	  cubeUVRenderTarget,
-	  _pingPongRenderTarget,
-	  lodIn,
-	  lodOut,
-	  sigma,
-	  'latitudinal',
-	  poleAxis );
+			cubeUVRenderTarget,
+			_pingPongRenderTarget,
+			lodIn,
+			lodOut,
+			sigma,
+			'latitudinal',
+			poleAxis );
 
 		_halfBlur(
-	  _pingPongRenderTarget,
-	  cubeUVRenderTarget,
-	  lodOut,
-	  lodOut,
-	  sigma,
-	  'longitudinal',
-	  poleAxis );
+			_pingPongRenderTarget,
+			cubeUVRenderTarget,
+			lodOut,
+			lodOut,
+			sigma,
+			'longitudinal',
+			poleAxis );
 
 	}
 
-	function _halfBlur(
-		targetIn, targetOut, lodIn,
-		lodOut, sigmaRadians, direction,
-		poleAxis ) {
+	function _halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
 
 		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
 
@@ -569,6 +580,48 @@ void main() {
 		} );
 
 		shaderMaterial.type = 'EquirectangularToCubeUV';
+
+		return shaderMaterial;
+
+	}
+
+	function _getCubemapShader() {
+
+		var shaderMaterial = new THREE.RawShaderMaterial( {
+
+			uniforms: {
+				'envMap': { value: null },
+				'inputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] },
+				'outputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] }
+			},
+
+			vertexShader: _getCommonVertexShader(),
+
+			fragmentShader: `
+precision mediump float;
+precision mediump int;
+varying vec3 vOutputDirection;
+uniform samplerCube envMap;
+
+${_getEncodings()}
+
+#define RECIPROCAL_PI 0.31830988618
+#define RECIPROCAL_PI2 0.15915494
+
+void main() {
+	gl_FragColor = vec4(0.0);
+	gl_FragColor.rgb = envMapTexelToLinear(textureCube(envMap, vOutputDirection)).rgb;
+  	gl_FragColor = linearToOutputTexel(gl_FragColor);
+}
+     		`,
+
+			blending: THREE.NoBlending,
+			depthTest: false,
+	   		depthWrite: false
+
+		} );
+
+		shaderMaterial.type = 'CubemapToCubeUV';
 
 		return shaderMaterial;
 
