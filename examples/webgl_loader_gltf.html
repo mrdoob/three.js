@@ -25,7 +25,6 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer;
@@ -48,20 +47,10 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
 
-						var options = {
-							minFilter: texture.minFilter,
-							magFilter: texture.magFilter
-						};
+						var pmremGenerator = new PMREMGenerator( renderer );
+						scene.background = pmremGenerator.fromEquirectangular(texture).texture;
 
-						scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
-
-						var pmremGenerator = new PMREMGenerator( scene.background.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						var envMap = scene.background;
 
 						// model
 
@@ -81,9 +70,6 @@
 							scene.add( gltf.scene );
 
 						} );
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 

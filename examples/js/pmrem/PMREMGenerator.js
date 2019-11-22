@@ -41,6 +41,7 @@ THREE.PMREMGenerator = ( function () {
 
 	var { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
 	var _pingPongRenderTarget = null;
+	var _renderer = null;
 
 	// Golden Ratio
 	const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -61,7 +62,7 @@ THREE.PMREMGenerator = ( function () {
 
 	var PMREMGenerator = function ( renderer ) {
 
-		this.renderer = renderer;
+		_renderer = renderer;
 
 	};
 
@@ -86,8 +87,8 @@ THREE.PMREMGenerator = ( function () {
 
 			}
 			_applyPMREM( cubeUVRenderTarget );
+			_cleanUp();
 
-			_pingPongRenderTarget.dispose();
 			return cubeUVRenderTarget;
 
 		},
@@ -105,8 +106,8 @@ THREE.PMREMGenerator = ( function () {
 			const cubeUVRenderTarget = _allocateTargets( equirectangular );
 			_equirectangularToCubeUV( equirectangular, cubeUVRenderTarget );
 			_applyPMREM( cubeUVRenderTarget );
+			_cleanUp();
 
-			_pingPongRenderTarget.dispose();
 			return cubeUVRenderTarget;
 
 		},
@@ -163,7 +164,7 @@ THREE.PMREMGenerator = ( function () {
 					[ x + 2 / 3, y + 1, 0 ],
 					[ x, y + 1, 0 ]
 				];
-				position.set( Array.concat( ...coordinates ),
+				position.set( [].concat( ...coordinates ),
 					positionSize * vertices * face );
 				uv.set( uv1, uvSize * vertices * face );
 				const fill = [ face, face, face, face, face, face ];
@@ -208,6 +209,15 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
+	function _cleanUp() {
+
+		_pingPongRenderTarget.dispose();
+		_renderer.setRenderTarget( null );
+		var size = _renderer.getSize();
+		_renderer.setViewport( 0, 0, size.x, size.y );
+
+	}
+
 	function _sceneToCubeUV(
 		scene, near, far,
 		cubeUVRenderTarget ) {
@@ -218,16 +228,16 @@ THREE.PMREMGenerator = ( function () {
 	  const upSign = [ 1, 1, 1, 1, - 1, 1 ];
 	  const forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
 
-	  const gammaOutput = this.renderer.gammaOutput;
-	  const toneMapping = this.renderer.toneMapping;
-	  const toneMappingExposure = this.renderer.toneMappingExposure;
+	  const gammaOutput = _renderer.gammaOutput;
+	  const toneMapping = _renderer.toneMapping;
+	  const toneMappingExposure = _renderer.toneMappingExposure;
 
-	  this.renderer.toneMapping = THREE.LinearToneMapping;
-	  this.renderer.toneMappingExposure = 1.0;
-	  this.renderer.gammaOutput = false;
+	  _renderer.toneMapping = THREE.LinearToneMapping;
+	  _renderer.toneMappingExposure = 1.0;
+	  _renderer.gammaOutput = false;
 	  scene.scale.z *= - 1;
 
-	  this.renderer.setRenderTarget( cubeUVRenderTarget );
+	  _renderer.setRenderTarget( cubeUVRenderTarget );
 	  for ( let i = 0; i < 6; i ++ ) {
 
 			const col = i % 3;
@@ -249,13 +259,13 @@ THREE.PMREMGenerator = ( function () {
 			}
 			_setViewport(
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
-			this.renderer.render( scene, cubeCamera );
+			_renderer.render( scene, cubeCamera );
 
 		}
 
-	  this.renderer.toneMapping = toneMapping;
-	  this.renderer.toneMappingExposure = toneMappingExposure;
-	  this.renderer.gammaOutput = gammaOutput;
+	  _renderer.toneMapping = toneMapping;
+	  _renderer.toneMappingExposure = toneMappingExposure;
+	  _renderer.gammaOutput = gammaOutput;
 	  scene.scale.z *= - 1;
 
 	}
@@ -274,9 +284,9 @@ THREE.PMREMGenerator = ( function () {
 	  uniforms[ 'inputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
 	  uniforms[ 'outputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
 
-	  this.renderer.setRenderTarget( cubeUVRenderTarget );
+	  _renderer.setRenderTarget( cubeUVRenderTarget );
 	  _setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
-	  this.renderer.render( scene, _flatCamera );
+	  _renderer.render( scene, _flatCamera );
 
 	}
 
@@ -292,14 +302,17 @@ THREE.PMREMGenerator = ( function () {
 
 	function _setViewport( x, y, width, height ) {
 
-		const dpr = this.threeRenderer.getPixelRatio();
-		this.threeRenderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
+		const dpr = _renderer.getPixelRatio();
+		_renderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
 
 	}
 
 	function _applyPMREM( cubeUVRenderTarget ) {
 
-	  for ( let i = 1; i < TOTAL_LODS; i ++ ) {
+		var autoClear = _renderer.autoClear;
+		_renderer.autoClear = false;
+
+	  	for ( let i = 1; i < TOTAL_LODS; i ++ ) {
 
 			const sigma = Math.sqrt(
 				_sigmas[ i ] * _sigmas[ i ] -
@@ -309,6 +322,8 @@ THREE.PMREMGenerator = ( function () {
 			_blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
 		}
+
+		_renderer.autoClear = autoClear;
 
 	}
 
@@ -415,11 +430,10 @@ THREE.PMREMGenerator = ( function () {
 		const y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) +
 	  2 * outputSize *
 		  ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
-		this.renderer.autoClear = false;
 
-		this.renderer.setRenderTarget( targetOut );
+		_renderer.setRenderTarget( targetOut );
 		_setViewport( x, y, 3 * outputSize, 2 * outputSize );
-		this.renderer.render( blurScene, _flatCamera );
+		_renderer.render( blurScene, _flatCamera );
 
 	}
 
@@ -528,7 +542,7 @@ vec4 envMapTexelToLinear(vec4 color) {
 
 void main() {
   gl_FragColor = vec4(0.0);
-  outputDirection = getDirection(vUv, vFaceIndex);
+  vec3 outputDirection = getDirection(vUv, vFaceIndex);
   if (copyEquirectangular) {
     vec3 direction = normalize(outputDirection);
     vec2 uv;
