@@ -2,18 +2,18 @@ import { ExpressionNode } from '../core/ExpressionNode';
 import { NodeBuilder } from '../core/NodeBuilder';
 import { Matrix3Node } from '../inputs/Matrix3Node';
 import { UVNode } from '../accessors/UVNode';
-  
+
 export class UVTransformNode extends ExpressionNode {
-  constructor(uv?: UVNode, position?: Matrix3Node);
 
-  uv: UVNode;
-  position: Matrix3Node;
+	constructor( uv?: UVNode, position?: Matrix3Node );
 
-  nodeType: string;
+	uv: UVNode;
+	position: Matrix3Node;
 
-  generate(builder: NodeBuilder, output: string): string;
-  setUvTransform(tx: number, ty: number, sx: number, sy: number, rotation: number, cx?: number, cy?: number): void;
-  copy(source: UVTransformNode): this;
+	nodeType: string;
+
+	generate( builder: NodeBuilder, output: string ): string;
+	setUvTransform( tx: number, ty: number, sx: number, sy: number, rotation: number, cx?: number, cy?: number ): void;
+	copy( source: UVTransformNode ): this;
 
 }
-  

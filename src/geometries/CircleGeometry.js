@@ -108,8 +108,6 @@ class CircleBufferGeometry extends BufferGeometry {
 
 		}
 
-		// build geometry
-
 		this.setIndex( indices );
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );

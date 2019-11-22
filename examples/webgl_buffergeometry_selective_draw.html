@@ -133,9 +133,9 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
-				geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
-				geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+				geometry.setAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
+				geometry.setAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
 
 				geometry.computeBoundingSphere();
 

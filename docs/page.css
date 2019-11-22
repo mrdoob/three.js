@@ -1,4 +1,6 @@
 :root {
+	color-scheme: light dark;
+
 	--color-blue: #049EF4;
 	--text-color: #444;
 
@@ -12,18 +14,30 @@
 	--icon-size: 20px;
 }
 
+@media (prefers-color-scheme: dark) {
+
+	:root {
+		--text-color: #bbb;
+
+		--border-style: 1px solid #444;
+	}
+
+}
+
 @font-face {
 	font-family: 'Roboto Mono';
 	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../files/RobotoMono-Regular.woff2') format('woff2');
 	font-style: normal;
 	font-weight: 400;
 }
+
 @font-face {
 	font-family: 'Inter';
 	font-style: normal;
 	font-weight: 400;
 	src: local('Inter-Regular'), url("../files/Inter-Regular.woff2?v=3.6") format("woff2");
 }
+
 @font-face {
 	font-family: 'Inter';
 	font-style: normal;

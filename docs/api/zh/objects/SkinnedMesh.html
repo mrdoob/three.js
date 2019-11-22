@@ -65,8 +65,8 @@
 
 		}
 
-		geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+		geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
 		// create skinned mesh and skeleton
 
@@ -91,8 +91,8 @@
 		<h2>构造器</h2>
 		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-    [page:BufferGeometry geometry] —— 一个[page:BufferGeometry]实例。<br />
-    [page:Material material] —— （可选）一个[page:Material]实例，默认值是一个新的[page:MeshBasicMaterial]。
+	[page:BufferGeometry geometry] —— 一个[page:BufferGeometry]实例。<br />
+	[page:Material material] —— （可选）一个[page:Material]实例，默认值是一个新的[page:MeshBasicMaterial]。
 		</p>
 
 

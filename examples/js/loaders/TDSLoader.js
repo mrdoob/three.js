@@ -272,6 +272,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				material.shininess = shininess;
 				this.debugMessage( '   Shininess : ' + shininess );
 
+			} else if ( next === MAT_TRANSPARENCY ) {
+
+				var opacity = this.readWord( data );
+				material.opacity = opacity * 0.01;
+				this.debugMessage( '  Opacity : ' + opacity );
+				material.transparent = opacity < 100 ? true : false;
+
 			} else if ( next === MAT_TEXMAP ) {
 
 				this.debugMessage( '   ColorMap' );
@@ -351,7 +358,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			} else if ( next === FACE_ARRAY ) {
 
@@ -375,7 +382,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 
 			} else if ( next === MESH_MATRIX ) {
@@ -912,7 +919,7 @@ var MAT_DIFFUSE = 0xA020;
 var MAT_SPECULAR = 0xA030;
 var MAT_SHININESS = 0xA040;
 // var MAT_SHIN2PCT = 0xA041;
-// var MAT_TRANSPARENCY = 0xA050;
+var MAT_TRANSPARENCY = 0xA050;
 // var MAT_XPFALL = 0xA052;
 // var MAT_USE_XPFALL = 0xA240;
 // var MAT_REFBLUR = 0xA053;

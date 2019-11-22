@@ -1,3 +1,5 @@
+import { Loader } from './Loader';
+
 export const DefaultLoadingManager: LoadingManager;
 
 /**
@@ -37,7 +39,7 @@ export class LoadingManager {
 	 * This behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
 	 * @param callback URL modifier callback. Called with url argument, and must return resolvedURL.
 	 */
-	setURLModifier( callback?: ( url: string ) => string ): void;
+	setURLModifier( callback?: ( url: string ) => string ): this;
 
 	/**
 	 * Given a URL, uses the URL modifier callback (if any) and returns a resolved URL.
@@ -49,5 +51,11 @@ export class LoadingManager {
 	itemStart( url: string ): void;
 	itemEnd( url: string ): void;
 	itemError( url: string ): void;
+
+	// handlers
+
+	addHandler( regex: RegExp, loader: Loader ): this;
+	removeHandler( regex: RegExp ): this;
+	getHandler( file: string ): Loader | null;
 
 }

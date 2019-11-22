@@ -5,7 +5,14 @@
 
 THREE.PointerLockControls = function ( camera, domElement ) {
 
-	this.domElement = domElement || document.body;
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document.body;
+
+	}
+
+	this.domElement = domElement;
 	this.isLocked = false;
 
 	//
@@ -22,7 +29,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	var PI_2 = Math.PI / 2;
 
-	var vec = new Vector3();
+	var vec = new THREE.Vector3();
 
 	function onMouseMove( event ) {
 

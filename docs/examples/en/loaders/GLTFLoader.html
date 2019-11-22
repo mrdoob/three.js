@@ -32,6 +32,7 @@
 			<li>KHR_draco_mesh_compression</li>
 			<li>KHR_materials_pbrSpecularGlossiness</li>
 			<li>KHR_materials_unlit</li>
+			<li>KHR_mesh_quantization</li>
 			<li>KHR_lights_punctual<sup>1</sup></li>
 			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>MSFT_texture_dds</li>
@@ -58,7 +59,7 @@
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
 		var dracoLoader = new THREE.DRACOLoader();
-		dracoLoader.setDecoderPath( '/examples/js/libs/draco' );
+		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
 		// Load a glTF resource

@@ -26,7 +26,9 @@ Object.defineProperties( MaxMIPLevelNode.prototype, {
 
 			if ( this.maxMIPLevel === 0 ) {
 
-				var image = this.texture.value.image ? this.texture.value.image[ 0 ] : undefined;
+				var image = this.texture.value.image;
+
+				if ( Array.isArray( image ) ) image = image[ 0 ];
 
 				this.maxMIPLevel = image !== undefined ? Math.log( Math.max( image.width, image.height ) ) * Math.LOG2E : 0;
 

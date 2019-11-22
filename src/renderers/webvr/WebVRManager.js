@@ -104,12 +104,13 @@ function WebVRManager( renderer ) {
 	//
 
 	var triggers = [];
+	var grips = [];
 
 	function findGamepad( id ) {
 
 		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
-		for ( var i = 0, j = 0, l = gamepads.length; i < l; i ++ ) {
+		for ( var i = 0, l = gamepads.length; i < l; i ++ ) {
 
 			var gamepad = gamepads[ i ];
 
@@ -119,9 +120,10 @@ function WebVRManager( renderer ) {
 				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
 				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
 
-				if ( j === id ) return gamepad;
+				var hand = gamepad.hand;
 
-				j ++;
+				if ( id === 0 && ( hand === '' || hand === 'right' ) ) return gamepad;
+				if ( id === 1 && ( hand === 'left' ) ) return gamepad;
 
 			}
 
@@ -173,6 +175,33 @@ function WebVRManager( renderer ) {
 
 						controller.dispatchEvent( { type: 'selectend' } );
 						controller.dispatchEvent( { type: 'select' } );
+
+					}
+
+				}
+
+				// Grip
+				buttonId = 2;
+
+				if ( grips[ i ] === undefined ) grips[ i ] = false;
+
+				// Skip if the grip button doesn't exist on this controller
+				if ( gamepad.buttons[ buttonId ] !== undefined ) {
+
+					if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+						grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+						if ( grips[ i ] === true ) {
+
+							controller.dispatchEvent( { type: 'squeezestart' } );
+
+						} else {
+
+							controller.dispatchEvent( { type: 'squeezeend' } );
+							controller.dispatchEvent( { type: 'squeeze' } );
+
+						}
 
 					}
 

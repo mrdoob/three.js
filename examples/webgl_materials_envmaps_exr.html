@@ -20,7 +20,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
-			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
@@ -78,15 +77,15 @@
 					.setDataType( THREE.FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						texture.minFilter = THREE.NearestFilter;
-						// texture.magFilter = THREE.NearestFilter;
-						texture.encoding = THREE.LinearEncoding;
+						var options = {
+							generateMipmaps: false,
+							minFilter: THREE.LinearFilter,
+							magFilter: THREE.LinearFilter
+						};
 
-						var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512, type: THREE.HalfFloatType } );
-						exrBackground = cubemapGenerator.renderTarget;
-						var cubeMapTexture = cubemapGenerator.update( renderer );
+						exrBackground = new THREE.WebGLRenderTargetCube( 512, 512, options ).fromEquirectangularTexture( renderer, texture );
 
-						var pmremGenerator = new PMREMGenerator( cubeMapTexture );
+						var pmremGenerator = new PMREMGenerator( exrBackground.texture );
 						pmremGenerator.update( renderer );
 
 						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
@@ -104,12 +103,9 @@
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					var cubemapGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 512 } );
-					pngBackground = cubemapGenerator.renderTarget;
+					pngBackground = new THREE.WebGLRenderTargetCube( 512, 512 ).fromEquirectangularTexture( renderer, texture );
 
-					var cubeMapTexture = cubemapGenerator.update( renderer );
-
-					var pmremGenerator = new PMREMGenerator( cubeMapTexture );
+					var pmremGenerator = new PMREMGenerator( pngBackground.texture );
 					pmremGenerator.update( renderer );
 
 					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );

@@ -85,9 +85,21 @@ NodePostProcessing.prototype = {
 
 	},
 
+	setPixelRatio: function ( value ) {
+
+		this.renderer.setPixelRatio( value );
+
+		var size = this.renderer.getSize( new Vector2() );
+
+		this.setSize( size.width, size.height );
+
+	},
+
 	setSize: function ( width, height ) {
 
-		this.renderTarget.setSize( width, height );
+		var pixelRatio = this.renderer.getPixelRatio();
+
+		this.renderTarget.setSize( width * pixelRatio, height * pixelRatio );
 
 		this.renderer.setSize( width, height );
 

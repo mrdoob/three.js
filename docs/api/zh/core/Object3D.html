@@ -38,9 +38,9 @@
 
 	<h3>[property:Material customDepthMaterial]</h3>
 	<p>渲染到深度贴图时此材质要使用的自定义深度材质。
-	    当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
-	    （b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
-	    您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
+		当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
+		（b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
+		您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
 	</p>
 
 	<h3>[property:Material customDistanceMaterial]</h3>
@@ -111,8 +111,8 @@
 
 	<h3>[property:function onBeforeRender]</h3>
 	<p>
-			一个可选的回调函数，在Object3D渲染之前直接执行。
-			使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+		一个可选的回调函数，在Object3D渲染之前直接执行。
+		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
 
 	<h3>[property:Object3D parent]</h3>
@@ -416,8 +416,15 @@
 	<p>更新局部变换。</p>
 
 	<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
-	<p>更新物体及其子级的全局变换。</p>
+	<p>更新物体及其后代的全局变换。</p>
 
+	<h3>[method:null updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+	<p>
+		updateParents - recursively updates global transform of ancestors.<br />
+		updateChildren - recursively updates global transform of descendants.<br /><br />
+
+		Updates the global transform of the object.
+	</p>
 
 	<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
 	<p>

@@ -18,7 +18,7 @@ GeometricContext geometry;
 
 geometry.position = - vViewPosition;
 geometry.normal = normal;
-geometry.viewDir = normalize( vViewPosition );
+geometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPosition );
 
 #ifdef CLEARCOAT
 

@@ -186,7 +186,7 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		function addObject( vertex, extruding ) {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
 
 			var segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;

@@ -62,14 +62,14 @@ var geometry = new THREE.BufferGeometry();
 
 // attributes
 var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
 var drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
-var material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 2 } );
+var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
 var line = new THREE.Line( geometry,  material );
@@ -166,7 +166,6 @@ geometry.tangentsNeedUpdate = true;
 			<p>在运行时无法轻松更改以下属性（一旦material被渲染了一次）：</p>
 			<ul>
 				<li>uniforms的数量和类型</li>
-				<li>lights的数量和类型</li>
 				<li>是否存在
 					<ul>
 						<li>texture</li>

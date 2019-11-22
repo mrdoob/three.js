@@ -322,12 +322,12 @@
 				var references = new THREE.BufferAttribute( new Float32Array( points * 2 ), 2 );
 				var birdVertex = new THREE.BufferAttribute( new Float32Array( points ), 1 );
 
-				this.addAttribute( 'position', vertices );
-				this.addAttribute( 'birdColor', birdColors );
-				this.addAttribute( 'reference', references );
-				this.addAttribute( 'birdVertex', birdVertex );
+				this.setAttribute( 'position', vertices );
+				this.setAttribute( 'birdColor', birdColors );
+				this.setAttribute( 'reference', references );
+				this.setAttribute( 'birdVertex', birdVertex );
 
-				// this.addAttribute( 'normal', new Float32Array( points * 3 ), 3 );
+				// this.setAttribute( 'normal', new Float32Array( points * 3 ), 3 );
 
 
 				var v = 0;

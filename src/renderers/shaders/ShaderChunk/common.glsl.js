@@ -7,7 +7,10 @@ export default /* glsl */`
 #define LOG2 1.442695
 #define EPSILON 1e-6
 
+#ifndef saturate
+// <tonemapping_pars_fragment> may have defined saturate() already
 #define saturate(a) clamp( a, 0.0, 1.0 )
+#endif
 #define whiteComplement(a) ( 1.0 - saturate( a ) )
 
 float pow2( const in float x ) { return x*x; }
@@ -105,6 +108,12 @@ float linearToRelativeLuminance( const in vec3 color ) {
 	vec3 weights = vec3( 0.2126, 0.7152, 0.0722 );
 
 	return dot( weights, color.rgb );
+
+}
+
+bool isPerspectiveMatrix( mat4 m ) {
+
+  return m[ 2 ][ 3 ] == - 1.0;
 
 }
 `;

@@ -3,11 +3,13 @@ import { TempNode } from '../core/TempNode';
 import { ResolutionNode } from './ResolutionNode';
 
 export class ScreenUVNode extends TempNode {
-  constructor(resolution?: ResolutionNode);
 
-  resolution: ResolutionNode;
-  nodeType: string;
+	constructor( resolution?: ResolutionNode );
 
-  generate(builder: NodeBuilder, output: string): string;
-  copy(source: ScreenUVNode): this;
+	resolution: ResolutionNode;
+	nodeType: string;
+
+	generate( builder: NodeBuilder, output: string ): string;
+	copy( source: ScreenUVNode ): this;
+
 }

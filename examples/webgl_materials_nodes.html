@@ -724,6 +724,18 @@
 
 						}, false );
 
+						addGui( 'side', {
+							DoubleSided: THREE.DoubleSide,
+							FrontSided: THREE.FrontSide,
+							BackSided: THREE.BackSide
+						}, function ( val ) {
+
+							defaultSide = Number( val );
+
+							updateMaterial();
+
+						} );
+
 						break;
 
 					case 'physical':
@@ -2579,6 +2591,7 @@
 						// GUI
 
 						addGui( 'scope', {
+							view: Nodes.NormalNode.VIEW,
 							local: Nodes.NormalNode.LOCAL,
 							world: Nodes.NormalNode.WORLD
 						}, function ( val ) {

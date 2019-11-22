@@ -50,10 +50,10 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 	QUnit.test( 'mergeBufferGeometries - basic', ( assert ) => {
 
 		var geometry1 = new BufferGeometry();
-		geometry1.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
+		geometry1.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
 
 		var geometry2 = new BufferGeometry();
-		geometry2.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
+		geometry2.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
 
 		var mergedGeometry = BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] );
 
@@ -66,11 +66,11 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 	QUnit.test( 'mergeBufferGeometries - indexed', ( assert ) => {
 
 		var geometry1 = new BufferGeometry();
-		geometry1.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
+		geometry1.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
 		geometry1.setIndex( new BufferAttribute( new Uint16Array( [ 0, 1, 2, 2, 1, 0 ] ), 1, false ) );
 
 		var geometry2 = new BufferGeometry();
-		geometry2.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
+		geometry2.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
 		geometry2.setIndex( new BufferAttribute( new Uint16Array( [ 0, 1, 2 ] ), 1, false ) );
 
 		var mergedGeometry = BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] );
@@ -85,14 +85,14 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 	QUnit.test( 'mergeBufferGeometries - morph targets', ( assert ) => {
 
 		var geometry1 = new BufferGeometry();
-		geometry1.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
+		geometry1.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
 		geometry1.morphAttributes.position = [
 			new BufferAttribute( new Float32Array( [ 10, 20, 30 ] ), 1, false ),
 			new BufferAttribute( new Float32Array( [ 100, 200, 300 ] ), 1, false )
 		];
 
 		var geometry2 = new BufferGeometry();
-		geometry2.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
+		geometry2.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
 		geometry2.morphAttributes.position = [
 			new BufferAttribute( new Float32Array( [ 40, 50, 60 ] ), 1, false ),
 			new BufferAttribute( new Float32Array( [ 400, 500, 600 ] ), 1, false )
@@ -111,11 +111,11 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 	QUnit.test( 'mergeBufferGeometries - invalid', ( assert ) => {
 
 		var geometry1 = new BufferGeometry();
-		geometry1.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
+		geometry1.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
 		geometry1.setIndex( new BufferAttribute( new Uint16Array( [ 0, 1, 2 ] ), 1, false ) );
 
 		var geometry2 = new BufferGeometry();
-		geometry2.addAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
+		geometry2.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 1, false ) );
 
 		assert.notOk( BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] ) );
 
@@ -123,7 +123,7 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 
 		assert.ok( BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] ) );
 
-		geometry2.addAttribute( 'foo', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
+		geometry2.setAttribute( 'foo', new BufferAttribute( new Float32Array( [ 1, 2, 3 ] ), 1, false ) );
 
 		assert.notOk( BufferGeometryUtils.mergeBufferGeometries( [ geometry1, geometry2 ] ) );
 

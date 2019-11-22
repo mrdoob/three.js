@@ -26,7 +26,7 @@ SubSlotNode.prototype.generate = function ( builder, output ) {
 
 	if ( this.slots[ builder.slot ] ) {
 
-		return this.slots[ builder.slot ].build( builder, output )
+		return this.slots[ builder.slot ].build( builder, output );
 
 	}
 

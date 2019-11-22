@@ -19,9 +19,9 @@ THREE.LuminosityShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
+		"	vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -37,11 +37,11 @@ THREE.LuminosityShader = {
 
 		"void main() {",
 
-			"vec4 texel = texture2D( tDiffuse, vUv );",
+		"	vec4 texel = texture2D( tDiffuse, vUv );",
 
-			"float l = linearToRelativeLuminance( texel.rgb );",
+		"	float l = linearToRelativeLuminance( texel.rgb );",
 
-			"gl_FragColor = vec4( l, l, l, texel.w );",
+		"	gl_FragColor = vec4( l, l, l, texel.w );",
 
 		"}"
 

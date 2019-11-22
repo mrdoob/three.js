@@ -13,11 +13,15 @@ THREE.CSS3DObject = function ( element ) {
 
 	this.addEventListener( 'removed', function () {
 
-		if ( this.element.parentNode !== null ) {
+		this.traverse( function ( object ) {
 
-			this.element.parentNode.removeChild( this.element );
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
-		}
+				object.element.parentNode.removeChild( object.element );
+
+			}
+
+		} );
 
 	} );
 
@@ -38,8 +42,6 @@ THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 //
 
 THREE.CSS3DRenderer = function () {
-
-	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -280,6 +282,11 @@ THREE.CSS3DRenderer = function () {
 
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.perspective = fov + 'px';
+
+			} else {
+
+				domElement.style.WebkitPerspective = '';
+				domElement.style.perspective = '';
 
 			}
 

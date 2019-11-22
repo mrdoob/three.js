@@ -47,7 +47,7 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
 
-	geometry.addAttribute( 'position', positions );
+	geometry.setAttribute( 'position', positions );
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
 

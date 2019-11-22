@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	BackSide 
+} from '../../../../build/three.module.js';
+
 import { TempNode } from '../core/TempNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -20,11 +24,11 @@ function NormalMapNode( value, scale ) {
 
 NormalMapNode.Nodes = ( function () {
 
-	var perturbNormal2Arb = new FunctionNode( 
+	var perturbNormal2Arb = new FunctionNode(
 
-// Per-Pixel Tangent Space Normal Mapping
-// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
-	
+		// Per-Pixel Tangent Space Normal Mapping
+		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
+
 `vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
 
 	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
@@ -47,14 +51,8 @@ NormalMapNode.Nodes = ( function () {
 	#ifdef DOUBLE_SIDED
 
 		// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-		// http://hacksoflife.blogspot.com/2009/11/per-pixel-tangent-space-normal-mapping.html?showComment=1522254677437#c5087545147696715943
-		vec3 NfromST = cross( S, T );
-		if( dot( NfromST, N ) > 0.0 ) {
 
-			S *= -1.0;
-			T *= -1.0;
-
-		}
+		if ( dot( cross( S, T ), N ) < 0.0 ) mapN.xy *= - 1.0;
 
 	#else
 
@@ -87,11 +85,19 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 
+		var scale = this.scale.build( builder, 'v2' );
+
+		if ( builder.material.side === BackSide ) {
+
+			scale = '-' + scale;
+
+		}
+
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
 			this.normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
 			this.uv.build( builder, 'v2' ) + ', ' +
-			this.scale.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
+			scale + ' )', this.getType( builder ), output );
 
 	} else {
 

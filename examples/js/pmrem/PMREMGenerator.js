@@ -150,6 +150,8 @@ THREE.PMREMGenerator = ( function () {
 
 			}
 
+			shader.dispose();
+
 		},
 
 	};

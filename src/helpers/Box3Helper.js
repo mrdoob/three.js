@@ -25,7 +25,7 @@ function Box3Helper( box, color ) {
 
 	geometry.setIndex( new BufferAttribute( indices, 1 ) );
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
 

@@ -25,7 +25,7 @@ function RectAreaLightHelper( light, color ) {
 	var positions = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 	geometry.computeBoundingSphere();
 
 	var material = new LineBasicMaterial( { fog: false } );
@@ -37,7 +37,7 @@ function RectAreaLightHelper( light, color ) {
 	var positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 
 	var geometry2 = new BufferGeometry();
-	geometry2.addAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
+	geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 	geometry2.computeBoundingSphere();
 
 	this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );

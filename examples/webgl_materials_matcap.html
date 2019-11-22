@@ -10,7 +10,7 @@
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl materials matcap<br />
-			Drag-and-drop alternate MatCap image files<br/>
+			Drag-and-drop JPG, PNG, or EXR MatCap image files<br/>
 		</div>
 
 		<script type="module">
@@ -20,6 +20,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
 			var mesh, renderer, scene, camera;
 
@@ -51,12 +52,13 @@
 
 				// camera
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
-				camera.position.set( 0, 0, 12 );
+				camera.position.set( 0, 0, 13 );
 
 				// controls
 				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.enableZoom = false;
+				controls.enablePan = false;
 
 				// manager
 				var manager = new THREE.LoadingManager( render );
@@ -109,21 +111,6 @@
 				// drag 'n drop
 				initDragAndDrop();
 
-				// corner div
-				var div = document.createElement( 'div' );
-				div.style.position = 'absolute';
-				div.style.top = '10px';
-				div.style.left = '10px';
-				document.body.appendChild( div );
-
-				image = document.createElement( 'img' );
-				image.style.width = '128px';
-				image.style.height = '128px';
-				image.style.display = 'block';
-				image.style.margin = '0 0 10px 0';
-				image.src = 'textures/matcaps/matcap-porcelain-white.jpg';
-				div.appendChild( image );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -146,10 +133,10 @@
 			}
 
 			//
-
 			// drag and drop anywhere in document
+			//
 
-			function imgCallback( event ) {
+			function updateMatcap( texture ) {
 
 				if ( mesh.material.matcap ) {
 
@@ -157,15 +144,91 @@
 
 				}
 
-				mesh.material.matcap = new THREE.Texture( event.target );
-				mesh.material.matcap.needsUpdate = true;
+				mesh.material.matcap = texture;
 
-				mesh.material.matcap.encoding = THREE.sRGBEncoding; // assume it is sRGB
-				mesh.material.needsUpdate = true;
+				texture.needsUpdate = true;
 
-				image.src = mesh.material.matcap.image.src; // corner div
+				mesh.material.needsUpdate = true; // because the encoding can change
 
 				render();
+
+			}
+
+			function handleJPG( event ) { // PNG, too
+
+				function imgCallback( event ) {
+
+					var texture = new THREE.Texture( event.target );
+
+					texture.encoding = THREE.sRGBEncoding;
+
+					updateMatcap( texture );
+
+				}
+
+				var img = new Image();
+
+				img.onload = imgCallback;
+
+				img.src = event.target.result;
+
+			}
+
+			function handleEXR( event ) {
+
+				var contents = event.target.result;
+
+				var loader = new EXRLoader();
+
+				var texData = loader.parse( contents );
+
+				var texture = new THREE.DataTexture();
+
+				texture.image.width = texData.width;
+				texture.image.height = texData.height;
+				texture.image.data = texData.data;
+
+				texture.format = texData.format;
+				texture.type = texData.type;
+
+				texture.generateMipmaps = false;
+				texture.magFilter = THREE.LinearFilter;
+				texture.minFilter = THREE.LinearFilter;
+
+				updateMatcap( texture );
+
+			}
+
+			function loadFile( file ) {
+
+				var filename = file.name;
+				var extension = filename.split( '.' ).pop().toLowerCase();
+
+				if ( extension === 'exr' ) {
+
+					var reader = new FileReader();
+
+					reader.addEventListener( 'load', function ( event ) {
+
+						handleEXR( event );
+
+					}, false );
+
+					reader.readAsArrayBuffer( file );
+
+				} else { // 'jpg', 'png'
+
+					var reader = new FileReader();
+
+					reader.addEventListener( 'load', function ( event ) {
+
+						handleJPG( event );
+
+					}, false );
+
+					reader.readAsDataURL( file );
+
+				}
 
 			}
 
@@ -182,19 +245,7 @@
 
 					event.preventDefault();
 
-					var reader = new FileReader();
-
-					reader.addEventListener( 'load', function ( event ) {
-
-						var img = new Image();
-
-						img.onload = imgCallback;
-
-						img.src = event.currentTarget.result;
-
-					}, false );
-
-					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
+					loadFile( event.dataTransfer.files[ 0 ] );
 
 				}, false );
 

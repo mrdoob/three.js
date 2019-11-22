@@ -46,7 +46,7 @@ LineSegments.prototype = Object.assign( Object.create( Line.prototype ), {
 
 				}
 
-				geometry.addAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
+				geometry.setAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
 
 			} else {
 

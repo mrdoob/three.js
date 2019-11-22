@@ -25,7 +25,8 @@ export class MultiMaterial extends Material {
 
 export interface PointsMaterialParameters extends MaterialParameters {
 	color?: Color | string | number;
-	map?: Texture;
+	map?: Texture | null;
+	alphaMap?: Texture | null;
 	size?: number;
 	sizeAttenuation?: boolean;
 }
@@ -36,6 +37,7 @@ export class PointsMaterial extends Material {
 
 	color: Color;
 	map: Texture | null;
+	alphaMap: Texture | null;
 	size: number;
 	sizeAttenuation: boolean;
 
