@@ -104,12 +104,7 @@ THREE.PMREMGenerator = ( function () {
 			equirectangular.minFilter = THREE.NearestFilter;
 			equirectangular.generateMipmaps = false;
 
-			var cubeUVRenderTarget = _allocateTargets( equirectangular );
-			_textureToCubeUV( equirectangular, cubeUVRenderTarget );
-			_applyPMREM( cubeUVRenderTarget );
-			_cleanup();
-
-			return cubeUVRenderTarget;
+			return this.fromCubemap( equirectangular );
 
 		},
 

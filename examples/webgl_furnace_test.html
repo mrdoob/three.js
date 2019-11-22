@@ -29,7 +29,6 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var scene, camera, renderer, envMap, radianceMap;
 			var right = 8;
@@ -110,34 +109,15 @@
 
 			function createEnvironment() {
 
-				var envScene = new THREE.Scene();
-				envScene.background = new THREE.Color( 0xcccccc );
-
-				var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
-				cubeCamera.update( renderer, envScene );
-
-				envMap = cubeCamera.renderTarget.texture;
-
-				scene.background = envScene.background;
-
-			}
-
-			function getRadiance() {
-
 				return new Promise( function ( resolve ) {
 
-					var pmremGenerator = new PMREMGenerator( envMap );
-					pmremGenerator.update( renderer );
+					var envScene = new THREE.Scene();
+					envScene.background = new THREE.Color( 0xcccccc );
 
-					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+					var pmremGenerator = new PMREMGenerator( renderer );
+					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 
-					var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
-
-					radianceMap = cubeRenderTarget.texture;
+					scene.background = envScene.background;
 
 					resolve();
 
@@ -170,7 +150,6 @@
 			Promise.resolve()
 				.then( init )
 				.then( createEnvironment )
-				.then( getRadiance )
 				.then( createObjects )
 				.then( animate );
 

@@ -43,7 +43,6 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var camera, scene, renderer;
 			var stats, carModel, materialsLib, envMap;
@@ -92,20 +91,10 @@
 							magFilter: texture.magFilter
 						};
 
-						scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
+						var pmremGenerator = new PMREMGenerator( renderer );
+						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
-						envMap = scene.background;
-
-						var pmremGenerator = new PMREMGenerator( scene.background.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+						scene.background = envMap;
 
 						//
 
