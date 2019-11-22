@@ -72,15 +72,11 @@ THREE.PMREMGenerator = ( function () {
 		 */
 		fromScene: function ( scene, near = 0.1, far = 100 ) {
 
-			const dpr = this.renderer.getPixelRatio();
-			this.renderer.setPixelRatio( 1 );
-
 			const cubeUVRenderTarget = allocateTargets();
 			sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 			applyPMREM( cubeUVRenderTarget );
 
 			_pingPongRenderTarget.dispose();
-			this.renderer.setPixelRatio( dpr );
 			return cubeUVRenderTarget;
 
 		},
@@ -91,9 +87,6 @@ THREE.PMREMGenerator = ( function () {
 		 */
 		fromEquirectangular: function ( equirectangular ) {
 
-			const dpr = this.renderer.getPixelRatio();
-			this.renderer.setPixelRatio( 1 );
-
 			equirectangular.magFilter = THREE.NearestFilter;
 			equirectangular.minFilter = THREE.NearestFilter;
 			equirectangular.generateMipmaps = false;
@@ -103,7 +96,6 @@ THREE.PMREMGenerator = ( function () {
 			applyPMREM( cubeUVRenderTarget );
 
 			_pingPongRenderTarget.dispose();
-			this.renderer.setPixelRatio( dpr );
 			return cubeUVRenderTarget;
 
 		},
@@ -244,7 +236,7 @@ THREE.PMREMGenerator = ( function () {
 		  cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
-			this.renderer.setViewport(
+			setViewport(
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			this.renderer.render( scene, cubeCamera );
 
@@ -272,7 +264,7 @@ THREE.PMREMGenerator = ( function () {
 	  uniforms[ 'outputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
 
 	  this.renderer.setRenderTarget( cubeUVRenderTarget );
-	  this.renderer.setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+	  setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 	  this.renderer.render( scene, _flatCamera );
 
 	}
@@ -284,6 +276,13 @@ THREE.PMREMGenerator = ( function () {
 	  cubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
 	  cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
 	  return cubeUVRenderTarget;
+
+	}
+
+	function setViewport( x, y, width, height ) {
+
+		const dpr = this.threeRenderer.getPixelRatio();
+		this.threeRenderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
 
 	}
 
@@ -412,7 +411,7 @@ THREE.PMREMGenerator = ( function () {
 		this.renderer.autoClear = false;
 
 		this.renderer.setRenderTarget( targetOut );
-		this.renderer.setViewport( x, y, 3 * outputSize, 2 * outputSize );
+		setViewport( x, y, 3 * outputSize, 2 * outputSize );
 		this.renderer.render( blurScene, _flatCamera );
 
 	}
