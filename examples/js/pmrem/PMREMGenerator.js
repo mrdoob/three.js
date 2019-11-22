@@ -22,6 +22,15 @@ THREE.PMREMGenerator = ( function () {
 	// geometric shadowing function.
 	const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 	const TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+	const ENCODINGS = {
+		[ THREE.LinearEncoding ]: 0,
+		[ THREE.sRGBEncoding ]: 1,
+		[ THREE.RGBEEncoding ]: 2,
+		[ THREE.RGBM7Encoding ]: 3,
+		[ THREE.RGBM16Encoding ]: 4,
+		[ THREE.RGBDEncoding ]: 5,
+		[ THREE.GammaEncoding ]: 6
+	  };
 
 	var _flatCamera = new THREE.OrthographicCamera();
 	var _blurMaterial = getShader();
@@ -259,8 +268,8 @@ THREE.PMREMGenerator = ( function () {
 	  uniforms[ 'copyEquirectangular' ].value = true;
 	  uniforms[ 'texelSize' ].value.set(
 		  1.0 / equirectangular.image.width, 1.0 / equirectangular.image.height );
-	  uniforms[ 'inputEncoding' ].value = encodings[ equirectangular.encoding ];
-	  uniforms[ 'outputEncoding' ].value = encodings[ equirectangular.encoding ];
+	  uniforms[ 'inputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
+	  uniforms[ 'outputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
 
 	  this.renderer.setRenderTarget( cubeUVRenderTarget );
 	  this.renderer.setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
@@ -392,8 +401,8 @@ THREE.PMREMGenerator = ( function () {
 		}
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
-		blurUniforms[ 'inputEncoding' ].value = encodings[ targetIn.texture.encoding ];
-		blurUniforms[ 'outputEncoding' ].value = encodings[ targetIn.texture.encoding ];
+		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
+		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
 
 		const outputSize = _sizeLods[ lodOut ];
 		const x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
@@ -427,8 +436,8 @@ THREE.PMREMGenerator = ( function () {
 				'dTheta': { value: 0 },
 				'mipInt': { value: 0 },
 				'poleAxis': { value: poleAxis },
-				'inputEncoding': { value: encodings[ THREE.LinearEncoding ] },
-				'outputEncoding': { value: encodings[ THREE.LinearEncoding ] }
+				'inputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] },
+				'outputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] }
 			},
 
 			vertexShader: `
@@ -437,18 +446,20 @@ precision mediump int;
 attribute vec3 position;
 attribute vec2 uv;
 attribute float faceIndex;
-varying vec3 vOutputDirection;
-${getDirectionChunk}
+varying vec2 vUv;
+varying float vFaceIndex;
 void main() {
-    vOutputDirection = getDirection(uv, faceIndex);
+	vUv = uv;
+	vFaceIndex = faceIndex;
     gl_Position = vec4( position, 1.0 );
 }
-      `,
+      		`,
 
 			fragmentShader: `
 precision mediump float;
 precision mediump int;
-varying vec3 vOutputDirection;
+varying vec2 vUv;
+varying float vFaceIndex;
 uniform sampler2D envMap;
 uniform bool copyEquirectangular;
 uniform vec2 texelSize;
@@ -458,17 +469,62 @@ uniform bool latitudinal;
 uniform float dTheta;
 uniform float mipInt;
 uniform vec3 poleAxis;
-#define RECIPROCAL_PI 0.31830988618
-#define RECIPROCAL_PI2 0.15915494
-${texelIO} 
+uniform int inputEncoding;
+uniform int outputEncoding;
+
+#include <encodings_pars_fragment>
+
+vec4 inputTexelToLinear(vec4 value){
+    if(inputEncoding == 0){
+        return value;
+    }else if(inputEncoding == 1){
+        return sRGBToLinear(value);
+    }else if(inputEncoding == 2){
+        return RGBEToLinear(value);
+    }else if(inputEncoding == 3){
+        return RGBMToLinear(value, 7.0);
+    }else if(inputEncoding == 4){
+        return RGBMToLinear(value, 16.0);
+    }else if(inputEncoding == 5){
+        return RGBDToLinear(value, 256.0);
+    }else{
+        return GammaToLinear(value, 2.2);
+    }
+}
+
+vec4 linearToOutputTexel(vec4 value){
+    if(outputEncoding == 0){
+        return value;
+    }else if(outputEncoding == 1){
+        return LinearTosRGB(value);
+    }else if(outputEncoding == 2){
+        return LinearToRGBE(value);
+    }else if(outputEncoding == 3){
+        return LinearToRGBM(value, 7.0);
+    }else if(outputEncoding == 4){
+        return LinearToRGBM(value, 16.0);
+    }else if(outputEncoding == 5){
+        return LinearToRGBD(value, 256.0);
+    }else{
+        return LinearToGamma(value, 2.2);
+    }
+}
+
 vec4 envMapTexelToLinear(vec4 color) {
   return inputTexelToLinear(color);
 }
-${bilinearCubeUVChunk}
+
+#define ENVMAP_TYPE_CUBE_UV
+#include <cube_uv_reflection_fragment>
+
+#define RECIPROCAL_PI 0.31830988618
+#define RECIPROCAL_PI2 0.15915494
+
 void main() {
   gl_FragColor = vec4(0.0);
+  outputDirection = getDirection(vUv, vFaceIndex);
   if (copyEquirectangular) {
-    vec3 direction = normalize(vOutputDirection);
+    vec3 direction = normalize(outputDirection);
     vec2 uv;
     uv.y = asin(clamp(direction.y, -1.0, 1.0)) * RECIPROCAL_PI + 0.5;
     uv.x = atan(direction.z, direction.x) * RECIPROCAL_PI2 + 0.5;
@@ -491,16 +547,16 @@ void main() {
       for (int dir = -1; dir < 2; dir += 2) {
         if (i == 0 && dir == 1)
           continue;
-        vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
+        vec3 axis = latitudinal ? poleAxis : cross(poleAxis, outputDirection);
         if (all(equal(axis, vec3(0.0))))
-          axis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);
+          axis = cross(vec3(0.0, 1.0, 0.0), outputDirection);
         axis = normalize(axis);
         float theta = dTheta * float(dir * i);
         float cosTheta = cos(theta);
         // Rodrigues' axis-angle rotation
-        vec3 sampleDirection = vOutputDirection * cosTheta 
-            + cross(axis, vOutputDirection) * sin(theta) 
-            + axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
+        vec3 sampleDirection = outputDirection * cosTheta 
+            + cross(axis, outputDirection) * sin(theta) 
+            + axis * dot(axis, outputDirection) * (1.0 - cosTheta);
         gl_FragColor.rgb +=
             weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);
       }
@@ -508,11 +564,11 @@ void main() {
   }
   gl_FragColor = linearToOutputTexel(gl_FragColor);
 }
-      `,
+     		`,
 
 			blending: THREE.NoBlending,
 			depthTest: false,
-	   depthWrite: false
+	   		depthWrite: false
 
 		} );
 
