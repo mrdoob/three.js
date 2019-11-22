@@ -74,9 +74,9 @@ class PolyhedronBufferGeometry extends BufferGeometry {
 
 		// build non-indexed geometry
 
-		this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
-		this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 
 		if ( detail === 0 ) {
 

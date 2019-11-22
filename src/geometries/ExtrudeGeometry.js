@@ -93,8 +93,8 @@ class ExtrudeBufferGeometry extends BufferGeometry {
 
 		// build geometry
 
-		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
+		this.setAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 		this.computeVertexNormals();
 
