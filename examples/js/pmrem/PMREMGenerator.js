@@ -22,6 +22,10 @@ THREE.PMREMGenerator = ( function () {
 	// geometric shadowing function.
 	const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 	const TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+	// The maximum length of the blur for loop, chosen to equal the number needed
+	// for GENERATED_SIGMA. Smaller _sigmas will use fewer samples and exit early,
+	// but not recompile the shader.
+	const MAX_SAMPLES = 20;
 	const ENCODINGS = {
 		[ THREE.LinearEncoding ]: 0,
 		[ THREE.sRGBEncoding ]: 1,
@@ -33,9 +37,9 @@ THREE.PMREMGenerator = ( function () {
 	  };
 
 	var _flatCamera = new THREE.OrthographicCamera();
-	var _blurMaterial = getShader();
+	var _blurMaterial = _getShader( MAX_SAMPLES );
 
-	var { _lodPlanes, _sizeLods, _sigmas } = createPlanes();
+	var { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
 	var _pingPongRenderTarget = null;
 
 	// Golden Ratio
@@ -48,6 +52,7 @@ THREE.PMREMGenerator = ( function () {
 		new THREE.Vector3( - 1, 1, 1 ),
 		new THREE.Vector3( 1, 1, - 1 ),
 		new THREE.Vector3( - 1, 1, - 1 ),
+		new THREE.Vector3( 0, PHI, INV_PHI ),
 		new THREE.Vector3( 0, PHI, - INV_PHI ),
 		new THREE.Vector3( INV_PHI, 0, PHI ),
 		new THREE.Vector3( - INV_PHI, 0, PHI ),
@@ -66,15 +71,21 @@ THREE.PMREMGenerator = ( function () {
 
 		/**
 		 * Generates a PMREM from a supplied Scene, which can be faster than using an
-		 * image if networking bandwidth is low. Optional near and far planes ensure
-		 * the scene is rendered in its entirety (the cubeCamera is placed at the
-		 * origin).
+		 * image if networking bandwidth is low. Optional sigma specifies a blur radius
+		 * in radians to be applied to the scene before PMREM generation. Optional near
+		 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
+		 * is placed at the origin).
 		 */
-		fromScene: function ( scene, near = 0.1, far = 100 ) {
+		fromScene: function ( scene, sigma = 0, near = 0.1, far = 100 ) {
 
-			const cubeUVRenderTarget = allocateTargets();
-			sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
-			applyPMREM( cubeUVRenderTarget );
+			const cubeUVRenderTarget = _allocateTargets();
+			_sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+			if ( sigma > 0 ) {
+
+				_blur( cubeUVRenderTarget, 0, 0, sigma );
+
+			}
+			_applyPMREM( cubeUVRenderTarget );
 
 			_pingPongRenderTarget.dispose();
 			return cubeUVRenderTarget;
@@ -91,9 +102,9 @@ THREE.PMREMGenerator = ( function () {
 			equirectangular.minFilter = THREE.NearestFilter;
 			equirectangular.generateMipmaps = false;
 
-			const cubeUVRenderTarget = allocateTargets( equirectangular );
-			equirectangularToCubeUV( equirectangular, cubeUVRenderTarget );
-			applyPMREM( cubeUVRenderTarget );
+			const cubeUVRenderTarget = _allocateTargets( equirectangular );
+			_equirectangularToCubeUV( equirectangular, cubeUVRenderTarget );
+			_applyPMREM( cubeUVRenderTarget );
 
 			_pingPongRenderTarget.dispose();
 			return cubeUVRenderTarget;
@@ -102,7 +113,7 @@ THREE.PMREMGenerator = ( function () {
 
 	};
 
-	function createPlanes() {
+	function _createPlanes() {
 
 		var _lodPlanes = [];
 		var _sizeLods = [];
@@ -178,7 +189,7 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function allocateTargets( equirectangular ) {
+	function _allocateTargets( equirectangular ) {
 
 		const params = {
 		  magFilter: THREE.NearestFilter,
@@ -190,14 +201,14 @@ THREE.PMREMGenerator = ( function () {
 		  depthBuffer: false,
 		  stencilBuffer: false
 		};
-		const cubeUVRenderTarget = createRenderTarget(
+		const cubeUVRenderTarget = _createRenderTarget(
 			{ ...params, depthBuffer: ( equirectangular ? false : true ) } );
-		_pingPongRenderTarget = createRenderTarget( params );
+		_pingPongRenderTarget = _createRenderTarget( params );
 		return cubeUVRenderTarget;
 
 	}
 
-	function sceneToCubeUV(
+	function _sceneToCubeUV(
 		scene, near, far,
 		cubeUVRenderTarget ) {
 
@@ -236,7 +247,7 @@ THREE.PMREMGenerator = ( function () {
 		  cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
-			setViewport(
+			_setViewport(
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			this.renderer.render( scene, cubeCamera );
 
@@ -249,7 +260,7 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function equirectangularToCubeUV(
+	function _equirectangularToCubeUV(
 		equirectangular, cubeUVRenderTarget ) {
 
 	  const scene = new THREE.Scene();
@@ -264,12 +275,12 @@ THREE.PMREMGenerator = ( function () {
 	  uniforms[ 'outputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
 
 	  this.renderer.setRenderTarget( cubeUVRenderTarget );
-	  setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+	  _setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 	  this.renderer.render( scene, _flatCamera );
 
 	}
 
-	function createRenderTarget( params ) {
+	function _createRenderTarget( params ) {
 
 	  const cubeUVRenderTarget =
 		  new THREE.WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
@@ -279,14 +290,14 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function setViewport( x, y, width, height ) {
+	function _setViewport( x, y, width, height ) {
 
 		const dpr = this.threeRenderer.getPixelRatio();
 		this.threeRenderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
 
 	}
 
-	function applyPMREM( cubeUVRenderTarget ) {
+	function _applyPMREM( cubeUVRenderTarget ) {
 
 	  for ( let i = 1; i < TOTAL_LODS; i ++ ) {
 
@@ -295,7 +306,7 @@ THREE.PMREMGenerator = ( function () {
 			_sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
 			const poleAxis =
 			_axisDirections[ ( i - 1 ) % _axisDirections.length ];
-			blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			_blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
 		}
 
@@ -308,11 +319,11 @@ THREE.PMREMGenerator = ( function () {
    * the poles) to approximate the orthogonally-separable blur. It is least
    * accurate at the poles, but still does a decent job.
    */
-	function blur(
+	function _blur(
 		cubeUVRenderTarget, lodIn, lodOut,
 		sigma, poleAxis ) {
 
-		halfBlur(
+		_halfBlur(
 	  cubeUVRenderTarget,
 	  _pingPongRenderTarget,
 	  lodIn,
@@ -321,7 +332,7 @@ THREE.PMREMGenerator = ( function () {
 	  'latitudinal',
 	  poleAxis );
 
-		halfBlur(
+		_halfBlur(
 	  _pingPongRenderTarget,
 	  cubeUVRenderTarget,
 	  lodOut,
@@ -332,7 +343,7 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function halfBlur(
+	function _halfBlur(
 		targetIn, targetOut, lodIn,
 		lodOut, sigmaRadians, direction,
 		poleAxis ) {
@@ -344,10 +355,6 @@ THREE.PMREMGenerator = ( function () {
 
 		}
 
-		// The maximum length of the blur for loop, chosen to equal the number needed
-		// for GENERATED_SIGMA. Smaller _sigmas will use fewer samples and exit early,
-		// but not recompile the shader.
-		const MAX_SAMPLES = 20;
 		// Number of standard deviations at which to cut off the discrete approximation.
 		const STANDARD_DEVIATIONS = 3;
 
@@ -411,12 +418,12 @@ THREE.PMREMGenerator = ( function () {
 		this.renderer.autoClear = false;
 
 		this.renderer.setRenderTarget( targetOut );
-		setViewport( x, y, 3 * outputSize, 2 * outputSize );
+		_setViewport( x, y, 3 * outputSize, 2 * outputSize );
 		this.renderer.render( blurScene, _flatCamera );
 
 	}
 
-	function getShader( maxSamples ) {
+	function _getShader( maxSamples ) {
 
 		const weights = new Float32Array( maxSamples );
 		const texelSize = new THREE.Vector2( 1, 1 );
