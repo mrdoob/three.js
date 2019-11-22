@@ -45,12 +45,12 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
 						var pmremGenerator = new PMREMGenerator( renderer );
-						scene.background = pmremGenerator.fromEquirectangular(texture).texture;
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
-						var envMap = scene.background;
+						scene.background = envMap;
 
 						// model
 

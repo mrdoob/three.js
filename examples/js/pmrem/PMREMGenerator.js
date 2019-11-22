@@ -23,9 +23,8 @@ THREE.PMREMGenerator = ( function () {
 	// variance #defines in cube_uv_reflection_fragment.glsl.js.
 	var EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 	var TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
-	// The maximum length of the blur for loop, chosen to equal the number needed
-	// for GENERATED_SIGMA. Smaller _sigmas will use fewer samples and exit early,
-	// but not recompile the shader.
+	// The maximum length of the blur for loop. Smaller sigmas will use fewer
+	// samples and exit early, but not recompile the shader.
 	var MAX_SAMPLES = 20;
 	var ENCODINGS = {
 		[ THREE.LinearEncoding ]: 0,
@@ -173,10 +172,10 @@ THREE.PMREMGenerator = ( function () {
 
 			}
 			var planes = new THREE.BufferGeometry();
-			planes.addAttribute(
+			planes.setAttribute(
 				'position', new THREE.BufferAttribute( position, positionSize ) );
-			planes.addAttribute( 'uv', new THREE.BufferAttribute( uv, uvSize ) );
-			planes.addAttribute(
+			planes.setAttribute( 'uv', new THREE.BufferAttribute( uv, uvSize ) );
+			planes.setAttribute(
 				'faceIndex', new THREE.BufferAttribute( faceIndex, faceIndexSize ) );
 			_lodPlanes.push( planes );
 
@@ -214,7 +213,7 @@ THREE.PMREMGenerator = ( function () {
 
 		_pingPongRenderTarget.dispose();
 		_renderer.setRenderTarget( null );
-		var size = _renderer.getSize();
+		var size = _renderer.getSize( new THREE.Vector2() );
 		_renderer.setViewport( 0, 0, size.x, size.y );
 
 	}
