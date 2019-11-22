@@ -8604,7 +8604,7 @@
 
 		this.userData = {};
 
-		this.needsUpdate = true;
+		this.version = 0;
 
 	}
 
@@ -8947,6 +8947,16 @@
 		dispose: function () {
 
 			this.dispatchEvent( { type: 'dispose' } );
+
+		}
+
+	} );
+
+	Object.defineProperty( Material.prototype, 'needsUpdate', {
+
+		set: function ( value ) {
+
+			if ( value === true ) { this.version ++; }
 
 		}
 
@@ -22843,6 +22853,7 @@
 		//
 
 		var triggers = [];
+		var grips = [];
 
 		function findGamepad( id ) {
 
@@ -22913,6 +22924,33 @@
 
 							controller.dispatchEvent( { type: 'selectend' } );
 							controller.dispatchEvent( { type: 'select' } );
+
+						}
+
+					}
+
+					// Grip
+					buttonId = 2;
+
+					if ( grips[ i ] === undefined ) { grips[ i ] = false; }
+
+					// Skip if the grip button doesn't exist on this controller
+					if ( gamepad.buttons[ buttonId ] !== undefined ) {
+
+						if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+							grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+							if ( grips[ i ] === true ) {
+
+								controller.dispatchEvent( { type: 'squeezestart' } );
+
+							} else {
+
+								controller.dispatchEvent( { type: 'squeezeend' } );
+								controller.dispatchEvent( { type: 'squeeze' } );
+
+							}
 
 						}
 
@@ -23290,6 +23328,9 @@
 				session.addEventListener( 'select', onSessionEvent );
 				session.addEventListener( 'selectstart', onSessionEvent );
 				session.addEventListener( 'selectend', onSessionEvent );
+				session.addEventListener( 'squeeze', onSessionEvent );
+				session.addEventListener( 'squeezestart', onSessionEvent );
+				session.addEventListener( 'squeezeend', onSessionEvent );
 				session.addEventListener( 'end', onSessionEnd );
 
 				// eslint-disable-next-line no-undef
@@ -25133,7 +25174,7 @@
 
 			}
 
-			if ( material.needsUpdate === false ) {
+			if ( material.version === materialProperties.__version ) {
 
 				if ( materialProperties.program === undefined ) {
 
@@ -25157,10 +25198,10 @@
 
 			}
 
-			if ( material.needsUpdate ) {
+			if ( material.version !== materialProperties.__version ) {
 
 				initMaterial( material, fog, object );
-				material.needsUpdate = false;
+				materialProperties.__version = material.version;
 
 			}
 
