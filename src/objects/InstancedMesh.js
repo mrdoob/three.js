@@ -53,7 +53,7 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			_instanceWorldMatrix.multiplyMatrices( matrixWorld, _instanceLocalMatrix );
 
 
-			//The agent mesh represents this single instance
+			//The mesh represents this single instance
 
 			_mesh.matrixWorld = _instanceWorldMatrix;
 
@@ -69,7 +69,7 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 				intersects.push( _instanceIntersects[ 0 ] );
 
-				_instanceIntersects = [];
+				_instanceIntersects.length = 0;
 
 			}
 
