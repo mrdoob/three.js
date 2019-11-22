@@ -10,27 +10,6 @@ export default /* glsl */`
 // a cubemap, the 0-5 integer index of a cube face, and the direction vector for
 // sampling a textureCube (not generally normalized).
 
-vec3 getDirection(vec2 uv, float face) {
-    uv = 2.0 * uv - 1.0;
-    vec3 direction = vec3(uv, 1.0);
-    if (face == 0.0) {
-      direction = direction.zyx;
-      direction.z *= -1.0;
-    } else if (face == 1.0) {
-      direction = direction.xzy;
-      direction.z *= -1.0;
-    } else if (face == 3.0) {
-      direction = direction.zyx;
-      direction.x *= -1.0;
-    } else if (face == 4.0) {
-      direction = direction.xzy;
-      direction.y *= -1.0;
-    } else if (face == 5.0) {
-      direction.xz *= -1.0;
-    }
-    return direction;
-}
-
 float getFace(vec3 direction) {
     vec3 absDirection = abs(direction);
     float face = -1.0;

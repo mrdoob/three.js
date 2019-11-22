@@ -37,7 +37,7 @@ THREE.PMREMGenerator = ( function () {
 	  };
 
 	var _flatCamera = new THREE.OrthographicCamera();
-	var _blurMaterial = _getShader( MAX_SAMPLES );
+	var _blurMaterial = _getBlurShader( MAX_SAMPLES );
 
 	var { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
 	var _pingPongRenderTarget = null;
@@ -95,7 +95,8 @@ THREE.PMREMGenerator = ( function () {
 
 		/**
 		 * Generates a PMREM from an equirectangular texture, which can be either LDR
-		 * (RGBFormat) or HDR (RGBEFormat).
+		 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
+		 * as this matches best with the 256 x 256 cubemap output.
 		 */
 		fromEquirectangular: function ( equirectangular ) {
 
@@ -274,11 +275,11 @@ THREE.PMREMGenerator = ( function () {
 		equirectangular, cubeUVRenderTarget ) {
 
 	  var scene = new THREE.Scene();
-	  scene.add( new THREE.Mesh( _lodPlanes[ 0 ], _blurMaterial ) );
-	  var uniforms = _blurMaterial.uniforms;
+	  var equirectMaterial = _getEquirectShader();
+	  scene.add( new THREE.Mesh( _lodPlanes[ 0 ], equirectMaterial ) );
+	  var uniforms = equirectMaterial.uniforms;
 
 	  uniforms[ 'envMap' ].value = equirectangular;
-	  uniforms[ 'copyEquirectangular' ].value = true;
 	  uniforms[ 'texelSize' ].value.set(
 		  1.0 / equirectangular.image.width, 1.0 / equirectangular.image.height );
 	  uniforms[ 'inputEncoding' ].value = ENCODINGS[ equirectangular.encoding ];
@@ -411,7 +412,6 @@ THREE.PMREMGenerator = ( function () {
 		weights = weights.map( w => w / sum );
 
 		blurUniforms[ 'envMap' ].value = targetIn.texture;
-		blurUniforms[ 'copyEquirectangular' ].value = false;
 		blurUniforms[ 'samples' ].value = samples;
 		blurUniforms[ 'weights' ].value = weights;
 		blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
@@ -437,10 +437,9 @@ THREE.PMREMGenerator = ( function () {
 
 	}
 
-	function _getShader( maxSamples ) {
+	function _getBlurShader( maxSamples ) {
 
 		var weights = new Float32Array( maxSamples );
-		var texelSize = new THREE.Vector2( 1, 1 );
 		var poleAxis = new THREE.Vector3( 0, 1, 0 );
 		var shaderMaterial = new THREE.RawShaderMaterial( {
 
@@ -448,8 +447,6 @@ THREE.PMREMGenerator = ( function () {
 
 			uniforms: {
 				'envMap': { value: null },
-				'copyEquirectangular': { value: false },
-				'texelSize': { value: texelSize },
 				'samples': { value: 1 },
 				'weights': { value: weights },
 				'latitudinal': { value: false },
@@ -460,35 +457,163 @@ THREE.PMREMGenerator = ( function () {
 				'outputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] }
 			},
 
-			vertexShader: `
-precision mediump float;
-precision mediump int;
-attribute vec3 position;
-attribute vec2 uv;
-attribute float faceIndex;
-varying vec2 vUv;
-varying float vFaceIndex;
-void main() {
-	vUv = uv;
-	vFaceIndex = faceIndex;
-    gl_Position = vec4( position, 1.0 );
-}
-      		`,
+			vertexShader: _getCommonVertexShader(),
 
 			fragmentShader: `
 precision mediump float;
 precision mediump int;
-varying vec2 vUv;
-varying float vFaceIndex;
+varying vec3 vOutputDirection;
 uniform sampler2D envMap;
-uniform bool copyEquirectangular;
-uniform vec2 texelSize;
 uniform int samples;
 uniform float weights[n];
 uniform bool latitudinal;
 uniform float dTheta;
 uniform float mipInt;
 uniform vec3 poleAxis;
+
+${_getEncodings()}
+
+#define ENVMAP_TYPE_CUBE_UV
+#include <cube_uv_reflection_fragment>
+
+void main() {
+	gl_FragColor = vec4(0.0);
+    for (int i = 0; i < n; i++) {
+      if (i >= samples)
+        break;
+      for (int dir = -1; dir < 2; dir += 2) {
+        if (i == 0 && dir == 1)
+          continue;
+        vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
+        if (all(equal(axis, vec3(0.0))))
+          axis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);
+        axis = normalize(axis);
+        float theta = dTheta * float(dir * i);
+        float cosTheta = cos(theta);
+        // Rodrigues' axis-angle rotation
+        vec3 sampleDirection = vOutputDirection * cosTheta 
+            + cross(axis, vOutputDirection) * sin(theta) 
+            + axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
+        gl_FragColor.rgb +=
+            weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);
+      }
+    }
+  	gl_FragColor = linearToOutputTexel(gl_FragColor);
+}
+     		`,
+
+			blending: THREE.NoBlending,
+			depthTest: false,
+	   		depthWrite: false
+
+		} );
+
+		shaderMaterial.type = 'SphericalGaussianBlur';
+
+		return shaderMaterial;
+
+	}
+
+	function _getEquirectShader() {
+
+		var texelSize = new THREE.Vector2( 1, 1 );
+		var shaderMaterial = new THREE.RawShaderMaterial( {
+
+			uniforms: {
+				'envMap': { value: null },
+				'texelSize': { value: texelSize },
+				'inputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] },
+				'outputEncoding': { value: ENCODINGS[ THREE.LinearEncoding ] }
+			},
+
+			vertexShader: _getCommonVertexShader(),
+
+			fragmentShader: `
+precision mediump float;
+precision mediump int;
+varying vec3 vOutputDirection;
+uniform sampler2D envMap;
+uniform vec2 texelSize;
+
+${_getEncodings()}
+
+#define RECIPROCAL_PI 0.31830988618
+#define RECIPROCAL_PI2 0.15915494
+
+void main() {
+	gl_FragColor = vec4(0.0);
+	vec3 outputDirection = normalize(vOutputDirection);
+	vec2 uv;
+	uv.y = asin(clamp(outputDirection.y, -1.0, 1.0)) * RECIPROCAL_PI + 0.5;
+	uv.x = atan(outputDirection.z, outputDirection.x) * RECIPROCAL_PI2 + 0.5;
+	vec2 f = fract(uv / texelSize - 0.5);
+	uv -= f * texelSize;
+	vec3 tl = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
+	uv.x += texelSize.x;
+	vec3 tr = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
+	uv.y += texelSize.y;
+	vec3 br = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
+	uv.x -= texelSize.x;
+	vec3 bl = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
+	vec3 tm = mix(tl, tr, f.x);
+	vec3 bm = mix(bl, br, f.x);
+	gl_FragColor.rgb = mix(tm, bm, f.y);
+  	gl_FragColor = linearToOutputTexel(gl_FragColor);
+}
+     		`,
+
+			blending: THREE.NoBlending,
+			depthTest: false,
+	   		depthWrite: false
+
+		} );
+
+		shaderMaterial.type = 'EquirectangularToCubeUV';
+
+		return shaderMaterial;
+
+	}
+
+	function _getCommonVertexShader() {
+
+		return `
+precision mediump float;
+precision mediump int;
+attribute vec3 position;
+attribute vec2 uv;
+attribute float faceIndex;
+varying vec3 vOutputDirection;
+vec3 getDirection(vec2 uv, float face) {
+	uv = 2.0 * uv - 1.0;
+	vec3 direction = vec3(uv, 1.0);
+	if (face == 0.0) {
+		direction = direction.zyx;
+		direction.z *= -1.0;
+	} else if (face == 1.0) {
+		direction = direction.xzy;
+		direction.z *= -1.0;
+	} else if (face == 3.0) {
+		direction = direction.zyx;
+		direction.x *= -1.0;
+	} else if (face == 4.0) {
+		direction = direction.xzy;
+		direction.y *= -1.0;
+	} else if (face == 5.0) {
+		direction.xz *= -1.0;
+	}
+	return direction;
+}
+void main() {
+	vOutputDirection = getDirection(uv, faceIndex);
+	gl_Position = vec4( position, 1.0 );
+}
+		`;
+
+	}
+
+	function _getEncodings() {
+
+		return `
 uniform int inputEncoding;
 uniform int outputEncoding;
 
@@ -533,68 +658,7 @@ vec4 linearToOutputTexel(vec4 value){
 vec4 envMapTexelToLinear(vec4 color) {
   return inputTexelToLinear(color);
 }
-
-#define ENVMAP_TYPE_CUBE_UV
-#include <cube_uv_reflection_fragment>
-
-#define RECIPROCAL_PI 0.31830988618
-#define RECIPROCAL_PI2 0.15915494
-
-void main() {
-  gl_FragColor = vec4(0.0);
-  vec3 outputDirection = getDirection(vUv, vFaceIndex);
-  if (copyEquirectangular) {
-    vec3 direction = normalize(outputDirection);
-    vec2 uv;
-    uv.y = asin(clamp(direction.y, -1.0, 1.0)) * RECIPROCAL_PI + 0.5;
-    uv.x = atan(direction.z, direction.x) * RECIPROCAL_PI2 + 0.5;
-    vec2 f = fract(uv / texelSize - 0.5);
-    uv -= f * texelSize;
-    vec3 tl = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
-    uv.x += texelSize.x;
-    vec3 tr = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
-    uv.y += texelSize.y;
-    vec3 br = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
-    uv.x -= texelSize.x;
-    vec3 bl = envMapTexelToLinear(texture2D(envMap, uv)).rgb;
-    vec3 tm = mix(tl, tr, f.x);
-    vec3 bm = mix(bl, br, f.x);
-    gl_FragColor.rgb = mix(tm, bm, f.y);
-  } else {
-    for (int i = 0; i < n; i++) {
-      if (i >= samples)
-        break;
-      for (int dir = -1; dir < 2; dir += 2) {
-        if (i == 0 && dir == 1)
-          continue;
-        vec3 axis = latitudinal ? poleAxis : cross(poleAxis, outputDirection);
-        if (all(equal(axis, vec3(0.0))))
-          axis = cross(vec3(0.0, 1.0, 0.0), outputDirection);
-        axis = normalize(axis);
-        float theta = dTheta * float(dir * i);
-        float cosTheta = cos(theta);
-        // Rodrigues' axis-angle rotation
-        vec3 sampleDirection = outputDirection * cosTheta 
-            + cross(axis, outputDirection) * sin(theta) 
-            + axis * dot(axis, outputDirection) * (1.0 - cosTheta);
-        gl_FragColor.rgb +=
-            weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);
-      }
-    }
-  }
-  gl_FragColor = linearToOutputTexel(gl_FragColor);
-}
-     		`,
-
-			blending: THREE.NoBlending,
-			depthTest: false,
-	   		depthWrite: false
-
-		} );
-
-		shaderMaterial.type = 'SphericalGaussianBlur';
-
-		return shaderMaterial;
+		`;
 
 	}
 
