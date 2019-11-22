@@ -14,19 +14,20 @@
 
 THREE.PMREMGenerator = ( function () {
 
-	const LOD_MIN = 4;
-	const LOD_MAX = 8;
-	const SIZE_MAX = Math.pow( 2, LOD_MAX );
+	var LOD_MIN = 4;
+	var LOD_MAX = 8;
+	var SIZE_MAX = Math.pow( 2, LOD_MAX );
 	// The standard deviations (radians) associated with the extra mips. These are
 	// chosen to approximate a Trowbridge-Reitz distribution function times the
-	// geometric shadowing function.
-	const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
-	const TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+	// geometric shadowing function. These sigma values squared must match the
+	// variance #defines in cube_uv_reflection_fragment.glsl.js.
+	var EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
+	var TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
 	// The maximum length of the blur for loop, chosen to equal the number needed
 	// for GENERATED_SIGMA. Smaller _sigmas will use fewer samples and exit early,
 	// but not recompile the shader.
-	const MAX_SAMPLES = 20;
-	const ENCODINGS = {
+	var MAX_SAMPLES = 20;
+	var ENCODINGS = {
 		[ THREE.LinearEncoding ]: 0,
 		[ THREE.sRGBEncoding ]: 1,
 		[ THREE.RGBEEncoding ]: 2,
@@ -44,8 +45,8 @@ THREE.PMREMGenerator = ( function () {
 	var _renderer = null;
 
 	// Golden Ratio
-	const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
-	const INV_PHI = 1 / PHI;
+	var PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
+	var INV_PHI = 1 / PHI;
 	// Vertices of a dodecahedron (except the opposites, which represent the
 	// same axis), used as axis directions evenly spread on a sphere.
 	var _axisDirections = [
@@ -79,7 +80,7 @@ THREE.PMREMGenerator = ( function () {
 		 */
 		fromScene: function ( scene, sigma = 0, near = 0.1, far = 100 ) {
 
-			const cubeUVRenderTarget = _allocateTargets();
+			var cubeUVRenderTarget = _allocateTargets();
 			_sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 			if ( sigma > 0 ) {
 
@@ -87,7 +88,7 @@ THREE.PMREMGenerator = ( function () {
 
 			}
 			_applyPMREM( cubeUVRenderTarget );
-			_cleanUp();
+			_cleanup();
 
 			return cubeUVRenderTarget;
 
@@ -103,10 +104,10 @@ THREE.PMREMGenerator = ( function () {
 			equirectangular.minFilter = THREE.NearestFilter;
 			equirectangular.generateMipmaps = false;
 
-			const cubeUVRenderTarget = _allocateTargets( equirectangular );
+			var cubeUVRenderTarget = _allocateTargets( equirectangular );
 			_equirectangularToCubeUV( equirectangular, cubeUVRenderTarget );
 			_applyPMREM( cubeUVRenderTarget );
-			_cleanUp();
+			_cleanup();
 
 			return cubeUVRenderTarget;
 
@@ -120,12 +121,12 @@ THREE.PMREMGenerator = ( function () {
 		var _sizeLods = [];
 		var _sigmas = [];
 
-		let lod = LOD_MAX;
-		for ( let i = 0; i < TOTAL_LODS; i ++ ) {
+		var lod = LOD_MAX;
+		for ( var i = 0; i < TOTAL_LODS; i ++ ) {
 
-			const sizeLod = Math.pow( 2, lod );
+			var sizeLod = Math.pow( 2, lod );
 			_sizeLods.push( sizeLod );
-			let sigma = 1.0 / sizeLod;
+			var sigma = 1.0 / sizeLod;
 			if ( i > LOD_MAX - LOD_MIN ) {
 
 				sigma = EXTRA_LOD_SIGMA[ i - LOD_MAX + LOD_MIN - 1 ];
@@ -137,26 +138,26 @@ THREE.PMREMGenerator = ( function () {
 			}
 			_sigmas.push( sigma );
 
-			const texelSize = 1.0 / ( sizeLod - 1 );
-			const min = - texelSize / 2;
-			const max = 1 + texelSize / 2;
-			const uv1 = [ min, min, max, min, max, max, min, min, max, max, min, max ];
+			var texelSize = 1.0 / ( sizeLod - 1 );
+			var min = - texelSize / 2;
+			var max = 1 + texelSize / 2;
+			var uv1 = [ min, min, max, min, max, max, min, min, max, max, min, max ];
 
-			const cubeFaces = 6;
-			const vertices = 6;
-			const positionSize = 3;
-			const uvSize = 2;
-			const faceIndexSize = 1;
+			var cubeFaces = 6;
+			var vertices = 6;
+			var positionSize = 3;
+			var uvSize = 2;
+			var faceIndexSize = 1;
 
-			const position = new Float32Array( positionSize * vertices * cubeFaces );
-			const uv = new Float32Array( uvSize * vertices * cubeFaces );
-			const faceIndex = new Float32Array( faceIndexSize * vertices * cubeFaces );
+			var position = new Float32Array( positionSize * vertices * cubeFaces );
+			var uv = new Float32Array( uvSize * vertices * cubeFaces );
+			var faceIndex = new Float32Array( faceIndexSize * vertices * cubeFaces );
 
-			for ( let face = 0; face < cubeFaces; face ++ ) {
+			for ( var face = 0; face < cubeFaces; face ++ ) {
 
-				const x = ( face % 3 ) * 2 / 3 - 1;
-				const y = face > 2 ? 0 : - 1;
-				const coordinates = [
+				var x = ( face % 3 ) * 2 / 3 - 1;
+				var y = face > 2 ? 0 : - 1;
+				var coordinates = [
 					[ x, y, 0 ],
 					[ x + 2 / 3, y, 0 ],
 					[ x + 2 / 3, y + 1, 0 ],
@@ -167,11 +168,11 @@ THREE.PMREMGenerator = ( function () {
 				position.set( [].concat( ...coordinates ),
 					positionSize * vertices * face );
 				uv.set( uv1, uvSize * vertices * face );
-				const fill = [ face, face, face, face, face, face ];
+				var fill = [ face, face, face, face, face, face ];
 				faceIndex.set( fill, faceIndexSize * vertices * face );
 
 			}
-			const planes = new THREE.BufferGeometry();
+			var planes = new THREE.BufferGeometry();
 			planes.addAttribute(
 				'position', new THREE.BufferAttribute( position, positionSize ) );
 			planes.addAttribute( 'uv', new THREE.BufferAttribute( uv, uvSize ) );
@@ -192,7 +193,7 @@ THREE.PMREMGenerator = ( function () {
 
 	function _allocateTargets( equirectangular ) {
 
-		const params = {
+		var params = {
 		  magFilter: THREE.NearestFilter,
 		  minFilter: THREE.NearestFilter,
 		  generateMipmaps: false,
@@ -202,14 +203,14 @@ THREE.PMREMGenerator = ( function () {
 		  depthBuffer: false,
 		  stencilBuffer: false
 		};
-		const cubeUVRenderTarget = _createRenderTarget(
+		var cubeUVRenderTarget = _createRenderTarget(
 			{ ...params, depthBuffer: ( equirectangular ? false : true ) } );
 		_pingPongRenderTarget = _createRenderTarget( params );
 		return cubeUVRenderTarget;
 
 	}
 
-	function _cleanUp() {
+	function _cleanup() {
 
 		_pingPongRenderTarget.dispose();
 		_renderer.setRenderTarget( null );
@@ -222,15 +223,15 @@ THREE.PMREMGenerator = ( function () {
 		scene, near, far,
 		cubeUVRenderTarget ) {
 
-	  const fov = 90;
-	  const aspect = 1;
-	  const cubeCamera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	  const upSign = [ 1, 1, 1, 1, - 1, 1 ];
-	  const forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
+	  var fov = 90;
+	  var aspect = 1;
+	  var cubeCamera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	  var upSign = [ 1, 1, 1, 1, - 1, 1 ];
+	  var forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
 
-	  const gammaOutput = _renderer.gammaOutput;
-	  const toneMapping = _renderer.toneMapping;
-	  const toneMappingExposure = _renderer.toneMappingExposure;
+	  var gammaOutput = _renderer.gammaOutput;
+	  var toneMapping = _renderer.toneMapping;
+	  var toneMappingExposure = _renderer.toneMappingExposure;
 
 	  _renderer.toneMapping = THREE.LinearToneMapping;
 	  _renderer.toneMappingExposure = 1.0;
@@ -238,9 +239,9 @@ THREE.PMREMGenerator = ( function () {
 	  scene.scale.z *= - 1;
 
 	  _renderer.setRenderTarget( cubeUVRenderTarget );
-	  for ( let i = 0; i < 6; i ++ ) {
+	  for ( var i = 0; i < 6; i ++ ) {
 
-			const col = i % 3;
+			var col = i % 3;
 			if ( col == 0 ) {
 
 		  cubeCamera.up.set( 0, upSign[ i ], 0 );
@@ -273,9 +274,9 @@ THREE.PMREMGenerator = ( function () {
 	function _equirectangularToCubeUV(
 		equirectangular, cubeUVRenderTarget ) {
 
-	  const scene = new THREE.Scene();
+	  var scene = new THREE.Scene();
 	  scene.add( new THREE.Mesh( _lodPlanes[ 0 ], _blurMaterial ) );
-	  const uniforms = _blurMaterial.uniforms;
+	  var uniforms = _blurMaterial.uniforms;
 
 	  uniforms[ 'envMap' ].value = equirectangular;
 	  uniforms[ 'copyEquirectangular' ].value = true;
@@ -292,7 +293,7 @@ THREE.PMREMGenerator = ( function () {
 
 	function _createRenderTarget( params ) {
 
-	  const cubeUVRenderTarget =
+	  var cubeUVRenderTarget =
 		  new THREE.WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
 	  cubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
 	  cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
@@ -302,7 +303,7 @@ THREE.PMREMGenerator = ( function () {
 
 	function _setViewport( x, y, width, height ) {
 
-		const dpr = _renderer.getPixelRatio();
+		var dpr = _renderer.getPixelRatio();
 		_renderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
 
 	}
@@ -312,12 +313,12 @@ THREE.PMREMGenerator = ( function () {
 		var autoClear = _renderer.autoClear;
 		_renderer.autoClear = false;
 
-	  	for ( let i = 1; i < TOTAL_LODS; i ++ ) {
+	  	for ( var i = 1; i < TOTAL_LODS; i ++ ) {
 
-			const sigma = Math.sqrt(
+			var sigma = Math.sqrt(
 				_sigmas[ i ] * _sigmas[ i ] -
 			_sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
-			const poleAxis =
+			var poleAxis =
 			_axisDirections[ ( i - 1 ) % _axisDirections.length ];
 			_blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
@@ -371,16 +372,16 @@ THREE.PMREMGenerator = ( function () {
 		}
 
 		// Number of standard deviations at which to cut off the discrete approximation.
-		const STANDARD_DEVIATIONS = 3;
+		var STANDARD_DEVIATIONS = 3;
 
-		const blurScene = new THREE.Scene();
+		var blurScene = new THREE.Scene();
 		blurScene.add( new THREE.Mesh( _lodPlanes[ lodOut ], _blurMaterial ) );
-		const blurUniforms = _blurMaterial.uniforms;
+		var blurUniforms = _blurMaterial.uniforms;
 
-		const pixels = _sizeLods[ lodIn ] - 1;
-		const radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
-		const sigmaPixels = sigmaRadians / radiansPerPixel;
-		const samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
+		var pixels = _sizeLods[ lodIn ] - 1;
+		var radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
+		var sigmaPixels = sigmaRadians / radiansPerPixel;
+		var samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
 
 		if ( samples > MAX_SAMPLES ) {
 
@@ -390,12 +391,12 @@ THREE.PMREMGenerator = ( function () {
 
 		}
 
-		let weights = [];
-		let sum = 0;
-		for ( let i = 0; i < MAX_SAMPLES; ++ i ) {
+		var weights = [];
+		var sum = 0;
+		for ( var i = 0; i < MAX_SAMPLES; ++ i ) {
 
-			const x = i / sigmaPixels;
-			const weight = Math.exp( - x * x / 2 );
+			var x = i / sigmaPixels;
+			var weight = Math.exp( - x * x / 2 );
 			weights.push( weight );
 			if ( i == 0 ) {
 
@@ -425,9 +426,9 @@ THREE.PMREMGenerator = ( function () {
 		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
 		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
 
-		const outputSize = _sizeLods[ lodOut ];
-		const x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
-		const y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) +
+		var outputSize = _sizeLods[ lodOut ];
+		var x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
+		var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) +
 	  2 * outputSize *
 		  ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
 
@@ -439,9 +440,9 @@ THREE.PMREMGenerator = ( function () {
 
 	function _getShader( maxSamples ) {
 
-		const weights = new Float32Array( maxSamples );
-		const texelSize = new THREE.Vector2( 1, 1 );
-		const poleAxis = new THREE.Vector3( 0, 1, 0 );
+		var weights = new Float32Array( maxSamples );
+		var texelSize = new THREE.Vector2( 1, 1 );
+		var poleAxis = new THREE.Vector3( 0, 1, 0 );
 		var shaderMaterial = new THREE.RawShaderMaterial( {
 
 			defines: { 'n': maxSamples },
