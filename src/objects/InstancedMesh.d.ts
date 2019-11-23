@@ -4,7 +4,7 @@ import { Material } from './../materials/Material';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { Mesh } from './Mesh';
 import { Matrix4 } from './../math/Matrix4';
-import {Intersection, Raycaster} from "../core/Raycaster";
+import { Intersection, Raycaster } from "../core/Raycaster";
 
 export class InstancedMesh extends Mesh {
 
