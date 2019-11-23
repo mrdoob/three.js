@@ -544,7 +544,7 @@
     // Override the getError function with one that returns our saved results.
     if (wrapper.getError) {
       wrapper.getError = function() {
-        for (const err of glErrorShadow) {
+        for (const err of Object.keys(glErrorShadow)) {
           if (glErrorShadow[err]) {
             glErrorShadow[err] = false;
             return err;
