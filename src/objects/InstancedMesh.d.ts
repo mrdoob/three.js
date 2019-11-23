@@ -4,7 +4,6 @@ import { Material } from './../materials/Material';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { Mesh } from './Mesh';
 import { Matrix4 } from './../math/Matrix4';
-import { Intersection, Raycaster } from "../core/Raycaster";
 
 export class InstancedMesh extends Mesh {
 
@@ -21,7 +20,6 @@ export class InstancedMesh extends Mesh {
 	getMatrixAt( index: number, matrix: Matrix4 ): void;
 	setMatrixAt( index: number, matrix: Matrix4 ): void;
 
-	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
 
 
 }
