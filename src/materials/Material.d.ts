@@ -294,6 +294,11 @@ export class Material extends EventDispatcher {
 	userData: any;
 
 	/**
+	 * This starts at 0 and counts how many times .needsUpdate is set to true.
+	 */
+	version: number;
+
+	/**
 	 * Return a new material with the same parameters as this material.
 	 */
 	clone(): this;

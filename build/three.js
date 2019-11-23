@@ -8604,7 +8604,7 @@
 
 		this.userData = {};
 
-		this.needsUpdate = true;
+		this.version = 0;
 
 	}
 
@@ -8947,6 +8947,16 @@
 		dispose: function () {
 
 			this.dispatchEvent( { type: 'dispose' } );
+
+		}
+
+	} );
+
+	Object.defineProperty( Material.prototype, 'needsUpdate', {
+
+		set: function ( value ) {
+
+			if ( value === true ) { this.version ++; }
 
 		}
 
@@ -14188,7 +14198,7 @@
 
 	var normal_fragment_maps = "#ifdef OBJECTSPACE_NORMALMAP\n\tnormal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( TANGENTSPACE_NORMALMAP )\n\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\tmapN.xy *= normalScale;\n\t#ifdef USE_TANGENT\n\t\tnormal = normalize( vTBN * mapN );\n\t#else\n\t\tnormal = perturbNormal2Arb( -vViewPosition, normal, mapN );\n\t#endif\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );\n#endif";
 
-	var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n#endif\n#ifdef OBJECTSPACE_NORMALMAP\n\tuniform mat3 normalMatrix;\n#endif\n#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tbool frontFacing = dot( cross( S, T ), N ) > 0.0;\n\t\t\tmapN.xy *= ( float( frontFacing ) * 2.0 - 1.0 );\n\t\t#else\n\t\t\tmapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\t#endif\n\t\tmat3 tsn = mat3( S, T, N );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif";
+	var normalmap_pars_fragment = "#ifdef USE_NORMALMAP\n\tuniform sampler2D normalMap;\n\tuniform vec2 normalScale;\n#endif\n#ifdef OBJECTSPACE_NORMALMAP\n\tuniform mat3 normalMatrix;\n#endif\n#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )\n\tvec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN ) {\n\t\tvec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );\n\t\tvec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );\n\t\tvec2 st0 = dFdx( vUv.st );\n\t\tvec2 st1 = dFdy( vUv.st );\n\t\tfloat scale = sign( st1.t * st0.s - st0.t * st1.s );\n\t\tvec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );\n\t\tvec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );\n\t\tvec3 N = normalize( surf_norm );\n\t\tmat3 tsn = mat3( S, T, N );\n\t\tmapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\t\treturn normalize( tsn * mapN );\n\t}\n#endif";
 
 	var clearcoat_normal_fragment_begin = "#ifdef CLEARCOAT\n\tvec3 clearcoatNormal = geometryNormal;\n#endif";
 
@@ -22843,6 +22853,7 @@
 		//
 
 		var triggers = [];
+		var grips = [];
 
 		function findGamepad( id ) {
 
@@ -22913,6 +22924,33 @@
 
 							controller.dispatchEvent( { type: 'selectend' } );
 							controller.dispatchEvent( { type: 'select' } );
+
+						}
+
+					}
+
+					// Grip
+					buttonId = 2;
+
+					if ( grips[ i ] === undefined ) { grips[ i ] = false; }
+
+					// Skip if the grip button doesn't exist on this controller
+					if ( gamepad.buttons[ buttonId ] !== undefined ) {
+
+						if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+							grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+							if ( grips[ i ] === true ) {
+
+								controller.dispatchEvent( { type: 'squeezestart' } );
+
+							} else {
+
+								controller.dispatchEvent( { type: 'squeezeend' } );
+								controller.dispatchEvent( { type: 'squeeze' } );
+
+							}
 
 						}
 
@@ -23290,6 +23328,9 @@
 				session.addEventListener( 'select', onSessionEvent );
 				session.addEventListener( 'selectstart', onSessionEvent );
 				session.addEventListener( 'selectend', onSessionEvent );
+				session.addEventListener( 'squeeze', onSessionEvent );
+				session.addEventListener( 'squeezestart', onSessionEvent );
+				session.addEventListener( 'squeezeend', onSessionEvent );
 				session.addEventListener( 'end', onSessionEnd );
 
 				// eslint-disable-next-line no-undef
@@ -24200,6 +24241,14 @@
 
 			var index = geometry.index;
 			var position = geometry.attributes.position;
+
+			//
+
+			if ( index !== null && index.count === 0 ) { return; }
+			if ( position === undefined || position.count === 0 ) { return; }
+
+			//
+
 			var rangeFactor = 1;
 
 			if ( material.wireframe === true ) {
@@ -25133,7 +25182,7 @@
 
 			}
 
-			if ( material.needsUpdate === false ) {
+			if ( material.version === materialProperties.__version ) {
 
 				if ( materialProperties.program === undefined ) {
 
@@ -25157,10 +25206,10 @@
 
 			}
 
-			if ( material.needsUpdate ) {
+			if ( material.version !== materialProperties.__version ) {
 
 				initMaterial( material, fog, object );
-				material.needsUpdate = false;
+				materialProperties.__version = material.version;
 
 			}
 
