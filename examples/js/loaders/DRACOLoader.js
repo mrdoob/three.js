@@ -222,6 +222,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	preload: function () {
 
+		this._initDecoder();
+
+		return this;
+
+	},
+
+	_initDecoder: function () {
+
 		if ( this.decoderPending ) return this.decoderPending;
 
 		var useJS = typeof WebAssembly !== 'object' || this.decoderConfig.type === 'js';
@@ -269,7 +277,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	_getWorker: function ( taskID, taskCost ) {
 
-		return this.preload().then( () => {
+		return this._initDecoder().then( () => {
 
 			if ( this.workerPool.length < this.workerLimit ) {
 

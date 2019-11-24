@@ -12,7 +12,7 @@ export class DRACOLoader extends Loader {
 	setDecoderPath( path: string ): DRACOLoader;
 	setDecoderConfig( config: object ): DRACOLoader;
 	setWorkerLimit( workerLimit: number ): DRACOLoader;
-	preload(): Promise<void>;
+	preload(): DRACOLoader;
 	dispose(): DRACOLoader;
 
 }
