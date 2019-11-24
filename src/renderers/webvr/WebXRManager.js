@@ -199,38 +199,32 @@ function WebXRManager( renderer, gl ) {
 
 	this.getCamera = function ( camera ) {
 
-		if ( isPresenting() ) {
+		var parent = camera.parent;
+		var cameras = cameraVR.cameras;
 
-			var parent = camera.parent;
-			var cameras = cameraVR.cameras;
+		updateCamera( cameraVR, parent );
 
-			updateCamera( cameraVR, parent );
+		for ( var i = 0; i < cameras.length; i ++ ) {
 
-			for ( var i = 0; i < cameras.length; i ++ ) {
-
-				updateCamera( cameras[ i ], parent );
-
-			}
-
-			// update camera and its children
-
-			camera.matrixWorld.copy( cameraVR.matrixWorld );
-
-			var children = camera.children;
-
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-				children[ i ].updateMatrixWorld( true );
-
-			}
-
-			setProjectionFromUnion( cameraVR, cameraL, cameraR );
-
-			return cameraVR;
+			updateCamera( cameras[ i ], parent );
 
 		}
 
-		return camera;
+		// update camera and its children
+
+		camera.matrixWorld.copy( cameraVR.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
+
+		setProjectionFromUnion( cameraVR, cameraL, cameraR );
+
+		return cameraVR;
 
 	};
 
