@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - instancing - raycast </title>
+	<title>three.js webgl - instancing - raycast</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -12,8 +12,8 @@
 	import * as THREE from '../build/three.module.js';
 
 	import Stats from './jsm/libs/stats.module.js';
-	import {GUI} from './jsm/libs/dat.gui.module.js';
-	import {OrbitControls} from "./jsm/controls/OrbitControls.js";
+	import { GUI } from './jsm/libs/dat.gui.module.js';
+	import { OrbitControls } from "./jsm/controls/OrbitControls.js";
 
 	var camera, scene, renderer, stats;
 
@@ -25,8 +25,6 @@
 	var intersection;
 	var raycaster = new THREE.Raycaster();
 	var mouse = new THREE.Vector2( 1, 1 );
-
-	var orbitControls;
 
 	var rotationTheta = 0.1;
 	var rotationMatrix = new THREE.Matrix4().makeRotationY( rotationTheta );
@@ -42,11 +40,9 @@
 		camera.position.set( amount, amount, amount );
 		camera.lookAt( 0, 0, 0 );
 
-
 		scene = new THREE.Scene();
 
 		geometry = new THREE.TorusKnotBufferGeometry( 0.5, 0.2, 16, 4, 2, 3 );
-
 		geometry.scale( 0.5, 0.5, 0.5 );
 
 		var material = new THREE.MeshNormalMaterial( { flatShading: true } );
@@ -76,6 +72,7 @@
 
 		scene.add( mesh );
 
+		//
 
 		var gui = new GUI();
 		gui.add( mesh, 'count', 0, count );
@@ -83,10 +80,9 @@
 		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
-
 		document.body.appendChild( renderer.domElement );
 
-		orbitControls = new OrbitControls( camera, renderer.domElement );
+		var orbitControls = new OrbitControls( camera, renderer.domElement );
 
 		stats = new Stats();
 		document.body.appendChild( stats.dom );
@@ -122,7 +118,6 @@
 
 	}
 
-
 	function render() {
 
 		raycaster.setFromCamera( mouse, camera );
@@ -144,8 +139,6 @@
 		stats.update();
 
 	}
-
-
 
 </script>
 
