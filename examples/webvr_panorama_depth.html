@@ -41,10 +41,7 @@
 				scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
-				var cameraRig = new THREE.Object3D();
-				cameraRig.position.y = - 1.6;
-				cameraRig.add( camera );
-				scene.add( cameraRig );
+				scene.add( camera );
 
 				// Create the panoramic sphere geometery
 				var panoSphereGeo = new THREE.SphereBufferGeometry( 6, 256, 256 );
@@ -93,7 +90,7 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 				//
 
@@ -120,7 +117,7 @@
 
 				// If we are not presenting move the camera a little so the effect is visible
 
-				if ( ! renderer.vr.isPresenting() ) {
+				if ( renderer.vr.isPresenting() === false ) {
 
 					var time = clock.getElapsedTime();
 
