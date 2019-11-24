@@ -1153,7 +1153,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && vr.isPresenting() ) {
 
 			camera = vr.getCamera( camera );
 

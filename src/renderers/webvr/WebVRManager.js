@@ -285,15 +285,6 @@ function WebVRManager( renderer ) {
 
 		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
 
-		if ( isPresenting() === false ) {
-
-			camera.position.set( 0, userHeight, 0 );
-			camera.rotation.set( 0, 0, 0 );
-
-			return camera;
-
-		}
-
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
 

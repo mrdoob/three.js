@@ -44,6 +44,7 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.layers.enable( 1 ); // render left view when no stereo available
+				camera.position.set( 0, 1.6, 0 );
 
 				// video
 
