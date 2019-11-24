@@ -23026,15 +23026,6 @@ function WebVRManager( renderer ) {
 
 		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
 
-		if ( isPresenting() === false ) {
-
-			camera.position.set( 0, userHeight, 0 );
-			camera.rotation.set( 0, 0, 0 );
-
-			return camera;
-
-		}
-
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
 
@@ -23386,38 +23377,32 @@ function WebXRManager( renderer, gl ) {
 
 	this.getCamera = function ( camera ) {
 
-		if ( isPresenting() ) {
+		var parent = camera.parent;
+		var cameras = cameraVR.cameras;
 
-			var parent = camera.parent;
-			var cameras = cameraVR.cameras;
+		updateCamera( cameraVR, parent );
 
-			updateCamera( cameraVR, parent );
+		for ( var i = 0; i < cameras.length; i ++ ) {
 
-			for ( var i = 0; i < cameras.length; i ++ ) {
-
-				updateCamera( cameras[ i ], parent );
-
-			}
-
-			// update camera and its children
-
-			camera.matrixWorld.copy( cameraVR.matrixWorld );
-
-			var children = camera.children;
-
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-				children[ i ].updateMatrixWorld( true );
-
-			}
-
-			setProjectionFromUnion( cameraVR, cameraL, cameraR );
-
-			return cameraVR;
+			updateCamera( cameras[ i ], parent );
 
 		}
 
-		return camera;
+		// update camera and its children
+
+		camera.matrixWorld.copy( cameraVR.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
+
+		setProjectionFromUnion( cameraVR, cameraL, cameraR );
+
+		return cameraVR;
 
 	};
 
@@ -24644,7 +24629,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( vr.enabled ) {
+		if ( vr.enabled && vr.isPresenting() ) {
 
 			camera = vr.getCamera( camera );
 
@@ -27359,21 +27344,19 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		for ( var instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
 
-			//Calculate the world matrix for each instance
+			// calculate the world matrix for each instance
 
 			this.getMatrixAt( instanceId, _instanceLocalMatrix );
 
 			_instanceWorldMatrix.multiplyMatrices( matrixWorld, _instanceLocalMatrix );
 
-
-			//The mesh represents this single instance
+			// the mesh represents this single instance
 
 			_mesh.matrixWorld = _instanceWorldMatrix;
 
 			_mesh.raycast( raycaster, _instanceIntersects );
 
-
-			//Process the result of raycast
+			// process the result of raycast
 
 			if ( _instanceIntersects.length > 0 ) {
 
