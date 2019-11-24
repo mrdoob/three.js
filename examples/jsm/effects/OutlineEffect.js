@@ -178,6 +178,7 @@ var OutlineEffect = function ( renderer, parameters ) {
 	function createMaterial() {
 
 		return new ShaderMaterial( {
+			type: 'OutlineEffect',
 			uniforms: UniformsUtils.merge( [
 				UniformsLib[ 'fog' ],
 				UniformsLib[ 'displacementmap' ],

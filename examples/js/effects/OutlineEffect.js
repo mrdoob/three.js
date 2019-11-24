@@ -170,6 +170,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 	function createMaterial() {
 
 		return new THREE.ShaderMaterial( {
+			type: 'OutlineEffect',
 			uniforms: THREE.UniformsUtils.merge( [
 				THREE.UniformsLib[ 'fog' ],
 				THREE.UniformsLib[ 'displacementmap' ],
