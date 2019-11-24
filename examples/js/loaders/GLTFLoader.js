@@ -2271,6 +2271,73 @@ THREE.GLTFLoader = ( function () {
 	 * @param {THREE.BufferGeometry} geometry
 	 * @param {GLTF.Primitive} primitiveDef
 	 * @param {GLTFParser} parser
+	 */
+	function computeBounds( geometry, primitiveDef, parser ) {
+
+		var attributes = primitiveDef.attributes;
+
+		var box = new THREE.Box3();
+
+		if ( attributes.POSITION !== undefined ) {
+
+			var accessor = parser.json.accessors[ attributes.POSITION ];
+			var min = accessor.min;
+			var max = accessor.max;
+
+			box.set(
+				new THREE.Vector3( min[ 0 ], min[ 1 ], min[ 2 ] ),
+				new THREE.Vector3( max[ 0 ], max[ 1 ], max[ 2 ] ) );
+
+		} else {
+
+			return;
+
+		}
+
+		var targets = primitiveDef.targets;
+
+		if ( targets !== undefined ) {
+
+			var vector = new THREE.Vector3();
+
+			for ( var i = 0, il = targets.length; i < il; i ++ ) {
+
+				var target = targets[ i ];
+
+				if ( target.POSITION !== undefined ) {
+
+					var accessor = parser.json.accessors[ target.POSITION ];
+					var min = accessor.min;
+					var max = accessor.max;
+
+					// we need to get max of absolute components because target weight is [-1,1]
+					vector.setX( Math.max( Math.abs( min[ 0 ] ), Math.abs( max[ 0 ] ) ) );
+					vector.setY( Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ) );
+					vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
+
+					box.expandByVector( vector );
+
+				}
+
+			}
+
+		}
+
+		geometry.boundingBox = box;
+
+		var sphere = new THREE.Sphere();
+
+		box.getCenter( sphere.center );
+		sphere.radius = box.min.distanceTo( box.max ) / 2;
+
+		geometry.boundingSphere = sphere;
+
+	}
+
+	/**
+	 * @param {THREE.BufferGeometry} geometry
+	 * @param {GLTF.Primitive} primitiveDef
+	 * @param {GLTFParser} parser
 	 * @return {Promise<THREE.BufferGeometry>}
 	 */
 	function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
@@ -2314,6 +2381,8 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		assignExtrasToUserData( geometry, primitiveDef );
+
+		computeBounds( geometry, primitiveDef, parser );
 
 		return Promise.all( pending ).then( function () {
 

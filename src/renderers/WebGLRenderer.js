@@ -742,6 +742,14 @@ function WebGLRenderer( parameters ) {
 
 		var index = geometry.index;
 		var position = geometry.attributes.position;
+
+		//
+
+		if ( index !== null && index.count === 0 ) return;
+		if ( position === undefined || position.count === 0 ) return;
+
+		//
+
 		var rangeFactor = 1;
 
 		if ( material.wireframe === true ) {
@@ -1675,7 +1683,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.needsUpdate === false ) {
+		if ( material.version === materialProperties.__version ) {
 
 			if ( materialProperties.program === undefined ) {
 
@@ -1699,10 +1707,10 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( material.needsUpdate ) {
+		if ( material.version !== materialProperties.__version ) {
 
 			initMaterial( material, fog, object );
-			material.needsUpdate = false;
+			materialProperties.__version = material.version;
 
 		}
 

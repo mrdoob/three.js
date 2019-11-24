@@ -133,6 +133,9 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'select', onSessionEvent );
 			session.addEventListener( 'selectstart', onSessionEvent );
 			session.addEventListener( 'selectend', onSessionEvent );
+			session.addEventListener( 'squeeze', onSessionEvent );
+			session.addEventListener( 'squeezestart', onSessionEvent );
+			session.addEventListener( 'squeezeend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
 			// eslint-disable-next-line no-undef
