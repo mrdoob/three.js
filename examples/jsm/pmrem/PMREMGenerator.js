@@ -267,11 +267,27 @@ var PMREMGenerator = ( function () {
 		var gammaOutput = _renderer.gammaOutput;
 		var toneMapping = _renderer.toneMapping;
 		var toneMappingExposure = _renderer.toneMappingExposure;
+		var clearColor = _renderer.getClearColor();
+		var clearAlpha = _renderer.getClearAlpha();
 
 		_renderer.toneMapping = LinearToneMapping;
 		_renderer.toneMappingExposure = 1.0;
 		_renderer.gammaOutput = false;
 		scene.scale.z *= - 1;
+
+		var background = scene.background;
+		if ( background && background.isColor ) {
+
+			background.convertSRGBToLinear();
+			// Convert linear to RGBE
+			var maxComponent = Math.max( background.r, background.g, background.b );
+			var fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
+			background = background.multiplyScalar( Math.pow( 2.0, - fExp ) );
+			var alpha = ( fExp + 128.0 ) / 255.0;
+			_renderer.setClearColor( background, alpha );
+			scene.background = null;
+
+		}
 
 		_renderer.setRenderTarget( cubeUVRenderTarget );
 		for ( var i = 0; i < 6; i ++ ) {
@@ -302,6 +318,7 @@ var PMREMGenerator = ( function () {
 		_renderer.toneMapping = toneMapping;
 		_renderer.toneMappingExposure = toneMappingExposure;
 		_renderer.gammaOutput = gammaOutput;
+		_renderer.setClearColor( clearColor, clearAlpha );
 		scene.scale.z *= - 1;
 
 	}
@@ -625,9 +642,6 @@ varying vec3 vOutputDirection;
 uniform samplerCube envMap;
 
 ${_getEncodings()}
-
-#define RECIPROCAL_PI 0.31830988618
-#define RECIPROCAL_PI2 0.15915494
 
 void main() {
 	gl_FragColor = vec4(0.0);
