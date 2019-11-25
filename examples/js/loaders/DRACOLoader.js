@@ -220,6 +220,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	},
 
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
+
+	},
+
 	_initDecoder: function () {
 
 		if ( this.decoderPending ) return this.decoderPending;
