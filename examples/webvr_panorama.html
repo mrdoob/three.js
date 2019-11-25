@@ -39,6 +39,7 @@
 
 				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.layers.enable( 1 );
+				camera.position.set( 0, 1.6, 0 );
 
 				var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
 				geometry.scale( 1, 1, - 1 );

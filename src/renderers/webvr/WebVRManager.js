@@ -104,6 +104,7 @@ function WebVRManager( renderer ) {
 	//
 
 	var triggers = [];
+	var grips = [];
 
 	function findGamepad( id ) {
 
@@ -174,6 +175,33 @@ function WebVRManager( renderer ) {
 
 						controller.dispatchEvent( { type: 'selectend' } );
 						controller.dispatchEvent( { type: 'select' } );
+
+					}
+
+				}
+
+				// Grip
+				buttonId = 2;
+
+				if ( grips[ i ] === undefined ) grips[ i ] = false;
+
+				// Skip if the grip button doesn't exist on this controller
+				if ( gamepad.buttons[ buttonId ] !== undefined ) {
+
+					if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+						grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+						if ( grips[ i ] === true ) {
+
+							controller.dispatchEvent( { type: 'squeezestart' } );
+
+						} else {
+
+							controller.dispatchEvent( { type: 'squeezeend' } );
+							controller.dispatchEvent( { type: 'squeeze' } );
+
+						}
 
 					}
 
@@ -256,15 +284,6 @@ function WebVRManager( renderer ) {
 	this.getCamera = function ( camera ) {
 
 		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
-
-		if ( isPresenting() === false ) {
-
-			camera.position.set( 0, userHeight, 0 );
-			camera.rotation.set( 0, 0, 0 );
-
-			return camera;
-
-		}
 
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;

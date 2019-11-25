@@ -48,6 +48,7 @@ var files = {
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
 		"webgl_instancing_suzanne",
+		"webgl_instancing_raycast",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
 		"webgl_interactive_cubes_gpu",
@@ -328,14 +329,14 @@ var files = {
 		"webvr_lorenzattractor",
 		"webvr_multiview",
 		"webvr_panorama",
+		"webvr_panorama_depth",
 		"webvr_paint",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
 		"webvr_sculpt",
 		"webvr_video",
 		"webvr_vive_paint",
-		"webvr_vive_sculpt",
-		"webvr_6dof_panorama"
+		"webvr_vive_sculpt"
 	],
 	"physics": [
 		"webgl_physics_cloth",

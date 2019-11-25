@@ -227,6 +227,14 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
+
+	},
+
 	_initDecoder: function () {
 
 		if ( this.decoderPending ) return this.decoderPending;
