@@ -2,7 +2,8 @@ import {
 	WebGLRenderer,
 	WebGLRenderTarget,
 	Texture,
-	CubeTexture
+	CubeTexture,
+	Scene
 } from '../../../src/Three';
 
 export class PMREMGenerator {
