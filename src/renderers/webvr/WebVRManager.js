@@ -22,8 +22,6 @@ function WebVRManager( renderer ) {
 	var device = null;
 	var frameData = null;
 
-	var poseTarget = null;
-
 	var controllers = [];
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
@@ -42,6 +40,8 @@ function WebVRManager( renderer ) {
 	var matrixWorldInverse = new Matrix4();
 	var tempQuaternion = new Quaternion();
 	var tempPosition = new Vector3();
+
+	var tempCamera = new PerspectiveCamera();
 
 	var cameraL = new PerspectiveCamera();
 	cameraL.viewport = new Vector4();
@@ -275,12 +275,6 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.setPoseTarget = function ( object ) {
-
-		if ( object !== undefined ) poseTarget = object;
-
-	};
-
 	this.getCamera = function ( camera ) {
 
 		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
@@ -310,16 +304,14 @@ function WebVRManager( renderer ) {
 
 
 		var pose = frameData.pose;
-		var poseObject = poseTarget !== null ? poseTarget : camera;
 
-		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
-		poseObject.matrix.copy( standingMatrix );
-		poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
+		tempCamera.matrix.copy( standingMatrix );
+		tempCamera.matrix.decompose( tempCamera.position, tempCamera.quaternion, tempCamera.scale );
 
 		if ( pose.orientation !== null ) {
 
 			tempQuaternion.fromArray( pose.orientation );
-			poseObject.quaternion.multiply( tempQuaternion );
+			tempCamera.quaternion.multiply( tempQuaternion );
 
 		}
 
@@ -328,11 +320,23 @@ function WebVRManager( renderer ) {
 			tempQuaternion.setFromRotationMatrix( standingMatrix );
 			tempPosition.fromArray( pose.position );
 			tempPosition.applyQuaternion( tempQuaternion );
-			poseObject.position.add( tempPosition );
+			tempCamera.position.add( tempPosition );
 
 		}
 
-		poseObject.updateMatrixWorld();
+		tempCamera.updateMatrixWorld();
+
+		//
+
+		camera.matrixWorld.copy( tempCamera.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
 
 		//
 
@@ -356,7 +360,7 @@ function WebVRManager( renderer ) {
 
 		}
 
-		var parent = poseObject.parent;
+		var parent = camera.parent;
 
 		if ( parent !== null ) {
 
