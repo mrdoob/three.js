@@ -1893,6 +1893,12 @@
 
 		},
 
+		applyNormalMatrix: function ( m ) {
+
+			return this.applyMatrix3( m ).normalize();
+
+		},
+
 		applyMatrix4: function ( m ) {
 
 			var x = this.x, y = this.y, z = this.z;
@@ -6833,7 +6839,7 @@
 	function Ray( origin, direction ) {
 
 		this.origin = ( origin !== undefined ) ? origin : new Vector3();
-		this.direction = ( direction !== undefined ) ? direction : new Vector3();
+		this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
 
 	}
 
