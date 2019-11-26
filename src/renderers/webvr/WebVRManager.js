@@ -41,6 +41,8 @@ function WebVRManager( renderer ) {
 	var tempQuaternion = new Quaternion();
 	var tempPosition = new Vector3();
 
+	var tempCamera = new PerspectiveCamera();
+
 	var cameraL = new PerspectiveCamera();
 	cameraL.viewport = new Vector4();
 	cameraL.layers.enable( 1 );
@@ -303,14 +305,13 @@ function WebVRManager( renderer ) {
 
 		var pose = frameData.pose;
 
-		// We want to manipulate camera by its position and quaternion components since users may rely on them.
-		camera.matrix.copy( standingMatrix );
-		camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+		tempCamera.matrix.copy( standingMatrix );
+		tempCamera.matrix.decompose( tempCamera.position, tempCamera.quaternion, tempCamera.scale );
 
 		if ( pose.orientation !== null ) {
 
 			tempQuaternion.fromArray( pose.orientation );
-			camera.quaternion.multiply( tempQuaternion );
+			tempCamera.quaternion.multiply( tempQuaternion );
 
 		}
 
@@ -319,11 +320,23 @@ function WebVRManager( renderer ) {
 			tempQuaternion.setFromRotationMatrix( standingMatrix );
 			tempPosition.fromArray( pose.position );
 			tempPosition.applyQuaternion( tempQuaternion );
-			camera.position.add( tempPosition );
+			tempCamera.position.add( tempPosition );
 
 		}
 
-		camera.updateMatrixWorld();
+		tempCamera.updateMatrixWorld();
+
+		//
+
+		camera.matrixWorld.copy( tempCamera.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
 
 		//
 
