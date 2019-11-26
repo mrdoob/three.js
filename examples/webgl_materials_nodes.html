@@ -83,6 +83,7 @@
 
 				var pmremGenerator = new PMREMGenerator( renderer );
 				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
+				pmremGenerator.dispose();
 
 				pmremCube.minFilter = minFilter;
 				pmremCube.magFilter = magFilter;

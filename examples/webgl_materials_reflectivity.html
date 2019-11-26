@@ -130,6 +130,7 @@
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						pmremGenerator.dispose();
 
 						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
 						gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;

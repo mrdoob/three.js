@@ -75,6 +75,7 @@
 
 				var pmremGenerator = new PMREMGenerator( renderer );
 				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+				pmremGenerator.dispose();
 
 				nodeTexture.value = hdrCubeRenderTarget.texture;
 

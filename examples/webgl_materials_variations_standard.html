@@ -72,6 +72,7 @@
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						pmremGenerator.dispose();
 
 						var bumpScale = 1;
 						var cubeWidth = 400;

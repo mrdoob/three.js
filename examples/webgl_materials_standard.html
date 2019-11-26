@@ -108,6 +108,7 @@
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						var rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
+						pmremGenerator.dispose();
 
 						material.envMap = rgbmCubeRenderTarget.texture;
 						material.needsUpdate = true; // is this needed?

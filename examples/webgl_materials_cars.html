@@ -93,6 +93,7 @@
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
 
 						scene.background = envMap;
 

@@ -54,6 +54,7 @@
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						pmremGenerator.dispose();
 
 						var geometry = new THREE.SphereBufferGeometry( 80, 64, 32 );
 

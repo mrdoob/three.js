@@ -72,6 +72,13 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
+				var pmremGenerator = new PMREMGenerator( renderer );
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+					pmremGenerator.dispose();
+
+				}
+
 				new EXRLoader()
 					.setDataType( THREE.FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
@@ -82,7 +89,6 @@
 							magFilter: THREE.LinearFilter
 						};
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
 
 						exrBackground = exrCubeRenderTarget.texture;
@@ -95,7 +101,6 @@
 
 					texture.encoding = THREE.sRGBEncoding;
 
-					var pmremGenerator = new PMREMGenerator( renderer );
 					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
 
 					pngBackground = pngCubeRenderTarget.texture;

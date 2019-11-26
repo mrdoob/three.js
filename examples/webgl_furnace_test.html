@@ -116,6 +116,7 @@
 
 					var pmremGenerator = new PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
+					pmremGenerator.dispose();
 
 					scene.background = radianceMap;
 
