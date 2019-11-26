@@ -77,14 +77,19 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				var pmremGenerator = new PMREMGenerator( renderer );
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
+					pmremGenerator.dispose();
+					
+				}
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
 					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
 
 						hdrCubeMap.magFilter = THREE.LinearFilter;
@@ -99,7 +104,6 @@
 
 						ldrCubeMap.encoding = THREE.GammaEncoding;
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
 					} );
@@ -113,7 +117,6 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 
 						rgbmCubeMap.magFilter = THREE.LinearFilter;

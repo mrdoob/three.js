@@ -64,6 +64,8 @@ var PMREMGenerator = ( function () {
 
 	var _flatCamera = new OrthographicCamera();
 	var _blurMaterial = _getBlurShader( MAX_SAMPLES );
+	var _equirectShader = null;
+	var _cubemapShader = null;
 
 	var { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
 	var _pingPongRenderTarget = null;
@@ -147,6 +149,25 @@ var PMREMGenerator = ( function () {
 			_cleanup();
 
 			return cubeUVRenderTarget;
+
+		},
+
+		/**
+		 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
+		 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
+		 * one of them will cause any others to also become unusable.
+		 */
+		dispose: function () {
+
+			_blurMaterial.dispose();
+			if ( _cubemapShader != null ) _cubemapShader.dispose();
+			if ( _equirectShader != null ) _equirectShader.dispose();
+			var plane;
+			for ( plane of _lodPlanes ) {
+
+				plane.dispose();
+
+			}
 
 		},
 
@@ -326,7 +347,24 @@ var PMREMGenerator = ( function () {
 	function _textureToCubeUV( texture, cubeUVRenderTarget ) {
 
 		var scene = new Scene();
-		var material = texture.isCubeTexture ? _getCubemapShader() : _getEquirectShader();
+		if ( texture.isCubeTexture ) {
+
+			if ( _cubemapShader == null ) {
+
+				_cubemapShader = _getCubemapShader();
+
+			}
+
+		} else {
+
+			if ( _equirectShader == null ) {
+
+				_equirectShader = _getEquirectShader();
+
+			}
+
+		}
+		var material = texture.isCubeTexture ? _cubemapShader : _equirectShader;
 		scene.add( new Mesh( _lodPlanes[ 0 ], material ) );
 		var uniforms = material.uniforms;
 
