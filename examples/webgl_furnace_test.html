@@ -74,8 +74,8 @@
 
 				// camera
 
-				camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
-				camera.position.set( 0, 0, 9 );
+				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+				camera.position.set( 0, 0, 18 );
 
 			}
 
@@ -128,11 +128,13 @@
 
 			function onResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
-				camera.top = right / aspect;
-				camera.bottom = - camera.top;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.setSize( width, height );
 
 			}
 
