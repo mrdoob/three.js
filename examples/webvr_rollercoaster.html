@@ -16,7 +16,13 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { RollerCoasterGeometry, RollerCoasterShadowGeometry, RollerCoasterLiftersGeometry, TreesGeometry, SkyGeometry } from './jsm/misc/RollerCoaster.js';
+			import {
+				RollerCoasterGeometry,
+				RollerCoasterShadowGeometry,
+				RollerCoasterLiftersGeometry,
+				TreesGeometry,
+				SkyGeometry
+			} from './jsm/misc/RollerCoaster.js';
 			import { WEBVR } from './jsm/vr/WebVR.js';
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -39,7 +45,7 @@
 			var train = new THREE.Object3D();
 			scene.add( train );
 
-			var camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 500 );
+			var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 500 );
 			train.add( camera );
 
 			// environment
