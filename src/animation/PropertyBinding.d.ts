@@ -1,3 +1,11 @@
+export interface ParseTrackNameResults {
+	nodeName: string;
+	objectName: string;
+	objectIndex: string;
+	propertyName: string;
+	propertyIndex: string;
+}
+
 export class PropertyBinding {
 
 	constructor( rootNode: any, path: string, parsedPath?: any );
@@ -23,7 +31,8 @@ export class PropertyBinding {
 		path: any,
 		parsedPath?: any
 	): PropertyBinding | PropertyBinding.Composite;
-	static parseTrackName( trackName: string ): any;
+	static sanitizeNodeName( name: string ): string;
+	static parseTrackName( trackName: string ): ParseTrackNameResults;
 	static findNode( root: any, nodeName: string ): any;
 
 }
