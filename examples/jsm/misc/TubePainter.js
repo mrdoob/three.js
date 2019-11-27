@@ -131,6 +131,12 @@ function TubePainter() {
 
 	}
 
+	function setSize( value ) {
+
+		size = value;
+
+	}
+
 	function updateGeometry( start, end ) {
 
 		if ( start === end ) return;
@@ -155,6 +161,7 @@ function TubePainter() {
 	return {
 		mesh: mesh,
 		stroke: stroke,
+		setSize: setSize,
 		updateGeometry: updateGeometry
 	};
 
