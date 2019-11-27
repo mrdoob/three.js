@@ -23,6 +23,7 @@ export class WebGLCapabilities {
   vertexTextures: any;
   floatFragmentTextures: any;
   floatVertexTextures: any;
+  isWebGL2: boolean;
 
   getMaxAnisotropy(): number;
   getMaxPrecision(precision: string): string;

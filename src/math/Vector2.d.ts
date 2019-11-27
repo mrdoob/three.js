@@ -306,6 +306,12 @@ export class Vector2 implements Vector {
   dot(v: Vector2): number;
 
   /**
+   * Calculates the cross product of this vector and v. Note that a 'cross-product' in 2D is not well-defined. This function
+   * computes a geometric cross-product often used in 2D graphics
+   */
+  cross(v: Vector2): number;
+
+  /**
    * Computes squared length of this vector.
    */
   lengthSq(): number;
