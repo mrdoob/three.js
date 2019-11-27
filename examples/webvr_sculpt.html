@@ -19,7 +19,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
 			import { WEBVR } from './jsm/vr/WebVR.js';
 
@@ -27,7 +27,7 @@
 			var camera, scene, renderer;
 			var controller1, controller2;
 
-			var blob;
+			var controls, blob;
 
 			var points = [];
 
@@ -45,6 +45,10 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.02, 50 );
 				camera.position.set( 0, 1.6, 3 );
+
+				controls = new OrbitControls( camera, container );
+				controls.target.set( 0, 1.6, 0 );
+				controls.update();
 
 				var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
 				var material = new THREE.MeshStandardMaterial( {
