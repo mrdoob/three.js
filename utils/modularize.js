@@ -241,8 +241,6 @@ var files = [
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
 
-	{ path: 'vr/deprecated/DaydreamController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
 	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
