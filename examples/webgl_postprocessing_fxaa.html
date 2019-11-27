@@ -4,35 +4,22 @@
 		<title>three.js WebGL  - postprocessing - FXAA</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			html, body {
-				height: 100%;
-			}
-
 			body {
-				background: #ffffff;
-				padding: 0;
-				margin: 0;
-				font-family: Monospace;
-				font-size: 13px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #222;
 			}
 
-			#info {
-				top: 0px;
-				width: 100%;
-				color: #000000;
-				margin: 6px 0px;
-				text-align: center;
-			}
-
-			#info a {
-				color: #000000;
+			a {
+				color: #08f;
 			}
 
 			#container {
+				position: absolute;
+				top: 80px;
 				width: 100%;
-				height: calc(100% - 80px);
+				bottom: 0px;
 			}
 		</style>
 	</head>
@@ -46,25 +33,17 @@
 		<div id="container">
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var camera, scene, renderer, clock, group;
+			var camera, scene, renderer, clock, group, container;
 
 			var composer1, composer2, fxaaPass;
 
@@ -73,9 +52,9 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( window.innerWidth * 0.5 ) / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -126,33 +105,31 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				container.appendChild( renderer.domElement );
 
 				//
 
-				var renderPass = new THREE.RenderPass( scene, camera );
+				var renderPass = new RenderPass( scene, camera );
 
 				//
 
-				fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
-				fxaaPass.renderToScreen = true;
+				fxaaPass = new ShaderPass( FXAAShader );
 
 				var pixelRatio = renderer.getPixelRatio();
 
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
-				composer1 = new THREE.EffectComposer( renderer );
+				composer1 = new EffectComposer( renderer );
 				composer1.addPass( renderPass );
 				composer1.addPass( fxaaPass );
 
 				//
 
-				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
-				copyPass.renderToScreen = true;
+				var copyPass = new ShaderPass( CopyShader );
 
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 
@@ -164,17 +141,17 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( window.innerWidth * 0.5 ) / window.innerHeight;
+				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer1.setSize( window.innerWidth, window.innerHeight );
-				composer2.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				composer1.setSize( container.offsetWidth, container.offsetHeight );
+				composer2.setSize( container.offsetWidth, container.offsetHeight );
 
 				var pixelRatio = renderer.getPixelRatio();
 
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
+				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
 			}
 
@@ -182,15 +159,15 @@
 
 				requestAnimationFrame( animate );
 
-				var halfWidth = window.innerWidth / 2;
+				var halfWidth = container.offsetWidth / 2;
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, window.innerHeight );
+				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
 
 				composer1.render();
 
-				renderer.setViewport( halfWidth, 0, halfWidth, window.innerHeight );
+				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
 
 				composer2.render();
 

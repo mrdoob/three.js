@@ -4,20 +4,14 @@
 		<title>three.js webgl - adaptive tone-mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
+			.label {
+				background-color: black;
+				position: absolute;
+				z-index: 100;
+				padding: 5px
 			}
-			a { color:skyblue; text-decoration:none }
-			canvas { pointer-events:none; z-index:0; position:relative; }
-			.label { background-color: black; position: absolute; z-index: 100; padding: 5px }
-
 		</style>
 	</head>
 
@@ -28,40 +22,32 @@
 				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
 
 			</div>
-			<div class="label" style="position: absolute;left: 12%;bottom: 10%;">Low Dynamic Range</div>
-			<div class="label" style="position: absolute;left: 12%;bottom: 5%;">Static Tone Mapping</div>
-			<div class="label" style="position: absolute;left: 45%;bottom: 10%;">High Dynamic Range</div>
-			<div class="label" style="position: absolute;left: 45%;bottom: 5%;">Static Tone Mapping</div>
-			<div class="label" style="position: absolute;left: 80%;bottom: 10%;">High Dynamic Range</div>
-			<div class="label" style="position: absolute;left: 80%;bottom: 5%;">Adaptive Tone Mapping</div>
+			<div class="label" style="position: absolute;left: 10%;bottom: 10%;">
+				Low Dynamic Range<br/>
+				Static Tone Mapping
+			</div>
+			<div class="label" style="position: absolute;left: 40%;bottom: 10%;">
+				High Dynamic Range<br/>
+				Static Tone Mapping
+			</div>
+			<div class="label" style="position: absolute;left: 73%;bottom: 10%;">
+				High Dynamic Range<br/>
+				Adaptive Tone Mapping
+			</div>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/LuminosityShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/ToneMapShader.js"></script>
-		<script src="js/shaders/GammaCorrectionShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/AdaptiveToneMappingPass.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { AdaptiveToneMappingPass } from './jsm/postprocessing/AdaptiveToneMappingPass.js';
+			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 			var container;
 
@@ -113,7 +99,7 @@
 				cameraBG = new THREE.OrthographicCamera( - windowHalfX, windowHalfX, windowHalfY, - windowHalfY, - 10000, 10000 );
 				cameraBG.position.z = 100;
 
-				orbitControls = new THREE.OrbitControls( camera, container );
+				orbitControls = new OrbitControls( camera, container );
 				orbitControls.autoRotate = true;
 				orbitControls.autoRotateSpeed = 1;
 
@@ -344,7 +330,7 @@
 
 				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
-				ldrEffectComposer = new THREE.EffectComposer( renderer, regularRenderTarget );
+				ldrEffectComposer = new EffectComposer( renderer, regularRenderTarget );
 
 				if ( renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
 
@@ -352,28 +338,26 @@
 
 	}
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
-				dynamicHdrEffectComposer = new THREE.EffectComposer( renderer, hdrRenderTarget );
+				dynamicHdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 				dynamicHdrEffectComposer.setSize( window.innerWidth, window.innerHeight );
-				hdrEffectComposer = new THREE.EffectComposer( renderer, hdrRenderTarget );
+				hdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 
-				var debugPass = new THREE.RenderPass( debugScene, cameraBG );
+				var debugPass = new RenderPass( debugScene, cameraBG );
 				debugPass.clear = false;
-				var scenePass = new THREE.RenderPass( scene, camera, undefined, undefined, undefined );
-				var skyboxPass = new THREE.RenderPass( sceneCube, cameraCube );
+				var scenePass = new RenderPass( scene, camera, undefined, undefined, undefined );
+				var skyboxPass = new RenderPass( sceneCube, cameraCube );
 				scenePass.clear = false;
 
-				adaptToneMappingPass = new THREE.AdaptiveToneMappingPass( true, 256 );
+				adaptToneMappingPass = new AdaptiveToneMappingPass( true, 256 );
 				adaptToneMappingPass.needsSwap = true;
-				ldrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
-				hdrToneMappingPass = new THREE.AdaptiveToneMappingPass( false, 256 );
-				bloomPass = new THREE.BloomPass();
-				var gammaCorrectionPass = new THREE.ShaderPass( THREE.GammaCorrectionShader );
-				gammaCorrectionPass.renderToScreen = true;
+				ldrToneMappingPass = new AdaptiveToneMappingPass( false, 256 );
+				hdrToneMappingPass = new AdaptiveToneMappingPass( false, 256 );
+				bloomPass = new BloomPass();
+				var gammaCorrectionPass = new ShaderPass( GammaCorrectionShader );
 
 				dynamicHdrEffectComposer.addPass( skyboxPass );
 				dynamicHdrEffectComposer.addPass( scenePass );
 				dynamicHdrEffectComposer.addPass( adaptToneMappingPass );
-				// dynamicHdrEffectComposer.addPass( debugPass );
 				dynamicHdrEffectComposer.addPass( bloomPass );
 				dynamicHdrEffectComposer.addPass( gammaCorrectionPass );
 
@@ -389,13 +373,8 @@
 				ldrEffectComposer.addPass( bloomPass );
 				ldrEffectComposer.addPass( gammaCorrectionPass );
 
-				// var gammaPass = new THREE.ShaderPass( GammaShader );
-				// gammaPass.renderToScreen = true;
-				// ldrEffectComposer.addPass( gammaPass );
+				var gui = new GUI();
 
-				var gui = new dat.GUI();
-
-				// dynamicHdrGui.add( params, 'projection', { 'From cam to mesh': 'camera', 'Normal to mesh': 'normal' } );
 				var sceneGui = gui.addFolder( 'Scenes' );
 				var toneMappingGui = gui.addFolder( 'ToneMapping' );
 				var staticToneMappingGui = gui.addFolder( 'StaticOnly' );

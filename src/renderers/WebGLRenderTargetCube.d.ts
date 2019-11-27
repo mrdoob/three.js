@@ -1,15 +1,15 @@
-import {
-  WebGLRenderTargetOptions,
-  WebGLRenderTarget,
-} from './WebGLRenderTarget';
+import { WebGLRenderTargetOptions, WebGLRenderTarget } from './WebGLRenderTarget';
+import { WebGLRenderer } from './WebGLRenderer';
+import { Texture } from './../textures/Texture';
 
 export class WebGLRenderTargetCube extends WebGLRenderTarget {
-  constructor(
-    width: number,
-    height: number,
-    options?: WebGLRenderTargetOptions
-  );
 
-  activeCubeFace: number; // PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5
-  activeMipMapLevel: number;
+	constructor(
+		width: number,
+		height: number,
+		options?: WebGLRenderTargetOptions
+	);
+
+	fromEquirectangularTexture( renderer: WebGLRenderer, texture: Texture ): this;
+
 }

@@ -4,49 +4,9 @@
 		<title>three.js webgl - postprocessing - pixel shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				/*text-align:center;*/
-				font-weight: lighter;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display: block;
-			}
-
-			#info a {
-				color: #f88;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer;
-			}
-
-			.dg.ac {
-				z-index: 1 !important;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/PixelShader.js"></script>
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="container"></div>
 
@@ -54,7 +14,18 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader by <a href="http://wongbryan.github.io">wongbryan</a>
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { PixelShader } from './jsm/shaders/PixelShader.js';
+
 
 			var camera, scene, renderer, gui, composer, controls;
 			var pixelPass, params;
@@ -90,7 +61,7 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 0, 30 );
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 2.0;
 				controls.panSpeed = 0.8;
 				controls.zoomSpeed = 1.5;
@@ -141,13 +112,12 @@
 
 				scene.add( group );
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				pixelPass = new THREE.ShaderPass( THREE.PixelShader );
+				pixelPass = new ShaderPass( PixelShader );
 				pixelPass.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
 				pixelPass.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
-				pixelPass.renderToScreen = true;
 				composer.addPass( pixelPass );
 
 				window.addEventListener( 'resize', resize );
@@ -156,7 +126,7 @@
 					pixelSize: 16,
 					postprocessing: true
 				};
-				gui = new dat.GUI();
+				gui = new GUI();
 				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 				gui.add( params, 'postprocessing' );
 

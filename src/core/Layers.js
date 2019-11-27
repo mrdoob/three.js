@@ -22,6 +22,12 @@ Object.assign( Layers.prototype, {
 
 	},
 
+	enableAll: function () {
+
+		this.mask = 0xffffffff | 0;
+
+	},
+
 	toggle: function ( channel ) {
 
 		this.mask ^= 1 << channel | 0;
@@ -31,6 +37,12 @@ Object.assign( Layers.prototype, {
 	disable: function ( channel ) {
 
 		this.mask &= ~ ( 1 << channel | 0 );
+
+	},
+
+	disableAll: function () {
+
+		this.mask = 0;
 
 	},
 

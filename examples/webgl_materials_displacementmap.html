@@ -4,28 +4,8 @@
 		<title>three.js webgl - materials - displacement map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {	color: #ffffff;	}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
 		</style>
@@ -40,23 +20,15 @@
 			<div id="vt">displacement mapping requires vertex textures</div>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/loaders/OBJLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			var stats;
 
 			var camera, scene, renderer, controls;
@@ -85,7 +57,7 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 				//var gui = gui.addFolder( "Material" );
 				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
@@ -153,7 +125,7 @@
 				camera.position.z = 1500;
 				scene.add( camera );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
 				controls.enableDamping = true;
 
@@ -220,7 +192,7 @@
 
 				//
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
 
 					var geometry = group.children[ 0 ].geometry;

@@ -1,8 +1,9 @@
 /**
  * @author Richard M. / https://github.com/richardmonette
+ * @author ScieCode / http://github.com/sciecode
  *
- * OpenEXR loader which, currently, supports reading 16 bit half data, in either
- * uncompressed or PIZ wavelet compressed form.
+ * OpenEXR loader which, currently, supports uncompressed, ZIP(S), RLE and PIZ wavelet compression.
+ * Supports reading 16 and 32 bit data format, except for PIZ compression which only reads 16-bit data.
  *
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
@@ -75,470 +76,549 @@
 
 THREE.EXRLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.DataTextureLoader.call( this, manager );
+
+	this.type = THREE.FloatType;
 
 };
 
-THREE.EXRLoader.prototype = Object.create( THREE.DataTextureLoader.prototype );
+THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
 
-THREE.EXRLoader.prototype._parser = function ( buffer ) {
+	constructor: THREE.EXRLoader,
 
-	const USHORT_RANGE = (1 << 16);
-	const BITMAP_SIZE = (USHORT_RANGE >> 3);
+	parse: function ( buffer ) {
 
-	const HUF_ENCBITS = 16;  // literal (value) bit length
-	const HUF_DECBITS = 14;  // decoding bit size (>= 8)
+		const USHORT_RANGE = ( 1 << 16 );
+		const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
 
-	const HUF_ENCSIZE = (1 << HUF_ENCBITS) + 1;  // encoding table size
-	const HUF_DECSIZE = 1 << HUF_DECBITS;        // decoding table size
-	const HUF_DECMASK = HUF_DECSIZE - 1;
+		const HUF_ENCBITS = 16; // literal (value) bit length
+		const HUF_DECBITS = 14; // decoding bit size (>= 8)
 
-	const SHORT_ZEROCODE_RUN = 59;
-	const LONG_ZEROCODE_RUN = 63;
-	const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
-	const LONGEST_LONG_RUN = 255 + SHORTEST_LONG_RUN;
+		const HUF_ENCSIZE = ( 1 << HUF_ENCBITS ) + 1; // encoding table size
+		const HUF_DECSIZE = 1 << HUF_DECBITS; // decoding table size
+		const HUF_DECMASK = HUF_DECSIZE - 1;
 
-	const BYTES_PER_HALF = 2;
+		const SHORT_ZEROCODE_RUN = 59;
+		const LONG_ZEROCODE_RUN = 63;
+		const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
 
-	const ULONG_SIZE = 8;
-	const FLOAT32_SIZE = 4;
-	const INT32_SIZE = 4;
-	const INT16_SIZE = 2;
-	const INT8_SIZE = 1;
+		const BYTES_PER_HALF = 2;
 
-	function reverseLutFromBitmap( bitmap, lut ) {
+		const ULONG_SIZE = 8;
+		const FLOAT32_SIZE = 4;
+		const INT32_SIZE = 4;
+		const INT16_SIZE = 2;
+		const INT8_SIZE = 1;
 
-		var k = 0;
+		function reverseLutFromBitmap( bitmap, lut ) {
 
-		for ( var i = 0; i < USHORT_RANGE; ++ i ) {
+			var k = 0;
 
-			if ( ( i == 0 ) || ( bitmap[ i >> 3 ] & ( 1 << ( i & 7 ) ) ) ) {
+			for ( var i = 0; i < USHORT_RANGE; ++ i ) {
 
-				lut[ k ++ ] = i;
+				if ( ( i == 0 ) || ( bitmap[ i >> 3 ] & ( 1 << ( i & 7 ) ) ) ) {
+
+					lut[ k ++ ] = i;
+
+				}
+
+			}
+
+			var n = k - 1;
+
+			while ( k < USHORT_RANGE ) lut[ k ++ ] = 0;
+
+			return n;
+
+		}
+
+		function hufClearDecTable( hdec ) {
+
+			for ( var i = 0; i < HUF_DECSIZE; i ++ ) {
+
+				hdec[ i ] = {};
+				hdec[ i ].len = 0;
+				hdec[ i ].lit = 0;
+				hdec[ i ].p = null;
 
 			}
 
 		}
 
-		var n = k - 1;
+		const getBitsReturn = { l: 0, c: 0, lc: 0 };
 
-		while ( k < USHORT_RANGE ) lut[ k ++ ] = 0;
+		function getBits( nBits, c, lc, uInt8Array, inOffset ) {
 
-		return n;
+			while ( lc < nBits ) {
 
-	}
+				c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
+				lc += 8;
 
-	function hufClearDecTable( hdec ) {
+			}
 
-		for ( var i = 0; i < HUF_DECSIZE; i ++ ) {
+			lc -= nBits;
 
-			hdec[ i ] = {};
-			hdec[ i ].len = 0;
-			hdec[ i ].lit = 0;
-			hdec[ i ].p = null;
-
-		}
-
-	}
-
-	const getBitsReturn = { l: 0, c: 0, lc: 0 };
-
-	function getBits( nBits, c, lc, uInt8Array, inOffset ) {
-
-		while ( lc < nBits ) {
-
-			c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
-			lc += 8;
+			getBitsReturn.l = ( c >> lc ) & ( ( 1 << nBits ) - 1 );
+			getBitsReturn.c = c;
+			getBitsReturn.lc = lc;
 
 		}
 
-		lc -= nBits;
+		const hufTableBuffer = new Array( 59 );
 
-		getBitsReturn.l = ( c >> lc ) & ( ( 1 << nBits ) - 1 );
-		getBitsReturn.c = c;
-		getBitsReturn.lc = lc;
-	}
+		function hufCanonicalCodeTable( hcode ) {
 
-	const hufTableBuffer = new Array( 59 );
+			for ( var i = 0; i <= 58; ++ i ) hufTableBuffer[ i ] = 0;
+			for ( var i = 0; i < HUF_ENCSIZE; ++ i ) hufTableBuffer[ hcode[ i ] ] += 1;
 
-	function hufCanonicalCodeTable( hcode ) {
+			var c = 0;
 
-		for ( var i = 0; i <= 58; ++ i ) hufTableBuffer[ i ] = 0;
-		for ( var i = 0; i < HUF_ENCSIZE; ++ i ) hufTableBuffer[ hcode[ i ] ] += 1;
+			for ( var i = 58; i > 0; -- i ) {
 
-		var c = 0;
+				var nc = ( ( c + hufTableBuffer[ i ] ) >> 1 );
+				hufTableBuffer[ i ] = c;
+				c = nc;
 
-		for ( var i = 58; i > 0; -- i ) {
+			}
 
-			var nc = ( ( c + hufTableBuffer[ i ] ) >> 1 );
-			hufTableBuffer[ i ] = c;
-			c = nc;
+			for ( var i = 0; i < HUF_ENCSIZE; ++ i ) {
 
-		}
+				var l = hcode[ i ];
+				if ( l > 0 ) hcode[ i ] = l | ( hufTableBuffer[ l ] ++ << 6 );
 
-		for ( var i = 0; i < HUF_ENCSIZE; ++ i ) {
-
-			var l = hcode[ i ];
-			if ( l > 0 ) hcode[ i ] = l | ( hufTableBuffer[ l ] ++ << 6 );
+			}
 
 		}
 
-	}
+		function hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, hcode ) {
 
-	function hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, hcode ) {
+			var p = inOffset;
+			var c = 0;
+			var lc = 0;
 
-		var p = inOffset;
-		var c = 0;
-		var lc = 0;
+			for ( ; im <= iM; im ++ ) {
 
-		for ( ; im <= iM; im ++ ) {
+				if ( p.value - inOffset.value > ni ) return false;
 
-			if ( p.value - inOffset.value > ni ) return false;
+				getBits( 6, c, lc, uInt8Array, p );
 
-			getBits( 6, c, lc, uInt8Array, p );
-
-			var l = getBitsReturn.l;
-			c = getBitsReturn.c;
-			lc = getBitsReturn.lc;
-
-			hcode[ im ] = l;
-
-			if ( l == LONG_ZEROCODE_RUN ) {
-
-				if ( p.value - inOffset.value > ni ) {
-
-					throw 'Something wrong with hufUnpackEncTable';
-
-				}
-
-				getBits( 8, c, lc, uInt8Array, p );
-
-				var zerun = getBitsReturn.l + SHORTEST_LONG_RUN;
+				var l = getBitsReturn.l;
 				c = getBitsReturn.c;
 				lc = getBitsReturn.lc;
 
-				if ( im + zerun > iM + 1 ) {
+				hcode[ im ] = l;
 
-					throw 'Something wrong with hufUnpackEncTable';
+				if ( l == LONG_ZEROCODE_RUN ) {
+
+					if ( p.value - inOffset.value > ni ) {
+
+						throw 'Something wrong with hufUnpackEncTable';
+
+					}
+
+					getBits( 8, c, lc, uInt8Array, p );
+
+					var zerun = getBitsReturn.l + SHORTEST_LONG_RUN;
+					c = getBitsReturn.c;
+					lc = getBitsReturn.lc;
+
+					if ( im + zerun > iM + 1 ) {
+
+						throw 'Something wrong with hufUnpackEncTable';
+
+					}
+
+					while ( zerun -- ) hcode[ im ++ ] = 0;
+
+					im --;
+
+				} else if ( l >= SHORT_ZEROCODE_RUN ) {
+
+					var zerun = l - SHORT_ZEROCODE_RUN + 2;
+
+					if ( im + zerun > iM + 1 ) {
+
+						throw 'Something wrong with hufUnpackEncTable';
+
+					}
+
+					while ( zerun -- ) hcode[ im ++ ] = 0;
+
+					im --;
 
 				}
-
-				while ( zerun -- ) hcode[ im ++ ] = 0;
-
-				im --;
-
-			} else if ( l >= SHORT_ZEROCODE_RUN ) {
-
-				var zerun = l - SHORT_ZEROCODE_RUN + 2;
-
-				if ( im + zerun > iM + 1 ) {
-
-					throw 'Something wrong with hufUnpackEncTable';
-
-				}
-
-				while ( zerun -- ) hcode[ im ++ ] = 0;
-
-				im --;
 
 			}
+
+			hufCanonicalCodeTable( hcode );
 
 		}
 
-		hufCanonicalCodeTable( hcode );
+		function hufLength( code ) {
 
-	}
+			return code & 63;
 
-	function hufLength( code ) { return code & 63; }
+		}
 
-	function hufCode( code ) { return code >> 6; }
+		function hufCode( code ) {
 
-	function hufBuildDecTable( hcode, im, iM, hdecod ) {
+			return code >> 6;
 
-		for ( ; im <= iM; im ++ ) {
+		}
 
-			var c = hufCode( hcode[ im ] );
-			var l = hufLength( hcode[ im ] );
+		function hufBuildDecTable( hcode, im, iM, hdecod ) {
 
-			if ( c >> l ) {
+			for ( ; im <= iM; im ++ ) {
 
-				throw 'Invalid table entry';
+				var c = hufCode( hcode[ im ] );
+				var l = hufLength( hcode[ im ] );
 
-			}
-
-			if ( l > HUF_DECBITS ) {
-
-				var pl = hdecod[ ( c >> ( l - HUF_DECBITS ) ) ];
-
-				if ( pl.len ) {
+				if ( c >> l ) {
 
 					throw 'Invalid table entry';
 
 				}
 
-				pl.lit ++;
+				if ( l > HUF_DECBITS ) {
 
-				if ( pl.p ) {
+					var pl = hdecod[ ( c >> ( l - HUF_DECBITS ) ) ];
 
-					var p = pl.p;
-					pl.p = new Array( pl.lit );
-
-					for ( var i = 0; i < pl.lit - 1; ++ i ) {
-
-						pl.p[ i ] = p[ i ];
-
-					}
-
-				} else {
-
-					pl.p = new Array( 1 );
-
-				}
-
-				pl.p[ pl.lit - 1 ] = im;
-
-			} else if ( l ) {
-
-				var plOffset = 0;
-
-				for ( var i = 1 << ( HUF_DECBITS - l ); i > 0; i -- ) {
-
-					var pl = hdecod[ ( c << ( HUF_DECBITS - l ) ) + plOffset ];
-
-					if ( pl.len || pl.p ) {
+					if ( pl.len ) {
 
 						throw 'Invalid table entry';
 
 					}
 
-					pl.len = l;
-					pl.lit = im;
+					pl.lit ++;
 
-					plOffset ++;
+					if ( pl.p ) {
+
+						var p = pl.p;
+						pl.p = new Array( pl.lit );
+
+						for ( var i = 0; i < pl.lit - 1; ++ i ) {
+
+							pl.p[ i ] = p[ i ];
+
+						}
+
+					} else {
+
+						pl.p = new Array( 1 );
+
+					}
+
+					pl.p[ pl.lit - 1 ] = im;
+
+				} else if ( l ) {
+
+					var plOffset = 0;
+
+					for ( var i = 1 << ( HUF_DECBITS - l ); i > 0; i -- ) {
+
+						var pl = hdecod[ ( c << ( HUF_DECBITS - l ) ) + plOffset ];
+
+						if ( pl.len || pl.p ) {
+
+							throw 'Invalid table entry';
+
+						}
+
+						pl.len = l;
+						pl.lit = im;
+
+						plOffset ++;
+
+					}
 
 				}
 
 			}
 
+			return true;
+
 		}
 
-		return true;
+		const getCharReturn = { c: 0, lc: 0 };
 
-	}
+		function getChar( c, lc, uInt8Array, inOffset ) {
 
-	const getCharReturn = { c: 0, lc: 0 };
+			c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
+			lc += 8;
 
-	function getChar( c, lc, uInt8Array, inOffset ) {
+			getCharReturn.c = c;
+			getCharReturn.lc = lc;
 
-		c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
-		lc += 8;
+		}
 
-		getCharReturn.c = c;
-		getCharReturn.lc = lc;
+		const getCodeReturn = { c: 0, lc: 0 };
 
-	}
+		function getCode( po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
 
-	const getCodeReturn = { c: 0, lc: 0 };
+			if ( po == rlc ) {
 
-	function getCode( po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
+				if ( lc < 8 ) {
 
-		if ( po == rlc ) {
+					getChar( c, lc, uInt8Array, inOffset );
+					c = getCharReturn.c;
+					lc = getCharReturn.lc;
 
-			if ( lc < 8 ) {
+				}
 
-				getChar( c, lc, uInt8Array, inOffset );
-				c = getCharReturn.c;
-				lc = getCharReturn.lc;
+				lc -= 8;
 
-			}
+				var cs = ( c >> lc );
+				var cs = new Uint8Array( [ cs ] )[ 0 ];
 
-			lc -= 8;
+				if ( outBufferOffset.value + cs > outBufferEndOffset ) {
 
-			var cs = ( c >> lc );
-			var cs = new Uint8Array([cs])[0];
+					return false;
 
-			if ( outBufferOffset.value + cs > outBufferEndOffset ) {
+				}
+
+				var s = outBuffer[ outBufferOffset.value - 1 ];
+
+				while ( cs -- > 0 ) {
+
+					outBuffer[ outBufferOffset.value ++ ] = s;
+
+				}
+
+			} else if ( outBufferOffset.value < outBufferEndOffset ) {
+
+				outBuffer[ outBufferOffset.value ++ ] = po;
+
+			} else {
 
 				return false;
 
 			}
 
-			var s = outBuffer[ outBufferOffset.value - 1 ];
-
-			while ( cs-- > 0 ) {
-
-				outBuffer[ outBufferOffset.value ++ ] = s;
-
-			}
-
-		} else if ( outBufferOffset.value < outBufferEndOffset ) {
-
-			outBuffer[ outBufferOffset.value ++ ] = po;
-
-		} else {
-
-			return false;
+			getCodeReturn.c = c;
+			getCodeReturn.lc = lc;
 
 		}
 
-		getCodeReturn.c = c;
-		getCodeReturn.lc = lc;
+		function UInt16( value ) {
 
-	}
+			return ( value & 0xFFFF );
 
-	var NBITS = 16;
-	var A_OFFSET = 1 << ( NBITS - 1 );
-	var M_OFFSET = 1 << ( NBITS - 1 );
-	var MOD_MASK = ( 1 << NBITS ) - 1;
+		}
 
-	function UInt16( value ) {
+		function Int16( value ) {
 
-		return ( value & 0xFFFF );
+			var ref = UInt16( value );
+			return ( ref > 0x7FFF ) ? ref - 0x10000 : ref;
 
-	}
+		}
 
-	function Int16( value ) {
+		const wdec14Return = { a: 0, b: 0 };
 
-		var ref = UInt16( value );
-		return ( ref > 0x7FFF ) ? ref - 0x10000 : ref;
+		function wdec14( l, h ) {
 
-	}
+			var ls = Int16( l );
+			var hs = Int16( h );
 
-	const wdec14Return = { a: 0, b: 0 };
+			var hi = hs;
+			var ai = ls + ( hi & 1 ) + ( hi >> 1 );
 
-	function wdec14( l, h ) {
+			var as = ai;
+			var bs = ai - hi;
 
-		var ls = Int16( l );
-		var hs = Int16( h );
+			wdec14Return.a = as;
+			wdec14Return.b = bs;
 
-		var hi = hs;
-		var ai = ls + ( hi & 1 ) + ( hi >> 1 );
+		}
 
-		var as = ai;
-		var bs = ai - hi;
+		function wav2Decode( j, buffer, nx, ox, ny, oy ) {
 
-		wdec14Return.a = as;
-		wdec14Return.b = bs;
+			var n = ( nx > ny ) ? ny : nx;
+			var p = 1;
+			var p2;
 
-	}
+			while ( p <= n ) p <<= 1;
 
-	function wav2Decode( j, buffer, nx, ox, ny, oy, mx ) {
-
-		var n = ( nx > ny ) ? ny : nx;
-		var p = 1;
-		var p2;
-
-		while ( p <= n ) p <<= 1;
-
-		p >>= 1;
-		p2 = p;
-		p >>= 1;
-
-		while ( p >= 1 ) {
-
-			var py = 0;
-			var ey = py + oy * ( ny - p2 );
-			var oy1 = oy * p;
-			var oy2 = oy * p2;
-			var ox1 = ox * p;
-			var ox2 = ox * p2;
-			var i00, i01, i10, i11;
-
-			for ( ; py <= ey; py += oy2 ) {
-
-				var px = py;
-				var ex = py + ox * ( nx - p2 );
-
-				for ( ; px <= ex; px += ox2 ) {
-
-					var p01 = px + ox1;
-					var p10 = px + oy1;
-					var p11 = p10 + ox1;
-
-					wdec14( buffer[ px + j ], buffer[ p10 + j ] );
-
-					i00 = wdec14Return.a;
-					i10 = wdec14Return.b;
-
-					wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
-
-					i01 = wdec14Return.a;
-					i11 = wdec14Return.b;
-
-					wdec14( i00, i01 );
-
-					buffer[ px + j ] = wdec14Return.a;
-					buffer[ p01 + j ] = wdec14Return.b;
-
-					wdec14( i10, i11 );
-
-					buffer[ p10 + j ] = wdec14Return.a;
-					buffer[ p11 + j ] = wdec14Return.b;
-
-				}
-
-				if ( nx & p ) {
-
-					var p10 = px + oy1;
-
-					wdec14( buffer[ px + j ], buffer[ p10 + j ] );
-
-					i00 = wdec14Return.a;
-					buffer[ p10 + j ] = wdec14Return.b;
-
-					buffer[ px + j ] = i00;
-
-				}
-
-			}
-
-			if ( ny & p ) {
-
-				var px = py;
-				var ex = py + ox * ( nx - p2 );
-
-				for ( ; px <= ex; px += ox2 ) {
-
-					var p01 = px + ox1;
-
-					wdec14( buffer[ px + j ], buffer[ p01 + j ] );
-
-					i00 = wdec14Return.a;
-					buffer[ p01 + j ] = wdec14Return.b;
-
-					buffer[ px + j ] = i00;
-
-				}
-
-			}
-
+			p >>= 1;
 			p2 = p;
 			p >>= 1;
 
+			while ( p >= 1 ) {
+
+				var py = 0;
+				var ey = py + oy * ( ny - p2 );
+				var oy1 = oy * p;
+				var oy2 = oy * p2;
+				var ox1 = ox * p;
+				var ox2 = ox * p2;
+				var i00, i01, i10, i11;
+
+				for ( ; py <= ey; py += oy2 ) {
+
+					var px = py;
+					var ex = py + ox * ( nx - p2 );
+
+					for ( ; px <= ex; px += ox2 ) {
+
+						var p01 = px + ox1;
+						var p10 = px + oy1;
+						var p11 = p10 + ox1;
+
+						wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+
+						i00 = wdec14Return.a;
+						i10 = wdec14Return.b;
+
+						wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
+
+						i01 = wdec14Return.a;
+						i11 = wdec14Return.b;
+
+						wdec14( i00, i01 );
+
+						buffer[ px + j ] = wdec14Return.a;
+						buffer[ p01 + j ] = wdec14Return.b;
+
+						wdec14( i10, i11 );
+
+						buffer[ p10 + j ] = wdec14Return.a;
+						buffer[ p11 + j ] = wdec14Return.b;
+
+					}
+
+					if ( nx & p ) {
+
+						var p10 = px + oy1;
+
+						wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+
+						i00 = wdec14Return.a;
+						buffer[ p10 + j ] = wdec14Return.b;
+
+						buffer[ px + j ] = i00;
+
+					}
+
+				}
+
+				if ( ny & p ) {
+
+					var px = py;
+					var ex = py + ox * ( nx - p2 );
+
+					for ( ; px <= ex; px += ox2 ) {
+
+						var p01 = px + ox1;
+
+						wdec14( buffer[ px + j ], buffer[ p01 + j ] );
+
+						i00 = wdec14Return.a;
+						buffer[ p01 + j ] = wdec14Return.b;
+
+						buffer[ px + j ] = i00;
+
+					}
+
+				}
+
+				p2 = p;
+				p >>= 1;
+
+			}
+
+			return py;
+
 		}
 
-		return py;
+		function hufDecode( encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset ) {
 
-	}
+			var c = 0;
+			var lc = 0;
+			var outBufferEndOffset = no;
+			var inOffsetEnd = Math.trunc( inOffset.value + ( ni + 7 ) / 8 );
 
-	function hufDecode( encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset ) {
+			while ( inOffset.value < inOffsetEnd ) {
 
-		var c = 0;
-		var lc = 0;
-		var outBufferEndOffset = no;
-		var inOffsetEnd = Math.trunc( inOffset.value + ( ni + 7 ) / 8 );
+				getChar( c, lc, uInt8Array, inOffset );
 
-		while ( inOffset.value < inOffsetEnd ) {
+				c = getCharReturn.c;
+				lc = getCharReturn.lc;
 
-			getChar( c, lc, uInt8Array, inOffset );
+				while ( lc >= HUF_DECBITS ) {
 
-			c = getCharReturn.c;
-			lc = getCharReturn.lc;
+					var index = ( c >> ( lc - HUF_DECBITS ) ) & HUF_DECMASK;
+					var pl = decodingTable[ index ];
 
-			while ( lc >= HUF_DECBITS ) {
+					if ( pl.len ) {
 
-				var index = ( c >> ( lc - HUF_DECBITS ) ) & HUF_DECMASK;
-				var pl = decodingTable[ index ];
+						lc -= pl.len;
+
+						getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+
+						c = getCodeReturn.c;
+						lc = getCodeReturn.lc;
+
+					} else {
+
+						if ( ! pl.p ) {
+
+							throw 'hufDecode issues';
+
+						}
+
+						var j;
+
+						for ( j = 0; j < pl.lit; j ++ ) {
+
+							var l = hufLength( encodingTable[ pl.p[ j ] ] );
+
+							while ( lc < l && inOffset.value < inOffsetEnd ) {
+
+								getChar( c, lc, uInt8Array, inOffset );
+
+								c = getCharReturn.c;
+								lc = getCharReturn.lc;
+
+							}
+
+							if ( lc >= l ) {
+
+								if ( hufCode( encodingTable[ pl.p[ j ] ] ) == ( ( c >> ( lc - l ) ) & ( ( 1 << l ) - 1 ) ) ) {
+
+									lc -= l;
+
+									getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+
+									c = getCodeReturn.c;
+									lc = getCodeReturn.lc;
+
+									break;
+
+								}
+
+							}
+
+						}
+
+						if ( j == pl.lit ) {
+
+							throw 'hufDecode issues';
+
+						}
+
+					}
+
+				}
+
+			}
+
+			var i = ( 8 - ni ) & 7;
+
+			c >>= i;
+			lc -= i;
+
+			while ( lc > 0 ) {
+
+				var pl = decodingTable[ ( c << ( HUF_DECBITS - lc ) ) & HUF_DECMASK ];
 
 				if ( pl.len ) {
 
@@ -551,612 +631,781 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 				} else {
 
-					if ( ! pl.p ) {
-
-						throw 'hufDecode issues';
-
-					}
-
-					var j;
-
-					for ( j = 0; j < pl.lit; j ++ ) {
-
-						var l = hufLength( encodingTable[ pl.p[ j ] ] );
-
-						while ( lc < l && inOffset.value < inOffsetEnd ) {
-
-							getChar( c, lc, uInt8Array, inOffset );
-
-							c = getCharReturn.c;
-							lc = getCharReturn.lc;
-
-						}
-
-						if ( lc >= l ) {
-
-							if ( hufCode( encodingTable[ pl.p[ j ] ] ) == ( ( c >> ( lc - l ) ) & ( ( 1 << l ) - 1 ) ) ) {
-
-								lc -= l;
-
-								getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
-
-								c = getCodeReturn.c;
-								lc = getCodeReturn.lc;
-
-								break;
-
-							}
-
-						}
-
-					}
-
-					if ( j == pl.lit ) {
-
-						throw 'hufDecode issues';
-
-					}
+					throw 'hufDecode issues';
 
 				}
 
 			}
 
+			return true;
+
 		}
 
-		var i = ( 8 - ni ) & 7;
+		function hufUncompress( uInt8Array, inDataView, inOffset, nCompressed, outBuffer, outOffset, nRaw ) {
 
-		c >>= i;
-		lc -= i;
+			var initialInOffset = inOffset.value;
 
-		while ( lc > 0 ) {
+			var im = parseUint32( inDataView, inOffset );
+			var iM = parseUint32( inDataView, inOffset );
 
-			var pl = decodingTable[ ( c << ( HUF_DECBITS - lc ) ) & HUF_DECMASK ];
+			inOffset.value += 4;
 
-			if ( pl.len ) {
+			var nBits = parseUint32( inDataView, inOffset );
 
-				lc -= pl.len;
+			inOffset.value += 4;
 
-				getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+			if ( im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE ) {
 
-				c = getCodeReturn.c;
-				lc = getCodeReturn.lc;
+				throw 'Something wrong with HUF_ENCSIZE';
 
-			} else {
+			}
 
-				throw 'hufDecode issues';
+			var freq = new Array( HUF_ENCSIZE );
+			var hdec = new Array( HUF_DECSIZE );
+
+			hufClearDecTable( hdec );
+
+			var ni = nCompressed - ( inOffset.value - initialInOffset );
+
+			hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, freq );
+
+			if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
+
+				throw 'Something wrong with hufUncompress';
+
+			}
+
+			hufBuildDecTable( freq, im, iM, hdec );
+
+			hufDecode( freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
+
+		}
+
+		function applyLut( lut, data, nData ) {
+
+			for ( var i = 0; i < nData; ++ i ) {
+
+				data[ i ] = lut[ data[ i ] ];
 
 			}
 
 		}
 
-		return true;
+		function predictor( source ) {
 
-	}
+			for ( var t = 1; t < source.length; t ++ ) {
 
-	function hufUncompress( uInt8Array, inDataView, inOffset, nCompressed, outBuffer, outOffset, nRaw ) {
-
-		var initialInOffset = inOffset.value;
-
-		var im = parseUint32( inDataView, inOffset );
-		var iM = parseUint32( inDataView, inOffset );
-
-		inOffset.value += 4;
-
-		var nBits = parseUint32( inDataView, inOffset );
-
-		inOffset.value += 4;
-
-		if ( im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE ) {
-
-			throw 'Something wrong with HUF_ENCSIZE';
-
-		}
-
-		var freq = new Array( HUF_ENCSIZE );
-		var hdec = new Array( HUF_DECSIZE );
-
-		hufClearDecTable( hdec );
-
-		var ni = nCompressed - ( inOffset.value - initialInOffset );
-
-		hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, freq );
-
-		if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
-
-			throw 'Something wrong with hufUncompress';
-
-		}
-
-		hufBuildDecTable( freq, im, iM, hdec );
-
-		hufDecode( freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
-
-	}
-
-	function applyLut( lut, data, nData ) {
-
-		for ( var i = 0; i < nData; ++ i ) {
-
-			data[ i ] = lut[ data[ i ] ];
-
-		}
-
-	}
-
-	function decompressPIZ( outBuffer, outOffset, uInt8Array, inDataView, inOffset, tmpBufSize, num_channels, exrChannelInfos, dataWidth, num_lines ) {
-
-		var bitmap = new Uint8Array( BITMAP_SIZE );
-
-		var minNonZero = parseUint16( inDataView, inOffset );
-		var maxNonZero = parseUint16( inDataView, inOffset );
-
-		if ( maxNonZero >= BITMAP_SIZE ) {
-
-			throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE';
-
-		}
-
-		if ( minNonZero <= maxNonZero ) {
-
-			for ( var i = 0; i < maxNonZero - minNonZero + 1; i ++ ) {
-
-				bitmap[ i + minNonZero ] = parseUint8( inDataView, inOffset );
+				var d = source[ t - 1 ] + source[ t ] - 128;
+				source[ t ] = d;
 
 			}
 
 		}
 
-		var lut = new Uint16Array( USHORT_RANGE );
-		var maxValue = reverseLutFromBitmap( bitmap, lut );
+		function interleaveScalar( source, out ) {
 
-		var length = parseUint32( inDataView, inOffset );
+			var t1 = 0;
+			var t2 = Math.floor( ( source.length + 1 ) / 2 );
+			var s = 0;
+			var stop = source.length - 1;
 
-		hufUncompress( uInt8Array, inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize );
+			while ( true ) {
 
-		var pizChannelData = new Array( num_channels );
+				if ( s > stop ) break;
+				out[ s ++ ] = source[ t1 ++ ];
 
-		var outBufferEnd = 0;
-
-		for ( var i = 0; i < num_channels; i ++ ) {
-
-			var exrChannelInfo = exrChannelInfos[ i ];
-
-			var pixelSize = 2; // assumes HALF_FLOAT
-
-			pizChannelData[ i ] = {};
-			pizChannelData[ i ][ 'start' ] = outBufferEnd;
-			pizChannelData[ i ][ 'end' ] = pizChannelData[ i ][ 'start' ];
-			pizChannelData[ i ][ 'nx' ] = dataWidth;
-			pizChannelData[ i ][ 'ny' ] = num_lines;
-			pizChannelData[ i ][ 'size' ] = 1;
-
-			outBufferEnd += pizChannelData[ i ].nx * pizChannelData[ i ].ny * pizChannelData[ i ].size;
-
-		}
-
-		var fooOffset = 0;
-
-		for ( var i = 0; i < num_channels; i ++ ) {
-
-			for ( var j = 0; j < pizChannelData[ i ].size; ++ j ) {
-
-				fooOffset += wav2Decode(
-					j + fooOffset,
-					outBuffer,
-					pizChannelData[ i ].nx,
-					pizChannelData[ i ].size,
-					pizChannelData[ i ].ny,
-					pizChannelData[ i ].nx * pizChannelData[ i ].size,
-					maxValue
-				);
+				if ( s > stop ) break;
+				out[ s ++ ] = source[ t2 ++ ];
 
 			}
 
 		}
 
-		applyLut( lut, outBuffer, outBufferEnd );
+		function decodeRunLength( source ) {
 
-		return true;
+			var size = source.byteLength;
+			var out = new Array();
+			var p = 0;
 
-	}
+			var reader = new DataView( source );
 
-	function parseNullTerminatedString( buffer, offset ) {
+			while ( size > 0 ) {
 
-		var uintBuffer = new Uint8Array( buffer );
-		var endOffset = 0;
+				var l = reader.getInt8( p ++ );
 
-		while ( uintBuffer[ offset.value + endOffset ] != 0 ) {
+				if ( l < 0 ) {
 
-			endOffset += 1;
+					var count = - l;
+					size -= count + 1;
 
-		}
+					for ( var i = 0; i < count; i ++ ) {
 
-		var stringValue = new TextDecoder().decode(
-			uintBuffer.slice( offset.value, offset.value + endOffset )
-		);
-
-		offset.value = offset.value + endOffset + 1;
-
-		return stringValue;
-
-	}
-
-	function parseFixedLengthString( buffer, offset, size ) {
-
-		var stringValue = new TextDecoder().decode(
-			new Uint8Array( buffer ).slice( offset.value, offset.value + size )
-		);
-
-		offset.value = offset.value + size;
-
-		return stringValue;
-
-	}
-
-	function parseUlong( dataView, offset ) {
-
-		var uLong = dataView.getUint32( 0, true );
-
-		offset.value = offset.value + ULONG_SIZE;
-
-		return uLong;
-
-	}
-
-	function parseUint32( dataView, offset ) {
-
-		var Uint32 = dataView.getUint32(offset.value, true);
-
-		offset.value = offset.value + INT32_SIZE;
-
-		return Uint32;
-
-	}
-
-	function parseUint8Array( uInt8Array, offset ) {
-
-		var Uint8 = uInt8Array[offset.value];
-
-		offset.value = offset.value + INT8_SIZE;
-
-		return Uint8;
-
-	}
-
-	function parseUint8( dataView, offset ) {
-
-		var Uint8 = dataView.getUint8(offset.value);
-
-		offset.value = offset.value + INT8_SIZE;
-
-		return Uint8;
-
-	}
-
-	function parseFloat32( dataView, offset ) {
-
-		var float = dataView.getFloat32(offset.value, true);
-
-		offset.value += FLOAT32_SIZE;
-
-		return float;
-
-	}
-
-	// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
-	function decodeFloat16( binary ) {
-
-		var exponent = ( binary & 0x7C00 ) >> 10,
-			fraction = binary & 0x03FF;
-
-		return ( binary >> 15 ? - 1 : 1 ) * (
-			exponent ?
-				(
-					exponent === 0x1F ?
-						fraction ? NaN : Infinity :
-						Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
-				) :
-				6.103515625e-5 * ( fraction / 0x400 )
-		);
-
-	}
-
-	function parseUint16( dataView, offset ) {
-
-		var Uint16 = dataView.getUint16( offset.value, true );
-
-		offset.value += INT16_SIZE;
-
-		return Uint16;
-
-	}
-
-	function parseFloat16( buffer, offset ) {
-
-		return decodeFloat16( parseUint16( buffer, offset) );
-
-	}
-
-	function parseChlist( dataView, buffer, offset, size ) {
-
-		var startOffset = offset.value;
-		var channels = [];
-
-		while ( offset.value < ( startOffset + size - 1 ) ) {
-
-			var name = parseNullTerminatedString( buffer, offset );
-			var pixelType = parseUint32( dataView, offset ); // TODO: Cast this to UINT, HALF or FLOAT
-			var pLinear = parseUint8( dataView, offset );
-			offset.value += 3; // reserved, three chars
-			var xSampling = parseUint32( dataView, offset );
-			var ySampling = parseUint32( dataView, offset );
-
-			channels.push( {
-				name: name,
-				pixelType: pixelType,
-				pLinear: pLinear,
-				xSampling: xSampling,
-				ySampling: ySampling
-			} );
-
-		}
-
-		offset.value += 1;
-
-		return channels;
-
-	}
-
-	function parseChromaticities( dataView, offset ) {
-
-		var redX = parseFloat32( dataView, offset );
-		var redY = parseFloat32( dataView, offset );
-		var greenX = parseFloat32( dataView, offset );
-		var greenY = parseFloat32( dataView, offset );
-		var blueX = parseFloat32( dataView, offset );
-		var blueY = parseFloat32( dataView, offset );
-		var whiteX = parseFloat32( dataView, offset );
-		var whiteY = parseFloat32( dataView, offset );
-
-		return { redX: redX, redY: redY, greenX: greenX, greenY: greenY, blueX: blueX, blueY: blueY, whiteX: whiteX, whiteY: whiteY };
-
-	}
-
-	function parseCompression( dataView, offset ) {
-
-		var compressionCodes = [
-			'NO_COMPRESSION',
-			'RLE_COMPRESSION',
-			'ZIPS_COMPRESSION',
-			'ZIP_COMPRESSION',
-			'PIZ_COMPRESSION',
-			'PXR24_COMPRESSION',
-			'B44_COMPRESSION',
-			'B44A_COMPRESSION',
-			'DWAA_COMPRESSION',
-			'DWAB_COMPRESSION'
-		];
-
-		var compression = parseUint8( dataView, offset );
-
-		return compressionCodes[ compression ];
-
-	}
-
-	function parseBox2i( dataView, offset ) {
-
-		var xMin = parseUint32( dataView, offset );
-		var yMin = parseUint32( dataView, offset );
-		var xMax = parseUint32( dataView, offset );
-		var yMax = parseUint32( dataView, offset );
-
-		return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
-
-	}
-
-	function parseLineOrder( dataView, offset ) {
-
-		var lineOrders = [
-			'INCREASING_Y'
-		];
-
-		var lineOrder = parseUint8( dataView, offset );
-
-		return lineOrders[ lineOrder ];
-
-	}
-
-	function parseV2f( dataView, offset ) {
-
-		var x = parseFloat32( dataView, offset );
-		var y = parseFloat32( dataView, offset );
-
-		return [ x, y ];
-
-	}
-
-	function parseValue( dataView, buffer, offset, type, size ) {
-
-		if ( type === 'string' || type === 'iccProfile' ) {
-
-			return parseFixedLengthString( buffer, offset, size );
-
-		} else if ( type === 'chlist' ) {
-
-			return parseChlist( dataView, buffer, offset, size );
-
-		} else if ( type === 'chromaticities' ) {
-
-			return parseChromaticities( dataView, offset );
-
-		} else if ( type === 'compression' ) {
-
-			return parseCompression( dataView, offset );
-
-		} else if ( type === 'box2i' ) {
-
-			return parseBox2i( dataView, offset );
-
-		} else if ( type === 'lineOrder' ) {
-
-			return parseLineOrder( dataView, offset );
-
-		} else if ( type === 'float' ) {
-
-			return parseFloat32( dataView, offset );
-
-		} else if ( type === 'v2f' ) {
-
-			return parseV2f( dataView, offset );
-
-		} else if ( type === 'int' ) {
-
-			return parseUint32( dataView, offset );
-
-		} else {
-
-			throw 'Cannot parse value for unsupported type: ' + type;
-
-		}
-
-	}
-
-	var bufferDataView = new DataView(buffer);
-	var uInt8Array = new Uint8Array(buffer);
-
-	var EXRHeader = {};
-
-	var magic = bufferDataView.getUint32( 0, true );
-	var versionByteZero = bufferDataView.getUint8( 4, true );
-	var fullMask = bufferDataView.getUint8( 5, true );
-
-	// start of header
-
-	var offset = { value: 8 }; // start at 8, after magic stuff
-
-	var keepReading = true;
-
-	while ( keepReading ) {
-
-		var attributeName = parseNullTerminatedString( buffer, offset );
-
-		if ( attributeName == 0 ) {
-
-			keepReading = false;
-
-		} else {
-
-			var attributeType = parseNullTerminatedString( buffer, offset );
-			var attributeSize = parseUint32( bufferDataView, offset );
-			var attributeValue = parseValue( bufferDataView, buffer, offset, attributeType, attributeSize );
-
-			EXRHeader[ attributeName ] = attributeValue;
-
-		}
-
-	}
-
-	// offsets
-
-	var dataWindowHeight = EXRHeader.dataWindow.yMax + 1;
-	var scanlineBlockSize = 1; // 1 for NO_COMPRESSION
-
-	if ( EXRHeader.compression === 'PIZ_COMPRESSION' ) {
-
-		scanlineBlockSize = 32;
-
-	}
-
-	var numBlocks = dataWindowHeight / scanlineBlockSize;
-
-	for ( var i = 0; i < numBlocks; i ++ ) {
-
-		var scanlineOffset = parseUlong( bufferDataView, offset );
-
-	}
-
-	// we should be passed the scanline offset table, start reading pixel data
-
-	var width = EXRHeader.dataWindow.xMax - EXRHeader.dataWindow.xMin + 1;
-	var height = EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1;
-	var numChannels = EXRHeader.channels.length;
-
-	var byteArray = new Float32Array( width * height * numChannels );
-
-	var channelOffsets = {
-		R: 0,
-		G: 1,
-		B: 2,
-		A: 3
-	};
-
-	if ( EXRHeader.compression === 'NO_COMPRESSION' ) {
-
-		for ( var y = 0; y < height; y ++ ) {
-
-			var y_scanline = parseUint32( bufferDataView, offset );
-			var dataSize = parseUint32( bufferDataView, offset );
-
-			for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
-
-				var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
-
-				if ( EXRHeader.channels[ channelID ].pixelType === 1 ) {
-
-					// HALF
-					for ( var x = 0; x < width; x ++ ) {
-
-						var val = parseFloat16( bufferDataView, offset );
-
-						byteArray[ ( ( ( height - y_scanline ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+						out.push( reader.getUint8( p ++ ) );
 
 					}
+
 
 				} else {
 
-					throw 'EXRLoader._parser: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+					var count = l;
+					size -= 2;
+
+					var value = reader.getUint8( p ++ );
+
+					for ( var i = 0; i < count + 1; i ++ ) {
+
+						out.push( value );
+
+					}
+
 
 				}
 
 			}
 
+			return out;
+
 		}
 
-	} else if ( EXRHeader.compression === 'PIZ_COMPRESSION' ) {
+		function uncompressRaw( info ) {
 
-		for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
+			return new DataView( info.array.buffer, info.offset.value, info.size );
 
-			var line_no = parseUint32( bufferDataView, offset );
-			var data_len = parseUint32( bufferDataView, offset );
+		}
 
-			var tmpBufferSize = width * scanlineBlockSize * ( EXRHeader.channels.length * BYTES_PER_HALF );
-			var tmpBuffer = new Uint16Array( tmpBufferSize );
+		function uncompressRLE( info ) {
+
+			var compressed = info.viewer.buffer.slice( info.offset.value, info.offset.value + info.size );
+
+			var rawBuffer = new Uint8Array( decodeRunLength( compressed ) );
+			var tmpBuffer = new Uint8Array( rawBuffer.length );
+
+			predictor( rawBuffer ); // revert predictor
+
+			interleaveScalar( rawBuffer, tmpBuffer ); // interleave pixels
+
+			return new DataView( tmpBuffer.buffer );
+
+		}
+
+		function uncompressZIP( info ) {
+
+			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
+
+			if ( typeof Zlib === 'undefined' ) {
+
+				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+
+			}
+
+			var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
+
+			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
+			var tmpBuffer = new Uint8Array( rawBuffer.length );
+
+			predictor( rawBuffer ); // revert predictor
+
+			interleaveScalar( rawBuffer, tmpBuffer ); // interleave pixels
+
+			return new DataView( tmpBuffer.buffer );
+
+		}
+
+		function uncompressPIZ( info ) {
+
+			var inDataView = info.viewer;
+			var inOffset = { value: info.offset.value };
+
+			var tmpBufSize = info.width * scanlineBlockSize * ( EXRHeader.channels.length * BYTES_PER_HALF );
+			var outBuffer = new Uint16Array( tmpBufSize );
+			var outOffset = { value: 0 };
+
+			var bitmap = new Uint8Array( BITMAP_SIZE );
+
+			var minNonZero = parseUint16( inDataView, inOffset );
+			var maxNonZero = parseUint16( inDataView, inOffset );
+
+			if ( maxNonZero >= BITMAP_SIZE ) {
+
+				throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE';
+
+			}
+
+			if ( minNonZero <= maxNonZero ) {
+
+				for ( var i = 0; i < maxNonZero - minNonZero + 1; i ++ ) {
+
+					bitmap[ i + minNonZero ] = parseUint8( inDataView, inOffset );
+
+				}
+
+			}
+
+			var lut = new Uint16Array( USHORT_RANGE );
+			reverseLutFromBitmap( bitmap, lut );
+
+			var length = parseUint32( inDataView, inOffset );
+
+			hufUncompress( info.array, inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize );
+
+			var pizChannelData = new Array( info.channels );
+
+			var outBufferEnd = 0;
+
+			for ( var i = 0; i < info.channels; i ++ ) {
+
+				pizChannelData[ i ] = {};
+				pizChannelData[ i ][ 'start' ] = outBufferEnd;
+				pizChannelData[ i ][ 'end' ] = pizChannelData[ i ][ 'start' ];
+				pizChannelData[ i ][ 'nx' ] = info.width;
+				pizChannelData[ i ][ 'ny' ] = info.lines;
+				pizChannelData[ i ][ 'size' ] = 1;
+
+				outBufferEnd += pizChannelData[ i ].nx * pizChannelData[ i ].ny * pizChannelData[ i ].size;
+
+			}
+
+			var fooOffset = 0;
+
+			for ( var i = 0; i < info.channels; i ++ ) {
+
+				for ( var j = 0; j < pizChannelData[ i ].size; ++ j ) {
+
+					fooOffset += wav2Decode(
+						j + fooOffset,
+						outBuffer,
+						pizChannelData[ i ].nx,
+						pizChannelData[ i ].size,
+						pizChannelData[ i ].ny,
+						pizChannelData[ i ].nx * pizChannelData[ i ].size
+					);
+
+				}
+
+			}
+
+			applyLut( lut, outBuffer, outBufferEnd );
+
+			var tmpBuffer = new Uint8Array( outBuffer.buffer.byteLength );
+			var tmpOffset = 0;
+			var n = info.width * 2;
+
+			for ( var y = 0; y < info.lines; y ++ ) {
+
+				for ( var c = 0; c < info.channels; c ++ ) {
+
+					var cd = pizChannelData[ c ];
+					var cp = new Uint8Array( outBuffer.buffer, cd.end * 2 + y * n, n );
+
+					tmpBuffer.set( cp, tmpOffset );
+					tmpOffset += n;
+
+				}
+
+			}
+
+			return new DataView( tmpBuffer.buffer );
+
+		}
+
+		function parseNullTerminatedString( buffer, offset ) {
+
+			var uintBuffer = new Uint8Array( buffer );
+			var endOffset = 0;
+
+			while ( uintBuffer[ offset.value + endOffset ] != 0 ) {
+
+				endOffset += 1;
+
+			}
+
+			var stringValue = new TextDecoder().decode(
+				uintBuffer.slice( offset.value, offset.value + endOffset )
+			);
+
+			offset.value = offset.value + endOffset + 1;
+
+			return stringValue;
+
+		}
+
+		function parseFixedLengthString( buffer, offset, size ) {
+
+			var stringValue = new TextDecoder().decode(
+				new Uint8Array( buffer ).slice( offset.value, offset.value + size )
+			);
+
+			offset.value = offset.value + size;
+
+			return stringValue;
+
+		}
+
+		function parseUlong( dataView, offset ) {
+
+			var uLong = dataView.getUint32( 0, true );
+
+			offset.value = offset.value + ULONG_SIZE;
+
+			return uLong;
+
+		}
+
+		function parseUint32( dataView, offset ) {
+
+			var Uint32 = dataView.getUint32( offset.value, true );
+
+			offset.value = offset.value + INT32_SIZE;
+
+			return Uint32;
+
+		}
+
+		function parseUint8Array( uInt8Array, offset ) {
+
+			var Uint8 = uInt8Array[ offset.value ];
+
+			offset.value = offset.value + INT8_SIZE;
+
+			return Uint8;
+
+		}
+
+		function parseUint8( dataView, offset ) {
+
+			var Uint8 = dataView.getUint8( offset.value );
+
+			offset.value = offset.value + INT8_SIZE;
+
+			return Uint8;
+
+		}
+
+		function parseFloat32( dataView, offset ) {
+
+			var float = dataView.getFloat32( offset.value, true );
+
+			offset.value += FLOAT32_SIZE;
+
+			return float;
+
+		}
+
+		// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
+		function decodeFloat16( binary ) {
+
+			var exponent = ( binary & 0x7C00 ) >> 10,
+				fraction = binary & 0x03FF;
+
+			return ( binary >> 15 ? - 1 : 1 ) * (
+				exponent ?
+					(
+						exponent === 0x1F ?
+							fraction ? NaN : Infinity :
+							Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
+					) :
+					6.103515625e-5 * ( fraction / 0x400 )
+			);
+
+		}
+
+		function parseUint16( dataView, offset ) {
+
+			var Uint16 = dataView.getUint16( offset.value, true );
+
+			offset.value += INT16_SIZE;
+
+			return Uint16;
+
+		}
+
+		function parseFloat16( buffer, offset ) {
+
+			return decodeFloat16( parseUint16( buffer, offset ) );
+
+		}
+
+		function parseChlist( dataView, buffer, offset, size ) {
+
+			var startOffset = offset.value;
+			var channels = [];
+
+			while ( offset.value < ( startOffset + size - 1 ) ) {
+
+				var name = parseNullTerminatedString( buffer, offset );
+				var pixelType = parseUint32( dataView, offset ); // TODO: Cast this to UINT, HALF or FLOAT
+				var pLinear = parseUint8( dataView, offset );
+				offset.value += 3; // reserved, three chars
+				var xSampling = parseUint32( dataView, offset );
+				var ySampling = parseUint32( dataView, offset );
+
+				channels.push( {
+					name: name,
+					pixelType: pixelType,
+					pLinear: pLinear,
+					xSampling: xSampling,
+					ySampling: ySampling
+				} );
+
+			}
+
+			offset.value += 1;
+
+			return channels;
+
+		}
+
+		function parseChromaticities( dataView, offset ) {
+
+			var redX = parseFloat32( dataView, offset );
+			var redY = parseFloat32( dataView, offset );
+			var greenX = parseFloat32( dataView, offset );
+			var greenY = parseFloat32( dataView, offset );
+			var blueX = parseFloat32( dataView, offset );
+			var blueY = parseFloat32( dataView, offset );
+			var whiteX = parseFloat32( dataView, offset );
+			var whiteY = parseFloat32( dataView, offset );
+
+			return { redX: redX, redY: redY, greenX: greenX, greenY: greenY, blueX: blueX, blueY: blueY, whiteX: whiteX, whiteY: whiteY };
+
+		}
+
+		function parseCompression( dataView, offset ) {
+
+			var compressionCodes = [
+				'NO_COMPRESSION',
+				'RLE_COMPRESSION',
+				'ZIPS_COMPRESSION',
+				'ZIP_COMPRESSION',
+				'PIZ_COMPRESSION',
+				'PXR24_COMPRESSION',
+				'B44_COMPRESSION',
+				'B44A_COMPRESSION',
+				'DWAA_COMPRESSION',
+				'DWAB_COMPRESSION'
+			];
+
+			var compression = parseUint8( dataView, offset );
+
+			return compressionCodes[ compression ];
+
+		}
+
+		function parseBox2i( dataView, offset ) {
+
+			var xMin = parseUint32( dataView, offset );
+			var yMin = parseUint32( dataView, offset );
+			var xMax = parseUint32( dataView, offset );
+			var yMax = parseUint32( dataView, offset );
+
+			return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
+
+		}
+
+		function parseLineOrder( dataView, offset ) {
+
+			var lineOrders = [
+				'INCREASING_Y'
+			];
+
+			var lineOrder = parseUint8( dataView, offset );
+
+			return lineOrders[ lineOrder ];
+
+		}
+
+		function parseV2f( dataView, offset ) {
+
+			var x = parseFloat32( dataView, offset );
+			var y = parseFloat32( dataView, offset );
+
+			return [ x, y ];
+
+		}
+
+		function parseValue( dataView, buffer, offset, type, size ) {
+
+			if ( type === 'string' || type === 'iccProfile' ) {
+
+				return parseFixedLengthString( buffer, offset, size );
+
+			} else if ( type === 'chlist' ) {
+
+				return parseChlist( dataView, buffer, offset, size );
+
+			} else if ( type === 'chromaticities' ) {
+
+				return parseChromaticities( dataView, offset );
+
+			} else if ( type === 'compression' ) {
+
+				return parseCompression( dataView, offset );
+
+			} else if ( type === 'box2i' ) {
+
+				return parseBox2i( dataView, offset );
+
+			} else if ( type === 'lineOrder' ) {
+
+				return parseLineOrder( dataView, offset );
+
+			} else if ( type === 'float' ) {
+
+				return parseFloat32( dataView, offset );
+
+			} else if ( type === 'v2f' ) {
+
+				return parseV2f( dataView, offset );
+
+			} else if ( type === 'int' ) {
+
+				return parseUint32( dataView, offset );
+
+			} else {
+
+				throw 'Cannot parse value for unsupported type: ' + type;
+
+			}
+
+		}
+
+		var bufferDataView = new DataView( buffer );
+		var uInt8Array = new Uint8Array( buffer );
+
+		var EXRHeader = {};
+
+		bufferDataView.getUint32( 0, true ); // magic
+		bufferDataView.getUint8( 4, true ); // versionByteZero
+		bufferDataView.getUint8( 5, true ); // fullMask
+
+		// start of header
+
+		var offset = { value: 8 }; // start at 8, after magic stuff
+
+		var keepReading = true;
+
+		while ( keepReading ) {
+
+			var attributeName = parseNullTerminatedString( buffer, offset );
+
+			if ( attributeName == 0 ) {
+
+				keepReading = false;
+
+			} else {
+
+				var attributeType = parseNullTerminatedString( buffer, offset );
+				var attributeSize = parseUint32( bufferDataView, offset );
+				var attributeValue = parseValue( bufferDataView, buffer, offset, attributeType, attributeSize );
+
+				EXRHeader[ attributeName ] = attributeValue;
+
+			}
+
+		}
+
+		// offsets
+		var dataWindowHeight = EXRHeader.dataWindow.yMax + 1;
+
+		var uncompress;
+		var scanlineBlockSize;
+
+		switch ( EXRHeader.compression ) {
+
+			case 'NO_COMPRESSION':
+
+				scanlineBlockSize = 1;
+				uncompress = uncompressRaw;
+				break;
+
+			case 'RLE_COMPRESSION':
+
+				scanlineBlockSize = 1;
+				uncompress = uncompressRLE;
+				break;
+
+			case 'ZIPS_COMPRESSION':
+
+				scanlineBlockSize = 1;
+				uncompress = uncompressZIP;
+				break;
+
+			case 'ZIP_COMPRESSION':
+
+				scanlineBlockSize = 16;
+				uncompress = uncompressZIP;
+				break;
+
+			case 'PIZ_COMPRESSION':
+
+				scanlineBlockSize = 32;
+				uncompress = uncompressPIZ;
+				break;
+
+			default:
+
+				throw 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported';
+
+		}
+
+		var size_t;
+		var getValue;
+
+		// mixed pixelType not supported
+		var pixelType = EXRHeader.channels[ 0 ].pixelType;
+
+		if ( pixelType === 1 ) { // half
+
+			switch ( this.type ) {
+
+				case THREE.FloatType:
+
+					getValue = parseFloat16;
+					size_t = INT16_SIZE;
+					break;
+
+				case THREE.HalfFloatType:
+
+					getValue = parseUint16;
+					size_t = INT16_SIZE;
+					break;
+
+			}
+
+		} else if ( pixelType === 2 ) { // float
+
+			switch ( this.type ) {
+
+				case THREE.FloatType:
+
+					getValue = parseFloat32;
+					size_t = FLOAT32_SIZE;
+					break;
+
+				case THREE.HalfFloatType:
+
+					throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.';
+
+			}
+
+		} else {
+
+			throw 'EXRLoader.parse: unsupported pixelType ' + pixelType + ' for ' + EXRHeader.compression + '.';
+
+		}
+
+		var numBlocks = dataWindowHeight / scanlineBlockSize;
+
+		for ( var i = 0; i < numBlocks; i ++ ) {
+
+			parseUlong( bufferDataView, offset ); // scanlineOffset
+
+		}
+
+		// we should be passed the scanline offset table, start reading pixel data
+
+		var width = EXRHeader.dataWindow.xMax - EXRHeader.dataWindow.xMin + 1;
+		var height = EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1;
+		// Firefox only supports RGBA (half) float textures
+		// var numChannels = EXRHeader.channels.length;
+		var numChannels = 4;
+		var size = width * height * numChannels;
+
+		// Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
+		switch ( this.type ) {
+
+			case THREE.FloatType:
+
+				var byteArray = new Float32Array( size );
+
+				if ( EXRHeader.channels.length < numChannels ) {
+
+					byteArray.fill( 1, 0, size );
+
+				}
+
+				break;
+
+			case THREE.HalfFloatType:
+
+				var byteArray = new Uint16Array( size );
+
+				if ( EXRHeader.channels.length < numChannels ) {
+
+					byteArray.fill( 0x3C00, 0, size ); // Uint16Array holds half float data, 0x3C00 is 1
+
+				}
+
+				break;
+
+			default:
+
+				console.error( 'THREE.EXRLoader: unsupported type: ', this.type );
+				break;
+
+		}
+
+		var channelOffsets = {
+			R: 0,
+			G: 1,
+			B: 2,
+			A: 3
+		};
+
+		var compressionInfo = {
+
+			array: uInt8Array,
+			viewer: bufferDataView,
+			offset: offset,
+			channels: EXRHeader.channels.length,
+			width: width,
+			lines: scanlineBlockSize,
+			size: 0
+
+		};
+
+		if ( EXRHeader.compression === 'NO_COMPRESSION' ||
+			EXRHeader.compression === 'ZIP_COMPRESSION' ||
+			EXRHeader.compression === 'ZIPS_COMPRESSION' ||
+			EXRHeader.compression === 'RLE_COMPRESSION' ||
+			EXRHeader.compression === 'PIZ_COMPRESSION' ) {
+
+			var size;
+			var viewer;
 			var tmpOffset = { value: 0 };
 
-			decompressPIZ( tmpBuffer, tmpOffset, uInt8Array, bufferDataView, offset, tmpBufferSize, numChannels, EXRHeader.channels, width, scanlineBlockSize );
+			for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
 
-			for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
+				parseUint32( bufferDataView, offset ); // line_no
+				size = parseUint32( bufferDataView, offset ); // data_len
 
-				for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
+				compressionInfo.offset = offset;
+				compressionInfo.size = size;
 
-					var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+				viewer = uncompress( compressionInfo );
 
-					if ( EXRHeader.channels[ channelID ].pixelType === 1 ) {
+				offset.value += size;
 
-						// HALF
+				for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
+
+					var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+
+					if ( true_y >= height ) break;
+
+					for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
+
+						var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+
 						for ( var x = 0; x < width; x ++ ) {
 
-							var val = decodeFloat16( tmpBuffer[ ( channelID * ( scanlineBlockSize * width ) ) + ( line_y * width ) + x ] );
+							var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
+							tmpOffset.value = idx * size_t;
 
-							var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+							var val = getValue( viewer, tmpOffset );
 
-							byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+							byteArray[ ( ( ( height - 1 - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
 						}
-
-					} else {
-
-						throw 'EXRLoader._parser: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
 
 					}
 
@@ -1166,19 +1415,56 @@ THREE.EXRLoader.prototype._parser = function ( buffer ) {
 
 		}
 
-	} else {
+		return {
+			header: EXRHeader,
+			width: width,
+			height: height,
+			data: byteArray,
+			format: numChannels === 4 ? THREE.RGBAFormat : THREE.RGBFormat,
+			type: this.type
+		};
 
-		throw 'EXRLoader._parser: ' + EXRHeader.compression + ' is unsupported';
+	},
+
+	setDataType: function ( value ) {
+
+		this.type = value;
+		return this;
+
+	},
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		function onLoadCallback( texture, texData ) {
+
+			switch ( texture.type ) {
+
+				case THREE.FloatType:
+
+					texture.encoding = THREE.LinearEncoding;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = false;
+					break;
+
+				case THREE.HalfFloatType:
+
+					texture.encoding = THREE.LinearEncoding;
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = false;
+					texture.flipY = false;
+					break;
+
+			}
+
+			if ( onLoad ) onLoad( texture, texData );
+
+		}
+
+		return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
 
 	}
 
-	return {
-		header: EXRHeader,
-		width: width,
-		height: height,
-		data: byteArray,
-		format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
-		type: THREE.FloatType
-	};
-
-};
+} );

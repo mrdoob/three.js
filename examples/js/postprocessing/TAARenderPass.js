@@ -12,7 +12,7 @@
  *
  */
 
-THREE.TAARenderPass = function ( scene, camera, params ) {
+THREE.TAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 
 	if ( THREE.SSAARenderPass === undefined ) {
 
@@ -20,7 +20,7 @@ THREE.TAARenderPass = function ( scene, camera, params ) {
 
 	}
 
-	THREE.SSAARenderPass.call( this, scene, camera, params );
+	THREE.SSAARenderPass.call( this, scene, camera, clearColor, clearAlpha );
 
 	this.sampleLevel = 0;
 	this.accumulate = false;
@@ -88,7 +88,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 				if ( this.camera.setViewOffset ) {
 
 					this.camera.setViewOffset( readBuffer.width, readBuffer.height,
-						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625,   // 0.0625 = 1 / 16
+						jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
 						readBuffer.width, readBuffer.height );
 
 				}
@@ -99,7 +99,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 
 				renderer.setRenderTarget( this.sampleRenderTarget );
 				if ( this.accumulateIndex === 0 ) renderer.clear();
-				renderer.render( this.scene2, this.camera2 );
+				this.fsQuad.render( renderer );
 
 				this.accumulateIndex ++;
 
@@ -119,7 +119,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 			this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
 			renderer.clear();
-			renderer.render( this.scene2, this.camera2 );
+			this.fsQuad.render( renderer );
 
 		}
 
@@ -129,7 +129,7 @@ THREE.TAARenderPass.prototype = Object.assign( Object.create( THREE.SSAARenderPa
 			this.copyUniforms[ "tDiffuse" ].value = this.holdRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
 			if ( accumulationWeight === 0 ) renderer.clear();
-			renderer.render( this.scene2, this.camera2 );
+			this.fsQuad.render( renderer );
 
 		}
 

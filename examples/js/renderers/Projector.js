@@ -322,7 +322,7 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === THREE.FaceColors ||  material.vertexColors === THREE.VertexColors ) {
+				if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -470,6 +470,7 @@ THREE.Projector = function () {
 						if ( material.morphTargets === true ) {
 
 							var morphTargets = geometry.morphAttributes.position;
+							var morphTargetsRelative = geometry.morphTargetsRelative;
 							var morphInfluences = object.morphTargetInfluences;
 
 							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
@@ -480,9 +481,19 @@ THREE.Projector = function () {
 
 								var target = morphTargets[ t ];
 
-								x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
-								y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
-								z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+								if ( morphTargetsRelative ) {
+
+									x += target.getX( i / 3 ) * influence;
+									y += target.getY( i / 3 ) * influence;
+									z += target.getZ( i / 3 ) * influence;
+
+								} else {
+
+									x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
+									y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
+									z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+
+								}
 
 							}
 
@@ -1038,8 +1049,8 @@ THREE.Projector = function () {
 
 		var alpha1 = 0, alpha2 = 1,
 
-		// Calculate the boundary coordinate of each vertex for the near and far clip planes,
-		// Z = -1 and Z = +1, respectively.
+			// Calculate the boundary coordinate of each vertex for the near and far clip planes,
+			// Z = -1 and Z = +1, respectively.
 
 			bc1near = s1.z + s1.w,
 			bc2near = s2.z + s2.w,

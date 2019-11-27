@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -15,12 +16,11 @@ import { setProjectionFromUnion } from './WebVRUtils.js';
 
 function WebVRManager( renderer ) {
 
+	var renderWidth, renderHeight;
 	var scope = this;
 
 	var device = null;
 	var frameData = null;
-
-	var poseTarget = null;
 
 	var controllers = [];
 	var standingMatrix = new Matrix4();
@@ -28,7 +28,7 @@ function WebVRManager( renderer ) {
 
 	var framebufferScaleFactor = 1.0;
 
-	var frameOfReferenceType = 'stage';
+	var referenceSpaceType = 'local-floor';
 
 	if ( typeof window !== 'undefined' && 'VRFrameData' in window ) {
 
@@ -41,12 +41,14 @@ function WebVRManager( renderer ) {
 	var tempQuaternion = new Quaternion();
 	var tempPosition = new Vector3();
 
+	var tempCamera = new PerspectiveCamera();
+
 	var cameraL = new PerspectiveCamera();
-	cameraL.bounds = new Vector4( 0.0, 0.0, 0.5, 1.0 );
+	cameraL.viewport = new Vector4();
 	cameraL.layers.enable( 1 );
 
 	var cameraR = new PerspectiveCamera();
-	cameraR.bounds = new Vector4( 0.5, 0.0, 0.5, 1.0 );
+	cameraR.viewport = new Vector4();
 	cameraR.layers.enable( 2 );
 
 	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
@@ -68,15 +70,20 @@ function WebVRManager( renderer ) {
 		if ( isPresenting() ) {
 
 			var eyeParameters = device.getEyeParameters( 'left' );
-			var renderWidth = eyeParameters.renderWidth * framebufferScaleFactor;
-			var renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
+			renderWidth = 2 * eyeParameters.renderWidth * framebufferScaleFactor;
+			renderHeight = eyeParameters.renderHeight * framebufferScaleFactor;
 
 			currentPixelRatio = renderer.getPixelRatio();
 			renderer.getSize( currentSize );
 
-			renderer.setDrawingBufferSize( renderWidth * 2, renderHeight, 1 );
+			renderer.setDrawingBufferSize( renderWidth, renderHeight, 1 );
+
+			cameraL.viewport.set( 0, 0, renderWidth / 2, renderHeight );
+			cameraR.viewport.set( renderWidth / 2, 0, renderWidth / 2, renderHeight );
 
 			animation.start();
+
+			scope.dispatchEvent( { type: 'sessionstart' } );
 
 		} else {
 
@@ -88,6 +95,8 @@ function WebVRManager( renderer ) {
 
 			animation.stop();
 
+			scope.dispatchEvent( { type: 'sessionend' } );
+
 		}
 
 	}
@@ -95,23 +104,26 @@ function WebVRManager( renderer ) {
 	//
 
 	var triggers = [];
+	var grips = [];
 
 	function findGamepad( id ) {
 
 		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
-		for ( var i = 0, j = 0, l = gamepads.length; i < l; i ++ ) {
+		for ( var i = 0, l = gamepads.length; i < l; i ++ ) {
 
 			var gamepad = gamepads[ i ];
 
 			if ( gamepad && ( gamepad.id === 'Daydream Controller' ||
 				gamepad.id === 'Gear VR Controller' || gamepad.id === 'Oculus Go Controller' ||
 				gamepad.id === 'OpenVR Gamepad' || gamepad.id.startsWith( 'Oculus Touch' ) ||
+				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
 				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
 
-				if ( j === id ) return gamepad;
+				var hand = gamepad.hand;
 
-				j ++;
+				if ( id === 0 && ( hand === '' || hand === 'right' ) ) return gamepad;
+				if ( id === 1 && ( hand === 'left' ) ) return gamepad;
 
 			}
 
@@ -131,7 +143,7 @@ function WebVRManager( renderer ) {
 
 				if ( gamepad.pose === null ) return;
 
-				//  Pose
+				// Pose
 
 				var pose = gamepad.pose;
 
@@ -145,9 +157,11 @@ function WebVRManager( renderer ) {
 				controller.matrixWorldNeedsUpdate = true;
 				controller.visible = true;
 
-				//  Trigger
+				// Trigger
 
 				var buttonId = gamepad.id === 'Daydream Controller' ? 0 : 1;
+
+				if ( triggers[ i ] === undefined ) triggers[ i ] = false;
 
 				if ( triggers[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
 
@@ -166,11 +180,48 @@ function WebVRManager( renderer ) {
 
 				}
 
+				// Grip
+				buttonId = 2;
+
+				if ( grips[ i ] === undefined ) grips[ i ] = false;
+
+				// Skip if the grip button doesn't exist on this controller
+				if ( gamepad.buttons[ buttonId ] !== undefined ) {
+
+					if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+						grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+						if ( grips[ i ] === true ) {
+
+							controller.dispatchEvent( { type: 'squeezestart' } );
+
+						} else {
+
+							controller.dispatchEvent( { type: 'squeezeend' } );
+							controller.dispatchEvent( { type: 'squeeze' } );
+
+						}
+
+					}
+
+				}
+
 			} else {
 
 				controller.visible = false;
 
 			}
+
+		}
+
+	}
+
+	function updateViewportFromBounds( viewport, bounds ) {
+
+		if ( bounds !== null && bounds.length === 4 ) {
+
+			viewport.set( bounds[ 0 ] * renderWidth, bounds[ 1 ] * renderHeight, bounds[ 2 ] * renderWidth, bounds[ 3 ] * renderHeight );
 
 		}
 
@@ -218,28 +269,15 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.setFrameOfReferenceType = function ( value ) {
+	this.setReferenceSpaceType = function ( value ) {
 
-		frameOfReferenceType = value;
-
-	};
-
-	this.setPoseTarget = function ( object ) {
-
-		if ( object !== undefined ) poseTarget = object;
+		referenceSpaceType = value;
 
 	};
 
 	this.getCamera = function ( camera ) {
 
-		var userHeight = frameOfReferenceType === 'stage' ? 1.6 : 0;
-
-		if ( device === null ) {
-
-			camera.position.set( 0, userHeight, 0 );
-			return camera;
-
-		}
+		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
 
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
@@ -248,7 +286,7 @@ function WebVRManager( renderer ) {
 
 		//
 
-		if ( frameOfReferenceType === 'stage' ) {
+		if ( referenceSpaceType === 'local-floor' ) {
 
 			var stageParameters = device.stageParameters;
 
@@ -266,16 +304,14 @@ function WebVRManager( renderer ) {
 
 
 		var pose = frameData.pose;
-		var poseObject = poseTarget !== null ? poseTarget : camera;
 
-		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
-		poseObject.matrix.copy( standingMatrix );
-		poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
+		tempCamera.matrix.copy( standingMatrix );
+		tempCamera.matrix.decompose( tempCamera.position, tempCamera.quaternion, tempCamera.scale );
 
 		if ( pose.orientation !== null ) {
 
 			tempQuaternion.fromArray( pose.orientation );
-			poseObject.quaternion.multiply( tempQuaternion );
+			tempCamera.quaternion.multiply( tempQuaternion );
 
 		}
 
@@ -284,13 +320,23 @@ function WebVRManager( renderer ) {
 			tempQuaternion.setFromRotationMatrix( standingMatrix );
 			tempPosition.fromArray( pose.position );
 			tempPosition.applyQuaternion( tempQuaternion );
-			poseObject.position.add( tempPosition );
+			tempCamera.position.add( tempPosition );
 
 		}
 
-		poseObject.updateMatrixWorld();
+		tempCamera.updateMatrixWorld();
 
-		if ( device.isPresenting === false ) return camera;
+		//
+
+		camera.matrixWorld.copy( tempCamera.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
 
 		//
 
@@ -307,14 +353,14 @@ function WebVRManager( renderer ) {
 
 		standingMatrixInverse.getInverse( standingMatrix );
 
-		if ( frameOfReferenceType === 'stage' ) {
+		if ( referenceSpaceType === 'local-floor' ) {
 
 			cameraL.matrixWorldInverse.multiply( standingMatrixInverse );
 			cameraR.matrixWorldInverse.multiply( standingMatrixInverse );
 
 		}
 
-		var parent = poseObject.parent;
+		var parent = camera.parent;
 
 		if ( parent !== null ) {
 
@@ -343,17 +389,8 @@ function WebVRManager( renderer ) {
 
 			var layer = layers[ 0 ];
 
-			if ( layer.leftBounds !== null && layer.leftBounds.length === 4 ) {
-
-				cameraL.bounds.fromArray( layer.leftBounds );
-
-			}
-
-			if ( layer.rightBounds !== null && layer.rightBounds.length === 4 ) {
-
-				cameraR.bounds.fromArray( layer.rightBounds );
-
-			}
+			updateViewportFromBounds( cameraL.viewport, layer.leftBounds );
+			updateViewportFromBounds( cameraR.viewport, layer.rightBounds );
 
 		}
 
@@ -379,6 +416,8 @@ function WebVRManager( renderer ) {
 
 		animation.setAnimationLoop( callback );
 
+		if ( isPresenting() ) animation.start();
+
 	};
 
 	this.submitFrame = function () {
@@ -397,6 +436,16 @@ function WebVRManager( renderer ) {
 
 	};
 
+	// DEPRECATED
+
+	this.setFrameOfReferenceType = function () {
+
+		console.warn( 'THREE.WebVRManager: setFrameOfReferenceType() has been deprecated.' );
+
+	};
+
 }
+
+Object.assign( WebVRManager.prototype, EventDispatcher.prototype );
 
 export { WebVRManager };

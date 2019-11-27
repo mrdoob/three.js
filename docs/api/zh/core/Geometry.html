@@ -12,7 +12,7 @@
 
 		<div class="desc">
 		<p>
-			Geometry 是对 [page:BufferGeometry] 的用户有好替代。Geometry 利用 [page:Vector3]
+			Geometry 是一个便于用户使用的 [page:BufferGeometry] 的替代品。Geometry 利用 [page:Vector3]
 			或 [page:Color] 存储了几何体的相关 attributes（如顶点位置，面信息，颜色等）比起 BufferGeometry
 			更容易读写，但是运行效率不如有类型的队列。
 		</p>
@@ -318,7 +318,9 @@
 		</p>
 
 		<h3>[method:JSON toJSON] ( )</h3>
-		<p> 将 Geometry 对象数据转为  JSON 格式。</p>
+		<p> 将 Geometry 对象转为  JSON 格式。<br />
+			将几何体转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+		</p>
 
 		<h3>[method:Geometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
@@ -329,6 +331,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

@@ -38,7 +38,7 @@
 
 
 		<h2>属性</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
 
 		<h3>[property:Integer drawMode]</h3>
 		<p>
@@ -46,7 +46,10 @@
 			请参阅draw mode [page:DrawModes constants]（绘图模式常量）来查看其所有可能的值。
 			其默认值是[page:DrawModes TrianglesDrawMode]。
 		</p>
-
+		<p>
+			A sensible usage of this property is only possible when [page:Mesh.geometry] is of type [page:BufferGeometry BufferGeometry]
+			since the engine always assumes *THREE.TrianglesDrawMode* for [page:Geometry Geometry].
+		</p>
 
 		<h3>[property:Boolean isMesh]</h3>
 		<p>
@@ -80,7 +83,7 @@
 
 
 		<h2>方法</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
+		<p>共有方法请参见其基类[page:Object3D]。</p>
 
 		<h3>[method:null setDrawMode]( [param:Integer value] )</h3>
 		<p>设置[page:.drawMode drawMode]的值。</p>
@@ -103,6 +106,8 @@
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

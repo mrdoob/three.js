@@ -4,38 +4,20 @@
 		<title>three.js webgl - percent closer soft-shadows</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #000;
+				background-color: #cce0ff;
 				color: #000;
-				margin: 0px;
-				overflow: hidden;
 			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-			}
-
 			a {
-				text-decoration: underline;
-				cursor: pointer;
+				color: #08f;
 			}
-
 		</style>
 	</head>
 
 	<body>
 		<div id="info">Percent Closer Soft-Shadows (PCSS) by <a href="http://eduperiment.com">spidersharma03</a></div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-fragment" id="PCSS">
 
@@ -132,13 +114,13 @@
 
 		</script>
 
-		<script>
+		<script type="module">
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import * as THREE from '../build/three.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			import Stats from './jsm/libs/stats.module.js';
 
-			}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -161,8 +143,15 @@
 				// camera
 
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.y = 5;
-				camera.position.z = 15;
+
+				// We use this particular camera position in order to expose a bug that can sometimes happen presumably
+				// due to lack of precision when interpolating values over really large triangles.
+				// It reproduced on at least NVIDIA GTX 1080 and GTX 1050 Ti GPUs when the ground plane was not
+				// subdivided into segments.
+				camera.position.x = 7;
+				camera.position.y = 13;
+				camera.position.z = 7;
+
 				scene.add( camera );
 
 				// lights
@@ -179,7 +168,7 @@
 
 				scene.add( light );
 
-				// scene.add( new THREE.DirectionalLightHelper( light ) );
+				// scene.add( new DirectionalLightHelper( light ) );
 				scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 				// group
@@ -209,7 +198,7 @@
 
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000, 8, 8 ), groundMaterial );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
@@ -255,7 +244,7 @@
 				renderer.shadowMap.enabled = true;
 
 				// controls
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.5;
 				controls.minDistance = 10;
 				controls.maxDistance = 75;

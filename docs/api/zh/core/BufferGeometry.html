@@ -37,7 +37,7 @@
 		] );
 
 		// itemSize = 3 因为每个顶点都是一个三元组。
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
@@ -49,39 +49,6 @@
 			[example:webgl_buffergeometry_custom_attributes_particles Particles]<br />
 			[example:webgl_buffergeometry_rawshader Raw Shaders]
 		</p>
-
-
-		<h2>访问属性值</h2>
-		<p>
-			WebGL 将与每个顶点相关的数据保存为 <em>attributes</em>. 这些属性例如，顶点位置、顶点法向量、顶点颜色等等。
-			当使用 [page:Geometry] 时，[page:WebGLRenderer renderer] 将数据包装为有类型的队列的缓存，并将数据送往着色器。有了
-			BufferGeometry 这些数据都被存储到相应类型的属性的缓存中。这就意味着，如果想要获得顶点的位置信息，你必须调用
-			[page:.getAttribute] 访问位置信息的 page:BufferAttribute attribute]，之后再访问位置矢量中每一维坐标值（x，y，z 值）。
-		</p>
-		<p>
-			通过该类提供的下属方法设置以下属性值:
-		</p>
-		<h3>[page:BufferAttribute position] (itemSize: 3)</h3>
-		<p>
-			存储当前几何体中每个顶点的坐标，包含 x，y，z 三维数据。通过 [page:.fromGeometry]() 设置。
-		</p>
-
-		<h3>[page:BufferAttribute normal] (itemSize: 3)</h3>
-		<p>
-			存储当前几何体中每个顶点的法向量，包含 x，y，z 三维数据。通过 [page:.fromGeometry]() 设置。
-		</p>
-
-		<h3>[page:BufferAttribute color] (itemSize: 3)</h3>
-		<p>
-			存储当前几何体中每个顶点的颜色值，包含 R，G，B 三通道颜色值。通过 [page:.fromGeometry]() 设置。
-		</p>
-
-		<p>
-			除了上述已有的属性，你可以通过 addAttribute 方法自定义属性。通过 [page:Geometry]，这些自定义属性被存储到
-			[page:Material] 中。在 BufferGeometry 中，属性则被存储到几何体本身。注意，你依然需要在材质中设置属性信息，
-			但是属性的值则被存储到 BufferGeometry。
-		</p>
-
 
 		<h2>构造函数</h2>
 
@@ -97,7 +64,7 @@
 		<h3>[property:Object attributes]</h3>
 		<p>
 			通过 hashmap 存储该几何体相关的属性，hashmap 的 id 是当前 attribute 的名称，值是相应的 [page:BufferAttribute buffer]。
-			你可以通过 [page:.addAttribute] 和 [page:.getAttribute] 添加和访问与当前几何体有关的 attribute。
+			你可以通过 [page:.setAttribute] 和 [page:.getAttribute] 添加和访问与当前几何体有关的 attribute。
 		</p>
 
 		<h3>[property:Box3 boundingBox]</h3>
@@ -189,9 +156,9 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</h3>
 
-		<h3>[method:BufferGeometry addAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<h3>[method:BufferGeometry setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
-			为当前几何体增加一个 attribute。 的属性，在类的内部，有一个存储 [page:.attributes] 的 hashmap，
+			为当前几何体设置一个 attribute 属性。在类的内部，有一个存储 [page:.attributes] 的 hashmap，
 			通过该 hashmap，遍历 attributes 的速度会更快。而使用该方法，可以向 hashmap 内部增加 attribute。
 			所以，你需要使用该方法来添加 attributes。
 		</p>
@@ -269,7 +236,7 @@
 			几何体中的每个法向量长度将会为 1。这样操作会更正光线在表面的效果。
 		</p>
 
-		<h3>[method:BufferAttribute removeAttribute]( [param:String name] )</h3>
+		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
 		<p>删除具有指定名称的 [page:BufferAttribute attribute]。</p>
 
 		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>
@@ -320,6 +287,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>
