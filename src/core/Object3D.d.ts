@@ -306,7 +306,7 @@ export class Object3D extends EventDispatcher {
   /**
    * Updates global transform of the object and its children.
    */
-  updateMatrixWorld(force: boolean): void;
+  updateMatrixWorld(force?: boolean): void;
 
   updateWorldMatrix(updateParents: boolean, updateChildren: boolean): void;
 

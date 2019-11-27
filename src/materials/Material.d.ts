@@ -44,6 +44,7 @@ export interface MaterialParameters {
   side?: Side;
   transparent?: boolean;
   vertexColors?: Colors;
+  vertexTangents?: boolean;
   visible?: boolean;
 }
 
@@ -233,6 +234,11 @@ export class Material extends EventDispatcher {
    * Defines whether vertex coloring is used. Default is THREE.NoColors. Other options are THREE.VertexColors and THREE.FaceColors.
    */
   vertexColors: Colors;
+
+  /**
+   * Defines whether precomputed vertex tangents are used. Default is false.
+   */
+  vertexTangents: boolean;
 
   /**
    * Defines whether this material is visible. Default is true.
