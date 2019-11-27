@@ -14,7 +14,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-			import { WEBVR } from './jsm/vr/WebVR.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var camera;
 			var renderer;
@@ -31,7 +31,7 @@
 				renderer.vr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
+				document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 				//
 

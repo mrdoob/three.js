@@ -23,7 +23,7 @@
 				TreesGeometry,
 				SkyGeometry
 			} from './jsm/misc/RollerCoaster.js';
-			import { WEBVR } from './jsm/vr/WebVR.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -31,7 +31,7 @@
 			renderer.vr.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( WEBVR.createButton( renderer, { referenceSpaceType: 'local' } ) );
+			document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
 
 			//
 

@@ -19,7 +19,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-			import { WEBVR } from './jsm/vr/WebVR.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -117,7 +117,7 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				// controllers
 

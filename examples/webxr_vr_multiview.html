@@ -24,7 +24,7 @@
 
 			import * as THREE from '../build/three.module.js';
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
-			import { WEBVR } from './jsm/vr/WebVR.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
 			import Stats from './jsm/libs/stats.module.js';
 
 			var container;
@@ -116,7 +116,7 @@
 
 				//
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				//
 

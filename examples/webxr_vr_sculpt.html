@@ -21,7 +21,7 @@
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
-			import { WEBVR } from './jsm/vr/WebVR.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -91,7 +91,7 @@
 				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				// controllers
 

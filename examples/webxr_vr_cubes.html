@@ -21,7 +21,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
-			import { WEBVR } from './jsm/vr/WebVR.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var clock = new THREE.Clock();
 
@@ -120,7 +120,7 @@
 				window.addEventListener( 'vrdisplaypointerrestricted', onPointerRestricted, false );
 				window.addEventListener( 'vrdisplaypointerunrestricted', onPointerUnrestricted, false );
 
-				document.body.appendChild( WEBVR.createButton( renderer ) );
+				document.body.appendChild( VRButton.createButton( renderer ) );
 
 			}
 
