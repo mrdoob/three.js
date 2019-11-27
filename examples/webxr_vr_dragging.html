@@ -19,6 +19,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var container;
@@ -28,7 +29,7 @@
 			var raycaster, intersected = [];
 			var tempMatrix = new THREE.Matrix4();
 
-			var group;
+			var controls, group;
 
 			init();
 			animate();
@@ -43,6 +44,10 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 3 );
+
+				controls = new OrbitControls( camera, container );
+				controls.target.set( 0, 1.6, 0 );
+				controls.update();
 
 				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
