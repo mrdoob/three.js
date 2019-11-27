@@ -37,6 +37,27 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
+			QUnit.test( "update", ( assert ) => {
+
+				const noop = () => {};
+				let count = 0;
+				const onUploadCallback = () => {
+
+					count ++;
+
+				};
+				const attribute = { onUploadCallback, array: { subarray: noop }, usage: {}, version: 0, updateRange: {} };
+				const webglAttribute = WebGLAttributes( { createBuffer: noop, bindBuffer: noop, bufferData: noop, bufferSubData: noop } );
+
+				webglAttribute.update( attribute, );
+				assert.equal( count, 1, ".onUploadCallback should be called when created" );
+
+				attribute.version ++;
+				webglAttribute.update( attribute, );
+				assert.equal( count, 2, ".onUploadCallback should be called when updated" );
+
+			} );
+
 		} );
 
 	} );
