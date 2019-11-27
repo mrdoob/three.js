@@ -158,7 +158,7 @@ var Loader = function ( editor ) {
 
 					if ( isGLTF1( contents ) ) {
 
-						loader = new THREE.LegacyGLTFLoader( manager );
+						alert( 'Import of glTF asset not possible. Only versions >= 2.0 are supported. Please try to upgrade the file to glTF 2.0 using glTF-Pipeline.' );
 
 					} else {
 
