@@ -40,10 +40,13 @@
 
 			import { CarControls } from './jsm/misc/CarControls.js';
 
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-			var camera, scene, renderer, stats, carModel, materialsLib, envMap;
+			var camera, scene, renderer;
+			var stats, carModel, materialsLib, envMap;
 
 			var bodyMatSelect = document.getElementById( 'body-mat' );
 			var rimMatSelect = document.getElementById( 'rim-mat' );
@@ -61,80 +64,86 @@
 				glass: [],
 			};
 
-			var damping = 5.0;
-			var distance = 5;
+			var damping = 3.0;
+
+			var cameraBack = new THREE.Object3D();
+			cameraBack.position.set( 0, 2.5, 5 );
+
 			var cameraTarget = new THREE.Vector3();
 
 			function init() {
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( 3.25, 2.0, - 5 );
-				camera.lookAt( 0, 0.5, 0 );
+				camera.lookAt( 0, 0.25, 0 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
+				// scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
 
-				var urls = [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ];
-				var loader = new THREE.CubeTextureLoader().setPath( 'textures/cube/skyboxsun25deg/' );
-				loader.load( urls, function ( texture ) {
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/hdr/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
-					scene.background = texture;
+						var options = {
+							minFilter: texture.minFilter,
+							magFilter: texture.magFilter
+						};
 
-					var pmremGenerator = new PMREMGenerator( texture );
-					pmremGenerator.update( renderer );
+						scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
 
-					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
+						envMap = scene.background;
 
-					envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						var pmremGenerator = new PMREMGenerator( scene.background.texture );
+						pmremGenerator.update( renderer );
 
-					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
+						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
+						pmremCubeUVPacker.update( renderer );
 
-					//
+						envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
 
-					initCar();
-					initMaterials();
-					initMaterialSelectionMenus();
+						pmremGenerator.dispose();
+						pmremCubeUVPacker.dispose();
 
-				} );
+						//
+
+						initCar();
+						initMaterials();
+						initMaterialSelectionMenus();
+
+					} );
 
 				var ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2400, 2400 ),
-					new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.15, depthWrite: false }
-					) );
+					new THREE.PlaneBufferGeometry( 400, 400 ),
+					new THREE.MeshBasicMaterial( { color: 0x6e6a62, depthWrite: false } )
+				);
 				ground.rotation.x = - Math.PI / 2;
-				ground.receiveShadow = true;
 				ground.renderOrder = 1;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 400, 40, 0x000000, 0x000000 );
+				var grid = new THREE.GridHelper( 400, 80, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.depthWrite = false;
 				grid.material.transparent = true;
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.gammaOutput = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
+
+				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				renderer.setAnimationLoop( function () {
-
-					update();
-
-					renderer.render( scene, camera );
-
-				} );
+				renderer.setAnimationLoop( render );
 
 			}
 
@@ -152,6 +161,8 @@
 
 					carControls.setModel( carModel );
 
+					carModel.add( cameraBack );
+
 					carModel.traverse( function ( child ) {
 
 						if ( child.isMesh ) {
@@ -165,9 +176,12 @@
 					// shadow
 					var texture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
 					var shadow = new THREE.Mesh(
-						new THREE.PlaneBufferGeometry( 0.655 * 4, 1.3 * 4 ).rotateX( - Math.PI / 2 ),
-						new THREE.MeshBasicMaterial( { map: texture, opacity: 0.8, transparent: true } )
+						new THREE.PlaneBufferGeometry( 0.655 * 4, 1.3 * 4 ),
+						new THREE.MeshBasicMaterial( {
+							map: texture, opacity: 0.7, transparent: true
+						} )
 					);
+					shadow.rotation.x = - Math.PI / 2;
 					shadow.renderOrder = 2;
 					carModel.add( shadow );
 
@@ -200,20 +214,38 @@
 
 					main: [
 
-						new THREE.MeshStandardMaterial( { color: 0xff4400, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'orange' } ),
-						new THREE.MeshStandardMaterial( { color: 0x001166, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'blue' } ),
-						new THREE.MeshStandardMaterial( { color: 0x990000, envMap: envMap, metalness: 0.9, roughness: 0.2, name: 'red' } ),
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'black' } ),
-						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 0.9, roughness: 0.5, name: 'white' } ),
-						new THREE.MeshStandardMaterial( { color: 0x555555, envMap: envMap, envMapIntensity: 2.0, metalness: 1.0, roughness: 0.2, name: 'metallic' } ),
+						new THREE.MeshStandardMaterial( {
+							color: 0xff4400, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'orange'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0x001166, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'blue'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0x990000, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'red'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0x000000, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'black'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0xffffff, envMap: envMap, metalness: 0.3, roughness: 0.2, name: 'white'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0xffffff, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'metallic'
+						} ),
 
 					],
 
 					glass: [
 
-						new THREE.MeshStandardMaterial( { color: 0xffffff, envMap: envMap, metalness: 1, roughness: 0, opacity: 0.2, transparent: true, premultipliedAlpha: true, name: 'clear' } ),
-						new THREE.MeshStandardMaterial( { color: 0x000000, envMap: envMap, metalness: 1, roughness: 0, opacity: 0.2, transparent: true, premultipliedAlpha: true, name: 'smoked' } ),
-						new THREE.MeshStandardMaterial( { color: 0x001133, envMap: envMap, metalness: 1, roughness: 0, opacity: 0.2, transparent: true, premultipliedAlpha: true, name: 'blue' } ),
+						new THREE.MeshPhysicalMaterial( {
+							color: 0xffffff, envMap: envMap, metalness: 1, roughness: 0, transparency: 1.0, transparent: true, name: 'clear'
+						} ),
+						new THREE.MeshPhysicalMaterial( {
+							color: 0x000000, envMap: envMap, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'smoked'
+						} ),
+						new THREE.MeshPhysicalMaterial( {
+							color: 0x001133, envMap: envMap, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'blue'
+						} ),
 
 					],
 
@@ -277,7 +309,7 @@
 
 			}
 
-			function update() {
+			function render() {
 
 				var delta = clock.getDelta();
 
@@ -294,24 +326,23 @@
 
 					if ( followCamera.checked ) {
 
-						carModel.getWorldPosition( cameraTarget );
-						cameraTarget.y = 2.5;
-						cameraTarget.z += distance;
-
-						camera.position.lerp( cameraTarget, delta * damping );
+						cameraBack.getWorldPosition( cameraTarget );
 
 					} else {
 
-						carModel.getWorldPosition( cameraTarget );
-						cameraTarget.y += 0.5;
-
-						camera.position.set( 3.25, 2.0, - 5 );
+						cameraTarget.set( 3.25, 2.0, - 5 );
 
 					}
 
-					camera.lookAt( carModel.position );
+					camera.position.lerp( cameraTarget, delta * damping );
+
+					var position = carModel.position;
+
+					camera.lookAt( position.x, position.y + 0.25, position.z );
 
 				}
+
+				renderer.render( scene, camera );
 
 				stats.update();
 

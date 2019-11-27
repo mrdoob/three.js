@@ -16,8 +16,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
 
@@ -85,7 +83,7 @@
 
 					lightProbe.copy( LightProbeGenerator.fromRenderTargetCube( renderer, cubeCamera.renderTarget ) );
 
-					scene.add( new THREE.LightProbeHelper(lightProbe, 5) );
+					scene.add( new THREE.LightProbeHelper( lightProbe, 5 ) );
 
 					render();
 

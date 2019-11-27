@@ -439,7 +439,7 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material.isMeshNormalMaterial ) {
 
-			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
+			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
 
 			_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 

@@ -282,7 +282,7 @@ PLYExporter.prototype = {
 							vertex.y = normals.getY( i );
 							vertex.z = normals.getZ( i );
 
-							vertex.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
 							output.setFloat32( vOffset, vertex.x );
 							vOffset += 4;
@@ -458,7 +458,7 @@ PLYExporter.prototype = {
 							vertex.y = normals.getY( i );
 							vertex.z = normals.getZ( i );
 
-							vertex.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
 							line += ' ' +
 								vertex.x + ' ' +

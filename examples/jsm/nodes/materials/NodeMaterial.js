@@ -30,7 +30,9 @@ function NodeMaterial( vertex, fragment ) {
 
 	this.onBeforeCompile = function ( shader, renderer ) {
 
-		if ( this.needsUpdate ) {
+		var materialProperties = renderer.properties.get( this );
+
+		if ( this.version !== materialProperties.__version ) {
 
 			this.build( { renderer: renderer } );
 
@@ -74,6 +76,7 @@ Object.defineProperties( NodeMaterial.prototype, {
 
 		set: function ( value ) {
 
+			if ( value === true ) this.version ++;
 			this.needsCompile = value;
 
 		},
@@ -119,8 +122,6 @@ NodeMaterial.prototype.build = function ( params ) {
 	this.lights = builder.requires.lights;
 
 	this.transparent = builder.requires.transparent || this.blending > NormalBlending;
-
-	this.needsUpdate = false;
 
 	return this;
 

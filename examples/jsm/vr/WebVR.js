@@ -11,6 +11,8 @@ var WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
+		console.warn( 'WEBVR.js has been deprecated. Use VRButton.js instead.' );
+
 		if ( options && options.referenceSpaceType ) {
 
 			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
@@ -171,7 +173,7 @@ var WEBVR = {
 
 		}
 
-		if ( 'xr' in navigator && 'isSessionSupported' in navigator.xr ) {
+		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
 			button.style.display = 'none';

@@ -10,6 +10,8 @@ THREE.OBJLoader = ( function () {
 	var material_library_pattern = /^mtllib /;
 	// usemtl material_name
 	var material_use_pattern = /^usemtl /;
+	// usemap map_name
+	var map_use_pattern = /^usemap /;
 
 	function ParserState() {
 
@@ -569,6 +571,13 @@ THREE.OBJLoader = ( function () {
 					// mtl file
 
 					state.materialLibraries.push( line.substring( 7 ).trim() );
+
+				} else if ( map_use_pattern.test( line ) ) {
+
+					// the line is parsed but ignored since the loader assumes textures are defined MTL files
+					// (according to https://www.okino.com/conv/imp_wave.htm, 'usemap' is the old-style Wavefront texture reference method)
+
+					console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
 
 				} else if ( lineFirstChar === 's' ) {
 

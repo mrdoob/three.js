@@ -27,7 +27,7 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( amount * 0.9, amount * 0.9, amount * 0.9 );
 				camera.lookAt( 0, 0, 0 );
 
@@ -102,7 +102,7 @@
 					mesh.rotation.y = Math.sin( time / 2 );
 
 					var i = 0;
-					var offset = amount / 2;
+					var offset = ( amount - 1 ) / 2;
 
 					for ( var x = 0; x < amount; x ++ ) {
 

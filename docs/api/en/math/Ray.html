@@ -25,7 +25,7 @@
 		<p>
 		[page:Vector3 origin] - (optional) the origin of the [page:Ray]. Default is a [page:Vector3] at (0, 0, 0).<br />
 		[page:Vector3 direction] - [page:Vector3] The direction of the [page:Ray]. This must be normalized
-		 (with [page:Vector3.normalize]) for the methods to operate properly.  Default is a [page:Vector3] at (0, 0, 0).<br /><br />
+		 (with [page:Vector3.normalize]) for the methods to operate properly.  Default is a [page:Vector3] at (0, 0, -1).<br /><br />
 
 		Creates a new [name].
 		</p>
@@ -38,7 +38,7 @@
 		<h3>[property:Vector3 direction]</h3>
 		<p>
 		The direction of the [page:Ray]. This must be normalized (with [page:Vector3.normalize])
-		for the methods to operate properly. Default is a [page:Vector3] at (0, 0, 0).
+		for the methods to operate properly. Default is a [page:Vector3] at (0, 0, -1).
 		</p>
 
 
@@ -201,8 +201,7 @@
 		This must be normalized (with [page:Vector3.normalize]) for the methods to operate
 		properly.<br /><br />
 
-		Copy the parameters to the [page:.origin origin] and [page:.direction direction] properties
-		of this ray.
+		Sets this ray's [page:.origin origin] and [page:.direction direction] properties by copying the values from the given objects.
 		</p>
 
 
