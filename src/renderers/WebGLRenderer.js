@@ -162,6 +162,8 @@ function WebGLRenderer( parameters ) {
 		_height = _canvas.height,
 
 		_pixelRatio = 1,
+		_opaqueSort = null,
+		_transparentSort = null,
 
 		_viewport = new Vector4( 0, 0, _width, _height ),
 		_scissor = new Vector4( 0, 0, _width, _height ),
@@ -252,8 +254,6 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists, renderStates;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-
-	var opaqueSort, transparentSort;
 
 	var utils;
 
@@ -509,13 +509,13 @@ function WebGLRenderer( parameters ) {
 
 	this.setOpaqueSort = function ( method ) {
 
-		opaqueSort = typeof method === 'function' ? method : null;
+		_opaqueSort = method;
 
 	};
 
 	this.setTransparentSort = function ( method ) {
 
-		transparentSort = typeof method === 'function' ? method : null;
+		_transparentSort = method;
 
 	};
 
@@ -1168,7 +1168,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _this.sortObjects === true ) {
 
-			currentRenderList.sort( opaqueSort, transparentSort );
+			currentRenderList.sort( _opaqueSort, _transparentSort );
 
 		}
 

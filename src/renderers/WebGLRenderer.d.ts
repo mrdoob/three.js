@@ -259,12 +259,12 @@ export class WebGLRenderer implements Renderer {
 	setScissorTest( enable: boolean ): void;
 
 	/**
-	 * Sets the costum opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+	 * Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
 	 */
 	setOpaqueSort( method: Function ): void;
 
 	/**
-	 * Sets the costum transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
+	 * Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
 	 */
 	setTransparentSort( method: Function ): void;
 
