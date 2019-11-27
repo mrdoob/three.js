@@ -322,19 +322,19 @@ var files = {
 		"webaudio_timing",
 		"webaudio_visualizer"
 	],
-	"webvr": [
-		"webvr_ballshooter",
-		"webvr_cubes",
-		"webvr_dragging",
-		"webvr_lorenzattractor",
-		"webvr_multiview",
-		"webvr_panorama",
-		"webvr_panorama_depth",
-		"webvr_paint",
-		"webvr_rollercoaster",
-		"webvr_sandbox",
-		"webvr_sculpt",
-		"webvr_video"
+	"webxr": [
+		"webxr_vr_ballshooter",
+		"webxr_vr_cubes",
+		"webxr_vr_dragging",
+		"webxr_vr_lorenzattractor",
+		"webxr_vr_multiview",
+		"webxr_vr_panorama",
+		"webxr_vr_panorama_depth",
+		"webxr_vr_paint",
+		"webxr_vr_rollercoaster",
+		"webxr_vr_sandbox",
+		"webxr_vr_sculpt",
+		"webxr_vr_video"
 	],
 	"physics": [
 		"webgl_physics_cloth",
