@@ -14,7 +14,9 @@ export interface GLTF {
 	scene: Scene;
 	scenes: Scene[];
 	cameras: Camera[];
-	asset: object;
+	asset: any;
+	parser: GLTFParser;
+	userData: any;
 }
 
 export class GLTFLoader extends Loader {
@@ -27,5 +29,21 @@ export class GLTFLoader extends Loader {
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;
 	setDDSLoader( ddsLoader: DDSLoader ): GLTFLoader;
 	parse( data: ArrayBuffer | string, path: string, onLoad: ( gltf: GLTF ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+
+}
+
+export class GLTFParser {
+
+	json: any;
+	extensions: any;
+	options: {
+		path: string,
+		corssOrigin: string,
+		manager: LoadingManager
+	};
+
+	parse: ( onLoad: ( result: GLTF ) => void, onError: ( reason: any ) => void ) => void;
+	getDependency: (type: string, index: number) => Promise<any>;
+	getDependencies: (type: string) => Promise<any[]>;
 
 }
