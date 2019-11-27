@@ -243,8 +243,6 @@ var files = [
 
 	{ path: 'vr/deprecated/DaydreamController.js', dependencies: [], ignoreList: [] },
 	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
-	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
 	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
