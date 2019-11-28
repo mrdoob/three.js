@@ -49,7 +49,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -84,7 +84,7 @@
 
 				}
 
-				controller = renderer.vr.getController( 0 );
+				controller = renderer.xr.getController( 0 );
 				controller.addEventListener( 'selectstart', onSelectStart );
 				controller.addEventListener( 'selectend', onSelectEnd );
 				controller.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];

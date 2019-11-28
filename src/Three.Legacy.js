@@ -1679,6 +1679,14 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return this.getContext();
 
 		}
+	},
+	vr: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .vr has been removed. Use .xr instead.' );
+			return this.xr;
+
+		}
 	}
 
 } );

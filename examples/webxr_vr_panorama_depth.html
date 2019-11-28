@@ -85,7 +85,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
@@ -115,7 +115,7 @@
 
 				// If we are not presenting move the camera a little so the effect is visible
 
-				if ( renderer.vr.isPresenting() === false ) {
+				if ( renderer.xr.isPresenting() === false ) {
 
 					var time = clock.getElapsedTime();
 

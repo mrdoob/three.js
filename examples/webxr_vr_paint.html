@@ -93,7 +93,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
@@ -126,7 +126,7 @@
 
 				}
 
-				controller1 = renderer.vr.getController( 0 );
+				controller1 = renderer.xr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'squeezestart', onSequeezeStart );
@@ -136,7 +136,7 @@
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller1 );
 
-				controller2 = renderer.vr.getController( 1 );
+				controller2 = renderer.xr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'squeezestart', onSequeezeStart );
