@@ -49,7 +49,6 @@ export class GLTFParser {
 		manager: LoadingManager
 	};
 
-	parse: ( onLoad: ( result: GLTF ) => void, onError: ( reason: any ) => void ) => void;
 	getDependency: (type: string, index: number) => Promise<any>;
 	getDependencies: (type: string) => Promise<any[]>;
 
