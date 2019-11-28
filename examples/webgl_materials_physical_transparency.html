@@ -21,7 +21,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var params = {
 				color: 0xffffff,
@@ -74,19 +73,12 @@
 
 				//
 
-				var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-				pmremGenerator.update( renderer );
-
-				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-				pmremCubeUVPacker.update( renderer );
-
-				hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+				var pmremGenerator = new PMREMGenerator( renderer );
+				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+				pmremGenerator.dispose();
 
 				hdrCubeMap.magFilter = THREE.LinearFilter;
 				hdrCubeMap.needsUpdate = true;
-
-				pmremGenerator.dispose();
-				pmremCubeUVPacker.dispose();
 
 				//
 

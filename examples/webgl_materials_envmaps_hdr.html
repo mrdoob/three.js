@@ -24,7 +24,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var params = {
 				envMap: 'HDR',
@@ -78,26 +77,23 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				var pmremGenerator = new PMREMGenerator( renderer );
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
+					pmremGenerator.dispose();
+
+				}
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
 					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
 
 						hdrCubeMap.magFilter = THREE.LinearFilter;
 						hdrCubeMap.needsUpdate = true;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 
@@ -106,18 +102,9 @@
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
 
-						ldrCubeMap.encoding = THREE.sRGBEncoding;
+						ldrCubeMap.encoding = THREE.GammaEncoding;
 
-						var pmremGenerator = new PMREMGenerator( ldrCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
 					} );
 
@@ -130,19 +117,10 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 
 						rgbmCubeMap.magFilter = THREE.LinearFilter;
 						rgbmCubeMap.needsUpdate = true;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 

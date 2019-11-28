@@ -22,7 +22,6 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var statsEnabled = true;
 
@@ -107,13 +106,9 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						var pmremGenerator = new PMREMGenerator( renderer );
+						var rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
+						pmremGenerator.dispose();
 
 						material.envMap = rgbmCubeRenderTarget.texture;
 						material.needsUpdate = true; // is this needed?
@@ -121,9 +116,6 @@
 						rgbmCubeMap.magFilter = THREE.LinearFilter;
 						rgbmCubeMap.needsUpdate = true;
 						scene.background = rgbmCubeMap;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 

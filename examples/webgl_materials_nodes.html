@@ -24,7 +24,6 @@
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
@@ -70,7 +69,7 @@
 
 			}
 
-			var premTexture, pmremCube, pmremGenerator, pmremCubeUVPacker, premSize = 1024;
+			var premTexture, pmremCube, pmremGenerator, premSize = 1024;
 
 			function updatePREM( textureCube ) {
 
@@ -82,23 +81,16 @@
 				var magFilter = pmremCube.magFilter;
 				var generateMipmaps = pmremCube.generateMipmaps;
 
-				pmremGenerator = new PMREMGenerator( pmremCube, undefined, premSize / 4 );
-				pmremGenerator.update( renderer );
-
-				pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-				pmremCubeUVPacker.update( renderer );
+				var pmremGenerator = new PMREMGenerator( renderer );
+				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
+				pmremGenerator.dispose();
 
 				pmremCube.minFilter = minFilter;
 				pmremCube.magFilter = magFilter;
 				pmremCube.generateMipmaps = generateMipmaps;
 				pmremCube.needsUpdate = true;
 
-				premTexture = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-
 				library[ premTexture.uuid ] = premTexture;
-
-				pmremGenerator.dispose();
-				pmremCubeUVPacker.dispose();
 
 			}
 

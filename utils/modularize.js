@@ -142,7 +142,6 @@ var files = [
 	{ path: 'objects/Water.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Water2.js', dependencies: [ { name: 'Reflector', path: 'objects/Reflector.js' }, { name: 'Refractor', path: 'objects/Refractor.js' } ], ignoreList: [] },
 
-	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
 	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'postprocessing/AdaptiveToneMappingPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'LuminosityShader', path: 'shaders/LuminosityShader.js' }, { name: 'ToneMapShader', path: 'shaders/ToneMapShader.js' } ], ignoreList: [] },
