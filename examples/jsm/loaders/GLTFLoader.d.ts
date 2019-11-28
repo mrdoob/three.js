@@ -42,12 +42,6 @@ export class GLTFLoader extends Loader {
 export class GLTFParser {
 
 	json: any;
-	extensions: any;
-	options: {
-		path: string,
-		corssOrigin: string,
-		manager: LoadingManager
-	};
 
 	getDependency: (type: string, index: number) => Promise<any>;
 	getDependencies: (type: string) => Promise<any[]>;
