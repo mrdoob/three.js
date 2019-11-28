@@ -1,7 +1,12 @@
 import { AudioListener } from './AudioListener';
 import { Audio } from './Audio';
 
-export class PositionalAudio extends Audio {
+// Override getOutput
+export class AudioWeaken extends Audio {
+	getOutput(): any;
+}
+
+export class PositionalAudio extends AudioWeaken {
 
 	constructor( listener: AudioListener );
 
