@@ -24,7 +24,6 @@
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
-			var painter1, painter2;
 
 			var controls;
 
@@ -81,10 +80,10 @@
 
 				//
 
-				painter1 = new TubePainter();
+				var painter1 = new TubePainter();
 				scene.add( painter1.mesh );
 
-				painter2 = new TubePainter();
+				var painter2 = new TubePainter();
 				scene.add( painter2.mesh );
 
 				//
