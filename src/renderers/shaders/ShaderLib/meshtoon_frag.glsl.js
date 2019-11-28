@@ -1,5 +1,5 @@
 export default /* glsl */`
-#define PHONG
+#define TOON
 
 uniform vec3 diffuse;
 uniform vec3 emissive;
@@ -18,12 +18,11 @@ uniform float opacity;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
-#include <envmap_common_pars_fragment>
-#include <envmap_pars_fragment>
+#include <gradientmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>
-#include <lights_phong_pars_fragment>
+#include <lights_toon_pars_fragment>
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
@@ -50,7 +49,7 @@ void main() {
 	#include <emissivemap_fragment>
 
 	// accumulation
-	#include <lights_phong_fragment>
+	#include <lights_toon_fragment>
 	#include <lights_fragment_begin>
 	#include <lights_fragment_maps>
 	#include <lights_fragment_end>
@@ -59,8 +58,6 @@ void main() {
 	#include <aomap_fragment>
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
-
-	#include <envmap_fragment>
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 

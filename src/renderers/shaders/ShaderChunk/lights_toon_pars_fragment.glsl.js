@@ -8,7 +8,7 @@ varying vec3 vViewPosition;
 #endif
 
 
-struct BlinnPhongMaterial {
+struct ToonMaterial {
 
 	vec3	diffuseColor;
 	vec3	specularColor;
@@ -17,10 +17,9 @@ struct BlinnPhongMaterial {
 
 };
 
-void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_Direct_Toon( const in IncidentLight directLight, const in GeometricContext geometry, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
 
-	float dotNL = saturate( dot( geometry.normal, directLight.direction ) );
-	vec3 irradiance = dotNL * directLight.color;
+	vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
 
 	#ifndef PHYSICALLY_CORRECT_LIGHTS
 
@@ -34,14 +33,14 @@ void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in Geometri
 
 }
 
-void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_IndirectDiffuse_Toon( const in vec3 irradiance, const in GeometricContext geometry, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
 
 	reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
 
 }
 
-#define RE_Direct				RE_Direct_BlinnPhong
-#define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong
+#define RE_Direct				RE_Direct_Toon
+#define RE_IndirectDiffuse		RE_IndirectDiffuse_Toon
 
 #define Material_LightProbeLOD( material )	(0)
 `;
