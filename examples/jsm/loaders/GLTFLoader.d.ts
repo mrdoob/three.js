@@ -14,7 +14,14 @@ export interface GLTF {
 	scene: Scene;
 	scenes: Scene[];
 	cameras: Camera[];
-	asset: any;
+	asset: {
+		copyright?: string;
+		generator?: string;
+		version?: string;
+		minVersion?: string;
+		extensions?: any;
+		extras?: any;
+	};
 	parser: GLTFParser;
 	userData: any;
 }
