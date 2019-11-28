@@ -21,8 +21,8 @@ var ARButton = {
 				} );
 				*/
 
-				renderer.vr.setReferenceSpaceType( 'local' );
-				renderer.vr.setSession( session );
+				renderer.xr.setReferenceSpaceType( 'local' );
+				renderer.xr.setSession( session );
 				button.textContent = 'STOP AR';
 
 				currentSession = session;
@@ -33,7 +33,7 @@ var ARButton = {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( null );
+				renderer.xr.setSession( null );
 				button.textContent = 'START AR';
 
 				currentSession = null;

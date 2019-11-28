@@ -13,7 +13,7 @@ THREE.WEBVR = {
 
 		if ( options && options.referenceSpaceType ) {
 
-			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
+			renderer.xr.setReferenceSpaceType( options.referenceSpaceType );
 
 		}
 
@@ -45,7 +45,7 @@ THREE.WEBVR = {
 
 			};
 
-			renderer.vr.setDevice( device );
+			renderer.xr.setDevice( device );
 
 		}
 
@@ -57,7 +57,7 @@ THREE.WEBVR = {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( session );
+				renderer.xr.setSession( session );
 				button.textContent = 'EXIT XR';
 
 				currentSession = session;
@@ -68,7 +68,7 @@ THREE.WEBVR = {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( null );
+				renderer.xr.setSession( null );
 				button.textContent = 'ENTER XR';
 
 				currentSession = null;
@@ -142,7 +142,7 @@ THREE.WEBVR = {
 
 			button.textContent = 'VR NOT FOUND';
 
-			renderer.vr.setDevice( null );
+			renderer.xr.setDevice( null );
 
 		}
 

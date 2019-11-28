@@ -260,6 +260,16 @@
 		色调映射的白点。默认是*1*
 		</p>
 
+		<h3>[property:Object xr]</h3>
+		<p>
+		Provides access to the WebXR related interface of the renderer.
+		</p>
+
+		<h3>[property:Boolean xr.enabled]</h3>
+		<p>
+		Whether the renderer should enable XR rendering or not. Default is *false*.
+		</p>
+
 		<h2>方法</h2>
 
 		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
@@ -388,7 +398,7 @@
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — 每个可用帧都会调用的函数。 如果传入‘null’,所有正在进行的动画都会停止。</p>
-		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebVR项目，必须使用此函数。</p>
+		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebXR项目，必须使用此函数。</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>设置alpha。合法参数是一个*0.0*到 *1.0*之间的浮点数</p>

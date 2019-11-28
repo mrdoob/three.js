@@ -9,7 +9,7 @@ var VRButton = {
 
 		if ( options && options.referenceSpaceType ) {
 
-			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );
+			renderer.xr.setReferenceSpaceType( options.referenceSpaceType );
 
 		}
 
@@ -41,7 +41,7 @@ var VRButton = {
 
 			};
 
-			renderer.vr.setDevice( device );
+			renderer.xr.setDevice( device );
 
 		}
 
@@ -53,7 +53,7 @@ var VRButton = {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( session );
+				renderer.xr.setSession( session );
 				button.textContent = 'EXIT VR';
 
 				currentSession = session;
@@ -64,7 +64,7 @@ var VRButton = {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.vr.setSession( null );
+				renderer.xr.setSession( null );
 				button.textContent = 'ENTER VR';
 
 				currentSession = null;
@@ -138,7 +138,7 @@ var VRButton = {
 
 			button.textContent = 'VR NOT FOUND';
 
-			renderer.vr.setDevice( null );
+			renderer.xr.setDevice( null );
 
 		}
 

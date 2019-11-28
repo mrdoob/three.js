@@ -307,11 +307,11 @@ function WebGLRenderer( parameters ) {
 
 	initGLContext();
 
-	// vr
+	// xr
 
-	var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+	var xr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
-	this.vr = vr;
+	this.xr = xr;
 
 	// Multiview
 
@@ -383,7 +383,7 @@ function WebGLRenderer( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		if ( vr.isPresenting() ) {
+		if ( xr.isPresenting() ) {
 
 			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
 			return;
@@ -573,7 +573,7 @@ function WebGLRenderer( parameters ) {
 		properties.dispose();
 		objects.dispose();
 
-		vr.dispose();
+		xr.dispose();
 
 		animation.stop();
 
@@ -1089,7 +1089,7 @@ function WebGLRenderer( parameters ) {
 
 	function onAnimationFrame( time ) {
 
-		if ( vr.isPresenting() ) return;
+		if ( xr.isPresenting() ) return;
 		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
 
 	}
@@ -1102,7 +1102,7 @@ function WebGLRenderer( parameters ) {
 	this.setAnimationLoop = function ( callback ) {
 
 		onAnimationFrameCallback = callback;
-		vr.setAnimationLoop( callback );
+		xr.setAnimationLoop( callback );
 
 		animation.start();
 
@@ -1153,9 +1153,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( vr.enabled && vr.isPresenting() ) {
+		if ( xr.enabled && xr.isPresenting() ) {
 
-			camera = vr.getCamera( camera );
+			camera = xr.getCamera( camera );
 
 		}
 
@@ -1205,7 +1205,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( vr.enabled && multiview.isAvailable() ) {
+		if ( xr.enabled && multiview.isAvailable() ) {
 
 			multiview.attachCamera( camera );
 
@@ -1265,7 +1265,7 @@ function WebGLRenderer( parameters ) {
 
 		state.setPolygonOffset( false );
 
-		if ( vr.enabled ) {
+		if ( xr.enabled ) {
 
 			if ( multiview.isAvailable() ) {
 
@@ -1273,7 +1273,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			vr.submitFrame();
+			xr.submitFrame();
 
 		}
 
@@ -1424,7 +1424,7 @@ function WebGLRenderer( parameters ) {
 
 				_currentArrayCamera = camera;
 
-				if ( vr.enabled && multiview.isAvailable() ) {
+				if ( xr.enabled && multiview.isAvailable() ) {
 
 					renderObject( object, scene, camera, geometry, material, group );
 
