@@ -573,6 +573,10 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						height: image.height
 					};
 
+				} else {
+
+					return null;
+
 				}
 
 			}
@@ -603,7 +607,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						var deserializedImage = deserializeImage( currentUrl );
 
-						if ( deserializedImage ) {
+						if ( deserializedImage !== null ) {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
@@ -625,7 +629,13 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					// load single image
 
-					images[ image.uuid ] = deserializeImage( image.url );
+					var deserializedImage = deserializeImage( image.url );
+
+					if ( deserializedImage !== null ) {
+
+						images[ image.uuid ] = deserializedImage;
+
+					}
 
 				}
 
