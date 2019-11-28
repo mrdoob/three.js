@@ -69,8 +69,6 @@ var files = [
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
-	{ path: 'loaders/deprecated/LegacyGLTFLoader.js', dependencies: [], ignoreList: [ 'AnimationMixer' ] },
-	{ path: 'loaders/deprecated/LegacyJSONLoader.js', dependencies: [], ignoreList: [ 'ObjectLoader' ] },
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
@@ -240,10 +238,6 @@ var files = [
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
 
-	{ path: 'vr/deprecated/DaydreamController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
-	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
 	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },

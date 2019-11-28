@@ -9,6 +9,8 @@ THREE.WEBVR = {
 
 	createButton: function ( renderer, options ) {
 
+		console.warn( 'WEBVR.js has been deprecated. Use VRButton.js instead.' );
+
 		if ( options && options.referenceSpaceType ) {
 
 			renderer.vr.setReferenceSpaceType( options.referenceSpaceType );

@@ -246,7 +246,9 @@ THREE.LineMaterial = function ( parameters ) {
 		uniforms: THREE.UniformsUtils.clone( THREE.ShaderLib[ 'line' ].uniforms ),
 
 		vertexShader: THREE.ShaderLib[ 'line' ].vertexShader,
-		fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader
+		fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader,
+
+		clipping: true // required for clipping support
 
 	} );
 

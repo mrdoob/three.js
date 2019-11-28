@@ -1,4 +1,4 @@
-// r110
+// r111
 
 const assets = [
 	'./',
@@ -18,7 +18,6 @@ const assets = [
 	'../examples/js/loaders/DRACOLoader.js',
 	'../examples/js/loaders/FBXLoader.js',
 	'../examples/js/loaders/GLTFLoader.js',
-	'../examples/js/loaders/deprecated/LegacyGLTFLoader.js',
 	'../examples/js/loaders/KMZLoader.js',
 	'../examples/js/loaders/MD2Loader.js',
 	'../examples/js/loaders/OBJLoader.js',
