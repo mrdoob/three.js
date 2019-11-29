@@ -60,12 +60,12 @@
 
 		// ...
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
 		var mesh = new THREE.Mesh( geometry, material );
-		mesh.drawMode = THREE.TrianglesDrawMode; //default
+		mesh.setDrawMode( THREE.TrianglesDrawMode ); //default
 
 		scene.add( mesh );
 		</code>
