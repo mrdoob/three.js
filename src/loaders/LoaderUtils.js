@@ -40,6 +40,12 @@ var LoaderUtils = {
 
 	extractUrlBase: function ( url ) {
 
+		if ( /^data:.*,.*$/i.test( url ) ) {
+
+			return '';
+
+		}
+
 		var index = url.lastIndexOf( '/' );
 
 		if ( index === - 1 ) return './';

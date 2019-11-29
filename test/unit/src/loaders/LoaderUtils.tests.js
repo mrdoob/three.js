@@ -25,6 +25,7 @@ export default QUnit.module( 'Loaders', () => {
 			assert.equal( '/path/to/', LoaderUtils.extractUrlBase( '/path/to/model.glb' ) );
 			assert.equal( './', LoaderUtils.extractUrlBase( 'model.glb' ) );
 			assert.equal( '/', LoaderUtils.extractUrlBase( '/model.glb' ) );
+			assert.equal( '', LoaderUtils.extractUrlBase( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAOAgMAAABrzWU4AAAACVBMVEUAAABS////UlJlNLqiAAAALUlEQVQIHQXBQQ0AIAwEsF7CJIAeLPCYBCThlxZkMA6zWZd6pKne0iQkJFSBD2pCAzD7/lbiAAAAAElFTkSuQmCC' ) );
 
 		} );
 
