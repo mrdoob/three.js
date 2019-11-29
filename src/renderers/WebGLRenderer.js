@@ -1286,7 +1286,7 @@ function WebGLRenderer( parameters ) {
 
 	function projectObject( object, camera, groupOrder, sortObjects ) {
 
-		if ( object.scale.x === 0 || object.scale.y === 0 || object.scale.z === 0) return;
+		if ( object.scale.x === 0 || object.scale.y === 0 || object.scale.z === 0 ) return;
 		if ( object.visible === false ) return;
 
 		var visible = object.layers.test( camera.layers );
