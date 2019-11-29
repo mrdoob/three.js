@@ -10,7 +10,6 @@ export class AttributeNode extends TempNode {
 
 	getAttributeType( builder: NodeBuilder ): string;
 	getType( builder: NodeBuilder ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: AttributeNode ): this;
 
 }

@@ -14,7 +14,6 @@ export class MathNode extends TempNode {
 
 	getNumInputs( builder: NodeBuilder ): number;
 	getInputType( builder: NodeBuilder ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: MathNode ): this;
 
 	static RAD: string;

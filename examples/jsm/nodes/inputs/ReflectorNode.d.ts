@@ -19,7 +19,6 @@ export class ReflectorNode extends TempNode {
 
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: ReflectorNode ): this;
 
 }
