@@ -622,6 +622,117 @@ THREE.BufferGeometryUtils = {
 
 		return result;
 
+	},
+
+	/**
+	 * @param {THREE.BufferGeometry} geometry
+	 * @param {number} drawMode
+	 * @return {THREE.BufferGeometry>}
+	 */
+	convertToTriangles: function ( geometry, drawMode ) {
+
+		if ( drawMode === THREE.TrianglesDrawMode ) {
+
+			console.warn( 'THREE.BufferGeometryUtils.convertToTriangles(): Geometry already defined as triangles.' );
+			return geometry;
+
+		}
+
+		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
+
+			var index = geometry.getIndex();
+
+			// generate index if not present
+
+			if ( index === null ) {
+
+				var indices = [];
+
+				var position = geometry.getAttribute( 'position' );
+
+				if ( position !== undefined ) {
+
+					for ( var i = 0; i < position.count; i ++ ) {
+
+						indices.push( i );
+
+					}
+
+					geometry.setIndex( indices );
+					index = geometry.getIndex();
+
+				} else {
+
+					console.error( 'THREE.BufferGeometryUtils.convertToTriangles(): Undefined position attribute. Unable to perform conversion.' );
+					return geometry;
+
+				}
+
+			}
+
+			//
+
+			var numberOfTriangles = index.count - 2;
+			var newIndices = [];
+
+			if ( drawMode === THREE.TriangleFanDrawMode ) {
+
+				// gl.TRIANGLE_FAN
+
+				for ( var i = 1; i <= numberOfTriangles; i ++ ) {
+
+					newIndices.push( index.getX( 0 ) );
+					newIndices.push( index.getX( i ) );
+					newIndices.push( index.getX( i + 1 ) );
+
+				}
+
+			} else {
+
+				// gl.TRIANGLE_STRIP
+
+				for ( var i = 0; i < numberOfTriangles; i ++ ) {
+
+					if ( i % 2 === 0 ) {
+
+						newIndices.push( index.getX( i ) );
+						newIndices.push( index.getX( i + 1 ) );
+						newIndices.push( index.getX( i + 2 ) );
+
+
+					} else {
+
+						newIndices.push( index.getX( i + 2 ) );
+						newIndices.push( index.getX( i + 1 ) );
+						newIndices.push( index.getX( i ) );
+
+					}
+
+				}
+
+			}
+
+			if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
+
+				console.error( 'THREE.BufferGeometryUtils.convertToTriangles(): Unable to generate correct amount of triangles.' );
+
+			}
+
+			// build final geometry
+
+			var newGeometry = geometry.clone();
+			newGeometry.setIndex( newIndices );
+			newGeometry.clearGroups();
+
+			return newGeometry;
+
+		} else {
+
+			console.error( 'THREE.BufferGeometryUtils.convertToTriangles(): Unknown draw mode:', drawMode );
+			return geometry;
+
+		}
+
 	}
 
 };
