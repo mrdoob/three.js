@@ -722,6 +722,7 @@ THREE.BufferGeometryUtils = {
 
 			var newGeometry = geometry.clone();
 			newGeometry.setIndex( newIndices );
+			newGeometry.clearGroups();
 
 			return newGeometry;
 
