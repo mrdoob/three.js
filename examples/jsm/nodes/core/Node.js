@@ -94,7 +94,7 @@ Node.prototype = {
 
 	},
 
-	generate: function ( builder, output, uuid, type, ns ) {
+	generate: function ( /* builder, output, uuid, type, ns */ ) {
 
 		// This method needs to be implemented in subclasses
 
