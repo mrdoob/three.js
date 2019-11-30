@@ -130,7 +130,7 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 
 	} );
 
-	QUnit.test( 'convertToTriangles()', ( assert ) => {
+	QUnit.test( 'toTrianglesDrawMode()', ( assert ) => {
 
 		// TRIANGLE_STRIP
 
@@ -146,7 +146,7 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 		var geometry1 = new BufferGeometry();
 
 		geometry1.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices1 ), 3 ) );
-		geometry1 = BufferGeometryUtils.convertToTriangles( geometry1, TriangleStripDrawMode );
+		geometry1 = BufferGeometryUtils.toTrianglesDrawMode( geometry1, TriangleStripDrawMode );
 
 		assert.deepEqual( geometry1.index.array, new Uint16Array( [ 0, 1, 2, 3, 2, 1, 2, 3, 4, 5, 4, 3 ] ), 'correct triangle indices from triangle strip' );
 
@@ -164,7 +164,7 @@ export default QUnit.module( 'BufferGeometryUtils', () => {
 		var geometry2 = new BufferGeometry();
 
 		geometry2.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices2 ), 3 ) );
-		geometry2 = BufferGeometryUtils.convertToTriangles( geometry2, TriangleFanDrawMode );
+		geometry2 = BufferGeometryUtils.toTrianglesDrawMode( geometry2, TriangleFanDrawMode );
 
 		assert.deepEqual( geometry2.index.array, new Uint16Array( [ 0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5 ] ), 'correct triangle indices from triangle fan' );
 

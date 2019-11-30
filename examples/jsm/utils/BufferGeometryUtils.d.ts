@@ -7,5 +7,5 @@ export namespace BufferGeometryUtils {
 	export function interleaveAttributes( attributes: BufferAttribute[] ): InterleavedBufferAttribute;
 	export function estimateBytesUsed( geometry: BufferGeometry ): number;
 	export function mergeVertices( geometry: BufferGeometry, tolerance?: number ): BufferGeometry;
-	export function convertToTriangles( geometry: BufferGeometry, drawMode: TrianglesDrawModes ): BufferGeometry;
+	export function toTrianglesDrawMode( geometry: BufferGeometry, drawMode: TrianglesDrawModes ): BufferGeometry;
 }

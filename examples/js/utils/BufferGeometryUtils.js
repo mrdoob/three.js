@@ -629,11 +629,11 @@ THREE.BufferGeometryUtils = {
 	 * @param {number} drawMode
 	 * @return {THREE.BufferGeometry>}
 	 */
-	convertToTriangles: function ( geometry, drawMode ) {
+	toTrianglesDrawMode: function ( geometry, drawMode ) {
 
 		if ( drawMode === THREE.TrianglesDrawMode ) {
 
-			console.warn( 'THREE.BufferGeometryUtils.convertToTriangles(): Geometry already defined as triangles.' );
+			console.warn( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.' );
 			return geometry;
 
 		}
@@ -663,7 +663,7 @@ THREE.BufferGeometryUtils = {
 
 				} else {
 
-					console.error( 'THREE.BufferGeometryUtils.convertToTriangles(): Undefined position attribute. Unable to perform conversion.' );
+					console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Undefined position attribute. Processing not possible.' );
 					return geometry;
 
 				}
@@ -714,7 +714,7 @@ THREE.BufferGeometryUtils = {
 
 			if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
 
-				console.error( 'THREE.BufferGeometryUtils.convertToTriangles(): Unable to generate correct amount of triangles.' );
+				console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
 
 			}
 
@@ -728,7 +728,7 @@ THREE.BufferGeometryUtils = {
 
 		} else {
 
-			console.error( 'THREE.BufferGeometryUtils.convertToTriangles(): Unknown draw mode:', drawMode );
+			console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unknown draw mode:', drawMode );
 			return geometry;
 
 		}
