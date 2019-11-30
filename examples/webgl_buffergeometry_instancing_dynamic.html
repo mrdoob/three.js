@@ -26,52 +26,6 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script id="vertexShader" type="x-shader/x-vertex">
-		precision highp float;
-
-		uniform mat4 modelViewMatrix;
-		uniform mat4 projectionMatrix;
-
-		attribute vec3 position;
-		attribute vec3 offset;
-		attribute vec2 uv;
-		attribute vec4 orientation;
-
-		varying vec2 vUv;
-
-		// http://www.geeks3d.com/20141201/how-to-rotate-a-vertex-by-a-quaternion-in-glsl/
-
-		vec3 applyQuaternionToVector( vec4 q, vec3 v ){
-
-			return v + 2.0 * cross( q.xyz, cross( q.xyz, v ) + q.w * v );
-
-		}
-
-		void main() {
-
-			vec3 vPosition = applyQuaternionToVector( orientation, position );
-
-			vUv = uv;
-
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( offset + vPosition, 1.0 );
-
-		}
-	</script>
-
-	<script id="fragmentShader" type="x-shader/x-fragment">
-		precision highp float;
-
-		uniform sampler2D map;
-
-		varying vec2 vUv;
-
-		void main() {
-
-			gl_FragColor = texture2D( map, vUv );
-
-		}
-	</script>
-
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
@@ -81,11 +35,13 @@
 		var camera, scene, renderer, mesh;
 		var offsetAttribute, orientationAttribute;
 
+		var instances = 5000;
 		var lastTime = 0;
 
 		var moveQ = new THREE.Quaternion( 0.5, 0.5, 0.5, 0.0 ).normalize();
 		var tmpQ = new THREE.Quaternion();
-		var currentQ = new THREE.Quaternion();
+		var tmpM = new THREE.Matrix4();
+		var currentM = new THREE.Matrix4();
 
 		init();
 		animate();
@@ -101,24 +57,29 @@
 
 			// geometry
 
-			var instances = 5000;
-
 			var bufferGeometry = new THREE.BoxBufferGeometry( 2, 2, 2 );
 
 			// copying data from a simple box geometry, but you can specify a custom geometry if you want
 
 			var geometry = new THREE.InstancedBufferGeometry();
-			geometry.index = bufferGeometry.index;
-			geometry.attributes.position = bufferGeometry.attributes.position;
-			geometry.attributes.uv = bufferGeometry.attributes.uv;
+			geometry.setIndex( bufferGeometry.index );
+			geometry.setAttribute( 'position', bufferGeometry.attributes.position );
+			geometry.setAttribute( 'uv', bufferGeometry.attributes.uv );
+
+			// material
+
+			var material = new THREE.MeshBasicMaterial();
+			material.map = new THREE.TextureLoader().load( 'textures/crate.gif' );
 
 			// per instance data
 
-			var offsets = [];
-			var orientations = [];
-
-			var vector = new THREE.Vector4();
+			var matrix = new THREE.Matrix4();
+			var offset = new THREE.Vector3();
+			var orientation = new THREE.Quaternion();
+			var scale = new THREE.Vector3( 1, 1, 1 );
 			var x, y, z, w;
+
+			mesh = new THREE.InstancedMesh( geometry, material, instances );
 
 			for ( var i = 0; i < instances; i ++ ) {
 
@@ -128,10 +89,9 @@
 				y = Math.random() * 100 - 50;
 				z = Math.random() * 100 - 50;
 
-				vector.set( x, y, z, 0 ).normalize();
-				vector.multiplyScalar( 5 ); // move out at least 5 units from center in current direction
-
-				offsets.push( x + vector.x, y + vector.y, z + vector.z );
+				offset.set( x, y, z ).normalize();
+				offset.multiplyScalar( 5 ); // move out at least 5 units from center in current direction
+				offset.set( x + offset.x, y + offset.y, z + offset.z );
 
 				// orientations
 
@@ -140,31 +100,14 @@
 				z = Math.random() * 2 - 1;
 				w = Math.random() * 2 - 1;
 
-				vector.set( x, y, z, w ).normalize();
+				orientation.set( x, y, z, w ).normalize();
 
-				orientations.push( vector.x, vector.y, vector.z, vector.w );
+				matrix.compose( offset, orientation, scale );
+
+				mesh.setMatrixAt( i, matrix );
 
 			}
 
-			offsetAttribute = new THREE.InstancedBufferAttribute( new Float32Array( offsets ), 3 );
-			orientationAttribute = new THREE.InstancedBufferAttribute( new Float32Array( orientations ), 4 ).setUsage( THREE.DynamicDrawUsage );
-
-			geometry.setAttribute( 'offset', offsetAttribute );
-			geometry.setAttribute( 'orientation', orientationAttribute );
-
-			// material
-
-			var material = new THREE.RawShaderMaterial( {
-
-				uniforms: {
-					map: { value: new THREE.TextureLoader().load( 'textures/crate.gif' ) }
-				},
-				vertexShader: document.getElementById( 'vertexShader' ).textContent,
-				fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-
-			} );
-
-			mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
 			renderer = new THREE.WebGLRenderer();
@@ -214,17 +157,18 @@
 
 			var delta = ( time - lastTime ) / 5000;
 			tmpQ.set( moveQ.x * delta, moveQ.y * delta, moveQ.z * delta, 1 ).normalize();
+			tmpM.makeRotationFromQuaternion( tmpQ );
 
-			for ( var i = 0, il = orientationAttribute.count; i < il; i ++ ) {
+			for ( var i = 0, il = instances; i < il; i ++ ) {
 
-				currentQ.fromArray( orientationAttribute.array, ( i * 4 ) );
-				currentQ.multiply( tmpQ );
-
-				orientationAttribute.setXYZW( i, currentQ.x, currentQ.y, currentQ.z, currentQ.w );
+				mesh.getMatrixAt( i, currentM );
+				currentM.multiply( tmpM );
+				mesh.setMatrixAt( i, currentM );
 
 			}
 
-			orientationAttribute.needsUpdate = true;
+			mesh.instanceMatrix.needsUpdate = true;
+
 			lastTime = time;
 
 			renderer.render( scene, camera );
