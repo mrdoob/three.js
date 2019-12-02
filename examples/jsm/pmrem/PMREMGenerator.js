@@ -395,8 +395,13 @@ var PMREMGenerator = ( function () {
 
 	function _setViewport( x, y, width, height ) {
 
-		var dpr = _renderer.getPixelRatio();
-		_renderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
+		var invDpr = 1.0 / _renderer.getPixelRatio();
+		x *= invDpr;
+		y *= invDpr;
+		width *= invDpr;
+		height *= invDpr;
+		_renderer.setViewport( x, y, width, height );
+		_renderer.setScissor( x, y, width, height );
 
 	}
 
