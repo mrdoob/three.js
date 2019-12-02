@@ -53,8 +53,8 @@
 				room.scale.setScalar(10);
 				envScene.add(room);
 
-				var mainLight = new THREE.PointLight(0xffffff, 1.0, 0, 2);
-				mainLight.position.set(0, 4.5, 0);
+				var mainLight = new THREE.PointLight(0xffffff, 0.2, 0, 2);
+				mainLight.position.set(0, 0, 0);
 				envScene.add(mainLight);
 
 				var lightMaterial = new THREE.MeshBasicMaterial();
@@ -68,6 +68,11 @@
 				var light2 = new THREE.Mesh(geometry, lightMaterial);
 				light2.position.set(0, 5, 0);
 				light2.scale.set(1, 0.1, 1);
+				envScene.add(light2);
+
+				var light2 = new THREE.Mesh(geometry, lightMaterial);
+				light2.position.set(2, 1, 5);
+				light2.scale.set(1.5, 2, 0.1);
 				envScene.add(light2);
 
 				return envScene;
@@ -117,7 +122,7 @@
 				}
 
 				var envScene = getEnvScene();
-				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene );
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
@@ -219,7 +224,7 @@
 
 					case 'Generated':
 						renderTarget = generatedCubeRenderTarget;
-						cubeMap = generatedCubeRenderTarget;
+						cubeMap = generatedCubeRenderTarget.texture;
 						break;
 					case 'LDR':
 						renderTarget = ldrCubeRenderTarget;
