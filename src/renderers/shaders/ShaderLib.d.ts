@@ -22,6 +22,7 @@ export let ShaderLib: {
 	cube: Shader;
 	equirect: Shader;
 	distanceRGBA: Shader;
+	cubeEnv: Shader;
 	shadow: Shader;
 	physical: Shader;
 };

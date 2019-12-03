@@ -1981,6 +1981,11 @@ function WebGLRenderer( parameters ) {
 
 				refreshUniformsPoints( m_uniforms, material );
 
+			} else if ( material.isSkyboxMaterial ) {
+
+				refreshUniformsCommon( m_uniforms, material );
+				refreshUniformsSkybox( m_uniforms, material );
+
 			} else if ( material.isSpriteMaterial ) {
 
 				refreshUniformsSprites( m_uniforms, material );
@@ -2177,6 +2182,15 @@ function WebGLRenderer( parameters ) {
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
+
+	}
+
+	function refreshUniformsSkybox( uniforms, material ) {
+
+		uniforms.roughness.value = material.roughness;
+		uniforms.opacity.value = material.opacity;
+		uniforms.envMapIntensity.value = material.envMapIntensity;
+		uniforms.tFlip.value = material.envMap.isCubeTexture ? - 1 : 1;
 
 	}
 

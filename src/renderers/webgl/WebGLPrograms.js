@@ -31,7 +31,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points',
 		ShadowMaterial: 'shadow',
-		SpriteMaterial: 'sprite'
+		SpriteMaterial: 'sprite',
+		SkyboxMaterial: 'skybox',
 	};
 
 	var parameterNames = [

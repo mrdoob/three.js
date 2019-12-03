@@ -15,8 +15,7 @@
 		<div id="container"></div>
 
 		<script type="module">
-
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from "../build/three.module.js";
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -29,10 +28,14 @@
 			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 
 			var scene, renderer, composer;
 			var clearPass, texturePass, renderPass;
 			var cameraP, cubeTexturePassP;
+			var material;
+			var ldrCubeMap, hdrCubeMap;
+			//var cameraO, cubeTexturePassO;
 			var gui, stats;
 
 			var params = {
@@ -47,7 +50,12 @@
 				cubeTexturePass: true,
 				cubeTexturePassOpacity: 1.0,
 
-				renderPass: true
+				renderPass: true,
+
+				exposure: 1,
+
+				hdr: false
+
 			};
 
 			init();
@@ -73,6 +81,10 @@
 
 				gui.add( params, "renderPass" );
 
+				gui.add( params, "exposure", 0, 2 );
+
+				gui.add( params, "hdr" );
+
 				gui.open();
 
 			}
@@ -90,6 +102,7 @@
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
+				renderer.gammaOutput = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -124,7 +137,7 @@
 
 				var geometry = new THREE.SphereBufferGeometry( 1, 48, 24 );
 
-				var material = new THREE.MeshStandardMaterial();
+				material = new THREE.MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
 				material.metalness = 0;
 				material.color.setHSL( Math.random(), 1.0, 0.3 );
@@ -163,11 +176,23 @@
 				composer.addPass( cubeTexturePassP );
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
-				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+				ldrCubeMap = new THREE.CubeTextureLoader().load( ldrUrls, function ( ) {
 
-					cubeTexturePassP.envMap = ldrCubeMap;
+					console.log( "loaded ldr envmap" );
 
 				} );
+				ldrCubeMap.encoding = THREE.sRGBEncoding;
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				hdrCubeMap = new HDRCubeTextureLoader()
+					.setPath( './textures/cube/pisaHDR/' )
+					.setDataType( THREE.UnsignedByteType )
+					.load( hdrUrls, function () {
+
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						console.log( "loaded hdr envmap" );
+
+					} );
 
 				renderPass = new RenderPass( scene, cameraP );
 				renderPass.clear = false;
@@ -226,6 +251,9 @@
 				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
 
 				renderPass.enabled = params.renderPass;
+
+				renderer.toneMappingExposure = params.exposure;
+				cubeTexturePassP.envMap = params.hdr ? hdrCubeMap : ldrCubeMap;
 
 				composer.render();
 

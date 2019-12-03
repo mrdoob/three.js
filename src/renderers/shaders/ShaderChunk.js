@@ -98,6 +98,8 @@ import background_frag from './ShaderLib/background_frag.glsl.js';
 import background_vert from './ShaderLib/background_vert.glsl.js';
 import cube_frag from './ShaderLib/cube_frag.glsl.js';
 import cube_vert from './ShaderLib/cube_vert.glsl.js';
+import skybox_frag from './ShaderLib/skybox_frag.glsl.js';
+import skybox_vert from './ShaderLib/skybox_vert.glsl.js';
 import depth_frag from './ShaderLib/depth_frag.glsl.js';
 import depth_vert from './ShaderLib/depth_vert.glsl.js';
 import distanceRGBA_frag from './ShaderLib/distanceRGBA_frag.glsl.js';
@@ -228,6 +230,8 @@ export var ShaderChunk = {
 	background_vert: background_vert,
 	cube_frag: cube_frag,
 	cube_vert: cube_vert,
+	skybox_frag: skybox_frag,
+	skybox_vert: skybox_vert,
 	depth_frag: depth_frag,
 	depth_vert: depth_vert,
 	distanceRGBA_frag: distanceRGBA_frag,
