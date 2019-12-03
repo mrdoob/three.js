@@ -211,7 +211,7 @@ PLYExporter.prototype = {
 			// faces
 			header +=
 				`element face ${faceCount}\n` +
-				`property list uchar uint${ indexByteCount * 8 } vertex_index\n`;
+				`property list uchar int vertex_index\n`;
 
 		}
 
@@ -543,7 +543,7 @@ PLYExporter.prototype = {
 
 			} );
 
-			result = `${ header }${vertexList}\n${ includeIndices ? `${faceList}\n` : '' }`;
+			result = `${ header }${vertexList}${ includeIndices ? `${faceList}\n` : '\n' }`;
 
 		}
 
