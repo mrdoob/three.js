@@ -1125,7 +1125,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		function parseValue( dataView, buffer, offset, type, size ) {
 
-			if ( type === 'string' || type === 'iccProfile' ) {
+			if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
 
 				return parseFixedLengthString( buffer, offset, size );
 
