@@ -5842,8 +5842,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// object specific properties
 
-		if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) object.drawMode = this.drawMode;
-
 		if ( this.isInstancedMesh ) {
 
 			object.type = 'InstancedMesh';
@@ -11050,8 +11048,6 @@ function Mesh( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.drawMode = TrianglesDrawMode;
-
 	this.updateMorphTargets();
 
 }
@@ -11062,17 +11058,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isMesh: true,
 
-	setDrawMode: function ( value ) {
-
-		this.drawMode = value;
-
-	},
-
 	copy: function ( source ) {
 
 		Object3D.prototype.copy.call( this, source );
-
-		this.drawMode = source.drawMode;
 
 		if ( source.morphTargetInfluences !== undefined ) {
 
@@ -11163,15 +11151,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( geometry.boundingBox !== null ) {
 
 			if ( _ray.intersectsBox( geometry.boundingBox ) === false ) return;
-
-		}
-
-		// check unsupported draw modes
-
-		if ( this.drawMode !== TrianglesDrawMode ) {
-
-			console.warn( 'THREE.Mesh: TriangleStripDrawMode and TriangleFanDrawMode are not supported by .raycast().' );
-			return;
 
 		}
 
@@ -16200,11 +16179,6 @@ function WebGLInfo( gl ) {
 
 			case 4:
 				render.triangles += instanceCount * ( count / 3 );
-				break;
-
-			case 5:
-			case 6:
-				render.triangles += instanceCount * ( count - 2 );
 				break;
 
 			case 1:
@@ -24346,21 +24320,7 @@ function WebGLRenderer( parameters ) {
 
 			} else {
 
-				switch ( object.drawMode ) {
-
-					case TrianglesDrawMode:
-						renderer.setMode( 4 );
-						break;
-
-					case TriangleStripDrawMode:
-						renderer.setMode( 5 );
-						break;
-
-					case TriangleFanDrawMode:
-						renderer.setMode( 6 );
-						break;
-
-				}
+				renderer.setMode( 4 );
 
 			}
 
@@ -40781,8 +40741,6 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( data.userData !== undefined ) object.userData = data.userData;
 		if ( data.layers !== undefined ) object.layers.mask = data.layers;
 
-		if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
-
 		if ( data.children !== undefined ) {
 
 			var children = data.children;
@@ -48926,6 +48884,34 @@ Object.defineProperties( Object3D.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+
+		}
+	}
+
+} );
+
+Object.assign( Mesh.prototype, {
+
+	setDrawMode: function () {
+
+		console.error( 'THREE.Mesh: .setDrawMode() has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
+
+	},
+
+} );
+
+Object.defineProperties( Mesh.prototype, {
+
+	drawMode: {
+		get: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode.' );
+			return TrianglesDrawMode;
+
+		},
+		set: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
 
 		}
 	}
