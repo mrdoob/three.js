@@ -90,6 +90,7 @@ THREE.PMREMGenerator = ( function () {
 			}
 			_applyPMREM( cubeUVRenderTarget );
 			_cleanup();
+			cubeUVRenderTarget.scissorTest = false;
 
 			return cubeUVRenderTarget;
 
@@ -121,6 +122,7 @@ THREE.PMREMGenerator = ( function () {
 			_textureToCubeUV( cubemap, cubeUVRenderTarget );
 			_applyPMREM( cubeUVRenderTarget );
 			_cleanup();
+			cubeUVRenderTarget.scissorTest = false;
 
 			return cubeUVRenderTarget;
 
@@ -363,14 +365,20 @@ THREE.PMREMGenerator = ( function () {
 		new THREE.WebGLRenderTarget( 3 * SIZE_MAX, 3 * SIZE_MAX, params );
 		cubeUVRenderTarget.texture.mapping = THREE.CubeUVReflectionMapping;
 		cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
+		cubeUVRenderTarget.scissorTest = true;
 		return cubeUVRenderTarget;
 
 	}
 
 	function _setViewport( x, y, width, height ) {
 
-		var dpr = _renderer.getPixelRatio();
-		_renderer.setViewport( x / dpr, y / dpr, width / dpr, height / dpr );
+		var invDpr = 1.0 / _renderer.getPixelRatio();
+		x *= invDpr;
+		y *= invDpr;
+		width *= invDpr;
+		height *= invDpr;
+		_renderer.setViewport( x, y, width, height );
+		_renderer.setScissor( x, y, width, height );
 
 	}
 
