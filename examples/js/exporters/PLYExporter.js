@@ -205,7 +205,7 @@ THREE.PLYExporter.prototype = {
 			// faces
 			header +=
 				`element face ${faceCount}\n` +
-				`property list uchar uint${ indexByteCount * 8 } vertex_index\n`;
+				`property list uchar int vertex_index\n`;
 
 		}
 
