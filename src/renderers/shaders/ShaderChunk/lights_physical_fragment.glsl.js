@@ -22,7 +22,7 @@ material.specularRoughness = min( material.specularRoughness, 1.0 );
 #ifdef CLEARCOAT
 
 	material.clearcoat = saturate( clearcoat ); // Burley clearcoat model
-	material.clearcoatRoughness = max( roughnessFactor, 0.0525 );
+	material.clearcoatRoughness = max( clearcoatRoughness, 0.0525 );
 	material.clearcoatRoughness += geometryRoughness;
 	material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );
 
