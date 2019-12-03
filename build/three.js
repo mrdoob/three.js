@@ -14150,7 +14150,7 @@
 
 	var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn texture2D( gradientMap, coord ).rgb;\n\t#else\n\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t#endif\n}";
 
-	var lightmap_fragment = "#ifdef USE_LIGHTMAP\n\tvec4 lightMapTexel= texture2D( lightMap, vUv2 )\n\treflectedLight.indirectDiffuse += PI * lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;\n#endif";
+	var lightmap_fragment = "#ifdef USE_LIGHTMAP\n\treflectedLight.indirectDiffuse += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;\n#endif";
 
 	var lightmap_pars_fragment = "#ifdef USE_LIGHTMAP\n\tuniform sampler2D lightMap;\n\tuniform float lightMapIntensity;\n#endif";
 
@@ -15311,8 +15311,8 @@
 			// Ignore background in AR
 			// TODO: Reconsider this.
 
-			var xr = renderer.xr;
-			var session = xr.getSession && xr.getSession();
+			var vr = renderer.vr;
+			var session = vr.getSession && vr.getSession();
 
 			if ( session && session.environmentBlendMode === 'additive' ) {
 
@@ -18019,13 +18019,12 @@
 
 				parameters.dithering ? '#define DITHERING' : '',
 
-				( parameters.outputEncoding || parameters.mapEncoding || parameters.matcapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding || parameters.lightMapEncoding ) ?
+				( parameters.outputEncoding || parameters.mapEncoding || parameters.matcapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ?
 					ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
 				parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
 				parameters.matcapEncoding ? getTexelDecodingFunction( 'matcapTexelToLinear', parameters.matcapEncoding ) : '',
 				parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
 				parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
-				parameters.lightMapEncoding ? getTexelDecodingFunction( 'lightMapTexelToLinear', parameters.lightMapEncoding ) : '',
 				parameters.outputEncoding ? getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ) : '',
 
 				parameters.depthPacking ? '#define DEPTH_PACKING ' + material.depthPacking : '',
@@ -18327,7 +18326,7 @@
 		var parameterNames = [
 			"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "numMultiviewViews",
 			"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
-			"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
+			"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 			"roughnessMap", "metalnessMap", "gradientMap",
 			"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "uvsVertexOnly", "fog", "useFog", "fogExp2",
 			"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
@@ -18453,7 +18452,6 @@
 				envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
 				envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === CubeUVReflectionMapping ) || ( material.envMap.mapping === CubeUVRefractionMapping ) ),
 				lightMap: !! material.lightMap,
-				lightMapEncoding: getTextureEncodingFromMap( material.lightMap, renderer.gammaInput ),
 				aoMap: !! material.aoMap,
 				emissiveMap: !! material.emissiveMap,
 				emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap, renderer.gammaInput ),
@@ -23840,11 +23838,11 @@
 
 		initGLContext();
 
-		// xr
+		// vr
 
-		var xr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+		var vr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
 
-		this.xr = xr;
+		this.vr = vr;
 
 		// Multiview
 
@@ -23916,7 +23914,7 @@
 
 		this.setSize = function ( width, height, updateStyle ) {
 
-			if ( xr.isPresenting() ) {
+			if ( vr.isPresenting() ) {
 
 				console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
 				return;
@@ -24106,7 +24104,7 @@
 			properties.dispose();
 			objects.dispose();
 
-			xr.dispose();
+			vr.dispose();
 
 			animation.stop();
 
@@ -24622,7 +24620,7 @@
 
 		function onAnimationFrame( time ) {
 
-			if ( xr.isPresenting() ) { return; }
+			if ( vr.isPresenting() ) { return; }
 			if ( onAnimationFrameCallback ) { onAnimationFrameCallback( time ); }
 
 		}
@@ -24635,7 +24633,7 @@
 		this.setAnimationLoop = function ( callback ) {
 
 			onAnimationFrameCallback = callback;
-			xr.setAnimationLoop( callback );
+			vr.setAnimationLoop( callback );
 
 			animation.start();
 
@@ -24686,9 +24684,9 @@
 
 			if ( camera.parent === null ) { camera.updateMatrixWorld(); }
 
-			if ( xr.enabled && xr.isPresenting() ) {
+			if ( vr.enabled && vr.isPresenting() ) {
 
-				camera = xr.getCamera( camera );
+				camera = vr.getCamera( camera );
 
 			}
 
@@ -24738,7 +24736,7 @@
 
 			}
 
-			if ( xr.enabled && multiview.isAvailable() ) {
+			if ( vr.enabled && multiview.isAvailable() ) {
 
 				multiview.attachCamera( camera );
 
@@ -24798,7 +24796,7 @@
 
 			state.setPolygonOffset( false );
 
-			if ( xr.enabled ) {
+			if ( vr.enabled ) {
 
 				if ( multiview.isAvailable() ) {
 
@@ -24806,7 +24804,7 @@
 
 				}
 
-				xr.submitFrame();
+				vr.submitFrame();
 
 			}
 
@@ -24957,7 +24955,7 @@
 
 					_currentArrayCamera = camera;
 
-					if ( xr.enabled && multiview.isAvailable() ) {
+					if ( vr.enabled && multiview.isAvailable() ) {
 
 						renderObject( object, scene, camera, geometry, material, group );
 
@@ -46355,99 +46353,6 @@
 	};
 
 	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
-	var _v1$6 = new Vector3();
-	var _v2$4 = new Vector3();
-
-	function VertexTangentsHelper( object, size, hex, linewidth ) {
-
-		this.object = object;
-
-		this.size = ( size !== undefined ) ? size : 1;
-
-		var color = ( hex !== undefined ) ? hex : 0x00ffff;
-
-		var width = ( linewidth !== undefined ) ? linewidth : 1;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		if ( ! ( objGeometry && objGeometry.isBufferGeometry ) ) {
-
-			console.error( 'THREE.VertexTangentsHelper: geometry not an instance of THREE.BufferGeometry.', objGeometry );
-			return;
-
-		}
-
-		var nTangents = objGeometry.attributes.tangent.count;
-
-		//
-
-		var geometry = new BufferGeometry();
-
-		var positions = new Float32BufferAttribute( nTangents * 2 * 3, 3 );
-
-		geometry.setAttribute( 'position', positions );
-
-		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
-
-		//
-
-		this.matrixAutoUpdate = false;
-
-		this.update();
-
-	}
-
-	VertexTangentsHelper.prototype = Object.create( LineSegments.prototype );
-	VertexTangentsHelper.prototype.constructor = VertexTangentsHelper;
-
-	VertexTangentsHelper.prototype.update = function () {
-
-		this.object.updateMatrixWorld( true );
-
-		var matrixWorld = this.object.matrixWorld;
-
-		var position = this.geometry.attributes.position;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		var objPos = objGeometry.attributes.position;
-
-		var objTan = objGeometry.attributes.tangent;
-
-		var idx = 0;
-
-		// for simplicity, ignore index and drawcalls, and render every tangent
-
-		for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
-
-			_v1$6.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
-
-			_v2$4.set( objTan.getX( j ), objTan.getY( j ), objTan.getZ( j ) );
-
-			_v2$4.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( _v1$6 );
-
-			position.setXYZ( idx, _v1$6.x, _v1$6.y, _v1$6.z );
-
-			idx = idx + 1;
-
-			position.setXYZ( idx, _v2$4.x, _v2$4.y, _v2$4.z );
-
-			idx = idx + 1;
-
-		}
-
-		position.needsUpdate = true;
-
-	};
-
-	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author WestLangley / http://github.com/WestLangley
@@ -47289,8 +47194,8 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	var _v1$7 = new Vector3();
-	var _v2$5 = new Vector3();
+	var _v1$6 = new Vector3();
+	var _v2$4 = new Vector3();
 	var _normalMatrix$2 = new Matrix3();
 
 	function FaceNormalsHelper( object, size, hex, linewidth ) {
@@ -47367,19 +47272,19 @@
 
 			var normal = face.normal;
 
-			_v1$7.copy( vertices[ face.a ] )
+			_v1$6.copy( vertices[ face.a ] )
 				.add( vertices[ face.b ] )
 				.add( vertices[ face.c ] )
 				.divideScalar( 3 )
 				.applyMatrix4( matrixWorld );
 
-			_v2$5.copy( normal ).applyMatrix3( _normalMatrix$2 ).normalize().multiplyScalar( this.size ).add( _v1$7 );
+			_v2$4.copy( normal ).applyMatrix3( _normalMatrix$2 ).normalize().multiplyScalar( this.size ).add( _v1$6 );
 
-			position.setXYZ( idx, _v1$7.x, _v1$7.y, _v1$7.z );
+			position.setXYZ( idx, _v1$6.x, _v1$6.y, _v1$6.z );
 
 			idx = idx + 1;
 
-			position.setXYZ( idx, _v2$5.x, _v2$5.y, _v2$5.z );
+			position.setXYZ( idx, _v2$4.x, _v2$4.y, _v2$4.z );
 
 			idx = idx + 1;
 
@@ -47395,8 +47300,8 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	var _v1$8 = new Vector3();
-	var _v2$6 = new Vector3();
+	var _v1$7 = new Vector3();
+	var _v2$5 = new Vector3();
 	var _v3$1 = new Vector3();
 
 	function DirectionalLightHelper( light, size, color ) {
@@ -47451,11 +47356,11 @@
 
 	DirectionalLightHelper.prototype.update = function () {
 
-		_v1$8.setFromMatrixPosition( this.light.matrixWorld );
-		_v2$6.setFromMatrixPosition( this.light.target.matrixWorld );
-		_v3$1.subVectors( _v2$6, _v1$8 );
+		_v1$7.setFromMatrixPosition( this.light.matrixWorld );
+		_v2$5.setFromMatrixPosition( this.light.target.matrixWorld );
+		_v3$1.subVectors( _v2$5, _v1$7 );
 
-		this.lightPlane.lookAt( _v2$6 );
+		this.lightPlane.lookAt( _v2$5 );
 
 		if ( this.color !== undefined ) {
 
@@ -47469,7 +47374,7 @@
 
 		}
 
-		this.targetLine.lookAt( _v2$6 );
+		this.targetLine.lookAt( _v2$5 );
 		this.targetLine.scale.z = _v3$1.length();
 
 	};
@@ -49629,14 +49534,6 @@
 				return this.getContext();
 
 			}
-		},
-		vr: {
-			get: function () {
-
-				console.warn( 'THREE.WebGLRenderer: .vr has been removed. Use .xr instead.' );
-				return this.xr;
-
-			}
 		}
 
 	} );
@@ -50482,7 +50379,6 @@
 	exports.Vertex = Vertex;
 	exports.VertexColors = VertexColors;
 	exports.VertexNormalsHelper = VertexNormalsHelper;
-	exports.VertexTangentsHelper = VertexTangentsHelper;
 	exports.VideoTexture = VideoTexture;
 	exports.WebGLMultisampleRenderTarget = WebGLMultisampleRenderTarget;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
