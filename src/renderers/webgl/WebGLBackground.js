@@ -92,7 +92,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 					get: function () {
 
-						return this.envMap;
+						return this.envMap.value;
 
 					}
 
