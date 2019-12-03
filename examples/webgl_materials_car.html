@@ -23,8 +23,6 @@
 			<span>Body: <select id="body-mat"></select></span>
 			<span>Details: <select id="rim-mat"></select></span>
 			<span>Glass: <select id="glass-mat"></select></span>
-			<br><br>
-			<span>Follow camera: <input type="checkbox" id="camera-toggle"></span>
 		</div>
 
 		<div id="container"></div>
@@ -38,8 +36,6 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-			import { CarControls } from './jsm/misc/CarControls.js';
-
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
@@ -51,32 +47,17 @@
 			var rimMatSelect = document.getElementById( 'rim-mat' );
 			var glassMatSelect = document.getElementById( 'glass-mat' );
 
-			var followCamera = document.getElementById( 'camera-toggle' );
-
-			var clock = new THREE.Clock();
-			var carControls = new CarControls();
-			carControls.turningRadius = 75;
-
 			var carParts = {
 				body: [],
 				rims: [],
 				glass: [],
 			};
 
-			var damping = 3.0;
-
-			var cameraBack = new THREE.Object3D();
-			cameraBack.position.set( 0, 2.5, 5 );
-
-			var cameraTarget = new THREE.Vector3();
-
 			function init() {
 
 				var container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( 3.25, 2.0, - 5 );
-				camera.lookAt( 0, 0.25, 0 );
 
 				scene = new THREE.Scene();
 				// scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
@@ -85,11 +66,6 @@
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/hdr/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
-
-						var options = {
-							minFilter: texture.minFilter,
-							magFilter: texture.magFilter
-						};
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
@@ -148,10 +124,6 @@
 				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
 
 					carModel = gltf.scene.children[ 0 ];
-
-					carControls.setModel( carModel );
-
-					carModel.add( cameraBack );
 
 					carModel.traverse( function ( child ) {
 
@@ -301,36 +273,12 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				var time = - performance.now() / 10000;
 
-				if ( carModel ) {
-
-					carControls.update( delta / 3 );
-
-					if ( carModel.position.length() > 200 ) {
-
-						carModel.position.set( 0, 0, 0 );
-						carControls.speed = 0;
-
-					}
-
-					if ( followCamera.checked ) {
-
-						cameraBack.getWorldPosition( cameraTarget );
-
-					} else {
-
-						cameraTarget.set( 3.25, 2.0, - 5 );
-
-					}
-
-					camera.position.lerp( cameraTarget, delta * damping );
-
-					var position = carModel.position;
-
-					camera.lookAt( position.x, position.y + 0.25, position.z );
-
-				}
+				camera.position.x = Math.cos( time ) * 6;
+				camera.position.y = 1.5;
+				camera.position.z = Math.sin( time ) * 6;
+				camera.lookAt( 0, 0.5, 0 );
 
 				renderer.render( scene, camera );
 
