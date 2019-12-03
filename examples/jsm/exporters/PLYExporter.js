@@ -543,7 +543,7 @@ PLYExporter.prototype = {
 
 			} );
 
-			result = `${ header }${vertexList}\n${ includeIndices ? `${faceList}\n` : '' }`;
+			result = `${ header }${vertexList}${ includeIndices ? `${faceList}\n` : '\n' }`;
 
 		}
 
