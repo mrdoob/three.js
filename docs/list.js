@@ -76,7 +76,6 @@ var list = {
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
 				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
-				"DrawModes": "api/en/constants/DrawModes",
 				"Materials": "api/en/constants/Materials",
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
@@ -520,7 +519,6 @@ var list = {
 				"Animation": "api/zh/constants/Animation",
 				"Core": "api/zh/constants/Core",
 				"CustomBlendingEquation": "api/zh/constants/CustomBlendingEquations",
-				"DrawModes": "api/zh/constants/DrawModes",
 				"Materials": "api/zh/constants/Materials",
 				"Renderer": "api/zh/constants/Renderer",
 				"Textures": "api/zh/constants/Textures"

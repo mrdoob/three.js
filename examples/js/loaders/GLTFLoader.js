@@ -2524,13 +2524,9 @@ THREE.GLTFLoader = ( function () {
 
 						}
 
-						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
+						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP || primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
 
-							mesh.drawMode = THREE.TriangleStripDrawMode;
-
-						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
-
-							mesh.drawMode = THREE.TriangleFanDrawMode;
+							console.warn( 'THREE.GLTFLoader: The draw modes triangle strip and fan are not supported anymore.' );
 
 						}
 

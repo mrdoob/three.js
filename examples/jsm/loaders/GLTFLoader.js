@@ -63,8 +63,6 @@ import {
 	Sphere,
 	SpotLight,
 	TextureLoader,
-	TriangleFanDrawMode,
-	TriangleStripDrawMode,
 	UniformsUtils,
 	Vector2,
 	Vector3,
@@ -2591,13 +2589,9 @@ var GLTFLoader = ( function () {
 
 						}
 
-						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
+						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP || primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
 
-							mesh.drawMode = TriangleStripDrawMode;
-
-						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
-
-							mesh.drawMode = TriangleFanDrawMode;
+							console.warn( 'THREE.GLTFLoader: The draw modes triangle strip and fan are not supported anymore.' );
 
 						}
 
