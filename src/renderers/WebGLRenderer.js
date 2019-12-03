@@ -713,9 +713,9 @@ function WebGLRenderer( parameters ) {
 
 		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
-		state.setMaterial( material, frontFaceCW );
-
 		var program = setProgram( camera, fog, material, object );
+
+		state.setMaterial( material, frontFaceCW );
 
 		var updateBuffers = false;
 
@@ -1472,9 +1472,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			state.setMaterial( material );
-
 			var program = setProgram( camera, scene.fog, material, object );
+
+			state.setMaterial( material );
 
 			_currentGeometryProgram.geometry = null;
 			_currentGeometryProgram.program = null;
