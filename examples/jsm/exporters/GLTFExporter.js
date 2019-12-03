@@ -23,8 +23,6 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	TriangleFanDrawMode,
-	TriangleStripDrawMode,
 	Vector3
 } from "../../../build/three.module.js";
 
@@ -1199,20 +1197,7 @@ GLTFExporter.prototype = {
 
 				}
 
-				if ( mesh.drawMode === TriangleFanDrawMode ) {
-
-					console.warn( 'GLTFExporter: TriangleFanDrawMode and wireframe incompatible.' );
-					mode = WEBGL_CONSTANTS.TRIANGLE_FAN;
-
-				} else if ( mesh.drawMode === TriangleStripDrawMode ) {
-
-					mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINE_STRIP : WEBGL_CONSTANTS.TRIANGLE_STRIP;
-
-				} else {
-
-					mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
-
-				}
+				mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
 
 			}
 
