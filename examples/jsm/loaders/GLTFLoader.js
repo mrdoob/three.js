@@ -2550,7 +2550,6 @@ var GLTFLoader = ( function () {
 
 		var newGeometry = geometry.clone();
 		newGeometry.setIndex( newIndices );
-		newGeometry.clearGroups();
 
 		return newGeometry;
 
