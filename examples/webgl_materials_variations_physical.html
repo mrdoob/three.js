@@ -19,7 +19,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var container, stats;
@@ -57,15 +57,16 @@
 
 				scene = new THREE.Scene();
 
-				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
-				new HDRCubeTextureLoader()
+				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.load( hdrUrls, function ( hdrCubeMap ) {
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeMap.dispose();
 						pmremGenerator.dispose();
 
 						// Materials
@@ -115,9 +116,7 @@
 
 						}
 
-						hdrCubeMap.magFilter = THREE.LinearFilter;
-						hdrCubeMap.needsUpdate = true;
-						scene.background = hdrCubeMap;
+						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
 
