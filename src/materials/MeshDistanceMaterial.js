@@ -56,6 +56,18 @@ MeshDistanceMaterial.prototype.constructor = MeshDistanceMaterial;
 
 MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;
 
+MeshDistanceMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	if ( this.emissiveMap ) {
+
+		uniforms.emissiveMap.value = this.emissiveMap;
+
+	}
+
+};
+
 MeshDistanceMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );

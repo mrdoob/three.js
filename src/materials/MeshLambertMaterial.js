@@ -87,6 +87,18 @@ MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
+MeshLambertMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	if ( this.emissiveMap ) {
+
+		uniforms.emissiveMap.value = this.emissiveMap;
+
+	}
+
+};
+
 MeshLambertMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );

@@ -57,6 +57,20 @@ MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
 
+MeshDepthMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	if ( this.displacementMap ) {
+
+		uniforms.displacementMap.value = this.displacementMap;
+		uniforms.displacementScale.value = this.displacementScale;
+		uniforms.displacementBias.value = this.displacementBias;
+
+	}
+
+};
+
 MeshDepthMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );

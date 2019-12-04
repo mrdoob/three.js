@@ -1,3 +1,4 @@
+import { BackSide } from '../constants.js';
 import { Vector2 } from '../math/Vector2.js';
 import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
@@ -50,6 +51,33 @@ MeshPhysicalMaterial.prototype = Object.create( MeshStandardMaterial.prototype )
 MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
+
+MeshPhysicalMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	MeshStandardMaterial.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	uniforms.reflectivity.value = this.reflectivity; // also part of uniforms common
+
+	uniforms.clearcoat.value = this.clearcoat;
+	uniforms.clearcoatRoughness.value = this.clearcoatRoughness;
+	if ( this.sheen ) uniforms.sheen.value.copy( this.sheen );
+
+	if ( this.clearcoatNormalMap ) {
+
+		uniforms.clearcoatNormalScale.value.copy( this.clearcoatNormalScale );
+		uniforms.clearcoatNormalMap.value = this.clearcoatNormalMap;
+
+		if ( this.side === BackSide ) {
+
+			uniforms.clearcoatNormalScale.value.negate();
+
+		}
+
+	}
+
+	uniforms.transparency.value = this.transparency;
+
+};
 
 MeshPhysicalMaterial.prototype.copy = function ( source ) {
 

@@ -86,6 +86,140 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	onBeforeCompile: function () {},
 
+	onRefreshUniforms: function ( uniforms, properties ) {
+
+		uniforms.opacity.value = this.opacity;
+
+		if ( this.color ) {
+
+			uniforms.diffuse.value.copy( this.color );
+
+		}
+
+		if ( this.emissive ) {
+
+			uniforms.emissive.value.copy( this.emissive ).multiplyScalar( this.emissiveIntensity );
+
+		}
+
+		if ( this.map ) {
+
+			uniforms.map.value = this.map;
+
+		}
+
+		if ( this.alphaMap ) {
+
+			uniforms.alphaMap.value = this.alphaMap;
+
+		}
+
+		if ( this.specularMap ) {
+
+			uniforms.specularMap.value = this.specularMap;
+
+		}
+
+		if ( this.envMap ) {
+
+			uniforms.envMap.value = this.envMap;
+
+			// don't flip CubeTexture envMaps, flip everything else:
+			//  WebGLRenderTargetCube will be flipped for backwards compatibility
+			//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
+			// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+			uniforms.flipEnvMap.value = this.envMap.isCubeTexture ? - 1 : 1;
+
+			uniforms.reflectivity.value = this.reflectivity;
+			uniforms.refractionRatio.value = this.refractionRatio;
+
+			uniforms.maxMipLevel.value = properties.get( this.envMap ).__maxMipLevel;
+
+		}
+
+		if ( this.lightMap ) {
+
+			uniforms.lightMap.value = this.lightMap;
+			uniforms.lightMapIntensity.value = this.lightMapIntensity;
+
+		}
+
+		if ( this.aoMap ) {
+
+			uniforms.aoMap.value = this.aoMap;
+			uniforms.aoMapIntensity.value = this.aoMapIntensity;
+
+		}
+
+		// uv repeat and offset setting priorities
+		// 1. color map
+		// 2. specular map
+		// 3. normal map
+		// 4. bump map
+		// 5. alpha map
+		// 6. emissive map
+
+		var uvScaleMap;
+
+		if ( this.map ) {
+
+			uvScaleMap = this.map;
+
+		} else if ( this.specularMap ) {
+
+			uvScaleMap = this.specularMap;
+
+		} else if ( this.displacementMap ) {
+
+			uvScaleMap = this.displacementMap;
+
+		} else if ( this.normalMap ) {
+
+			uvScaleMap = this.normalMap;
+
+		} else if ( this.bumpMap ) {
+
+			uvScaleMap = this.bumpMap;
+
+		} else if ( this.roughnessMap ) {
+
+			uvScaleMap = this.roughnessMap;
+
+		} else if ( this.metalnessMap ) {
+
+			uvScaleMap = this.metalnessMap;
+
+		} else if ( this.alphaMap ) {
+
+			uvScaleMap = this.alphaMap;
+
+		} else if ( this.emissiveMap ) {
+
+			uvScaleMap = this.emissiveMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			// backwards compatibility
+			if ( uvScaleMap.isWebGLRenderTarget ) {
+
+				uvScaleMap = uvScaleMap.texture;
+
+			}
+
+			if ( uvScaleMap.matrixAutoUpdate === true ) {
+
+				uvScaleMap.updateMatrix();
+
+			}
+
+			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+		}
+
+	},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;

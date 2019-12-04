@@ -44,6 +44,55 @@ PointsMaterial.prototype.constructor = PointsMaterial;
 
 PointsMaterial.prototype.isPointsMaterial = true;
 
+PointsMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
+
+	uniforms.diffuse.value.copy( this.color );
+	uniforms.opacity.value = this.opacity;
+	uniforms.size.value = this.size * _pixelRatio;
+	uniforms.scale.value = _height * 0.5;
+
+	if ( this.map ) {
+
+		uniforms.map.value = this.map;
+
+	}
+
+	if ( this.alphaMap ) {
+
+		uniforms.alphaMap.value = this.alphaMap;
+
+	}
+
+	// uv repeat and offset setting priorities
+	// 1. color map
+	// 2. alpha map
+
+	var uvScaleMap;
+
+	if ( this.map ) {
+
+		uvScaleMap = this.map;
+
+	} else if ( this.alphaMap ) {
+
+		uvScaleMap = this.alphaMap;
+
+	}
+
+	if ( uvScaleMap !== undefined ) {
+
+		if ( uvScaleMap.matrixAutoUpdate === true ) {
+
+			uvScaleMap.updateMatrix();
+
+		}
+
+		uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+	}
+
+};
+
 PointsMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );

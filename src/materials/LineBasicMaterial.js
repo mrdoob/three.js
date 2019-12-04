@@ -36,6 +36,21 @@ LineBasicMaterial.prototype.constructor = LineBasicMaterial;
 
 LineBasicMaterial.prototype.isLineBasicMaterial = true;
 
+LineBasicMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
+
+	uniforms.diffuse.value.copy( this.color );
+	uniforms.opacity.value = this.opacity;
+
+	if ( this.isLineDashedMaterial ) {
+
+		uniforms.dashSize.value = this.dashSize;
+		uniforms.totalSize.value = this.dashSize + this.gapSize;
+		uniforms.scale.value = this.scale;
+
+	}
+
+};
+
 LineBasicMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );

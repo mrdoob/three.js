@@ -27,6 +27,13 @@ ShadowMaterial.prototype.constructor = ShadowMaterial;
 
 ShadowMaterial.prototype.isShadowMaterial = true;
 
+ShadowMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
+
+	m_uniforms.color.value.copy( this.color );
+	m_uniforms.opacity.value = this.opacity;
+
+};
+
 ShadowMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );

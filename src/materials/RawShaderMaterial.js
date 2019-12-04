@@ -17,5 +17,6 @@ RawShaderMaterial.prototype.constructor = RawShaderMaterial;
 
 RawShaderMaterial.prototype.isRawShaderMaterial = true;
 
+RawShaderMaterial.prototype.onRefreshUniforms = function () {};
 
 export { RawShaderMaterial };

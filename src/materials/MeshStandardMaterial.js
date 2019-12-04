@@ -1,4 +1,4 @@
-import { TangentSpaceNormalMap } from '../constants.js';
+import { TangentSpaceNormalMap, BackSide } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
@@ -118,6 +118,64 @@ MeshStandardMaterial.prototype = Object.create( Material.prototype );
 MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
+
+MeshStandardMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	uniforms.roughness.value = this.roughness;
+	uniforms.metalness.value = this.metalness;
+
+	if ( this.roughnessMap ) {
+
+		uniforms.roughnessMap.value = this.roughnessMap;
+
+	}
+
+	if ( this.metalnessMap ) {
+
+		uniforms.metalnessMap.value = this.metalnessMap;
+
+	}
+
+	if ( this.emissiveMap ) {
+
+		uniforms.emissiveMap.value = this.emissiveMap;
+
+	}
+
+	if ( this.bumpMap ) {
+
+		uniforms.bumpMap.value = this.bumpMap;
+		uniforms.bumpScale.value = this.bumpScale;
+		if ( this.side === BackSide ) uniforms.bumpScale.value *= - 1;
+
+	}
+
+	if ( this.normalMap ) {
+
+		uniforms.normalMap.value = this.normalMap;
+		uniforms.normalScale.value.copy( this.normalScale );
+		if ( this.side === BackSide ) uniforms.normalScale.value.negate();
+
+	}
+
+	if ( this.displacementMap ) {
+
+		uniforms.displacementMap.value = this.displacementMap;
+		uniforms.displacementScale.value = this.displacementScale;
+		uniforms.displacementBias.value = this.displacementBias;
+
+	}
+
+	if ( this.envMap ) {
+
+		//uniforms.envMap.value = this.envMap; // part of uniforms common
+		uniforms.envMapIntensity.value = this.envMapIntensity;
+
+	}
+
+};
 
 MeshStandardMaterial.prototype.copy = function ( source ) {
 

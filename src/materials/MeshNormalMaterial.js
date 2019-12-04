@@ -1,4 +1,4 @@
-import { TangentSpaceNormalMap } from '../constants.js';
+import { TangentSpaceNormalMap, BackSide } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 
@@ -63,6 +63,36 @@ MeshNormalMaterial.prototype = Object.create( Material.prototype );
 MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
 
 MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
+
+MeshNormalMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	if ( this.bumpMap ) {
+
+		uniforms.bumpMap.value = this.bumpMap;
+		uniforms.bumpScale.value = this.bumpScale;
+		if ( this.side === BackSide ) uniforms.bumpScale.value *= - 1;
+
+	}
+
+	if ( this.normalMap ) {
+
+		uniforms.normalMap.value = this.normalMap;
+		uniforms.normalScale.value.copy( this.normalScale );
+		if ( this.side === BackSide ) uniforms.normalScale.value.negate();
+
+	}
+
+	if ( this.displacementMap ) {
+
+		uniforms.displacementMap.value = this.displacementMap;
+		uniforms.displacementScale.value = this.displacementScale;
+		uniforms.displacementBias.value = this.displacementBias;
+
+	}
+
+};
 
 MeshNormalMaterial.prototype.copy = function ( source ) {
 

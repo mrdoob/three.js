@@ -87,6 +87,16 @@ ShaderMaterial.prototype.constructor = ShaderMaterial;
 
 ShaderMaterial.prototype.isShaderMaterial = true;
 
+ShaderMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+
+	if ( this.envMap ) {
+
+		Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+
+	}
+
+};
+
 ShaderMaterial.prototype.copy = function ( source ) {
 
 	Material.prototype.copy.call( this, source );
