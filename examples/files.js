@@ -359,6 +359,7 @@ var files = {
 		"misc_exporter_draco",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
+		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_lookat",
 	],
