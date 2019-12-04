@@ -21,6 +21,7 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var statsEnabled = true;
@@ -100,22 +101,19 @@
 
 					} );
 
-				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
-
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
-						rgbmCubeMap.format = THREE.RGBAFormat;
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( renderer );
-						var rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
+						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeMap.dispose();
 						pmremGenerator.dispose();
 
-						material.envMap = rgbmCubeRenderTarget.texture;
-						material.needsUpdate = true; // is this needed?
+						material.envMap = hdrCubeRenderTarget.texture;
 
-						rgbmCubeMap.magFilter = THREE.LinearFilter;
-						rgbmCubeMap.needsUpdate = true;
-						scene.background = rgbmCubeMap;
+						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
 

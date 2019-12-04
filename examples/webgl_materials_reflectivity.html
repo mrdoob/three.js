@@ -23,7 +23,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var container, stats;
@@ -112,21 +112,10 @@
 
 				} );
 
-				var genCubeUrls = function ( prefix, postfix ) {
-
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
-
-	};
-
-				var hdrUrls = genCubeUrls( "./textures/cube/pisaHDR/", ".hdr" );
-
-				new HDRCubeTextureLoader()
+				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.load( hdrUrls, function ( hdrCubeMap ) {
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );

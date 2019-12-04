@@ -53,13 +53,11 @@
 				room.scale.setScalar(10);
 				envScene.add(room);
 
-				var mainLight = new THREE.PointLight(0xffffff, 0.2, 0, 2);
-				mainLight.position.set(0, 0, 0);
+				var mainLight = new THREE.PointLight(0xffffff, 50, 0, 2);
 				envScene.add(mainLight);
 
-				var lightMaterial = new THREE.MeshBasicMaterial();
-				lightMaterial.color.setScalar(20);
-
+				var lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
+				
 				var light1 = new THREE.Mesh(geometry, lightMaterial);
 				light1.position.set(-5, 2, 0);
 				light1.scale.set(0.1, 1, 1);
@@ -91,6 +89,7 @@
 				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.physicallyCorrectLights = true;
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
