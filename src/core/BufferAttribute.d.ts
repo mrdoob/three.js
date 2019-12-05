@@ -43,6 +43,10 @@ export class BufferAttribute {
 	copyVector4sArray(
 		vectors: { x: number; y: number; z: number; w: number }[]
 	): this;
+	applyMatrix3( m: Matrix3 ): this;
+	applyMatrix4( m: Matrix4 ): this;
+	applyNormalMatrix( m: Matrix3 ): this;
+	transformDirection( m: Matrix4 ): this;
 	set(
 		value: ArrayLike<number> | ArrayBufferView,
 		offset?: number
