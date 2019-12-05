@@ -1,5 +1,6 @@
 import { Plane } from './../math/Plane';
 import { Shader } from './../renderers/shaders/ShaderLib';
+import { IUniform } from './../renderers/shaders/UniformsLib';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import {
@@ -313,6 +314,12 @@ export class Material extends EventDispatcher {
 	 * This disposes the material. Textures of a material don't get disposed. These needs to be disposed by {@link Texture}.
 	 */
 	dispose(): void;
+
+	/**
+	 * Update uniforms of the shader
+	 * @param uniforms Uniforms of the shader
+	 */
+	onRefreshUniforms ( uniforms : { [uniform: string]: IUniform } ) : void;
 
 	/**
 	 * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
