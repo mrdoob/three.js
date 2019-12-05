@@ -87,11 +87,11 @@ ShaderMaterial.prototype.constructor = ShaderMaterial;
 
 ShaderMaterial.prototype.isShaderMaterial = true;
 
-ShaderMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+ShaderMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
 	if ( this.envMap ) {
 
-		Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+		Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	}
 

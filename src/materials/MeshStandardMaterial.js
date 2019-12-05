@@ -119,9 +119,9 @@ MeshStandardMaterial.prototype.constructor = MeshStandardMaterial;
 
 MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
-MeshStandardMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshStandardMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	uniforms.roughness.value = this.roughness;
 	uniforms.metalness.value = this.metalness;

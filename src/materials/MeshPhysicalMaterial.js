@@ -52,9 +52,9 @@ MeshPhysicalMaterial.prototype.constructor = MeshPhysicalMaterial;
 
 MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
-MeshPhysicalMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshPhysicalMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	MeshStandardMaterial.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	MeshStandardMaterial.prototype.onRefreshUniforms.call( this, uniforms );
 
 	uniforms.reflectivity.value = this.reflectivity; // also part of uniforms common
 

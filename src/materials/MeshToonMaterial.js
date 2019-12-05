@@ -106,9 +106,9 @@ MeshToonMaterial.prototype.constructor = MeshToonMaterial;
 
 MeshToonMaterial.prototype.isMeshToonMaterial = true;
 
-MeshToonMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshToonMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	uniforms.specular.value.copy( this.specular );
 	uniforms.shininess.value = Math.max( this.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )

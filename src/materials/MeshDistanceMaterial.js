@@ -56,9 +56,9 @@ MeshDistanceMaterial.prototype.constructor = MeshDistanceMaterial;
 
 MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;
 
-MeshDistanceMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshDistanceMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	if ( this.emissiveMap ) {
 

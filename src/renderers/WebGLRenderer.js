@@ -1897,7 +1897,13 @@ function WebGLRenderer( parameters ) {
 
 			// refresh materials uniforms
 
-			material.onRefreshUniforms( m_uniforms, properties );
+			material.onRefreshUniforms( m_uniforms );
+
+			if ( material.envMap ) {
+
+				m_uniforms.maxMipLevel.value = properties.get( material.envMap ).__maxMipLevel;
+
+			}
 
 			// RectAreaLight Texture
 			// TODO (mrdoob): Find a nicer implementation

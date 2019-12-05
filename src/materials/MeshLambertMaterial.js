@@ -87,9 +87,9 @@ MeshLambertMaterial.prototype.constructor = MeshLambertMaterial;
 
 MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
-MeshLambertMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshLambertMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	if ( this.emissiveMap ) {
 

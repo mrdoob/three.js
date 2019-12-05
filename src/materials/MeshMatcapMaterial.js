@@ -73,9 +73,9 @@ MeshMatcapMaterial.prototype.constructor = MeshMatcapMaterial;
 
 MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
 
-MeshMatcapMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshMatcapMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	if ( this.matcap ) {
 

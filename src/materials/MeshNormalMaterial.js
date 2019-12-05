@@ -64,9 +64,9 @@ MeshNormalMaterial.prototype.constructor = MeshNormalMaterial;
 
 MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
 
-MeshNormalMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshNormalMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	if ( this.bumpMap ) {
 

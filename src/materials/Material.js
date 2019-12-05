@@ -86,7 +86,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	onBeforeCompile: function () {},
 
-	onRefreshUniforms: function ( uniforms, properties ) {
+	onRefreshUniforms: function ( uniforms ) {
 
 		uniforms.opacity.value = this.opacity;
 
@@ -132,8 +132,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			uniforms.reflectivity.value = this.reflectivity;
 			uniforms.refractionRatio.value = this.refractionRatio;
-
-			uniforms.maxMipLevel.value = properties.get( this.envMap ).__maxMipLevel;
 
 		}
 

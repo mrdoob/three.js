@@ -57,9 +57,9 @@ MeshDepthMaterial.prototype.constructor = MeshDepthMaterial;
 
 MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
 
-MeshDepthMaterial.prototype.onRefreshUniforms = function ( uniforms, properties ) {
+MeshDepthMaterial.prototype.onRefreshUniforms = function ( uniforms ) {
 
-	Material.prototype.onRefreshUniforms.call( this, uniforms, properties );
+	Material.prototype.onRefreshUniforms.call( this, uniforms );
 
 	if ( this.displacementMap ) {
 
